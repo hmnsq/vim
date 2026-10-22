@@ -11,23 +11,23 @@
  * digraph.c: code for digraphs
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_DIGRAPHS)
+#إذا defined(FEAT_DIGRAPHS)
 
-typedef int result_T;
+تعريفنوع صحيح پایله_T;
 
-typedef struct digraph
+تعريفنوع بنية digraph
 {
     char_u	char1;
     char_u	char2;
-    result_T	result;
+    پایله_T	پایله;
 } digr_T;
 
-static void printdigraph(digr_T *dp, result_T *previous);
+ساكن فراغ printdigraph(digr_T *dp, پایله_T *پخوانی);
 
 // digraphs added by the user
-static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
+ساكن garray_T	user_digraphs = {0, 0, (صحيح)حجم(digr_T), 10, عدم};
 
 /*
  * digraphs for Unicode from RFC1345
@@ -36,7 +36,7 @@ static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
  * Note: Characters marked with XX are not included literally, because some
  * compilers cannot handle them (Amiga SAS/C is the most picky one).
  */
-static digr_T digraphdefault[] = {
+ساكن digr_T digraphdefault[] = {
 	{'N', 'U', 0x0a},	// LF for NUL
 	{'S', 'H', 0x01},
 	{'S', 'X', 0x02},
@@ -116,7 +116,7 @@ static digr_T digraphdefault[] = {
 	{'P', 'M', 0x9e},
 	{'A', 'C', 0x9f},
 	{'N', 'S', 0xa0},
-# define DG_START_LATIN 0xa1
+# define DG_پیل_LATIN 0xa1
 	{'!', 'I', 0xa1},
 	{'~', '!', 0xa1},	// ¡ Vim 5.x compatible
 	{'C', 't', 0xa2},
@@ -440,7 +440,7 @@ static digr_T digraphdefault[] = {
 	{'\'', '0', 0x02da},
 	{'\'', ';', 0x02db},
 	{'\'', '"', 0x02dd},
-# define DG_START_GREEK 0x0386
+# define DG_پیل_GREEK 0x0386
 	{'A', '%', 0x0386},
 	{'E', '%', 0x0388},
 	{'Y', '%', 0x0389},
@@ -522,7 +522,7 @@ static digr_T digraphdefault[] = {
 	{'p', '3', 0x03e1},
 	{'\'', '%', 0x03f4},
 	{'j', '3', 0x03f5},
-# define DG_START_CYRILLIC 0x0401
+# define DG_پیل_CYRILLIC 0x0401
 	{'I', 'O', 0x0401},
 	{'D', '%', 0x0402},
 	{'G', '%', 0x0403},
@@ -627,7 +627,7 @@ static digr_T digraphdefault[] = {
 	{'c', '3', 0x0481},
 	{'G', '3', 0x0490},
 	{'g', '3', 0x0491},
-# define DG_START_HEBREW 0x05d0
+# define DG_پیل_HEBREW 0x05d0
 	{'A', '+', 0x05d0},
 	{'B', '+', 0x05d1},
 	{'G', '+', 0x05d2},
@@ -655,7 +655,7 @@ static digr_T digraphdefault[] = {
 	{'R', '+', 0x05e8},
 	{'S', 'h', 0x05e9},
 	{'T', '+', 0x05ea},
-# define DG_START_ARABIC 0x060c
+# define DG_پیل_ARABIC 0x060c
 	{',', '+', 0x060c},
 	{';', '+', 0x061b},
 	{'?', '+', 0x061f},
@@ -718,7 +718,7 @@ static digr_T digraphdefault[] = {
 	{'7', 'a', 0x06f7},
 	{'8', 'a', 0x06f8},
 	{'9', 'a', 0x06f9},
-# define DG_START_LATIN_EXTENDED 0x1e02
+# define DG_پیل_LATIN_EXTENDED 0x1e02
 	{'B', '.', 0x1e02},
 	{'b', '.', 0x1e03},
 	{'B', '_', 0x1e06},
@@ -813,7 +813,7 @@ static digr_T digraphdefault[] = {
 	{'y', '2', 0x1ef7},
 	{'Y', '?', 0x1ef8},
 	{'y', '?', 0x1ef9},
-# define DG_START_GREEK_EXTENDED 0x1f00
+# define DG_پیل_GREEK_EXTENDED 0x1f00
 	{';', '\'', 0x1f00},
 	{',', '\'', 0x1f01},
 	{';', '!', 0x1f02},
@@ -822,7 +822,7 @@ static digr_T digraphdefault[] = {
 	{'?', ',', 0x1f05},
 	{'!', ':', 0x1f06},
 	{'?', ':', 0x1f07},
-# define DG_START_PUNCTUATION 0x2002
+# define DG_پیل_PUNCTUATION 0x2002
 	{'1', 'N', 0x2002},
 	{'1', 'M', 0x2003},
 	{'3', 'M', 0x2004},
@@ -863,7 +863,7 @@ static digr_T digraphdefault[] = {
 	{':', 'X', 0x203b},
 	{'\'', '-', 0x203e},
 	{'/', 'f', 0x2044},
-# define DG_START_SUB_SUPER 0x2070
+# define DG_پیل_SUB_SUPER 0x2070
 	{'0', 'S', 0x2070},
 	{'4', 'S', 0x2074},
 	{'5', 'S', 0x2075},
@@ -892,7 +892,7 @@ static digr_T digraphdefault[] = {
 	{'=', 's', 0x208c},
 	{'(', 's', 0x208d},
 	{')', 's', 0x208e},
-# define DG_START_CURRENCY 0x20a4
+# define DG_پیل_CURRENCY 0x20a4
 	{'L', 'i', 0x20a4},
 	{'P', 't', 0x20a7},
 	{'W', '=', 0x20a9},
@@ -900,7 +900,7 @@ static digr_T digraphdefault[] = {
 	{'E', 'u', 0x20ac}, // euro
 	{'=', 'R', 0x20bd}, // rouble
 	{'=', 'P', 0x20bd}, // rouble
-# define DG_START_OTHER1 0x2103
+# define DG_پیل_OTHER1 0x2103
 	{'o', 'C', 0x2103},
 	{'c', 'o', 0x2105},
 	{'o', 'F', 0x2109},
@@ -923,7 +923,7 @@ static digr_T digraphdefault[] = {
 	{'3', '8', 0x215c},
 	{'5', '8', 0x215d},
 	{'7', '8', 0x215e},
-# define DG_START_ROMAN 0x2160
+# define DG_پیل_ROMAN 0x2160
 	{'1', 'R', 0x2160},
 	{'2', 'R', 0x2161},
 	{'3', 'R', 0x2162},
@@ -948,7 +948,7 @@ static digr_T digraphdefault[] = {
 	{'a', 'r', 0x2179},
 	{'b', 'r', 0x217a},
 	{'c', 'r', 0x217b},
-# define DG_START_ARROWS 0x2190
+# define DG_پیل_ARROWS 0x2190
 	{'<', '-', 0x2190},
 	{'-', '!', 0x2191},
 	{'-', '>', 0x2192},
@@ -958,7 +958,7 @@ static digr_T digraphdefault[] = {
 	{'<', '=', 0x21d0},
 	{'=', '>', 0x21d2},
 	{'=', '=', 0x21d4},
-# define DG_START_MATH 0x2200
+# define DG_پیل_MATH 0x2200
 	{'F', 'A', 0x2200},
 	{'d', 'P', 0x2202},
 	{'T', 'E', 0x2203},
@@ -1017,7 +1017,7 @@ static digr_T digraphdefault[] = {
 	{'.', 'P', 0x22c5},
 	{':', '3', 0x22ee},
 	{'.', '3', 0x22ef},
-# define DG_START_TECHNICAL 0x2302
+# define DG_پیل_TECHNICAL 0x2302
 	{'E', 'h', 0x2302},
 	{'<', '7', 0x2308},
 	{'>', '7', 0x2309},
@@ -1030,7 +1030,7 @@ static digr_T digraphdefault[] = {
 	{'I', 'l', 0x2321},
 	{'<', '[', 0x27e8},
 	{']', '>', 0x27e9},
-# define DG_START_OTHER2 0x2423
+# define DG_پیل_OTHER2 0x2423
 	{'V', 's', 0x2423},
 	{'1', 'h', 0x2440},
 	{'3', 'h', 0x2441},
@@ -1049,7 +1049,7 @@ static digr_T digraphdefault[] = {
 	{'7', '.', 0x248e},
 	{'8', '.', 0x248f},
 	{'9', '.', 0x2490},
-# define DG_START_DRAWING 0x2500
+# define DG_پیل_DRAWING 0x2500
 	{'h', 'h', 0x2500},
 	{'H', 'H', 0x2501},
 	{'v', 'v', 0x2502},
@@ -1100,7 +1100,7 @@ static digr_T digraphdefault[] = {
 	{'V', 'H', 0x254b},
 	{'F', 'D', 0x2571},
 	{'B', 'D', 0x2572},
-# define DG_START_BLOCK 0x2580
+# define DG_پیل_بلاک 0x2580
 	{'T', 'B', 0x2580},
 	{'L', 'B', 0x2584},
 	{'F', 'B', 0x2588},
@@ -1109,7 +1109,7 @@ static digr_T digraphdefault[] = {
 	{'.', 'S', 0x2591},
 	{':', 'S', 0x2592},
 	{'?', 'S', 0x2593},
-# define DG_START_SHAPES 0x25a0
+# define DG_پیل_SHAPES 0x25a0
 	{'f', 'S', 0x25a0},
 	{'O', 'S', 0x25a1},
 	{'R', 'O', 0x25a2},
@@ -1143,7 +1143,7 @@ static digr_T digraphdefault[] = {
 	{'I', 'c', 0x25d9},
 	{'F', 'd', 0x25e2},
 	{'B', 'd', 0x25e3},
-# define DG_START_SYMBOLS 0x2605
+# define DG_پیل_SYMBOLS 0x2605
 	{'*', '2', 0x2605},
 	{'*', '1', 0x2606},
 	{'<', 'H', 0x261c},
@@ -1163,11 +1163,11 @@ static digr_T digraphdefault[] = {
 	{'M', 'b', 0x266d},
 	{'M', 'x', 0x266e},
 	{'M', 'X', 0x266f},
-# define DG_START_DINGBATS 0x2713
+# define DG_پیل_DINGBATS 0x2713
 	{'O', 'K', 0x2713},
 	{'X', 'X', 0x2717},
 	{'-', 'X', 0x2720},
-# define DG_START_CJK_SYMBOLS 0x3000
+# define DG_پیل_CJK_SYMBOLS 0x3000
 	{'I', 'S', 0x3000},
 	{',', '_', 0x3001},
 	{'.', '_', 0x3002},
@@ -1193,7 +1193,7 @@ static digr_T digraphdefault[] = {
 	{'(', 'I', 0x3016},
 	{')', 'I', 0x3017},
 	{'-', '?', 0x301c},
-# define DG_START_HIRAGANA 0x3041
+# define DG_پیل_HIRAGANA 0x3041
 	{'A', '5', 0x3041},
 	{'a', '5', 0x3042},
 	{'I', '5', 0x3043},
@@ -1282,7 +1282,7 @@ static digr_T digraphdefault[] = {
 	{'0', '5', 0x309c},
 	{'*', '5', 0x309d},
 	{'+', '5', 0x309e},
-# define DG_START_KATAKANA 0x30a1
+# define DG_پیل_KATAKANA 0x30a1
 	{'a', '6', 0x30a1},
 	{'A', '6', 0x30a2},
 	{'i', '6', 0x30a3},
@@ -1377,7 +1377,7 @@ static digr_T digraphdefault[] = {
 	{'-', '6', 0x30fc},
 	{'*', '6', 0x30fd},
 	{'+', '6', 0x30fe},
-# define DG_START_BOPOMOFO 0x3105
+# define DG_پیل_BOPOMOFO 0x3105
 	{'b', '4', 0x3105},
 	{'p', '4', 0x3106},
 	{'m', '4', 0x3107},
@@ -1417,7 +1417,7 @@ static digr_T digraphdefault[] = {
 	{'v', '4', 0x312a},
 	{'n', 'G', 0x312b},
 	{'g', 'n', 0x312c},
-# define DG_START_OTHER3 0x3220
+# define DG_پیل_OTHER3 0x3220
 	{'1', 'c', 0x3220},
 	{'2', 'c', 0x3221},
 	{'3', 'c', 0x3222},
@@ -1441,26 +1441,26 @@ static digr_T digraphdefault[] = {
 /*
  * handle digraphs after typing a character
  */
-    int
-do_digraph(int c)
+    صحيح
+do_digraph(صحيح c)
 {
-    static int	backspaced;	// character before K_BS
-    static int	lastchar;	// last typed character
+    ساكن صحيح	backspaced;	// character before K_BS
+    ساكن صحيح	lastchar;	// last typed character
 
-    if (c == -1)		// init values
+    إذا (c == -1)		// init values
     {
 	backspaced = -1;
     }
-    else if (p_dg)
+    وإلا إذا (p_dg)
     {
-	if (backspaced >= 0)
+	إذا (backspaced >= 0)
 	    c = digraph_get(backspaced, c, FALSE);
 	backspaced = -1;
-	if ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
+	إذا ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
 	    backspaced = lastchar;
     }
     lastchar = c;
-    return c;
+    أرجع c;
 }
 
 /*
@@ -1468,57 +1468,57 @@ do_digraph(int c)
  * If not found return NULL.
  */
     char_u *
-get_digraph_for_char(int val_arg)
+get_digraph_for_char(صحيح val_arg)
 {
-    int		val = val_arg;
-    int		i;
-    int		use_defaults;
+    صحيح		val = val_arg;
+    صحيح		i;
+    صحيح		use_defaults;
     digr_T	*dp;
-    static      char_u      r[3];
+    ساكن      char_u      r[3];
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (!enc_utf8)
+# إذا defined(USE_UNICODE_DIGRAPHS)
+    إذا (!enc_utf8)
     {
-	char_u	    buf[6], *to;
+	char_u	    buf[6], *منزل;
 	vimconv_T   vc;
 
 	// convert the character from 'encoding' to Unicode
 	i = mb_char2bytes(val, buf);
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
+	إذا (convert_تیاری(&vc, p_enc, (char_u *)"utf-8") == OK)
 	{
 	    vc.vc_fail = TRUE;
-	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    منزل = string_convert(&vc, buf, &i);
+	    إذا (منزل != عدم)
 	    {
-		val = utf_ptr2char(to);
-		vim_free(to);
+		val = utf_ptr2char(منزل);
+		vim_free(منزل);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (فراغ)convert_تیاری(&vc, عدم, عدم);
 	}
     }
 # endif
 
-    for (use_defaults = 0; use_defaults <= 1; use_defaults++)
+    لكل (use_defaults = 0; use_defaults <= 1; use_defaults++)
     {
-	if (use_defaults == 0)
-	    dp = (digr_T *)user_digraphs.ga_data;
-	else
+	إذا (use_defaults == 0)
+	    dp = (digr_T *)user_digraphs.ga_معلومات;
+	وإلا
 	    dp = digraphdefault;
-	for (i = 0; use_defaults ? dp->char1 != NUL
+	لكل (i = 0; use_defaults ? dp->char1 != NUL
 					       : i < user_digraphs.ga_len; ++i)
 	{
-	    if (dp->result == val)
+	    إذا (dp->پایله == val)
 	    {
 		r[0] = dp->char1;
 		r[1] = dp->char2;
 		r[2] = NUL;
-		return r;
+		أرجع r;
 	    }
 	    ++dp;
 	}
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -1526,42 +1526,42 @@ get_digraph_for_char(int val_arg)
  * mode.
  * Returns composed character, or NUL when ESC was used.
  */
-    int
+    صحيح
 get_digraph(
-    int		cmdline)	// TRUE when called from the cmdline
+    صحيح		cmdline)	// TRUE when called from the cmdline
 {
-    int		c, cc;
+    صحيح		c, cc;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_کلیګانې;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_کلیګانې;
 
-    if (c == ESC)		// ESC cancels CTRL-K
-	return NUL;
+    إذا (c == ESC)		// ESC cancels CTRL-K
+	أرجع NUL;
 
-    if (IS_SPECIAL(c))	// insert special key code
-	return c;
-    if (cmdline)
+    إذا (IS_SPECIAL(c))	// insert special key code
+	أرجع c;
+    إذا (cmdline)
     {
-	if (char2cells(c) == 1
-# if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-		&& cmdline_star == 0
+	إذا (char2cells(c) == 1
+# إذا defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+		&& cmdline_ستوری == 0
 # endif
 	   )
 	    putcmdline(c, TRUE);
     }
-    else
-	add_to_showcmd(c);
+    وإلا
+	جمع_کړه_منزل_showcmd(c);
     ++no_mapping;
-    ++allow_keys;
+    ++allow_کلیګانې;
     cc = plain_vgetc();
     --no_mapping;
-    --allow_keys;
-    if (cc != ESC)	    // ESC cancels CTRL-K
-	return digraph_get(c, cc, TRUE);
-    return NUL;
+    --allow_کلیګانې;
+    إذا (cc != ESC)	    // ESC cancels CTRL-K
+	أرجع digraph_get(c, cc, TRUE);
+    أرجع NUL;
 }
 
 /*
@@ -1569,26 +1569,26 @@ get_digraph(
  * If no match, return "char2".
  * If "meta_char" is TRUE and "char1" is a space, return "char2" | 0x80.
  */
-    static int
-getexactdigraph(int char1, int char2, int meta_char)
+    ساكن صحيح
+getexactdigraph(صحيح char1, صحيح char2, صحيح meta_char)
 {
-    int		i;
-    int		retval = 0;
+    صحيح		i;
+    صحيح		retval = 0;
     digr_T	*dp;
 
-    if (IS_SPECIAL(char1) || IS_SPECIAL(char2))
-	return char2;
+    إذا (IS_SPECIAL(char1) || IS_SPECIAL(char2))
+	أرجع char2;
 
     /*
      * Search user digraphs first.
      */
-    dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    dp = (digr_T *)user_digraphs.ga_معلومات;
+    لكل (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	إذا ((صحيح)dp->char1 == char1 && (صحيح)dp->char2 == char2)
 	{
-	    retval = dp->result;
-	    break;
+	    retval = dp->پایله;
+	    اكسر;
 	}
 	++dp;
     }
@@ -1596,23 +1596,23 @@ getexactdigraph(int char1, int char2, int meta_char)
     /*
      * Search default digraphs.
      */
-    if (retval == 0)
+    إذا (retval == 0)
     {
 	dp = digraphdefault;
-	while (dp->char1 != 0)
+	طالما (dp->char1 != 0)
 	{
-	    if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	    إذا ((صحيح)dp->char1 == char1 && (صحيح)dp->char2 == char2)
 	    {
-		retval = dp->result;
-		break;
+		retval = dp->پایله;
+		اكسر;
 	    }
 	    ++dp;
 	}
     }
 # ifdef USE_UNICODE_DIGRAPHS
-    if (retval != 0 && !enc_utf8)
+    إذا (retval != 0 && !enc_utf8)
     {
-	char_u	    buf[6], *to;
+	char_u	    buf[6], *منزل;
 	vimconv_T   vc;
 
 	/*
@@ -1621,78 +1621,78 @@ getexactdigraph(int char1, int char2, int meta_char)
 	i = utf_char2bytes(retval, buf);
 	retval = 0;
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
+	إذا (convert_تیاری(&vc, (char_u *)"utf-8", p_enc) == OK)
 	{
 	    vc.vc_fail = TRUE;
-	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    منزل = string_convert(&vc, buf, &i);
+	    إذا (منزل != عدم)
 	    {
-		retval = (*mb_ptr2char)(to);
-		vim_free(to);
+		retval = (*mb_ptr2char)(منزل);
+		vim_free(منزل);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (فراغ)convert_تیاری(&vc, عدم, عدم);
 	}
     }
 # endif
 
     // Ignore multi-byte characters when not in multi-byte mode.
-    if (!has_mbyte && retval > 0xff)
+    إذا (!has_mbyte && retval > 0xff)
 	retval = 0;
 
-    if (retval == 0)		// digraph deleted or not found
+    إذا (retval == 0)		// digraph deleted or not found
     {
-	if (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
-	    return (char2 | 0x80);
-	return char2;
+	إذا (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
+	    أرجع (char2 | 0x80);
+	أرجع char2;
     }
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Get digraph.
  * Allow for both char1-char2 and char2-char1
  */
-    int
-digraph_get(int char1, int char2, int meta_char)
+    صحيح
+digraph_get(صحيح char1, صحيح char2, صحيح meta_char)
 {
-    int	    retval;
+    صحيح	    retval;
 
-    if (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
+    إذا (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
 	    && (char1 != char2)
 	    && ((retval = getexactdigraph(char2, char1, meta_char)) == char1))
-	return char2;
-    return retval;
+	أرجع char2;
+    أرجع retval;
 }
 
 /*
  * Add a digraph to the digraph table.
  */
-    static void
-registerdigraph(int char1, int char2, int n)
+    ساكن فراغ
+registerdigraph(صحيح char1, صحيح char2, صحيح n)
 {
-    int		i;
+    صحيح		i;
     digr_T	*dp;
 
     // If the digraph already exists, replace "result".
-    dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    dp = (digr_T *)user_digraphs.ga_معلومات;
+    لكل (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	إذا ((صحيح)dp->char1 == char1 && (صحيح)dp->char2 == char2)
 	{
-	    dp->result = n;
-	    return;
+	    dp->پایله = n;
+	    أرجع;
 	}
 	++dp;
     }
 
     // Add a new digraph to the table.
-    if (ga_grow(&user_digraphs, 1) == FAIL)
-	return;
+    إذا (ga_grow(&user_digraphs, 1) == FAIL)
+	أرجع;
 
-    dp = (digr_T *)user_digraphs.ga_data + user_digraphs.ga_len;
+    dp = (digr_T *)user_digraphs.ga_معلومات + user_digraphs.ga_len;
     dp->char1 = char1;
     dp->char2 = char2;
-    dp->result = n;
+    dp->پایله = n;
     ++user_digraphs.ga_len;
 }
 
@@ -1701,24 +1701,24 @@ registerdigraph(int char1, int char2, int n)
  * If they are valid, returns TRUE; otherwise, give an error message and
  * returns FALSE.
  */
-    static int
-check_digraph_chars_valid(int char1, int char2)
+    ساكن صحيح
+check_digraph_chars_valid(صحيح char1, صحيح char2)
 {
-    if (char2 == 0)
+    إذا (char2 == 0)
     {
-	char_u msg[MB_MAXBYTES + 1];
+	char_u پیغام[MB_MAXBYTES + 1];
 
-	msg[mb_char2bytes(char1, msg)] = NUL;
+	پیغام[mb_char2bytes(char1, پیغام)] = NUL;
 
-	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
-	return FALSE;
+	semsg(_(e_digraph_must_be_just_two_characters_str), پیغام);
+	أرجع FALSE;
     }
-    if (char1 == ESC || char2 == ESC)
+    إذا (char1 == ESC || char2 == ESC)
     {
-	emsg(_(e_escape_not_allowed_in_digraph));
-	return FALSE;
+	emsg(_(e_escape_not_allowed_دننه_digraph));
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 
@@ -1727,27 +1727,27 @@ check_digraph_chars_valid(int char1, int char2)
  * Add the digraphs in the argument to the digraph table.
  * format: {c1}{c2} char {c1}{c2} char ...
  */
-    void
+    فراغ
 putdigraph(char_u *str)
 {
-    int		char1, char2, n;
+    صحيح		char1, char2, n;
 
-    while (*str != NUL)
+    طالما (*str != NUL)
     {
 	str = skipwhite(str);
-	if (*str == NUL)
-	    return;
+	إذا (*str == NUL)
+	    أرجع;
 	char1 = *str++;
 	char2 = *str++;
 
-	if (!check_digraph_chars_valid(char1, char2))
-	    return;
+	إذا (!check_digraph_chars_valid(char1, char2))
+	    أرجع;
 
 	str = skipwhite(str);
-	if (!VIM_ISDIGIT(*str))
+	إذا (!VIM_ISDIGIT(*str))
 	{
-	    emsg(_(e_number_expected));
-	    return;
+	    emsg(_(e_شمېره_expected));
+	    أرجع;
 	}
 	n = getdigits(&str);
 
@@ -1755,68 +1755,68 @@ putdigraph(char_u *str)
     }
 }
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    static void
-digraph_header(char *msg)
+# إذا defined(USE_UNICODE_DIGRAPHS)
+    ساكن فراغ
+digraph_سرلیک(حرف *پیغام)
 {
-    if (msg_col > 0)
-	msg_putchar('\n');
-    msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
-    msg_putchar('\n');
+    إذا (پیغام_ستون > 0)
+	پیغام_putchar('\n');
+    پیغام_outtrans_attr((char_u *)پیغام, HL_ATTR(HLF_CM));
+    پیغام_putchar('\n');
 }
 # endif
 
-    void
-listdigraphs(int use_headers)
+    فراغ
+listdigraphs(صحيح use_سرلیکونه)
 {
-    int		i;
+    صحيح		i;
     digr_T	*dp;
-    result_T	previous = 0;
+    پایله_T	پخوانی = 0;
 
-    msg_putchar('\n');
+    پیغام_putchar('\n');
 
     dp = digraphdefault;
-    while (dp->char1 != NUL && !got_int)
+    طالما (dp->char1 != NUL && !got_int)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
+# إذا defined(USE_UNICODE_DIGRAPHS)
 	digr_T tmp;
 
 	// May need to convert the result to 'encoding'.
 	tmp.char1 = dp->char1;
 	tmp.char2 = dp->char2;
-	tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	if (tmp.result != 0 && tmp.result != tmp.char2
-					  && (has_mbyte || tmp.result <= 255))
-	    printdigraph(&tmp, use_headers ? &previous : NULL);
-# else
+	tmp.پایله = getexactdigraph(tmp.char1, tmp.char2, FALSE);
+	إذا (tmp.پایله != 0 && tmp.پایله != tmp.char2
+					  && (has_mbyte || tmp.پایله <= 255))
+	    printdigraph(&tmp, use_سرلیکونه ? &پخوانی : عدم);
+# وإلا
 
-	if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
-		&& (has_mbyte || dp->result <= 255))
-	    printdigraph(dp, use_headers ? &previous : NULL);
+	إذا (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->پایله
+		&& (has_mbyte || dp->پایله <= 255))
+	    printdigraph(dp, use_سرلیکونه ? &پخوانی : عدم);
 # endif
 	++dp;
 	ui_breakcheck();
     }
 
-    dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    dp = (digr_T *)user_digraphs.ga_معلومات;
+    لكل (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
-	if (previous >= 0 && use_headers)
-	    digraph_header(_("Custom"));
-	previous = -1;
+# إذا defined(USE_UNICODE_DIGRAPHS)
+	إذا (پخوانی >= 0 && use_سرلیکونه)
+	    digraph_سرلیک(_("Custom"));
+	پخوانی = -1;
 # endif
-	printdigraph(dp, NULL);
+	printdigraph(dp, عدم);
 	ui_breakcheck();
 	++dp;
     }
 
     // clear screen, because some digraphs may be wrong, in which case we
     // messed up ScreenLines
-    set_must_redraw(UPD_CLEAR);
+    سېټ_must_redraw(UPD_CLEAR);
 }
 
-    static void
+    ساكن فراغ
 digraph_getlist_appendpair(digr_T *dp, list_T *l)
 {
     char_u	buf[30];
@@ -1826,24 +1826,24 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 
 
     li = listitem_alloc();
-    if (li == NULL)
-	return;
+    إذا (li == عدم)
+	أرجع;
     list_append(l, li);
     li->li_tv.v_type = VAR_LIST;
-    li->li_tv.v_lock = 0;
+    li->li_tv.v_قلف = 0;
 
     l2 = list_alloc();
     li->li_tv.vval.v_list = l2;
-    if (l2 == NULL)
-	return;
+    إذا (l2 == عدم)
+	أرجع;
     ++l2->lv_refcount;
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    إذا (li2 == عدم)
+	أرجع;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
-    li2->li_tv.v_lock = 0;
+    li2->li_tv.v_قلف = 0;
 
     buf[0] = dp->char1;
     buf[1] = dp->char2;
@@ -1851,156 +1851,156 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
     li2->li_tv.vval.v_string = vim_strsave(&buf[0]);
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    إذا (li2 == عدم)
+	أرجع;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
-    li2->li_tv.v_lock = 0;
+    li2->li_tv.v_قلف = 0;
 
     p = buf;
-    if (has_mbyte)
-	p += (*mb_char2bytes)(dp->result, p);
-    else
-	*p++ = (char_u)dp->result;
+    إذا (has_mbyte)
+	p += (*mb_char2bytes)(dp->پایله, p);
+    وإلا
+	*p++ = (char_u)dp->پایله;
     *p = NUL;
 
     li2->li_tv.vval.v_string = vim_strsave(buf);
 }
 
-    static void
-digraph_getlist_common(int list_all, typval_T *rettv)
+    ساكن فراغ
+digraph_getlist_common(صحيح list_all, typval_T *rettv)
 {
-    int		i;
+    صحيح		i;
     digr_T	*dp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (list_all)
+    إذا (list_all)
     {
 	dp = digraphdefault;
-	while (dp->char1 != NUL && !got_int)
+	طالما (dp->char1 != NUL && !got_int)
 	{
 # ifdef USE_UNICODE_DIGRAPHS
 	    digr_T tmp;
 
 	    tmp.char1 = dp->char1;
 	    tmp.char2 = dp->char2;
-	    tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	    if (tmp.result != 0 && tmp.result != tmp.char2
-					  && (has_mbyte || tmp.result <= 255))
+	    tmp.پایله = getexactdigraph(tmp.char1, tmp.char2, FALSE);
+	    إذا (tmp.پایله != 0 && tmp.پایله != tmp.char2
+					  && (has_mbyte || tmp.پایله <= 255))
 		digraph_getlist_appendpair(&tmp, rettv->vval.v_list);
-# else
-	    if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
-		    && (has_mbyte || dp->result <= 255))
+# وإلا
+	    إذا (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->پایله
+		    && (has_mbyte || dp->پایله <= 255))
 		digraph_getlist_appendpair(dp, rettv->vval.v_list);
 # endif
 	    ++dp;
 	}
     }
 
-    dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    dp = (digr_T *)user_digraphs.ga_معلومات;
+    لكل (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
 	digraph_getlist_appendpair(dp, rettv->vval.v_list);
 	++dp;
     }
 }
 
-static struct dg_header_entry {
-    int	    dg_start;
-    char    *dg_header;
-} header_table[] = {
-    {DG_START_LATIN, N_("Latin supplement")},
-    {DG_START_GREEK, N_("Greek and Coptic")},
-    {DG_START_CYRILLIC, N_("Cyrillic")},
-    {DG_START_HEBREW, N_("Hebrew")},
-    {DG_START_ARABIC, N_("Arabic")},
-    {DG_START_LATIN_EXTENDED, N_("Latin extended")},
-    {DG_START_GREEK_EXTENDED, N_("Greek extended")},
-    {DG_START_PUNCTUATION, N_("Punctuation")},
-    {DG_START_SUB_SUPER, N_("Super- and subscripts")},
-    {DG_START_CURRENCY, N_("Currency")},
-    {DG_START_OTHER1, N_("Other")},
-    {DG_START_ROMAN, N_("Roman numbers")},
-    {DG_START_ARROWS, N_("Arrows")},
-    {DG_START_MATH, N_("Mathematical operators")},
-    {DG_START_TECHNICAL, N_("Technical")},
-    {DG_START_OTHER2, N_("Other")},
-    {DG_START_DRAWING, N_("Box drawing")},
-    {DG_START_BLOCK, N_("Block elements")},
-    {DG_START_SHAPES, N_("Geometric shapes")},
-    {DG_START_SYMBOLS, N_("Symbols")},
-    {DG_START_DINGBATS, N_("Dingbats")},
-    {DG_START_CJK_SYMBOLS, N_("CJK symbols and punctuation")},
-    {DG_START_HIRAGANA, N_("Hiragana")},
-    {DG_START_KATAKANA, N_("Katakana")},
-    {DG_START_BOPOMOFO, N_("Bopomofo")},
-    {DG_START_OTHER3, N_("Other")},
-    {0xfffffff, NULL},
+ساكن بنية dg_سرلیک_ثبت {
+    صحيح	    dg_پیل;
+    حرف    *dg_سرلیک;
+} سرلیک_جدول[] = {
+    {DG_پیل_LATIN, N_("Latin supplement")},
+    {DG_پیل_GREEK, N_("Greek and Coptic")},
+    {DG_پیل_CYRILLIC, N_("Cyrillic")},
+    {DG_پیل_HEBREW, N_("Hebrew")},
+    {DG_پیل_ARABIC, N_("Arabic")},
+    {DG_پیل_LATIN_EXTENDED, N_("Latin extended")},
+    {DG_پیل_GREEK_EXTENDED, N_("Greek extended")},
+    {DG_پیل_PUNCTUATION, N_("Punctuation")},
+    {DG_پیل_SUB_SUPER, N_("Super- and subscripts")},
+    {DG_پیل_CURRENCY, N_("Currency")},
+    {DG_پیل_OTHER1, N_("Other")},
+    {DG_پیل_ROMAN, N_("Roman numbers")},
+    {DG_پیل_ARROWS, N_("Arrows")},
+    {DG_پیل_MATH, N_("Mathematical operators")},
+    {DG_پیل_TECHNICAL, N_("Technical")},
+    {DG_پیل_OTHER2, N_("Other")},
+    {DG_پیل_DRAWING, N_("Box drawing")},
+    {DG_پیل_بلاک, N_("Block elements")},
+    {DG_پیل_SHAPES, N_("Geometric shapes")},
+    {DG_پیل_SYMBOLS, N_("Symbols")},
+    {DG_پیل_DINGBATS, N_("Dingbats")},
+    {DG_پیل_CJK_SYMBOLS, N_("CJK symbols and punctuation")},
+    {DG_پیل_HIRAGANA, N_("Hiragana")},
+    {DG_پیل_KATAKANA, N_("Katakana")},
+    {DG_پیل_BOPOMOFO, N_("Bopomofo")},
+    {DG_پیل_OTHER3, N_("Other")},
+    {0xfffffff, عدم},
 };
 
-    static void
-printdigraph(digr_T *dp, result_T *previous)
+    ساكن فراغ
+printdigraph(digr_T *dp, پایله_T *پخوانی)
 {
     char_u	buf[30];
     char_u	*p;
 
-    int		list_width;
+    صحيح		list_پلنوالی;
 
-    if ((dy_flags & DY_UHEX) || has_mbyte)
-	list_width = 13;
-    else
-	list_width = 11;
+    إذا ((dy_flags & DY_UHEX) || has_mbyte)
+	list_پلنوالی = 13;
+    وإلا
+	list_پلنوالی = 11;
 
-    if (dp->result == 0)
-	return;
+    إذا (dp->پایله == 0)
+	أرجع;
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (previous != NULL)
+# إذا defined(USE_UNICODE_DIGRAPHS)
+    إذا (پخوانی != عدم)
     {
-	int i;
+	صحيح i;
 
-	for (i = 0; header_table[i].dg_header != NULL; ++i)
-	    if (*previous < header_table[i].dg_start
-		    && dp->result >= header_table[i].dg_start
-		    && dp->result < header_table[i + 1].dg_start)
+	لكل (i = 0; سرلیک_جدول[i].dg_سرلیک != عدم; ++i)
+	    إذا (*پخوانی < سرلیک_جدول[i].dg_پیل
+		    && dp->پایله >= سرلیک_جدول[i].dg_پیل
+		    && dp->پایله < سرلیک_جدول[i + 1].dg_پیل)
 	    {
-		digraph_header(_(header_table[i].dg_header));
-		break;
+		digraph_سرلیک(_(سرلیک_جدول[i].dg_سرلیک));
+		اكسر;
 	    }
-	*previous = dp->result;
+	*پخوانی = dp->پایله;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
-	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
-	    msg_putchar(' ');
+    إذا (پیغام_ستون > cmdline_پلنوالی - list_پلنوالی)
+	پیغام_putchar('\n');
+    إذا (پیغام_ستون)
+	طالما (پیغام_ستون % list_پلنوالی != 0)
+	    پیغام_putchar(' ');
 
     p = buf;
     *p++ = dp->char1;
     *p++ = dp->char2;
     *p++ = ' ';
     *p = NUL;
-    msg_outtrans(buf);
+    پیغام_outtrans(buf);
     p = buf;
-    if (has_mbyte)
+    إذا (has_mbyte)
     {
 	// add a space to draw a composing char on
-	if (enc_utf8 && utf_iscomposing(dp->result))
+	إذا (enc_utf8 && utf_iscomposing(dp->پایله))
 	    *p++ = ' ';
-	p += (*mb_char2bytes)(dp->result, p);
+	p += (*mb_char2bytes)(dp->پایله, p);
     }
-    else
-	*p++ = (char_u)dp->result;
+    وإلا
+	*p++ = (char_u)dp->پایله;
     *p = NUL;
-    msg_outtrans_attr(buf, HL_ATTR(HLF_8));
+    پیغام_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
-    if (char2cells(dp->result) == 1)
+    إذا (char2cells(dp->پایله) == 1)
 	*p++ = ' ';
-    vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
-    msg_outtrans(buf);
+    vim_snprintf((حرف *)p, حجم(buf) - (p - buf), " %3d", dp->پایله);
+    پیغام_outtrans(buf);
 }
 
 # ifdef FEAT_EVAL
@@ -2008,122 +2008,122 @@ printdigraph(digr_T *dp, result_T *previous)
  * Get the two digraph characters from a typval.
  * Return OK or FAIL.
  */
-    static int
-get_digraph_chars(typval_T *arg, int *char1, int *char2)
+    ساكن صحيح
+get_digraph_chars(typval_T *arg, صحيح *char1, صحيح *char2)
 {
     char_u	buf_chars[NUMBUFLEN];
     char_u	*chars = tv_get_string_buf_chk(arg, buf_chars);
     char_u	*p = chars;
 
-    if (p != NULL)
+    إذا (p != عدم)
     {
-	if (*p != NUL)
+	إذا (*p != NUL)
 	{
 	    *char1 = mb_cptr2char_adv(&p);
-	    if (*p != NUL)
+	    إذا (*p != NUL)
 	    {
 		*char2 = mb_cptr2char_adv(&p);
-		if (*p == NUL)
+		إذا (*p == NUL)
 		{
-		    if (check_digraph_chars_valid(*char1, *char2))
-			return OK;
-		    return FAIL;
+		    إذا (check_digraph_chars_valid(*char1, *char2))
+			أرجع OK;
+		    أرجع FAIL;
 		}
 	    }
 	}
     }
     semsg(_(e_digraph_must_be_just_two_characters_str), chars);
-    return FAIL;
+    أرجع FAIL;
 }
 
-    static int
-digraph_set_common(typval_T *argchars, typval_T *argdigraph)
+    ساكن صحيح
+digraph_سېټ_common(typval_T *argchars, typval_T *argdigraph)
 {
-    int		char1, char2;
+    صحيح		char1, char2;
     char_u	*digraph;
     char_u	*p;
     char_u	buf_digraph[NUMBUFLEN];
     varnumber_T n;
 
-    if (get_digraph_chars(argchars, &char1, &char2) == FAIL)
-	return FALSE;
+    إذا (get_digraph_chars(argchars, &char1, &char2) == FAIL)
+	أرجع FALSE;
 
     digraph = tv_get_string_buf_chk(argdigraph, buf_digraph);
-    if (digraph == NULL)
-	return FALSE;
+    إذا (digraph == عدم)
+	أرجع FALSE;
     p = digraph;
     n = mb_cptr2char_adv(&p);
-    if (*p != NUL)
+    إذا (*p != NUL)
     {
-	semsg(_(e_digraph_argument_must_be_one_character_str), digraph);
-	return FALSE;
+	semsg(_(e_digraph_دلیل_must_be_one_character_str), digraph);
+	أرجع FALSE;
     }
 
-    registerdigraph(char1, char2, (int)n);
-    return TRUE;
+    registerdigraph(char1, char2, (صحيح)n);
+    أرجع TRUE;
 }
 # endif
 
-#endif // FEAT_DIGRAPHS
+#د_که_پای // FEAT_DIGRAPHS
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * "digraph_get()" function
  */
-    void
+    فراغ
 f_digraph_get(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int		code;
+    صحيح		کوډ;
     char_u	buf[NUMBUFLEN];
     char_u	*digraphs;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;  // Return empty string for failure
+    rettv->vval.v_string = عدم;  // Return empty string for failure
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     digraphs = tv_get_string_chk(&argvars[0]);
 
-    if (digraphs == NULL)
-	return;
-    else if (STRLEN(digraphs) != 2)
+    إذا (digraphs == عدم)
+	أرجع;
+    وإلا إذا (STRLEN(digraphs) != 2)
     {
 	semsg(_(e_digraph_must_be_just_two_characters_str), digraphs);
-	return;
+	أرجع;
     }
-    code = digraph_get(digraphs[0], digraphs[1], FALSE);
+    کوډ = digraph_get(digraphs[0], digraphs[1], FALSE);
 
-    if (has_mbyte)
-	buf[(*mb_char2bytes)(code, buf)] = NUL;
-    else
+    إذا (has_mbyte)
+	buf[(*mb_char2bytes)(کوډ, buf)] = NUL;
+    وإلا
     {
-	buf[0] = code;
+	buf[0] = کوډ;
 	buf[1] = NUL;
     }
 
     rettv->vval.v_string = vim_strsave(buf);
-# else
-    emsg(_(e_no_digraphs_version));
+# وإلا
+    emsg(_(e_no_digraphs_نسخه));
 # endif
 }
 
 /*
  * "digraph_getlist()" function
  */
-    void
+    فراغ
 f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int     flag_list_all;
+    صحيح     flag_list_all;
 
-    if (check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_opt_bool_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    إذا (argvars[0].v_type == VAR_UNKNOWN)
 	flag_list_all = FALSE;
-    else
+    وإلا
     {
 	varnumber_T flag = tv_get_bool(&argvars[0]);
 
@@ -2131,39 +2131,39 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
     }
 
     digraph_getlist_common(flag_list_all, rettv);
-# else
-    emsg(_(e_no_digraphs_version));
+# وإلا
+    emsg(_(e_no_digraphs_نسخه));
 # endif
 }
 
 /*
  * "digraph_set()" function
  */
-    void
-f_digraph_set(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_digraph_سېټ(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_شمېره = VVAL_FALSE;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    if (!digraph_set_common(&argvars[0], &argvars[1]))
-	return;
+    إذا (!digraph_سېټ_common(&argvars[0], &argvars[1]))
+	أرجع;
 
-    rettv->vval.v_number = VVAL_TRUE;
-# else
-    emsg(_(e_no_digraphs_version));
+    rettv->vval.v_شمېره = VVAL_TRUE;
+# وإلا
+    emsg(_(e_no_digraphs_نسخه));
 # endif
 }
 
 /*
  * "digraph_setlist()" function
  */
-    void
+    فراغ
 f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
@@ -2171,62 +2171,62 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     listitem_T	*pli;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_شمېره = VVAL_FALSE;
 
-    if (argvars[0].v_type != VAR_LIST)
+    إذا (argvars[0].v_type != VAR_LIST)
     {
-	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	return;
+	emsg(_(e_digraph_setlist_دلیل_must_be_list_د_lists_with_two_توکي));
+	أرجع;
     }
 
     pl = argvars[0].vval.v_list;
-    if (pl == NULL)
+    إذا (pl == عدم)
     {
 	// Empty list always results in success.
-	rettv->vval.v_number = VVAL_TRUE;
-	return;
+	rettv->vval.v_شمېره = VVAL_TRUE;
+	أرجع;
     }
 
-    FOR_ALL_LIST_ITEMS(pl, pli)
+    FOR_ALL_LIST_توکي(pl, pli)
     {
-	if (pli->li_tv.v_type != VAR_LIST)
+	إذا (pli->li_tv.v_type != VAR_LIST)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_دلیل_must_be_list_د_lists_with_two_توکي));
+	    أرجع;
 	}
 
 	l = pli->li_tv.vval.v_list;
-	if (l == NULL || l->lv_len != 2)
+	إذا (l == عدم || l->lv_len != 2)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_دلیل_must_be_list_د_lists_with_two_توکي));
+	    أرجع;
 	}
 
-	if (!digraph_set_common(&l->lv_first->li_tv,
-						 &l->lv_first->li_next->li_tv))
-	    return;
+	إذا (!digraph_سېټ_common(&l->lv_لومړی->li_tv,
+						 &l->lv_لومړی->li_بل->li_tv))
+	    أرجع;
     }
-    rettv->vval.v_number = VVAL_TRUE;
-# else
-    emsg(_(e_no_digraphs_version));
+    rettv->vval.v_شمېره = VVAL_TRUE;
+# وإلا
+    emsg(_(e_no_digraphs_نسخه));
 # endif
 }
 
-#endif // FEAT_EVAL
+#د_که_پای // FEAT_EVAL
 
 
-#if defined(FEAT_KEYMAP)
+#إذا defined(FEAT_KEYMAP)
 
 // structure used for b_kmap_ga.ga_data
-typedef struct
+تعريفنوع بنية
 {
     char_u	*from;
-    char_u	*to;
+    char_u	*منزل;
 } kmap_T;
 
 # define KMAP_MAXLEN 20	    // maximum length of "from" or "to"
 
-static void keymap_unload(void);
+ساكن فراغ keymap_unload(فراغ);
 
 /*
  * Set up key mapping tables for the 'keymap' option.
@@ -2234,19 +2234,19 @@ static void keymap_unload(void);
  * used when setting the option, not later when the value has already been
  * checked.
  */
-    char *
-keymap_init(void)
+    حرف *
+keymap_init(فراغ)
 {
     curbuf->b_kmap_state &= ~KEYMAP_INIT;
 
-    if (*curbuf->b_p_keymap == NUL)
+    إذا (*curbuf->b_p_keymap == NUL)
     {
 	// Stop any active keymap and clear the table.  Also remove
 	// b:keymap_name, as no keymap is active now.
 	keymap_unload();
 	do_cmdline_cmd((char_u *)"unlet! b:keymap_name");
     }
-    else
+    وإلا
     {
 	char_u	*buf;
 	size_t  buflen;
@@ -2255,56 +2255,56 @@ keymap_init(void)
 	// which will call ex_loadkeymap() below.
 	buflen = STRLEN(curbuf->b_p_keymap) + STRLEN(p_enc) + 14;
 	buf = alloc(buflen);
-	if (buf == NULL)
-	    return e_out_of_memory;
+	إذا (buf == عدم)
+	    أرجع e_بهر_د_حافظه;
 
 	// try finding "keymap/'keymap'_'encoding'.vim"  in 'runtimepath'
-	vim_snprintf((char *)buf, buflen, "keymap/%s_%s.vim",
+	vim_snprintf((حرف *)buf, buflen, "keymap/%s_%s.vim",
 						   curbuf->b_p_keymap, p_enc);
-	if (source_runtime(buf, 0) == FAIL)
+	إذا (سرچینه_runtime(buf, 0) == FAIL)
 	{
 	    // try finding "keymap/'keymap'.vim" in 'runtimepath'
-	    vim_snprintf((char *)buf, buflen, "keymap/%s.vim",
+	    vim_snprintf((حرف *)buf, buflen, "keymap/%s.vim",
 							  curbuf->b_p_keymap);
-	    if (source_runtime(buf, 0) == FAIL)
+	    إذا (سرچینه_runtime(buf, 0) == FAIL)
 	    {
 		vim_free(buf);
-		return N_(e_keymap_file_not_found);
+		أرجع N_(e_keymap_file_not_وموندل);
 	    }
 	}
 	vim_free(buf);
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * ":loadkeymap" command: load the following lines as the keymap.
  */
-    void
+    فراغ
 ex_loadkeymap(exarg_T *eap)
 {
-    char_u	*line;
+    char_u	*کرښه;
     char_u	*p;
     char_u	*s;
     kmap_T	*kp;
 # define KMAP_LLEN   200	    // max length of "to" and "from" together
     char_u	buf[KMAP_LLEN + 11];
-    int		i;
+    صحيح		i;
     char_u	*save_cpo = p_cpo;
 
-    if (!sourcing_a_script(eap))
+    إذا (!sourcing_a_script(eap))
     {
-	emsg(_(e_using_loadkeymap_not_in_sourced_file));
-	return;
+	emsg(_(e_using_loadkeymap_not_دننه_sourced_file));
+	أرجع;
     }
 
-    if (eap->skip)
+    إذا (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
-	    vim_free(line);
-	return;
+	طالما ((کرښه = eap->ea_getline(0, eap->cookie, 0, TRUE)) != عدم)
+	    vim_free(کرښه);
+	أرجع;
     }
 
     /*
@@ -2313,7 +2313,7 @@ ex_loadkeymap(exarg_T *eap)
     keymap_unload();
 
     curbuf->b_kmap_state = 0;
-    ga_init2(&curbuf->b_kmap_ga, sizeof(kmap_T), 20);
+    ga_init2(&curbuf->b_kmap_ga, حجم(kmap_T), 20);
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
@@ -2321,77 +2321,77 @@ ex_loadkeymap(exarg_T *eap)
     /*
      * Get each line of the sourced file, break at the end.
      */
-    for (;;)
+    لكل (;;)
     {
-	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
-	    break;
+	کرښه = eap->ea_getline(0, eap->cookie, 0, TRUE);
+	إذا (کرښه == عدم)
+	    اكسر;
 
-	p = skipwhite(line);
-	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
+	p = skipwhite(کرښه);
+	إذا (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
-	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
+	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_معلومات + curbuf->b_kmap_ga.ga_len;
 	    s = skiptowhite(p);
 	    kp->from = vim_strnsave(p, s - p);
 	    p = skipwhite(s);
 	    s = skiptowhite(p);
-	    kp->to = vim_strnsave(p, s - p);
+	    kp->منزل = vim_strnsave(p, s - p);
 
-	    if (kp->from == NULL || kp->to == NULL
-		    || STRLEN(kp->from) + STRLEN(kp->to) >= KMAP_LLEN
-		    || *kp->from == NUL || *kp->to == NUL)
+	    إذا (kp->from == عدم || kp->منزل == عدم
+		    || STRLEN(kp->from) + STRLEN(kp->منزل) >= KMAP_LLEN
+		    || *kp->from == NUL || *kp->منزل == NUL)
 	    {
-		if (kp->to != NULL && *kp->to == NUL)
-		    emsg(_(e_empty_keymap_entry));
+		إذا (kp->منزل != عدم && *kp->منزل == NUL)
+		    emsg(_(e_تشه_keymap_ثبت));
 		vim_free(kp->from);
-		vim_free(kp->to);
+		vim_free(kp->منزل);
 	    }
-	    else
+	    وإلا
 		++curbuf->b_kmap_ga.ga_len;
 	}
-	vim_free(line);
+	vim_free(کرښه);
     }
 
     /*
      * setup ":lnoremap" to map the keys
      */
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    لكل (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s %s",
-				((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].from,
-				 ((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].to);
-	(void)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
+	vim_snprintf((حرف *)buf, حجم(buf), "<buffer> %s %s",
+				((kmap_T *)curbuf->b_kmap_ga.ga_معلومات)[i].from,
+				 ((kmap_T *)curbuf->b_kmap_ga.ga_معلومات)[i].منزل);
+	(فراغ)do_map(MAPTYPE_NOREMAP, buf, ډېرپېښ_LANGMAP, FALSE);
     }
 
     p_cpo = save_cpo;
 
     curbuf->b_kmap_state |= KEYMAP_LOADED;
-    status_redraw_curbuf();
+    حالت_redraw_curbuf();
 }
 
 /*
  * Stop using 'keymap'.
  */
-    static void
-keymap_unload(void)
+    ساكن فراغ
+keymap_unload(فراغ)
 {
     char_u	buf[KMAP_MAXLEN + 10];
-    int		i;
+    صحيح		i;
     char_u	*save_cpo = p_cpo;
     kmap_T	*kp;
 
-    if (!(curbuf->b_kmap_state & KEYMAP_LOADED))
-	return;
+    إذا (!(curbuf->b_kmap_state & KEYMAP_LOADED))
+	أرجع;
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
 
     // clear the ":lmap"s
-    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data;
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    kp = (kmap_T *)curbuf->b_kmap_ga.ga_معلومات;
+    لكل (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s", kp[i].from);
-	(void)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
+	vim_snprintf((حرف *)buf, حجم(buf), "<buffer> %s", kp[i].from);
+	(فراغ)do_map(MAPTYPE_UNMAP, buf, ډېرپېښ_LANGMAP, FALSE);
     }
     keymap_clear(&curbuf->b_kmap_ga);
 
@@ -2399,19 +2399,19 @@ keymap_unload(void)
 
     ga_clear(&curbuf->b_kmap_ga);
     curbuf->b_kmap_state &= ~KEYMAP_LOADED;
-    status_redraw_curbuf();
+    حالت_redraw_curbuf();
 }
 
-    void
+    فراغ
 keymap_clear(garray_T *kmap)
 {
-    int	    i;
-    kmap_T  *kp = (kmap_T *)kmap->ga_data;
+    صحيح	    i;
+    kmap_T  *kp = (kmap_T *)kmap->ga_معلومات;
 
-    for (i = 0; i < kmap->ga_len; ++i)
+    لكل (i = 0; i < kmap->ga_len; ++i)
     {
 	vim_free(kp[i].from);
-	vim_free(kp[i].to);
+	vim_free(kp[i].منزل);
     }
 }
-#endif // FEAT_KEYMAP
+#د_که_پای // FEAT_KEYMAP

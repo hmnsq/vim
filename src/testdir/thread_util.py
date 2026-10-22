@@ -1,9 +1,9 @@
-import platform
+استورد platform
 
-if platform.system() == 'Darwin':
-    from ctypes import (
+إذا platform.system() == 'Darwin':
+    من ctypes استورد (
         CDLL,
-        POINTER,
+        اشاره_ګر_2,
         Structure,
         byref,
         c_int,
@@ -12,9 +12,9 @@ if platform.system() == 'Darwin':
         c_void_p,
         sizeof
     )
-    from ctypes.util import find_library
+    من ctypes.util استورد پیدا_کړه_library
 
-    class ThreadTimeConstraintPolicy(Structure):
+    صنف Thread_وخت_Constraint_Policy(Structure):
         _fields_ = [
             ("period", c_uint32),
             ("computation", c_uint32),
@@ -22,12 +22,12 @@ if platform.system() == 'Darwin':
             ("preemptible", c_uint)
         ]
 
-    _libc = CDLL(find_library('c'))
+    _libc = CDLL(پیدا_کړه_library('c'))
 
-    THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
+    THREAD_وخت_CONSTRAINT_POLICY = c_uint(2)
 
-    THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
-        int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
+    THREAD_وخت_CONSTRAINT_POLICY_شمېر = c_uint(
+        صحيح(sizeof(Thread_وخت_Constraint_Policy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
 
@@ -39,52 +39,52 @@ if platform.system() == 'Darwin':
         c_uint,
         c_uint,
         c_void_p,
-        POINTER(c_uint),
-        POINTER(c_uint)
+        اشاره_ګر_2(c_uint),
+        اشاره_ګر_2(c_uint)
     ]
 
-    _libc.thread_policy_set.restype = c_int
-    _libc.thread_policy_set.argtypes = [
+    _libc.thread_policy_سېټ.restype = c_int
+    _libc.thread_policy_سېټ.argtypes = [
         c_uint,
         c_uint,
         c_void_p,
         c_uint
     ]
 
-    def _mach_thread_self():
-        return _libc.pthread_mach_thread_np(_libc.pthread_self())
+    تعریف _mach_thread_self():
+        أرجع _libc.pthread_mach_thread_np(_libc.pthread_self())
 
-    def _get_time_constraint_policy(default=False):
+    تعریف get_وخت_constraint_policy(افتراضي=خطأ):
         thread = _mach_thread_self()
-        policy_info = ThreadTimeConstraintPolicy()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
-        get_default = c_uint(default)
+        policy_info = Thread_وخت_Constraint_Policy()
+        policy_infoCnt = THREAD_وخت_CONSTRAINT_POLICY_شمېر
+        get_default = c_uint(افتراضي)
 
         kret = _libc.thread_policy_get(
             thread,
-            THREAD_TIME_CONSTRAINT_POLICY,
+            THREAD_وخت_CONSTRAINT_POLICY,
             byref(policy_info),
             byref(policy_infoCnt),
             byref(get_default))
-        if kret != 0:
-            return None
-        return policy_info
+        إذا kret != 0:
+            أرجع هیڅ
+        أرجع policy_info
 
-    def _set_time_constraint_policy(policy_info):
+    تعریف سېټ_وخت_constraint_policy(policy_info):
         thread = _mach_thread_self()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
+        policy_infoCnt = THREAD_وخت_CONSTRAINT_POLICY_شمېر
 
-        kret = _libc.thread_policy_set(
+        kret = _libc.thread_policy_سېټ(
             thread,
-            THREAD_TIME_CONSTRAINT_POLICY,
+            THREAD_وخت_CONSTRAINT_POLICY,
             byref(policy_info),
             policy_infoCnt)
-        if kret != 0:
-            raise OSError(kret)
+        إذا kret != 0:
+            ارفع OSError(kret)
 
-    def set_high_priority():
-        policy_info = _get_time_constraint_policy(default=True)
-        if not policy_info:
-            return
-        policy_info.preemptible = c_uint(False)
-        _set_time_constraint_policy(policy_info)
+    تعریف سېټ_لوړ_لومړیتوب():
+        policy_info = get_وخت_constraint_policy(افتراضي=ریښتیا)
+        إذا ليس policy_info:
+            أرجع
+        policy_info.preemptible = c_uint(خطأ)
+        سېټ_وخت_constraint_policy(policy_info)

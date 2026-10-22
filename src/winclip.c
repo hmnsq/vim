@@ -14,17 +14,17 @@
  * Also used by Cygwin, using os_unix.c.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * Compile only the clipboard handling features when compiling for cygwin
  * posix environment.
  */
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-# define WIN32_LEAN_AND_MEAN
+#که_تعریف_شوی FEAT_CYGWIN_WIN32_CLIPBOARD
+# define WIN32_LEAN_AND_منځنۍ
 # include <windows.h>
 # include "winclip.pro"
-#endif
+#د_که_پای
 
 /*
  * Convert an UTF-8 string to UTF-16.
@@ -33,46 +33,46 @@
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Returns the number of UTF-16 words produced.
  */
-    int
-utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
+    صحيح
+utf8_منزل_utf16(char_u *instr, صحيح inlen, short_u *outstr, صحيح *unconvlenp)
 {
-    int		outlen = 0;
+    صحيح		outlen = 0;
     char_u	*p = instr;
-    int		todo = inlen;
-    int		l;
-    int		ch;
+    صحيح		todo = inlen;
+    صحيح		l;
+    صحيح		ch;
 
-    while (todo > 0)
+    طالما (todo > 0)
     {
 	// Only convert if we have a complete sequence.
 	l = utf_ptr2len_len(p, todo);
-	if (l > todo)
+	إذا (l > todo)
 	{
 	    // Return length of incomplete sequence.
-	    if (unconvlenp != NULL)
+	    إذا (unconvlenp != عدم)
 		*unconvlenp = todo;
-	    break;
+	    اكسر;
 	}
 
 	ch = utf_ptr2char(p);
-	if (ch >= 0x10000)
+	إذا (ch >= 0x10000)
 	{
 	    // non-BMP character, encoding with surrogate pairs
 	    ++outlen;
-	    if (outstr != NULL)
+	    إذا (outstr != عدم)
 	    {
 		*outstr++ = (0xD800 - (0x10000 >> 10)) + (ch >> 10);
 		*outstr++ = 0xDC00 | (ch & 0x3FF);
 	    }
 	}
-	else if (outstr != NULL)
+	وإلا إذا (outstr != عدم)
 	    *outstr++ = ch;
 	++outlen;
 	p += l;
 	todo -= l;
     }
 
-    return outlen;
+    أرجع outlen;
 }
 
 /*
@@ -82,42 +82,42 @@ utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Return the number of bytes produced.
  */
-    int
-utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
+    صحيح
+utf16_منزل_utf8(short_u *instr, صحيح inlen, char_u *outstr)
 {
-    int		outlen = 0;
-    int		todo = inlen;
+    صحيح		outlen = 0;
+    صحيح		todo = inlen;
     short_u	*p = instr;
-    int		l;
-    int		ch, ch2;
+    صحيح		l;
+    صحيح		ch, ch2;
 
-    while (todo > 0)
+    طالما (todo > 0)
     {
 	ch = *p;
-	if (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
+	إذا (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
 	{
 	    // surrogate pairs handling
 	    ch2 = p[1];
-	    if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+	    إذا (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 	    {
 		ch = ((ch - 0xD800) << 10) + (ch2 & 0x3FF) + 0x10000;
 		++p;
 		--todo;
 	    }
 	}
-	if (outstr != NULL)
+	إذا (outstr != عدم)
 	{
 	    l = utf_char2bytes(ch, outstr);
 	    outstr += l;
 	}
-	else
+	وإلا
 	    l = utf_char2len(ch);
 	++p;
 	outlen += l;
 	--todo;
     }
 
-    return outlen;
+    أرجع outlen;
 }
 
 /*
@@ -125,48 +125,48 @@ utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
  * Returns the result in "*out[*outlen]" with an extra zero appended.
  * "outlen" is in words.
  */
-    void
-MultiByteToWideChar_alloc(UINT cp, DWORD flags,
-	LPCSTR in, int inlen,
-	LPWSTR *out, int *outlen)
+    فراغ
+Multi_Byte_منزل_Wide_Char_alloc(UINT cp, DWORD flags,
+	LPCSTR دننه, صحيح inlen,
+	LPWSTR *بهر, صحيح *outlen)
 {
-    *outlen = MultiByteToWideChar(cp, flags, in, inlen, 0, 0);
+    *outlen = Multi_Byte_منزل_Wide_Char(cp, flags, دننه, inlen, 0, 0);
     // Add one word to avoid a zero-length alloc().
-    *out = ALLOC_MULT(WCHAR, *outlen + 1);
-    if (*out == NULL)
-	return;
+    *بهر = ALLOC_MULT(WCHAR, *outlen + 1);
+    إذا (*بهر == عدم)
+	أرجع;
 
-    MultiByteToWideChar(cp, flags, in, inlen, *out, *outlen);
-    (*out)[*outlen] = 0;
+    Multi_Byte_منزل_Wide_Char(cp, flags, دننه, inlen, *بهر, *outlen);
+    (*بهر)[*outlen] = 0;
 }
 
 /*
  * Call WideCharToMultiByte() and allocate memory for the result.
  * Returns the result in "*out[*outlen]" with an extra NUL appended.
  */
-    void
-WideCharToMultiByte_alloc(UINT cp, DWORD flags,
-	LPCWSTR in, int inlen,
-	LPSTR *out, int *outlen,
+    فراغ
+Wide_Char_منزل_Multi_Byte_alloc(UINT cp, DWORD flags,
+	LPCWSTR دننه, صحيح inlen,
+	LPSTR *بهر, صحيح *outlen,
 	LPCSTR def, LPBOOL useddef)
 {
-    *outlen = WideCharToMultiByte(cp, flags, in, inlen, NULL, 0, def, useddef);
+    *outlen = Wide_Char_منزل_Multi_Byte(cp, flags, دننه, inlen, عدم, 0, def, useddef);
     // Add one byte to avoid a zero-length alloc().
-    *out = alloc(*outlen + 1);
-    if (*out == NULL)
-	return;
-    WideCharToMultiByte(cp, flags, in, inlen, *out, *outlen, def, useddef);
-    (*out)[*outlen] = 0;
+    *بهر = alloc(*outlen + 1);
+    إذا (*بهر == عدم)
+	أرجع;
+    Wide_Char_منزل_Multi_Byte(cp, flags, دننه, inlen, *بهر, *outlen, def, useddef);
+    (*بهر)[*outlen] = 0;
 }
 
 
-#ifdef FEAT_CLIPBOARD
+#که_تعریف_شوی FEAT_CLIPBOARD
 /*
  * Clipboard stuff, for cutting and pasting text to other windows.
  */
 
-    void
-win_clip_init(void)
+    فراغ
+win_clip_init(فراغ)
 {
     clip_init(TRUE);
 
@@ -176,38 +176,38 @@ win_clip_init(void)
      * "Clipboard_T" was used for previous versions, using the first
      * character to specify MCHAR, MLINE or MBLOCK.
      */
-    clip_star.format = RegisterClipboardFormat("VimClipboard2");
-    clip_star.format_raw = RegisterClipboardFormat("VimRawBytes");
+    clip_ستوری.format = ثبتوونکی_Clipboard_Format("VimClipboard2");
+    clip_ستوری.format_raw = ثبتوونکی_Clipboard_Format("VimRawBytes");
 }
 
 // Type used for the clipboard type of Vim's data.
-typedef struct
+تعريفنوع بنية
 {
-    int type;		// MCHAR, MBLOCK or MLINE
-    int txtlen;		// length of CF_TEXT in bytes
-    int ucslen;		// length of CF_UNICODETEXT in words
-    int rawlen;		// length of clip_star.format_raw, including encoding,
+    صحيح type;		// MCHAR, MBLOCK or MLINE
+    صحيح txtlen;		// length of CF_TEXT in bytes
+    صحيح ucslen;		// length of CF_UNICODETEXT in words
+    صحيح rawlen;		// length of clip_star.format_raw, including encoding,
 			// excluding terminating NUL
 } VimClipType_t;
 
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
-clip_mch_own_selection(Clipboard_T *cbd UNUSED)
+    صحيح
+clip_mch_own_selection(Clipboard_T *cbd ناکارول_شوی)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Make vim NOT the owner of the current selection.
  */
-    void
-clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
+    فراغ
+clip_mch_lose_selection(Clipboard_T *cbd ناکارول_شوی)
 {
     // Nothing needs to be done here
 }
@@ -217,50 +217,50 @@ clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
  * Return the allocated result and the size in "*size".
  * Returns NULL when out of memory.
  */
-    static char_u *
-crnl_to_nl(const char_u *str, int *size)
+    ساكن char_u *
+crnl_منزل_nl(ثابت char_u *str, صحيح *اندازه)
 {
-    int		pos = 0;
-    int		str_len = *size;
+    صحيح		pos = 0;
+    صحيح		str_len = *اندازه;
     char_u	*ret;
     char_u	*retp;
 
     // Avoid allocating zero bytes, it generates an error message.
     ret = alloc(str_len == 0 ? 1 : str_len);
-    if (ret != NULL)
+    إذا (ret != عدم)
     {
 	retp = ret;
-	for (pos = 0; pos < str_len; ++pos)
+	لكل (pos = 0; pos < str_len; ++pos)
 	{
-	    if (str[pos] == '\r' && str[pos + 1] == '\n')
+	    إذا (str[pos] == '\r' && str[pos + 1] == '\n')
 	    {
 		++pos;
-		--(*size);
+		--(*اندازه);
 	    }
 	    *retp++ = str[pos];
 	}
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Wait for another process to Close the Clipboard.
  * Returns TRUE for success.
  */
-    static int
-vim_open_clipboard(void)
+    ساكن صحيح
+vim_open_clipboard(فراغ)
 {
-    int delay = 10;
+    صحيح delay = 10;
 
-    while (!OpenClipboard(NULL))
+    طالما (!OpenClipboard(عدم))
     {
-	if (delay > 500)
-	    return FALSE;  // waited too long, give up
+	إذا (delay > 500)
+	    أرجع FALSE;  // waited too long, give up
 	Sleep(delay);
 	delay *= 2;	// wait for 10, 20, 40, 80, etc. msec
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -274,176 +274,176 @@ vim_open_clipboard(void)
  * so we can't just cast the return value of GetClipboardData to (char_u*).
  * <VN>
  */
-    void
+    فراغ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
     VimClipType_t	metadata = { -1, -1, -1, -1 };
-    HGLOBAL		hMem = NULL;
-    char_u		*str = NULL;
-    char_u		*to_free = NULL;
-    HGLOBAL		rawh = NULL;
-    int			str_size = 0;
-    int			maxlen;
+    HGLOBAL		hMem = عدم;
+    char_u		*str = عدم;
+    char_u		*منزل_free = عدم;
+    HGLOBAL		rawh = عدم;
+    صحيح			str_اندازه = 0;
+    صحيح			maxlen;
     size_t		n;
 
     /*
      * Don't pass GetActiveWindow() as an argument to OpenClipboard() because
      * then we can't paste back into the same window for some reason - webb.
      */
-    if (!vim_open_clipboard())
-	return;
+    إذا (!vim_open_clipboard())
+	أرجع;
 
     // Check for vim's own clipboard format first.  This only gets the type of
     // the data, still need to use CF_UNICODETEXT or CF_TEXT for the text.
-    if (IsClipboardFormatAvailable(cbd->format))
+    إذا (Is_Clipboard_Format_شته(cbd->format))
     {
 	VimClipType_t	*meta_p;
 	HGLOBAL		meta_h;
 
 	// We have metadata on the clipboard; try to get it.
-	if ((meta_h = GetClipboardData(cbd->format)) != NULL
-		&& (meta_p = (VimClipType_t *)GlobalLock(meta_h)) != NULL)
+	إذا ((meta_h = Get_Clipboard_معلومات(cbd->format)) != عدم
+		&& (meta_p = (VimClipType_t *)Global_قلف(meta_h)) != عدم)
 	{
 	    // The size of "VimClipType_t" changed, "rawlen" was added later.
 	    // Only copy what is available for backwards compatibility.
-	    n = sizeof(VimClipType_t);
-	    if (GlobalSize(meta_h) < n)
-		n = GlobalSize(meta_h);
-	    memcpy(&metadata, meta_p, n);
+	    n = حجم(VimClipType_t);
+	    إذا (Global_اندازه(meta_h) < n)
+		n = Global_اندازه(meta_h);
+	    حافظه_نقل(&metadata, meta_p, n);
 	    GlobalUnlock(meta_h);
 	}
     }
 
     // Check for Vim's raw clipboard format first.  This is used without
     // conversion, but only if 'encoding' matches.
-    if (IsClipboardFormatAvailable(cbd->format_raw)
-				      && metadata.rawlen > (int)STRLEN(p_enc))
+    إذا (Is_Clipboard_Format_شته(cbd->format_raw)
+				      && metadata.rawlen > (صحيح)STRLEN(p_enc))
     {
 	// We have raw data on the clipboard; try to get it.
-	if ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
+	إذا ((rawh = Get_Clipboard_معلومات(cbd->format_raw)) != عدم)
 	{
 	    char_u	*rawp;
 
-	    rawp = (char_u *)GlobalLock(rawh);
-	    if (rawp != NULL && STRCMP(p_enc, rawp) == 0)
+	    rawp = (char_u *)Global_قلف(rawh);
+	    إذا (rawp != عدم && STRCMP(p_enc, rawp) == 0)
 	    {
 		n = STRLEN(p_enc) + 1;
 		str = rawp + n;
-		str_size = (int)(metadata.rawlen - n);
+		str_اندازه = (صحيح)(metadata.rawlen - n);
 	    }
-	    else
+	    وإلا
 	    {
 		GlobalUnlock(rawh);
-		rawh = NULL;
+		rawh = عدم;
 	    }
 	}
     }
-    if (str == NULL)
+    إذا (str == عدم)
     {
 	// Try to get the clipboard in Unicode if it's not an empty string.
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
+	إذا (Is_Clipboard_Format_شته(CF_UNICODETEXT) && metadata.ucslen != 0)
 	{
 	    HGLOBAL hMemW;
 
-	    if ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
+	    إذا ((hMemW = Get_Clipboard_معلومات(CF_UNICODETEXT)) != عدم)
 	    {
-		WCHAR *hMemWstr = (WCHAR *)GlobalLock(hMemW);
+		WCHAR *hMemWstr = (WCHAR *)Global_قلف(hMemW);
 
 		// Use the length of our metadata if possible, but limit it to
 		// the GlobalSize() for safety.
-		maxlen = (int)(GlobalSize(hMemW) / sizeof(WCHAR));
-		if (metadata.ucslen >= 0)
+		maxlen = (صحيح)(Global_اندازه(hMemW) / حجم(WCHAR));
+		إذا (metadata.ucslen >= 0)
 		{
-		    if (metadata.ucslen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.ucslen;
+		    إذا (metadata.ucslen > maxlen)
+			str_اندازه = maxlen;
+		    وإلا
+			str_اندازه = metadata.ucslen;
 		}
-		else
+		وإلا
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (hMemWstr[str_size] == NUL)
-			    break;
+		    لكل (str_اندازه = 0; str_اندازه < maxlen; ++str_اندازه)
+			إذا (hMemWstr[str_اندازه] == NUL)
+			    اكسر;
 		}
-		to_free = str = utf16_to_enc((short_u *)hMemWstr, &str_size);
+		منزل_free = str = utf16_منزل_enc((short_u *)hMemWstr, &str_اندازه);
 		GlobalUnlock(hMemW);
 	    }
 	}
 	// Get the clipboard in the Active codepage.
-	else if (IsClipboardFormatAvailable(CF_TEXT))
+	وإلا إذا (Is_Clipboard_Format_شته(CF_متن))
 	{
-	    if ((hMem = GetClipboardData(CF_TEXT)) != NULL)
+	    إذا ((hMem = Get_Clipboard_معلومات(CF_متن)) != عدم)
 	    {
-		str = (char_u *)GlobalLock(hMem);
+		str = (char_u *)Global_قلف(hMem);
 
 		// The length is either what our metadata says or the strlen().
 		// But limit it to the GlobalSize() for safety.
-		maxlen = (int)GlobalSize(hMem);
-		if (metadata.txtlen >= 0)
+		maxlen = (صحيح)Global_اندازه(hMem);
+		إذا (metadata.txtlen >= 0)
 		{
-		    if (metadata.txtlen > maxlen)
-			str_size = maxlen;
-		    else
-			str_size = metadata.txtlen;
+		    إذا (metadata.txtlen > maxlen)
+			str_اندازه = maxlen;
+		    وإلا
+			str_اندازه = metadata.txtlen;
 		}
-		else
+		وإلا
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (str[str_size] == NUL)
-			    break;
+		    لكل (str_اندازه = 0; str_اندازه < maxlen; ++str_اندازه)
+			إذا (str[str_اندازه] == NUL)
+			    اكسر;
 		}
 
 		// The text is in the active codepage.  Convert to
 		// 'encoding', going through UTF-16.
-		acp_to_enc(str, str_size, &to_free, &maxlen);
-		if (to_free != NULL)
+		acp_منزل_enc(str, str_اندازه, &منزل_free, &maxlen);
+		إذا (منزل_free != عدم)
 		{
-		    str_size = maxlen;
-		    str = to_free;
+		    str_اندازه = maxlen;
+		    str = منزل_free;
 		}
 	    }
 	}
     }
 
-    if (str != NULL && metadata.txtlen != 0)
+    إذا (str != عدم && metadata.txtlen != 0)
     {
-	char_u *temp_clipboard;
+	char_u *لنډمهاله_clipboard;
 
 	// If the type is not known detect it.
-	if (metadata.type == -1)
+	إذا (metadata.type == -1)
 	    metadata.type = MAUTO;
 
 	// Translate <CR><NL> into <NL>.
-	temp_clipboard = crnl_to_nl(str, &str_size);
-	if (temp_clipboard != NULL)
+	لنډمهاله_clipboard = crnl_منزل_nl(str, &str_اندازه);
+	إذا (لنډمهاله_clipboard != عدم)
 	{
-	    clip_yank_selection(metadata.type, temp_clipboard, str_size, cbd);
-	    vim_free(temp_clipboard);
+	    clip_yank_selection(metadata.type, لنډمهاله_clipboard, str_اندازه, cbd);
+	    vim_free(لنډمهاله_clipboard);
 	}
     }
 
     // unlock the global object
-    if (hMem != NULL)
+    إذا (hMem != عدم)
 	GlobalUnlock(hMem);
-    if (rawh != NULL)
+    إذا (rawh != عدم)
 	GlobalUnlock(rawh);
     CloseClipboard();
-    vim_free(to_free);
+    vim_free(منزل_free);
 }
 
 /*
  * Send the current selection to the clipboard.
  */
-    void
-clip_mch_set_selection(Clipboard_T *cbd)
+    فراغ
+clip_mch_سېټ_selection(Clipboard_T *cbd)
 {
-    char_u		*str = NULL;
+    char_u		*str = عدم;
     VimClipType_t	metadata;
     long_u		txtlen;
-    HGLOBAL		hMemRaw = NULL;
-    HGLOBAL		hMem = NULL;
-    HGLOBAL		hMemVim = NULL;
-    HGLOBAL		hMemW = NULL;
+    HGLOBAL		hMemRaw = عدم;
+    HGLOBAL		hMem = عدم;
+    HGLOBAL		hMemVim = عدم;
+    HGLOBAL		hMemW = عدم;
 
     // If the '*' register isn't already filled in, fill it in now
     cbd->owned = TRUE;
@@ -452,9 +452,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Get the text to be put on the clipboard, with CR-LF.
     metadata.type = clip_convert_selection(&str, &txtlen, cbd);
-    if (metadata.type < 0)
-	return;
-    metadata.txtlen = (int)txtlen;
+    إذا (metadata.type < 0)
+	أرجع;
+    metadata.txtlen = (صحيح)txtlen;
     metadata.ucslen = 0;
     metadata.rawlen = 0;
 
@@ -464,57 +464,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMemRaw;
 
-	metadata.rawlen = (int)(txtlen + STRLEN(p_enc) + 1);
+	metadata.rawlen = (صحيح)(txtlen + STRLEN(p_enc) + 1);
 	hMemRaw = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							 metadata.rawlen + 1);
-	lpszMemRaw = (LPSTR)GlobalLock(hMemRaw);
-	if (lpszMemRaw != NULL)
+	lpszMemRaw = (LPSTR)Global_قلف(hMemRaw);
+	إذا (lpszMemRaw != عدم)
 	{
 	    STRCPY(lpszMemRaw, p_enc);
-	    memcpy(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
+	    حافظه_نقل(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
 	    GlobalUnlock(hMemRaw);
 	}
-	else
+	وإلا
 	    metadata.rawlen = 0;
     }
 
     {
-	WCHAR		*out;
-	int		len = metadata.txtlen;
+	WCHAR		*بهر;
+	صحيح		len = metadata.txtlen;
 
 	// Convert the text to UTF-16. This is put on the clipboard as
 	// CF_UNICODETEXT.
-	out = (WCHAR *)enc_to_utf16(str, &len);
-	if (out != NULL)
+	بهر = (WCHAR *)enc_منزل_utf16(str, &len);
+	إذا (بهر != عدم)
 	{
 	    WCHAR *lpszMemW;
 
 	    // Convert the text for CF_TEXT to Active codepage. Otherwise it's
 	    // p_enc, which has no relation to the Active codepage.
-	    metadata.txtlen = WideCharToMultiByte(GetACP(), 0, out, len,
-							       NULL, 0, 0, 0);
+	    metadata.txtlen = Wide_Char_منزل_Multi_Byte(GetACP(), 0, بهر, len,
+							       عدم, 0, 0, 0);
 	    vim_free(str);
 	    str = alloc(metadata.txtlen == 0 ? 1 : metadata.txtlen);
-	    if (str == NULL)
+	    إذا (str == عدم)
 	    {
-		vim_free(out);
-		return;		// out of memory
+		vim_free(بهر);
+		أرجع;		// out of memory
 	    }
-	    WideCharToMultiByte(GetACP(), 0, out, len,
+	    Wide_Char_منزل_Multi_Byte(GetACP(), 0, بهر, len,
 					   (LPSTR)str, metadata.txtlen, 0, 0);
 
 	    // Allocate memory for the UTF-16 text, add one NUL word to
 	    // terminate the string.
 	    hMemW = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-						   (len + 1) * sizeof(WCHAR));
-	    lpszMemW = (WCHAR *)GlobalLock(hMemW);
-	    if (lpszMemW != NULL)
+						   (len + 1) * حجم(WCHAR));
+	    lpszMemW = (WCHAR *)Global_قلف(hMemW);
+	    إذا (lpszMemW != عدم)
 	    {
-		memcpy(lpszMemW, out, len * sizeof(WCHAR));
+		حافظه_نقل(lpszMemW, بهر, len * حجم(WCHAR));
 		lpszMemW[len] = NUL;
 		GlobalUnlock(hMemW);
 	    }
-	    vim_free(out);
+	    vim_free(بهر);
 	    metadata.ucslen = len;
 	}
     }
@@ -522,9 +522,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
     // Allocate memory for the text, add one NUL byte to terminate the string.
     hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, metadata.txtlen + 1);
     {
-	LPSTR lpszMem = (LPSTR)GlobalLock(hMem);
+	LPSTR lpszMem = (LPSTR)Global_قلف(hMem);
 
-	if (lpszMem)
+	إذا (lpszMem)
 	{
 	    mch_memmove((char_u *)lpszMem, str, metadata.txtlen);
 	    GlobalUnlock(hMem);
@@ -533,12 +533,12 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Set up metadata:
     {
-	VimClipType_t *lpszMemVim = NULL;
+	VimClipType_t *lpszMemVim = عدم;
 
 	hMemVim = GlobalAlloc(GMEM_MOVEABLE|GMEM_DDESHARE,
-						       sizeof(VimClipType_t));
-	lpszMemVim = (VimClipType_t *)GlobalLock(hMemVim);
-	memcpy(lpszMemVim, &metadata, sizeof(metadata));
+						       حجم(VimClipType_t));
+	lpszMemVim = (VimClipType_t *)Global_قلف(hMemVim);
+	حافظه_نقل(lpszMemVim, &metadata, حجم(metadata));
 	GlobalUnlock(hMemVim);
     }
 
@@ -550,20 +550,20 @@ clip_mch_set_selection(Clipboard_T *cbd)
      * because then we can't paste back into the same window for some
      * reason - webb.
      */
-    if (vim_open_clipboard())
+    إذا (vim_open_clipboard())
     {
-	if (EmptyClipboard())
+	إذا (تشه_Clipboard())
 	{
-	    SetClipboardData(cbd->format, hMemVim);
+	    سېټ_Clipboard_معلومات(cbd->format, hMemVim);
 	    hMemVim = 0;
-	    if (hMemW != NULL)
+	    إذا (hMemW != عدم)
 	    {
-		if (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
-		    hMemW = NULL;
+		إذا (سېټ_Clipboard_معلومات(CF_UNICODETEXT, hMemW) != عدم)
+		    hMemW = عدم;
 	    }
 	    // Always use CF_TEXT.  On Win98 Notepad won't obtain the
 	    // CF_UNICODETEXT text, only CF_TEXT.
-	    SetClipboardData(CF_TEXT, hMem);
+	    سېټ_Clipboard_معلومات(CF_متن, hMem);
 	    hMem = 0;
 	}
 	CloseClipboard();
@@ -571,17 +571,17 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     vim_free(str);
     // Free any allocations we didn't give to the clipboard:
-    if (hMemRaw)
+    إذا (hMemRaw)
 	GlobalFree(hMemRaw);
-    if (hMem)
+    إذا (hMem)
 	GlobalFree(hMem);
-    if (hMemW)
+    إذا (hMemW)
 	GlobalFree(hMemW);
-    if (hMemVim)
+    إذا (hMemVim)
 	GlobalFree(hMemVim);
 }
 
-#endif // FEAT_CLIPBOARD
+#د_که_پای // FEAT_CLIPBOARD
 
 /*
  * Note: the following two functions are only guaranteed to work when using
@@ -596,57 +596,57 @@ clip_mch_set_selection(Clipboard_T *cbd)
  * Returns NULL when out of memory.
  */
     short_u *
-enc_to_utf16(char_u *str, int *lenp)
+enc_منزل_utf16(char_u *str, صحيح *lenp)
 {
     vimconv_T	conv;
     WCHAR	*ret;
-    char_u	*allocbuf = NULL;
-    int		len_loc;
-    int		length;
+    char_u	*allocbuf = عدم;
+    صحيح		len_loc;
+    صحيح		اوږدتیا;
 
-    if (lenp == NULL)
+    إذا (lenp == عدم)
     {
-	len_loc = (int)STRLEN(str) + 1;
+	len_loc = (صحيح)STRLEN(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    إذا (enc_codepage > 0)
     {
 	// We can do any CP### -> UTF-16 in one pass, and we can do it
 	// without iconv() (convert_* may need iconv).
-	MultiByteToWideChar_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
-							       &ret, &length);
+	Multi_Byte_منزل_Wide_Char_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
+							       &ret, &اوږدتیا);
     }
-    else
+    وإلا
     {
 	// Use "latin1" by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
+	إذا (convert_تیاری(&conv, p_enc ? p_enc : (char_u *)"latin1",
 						   (char_u *)"utf-8") == FAIL)
-	    return NULL;
-	if (conv.vc_type != CONV_NONE)
+	    أرجع عدم;
+	إذا (conv.vc_type != CONV_NONE)
 	{
 	    str = allocbuf = string_convert(&conv, str, lenp);
-	    if (str == NULL)
-		return NULL;
+	    إذا (str == عدم)
+		أرجع عدم;
 	}
-	convert_setup(&conv, NULL, NULL);
+	convert_تیاری(&conv, عدم, عدم);
 
-	length = utf8_to_utf16(str, *lenp, NULL, NULL);
-	ret = ALLOC_MULT(WCHAR, length + 1);
-	if (ret != NULL)
+	اوږدتیا = utf8_منزل_utf16(str, *lenp, عدم, عدم);
+	ret = ALLOC_MULT(WCHAR, اوږدتیا + 1);
+	إذا (ret != عدم)
 	{
-	    utf8_to_utf16(str, *lenp, (short_u *)ret, NULL);
-	    ret[length] = 0;
+	    utf8_منزل_utf16(str, *lenp, (short_u *)ret, عدم);
+	    ret[اوږدتیا] = 0;
 	}
 
 	vim_free(allocbuf);
     }
 
-    *lenp = length;
-    return (short_u *)ret;
+    *lenp = اوږدتیا;
+    أرجع (short_u *)ret;
 }
 
 /*
@@ -658,54 +658,54 @@ enc_to_utf16(char_u *str, int *lenp)
  * Returns NULL when out of memory.
  */
     char_u *
-utf16_to_enc(short_u *str, int *lenp)
+utf16_منزل_enc(short_u *str, صحيح *lenp)
 {
     vimconv_T	conv;
-    char_u	*utf8_str = NULL, *enc_str = NULL;
-    int		len_loc;
+    char_u	*utf8_str = عدم, *enc_str = عدم;
+    صحيح		len_loc;
 
-    if (lenp == NULL)
+    إذا (lenp == عدم)
     {
-	len_loc = (int)wcslen(str) + 1;
+	len_loc = (صحيح)wcslen(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    إذا (enc_codepage > 0)
     {
 	// We can do any UTF-16 -> CP### in one pass.
-	int length;
+	صحيح اوږدتیا;
 
-	WideCharToMultiByte_alloc(enc_codepage, 0, str, *lenp,
-					    (LPSTR *)&enc_str, &length, 0, 0);
-	*lenp = length;
-	return enc_str;
+	Wide_Char_منزل_Multi_Byte_alloc(enc_codepage, 0, str, *lenp,
+					    (LPSTR *)&enc_str, &اوږدتیا, 0, 0);
+	*lenp = اوږدتیا;
+	أرجع enc_str;
     }
 
     // Avoid allocating zero bytes, it generates an error message.
-    utf8_str = alloc(utf16_to_utf8(str, *lenp == 0 ? 1 : *lenp, NULL));
-    if (utf8_str != NULL)
+    utf8_str = alloc(utf16_منزل_utf8(str, *lenp == 0 ? 1 : *lenp, عدم));
+    إذا (utf8_str != عدم)
     {
-	*lenp = utf16_to_utf8(str, *lenp, utf8_str);
+	*lenp = utf16_منزل_utf8(str, *lenp, utf8_str);
 
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, (char_u *)"utf-8",
+	convert_تیاری(&conv, (char_u *)"utf-8",
 					    p_enc? p_enc: (char_u *)"latin1");
-	if (conv.vc_type == CONV_NONE)
+	إذا (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    enc_str = utf8_str;
 	}
-	else
+	وإلا
 	{
 	    enc_str = string_convert(&conv, utf8_str, lenp);
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_تیاری(&conv, عدم, عدم);
     }
 
-    return enc_str;
+    أرجع enc_str;
 }
 
 /*
@@ -714,22 +714,22 @@ utf16_to_enc(short_u *str, int *lenp)
  * The result is in allocated memory: "out[outlen]".  "outlen" includes the
  * terminating NUL.
  */
-    void
-acp_to_enc(
+    فراغ
+acp_منزل_enc(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    صحيح		str_اندازه,
+    char_u	**بهر,
+    صحيح		*outlen)
 
 {
     LPWSTR	widestr;
 
-    MultiByteToWideChar_alloc(GetACP(), 0, (LPCSTR)str, str_size,
+    Multi_Byte_منزل_Wide_Char_alloc(GetACP(), 0, (LPCSTR)str, str_اندازه,
 							    &widestr, outlen);
-    if (widestr == NULL)
-	return;
+    إذا (widestr == عدم)
+	أرجع;
     ++*outlen;	// Include the 0 after the string
-    *out = utf16_to_enc((short_u *)widestr, outlen);
+    *بهر = utf16_منزل_enc((short_u *)widestr, outlen);
     vim_free(widestr);
 }
 
@@ -738,21 +738,21 @@ acp_to_enc(
  * Input is "str[str_size]".
  * The result is in allocated memory: "out[outlen]".  With terminating NUL.
  */
-    void
-enc_to_acp(
+    فراغ
+enc_منزل_acp(
     char_u	*str,
-    int		str_size,
-    char_u	**out,
-    int		*outlen)
+    صحيح		str_اندازه,
+    char_u	**بهر,
+    صحيح		*outlen)
 
 {
     LPWSTR	widestr;
-    int		len = str_size;
+    صحيح		len = str_اندازه;
 
-    widestr = (WCHAR *)enc_to_utf16(str, &len);
-    if (widestr == NULL)
-	return;
-    WideCharToMultiByte_alloc(GetACP(), 0, widestr, len,
-	    (LPSTR *)out, outlen, 0, 0);
+    widestr = (WCHAR *)enc_منزل_utf16(str, &len);
+    إذا (widestr == عدم)
+	أرجع;
+    Wide_Char_منزل_Multi_Byte_alloc(GetACP(), 0, widestr, len,
+	    (LPSTR *)بهر, outlen, 0, 0);
     vim_free(widestr);
 }

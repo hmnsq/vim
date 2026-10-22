@@ -20,37 +20,37 @@
  *
  */
 
-#if !defined(XUTILS_H)
-#define XUTILS_H
+#إذا !defined(XUTILS_H)
+#تعریف_کړه XUTILS_H
 
 
 
-long xdl_bogosqrt(long n);
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+اوږد xdl_bogosqrt(اوږد n);
+صحيح xdl_emit_diffrec(حرف ثابت *rec, اوږد اندازه, حرف ثابت *pre, اوږد psize,
 		     xdemitcb_t *ecb);
-int xdl_cha_init(chastore_t *cha, long isize, long icount);
-void xdl_cha_free(chastore_t *cha);
-void *xdl_cha_alloc(chastore_t *cha);
-long xdl_guess_lines(mmfile_t *mf, long sample);
-int xdl_blankline(const char *line, long size, long flags);
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top);
-unsigned long xdl_hash_record_with_whitespace(char const **data, char const *top, long flags);
-static inline unsigned long xdl_hash_record(char const **data, char const *top, long flags)
+صحيح xdl_cha_init(chastore_t *cha, اوږد isize, اوږد icount);
+فراغ xdl_cha_free(chastore_t *cha);
+فراغ *xdl_cha_alloc(chastore_t *cha);
+اوږد xdl_guess_کرښې(mmfile_t *mf, اوږد sample);
+صحيح xdl_blankline(ثابت حرف *کرښه, اوږد اندازه, اوږد flags);
+صحيح xdl_recmatch(ثابت حرف *l1, اوږد s1, ثابت حرف *l2, اوږد s2, اوږد flags);
+بینښه اوږد xdl_hash_ریکارډ_verbatim(حرف ثابت **معلومات, حرف ثابت *سر_2);
+بینښه اوږد xdl_hash_ریکارډ_with_whitespace(حرف ثابت **معلومات, حرف ثابت *سر_2, اوږد flags);
+ساكن مضمن بینښه اوږد xdl_hash_ریکارډ(حرف ثابت **معلومات, حرف ثابت *سر_2, اوږد flags)
 {
-	if (flags & XDF_WHITESPACE_FLAGS)
-		return xdl_hash_record_with_whitespace(data, top, flags);
-	else
-		return xdl_hash_record_verbatim(data, top);
+	إذا (flags & XDF_WHITESPACE_FLAGS)
+		أرجع xdl_hash_ریکارډ_with_whitespace(معلومات, سر_2, flags);
+	وإلا
+		أرجع xdl_hash_ریکارډ_verbatim(معلومات, سر_2);
 }
-unsigned int xdl_hashbits(unsigned int size);
-int xdl_num_out(char *out, long val);
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen, xdemitcb_t *ecb);
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		       int line1, int count1, int line2, int count2);
+بینښه صحيح xdl_hashbits(بینښه صحيح اندازه);
+صحيح xdl_عدد_بهر(حرف *بهر, اوږد val);
+صحيح xdl_emit_hunk_hdr(اوږد s1, اوږد c1, اوږد s2, اوږد c2,
+		      ثابت حرف *func, اوږد funclen, xdemitcb_t *ecb);
+صحيح xdl_fall_شا_diff(xdfenv_t *diff_env, xpparam_t ثابت *xpp,
+		       صحيح line1, صحيح count1, صحيح line2, صحيح count2);
 
 /* Do not call this function, use XDL_ALLOC_GROW instead */
-void* xdl_alloc_grow_helper(void* p, long nr, long* alloc, size_t size);
+فراغ* xdl_alloc_grow_helper(فراغ* p, اوږد nr, اوږد* alloc, size_t اندازه);
 
-#endif /* #if !defined(XUTILS_H) */
+#د_که_پای /* #if !defined(XUTILS_H) */

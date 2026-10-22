@@ -7,66 +7,66 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include <gtk/gtk.h>
-#include "gui_gtk4_da.h"
+#ضمن <gtk/gtk.h>
+#ضمن "gui_gtk4_da.h"
 
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Used for sign icons and netbeans multisign indicator. It is in a DrawGlyphs
  * so that it can move/be manipulated with the text.
  */
-typedef struct
+تعريفنوع بنية
 {
     GdkTexture	*texture;
-    int		width;
-    int		height;
+    صحيح		پلنوالی;
+    صحيح		لوړوالی;
 } DrawSign;
-#endif
+#د_که_پای
 
 /*
  * Temporary struct when drawing string representing visual attributes of a cell
  */
-typedef struct
+تعريفنوع بنية
 {
     uint32_t	bg_color;
     uint32_t	fg_color;   // Only used for underlines
     uint32_t	sp_color;
-    int		draw_flags; // DRAW_* flags, only DRAW_UNDERL, DRAW_UNDERC, and
+    صحيح		draw_flags; // DRAW_* flags, only DRAW_UNDERL, DRAW_UNDERC, and
 			    // DRAW_STRIKE are used.
 } DrawAttr;
 
 /*
  * Represents the glyphs of a single cell.
  */
-typedef struct
+تعريفنوع بنية
 {
-    int refcount;
+    صحيح refcount;
 
     uint32_t	fg_color;
     PangoFont	*font;
     // If "font" is NULL, "dsign" is used, otherwise "glyphs" is used.
-    union
+    اتحاد
     {
 	PangoGlyphInfo  *glyphs; // May be NULL
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 	DrawSign	*dsign;
-#endif
+#د_که_پای
     };
-    int n_glyphs;
+    صحيح n_glyphs;
 } DrawGlyphs;
 
-typedef struct
+تعريفنوع بنية
 {
     DrawGlyphs *dglyphs;
 } DrawCell;
 
-typedef enum
+تعريفنوع تعداد
 {
     DRAW_LAYER_BACKGROUND,  // Background color, buf stores bg color
-    DRAW_LAYER_TEXT,	    // Text glyphs + underline, buf stores fg color (for
+    DRAW_LAYER_متن,	    // Text glyphs + underline, buf stores fg color (for
 			    // underline)
     DRAW_LAYER_SPECIAL,	    // Undercurls and strikethrough, buf store special
 			    // color
@@ -74,9 +74,9 @@ typedef enum
     N_DRAW_LAYERS
 } DrawLayerType;
 
-typedef struct
+تعريفنوع بنية
 {
-    GskRenderNode   *node;
+    Gsk_Render_غوټه   *غوټه;
     gboolean	    dirty;
 
     // RGBA buffer, pixel size is number of cells in the row. Note that for the
@@ -85,99 +85,99 @@ typedef struct
     uint32_t *buf;
 } DrawLayer;
 
-#define UNDERC_OFFSET(n_cols) (0)
-#define STRIKE_OFFSET(n_cols) (n_cols)
+#تعریف_کړه UNDERC_دننه_واټن(n_ستون_شمېر) (0)
+#تعریف_کړه STRIKE_دننه_واټن(n_ستون_شمېر) (n_ستون_شمېر)
 
-typedef struct
+تعريفنوع بنية
 {
     DrawLayer	dlayers[N_DRAW_LAYERS];
     DrawCell	*cells;
-    int		n_cells; // For convenience
-    int		row;	 // For convenience
+    صحيح		n_cells; // For convenience
+    صحيح		لیکه;	 // For convenience
 
     // Pre generated mask of of under decorations
-    GskRenderNode *underl_mask;
-    GskRenderNode *underc_mask;
-    GskRenderNode *strike_mask;
-} DrawRow;
+    Gsk_Render_غوټه *underl_ماسک;
+    Gsk_Render_غوټه *underc_ماسک;
+    Gsk_Render_غوټه *strike_ماسک;
+} Draw_لیکه;
 
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End) \
-    do { \
+#تعریف_کړه ورننباسه_PANGO_ATTR(Attribute, AttrList, پیل_2, پای_ټکی_2) \
+    افعل { \
 	PangoAttribute *tmp_attr_; \
 	tmp_attr_ = (Attribute); \
-	tmp_attr_->start_index = (Start); \
-	tmp_attr_->end_index = (End); \
-	pango_attr_list_insert((AttrList), tmp_attr_); \
-    } while (FALSE)
-#define CELLS2PANGO(c) ((c) * gui.char_width * PANGO_SCALE)
+	tmp_attr_->پیل_شاخص = (پیل_2); \
+	tmp_attr_->پای_ټکی_شاخص = (پای_ټکی_2); \
+	pango_attr_list_ورننباسه((AttrList), tmp_attr_); \
+    } طالما (FALSE)
+#تعریف_کړه CELLS2PANGO(c) ((c) * gui.char_پلنوالی * PANGO_SCALE)
 
 /*
  * Attributes of cursor
  */
-typedef struct
+تعريفنوع بنية
 {
     gboolean draw; // If cursor should be drawn
-    int width;
-    int height;
-    int n_cells; // Cells covered, 2 for a double width character
+    صحيح پلنوالی;
+    صحيح لوړوالی;
+    صحيح n_cells; // Cells covered, 2 for a double width character
     GdkRGBA bg_color;
     GdkRGBA fg_color;
 } DrawCursor;
 
-struct _VimDrawArea
+بنية _VimDrawArea
 {
-    GtkWidget parent;
+    GtkWidget پلار;
 
-    DrawRow *rows;
+    Draw_لیکه *لیکې_2;
 
-    int n_rows;
-    int	n_cols;
+    صحيح n_لیکې;
+    صحيح	n_ستون_شمېر;
 
-    int	bleed_right;
+    صحيح	bleed_ښی;
 
     // Used for snapshot vfunc call when rendering text, kept around so there is
     // no need to allocate a new one each time.
     GArray	*glyph_buf;
-    GPtrArray	*node_buf;
+    GPtrArray	*غوټه_buf;
 
     DrawCursor cursor;
 
-#ifdef FEAT_IMAGE_GUI
+#که_تعریف_شوی FEAT_IMAGE_GUI
     // Queue of external render nodes
-    GHashTable *external;
-#endif
+    GHash_جدول *external;
+#د_که_پای
 };
 
-static void draw_row_init(DrawRow *drow, int row, int cols);
-static void draw_row_clear(DrawRow *drow);
-static void draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t);
-static void vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
+ساكن فراغ draw_لیکه_init(Draw_لیکه *drow, صحيح لیکه, صحيح ستون_شمېر);
+ساكن فراغ draw_لیکه_clear(Draw_لیکه *drow);
+ساكن فراغ draw_لیکه_dirty_layer(Draw_لیکه *drow, DrawLayerType dlayer_t);
+ساكن فراغ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
 
-static GdkRGBA white_rgba = {1, 1, 1, 1};
+ساكن GdkRGBA white_rgba = {1, 1, 1, 1};
 
 G_DEFINE_TYPE(VimDrawArea, vim_draw_area, GTK_TYPE_WIDGET)
 
-    static void
+    ساكن فراغ
 vim_draw_area_finalize(GObject *obj)
 {
     VimDrawArea *self = VIM_DRAW_AREA(obj);
 
     vim_draw_area_clear(self);
-    for (int r = 0; r < self->n_rows; r++)
-	draw_row_clear(self->rows + r);
-    g_free(self->rows);
+    لكل (صحيح r = 0; r < self->n_لیکې; r++)
+	draw_لیکه_clear(self->لیکې_2 + r);
+    g_free(self->لیکې_2);
 
     g_array_free(self->glyph_buf, TRUE);
-    g_ptr_array_free(self->node_buf, TRUE);
+    g_ptr_array_free(self->غوټه_buf, TRUE);
 
-#ifdef FEAT_IMAGE_GUI
-    g_hash_table_unref(self->external);
-#endif
+#که_تعریف_شوی FEAT_IMAGE_GUI
+    g_hash_جدول_unref(self->external);
+#د_که_پای
 
-    G_OBJECT_CLASS(vim_draw_area_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(vim_draw_area_پلار_class)->finalize(obj);
 }
 
-    static void
+    ساكن فراغ
 vim_draw_area_class_init(VimDrawAreaClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -188,289 +188,289 @@ vim_draw_area_class_init(VimDrawAreaClass *class)
     obj_class->finalize = vim_draw_area_finalize;
 
     // Add a layout manager so it can handle child popovers
-    gtk_widget_class_set_layout_manager_type(widget_class, GTK_TYPE_BIN_LAYOUT);
+    gtk_widget_class_سېټ_layout_manager_type(widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
-    static void
+    ساكن فراغ
 vim_draw_area_init(VimDrawArea *self)
 {
-    self->bleed_right = -1;
-#ifdef FEAT_IMAGE_GUI
-    self->external = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-	    NULL, (GDestroyNotify)gsk_render_node_unref);
-#endif
-    self->glyph_buf = g_array_new(FALSE, FALSE, sizeof(PangoGlyphInfo));
-    self->node_buf = g_ptr_array_new_with_free_func(
-	    (GDestroyNotify)gsk_render_node_unref);
+    self->bleed_ښی = -1;
+#که_تعریف_شوی FEAT_IMAGE_GUI
+    self->external = g_hash_جدول_new_ډک(g_مستقیم_hash, g_مستقیم_equal,
+	    عدم, (GDestroyNotify)gsk_render_غوټه_unref);
+#د_که_پای
+    self->glyph_buf = g_array_new(FALSE, FALSE, حجم(PangoGlyphInfo));
+    self->غوټه_buf = g_ptr_array_new_with_free_func(
+	    (GDestroyNotify)gsk_render_غوټه_unref);
 
 }
 
     GtkWidget *
-vim_draw_area_new(void)
+vim_draw_area_new(فراغ)
 {
-    return g_object_new(VIM_TYPE_DRAW_AREA, NULL);
+    أرجع g_object_new(VIM_TYPE_DRAW_AREA, عدم);
 }
 
 /*
  * Set the size of the draw area to "rows" and "cols".
  */
-    void
-vim_draw_area_set_size(VimDrawArea *self, int rows, int cols)
+    فراغ
+vim_draw_area_سېټ_اندازه(VimDrawArea *self, صحيح لیکې_2, صحيح ستون_شمېر)
 {
-    if (self->rows != NULL && self->n_rows == rows && self->n_cols == cols)
-	return;
-    if (rows == 0 || cols == 0)
-	return;
+    إذا (self->لیکې_2 != عدم && self->n_لیکې == لیکې_2 && self->n_ستون_شمېر == ستون_شمېر)
+	أرجع;
+    إذا (لیکې_2 == 0 || ستون_شمېر == 0)
+	أرجع;
 
     vim_draw_area_clear(self);
 
-    for (int r = 0; r < self->n_rows; r++)
-	draw_row_clear(self->rows + r);
-    self->rows = g_realloc_n(self->rows, rows, sizeof(DrawRow));
-    for (int r = 0; r < rows; r++)
-	draw_row_init(self->rows + r, r, cols);
+    لكل (صحيح r = 0; r < self->n_لیکې; r++)
+	draw_لیکه_clear(self->لیکې_2 + r);
+    self->لیکې_2 = g_realloc_n(self->لیکې_2, لیکې_2, حجم(Draw_لیکه));
+    لكل (صحيح r = 0; r < لیکې_2; r++)
+	draw_لیکه_init(self->لیکې_2 + r, r, ستون_شمېر);
 
-    self->n_rows = rows;
-    self->n_cols = cols;
+    self->n_لیکې = لیکې_2;
+    self->n_ستون_شمېر = ستون_شمېر;
 }
 
 /*
  * Convert the GdkRGBA to a packed uint32_t.
  */
-    static uint32_t
-rgba_to_u32(const GdkRGBA *rgba)
+    ساكن uint32_t
+rgba_منزل_u32(ثابت GdkRGBA *rgba)
 {
-    union { uint32_t val; uint8_t bytes[4]; } color;
+    اتحاد { uint32_t val; uint8_t بایټونه[4]; } color;
 
-    color.bytes[0] = (uint8_t)(CLAMP(rgba->red,   0.0, 1.0) * 255.0 + 0.5);
-    color.bytes[1] = (uint8_t)(CLAMP(rgba->green, 0.0, 1.0) * 255.0 + 0.5);
-    color.bytes[2] = (uint8_t)(CLAMP(rgba->blue,  0.0, 1.0) * 255.0 + 0.5);
-    color.bytes[3] = (uint8_t)(CLAMP(rgba->alpha, 0.0, 1.0) * 255.0 + 0.5);
+    color.بایټونه[0] = (uint8_t)(CLAMP(rgba->red,   0.0, 1.0) * 255.0 + 0.5);
+    color.بایټونه[1] = (uint8_t)(CLAMP(rgba->green, 0.0, 1.0) * 255.0 + 0.5);
+    color.بایټونه[2] = (uint8_t)(CLAMP(rgba->blue,  0.0, 1.0) * 255.0 + 0.5);
+    color.بایټونه[3] = (uint8_t)(CLAMP(rgba->alpha, 0.0, 1.0) * 255.0 + 0.5);
 
-    return color.val;
+    أرجع color.val;
 }
 
 /*
  * Convert the 32 bit RGBA value to a GdkRGBA
  */
-    static GdkRGBA
-u32_to_rgba(uint32_t val)
+    ساكن GdkRGBA
+u32_منزل_rgba(uint32_t val)
 {
-    union { uint32_t val; uint8_t bytes[4]; } packed;
+    اتحاد { uint32_t val; uint8_t بایټونه[4]; } packed;
     GdkRGBA color;
 
     packed.val = val;
-    color.red   = packed.bytes[0] / 255.0;
-    color.green = packed.bytes[1] / 255.0;
-    color.blue  = packed.bytes[2] / 255.0;
-    color.alpha = packed.bytes[3] / 255.0;
-    return color;
+    color.red   = packed.بایټونه[0] / 255.0;
+    color.green = packed.بایټونه[1] / 255.0;
+    color.blue  = packed.بایټونه[2] / 255.0;
+    color.alpha = packed.بایټونه[3] / 255.0;
+    أرجع color;
 }
 
 /*
  * Return TRUE if "rgb" equals "rgba", ignoring the alpha channel.
  */
-    static gboolean
+    ساكن gboolean
 color_equal_u32(guicolor_T rgb, uint32_t rgba)
 {
-    union { uint32_t val; uint8_t bytes[4]; } packed;
+    اتحاد { uint32_t val; uint8_t بایټونه[4]; } packed;
     guicolor_T	res;
 
     packed.val = rgba;
-    res = ((guicolor_T)packed.bytes[0] << 16) |
-	((guicolor_T)packed.bytes[1] << 8)  |
-	packed.bytes[2];
-    return res == rgb;
+    res = ((guicolor_T)packed.بایټونه[0] << 16) |
+	((guicolor_T)packed.بایټونه[1] << 8)  |
+	packed.بایټونه[2];
+    أرجع res == rgb;
 }
 
 /*
  * Checks if a RGBA pixel buffer is fully transparent.
  */
-    static inline gboolean
-rgba_is_transparent(const uint32_t *buf, int n_pixels)
+    ساكن مضمن gboolean
+rgba_is_transparent(ثابت uint32_t *buf, صحيح n_pixels)
 {
     // Could also compare 2 pixels at once using a 64 bit integer, but not sure
     // if that might cause alignment issues...
-    for (int i = 0; i < n_pixels; i++)
-	if (buf[i] != 0)
-	    return FALSE;
-    return TRUE;
+    لكل (صحيح i = 0; i < n_pixels; i++)
+	إذا (buf[i] != 0)
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
 /*
  * Return TRUE if "glyph" has ink (not whitespace).
  */
-    static gboolean
+    ساكن gboolean
 glyph_has_ink(PangoFont *font, PangoGlyphInfo glyph)
 {
     PangoRectangle ink;
 
-    pango_font_get_glyph_extents (font, glyph.glyph, &ink, NULL);
+    pango_font_get_glyph_extents (font, glyph.glyph, &ink, عدم);
 
-    return ink.width > 0 && ink.height > 0;
+    أرجع ink.پلنوالی > 0 && ink.لوړوالی > 0;
 }
 
 /*
  * Apply the 'guifontwide' font to double-width characters in the string.
  */
-    static void
-apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
+    ساكن فراغ
+apply_wide_font_attr(char_u *s, صحيح len, PangoAttrList *attr_list)
 {
-    char_u  *start = NULL;
+    char_u  *پیل = عدم;
     char_u  *p;
-    int	    uc;
+    صحيح	    uc;
 
-    for (p = s; p < s + len; p += utf_byte2len(*p))
+    لكل (p = s; p < s + len; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
 
-	if (start == NULL)
+	إذا (پیل == عدم)
 	{
-	    if (uc >= 0x80 && utf_char2cells(uc) == 2)
-		start = p;
+	    إذا (uc >= 0x80 && utf_char2cells(uc) == 2)
+		پیل = p;
 	}
-	else if (uc < 0x80
+	وإلا إذا (uc < 0x80
 		|| (utf_char2cells(uc) != 2 && !utf_iscomposing(uc)))
 	{
-	    INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
-		    attr_list, start - s, p - s);
-	    start = NULL;
+	    ورننباسه_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+		    attr_list, پیل - s, p - s);
+	    پیل = عدم;
 	}
     }
 
-    if (start != NULL)
-	INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
-		attr_list, start - s, len);
+    إذا (پیل != عدم)
+	ورننباسه_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+		attr_list, پیل - s, len);
 }
 
 /*
  * Count the number of display cells occupied by a glyph cluster.
  */
-    static int
-count_cluster_cells(
+    ساكن صحيح
+شمېر_cluster_cells(
 	char_u		    *s,
-	PangoItem	    *item,
+	Pango_توکی	    *توکی,
 	PangoGlyphString    *glyphs,
-	int		    i,
-	int		    *cluster_width,
-	int		    *last_glyph_rbearing)
+	صحيح		    i,
+	صحيح		    *cluster_پلنوالی,
+	صحيح		    *وروستی_glyph_rbearing)
 {
     char_u  *p;
-    int	    next;
-    int	    start, end;
-    int	    width;
-    int	    uc;
-    int	    cellcount = 0;
+    صحيح	    بل;
+    صحيح	    پیل, پای_ټکی;
+    صحيح	    پلنوالی;
+    صحيح	    uc;
+    صحيح	    cellcount = 0;
 
-    width = glyphs->glyphs[i].geometry.width;
+    پلنوالی = glyphs->glyphs[i].geometry.پلنوالی;
 
-    for (next = i + 1; next < glyphs->num_glyphs; ++next)
+    لكل (بل = i + 1; بل < glyphs->عدد_glyphs; ++بل)
     {
-	if (glyphs->glyphs[next].attr.is_cluster_start)
-	    break;
-	else if (glyphs->glyphs[next].geometry.width > width)
-	    width = glyphs->glyphs[next].geometry.width;
+	إذا (glyphs->glyphs[بل].attr.is_cluster_پیل)
+	    اكسر;
+	وإلا إذا (glyphs->glyphs[بل].geometry.پلنوالی > پلنوالی)
+	    پلنوالی = glyphs->glyphs[بل].geometry.پلنوالی;
     }
 
-    start = item->offset + glyphs->log_clusters[i];
-    end   = item->offset + ((next < glyphs->num_glyphs) ?
-	    glyphs->log_clusters[next] : item->length);
+    پیل = توکی->دننه_واټن + glyphs->log_clusters[i];
+    پای_ټکی   = توکی->دننه_واټن + ((بل < glyphs->عدد_glyphs) ?
+	    glyphs->log_clusters[بل] : توکی->اوږدتیا);
 
-    for (p = s + start; p < s + end; p += utf_byte2len(*p))
+    لكل (p = s + پیل; p < s + پای_ټکی; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
-	if (uc < 0x80)
+	إذا (uc < 0x80)
 	    ++cellcount;
-	else if (!utf_iscomposing(uc))
+	وإلا إذا (!utf_iscomposing(uc))
 	    cellcount += utf_char2cells(uc);
     }
 
-    if (last_glyph_rbearing != NULL
-	    && cellcount > 0 && next == glyphs->num_glyphs)
+    إذا (وروستی_glyph_rbearing != عدم
+	    && cellcount > 0 && بل == glyphs->عدد_glyphs)
     {
 	PangoRectangle ink_rect;
 
-	pango_font_get_glyph_extents(item->analysis.font,
+	pango_font_get_glyph_extents(توکی->analysis.font,
 		glyphs->glyphs[i].glyph,
-		&ink_rect, NULL);
+		&ink_rect, عدم);
 
-	if (PANGO_RBEARING(ink_rect) > 0)
-	    *last_glyph_rbearing = PANGO_RBEARING(ink_rect);
+	إذا (PANGO_RBEARING(ink_rect) > 0)
+	    *وروستی_glyph_rbearing = PANGO_RBEARING(ink_rect);
     }
 
-    if (cellcount > 0)
-	*cluster_width = width;
+    إذا (cellcount > 0)
+	*cluster_پلنوالی = پلنوالی;
 
-    return cellcount;
+    أرجع cellcount;
 }
 
 /*
  * Handle combining characters that form a zero-width cluster.
  */
-    static void
-setup_zero_width_cluster(
-	PangoItem	*item,
+    ساكن فراغ
+تیاری_zero_پلنوالی_cluster(
+	Pango_توکی	*توکی,
 	PangoGlyphInfo	*glyph,
-	int		last_cellcount,
-	int		last_cluster_width,
-	int		last_glyph_rbearing)
+	صحيح		وروستی_cellcount,
+	صحيح		وروستی_cluster_پلنوالی,
+	صحيح		وروستی_glyph_rbearing)
 {
     PangoRectangle  ink_rect;
     PangoRectangle  logical_rect;
-    int		    width;
+    صحيح		    پلنوالی;
 
-    width = last_cellcount * gui.char_width * PANGO_SCALE;
-    glyph->geometry.x_offset = -width + MAX(0, width - last_cluster_width) / 2;
-    glyph->geometry.width = 0;
+    پلنوالی = وروستی_cellcount * gui.char_پلنوالی * PANGO_SCALE;
+    glyph->geometry.x_دننه_واټن = -پلنوالی + MAX(0, پلنوالی - وروستی_cluster_پلنوالی) / 2;
+    glyph->geometry.پلنوالی = 0;
 
-    pango_font_get_glyph_extents(item->analysis.font,
+    pango_font_get_glyph_extents(توکی->analysis.font,
 	    glyph->glyph,
 	    &ink_rect, &logical_rect);
-    if (ink_rect.x < 0)
+    إذا (ink_rect.x < 0)
     {
-	glyph->geometry.x_offset += last_glyph_rbearing;
-	glyph->geometry.y_offset  = logical_rect.height
-	    - (gui.char_height - p_linespace) * PANGO_SCALE;
+	glyph->geometry.x_دننه_واټن += وروستی_glyph_rbearing;
+	glyph->geometry.y_دننه_واټن  = logical_rect.لوړوالی
+	    - (gui.char_لوړوالی - p_linespace) * PANGO_SCALE;
     }
-    else
-	glyph->geometry.x_offset = -width + MAX(0, width - ink_rect.width) / 2;
+    وإلا
+	glyph->geometry.x_دننه_واټن = -پلنوالی + MAX(0, پلنوالی - ink_rect.پلنوالی) / 2;
 }
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Create a new draw sign icon with the given texture.
  */
-    static DrawSign *
-draw_sign_new(GdkTexture *texture, int width, int height)
+    ساكن DrawSign *
+draw_sign_new(GdkTexture *texture, صحيح پلنوالی, صحيح لوړوالی)
 {
     DrawSign *dsign = g_new0(DrawSign, 1);
 
     dsign->texture = g_object_ref(texture);
-    dsign->width = width;
-    dsign->height = height;
+    dsign->پلنوالی = پلنوالی;
+    dsign->لوړوالی = لوړوالی;
 
-    return dsign;
+    أرجع dsign;
 }
 
-    static void
+    ساكن فراغ
 draw_sign_free(DrawSign *dsign)
 {
     g_object_unref(dsign->texture);
     g_free(dsign);
 }
-#endif
+#د_که_پای
 
-    static void
+    ساكن فراغ
 draw_attr_init(
 	DrawAttr	*dattr,
-	const GdkRGBA	*bg_color,
-	const GdkRGBA	*fg_color,
-	const GdkRGBA	*sp_color,
-	int		draw_flags)
+	ثابت GdkRGBA	*bg_color,
+	ثابت GdkRGBA	*fg_color,
+	ثابت GdkRGBA	*sp_color,
+	صحيح		draw_flags)
 {
-    dattr->bg_color = rgba_to_u32(bg_color);
-    dattr->fg_color = rgba_to_u32(fg_color);
-    dattr->sp_color = rgba_to_u32(sp_color);
+    dattr->bg_color = rgba_منزل_u32(bg_color);
+    dattr->fg_color = rgba_منزل_u32(fg_color);
+    dattr->sp_color = rgba_منزل_u32(sp_color);
     dattr->draw_flags = draw_flags & (DRAW_UNDERL | DRAW_UNDERC | DRAW_STRIKE);
 }
 
@@ -478,96 +478,96 @@ draw_attr_init(
  * Apply the draw attr to the row for the given col/cell. Only dirty layers that
  * have actually changed.
  */
-    static void
-draw_attr_apply(DrawAttr *dattr, int col, DrawRow *drow)
+    ساكن فراغ
+draw_attr_apply(DrawAttr *dattr, صحيح ستون, Draw_لیکه *drow)
 {
-    uint32_t	*bg_cell = drow->dlayers[DRAW_LAYER_BACKGROUND].buf + col;
-    uint32_t	*text_cell = drow->dlayers[DRAW_LAYER_TEXT].buf + col;
+    uint32_t	*bg_cell = drow->dlayers[DRAW_LAYER_BACKGROUND].buf + ستون;
+    uint32_t	*متن_cell = drow->dlayers[DRAW_LAYER_متن].buf + ستون;
     uint32_t	*underc_cell;
     uint32_t	*strike_cell;
     uint32_t	fg_color = 0, bg_color = 0, sp_color = 0;
-    int		draw_flags = 0;
+    صحيح		draw_flags = 0;
     gboolean	bg_is_default = TRUE;
 
     underc_cell = drow->dlayers[DRAW_LAYER_SPECIAL].buf +
-	col + UNDERC_OFFSET(drow->n_cells);
+	ستون + UNDERC_دننه_واټن(drow->n_cells);
     strike_cell = drow->dlayers[DRAW_LAYER_SPECIAL].buf +
-	col + STRIKE_OFFSET(drow->n_cells);
+	ستون + STRIKE_دننه_واټن(drow->n_cells);
 
     // If "dattr" is NULL, then make the pixels transparent.
-    if (dattr != NULL)
+    إذا (dattr != عدم)
     {
 	fg_color = dattr->fg_color;
 	bg_color = dattr->bg_color;
 	sp_color = dattr->sp_color;
 	draw_flags = dattr->draw_flags;
-	bg_is_default = color_equal_u32(gui.back_pixel, bg_color);
+	bg_is_default = color_equal_u32(gui.شا_pixel, bg_color);
     }
 
-    if (*bg_cell != bg_color && !(*bg_cell == 0 && bg_is_default))
+    إذا (*bg_cell != bg_color && !(*bg_cell == 0 && bg_is_default))
     {
-	draw_row_dirty_layer(drow, DRAW_LAYER_BACKGROUND);
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_BACKGROUND);
 
 	// If "bg_color" is same as global background color, then use
 	// transparent color.
-	if (bg_is_default)
+	إذا (bg_is_default)
 	    *bg_cell = 0;
-	else
+	وإلا
 	    *bg_cell = bg_color;
     }
-    if ((draw_flags & DRAW_UNDERL && *text_cell != fg_color)
-	    || (!(draw_flags & DRAW_UNDERL) && *text_cell != 0))
+    إذا ((draw_flags & DRAW_UNDERL && *متن_cell != fg_color)
+	    || (!(draw_flags & DRAW_UNDERL) && *متن_cell != 0))
     {
-	draw_row_dirty_layer(drow, DRAW_LAYER_TEXT);
-	if (draw_flags & DRAW_UNDERL)
-	    *text_cell = fg_color;
-	else
-	    *text_cell = 0;
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_متن);
+	إذا (draw_flags & DRAW_UNDERL)
+	    *متن_cell = fg_color;
+	وإلا
+	    *متن_cell = 0;
     }
-    if ((draw_flags & DRAW_UNDERC && *underc_cell != sp_color)
+    إذا ((draw_flags & DRAW_UNDERC && *underc_cell != sp_color)
 	    || (!(draw_flags & DRAW_UNDERC) && *underc_cell != 0))
     {
-	draw_row_dirty_layer(drow, DRAW_LAYER_SPECIAL);
-	if (draw_flags & DRAW_UNDERC)
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_SPECIAL);
+	إذا (draw_flags & DRAW_UNDERC)
 	    *underc_cell = sp_color;
-	else
+	وإلا
 	    *underc_cell = 0;
     }
-    if ((draw_flags & DRAW_STRIKE && *strike_cell != sp_color)
+    إذا ((draw_flags & DRAW_STRIKE && *strike_cell != sp_color)
 	    || (!(draw_flags & DRAW_STRIKE) && *strike_cell != 0))
     {
-	draw_row_dirty_layer(drow, DRAW_LAYER_SPECIAL);
-	if (draw_flags & DRAW_STRIKE)
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_SPECIAL);
+	إذا (draw_flags & DRAW_STRIKE)
 	    *strike_cell = sp_color;
-	else
+	وإلا
 	    *strike_cell = 0;
     }
 }
 
-    static DrawGlyphs *
+    ساكن DrawGlyphs *
 draw_glyphs_new(
 	PangoFont	*font,
 	PangoGlyphInfo	*glyphs,
-	int		n_glyphs,
+	صحيح		n_glyphs,
 	uint32_t	fg_color)
 {
     DrawGlyphs *dglyphs = g_new0(DrawGlyphs, 1);
 
     dglyphs->refcount = 1;
     dglyphs->font = g_object_ref(font);
-    dglyphs->glyphs = g_memdup2(glyphs, sizeof(*glyphs) * n_glyphs);
+    dglyphs->glyphs = g_memdup2(glyphs, حجم(*glyphs) * n_glyphs);
     dglyphs->n_glyphs = n_glyphs;
     dglyphs->fg_color = fg_color;
 
-    return dglyphs;
+    أرجع dglyphs;
 }
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Create a new draw glyphs that shows the given sign. Note that ownership of
  * "dsign" is taken.
  */
-    static DrawGlyphs *
+    ساكن DrawGlyphs *
 draw_glyphs_new_sign(DrawSign *dsign)
 {
     DrawGlyphs *dglyphs = g_new0(DrawGlyphs, 1);
@@ -575,27 +575,27 @@ draw_glyphs_new_sign(DrawSign *dsign)
     dglyphs->refcount = 1;
     dglyphs->dsign = dsign;
 
-    return dglyphs;
+    أرجع dglyphs;
 }
-#endif
+#د_که_پای
 
-    static DrawGlyphs *
+    ساكن DrawGlyphs *
 draw_glyphs_ref(DrawGlyphs *dglyphs)
 {
     dglyphs->refcount++;
-    return dglyphs;
+    أرجع dglyphs;
 }
 
-    static void
+    ساكن فراغ
 draw_glyphs_unref(DrawGlyphs *dglyphs)
 {
-    if (--dglyphs->refcount <= 0)
+    إذا (--dglyphs->refcount <= 0)
     {
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
-	if (dglyphs->font == NULL)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+	إذا (dglyphs->font == عدم)
 	    draw_sign_free(dglyphs->dsign);
-	else
-#endif
+	وإلا
+#د_که_پای
 	{
 	    g_free(dglyphs->glyphs);
 	    g_object_unref(dglyphs->font);
@@ -608,25 +608,25 @@ draw_glyphs_unref(DrawGlyphs *dglyphs)
  * Return TRUE if "a" and "b" are same. If either are NULL, return FALSE, if
  * both are NULL, return TRUE.
  */
-    static gboolean
+    ساكن gboolean
 draw_glyphs_same(DrawGlyphs *a, DrawGlyphs *b)
 {
-    if (a == NULL && b == NULL)
-	return TRUE;
-    if (a == NULL || b == NULL)
-	return FALSE;
-    if (a->fg_color != b->fg_color)
-	return FALSE;
-    if (a->n_glyphs != b->n_glyphs || a->font != b->font)
-	return FALSE;
-    for (int i = 0; i < a->n_glyphs; i++)
-	if (a->glyphs[i].glyph != b->glyphs[i].glyph
-		|| a->glyphs[i].geometry.width != b->glyphs[i].geometry.width
-		|| a->glyphs[i].geometry.x_offset != b->glyphs[i].geometry.x_offset
-		|| a->glyphs[i].geometry.y_offset != b->glyphs[i].geometry.y_offset
-		|| a->glyphs[i].attr.is_cluster_start != b->glyphs[i].attr.is_cluster_start)
-	    return FALSE;
-    return TRUE;
+    إذا (a == عدم && b == عدم)
+	أرجع TRUE;
+    إذا (a == عدم || b == عدم)
+	أرجع FALSE;
+    إذا (a->fg_color != b->fg_color)
+	أرجع FALSE;
+    إذا (a->n_glyphs != b->n_glyphs || a->font != b->font)
+	أرجع FALSE;
+    لكل (صحيح i = 0; i < a->n_glyphs; i++)
+	إذا (a->glyphs[i].glyph != b->glyphs[i].glyph
+		|| a->glyphs[i].geometry.پلنوالی != b->glyphs[i].geometry.پلنوالی
+		|| a->glyphs[i].geometry.x_دننه_واټن != b->glyphs[i].geometry.x_دننه_واټن
+		|| a->glyphs[i].geometry.y_دننه_واټن != b->glyphs[i].geometry.y_دننه_واټن
+		|| a->glyphs[i].attr.is_cluster_پیل != b->glyphs[i].attr.is_cluster_پیل)
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
 /*
@@ -635,126 +635,126 @@ draw_glyphs_same(DrawGlyphs *a, DrawGlyphs *b)
  * "bleed" is TRUE, then expand the buffer by 1 cell (clipped by draw area
  * width), using the color of the rightmost cell.
  */
-    static GskRenderNode *
+    ساكن Gsk_Render_غوټه *
 draw_layer_get_texture(
 	DrawLayer   *dlayer,
-	int	    row,
+	صحيح	    لیکه,
 	VimDrawArea *da,
-	int	    off,
+	صحيح	    off,
 	gboolean    bleed)
 {
-    GBytes	    *bytes;
+    GBytes	    *بایټونه;
     GdkTexture	    *texture;
-    GskRenderNode   *node;
-    int		    height;
+    Gsk_Render_غوټه   *غوټه;
+    صحيح		    لوړوالی;
 
-#if GTK_CHECK_VERSION(4,24,0)
-    height = gui.char_height;
-#else
-    height = gui.char_height + 1;
-#endif
+#إذا GTK_CHECK_نسخه(4,24,0)
+    لوړوالی = gui.char_لوړوالی;
+#وإلا
+    لوړوالی = gui.char_لوړوالی + 1;
+#د_که_پای
 
-    if (bleed)
+    إذا (bleed)
     {
 	GByteArray *arr = g_byte_array_new();
 
 	g_byte_array_append(arr, (uint8_t *)(dlayer->buf + off),
-		sizeof(uint32_t) * da->n_cols);
+		حجم(uint32_t) * da->n_ستون_شمېر);
 	g_byte_array_append(arr,
-		(uint8_t *)(dlayer->buf + off + (da->n_cols - 1)),
-		sizeof(uint32_t)); // Add bleed using last pixel of buffer
-	bytes = g_byte_array_free_to_bytes(arr);
+		(uint8_t *)(dlayer->buf + off + (da->n_ستون_شمېر - 1)),
+		حجم(uint32_t)); // Add bleed using last pixel of buffer
+	بایټونه = g_byte_array_free_منزل_بایټونه(arr);
     }
-    else
-	bytes = g_bytes_new(dlayer->buf + off, sizeof(uint32_t) * da->n_cols);
+    وإلا
+	بایټونه = g_بایټونه_new(dlayer->buf + off, حجم(uint32_t) * da->n_ستون_شمېر);
 
-    texture = gdk_memory_texture_new(da->n_cols + bleed, 1,
-	    GDK_MEMORY_R8G8B8A8, bytes, (da->n_cols + bleed) * 4);
-    g_bytes_unref(bytes);
+    texture = gdk_حافظه_texture_new(da->n_ستون_شمېر + bleed, 1,
+	    GDK_حافظه_R8_G8_B8_A8, بایټونه, (da->n_ستون_شمېر + bleed) * 4);
+    g_بایټونه_unref(بایټونه);
 
     // Scale texture to actual size
-    node = gsk_texture_scale_node_new(texture,
-		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
-		(da->n_cols + bleed) * gui.char_width, gui.char_height + bleed),
-	    GSK_SCALING_FILTER_NEAREST);
-    if (bleed)
+    غوټه = gsk_texture_scale_غوټه_new(texture,
+		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(لیکه),
+		(da->n_ستون_شمېر + bleed) * gui.char_پلنوالی, gui.char_لوړوالی + bleed),
+	    GSK_SCALING_FILTER_تر_ټولو_نږدې);
+    إذا (bleed)
     {
-	GskRenderNode *new;
+	Gsk_Render_غوټه *new;
 
-	new = gsk_clip_node_new(node,
-		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
-		    da->n_cols * gui.char_width + da->bleed_right, height));
-	gsk_render_node_unref(node);
-	node = new;
+	new = gsk_clip_غوټه_new(غوټه,
+		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(لیکه),
+		    da->n_ستون_شمېر * gui.char_پلنوالی + da->bleed_ښی, لوړوالی));
+	gsk_render_غوټه_unref(غوټه);
+	غوټه = new;
     }
     g_object_unref(texture);
-    return node;
+    أرجع غوټه;
 }
 
-    static void
-draw_row_init(DrawRow *drow, int row, int cols)
+    ساكن فراغ
+draw_لیکه_init(Draw_لیکه *drow, صحيح لیکه, صحيح ستون_شمېر)
 {
-    drow->cells = g_malloc0_n(cols, sizeof(DrawCell));
-    drow->n_cells = cols;
-    drow->row = row;
-    drow->underl_mask = drow->underc_mask = drow->strike_mask = NULL;
+    drow->cells = g_malloc0_n(ستون_شمېر, حجم(DrawCell));
+    drow->n_cells = ستون_شمېر;
+    drow->لیکه = لیکه;
+    drow->underl_ماسک = drow->underc_ماسک = drow->strike_ماسک = عدم;
 
-    memset(drow->dlayers, 0, sizeof(DrawLayer) * N_DRAW_LAYERS);
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    memset(drow->dlayers, 0, حجم(DrawLayer) * N_DRAW_LAYERS);
+    لكل (صحيح l = 0; l < N_DRAW_LAYERS; l++)
     {
 	DrawLayer *dlayer = drow->dlayers + l;
 
 	// Make the buffer transparent initially
-	if (l == DRAW_LAYER_SPECIAL)
-	    dlayer->buf = g_malloc0_n(cols * 2, 4);
-	else
-	    dlayer->buf = g_malloc0_n(cols, 4);
+	إذا (l == DRAW_LAYER_SPECIAL)
+	    dlayer->buf = g_malloc0_n(ستون_شمېر * 2, 4);
+	وإلا
+	    dlayer->buf = g_malloc0_n(ستون_شمېر, 4);
     }
 }
 
-    static void
-draw_row_clear(DrawRow *drow)
+    ساكن فراغ
+draw_لیکه_clear(Draw_لیکه *drow)
 {
     g_free(drow->cells);
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    لكل (صحيح l = 0; l < N_DRAW_LAYERS; l++)
     {
 	DrawLayer *dlayer = drow->dlayers + l;
 
-	if (dlayer->node != NULL)
-	    gsk_render_node_unref(dlayer->node);
+	إذا (dlayer->غوټه != عدم)
+	    gsk_render_غوټه_unref(dlayer->غوټه);
 	g_free(dlayer->buf);
     }
-    g_clear_pointer(&drow->underl_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->underc_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->strike_mask, gsk_render_node_unref);
+    g_clear_اشاره_ګر(&drow->underl_ماسک, gsk_render_غوټه_unref);
+    g_clear_اشاره_ګر(&drow->underc_ماسک, gsk_render_غوټه_unref);
+    g_clear_اشاره_ګر(&drow->strike_ماسک, gsk_render_غوټه_unref);
 }
 
 /*
  * Dirty the given layer for the row so it is rendered again.
  */
-    static void
-draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t)
+    ساكن فراغ
+draw_لیکه_dirty_layer(Draw_لیکه *drow, DrawLayerType dlayer_t)
 {
     DrawLayer *dlayer = drow->dlayers + dlayer_t;
 
     dlayer->dirty = TRUE;
-    g_clear_pointer(&dlayer->node, gsk_render_node_unref);
+    g_clear_اشاره_ګر(&dlayer->غوټه, gsk_render_غوټه_unref);
 }
 
 /*
  * If the cell at "col" is inverted, then uninvert and set the layer as dirty.
  * Otherwise do nothing.
  */
-    static void
-draw_row_uninvert_cell(DrawRow *drow, int col)
+    ساكن فراغ
+draw_لیکه_uninvert_cell(Draw_لیکه *drow, صحيح ستون)
 {
     uint32_t *buf = drow->dlayers[DRAW_LAYER_OVERLAY].buf;
 
     // If pixel is white, then it is inverted.
-    if (buf[col] == 0xffffffff)
+    إذا (buf[ستون] == 0xffffffff)
     {
-	draw_row_dirty_layer(drow, DRAW_LAYER_OVERLAY);
-	buf[col] = 0;
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_OVERLAY);
+	buf[ستون] = 0;
     }
 }
 
@@ -762,47 +762,47 @@ draw_row_uninvert_cell(DrawRow *drow, int col)
  * Set the cell in the row to the glyphs and attrs (that represents the cell).
  * This will dirty the changed layers of the row.
  */
-    static void
-draw_row_set_cell(DrawRow *drow, int col, DrawGlyphs *dglyphs, DrawAttr *dattr)
+    ساكن فراغ
+draw_لیکه_سېټ_cell(Draw_لیکه *drow, صحيح ستون, DrawGlyphs *dglyphs, DrawAttr *dattr)
 {
-    DrawCell *dcell = drow->cells + col;
+    DrawCell *dcell = drow->cells + ستون;
 
-    if (!draw_glyphs_same(dglyphs, dcell->dglyphs))
-	draw_row_dirty_layer(drow, DRAW_LAYER_TEXT);
+    إذا (!draw_glyphs_same(dglyphs, dcell->dglyphs))
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_متن);
 
     // When drawing double width characters in the snapshot vfunc, pointer
     // equality of the DrawGlyphs is used. Must make sure to always keep the
     // pointer in sync, even if glyphs are technically the "same".
-    if (dcell->dglyphs != dglyphs)
+    إذا (dcell->dglyphs != dglyphs)
     {
-	if (dcell->dglyphs != NULL)
+	إذا (dcell->dglyphs != عدم)
 	    draw_glyphs_unref(dcell->dglyphs);
-	dcell->dglyphs = dglyphs == NULL ? NULL : draw_glyphs_ref(dglyphs);
+	dcell->dglyphs = dglyphs == عدم ? عدم : draw_glyphs_ref(dglyphs);
     }
 
-    draw_attr_apply(dattr, col, drow);
-    draw_row_uninvert_cell(drow, col);
+    draw_attr_apply(dattr, ستون, drow);
+    draw_لیکه_uninvert_cell(drow, ستون);
 }
 
 /*
  * Same as draw_row_set_cell(), but fills in the cells between "col1" and "col2"
  * (inclusive).
  */
-    static void
-draw_row_fill(
-	DrawRow	    *drow,
-	int	    col1,
-	int	    col2,
+    ساكن فراغ
+draw_لیکه_fill(
+	Draw_لیکه	    *drow,
+	صحيح	    col1,
+	صحيح	    col2,
 	DrawGlyphs  *dglyphs,
 	DrawAttr    *dattr,
 	DrawCursor  *cursor)
 {
-    for (int c = col1; c <= col2; c++)
-	draw_row_set_cell(drow, c, dglyphs, dattr);
+    لكل (صحيح c = col1; c <= col2; c++)
+	draw_لیکه_سېټ_cell(drow, c, dglyphs, dattr);
 
     // Clear cursor if its in the region
-    if (gui.cursor_row == drow->row && gui.cursor_col >= col1
-	    && gui.cursor_col <= col2)
+    إذا (gui.cursor_لیکه == drow->لیکه && gui.cursor_ستون >= col1
+	    && gui.cursor_ستون <= col2)
 	cursor->draw = FALSE;
 }
 
@@ -810,151 +810,151 @@ draw_row_fill(
  * Move the cells between "col1" and "col2" from "src" to "dest", overwriting
  * the existing cells. This will clear the source cells.
  */
-    static void
-draw_row_move_to(
-	DrawRow	    *dest_row,
-	DrawRow	    *src_row,
-	int	    col1,
-	int	    col2,
+    ساكن فراغ
+draw_لیکه_move_منزل(
+	Draw_لیکه	    *dest_لیکه,
+	Draw_لیکه	    *src_لیکه,
+	صحيح	    col1,
+	صحيح	    col2,
 	VimDrawArea *da)
 {
-    int move_size = (col2 - col1 + 1) * sizeof(DrawCell);
+    صحيح move_اندازه = (col2 - col1 + 1) * حجم(DrawCell);
 
-    draw_row_fill(dest_row, col1, col2, NULL, NULL, &da->cursor);
-    memmove(dest_row->cells + col1, src_row->cells + col1, move_size);
+    draw_لیکه_fill(dest_لیکه, col1, col2, عدم, عدم, &da->cursor);
+    memmove(dest_لیکه->cells + col1, src_لیکه->cells + col1, move_اندازه);
     // NULL the draw cells so we don't double unreference.
-    memset(src_row->cells + col1, 0, move_size);
-    draw_row_dirty_layer(src_row, DRAW_LAYER_TEXT);
+    memset(src_لیکه->cells + col1, 0, move_اندازه);
+    draw_لیکه_dirty_layer(src_لیکه, DRAW_LAYER_متن);
 
     // Move the layer buffers
-    move_size = (col2 - col1 + 1) * 4;
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    move_اندازه = (col2 - col1 + 1) * 4;
+    لكل (صحيح l = 0; l < N_DRAW_LAYERS; l++)
     {
-	uint32_t *src = src_row->dlayers[l].buf;
-	uint32_t *dest = dest_row->dlayers[l].buf;
+	uint32_t *src = src_لیکه->dlayers[l].buf;
+	uint32_t *dest = dest_لیکه->dlayers[l].buf;
 
-	if (l == DRAW_LAYER_SPECIAL)
+	إذا (l == DRAW_LAYER_SPECIAL)
 	{
-	    memmove(dest + col1 + UNDERC_OFFSET(dest_row->n_cells),
-		    src + col1 + UNDERC_OFFSET(src_row->n_cells), move_size);
-	    memmove(dest + col1 + STRIKE_OFFSET(dest_row->n_cells),
-		    src + col1 + STRIKE_OFFSET(src_row->n_cells), move_size);
+	    memmove(dest + col1 + UNDERC_دننه_واټن(dest_لیکه->n_cells),
+		    src + col1 + UNDERC_دننه_واټن(src_لیکه->n_cells), move_اندازه);
+	    memmove(dest + col1 + STRIKE_دننه_واټن(dest_لیکه->n_cells),
+		    src + col1 + STRIKE_دننه_واټن(src_لیکه->n_cells), move_اندازه);
 	}
-	else
-	    memmove(dest + col1, src + col1, move_size);
-	draw_row_dirty_layer(dest_row, l);
+	وإلا
+	    memmove(dest + col1, src + col1, move_اندازه);
+	draw_لیکه_dirty_layer(dest_لیکه, l);
     }
 }
 
 /*
  * If background layer is dirty, then render it.
  */
-    static void
-draw_row_render_background(DrawRow *drow, VimDrawArea *da)
+    ساكن فراغ
+draw_لیکه_render_background(Draw_لیکه *drow, VimDrawArea *da)
 {
     DrawLayer *dlayer = drow->dlayers + DRAW_LAYER_BACKGROUND;
 
-    if (!dlayer->dirty)
-	return;
+    إذا (!dlayer->dirty)
+	أرجع;
 
     dlayer->dirty = FALSE;
 
     // If background is transparent, don't add a render node.
-    if (rgba_is_transparent(dlayer->buf, da->n_cols))
-	return;
+    إذا (rgba_is_transparent(dlayer->buf, da->n_ستون_شمېر))
+	أرجع;
 
     // Add a 1 cell bleed, then use a clip node to clip it to the draw area
     // width. This just makes things like status bars look a bit nicer when draw
     // area size is not an exact multiple of the cell size.
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->غوټه = draw_layer_get_texture(dlayer, drow->لیکه, da, 0, TRUE);
 }
 
 /*
  * Ensure the given under decorations are generated.
  */
-    static void
-draw_row_ensure_decor(DrawRow *drow, int flags)
+    ساكن فراغ
+draw_لیکه_ensure_decor(Draw_لیکه *drow, صحيح flags)
 {
-    if (flags & DRAW_UNDERL && drow->underl_mask == NULL)
-	drow->underl_mask = gsk_color_node_new(&white_rgba,
-		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(drow->row + 1) - 1,
+    إذا (flags & DRAW_UNDERL && drow->underl_ماسک == عدم)
+	drow->underl_ماسک = gsk_color_غوټه_new(&white_rgba,
+		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(drow->لیکه + 1) - 1,
 		    FILL_X(drow->n_cells), 1));
 
-    if (flags & DRAW_STRIKE && drow->strike_mask == NULL)
-	drow->strike_mask = gsk_color_node_new(&white_rgba,
+    إذا (flags & DRAW_STRIKE && drow->strike_ماسک == عدم)
+	drow->strike_ماسک = gsk_color_غوټه_new(&white_rgba,
 		&GRAPHENE_RECT_INIT(FILL_X(0),
-		    FILL_Y(drow->row) + (int)(gui.char_height / 2),
+		    FILL_Y(drow->لیکه) + (صحيح)(gui.char_لوړوالی / 2),
 		    FILL_X(drow->n_cells), 1));
 
-    if (flags & DRAW_UNDERC && drow->underc_mask == NULL)
+    إذا (flags & DRAW_UNDERC && drow->underc_ماسک == عدم)
     {
-	static const int val[8] = {1, 0, 0, 0, 1, 2, 2, 2};
+	ساكن ثابت صحيح val[8] = {1, 0, 0, 0, 1, 2, 2, 2};
 
-	int y = FILL_Y(drow->row + 1) - 1;
-	int x_start = FILL_X(0);
-	int x_end = FILL_X(drow->n_cells);
+	صحيح y = FILL_Y(drow->لیکه + 1) - 1;
+	صحيح x_پیل = FILL_X(0);
+	صحيح x_پای_ټکی = FILL_X(drow->n_cells);
 
 	// Instead of rendering the entire pattern, use a repeating node to
 	// render a single cycle of the undercurl, taking advantage of the GPU
 	// (if using opengl or vulkan renderer).
-	GskRenderNode *child = NULL;
+	Gsk_Render_غوټه *ماشوم = عدم;
 
 	// GskPath was added in GSK 4.14, otherwise use Cairo
-#if GTK_CHECK_VERSION(4, 14, 0)
-	GskPathBuilder	*builder;
-	GskPath		*path;
+#إذا GTK_CHECK_نسخه(4, 14, 0)
+	Gsk_لار_Builder	*builder;
+	Gsk_لار		*لار;
 	GskStroke       *stroke;
-	GskRenderNode	*color_node;
+	Gsk_Render_غوټه	*color_غوټه;
 	graphene_rect_t bounds;
 
-	builder = gsk_path_builder_new();
+	builder = gsk_لار_builder_new();
 
 	// Start at X = -1 (val[7]) to ensure a fully formed stroke at X = 0
-	gsk_path_builder_move_to(builder, -1, y - val[7] + 0.5);
-	gsk_path_builder_line_to(builder, 0, y - val[0] + 0.5);
+	gsk_لار_builder_move_منزل(builder, -1, y - val[7] + 0.5);
+	gsk_لار_builder_کرښه_منزل(builder, 0, y - val[0] + 0.5);
 
-	for (int i = 1; i < 8; i++)
-	    gsk_path_builder_line_to(builder, i, y - val[i] + 0.5);
+	لكل (صحيح i = 1; i < 8; i++)
+	    gsk_لار_builder_کرښه_منزل(builder, i, y - val[i] + 0.5);
 
 	// Extend to X = 9 (val[1]) to ensure a fully formed stroke at X = 8
-	gsk_path_builder_line_to(builder, 8, y - val[0] + 0.5);
-	gsk_path_builder_line_to(builder, 9, y - val[1] + 0.5);
+	gsk_لار_builder_کرښه_منزل(builder, 8, y - val[0] + 0.5);
+	gsk_لار_builder_کرښه_منزل(builder, 9, y - val[1] + 0.5);
 
-	path = gsk_path_builder_free_to_path(builder);
+	لار = gsk_لار_builder_free_منزل_لار(builder);
 	stroke = gsk_stroke_new(1.0);
 
-	gsk_path_get_stroke_bounds(path, stroke, &bounds);
-	color_node = gsk_color_node_new(&white_rgba, &bounds);
-	child = gsk_stroke_node_new(color_node, path, stroke);
+	gsk_لار_get_stroke_bounds(لار, stroke, &bounds);
+	color_غوټه = gsk_color_غوټه_new(&white_rgba, &bounds);
+	ماشوم = gsk_stroke_غوټه_new(color_غوټه, لار, stroke);
 
 	gsk_stroke_free(stroke);
-	gsk_path_unref(path);
-	gsk_render_node_unref(color_node);
-#else
+	gsk_لار_unref(لار);
+	gsk_render_غوټه_unref(color_غوټه);
+#وإلا
 	cairo_t *cr;
 
-	child = gsk_cairo_node_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
-	cr = gsk_cairo_node_get_draw_context(child);
+	ماشوم = gsk_cairo_غوټه_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
+	cr = gsk_cairo_غوټه_get_draw_context(ماشوم);
 
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+	cairo_سېټ_کرښه_پلنوالی(cr, 1.0);
+	cairo_سېټ_سرچینه_rgba(cr, 1.0, 1.0, 1.0, 1.0);
 
-	cairo_move_to(cr, -1, y - val[7] + 0.5);
-	cairo_line_to(cr, 0, y - val[0] + 0.5);
+	cairo_move_منزل(cr, -1, y - val[7] + 0.5);
+	cairo_کرښه_منزل(cr, 0, y - val[0] + 0.5);
 
-	for (int i = 1; i < 8; ++i)
-	    cairo_line_to(cr, i, y - val[i] + 0.5);
+	لكل (صحيح i = 1; i < 8; ++i)
+	    cairo_کرښه_منزل(cr, i, y - val[i] + 0.5);
 
-	cairo_line_to(cr, 8, y - val[0] + 0.5);
-	cairo_line_to(cr, 9, y - val[1] + 0.5);
+	cairo_کرښه_منزل(cr, 8, y - val[0] + 0.5);
+	cairo_کرښه_منزل(cr, 9, y - val[1] + 0.5);
 
 	cairo_stroke(cr);
 	cairo_destroy(cr);
-#endif
-	drow->underc_mask = gsk_repeat_node_new(
-		&GRAPHENE_RECT_INIT(x_start, y - 3, x_end - x_start, 5),
-		child, &GRAPHENE_RECT_INIT(0.0f, y - 3, 8.0f, 5.0f));
-	gsk_render_node_unref(child);
+#د_که_پای
+	drow->underc_ماسک = gsk_repeat_غوټه_new(
+		&GRAPHENE_RECT_INIT(x_پیل, y - 3, x_پای_ټکی - x_پیل, 5),
+		ماشوم, &GRAPHENE_RECT_INIT(0.0f, y - 3, 8.0f, 5.0f));
+	gsk_render_غوټه_unref(ماشوم);
     }
 }
 
@@ -963,136 +963,136 @@ draw_row_ensure_decor(DrawRow *drow, int flags)
  * node. Note that the render node may still be NULL if there is nothing to
  * display.
  */
-    static void
-draw_row_render_text(DrawRow *drow, VimDrawArea *da)
+    ساكن فراغ
+draw_لیکه_render_متن(Draw_لیکه *drow, VimDrawArea *da)
 {
-    DrawLayer	*dlayer = drow->dlayers + DRAW_LAYER_TEXT;
+    DrawLayer	*dlayer = drow->dlayers + DRAW_LAYER_متن;
     GArray	*glyph_buf;
     GPtrArray	*nodes;
-    PangoFont	*cur_font = NULL;
-    int		start_col = 0;
-    int		empty_cells = 0;
+    PangoFont	*cur_font = عدم;
+    صحيح		پیل_ستون = 0;
+    صحيح		تشه_cells = 0;
     uint32_t	cur_fg = 0;
-    int		c;
+    صحيح		c;
 
-    if (!dlayer->dirty)
-	return;
+    إذا (!dlayer->dirty)
+	أرجع;
 
     glyph_buf = da->glyph_buf;
-    nodes = da->node_buf;
+    nodes = da->غوټه_buf;
 
-    g_array_set_size(glyph_buf, 0);
-    g_ptr_array_set_size(nodes, 0);
+    g_array_سېټ_اندازه(glyph_buf, 0);
+    g_ptr_array_سېټ_اندازه(nodes, 0);
 
     // GskTextNode does not use the "log_clusters" array of PangoGlyphString, so
     // we don't need to set it.
-#define FLUSH_NODE() \
-    do { \
-	if (cur_font != NULL) \
+#تعریف_کړه FLUSH_غوټه() \
+    افعل { \
+	إذا (cur_font != عدم) \
 	{ \
 	    PangoGlyphString	glyph_str; \
-	    GskRenderNode	*node; \
-	    GdkRGBA		fg_color = u32_to_rgba(cur_fg); \
-	    glyph_str.glyphs = (PangoGlyphInfo *)glyph_buf->data; \
-	    glyph_str.num_glyphs = glyph_buf->len; \
-	    node = gsk_text_node_new(cur_font, &glyph_str, &fg_color, \
-		    &GRAPHENE_POINT_INIT(TEXT_X(start_col), \
-			TEXT_Y(drow->row))); \
-	    if (node != NULL) \
-		g_ptr_array_add(nodes, node); \
-	    g_array_set_size(glyph_buf, 0); \
-	    cur_font = NULL; \
+	    Gsk_Render_غوټه	*غوټه; \
+	    GdkRGBA		fg_color = u32_منزل_rgba(cur_fg); \
+	    glyph_str.glyphs = (PangoGlyphInfo *)glyph_buf->معلومات; \
+	    glyph_str.عدد_glyphs = glyph_buf->len; \
+	    غوټه = gsk_متن_غوټه_new(cur_font, &glyph_str, &fg_color, \
+		    &GRAPHENE_ټکی_INIT(متن_X(پیل_ستون), \
+			متن_Y(drow->لیکه))); \
+	    إذا (غوټه != عدم) \
+		g_ptr_array_جمع_کړه(nodes, غوټه); \
+	    g_array_سېټ_اندازه(glyph_buf, 0); \
+	    cur_font = عدم; \
 	} \
-    } while (FALSE)
+    } طالما (FALSE)
 
-    for (c = 0; c < da->n_cols; c++)
+    لكل (c = 0; c < da->n_ستون_شمېر; c++)
     {
 	DrawCell    *dcell = drow->cells + c;
 	DrawGlyphs  *dglyphs = dcell->dglyphs;
-	int	    prev_len;
+	صحيح	    prev_len;
 
-	if (dglyphs == NULL)
+	إذا (dglyphs == عدم)
 	{
-	    empty_cells++;
-	    continue;
+	    تشه_cells++;
+	    استمر;
 	}
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
-	else if (dglyphs->font == NULL)
+#إذا defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+	وإلا إذا (dglyphs->font == عدم)
 	{
 	    // Add sign icon
-	    GskRenderNode   *snode;
-	    int		    w;
+	    Gsk_Render_غوټه   *snode;
+	    صحيح		    w;
 
-	    FLUSH_NODE();
+	    FLUSH_غوټه();
 
-	    snode = gsk_texture_scale_node_new(dglyphs->dsign->texture,
-		    &GRAPHENE_RECT_INIT(FILL_X(c), FILL_Y(drow->row),
-			dglyphs->dsign->width, dglyphs->dsign->height),
+	    snode = gsk_texture_scale_غوټه_new(dglyphs->dsign->texture,
+		    &GRAPHENE_RECT_INIT(FILL_X(c), FILL_Y(drow->لیکه),
+			dglyphs->dsign->پلنوالی, dglyphs->dsign->لوړوالی),
 		    GSK_SCALING_FILTER_TRILINEAR);
-	    w = (dglyphs->dsign->width + gui.char_width - 1) / gui.char_width;
+	    w = (dglyphs->dsign->پلنوالی + gui.char_پلنوالی - 1) / gui.char_پلنوالی;
 
-	    if (snode != NULL)
-		g_ptr_array_add(nodes, snode);
+	    إذا (snode != عدم)
+		g_ptr_array_جمع_کړه(nodes, snode);
 	    // Skip the cells the draw sign covers.
 	    c += w - 1; // Subtract one because we increment by one in the for
 			// loop
-	    continue;
+	    استمر;
 	}
-#endif
-	else if (dglyphs->font != cur_font || cur_fg != dglyphs->fg_color)
+#د_که_پای
+	وإلا إذا (dglyphs->font != cur_font || cur_fg != dglyphs->fg_color)
 	{
-	    FLUSH_NODE();
+	    FLUSH_غوټه();
 	    cur_font = dglyphs->font;
-	    start_col = c;
+	    پیل_ستون = c;
 	    cur_fg = dglyphs->fg_color;
 	}
 
 	// Don't want to render double width characters twice.
-	if (c > 0 && drow->cells[c - 1].dglyphs == dglyphs)
-	    continue;
+	إذا (c > 0 && drow->cells[c - 1].dglyphs == dglyphs)
+	    استمر;
 
 	prev_len = glyph_buf->len;
 	g_array_append_vals(glyph_buf, dglyphs->glyphs, dglyphs->n_glyphs);
 
 	// Inject the accumulated space width into the glyphs that
 	// have ink.
-	if (empty_cells > 0)
+	إذا (تشه_cells > 0)
 	{
-	    if (prev_len > 0)
+	    إذا (prev_len > 0)
 	    {
 		// Spaces occurred between valid text: extend
 		// previous character's advance
-		PangoGlyphInfo *last = &g_array_index(
+		PangoGlyphInfo *وروستی = &g_array_شاخص(
 			glyph_buf, PangoGlyphInfo,
 			prev_len - 1);
-		last->geometry.width += CELLS2PANGO(empty_cells);
+		وروستی->geometry.پلنوالی += CELLS2PANGO(تشه_cells);
 	    }
-	    empty_cells = 0; // Width consumed
+	    تشه_cells = 0; // Width consumed
 	}
     }
 
-    FLUSH_NODE();
+    FLUSH_غوټه();
 
-#undef FLUSH_NODE
+#تعریف_لغوه FLUSH_غوټه
 
-    if (nodes->len > 0)
+    إذا (nodes->len > 0)
     {
 	// Add underline mask (if needed).
-	GskRenderNode *source;
-	GskRenderNode *node;
+	Gsk_Render_غوټه *سرچینه;
+	Gsk_Render_غوټه *غوټه;
 
-	draw_row_ensure_decor(drow, DRAW_UNDERL);
-	if (!rgba_is_transparent(dlayer->buf, drow->n_cells))
+	draw_لیکه_ensure_decor(drow, DRAW_UNDERL);
+	إذا (!rgba_is_transparent(dlayer->buf, drow->n_cells))
 	{
-	    source = draw_layer_get_texture(dlayer, drow->row, da, 0, FALSE);
-	    node = gsk_mask_node_new(source, drow->underl_mask,
-		    GSK_MASK_MODE_ALPHA);
-	    gsk_render_node_unref(source);
-	    g_ptr_array_add(nodes, node);
+	    سرچینه = draw_layer_get_texture(dlayer, drow->لیکه, da, 0, FALSE);
+	    غوټه = gsk_ماسک_غوټه_new(سرچینه, drow->underl_ماسک,
+		    GSK_ماسک_ډېرپېښ_ALPHA);
+	    gsk_render_غوټه_unref(سرچینه);
+	    g_ptr_array_جمع_کړه(nodes, غوټه);
 	}
 
-	dlayer->node = gsk_container_node_new(
-		(GskRenderNode **)nodes->pdata, nodes->len);
+	dlayer->غوټه = gsk_container_غوټه_new(
+		(Gsk_Render_غوټه **)nodes->pdata, nodes->len);
     }
     dlayer->dirty = FALSE;
 }
@@ -1100,49 +1100,49 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 /*
  * Render undercurl and strikethough, which use the special colour.
  */
-    static void
-draw_row_render_special(DrawRow *drow, VimDrawArea *da)
+    ساكن فراغ
+draw_لیکه_render_special(Draw_لیکه *drow, VimDrawArea *da)
 {
     DrawLayer	    *dlayer = drow->dlayers + DRAW_LAYER_SPECIAL;
-    GskRenderNode   *source;
-    GskRenderNode   *nodes[2];
-    int		    n_nodes = 0;
+    Gsk_Render_غوټه   *سرچینه;
+    Gsk_Render_غوټه   *nodes[2];
+    صحيح		    n_nodes = 0;
 
-    if (!dlayer->dirty)
-	return;
+    إذا (!dlayer->dirty)
+	أرجع;
 
-    draw_row_ensure_decor(drow, DRAW_UNDERC | DRAW_STRIKE);
+    draw_لیکه_ensure_decor(drow, DRAW_UNDERC | DRAW_STRIKE);
 
-    if (!rgba_is_transparent(dlayer->buf + UNDERC_OFFSET(drow->n_cells),
+    إذا (!rgba_is_transparent(dlayer->buf + UNDERC_دننه_واټن(drow->n_cells),
 		drow->n_cells))
     {
-	source = draw_layer_get_texture(dlayer, drow->row, da,
-		UNDERC_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->underc_mask,
-		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	سرچینه = draw_layer_get_texture(dlayer, drow->لیکه, da,
+		UNDERC_دننه_واټن(drow->n_cells), FALSE);
+	nodes[n_nodes++] = gsk_ماسک_غوټه_new(سرچینه, drow->underc_ماسک,
+		GSK_ماسک_ډېرپېښ_ALPHA);
+	gsk_render_غوټه_unref(سرچینه);
     }
 
-    if (!rgba_is_transparent(dlayer->buf + STRIKE_OFFSET(drow->n_cells),
+    إذا (!rgba_is_transparent(dlayer->buf + STRIKE_دننه_واټن(drow->n_cells),
 		drow->n_cells))
     {
-	source = draw_layer_get_texture(dlayer, drow->row, da,
-		STRIKE_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->strike_mask,
-		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	سرچینه = draw_layer_get_texture(dlayer, drow->لیکه, da,
+		STRIKE_دننه_واټن(drow->n_cells), FALSE);
+	nodes[n_nodes++] = gsk_ماسک_غوټه_new(سرچینه, drow->strike_ماسک,
+		GSK_ماسک_ډېرپېښ_ALPHA);
+	gsk_render_غوټه_unref(سرچینه);
     }
 
-    if (n_nodes == 1)
+    إذا (n_nodes == 1)
     {
-	dlayer->node = nodes[0];
+	dlayer->غوټه = nodes[0];
     }
-    else if (n_nodes > 0)
+    وإلا إذا (n_nodes > 0)
     {
-	dlayer->node = gsk_container_node_new(nodes, 2);
+	dlayer->غوټه = gsk_container_غوټه_new(nodes, 2);
 	// gsk_container_node_new() takes its own ref
-	for (int i = 0; i < (int)ARRAY_LENGTH(nodes); i++)
-	    gsk_render_node_unref(nodes[i]);
+	لكل (صحيح i = 0; i < (صحيح)ARRAY_اوږدتیا(nodes); i++)
+	    gsk_render_غوټه_unref(nodes[i]);
     }
 
     dlayer->dirty = FALSE;
@@ -1151,99 +1151,99 @@ draw_row_render_special(DrawRow *drow, VimDrawArea *da)
 /*
  * Render white color blocks used for blend to invert cells.
  */
-    static void
-draw_row_render_overlay(DrawRow *drow, VimDrawArea *da)
+    ساكن فراغ
+draw_لیکه_render_overlay(Draw_لیکه *drow, VimDrawArea *da)
 {
     DrawLayer *dlayer = drow->dlayers + DRAW_LAYER_OVERLAY;
 
-    if (!dlayer->dirty)
-	return;
+    إذا (!dlayer->dirty)
+	أرجع;
 
     dlayer->dirty = FALSE;
 
     // If no invert regions, don't do anything.
-    if (rgba_is_transparent(dlayer->buf, da->n_cols))
-	return;
+    إذا (rgba_is_transparent(dlayer->buf, da->n_ستون_شمېر))
+	أرجع;
 
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->غوټه = draw_layer_get_texture(dlayer, drow->لیکه, da, 0, TRUE);
 }
 
 /*
  * Add the glyph cluster to the raw area with given attributes and font.
  */
-    static void
-draw_row_add_cluster(
-	DrawRow		*drow,
+    ساكن فراغ
+draw_لیکه_جمع_کړه_cluster(
+	Draw_لیکه		*drow,
 	DrawAttr	*dattr,
-	int		col,
-	int		n_cells,
+	صحيح		ستون,
+	صحيح		n_cells,
 	PangoFont	*font,
 	PangoGlyphInfo	*glyphs,
-	int		n_glyphs,
+	صحيح		n_glyphs,
 	VimDrawArea	*da)
 {
-    DrawGlyphs *dglyphs = NULL;
+    DrawGlyphs *dglyphs = عدم;
 
-    if (col + n_cells > da->n_cols)
-	return;
+    إذا (ستون + n_cells > da->n_ستون_شمېر)
+	أرجع;
 
     // If there is no ink ("glyphs" is NULL), then just set the "dglyphs" of
     // each cell to NULL.
-    if (glyphs != NULL)
+    إذا (glyphs != عدم)
 	dglyphs = draw_glyphs_new(font, glyphs, n_glyphs, dattr->fg_color);
 
-    draw_row_fill(drow, col, col + n_cells - 1, dglyphs, dattr, &da->cursor);
+    draw_لیکه_fill(drow, ستون, ستون + n_cells - 1, dglyphs, dattr, &da->cursor);
 
-    if (dglyphs != NULL)
+    إذا (dglyphs != عدم)
 	draw_glyphs_unref(dglyphs);
 }
 
 /*
  * Add the string to the draw area. This will handle the 'guiligatures' option.
  */
-    static int
-vim_draw_area_add_string(
+    ساكن صحيح
+vim_draw_area_جمع_کړه_string(
 	VimDrawArea *self,
-	DrawRow	    *drow,
+	Draw_لیکه	    *drow,
 	DrawAttr    *dattr,
-	int	    col,
+	صحيح	    ستون,
 	char_u	    *s,
-	int	    len,
-	int	    draw_flags)
+	صحيح	    len,
+	صحيح	    draw_flags)
 {
     PangoGlyphString	*glyphs;
-    PangoAttrList	*attr_list = NULL;
-    int			start_idx = -1;
-    GList		*item_list;
-    int			column_offset = 0;
-    int			cluster_width;
-    int			last_glyph_rbearing;
-    int			cells = 0;
-    int			i = 0;
+    PangoAttrList	*attr_list = عدم;
+    صحيح			پیل_idx = -1;
+    GList		*توکی_list;
+    صحيح			ستنه_دننه_واټن = 0;
+    صحيح			cluster_پلنوالی;
+    صحيح			وروستی_glyph_rbearing;
+    صحيح			cells = 0;
+    صحيح			i = 0;
     gboolean		has_unicode = FALSE;
     gboolean		needs_shaping = FALSE;
 
     // Scan the string, and find spans where ligatures should not happen. We
     // must ensure that attribute boundaries do not split a base character from
     // its combining marks, as Pango breaks items at attribute boundaries.
-    while (i < len)
+    طالما (i < len)
     {
-	int	clen = 1;
-	int	is_composing = 0;
+	صحيح	clen = 1;
+	صحيح	is_composing = 0;
 	bool	want_disable;
 
-	if (s[i] >= 0x80)
+	إذا (s[i] >= 0x80)
 	{
 	    clen = utf_ptr2len(s + i);
 	    is_composing = utf_iscomposing(utf_ptr2char(s + i));
 	    has_unicode = TRUE;
 	}
 
-	if (is_composing)
+	إذا (is_composing)
 	    // Do not change state mid-cluster. Inherit the previous character's
 	    // state.
-	    want_disable = (start_idx != -1);
-	else
+	    want_disable = (پیل_idx != -1);
+	وإلا
 	    // Base character: disable ligatures if it's an ASCII non-ligature
 	    // char.
 	    want_disable = (s[i] < 0x80 && !gui.ligatures_map[s[i]]);
@@ -1252,21 +1252,21 @@ vim_draw_area_add_string(
 	// the string must go through Pango's shaping engine -- the ASCII
 	// fast path below draws cached glyphs one-by-one and can never
 	// produce a ligature, regardless of 'guiligatures'.
-	if (!is_composing && !want_disable)
+	إذا (!is_composing && !want_disable)
 	    needs_shaping = TRUE;
 
-	if (want_disable)
+	إذا (want_disable)
 	{
-	    if (start_idx == -1)
-		start_idx = i;
+	    إذا (پیل_idx == -1)
+		پیل_idx = i;
 	}
-	else if (start_idx != -1)
+	وإلا إذا (پیل_idx != -1)
 	{
-	    if (attr_list == NULL)
+	    إذا (attr_list == عدم)
 		attr_list = pango_attr_list_new();
-	    INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
-		    attr_list, start_idx, i);
-	    start_idx = -1;
+	    ورننباسه_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+		    attr_list, پیل_idx, i);
+	    پیل_idx = -1;
 	}
 	i += clen;
     }
@@ -1274,193 +1274,193 @@ vim_draw_area_add_string(
     // Fast path for pure ASCII: use cached glyph table. Skip this path when
     // there are non-ascii characters in the string, font attributes, or if
     // there's a possible ligature.
-    if (!(draw_flags & DRAW_ITALIC)
+    إذا (!(draw_flags & DRAW_ITALIC)
 	    && !((draw_flags & DRAW_BOLD) && gui.font_can_bold)
-	    && gui.ascii_glyphs != NULL
+	    && gui.ascii_glyphs != عدم
 	    && !has_unicode
 	    && !needs_shaping)
     {
-	for (i = 0; i < len; ++i)
+	لكل (i = 0; i < len; ++i)
 	{
 	    PangoGlyphInfo  glyph = gui.ascii_glyphs->glyphs[2 * s[i]];
 	    gboolean	    has_ink;
 
 	    has_ink = glyph_has_ink(gui.ascii_font, glyph);
 
-	    draw_row_add_cluster(drow, dattr, col + i, 1,
-		    gui.ascii_font, has_ink ? &glyph : NULL, 1, self);
+	    draw_لیکه_جمع_کړه_cluster(drow, dattr, ستون + i, 1,
+		    gui.ascii_font, has_ink ? &glyph : عدم, 1, self);
 	}
 
-	column_offset = len;
-	goto exit;
+	ستنه_دننه_واټن = len;
+	اذهب وتل;
     }
 
     glyphs = pango_glyph_string_new();
 
-    if (attr_list == NULL)
+    إذا (attr_list == عدم)
 	attr_list = pango_attr_list_new();
 
-    if (start_idx != -1)
-	INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
-		attr_list, start_idx, len);
+    إذا (پیل_idx != -1)
+	ورننباسه_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+		attr_list, پیل_idx, len);
 
-    cluster_width = PANGO_SCALE * gui.char_width;
-    last_glyph_rbearing = PANGO_SCALE * gui.char_width;
+    cluster_پلنوالی = PANGO_SCALE * gui.char_پلنوالی;
+    وروستی_glyph_rbearing = PANGO_SCALE * gui.char_پلنوالی;
 
     // If 'guifontwide' is set then use that for double-width characters.
-    if (gui.wide_font != NULL)
+    إذا (gui.wide_font != عدم)
 	apply_wide_font_attr(s, len, attr_list);
 
-    if ((draw_flags & DRAW_BOLD) && gui.font_can_bold)
-	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+    إذا ((draw_flags & DRAW_BOLD) && gui.font_can_bold)
+	ورننباسه_PANGO_ATTR(pango_attr_وزن_new(PANGO_وزن_BOLD),
 		attr_list, 0, len);
-    if (draw_flags & DRAW_ITALIC)
-	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+    إذا (draw_flags & DRAW_ITALIC)
+	ورننباسه_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
-    item_list = pango_itemize(gui.text_context,
-	    (const char *)s, 0, len, attr_list, NULL);
+    توکی_list = pango_itemize(gui.متن_context,
+	    (ثابت حرف *)s, 0, len, attr_list, عدم);
 
-    while (item_list != NULL)
+    طالما (توکی_list != عدم)
     {
-	PangoItem   *item = item_list->data;
-	int	    item_cells = 0;
-	int	    cluster_start_idx = 0;
-	int	    current_cluster_col = col + column_offset;
-	int	    current_cluster_cells = 0;
+	Pango_توکی   *توکی = توکی_list->معلومات;
+	صحيح	    توکی_cells = 0;
+	صحيح	    cluster_پیل_idx = 0;
+	صحيح	    current_cluster_ستون = ستون + ستنه_دننه_واټن;
+	صحيح	    current_cluster_cells = 0;
 	gboolean    current_cluster_ink = FALSE;
 
-	item_list = g_list_delete_link(item_list, item_list);
+	توکی_list = g_list_delete_link(توکی_list, توکی_list);
 
 	// Force LTR direction; Vim handles bidi on its own.
-	item->analysis.level = (item->analysis.level + 1) & (~1U);
+	توکی->analysis.level = (توکی->analysis.level + 1) & (~1U);
 
-	pango_shape_full((const char *)s + item->offset, item->length,
-		(const char *)s, len, &item->analysis, glyphs);
+	pango_shape_ډک((ثابت حرف *)s + توکی->دننه_واټن, توکی->اوږدتیا,
+		(ثابت حرف *)s, len, &توکی->analysis, glyphs);
 
 	// Fixed-width hack: assign a fixed width to each glyph based on the
 	// number of cells it occupies, handling composing characters and
 	// cluster boundaries properly.
 	//
 	// At the end of each cluster, add it to the draw area.
-	for (i = 0; i < glyphs->num_glyphs; ++i)
+	لكل (i = 0; i < glyphs->عدد_glyphs; ++i)
 	{
 	    PangoGlyphInfo *glyph;
 
 	    glyph = &glyphs->glyphs[i];
 
-	    if (glyph->attr.is_cluster_start)
+	    إذا (glyph->attr.is_cluster_پیل)
 	    {
-		int cellcount;
+		صحيح cellcount;
 
-		cellcount = count_cluster_cells(
-			s, item, glyphs, i, &cluster_width,
-			(item_list != NULL) ? &last_glyph_rbearing : NULL);
+		cellcount = شمېر_cluster_cells(
+			s, توکی, glyphs, i, &cluster_پلنوالی,
+			(توکی_list != عدم) ? &وروستی_glyph_rbearing : عدم);
 
-		if (i > 0 && cellcount > 0)
+		إذا (i > 0 && cellcount > 0)
 		{
-		    draw_row_add_cluster(drow, dattr,
-			    current_cluster_col, current_cluster_cells,
-			    item->analysis.font,
+		    draw_لیکه_جمع_کړه_cluster(drow, dattr,
+			    current_cluster_ستون, current_cluster_cells,
+			    توکی->analysis.font,
 			    current_cluster_ink ?
-			    glyphs->glyphs + cluster_start_idx : NULL,
-			    i - cluster_start_idx, self);
+			    glyphs->glyphs + cluster_پیل_idx : عدم,
+			    i - cluster_پیل_idx, self);
 
-		    current_cluster_col += current_cluster_cells;
-		    cluster_start_idx = i;
+		    current_cluster_ستون += current_cluster_cells;
+		    cluster_پیل_idx = i;
 		    current_cluster_ink = FALSE;
 		    current_cluster_cells = 0;
 		}
 
-		if (cellcount > 0)
+		إذا (cellcount > 0)
 		{
-		    int width;
+		    صحيح پلنوالی;
 
-		    width = cellcount * gui.char_width * PANGO_SCALE;
-		    glyph->geometry.x_offset +=
-			MAX(0, width - cluster_width) / 2;
-		    glyph->geometry.width = width;
+		    پلنوالی = cellcount * gui.char_پلنوالی * PANGO_SCALE;
+		    glyph->geometry.x_دننه_واټن +=
+			MAX(0, پلنوالی - cluster_پلنوالی) / 2;
+		    glyph->geometry.پلنوالی = پلنوالی;
 		}
-		else
-		    setup_zero_width_cluster(item, glyph, cells,
-			    cluster_width,
-			    last_glyph_rbearing);
+		وإلا
+		    تیاری_zero_پلنوالی_cluster(توکی, glyph, cells,
+			    cluster_پلنوالی,
+			    وروستی_glyph_rbearing);
 
-		item_cells += cellcount;
+		توکی_cells += cellcount;
 		cells = cellcount;
 		current_cluster_cells += cellcount;
 	    }
-	    else if (i > 0)
+	    وإلا إذا (i > 0)
 	    {
-		int width;
+		صحيح پلنوالی;
 
-		if (glyph->geometry.x_offset >= 0)
+		إذا (glyph->geometry.x_دننه_واټن >= 0)
 		{
-		    glyphs->glyphs[i].geometry.width =
-			glyphs->glyphs[i - 1].geometry.width;
-		    glyphs->glyphs[i - 1].geometry.width = 0;
+		    glyphs->glyphs[i].geometry.پلنوالی =
+			glyphs->glyphs[i - 1].geometry.پلنوالی;
+		    glyphs->glyphs[i - 1].geometry.پلنوالی = 0;
 		}
-		width = cells * gui.char_width * PANGO_SCALE;
-		glyph->geometry.x_offset +=
-		    MAX(0, width - cluster_width) / 2;
+		پلنوالی = cells * gui.char_پلنوالی * PANGO_SCALE;
+		glyph->geometry.x_دننه_واټن +=
+		    MAX(0, پلنوالی - cluster_پلنوالی) / 2;
 	    }
-	    else
-		glyph->geometry.width = 0;
+	    وإلا
+		glyph->geometry.پلنوالی = 0;
 
 
-	    if (!current_cluster_ink)
+	    إذا (!current_cluster_ink)
 		current_cluster_ink = glyph_has_ink(
-			item->analysis.font, *glyph);
+			توکی->analysis.font, *glyph);
 	}
-	if (glyphs->num_glyphs > 0)
-	    draw_row_add_cluster(drow, dattr,
-		    current_cluster_col, current_cluster_cells,
-		    item->analysis.font,
+	إذا (glyphs->عدد_glyphs > 0)
+	    draw_لیکه_جمع_کړه_cluster(drow, dattr,
+		    current_cluster_ستون, current_cluster_cells,
+		    توکی->analysis.font,
 		    current_cluster_ink ?
-		    glyphs->glyphs + cluster_start_idx : NULL,
-		    glyphs->num_glyphs - cluster_start_idx, self);
+		    glyphs->glyphs + cluster_پیل_idx : عدم,
+		    glyphs->عدد_glyphs - cluster_پیل_idx, self);
 
-	pango_item_free(item);
-	column_offset += item_cells;
+	pango_توکی_free(توکی);
+	ستنه_دننه_واټن += توکی_cells;
     }
 
     pango_glyph_string_free(glyphs);
 
-exit:
-    if (attr_list != NULL)
+وتل:
+    إذا (attr_list != عدم)
 	pango_attr_list_unref(attr_list);
 
-    return column_offset;
+    أرجع ستنه_دننه_واټن;
 }
 
 /*
  * Draw the given string at position (col, row) on the draw area.
  */
-    int
+    صحيح
 vim_draw_area_draw_string(
 	VimDrawArea *self,
-	int	    row,
-	int	    col,
+	صحيح	    لیکه,
+	صحيح	    ستون,
 	char_u	    *s,
-	int	    len,
-	int	    flags)
+	صحيح	    len,
+	صحيح	    flags)
 {
-    DrawRow	*drow;
+    Draw_لیکه	*drow;
     DrawAttr	dattr;
-    char_u	*conv_buf = NULL;
-    int		convlen;
-    int		n_cells ;
+    char_u	*conv_buf = عدم;
+    صحيح		convlen;
+    صحيح		n_cells ;
 
-    if (unlikely(self->rows == NULL
-		|| row >= self->n_rows
-		|| col >= self->n_cols))
-	return len;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| لیکه >= self->n_لیکې
+		|| ستون >= self->n_ستون_شمېر))
+	أرجع len;
 
-    if (output_conv.vc_type != CONV_NONE)
+    إذا (output_conv.vc_type != CONV_NONE)
     {
 	convlen = len;
 	conv_buf = string_convert(&output_conv, s, &convlen);
-	if (conv_buf != NULL)
+	إذا (conv_buf != عدم)
 	{
 	    s = conv_buf;
 	    len = convlen;
@@ -1468,51 +1468,51 @@ vim_draw_area_draw_string(
     }
 
     // Safety check: pango crashes with invalid utf-8.
-    if (!utf_valid_string(s, s + len))
+    إذا (!utf_valid_string(s, s + len))
     {
 	vim_free(conv_buf);
-	return len;
+	أرجع len;
     }
 
-    drow = self->rows + row;
+    drow = self->لیکې_2 + لیکه;
     draw_attr_init(&dattr, gui.bgcolor, gui.fgcolor, gui.spcolor, flags);
 
-    n_cells = vim_draw_area_add_string(self, drow, &dattr, col, s, len, flags);
+    n_cells = vim_draw_area_جمع_کړه_string(self, drow, &dattr, ستون, s, len, flags);
 
     vim_free(conv_buf);
 
-    return n_cells;
+    أرجع n_cells;
 }
 
 /*
  * Clear out the block with the given bounds (inclusive).
  */
-    void
-vim_draw_area_clear_block(
+    فراغ
+vim_draw_area_clear_بلاک(
 	VimDrawArea	*self,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2)
+	صحيح		row1,
+	صحيح		col1,
+	صحيح		row2,
+	صحيح		col2)
 {
-    if (unlikely(self->rows == NULL
-		|| row1 >= self->n_rows
-		|| col1 >= self->n_cols
-		|| row2 >= self->n_rows
-		|| col2 >= self->n_cols))
-	return;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| row1 >= self->n_لیکې
+		|| col1 >= self->n_ستون_شمېر
+		|| row2 >= self->n_لیکې
+		|| col2 >= self->n_ستون_شمېر))
+	أرجع;
 
-    for (int r = row1; r <= row2; r++)
-	draw_row_fill(self->rows + r, col1, col2, NULL, NULL, &self->cursor);
+    لكل (صحيح r = row1; r <= row2; r++)
+	draw_لیکه_fill(self->لیکې_2 + r, col1, col2, عدم, عدم, &self->cursor);
 }
 
 /*
  * Clear out the entire draw area
  */
-    void
+    فراغ
 vim_draw_area_clear(VimDrawArea *self)
 {
-    vim_draw_area_clear_block(self, 0, 0, self->n_rows - 1, self->n_cols - 1);
+    vim_draw_area_clear_بلاک(self, 0, 0, self->n_لیکې - 1, self->n_ستون_شمېر - 1);
 }
 
 /*
@@ -1520,48 +1520,48 @@ vim_draw_area_clear(VimDrawArea *self)
  * "col2" (making a rectangle region), to the row "to". The previous region that
  * was moved is cleared.
  */
-    void
-vim_draw_area_move_block(
+    فراغ
+vim_draw_area_move_بلاک(
 	VimDrawArea *self,
-	int	    to,
-	int	    row1,
-	int	    row2,
-	int	    col1,
-	int	    col2)
+	صحيح	    منزل,
+	صحيح	    row1,
+	صحيح	    row2,
+	صحيح	    col1,
+	صحيح	    col2)
 {
-    int offset = row2 - row1;
+    صحيح دننه_واټن = row2 - row1;
 
-    if (unlikely(self->rows == NULL
-		|| row1 >= self->n_rows
-		|| row2 >= self->n_rows
-		|| to >= self->n_rows
-		|| col1 >= self->n_cols
-		|| col2 >= self->n_cols))
-	return;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| row1 >= self->n_لیکې
+		|| row2 >= self->n_لیکې
+		|| منزل >= self->n_لیکې
+		|| col1 >= self->n_ستون_شمېر
+		|| col2 >= self->n_ستون_شمېر))
+	أرجع;
 
-    assert(row2 >= row1);
-    assert(col2 >= col1);
-    assert(row1 != to);
+    أكد(row2 >= row1);
+    أكد(col2 >= col1);
+    أكد(row1 != منزل);
 
-    if (row1 > to)
+    إذا (row1 > منزل)
     {
 	// "row1" is below "to", start moving rows starting at "row1". Rows are
 	// being shifted upwards.
-	for (int o = 0; o <= offset; o++)
-	    draw_row_move_to(self->rows + to + o, self->rows + row1 + o,
+	لكل (صحيح o = 0; o <= دننه_واټن; o++)
+	    draw_لیکه_move_منزل(self->لیکې_2 + منزل + o, self->لیکې_2 + row1 + o,
 		    col1, col2, self);
     }
-    else
+    وإلا
     {
 	// "row1" is above "to", must start moving rows starting at "row2". Rows
 	// are being shifted downwards.
-	for (int o = offset; o >= 0; o--)
-	    if (to + o >= self->n_rows)
+	لكل (صحيح o = دننه_واټن; o >= 0; o--)
+	    إذا (منزل + o >= self->n_لیکې)
 		// "src_row" is being "moved" off the screen, no need to move
 		// it physically.
-		vim_draw_area_clear_block(self, row1 + o, col1, row1 + o, col2);
-	    else
-		draw_row_move_to(self->rows + to + o, self->rows + row1 + o,
+		vim_draw_area_clear_بلاک(self, row1 + o, col1, row1 + o, col2);
+	    وإلا
+		draw_لیکه_move_منزل(self->لیکې_2 + منزل + o, self->لیکې_2 + row1 + o,
 			col1, col2, self);
     }
 }
@@ -1572,15 +1572,15 @@ vim_draw_area_move_block(
  * block cursor is used, if "w" and "h" is -1 then a hollow cursor is used,
  * otherwise a part cursor with dimensions "w" and "h" is used.
  */
-    void
-vim_draw_area_set_cursor(VimDrawArea *self, int w, int h)
+    فراغ
+vim_draw_area_سېټ_cursor(VimDrawArea *self, صحيح w, صحيح h)
 {
     self->cursor.draw = TRUE;
-    self->cursor.width = w;
-    self->cursor.height = h;
+    self->cursor.پلنوالی = w;
+    self->cursor.لوړوالی = h;
     // Remember this now: the snapshot runs later, when the drawing position
     // has moved on.
-    self->cursor.n_cells = 1 + mb_lefthalve(gui.cursor_row, gui.cursor_col);
+    self->cursor.n_cells = 1 + mb_lefthalve(gui.cursor_لیکه, gui.cursor_ستون);
     self->cursor.bg_color = *gui.bgcolor;
     self->cursor.fg_color = *gui.fgcolor;
 }
@@ -1588,173 +1588,173 @@ vim_draw_area_set_cursor(VimDrawArea *self, int w, int h)
 /*
  * Invert the rectangle in the draw area.
  */
-    void
-vim_draw_area_invert_block(
+    فراغ
+vim_draw_area_invert_بلاک(
 	VimDrawArea	*self,
-	int		row,
-	int		col,
-	int		nrows,
-	int		ncols)
+	صحيح		لیکه,
+	صحيح		ستون,
+	صحيح		nrows,
+	صحيح		ncols)
 {
-    if (unlikely(self->rows == NULL
-		|| row >= self->n_rows
-		|| col >= self->n_cols
-		|| row + nrows - 1 >= self->n_rows
-		|| col + ncols - 1 >= self->n_cols))
-	return;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| لیکه >= self->n_لیکې
+		|| ستون >= self->n_ستون_شمېر
+		|| لیکه + nrows - 1 >= self->n_لیکې
+		|| ستون + ncols - 1 >= self->n_ستون_شمېر))
+	أرجع;
 
-    for (int r = row; r < row + nrows; r++)
+    لكل (صحيح r = لیکه; r < لیکه + nrows; r++)
     {
-	DrawRow	    *drow = self->rows + r;
+	Draw_لیکه	    *drow = self->لیکې_2 + r;
 	DrawLayer   *dlayer = drow->dlayers + DRAW_LAYER_OVERLAY;
 
-	for (int c = 0; c < ncols; c++)
-	    dlayer->buf[c + col] = ~dlayer->buf[c + col];
-	draw_row_dirty_layer(drow, DRAW_LAYER_OVERLAY);
+	لكل (صحيح c = 0; c < ncols; c++)
+	    dlayer->buf[c + ستون] = ~dlayer->buf[c + ستون];
+	draw_لیکه_dirty_layer(drow, DRAW_LAYER_OVERLAY);
     }
 }
 
-#if defined(FEAT_SIGN_ICONS)
+#إذا defined(FEAT_SIGN_ICONS)
 /*
  * Add a sign texture at the given row and column, and scale it to "width" and
  * "height".
  */
-    void
-vim_draw_area_add_sign(
+    فراغ
+vim_draw_area_جمع_کړه_sign(
 	VimDrawArea *self,
 	GdkTexture  *sign,
-	int	    row,
-	int	    col,
-	int	    width,
-	int	    height)
+	صحيح	    لیکه,
+	صحيح	    ستون,
+	صحيح	    پلنوالی,
+	صحيح	    لوړوالی)
 {
-    DrawRow	*drow;
+    Draw_لیکه	*drow;
     DrawSign	*dsign;
     DrawGlyphs	*dglyphs;
-    int		cells;
+    صحيح		cells;
 
-    if (unlikely(self->rows == NULL
-		|| row >= self->n_rows
-		|| col >= self->n_cols))
-	return;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| لیکه >= self->n_لیکې
+		|| ستون >= self->n_ستون_شمېر))
+	أرجع;
 
-    drow = self->rows + row;
-    dsign = draw_sign_new(sign, width, height);
+    drow = self->لیکې_2 + لیکه;
+    dsign = draw_sign_new(sign, پلنوالی, لوړوالی);
     dglyphs = draw_glyphs_new_sign(dsign);
-    cells = (width + gui.char_width - 1) / gui.char_width;
+    cells = (پلنوالی + gui.char_پلنوالی - 1) / gui.char_پلنوالی;
 
-    draw_row_fill(drow, col, col + cells - 1, dglyphs, NULL, &self->cursor);
+    draw_لیکه_fill(drow, ستون, ستون + cells - 1, dglyphs, عدم, &self->cursor);
     draw_glyphs_unref(dglyphs);
 }
-#endif
+#د_که_پای
 
-#ifdef FEAT_NETBEANS_INTG
+#که_تعریف_شوی FEAT_NETBEANS_INTG
 /*
  * Add a multi sign indicator at the given position. "surf" should be in ARGB
  * format.
  */
-    void
-vim_draw_area_add_multisign(
+    فراغ
+vim_draw_area_جمع_کړه_multisign(
 	VimDrawArea	*self,
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	صحيح		لیکه,
+	صحيح		ستون,
+	صحيح		پلنوالی,
+	صحيح		لوړوالی)
 {
-    DrawRow	*drow;
+    Draw_لیکه	*drow;
     DrawSign	*dsign;
     DrawGlyphs	*dglyphs;
-    int		cells;
+    صحيح		cells;
     GdkTexture	*texture;
-    GBytes	*bytes;
+    GBytes	*بایټونه;
 
-    if (unlikely(self->rows == NULL
-		|| row >= self->n_rows
-		|| col >= self->n_cols))
-	return;
+    إذا (unlikely(self->لیکې_2 == عدم
+		|| لیکه >= self->n_لیکې
+		|| ستون >= self->n_ستون_شمېر))
+	أرجع;
 
     cairo_surface_flush(surf);
-    bytes = g_bytes_new_with_free_func(cairo_image_surface_get_data(surf),
-	    cairo_image_surface_get_height(surf)
+    بایټونه = g_بایټونه_new_with_free_func(cairo_image_surface_get_معلومات(surf),
+	    cairo_image_surface_get_لوړوالی(surf)
 	    * cairo_image_surface_get_stride(surf),
 	    (GDestroyNotify)cairo_surface_destroy,
 	    cairo_surface_reference(surf));
 
-    texture = gdk_memory_texture_new(cairo_image_surface_get_width(surf),
-	    cairo_image_surface_get_height(surf),
-	    GDK_MEMORY_A8R8G8B8_PREMULTIPLIED,
-	    bytes, cairo_image_surface_get_stride(surf));
-    g_bytes_unref(bytes);
+    texture = gdk_حافظه_texture_new(cairo_image_surface_get_پلنوالی(surf),
+	    cairo_image_surface_get_لوړوالی(surf),
+	    GDK_حافظه_A8_R8_G8_B8_PREMULTIPLIED,
+	    بایټونه, cairo_image_surface_get_stride(surf));
+    g_بایټونه_unref(بایټونه);
 
-    drow = self->rows + row;
-    dsign = draw_sign_new(texture, width, height);
+    drow = self->لیکې_2 + لیکه;
+    dsign = draw_sign_new(texture, پلنوالی, لوړوالی);
     g_object_unref(texture);
     dglyphs = draw_glyphs_new_sign(dsign);
-    cells = (width + gui.char_width - 1) / gui.char_width;
+    cells = (پلنوالی + gui.char_پلنوالی - 1) / gui.char_پلنوالی;
 
-    draw_row_fill(drow, col, col + cells - 1, dglyphs, NULL, &self->cursor);
+    draw_لیکه_fill(drow, ستون, ستون + cells - 1, dglyphs, عدم, &self->cursor);
     draw_glyphs_unref(dglyphs);
 }
-#endif
+#د_که_پای
 
-#ifdef FEAT_IMAGE_GUI
+#که_تعریف_شوی FEAT_IMAGE_GUI
 
 /*
  * Add an external node to be rendered, adding a new reference to the node.
  */
-    void
-vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node)
+    فراغ
+vim_draw_area_جمع_کړه_external(VimDrawArea *self, Gsk_Render_غوټه *غوټه)
 {
-    g_hash_table_add(self->external, gsk_render_node_ref(node));
+    g_hash_جدول_جمع_کړه(self->external, gsk_render_غوټه_ref(غوټه));
 }
 
-    void
-vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node)
+    فراغ
+vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_غوټه *غوټه)
 {
-    g_hash_table_remove(self->external, node);
+    g_hash_جدول_remove(self->external, غوټه);
 }
 
-#endif
+#د_که_پای
 
 /*
  * Add the cursor to the snapshot.
  */
-    static void
+    ساكن فراغ
 vim_draw_area_snapshot_cursor(
 	VimDrawArea	*self,
-	GskRenderNode	*text_node,	// May be NULL
-	GskRenderNode	*special_node,	// May be NULL
+	Gsk_Render_غوټه	*متن_غوټه,	// May be NULL
+	Gsk_Render_غوټه	*special_غوټه,	// May be NULL
 	GtkSnapshot	*snapshot)
 {
     DrawCursor	    *cursor = &self->cursor;
-    int		    w = cursor->width;
-    int		    h = cursor->height;
+    صحيح		    w = cursor->پلنوالی;
+    صحيح		    h = cursor->لوړوالی;
     graphene_rect_t rect;
 
-    if (!cursor->draw)
-	return;
+    إذا (!cursor->draw)
+	أرجع;
 
-    if (cursor->width <= 0 && cursor->height <= 0)
+    إذا (cursor->پلنوالی <= 0 && cursor->لوړوالی <= 0)
     {
-	w += gui.char_width * cursor->n_cells;
-	h = gui.char_height;
+	w += gui.char_پلنوالی * cursor->n_cells;
+	h = gui.char_لوړوالی;
     }
 
     graphene_rect_init(&rect,
-#ifdef FEAT_RIGHTLEFT
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.cursor_col + 1) - w :
-#endif
-	    FILL_X(gui.cursor_col),
-	    FILL_Y(gui.cursor_row) + gui.char_height - h, w, h);
+#که_تعریف_شوی FEAT_RIGHTLEFT
+	    CURSOR_BAR_ښی ? FILL_X(gui.cursor_ستون + 1) - w :
+#د_که_پای
+	    FILL_X(gui.cursor_ستون),
+	    FILL_Y(gui.cursor_لیکه) + gui.char_لوړوالی - h, w, h);
 
 
-    if (cursor->width == -1 && cursor->height == -1)
+    إذا (cursor->پلنوالی == -1 && cursor->لوړوالی == -1)
     {
 	// Create hollow cursor
 	GskRoundedRect	    outline;
-	static const float  border[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	const GdkRGBA	    color[4] = {
+	ساكن ثابت عائم  border[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	ثابت GdkRGBA	    color[4] = {
 	    cursor->bg_color, cursor->bg_color,
 	    cursor->bg_color, cursor->bg_color
 	} ;
@@ -1762,140 +1762,140 @@ vim_draw_area_snapshot_cursor(
 	gsk_rounded_rect_init_from_rect(&outline, &rect, 0.0f);
 	gtk_snapshot_append_border(snapshot, &outline, border, color);
     }
-    else
+    وإلا
     {
 	// Create block style cursor, by masking the text + under decorations
 	// with the fg color.
 	gtk_snapshot_append_color(snapshot, &cursor->bg_color, &rect);
 
-	gtk_snapshot_push_mask(snapshot, GSK_MASK_MODE_ALPHA);
+	gtk_snapshot_ټېل_ماسک(snapshot, GSK_ماسک_ډېرپېښ_ALPHA);
 
 	// Used as an "outline" for the fg color.
-	if (text_node != NULL)
-	    gtk_snapshot_append_node(snapshot, text_node);
-	if (special_node != NULL)
-	    gtk_snapshot_append_node(snapshot, special_node);
+	إذا (متن_غوټه != عدم)
+	    gtk_snapshot_append_غوټه(snapshot, متن_غوټه);
+	إذا (special_غوټه != عدم)
+	    gtk_snapshot_append_غوټه(snapshot, special_غوټه);
 
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_راوباسه(snapshot);
 
 	gtk_snapshot_append_color(snapshot, &cursor->fg_color, &rect);
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_راوباسه(snapshot);
     }
 }
 
-    static void
+    ساكن فراغ
 vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 {
     VimDrawArea	    *self = VIM_DRAW_AREA(widget);
-    int		    height, width;
+    صحيح		    لوړوالی, پلنوالی;
     GtkSnapshot	    *body_snapshot;
-    GtkSnapshot	    *invert_snapshot = NULL;
-    GskRenderNode   *body_node;
-    GskRenderNode   *invert_node = NULL;
-#ifdef FEAT_IMAGE_GUI
-    GskRenderNode   *ext_node;
-    GHashTableIter  iter;
-#endif
+    GtkSnapshot	    *invert_snapshot = عدم;
+    Gsk_Render_غوټه   *body_غوټه;
+    Gsk_Render_غوټه   *invert_غوټه = عدم;
+#که_تعریف_شوی FEAT_IMAGE_GUI
+    Gsk_Render_غوټه   *ext_غوټه;
+    GHash_جدول_Iter  iter;
+#د_که_پای
 
-    gui_mch_set_bg_color(gui.back_pixel);
-    height = gtk_widget_get_height(widget) + gui.bleed_bot;
-    width = gtk_widget_get_width(widget) + gui.bleed_right;
+    gui_mch_سېټ_bg_color(gui.شا_pixel);
+    لوړوالی = gtk_widget_get_لوړوالی(widget) + gui.bleed_bot;
+    پلنوالی = gtk_widget_get_پلنوالی(widget) + gui.bleed_ښی;
 
-    if (self->rows == NULL)
+    إذا (self->لیکې_2 == عدم)
     {
 	gtk_snapshot_append_color(snapshot, gui.bgcolor,
-		&GRAPHENE_RECT_INIT(0, 0, width, height));
-	return;
+		&GRAPHENE_RECT_INIT(0, 0, پلنوالی, لوړوالی));
+	أرجع;
     }
 
     // If number of pixels to bleed has changed, then dirty the background and
     // overlay layers of all rows.
-    if (self->bleed_right == -1 || self->bleed_right != gui.bleed_right)
+    إذا (self->bleed_ښی == -1 || self->bleed_ښی != gui.bleed_ښی)
     {
-	self->bleed_right = gui.bleed_right;
-	for (int r = 0; r < self->n_rows; r++)
+	self->bleed_ښی = gui.bleed_ښی;
+	لكل (صحيح r = 0; r < self->n_لیکې; r++)
 	{
-	    draw_row_dirty_layer(self->rows + r, DRAW_LAYER_BACKGROUND);
-	    draw_row_dirty_layer(self->rows + r, DRAW_LAYER_OVERLAY);
+	    draw_لیکه_dirty_layer(self->لیکې_2 + r, DRAW_LAYER_BACKGROUND);
+	    draw_لیکه_dirty_layer(self->لیکې_2 + r, DRAW_LAYER_OVERLAY);
 	}
     }
 
     // First append everything that should be inverted to another snapshot, then
     // free that snapshot into a node so it can be blended (if needed).
     body_snapshot = gtk_snapshot_new();
-#if GTK_CHECK_VERSION(4,24,0)
-    gtk_snapshot_set_snap(body_snapshot, GSK_RECT_SNAP_ROUND);
-#endif
+#إذا GTK_CHECK_نسخه(4,24,0)
+    gtk_snapshot_سېټ_snap(body_snapshot, GSK_RECT_SNAP_پړاو);
+#د_که_پای
 
-    for (int r = 0; r < self->n_rows; r++)
+    لكل (صحيح r = 0; r < self->n_لیکې; r++)
     {
-	DrawRow *drow = self->rows + r;
+	Draw_لیکه *drow = self->لیکې_2 + r;
 
-	draw_row_render_background(drow, self);
-	draw_row_render_text(drow, self);
-	draw_row_render_special(drow, self);
-	draw_row_render_overlay(drow, self);
+	draw_لیکه_render_background(drow, self);
+	draw_لیکه_render_متن(drow, self);
+	draw_لیکه_render_special(drow, self);
+	draw_لیکه_render_overlay(drow, self);
 
-	for (int l = 0; l < N_DRAW_LAYERS; l++)
+	لكل (صحيح l = 0; l < N_DRAW_LAYERS; l++)
 	{
 	    DrawLayer *dlayer = drow->dlayers + l;
 
-	    if (dlayer->node != NULL)
+	    إذا (dlayer->غوټه != عدم)
 	    {
-		if (l == DRAW_LAYER_OVERLAY)
+		إذا (l == DRAW_LAYER_OVERLAY)
 		{
-		    if (invert_snapshot == NULL)
+		    إذا (invert_snapshot == عدم)
 		    {
 			invert_snapshot = gtk_snapshot_new();
-#if GTK_CHECK_VERSION(4,24,0)
-			gtk_snapshot_set_snap(invert_snapshot,
-				GSK_RECT_SNAP_ROUND);
-#endif
+#إذا GTK_CHECK_نسخه(4,24,0)
+			gtk_snapshot_سېټ_snap(invert_snapshot,
+				GSK_RECT_SNAP_پړاو);
+#د_که_پای
 		    }
-		    gtk_snapshot_append_node(invert_snapshot, dlayer->node);
+		    gtk_snapshot_append_غوټه(invert_snapshot, dlayer->غوټه);
 		}
-		else
-		    gtk_snapshot_append_node(body_snapshot, dlayer->node);
+		وإلا
+		    gtk_snapshot_append_غوټه(body_snapshot, dlayer->غوټه);
 	    }
 	}
 
-	if (r == gui.cursor_row)
+	إذا (r == gui.cursor_لیکه)
 	    vim_draw_area_snapshot_cursor(self,
-		    drow->dlayers[DRAW_LAYER_TEXT].node,
-		    drow->dlayers[DRAW_LAYER_SPECIAL].node,
+		    drow->dlayers[DRAW_LAYER_متن].غوټه,
+		    drow->dlayers[DRAW_LAYER_SPECIAL].غوټه,
 		    body_snapshot);
     }
 
-    if (invert_snapshot != NULL)
-	gtk_snapshot_push_blend(snapshot, GSK_BLEND_MODE_DIFFERENCE);
+    إذا (invert_snapshot != عدم)
+	gtk_snapshot_ټېل_blend(snapshot, GSK_BLEND_ډېرپېښ_DIFFERENCE);
 
     gtk_snapshot_append_color(snapshot, gui.bgcolor,
-	    &GRAPHENE_RECT_INIT(0, 0, width, height));
-    body_node = gtk_snapshot_free_to_node(body_snapshot);
-    if (body_node != NULL)
+	    &GRAPHENE_RECT_INIT(0, 0, پلنوالی, لوړوالی));
+    body_غوټه = gtk_snapshot_free_منزل_غوټه(body_snapshot);
+    إذا (body_غوټه != عدم)
     {
-	gtk_snapshot_append_node(snapshot, body_node);
-	gsk_render_node_unref(body_node);
+	gtk_snapshot_append_غوټه(snapshot, body_غوټه);
+	gsk_render_غوټه_unref(body_غوټه);
     }
 
-#ifdef FEAT_IMAGE_GUI
+#که_تعریف_شوی FEAT_IMAGE_GUI
     // Allow external nodes to be inverted
-    g_hash_table_iter_init(&iter, self->external);
+    g_hash_جدول_iter_init(&iter, self->external);
 
-    while (g_hash_table_iter_next(&iter, (void **)&ext_node, NULL))
-	gtk_snapshot_append_node(snapshot, ext_node);
-#endif
+    طالما (g_hash_جدول_iter_بل(&iter, (فراغ **)&ext_غوټه, عدم))
+	gtk_snapshot_append_غوټه(snapshot, ext_غوټه);
+#د_که_پای
 
-    if (invert_snapshot != NULL)
+    إذا (invert_snapshot != عدم)
     {
-	gtk_snapshot_pop(snapshot);
-	invert_node = gtk_snapshot_free_to_node(invert_snapshot);
+	gtk_snapshot_راوباسه(snapshot);
+	invert_غوټه = gtk_snapshot_free_منزل_غوټه(invert_snapshot);
 	// Not sure if it can be NULL but still check
-	if (invert_node != NULL)
+	إذا (invert_غوټه != عدم)
 	{
-	    gtk_snapshot_append_node(snapshot, invert_node);
-	    gsk_render_node_unref(invert_node);
+	    gtk_snapshot_append_غوټه(snapshot, invert_غوټه);
+	    gsk_render_غوټه_unref(invert_غوټه);
 	}
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_راوباسه(snapshot);
     }
 }

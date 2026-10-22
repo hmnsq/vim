@@ -10,42 +10,42 @@
 /*
  * misc2.c: Various functions.
  */
-#include "vim.h"
+#ضمن "vim.h"
 
-static char_u	*username = NULL; // cached result of mch_get_user_name()
+ساكن char_u	*username = عدم; // cached result of mch_get_user_name()
 
-static int coladvance2(pos_T *pos, int addspaces, int finetune, colnr_T wcol);
+ساكن صحيح coladvance2(pos_T *pos, صحيح addspaces, صحيح finetune, colnr_T wcol);
 
 /*
  * Return TRUE if in the current mode we need to use virtual.
  */
-    int
-virtual_active(void)
+    صحيح
+virtual_فعال(فراغ)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    بینښه صحيح cur_ve_flags = get_ve_flags();
 
-    if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
-	return TRUE;
+    إذا (cur_ve_flags == VE_ALL
+	    || ((cur_ve_flags & VE_ورننباسه) && (State & ډېرپېښ_ورننباسه)))
+	أرجع TRUE;
 
     // While an operator is being executed we return "virtual_op", because
     // VIsual_active has already been reset, thus we can't check for "block"
     // being used.
-    if (virtual_op != MAYBE)
-	return virtual_op;
-    return (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
+    إذا (virtual_op != MAYBE)
+	أرجع virtual_op;
+    أرجع (cur_ve_flags & VE_بلاک) && VIsual_فعال && VIsual_ډېرپېښ == Ctrl_V;
 }
 
 /*
  * Get the screen position of the cursor.
  */
-    int
-getviscol(void)
+    صحيح
+getviscol(فراغ)
 {
     colnr_T	x;
 
-    getvvcol(curwin, &curwin->w_cursor, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &curwin->w_cursor, &x, عدم, عدم, GETVCOL_NO_ABOVE);
+    أرجع (صحيح)x;
 }
 
 /*
@@ -53,33 +53,33 @@ getviscol(void)
  * cursor in that column.
  * The caller must have saved the cursor line for undo!
  */
-    int
+    صحيح
 coladvance_force(colnr_T wcol)
 {
-    int rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
+    صحيح rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
 
-    if (wcol == MAXCOL)
+    إذا (wcol == MAXCOL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else
+    وإلا
 	// Virtcol is valid
-	set_valid_virtcol(curwin, wcol);
-    return rc;
+	سېټ_valid_virtcol(curwin, wcol);
+    أرجع rc;
 }
 
 /*
  * Get the screen position of character col with a coladd in the cursor line.
  */
-    int
-getviscol2(colnr_T col, colnr_T coladd)
+    صحيح
+getviscol2(colnr_T ستون, colnr_T coladd)
 {
     colnr_T	x;
     pos_T	pos;
 
     pos.lnum = curwin->w_cursor.lnum;
-    pos.col = col;
+    pos.ستون = ستون;
     pos.coladd = coladd;
-    getvvcol(curwin, &pos, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &pos, &x, عدم, عدم, GETVCOL_NO_ABOVE);
+    أرجع (صحيح)x;
 }
 
 /*
@@ -91,17 +91,17 @@ getviscol2(colnr_T col, colnr_T coladd)
  *
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    صحيح
 coladvance(colnr_T wantcol)
 {
-    int rc = getvpos(&curwin->w_cursor, wantcol);
+    صحيح rc = getvpos(&curwin->w_cursor, wantcol);
 
-    if (wantcol == MAXCOL || rc == FAIL)
+    إذا (wantcol == MAXCOL || rc == FAIL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else if (*ml_get_cursor() != TAB)
+    وإلا إذا (*ml_get_cursor() != TAB)
 	// Virtcol is valid when not on a TAB
-	set_valid_virtcol(curwin, wantcol);
-    return rc;
+	سېټ_valid_virtcol(curwin, wantcol);
+    أرجع rc;
 }
 
 /*
@@ -109,93 +109,93 @@ coladvance(colnr_T wantcol)
  * "wantcol".
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    صحيح
 getvpos(pos_T *pos, colnr_T wantcol)
 {
-    return coladvance2(pos, FALSE, virtual_active(), wantcol);
+    أرجع coladvance2(pos, FALSE, virtual_فعال(), wantcol);
 }
 
-    static int
+    ساكن صحيح
 coladvance2(
     pos_T	*pos,
-    int		addspaces,	// change the text to achieve our goal?
-    int		finetune,	// change char offset for the exact column
+    صحيح		addspaces,	// change the text to achieve our goal?
+    صحيح		finetune,	// change char offset for the exact column
     colnr_T	wcol_arg)	// column to move to (can be negative)
 {
     colnr_T	wcol = wcol_arg;
-    int		idx;
-    char_u	*line;
-    int		linelen;
-    colnr_T	col = 0;
-    int		csize = 0;
-    int		one_more;
-#ifdef FEAT_LINEBREAK
-    int		head = 0;
-#endif
+    صحيح		idx;
+    char_u	*کرښه;
+    صحيح		linelen;
+    colnr_T	ستون = 0;
+    صحيح		csize = 0;
+    صحيح		one_نور;
+#که_تعریف_شوی FEAT_LINEBREAK
+    صحيح		سر = 0;
+#د_که_پای
 
-    one_more = (State & MODE_INSERT)
+    one_نور = (State & ډېرپېښ_ورننباسه)
 		    || restart_edit != NUL
-		    || (VIsual_active && *p_sel != 'o')
+		    || (VIsual_فعال && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    کرښه = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
-    if (wcol >= MAXCOL)
+    إذا (wcol >= MAXCOL)
     {
-	    idx = linelen - 1 + one_more;
-	    col = wcol;
+	    idx = linelen - 1 + one_نور;
+	    ستون = wcol;
 
-	    if ((addspaces || finetune) && !VIsual_active)
+	    إذا ((addspaces || finetune) && !VIsual_فعال)
 	    {
 		curwin->w_curswant = linetabsize_no_outer(curwin, pos->lnum)
-								   + one_more;
-		if (curwin->w_curswant > 0)
+								   + one_نور;
+		إذا (curwin->w_curswant > 0)
 		    --curwin->w_curswant;
 	    }
     }
-    else
+    وإلا
     {
-	int		width = curwin->w_width - win_col_off(curwin);
+	صحيح		پلنوالی = curwin->w_پلنوالی - win_ستون_off(curwin);
 	chartabsize_T	cts;
 
-	if (finetune
+	إذا (finetune
 		&& curwin->w_p_wrap
-		&& curwin->w_width != 0
-		&& wcol >= (colnr_T)width
-		&& width > 0)
+		&& curwin->w_پلنوالی != 0
+		&& wcol >= (colnr_T)پلنوالی
+		&& پلنوالی > 0)
 	{
 	    csize = linetabsize_no_outer_eol(curwin, pos->lnum);
-	    if (csize > 0)
+	    إذا (csize > 0)
 		csize--;
 
-	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+	    إذا (wcol / پلنوالی > (colnr_T)csize / پلنوالی
+		    && ((State & ډېرپېښ_ورننباسه) == 0 || (صحيح)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
 		// the last character (like what happens when typing and
 		// reaching the right window edge).
-		wcol = (csize / width + 1) * width - 1;
+		wcol = (csize / پلنوالی + 1) * پلنوالی - 1;
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
-#ifdef FEAT_PROP_POPUP
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, کرښه, کرښه);
+#که_تعریف_شوی FEAT_PROP_POPUP
 	cts.cts_no_above = true;
-#endif
-	while (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
+#د_که_پای
+	طالما (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
 	{
 	    // Count a tab for what it's worth (if list mode not on)
-#ifdef FEAT_LINEBREAK
-	    csize = win_lbr_chartabsize(&cts, &head, NULL);
+#که_تعریف_شوی FEAT_LINEBREAK
+	    csize = win_lbr_chartabsize(&cts, &سر, عدم);
 	    MB_PTR_ADV(cts.cts_ptr);
-#else
+#وإلا
 	    csize = lbr_chartabsize_adv(&cts);
-#endif
+#د_که_پای
 	    cts.cts_vcol += csize;
 	}
-	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	ستون = cts.cts_vcol;
+	idx = (صحيح)(cts.cts_ptr - کرښه);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -204,129 +204,129 @@ coladvance2(
 	 * a line has the correct indexing.  The one_more comparison
 	 * replaces an explicit add of one_more later on.
 	 */
-	if (col > wcol || (!virtual_active() && one_more == 0))
+	إذا (ستون > wcol || (!virtual_فعال() && one_نور == 0))
 	{
 	    idx -= 1;
-#ifdef FEAT_LINEBREAK
+#که_تعریف_شوی FEAT_LINEBREAK
 	    // Don't count the chars from 'showbreak'.
-	    csize -= head;
-#endif
-	    col -= csize;
+	    csize -= سر;
+#د_که_پای
+	    ستون -= csize;
 	}
 
-	if (virtual_active()
+	إذا (virtual_فعال()
 		&& addspaces
 		&& wcol >= 0
-		&& ((col != wcol && col != wcol + 1) || csize > 1))
+		&& ((ستون != wcol && ستون != wcol + 1) || csize > 1))
 	{
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    إذا (کرښه[idx] == NUL)
 	    {
 		// Append spaces
-		int	correct = wcol - col;
+		صحيح	correct = wcol - ستون;
 		char_u	*newline = alloc(idx + correct + 1);
-		int	t;
+		صحيح	t;
 
-		if (newline == NULL)
-		    return FAIL;
+		إذا (newline == عدم)
+		    أرجع FAIL;
 
-		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		لكل (t = 0; t < idx; ++t)
+		    newline[t] = کرښه[t];
 
-		for (t = 0; t < correct; ++t)
+		لكل (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
 
 		newline[idx + correct] = NUL;
 
 		ml_replace(pos->lnum, newline, FALSE);
-		changed_bytes(pos->lnum, (colnr_T)idx);
+		بدل_شوی_بایټونه(pos->lnum, (colnr_T)idx);
 		idx += correct;
-		col = wcol;
+		ستون = wcol;
 	    }
-	    else
+	    وإلا
 	    {
 		// Break a tab
-		int	correct = wcol - col - csize + 1; // negative!!
+		صحيح	correct = wcol - ستون - csize + 1; // negative!!
 		char_u	*newline;
-		int	t, s = 0;
-		int	v;
+		صحيح	t, s = 0;
+		صحيح	v;
 
-		if (-correct > csize)
-		    return FAIL;
+		إذا (-correct > csize)
+		    أرجع FAIL;
 
 		newline = alloc(linelen + csize);
-		if (newline == NULL)
-		    return FAIL;
+		إذا (newline == عدم)
+		    أرجع FAIL;
 
-		for (t = 0; t < linelen; t++)
+		لكل (t = 0; t < linelen; t++)
 		{
-		    if (t != idx)
-			newline[s++] = line[t];
-		    else
-			for (v = 0; v < csize; v++)
+		    إذا (t != idx)
+			newline[s++] = کرښه[t];
+		    وإلا
+			لكل (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
 		}
 
 		newline[linelen + csize - 1] = NUL;
 
 		ml_replace(pos->lnum, newline, FALSE);
-		changed_bytes(pos->lnum, idx);
+		بدل_شوی_بایټونه(pos->lnum, idx);
 		idx += (csize - 1 + correct);
-		col += correct;
+		ستون += correct;
 	    }
 	}
     }
 
-    if (idx < 0)
-	pos->col = 0;
-    else
-	pos->col = idx;
+    إذا (idx < 0)
+	pos->ستون = 0;
+    وإلا
+	pos->ستون = idx;
 
     pos->coladd = 0;
 
-    if (finetune)
+    إذا (finetune)
     {
-	if (wcol == MAXCOL)
+	إذا (wcol == MAXCOL)
 	{
 	    // The width of the last character is used to set coladd.
-	    if (!one_more)
+	    إذا (!one_نور)
 	    {
 		colnr_T	    scol, ecol;
 
-		getvcol(curwin, pos, &scol, NULL, &ecol, 0);
+		getvcol(curwin, pos, &scol, عدم, &ecol, 0);
 		pos->coladd = ecol - scol;
 	    }
 	}
-	else
+	وإلا
 	{
-	    int b = (int)wcol - (int)col;
+	    صحيح b = (صحيح)wcol - (صحيح)ستون;
 
 	    // The difference between wcol and col is used to set coladd.
-	    if (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
+	    إذا (b > 0 && b < (MAXCOL - 2 * curwin->w_پلنوالی))
 		pos->coladd = b;
 
-	    col += b;
+	    ستون += b;
 	}
     }
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    إذا (has_mbyte)
 	mb_adjustpos(curbuf, pos);
 
-    if (wcol < 0 || col < wcol)
-	return FAIL;
-    return OK;
+    إذا (wcol < 0 || ستون < wcol)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Increment the cursor position.  See inc() for return values.
  */
-    int
-inc_cursor(void)
+    صحيح
+inc_cursor(فراغ)
 {
-    return inc(&curwin->w_cursor);
+    أرجع inc(&curwin->w_cursor);
 }
 
 /*
@@ -336,50 +336,50 @@ inc_cursor(void)
  * Return -1 when at the end of file.
  * Return 0 otherwise.
  */
-    int
+    صحيح
 inc(pos_T *lp)
 {
     char_u  *p;
 
     // when searching position may be set to end of a line
-    if (lp->col != MAXCOL)
+    إذا (lp->ستون != MAXCOL)
     {
 	p = ml_get_pos(lp);
-	if (*p != NUL)	// still within line, move to next char (may be NUL)
+	إذا (*p != NUL)	// still within line, move to next char (may be NUL)
 	{
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
-		int l = (*mb_ptr2len)(p);
+		صحيح l = (*mb_ptr2len)(p);
 
-		lp->col += l;
-		return ((p[l] != NUL) ? 0 : 2);
+		lp->ستون += l;
+		أرجع ((p[l] != NUL) ? 0 : 2);
 	    }
-	    lp->col++;
+	    lp->ستون++;
 	    lp->coladd = 0;
-	    return ((p[1] != NUL) ? 0 : 2);
+	    أرجع ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    إذا (lp->lnum != curbuf->b_ml.ml_کرښه_شمېر)     // there is a next line
     {
-	lp->col = 0;
+	lp->ستون = 0;
 	lp->lnum++;
 	lp->coladd = 0;
-	return 1;
+	أرجع 1;
     }
-    return -1;
+    أرجع -1;
 }
 
 /*
  * incl(lp): same as inc(), but skip the NUL at the end of non-empty lines
  */
-    int
+    صحيح
 incl(pos_T *lp)
 {
-    int	    r;
+    صحيح	    r;
 
-    if ((r = inc(lp)) >= 1 && lp->col)
+    إذا ((r = inc(lp)) >= 1 && lp->ستون)
 	r = inc(lp);
-    return r;
+    أرجع r;
 }
 
 /*
@@ -388,66 +388,66 @@ incl(pos_T *lp)
  * Decrement the line pointer 'p' crossing line boundaries as necessary.
  * Return 1 when crossing a line, -1 when at start of file, 0 otherwise.
  */
-    int
-dec_cursor(void)
+    صحيح
+dec_cursor(فراغ)
 {
-    return dec(&curwin->w_cursor);
+    أرجع dec(&curwin->w_cursor);
 }
 
-    int
+    صحيح
 dec(pos_T *lp)
 {
     char_u	*p;
 
     lp->coladd = 0;
-    if (lp->col == MAXCOL)
+    إذا (lp->ستون == MAXCOL)
     {
 	// past end of line
 	p = ml_get(lp->lnum);
-	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 0;
+	lp->ستون = ml_get_len(lp->lnum);
+	إذا (has_mbyte)
+	    lp->ستون -= (*mb_سر_off)(p, p + lp->ستون);
+	أرجع 0;
     }
 
-    if (lp->col > 0)
+    إذا (lp->ستون > 0)
     {
 	// still within line
-	lp->col--;
-	if (has_mbyte)
+	lp->ستون--;
+	إذا (has_mbyte)
 	{
 	    p = ml_get(lp->lnum);
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
+	    lp->ستون -= (*mb_سر_off)(p, p + lp->ستون);
 	}
-	return 0;
+	أرجع 0;
     }
 
-    if (lp->lnum > 1)
+    إذا (lp->lnum > 1)
     {
 	// there is a prior line
 	lp->lnum--;
 	p = ml_get(lp->lnum);
-	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
-	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 1;
+	lp->ستون = ml_get_len(lp->lnum);
+	إذا (has_mbyte)
+	    lp->ستون -= (*mb_سر_off)(p, p + lp->ستون);
+	أرجع 1;
     }
 
     // at start of file
-    return -1;
+    أرجع -1;
 }
 
 /*
  * decl(lp): same as dec(), but skip the NUL at the end of non-empty lines
  */
-    int
+    صحيح
 decl(pos_T *lp)
 {
-    int	    r;
+    صحيح	    r;
 
-    if ((r = dec(lp)) == 1 && lp->col)
+    إذا ((r = dec(lp)) == 1 && lp->ستون)
 	r = dec(lp);
-    return r;
+    أرجع r;
 }
 
 /*
@@ -463,29 +463,29 @@ get_cursor_rel_lnum(
     linenr_T	cursor = wp->w_cursor.lnum;
     linenr_T	retval = 0;
 
-#ifdef FEAT_FOLDING
-    if (hasAnyFolding(wp))
+#که_تعریف_شوی FEAT_FOLDING
+    إذا (hasAnyFolding(wp))
     {
-	if (lnum > cursor)
+	إذا (lnum > cursor)
 	{
-	    while (lnum > cursor)
+	    طالما (lnum > cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+		(فراغ)hasFoldingWin(wp, lnum, &lnum, عدم, TRUE, عدم);
 		// if lnum and cursor are in the same fold,
 		// now lnum <= cursor
-		if (lnum > cursor)
+		إذا (lnum > cursor)
 		    retval++;
 		lnum--;
 	    }
 	}
-	else if (lnum < cursor)
+	وإلا إذا (lnum < cursor)
 	{
-	    while (lnum < cursor)
+	    طالما (lnum < cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
+		(فراغ)hasFoldingWin(wp, lnum, عدم, &lnum, TRUE, عدم);
 		// if lnum and cursor are in the same fold,
 		// now lnum >= cursor
-		if (lnum < cursor)
+		إذا (lnum < cursor)
 		    retval--;
 		lnum++;
 	    }
@@ -493,122 +493,122 @@ get_cursor_rel_lnum(
 	// else if (lnum == cursor)
 	//     retval = 0;
     }
-    else
-#endif
+    وإلا
+#د_که_پای
 	retval = lnum - cursor;
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Make sure "pos.lnum" and "pos.col" are valid in "buf".
  * This allows for the col to be on the NUL byte.
  */
-    void
+    فراغ
 check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    إذا (pos->lnum > buf->b_ml.ml_کرښه_شمېر)
+	pos->lnum = buf->b_ml.ml_کرښه_شمېر;
 
-    if (pos->col > 0)
+    إذا (pos->ستون > 0)
     {
 	len = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > len)
-	    pos->col = len;
+	إذا (pos->ستون > len)
+	    pos->ستون = len;
     }
 }
 
 /*
  * Make sure curwin->w_cursor.lnum is valid.
  */
-    void
-check_cursor_lnum(void)
+    فراغ
+check_cursor_lnum(فراغ)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_کرښه_شمېر)
     {
-#ifdef FEAT_FOLDING
+#که_تعریف_شوی FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
-						&curwin->w_cursor.lnum, NULL))
-#endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	إذا (!hasFolding(curbuf->b_ml.ml_کرښه_شمېر,
+						&curwin->w_cursor.lnum, عدم))
+#د_که_پای
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_کرښه_شمېر;
     }
-    if (curwin->w_cursor.lnum <= 0)
+    إذا (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
 }
 
 /*
  * Make sure curwin->w_cursor.col is valid.
  */
-    void
-check_cursor_col(void)
+    فراغ
+check_cursor_ستون(فراغ)
 {
-    check_cursor_col_win(curwin);
+    check_cursor_ستون_win(curwin);
 }
 
 /*
  * Make sure win->w_cursor.col is valid.
  */
-    void
-check_cursor_col_win(win_T *win)
+    فراغ
+check_cursor_ستون_win(win_T *win)
 {
     colnr_T      len;
-    colnr_T      oldcol = win->w_cursor.col;
-    colnr_T      oldcoladd = win->w_cursor.col + win->w_cursor.coladd;
-    unsigned int cur_ve_flags = get_ve_flags();
+    colnr_T      oldcol = win->w_cursor.ستون;
+    colnr_T      oldcoladd = win->w_cursor.ستون + win->w_cursor.coladd;
+    بینښه صحيح cur_ve_flags = get_ve_flags();
 
-    len = ml_get_buf_len(win->w_buffer, win->w_cursor.lnum);
-    if (len == 0)
-	win->w_cursor.col = 0;
-    else if (win->w_cursor.col >= len)
+    len = ml_get_buf_len(win->w_بفر, win->w_cursor.lnum);
+    إذا (len == 0)
+	win->w_cursor.ستون = 0;
+    وإلا إذا (win->w_cursor.ستون >= len)
     {
 	// Allow cursor past end-of-line when:
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
-		|| (VIsual_active && *p_sel != 'o')
+	إذا ((State & ډېرپېښ_ورننباسه) || restart_edit
+		|| (VIsual_فعال && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
-		|| virtual_active())
-	    win->w_cursor.col = len;
-	else
+		|| virtual_فعال())
+	    win->w_cursor.ستون = len;
+	وإلا
 	{
-	    win->w_cursor.col = len - 1;
+	    win->w_cursor.ستون = len - 1;
 	    // Move the cursor to the head byte.
-	    if (has_mbyte)
-		mb_adjustpos(win->w_buffer, &win->w_cursor);
+	    إذا (has_mbyte)
+		mb_adjustpos(win->w_بفر, &win->w_cursor);
 	}
     }
-    else if (win->w_cursor.col < 0)
-	win->w_cursor.col = 0;
+    وإلا إذا (win->w_cursor.ستون < 0)
+	win->w_cursor.ستون = 0;
 
     // If virtual editing is on, we can leave the cursor on the old position,
     // only we must set it to virtual.  But don't do it when at the end of the
     // line.
-    if (oldcol == MAXCOL)
+    إذا (oldcol == MAXCOL)
 	win->w_cursor.coladd = 0;
-    else if (cur_ve_flags == VE_ALL)
+    وإلا إذا (cur_ve_flags == VE_ALL)
     {
-	if (oldcoladd > win->w_cursor.col)
+	إذا (oldcoladd > win->w_cursor.ستون)
 	{
-	    win->w_cursor.coladd = oldcoladd - win->w_cursor.col;
+	    win->w_cursor.coladd = oldcoladd - win->w_cursor.ستون;
 
 	    // Make sure that coladd is not more than the char width.
 	    // Not for the last character, coladd is then used when the cursor
 	    // is actually after the last character.
-	    if (win->w_cursor.col + 1 < len)
+	    إذا (win->w_cursor.ستون + 1 < len)
 	    {
-		int cs, ce;
+		صحيح cs, ce;
 
-		getvcol(win, &win->w_cursor, &cs, NULL, &ce, 0);
-		if (win->w_cursor.coladd > ce - cs)
+		getvcol(win, &win->w_cursor, &cs, عدم, &ce, 0);
+		إذا (win->w_cursor.coladd > ce - cs)
 		    win->w_cursor.coladd = ce - cs;
 	    }
 	}
-	else
+	وإلا
 	    // avoid weird number when there is a miscalculation or overflow
 	    win->w_cursor.coladd = 0;
     }
@@ -617,33 +617,33 @@ check_cursor_col_win(win_T *win)
 /*
  * make sure curwin->w_cursor in on a valid character
  */
-    void
-check_cursor(void)
+    فراغ
+check_cursor(فراغ)
 {
     check_cursor_lnum();
-    check_cursor_col();
+    check_cursor_ستون();
 }
 
 /*
  * Check if VIsual position is valid, correct it if not.
  * Can be called when in Visual mode and a change has been made.
  */
-    void
-check_visual_pos(void)
+    فراغ
+check_visual_pos(فراغ)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    إذا (VIsual.lnum > curbuf->b_ml.ml_کرښه_شمېر)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
-	VIsual.col = 0;
+	VIsual.lnum = curbuf->b_ml.ml_کرښه_شمېر;
+	VIsual.ستون = 0;
 	VIsual.coladd = 0;
     }
-    else
+    وإلا
     {
-	int len = ml_get_len(VIsual.lnum);
+	صحيح len = ml_get_len(VIsual.lnum);
 
-	if (VIsual.col > len)
+	إذا (VIsual.ستون > len)
 	{
-	    VIsual.col = len;
+	    VIsual.ستون = len;
 	    VIsual.coladd = 0;
 	}
     }
@@ -653,13 +653,13 @@ check_visual_pos(void)
  * Make sure curwin->w_cursor is not on the NUL at the end of the line.
  * Allow it when in Visual mode and 'selection' is not "old".
  */
-    void
-adjust_cursor_col(void)
+    فراغ
+adjust_cursor_ستون(فراغ)
 {
-    if (curwin->w_cursor.col > 0
-	    && (!VIsual_active || *p_sel == 'o')
+    إذا (curwin->w_cursor.ستون > 0
+	    && (!VIsual_فعال || *p_sel == 'o')
 	    && gchar_cursor() == NUL)
-	--curwin->w_cursor.col;
+	--curwin->w_cursor.ستون;
 }
 
 /*
@@ -667,58 +667,58 @@ adjust_cursor_col(void)
  * Adjust the cursor position if needed.
  * Return TRUE if the cursor was moved.
  */
-    int
-set_leftcol(colnr_T leftcol)
+    صحيح
+سېټ_leftcol(colnr_T leftcol)
 {
-    int		retval = FALSE;
+    صحيح		retval = FALSE;
 
     // Return quickly when there is no change.
-    if (curwin->w_leftcol == leftcol)
-	return FALSE;
+    إذا (curwin->w_leftcol == leftcol)
+	أرجع FALSE;
     curwin->w_leftcol = leftcol;
 
-    changed_cline_bef_curs();
-    long lastcol = curwin->w_leftcol + curwin->w_width - curwin_col_off() - 1;
+    بدل_شوی_cline_bef_curs();
+    اوږد lastcol = curwin->w_leftcol + curwin->w_پلنوالی - curwin_ستون_off() - 1;
     validate_virtcol();
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
-    if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
+    اوږد siso = get_sidescrolloff_ارزښت();
+    إذا (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
 	coladvance((colnr_T)(lastcol - siso));
     }
-    else if (curwin->w_virtcol < curwin->w_leftcol + siso)
+    وإلا إذا (curwin->w_virtcol < curwin->w_leftcol + siso)
     {
 	retval = TRUE;
-	(void)coladvance((colnr_T)(curwin->w_leftcol + siso));
+	(فراغ)coladvance((colnr_T)(curwin->w_leftcol + siso));
     }
 
     // If the start of the character under the cursor is not on the screen,
     // advance the cursor one more char.  If this fails (last char of the
     // line) adjust the scrolling.
     colnr_T	s, e;
-    getvvcol(curwin, &curwin->w_cursor, &s, NULL, &e, 0);
-    if (e > (colnr_T)lastcol)
+    getvvcol(curwin, &curwin->w_cursor, &s, عدم, &e, 0);
+    إذا (e > (colnr_T)lastcol)
     {
 	retval = TRUE;
 	coladvance(s - 1);
     }
-    else if (s < curwin->w_leftcol)
+    وإلا إذا (s < curwin->w_leftcol)
     {
 	retval = TRUE;
-	if (coladvance(e + 1) == FAIL)	// there isn't another character
+	إذا (coladvance(e + 1) == FAIL)	// there isn't another character
 	{
 	    curwin->w_leftcol = s;	// adjust w_leftcol instead
-	    changed_cline_bef_curs();
+	    بدل_شوی_cline_bef_curs();
 	}
     }
 
-    if (retval)
-	curwin->w_set_curswant = true;
+    إذا (retval)
+	curwin->w_سېټ_curswant = true;
     redraw_later(UPD_NOT_VALID);
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -728,60 +728,60 @@ set_leftcol(colnr_T leftcol)
  * "*option" is advanced to the next part.
  * The length is returned.
  */
-    int
+    صحيح
 copy_option_part(
     char_u	**option,
     char_u	*buf,
-    int		maxlen,
-    char	*sep_chars)
+    صحيح		maxlen,
+    حرف	*sep_chars)
 {
-    int	    len = 0;
+    صحيح	    len = 0;
     char_u  *p = *option;
 
     // skip '.' at start of option part, for 'suffixes'
-    if (*p == '.')
+    إذا (*p == '.')
 	buf[len++] = *p++;
-    while (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == NULL)
+    طالما (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == عدم)
     {
 	/*
 	 * Skip backslash before a separator character and space.
 	 */
-	if (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != NULL)
+	إذا (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != عدم)
 	    ++p;
-	if (len < maxlen - 1)
+	إذا (len < maxlen - 1)
 	    buf[len++] = *p;
 	++p;
     }
     buf[len] = NUL;
 
-    if (*p != NUL && *p != ',')	// skip non-standard separator
+    إذا (*p != NUL && *p != ',')	// skip non-standard separator
 	++p;
-    p = skip_to_option_part(p);	// p points to next file name
+    p = skip_منزل_option_part(p);	// p points to next file name
 
     *option = p;
-    return len;
+    أرجع len;
 }
 
-#if !defined(HAVE_MEMSET) && !defined(PROTO)
-    void *
-vim_memset(void *ptr, int c, size_t size)
+#إذا !defined(HAVE_MEMSET) && !defined(PROTO)
+    فراغ *
+vim_memset(فراغ *ptr, صحيح c, size_t اندازه)
 {
-    char *p = ptr;
+    حرف *p = ptr;
 
-    while (size-- > 0)
+    طالما (اندازه-- > 0)
 	*p++ = c;
-    return ptr;
+    أرجع ptr;
 }
-#endif
+#د_که_پای
 
 /*
  * Vim has its own isspace() function, because on some machines isspace()
  * can't handle characters above 128.
  */
-    int
-vim_isspace(int x)
+    صحيح
+vim_isspace(صحيح x)
 {
-    return ((x >= 9 && x <= 13) || x == ' ');
+    أرجع ((x >= 9 && x <= 13) || x == ' ');
 }
 
 /************************************************************************
@@ -793,25 +793,25 @@ vim_isspace(int x)
  * Some useful tables.
  */
 
-static struct modmasktable
+ساكن بنية modmasktable
 {
-    short	mod_mask;	// Bit-mask for particular key modifier
-    short	mod_flag;	// Bit(s) for particular key modifier
+    لنډ	mod_ماسک;	// Bit-mask for particular key modifier
+    لنډ	mod_flag;	// Bit(s) for particular key modifier
     char_u	name;		// Single letter name of modifier
-} mod_mask_table[] =
+} mod_ماسک_جدول[] =
 {
-    {MOD_MASK_ALT,		MOD_MASK_ALT,		(char_u)'M'},
-    {MOD_MASK_META,		MOD_MASK_META,		(char_u)'T'},
-    {MOD_MASK_CTRL,		MOD_MASK_CTRL,		(char_u)'C'},
-    {MOD_MASK_SHIFT,		MOD_MASK_SHIFT,		(char_u)'S'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_2CLICK,	(char_u)'2'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_3CLICK,	(char_u)'3'},
-    {MOD_MASK_MULTI_CLICK,	MOD_MASK_4CLICK,	(char_u)'4'},
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
-    {MOD_MASK_CMD,		MOD_MASK_CMD,		(char_u)'D'},
-#endif
+    {MOD_ماسک_ALT,		MOD_ماسک_ALT,		(char_u)'M'},
+    {MOD_ماسک_META,		MOD_ماسک_META,		(char_u)'T'},
+    {MOD_ماسک_CTRL,		MOD_ماسک_CTRL,		(char_u)'C'},
+    {MOD_ماسک_ښويدنه,		MOD_ماسک_ښويدنه,		(char_u)'S'},
+    {MOD_ماسک_MULTI_CLICK,	MOD_ماسک_2_CLICK,	(char_u)'2'},
+    {MOD_ماسک_MULTI_CLICK,	MOD_ماسک_3_CLICK,	(char_u)'3'},
+    {MOD_ماسک_MULTI_CLICK,	MOD_ماسک_4_CLICK,	(char_u)'4'},
+#إذا defined(MACOS_X) || defined(FEAT_GUI_GTK)
+    {MOD_ماسک_CMD,		MOD_ماسک_CMD,		(char_u)'D'},
+#د_که_پای
     // 'A' must be the last one
-    {MOD_MASK_ALT,		MOD_MASK_ALT,		(char_u)'A'},
+    {MOD_ماسک_ALT,		MOD_ماسک_ALT,		(char_u)'A'},
     {0, 0, NUL}
     // NOTE: when adding an entry, update MAX_KEY_NAME_LEN!
 };
@@ -820,105 +820,105 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#تعریف_کړه MOD_کلیګانې_ثبت_اندازه 5
 
-static char_u modifier_keys_table[] =
+ساكن char_u modifier_کلیګانې_جدول[] =
 {
 //  mod mask	    with modifier		without modifier
-    MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
-    MOD_MASK_SHIFT, '&', '0',			'@', '2',	// cancel
-    MOD_MASK_SHIFT, '*', '1',			'@', '4',	// command
-    MOD_MASK_SHIFT, '*', '2',			'@', '5',	// copy
-    MOD_MASK_SHIFT, '*', '3',			'@', '6',	// create
-    MOD_MASK_SHIFT, '*', '4',			'k', 'D',	// delete char
-    MOD_MASK_SHIFT, '*', '5',			'k', 'L',	// delete line
-    MOD_MASK_SHIFT, '*', '7',			'@', '7',	// end
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_END,	'@', '7',	// end
-    MOD_MASK_SHIFT, '*', '9',			'@', '9',	// exit
-    MOD_MASK_SHIFT, '*', '0',			'@', '0',	// find
-    MOD_MASK_SHIFT, '#', '1',			'%', '1',	// help
-    MOD_MASK_SHIFT, '#', '2',			'k', 'h',	// home
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
-    MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
-    MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
-    MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
-    MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
-    MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
-    MOD_MASK_SHIFT, '%', 'd',			'%', '7',	// options
-    MOD_MASK_SHIFT, '%', 'e',			'%', '8',	// previous
-    MOD_MASK_SHIFT, '%', 'f',			'%', '9',	// print
-    MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
-    MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
-    MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
-    MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
-    MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
-    MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
-    MOD_MASK_SHIFT, '!', '3',			'&', '8',	// undo
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_UP,	'k', 'u',	// up arrow
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_DOWN,	'k', 'd',	// down arrow
+    MOD_ماسک_ښويدنه, '&', '9',			'@', '1',	// begin
+    MOD_ماسک_ښويدنه, '&', '0',			'@', '2',	// cancel
+    MOD_ماسک_ښويدنه, '*', '1',			'@', '4',	// command
+    MOD_ماسک_ښويدنه, '*', '2',			'@', '5',	// copy
+    MOD_ماسک_ښويدنه, '*', '3',			'@', '6',	// create
+    MOD_ماسک_ښويدنه, '*', '4',			'k', 'D',	// delete char
+    MOD_ماسک_ښويدنه, '*', '5',			'k', 'L',	// delete line
+    MOD_ماسک_ښويدنه, '*', '7',			'@', '7',	// end
+    MOD_ماسک_CTRL,  KS_EXTRA, (صحيح)KE_C_پای_ټکی,	'@', '7',	// end
+    MOD_ماسک_ښويدنه, '*', '9',			'@', '9',	// exit
+    MOD_ماسک_ښويدنه, '*', '0',			'@', '0',	//پیدا_کړه
+    MOD_ماسک_ښويدنه, '#', '1',			'%', '1',	// help
+    MOD_ماسک_ښويدنه, '#', '2',			'k', 'h',	// home
+    MOD_ماسک_CTRL,  KS_EXTRA, (صحيح)KE_C_HOME,	'k', 'h',	// home
+    MOD_ماسک_ښويدنه, '#', '3',			'k', 'I',	// insert
+    MOD_ماسک_ښويدنه, '#', '4',			'k', 'l',	// left arrow
+    MOD_ماسک_CTRL,  KS_EXTRA, (صحيح)KE_C_کیڼ,	'k', 'l',	// left arrow
+    MOD_ماسک_ښويدنه, '%', 'a',			'%', '3',	//پیغام
+    MOD_ماسک_ښويدنه, '%', 'b',			'%', '4',	// move
+    MOD_ماسک_ښويدنه, '%', 'c',			'%', '5',	//بل
+    MOD_ماسک_ښويدنه, '%', 'd',			'%', '7',	// options
+    MOD_ماسک_ښويدنه, '%', 'e',			'%', '8',	//پخوانی
+    MOD_ماسک_ښويدنه, '%', 'f',			'%', '9',	// print
+    MOD_ماسک_ښويدنه, '%', 'g',			'%', '0',	// redo
+    MOD_ماسک_ښويدنه, '%', 'h',			'&', '3',	// replace
+    MOD_ماسک_ښويدنه, '%', 'i',			'k', 'r',	// right arr.
+    MOD_ماسک_CTRL,  KS_EXTRA, (صحيح)KE_C_ښی,	'k', 'r',	// right arr.
+    MOD_ماسک_ښويدنه, '%', 'j',			'&', '5',	// resume
+    MOD_ماسک_ښويدنه, '!', '1',			'&', '6',	// save
+    MOD_ماسک_ښويدنه, '!', '2',			'&', '7',	// suspend
+    MOD_ماسک_ښويدنه, '!', '3',			'&', '8',	// undo
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_پورته,	'k', 'u',	// up arrow
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_ښکته,	'k', 'd',	// down arrow
 
 								// vt100 F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF1,	KS_EXTRA, (int)KE_XF1,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF2,	KS_EXTRA, (int)KE_XF2,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF3,	KS_EXTRA, (int)KE_XF3,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF4,	KS_EXTRA, (int)KE_XF4,
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_XF1,	KS_EXTRA, (صحيح)KE_XF1,
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_XF2,	KS_EXTRA, (صحيح)KE_XF2,
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_XF3,	KS_EXTRA, (صحيح)KE_XF3,
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_XF4,	KS_EXTRA, (صحيح)KE_XF4,
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F1,	'k', '1',	// F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F2,	'k', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F3,	'k', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F4,	'k', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F5,	'k', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F6,	'k', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F7,	'k', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F8,	'k', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F9,	'k', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F10,	'k', ';',	// F10
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F1,	'k', '1',	// F1
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F2,	'k', '2',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F3,	'k', '3',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F4,	'k', '4',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F5,	'k', '5',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F6,	'k', '6',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F7,	'k', '7',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F8,	'k', '8',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F9,	'k', '9',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F10,	'k', ';',	// F10
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F11,	'F', '1',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F12,	'F', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F13,	'F', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F14,	'F', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F15,	'F', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F16,	'F', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F17,	'F', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F18,	'F', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F19,	'F', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F20,	'F', 'A',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F11,	'F', '1',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F12,	'F', '2',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F13,	'F', '3',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F14,	'F', '4',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F15,	'F', '5',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F16,	'F', '6',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F17,	'F', '7',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F18,	'F', '8',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F19,	'F', '9',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F20,	'F', 'A',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F21,	'F', 'B',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F22,	'F', 'C',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F23,	'F', 'D',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F24,	'F', 'E',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F25,	'F', 'F',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F26,	'F', 'G',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F27,	'F', 'H',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F28,	'F', 'I',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F29,	'F', 'J',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F30,	'F', 'K',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F21,	'F', 'B',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F22,	'F', 'C',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F23,	'F', 'D',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F24,	'F', 'E',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F25,	'F', 'F',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F26,	'F', 'G',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F27,	'F', 'H',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F28,	'F', 'I',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F29,	'F', 'J',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F30,	'F', 'K',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F31,	'F', 'L',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F32,	'F', 'M',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F33,	'F', 'N',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F34,	'F', 'O',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F35,	'F', 'P',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F36,	'F', 'Q',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F37,	'F', 'R',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F31,	'F', 'L',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F32,	'F', 'M',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F33,	'F', 'N',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F34,	'F', 'O',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F35,	'F', 'P',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F36,	'F', 'Q',
+    MOD_ماسک_ښويدنه, KS_EXTRA, (صحيح)KE_S_F37,	'F', 'R',
 
 							    // TAB pseudo code
-    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (int)KE_TAB,
+    MOD_ماسک_ښويدنه, 'k', 'B',			KS_EXTRA, (صحيح)KE_TAB,
 
     NUL
 };
 
-static struct key_name_entry
+ساكن بنية کلی_name_ثبت
 {
-    int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    صحيح		enabled;	    // is this entry available (TRUE/FALSE)?
+    صحيح		کلی;		    // special key code or ascii value
     string_T	name;		    // name of key
-    int		is_alt;		    // is an alternative name
-} key_names_table[] =
+    صحيح		is_alt;		    // is an alternative name
+} کلی_نومونه_جدول[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -930,17 +930,17 @@ static struct key_name_entry
     {TRUE, CSI, STR_LITERAL_INIT("CSI"), FALSE},
     {TRUE, K_CURSORHOLD, STR_LITERAL_INIT("CursorHold"), FALSE},
     {
-#ifdef FEAT_MOUSE_DEC
+#که_تعریف_شوی FEAT_MOUSE_DEC
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_DEC_MOUSE, STR_LITERAL_INIT("DecMouse"), FALSE},
     {TRUE, K_DEL, STR_LITERAL_INIT("Del"), FALSE},
     {TRUE, K_DEL, STR_LITERAL_INIT("Delete"), TRUE},
-    {TRUE, K_DOWN, STR_LITERAL_INIT("Down"), FALSE},
+    {TRUE, K_ښکته, STR_LITERAL_INIT("Down"), FALSE},
     {TRUE, K_DROP, STR_LITERAL_INIT("Drop"), FALSE},
-    {TRUE, K_END, STR_LITERAL_INIT("End"), FALSE},
+    {TRUE, K_پای_ټکی, STR_LITERAL_INIT("End"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Enter"), TRUE},
     {TRUE, ESC, STR_LITERAL_INIT("Esc"), FALSE},
 
@@ -993,11 +993,11 @@ static struct key_name_entry
     {TRUE, K_INS, STR_LITERAL_INIT("Ins"), TRUE},
     {TRUE, K_INS, STR_LITERAL_INIT("Insert"), FALSE},
     {
-#ifdef FEAT_MOUSE_JSB
+#که_تعریف_شوی FEAT_MOUSE_JSB
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_JSBTERM_MOUSE, STR_LITERAL_INIT("JsbMouse"), FALSE},
     {TRUE, K_K0, STR_LITERAL_INIT("k0"), FALSE},
     {TRUE, K_K1, STR_LITERAL_INIT("k1"), FALSE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_کیڼ, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1039,11 +1039,11 @@ static struct key_name_entry
     {TRUE, K_MOUSEMOVE, STR_LITERAL_INIT("MouseMove"), FALSE},
     {TRUE, K_MOUSEUP, STR_LITERAL_INIT("MouseUp"), TRUE},
     {
-#ifdef FEAT_MOUSE_NET
+#که_تعریف_شوی FEAT_MOUSE_NET
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_NETTERM_MOUSE, STR_LITERAL_INIT("NetMouse"), FALSE},
     {TRUE, NL, STR_LITERAL_INIT("NewLine"), TRUE},
     {TRUE, NL, STR_LITERAL_INIT("NL"), FALSE},
@@ -1055,14 +1055,14 @@ static struct key_name_entry
     {TRUE, K_PS, STR_LITERAL_INIT("PasteStart"), FALSE},
     {TRUE, K_PLUG, STR_LITERAL_INIT("Plug"), FALSE},
     {
-#ifdef FEAT_MOUSE_PTERM
+#که_تعریف_شوی FEAT_MOUSE_PTERM
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_ښی, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1074,23 +1074,23 @@ static struct key_name_entry
     {TRUE, K_SGR_MOUSE, STR_LITERAL_INIT("SgrMouse"), FALSE},
     {TRUE, K_SGR_MOUSERELEASE, STR_LITERAL_INIT("SgrMouseRelease"), FALSE},
     {
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_SNR, STR_LITERAL_INIT("SNR"), FALSE},
     {TRUE, ' ', STR_LITERAL_INIT("Space"), FALSE},
     {TRUE, TAB, STR_LITERAL_INIT("Tab"), FALSE},
     {TRUE, K_TAB, STR_LITERAL_INIT("Tab"), FALSE},
     {TRUE, K_UNDO, STR_LITERAL_INIT("Undo"), FALSE},
-    {TRUE, K_UP, STR_LITERAL_INIT("Up"), FALSE},
+    {TRUE, K_پورته, STR_LITERAL_INIT("Up"), FALSE},
     {
-#ifdef FEAT_MOUSE_URXVT
+#که_تعریف_شوی FEAT_MOUSE_URXVT
     TRUE,
-#else
+#وإلا
     FALSE,
-#endif
+#د_که_پای
 	K_URXVT_MOUSE, STR_LITERAL_INIT("UrxvtMouse"), FALSE},
     {TRUE, K_X1DRAG, STR_LITERAL_INIT("X1Drag"), FALSE},
     {TRUE, K_X1MOUSE, STR_LITERAL_INIT("X1Mouse"), FALSE},
@@ -1119,80 +1119,80 @@ static struct key_name_entry
  * Return the modifier mask bit (MOD_MASK_*) which corresponds to the given
  * modifier name ('S' for Shift, 'C' for Ctrl etc).
  */
-    static int
-name_to_mod_mask(int c)
+    ساكن صحيح
+name_منزل_mod_ماسک(صحيح c)
 {
-    int	    i;
+    صحيح	    i;
 
     c = TOUPPER_ASC(c);
-    for (i = 0; mod_mask_table[i].mod_mask != 0; i++)
-	if (c == mod_mask_table[i].name)
-	    return mod_mask_table[i].mod_flag;
-    return 0;
+    لكل (i = 0; mod_ماسک_جدول[i].mod_ماسک != 0; i++)
+	إذا (c == mod_ماسک_جدول[i].name)
+	    أرجع mod_ماسک_جدول[i].mod_flag;
+    أرجع 0;
 }
 
 /*
  * Check if if there is a special key code for "key" that includes the
  * modifiers specified.
  */
-    int
-simplify_key(int key, int *modifiers)
+    صحيح
+simplify_کلی(صحيح کلی, صحيح *modifiers)
 {
-    int	    i;
-    int	    key0;
-    int	    key1;
+    صحيح	    i;
+    صحيح	    key0;
+    صحيح	    key1;
 
-    if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+    إذا (!(*modifiers & (MOD_ماسک_ښويدنه | MOD_ماسک_CTRL)))
+	أرجع کلی;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    إذا (کلی == TAB && (*modifiers & MOD_ماسک_ښويدنه))
     {
-	*modifiers &= ~MOD_MASK_SHIFT;
-	return K_S_TAB;
+	*modifiers &= ~MOD_ماسک_ښويدنه;
+	أرجع K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(کلی);
+    key1 = KEY2TERMCAP1(کلی);
+    لكل (i = 0; modifier_کلیګانې_جدول[i] != NUL; i += MOD_کلیګانې_ثبت_اندازه)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	إذا (key0 == modifier_کلیګانې_جدول[i + 3]
+		&& key1 == modifier_کلیګانې_جدول[i + 4]
+		&& (*modifiers & modifier_کلیګانې_جدول[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_کلیګانې_جدول[i];
+	    أرجع TERMCAP2_کلی(modifier_کلیګانې_جدول[i + 1],
+		    modifier_کلیګانې_جدول[i + 2]);
 	}
     }
-    return key;
+    أرجع کلی;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
-    int
-handle_x_keys(int key)
+    صحيح
+handle_x_کلیګانې(صحيح کلی)
 {
-    switch (key)
+    بدل (کلی)
     {
-	case K_XUP:	return K_UP;
-	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
-	case K_XHOME:	return K_HOME;
-	case K_ZHOME:	return K_HOME;
-	case K_XEND:	return K_END;
-	case K_ZEND:	return K_END;
-	case K_XF1:	return K_F1;
-	case K_XF2:	return K_F2;
-	case K_XF3:	return K_F3;
-	case K_XF4:	return K_F4;
-	case K_S_XF1:	return K_S_F1;
-	case K_S_XF2:	return K_S_F2;
-	case K_S_XF3:	return K_S_F3;
-	case K_S_XF4:	return K_S_F4;
+	حالة K_XUP:	أرجع K_پورته;
+	حالة K_XDOWN:	أرجع K_ښکته;
+	حالة K_XLEFT:	أرجع K_کیڼ;
+	حالة K_XRIGHT:	أرجع K_ښی;
+	حالة K_XHOME:	أرجع K_HOME;
+	حالة K_ZHOME:	أرجع K_HOME;
+	حالة K_XEND:	أرجع K_پای_ټکی;
+	حالة K_ZEND:	أرجع K_پای_ټکی;
+	حالة K_XF1:	أرجع K_F1;
+	حالة K_XF2:	أرجع K_F2;
+	حالة K_XF3:	أرجع K_F3;
+	حالة K_XF4:	أرجع K_F4;
+	حالة K_S_XF1:	أرجع K_S_F1;
+	حالة K_S_XF2:	أرجع K_S_F2;
+	حالة K_S_XF3:	أرجع K_S_F3;
+	حالة K_S_XF4:	أرجع K_S_F4;
     }
-    return key;
+    أرجع کلی;
 }
 
 /*
@@ -1200,73 +1200,73 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_کلی_name(صحيح c, صحيح modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
-    int	    i, idx, len;
-    int	    table_idx;
+    ساكن char_u string[MAX_کلی_NAME_LEN + 1];
+    صحيح	    i, idx, len;
+    صحيح	    جدول_idx;
 
     string[0] = '<';
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    إذا (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_کلی)
 	c = KEY2TERMCAP1(c);
 
     /*
      * Translate shifted special keys into unshifted keys and set modifier.
      * Same for CTRL and ALT modifiers.
      */
-    if (IS_SPECIAL(c))
+    إذا (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	لكل (i = 0; modifier_کلیګانې_جدول[i] != 0; i += MOD_کلیګانې_ثبت_اندازه)
+	    إذا (       KEY2TERMCAP0(c) == (صحيح)modifier_کلیګانې_جدول[i + 1]
+		    && (صحيح)KEY2TERMCAP1(c) == (صحيح)modifier_کلیګانې_جدول[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
-		break;
+		modifiers |= modifier_کلیګانې_جدول[i];
+		c = TERMCAP2_کلی(modifier_کلیګانې_جدول[i + 3],
+						   modifier_کلیګانې_جدول[i + 4]);
+		اكسر;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    جدول_idx = پیدا_کړه_special_کلی_دننه_جدول(c);
 
     /*
      * When not a known special key, and not a printable character, try to
      * extract modifiers.
      */
-    if (c > 0 && (*mb_char2len)(c) == 1)
+    إذا (c > 0 && (*mb_char2len)(c) == 1)
     {
-	if (table_idx < 0
+	إذا (جدول_idx < 0
 		&& (!vim_isprintc(c) || (c & 0x7f) == ' ')
 		&& (c & 0x80))
 	{
 	    c &= 0x7f;
-	    modifiers |= MOD_MASK_ALT;
+	    modifiers |= MOD_ماسک_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    جدول_idx = پیدا_کړه_special_کلی_دننه_جدول(c);
 	}
-	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
+	إذا (جدول_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
 	    c += '@';
-	    modifiers |= MOD_MASK_CTRL;
+	    modifiers |= MOD_ماسک_CTRL;
 	}
     }
 
     // translate the modifier into a string
-    for (i = 0; mod_mask_table[i].name != 'A'; i++)
-	if ((modifiers & mod_mask_table[i].mod_mask)
-						== mod_mask_table[i].mod_flag)
+    لكل (i = 0; mod_ماسک_جدول[i].name != 'A'; i++)
+	إذا ((modifiers & mod_ماسک_جدول[i].mod_ماسک)
+						== mod_ماسک_جدول[i].mod_flag)
 	{
-	    string[idx++] = mod_mask_table[i].name;
+	    string[idx++] = mod_ماسک_جدول[i].name;
 	    string[idx++] = (char_u)'-';
 	}
 
-    if (table_idx < 0)		// unknown special key, may output t_xx
+    إذا (جدول_idx < 0)		// unknown special key, may output t_xx
     {
-	if (IS_SPECIAL(c))
+	إذا (IS_SPECIAL(c))
 	{
 	    string[idx++] = 't';
 	    string[idx++] = '_';
@@ -1274,37 +1274,37 @@ get_special_key_name(int c, int modifiers)
 	    string[idx++] = KEY2TERMCAP1(c);
 	}
 	// Not a special key, only modifiers, output directly
-	else
+	وإلا
 	{
 	    len = (*mb_char2len)(c);
-	    if (len == 1 && vim_isprintc(c))
+	    إذا (len == 1 && vim_isprintc(c))
 		string[idx++] = c;
-	    else if (has_mbyte && len > 1)
+	    وإلا إذا (has_mbyte && len > 1)
 		idx += (*mb_char2bytes)(c, string + idx);
-	    else
+	    وإلا
 	    {
 		char_u	*s = transchar(c);
-		while (*s)
+		طالما (*s)
 		    string[idx++] = *s++;
 	    }
 	}
     }
-    else		// use name of special key
+    وإلا		// use name of special key
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &کلی_نومونه_جدول[جدول_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	إذا (s->اوږدتیا + idx + 2 <= MAX_کلی_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
-	    idx += (int)s->length;
+	    idx += (صحيح)s->اوږدتیا;
 	}
     }
     string[idx++] = '>';
     string[idx] = NUL;
 
-    return string;
+    أرجع string;
 }
 
 /*
@@ -1313,22 +1313,22 @@ get_special_key_name(int c, int modifiers)
  * If there is a match, "srcp" is advanced to after the <> name.
  * "dst[]" must be big enough to hold the result (up to six characters)!
  */
-    int
+    صحيح
 trans_special(
     char_u	**srcp,
     char_u	*dst,
-    int		flags,		// FSK_ values
-    int		escape_ks,	// escape K_SPECIAL bytes in the character
-    int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
+    صحيح		flags,		// FSK_ values
+    صحيح		escape_ks,	// escape K_SPECIAL bytes in the character
+    صحيح		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
-    int		modifiers = 0;
-    int		key;
+    صحيح		modifiers = 0;
+    صحيح		کلی;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
-	return 0;
+    کلی = پیدا_کړه_special_کلی(srcp, &modifiers, flags, did_simplify);
+    إذا (کلی == 0)
+	أرجع 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    أرجع special_منزل_buf(کلی, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1338,33 +1338,33 @@ trans_special(
  * The sequence is not NUL terminated.
  * This is how characters in a string are encoded.
  */
-    int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+    صحيح
+special_منزل_buf(صحيح کلی, صحيح modifiers, صحيح escape_ks, char_u *dst)
 {
-    int		dlen = 0;
+    صحيح		dlen = 0;
 
     // Put the appropriate modifier in a string
-    if (modifiers != 0)
+    إذا (modifiers != 0)
     {
 	dst[dlen++] = K_SPECIAL;
 	dst[dlen++] = KS_MODIFIER;
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    إذا (IS_SPECIAL(کلی))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(کلی);
+	dst[dlen++] = KEY2TERMCAP1(کلی);
     }
-    else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
-    else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
-    else
-	dst[dlen++] = key;
+    وإلا إذا (escape_ks)
+	dlen = (صحيح)(جمع_کړه_char2buf(کلی, dst + dlen) - dst);
+    وإلا إذا (has_mbyte)
+	dlen += (*mb_char2bytes)(کلی, dst + dlen);
+    وإلا
+	dst[dlen++] = کلی;
 
-    return dlen;
+    أرجع dlen;
 }
 
 /*
@@ -1373,121 +1373,121 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * "srcp" is advanced to after the <> name.
  * returns 0 if there is no match.
  */
-    int
-find_special_key(
+    صحيح
+پیدا_کړه_special_کلی(
     char_u	**srcp,
-    int		*modp,
-    int		flags,		// FSK_ values
-    int		*did_simplify)  // found <C-H> or <A-x>
+    صحيح		*modp,
+    صحيح		flags,		// FSK_ values
+    صحيح		*did_simplify)  // found <C-H> or <A-x>
 {
-    char_u	*last_dash;
-    char_u	*end_of_name;
+    char_u	*وروستی_dash;
+    char_u	*پای_ټکی_د_name;
     char_u	*src;
     char_u	*bp;
-    int		in_string = flags & FSK_IN_STRING;
-    int		modifiers;
-    int		bit;
-    int		key;
+    صحيح		دننه_string = flags & FSK_دننه_STRING;
+    صحيح		modifiers;
+    صحيح		بټ;
+    صحيح		کلی;
     uvarnumber_T	n;
-    int		l;
+    صحيح		l;
 
     src = *srcp;
-    if (src[0] != '<')
-	return 0;
-    if (src[1] == '*')	    // <*xxx>: do not simplify
+    إذا (src[0] != '<')
+	أرجع 0;
+    إذا (src[1] == '*')	    // <*xxx>: do not simplify
 	++src;
 
     // Find end of modifier list
-    last_dash = src;
-    for (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
+    وروستی_dash = src;
+    لكل (bp = src + 1; *bp == '-' || vim_is_نورمال_IDc(*bp); bp++)
     {
-	if (*bp == '-')
+	إذا (*bp == '-')
 	{
-	    last_dash = bp;
-	    if (bp[1] != NUL)
+	    وروستی_dash = bp;
+	    إذا (bp[1] != NUL)
 	    {
-		if (has_mbyte)
+		إذا (has_mbyte)
 		    l = mb_ptr2len(bp + 1);
-		else
+		وإلا
 		    l = 1;
 		// Anything accepted, like <C-?>.
 		// <C-"> or <M-"> are not special in strings as " is
 		// the string delimiter. With a backslash it works: <M-\">
-		if (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
+		إذا (!(دننه_string && bp[1] == '"') && bp[l + 1] == '>')
 		    bp += l;
-		else if (in_string && bp[1] == '\\' && bp[2] == '"'
+		وإلا إذا (دننه_string && bp[1] == '\\' && bp[2] == '"'
 							   && bp[3] == '>')
 		    bp += 2;
 	    }
 	}
-	if (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
+	إذا (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
 	    bp += 3;	// skip t_xx, xx may be '-' or '>'
-	else if (STRNICMP(bp, "char-", 5) == 0)
+	وإلا إذا (STRNICMP(bp, "char-", 5) == 0)
 	{
-	    vim_str2nr(bp + 5, NULL, &l, STR2NR_ALL, NULL, NULL, 0, TRUE, NULL);
-	    if (l == 0)
+	    vim_str2nr(bp + 5, عدم, &l, STR2NR_ALL, عدم, عدم, 0, TRUE, عدم);
+	    إذا (l == 0)
 	    {
-		emsg(_(e_invalid_argument));
-		return 0;
+		emsg(_(e_invalid_دلیل));
+		أرجع 0;
 	    }
 	    bp += l + 5;
-	    break;
+	    اكسر;
 	}
     }
 
-    if (*bp == '>')	// found matching '>'
+    إذا (*bp == '>')	// found matching '>'
     {
-	end_of_name = bp + 1;
+	پای_ټکی_د_name = bp + 1;
 
 	// Which modifiers are given?
 	modifiers = 0x0;
-	for (bp = src + 1; bp < last_dash; bp++)
+	لكل (bp = src + 1; bp < وروستی_dash; bp++)
 	{
-	    if (*bp != '-')
+	    إذا (*bp != '-')
 	    {
-		bit = name_to_mod_mask(*bp);
-		if (bit == 0x0)
-		    break;	// Illegal modifier name
-		modifiers |= bit;
+		بټ = name_منزل_mod_ماسک(*bp);
+		إذا (بټ == 0x0)
+		    اكسر;	// Illegal modifier name
+		modifiers |= بټ;
 	    }
 	}
 
 	/*
 	 * Legal modifier name.
 	 */
-	if (bp >= last_dash)
+	إذا (bp >= وروستی_dash)
 	{
-	    if (STRNICMP(last_dash + 1, "char-", 5) == 0
-						 && VIM_ISDIGIT(last_dash[6]))
+	    إذا (STRNICMP(وروستی_dash + 1, "char-", 5) == 0
+						 && VIM_ISDIGIT(وروستی_dash[6]))
 	    {
 		// <Char-123> or <Char-033> or <Char-0x33>
-		vim_str2nr(last_dash + 6, NULL, &l, STR2NR_ALL, NULL,
-							    &n, 0, TRUE, NULL);
-		if (l == 0)
+		vim_str2nr(وروستی_dash + 6, عدم, &l, STR2NR_ALL, عدم,
+							    &n, 0, TRUE, عدم);
+		إذا (l == 0)
 		{
-		    emsg(_(e_invalid_argument));
-		    return 0;
+		    emsg(_(e_invalid_دلیل));
+		    أرجع 0;
 		}
-		key = (int)n;
+		کلی = (صحيح)n;
 	    }
-	    else
+	    وإلا
 	    {
-		int off = 1;
+		صحيح off = 1;
 
 		// Modifier with single letter, or special key name.
-		if (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
+		إذا (دننه_string && وروستی_dash[1] == '\\' && وروستی_dash[2] == '"')
 		    off = 2;
-		if (has_mbyte)
-		    l = mb_ptr2len(last_dash + off);
-		else
+		إذا (has_mbyte)
+		    l = mb_ptr2len(وروستی_dash + off);
+		وإلا
 		    l = 1;
-		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
-		else
+		إذا (modifiers != 0 && وروستی_dash[l + off] == '>')
+		    کلی = PTR2CHAR(وروستی_dash + off);
+		وإلا
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    کلی = get_special_کلی_کوډ(وروستی_dash + off);
+		    إذا (!(flags & FSK_KEEP_X_کلی))
+			کلی = handle_x_کلیګانې(کلی);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    إذا (کلی != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		کلی = simplify_کلی(کلی, &modifiers);
 
-		if ((flags & FSK_KEYCODE) == 0)
+		إذا ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    إذا (کلی == K_BS)
+			کلی = BS;
+		    وإلا إذا (کلی == K_DEL || کلی == K_KDEL)
+			کلی = DEL;
 		}
-		else if (key == 27
+		وإلا إذا (کلی == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1520,27 +1520,27 @@ find_special_key(
 		    // Esc character.  For the simplified keys use the Esc
 		    // character and set did_simplify, then in the
 		    // non-simplified keys use K_ESC.
-		    if ((flags & FSK_SIMPLIFY) != 0)
+		    إذا ((flags & FSK_SIMPLIFY) != 0)
 		    {
-			if (did_simplify != NULL)
+			إذا (did_simplify != عدم)
 			    *did_simplify = TRUE;
 		    }
-		    else
-			key = K_ESC;
+		    وإلا
+			کلی = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		إذا (!IS_SPECIAL(کلی))
+		    کلی = ایستل_modifiers(کلی, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
-		*srcp = end_of_name;
-		return key;
+		*srcp = پای_ټکی_د_name;
+		أرجع کلی;
 	    }
 	}
     }
-    return 0;
+    أرجع 0;
 }
 
 
@@ -1554,33 +1554,33 @@ find_special_key(
  * use "H".
  * Returns the possibly adjusted key.
  */
-    int
-may_adjust_key_for_ctrl(int modifiers, int key)
+    صحيح
+may_adjust_کلی_for_ctrl(صحيح modifiers, صحيح کلی)
 {
-    if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+    إذا ((modifiers & MOD_ماسک_CTRL) == 0)
+	أرجع کلی;
 
-    if (ASCII_ISALPHA(key))
+    إذا (ASCII_ISALPHA(کلی))
     {
-#ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
-#endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+#که_تعریف_شوی FEAT_TERMINAL
+	check_no_reduce_کلیګانې();  // may update the no_reduce_keys flag
+#د_که_پای
+	أرجع no_reduce_کلیګانې == 0 ? TOUPPER_ASC(کلی) : کلی;
     }
-    if (key == '2')
-	return '@';
-    if (key == '6')
-	return '^';
-    if (key == '-')
-	return '_';
+    إذا (کلی == '2')
+	أرجع '@';
+    إذا (کلی == '6')
+	أرجع '^';
+    إذا (کلی == '-')
+	أرجع '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
-	return ']';
+    إذا (کلی == '$' && (modifiers & MOD_ماسک_ښويدنه) == 0)
+	أرجع ']';
 
-    return key;
+    أرجع کلی;
 }
 
 /*
@@ -1591,27 +1591,27 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * This includes all printable ASCII characters except a-z.
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
-    int
-may_remove_shift_modifier(int modifiers, int key)
+    صحيح
+may_remove_ښويدنه_modifier(صحيح modifiers, صحيح کلی)
 {
-    if ((modifiers == MOD_MASK_SHIFT
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
-#ifdef FEAT_GUI_GTK
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
-#endif
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
-	return modifiers & ~MOD_MASK_SHIFT;
+    إذا ((modifiers == MOD_ماسک_ښويدنه
+		|| modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_ALT)
+#که_تعریف_شوی FEAT_GUI_GTK
+		|| modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_CMD)
+#د_که_پای
+		|| modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_META))
+	    && ((کلی >= '!' && کلی <= '/')
+		|| (کلی >= ':' && کلی <= 'Z')
+		|| vim_isdigit(کلی)
+		|| (کلی >= '[' && کلی <= '`')
+		|| (کلی >= '{' && کلی <= '~')))
+	أرجع modifiers & ~MOD_ماسک_ښويدنه;
 
-    if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
-	return modifiers & ~MOD_MASK_SHIFT;
+    إذا (modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_CTRL)
+		&& (کلی == '{' || کلی == '}' || کلی == '|'))
+	أرجع modifiers & ~MOD_ماسک_ښويدنه;
 
-    return modifiers;
+    أرجع modifiers;
 }
 
 /*
@@ -1621,73 +1621,73 @@ may_remove_shift_modifier(int modifiers, int key)
  * When "simplify" is TRUE and Ctrl or Alt is removed from modifiers set
  * "did_simplify" when it's not NULL.
  */
-    int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+    صحيح
+ایستل_modifiers(صحيح کلی, صحيح *modp, صحيح simplify, صحيح *did_simplify)
 {
-    int	modifiers = *modp;
+    صحيح	modifiers = *modp;
 
-#ifdef MACOS_X
+#که_تعریف_شوی MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
-#endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    إذا (!(modifiers & MOD_ماسک_CMD))
+#د_که_پای
+    إذا ((modifiers & MOD_ماسک_ښويدنه) && ASCII_ISALPHA(کلی))
     {
-	key = TOUPPER_ASC(key);
+	کلی = TOUPPER_ASC(کلی);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
-	if (simplify || modifiers == MOD_MASK_SHIFT
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
-		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    modifiers &= ~MOD_MASK_SHIFT;
+	إذا (simplify || modifiers == MOD_ماسک_ښويدنه
+		|| modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_ALT)
+		|| modifiers == (MOD_ماسک_ښويدنه | MOD_ماسک_META))
+	    modifiers &= ~MOD_ماسک_ښويدنه;
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    إذا ((modifiers & MOD_ماسک_CTRL) && ASCII_ISALPHA(کلی))
+	کلی = TOUPPER_ASC(کلی);
 
-    if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+    إذا (simplify && (modifiers & MOD_ماسک_CTRL)
+	    && ((کلی >= '?' && کلی <= '_') || ASCII_ISALPHA(کلی)))
     {
-	key = Ctrl_chr(key);
-	modifiers &= ~MOD_MASK_CTRL;
+	کلی = Ctrl_chr(کلی);
+	modifiers &= ~MOD_ماسک_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
-	if (did_simplify != NULL)
+	إذا (کلی == NUL)
+	    کلی = K_ZERO;
+	إذا (did_simplify != عدم)
 	    *did_simplify = TRUE;
     }
 
-#ifdef MACOS_X
+#که_تعریف_شوی MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
-#endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    إذا (!(modifiers & MOD_ماسک_CMD))
+#د_که_پای
+    إذا (simplify && (modifiers & MOD_ماسک_ALT) && کلی < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
-	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
-	if (did_simplify != NULL)
+	کلی |= 0x80;
+	modifiers &= ~MOD_ماسک_ALT;	// remove the META modifier
+	إذا (did_simplify != عدم)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    أرجع کلی;
 }
 
 /*
  * Try to find key "c" in the special key table.
  * Return the index when found, -1 when not found.
  */
-    int
-find_special_key_in_table(int c)
+    صحيح
+پیدا_کړه_special_کلی_دننه_جدول(صحيح c)
 {
-    int	    i;
+    صحيح	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    لكل (i = 0; i < (صحيح)ARRAY_اوږدتیا(کلی_نومونه_جدول); i++)
+	إذا (c == کلی_نومونه_جدول[i].کلی && !کلی_نومونه_جدول[i].is_alt)
+	    أرجع کلی_نومونه_جدول[i].enabled ? i : -1;
 
-    return -1;
+    أرجع -1;
 }
 
 
@@ -1700,38 +1700,38 @@ find_special_key_in_table(int c)
  * 'LeftMouse'.
  * These characters are identified by vim_isNormalIDc().
  */
-    static int
-cmp_key_name_entry(const void *a, const void *b)
+    ساكن صحيح
+cmp_کلی_name_ثبت(ثابت فراغ *a, ثابت فراغ *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
-    int	    result = 0;
+    char_u  *p1 = ((بنية کلی_name_ثبت *)a)->name.string;
+    char_u  *p2 = ((بنية کلی_name_ثبت *)b)->name.string;
+    صحيح	    پایله = 0;
 
-    if (p1 == p2)
-	return 0;
+    إذا (p1 == p2)
+	أرجع 0;
 
-    while (vim_isNormalIDc(*p1) && *p2 != NUL)
+    طالما (vim_is_نورمال_IDc(*p1) && *p2 != NUL)
     {
-	if ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
-	    break;
+	إذا ((پایله = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
+	    اكسر;
 	++p1;
 	++p2;
     }
 
-    if (result == 0)
+    إذا (پایله == 0)
     {
-	if (*p2 == NUL)
+	إذا (*p2 == NUL)
 	{
-	    if (vim_isNormalIDc(*p1))
-		result = 1;
+	    إذا (vim_is_نورمال_IDc(*p1))
+		پایله = 1;
 	}
-	else
+	وإلا
 	{
-	    result = -1;
+	    پایله = -1;
 	}
     }
 
-    return result;
+    أرجع پایله;
 }
 
 /*
@@ -1741,99 +1741,99 @@ cmp_key_name_entry(const void *a, const void *b)
  * termcap name.
  * Return the key code, or 0 if not found.
  */
-    int
-get_special_key_code(char_u *name)
+    صحيح
+get_special_کلی_کوډ(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
      */
-    if (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
+    إذا (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
     {
 	char_u  string[3];
 
 	string[0] = name[2];
 	string[1] = name[3];
 	string[2] = NUL;
-	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	إذا (جمع_کړه_termcap_ثبت(string, FALSE) == OK)
+	    أرجع TERMCAP2_کلی(name[2], name[3]);
     }
-    else
+    وإلا
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	بنية کلی_name_ثبت	موخه;
+	بنية کلی_name_ثبت	*ثبت;
 
-	target.enabled = TRUE;
-	target.key = 0;
-	target.name.string = name;
-	target.name.length = 0;
+	موخه.enabled = TRUE;
+	موخه.کلی = 0;
+	موخه.name.string = name;
+	موخه.name.اوږدتیا = 0;
 
-	entry = (struct key_name_entry *)bsearch(
-	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
-	if (entry != NULL && entry->enabled)
+	ثبت = (بنية کلی_name_ثبت *)bsearch(
+	    &موخه,
+	    &کلی_نومونه_جدول,
+	    ARRAY_اوږدتیا(کلی_نومونه_جدول),
+	    حجم(کلی_نومونه_جدول[0]),
+	    cmp_کلی_name_ثبت);
+	إذا (ثبت != عدم && ثبت->enabled)
 	{
-	    int key = entry->key;
+	    صحيح کلی = ثبت->کلی;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    أرجع کلی == K_TAB ? TAB : کلی;
 	}
     }
 
-    return 0;
+    أرجع 0;
 }
 
     char_u *
-get_key_name(int i)
+get_کلی_name(صحيح i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
-	return NULL;
+    إذا (i < 0 || i >= (صحيح)ARRAY_اوږدتیا(کلی_نومونه_جدول))
+	أرجع عدم;
 
-    return key_names_table[i].name.string;
+    أرجع کلی_نومونه_جدول[i].name.string;
 }
 
 /*
  * Return the current end-of-line type: EOL_DOS, EOL_UNIX or EOL_MAC.
  */
-    int
+    صحيح
 get_fileformat(buf_T *buf)
 {
-    int		c = *buf->b_p_ff;
+    صحيح		c = *buf->b_p_ff;
 
-    if (buf->b_p_bin || c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    إذا (buf->b_p_bin || c == 'u')
+	أرجع EOL_UNIX;
+    إذا (c == 'm')
+	أرجع EOL_MAC;
+    أرجع EOL_DOS;
 }
 
 /*
  * Like get_fileformat(), but override 'fileformat' with "p" for "++opt=val"
  * argument.
  */
-    int
+    صحيح
 get_fileformat_force(
     buf_T	*buf,
     exarg_T	*eap)	    // can be NULL!
 {
-    int		c;
+    صحيح		c;
 
-    if (eap != NULL && eap->force_ff != 0)
+    إذا (eap != عدم && eap->force_ff != 0)
 	c = eap->force_ff;
-    else
+    وإلا
     {
-	if ((eap != NULL && eap->force_bin != 0)
+	إذا ((eap != عدم && eap->force_bin != 0)
 			       ? (eap->force_bin == FORCE_BIN) : buf->b_p_bin)
-	    return EOL_UNIX;
+	    أرجع EOL_UNIX;
 	c = *buf->b_p_ff;
     }
-    if (c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    إذا (c == 'u')
+	أرجع EOL_UNIX;
+    إذا (c == 'm')
+	أرجع EOL_MAC;
+    أرجع EOL_DOS;
 }
 
 /*
@@ -1841,131 +1841,131 @@ get_fileformat_force(
  * Sets both 'textmode' and 'fileformat'.
  * Note: Does _not_ set global value of 'textmode'!
  */
-    void
-set_fileformat(
-    int		t,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    فراغ
+سېټ_fileformat(
+    صحيح		t,
+    صحيح		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    char	*p = NULL;
+    حرف	*p = عدم;
 
-    switch (t)
+    بدل (t)
     {
-    case EOL_DOS:
+    حالة EOL_DOS:
 	p = FF_DOS;
 	curbuf->b_p_tx = TRUE;
-	break;
-    case EOL_UNIX:
+	اكسر;
+    حالة EOL_UNIX:
 	p = FF_UNIX;
 	curbuf->b_p_tx = FALSE;
-	break;
-    case EOL_MAC:
+	اكسر;
+    حالة EOL_MAC:
 	p = FF_MAC;
 	curbuf->b_p_tx = FALSE;
-	break;
+	اكسر;
     }
-    if (p != NULL)
-	set_string_option_direct((char_u *)"ff", -1, (char_u *)p,
+    إذا (p != عدم)
+	سېټ_string_option_مستقیم((char_u *)"ff", -1, (char_u *)p,
 						     OPT_FREE | opt_flags, 0);
 
     // This may cause the buffer to become (un)modified.
-    check_status(curbuf);
+    check_حالت(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#د_که_پای
     need_maketitle = TRUE;	    // set window title later
 }
 
 /*
  * Return the default fileformat from 'fileformats'.
  */
-    int
-default_fileformat(void)
+    صحيح
+default_fileformat(فراغ)
 {
-    switch (*p_ffs)
+    بدل (*p_ffs)
     {
-	case 'm':   return EOL_MAC;
-	case 'd':   return EOL_DOS;
+	حالة 'm':   أرجع EOL_MAC;
+	حالة 'd':   أرجع EOL_DOS;
     }
-    return EOL_UNIX;
+    أرجع EOL_UNIX;
 }
 
 /*
  * Call shell.	Calls mch_call_shell, with 'shellxquote' added.
  */
-    int
-call_shell(char_u *cmd, int opt)
+    صحيح
+call_shell(char_u *cmd, صحيح opt)
 {
-    int		retval;
-#ifdef FEAT_PROFILE
-    proftime_T	wait_time;
-#endif
+    صحيح		retval;
+#که_تعریف_شوی FEAT_PROFILE
+    proftime_T	wait_وخت;
+#د_که_پای
 
-    if (p_verbose > 3)
+    إذا (p_verbose > 3)
     {
 	verbose_enter();
-	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	smsg(_("Calling shell to execute: \"%s\""), cmd == عدم ? p_sh : cmd);
+	پیغام_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
 
-#ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_enter(&wait_time);
-#endif
+#که_تعریف_شوی FEAT_PROFILE
+    إذا (do_profiling == PROF_YES)
+	prof_ماشوم_enter(&wait_وخت);
+#د_که_پای
 
-    if (*p_sh == NUL)
+    إذا (*p_sh == NUL)
     {
-	emsg(_(e_shell_option_is_empty));
+	emsg(_(e_shell_option_is_تشه));
 	retval = -1;
     }
-    else
+    وإلا
     {
-#ifdef FEAT_GUI_MSWIN
+#که_تعریف_شوی FEAT_GUI_MSWIN
 	// Don't hide the pointer while executing a shell command.
 	gui_mch_mousehide(FALSE);
-#endif
-#ifdef FEAT_GUI
+#د_که_پای
+#که_تعریف_شوی FEAT_GUI
 	++hold_gui_events;
-#endif
+#د_که_پای
 	// The external command may update a tags file, clear cached tags.
-	tag_freematch();
+	نښان_freematch();
 
-	if (cmd == NULL || *p_sxq == NUL)
+	إذا (cmd == عدم || *p_sxq == NUL)
 	    retval = mch_call_shell(cmd, opt);
-	else
+	وإلا
 	{
 	    char_u  *ncmd;
 	    size_t  ncmdsize;
 	    char_u  *ecmd = cmd;
 
-	    if (*p_sxe != NUL && *p_sxq == '(')
+	    إذا (*p_sxe != NUL && *p_sxq == '(')
 	    {
 		ecmd = vim_strsave_escaped_ext(cmd, p_sxe, '^', FALSE);
-		if (ecmd == NULL)
+		إذا (ecmd == عدم)
 		    ecmd = cmd;
 	    }
 	    ncmdsize = STRLEN(ecmd) + STRLEN(p_sxq) * 2 + 1;
 	    ncmd = alloc(ncmdsize);
-	    if (ncmd != NULL)
+	    إذا (ncmd != عدم)
 	    {
 		// When 'shellxquote' is ( append ).
 		// When 'shellxquote' is "( append )".
-		vim_snprintf((char *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
+		vim_snprintf((حرف *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
 		    : *p_sxq == '"' && *(p_sxq+1) == '(' ? (char_u *)")\""
 		    : p_sxq);
 		retval = mch_call_shell(ncmd, opt);
 		vim_free(ncmd);
 	    }
-	    else
+	    وإلا
 		retval = -1;
-	    if (ecmd != cmd)
+	    إذا (ecmd != cmd)
 		vim_free(ecmd);
 	}
-#ifdef FEAT_GUI
+#که_تعریف_شوی FEAT_GUI
 	--hold_gui_events;
-#endif
+#د_که_پای
 	/*
 	 * Check the window size, in case it changed while executing the
 	 * external command.
@@ -1973,15 +1973,15 @@ call_shell(char_u *cmd, int opt)
 	shell_resized_check();
     }
 
-#ifdef FEAT_EVAL
-    set_vim_var_nr(VV_SHELL_ERROR, (long)retval);
+#که_تعریف_شوی FEAT_EVAL
+    سېټ_vim_var_nr(VV_SHELL_ERROR, (اوږد)retval);
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_exit(&wait_time);
+    إذا (do_profiling == PROF_YES)
+	prof_ماشوم_exit(&wait_وخت);
 # endif
-#endif
+#د_که_پای
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -1989,21 +1989,21 @@ call_shell(char_u *cmd, int opt)
  * equal to MODE_NORMAL State with a condition.  This function returns the real
  * State.
  */
-    int
-get_real_state(void)
+    صحيح
+get_real_state(فراغ)
 {
-    if (State & MODE_NORMAL)
+    إذا (State & ډېرپېښ_نورمال)
     {
-	if (VIsual_active)
+	إذا (VIsual_فعال)
 	{
-	    if (VIsual_select)
-		return MODE_SELECT;
-	    return MODE_VISUAL;
+	    إذا (VIsual_select)
+		أرجع ډېرپېښ_SELECT;
+	    أرجع ډېرپېښ_VISUAL;
 	}
-	else if (finish_op)
-	    return MODE_OP_PENDING;
+	وإلا إذا (پای_op)
+	    أرجع ډېرپېښ_OP_PENDING;
     }
-    return State;
+    أرجع State;
 }
 
 /*
@@ -2011,18 +2011,18 @@ get_real_state(void)
  * Takes care of multi-byte characters.
  * "b" must point to the start of the file name
  */
-    int
+    صحيح
 after_pathsep(char_u *b, char_u *p)
 {
-    return p > b && vim_ispathsep(p[-1])
-			     && (!has_mbyte || (*mb_head_off)(b, p - 1) == 0);
+    أرجع p > b && vim_ispathsep(p[-1])
+			     && (!has_mbyte || (*mb_سر_off)(b, p - 1) == 0);
 }
 
 /*
  * Return TRUE if file names "f1" and "f2" are in the same directory.
  * "f1" may be a short name, "f2" must be a full path.
  */
-    int
+    صحيح
 same_directory(char_u *f1, char_u *f2)
 {
     char_u	ffname[MAXPATHL];
@@ -2030,17 +2030,17 @@ same_directory(char_u *f1, char_u *f2)
     char_u	*t2;
 
     // safety check
-    if (f1 == NULL || f2 == NULL)
-	return FALSE;
+    إذا (f1 == عدم || f2 == عدم)
+	أرجع FALSE;
 
-    (void)vim_FullName(f1, ffname, MAXPATHL, FALSE);
+    (فراغ)vim_ډک_Name(f1, ffname, MAXPATHL, FALSE);
     t1 = gettail_sep(ffname);
     t2 = gettail_sep(f2);
-    return (t1 - ffname == t2 - f2
-	     && pathcmp((char *)ffname, (char *)f2, (int)(t1 - ffname)) == 0);
+    أرجع (t1 - ffname == t2 - f2
+	     && pathcmp((حرف *)ffname, (حرف *)f2, (صحيح)(t1 - ffname)) == 0);
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
+#إذا defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
 	|| defined(MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_NETBEANS_INTG)
 /*
@@ -2048,72 +2048,72 @@ same_directory(char_u *f1, char_u *f2)
  * Caller must call shorten_fnames()!
  * Return OK or FAIL.
  */
-    int
-vim_chdirfile(char_u *fname, char *trigger_autocmd)
+    صحيح
+vim_chdirfile(char_u *fname, حرف *trigger_autocmd)
 {
     char_u	old_dir[MAXPATHL];
     char_u	new_dir[MAXPATHL];
 
-    if (mch_dirname(old_dir, MAXPATHL) != OK)
+    إذا (mch_dirname(old_dir, MAXPATHL) != OK)
 	*old_dir = NUL;
 
     vim_strncpy(new_dir, fname, MAXPATHL - 1);
     *gettail_sep(new_dir) = NUL;
 
-    if (pathcmp((char *)old_dir, (char *)new_dir, -1) == 0)
+    إذا (pathcmp((حرف *)old_dir, (حرف *)new_dir, -1) == 0)
 	// nothing to do
-	return OK;
+	أرجع OK;
 
-    if (trigger_autocmd != NULL)
-	trigger_DirChangedPre((char_u *)trigger_autocmd, new_dir);
+    إذا (trigger_autocmd != عدم)
+	trigger_Dir_بدل_شوی_Pre((char_u *)trigger_autocmd, new_dir);
 
-    if (mch_chdir((char *)new_dir) != 0)
-	return FAIL;
+    إذا (mch_chdir((حرف *)new_dir) != 0)
+	أرجع FAIL;
 
-    if (trigger_autocmd != NULL)
+    إذا (trigger_autocmd != عدم)
 	apply_autocmds(EVENT_DIRCHANGED, (char_u *)trigger_autocmd,
 						       new_dir, FALSE, curbuf);
-    return OK;
+    أرجع OK;
 }
-#endif
+#د_که_پای
 
-#if defined(STAT_IGNORES_SLASH)
+#إذا defined(STAT_IGNORES_SLASH)
 /*
  * Check if "name" ends in a slash and is not a directory.
  * Used for systems where stat() ignores a trailing slash on a file name.
  * The Vim code assumes a trailing slash is only ignored for a directory.
  */
-    static int
-illegal_slash(const char *name)
+    ساكن صحيح
+illegal_slash(ثابت حرف *name)
 {
-    if (name[0] == NUL)
-	return FALSE;	    // no file name is not illegal
-    if (name[strlen(name) - 1] != '/')
-	return FALSE;	    // no trailing slash
-    if (mch_isdir((char_u *)name))
-	return FALSE;	    // trailing slash for a directory
-    return TRUE;
+    إذا (name[0] == NUL)
+	أرجع FALSE;	    // no file name is not illegal
+    إذا (name[مزي_اوږدوالی(name) - 1] != '/')
+	أرجع FALSE;	    // no trailing slash
+    إذا (mch_isdir((char_u *)name))
+	أرجع FALSE;	    // trailing slash for a directory
+    أرجع TRUE;
 }
 
 /*
  * Special implementation of mch_stat() for Solaris.
  */
-    int
-vim_stat(const char *name, stat_T *stp)
+    صحيح
+vim_stat(ثابت حرف *name, stat_T *stp)
 {
     // On Solaris stat() accepts "file/" as if it was "file".  Return -1 if
     // the name ends in "/" and it's not a directory.
-    return illegal_slash(name) ? -1 : stat(name, stp);
+    أرجع illegal_slash(name) ? -1 : stat(name, stp);
 }
-#endif
+#د_که_پای
 
-#if defined(CURSOR_SHAPE)
+#إذا defined(CURSOR_SHAPE)
 
 /*
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_جدول[SHAPE_IDX_شمېر] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2142,7 +2142,7 @@ cursorentry_T shape_table[SHAPE_IDX_COUNT] =
  * Table with names for mouse shapes.  Keep in sync with all the tables for
  * mch_set_mouse_shape()!.
  */
-static string_T mshape_names[] =
+ساكن string_T mshape_نومونه[] =
 {
     STR_LITERAL_INIT("arrow"),	// default, must be the first one
     STR_LITERAL_INIT("blank"),	// hidden
@@ -2160,10 +2160,10 @@ static string_T mshape_names[] =
     STR_LITERAL_INIT("question"),
     STR_LITERAL_INIT("rightup-arrow"),
     STR_LITERAL_INIT("up-arrow"),
-    {NULL, 0}
+    {عدم, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_نومونه_شمېر  (ARRAY_اوږدتیا(mshape_نومونه) - 1)
 # endif
 
 /*
@@ -2171,127 +2171,127 @@ static string_T mshape_names[] =
  * ("what" is SHAPE_MOUSE).
  * Returns error message for an illegal option, NULL otherwise.
  */
-    char *
-parse_shape_opt(int what)
+    حرف *
+parse_shape_opt(صحيح what)
 {
     char_u	*modep;
     char_u	*colonp;
     char_u	*commap;
     char_u	*slashp;
     char_u	*p, *endp;
-    int		idx = 0;		// init for GCC
-    int		all_idx;
-    int		len;
-    int		i;
-    long	n;
-    int		found_ve = FALSE;	// found "ve" flag
-    int		round;
+    صحيح		idx = 0;		// init for GCC
+    صحيح		all_idx;
+    صحيح		len;
+    صحيح		i;
+    اوږد	n;
+    صحيح		وموندل_ve = FALSE;	// found "ve" flag
+    صحيح		پړاو;
 
     /*
      * First round: check for errors; second round: do it for real.
      */
-    for (round = 1; round <= 2; ++round)
+    لكل (پړاو = 1; پړاو <= 2; ++پړاو)
     {
 	/*
 	 * Repeat for all comma separated parts.
 	 */
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	إذا (what == SHAPE_MOUSE)
 	    modep = p_mouseshape;
-	else
+	وإلا
 # endif
 	    modep = p_guicursor;
-	while (*modep != NUL)
+	طالما (*modep != NUL)
 	{
 	    colonp = vim_strchr(modep, ':');
 	    commap = vim_strchr(modep, ',');
 
-	    if (colonp == NULL || (commap != NULL && commap < colonp))
-		return e_missing_colon_2;
-	    if (colonp == modep)
-		return e_illegal_mode;
+	    إذا (colonp == عدم || (commap != عدم && commap < colonp))
+		أرجع e_missing_colon_2;
+	    إذا (colonp == modep)
+		أرجع e_illegal_ډېرپېښ;
 
 	    /*
 	     * Repeat for all mode's before the colon.
 	     * For the 'a' mode, we loop to handle all the modes.
 	     */
 	    all_idx = -1;
-	    while (modep < colonp || all_idx >= 0)
+	    طالما (modep < colonp || all_idx >= 0)
 	    {
-		if (all_idx < 0)
+		إذا (all_idx < 0)
 		{
 		    // Find the mode.
-		    if (modep[1] == '-' || modep[1] == ':')
+		    إذا (modep[1] == '-' || modep[1] == ':')
 			len = 1;
-		    else
+		    وإلا
 			len = 2;
-		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
-		    else
+		    إذا (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
+			all_idx = SHAPE_IDX_شمېر - 1;
+		    وإلا
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
-			    if (STRNICMP(modep, shape_table[idx].name, len)
+			لكل (idx = 0; idx < SHAPE_IDX_شمېر; ++idx)
+			    إذا (STRNICMP(modep, shape_جدول[idx].name, len)
 									 == 0)
-				break;
-			if (idx == SHAPE_IDX_COUNT
-				   || (shape_table[idx].used_for & what) == 0)
-			    return e_illegal_mode;
-			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
-			    found_ve = TRUE;
+				اكسر;
+			إذا (idx == SHAPE_IDX_شمېر
+				   || (shape_جدول[idx].کارول_شوی_for & what) == 0)
+			    أرجع e_illegal_ډېرپېښ;
+			إذا (len == 2 && modep[0] == 'v' && modep[1] == 'e')
+			    وموندل_ve = TRUE;
 		    }
 		    modep += len + 1;
 		}
 
-		if (all_idx >= 0)
+		إذا (all_idx >= 0)
 		    idx = all_idx--;
-		else if (round == 2)
+		وإلا إذا (پړاو == 2)
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    إذا (what == SHAPE_MOUSE)
 		    {
 			// Set the default, for the missing parts
-			shape_table[idx].mshape = 0;
+			shape_جدول[idx].mshape = 0;
 		    }
-		    else
+		    وإلا
 # endif
 		    {
 			// Set the defaults, for the missing parts
-			shape_table[idx].shape = SHAPE_BLOCK;
-			shape_table[idx].blinkwait = 700L;
-			shape_table[idx].blinkon = 400L;
-			shape_table[idx].blinkoff = 250L;
+			shape_جدول[idx].shape = SHAPE_بلاک;
+			shape_جدول[idx].blinkwait = 700L;
+			shape_جدول[idx].blinkon = 400L;
+			shape_جدول[idx].blinkoff = 250L;
 		    }
 		}
 
 		// Parse the part after the colon
-		for (p = colonp + 1; *p && *p != ','; )
+		لكل (p = colonp + 1; *p && *p != ','; )
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    إذا (what == SHAPE_MOUSE)
 		    {
-			for (i = 0; ; ++i)
+			لكل (i = 0; ; ++i)
 			{
-			    if (mshape_names[i].string == NULL)
+			    إذا (mshape_نومونه[i].string == عدم)
 			    {
-				if (!VIM_ISDIGIT(*p))
-				    return e_illegal_mouseshape;
-				if (round == 2)
-				    shape_table[idx].mshape =
+				إذا (!VIM_ISDIGIT(*p))
+				    أرجع e_illegal_mouseshape;
+				إذا (پړاو == 2)
+				    shape_جدول[idx].mshape =
 					      getdigits(&p) + MSHAPE_NUMBERED;
-				else
-				    (void)getdigits(&p);
-				break;
+				وإلا
+				    (فراغ)getdigits(&p);
+				اكسر;
 			    }
-			    if (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
+			    إذا (STRNICMP(p, mshape_نومونه[i].string, mshape_نومونه[i].اوږدتیا) == 0)
 			    {
-				if (round == 2)
-				    shape_table[idx].mshape = i;
-				p += mshape_names[i].length;
-				break;
+				إذا (پړاو == 2)
+				    shape_جدول[idx].mshape = i;
+				p += mshape_نومونه[i].اوږدتیا;
+				اكسر;
 			    }
 			}
 		    }
-		    else // if (what == SHAPE_MOUSE)
+		    وإلا // if (what == SHAPE_MOUSE)
 # endif
 		    {
 			/*
@@ -2299,174 +2299,174 @@ parse_shape_opt(int what)
 			 */
 			i = *p;
 			len = 0;
-			if (STRNICMP(p, "ver", 3) == 0)
+			إذا (STRNICMP(p, "ver", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "hor", 3) == 0)
+			وإلا إذا (STRNICMP(p, "hor", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "blinkwait", 9) == 0)
+			وإلا إذا (STRNICMP(p, "blinkwait", 9) == 0)
 			    len = 9;
-			else if (STRNICMP(p, "blinkon", 7) == 0)
+			وإلا إذا (STRNICMP(p, "blinkon", 7) == 0)
 			    len = 7;
-			else if (STRNICMP(p, "blinkoff", 8) == 0)
+			وإلا إذا (STRNICMP(p, "blinkoff", 8) == 0)
 			    len = 8;
-			if (len != 0)
+			إذا (len != 0)
 			{
 			    p += len;
-			    if (!VIM_ISDIGIT(*p))
-				return e_digit_expected;
+			    إذا (!VIM_ISDIGIT(*p))
+				أرجع e_digit_expected;
 			    n = getdigits(&p);
-			    if (len == 3)   // "ver" or "hor"
+			    إذا (len == 3)   // "ver" or "hor"
 			    {
-				if (n == 0)
-				    return e_illegal_percentage;
-				if (round == 2)
+				إذا (n == 0)
+				    أرجع e_illegal_percentage;
+				إذا (پړاو == 2)
 				{
-				    if (TOLOWER_ASC(i) == 'v')
-					shape_table[idx].shape = SHAPE_VER;
-				    else
-					shape_table[idx].shape = SHAPE_HOR;
-				    shape_table[idx].percentage = n;
+				    إذا (TOLOWER_ASC(i) == 'v')
+					shape_جدول[idx].shape = SHAPE_VER;
+				    وإلا
+					shape_جدول[idx].shape = SHAPE_HOR;
+				    shape_جدول[idx].percentage = n;
 				}
 			    }
-			    else if (round == 2)
+			    وإلا إذا (پړاو == 2)
 			    {
-				if (len == 9)
-				    shape_table[idx].blinkwait = n;
-				else if (len == 7)
-				    shape_table[idx].blinkon = n;
-				else
-				    shape_table[idx].blinkoff = n;
+				إذا (len == 9)
+				    shape_جدول[idx].blinkwait = n;
+				وإلا إذا (len == 7)
+				    shape_جدول[idx].blinkon = n;
+				وإلا
+				    shape_جدول[idx].blinkoff = n;
 			    }
 			}
-			else if (STRNICMP(p, "block", 5) == 0)
+			وإلا إذا (STRNICMP(p, "block", 5) == 0)
 			{
-			    if (round == 2)
-				shape_table[idx].shape = SHAPE_BLOCK;
+			    إذا (پړاو == 2)
+				shape_جدول[idx].shape = SHAPE_بلاک;
 			    p += 5;
 			}
-			else	// must be a highlight group name then
+			وإلا	// must be a highlight group name then
 			{
 			    endp = vim_strchr(p, '-');
-			    if (commap == NULL)		    // last part
+			    إذا (commap == عدم)		    // last part
 			    {
-				if (endp == NULL)
+				إذا (endp == عدم)
 				    endp = p + STRLEN(p);   // find end of part
 			    }
-			    else if (endp > commap || endp == NULL)
+			    وإلا إذا (endp > commap || endp == عدم)
 				endp = commap;
 			    slashp = vim_strchr(p, '/');
-			    if (slashp != NULL && slashp < endp)
+			    إذا (slashp != عدم && slashp < endp)
 			    {
 				// "group/langmap_group"
-				i = syn_check_group(p, (int)(slashp - p));
+				i = syn_check_ډله(p, (صحيح)(slashp - p));
 				p = slashp + 1;
 			    }
-			    if (round == 2)
+			    إذا (پړاو == 2)
 			    {
-				shape_table[idx].id = syn_check_group(p,
-							     (int)(endp - p));
-				shape_table[idx].id_lm = shape_table[idx].id;
-				if (slashp != NULL && slashp < endp)
-				    shape_table[idx].id = i;
+				shape_جدول[idx].id = syn_check_ډله(p,
+							     (صحيح)(endp - p));
+				shape_جدول[idx].id_lm = shape_جدول[idx].id;
+				إذا (slashp != عدم && slashp < endp)
+				    shape_جدول[idx].id = i;
 			    }
 			    p = endp;
 			}
 		    } // if (what != SHAPE_MOUSE)
 
-		    if (*p == '-')
+		    إذا (*p == '-')
 			++p;
 		}
 	    }
 	    modep = p;
-	    if (*modep == ',')
+	    إذا (*modep == ',')
 		++modep;
 	}
     }
 
     // If the 's' flag is not given, use the 'v' cursor for 's'
-    if (!found_ve)
+    إذا (!وموندل_ve)
     {
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	إذا (what == SHAPE_MOUSE)
 	{
-	    shape_table[SHAPE_IDX_VE].mshape = shape_table[SHAPE_IDX_V].mshape;
+	    shape_جدول[SHAPE_IDX_VE].mshape = shape_جدول[SHAPE_IDX_V].mshape;
 	}
-	else
+	وإلا
 # endif
 	{
-	    shape_table[SHAPE_IDX_VE].shape = shape_table[SHAPE_IDX_V].shape;
-	    shape_table[SHAPE_IDX_VE].percentage =
-					 shape_table[SHAPE_IDX_V].percentage;
-	    shape_table[SHAPE_IDX_VE].blinkwait =
-					  shape_table[SHAPE_IDX_V].blinkwait;
-	    shape_table[SHAPE_IDX_VE].blinkon =
-					    shape_table[SHAPE_IDX_V].blinkon;
-	    shape_table[SHAPE_IDX_VE].blinkoff =
-					   shape_table[SHAPE_IDX_V].blinkoff;
-	    shape_table[SHAPE_IDX_VE].id = shape_table[SHAPE_IDX_V].id;
-	    shape_table[SHAPE_IDX_VE].id_lm = shape_table[SHAPE_IDX_V].id_lm;
+	    shape_جدول[SHAPE_IDX_VE].shape = shape_جدول[SHAPE_IDX_V].shape;
+	    shape_جدول[SHAPE_IDX_VE].percentage =
+					 shape_جدول[SHAPE_IDX_V].percentage;
+	    shape_جدول[SHAPE_IDX_VE].blinkwait =
+					  shape_جدول[SHAPE_IDX_V].blinkwait;
+	    shape_جدول[SHAPE_IDX_VE].blinkon =
+					    shape_جدول[SHAPE_IDX_V].blinkon;
+	    shape_جدول[SHAPE_IDX_VE].blinkoff =
+					   shape_جدول[SHAPE_IDX_V].blinkoff;
+	    shape_جدول[SHAPE_IDX_VE].id = shape_جدول[SHAPE_IDX_V].id;
+	    shape_جدول[SHAPE_IDX_VE].id_lm = shape_جدول[SHAPE_IDX_V].id_lm;
 	}
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
-# if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
+# إذا defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
 	|| defined(FEAT_MOUSESHAPE)
 /*
  * Return the index into shape_table[] for the current mode.
  * When "mouse" is TRUE, consider indexes valid for the mouse pointer.
  */
-    int
-get_shape_idx(int mouse)
+    صحيح
+get_shape_idx(صحيح mouse)
 {
 #  ifdef FEAT_MOUSESHAPE
-    if (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
+    إذا (mouse && (State == ډېرپېښ_HITRETURN || State == ډېرپېښ_ASKMORE))
     {
 #   ifdef FEAT_GUI
-	int x, y;
+	صحيح x, y;
 	gui_mch_getmouse(&x, &y);
-	if (Y_2_ROW(y) == Rows - 1)
-	    return SHAPE_IDX_MOREL;
+	إذا (Y_2_لیکه(y) == لیکې - 1)
+	    أرجع SHAPE_IDX_MOREL;
 #   endif
-	return SHAPE_IDX_MORE;
+	أرجع SHAPE_IDX_نور;
     }
-    if (mouse && drag_status_line)
-	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
-	return SHAPE_IDX_VDRAG;
+    إذا (mouse && drag_حالت_کرښه)
+	أرجع SHAPE_IDX_SDRAG;
+    إذا (mouse && drag_sep_کرښه)
+	أرجع SHAPE_IDX_VDRAG;
 #  endif
-    if (!mouse && State == MODE_SHOWMATCH)
-	return SHAPE_IDX_SM;
-    if (State & VREPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & REPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
-	return SHAPE_IDX_I;
-    if (State & MODE_CMDLINE)
+    إذا (!mouse && State == ډېرپېښ_SHOWMATCH)
+	أرجع SHAPE_IDX_SM;
+    إذا (State & VREPLACE_FLAG)
+	أرجع SHAPE_IDX_R;
+    إذا (State & REPLACE_FLAG)
+	أرجع SHAPE_IDX_R;
+    إذا (State & ډېرپېښ_ورننباسه)
+	أرجع SHAPE_IDX_I;
+    إذا (State & ډېرپېښ_CMDLINE)
     {
-	if (cmdline_at_end())
-	    return SHAPE_IDX_C;
-	if (cmdline_overstrike())
-	    return SHAPE_IDX_CR;
-	return SHAPE_IDX_CI;
+	إذا (cmdline_at_پای_ټکی())
+	    أرجع SHAPE_IDX_C;
+	إذا (cmdline_overstrike())
+	    أرجع SHAPE_IDX_CR;
+	أرجع SHAPE_IDX_CI;
     }
-    if (finish_op)
-	return SHAPE_IDX_O;
-    if (VIsual_active)
+    إذا (پای_op)
+	أرجع SHAPE_IDX_O;
+    إذا (VIsual_فعال)
     {
-	if (*p_sel == 'e')
-	    return SHAPE_IDX_VE;
-	else
-	    return SHAPE_IDX_V;
+	إذا (*p_sel == 'e')
+	    أرجع SHAPE_IDX_VE;
+	وإلا
+	    أرجع SHAPE_IDX_V;
     }
-    return SHAPE_IDX_N;
+    أرجع SHAPE_IDX_N;
 }
 # endif
 
-# if defined(FEAT_MOUSESHAPE)
-static int current_mouse_shape = 0;
+# إذا defined(FEAT_MOUSESHAPE)
+ساكن صحيح current_mouse_shape = 0;
 
 /*
  * Set the mouse shape:
@@ -2475,68 +2475,68 @@ static int current_mouse_shape = 0;
  * If "shape" is -2, only update the shape when it's CLINE or STATUS (used
  * when the mouse moves off the status or command line).
  */
-    void
-update_mouseshape(int shape_idx)
+    فراغ
+update_mouseshape(صحيح shape_idx)
 {
-    int new_mouse_shape;
+    صحيح new_mouse_shape;
 
     // Only works in GUI mode.
-    if (!gui.in_use || gui.starting)
-	return;
+    إذا (!gui.دننه_use || gui.starting)
+	أرجع;
 
     // Postpone the updating when more is to come.  Speeds up executing of
     // mappings.
-    if (shape_idx == -1 && char_avail())
+    إذا (shape_idx == -1 && char_avail())
     {
 	postponed_mouseshape = TRUE;
-	return;
+	أرجع;
     }
 
     // When ignoring the mouse don't change shape on the statusline.
-    if (*p_mouse == NUL
+    إذا (*p_mouse == NUL
 	    && (shape_idx == SHAPE_IDX_CLINE
-		|| shape_idx == SHAPE_IDX_STATUS
+		|| shape_idx == SHAPE_IDX_حالت
 		|| shape_idx == SHAPE_IDX_VSEP))
 	shape_idx = -2;
 
-    if (shape_idx == -2
-	    && current_mouse_shape != shape_table[SHAPE_IDX_CLINE].mshape
-	    && current_mouse_shape != shape_table[SHAPE_IDX_STATUS].mshape
-	    && current_mouse_shape != shape_table[SHAPE_IDX_VSEP].mshape)
-	return;
-    if (shape_idx < 0)
-	new_mouse_shape = shape_table[get_shape_idx(TRUE)].mshape;
-    else
-	new_mouse_shape = shape_table[shape_idx].mshape;
-    if (new_mouse_shape != current_mouse_shape)
+    إذا (shape_idx == -2
+	    && current_mouse_shape != shape_جدول[SHAPE_IDX_CLINE].mshape
+	    && current_mouse_shape != shape_جدول[SHAPE_IDX_حالت].mshape
+	    && current_mouse_shape != shape_جدول[SHAPE_IDX_VSEP].mshape)
+	أرجع;
+    إذا (shape_idx < 0)
+	new_mouse_shape = shape_جدول[get_shape_idx(TRUE)].mshape;
+    وإلا
+	new_mouse_shape = shape_جدول[shape_idx].mshape;
+    إذا (new_mouse_shape != current_mouse_shape)
     {
-	mch_set_mouse_shape(new_mouse_shape);
+	mch_سېټ_mouse_shape(new_mouse_shape);
 	current_mouse_shape = new_mouse_shape;
     }
     postponed_mouseshape = FALSE;
 }
 # endif
 
-#endif // CURSOR_SHAPE
+#د_که_پای // CURSOR_SHAPE
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Mainly for tests: get the name of the current mouse shape.
  */
-    void
-f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_getmouseshape(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-# if defined(FEAT_MOUSESHAPE)
-    if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+    rettv->vval.v_string = عدم;
+# إذا defined(FEAT_MOUSESHAPE)
+    إذا (current_mouse_shape >= 0
+			      && current_mouse_shape < (صحيح)MSHAPE_نومونه_شمېر)
 	rettv->vval.v_string = vim_strnsave(
-				  mshape_names[current_mouse_shape].string,
-				  mshape_names[current_mouse_shape].length);
+				  mshape_نومونه[current_mouse_shape].string,
+				  mshape_نومونه[current_mouse_shape].اوږدتیا);
 # endif
 }
-#endif
+#د_که_پای
 
 
 
@@ -2544,23 +2544,23 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
  * Change directory to "new_dir".  Search 'cdpath' for relative directory
  * names.
  */
-    int
+    صحيح
 vim_chdir(char_u *new_dir)
 {
     char_u	*dir_name;
-    int		r;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    صحيح		r;
+    char_u	*file_منزل_پیدا_کړه = عدم;
+    حرف	*پلټنه_ctx = عدم;
 
-    dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
-    vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
-    if (dir_name == NULL)
-	return -1;
-    r = mch_chdir((char *)dir_name);
+    dir_name = پیدا_کړه_directory_دننه_لار(new_dir, (صحيح)STRLEN(new_dir),
+		     FNAME_MESS, curbuf->b_ffname, &file_منزل_پیدا_کړه, &پلټنه_ctx);
+    vim_free(file_منزل_پیدا_کړه);
+    vim_findfile_cleanup(پلټنه_ctx);
+    إذا (dir_name == عدم)
+	أرجع -1;
+    r = mch_chdir((حرف *)dir_name);
     vim_free(dir_name);
-    return r;
+    أرجع r;
 }
 
 /*
@@ -2570,71 +2570,71 @@ vim_chdir(char_u *new_dir)
  * cache the result.
  * Returns OK or FAIL.
  */
-    int
-get_user_name(char_u *buf, int len)
+    صحيح
+get_user_name(char_u *buf, صحيح len)
 {
-    if (username == NULL)
+    إذا (username == عدم)
     {
-	if (mch_get_user_name(buf, len) == FAIL)
-	    return FAIL;
+	إذا (mch_get_user_name(buf, len) == FAIL)
+	    أرجع FAIL;
 	username = vim_strsave(buf);
     }
-    else
+    وإلا
 	vim_strncpy(buf, username, len - 1);
-    return OK;
+    أرجع OK;
 }
 
-#if defined(EXITFREE)
+#إذا defined(EXITFREE)
 /*
  * Free the memory allocated by get_user_name()
  */
-    void
-free_username(void)
+    فراغ
+free_username(فراغ)
 {
     vim_free(username);
 }
-#endif
+#د_که_پای
 
-#if !defined(HAVE_QSORT) && !defined(PROTO)
+#إذا !defined(HAVE_QSORT) && !defined(PROTO)
 /*
  * Our own qsort(), for systems that don't have it.
  * It's simple and slow.  From the K&R C book.
  */
-    void
+    فراغ
 qsort(
-    void	*base,
-    size_t	elm_count,
-    size_t	elm_size,
-    int (*cmp)(const void *, const void *))
+    فراغ	*بنسټ,
+    size_t	elm_شمېر,
+    size_t	elm_اندازه,
+    صحيح (*cmp)(ثابت فراغ *, ثابت فراغ *))
 {
     char_u	*buf;
     char_u	*p1;
     char_u	*p2;
-    int		i, j;
-    int		gap;
+    صحيح		i, j;
+    صحيح		gap;
 
-    buf = alloc(elm_size);
-    if (buf == NULL)
-	return;
+    buf = alloc(elm_اندازه);
+    إذا (buf == عدم)
+	أرجع;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
-	    for (j = i - gap; j >= 0; j -= gap)
+    لكل (gap = elm_شمېر / 2; gap > 0; gap /= 2)
+	لكل (i = gap; i < elm_شمېر; ++i)
+	    لكل (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
-		p1 = (char_u *)base + j * elm_size;
-		p2 = (char_u *)base + (j + gap) * elm_size;
-		if ((*cmp)((void *)p1, (void *)p2) <= 0)
-		    break;
+		p1 = (char_u *)بنسټ + j * elm_اندازه;
+		p2 = (char_u *)بنسټ + (j + gap) * elm_اندازه;
+		إذا ((*cmp)((فراغ *)p1, (فراغ *)p2) <= 0)
+		    اكسر;
 		// Exchange the elements.
-		mch_memmove(buf, p1, elm_size);
-		mch_memmove(p1, p2, elm_size);
-		mch_memmove(p2, buf, elm_size);
+		mch_memmove(buf, p1, elm_اندازه);
+		mch_memmove(p1, p2, elm_اندازه);
+		mch_memmove(p2, buf, elm_اندازه);
 	    }
 
     vim_free(buf);
 }
-#endif
+#د_که_پای
 
 /*
  * The putenv() implementation below comes from the "screen" program.
@@ -2662,96 +2662,96 @@ qsort(
  *  (history removed, not very interesting.  See the "screen" sources.)
  */
 
-#if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
+#إذا !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
 
 # define EXTRASIZE 5		// increment to add to env. size
 
-static int  envsize = -1;	// current size of environment
-extern char **environ;		// the global which is your env.
+ساكن صحيح  envsize = -1;	// current size of environment
+خارجي حرف **environ;		// the global which is your env.
 
-static int  findenv(char *name); // look for a name in the env.
-static int  newenv(void);	// copy env. from stack to heap
-static int  moreenv(void);	// incr. size of env.
+ساكن صحيح  findenv(حرف *name); // look for a name in the env.
+ساكن صحيح  newenv(فراغ);	// copy env. from stack to heap
+ساكن صحيح  moreenv(فراغ);	// incr. size of env.
 
-    int
-putenv(const char *string)
+    صحيح
+putenv(ثابت حرف *string)
 {
-    int	    i;
-    char    *p;
+    صحيح	    i;
+    حرف    *p;
 
-    if (envsize < 0)
+    إذا (envsize < 0)
     {				// first time putenv called
-	if (newenv() < 0)	// copy env. to heap
-	    return -1;
+	إذا (newenv() < 0)	// copy env. to heap
+	    أرجع -1;
     }
 
-    i = findenv((char *)string); // look for name in environment
+    i = findenv((حرف *)string); // look for name in environment
 
-    if (i < 0)
+    إذا (i < 0)
     {				// name must be added
-	for (i = 0; environ[i]; i++);
-	if (i >= (envsize - 1))
+	لكل (i = 0; environ[i]; i++);
+	إذا (i >= (envsize - 1))
 	{			// need new slot
-	    if (moreenv() < 0)
-		return -1;
+	    إذا (moreenv() < 0)
+		أرجع -1;
 	}
-	p = alloc(strlen(string) + 1);
-	if (p == NULL)		// not enough core
-	    return -1;
+	p = alloc(مزي_اوږدوالی(string) + 1);
+	إذا (p == عدم)		// not enough core
+	    أرجع -1;
 	environ[i + 1] = 0;	// new end of env.
     }
-    else
+    وإلا
     {				// name already in env.
-	p = vim_realloc(environ[i], strlen(string) + 1);
-	if (p == NULL)
-	    return -1;
+	p = vim_realloc(environ[i], مزي_اوږدوالی(string) + 1);
+	إذا (p == عدم)
+	    أرجع -1;
     }
     sprintf(p, "%s", string);	// copy into env.
     environ[i] = p;
 
-    return 0;
+    أرجع 0;
 }
 
-    static int
-findenv(char *name)
+    ساكن صحيح
+findenv(حرف *name)
 {
-    char    *namechar, *envchar;
-    int	    i, found;
+    حرف    *namechar, *envchar;
+    صحيح	    i, وموندل;
 
-    found = 0;
-    for (i = 0; environ[i] && !found; i++)
+    وموندل = 0;
+    لكل (i = 0; environ[i] && !وموندل; i++)
     {
 	envchar = environ[i];
 	namechar = name;
-	while (*namechar && *namechar != '=' && (*namechar == *envchar))
+	طالما (*namechar && *namechar != '=' && (*namechar == *envchar))
 	{
 	    namechar++;
 	    envchar++;
 	}
-	found = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
+	وموندل = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
     }
-    return found ? i - 1 : -1;
+    أرجع وموندل ? i - 1 : -1;
 }
 
-    static int
-newenv(void)
+    ساكن صحيح
+newenv(فراغ)
 {
-    char    **env, *elem;
-    int	    i, esize;
+    حرف    **env, *elem;
+    صحيح	    i, esize;
 
-    for (i = 0; environ[i]; i++)
+    لكل (i = 0; environ[i]; i++)
 	;
 
     esize = i + EXTRASIZE + 1;
-    env = ALLOC_MULT(char *, esize);
-    if (env == NULL)
-	return -1;
+    env = ALLOC_MULT(حرف *, esize);
+    إذا (env == عدم)
+	أرجع -1;
 
-    for (i = 0; environ[i]; i++)
+    لكل (i = 0; environ[i]; i++)
     {
-	elem = alloc(strlen(environ[i]) + 1);
-	if (elem == NULL)
-	    return -1;
+	elem = alloc(مزي_اوږدوالی(environ[i]) + 1);
+	إذا (elem == عدم)
+	    أرجع -1;
 	env[i] = elem;
 	strcpy(elem, environ[i]);
     }
@@ -2759,22 +2759,22 @@ newenv(void)
     env[i] = 0;
     environ = env;
     envsize = esize;
-    return 0;
+    أرجع 0;
 }
 
-    static int
-moreenv(void)
+    ساكن صحيح
+moreenv(فراغ)
 {
-    int	    esize;
-    char    **env;
+    صحيح	    esize;
+    حرف    **env;
 
     esize = envsize + EXTRASIZE;
-    env = vim_realloc((char *)environ, esize * sizeof (*env));
-    if (env == 0)
-	return -1;
+    env = vim_realloc((حرف *)environ, esize * حجم (*env));
+    إذا (env == 0)
+	أرجع -1;
     environ = env;
     envsize = esize;
-    return 0;
+    أرجع 0;
 }
 
 # ifdef USE_VIMPTY_GETENV
@@ -2782,122 +2782,122 @@ moreenv(void)
  * Used for mch_getenv() for Mac.
  */
     char_u *
-vimpty_getenv(const char_u *string)
+vimpty_getenv(ثابت char_u *string)
 {
-    int i;
+    صحيح i;
     char_u *p;
 
-    if (envsize < 0)
-	return NULL;
+    إذا (envsize < 0)
+	أرجع عدم;
 
-    i = findenv((char *)string);
+    i = findenv((حرف *)string);
 
-    if (i < 0)
-	return NULL;
+    إذا (i < 0)
+	أرجع عدم;
 
     p = vim_strchr((char_u *)environ[i], '=');
-    return (p + 1);
+    أرجع (p + 1);
 }
 # endif
 
-#endif // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
+#د_که_پای // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#إذا defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    int
+    صحيح
 filewritable(char_u *fname)
 {
-    int		retval = 0;
-# if defined(UNIX) || defined(VMS)
-    int		perm = 0;
+    صحيح		retval = 0;
+# إذا defined(UNIX) || defined(VMS)
+    صحيح		perm = 0;
 # endif
 
-# if defined(UNIX) || defined(VMS)
+# إذا defined(UNIX) || defined(VMS)
     perm = mch_getperm(fname);
 # endif
-    if (
+    إذا (
 # ifdef MSWIN
 	    mch_writable(fname) &&
-# else
-#  if defined(UNIX) || defined(VMS)
+# وإلا
+#  إذا defined(UNIX) || defined(VMS)
 	    (perm & 0222) &&
 #  endif
 # endif
-	    mch_access((char *)fname, W_OK) == 0
+	    mch_access((حرف *)fname, W_OK) == 0
        )
     {
 	++retval;
-	if (mch_isdir(fname))
+	إذا (mch_isdir(fname))
 	    ++retval;
     }
-    return retval;
+    أرجع retval;
 }
-#endif
+#د_که_پای
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#إذا defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 2 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    صحيح
 get2c(FILE *fd)
 {
-    int		c, n;
+    صحيح		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    إذا (n == EOF) أرجع -1;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    إذا (c == EOF) أرجع -1;
+    أرجع (n << 8) + c;
 }
 
 /*
  * Read 3 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    صحيح
 get3c(FILE *fd)
 {
-    int		c, n;
+    صحيح		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    إذا (n == EOF) أرجع -1;
     c = getc(fd);
-    if (c == EOF) return -1;
+    إذا (c == EOF) أرجع -1;
     n = (n << 8) + c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    إذا (c == EOF) أرجع -1;
+    أرجع (n << 8) + c;
 }
 
 /*
  * Read 4 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    صحيح
 get4c(FILE *fd)
 {
-    int		c;
+    صحيح		c;
     // Use unsigned rather than int otherwise result is undefined
     // when left-shift sets the MSB.
-    unsigned	n;
+    بینښه	n;
 
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (unsigned)c;
+    إذا (c == EOF) أرجع -1;
+    n = (بینښه)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
+    إذا (c == EOF) أرجع -1;
+    n = (n << 8) + (بینښه)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
+    إذا (c == EOF) أرجع -1;
+    n = (n << 8) + (بینښه)c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    n = (n << 8) + (unsigned)c;
-    return (int)n;
+    إذا (c == EOF) أرجع -1;
+    n = (n << 8) + (بینښه)c;
+    أرجع (صحيح)n;
 }
 
 /*
@@ -2905,61 +2905,61 @@ get4c(FILE *fd)
  * Returns NULL when out of memory or unable to read that many bytes.
  */
     char_u *
-read_string(FILE *fd, int cnt)
+read_string(FILE *fd, صحيح cnt)
 {
     char_u	*str;
-    int		i;
-    int		c;
+    صحيح		i;
+    صحيح		c;
 
     // allocate memory
     str = alloc(cnt + 1);
-    if (str == NULL)
-	return NULL;
+    إذا (str == عدم)
+	أرجع عدم;
 
     // Read the string.  Quit when running into the EOF.
-    for (i = 0; i < cnt; ++i)
+    لكل (i = 0; i < cnt; ++i)
     {
 	c = getc(fd);
-	if (c == EOF)
+	إذا (c == EOF)
 	{
 	    vim_free(str);
-	    return NULL;
+	    أرجع عدم;
 	}
 	str[i] = c;
     }
     str[i] = NUL;
-    return str;
+    أرجع str;
 }
 
 /*
  * Write a number to file "fd", MSB first, in "len" bytes.
  */
-    int
-put_bytes(FILE *fd, long_u nr, int len)
+    صحيح
+put_بایټونه(FILE *fd, long_u nr, صحيح len)
 {
-    int	    i;
+    صحيح	    i;
 
-    for (i = len - 1; i >= 0; --i)
-	if (putc((int)(nr >> (i * 8)), fd) == EOF)
-	    return FAIL;
-    return OK;
+    لكل (i = len - 1; i >= 0; --i)
+	إذا (putc((صحيح)(nr >> (i * 8)), fd) == EOF)
+	    أرجع FAIL;
+    أرجع OK;
 }
 
-#endif
+#د_که_پای
 
-#ifndef PROTO  // proto is defined in vim.h
+#که_نه_تعریف_شوی PROTO  // proto is defined in vim.h
 # ifdef ELAPSED_TIMEVAL
 /*
  * Return time in msec since "start_tv".
  */
-    long
-elapsed(struct timeval *start_tv)
+    اوږد
+elapsed(بنية timeval *پیل_tv)
 {
-    struct timeval  now_tv;
+    بنية timeval  now_tv;
 
-    gettimeofday(&now_tv, NULL);
-    return (now_tv.tv_sec - start_tv->tv_sec) * 1000L
-	 + (now_tv.tv_usec - start_tv->tv_usec) / 1000L;
+    gettimeofday(&now_tv, عدم);
+    أرجع (now_tv.tv_sec - پیل_tv->tv_sec) * 1000L
+	 + (now_tv.tv_usec - پیل_tv->tv_usec) / 1000L;
 }
 # endif
 
@@ -2967,17 +2967,17 @@ elapsed(struct timeval *start_tv)
 /*
  * Return time in msec since "start_tick".
  */
-    long
-elapsed(DWORD start_tick)
+    اوږد
+elapsed(DWORD پیل_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_شمېر();
 
-    return (long)now - (long)start_tick;
+    أرجع (اوږد)now - (اوږد)پیل_tick;
 }
 # endif
-#endif
+#د_که_پای
 
-#if defined(FEAT_JOB_CHANNEL) \
+#إذا defined(FEAT_دنده_CHANNEL) \
 	|| (defined(UNIX) && (!defined(USE_SYSTEM) \
 	|| (defined(FEAT_GUI) && defined(FEAT_TERMINAL))))
 /*
@@ -2985,79 +2985,79 @@ elapsed(DWORD start_tick)
  * "argv" is an allocated array with "argc" entries and room for 4 more.
  * Returns FAIL when out of memory.
  */
-    int
-mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
+    صحيح
+mch_parse_cmd(char_u *cmd, صحيح use_shcf, حرف ***argv, صحيح *argc)
 {
-    int		i;
+    صحيح		i;
     char_u	*p, *d;
-    int		inquote;
+    صحيح		inquote;
 
     /*
      * Do this loop twice:
      * 1: find number of arguments
      * 2: separate them and build argv[]
      */
-    for (i = 1; i <= 2; ++i)
+    لكل (i = 1; i <= 2; ++i)
     {
 	p = skipwhite(cmd);
 	inquote = FALSE;
 	*argc = 0;
-	while (*p != NUL)
+	طالما (*p != NUL)
 	{
-	    if (i == 2)
-		(*argv)[*argc] = (char *)p;
+	    إذا (i == 2)
+		(*argv)[*argc] = (حرف *)p;
 	    ++*argc;
 	    d = p;
-	    while (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
+	    طالما (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
 	    {
-		if (p[0] == '"')
+		إذا (p[0] == '"')
 		    // quotes surrounding an argument and are dropped
 		    inquote = !inquote;
-		else
+		وإلا
 		{
-		    if (rem_backslash(p))
+		    إذا (rem_backslash(p))
 		    {
 			// First pass: skip over "\ " and "\"".
 			// Second pass: Remove the backslash.
 			++p;
 		    }
-		    if (i == 2)
+		    إذا (i == 2)
 			*d++ = *p;
 		}
 		++p;
 	    }
-	    if (*p == NUL)
+	    إذا (*p == NUL)
 	    {
-		if (i == 2)
+		إذا (i == 2)
 		    *d++ = NUL;
-		break;
+		اكسر;
 	    }
-	    if (i == 2)
+	    إذا (i == 2)
 		*d++ = NUL;
 	    p = skipwhite(p + 1);
 	}
-	if (*argv == NULL)
+	إذا (*argv == عدم)
 	{
-	    if (use_shcf)
+	    إذا (use_shcf)
 	    {
 		// Account for possible multiple args in p_shcf.
 		p = p_shcf;
-		for (;;)
+		لكل (;;)
 		{
 		    p = skiptowhite(p);
-		    if (*p == NUL)
-			break;
+		    إذا (*p == NUL)
+			اكسر;
 		    ++*argc;
 		    p = skipwhite(p);
 		}
 	    }
 
-	    *argv = ALLOC_MULT(char *, *argc + 4);
-	    if (*argv == NULL)	    // out of memory
-		return FAIL;
+	    *argv = ALLOC_MULT(حرف *, *argc + 4);
+	    إذا (*argv == عدم)	    // out of memory
+		أرجع FAIL;
 	}
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -3065,65 +3065,65 @@ mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_string(char_u *cmd, char ***argv, int *argc)
+    صحيح
+build_argv_from_string(char_u *cmd, حرف ***argv, صحيح *argc)
 {
     char_u	*cmd_copy;
-    int		i;
+    صحيح		i;
 
     // Make a copy, parsing will modify "cmd".
     cmd_copy = vim_strsave(cmd);
-    if (cmd_copy == NULL
+    إذا (cmd_copy == عدم
 	    || mch_parse_cmd(cmd_copy, FALSE, argv, argc) == FAIL)
     {
 	vim_free(cmd_copy);
-	return FAIL;
+	أرجع FAIL;
     }
-    for (i = 0; i < *argc; i++)
-	(*argv)[i] = (char *)vim_strsave((char_u *)(*argv)[i]);
-    (*argv)[*argc] = NULL;
+    لكل (i = 0; i < *argc; i++)
+	(*argv)[i] = (حرف *)vim_strsave((char_u *)(*argv)[i]);
+    (*argv)[*argc] = عدم;
     vim_free(cmd_copy);
-    return OK;
+    أرجع OK;
 }
 
-#endif
+#د_که_پای
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Build "argv[argc]" from the list "l".
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_list(list_T *l, char ***argv, int *argc)
+    صحيح
+build_argv_from_list(list_T *l, حرف ***argv, صحيح *argc)
 {
     listitem_T  *li;
     char_u	*s;
 
     // Pass argv[] to mch_call_shell().
-    *argv = ALLOC_MULT(char *, l->lv_len + 1);
-    if (*argv == NULL)
-	return FAIL;
+    *argv = ALLOC_MULT(حرف *, l->lv_len + 1);
+    إذا (*argv == عدم)
+	أرجع FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_توکي(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
+	إذا (s == عدم)
 	{
-	    int i;
+	    صحيح i;
 
-	    for (i = 0; i < *argc; ++i)
+	    لكل (i = 0; i < *argc; ++i)
 		VIM_CLEAR((*argv)[i]);
-	    (*argv)[0] = NULL;
-	    return FAIL;
+	    (*argv)[0] = عدم;
+	    أرجع FAIL;
 	}
-	(*argv)[*argc] = (char *)vim_strsave(s);
+	(*argv)[*argc] = (حرف *)vim_strsave(s);
 	*argc += 1;
     }
-    (*argv)[*argc] = NULL;
-    return OK;
+    (*argv)[*argc] = عدم;
+    أرجع OK;
 }
-#endif
+#د_که_پای
 
 /*
  * Change the behavior of vterm.
@@ -3134,58 +3134,58 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
  *      Use the wrong result because each result is different.
  * 3: Windows 10 insider preview (current latest logic)
  */
-    int
-get_special_pty_type(void)
+    صحيح
+get_special_pty_type(فراغ)
 {
-#ifdef MSWIN
-    return get_conpty_type();
-#else
-    return 0;
-#endif
+#که_تعریف_شوی MSWIN
+    أرجع get_conpty_type();
+#وإلا
+    أرجع 0;
+#د_که_پای
 }
 
 // compare two keyvalue_T structs by case sensitive value
-    int
-cmp_keyvalue_value(const void *a, const void *b)
+    صحيح
+cmp_keyvalue_ارزښت(ثابت فراغ *a, ثابت فراغ *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    أرجع STRCMP(kv1->ارزښت.string, kv2->ارزښت.string);
 }
 
 // compare two keyvalue_T structs by value with length
-    int
-cmp_keyvalue_value_n(const void *a, const void *b)
+    صحيح
+cmp_keyvalue_ارزښت_n(ثابت فراغ *a, ثابت فراغ *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    أرجع STRNCMP(kv1->ارزښت.string, kv2->ارزښت.string, MAX(kv1->ارزښت.اوږدتیا,
+		kv2->ارزښت.اوږدتیا));
 }
 
 // compare two keyvalue_T structs by case insensitive value
-    int
-cmp_keyvalue_value_i(const void *a, const void *b)
+    صحيح
+cmp_keyvalue_ارزښت_i(ثابت فراغ *a, ثابت فراغ *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    أرجع STRICMP(kv1->ارزښت.string, kv2->ارزښت.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
-    int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+    صحيح
+cmp_keyvalue_ارزښت_ni(ثابت فراغ *a, ثابت فراغ *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    أرجع vim_strnicmp_asc((حرف *)kv1->ارزښت.string,
+	    (حرف *)kv2->ارزښت.string, MAX(kv1->ارزښت.اوږدتیا,
+		    kv2->ارزښت.اوږدتیا));
 }
 
 /*
@@ -3195,146 +3195,146 @@ cmp_keyvalue_value_ni(const void *a, const void *b)
  *  - Each pair of blocks is merged in sorted order.
  *  - Merged blocks are reconnected to build the sorted list.
  */
-    void *
+    فراغ *
 mergesort_list(
-    void	*head,
-    void	*(*get_next)(void *),
-    void	(*set_next)(void *, void *),
-    void	*(*get_prev)(void *),
-    void	(*set_prev)(void *, void *),
-    int		(*compare)(const void *, const void *))
+    فراغ	*سر,
+    فراغ	*(*get_بل)(فراغ *),
+    فراغ	(*سېټ_بل)(فراغ *, فراغ *),
+    فراغ	*(*get_prev)(فراغ *),
+    فراغ	(*سېټ_prev)(فراغ *, فراغ *),
+    صحيح		(*compare)(ثابت فراغ *, ثابت فراغ *))
 {
-    if (!head || !get_next(head))
-	return head;
+    إذا (!سر || !get_بل(سر))
+	أرجع سر;
 
     // Count length
-    int	    n = 0;
-    void*   curr = head;
-    while (curr)
+    صحيح	    n = 0;
+    فراغ*   curr = سر;
+    طالما (curr)
     {
 	n++;
-	curr = get_next(curr);
+	curr = get_بل(curr);
     }
 
-    int	size;
-    for (size = 1; size < n; size *= 2)
+    صحيح	اندازه;
+    لكل (اندازه = 1; اندازه < n; اندازه *= 2)
     {
-	void*	new_head = NULL;
-	void*	tail = NULL;
-	curr = head;
+	فراغ*	new_سر = عدم;
+	فراغ*	لکۍ = عدم;
+	curr = سر;
 
-	while (curr)
+	طالما (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
-	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    فراغ    *کیڼ_2 = curr;
+	    فراغ    *ښی_2 = کیڼ_2;
+	    صحيح	    i;
+	    لكل (i = 0; i < اندازه && ښی_2; ++i)
+		ښی_2 = get_بل(ښی_2);
 
-	    void    *next = right;
-	    for (i = 0; i < size && next; ++i)
-		next = get_next(next);
+	    فراغ    *بل = ښی_2;
+	    لكل (i = 0; i < اندازه && بل; ++i)
+		بل = get_بل(بل);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
-	    if (l_end)
-		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    فراغ    *l_پای_ټکی = ښی_2 ? get_prev(ښی_2) : عدم;
+	    إذا (l_پای_ټکی)
+		سېټ_بل(l_پای_ټکی, عدم);
+	    إذا (ښی_2)
+		سېټ_prev(ښی_2, عدم);
 
-	    void    *r_end = next ? get_prev(next) : NULL;
-	    if (r_end)
-		set_next(r_end, NULL);
-	    if (next)
-		set_prev(next, NULL);
+	    فراغ    *r_پای_ټکی = بل ? get_prev(بل) : عدم;
+	    إذا (r_پای_ټکی)
+		سېټ_بل(r_پای_ټکی, عدم);
+	    إذا (بل)
+		سېټ_prev(بل, عدم);
 
-	    // Merge
-	    void    *merged = NULL;
-	    void    *merged_tail = NULL;
+	    //یوځای
+	    فراغ    *merged = عدم;
+	    فراغ    *merged_لکۍ = عدم;
 
-	    while (left || right)
+	    طالما (کیڼ_2 || ښی_2)
 	    {
-		void	*chosen = NULL;
-		if (!left)
+		فراغ	*chosen = عدم;
+		إذا (!کیڼ_2)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = ښی_2;
+		    ښی_2 = get_بل(ښی_2);
 		}
-		else if (!right)
+		وإلا إذا (!ښی_2)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = کیڼ_2;
+		    کیڼ_2 = get_بل(کیڼ_2);
 		}
-		else if (compare(left, right) <= 0)
+		وإلا إذا (compare(کیڼ_2, ښی_2) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = کیڼ_2;
+		    کیڼ_2 = get_بل(کیڼ_2);
 		}
-		else
+		وإلا
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = ښی_2;
+		    ښی_2 = get_بل(ښی_2);
 		}
 
-		if (merged_tail)
+		إذا (merged_لکۍ)
 		{
-		    set_next(merged_tail, chosen);
-		    set_prev(chosen, merged_tail);
-		    merged_tail = chosen;
+		    سېټ_بل(merged_لکۍ, chosen);
+		    سېټ_prev(chosen, merged_لکۍ);
+		    merged_لکۍ = chosen;
 		}
-		else
+		وإلا
 		{
-		    merged = merged_tail = chosen;
-		    set_prev(chosen, NULL);
+		    merged = merged_لکۍ = chosen;
+		    سېټ_prev(chosen, عدم);
 		}
 	    }
 
 	    // Connect to full list
-	    if (!new_head)
-		new_head = merged;
-	    else
+	    إذا (!new_سر)
+		new_سر = merged;
+	    وإلا
 	    {
-		set_next(tail, merged);
-		set_prev(merged, tail);
+		سېټ_بل(لکۍ, merged);
+		سېټ_prev(merged, لکۍ);
 	    }
 
 	    // Move tail to end
-	    while (get_next(merged_tail))
-		merged_tail = get_next(merged_tail);
-	    tail = merged_tail;
+	    طالما (get_بل(merged_لکۍ))
+		merged_لکۍ = get_بل(merged_لکۍ);
+	    لکۍ = merged_لکۍ;
 
-	    curr = next;
+	    curr = بل;
 	}
 
-	head = new_head;
+	سر = new_سر;
     }
 
-    return head;
+    أرجع سر;
 }
 
-static const char_u base64_table[] =
+ساكن ثابت char_u base64_جدول[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static char_u base64_dec_table[256];
+ساكن char_u base64_dec_جدول[256];
 
-#define BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
+#تعریف_کړه BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
 
 /*
  * Initialize the base64 decoding table
  */
-    static void
-init_base64_dec_table(void)
+    ساكن فراغ
+init_base64_dec_جدول(فراغ)
 {
-    static int base64_dec_tbl_initialized = FALSE;
+    ساكن صحيح base64_dec_tbl_initialized = FALSE;
 
-    if (base64_dec_tbl_initialized)
-	return;
+    إذا (base64_dec_tbl_initialized)
+	أرجع;
 
-    vim_memset(base64_dec_table, 0xFF, sizeof(base64_dec_table));
-    for (size_t i = 0; i < sizeof(base64_table) - 1; i++)
-	base64_dec_table[(char_u)base64_table[i]] = (char_u)i;
-    base64_dec_table['='] = 0;
+    vim_memset(base64_dec_جدول, 0xFF, حجم(base64_dec_جدول));
+    لكل (size_t i = 0; i < حجم(base64_جدول) - 1; i++)
+	base64_dec_جدول[(char_u)base64_جدول[i]] = (char_u)i;
+    base64_dec_جدول['='] = 0;
 
     base64_dec_tbl_initialized = TRUE;
 }
@@ -3344,33 +3344,33 @@ init_base64_dec_table(void)
  * at least BASE64_ENCODED_LEN(len) bytes (NUL terminated). Returns the number
  * of bytes written, excluding the NUL.
  */
-    long
-base64_encode_buf(char_u *dst, const char_u *src, size_t len)
+    اوږد
+base64_encode_buf(char_u *dst, ثابت char_u *src, size_t len)
 {
     size_t i, j;
 
-    for (i = 0, j = 0; i < len;)
+    لكل (i = 0, j = 0; i < len;)
     {
-	size_t remaining = len - i;
+	size_t پاتې_شوی = len - i;
 
 	int_u octet_a = src[i++];
-	int_u octet_b = remaining > 1 ? src[i++] : 0;
-	int_u octet_c = remaining > 2 ? src[i++] : 0;
+	int_u octet_b = پاتې_شوی > 1 ? src[i++] : 0;
+	int_u octet_c = پاتې_شوی > 2 ? src[i++] : 0;
 
 	int_u triple = (octet_a << 16) | (octet_b << 8) | octet_c;
 
-	dst[j++] = base64_table[(triple >> 18) & 0x3F];
-	dst[j++] = base64_table[(triple >> 12) & 0x3F];
-	dst[j++] = remaining > 1
-	    ? base64_table[(triple >> 6) & 0x3F]
+	dst[j++] = base64_جدول[(triple >> 18) & 0x3F];
+	dst[j++] = base64_جدول[(triple >> 12) & 0x3F];
+	dst[j++] = پاتې_شوی > 1
+	    ? base64_جدول[(triple >> 6) & 0x3F]
 	    : '=';
-	dst[j++] = remaining > 2
-	    ? base64_table[triple & 0x3F]
+	dst[j++] = پاتې_شوی > 2
+	    ? base64_جدول[triple & 0x3F]
 	    : '=';
     }
 
     dst[j] = NUL;
-    return (long)j;
+    أرجع (اوږد)j;
 }
 
 /*
@@ -3378,14 +3378,14 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
  * NULL on OOM.  Caller frees with vim_free().
  */
     char_u *
-base64_encode(const char_u *data, size_t len)
+base64_encode(ثابت char_u *معلومات, size_t len)
 {
     char_u *encoded = alloc(BASE64_ENCODED_LEN(len));
 
-    if (encoded == NULL)
-	return NULL;
-    base64_encode_buf(encoded, data, len);
-    return encoded;
+    إذا (encoded == عدم)
+	أرجع عدم;
+    base64_encode_buf(encoded, معلومات, len);
+    أرجع encoded;
 }
 
 /*
@@ -3393,71 +3393,71 @@ base64_encode(const char_u *data, size_t len)
  * "out" (appended byte-by-byte, e.g. a blob's bv_ga). Returns OK on success and
  * FAIL on failure.
  */
-    int
-base64_decode(const char_u *data, size_t len, garray_T *out)
+    صحيح
+base64_decode(ثابت char_u *معلومات, size_t len, garray_T *بهر)
 {
-    if (len == 0)
-	return OK;
+    إذا (len == 0)
+	أرجع OK;
 
-    if (len % 4 != 0)
+    إذا (len % 4 != 0)
     {
-	semsg(_(e_invalid_argument_str), data);
-	return FAIL;
+	semsg(_(e_invalid_دلیل_str), معلومات);
+	أرجع FAIL;
     }
 
-    init_base64_dec_table();
+    init_base64_dec_جدول();
 
     size_t decoded_len = (len / 4) * 3;
-    if (data[len - 1] == '=')
+    إذا (معلومات[len - 1] == '=')
 	decoded_len--;
-    if (data[len - 2] == '=')
+    إذا (معلومات[len - 2] == '=')
 	decoded_len--;
 
     size_t i, j;
-    for (i = 0, j = 0; i < len;)
+    لكل (i = 0, j = 0; i < len;)
     {
-	int_u sextet_a = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_b = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_c = base64_dec_table[(char_u)data[i++]];
-	int_u sextet_d = base64_dec_table[(char_u)data[i++]];
+	int_u sextet_a = base64_dec_جدول[(char_u)معلومات[i++]];
+	int_u sextet_b = base64_dec_جدول[(char_u)معلومات[i++]];
+	int_u sextet_c = base64_dec_جدول[(char_u)معلومات[i++]];
+	int_u sextet_d = base64_dec_جدول[(char_u)معلومات[i++]];
 
-	if (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
+	إذا (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
 							|| sextet_d == 0xFF)
 	{
-	    semsg(_(e_invalid_argument_str), data);
-	    ga_clear(out);
-	    return FAIL;
+	    semsg(_(e_invalid_دلیل_str), معلومات);
+	    ga_clear(بهر);
+	    أرجع FAIL;
 	}
 
 	int_u triple = (sextet_a << 18) | (sextet_b << 12)
 						| (sextet_c << 6) | sextet_d;
 
-	if (j < decoded_len)
+	إذا (j < decoded_len)
 	{
-	    ga_append(out, (triple >> 16) & 0xFF);
+	    ga_append(بهر, (triple >> 16) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	إذا (j < decoded_len)
 	{
-	    ga_append(out, (triple >> 8) & 0xFF);
+	    ga_append(بهر, (triple >> 8) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	إذا (j < decoded_len)
 	{
-	    ga_append(out, triple & 0xFF);
+	    ga_append(بهر, triple & 0xFF);
 	    j++;
 	}
 
-	if (j == decoded_len)
+	إذا (j == decoded_len)
 	{
-	    if ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
-		|| ((data[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
+	    إذا ((معلومات[len - 2] == '=' && ((sextet_b & 0xF) != 0))
+		|| ((معلومات[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
 	    {
-		semsg(_(e_invalid_argument_str), data);
-		ga_clear(out);
-		return FAIL;
+		semsg(_(e_invalid_دلیل_str), معلومات);
+		ga_clear(بهر);
+		أرجع FAIL;
 	    }
 	}
     }
-    return OK;
+    أرجع OK;
 }

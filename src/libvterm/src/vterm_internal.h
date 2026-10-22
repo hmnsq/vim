@@ -1,175 +1,175 @@
-#ifndef __VTERM_INTERNAL_H__
-#define __VTERM_INTERNAL_H__
+#که_نه_تعریف_شوی __VTERM_INTERNAL_H__
+#تعریف_کړه __VTERM_INTERNAL_H__
 
-#include "vterm.h"
+#ضمن "vterm.h"
 
-#include <stdarg.h>
+#ضمن <stdarg.h>
 
-#if defined(__GNUC__) && !defined(__MINGW32__)
-# define INTERNAL __attribute__((visibility("internal")))
-#else
-# define INTERNAL
-#endif
+#إذا defined(__GNUC__) && !defined(__MINGW32__)
+# define دننی __attribute__((visibility("internal")))
+#وإلا
+# define دننی
+#د_که_پای
 
-#if defined(__GNUC__) || defined(__MINGW32__)
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#إذا defined(__GNUC__) || defined(__MINGW32__)
+# define ناکارول_شوی __attribute__((ناکارول_شوی_2))
+#وإلا
+# define ناکارول_شوی
+#د_که_پای
 
-#ifdef DEBUG
+#که_تعریف_شوی DEBUG
 # define DEBUG_LOG(s) fprintf(stderr, s)
 # define DEBUG_LOG1(s, a) fprintf(stderr, s, a)
 # define DEBUG_LOG2(s, a, b) fprintf(stderr, s, a, b)
 # define DEBUG_LOG3(s, a, b, c) fprintf(stderr, s, a, b, c)
-#else
+#وإلا
 # define DEBUG_LOG(s)
 # define DEBUG_LOG1(s, a)
 # define DEBUG_LOG2(s, a, b)
 # define DEBUG_LOG3(s, a, b, c)
-#endif
+#د_که_پای
 
-#define ESC_S "\x1b"
+#تعریف_کړه ESC_S "\x1b"
 
-#define INTERMED_MAX 16
+#تعریف_کړه INTERMED_MAX 16
 
-#define CSI_ARGS_MAX 16
-#define CSI_LEADER_MAX 16
+#تعریف_کړه CSI_دلیلونه_MAX 16
+#تعریف_کړه CSI_LEADER_MAX 16
 
-#define BUFIDX_PRIMARY   0
-#define BUFIDX_ALTSCREEN 1
+#تعریف_کړه BUFIDX_PRIMARY   0
+#تعریف_کړه BUFIDX_ALTSCREEN 1
 
-typedef struct VTermEncoding VTermEncoding;
+تعريفنوع بنية VTermEncoding VTermEncoding;
 
-typedef struct {
+تعريفنوع بنية {
   VTermEncoding *enc;
 
   // This size should be increased if required by other stateful encodings
-  char           data[4*sizeof(uint32_t)];
+  حرف           معلومات[4*حجم(uint32_t)];
 } VTermEncodingInstance;
 
-struct VTermPen
+بنية VTermPen
 {
   VTermColor fg;
   VTermColor bg;
-  unsigned int bold:1;
-  unsigned int underline:2;
-  unsigned int italic:1;
-  unsigned int blink:1;
-  unsigned int reverse:1;
-  unsigned int conceal:1;
-  unsigned int strike:1;
-  unsigned int font:4; /* To store 0-9 */
-  unsigned int small:1;
-  unsigned int baseline:2;
+  بینښه صحيح bold:1;
+  بینښه صحيح underline:2;
+  بینښه صحيح italic:1;
+  بینښه صحيح blink:1;
+  بینښه صحيح سرچپه:1;
+  بینښه صحيح conceal:1;
+  بینښه صحيح strike:1;
+  بینښه صحيح font:4; /* To store 0-9 */
+  بینښه صحيح small:1;
+  بینښه صحيح baseline:2;
 };
 
-struct VTermState
+بنية VTermState
 {
   VTerm *vt;
 
-  const VTermStateCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_premove;
+  ثابت VTermStateCallbacks *callbacks;
+  فراغ *cbdata;
+  صحيح callbacks_has_premove;
 
-  const VTermStateFallbacks *fallbacks;
-  void *fbdata;
+  ثابت VTermStateFallbacks *fallbacks;
+  فراغ *fbdata;
 
-  int rows;
-  int cols;
+  صحيح لیکې_2;
+  صحيح ستون_شمېر;
 
   /* Current cursor position */
   VTermPos pos;
 
-  int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
+  صحيح at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
-  int scrollregion_bottom; /* -1 means unbounded */
-#define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
-#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
-#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
+  صحيح scrollregion_سر;
+  صحيح scrollregion_bottom; /* -1 means unbounded */
+#تعریف_کړه SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->لیکې_2)
+  صحيح scrollregion_کیڼ;
+#تعریف_کړه SCROLLREGION_کیڼ(state)  ((state)->ډېرپېښ.leftrightmargin ? (state)->scrollregion_کیڼ : 0)
+  صحيح scrollregion_ښی; /* -1 means unbounded */
+#تعریف_کړه SCROLLREGION_ښی(state) ((state)->ډېرپېښ.leftrightmargin && (state)->scrollregion_ښی > -1 ? (state)->scrollregion_ښی : (state)->ستون_شمېر)
 
   /* Bitvector of tab stops */
-  unsigned char *tabstops;
+  بینښه حرف *tabstops;
 
   /* Primary and Altscreen; lineinfos[1] is lazily allocated as needed */
-  VTermLineInfo *lineinfos[2];
+  VTerm_کرښه_Info *lineinfos[2];
 
   /* lineinfo will == lineinfos[0] or lineinfos[1], depending on altscreen */
-  VTermLineInfo *lineinfo;
-#define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
-#define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
+  VTerm_کرښه_Info *lineinfo;
+#تعریف_کړه ROWWIDTH(state,لیکه) ((state)->lineinfo[(لیکه)].doublewidth ? ((state)->ستون_شمېر / 2) : (state)->ستون_شمېر)
+#تعریف_کړه THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.لیکه)
 
   /* Mouse state */
-  int mouse_col, mouse_row;
-  int mouse_buttons;
-  int mouse_flags;
+  صحيح mouse_ستون, mouse_لیکه;
+  صحيح mouse_buttons;
+  صحيح mouse_flags;
 
-  enum { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
+  تعداد { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
 
   /* Last glyph output, for Unicode recombining purposes */
   uint32_t *combine_chars;
-  size_t combine_chars_size; // Number of ELEMENTS in the above
-  int combine_width; // The width of the glyph above
+  size_t combine_chars_اندازه; // Number of ELEMENTS in the above
+  صحيح combine_پلنوالی; // The width of the glyph above
   VTermPos combine_pos;   // Position before movement
 
-  struct {
-    unsigned int keypad:1;
-    unsigned int cursor:1;
-    unsigned int autowrap:1;
-    unsigned int insert:1;
-    unsigned int newline:1;
-    unsigned int cursor_visible:1;
-    unsigned int cursor_blink:1;
-    unsigned int cursor_shape:2;
-    unsigned int alt_screen:1;
-    unsigned int origin:1;
-    unsigned int screen:1;
-    unsigned int leftrightmargin:1;
-    unsigned int bracketpaste:1;
-    unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
-    unsigned int kitty_keyboard:1;
-  } mode;
+  بنية {
+    بینښه صحيح keypad:1;
+    بینښه صحيح cursor:1;
+    بینښه صحيح autowrap:1;
+    بینښه صحيح ورننباسه:1;
+    بینښه صحيح newline:1;
+    بینښه صحيح cursor_visible:1;
+    بینښه صحيح cursor_blink:1;
+    بینښه صحيح cursor_shape:2;
+    بینښه صحيح alt_screen:1;
+    بینښه صحيح origin:1;
+    بینښه صحيح screen:1;
+    بینښه صحيح leftrightmargin:1;
+    بینښه صحيح bracketpaste:1;
+    بینښه صحيح report_focus:1;
+    بینښه صحيح modify_other_کلیګانې:1;
+    بینښه صحيح kitty_keyboard:1;
+  } ډېرپېښ;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set, gsingle_set;
+  صحيح gl_سېټ, gr_سېټ, gsingle_سېټ;
 
-  struct VTermPen pen;
+  بنية VTermPen pen;
 
   VTermColor default_fg;
   VTermColor default_bg;
   VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
 
-  int bold_is_highbright;
+  صحيح bold_is_highbright;
 
-  unsigned int protected_cell : 1;
+  بینښه صحيح protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
-  struct {
+  بنية {
     VTermPos pos;
-    struct VTermPen pen;
+    بنية VTermPen pen;
 
-    struct {
-      unsigned int cursor_visible:1;
-      unsigned int cursor_blink:1;
-      unsigned int cursor_shape:2;
-    } mode;
+    بنية {
+      بینښه صحيح cursor_visible:1;
+      بینښه صحيح cursor_blink:1;
+      بینښه صحيح cursor_shape:2;
+    } ډېرپېښ;
   } saved;
 
   /* Temporary state for DECRQSS parsing */
-  union {
-    char decrqss[4];
-    struct {
-      uint16_t mask;
-      enum {
+  اتحاد {
+    حرف decrqss[4];
+    بنية {
+      uint16_t ماسک;
+      تعداد {
         SELECTION_INITIAL,
         SELECTION_SELECTED,
         SELECTION_QUERY,
-        SELECTION_SET_INITIAL,
-        SELECTION_SET,
+        SELECTION_سېټ_INITIAL,
+        SELECTION_سېټ,
         SELECTION_INVALID,
       } state : 8;
       uint32_t recvpartial;
@@ -177,32 +177,32 @@ struct VTermState
     } selection;
   } tmp;
 
-  struct {
-    const VTermSelectionCallbacks *callbacks;
-    void *user;
-    char *buffer;
+  بنية {
+    ثابت VTermSelectionCallbacks *callbacks;
+    فراغ *user;
+    حرف *بفر;
     size_t buflen;
   } selection;
 };
 
-struct VTerm
+بنية VTerm
 {
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  ثابت VTermAllocatorFunctions *allocator;
+  فراغ *allocdata;
 
-  int rows;
-  int cols;
+  صحيح لیکې_2;
+  صحيح ستون_شمېر;
 
-  struct {
-    unsigned int utf8:1;
-    unsigned int ctrl8bit:1;
-  } mode;
+  بنية {
+    بینښه صحيح utf8:1;
+    بینښه صحيح ctrl8bit:1;
+  } ډېرپېښ;
 
-  struct {
-    enum VTermParserState {
-      NORMAL,
+  بنية {
+    تعداد VTermParserState {
+      نورمال_2,
       CSI_LEADER,
-      CSI_ARGS,
+      CSI_دلیلونه,
       CSI_INTERMED,
       DCS_COMMAND,
       /* below here are the "string states" */
@@ -214,84 +214,84 @@ struct VTerm
       SOS,
     } state;
 
-    unsigned int in_esc : 1;
+    بینښه صحيح دننه_esc : 1;
 
-    int intermedlen;
-    char intermed[INTERMED_MAX];
+    صحيح intermedlen;
+    حرف intermed[INTERMED_MAX];
 
-    union {
-      struct {
-        int leaderlen;
-        char leader[CSI_LEADER_MAX];
+    اتحاد {
+      بنية {
+        صحيح leaderlen;
+        حرف leader[CSI_LEADER_MAX];
 
-        int argi;
-        long args[CSI_ARGS_MAX];
+        صحيح argi;
+        اوږد دلیلونه[CSI_دلیلونه_MAX];
       } csi;
-      struct {
-        int command;
+      بنية {
+        صحيح command;
       } osc;
-      struct {
-        int commandlen;
-        char command[CSI_LEADER_MAX];
+      بنية {
+        صحيح commandlen;
+        حرف command[CSI_LEADER_MAX];
       } dcs;
     } v;
 
-    const VTermParserCallbacks *callbacks;
-    void *cbdata;
+    ثابت VTermParserCallbacks *callbacks;
+    فراغ *cbdata;
 
-    int string_initial;
+    صحيح string_initial;
 
-    int emit_nul;
+    صحيح emit_nul;
   } parser;
 
   /* len == malloc()ed size; cur == number of valid bytes */
 
   VTermOutputCallback *outfunc;
-  void                *outdata;
+  فراغ                *outdata;
 
-  char  *outbuffer;
+  حرف  *outbuffer;
   size_t outbuffer_len;
   size_t outbuffer_cur;
 
-  char  *tmpbuffer;
+  حرف  *tmpbuffer;
   size_t tmpbuffer_len;
 
   VTermState *state;
   VTermScreen *screen;
 
-  int in_backspace;
+  صحيح دننه_backspace;
 };
 
-struct VTermEncoding {
-  void (*init) (VTermEncoding *enc, void *data);
-  void (*decode)(VTermEncoding *enc, void *data,
-                 uint32_t cp[], int *cpi, int cplen,
-                 const char bytes[], size_t *pos, size_t len);
+بنية VTermEncoding {
+  فراغ (*init) (VTermEncoding *enc, فراغ *معلومات);
+  فراغ (*decode)(VTermEncoding *enc, فراغ *معلومات,
+                 uint32_t cp[], صحيح *cpi, صحيح cplen,
+                 ثابت حرف بایټونه[], size_t *pos, size_t len);
 };
 
-typedef enum {
+تعريفنوع تعداد {
   ENC_UTF8,
   ENC_SINGLE_94
 } VTermEncodingType;
 
-void *vterm_allocator_malloc(VTerm *vt, size_t size);
-void  vterm_allocator_free(VTerm *vt, void *ptr);
+فراغ *vterm_allocator_malloc(VTerm *vt, size_t اندازه);
+فراغ  vterm_allocator_free(VTerm *vt, فراغ *ptr);
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
-void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+فراغ vterm_ټېل_output_بایټونه(VTerm *vt, ثابت حرف *بایټونه, size_t len);
+فراغ vterm_ټېل_output_vsprintf(VTerm *vt, ثابت حرف *format, va_list دلیلونه);
+فراغ vterm_ټېل_output_sprintf(VTerm *vt, ثابت حرف *format, ...);
+فراغ vterm_ټېل_output_sprintf_ctrl(VTerm *vt, بینښه حرف ctrl, ثابت حرف *fmt, ...);
+فراغ vterm_ټېل_output_sprintf_str(VTerm *vt, بینښه حرف ctrl, صحيح غړی, ثابت حرف *fmt, ...);
 
-void vterm_state_free(VTermState *state);
+فراغ vterm_state_free(VTermState *state);
 
-void vterm_state_newpen(VTermState *state);
-void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
-void vterm_state_savepen(VTermState *state, int save);
+فراغ vterm_state_newpen(VTermState *state);
+فراغ vterm_state_resetpen(VTermState *state);
+فراغ vterm_state_setpen(VTermState *state, ثابت اوږد دلیلونه[], صحيح argcount);
+صحيح  vterm_state_getpen(VTermState *state, اوږد دلیلونه[], صحيح argcount);
+فراغ vterm_state_savepen(VTermState *state, صحيح save);
 
-enum {
+تعداد {
   C1_SS3 = 0x8f,
   C1_DCS = 0x90,
   C1_CSI = 0x9b,
@@ -299,35 +299,35 @@ enum {
   C1_OSC = 0x9d,
 };
 
-void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
+فراغ vterm_state_ټېل_output_sprintf_CSI(VTermState *vts, ثابت حرف *format, ...);
 
-void vterm_screen_free(VTermScreen *screen);
+فراغ vterm_screen_free(VTermScreen *screen);
 
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation);
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, حرف designation);
 
-int vterm_unicode_width(uint32_t codepoint);
-int vterm_unicode_is_combining(uint32_t codepoint);
-int vterm_unicode_is_ambiguous(uint32_t codepoint);
-int vterm_get_special_pty_type(void);
+صحيح vterm_unicode_پلنوالی(uint32_t codepoint);
+صحيح vterm_unicode_is_combining(uint32_t codepoint);
+صحيح vterm_unicode_is_ambiguous(uint32_t codepoint);
+صحيح vterm_get_special_pty_type(فراغ);
 
-#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
-	|| defined(_ISOC99_SOURCE) || defined(_BSD_SOURCE)
+#إذا (defined(XOPEN_سرچینه) && XOPEN_سرچینه >= 500) \
+	|| defined(ISOC99_سرچینه) || defined(BSD_سرچینه)
 # undef VSNPRINTF
 # define VSNPRINTF vsnprintf
 # undef SNPRINTF
-#else
+#وإلا
 # ifdef VSNPRINTF
 // Use a provided vsnprintf() function.
-int VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
+صحيح VSNPRINTF(حرف *str, size_t str_m, ثابت حرف *fmt, va_list ap);
 # endif
 # ifdef SNPRINTF
 // Use a provided snprintf() function.
-int SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
+صحيح SNPRINTF(حرف *str, size_t str_m, ثابت حرف *fmt, ...);
 # endif
-#endif
-#ifndef SNPRINTF
+#د_که_پای
+#که_نه_تعریف_شوی SNPRINTF
 # define SNPRINTF snprintf
-#endif
+#د_که_پای
 
 
-#endif
+#د_که_پای

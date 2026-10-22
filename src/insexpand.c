@@ -11,49 +11,49 @@
  * insexpand.c: functions for Insert mode completion
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * Definitions used for CTRL-X submode.
  * Note: If you change CTRL-X submode, you must also maintain ctrl_x_msgs[] and
  * ctrl_x_mode_names[] below.
  */
-#define CTRL_X_WANT_IDENT	0x100
+#تعریف_کړه CTRL_X_WANT_IDENT	0x100
 
-#define CTRL_X_NORMAL		0  // CTRL-N CTRL-P completion, default
-#define CTRL_X_NOT_DEFINED_YET	1
-#define CTRL_X_SCROLL		2
-#define CTRL_X_WHOLE_LINE	3
-#define CTRL_X_FILES		4
-#define CTRL_X_TAGS		(5 + CTRL_X_WANT_IDENT)
-#define CTRL_X_PATH_PATTERNS	(6 + CTRL_X_WANT_IDENT)
-#define CTRL_X_PATH_DEFINES	(7 + CTRL_X_WANT_IDENT)
-#define CTRL_X_FINISHED		8
-#define CTRL_X_DICTIONARY	(9 + CTRL_X_WANT_IDENT)
-#define CTRL_X_THESAURUS	(10 + CTRL_X_WANT_IDENT)
-#define CTRL_X_CMDLINE		11
-#define CTRL_X_FUNCTION	12
-#define CTRL_X_OMNI		13
-#define CTRL_X_SPELL		14
-#define CTRL_X_LOCAL_MSG	15	// only used in "ctrl_x_msgs"
-#define CTRL_X_EVAL		16	// for builtin function complete()
-#define CTRL_X_CMDLINE_CTRL_X	17	// CTRL-X typed in CTRL_X_CMDLINE
-#define CTRL_X_REGISTER	18	// complete words from registers
+#تعریف_کړه CTRL_X_نورمال		0  // CTRL-N CTRL-P completion, default
+#تعریف_کړه CTRL_X_NOT_DEFINED_YET	1
+#تعریف_کړه CTRL_X_SCROLL		2
+#تعریف_کړه CTRL_X_ټولیز_کرښه	3
+#تعریف_کړه CTRL_X_FILES		4
+#تعریف_کړه CTRL_X_نښانونه		(5 + CTRL_X_WANT_IDENT)
+#تعریف_کړه CTRL_X_لار_PATTERNS	(6 + CTRL_X_WANT_IDENT)
+#تعریف_کړه CTRL_X_لار_تعریفوي	(7 + CTRL_X_WANT_IDENT)
+#تعریف_کړه CTRL_X_پای_ته_رسېدلی		8
+#تعریف_کړه CTRL_X_DICTIONARY	(9 + CTRL_X_WANT_IDENT)
+#تعریف_کړه CTRL_X_THESAURUS	(10 + CTRL_X_WANT_IDENT)
+#تعریف_کړه CTRL_X_CMDLINE		11
+#تعریف_کړه CTRL_X_FUNCTION	12
+#تعریف_کړه CTRL_X_OMNI		13
+#تعریف_کړه CTRL_X_SPELL		14
+#تعریف_کړه CTRL_X_LOCAL_پیغام	15	// only used in "ctrl_x_msgs"
+#تعریف_کړه CTRL_X_EVAL		16	// for builtin function complete()
+#تعریف_کړه CTRL_X_CMDLINE_CTRL_X	17	// CTRL-X typed in CTRL_X_CMDLINE
+#تعریف_کړه CTRL_X_ثبتوونکی	18	// complete words from registers
 
-#define CTRL_X_MSG(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
+#تعریف_کړه CTRL_X_پیغام(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
 
 // Message for CTRL-X mode, index is ctrl_x_mode.
-static char *ctrl_x_msgs[] =
+ساكن حرف *ctrl_x_msgs[] =
 {
     N_(" Keyword completion (^N^P)"), // CTRL_X_NORMAL, ^P/^N compl.
     N_(" ^X mode (^]^D^E^F^I^K^L^N^O^P^Rs^U^V^Y)"),
-    NULL, // CTRL_X_SCROLL: depends on state
+    عدم, // CTRL_X_SCROLL: depends on state
     N_(" Whole line completion (^L^N^P)"),
     N_(" File name completion (^F^N^P)"),
     N_(" Tag completion (^]^N^P)"),
     N_(" Path pattern completion (^N^P)"),
     N_(" Definition completion (^D^N^P)"),
-    NULL, // CTRL_X_FINISHED
+    عدم, // CTRL_X_FINISHED
     N_(" Dictionary completion (^K^N^P)"),
     N_(" Thesaurus completion (^T^N^P)"),
     N_(" Command-line completion (^V^N^P)"),
@@ -61,13 +61,13 @@ static char *ctrl_x_msgs[] =
     N_(" Omni completion (^O^N^P)"),
     N_(" Spelling suggestion (^S^N^P)"),
     N_(" Keyword Local completion (^N^P)"),
-    NULL,   // CTRL_X_EVAL doesn't use msg.
+    عدم,   // CTRL_X_EVAL doesn't use msg.
     N_(" Command-line completion (^V^N^P)"),
     N_(" Register completion (^N^P)"),
 };
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static string_T ctrl_x_mode_names[] = {
+#إذا defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+ساكن string_T ctrl_x_ډېرپېښ_نومونه[] = {
     STR_LITERAL_INIT("keyword"),
     STR_LITERAL_INIT("ctrl_x"),
     STR_LITERAL_INIT("scroll"),
@@ -83,46 +83,46 @@ static string_T ctrl_x_mode_names[] = {
     STR_LITERAL_INIT("function"),
     STR_LITERAL_INIT("omni"),
     STR_LITERAL_INIT("spell"),
-    {NULL, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
+    {عدم, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
     STR_LITERAL_INIT("eval"),
     STR_LITERAL_INIT("cmdline"),
     STR_LITERAL_INIT("register"),
 };
-#endif
+#د_که_پای
 
 /*
  * Structure used to store one match for insert completion.
  */
-typedef struct compl_S compl_T;
-struct compl_S
+تعريفنوع بنية compl_S compl_T;
+بنية compl_S
 {
-    compl_T	*cp_next;
+    compl_T	*cp_بل;
     compl_T	*cp_prev;
-    compl_T	*cp_match_next;		// matched next compl_T
+    compl_T	*cp_سمون_بل;		// matched next compl_T
     string_T	cp_str;			// matched text
-    char_u	*(cp_text[CPT_COUNT]);	// text for the menu
-#ifdef FEAT_EVAL
-    typval_T	cp_user_data;
-#endif
+    char_u	*(cp_متن[CPT_شمېر]);	// text for the menu
+#که_تعریف_شوی FEAT_EVAL
+    typval_T	cp_user_معلومات;
+#د_که_پای
     char_u	*cp_fname;		// file containing the match, allocated when
 					// cp_flags has CP_FREE_FNAME
-    int		cp_flags;		// CP_ values
-    int		cp_number;		// sequence number
-    int		cp_order;		// list position when first scored
-    int		cp_score;		// fuzzy match score or proximity score
-    int		cp_in_match_array;	// collected by compl_match_array
-    int		cp_user_abbr_hl_id;	// highlight group ID for abbr
-    int		cp_user_kind_hl_id;	// highlight group ID for kind
-    int		cp_cpt_source_idx;	// index of this match's source in 'cpt' option
+    صحيح		cp_flags;		// CP_ values
+    صحيح		cp_شمېره;		// sequence number
+    صحيح		cp_ترتیب;		// list position when first scored
+    صحيح		cp_score;		// fuzzy match score or proximity score
+    صحيح		cp_دننه_سمون_array;	// collected by compl_match_array
+    صحيح		cp_user_abbr_hl_id;	// highlight group ID for abbr
+    صحيح		cp_user_ډول_hl_id;	// highlight group ID for kind
+    صحيح		cp_cpt_سرچینه_idx;	// index of this match's source in 'cpt' option
 };
 
 // values for cp_flags
-#define CP_ORIGINAL_TEXT   1	// the original text when the expansion begun
-#define CP_FREE_FNAME	    2	// cp_fname is allocated
-#define CP_CONT_S_IPOS	    4	// use CONT_S_IPOS for compl_cont_status
-#define CP_EQUAL	    8	// ins_compl_equal() always returns TRUE
-#define CP_ICASE	    16	// ins_compl_equal() ignores case
-#define CP_FAST	    32	// use fast_breakcheck instead of ui_breakcheck
+#تعریف_کړه CP_ORIGINAL_متن   1	// the original text when the expansion begun
+#تعریف_کړه CP_FREE_FNAME	    2	// cp_fname is allocated
+#تعریف_کړه CP_CONT_S_IPOS	    4	// use CONT_S_IPOS for compl_cont_status
+#تعریف_کړه CP_EQUAL	    8	// ins_compl_equal() always returns TRUE
+#تعریف_کړه CP_ICASE	    16	// ins_compl_equal() ignores case
+#تعریف_کړه CP_FAST	    32	// use fast_breakcheck instead of ui_breakcheck
 
 /*
  * All the current matches are stored in a list.
@@ -132,119 +132,119 @@ struct compl_S
  * ins_compl_get_exp(), when new matches are added to the list.
  * "compl_old_match" points to previous "compl_curr_match".
  */
-static compl_T    *compl_first_match = NULL;
-static compl_T    *compl_curr_match = NULL;
-static compl_T    *compl_shown_match = NULL;
-static compl_T    *compl_old_match = NULL;
+ساكن compl_T    *compl_لومړی_سمون = عدم;
+ساكن compl_T    *compl_curr_سمون = عدم;
+ساكن compl_T    *compl_shown_سمون = عدم;
+ساكن compl_T    *compl_old_سمون = عدم;
 
 // Hashtab with the strings of the matches in the list above, except the
 // original-text entries.  Each entry owns a copy of the string and counts
 // the matches with that string, so that when matches were added with "adup"
 // the entry remains until the last match with the string is removed.
-typedef struct
+تعريفنوع بنية
 {
-    int	    cse_count;	// number of matches with this string
+    صحيح	    cse_شمېر;	// number of matches with this string
     char_u  cse_str[1];	// the string, actually longer
 } complstr_T;
 
-#define CSE_OFF		((int)offsetof(complstr_T, cse_str))
-#define HI2CSE(hi)	((complstr_T *)((hi)->hi_key - CSE_OFF))
+#تعریف_کړه CSE_OFF		((صحيح)offsetof(complstr_T, cse_str))
+#تعریف_کړه HI2CSE(hi)	((complstr_T *)((hi)->hi_کلی - CSE_OFF))
 
-static hashtab_T  compl_strings_ht;
+ساكن hashtab_T  compl_مزي_ګانې_ht;
 
 /*
  * Count the string of a new match in the duplicate-check hashtab.
  * "hash" is the hash of "str" when it is not zero.
  */
-    static void
-compl_strings_add(char_u *str, size_t len, hash_T hash)
+    ساكن فراغ
+compl_مزي_ګانې_جمع_کړه(char_u *str, size_t len, hash_T hash)
 {
     hashitem_T	*hi;
-    complstr_T	*entry;
+    complstr_T	*ثبت;
 
-    if (compl_strings_ht.ht_array == NULL)
-	hash_init(&compl_strings_ht);
-    if (hash == 0)
+    إذا (compl_مزي_ګانې_ht.ht_array == عدم)
+	hash_init(&compl_مزي_ګانې_ht);
+    إذا (hash == 0)
 	hash = hash_hash(str);
-    hi = hash_lookup(&compl_strings_ht, str, hash);
-    if (HASHITEM_EMPTY(hi))
+    hi = hash_lookup(&compl_مزي_ګانې_ht, str, hash);
+    إذا (HASHITEM_تشه(hi))
     {
-	entry = alloc(CSE_OFF + len + 1);
-	if (entry == NULL)
+	ثبت = alloc(CSE_OFF + len + 1);
+	إذا (ثبت == عدم)
 	    // Out of memory: the duplicate check degrades, an equal string
 	    // added later is not recognized as a duplicate.
-	    return;
-	entry->cse_count = 1;
-	vim_strncpy(entry->cse_str, str, len);
-	if (hash_add_item(&compl_strings_ht, hi, entry->cse_str, hash)
+	    أرجع;
+	ثبت->cse_شمېر = 1;
+	vim_strncpy(ثبت->cse_str, str, len);
+	إذا (hash_جمع_کړه_توکی(&compl_مزي_ګانې_ht, hi, ثبت->cse_str, hash)
 								      == FAIL)
-	    vim_free(entry);
+	    vim_free(ثبت);
     }
-    else
-	++HI2CSE(hi)->cse_count;
+    وإلا
+	++HI2CSE(hi)->cse_شمېر;
 }
 
 // list used to store the compl_T which have the max score
-static compl_T	  **compl_best_matches = NULL;
-static int	  compl_num_bests = 0;
+ساكن compl_T	  **compl_غوره_matches = عدم;
+ساكن صحيح	  compl_عدد_bests = 0;
 
 // After using a cursor key <Enter> selects a match in the popup menu,
 // otherwise it inserts a line break.
-static int	  compl_enter_selects = FALSE;
+ساكن صحيح	  compl_enter_selects = FALSE;
 
 // When "compl_leader" is not NULL only matches that start with this string
 // are used.
-static string_T	  compl_leader = {NULL, 0};
+ساكن string_T	  compl_leader = {عدم, 0};
 
-static int	  compl_get_longest = FALSE;	// put longest common string
+ساكن صحيح	  compl_get_longest = FALSE;	// put longest common string
 						// in compl_leader
 
 // This flag is FALSE when no match is selected (by ^N/^P) or the match was
 // edited or using the longest common string.
-static int	  compl_used_match;
+ساكن صحيح	  compl_کارول_شوی_سمون;
 
 // didn't finish finding completions.
-static int	  compl_was_interrupted = FALSE;
+ساكن صحيح	  compl_was_interrupted = FALSE;
 
 // Set when character typed while looking for matches and it means we should
 // stop looking for matches.
-static int	  compl_interrupted = FALSE;
+ساكن صحيح	  compl_interrupted = FALSE;
 
-static int	  compl_restarting = FALSE;	// don't insert match
+ساكن صحيح	  compl_restarting = FALSE;	// don't insert match
 
 // When the first completion is done "compl_started" is set.  When it's
 // FALSE the word to be completed must be located.
-static int	  compl_started = FALSE;
+ساكن صحيح	  compl_started = FALSE;
 
 // Which Ctrl-X mode are we in?
-static int	  ctrl_x_mode = CTRL_X_NORMAL;
+ساكن صحيح	  ctrl_x_ډېرپېښ = CTRL_X_نورمال;
 
-static int	  compl_matches = 0;	    // number of completion matches
-static string_T	  compl_pattern = {NULL, 0};	 // search pattern for matching items
-#ifdef FEAT_COMPL_FUNC
-static string_T	  cpt_compl_pattern = {NULL, 0}; // pattern returned by func in 'cpt'
-#endif
-static int	  compl_direction = FORWARD;
-static int	  compl_shows_dir = FORWARD;
-static int	  compl_pending = 0;	    // > 1 for postponed CTRL-N
-static pos_T	  compl_startpos;
+ساكن صحيح	  compl_matches = 0;	    // number of completion matches
+ساكن string_T	  compl_نمونه = {عدم, 0};	 // search pattern for matching items
+#که_تعریف_شوی FEAT_COMPL_FUNC
+ساكن string_T	  cpt_compl_نمونه = {عدم, 0}; // pattern returned by func in 'cpt'
+#د_که_پای
+ساكن صحيح	  compl_direction = FORWARD;
+ساكن صحيح	  compl_shows_dir = FORWARD;
+ساكن صحيح	  compl_pending = 0;	    // > 1 for postponed CTRL-N
+ساكن pos_T	  compl_startpos;
 // Length in bytes of the text being completed (this is deleted to be replaced
 // by the match.)
-static int	  compl_length = 0;
-static linenr_T	  compl_lnum = 0;           // lnum where the completion start
-static colnr_T	  compl_col = 0;	    // column where the text starts
+ساكن صحيح	  compl_اوږدتیا = 0;
+ساكن linenr_T	  compl_lnum = 0;           // lnum where the completion start
+ساكن colnr_T	  compl_ستون = 0;	    // column where the text starts
 					    // that is being completed
-static colnr_T	  compl_ins_end_col = 0;
-static colnr_T	  compl_longest_end_col = 0;  // end of 'longest' inserted text
-static string_T	  compl_orig_text = {NULL, 0};  // text as it was before
+ساكن colnr_T	  compl_ins_پای_ټکی_ستون = 0;
+ساكن colnr_T	  compl_longest_پای_ټکی_ستون = 0;  // end of 'longest' inserted text
+ساكن string_T	  compl_orig_متن = {عدم, 0};  // text as it was before
 					    // completion started
-static int	  compl_cont_mode = 0;
-static expand_T	  compl_xp;
+ساكن صحيح	  compl_cont_ډېرپېښ = 0;
+ساكن expand_T	  compl_xp;
 
-static win_T	  *compl_curr_win = NULL;  // win where completion is active
-static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
+ساكن win_T	  *compl_curr_win = عدم;  // win where completion is active
+ساكن buf_T	  *compl_curr_buf = عدم;  // buf where completion is active
 
-#define COMPL_INITIAL_TIMEOUT_MS    80
+#تعریف_کړه COMPL_INITIAL_TIMEOUT_MS    80
 // Autocomplete uses a decaying timeout: starting from COMPL_INITIAL_TIMEOUT_MS,
 // if the current source exceeds its timeout, it is interrupted and the next
 // begins with half the time. A small minimum timeout ensures every source
@@ -252,133 +252,133 @@ static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
 // Special case: when 'complete' contains "F" or "o" (function sources), a
 // longer fixed timeout is used (COMPL_FUNC_TIMEOUT_MS or
 // COMPL_FUNC_TIMEOUT_NON_KW_MS). - girish
-static int	  compl_autocomplete = FALSE;	    // whether autocompletion is active
-static bool	  compl_autostarted = false;	    // Vim started this completion
-static bool	  compl_autostart_pending = false;  // the trigger armed one
-static bool	  compl_autocomplete_pending = false;
-#ifdef ELAPSED_FUNC
-static elapsed_T  compl_autocomplete_start_tv;	    // when the delay was armed
-#endif
-static int	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
-static int	  compl_time_slice_expired = FALSE; // time budget exceeded for current source
-static int	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
-static int	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
+ساكن صحيح	  compl_autocomplete = FALSE;	    // whether autocompletion is active
+ساكن bool	  compl_autostarted = false;	    // Vim started this completion
+ساكن bool	  compl_autostart_pending = false;  // the trigger armed one
+ساكن bool	  compl_autocomplete_pending = false;
+#که_تعریف_شوی ELAPSED_FUNC
+ساكن elapsed_T  compl_autocomplete_پیل_tv;	    // when the delay was armed
+#د_که_پای
+ساكن صحيح	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
+ساكن صحيح	  compl_وخت_ټوټه_expired = FALSE; // time budget exceeded for current source
+ساكن صحيح	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
+ساكن صحيح	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
 
 // Halve the current completion timeout, simulating exponential decay.
-#define COMPL_MIN_TIMEOUT_MS	5
-#define DECAY_COMPL_TIMEOUT() \
-    do { \
-	if (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
+#تعریف_کړه COMPL_MIN_TIMEOUT_MS	5
+#تعریف_کړه DECAY_COMPL_TIMEOUT() \
+    افعل { \
+	إذا (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
 	    compl_timeout_ms /= 2; \
-    } while (0)
+    } طالما (0)
 
 // Timeout values for F{func}, F and o values in 'complete'
-#define COMPL_FUNC_TIMEOUT_MS		300
-#define COMPL_FUNC_TIMEOUT_NON_KW_MS	1000
+#تعریف_کړه COMPL_FUNC_TIMEOUT_MS		300
+#تعریف_کړه COMPL_FUNC_TIMEOUT_NON_KW_MS	1000
 
 // List of flags for method of completion.
-static int	  compl_cont_status = 0;
-#define CONT_ADDING	1	// "normal" or "adding" expansion
-#define CONT_INTRPT	(2 + 4)	// a ^X interrupted the current expansion
+ساكن صحيح	  compl_cont_حالت = 0;
+#تعریف_کړه CONT_ADDING	1	// "normal" or "adding" expansion
+#تعریف_کړه CONT_INTRPT	(2 + 4)	// a ^X interrupted the current expansion
 				// it's set only iff N_ADDS is set
-#define CONT_N_ADDS	4	// next ^X<> will add-new or expand-current
-#define CONT_S_IPOS	8	// next ^X<> will set initial_pos?
+#تعریف_کړه CONT_N_ADDS	4	// next ^X<> will add-new or expand-current
+#تعریف_کړه CONT_S_IPOS	8	// next ^X<> will set initial_pos?
 				// if so, word-wise-expansion will set SOL
-#define CONT_SOL	16	// pattern includes start of line, just for
+#تعریف_کړه CONT_SOL	16	// pattern includes start of line, just for
 				// word-wise expansion, not set for ^X^L
-#define CONT_LOCAL	32	// for ctrl_x_mode 0, ^X^P/^X^N do a local
+#تعریف_کړه CONT_LOCAL	32	// for ctrl_x_mode 0, ^X^P/^X^N do a local
 				// expansion, (eg use complete=.)
 
-static int	  compl_opt_refresh_always = FALSE;
-static int	  compl_opt_suppress_empty = FALSE;
+ساكن صحيح	  compl_opt_refresh_always = FALSE;
+ساكن صحيح	  compl_opt_suppress_تشه = FALSE;
 
-static int	  compl_selected_item = -1;
+ساكن صحيح	  compl_selected_توکی = -1;
 
-static int	  *compl_fuzzy_scores;
+ساكن صحيح	  *compl_fuzzy_scores;
 
 // Define the structure for completion source (in 'cpt' option) information
-typedef struct cpt_source_T
+تعريفنوع بنية cpt_سرچینه_T
 {
-    int	cs_refresh_always;  // Whether 'refresh:always' is set for func
-    int	cs_startcol;	    // Start column returned by func
-    int	cs_max_matches;	    // Max items to display from this source
-#ifdef ELAPSED_FUNC
-    elapsed_T	compl_start_tv;	    // Timestamp when match collection starts
-#endif
+    صحيح	cs_refresh_always;  // Whether 'refresh:always' is set for func
+    صحيح	cs_startcol;	    // Start column returned by func
+    صحيح	cs_max_matches;	    // Max items to display from this source
+#که_تعریف_شوی ELAPSED_FUNC
+    elapsed_T	compl_پیل_tv;	    // Timestamp when match collection starts
+#د_که_پای
     char_u  cs_flag;	    // flag indicating the type of source
-} cpt_source_T;
+} cpt_سرچینه_T;
 
-static cpt_source_T *cpt_sources_array; // Pointer to the array of completion sources
-static int	    cpt_sources_count;  // Total number of completion sources specified in the 'cpt' option
-static int	    cpt_sources_index = -1;  // Index of the current completion source being expanded
+ساكن cpt_سرچینه_T *cpt_sources_array; // Pointer to the array of completion sources
+ساكن صحيح	    cpt_sources_شمېر;  // Total number of completion sources specified in the 'cpt' option
+ساكن صحيح	    cpt_sources_شاخص = -1;  // Index of the current completion source being expanded
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
-static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+ساكن pumitem_T *compl_سمون_array = عدم;
+ساكن صحيح compl_سمون_arraysize;
 
-static int ins_compl_add(char_u *str, int len, char_u *fname, char_u **cptext, typval_T *user_data, int cdir, int flags, int adup, int *user_hl, int score);
-static void ins_compl_longest_match(compl_T *match);
-static void ins_compl_del_pum(void);
-static void ins_compl_files(int count, char_u **files, int thesaurus, int flags, regmatch_T *regmatch, char_u *buf, int *dir);
-static void ins_compl_free(void);
-static int  ins_compl_need_restart(void);
-static void ins_compl_new_leader(void);
-static int  get_compl_len(void);
-static void ins_compl_restart(void);
-static void ins_compl_set_original_text(char_u *str, size_t len);
-static void ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static void ins_compl_add_list(list_T *list);
-static void ins_compl_add_dict(dict_T *dict);
-static int get_userdefined_compl_info(colnr_T curs_col, callback_T *cb, int *startcol);
-static void get_cpt_func_completion_matches(callback_T *cb);
-static callback_T *get_callback_if_cpt_func(char_u *p, int idx);
-static void fill_complete_info_dict(dict_T *di, compl_T *match, int add_match);
-#endif
-static int setup_cpt_sources(void);
-static int is_cpt_func_refresh_always(void);
-static void cpt_sources_clear(void);
-static void cpt_compl_refresh(void);
-static int  ins_compl_key2dir(int c);
-static int  ins_compl_pum_key(int c);
-static int  ins_compl_key2count(int c);
-static void show_pum(int prev_w_wrow, int prev_w_leftcol);
-static unsigned  quote_meta(char_u *dest, char_u *str, int len);
-static int ins_compl_has_multiple(void);
-static void ins_compl_expand_multiple(char_u *str);
-static void ins_compl_longest_insert(char_u *prefix);
-static void ins_compl_make_linear(void);
-static int ins_compl_make_cyclic(void);
+ساكن صحيح ins_compl_جمع_کړه(char_u *str, صحيح len, char_u *fname, char_u **cptext, typval_T *user_معلومات, صحيح cdir, صحيح flags, صحيح adup, صحيح *user_hl, صحيح score);
+ساكن فراغ ins_compl_longest_سمون(compl_T *سمون);
+ساكن فراغ ins_compl_del_pum(فراغ);
+ساكن فراغ ins_compl_files(صحيح شمېر, char_u **files, صحيح thesaurus, صحيح flags, regmatch_T *regmatch, char_u *buf, صحيح *dir);
+ساكن فراغ ins_compl_free(فراغ);
+ساكن صحيح  ins_compl_need_restart(فراغ);
+ساكن فراغ ins_compl_new_leader(فراغ);
+ساكن صحيح  get_compl_len(فراغ);
+ساكن فراغ ins_compl_restart(فراغ);
+ساكن فراغ ins_compl_سېټ_original_متن(char_u *str, size_t len);
+ساكن فراغ ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
+#إذا defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+ساكن فراغ ins_compl_جمع_کړه_list(list_T *list);
+ساكن فراغ ins_compl_جمع_کړه_dict(dict_T *dict);
+ساكن صحيح get_userdefined_compl_info(colnr_T curs_ستون, callback_T *cb, صحيح *startcol);
+ساكن فراغ get_cpt_func_completion_matches(callback_T *cb);
+ساكن callback_T *get_callback_if_cpt_func(char_u *p, صحيح idx);
+ساكن فراغ fill_complete_info_dict(dict_T *di, compl_T *سمون, صحيح جمع_کړه_سمون);
+#د_که_پای
+ساكن صحيح تیاری_cpt_sources(فراغ);
+ساكن صحيح is_cpt_func_refresh_always(فراغ);
+ساكن فراغ cpt_sources_clear(فراغ);
+ساكن فراغ cpt_compl_refresh(فراغ);
+ساكن صحيح  ins_compl_key2dir(صحيح c);
+ساكن صحيح  ins_compl_pum_کلی(صحيح c);
+ساكن صحيح  ins_compl_key2count(صحيح c);
+ساكن فراغ show_pum(صحيح prev_w_wrow, صحيح prev_w_leftcol);
+ساكن بینښه  quote_meta(char_u *dest, char_u *str, صحيح len);
+ساكن صحيح ins_compl_has_مضرب(فراغ);
+ساكن فراغ ins_compl_expand_مضرب(char_u *str);
+ساكن فراغ ins_compl_longest_ورننباسه(char_u *مختاړی);
+ساكن فراغ ins_compl_make_خطي(فراغ);
+ساكن صحيح ins_compl_make_cyclic(فراغ);
 
-#ifdef FEAT_SPELL
-static void spell_back_to_badword(void);
-static int  spell_bad_len = 0;	// length of located bad word
-#endif
+#که_تعریف_شوی FEAT_SPELL
+ساكن فراغ spell_شا_منزل_badword(فراغ);
+ساكن صحيح  spell_bad_len = 0;	// length of located bad word
+#د_که_پای
 
 /*
  * CTRL-X pressed in Insert mode.
  */
-    void
-ins_ctrl_x(void)
+    فراغ
+ins_ctrl_x(فراغ)
 {
-    if (!ctrl_x_mode_cmdline())
+    إذا (!ctrl_x_ډېرپېښ_cmdline())
     {
 	// if the next ^X<> won't ADD nothing, then reset compl_cont_status
-	if (compl_cont_status & CONT_N_ADDS)
-	    compl_cont_status |= CONT_INTRPT;
-	else
-	    compl_cont_status = 0;
+	إذا (compl_cont_حالت & CONT_N_ADDS)
+	    compl_cont_حالت |= CONT_INTRPT;
+	وإلا
+	    compl_cont_حالت = 0;
 	// We're not sure which CTRL-X mode it will be yet
-	ctrl_x_mode = CTRL_X_NOT_DEFINED_YET;
-	edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
-	edit_submode_pre = NULL;
+	ctrl_x_ډېرپېښ = CTRL_X_NOT_DEFINED_YET;
+	edit_submode = (char_u *)_(CTRL_X_پیغام(ctrl_x_ډېرپېښ));
+	edit_submode_pre = عدم;
 	showmode();
     }
-    else
+    وإلا
 	// CTRL-X in CTRL-X CTRL-V mode behaves differently to make CTRL-X
 	// CTRL-V look like CTRL-N
-	ctrl_x_mode = CTRL_X_CMDLINE_CTRL_X;
+	ctrl_x_ډېرپېښ = CTRL_X_CMDLINE_CTRL_X;
 
     may_trigger_modechanged();
 }
@@ -386,258 +386,258 @@ ins_ctrl_x(void)
 /*
  * Functions to check the current CTRL-X mode.
  */
-int ctrl_x_mode_none(void)
-    { return ctrl_x_mode == 0; }
-int ctrl_x_mode_normal(void)
-    { return ctrl_x_mode == CTRL_X_NORMAL; }
-int ctrl_x_mode_scroll(void)
-    { return ctrl_x_mode == CTRL_X_SCROLL; }
-int ctrl_x_mode_whole_line(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE; }
-int ctrl_x_mode_files(void)
-    { return ctrl_x_mode == CTRL_X_FILES; }
-int ctrl_x_mode_tags(void)
-    { return ctrl_x_mode == CTRL_X_TAGS; }
-int ctrl_x_mode_path_patterns(void)
-    { return ctrl_x_mode == CTRL_X_PATH_PATTERNS; }
-int ctrl_x_mode_path_defines(void)
-    { return ctrl_x_mode == CTRL_X_PATH_DEFINES; }
-int ctrl_x_mode_dictionary(void)
-    { return ctrl_x_mode == CTRL_X_DICTIONARY; }
-int ctrl_x_mode_thesaurus(void)
-    { return ctrl_x_mode == CTRL_X_THESAURUS; }
-int ctrl_x_mode_cmdline(void)
-    { return ctrl_x_mode == CTRL_X_CMDLINE
-		|| ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X; }
-int ctrl_x_mode_function(void)
-    { return ctrl_x_mode == CTRL_X_FUNCTION; }
-int ctrl_x_mode_omni(void)
-    { return ctrl_x_mode == CTRL_X_OMNI; }
-int ctrl_x_mode_spell(void)
-    { return ctrl_x_mode == CTRL_X_SPELL; }
-int ctrl_x_mode_eval(void)
-    { return ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_line_or_eval(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE || ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_register(void)
-    { return ctrl_x_mode == CTRL_X_REGISTER; }
+صحيح ctrl_x_ډېرپېښ_none(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == 0; }
+صحيح ctrl_x_ډېرپېښ_نورمال(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_نورمال; }
+صحيح ctrl_x_ډېرپېښ_scroll(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_SCROLL; }
+صحيح ctrl_x_ډېرپېښ_ټولیز_کرښه(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_ټولیز_کرښه; }
+صحيح ctrl_x_ډېرپېښ_files(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_FILES; }
+صحيح ctrl_x_ډېرپېښ_نښانونه(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_نښانونه; }
+صحيح ctrl_x_ډېرپېښ_لار_patterns(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_لار_PATTERNS; }
+صحيح ctrl_x_ډېرپېښ_لار_تعریفوي(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_لار_تعریفوي; }
+صحيح ctrl_x_ډېرپېښ_dictionary(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_DICTIONARY; }
+صحيح ctrl_x_ډېرپېښ_thesaurus(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_THESAURUS; }
+صحيح ctrl_x_ډېرپېښ_cmdline(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_CMDLINE
+		|| ctrl_x_ډېرپېښ == CTRL_X_CMDLINE_CTRL_X; }
+صحيح ctrl_x_ډېرپېښ_function(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_FUNCTION; }
+صحيح ctrl_x_ډېرپېښ_omni(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_OMNI; }
+صحيح ctrl_x_ډېرپېښ_spell(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_SPELL; }
+صحيح ctrl_x_ډېرپېښ_eval(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_EVAL; }
+صحيح ctrl_x_ډېرپېښ_کرښه_or_eval(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_ټولیز_کرښه || ctrl_x_ډېرپېښ == CTRL_X_EVAL; }
+صحيح ctrl_x_ډېرپېښ_ثبتوونکی(فراغ)
+    { أرجع ctrl_x_ډېرپېښ == CTRL_X_ثبتوونکی; }
 
 /*
  * Whether other than default completion has been selected.
  */
-    int
-ctrl_x_mode_not_default(void)
+    صحيح
+ctrl_x_ډېرپېښ_not_default(فراغ)
 {
-    return ctrl_x_mode != CTRL_X_NORMAL;
+    أرجع ctrl_x_ډېرپېښ != CTRL_X_نورمال;
 }
 
 /*
  * Whether CTRL-X was typed without a following character,
  * not including when in CTRL-X CTRL-V mode.
  */
-    int
-ctrl_x_mode_not_defined_yet(void)
+    صحيح
+ctrl_x_ډېرپېښ_not_defined_yet(فراغ)
 {
-    return ctrl_x_mode == CTRL_X_NOT_DEFINED_YET;
+    أرجع ctrl_x_ډېرپېښ == CTRL_X_NOT_DEFINED_YET;
 }
 
 /*
  * Return TRUE if currently in "normal" or "adding" insert completion matches
  * state
  */
-    int
-compl_status_adding(void)
+    صحيح
+compl_حالت_adding(فراغ)
 {
-    return compl_cont_status & CONT_ADDING;
+    أرجع compl_cont_حالت & CONT_ADDING;
 }
 
 /*
  * Return TRUE if the completion pattern includes start of line, just for
  * word-wise expansion.
  */
-    int
-compl_status_sol(void)
+    صحيح
+compl_حالت_sol(فراغ)
 {
-    return compl_cont_status & CONT_SOL;
+    أرجع compl_cont_حالت & CONT_SOL;
 }
 
 /*
  * Return TRUE if ^X^P/^X^N will do a local completion (i.e. use complete=.)
  */
-    int
-compl_status_local(void)
+    صحيح
+compl_حالت_local(فراغ)
 {
-    return compl_cont_status & CONT_LOCAL;
+    أرجع compl_cont_حالت & CONT_LOCAL;
 }
 
 /*
  * Clear the completion status flags
  */
-    void
-compl_status_clear(void)
+    فراغ
+compl_حالت_clear(فراغ)
 {
-    compl_cont_status = 0;
+    compl_cont_حالت = 0;
 }
 
 /*
  * Return TRUE if completion is using the forward direction matches
  */
-    static int
-compl_dir_forward(void)
+    ساكن صحيح
+compl_dir_forward(فراغ)
 {
-    return compl_direction == FORWARD;
+    أرجع compl_direction == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing forward completion matches
  */
-    static int
-compl_shows_dir_forward(void)
+    ساكن صحيح
+compl_shows_dir_forward(فراغ)
 {
-    return compl_shows_dir == FORWARD;
+    أرجع compl_shows_dir == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing backward completion matches
  */
-    static int
-compl_shows_dir_backward(void)
+    ساكن صحيح
+compl_shows_dir_backward(فراغ)
 {
-    return compl_shows_dir == BACKWARD;
+    أرجع compl_shows_dir == BACKWARD;
 }
 
 /*
  * Return TRUE if the 'dictionary' or 'thesaurus' option can be used.
  */
-    int
-has_compl_option(int dict_opt)
+    صحيح
+has_compl_option(صحيح dict_opt)
 {
-    if (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
-#ifdef FEAT_SPELL
+    إذا (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
+#که_تعریف_شوی FEAT_SPELL
 							&& !curwin->w_p_spell
-#endif
+#د_که_پای
 							)
 		 : (*curbuf->b_p_tsr == NUL && *p_tsr == NUL
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
 		     && *curbuf->b_p_tsrfu == NUL && *p_tsrfu == NUL
-#endif
+#د_که_پای
 		   ))
     {
-	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	msg_attr(dict_opt ? _("'dictionary' option is empty")
+	ctrl_x_ډېرپېښ = CTRL_X_نورمال;
+	edit_submode = عدم;
+	پیغام_attr(dict_opt ? _("'dictionary' option is empty")
 			  : _("'thesaurus' option is empty"),
 							      HL_ATTR(HLF_E));
-	if (emsg_silent == 0 && !in_assert_fails)
+	إذا (emsg_silent == 0 && !دننه_assert_fails)
 	{
 	    vim_beep(BO_COMPL);
 	    setcursor();
-	    out_flush();
-#ifdef FEAT_EVAL
-	    if (!get_vim_var_nr(VV_TESTING))
-#endif
+	    بهر_flush();
+#که_تعریف_شوی FEAT_EVAL
+	    إذا (!get_vim_var_nr(VV_TESTING))
+#د_که_پای
 		ui_delay(2004L, FALSE);
 	}
-	return FALSE;
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Is the character "c" a valid key to go to or keep us in CTRL-X mode?
  * This depends on the current mode.
  */
-    int
-vim_is_ctrl_x_key(int c)
+    صحيح
+vim_is_ctrl_x_کلی(صحيح c)
 {
     // Accept <PageUp> and <PageDown> if the popup menu is visible.
-    if (ins_compl_pum_key(c))
-	return TRUE;
+    إذا (ins_compl_pum_کلی(c))
+	أرجع TRUE;
 
-    switch (ctrl_x_mode)
+    بدل (ctrl_x_ډېرپېښ)
     {
-	case 0:		    // Not in any CTRL-X mode
-	    return (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
-	case CTRL_X_NOT_DEFINED_YET:
-	case CTRL_X_CMDLINE_CTRL_X:
-	    return (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
+	حالة 0:		    // Not in any CTRL-X mode
+	    أرجع (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
+	حالة CTRL_X_NOT_DEFINED_YET:
+	حالة CTRL_X_CMDLINE_CTRL_X:
+	    أرجع (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
 		    || c == Ctrl_L || c == Ctrl_F || c == Ctrl_RSB
 		    || c == Ctrl_I || c == Ctrl_D || c == Ctrl_P
 		    || c == Ctrl_N || c == Ctrl_T || c == Ctrl_V
 		    || c == Ctrl_Q || c == Ctrl_U || c == Ctrl_O
 		    || c == Ctrl_S || c == Ctrl_K || c == 's'
 		    || c == Ctrl_Z || c == Ctrl_R);
-	case CTRL_X_SCROLL:
-	    return (c == Ctrl_Y || c == Ctrl_E);
-	case CTRL_X_WHOLE_LINE:
-	    return (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_FILES:
-	    return (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_DICTIONARY:
-	    return (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_THESAURUS:
-	    return (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_TAGS:
-	    return (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
-#ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_PATH_DEFINES:
-	    return (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
-#endif
-	case CTRL_X_CMDLINE:
-	    return (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
+	حالة CTRL_X_SCROLL:
+	    أرجع (c == Ctrl_Y || c == Ctrl_E);
+	حالة CTRL_X_ټولیز_کرښه:
+	    أرجع (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_FILES:
+	    أرجع (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_DICTIONARY:
+	    أرجع (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_THESAURUS:
+	    أرجع (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_نښانونه:
+	    أرجع (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
+#که_تعریف_شوی FEAT_پیدا_کړه_ID
+	حالة CTRL_X_لار_PATTERNS:
+	    أرجع (c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_لار_تعریفوي:
+	    أرجع (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
+#د_که_پای
+	حالة CTRL_X_CMDLINE:
+	    أرجع (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
 		    || c == Ctrl_X);
-#ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    return (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_OMNI:
-	    return (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
-#endif
-	case CTRL_X_SPELL:
-	    return (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_EVAL:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_REGISTER:
-	    return (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
+#که_تعریف_شوی FEAT_COMPL_FUNC
+	حالة CTRL_X_FUNCTION:
+	    أرجع (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_OMNI:
+	    أرجع (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
+#د_که_پای
+	حالة CTRL_X_SPELL:
+	    أرجع (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_EVAL:
+	    أرجع (c == Ctrl_P || c == Ctrl_N);
+	حالة CTRL_X_ثبتوونکی:
+	    أرجع (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
     }
-    internal_error("vim_is_ctrl_x_key()");
-    return FALSE;
+    دننی_error("vim_is_ctrl_x_key()");
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE if "match" is the original text when the completion began.
  */
-    static int
-match_at_original_text(compl_T *match)
+    ساكن صحيح
+سمون_at_original_متن(compl_T *سمون)
 {
-    return match->cp_flags & CP_ORIGINAL_TEXT;
+    أرجع سمون->cp_flags & CP_ORIGINAL_متن;
 }
 
 /*
  * Returns TRUE if "match" is the first match in the completion list.
  */
-    static int
-is_first_match(compl_T *match)
+    ساكن صحيح
+is_لومړی_سمون(compl_T *سمون)
 {
-    return match == compl_first_match;
+    أرجع سمون == compl_لومړی_سمون;
 }
 
 /*
  * Return the entry holding the original text, NULL if not found.
  * It is the first item, or the last one for backward completion.
  */
-    static compl_T *
-find_original_text_match(void)
+    ساكن compl_T *
+پیدا_کړه_original_متن_سمون(فراغ)
 {
-    if (compl_first_match == NULL)
-	return NULL;
-    if (match_at_original_text(compl_first_match))
-	return compl_first_match;
-    if (compl_first_match->cp_prev != NULL
-	    && match_at_original_text(compl_first_match->cp_prev))
-	return compl_first_match->cp_prev;
-    return NULL;
+    إذا (compl_لومړی_سمون == عدم)
+	أرجع عدم;
+    إذا (سمون_at_original_متن(compl_لومړی_سمون))
+	أرجع compl_لومړی_سمون;
+    إذا (compl_لومړی_سمون->cp_prev != عدم
+	    && سمون_at_original_متن(compl_لومړی_سمون->cp_prev))
+	أرجع compl_لومړی_سمون->cp_prev;
+    أرجع عدم;
 }
 
 /*
@@ -645,118 +645,118 @@ find_original_text_match(void)
  * completed.  Used to decide whether to abandon complete mode when the menu
  * is visible.
  */
-    int
-ins_compl_accept_char(int c)
+    صحيح
+ins_compl_accept_char(صحيح c)
 {
-    if (compl_autocomplete && compl_from_nonkeyword)
-	return FALSE;
+    إذا (compl_autocomplete && compl_from_nonkeyword)
+	أرجع FALSE;
 
-    if (ctrl_x_mode & CTRL_X_WANT_IDENT)
+    إذا (ctrl_x_ډېرپېښ & CTRL_X_WANT_IDENT)
 	// When expanding an identifier only accept identifier chars.
-	return vim_isIDc(c);
+	أرجع vim_isIDc(c);
 
-    switch (ctrl_x_mode)
+    بدل (ctrl_x_ډېرپېښ)
     {
-	case CTRL_X_FILES:
+	حالة CTRL_X_FILES:
 	    // When expanding file name only accept file name chars. But not
 	    // path separators, so that "proto/<Tab>" expands files in
 	    // "proto", not "proto/" as a whole
-	    return vim_isfilec(c) && !vim_ispathsep(c);
+	    أرجع vim_isfilec(c) && !vim_ispathsep(c);
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
-	case CTRL_X_OMNI:
+	حالة CTRL_X_CMDLINE:
+	حالة CTRL_X_CMDLINE_CTRL_X:
+	حالة CTRL_X_OMNI:
 	    // Command line and Omni completion can work with just about any
 	    // printable character, but do stop at white space.
-	    return vim_isprintc(c) && !VIM_ISWHITE(c);
+	    أرجع vim_isprintc(c) && !VIM_ISWHITE(c);
 
-	case CTRL_X_WHOLE_LINE:
+	حالة CTRL_X_ټولیز_کرښه:
 	    // For while line completion a space can be part of the line.
-	    return vim_isprintc(c);
+	    أرجع vim_isprintc(c);
     }
-    return vim_iswordc(c);
+    أرجع vim_iswordc(c);
 }
 
 /*
  * Get the completed text by inferring the case of the originally typed text.
  * If the result is in allocated memory "tofree" is set to it.
  */
-    static char_u *
+    ساكن char_u *
 ins_compl_infercase_gettext(
     char_u  *str,
-    int	    char_len,
-    int	    compl_char_len,
-    int	    min_len,
+    صحيح	    char_len,
+    صحيح	    compl_char_len,
+    صحيح	    min_len,
     char_u  **tofree)
 {
-    int		*wca;			// Wide character array.
+    صحيح		*wca;			// Wide character array.
     char_u	*p;
-    int		i, c;
-    int		has_lower = FALSE;
-    int		was_letter = FALSE;
+    صحيح		i, c;
+    صحيح		has_ښکتنی = FALSE;
+    صحيح		was_letter = FALSE;
     garray_T	gap;
 
     IObuff[0] = NUL;
 
     // Allocate wide character array for the completion and fill it.
-    wca = ALLOC_MULT(int, char_len);
-    if (wca == NULL)
-	return IObuff;
+    wca = ALLOC_MULT(صحيح, char_len);
+    إذا (wca == عدم)
+	أرجع IObuff;
 
     p = str;
-    for (i = 0; i < char_len; ++i)
+    لكل (i = 0; i < char_len; ++i)
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    wca[i] = mb_ptr2char_adv(&p);
-	else
+	وإلا
 	    wca[i] = *(p++);
     }
 
     // Rule 1: Were any chars converted to lower?
-    p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    p = compl_orig_متن.string;
+    لكل (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	إذا (MB_ISLOWER(c))
 	{
-	    has_lower = TRUE;
-	    if (MB_ISUPPER(wca[i]))
+	    has_ښکتنی = TRUE;
+	    إذا (MB_ISUPPER(wca[i]))
 	    {
 		// Rule 1 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		لكل (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOLOWER(wca[i]);
-		break;
+		اكسر;
 	    }
 	}
     }
 
     // Rule 2: No lower case, 2nd consecutive letter converted to
     // upper case.
-    if (!has_lower)
+    إذا (!has_ښکتنی)
     {
-	p = compl_orig_text.string;
-	for (i = 0; i < min_len; ++i)
+	p = compl_orig_متن.string;
+	لكل (i = 0; i < min_len; ++i)
 	{
 	    c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	    if (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
+	    إذا (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
 	    {
 		// Rule 2 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		لكل (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOUPPER(wca[i]);
-		break;
+		اكسر;
 	    }
 	    was_letter = MB_ISLOWER(c) || MB_ISUPPER(c);
 	}
     }
 
     // Copy the original case of the part we typed.
-    p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    p = compl_orig_متن.string;
+    لكل (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	إذا (MB_ISLOWER(c))
 	    wca[i] = MB_TOLOWER(wca[i]);
-	else if (MB_ISUPPER(c))
+	وإلا إذا (MB_ISUPPER(c))
 	    wca[i] = MB_TOUPPER(wca[i]);
     }
 
@@ -764,55 +764,55 @@ ins_compl_infercase_gettext(
     p = IObuff;
     i = 0;
     ga_init2(&gap, 1, 500);
-    while (i < char_len)
+    طالما (i < char_len)
     {
-	if (gap.ga_data != NULL)
+	إذا (gap.ga_معلومات != عدم)
 	{
-	    if (ga_grow(&gap, 10) == FAIL)
+	    إذا (ga_grow(&gap, 10) == FAIL)
 	    {
 		ga_clear(&gap);
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		أرجع (char_u *)"[failed]";
 	    }
-	    p = (char_u *)gap.ga_data + gap.ga_len;
-	    if (has_mbyte)
+	    p = (char_u *)gap.ga_معلومات + gap.ga_len;
+	    إذا (has_mbyte)
 		gap.ga_len += (*mb_char2bytes)(wca[i++], p);
-	    else
+	    وإلا
 	    {
 		*p = wca[i++];
 		++gap.ga_len;
 	    }
 	}
-	else if ((p - IObuff) + 6 >= IOSIZE)
+	وإلا إذا ((p - IObuff) + 6 >= IOSIZE)
 	{
 	    // Multi-byte characters can occupy up to five bytes more than
 	    // ASCII characters, and we also need one byte for NUL, so when
 	    // getting to six bytes from the edge of IObuff switch to using a
 	    // growarray.  Add the character in the next round.
-	    if (ga_grow(&gap, IOSIZE) == FAIL)
+	    إذا (ga_grow(&gap, IOSIZE) == FAIL)
 	    {
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		أرجع (char_u *)"[failed]";
 	    }
 	    *p = NUL;
-	    STRCPY(gap.ga_data, IObuff);
-	    gap.ga_len = (int)(p - IObuff);
+	    STRCPY(gap.ga_معلومات, IObuff);
+	    gap.ga_len = (صحيح)(p - IObuff);
 	}
-	else if (has_mbyte)
+	وإلا إذا (has_mbyte)
 	    p += (*mb_char2bytes)(wca[i++], p);
-	else
+	وإلا
 	    *(p++) = wca[i++];
     }
     vim_free(wca);
 
-    if (gap.ga_data != NULL)
+    إذا (gap.ga_معلومات != عدم)
     {
-	*tofree = gap.ga_data;
-	return gap.ga_data;
+	*tofree = gap.ga_معلومات;
+	أرجع gap.ga_معلومات;
     }
 
     *p = NUL;
-    return IObuff;
+    أرجع IObuff;
 }
 
 /*
@@ -821,59 +821,59 @@ ins_compl_infercase_gettext(
  * text is inferred, ie this tries to work out what case you probably wanted
  * the rest of the word to be in -- webb
  */
-    int
-ins_compl_add_infercase(
+    صحيح
+ins_compl_جمع_کړه_infercase(
     char_u	*str_arg,
-    int		len,
-    int		icase,
+    صحيح		len,
+    صحيح		icase,
     char_u	*fname,
-    int		dir,
-    int		cont_s_ipos,  // next ^X<> will set initial_pos
-    int		score)
+    صحيح		dir,
+    صحيح		cont_s_ipos,  // next ^X<> will set initial_pos
+    صحيح		score)
 {
     char_u	*str = str_arg;
     char_u	*p;
-    int		char_len;		// count multi-byte characters
-    int		compl_char_len;
-    int		min_len;
-    int		flags = 0;
-    int		res;
-    char_u	*tofree = NULL;
+    صحيح		char_len;		// count multi-byte characters
+    صحيح		compl_char_len;
+    صحيح		min_len;
+    صحيح		flags = 0;
+    صحيح		res;
+    char_u	*tofree = عدم;
 
-    if (p_ic && curbuf->b_p_inf && len > 0)
+    إذا (p_ic && curbuf->b_p_inf && len > 0)
     {
 	// Infer case of completed part.
 
 	// Find actual length of completion.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    p = str;
 	    char_len = 0;
-	    while (*p != NUL)
+	    طالما (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++char_len;
 	    }
 	}
-	else
+	وإلا
 	{
 	    char_len = len;
 	}
 
 	// Find actual length of original text.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    p = compl_orig_text.string;
+	    p = compl_orig_متن.string;
 	    compl_char_len = 0;
-	    while (*p != NUL)
+	    طالما (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++compl_char_len;
 	    }
 	}
-	else
+	وإلا
 	{
-	    compl_char_len = compl_length;
+	    compl_char_len = compl_اوږدتیا;
 	}
 
 	// "char_len" may be smaller than "compl_char_len" when using
@@ -883,52 +883,52 @@ ins_compl_add_infercase(
 	str = ins_compl_infercase_gettext(str, char_len,
 					  compl_char_len, min_len, &tofree);
     }
-    if (cont_s_ipos)
+    إذا (cont_s_ipos)
 	flags |= CP_CONT_S_IPOS;
-    if (icase)
+    إذا (icase)
 	flags |= CP_ICASE;
 
-    res = ins_compl_add(str, len, fname, NULL, NULL, dir, flags, FALSE, NULL, score);
+    res = ins_compl_جمع_کړه(str, len, fname, عدم, عدم, dir, flags, FALSE, عدم, score);
     vim_free(tofree);
-    return res;
+    أرجع res;
 }
 
 /*
  * Check if fuzzy matching is enabled
  */
-    static int
-cot_fuzzy(void)
+    ساكن صحيح
+cot_fuzzy(فراغ)
 {
-    return (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_mode_thesaurus();
+    أرجع (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_ډېرپېښ_thesaurus();
 }
 
 /*
  * Returns TRUE if matches should be sorted based on proximity to the cursor.
  */
-    static int
-is_nearest_active(void)
+    ساكن صحيح
+is_تر_ټولو_نږدې_فعال(فراغ)
 {
-    return (compl_autocomplete || (get_cot_flags() & COT_NEAREST))
+    أرجع (compl_autocomplete || (get_cot_flags() & COT_تر_ټولو_نږدې))
 	&& !cot_fuzzy();
 }
 
 /*
  * TRUE if a match is selected (even if it is not inserted).
  */
-    int
-ins_compl_is_match_selected(void)
+    صحيح
+ins_compl_is_سمون_selected(فراغ)
 {
-    return compl_shown_match != NULL && !is_first_match(compl_shown_match);
+    أرجع compl_shown_سمون != عدم && !is_لومړی_سمون(compl_shown_سمون);
 }
 
 /*
  * Returns TRUE if autocomplete is active and the pre-insert effect targets the
  * longest prefix.
  */
-    int
-ins_compl_preinsert_longest(void)
+    صحيح
+ins_compl_preinsert_longest(فراغ)
 {
-    return compl_autocomplete
+    أرجع compl_autocomplete
 	&& (get_cot_flags() & (COT_LONGEST | COT_PREINSERT | COT_FUZZY))
 		== COT_LONGEST;
 }
@@ -953,81 +953,81 @@ ins_compl_preinsert_longest(void)
  * NOTDONE, otherwise add it to the list and return OK.  If there is an error,
  * maybe because alloc() returns NULL, then FAIL is returned.
  */
-    static int
-ins_compl_add(
+    ساكن صحيح
+ins_compl_جمع_کړه(
     char_u	*str,
-    int		len,
+    صحيح		len,
     char_u	*fname,
     char_u	**cptext,	    // extra text for popup menu or NULL
-    typval_T	*user_data UNUSED,  // "user_data" entry or NULL
-    int		cdir,
-    int		flags_arg,
-    int		adup,		    // accept duplicate match
-    int		*user_hl,           // user abbr/kind hlattr
-    int		score)
+    typval_T	*user_معلومات ناکارول_شوی,  // "user_data" entry or NULL
+    صحيح		cdir,
+    صحيح		flags_arg,
+    صحيح		adup,		    // accept duplicate match
+    صحيح		*user_hl,           // user abbr/kind hlattr
+    صحيح		score)
 {
-    compl_T	*match, *current, *prev;
-    int		dir = (cdir == 0 ? compl_direction : cdir);
-    int		flags = flags_arg;
-    int		inserted = FALSE;
-    char_u	*new_str = NULL;
+    compl_T	*سمون, *current, *prev;
+    صحيح		dir = (cdir == 0 ? compl_direction : cdir);
+    صحيح		flags = flags_arg;
+    صحيح		inserted = FALSE;
+    char_u	*new_str = عدم;
     hash_T	str_hash = 0;	    // hash of the match string, when not 0
 
-    if (flags & CP_FAST)
+    إذا (flags & CP_FAST)
 	fast_breakcheck();
-    else
+    وإلا
 	ui_breakcheck();
-    if (got_int)
-	return FAIL;
-    if (len < 0)
-	len = (int)STRLEN(str);
+    إذا (got_int)
+	أرجع FAIL;
+    إذا (len < 0)
+	len = (صحيح)STRLEN(str);
 
     // If the same match is already present, don't add it.
-    if (compl_first_match != NULL && !adup && compl_strings_ht.ht_used > 0)
+    إذا (compl_لومړی_سمون != عدم && !adup && compl_مزي_ګانې_ht.ht_کارول_شوی > 0)
     {
 	// The key must be NUL terminated.
 	char_u	    keybuf[128];
-	char_u	    *key;
+	char_u	    *کلی;
 	hashitem_T  *hi;
 
-	if (len < (int)sizeof(keybuf))
+	إذا (len < (صحيح)حجم(keybuf))
 	{
 	    mch_memmove(keybuf, str, (size_t)len);
 	    keybuf[len] = NUL;
-	    key = keybuf;
+	    کلی = keybuf;
 	}
-	else
+	وإلا
 	{
 	    new_str = vim_strnsave(str, len);
-	    if (new_str == NULL)
-		return FAIL;
-	    key = new_str;
+	    إذا (new_str == عدم)
+		أرجع FAIL;
+	    کلی = new_str;
 	}
-	str_hash = hash_hash(key);
-	hi = hash_lookup(&compl_strings_ht, key, str_hash);
-	if (!HASHITEM_EMPTY(hi))
+	str_hash = hash_hash(کلی);
+	hi = hash_lookup(&compl_مزي_ګانې_ht, کلی, str_hash);
+	إذا (!HASHITEM_تشه(hi))
 	{
-	    if (is_nearest_active() && score > 0)
+	    إذا (is_تر_ټولو_نږدې_فعال() && score > 0)
 	    {
 		// The duplicate may need its score updated, scan the
 		// matches to find it.
-		match = compl_first_match;
-		do
+		سمون = compl_لومړی_سمون;
+		افعل
 		{
-		    if (!match_at_original_text(match)
-			    && STRNCMP(match->cp_str.string, str, len) == 0
-			    && ((int)match->cp_str.length <= len
-					  || match->cp_str.string[len] == NUL))
+		    إذا (!سمون_at_original_متن(سمون)
+			    && STRNCMP(سمون->cp_str.string, str, len) == 0
+			    && ((صحيح)سمون->cp_str.اوږدتیا <= len
+					  || سمون->cp_str.string[len] == NUL))
 		    {
-			if (score < match->cp_score)
-			    match->cp_score = score;
-			break;
+			إذا (score < سمون->cp_score)
+			    سمون->cp_score = score;
+			اكسر;
 		    }
-		    match = match->cp_next;
-		} while (match != NULL && !is_first_match(match));
+		    سمون = سمون->cp_بل;
+		} طالما (سمون != عدم && !is_لومړی_سمون(سمون));
 	    }
 	    vim_free(new_str);
-	    return NOTDONE;
+	    أرجع NOTDONE;
 	}
     }
 
@@ -1036,190 +1036,190 @@ ins_compl_add(
 
     // Allocate a new match structure.
     // Copy the values to the new match structure.
-    match = ALLOC_CLEAR_ONE(compl_T);
-    if (match == NULL)
+    سمون = ALLOC_CLEAR_ONE(compl_T);
+    إذا (سمون == عدم)
     {
 	vim_free(new_str);
-	return FAIL;
+	أرجع FAIL;
     }
-    match->cp_number = flags & CP_ORIGINAL_TEXT ? 0 : -1;
-    match->cp_order = -1;
-    if (new_str == NULL && (new_str = vim_strnsave(str, len)) == NULL)
+    سمون->cp_شمېره = flags & CP_ORIGINAL_متن ? 0 : -1;
+    سمون->cp_ترتیب = -1;
+    إذا (new_str == عدم && (new_str = vim_strnsave(str, len)) == عدم)
     {
-	vim_free(match);
-	return FAIL;
+	vim_free(سمون);
+	أرجع FAIL;
     }
-    match->cp_str.string = new_str;
-    match->cp_str.length = len;
+    سمون->cp_str.string = new_str;
+    سمون->cp_str.اوږدتیا = len;
 
     // match-fname is:
     // - compl_curr_match->cp_fname if it is a string equal to fname.
     // - a copy of fname, CP_FREE_FNAME is set to free later THE allocated mem.
     // - NULL otherwise.	--Acevedo
-    if (fname != NULL
-	    && compl_curr_match != NULL
-	    && compl_curr_match->cp_fname != NULL
-	    && STRCMP(fname, compl_curr_match->cp_fname) == 0)
-	match->cp_fname = compl_curr_match->cp_fname;
-    else if (fname != NULL)
+    إذا (fname != عدم
+	    && compl_curr_سمون != عدم
+	    && compl_curr_سمون->cp_fname != عدم
+	    && STRCMP(fname, compl_curr_سمون->cp_fname) == 0)
+	سمون->cp_fname = compl_curr_سمون->cp_fname;
+    وإلا إذا (fname != عدم)
     {
-	match->cp_fname = vim_strsave(fname);
+	سمون->cp_fname = vim_strsave(fname);
 	flags |= CP_FREE_FNAME;
     }
-    else
-	match->cp_fname = NULL;
-    match->cp_flags = flags;
-    match->cp_user_abbr_hl_id = user_hl ? user_hl[0] : 0;
-    match->cp_user_kind_hl_id = user_hl ? user_hl[1] : 0;
-    match->cp_score = score;
-    match->cp_cpt_source_idx = cpt_sources_index;
+    وإلا
+	سمون->cp_fname = عدم;
+    سمون->cp_flags = flags;
+    سمون->cp_user_abbr_hl_id = user_hl ? user_hl[0] : 0;
+    سمون->cp_user_ډول_hl_id = user_hl ? user_hl[1] : 0;
+    سمون->cp_score = score;
+    سمون->cp_cpt_سرچینه_idx = cpt_sources_شاخص;
 
-    if (cptext != NULL)
+    إذا (cptext != عدم)
     {
-	for (int i = 0; i < CPT_COUNT; ++i)
+	لكل (صحيح i = 0; i < CPT_شمېر; ++i)
 	{
-	    if (cptext[i] != NULL && *cptext[i] != NUL)
-		match->cp_text[i] = vim_strsave(cptext[i]);
+	    إذا (cptext[i] != عدم && *cptext[i] != NUL)
+		سمون->cp_متن[i] = vim_strsave(cptext[i]);
 	}
     }
-#ifdef FEAT_EVAL
-    if (user_data != NULL)
-	match->cp_user_data = *user_data;
-#endif
+#که_تعریف_شوی FEAT_EVAL
+    إذا (user_معلومات != عدم)
+	سمون->cp_user_معلومات = *user_معلومات;
+#د_که_پای
 
     // Link the new match structure after (FORWARD) or before (BACKWARD) the
     // current match in the list of matches .
-    if (compl_first_match == NULL)
-	match->cp_next = match->cp_prev = NULL;
-    else if (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
+    إذا (compl_لومړی_سمون == عدم)
+	سمون->cp_بل = سمون->cp_prev = عدم;
+    وإلا إذا (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
     {
-	current = compl_first_match->cp_next;
-	prev = compl_first_match;
+	current = compl_لومړی_سمون->cp_بل;
+	prev = compl_لومړی_سمون;
 	inserted = FALSE;
 	// The direction is ignored when using longest and fuzzy match, because
 	// matches are inserted and sorted by score.
-	while (current != NULL && current != compl_first_match)
+	طالما (current != عدم && current != compl_لومړی_سمون)
 	{
-	    if (current->cp_score < score)
+	    إذا (current->cp_score < score)
 	    {
-		match->cp_next = current;
-		match->cp_prev = current->cp_prev;
-		if (current->cp_prev)
-		    current->cp_prev->cp_next = match;
-		current->cp_prev = match;
+		سمون->cp_بل = current;
+		سمون->cp_prev = current->cp_prev;
+		إذا (current->cp_prev)
+		    current->cp_prev->cp_بل = سمون;
+		current->cp_prev = سمون;
 		inserted = TRUE;
-		break;
+		اكسر;
 	    }
 	    prev = current;
-	    current = current->cp_next;
+	    current = current->cp_بل;
 	}
-	if (!inserted)
+	إذا (!inserted)
 	{
-	    prev->cp_next = match;
-	    match->cp_prev = prev;
-	    match->cp_next = compl_first_match;
-	    compl_first_match->cp_prev = match;
+	    prev->cp_بل = سمون;
+	    سمون->cp_prev = prev;
+	    سمون->cp_بل = compl_لومړی_سمون;
+	    compl_لومړی_سمون->cp_prev = سمون;
 	}
     }
-    else if (dir == FORWARD)
+    وإلا إذا (dir == FORWARD)
     {
-	match->cp_next = compl_curr_match->cp_next;
-	match->cp_prev = compl_curr_match;
+	سمون->cp_بل = compl_curr_سمون->cp_بل;
+	سمون->cp_prev = compl_curr_سمون;
     }
-    else	// BACKWARD
+    وإلا	// BACKWARD
     {
-	match->cp_next = compl_curr_match;
-	match->cp_prev = compl_curr_match->cp_prev;
+	سمون->cp_بل = compl_curr_سمون;
+	سمون->cp_prev = compl_curr_سمون->cp_prev;
     }
-    if (match->cp_next)
-	match->cp_next->cp_prev = match;
-    if (match->cp_prev)
-	match->cp_prev->cp_next = match;
-    else	// if there's nothing before, it is the first match
-	compl_first_match = match;
-    compl_curr_match = match;
+    إذا (سمون->cp_بل)
+	سمون->cp_بل->cp_prev = سمون;
+    إذا (سمون->cp_prev)
+	سمون->cp_prev->cp_بل = سمون;
+    وإلا	// if there's nothing before, it is the first match
+	compl_لومړی_سمون = سمون;
+    compl_curr_سمون = سمون;
 
-    if (!match_at_original_text(match))
-	compl_strings_add(match->cp_str.string, match->cp_str.length,
+    إذا (!سمون_at_original_متن(سمون))
+	compl_مزي_ګانې_جمع_کړه(سمون->cp_str.string, سمون->cp_str.اوږدتیا,
 								    str_hash);
 
     // Find the longest common string if still doing that.
-    if (compl_get_longest && (flags & CP_ORIGINAL_TEXT) == 0 && !cot_fuzzy()
-	    && !ins_compl_preinsert_longest() && !ctrl_x_mode_thesaurus())
-	ins_compl_longest_match(match);
+    إذا (compl_get_longest && (flags & CP_ORIGINAL_متن) == 0 && !cot_fuzzy()
+	    && !ins_compl_preinsert_longest() && !ctrl_x_ډېرپېښ_thesaurus())
+	ins_compl_longest_سمون(سمون);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Return TRUE if "str[len]" matches with match->cp_str, considering
  * match->cp_flags.
  */
-    static int
-ins_compl_equal(compl_T *match, char_u *str, int len)
+    ساكن صحيح
+ins_compl_equal(compl_T *سمون, char_u *str, صحيح len)
 {
-    if (match->cp_flags & CP_EQUAL)
-	return TRUE;
-    if (match->cp_flags & CP_ICASE)
-	return STRNICMP(match->cp_str.string, str, (size_t)len) == 0;
-    return STRNCMP(match->cp_str.string, str, (size_t)len) == 0;
+    إذا (سمون->cp_flags & CP_EQUAL)
+	أرجع TRUE;
+    إذا (سمون->cp_flags & CP_ICASE)
+	أرجع STRNICMP(سمون->cp_str.string, str, (size_t)len) == 0;
+    أرجع STRNCMP(سمون->cp_str.string, str, (size_t)len) == 0;
 }
 
 /*
  * Like ins_compl_equal(), but ignore case in the 'longest'-inserted part of
  * the leader, so CTRL-N and CTRL-P filter the same way.
  */
-    static int
-ins_compl_equal_sc(compl_T *match, char_u *str, int len)
+    ساكن صحيح
+ins_compl_equal_sc(compl_T *سمون, char_u *str, صحيح len)
 {
-    int	typed = compl_length;
-    int	longest_end = (compl_get_longest && compl_longest_end_col > compl_col)
-			    ? (int)(compl_longest_end_col - compl_col) : typed;
+    صحيح	typed = compl_اوږدتیا;
+    صحيح	longest_پای_ټکی = (compl_get_longest && compl_longest_پای_ټکی_ستون > compl_ستون)
+			    ? (صحيح)(compl_longest_پای_ټکی_ستون - compl_ستون) : typed;
 
-    if ((match->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_end <= typed)
-	return ins_compl_equal(match, str, len);
+    إذا ((سمون->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_پای_ټکی <= typed)
+	أرجع ins_compl_equal(سمون, str, len);
 
-    if ((int)match->cp_str.length < len)
-	return FALSE;
+    إذا ((صحيح)سمون->cp_str.اوږدتیا < len)
+	أرجع FALSE;
 
-    for (int i = 0; i < len; ++i)
+    لكل (صحيح i = 0; i < len; ++i)
     {
-	if (i >= typed && i < longest_end
-		? TOLOWER_LOC(match->cp_str.string[i]) != TOLOWER_LOC(str[i])
-		: match->cp_str.string[i] != str[i])
-	    return FALSE;
+	إذا (i >= typed && i < longest_پای_ټکی
+		? TOLOWER_LOC(سمون->cp_str.string[i]) != TOLOWER_LOC(str[i])
+		: سمون->cp_str.string[i] != str[i])
+	    أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * when len is -1 mean use whole length of p otherwise part of p
  */
-    static void
-ins_compl_insert_bytes(char_u *p, int len)
+    ساكن فراغ
+ins_compl_ورننباسه_بایټونه(char_u *p, صحيح len)
 {
-    if (len == -1)
-	len = (int)STRLEN(p);
-    ins_bytes_len(p, len);
-    compl_ins_end_col = curwin->w_cursor.col;
+    إذا (len == -1)
+	len = (صحيح)STRLEN(p);
+    ins_بایټونه_len(p, len);
+    compl_ins_پای_ټکی_ستون = curwin->w_cursor.ستون;
 }
 
 /*
  * Get current completion leader
  */
     char_u *
-ins_compl_leader(void)
+ins_compl_leader(فراغ)
 {
-    return compl_leader.string != NULL ? compl_leader.string : compl_orig_text.string;
+    أرجع compl_leader.string != عدم ? compl_leader.string : compl_orig_متن.string;
 }
 
 /*
  * Get current completion leader length
  */
-    static size_t
-ins_compl_leader_len(void)
+    ساكن size_t
+ins_compl_leader_len(فراغ)
 {
-    return compl_leader.string != NULL ? compl_leader.length : compl_orig_text.length;
+    أرجع compl_leader.string != عدم ? compl_leader.اوږدتیا : compl_orig_متن.اوږدتیا;
 }
 
 /*
@@ -1227,41 +1227,41 @@ ins_compl_leader_len(void)
  * column range. If it is, it returns a special highlight attribute.
  * -1 means normal item.
  */
-    int
-ins_compl_col_range_attr(linenr_T lnum, int col)
+    صحيح
+ins_compl_ستون_range_attr(linenr_T lnum, صحيح ستون)
 {
-    int	    start_col;
-    int	    has_preinsert = ins_compl_has_preinsert()
+    صحيح	    پیل_ستون;
+    صحيح	    has_preinsert = ins_compl_has_preinsert()
 			|| ins_compl_preinsert_longest();
-    int	    attr;
+    صحيح	    attr;
 
-    if (cot_fuzzy()
+    إذا (cot_fuzzy()
 	    || (!compl_hi_on_autocompl_longest && ins_compl_preinsert_longest())
 	    || (attr = syn_name2attr(has_preinsert
 		    ? (char_u *)"PreInsert" : (char_u *)"ComplMatchIns")) == 0)
-	return -1;
+	أرجع -1;
 
-    start_col = compl_col + (int)ins_compl_leader_len();
-    if (!ins_compl_has_multiple())
-	return (col >= start_col && col < compl_ins_end_col) ? attr : -1;
+    پیل_ستون = compl_ستون + (صحيح)ins_compl_leader_len();
+    إذا (!ins_compl_has_مضرب())
+	أرجع (ستون >= پیل_ستون && ستون < compl_ins_پای_ټکی_ستون) ? attr : -1;
 
     // Multiple lines
-    if ((lnum == compl_lnum && col >= start_col && col < MAXCOL) ||
+    إذا ((lnum == compl_lnum && ستون >= پیل_ستون && ستون < MAXCOL) ||
 	(lnum > compl_lnum && lnum < curwin->w_cursor.lnum) ||
-	(lnum == curwin->w_cursor.lnum && col <= compl_ins_end_col))
-	return attr;
+	(lnum == curwin->w_cursor.lnum && ستون <= compl_ins_پای_ټکی_ستون))
+	أرجع attr;
 
-    return -1;
+    أرجع -1;
 }
 
 /*
  * Returns TRUE if the current completion string contains newline characters,
  * indicating it's a multi-line completion.
  */
-    static int
-ins_compl_has_multiple(void)
+    ساكن صحيح
+ins_compl_has_مضرب(فراغ)
 {
-    return vim_strchr(compl_shown_match->cp_str.string, '\n') != NULL;
+    أرجع vim_strchr(compl_shown_سمون->cp_str.string, '\n') != عدم;
 }
 
 /*
@@ -1269,333 +1269,333 @@ ins_compl_has_multiple(void)
  * completion, i.e. between the starting line (compl_lnum) and current cursor
  * line. Always returns FALSE for single-line completions.
  */
-    int
-ins_compl_lnum_in_range(linenr_T lnum)
+    صحيح
+ins_compl_lnum_دننه_range(linenr_T lnum)
 {
-    if (!ins_compl_has_multiple())
-	return FALSE;
-    return lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
+    إذا (!ins_compl_has_مضرب())
+	أرجع FALSE;
+    أرجع lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
 }
 
 /*
  * Reduce the longest common string for match "match".
  */
-    static void
-ins_compl_longest_match(compl_T *match)
+    ساكن فراغ
+ins_compl_longest_سمون(compl_T *سمون)
 {
     char_u	*p, *s;
-    int		c1, c2;
-    int		had_match;
+    صحيح		c1, c2;
+    صحيح		had_سمون;
 
-    if (compl_leader.string == NULL)
+    إذا (compl_leader.string == عدم)
     {
 	// First match, use it as a whole.
-	compl_leader.string = vim_strnsave(match->cp_str.string, match->cp_str.length);
-	if (compl_leader.string == NULL)
-	    return;
+	compl_leader.string = vim_strnsave(سمون->cp_str.string, سمون->cp_str.اوږدتیا);
+	إذا (compl_leader.string == عدم)
+	    أرجع;
 
-	compl_leader.length = match->cp_str.length;
-	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	compl_leader.اوږدتیا = سمون->cp_str.اوږدتیا;
+	had_سمون = (curwin->w_cursor.ستون > compl_ستون);
+	ins_compl_longest_ورننباسه(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	إذا (!had_سمون)
 	    ins_compl_delete();
-	compl_used_match = FALSE;
+	compl_کارول_شوی_سمون = FALSE;
 
-	return;
+	أرجع;
     }
 
     // Reduce the text if this match differs from compl_leader.
     p = compl_leader.string;
-    s = match->cp_str.string;
-    while (*p != NUL)
+    s = سمون->cp_str.string;
+    طالما (*p != NUL)
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    c1 = mb_ptr2char(p);
 	    c2 = mb_ptr2char(s);
 	}
-	else
+	وإلا
 	{
 	    c1 = *p;
 	    c2 = *s;
 	}
-	if ((match->cp_flags & CP_ICASE)
+	إذا ((سمون->cp_flags & CP_ICASE)
 		? (MB_TOLOWER(c1) != MB_TOLOWER(c2)) : (c1 != c2))
-	    break;
-	if (has_mbyte)
+	    اكسر;
+	إذا (has_mbyte)
 	{
 	    MB_PTR_ADV(p);
 	    MB_PTR_ADV(s);
 	}
-	else
+	وإلا
 	{
 	    ++p;
 	    ++s;
 	}
     }
 
-    if (*p != NUL)
+    إذا (*p != NUL)
     {
 	// Leader was shortened, need to change the inserted text.
 	*p = NUL;
-	compl_leader.length = (size_t)(p - compl_leader.string);
+	compl_leader.اوږدتیا = (size_t)(p - compl_leader.string);
 
-	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	had_سمون = (curwin->w_cursor.ستون > compl_ستون);
+	ins_compl_longest_ورننباسه(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	إذا (!had_سمون)
 	    ins_compl_delete();
     }
 
-    compl_used_match = FALSE;
+    compl_کارول_شوی_سمون = FALSE;
 }
 
 /*
  * Add an array of matches to the list of matches.
  * Frees matches[].
  */
-    static void
-ins_compl_add_matches(
-    int		num_matches,
+    ساكن فراغ
+ins_compl_جمع_کړه_matches(
+    صحيح		عدد_matches,
     char_u	**matches,
-    int		icase)
+    صحيح		icase)
 {
-    int		add_r = OK;
-    int		dir = compl_direction;
+    صحيح		جمع_کړه_r = OK;
+    صحيح		dir = compl_direction;
 
-    for (int i = 0; i < num_matches && add_r != FAIL; i++)
+    لكل (صحيح i = 0; i < عدد_matches && جمع_کړه_r != FAIL; i++)
     {
-	add_r = ins_compl_add(matches[i], -1, NULL, NULL, NULL, dir,
-		CP_FAST | (icase ? CP_ICASE : 0), FALSE, NULL,
+	جمع_کړه_r = ins_compl_جمع_کړه(matches[i], -1, عدم, عدم, عدم, dir,
+		CP_FAST | (icase ? CP_ICASE : 0), FALSE, عدم,
 		FUZZY_SCORE_NONE);
-	if (add_r == OK)
+	إذا (جمع_کړه_r == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
     }
-    FreeWild(num_matches, matches);
+    FreeWild(عدد_matches, matches);
 }
 
 /*
  * Make the completion list cyclic.
  * Return the number of matches (excluding the original).
  */
-    static int
-ins_compl_make_cyclic(void)
+    ساكن صحيح
+ins_compl_make_cyclic(فراغ)
 {
-    compl_T *match;
-    int	    count = 0;
+    compl_T *سمون;
+    صحيح	    شمېر = 0;
 
-    if (compl_first_match == NULL)
-	return 0;
+    إذا (compl_لومړی_سمون == عدم)
+	أرجع 0;
 
     // Find the end of the list.
-    match = compl_first_match;
+    سمون = compl_لومړی_سمون;
     // there's always an entry for the compl_orig_text, it doesn't count.
-    while (match->cp_next != NULL && !is_first_match(match->cp_next))
+    طالما (سمون->cp_بل != عدم && !is_لومړی_سمون(سمون->cp_بل))
     {
-	match = match->cp_next;
-	++count;
+	سمون = سمون->cp_بل;
+	++شمېر;
     }
-    match->cp_next = compl_first_match;
-    compl_first_match->cp_prev = match;
+    سمون->cp_بل = compl_لومړی_سمون;
+    compl_لومړی_سمون->cp_prev = سمون;
 
-    return count;
+    أرجع شمېر;
 }
 
 /*
  * Return whether there currently is a shown match.
  */
-    int
-ins_compl_has_shown_match(void)
+    صحيح
+ins_compl_has_shown_سمون(فراغ)
 {
-    return compl_shown_match == NULL
-	|| compl_shown_match != compl_shown_match->cp_next;
+    أرجع compl_shown_سمون == عدم
+	|| compl_shown_سمون != compl_shown_سمون->cp_بل;
 }
 
 /*
  * Return whether the shown match is long enough.
  */
-    int
-ins_compl_long_shown_match(void)
+    صحيح
+ins_compl_long_shown_سمون(فراغ)
 {
-    return (int)compl_shown_match->cp_str.length
-					    > curwin->w_cursor.col - compl_col;
+    أرجع (صحيح)compl_shown_سمون->cp_str.اوږدتیا
+					    > curwin->w_cursor.ستون - compl_ستون;
 }
 
 /*
  * Get the local or global value of 'completeopt' flags.
  */
-    unsigned int
-get_cot_flags(void)
+    بینښه صحيح
+get_cot_flags(فراغ)
 {
-    return curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
+    أرجع curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
 }
 
 /*
  * Update the screen and when there is any scrolling remove the popup menu.
  */
-    static void
-ins_compl_upd_pum(void)
+    ساكن فراغ
+ins_compl_upd_pum(فراغ)
 {
-    if (compl_match_array == NULL)
-	return;
+    إذا (compl_سمون_array == عدم)
+	أرجع;
 
-    int h = curwin->w_cline_height;
+    صحيح h = curwin->w_cline_لوړوالی;
     // Update the screen later, before drawing the popup menu over it.
     pum_call_update_screen();
-    if (h != curwin->w_cline_height)
+    إذا (h != curwin->w_cline_لوړوالی)
 	ins_compl_del_pum();
 }
 
 /*
  * Remove any popup menu.
  */
-    static void
-ins_compl_del_pum(void)
+    ساكن فراغ
+ins_compl_del_pum(فراغ)
 {
-    if (compl_match_array == NULL)
-	return;
+    إذا (compl_سمون_array == عدم)
+	أرجع;
 
     pum_undisplay();
-    VIM_CLEAR(compl_match_array);
+    VIM_CLEAR(compl_سمون_array);
 }
 
 /*
  * Return TRUE if the popup menu should be displayed.
  */
-    int
-pum_wanted(void)
+    صحيح
+pum_wanted(فراغ)
 {
     // 'completeopt' must contain "menu" or "menuone"
-    return (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
+    أرجع (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
 }
 
 /*
  * Return TRUE if there are two or more matches to be shown in the popup menu.
  * One if 'completopt' contains "menuone".
  */
-    static int
-pum_enough_matches(void)
+    ساكن صحيح
+pum_enough_matches(فراغ)
 {
     compl_T     *compl;
-    int		i = 0;
+    صحيح		i = 0;
 
     // Don't display the popup menu if there are no matches or there is only
     // one (ignoring the original text).
-    compl = compl_first_match;
-    do
+    compl = compl_لومړی_سمون;
+    افعل
     {
-	if (compl == NULL || (!match_at_original_text(compl) && ++i == 2))
-	    break;
-	compl = compl->cp_next;
-    } while (!is_first_match(compl));
+	إذا (compl == عدم || (!سمون_at_original_متن(compl) && ++i == 2))
+	    اكسر;
+	compl = compl->cp_بل;
+    } طالما (!is_لومړی_سمون(compl));
 
-    if ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
-	return (i >= 1);
-    return (i >= 2);
+    إذا ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
+	أرجع (i >= 1);
+    أرجع (i >= 2);
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Allocate Dict for the completed item.
  * { word, abbr, menu, kind, info }
  */
-    static dict_T *
-ins_compl_dict_alloc(compl_T *match)
+    ساكن dict_T *
+ins_compl_dict_alloc(compl_T *سمون)
 {
-    dict_T *dict = dict_alloc_lock(VAR_FIXED);
+    dict_T *dict = dict_alloc_قلف(VAR_FIXED);
 
-    if (dict == NULL)
-	return NULL;
-    fill_complete_info_dict(dict, match, FALSE);
-    return dict;
+    إذا (dict == عدم)
+	أرجع عدم;
+    fill_complete_info_dict(dict, سمون, FALSE);
+    أرجع dict;
 }
 
 /*
  * Trigger the CompleteChanged autocmd event. Invoked each time the Insert mode
  * completion menu is changed.
  */
-    static void
-trigger_complete_changed_event(int cur)
+    ساكن فراغ
+trigger_complete_بدل_شوی_event(صحيح cur)
 {
     dict_T	    *v_event;
-    dict_T	    *item;
-    static int	    recursive = FALSE;
+    dict_T	    *توکی;
+    ساكن صحيح	    recursive = FALSE;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    إذا (recursive)
+	أرجع;
 
-    item = cur < 0 ? dict_alloc() : ins_compl_dict_alloc(compl_curr_match);
-    if (item == NULL)
-	return;
+    توکی = cur < 0 ? dict_alloc() : ins_compl_dict_alloc(compl_curr_سمون);
+    إذا (توکی == عدم)
+	أرجع;
     v_event = get_v_event(&save_v_event);
-    dict_add_dict(v_event, "completed_item", item);
-    pum_set_event_info(v_event);
-    dict_set_items_ro(v_event);
+    dict_جمع_کړه_dict(v_event, "completed_item", توکی);
+    pum_سېټ_event_info(v_event);
+    dict_سېټ_توکي_ro(v_event);
 
     recursive = TRUE;
     textlock++;
-    apply_autocmds(EVENT_COMPLETECHANGED, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_COMPLETECHANGED, عدم, عدم, FALSE, curbuf);
     textlock--;
     recursive = FALSE;
 
     restore_v_event(v_event, &save_v_event);
 }
-#endif
+#د_که_پای
 
 /*
  * Helper functions for mergesort_list().
  */
-    static void*
-cp_get_next(void *node)
+    ساكن فراغ*
+cp_get_بل(فراغ *غوټه)
 {
-    return ((compl_T*)node)->cp_next;
+    أرجع ((compl_T*)غوټه)->cp_بل;
 }
 
-    static void
-cp_set_next(void *node, void *next)
+    ساكن فراغ
+cp_سېټ_بل(فراغ *غوټه, فراغ *بل)
 {
-    ((compl_T*)node)->cp_next = (compl_T*)next;
+    ((compl_T*)غوټه)->cp_بل = (compl_T*)بل;
 }
 
-    static void*
-cp_get_prev(void* node)
+    ساكن فراغ*
+cp_get_prev(فراغ* غوټه)
 {
-    return ((compl_T*)node)->cp_prev;
+    أرجع ((compl_T*)غوټه)->cp_prev;
 }
 
-    static void
-cp_set_prev(void* node, void* prev)
+    ساكن فراغ
+cp_سېټ_prev(فراغ* غوټه, فراغ* prev)
 {
-    ((compl_T*)node)->cp_prev = (compl_T*)prev;
+    ((compl_T*)غوټه)->cp_prev = (compl_T*)prev;
 }
 
-    static int
-cp_compare_fuzzy(const void* a, const void* b)
+    ساكن صحيح
+cp_compare_fuzzy(ثابت فراغ* a, ثابت فراغ* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
+    صحيح score_a = ((compl_T*)a)->cp_score;
+    صحيح score_b = ((compl_T*)b)->cp_score;
 
-    if (score_a != score_b)
-	return (score_b > score_a) ? 1 : -1;
+    إذا (score_a != score_b)
+	أرجع (score_b > score_a) ? 1 : -1;
 
-    return ((compl_T *)a)->cp_order - ((compl_T *)b)->cp_order;
+    أرجع ((compl_T *)a)->cp_ترتیب - ((compl_T *)b)->cp_ترتیب;
 }
 
-    static int
-cp_compare_nearest(const void* a, const void* b)
+    ساكن صحيح
+cp_compare_تر_ټولو_نږدې(ثابت فراغ* a, ثابت فراغ* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
-    if (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
-	return 0;
-    return (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
+    صحيح score_a = ((compl_T*)a)->cp_score;
+    صحيح score_b = ((compl_T*)b)->cp_score;
+    إذا (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
+	أرجع 0;
+    أرجع (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
 }
 
 /*
@@ -1603,26 +1603,26 @@ cp_compare_nearest(const void* a, const void* b)
  * startcol to compl_col) to the given source string. Stores the result in
  * dest. Returns OK or FAIL.
  */
-    static int
-prepend_startcol_text(string_T *dest, string_T *src, int startcol)
+    ساكن صحيح
+prepend_startcol_متن(string_T *dest, string_T *src, صحيح startcol)
 {
-    int prepend_len = compl_col - startcol;
-    int new_length = prepend_len + (int)src->length;
+    صحيح prepend_len = compl_ستون - startcol;
+    صحيح new_اوږدتیا = prepend_len + (صحيح)src->اوږدتیا;
 
-    dest->length = (size_t)new_length;
-    dest->string = alloc(new_length + 1);  // +1 for NUL
-    if (dest->string == NULL)
+    dest->اوږدتیا = (size_t)new_اوږدتیا;
+    dest->string = alloc(new_اوږدتیا + 1);  // +1 for NUL
+    إذا (dest->string == عدم)
     {
-	dest->length = 0;
-	return FAIL;
+	dest->اوږدتیا = 0;
+	أرجع FAIL;
     }
 
-    char_u	*line = ml_get(curwin->w_cursor.lnum);
+    char_u	*کرښه = ml_get(curwin->w_cursor.lnum);
 
-    mch_memmove(dest->string, line + startcol, prepend_len);
-    mch_memmove(dest->string + prepend_len, src->string, src->length);
-    dest->string[new_length] = NUL;
-    return OK;
+    mch_memmove(dest->string, کرښه + startcol, prepend_len);
+    mch_memmove(dest->string + prepend_len, src->string, src->اوږدتیا);
+    dest->string[new_اوږدتیا] = NUL;
+    أرجع OK;
 }
 
 /*
@@ -1630,26 +1630,26 @@ prepend_startcol_text(string_T *dest, string_T *src, int startcol)
  * startcol. If the source's startcol is before compl_col, prepends text from
  * the buffer line to the original compl_leader.
  */
-    static string_T *
-get_leader_for_startcol(compl_T *match, int cached)
+    ساكن string_T *
+get_leader_for_startcol(compl_T *سمون, صحيح cached)
 {
-    static string_T adjusted_leader = {NULL, 0};
+    ساكن string_T adjusted_leader = {عدم, 0};
 
-    if (match == NULL)
+    إذا (سمون == عدم)
     {
 	VIM_CLEAR_STRING(adjusted_leader);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (cpt_sources_array == NULL)
-	goto theend;
+    إذا (cpt_sources_array == عدم)
+	اذهب theend;
 
-    int	cpt_idx = match->cp_cpt_source_idx;
-    if (cpt_idx < 0)
-	goto theend;
-    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+    صحيح	cpt_idx = سمون->cp_cpt_سرچینه_idx;
+    إذا (cpt_idx < 0)
+	اذهب theend;
+    صحيح	startcol = cpt_sources_array[cpt_idx].cs_startcol;
 
-    if (compl_leader.string == NULL)
+    إذا (compl_leader.string == عدم)
     {
 	// When leader is not set (e.g. 'autocomplete' first fires before
 	// compl_leader is initialised), fall back to compl_orig_text for
@@ -1657,129 +1657,129 @@ get_leader_for_startcol(compl_T *match, int cached)
 	// compl_col carry pre-compl_col text and must not be compared with
 	// compl_orig_text, so return &compl_leader (NULL string) to signal
 	// "pass through" (no prefix filter).
-	if (startcol < 0 || startcol >= compl_col)
-	    return &compl_orig_text;
-	return &compl_leader;  // pass through (startcol < compl_col)
+	إذا (startcol < 0 || startcol >= compl_ستون)
+	    أرجع &compl_orig_متن;
+	أرجع &compl_leader;  // pass through (startcol < compl_col)
     }
 
-    if (compl_col <= 0)
-	goto theend;
+    إذا (compl_ستون <= 0)
+	اذهب theend;
 
-    if (startcol >= 0 && startcol < compl_col)
+    إذا (startcol >= 0 && startcol < compl_ستون)
     {
-	int prepend_len = compl_col - startcol;
-	int new_length = prepend_len + (int)compl_leader.length;
-	if (cached && (size_t)new_length == adjusted_leader.length
-		&& adjusted_leader.string != NULL)
-	    return &adjusted_leader;
+	صحيح prepend_len = compl_ستون - startcol;
+	صحيح new_اوږدتیا = prepend_len + (صحيح)compl_leader.اوږدتیا;
+	إذا (cached && (size_t)new_اوږدتیا == adjusted_leader.اوږدتیا
+		&& adjusted_leader.string != عدم)
+	    أرجع &adjusted_leader;
 
 	VIM_CLEAR_STRING(adjusted_leader);
-	if (prepend_startcol_text(&adjusted_leader, &compl_leader,
+	إذا (prepend_startcol_متن(&adjusted_leader, &compl_leader,
 		    startcol) != OK)
-	    goto theend;
+	    اذهب theend;
 
-	return &adjusted_leader;
+	أرجع &adjusted_leader;
     }
 theend:
-    return &compl_leader;
+    أرجع &compl_leader;
 }
 
 /*
  * Set fuzzy score for completion matches.
  */
-    static void
-set_fuzzy_score(void)
+    ساكن فراغ
+سېټ_fuzzy_score(فراغ)
 {
     compl_T *compl;
-    char_u  *pattern;
-    int	    use_leader;
+    char_u  *نمونه;
+    صحيح	    use_leader;
 
-    if (compl_first_match == NULL)
-	return;
+    إذا (compl_لومړی_سمون == عدم)
+	أرجع;
 
     /* Determine the pattern to match against */
-    use_leader = (compl_leader.string != NULL && compl_leader.length > 0);
-    if (!use_leader)
+    use_leader = (compl_leader.string != عدم && compl_leader.اوږدتیا > 0);
+    إذا (!use_leader)
     {
-	if (compl_orig_text.string == NULL || compl_orig_text.length == 0)
-	    return;
-	pattern = compl_orig_text.string;
+	إذا (compl_orig_متن.string == عدم || compl_orig_متن.اوږدتیا == 0)
+	    أرجع;
+	نمونه = compl_orig_متن.string;
     }
-    else
+    وإلا
     {
 	/* Clear the leader cache once before the loop */
-	(void)get_leader_for_startcol(NULL, TRUE);
-	pattern = NULL;  /* Will be computed per-completion */
+	(فراغ)get_leader_for_startcol(عدم, TRUE);
+	نمونه = عدم;  /* Will be computed per-completion */
     }
 
     /* Score all completion matches */
-    int next = 0;
-    compl = compl_first_match;
-    do
+    صحيح بل = 0;
+    compl = compl_لومړی_سمون;
+    افعل
     {
-	if (compl->cp_order < 0)
-	    compl->cp_order = next;
-	next = MAX(next, compl->cp_order + 1);
+	إذا (compl->cp_ترتیب < 0)
+	    compl->cp_ترتیب = بل;
+	بل = MAX(بل, compl->cp_ترتیب + 1);
 
-	if (use_leader)
-	    pattern = get_leader_for_startcol(compl, TRUE)->string;
+	إذا (use_leader)
+	    نمونه = get_leader_for_startcol(compl, TRUE)->string;
 
-	compl->cp_score = fuzzy_match_str(compl->cp_str.string, pattern);
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl->cp_score = fuzzy_سمون_str(compl->cp_str.string, نمونه);
+	compl = compl->cp_بل;
+    } طالما (compl != عدم && !is_لومړی_سمون(compl));
 }
 
 /*
  * Sort completion matches, leaving the entry with the original text in place.
  */
-    static void
-sort_compl_match_list(int (*compare)(const void *, const void *))
+    ساكن فراغ
+ترتیبول_compl_سمون_list(صحيح (*compare)(ثابت فراغ *, ثابت فراغ *))
 {
-    compl_T	*orig_text;
+    compl_T	*orig_متن;
 
-    if (!compl_first_match || is_first_match(compl_first_match->cp_next))
-	return;
+    إذا (!compl_لومړی_سمون || is_لومړی_سمون(compl_لومړی_سمون->cp_بل))
+	أرجع;
 
-    orig_text = find_original_text_match();
-    if (orig_text == NULL)
-	return;
+    orig_متن = پیدا_کړه_original_متن_سمون();
+    إذا (orig_متن == عدم)
+	أرجع;
 
-    ins_compl_make_linear();
-    if (orig_text == compl_first_match)
+    ins_compl_make_خطي();
+    إذا (orig_متن == compl_لومړی_سمون)
     {
-	compl_first_match->cp_next->cp_prev = NULL;
-	compl_first_match->cp_next = mergesort_list(compl_first_match->cp_next,
-		cp_get_next, cp_set_next, cp_get_prev, cp_set_prev, compare);
-	compl_first_match->cp_next->cp_prev = compl_first_match;
+	compl_لومړی_سمون->cp_بل->cp_prev = عدم;
+	compl_لومړی_سمون->cp_بل = mergesort_list(compl_لومړی_سمون->cp_بل,
+		cp_get_بل, cp_سېټ_بل, cp_get_prev, cp_سېټ_prev, compare);
+	compl_لومړی_سمون->cp_بل->cp_prev = compl_لومړی_سمون;
     }
-    else
+    وإلا
     {
-	compl_T	*tail;
+	compl_T	*لکۍ;
 
-	orig_text->cp_prev->cp_next = NULL;
-	compl_first_match = mergesort_list(compl_first_match, cp_get_next,
-		cp_set_next, cp_get_prev, cp_set_prev, compare);
-	tail = compl_first_match;
-	while (tail->cp_next != NULL)
-	    tail = tail->cp_next;
-	tail->cp_next = orig_text;
-	orig_text->cp_prev = tail;
+	orig_متن->cp_prev->cp_بل = عدم;
+	compl_لومړی_سمون = mergesort_list(compl_لومړی_سمون, cp_get_بل,
+		cp_سېټ_بل, cp_get_prev, cp_سېټ_prev, compare);
+	لکۍ = compl_لومړی_سمون;
+	طالما (لکۍ->cp_بل != عدم)
+	    لکۍ = لکۍ->cp_بل;
+	لکۍ->cp_بل = orig_متن;
+	orig_متن->cp_prev = لکۍ;
     }
-    (void)ins_compl_make_cyclic();
+    (فراغ)ins_compl_make_cyclic();
 }
 
 /*
  * Return the attribute for highlight group "hl_id", -1 when it has none.
  */
-    static int
-get_user_highlight_attr(int hl_id)
+    ساكن صحيح
+get_user_highlight_attr(صحيح hl_id)
 {
-    int	    attr;
+    صحيح	    attr;
 
-    if (hl_id <= 0)
-	return -1;
+    إذا (hl_id <= 0)
+	أرجع -1;
     attr = syn_id2attr(hl_id);
-    return attr > 0 ? attr : -1;
+    أرجع attr > 0 ? attr : -1;
 }
 
 /*
@@ -1787,224 +1787,224 @@ get_user_highlight_attr(int hl_id)
  * Returns the popup menu entry that should be selected. Returns -1 if nothing
  * should be selected.
  */
-    static int
-ins_compl_build_pum(void)
+    ساكن صحيح
+ins_compl_build_pum(فراغ)
 {
     compl_T     *compl;
-    compl_T     *shown_compl = NULL;
-    int		did_find_shown_match = FALSE;
-    int		shown_match_ok = FALSE;
-    int		i = 0;
-    int		cur = -1;
-    int		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
+    compl_T     *shown_compl = عدم;
+    صحيح		did_پیدا_کړه_shown_سمون = FALSE;
+    صحيح		shown_سمون_ok = FALSE;
+    صحيح		i = 0;
+    صحيح		cur = -1;
+    صحيح		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    compl_T	*match_head = NULL;
-    compl_T	*match_tail = NULL;
-    compl_T	*match_next = NULL;
-    int		*match_count = NULL;
-    int		is_forward = compl_shows_dir_forward();
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    compl_T	*سمون_سر = عدم;
+    compl_T	*سمون_لکۍ = عدم;
+    compl_T	*سمون_بل = عدم;
+    صحيح		*سمون_شمېر = عدم;
+    صحيح		is_forward = compl_shows_dir_forward();
+    صحيح		is_cpt_completion = (cpt_sources_array != عدم);
     string_T	*leader;
 
     // Need to build the popup menu list.
-    compl_match_arraysize = 0;
+    compl_سمون_arraysize = 0;
 
     // If the current match is the original text don't find the first
     // match after it, don't highlight anything.
-    if (match_at_original_text(compl_shown_match))
-	shown_match_ok = TRUE;
+    إذا (سمون_at_original_متن(compl_shown_سمون))
+	shown_سمون_ok = TRUE;
 
-    if (compl_leader.string != NULL
-	    && STRCMP(compl_leader.string, compl_orig_text.string) == 0
-	    && shown_match_ok == FALSE)
-	compl_shown_match = compl_no_select ? compl_first_match
-					    : compl_first_match->cp_next;
+    إذا (compl_leader.string != عدم
+	    && STRCMP(compl_leader.string, compl_orig_متن.string) == 0
+	    && shown_سمون_ok == FALSE)
+	compl_shown_سمون = compl_no_select ? compl_لومړی_سمون
+					    : compl_لومړی_سمون->cp_بل;
 
-    if (is_cpt_completion)
+    إذا (is_cpt_completion)
     {
-	match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-	if (match_count == NULL)
-	    return -1;
+	سمون_شمېر = ALLOC_CLEAR_MULT(صحيح, cpt_sources_شمېر);
+	إذا (سمون_شمېر == عدم)
+	    أرجع -1;
     }
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (فراغ)get_leader_for_startcol(عدم, TRUE); // Clear the cache
 
-    compl = compl_first_match;
-    do
+    compl = compl_لومړی_سمون;
+    افعل
     {
-	compl->cp_in_match_array = FALSE;
+	compl->cp_دننه_سمون_array = FALSE;
 
 	leader = get_leader_for_startcol(compl, TRUE);
 
 	// Apply 'smartcase': judge case from compl_orig_text, not the leader
 	// which 'longest' may fill with uppercase the user never typed.
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
-		&& !ignorecase(compl_orig_text.string) && !cot_fuzzy())
+	إذا (ctrl_x_ډېرپېښ_نورمال() && !p_inf && compl_orig_متن.string
+		&& !ignorecase(compl_orig_متن.string) && !cot_fuzzy())
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	إذا (!سمون_at_original_متن(compl)
+		&& (leader->string == عدم
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)
+			(صحيح)leader->اوږدتیا)
 		    || (cot_fuzzy() && compl->cp_score != FUZZY_SCORE_NONE)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
-	    if (is_forward && cur_source != -1 && is_cpt_completion)
+	    صحيح سمون_حد_exceeded = FALSE;
+	    صحيح cur_سرچینه = compl->cp_cpt_سرچینه_idx;
+	    إذا (is_forward && cur_سرچینه != -1 && is_cpt_completion)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
-		    match_limit_exceeded = TRUE;
+		سمون_شمېر[cur_سرچینه]++;
+		صحيح max_matches = cpt_sources_array[cur_سرچینه].cs_max_matches;
+		إذا (max_matches > 0 && سمون_شمېر[cur_سرچینه] > max_matches)
+		    سمون_حد_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded)
+	    إذا (!سمون_حد_exceeded)
 	    {
-		++compl_match_arraysize;
-		compl->cp_in_match_array = TRUE;
-		if (match_head == NULL)
-		    match_head = compl;
-		else
-		    match_tail->cp_match_next = compl;
-		match_tail = compl;
+		++compl_سمون_arraysize;
+		compl->cp_دننه_سمون_array = TRUE;
+		إذا (سمون_سر == عدم)
+		    سمون_سر = compl;
+		وإلا
+		    سمون_لکۍ->cp_سمون_بل = compl;
+		سمون_لکۍ = compl;
 
-		if (!shown_match_ok && !cot_fuzzy())
+		إذا (!shown_سمون_ok && !cot_fuzzy())
 		{
-		    if (compl == compl_shown_match || did_find_shown_match)
+		    إذا (compl == compl_shown_سمون || did_پیدا_کړه_shown_سمون)
 		    {
 			// This item is the shown match or this is the
 			// first displayed item after the shown match.
-			compl_shown_match = compl;
-			did_find_shown_match = TRUE;
-			shown_match_ok = TRUE;
+			compl_shown_سمون = compl;
+			did_پیدا_کړه_shown_سمون = TRUE;
+			shown_سمون_ok = TRUE;
 		    }
-		    else
+		    وإلا
 			// Remember this displayed match for when the
 			// shown match is just below it.
 			shown_compl = compl;
 		    cur = i;
 		}
-		else if (cot_fuzzy())
+		وإلا إذا (cot_fuzzy())
 		{
-		    if (i == 0)
+		    إذا (i == 0)
 			shown_compl = compl;
 
-		    if (!shown_match_ok && compl == compl_shown_match)
+		    إذا (!shown_سمون_ok && compl == compl_shown_سمون)
 		    {
 			cur = i;
-			shown_match_ok = TRUE;
+			shown_سمون_ok = TRUE;
 		    }
 		}
 		i++;
 	    }
 	}
 
-	if (compl == compl_shown_match && !cot_fuzzy())
+	إذا (compl == compl_shown_سمون && !cot_fuzzy())
 	{
-	    did_find_shown_match = TRUE;
+	    did_پیدا_کړه_shown_سمون = TRUE;
 
 	    // When the original text is the shown match don't set
 	    // compl_shown_match.
-	    if (match_at_original_text(compl))
-		shown_match_ok = TRUE;
+	    إذا (سمون_at_original_متن(compl))
+		shown_سمون_ok = TRUE;
 
-	    if (!shown_match_ok && shown_compl != NULL)
+	    إذا (!shown_سمون_ok && shown_compl != عدم)
 	    {
 		// The shown match isn't displayed, set it to the
 		// previously displayed match.
-		compl_shown_match = shown_compl;
-		shown_match_ok = TRUE;
+		compl_shown_سمون = shown_compl;
+		shown_سمون_ok = TRUE;
 	    }
 	}
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl = compl->cp_بل;
+    } طالما (compl != عدم && !is_لومړی_سمون(compl));
 
-    vim_free(match_count);
+    vim_free(سمون_شمېر);
 
-    if (compl_match_arraysize == 0)
-	return -1;
+    إذا (compl_سمون_arraysize == 0)
+	أرجع -1;
 
-    if (cot_fuzzy() && !compl_no_select && !shown_match_ok)
+    إذا (cot_fuzzy() && !compl_no_select && !shown_سمون_ok)
     {
-	compl_shown_match = shown_compl;
-	shown_match_ok = TRUE;
+	compl_shown_سمون = shown_compl;
+	shown_سمون_ok = TRUE;
 	cur = 0;
     }
 
-    compl_match_array = ALLOC_CLEAR_MULT(pumitem_T, compl_match_arraysize);
-    if (compl_match_array == NULL)
-	return -1;
+    compl_سمون_array = ALLOC_CLEAR_MULT(pumitem_T, compl_سمون_arraysize);
+    إذا (compl_سمون_array == عدم)
+	أرجع -1;
 
-    compl = match_head;
+    compl = سمون_سر;
     i = 0;
-    while (compl != NULL)
+    طالما (compl != عدم)
     {
-	compl_match_array[i].pum_text = compl->cp_text[CPT_ABBR] != NULL
-			    ? compl->cp_text[CPT_ABBR] : compl->cp_str.string;
-	compl_match_array[i].pum_kind = compl->cp_text[CPT_KIND];
-	compl_match_array[i].pum_info = compl->cp_text[CPT_INFO];
-	compl_match_array[i].pum_cpt_source_idx = compl->cp_cpt_source_idx;
-	compl_match_array[i].pum_user_abbr_hlattr =
+	compl_سمون_array[i].pum_متن = compl->cp_متن[CPT_ABBR] != عدم
+			    ? compl->cp_متن[CPT_ABBR] : compl->cp_str.string;
+	compl_سمون_array[i].pum_ډول = compl->cp_متن[CPT_ډول];
+	compl_سمون_array[i].pum_info = compl->cp_متن[CPT_INFO];
+	compl_سمون_array[i].pum_cpt_سرچینه_idx = compl->cp_cpt_سرچینه_idx;
+	compl_سمون_array[i].pum_user_abbr_hlattr =
 			get_user_highlight_attr(compl->cp_user_abbr_hl_id);
-	compl_match_array[i].pum_user_kind_hlattr =
-			get_user_highlight_attr(compl->cp_user_kind_hl_id);
-	compl_match_array[i++].pum_extra = compl->cp_text[CPT_MENU] != NULL
-			    ? compl->cp_text[CPT_MENU] : compl->cp_fname;
-	match_next = compl->cp_match_next;
-	compl->cp_match_next = NULL;
-	compl = match_next;
+	compl_سمون_array[i].pum_user_ډول_hlattr =
+			get_user_highlight_attr(compl->cp_user_ډول_hl_id);
+	compl_سمون_array[i++].pum_extra = compl->cp_متن[CPT_MENU] != عدم
+			    ? compl->cp_متن[CPT_MENU] : compl->cp_fname;
+	سمون_بل = compl->cp_سمون_بل;
+	compl->cp_سمون_بل = عدم;
+	compl = سمون_بل;
     }
 
-    if (!shown_match_ok)    // no displayed match at all
+    إذا (!shown_سمون_ok)    // no displayed match at all
 	cur = -1;
 
-    return cur;
+    أرجع cur;
 }
 
 /*
  * Show the popup menu for the list of matches.
  * Also adjusts "compl_shown_match" to an entry that is actually displayed.
  */
-    void
-ins_compl_show_pum(void)
+    فراغ
+ins_compl_show_pum(فراغ)
 {
-    int		i;
-    int		cur = -1;
-    colnr_T	col;
+    صحيح		i;
+    صحيح		cur = -1;
+    colnr_T	ستون;
 
-    if (!pum_wanted() || !pum_enough_matches())
-	return;
+    إذا (!pum_wanted() || !pum_enough_matches())
+	أرجع;
 
     // Avoid redrawing the screen under a pum that stays in place.
-    if (!pum_redraw_in_same_position())
+    إذا (!pum_redraw_دننه_same_position())
 	pum_call_update_screen();
 
-    if (compl_match_array == NULL)
+    إذا (compl_سمون_array == عدم)
 	// Need to build the popup menu list.
 	cur = ins_compl_build_pum();
-    else
+    وإلا
     {
 	// popup menu already exists, only need to find the current item.
-	for (i = 0; i < compl_match_arraysize; ++i)
+	لكل (i = 0; i < compl_سمون_arraysize; ++i)
 	{
-	    if (compl_match_array[i].pum_text == compl_shown_match->cp_str.string
-		    || compl_match_array[i].pum_text
-				      == compl_shown_match->cp_text[CPT_ABBR])
+	    إذا (compl_سمون_array[i].pum_متن == compl_shown_سمون->cp_str.string
+		    || compl_سمون_array[i].pum_متن
+				      == compl_shown_سمون->cp_متن[CPT_ABBR])
 	    {
 		cur = i;
-		break;
+		اكسر;
 	    }
 	}
     }
 
-    if (compl_match_array == NULL)
+    إذا (compl_سمون_array == عدم)
     {
-#ifdef FEAT_EVAL
-	if (compl_started && has_completechanged())
-	    trigger_complete_changed_event(cur);
-#endif
-	return;
+#که_تعریف_شوی FEAT_EVAL
+	إذا (compl_started && has_completechanged())
+	    trigger_complete_بدل_شوی_event(cur);
+#د_که_پای
+	أرجع;
     }
 
     // In Replace mode when a $ is displayed at the end of the line only
@@ -2013,150 +2013,150 @@ ins_compl_show_pum(void)
 
     // Position the menu at the completion start without moving the cursor
     // there, so the ruler keeps showing the real cursor column.
-    col = curwin->w_cursor.col;
-    curwin->w_cursor.col = compl_col;
-    validate_cursor_col();
-    int pum_wcol = curwin->w_wcol;
-    curwin->w_cursor.col = col;
-    validate_cursor_col();
-    compl_selected_item = cur;
+    ستون = curwin->w_cursor.ستون;
+    curwin->w_cursor.ستون = compl_ستون;
+    validate_cursor_ستون();
+    صحيح pum_wcol = curwin->w_wcol;
+    curwin->w_cursor.ستون = ستون;
+    validate_cursor_ستون();
+    compl_selected_توکی = cur;
     // Flag the status line so the ruler is redrawn for the real cursor column
     // when the menu update redraws the screen.
-    curwin->w_redr_status = true;
-    pum_display(compl_match_array, compl_match_arraysize, cur, pum_wcol);
+    curwin->w_redr_حالت = true;
+    pum_display(compl_سمون_array, compl_سمون_arraysize, cur, pum_wcol);
 
     // After adding leader, set the current match to shown match.
-    if (compl_started && compl_curr_match != compl_shown_match)
-	compl_curr_match = compl_shown_match;
+    إذا (compl_started && compl_curr_سمون != compl_shown_سمون)
+	compl_curr_سمون = compl_shown_سمون;
 
-#ifdef FEAT_EVAL
-    if (has_completechanged())
-	trigger_complete_changed_event(cur);
-#endif
+#که_تعریف_شوی FEAT_EVAL
+    إذا (has_completechanged())
+	trigger_complete_بدل_شوی_event(cur);
+#د_که_پای
 }
 
-#define DICT_FIRST	(1)	// use just first element in "dict"
-#define DICT_EXACT	(2)	// "dict" is the exact name of a file
+#تعریف_کړه DICT_لومړی	(1)	// use just first element in "dict"
+#تعریف_کړه DICT_EXACT	(2)	// "dict" is the exact name of a file
 
 /*
  * Add any identifiers that match the given pattern "pat" in the list of
  * dictionary files "dict_start" to the list of completions.
  */
-    static void
+    ساكن فراغ
 ins_compl_dictionaries(
-    char_u	*dict_start,
+    char_u	*dict_پیل,
     char_u	*pat,
-    int		flags,		// DICT_FIRST and/or DICT_EXACT
-    int		thesaurus)	// Thesaurus completion
+    صحيح		flags,		// DICT_FIRST and/or DICT_EXACT
+    صحيح		thesaurus)	// Thesaurus completion
 {
-    char_u	*dict = dict_start;
+    char_u	*dict = dict_پیل;
     char_u	*ptr;
     char_u	*buf;
     regmatch_T	regmatch;
     char_u	**files;
-    int		count;
-    int		save_p_scs;
-    int		dir = compl_direction;
+    صحيح		شمېر;
+    صحيح		save_p_scs;
+    صحيح		dir = compl_direction;
 
-    if (*dict == NUL)
+    إذا (*dict == NUL)
     {
-#ifdef FEAT_SPELL
+#که_تعریف_شوی FEAT_SPELL
 	// When 'dictionary' is empty and spell checking is enabled use
 	// "spell".
-	if (!thesaurus && curwin->w_p_spell)
+	إذا (!thesaurus && curwin->w_p_spell)
 	    dict = (char_u *)"spell";
-	else
-#endif
-	    return;
+	وإلا
+#د_که_پای
+	    أرجع;
     }
 
     buf = alloc(LSIZE);
-    if (buf == NULL)
-	return;
-    regmatch.regprog = NULL;	// so that we can goto theend
+    إذا (buf == عدم)
+	أرجع;
+    regmatch.regprog = عدم;	// so that we can goto theend
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (curbuf->b_p_inf)
+    إذا (curbuf->b_p_inf)
 	p_scs = FALSE;
 
     // When invoked to match whole lines for CTRL-X CTRL-L adjust the pattern
     // to only match at the start of a line.  Otherwise just match the
     // pattern. Also need to double backslashes.
-    if (ctrl_x_mode_line_or_eval())
+    إذا (ctrl_x_ډېرپېښ_کرښه_or_eval())
     {
 	char_u *pat_esc = vim_strsave_escaped(pat, (char_u *)"\\");
 
-	if (pat_esc == NULL)
-	    goto theend;
+	إذا (pat_esc == عدم)
+	    اذهب theend;
 	size_t len = STRLEN(pat_esc) + 10;
 	ptr = alloc(len);
-	if (ptr == NULL)
+	إذا (ptr == عدم)
 	{
 	    vim_free(pat_esc);
-	    goto theend;
+	    اذهب theend;
 	}
-	vim_snprintf((char *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
+	vim_snprintf((حرف *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
 	regmatch.regprog = vim_regcomp(ptr, RE_MAGIC);
 	vim_free(pat_esc);
 	vim_free(ptr);
     }
-    else
+    وإلا
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
-	    goto theend;
+	إذا (regmatch.regprog == عدم)
+	    اذهب theend;
     }
 
     // ignore case depends on 'ignorecase', 'smartcase' and "pat"
     regmatch.rm_ic = ignorecase(pat);
-    while (*dict != NUL && !got_int && !compl_interrupted)
+    طالما (*dict != NUL && !got_int && !compl_interrupted)
     {
 	// copy one dictionary file name into buf
-	if (flags == DICT_EXACT)
+	إذا (flags == DICT_EXACT)
 	{
-	    count = 1;
+	    شمېر = 1;
 	    files = &dict;
 	}
-	else
+	وإلا
 	{
 	    // Expand wildcards in the dictionary name, but do not allow
 	    // backticks (for security, the 'dict' option may have been set in
 	    // a modeline).
 	    copy_option_part(&dict, buf, LSIZE, ",");
-#ifdef FEAT_SPELL
-	    if (!thesaurus && STRCMP(buf, "spell") == 0)
-		count = -1;
-	    else
-#endif
-		if (vim_strchr(buf, '`') != NULL
-		    || expand_wildcards(1, &buf, &count, &files,
+#که_تعریف_شوی FEAT_SPELL
+	    إذا (!thesaurus && STRCMP(buf, "spell") == 0)
+		شمېر = -1;
+	    وإلا
+#د_که_پای
+		إذا (vim_strchr(buf, '`') != عدم
+		    || expand_wildcards(1, &buf, &شمېر, &files,
 						     EW_FILE|EW_SILENT) != OK)
-		count = 0;
+		شمېر = 0;
 	}
 
-#ifdef FEAT_SPELL
-	if (count == -1)
+#که_تعریف_شوی FEAT_SPELL
+	إذا (شمېر == -1)
 	{
 	    // Complete from active spelling.  Skip "\<" in the pattern, we
 	    // don't use it as a RE.
-	    if (pat[0] == '\\' && pat[1] == '<')
+	    إذا (pat[0] == '\\' && pat[1] == '<')
 		ptr = pat + 2;
-	    else
+	    وإلا
 		ptr = pat;
 	    spell_dump_compl(ptr, regmatch.rm_ic, &dir, 0);
 	}
-	else
-#endif
-	    if (count > 0)	// avoid warning for using "files" uninit
+	وإلا
+#د_که_پای
+	    إذا (شمېر > 0)	// avoid warning for using "files" uninit
 	{
-	    ins_compl_files(count, files, thesaurus, flags, &regmatch, buf,
+	    ins_compl_files(شمېر, files, thesaurus, flags, &regmatch, buf,
 		    &dir);
-	    if (flags != DICT_EXACT)
-		FreeWild(count, files);
+	    إذا (flags != DICT_EXACT)
+		FreeWild(شمېر, files);
 	}
-	if (flags != 0)
-	    break;
+	إذا (flags != 0)
+	    اكسر;
     }
 
 theend:
@@ -2169,160 +2169,160 @@ theend:
  * Add all the words in the line "*buf_arg" from the thesaurus file "fname"
  * skipping the word at 'skip_word'.  Returns OK on success.
  */
-    static int
-thesaurus_add_words_in_line(
+    ساكن صحيح
+thesaurus_جمع_کړه_ټکي_دننه_کرښه(
     char_u	*fname,
     char_u	**buf_arg,
-    int		dir,
-    char_u	*skip_word)
+    صحيح		dir,
+    char_u	*skip_کلمه)
 {
-    int		status = OK;
+    صحيح		حالت = OK;
     char_u	*ptr;
     char_u	*wstart;
 
     // Add the other matches on the line
     ptr = *buf_arg;
-    while (!got_int)
+    طالما (!got_int)
     {
 	// Find start of the next word.  Skip white
 	// space and punctuation.
-	ptr = find_word_start(ptr);
-	if (*ptr == NUL || *ptr == NL)
-	    break;
+	ptr = پیدا_کړه_کلمه_پیل(ptr);
+	إذا (*ptr == NUL || *ptr == NL)
+	    اكسر;
 	wstart = ptr;
 
 	// Find end of the word.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    // Japanese words may have characters in
 	    // different classes, only separate words
 	    // with single-byte non-word characters.
-	    while (*ptr != NUL)
+	    طالما (*ptr != NUL)
 	    {
-		int l = (*mb_ptr2len)(ptr);
+		صحيح l = (*mb_ptr2len)(ptr);
 
-		if (l < 2 && !vim_iswordc(*ptr))
-		    break;
+		إذا (l < 2 && !vim_iswordc(*ptr))
+		    اكسر;
 		ptr += l;
 	    }
-	else
-	    ptr = find_word_end(ptr);
+	وإلا
+	    ptr = پیدا_کړه_کلمه_پای_ټکی(ptr);
 
 	// Add the word. Skip the regexp match.
-	if (wstart != skip_word)
+	إذا (wstart != skip_کلمه)
 	{
-	    status = ins_compl_add_infercase(wstart, (int)(ptr - wstart), p_ic,
+	    حالت = ins_compl_جمع_کړه_infercase(wstart, (صحيح)(ptr - wstart), p_ic,
 		    fname, dir, FALSE, FUZZY_SCORE_NONE);
-	    if (status == FAIL)
-		break;
+	    إذا (حالت == FAIL)
+		اكسر;
 	}
     }
 
     *buf_arg = ptr;
-    return status;
+    أرجع حالت;
 }
 
 /*
  * Process "count" dictionary/thesaurus "files" and add the text matching
  * "regmatch".
  */
-    static void
+    ساكن فراغ
 ins_compl_files(
-    int		count,
+    صحيح		شمېر,
     char_u	**files,
-    int		thesaurus,
-    int		flags,
+    صحيح		thesaurus,
+    صحيح		flags,
     regmatch_T	*regmatch,
     char_u	*buf,
-    int		*dir)
+    صحيح		*dir)
 {
     char_u	*ptr;
-    int		i;
+    صحيح		i;
     FILE	*fp;
-    int		add_r;
-    char_u	*leader = NULL;
-    int		leader_len = 0;
-    int		score = 0;
-    int		len = 0;
-    char_u	*line_end = NULL;
+    صحيح		جمع_کړه_r;
+    char_u	*leader = عدم;
+    صحيح		leader_len = 0;
+    صحيح		score = 0;
+    صحيح		len = 0;
+    char_u	*کرښه_پای_ټکی = عدم;
 
-    if (cot_fuzzy())
+    إذا (cot_fuzzy())
     {
 	leader = ins_compl_leader();
-	leader_len = (int)ins_compl_leader_len();
+	leader_len = (صحيح)ins_compl_leader_len();
     }
 
-    for (i = 0; i < count && !got_int && !ins_compl_interrupted(); i++)
+    لكل (i = 0; i < شمېر && !got_int && !ins_compl_interrupted(); i++)
     {
-	fp = mch_fopen((char *)files[i], "r");  // open dictionary file
-	if (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
+	fp = mch_fopen((حرف *)files[i], "r");  // open dictionary file
+	إذا (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
 		&& !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE,
-			      _("Scanning dictionary: %s"), (char *)files[i]);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    پیغام_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((حرف *)IObuff, IOSIZE,
+			      _("Scanning dictionary: %s"), (حرف *)files[i]);
+	    (فراغ)پیغام_trunc_attr((حرف *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
 
-	if (fp == NULL)
-	    continue;
+	إذا (fp == عدم)
+	    استمر;
 
 	// Read dictionary file line by line.
 	// Check each line for a match.
-	while (!got_int && !ins_compl_interrupted()
+	طالما (!got_int && !ins_compl_interrupted()
 	       && !vim_fgets(buf, LSIZE, fp))
 	{
 	    ptr = buf;
-	    if (cot_fuzzy() && leader_len > 0)
+	    إذا (cot_fuzzy() && leader_len > 0)
 	    {
-		line_end = find_line_end(ptr);
-		while (ptr < line_end)
+		کرښه_پای_ټکی = پیدا_کړه_کرښه_پای_ټکی(ptr);
+		طالما (ptr < کرښه_پای_ټکی)
 		{
-		    if (fuzzy_match_str_in_line(&ptr, leader, &len, NULL, &score))
+		    إذا (fuzzy_سمون_str_دننه_کرښه(&ptr, leader, &len, عدم, &score))
 		    {
-			char_u *end_ptr = ctrl_x_mode_line_or_eval()
-					? find_line_end(ptr) : find_word_end(ptr);
-			add_r = ins_compl_add_infercase(ptr, (int)(end_ptr - ptr),
+			char_u *end_ptr = ctrl_x_ډېرپېښ_کرښه_or_eval()
+					? پیدا_کړه_کرښه_پای_ټکی(ptr) : پیدا_کړه_کلمه_پای_ټکی(ptr);
+			جمع_کړه_r = ins_compl_جمع_کړه_infercase(ptr, (صحيح)(end_ptr - ptr),
 					    p_ic, files[i], *dir, FALSE, score);
-			if (add_r == FAIL)
-			    break;
+			إذا (جمع_کړه_r == FAIL)
+			    اكسر;
 			ptr = end_ptr;  // start from next word
-			if (compl_get_longest && ctrl_x_mode_normal()
-				&& compl_first_match->cp_next
-				&& score == compl_first_match->cp_next->cp_score)
-			    compl_num_bests++;
+			إذا (compl_get_longest && ctrl_x_ډېرپېښ_نورمال()
+				&& compl_لومړی_سمون->cp_بل
+				&& score == compl_لومړی_سمون->cp_بل->cp_score)
+			    compl_عدد_bests++;
 		    }
 		}
 	    }
-	    else if (regmatch != NULL)
+	    وإلا إذا (regmatch != عدم)
 	    {
-		while (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
+		طالما (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
 		{
 		    ptr = regmatch->startp[0];
-		    ptr = ctrl_x_mode_line_or_eval() ? find_line_end(ptr)
-						    : find_word_end(ptr);
-		    add_r = ins_compl_add_infercase(regmatch->startp[0],
-			    (int)(ptr - regmatch->startp[0]),
+		    ptr = ctrl_x_ډېرپېښ_کرښه_or_eval() ? پیدا_کړه_کرښه_پای_ټکی(ptr)
+						    : پیدا_کړه_کلمه_پای_ټکی(ptr);
+		    جمع_کړه_r = ins_compl_جمع_کړه_infercase(regmatch->startp[0],
+			    (صحيح)(ptr - regmatch->startp[0]),
 			    p_ic, files[i], *dir, FALSE, FUZZY_SCORE_NONE);
-		    if (thesaurus)
+		    إذا (thesaurus)
 		    {
 			// For a thesaurus, add all the words in the line
 			ptr = buf;
-			add_r = thesaurus_add_words_in_line(files[i], &ptr, *dir,
+			جمع_کړه_r = thesaurus_جمع_کړه_ټکي_دننه_کرښه(files[i], &ptr, *dir,
 							    regmatch->startp[0]);
 		    }
-		    if (add_r == OK)
+		    إذا (جمع_کړه_r == OK)
 			// if dir was BACKWARD then honor it just once
 			*dir = FORWARD;
-		    else if (add_r == FAIL)
-			break;
+		    وإلا إذا (جمع_کړه_r == FAIL)
+			اكسر;
 		    // avoid expensive call to vim_regexec() when at end
 		    // of line
-		    if (*ptr == '\n' || got_int)
-			break;
+		    إذا (*ptr == '\n' || got_int)
+			اكسر;
 		}
 	    }
-	    line_breakcheck();
-	    ins_compl_check_keys(50, FALSE);
+	    کرښه_breakcheck();
+	    ins_compl_check_کلیګانې(50, FALSE);
 	}
 	fclose(fp);
     }
@@ -2333,19 +2333,19 @@ ins_compl_files(
  * Returns a pointer to the first char of the word.  Also stops at a NUL.
  */
     char_u *
-find_word_start(char_u *ptr)
+پیدا_کړه_کلمه_پیل(char_u *ptr)
 {
-    if (has_mbyte)
+    إذا (has_mbyte)
     {
-	while (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
+	طالما (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
 	    ptr += (*mb_ptr2len)(ptr);
     }
-    else
+    وإلا
     {
-	while (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
+	طالما (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
 	    ++ptr;
     }
-    return ptr;
+    أرجع ptr;
 }
 
 /*
@@ -2353,23 +2353,23 @@ find_word_start(char_u *ptr)
  * Returns a pointer to just after the word.
  */
     char_u *
-find_word_end(char_u *ptr)
+پیدا_کړه_کلمه_پای_ټکی(char_u *ptr)
 {
-    if (has_mbyte)
+    إذا (has_mbyte)
     {
-	int start_class = mb_get_class(ptr);
-	if (start_class > 1)
-	    while (*ptr != NUL)
+	صحيح پیل_class = mb_get_class(ptr);
+	إذا (پیل_class > 1)
+	    طالما (*ptr != NUL)
 	    {
 		ptr += (*mb_ptr2len)(ptr);
-		if (mb_get_class(ptr) != start_class)
-		    break;
+		إذا (mb_get_class(ptr) != پیل_class)
+		    اكسر;
 	    }
     }
-    else
-	while (vim_iswordc(*ptr))
+    وإلا
+	طالما (vim_iswordc(*ptr))
 	    ++ptr;
-    return ptr;
+    أرجع ptr;
 }
 
 /*
@@ -2377,149 +2377,149 @@ find_word_end(char_u *ptr)
  * Returns a pointer to just after the line.
  */
     char_u *
-find_line_end(char_u *ptr)
+پیدا_کړه_کرښه_پای_ټکی(char_u *ptr)
 {
     char_u *s = ptr + STRLEN(ptr);
-    while (s > ptr && (s[-1] == CAR || s[-1] == NL))
+    طالما (s > ptr && (s[-1] == CAR || s[-1] == NL))
 	--s;
-    return s;
+    أرجع s;
 }
 
 /*
  * Free a completion item in the list
  */
-    static void
-ins_compl_item_free(compl_T *match)
+    ساكن فراغ
+ins_compl_توکی_free(compl_T *سمون)
 {
     // Uncount the match string in the duplicate-check hashtab; the entry is
     // only removed with its last match.  The hashtab is empty when it was
     // already cleared as a whole by ins_compl_free().
-    if (compl_strings_ht.ht_used > 0 && match->cp_str.string != NULL
-					   && !match_at_original_text(match))
+    إذا (compl_مزي_ګانې_ht.ht_کارول_شوی > 0 && سمون->cp_str.string != عدم
+					   && !سمون_at_original_متن(سمون))
     {
-	hashitem_T *hi = hash_find(&compl_strings_ht, match->cp_str.string);
+	hashitem_T *hi = hash_پیدا_کړه(&compl_مزي_ګانې_ht, سمون->cp_str.string);
 
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_تشه(hi))
 	{
-	    complstr_T *entry = HI2CSE(hi);
+	    complstr_T *ثبت = HI2CSE(hi);
 
-	    if (--entry->cse_count <= 0)
+	    إذا (--ثبت->cse_شمېر <= 0)
 	    {
-		hash_remove(&compl_strings_ht, hi, "completion match");
-		vim_free(entry);
+		hash_remove(&compl_مزي_ګانې_ht, hi, "completion match");
+		vim_free(ثبت);
 	    }
 	}
     }
-    VIM_CLEAR_STRING(match->cp_str);
+    VIM_CLEAR_STRING(سمون->cp_str);
     // several entries may use the same fname, free it just once.
-    if (match->cp_flags & CP_FREE_FNAME)
-	vim_free(match->cp_fname);
-    for (int i = 0; i < CPT_COUNT; ++i)
-	vim_free(match->cp_text[i]);
-#ifdef FEAT_EVAL
-    clear_tv(&match->cp_user_data);
-#endif
-    vim_free(match);
+    إذا (سمون->cp_flags & CP_FREE_FNAME)
+	vim_free(سمون->cp_fname);
+    لكل (صحيح i = 0; i < CPT_شمېر; ++i)
+	vim_free(سمون->cp_متن[i]);
+#که_تعریف_شوی FEAT_EVAL
+    clear_tv(&سمون->cp_user_معلومات);
+#د_که_پای
+    vim_free(سمون);
 }
 
 /*
  * Free the list of completions
  */
-    static void
-ins_compl_free(void)
+    ساكن فراغ
+ins_compl_free(فراغ)
 {
-    compl_T *match;
+    compl_T *سمون;
 
-    VIM_CLEAR_STRING(compl_pattern);
+    VIM_CLEAR_STRING(compl_نمونه);
     VIM_CLEAR_STRING(compl_leader);
 
-    if (compl_first_match == NULL)
-	return;
+    إذا (compl_لومړی_سمون == عدم)
+	أرجع;
 
     ins_compl_del_pum();
     pum_clear();
 
     // Free the duplicate-check hashtab entries all at once, then freeing
     // the matches below does not need to uncount them one by one.
-    hash_clear_all(&compl_strings_ht, CSE_OFF);
-    hash_init(&compl_strings_ht);
+    hash_clear_all(&compl_مزي_ګانې_ht, CSE_OFF);
+    hash_init(&compl_مزي_ګانې_ht);
 
-    compl_curr_match = compl_first_match;
-    do
+    compl_curr_سمون = compl_لومړی_سمون;
+    افعل
     {
-	match = compl_curr_match;
-	compl_curr_match = compl_curr_match->cp_next;
-	ins_compl_item_free(match);
-    } while (compl_curr_match != NULL && !is_first_match(compl_curr_match));
-    compl_first_match = compl_curr_match = NULL;
-    compl_shown_match = NULL;
-    compl_old_match = NULL;
+	سمون = compl_curr_سمون;
+	compl_curr_سمون = compl_curr_سمون->cp_بل;
+	ins_compl_توکی_free(سمون);
+    } طالما (compl_curr_سمون != عدم && !is_لومړی_سمون(compl_curr_سمون));
+    compl_لومړی_سمون = compl_curr_سمون = عدم;
+    compl_shown_سمون = عدم;
+    compl_old_سمون = عدم;
 }
 
 /*
  * Reset/clear the completion state.
  */
-    void
-ins_compl_clear(void)
+    فراغ
+ins_compl_clear(فراغ)
 {
-    compl_cont_status = 0;
+    compl_cont_حالت = 0;
     compl_started = FALSE;
     compl_matches = 0;
-    compl_selected_item = -1;
-    compl_ins_end_col = 0;
-    compl_longest_end_col = 0;
-    compl_curr_win = NULL;
-    compl_curr_buf = NULL;
-    VIM_CLEAR_STRING(compl_pattern);
+    compl_selected_توکی = -1;
+    compl_ins_پای_ټکی_ستون = 0;
+    compl_longest_پای_ټکی_ستون = 0;
+    compl_curr_win = عدم;
+    compl_curr_buf = عدم;
+    VIM_CLEAR_STRING(compl_نمونه);
     VIM_CLEAR_STRING(compl_leader);
-    edit_submode_extra = NULL;
-    VIM_CLEAR_STRING(compl_orig_text);
+    edit_submode_extra = عدم;
+    VIM_CLEAR_STRING(compl_orig_متن);
     compl_enter_selects = FALSE;
     cpt_sources_clear();
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
-#ifdef FEAT_EVAL
+    compl_عدد_bests = 0;
+#که_تعریف_شوی FEAT_EVAL
     // clear v:completed_item
-    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
-#endif
+    سېټ_vim_var_dict(VV_COMPLETED_توکی, dict_alloc_قلف(VAR_FIXED));
+#د_که_پای
 }
 
 /*
  * Return TRUE when Insert completion is active.
  */
-    int
-ins_compl_active(void)
+    صحيح
+ins_compl_فعال(فراغ)
 {
-    return compl_started;
+    أرجع compl_started;
 }
 
 /*
  * Return True when wp is the actual completion window
  */
-    int
-ins_compl_win_active(win_T *wp)
+    صحيح
+ins_compl_win_فعال(win_T *wp)
 {
-    return ins_compl_active() && wp == compl_curr_win
-	&& wp->w_buffer == compl_curr_buf;
+    أرجع ins_compl_فعال() && wp == compl_curr_win
+	&& wp->w_بفر == compl_curr_buf;
 }
 
 /*
  * Selected one of the matches.  When FALSE, the match was either edited or
  * using the longest common string.
  */
-    int
-ins_compl_used_match(void)
+    صحيح
+ins_compl_کارول_شوی_سمون(فراغ)
 {
-    return compl_used_match;
+    أرجع compl_کارول_شوی_سمون;
 }
 
 /*
  * Initialize get longest common string.
  */
-    void
-ins_compl_init_get_longest(void)
+    فراغ
+ins_compl_init_get_longest(فراغ)
 {
     compl_get_longest = FALSE;
 }
@@ -2527,51 +2527,51 @@ ins_compl_init_get_longest(void)
 /*
  * Returns TRUE when insert completion is interrupted.
  */
-    int
-ins_compl_interrupted(void)
+    صحيح
+ins_compl_interrupted(فراغ)
 {
-    return compl_interrupted || compl_time_slice_expired;
+    أرجع compl_interrupted || compl_وخت_ټوټه_expired;
 }
 
 /*
  * Returns TRUE if the <Enter> key selects a match in the completion popup
  * menu.
  */
-    int
-ins_compl_enter_selects(void)
+    صحيح
+ins_compl_enter_selects(فراغ)
 {
-    return compl_enter_selects;
+    أرجع compl_enter_selects;
 }
 
 /*
  * Return the column where the text starts that is being completed
  */
     colnr_T
-ins_compl_col(void)
+ins_compl_ستون(فراغ)
 {
-    return compl_col;
+    أرجع compl_ستون;
 }
 
 /*
  * Return the length in bytes of the text being completed
  */
-    int
-ins_compl_len(void)
+    صحيح
+ins_compl_len(فراغ)
 {
-    return compl_length;
+    أرجع compl_اوږدتیا;
 }
 
 /*
  * Return TRUE when the 'completeopt' "preinsert" flag is in effect,
  * otherwise return FALSE.
  */
-    int
-ins_compl_has_preinsert(void)
+    صحيح
+ins_compl_has_preinsert(فراغ)
 {
-    int cur_cot_flags = get_cot_flags();
-    if (compl_autocomplete && p_ic && !p_inf)
-	return FALSE;
-    return !compl_autocomplete
+    صحيح cur_cot_flags = get_cot_flags();
+    إذا (compl_autocomplete && p_ic && !p_inf)
+	أرجع FALSE;
+    أرجع !compl_autocomplete
 	? (cur_cot_flags & (COT_PREINSERT | COT_FUZZY | COT_MENUONE))
 		== (COT_PREINSERT | COT_MENUONE)
 	: (cur_cot_flags & (COT_PREINSERT | COT_FUZZY)) == COT_PREINSERT;
@@ -2581,13 +2581,13 @@ ins_compl_has_preinsert(void)
  * Returns TRUE if the pre-insert effect is valid and the cursor is within
  * the `compl_ins_end_col` range.
  */
-    int
-ins_compl_preinsert_effect(void)
+    صحيح
+ins_compl_preinsert_effect(فراغ)
 {
-    if (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
-	return FALSE;
+    إذا (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
+	أرجع FALSE;
 
-    return curwin->w_cursor.col < compl_ins_end_col;
+    أرجع curwin->w_cursor.ستون < compl_ins_پای_ټکی_ستون;
 }
 
 /*
@@ -2596,101 +2596,101 @@ ins_compl_preinsert_effect(void)
  * Returns the character to be used, NUL if the work is done and another char
  * to be got from the user.
  */
-    int
-ins_compl_bs(void)
+    صحيح
+ins_compl_bs(فراغ)
 {
-    char_u	*line;
+    char_u	*کرښه;
     char_u	*p;
 
-    if (ins_compl_preinsert_effect())
+    إذا (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    line = ml_get_curline();
-    p = line + curwin->w_cursor.col;
-    MB_PTR_BACK(line, p);
+    کرښه = ml_get_curline();
+    p = کرښه + curwin->w_cursor.ستون;
+    MB_PTR_شا(کرښه, p);
 
     // Stop completion when the whole word was deleted.  For Omni completion
     // allow the word to be deleted, we won't match everything.
     // Respect the 'backspace' option.
-    if ((int)(p - line) - (int)compl_col < 0
-	    || ((int)(p - line) - (int)compl_col == 0 && !ctrl_x_mode_omni())
-	    || ctrl_x_mode_eval()
-	    || (!can_bs(BS_START) && (int)(p - line) - (int)compl_col
-							- compl_length < 0))
-	return K_BS;
+    إذا ((صحيح)(p - کرښه) - (صحيح)compl_ستون < 0
+	    || ((صحيح)(p - کرښه) - (صحيح)compl_ستون == 0 && !ctrl_x_ډېرپېښ_omni())
+	    || ctrl_x_ډېرپېښ_eval()
+	    || (!can_bs(BS_پیل) && (صحيح)(p - کرښه) - (صحيح)compl_ستون
+							- compl_اوږدتیا < 0))
+	أرجع K_BS;
 
     // Deleted more than what was used to find matches or didn't finish
     // finding all matches: need to look for matches all over again.
-    if (curwin->w_cursor.col <= compl_col + compl_length
+    إذا (curwin->w_cursor.ستون <= compl_ستون + compl_اوږدتیا
 						  || ins_compl_need_restart())
 	ins_compl_restart();
 
     VIM_CLEAR_STRING(compl_leader);
-    compl_leader.length = (size_t)((p - line) - compl_col);
-    compl_leader.string = vim_strnsave(line + compl_col, compl_leader.length);
-    if (compl_leader.string == NULL)
+    compl_leader.اوږدتیا = (size_t)((p - کرښه) - compl_ستون);
+    compl_leader.string = vim_strnsave(کرښه + compl_ستون, compl_leader.اوږدتیا);
+    إذا (compl_leader.string == عدم)
     {
-	compl_leader.length = 0;
-	return K_BS;
+	compl_leader.اوږدتیا = 0;
+	أرجع K_BS;
     }
 
     // Clear selection if a menu item is currently selected in autocompletion
-    if (compl_autocomplete && compl_first_match && !ins_compl_has_preinsert())
-	compl_shown_match = compl_first_match;
+    إذا (compl_autocomplete && compl_لومړی_سمون && !ins_compl_has_preinsert())
+	compl_shown_سمون = compl_لومړی_سمون;
 
     ins_compl_new_leader();
-    if (compl_shown_match != NULL)
+    إذا (compl_shown_سمون != عدم)
 	// Make sure current match is not a hidden item.
-	compl_curr_match = compl_shown_match;
-    return NUL;
+	compl_curr_سمون = compl_shown_سمون;
+    أرجع NUL;
 }
 
 /*
  * Return TRUE when we need to find matches again, ins_compl_restart() is to
  * be called.
  */
-    static int
-ins_compl_need_restart(void)
+    ساكن صحيح
+ins_compl_need_restart(فراغ)
 {
     // Return TRUE if we didn't complete finding matches or when the
     // 'completefunc' returned "always" in the "refresh" dictionary item.
-    return compl_was_interrupted
-	|| ((ctrl_x_mode_function() || ctrl_x_mode_omni())
+    أرجع compl_was_interrupted
+	|| ((ctrl_x_ډېرپېښ_function() || ctrl_x_ډېرپېښ_omni())
 						  && compl_opt_refresh_always);
 }
 
 /*
  * Return TRUE if 'autocomplete' option is set
  */
-    int
-ins_compl_has_autocomplete(void)
+    صحيح
+ins_compl_has_autocomplete(فراغ)
 {
     // Use buffer-local setting if defined (>= 0), otherwise use global
-    return curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
+    أرجع curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
 }
 
 /*
  * Calculate fuzzy score and sort completion matches unless sorting is disabled.
  */
-    static void
-ins_compl_fuzzy_sort(void)
+    ساكن فراغ
+ins_compl_fuzzy_ترتیبول(فراغ)
 {
-    int	    cur_cot_flags = get_cot_flags();
+    صحيح	    cur_cot_flags = get_cot_flags();
 
     // Set the fuzzy score in cp_score and sort
-    set_fuzzy_score();
-    if (!(cur_cot_flags & COT_NOSORT))
+    سېټ_fuzzy_score();
+    إذا (!(cur_cot_flags & COT_NOSORT))
     {
-	sort_compl_match_list(cp_compare_fuzzy);
+	ترتیبول_compl_سمون_list(cp_compare_fuzzy);
 	// Reset the shown item since sorting reorders items
-	if ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
+	إذا ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
 	{
-	    int none_selected = compl_shown_match == (compl_shows_dir_forward()
-		    ? compl_first_match : compl_first_match->cp_prev);
-	    if (!none_selected)
-		compl_shown_match
+	    صحيح none_selected = compl_shown_سمون == (compl_shows_dir_forward()
+		    ? compl_لومړی_سمون : compl_لومړی_سمون->cp_prev);
+	    إذا (!none_selected)
+		compl_shown_سمون
 		    = (!compl_autocomplete && compl_shows_dir_forward())
-		    ? compl_first_match->cp_next : compl_first_match;
+		    ? compl_لومړی_سمون->cp_بل : compl_لومړی_سمون;
 	}
     }
 }
@@ -2700,131 +2700,131 @@ ins_compl_fuzzy_sort(void)
  * Show the popup menu with a different set of matches.
  * May also search for matches again if the previous search was interrupted.
  */
-    static void
-ins_compl_new_leader(void)
+    ساكن فراغ
+ins_compl_new_leader(فراغ)
 {
-    int	    save_w_wrow = curwin->w_wrow;
-    int	    save_w_leftcol = curwin->w_leftcol;
+    صحيح	    save_w_wrow = curwin->w_wrow;
+    صحيح	    save_w_leftcol = curwin->w_leftcol;
 
     ins_compl_del_pum();
     ins_compl_delete();
-    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
-    compl_used_match = FALSE;
+    ins_compl_ورننباسه_بایټونه(compl_leader.string + get_compl_len(), -1);
+    compl_کارول_شوی_سمون = FALSE;
 
-    if (compl_started)
+    إذا (compl_started)
     {
-	ins_compl_set_original_text(compl_leader.string, compl_leader.length);
-	if (is_cpt_func_refresh_always())
+	ins_compl_سېټ_original_متن(compl_leader.string, compl_leader.اوږدتیا);
+	إذا (is_cpt_func_refresh_always())
 	    cpt_compl_refresh();
-	if (cot_fuzzy())
-	    ins_compl_fuzzy_sort();
+	إذا (cot_fuzzy())
+	    ins_compl_fuzzy_ترتیبول();
     }
-    else
+    وإلا
     {
-#ifdef FEAT_SPELL
+#که_تعریف_شوی FEAT_SPELL
 	spell_bad_len = 0;	// need to redetect bad word
-#endif
+#د_که_پای
 	// Matches were cleared, need to search for them now.  Before drawing
 	// the popup menu display the changed text before the cursor.  Set
 	// "compl_restarting" to avoid that the first match is inserted.
 	pum_call_update_screen();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#که_تعریف_شوی FEAT_GUI
+	إذا (gui.دننه_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
-	    out_flush_cursor(FALSE, FALSE);
+	    بهر_flush_cursor(FALSE, FALSE);
 	}
-#endif
+#د_که_پای
 	save_w_wrow = curwin->w_wrow;
 	save_w_leftcol = curwin->w_leftcol;
 	compl_restarting = TRUE;
-	if (ins_compl_has_autocomplete())
+	إذا (ins_compl_has_autocomplete())
 	    ins_compl_enable_autocomplete();
-	else
+	وإلا
 	    compl_autocomplete = FALSE;
-	if (ins_complete(Ctrl_N, FALSE) == FAIL)
-	    compl_cont_status = 0;
+	إذا (ins_complete(Ctrl_N, FALSE) == FAIL)
+	    compl_cont_حالت = 0;
 	compl_restarting = FALSE;
     }
 
-    compl_enter_selects = !compl_used_match && compl_selected_item != -1;
+    compl_enter_selects = !compl_کارول_شوی_سمون && compl_selected_توکی != -1;
 
     // Show the popup menu with a different set of matches.  With
     // 'autocompletedelay' the menu is already visible here, so update it
     // immediately rather than re-arming the delay, like a zero delay does.
-    if (!compl_interrupted)
+    إذا (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     // Don't let Enter select the original text when there is no popup menu.
-    if (compl_match_array == NULL)
+    إذا (compl_سمون_array == عدم)
 	compl_enter_selects = FALSE;
-    else if (ins_compl_has_preinsert() && compl_leader.length > 0)
-	ins_compl_insert(TRUE, FALSE);
-    else if (compl_started && ins_compl_preinsert_longest()
-	    && compl_leader.length > 0 && !ins_compl_preinsert_effect())
-	ins_compl_insert(TRUE, TRUE);
+    وإلا إذا (ins_compl_has_preinsert() && compl_leader.اوږدتیا > 0)
+	ins_compl_ورننباسه(TRUE, FALSE);
+    وإلا إذا (compl_started && ins_compl_preinsert_longest()
+	    && compl_leader.اوږدتیا > 0 && !ins_compl_preinsert_effect())
+	ins_compl_ورننباسه(TRUE, TRUE);
 }
 
 /*
  * Return the length of the completion, from the completion start column to
  * the cursor column.  Making sure it never goes below zero.
  */
-    static int
-get_compl_len(void)
+    ساكن صحيح
+get_compl_len(فراغ)
 {
-    int off = (int)curwin->w_cursor.col - (int)compl_col;
-    return MAX(0, off);
+    صحيح off = (صحيح)curwin->w_cursor.ستون - (صحيح)compl_ستون;
+    أرجع MAX(0, off);
 }
 
 /*
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addleader(int c)
+    فراغ
+ins_compl_addleader(صحيح c)
 {
-    int	    cc;
+    صحيح	    cc;
 
-    if (ins_compl_preinsert_effect())
+    إذا (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    if (stop_arrow() == FAIL)
-	return;
-    if (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
+    إذا (stop_arrow() == FAIL)
+	أرجع;
+    إذا (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
     {
 	char_u	buf[MB_MAXBYTES + 1];
 
 	(*mb_char2bytes)(c, buf);
 	buf[cc] = NUL;
-	ins_char_bytes(buf, cc);
-	if (compl_opt_refresh_always)
-	    AppendToRedobuff(buf);
+	ins_char_بایټونه(buf, cc);
+	إذا (compl_opt_refresh_always)
+	    Append_منزل_Redobuff(buf);
     }
-    else
+    وإلا
     {
 	ins_char(c);
-	if (compl_opt_refresh_always)
-	    AppendCharToRedobuff(c);
+	إذا (compl_opt_refresh_always)
+	    Append_Char_منزل_Redobuff(c);
     }
 
     // If we didn't complete finding matches we must search again.
-    if (ins_compl_need_restart())
+    إذا (ins_compl_need_restart())
 	ins_compl_restart();
 
     // When 'always' is set, don't reset compl_leader. While completing,
     // cursor doesn't point to the original position, changing compl_leader
     // would break redo.
-    if (!compl_opt_refresh_always)
+    إذا (!compl_opt_refresh_always)
     {
 	VIM_CLEAR_STRING(compl_leader);
-	compl_leader.length = (size_t)(curwin->w_cursor.col - compl_col);
-	compl_leader.string = vim_strnsave(ml_get_curline() + compl_col,
-		compl_leader.length);
-	if (compl_leader.string == NULL)
+	compl_leader.اوږدتیا = (size_t)(curwin->w_cursor.ستون - compl_ستون);
+	compl_leader.string = vim_strnsave(ml_get_curline() + compl_ستون,
+		compl_leader.اوږدتیا);
+	إذا (compl_leader.string == عدم)
 	{
-	    compl_leader.length = 0;
-	    return;
+	    compl_leader.اوږدتیا = 0;
+	    أرجع;
 	}
 
 	ins_compl_new_leader();
@@ -2835,81 +2835,81 @@ ins_compl_addleader(int c)
  * Setup for finding completions again without leaving CTRL-X mode.  Used when
  * BS or a key was typed while still searching for matches.
  */
-    static void
-ins_compl_restart(void)
+    ساكن فراغ
+ins_compl_restart(فراغ)
 {
     ins_compl_free();
     compl_started = FALSE;
     compl_matches = 0;
-    compl_cont_status = 0;
-    compl_cont_mode = 0;
+    compl_cont_حالت = 0;
+    compl_cont_ډېرپېښ = 0;
     cpt_sources_clear();
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
+    compl_عدد_bests = 0;
 }
 
 /*
  * Set the first match, the original text.
  */
-    static void
-ins_compl_set_original_text(char_u *str, size_t len)
+    ساكن فراغ
+ins_compl_سېټ_original_متن(char_u *str, size_t len)
 {
-    compl_T	*match = find_original_text_match();
+    compl_T	*سمون = پیدا_کړه_original_متن_سمون();
     char_u	*p;
 
     // Replace the original text entry.
-    if (match == NULL)
-	return;
+    إذا (سمون == عدم)
+	أرجع;
 
     p = vim_strnsave(str, len);
-    if (p == NULL)
-	return;
+    إذا (p == عدم)
+	أرجع;
 
-    VIM_CLEAR_STRING(match->cp_str);
-    match->cp_str.string = p;
-    match->cp_str.length = len;
+    VIM_CLEAR_STRING(سمون->cp_str);
+    سمون->cp_str.string = p;
+    سمون->cp_str.اوږدتیا = len;
 }
 
 /*
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addfrommatch(void)
+    فراغ
+ins_compl_addfrommatch(فراغ)
 {
     char_u	*p;
-    int		len = (int)curwin->w_cursor.col - (int)compl_col;
-    int		c;
+    صحيح		len = (صحيح)curwin->w_cursor.ستون - (صحيح)compl_ستون;
+    صحيح		c;
 
-    p = compl_shown_match->cp_str.string;
-    if ((int)compl_shown_match->cp_str.length <= len)   // the match is too short
+    p = compl_shown_سمون->cp_str.string;
+    إذا ((صحيح)compl_shown_سمون->cp_str.اوږدتیا <= len)   // the match is too short
     {
 	size_t	plen;
 	compl_T	*cp;
 
 	// When still at the original match use the first entry that matches
 	// the leader.
-	if (!match_at_original_text(compl_shown_match))
-	    return;
+	إذا (!سمون_at_original_متن(compl_shown_سمون))
+	    أرجع;
 
-	p = NULL;
+	p = عدم;
 	plen = 0;
-	for (cp = compl_shown_match->cp_next; cp != NULL
-		&& !is_first_match(cp); cp = cp->cp_next)
+	لكل (cp = compl_shown_سمون->cp_بل; cp != عدم
+		&& !is_لومړی_سمون(cp); cp = cp->cp_بل)
 	{
-	    if (compl_leader.string == NULL
+	    إذا (compl_leader.string == عدم
 		    || ins_compl_equal(cp, compl_leader.string,
-			(int)compl_leader.length))
+			(صحيح)compl_leader.اوږدتیا))
 	    {
 		p = cp->cp_str.string;
-		plen = cp->cp_str.length;
-		break;
+		plen = cp->cp_str.اوږدتیا;
+		اكسر;
 	    }
 	}
-	if (p == NULL || (int)plen <= len)
-	    return;
+	إذا (p == عدم || (صحيح)plen <= len)
+	    أرجع;
     }
     p += len;
     c = PTR2CHAR(p);
@@ -2922,96 +2922,96 @@ ins_compl_addfrommatch(void)
  * compl_cont_mode and compl_cont_status.
  * Returns TRUE when the character is not to be inserted.
  */
-    static int
-set_ctrl_x_mode(int c)
+    ساكن صحيح
+سېټ_ctrl_x_ډېرپېښ(صحيح c)
 {
-    int	    retval = FALSE;
+    صحيح	    retval = FALSE;
 
-    switch (c)
+    بدل (c)
     {
-	case Ctrl_E:
-	case Ctrl_Y:
+	حالة Ctrl_E:
+	حالة Ctrl_Y:
 	    // scroll the window one line up or down
-	    ctrl_x_mode = CTRL_X_SCROLL;
-	    if (!(State & REPLACE_FLAG))
+	    ctrl_x_ډېرپېښ = CTRL_X_SCROLL;
+	    إذا (!(State & REPLACE_FLAG))
 		edit_submode = (char_u *)_(" (insert) Scroll (^E/^Y)");
-	    else
+	    وإلا
 		edit_submode = (char_u *)_(" (replace) Scroll (^E/^Y)");
-	    edit_submode_pre = NULL;
+	    edit_submode_pre = عدم;
 	    showmode();
-	    break;
-	case Ctrl_L:
+	    اكسر;
+	حالة Ctrl_L:
 	    // complete whole line
-	    ctrl_x_mode = CTRL_X_WHOLE_LINE;
-	    break;
-	case Ctrl_F:
+	    ctrl_x_ډېرپېښ = CTRL_X_ټولیز_کرښه;
+	    اكسر;
+	حالة Ctrl_F:
 	    // complete filenames
-	    ctrl_x_mode = CTRL_X_FILES;
-	    break;
-	case Ctrl_K:
+	    ctrl_x_ډېرپېښ = CTRL_X_FILES;
+	    اكسر;
+	حالة Ctrl_K:
 	    // complete words from a dictionary
-	    ctrl_x_mode = CTRL_X_DICTIONARY;
-	    break;
-	case Ctrl_R:
+	    ctrl_x_ډېرپېښ = CTRL_X_DICTIONARY;
+	    اكسر;
+	حالة Ctrl_R:
 	    // When CTRL-R is followed by '=', don't trigger register completion
 	    // This allows expressions like <C-R>=func()<CR> to work normally
-	    if (vpeekc() == '=')
-		break;
-	    ctrl_x_mode = CTRL_X_REGISTER;
-	    break;
-	case Ctrl_T:
+	    إذا (vpeekc() == '=')
+		اكسر;
+	    ctrl_x_ډېرپېښ = CTRL_X_ثبتوونکی;
+	    اكسر;
+	حالة Ctrl_T:
 	    // complete words from a thesaurus
-	    ctrl_x_mode = CTRL_X_THESAURUS;
-	    break;
-#ifdef FEAT_COMPL_FUNC
-	case Ctrl_U:
+	    ctrl_x_ډېرپېښ = CTRL_X_THESAURUS;
+	    اكسر;
+#که_تعریف_شوی FEAT_COMPL_FUNC
+	حالة Ctrl_U:
 	    // user defined completion
-	    ctrl_x_mode = CTRL_X_FUNCTION;
-	    break;
-	case Ctrl_O:
+	    ctrl_x_ډېرپېښ = CTRL_X_FUNCTION;
+	    اكسر;
+	حالة Ctrl_O:
 	    // omni completion
-	    ctrl_x_mode = CTRL_X_OMNI;
-	    break;
-#endif
-	case 's':
-	case Ctrl_S:
+	    ctrl_x_ډېرپېښ = CTRL_X_OMNI;
+	    اكسر;
+#د_که_پای
+	حالة 's':
+	حالة Ctrl_S:
 	    // complete spelling suggestions
-	    ctrl_x_mode = CTRL_X_SPELL;
-#ifdef FEAT_SPELL
+	    ctrl_x_ډېرپېښ = CTRL_X_SPELL;
+#که_تعریف_شوی FEAT_SPELL
 	    ++emsg_off;	// Avoid getting the E756 error twice.
-	    spell_back_to_badword();
+	    spell_شا_منزل_badword();
 	    --emsg_off;
-#endif
-	    break;
-	case Ctrl_RSB:
+#د_که_پای
+	    اكسر;
+	حالة Ctrl_RSB:
 	    // complete tag names
-	    ctrl_x_mode = CTRL_X_TAGS;
-	    break;
-#ifdef FEAT_FIND_ID
-	case Ctrl_I:
-	case K_S_TAB:
+	    ctrl_x_ډېرپېښ = CTRL_X_نښانونه;
+	    اكسر;
+#که_تعریف_شوی FEAT_پیدا_کړه_ID
+	حالة Ctrl_I:
+	حالة K_S_TAB:
 	    // complete keywords from included files
-	    ctrl_x_mode = CTRL_X_PATH_PATTERNS;
-	    break;
-	case Ctrl_D:
+	    ctrl_x_ډېرپېښ = CTRL_X_لار_PATTERNS;
+	    اكسر;
+	حالة Ctrl_D:
 	    // complete definitions from included files
-	    ctrl_x_mode = CTRL_X_PATH_DEFINES;
-	    break;
-#endif
-	case Ctrl_V:
-	case Ctrl_Q:
+	    ctrl_x_ډېرپېښ = CTRL_X_لار_تعریفوي;
+	    اكسر;
+#د_که_پای
+	حالة Ctrl_V:
+	حالة Ctrl_Q:
 	    // complete vim commands
-	    ctrl_x_mode = CTRL_X_CMDLINE;
-	    break;
-	case Ctrl_Z:
+	    ctrl_x_ډېرپېښ = CTRL_X_CMDLINE;
+	    اكسر;
+	حالة Ctrl_Z:
 	    // stop completion
-	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    ctrl_x_ډېرپېښ = CTRL_X_نورمال;
+	    edit_submode = عدم;
 	    showmode();
 	    retval = TRUE;
-	    break;
-	case Ctrl_P:
-	case Ctrl_N:
+	    اكسر;
+	حالة Ctrl_P:
+	حالة Ctrl_N:
 	    // ^X^P means LOCAL expansion if nothing interrupted (eg we
 	    // just started ^X mode, or there were enough ^X's to cancel
 	    // the previous mode, say ^X^F^X^X^P or ^P^X^X^X^P, see below)
@@ -3019,12 +3019,12 @@ set_ctrl_x_mode(int c)
 	    // ^X^F^X^P or ^P^X^X^P, see below)
 	    // nothing changes if interrupting mode 0, (eg, the flag
 	    // doesn't change when going to ADDING mode  -- Acevedo
-	    if (!(compl_cont_status & CONT_INTRPT))
-		compl_cont_status |= CONT_LOCAL;
-	    else if (compl_cont_mode != 0)
-		compl_cont_status &= ~CONT_LOCAL;
+	    إذا (!(compl_cont_حالت & CONT_INTRPT))
+		compl_cont_حالت |= CONT_LOCAL;
+	    وإلا إذا (compl_cont_ډېرپېښ != 0)
+		compl_cont_حالت &= ~CONT_LOCAL;
 	    // FALLTHROUGH
-	default:
+	افتراضي:
 	    // If we have typed at least 2 ^X's... for modes != 0, we set
 	    // compl_cont_status = 0 (eg, as if we had just started ^X
 	    // mode).
@@ -3035,70 +3035,70 @@ set_ctrl_x_mode(int c)
 	    // 'complete' and local ^P expansions respectively.
 	    // In mode 0 an extra ^X is needed since ^X^P goes to ADDING
 	    // mode  -- Acevedo
-	    if (c == Ctrl_X)
+	    إذا (c == Ctrl_X)
 	    {
-		if (compl_cont_mode != 0)
-		    compl_cont_status = 0;
-		else
-		    compl_cont_mode = CTRL_X_NOT_DEFINED_YET;
+		إذا (compl_cont_ډېرپېښ != 0)
+		    compl_cont_حالت = 0;
+		وإلا
+		    compl_cont_ډېرپېښ = CTRL_X_NOT_DEFINED_YET;
 	    }
-	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    ctrl_x_ډېرپېښ = CTRL_X_نورمال;
+	    edit_submode = عدم;
 	    showmode();
-	    break;
+	    اكسر;
     }
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Trigger CompleteDone event and adds relevant information to v:event
  */
-    static void
-trigger_complete_done_event(int mode UNUSED, string_T *word UNUSED)
+    ساكن فراغ
+trigger_complete_بشپړ_event(صحيح ډېرپېښ ناکارول_شوی, string_T *کلمه ناکارول_شوی)
 {
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     save_v_event_T	save_v_event;
     dict_T		*v_event = get_v_event(&save_v_event);
-    string_T		*mode_str;
+    string_T		*ډېرپېښ_str;
 
-    if (word == NULL || word->string == NULL)
-	(void)dict_add_string_len(v_event, "complete_word", (char_u *)"", 0);
-    else
-	(void)dict_add_string_len(v_event, "complete_word", word->string, (int)word->length);
+    إذا (کلمه == عدم || کلمه->string == عدم)
+	(فراغ)dict_جمع_کړه_string_len(v_event, "complete_word", (char_u *)"", 0);
+    وإلا
+	(فراغ)dict_جمع_کړه_string_len(v_event, "complete_word", کلمه->string, (صحيح)کلمه->اوږدتیا);
 
-    mode_str = &ctrl_x_mode_names[mode & ~CTRL_X_WANT_IDENT];
-    (void)dict_add_string_len(v_event, "complete_type",
-	(mode_str->string == NULL) ? (char_u *)"" : mode_str->string, (int)mode_str->length);
+    ډېرپېښ_str = &ctrl_x_ډېرپېښ_نومونه[ډېرپېښ & ~CTRL_X_WANT_IDENT];
+    (فراغ)dict_جمع_کړه_string_len(v_event, "complete_type",
+	(ډېرپېښ_str->string == عدم) ? (char_u *)"" : ډېرپېښ_str->string, (صحيح)ډېرپېښ_str->اوږدتیا);
 
-    dict_set_items_ro(v_event);
-#endif
+    dict_سېټ_توکي_ro(v_event);
+#د_که_پای
     ins_apply_autocmds(EVENT_COMPLETEDONE);
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     restore_v_event(v_event, &save_v_event);
-#endif
+#د_که_پای
 }
 
 /*
  * Stop insert completion mode
  */
-    static int
-ins_compl_stop(int c, int prev_mode, int retval)
+    ساكن صحيح
+ins_compl_stop(صحيح c, صحيح prev_ډېرپېښ, صحيح retval)
 {
-    int		want_cindent;
-    string_T	word = {NULL, 0};
+    صحيح		want_cindent;
+    string_T	کلمه = {عدم, 0};
 
     // Remove pre-inserted text when present.
-    if (ins_compl_preinsert_effect() && ins_compl_win_active(curwin))
+    إذا (ins_compl_preinsert_effect() && ins_compl_win_فعال(curwin))
 	ins_compl_delete();
 
     // Get here when we have finished typing a sequence of ^N and
     // ^P or other completion characters in CTRL-X mode.  Free up
     // memory that was used, and make sure we can redo the insert.
-    if (compl_curr_match != NULL || compl_leader.string != NULL || c == Ctrl_E)
+    إذا (compl_curr_سمون != عدم || compl_leader.string != عدم || c == Ctrl_E)
     {
-	char_u	*ptr = NULL;
+	char_u	*ptr = عدم;
 
 	// If any of the original typed text has been changed, eg when
 	// ignorecase is set, we must add back-spaces to the redo
@@ -3106,8 +3106,8 @@ ins_compl_stop(int c, int prev_mode, int retval)
 	// of the original text that has changed.
 	// When using the longest match, edited the match or used
 	// CTRL-E then don't use the current match.
-	if (compl_curr_match != NULL && compl_used_match && c != Ctrl_E)
-	    ptr = compl_curr_match->cp_str.string;
+	إذا (compl_curr_سمون != عدم && compl_کارول_شوی_سمون && c != Ctrl_E)
+	    ptr = compl_curr_سمون->cp_str.string;
 	ins_compl_fixRedoBufForLeader(ptr);
     }
 
@@ -3115,70 +3115,70 @@ ins_compl_stop(int c, int prev_mode, int retval)
 
     // When completing whole lines: fix indent for 'cindent'.
     // Otherwise, break line if it's too long.
-    if (compl_cont_mode == CTRL_X_WHOLE_LINE)
+    إذا (compl_cont_ډېرپېښ == CTRL_X_ټولیز_کرښه)
     {
 	// re-indent the current line
-	if (want_cindent)
+	إذا (want_cindent)
 	{
-	    do_c_expr_indent();
+	    do_c_بیان_indent();
 	    want_cindent = FALSE;	// don't do it again
 	}
     }
-    else if (!compl_autocomplete || compl_used_match)
+    وإلا إذا (!compl_autocomplete || compl_کارول_شوی_سمون)
     {
-	int prev_col = curwin->w_cursor.col;
+	صحيح prev_ستون = curwin->w_cursor.ستون;
 
 	// put the cursor on the last char, for 'tw' formatting
-	if (prev_col > 0)
+	إذا (prev_ستون > 0)
 	    dec_cursor();
 	// only format when something was inserted
-	if (!arrow_used && !ins_need_undo_get() && c != Ctrl_E)
+	إذا (!arrow_کارول_شوی && !ins_need_undo_get() && c != Ctrl_E)
 	    insertchar(NUL, 0, -1);
-	if (prev_col > 0
-		&& ml_get_curline()[curwin->w_cursor.col] != NUL)
+	إذا (prev_ستون > 0
+		&& ml_get_curline()[curwin->w_cursor.ستون] != NUL)
 	    inc_cursor();
     }
 
     // If the popup menu is displayed pressing CTRL-Y means accepting
     // the selection without inserting anything.  When
     // compl_enter_selects is set the Enter key does the same.
-    if ((c == Ctrl_Y || (compl_enter_selects
+    إذا ((c == Ctrl_Y || (compl_enter_selects
 		    && (c == CAR || c == K_KENTER || c == NL)))
 	    && pum_visible())
     {
-	word.string = vim_strnsave(compl_shown_match->cp_str.string,
-	    compl_shown_match->cp_str.length);
-	if (word.string == NULL)
-	    word.length = 0;
-	else
-	    word.length = compl_shown_match->cp_str.length;
+	کلمه.string = vim_strnsave(compl_shown_سمون->cp_str.string,
+	    compl_shown_سمون->cp_str.اوږدتیا);
+	إذا (کلمه.string == عدم)
+	    کلمه.اوږدتیا = 0;
+	وإلا
+	    کلمه.اوږدتیا = compl_shown_سمون->cp_str.اوږدتیا;
 	retval = TRUE;
     }
 
     // CTRL-E means completion is Ended, go back to the typed text.
     // but only do this, if the Popup is still visible
-    if (c == Ctrl_E)
+    إذا (c == Ctrl_E)
     {
-	char_u *p = NULL;
+	char_u *p = عدم;
 	size_t	plen = 0;
 
 	ins_compl_delete();
-	if (compl_leader.string != NULL)
+	إذا (compl_leader.string != عدم)
 	{
 	    p = compl_leader.string;
-	    plen = compl_leader.length;
+	    plen = compl_leader.اوږدتیا;
 	}
-	else if (compl_first_match != NULL)
+	وإلا إذا (compl_لومړی_سمون != عدم)
 	{
-	    p = compl_orig_text.string;
-	    plen = compl_orig_text.length;
+	    p = compl_orig_متن.string;
+	    plen = compl_orig_متن.اوږدتیا;
 	}
-	if (p != NULL)
+	إذا (p != عدم)
 	{
-	    int	    compl_len = get_compl_len();
+	    صحيح	    compl_len = get_compl_len();
 
-	    if ((int)plen > compl_len)
-		ins_compl_insert_bytes(p + compl_len, (int)plen - compl_len);
+	    إذا ((صحيح)plen > compl_len)
+		ins_compl_ورننباسه_بایټونه(p + compl_len, (صحيح)plen - compl_len);
 	}
 	retval = TRUE;
     }
@@ -3188,49 +3188,49 @@ ins_compl_stop(int c, int prev_mode, int retval)
     // Trigger the CompleteDonePre event to give scripts a chance to
     // act upon the completion before clearing the info, and restore
     // ctrl_x_mode, so that complete_info() can be used.
-    ctrl_x_mode = prev_mode;
+    ctrl_x_ډېرپېښ = prev_ډېرپېښ;
     ins_apply_autocmds(EVENT_COMPLETEDONEPRE);
 
     ins_compl_free();
     compl_started = FALSE;
     compl_matches = 0;
-    if (!shortmess(SHM_COMPLETIONMENU))
-	msg_clr_cmdline();	// necessary for "noshowmode"
-    ctrl_x_mode = CTRL_X_NORMAL;
+    إذا (!shortmess(SHM_COMPLETIONMENU))
+	پیغام_clr_cmdline();	// necessary for "noshowmode"
+    ctrl_x_ډېرپېښ = CTRL_X_نورمال;
     compl_enter_selects = FALSE;
-    if (edit_submode != NULL)
+    إذا (edit_submode != عدم)
     {
-	edit_submode = NULL;
+	edit_submode = عدم;
 	showmode();
     }
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
-    compl_ins_end_col = 0;
+    compl_عدد_bests = 0;
+    compl_ins_پای_ټکی_ستون = 0;
 
-    if (c == Ctrl_C && cmdwin_type != 0)
+    إذا (c == Ctrl_C && cmdwin_type != 0)
 	// Avoid the popup menu remains displayed when leaving the
 	// command line window.
 	update_screen(0);
     // Indent now if a key was typed that is in 'cinkeys'.
-    if (want_cindent && in_cinkeys(KEY_COMPLETE, ' ', inindent(0)))
-	do_c_expr_indent();
+    إذا (want_cindent && دننه_cinkeys(کلی_COMPLETE, ' ', inindent(0)))
+	do_c_بیان_indent();
     // Trigger the CompleteDone event to give scripts a chance to act
     // upon the end of completion.
-    trigger_complete_done_event(prev_mode, &word);
-    vim_free(word.string);
+    trigger_complete_بشپړ_event(prev_ډېرپېښ, &کلمه);
+    vim_free(کلمه.string);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Cancel completion.
  */
-    int
-ins_compl_cancel(void)
+    صحيح
+ins_compl_cancel(فراغ)
 {
-    return ins_compl_stop(' ', ctrl_x_mode, TRUE);
+    أرجع ins_compl_stop(' ', ctrl_x_ډېرپېښ, TRUE);
 }
 
 /*
@@ -3238,30 +3238,30 @@ ins_compl_cancel(void)
  * Called just after typing a character in Insert mode.
  * Returns TRUE when the character is not to be inserted;
  */
-    int
-ins_compl_prep(int c)
+    صحيح
+ins_compl_prep(صحيح c)
 {
-    int	    retval = FALSE;
-    int	    prev_mode = ctrl_x_mode;
+    صحيح	    retval = FALSE;
+    صحيح	    prev_ډېرپېښ = ctrl_x_ډېرپېښ;
 
     // Forget any previous 'special' messages if this is actually
     // a ^X mode key - bar ^R, in which case we wait to see what it gives us.
-    if (c != Ctrl_R && vim_is_ctrl_x_key(c))
-	edit_submode_extra = NULL;
+    إذا (c != Ctrl_R && vim_is_ctrl_x_کلی(c))
+	edit_submode_extra = عدم;
 
     // Ignore end of Select mode mapping and mouse scroll/movement.
-    if (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
+    إذا (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
 	    || c == K_MOUSELEFT || c == K_MOUSERIGHT || c == K_MOUSEMOVE
 	    || c == K_COMMAND || c == K_SCRIPT_COMMAND)
-	return retval;
+	أرجع retval;
 
-#ifdef FEAT_PROP_POPUP
+#که_تعریف_شوی FEAT_PROP_POPUP
     // Ignore mouse events in a popup window
-    if (is_mouse_key(c))
+    إذا (is_mouse_کلی(c))
     {
 	// Ignore drag and release events, the position does not need to be in
 	// the popup and it may have just closed.
-	if (c == K_LEFTRELEASE
+	إذا (c == K_LEFTRELEASE
 		|| c == K_LEFTRELEASE_NM
 		|| c == K_MIDDLERELEASE
 		|| c == K_RIGHTRELEASE
@@ -3272,92 +3272,92 @@ ins_compl_prep(int c)
 		|| c == K_RIGHTDRAG
 		|| c == K_X1DRAG
 		|| c == K_X2DRAG)
-	    return retval;
-	if (popup_visible)
+	    أرجع retval;
+	إذا (popup_visible)
 	{
-	    int	    row = mouse_row;
-	    int	    col = mouse_col;
-	    win_T   *wp = mouse_find_win(&row, &col, FIND_POPUP);
+	    صحيح	    لیکه = mouse_لیکه;
+	    صحيح	    ستون = mouse_ستون;
+	    win_T   *wp = mouse_پیدا_کړه_win(&لیکه, &ستون, پیدا_کړه_POPUP);
 
-	    if (wp != NULL && WIN_IS_POPUP(wp))
-		return retval;
+	    إذا (wp != عدم && WIN_IS_POPUP(wp))
+		أرجع retval;
 	}
     }
-#endif
+#د_که_پای
 
-    if (ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
+    إذا (ctrl_x_ډېرپېښ == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
     {
-	if (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_key(c)
-		|| !vim_is_ctrl_x_key(c))
+	إذا (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_کلی(c)
+		|| !vim_is_ctrl_x_کلی(c))
 	{
 	    // Not starting another completion mode.
-	    ctrl_x_mode = CTRL_X_CMDLINE;
+	    ctrl_x_ډېرپېښ = CTRL_X_CMDLINE;
 
 	    // CTRL-X CTRL-Z should stop completion without inserting anything
-	    if (c == Ctrl_Z)
+	    إذا (c == Ctrl_Z)
 		retval = TRUE;
 	}
-	else
+	وإلا
 	{
-	    ctrl_x_mode = CTRL_X_CMDLINE;
+	    ctrl_x_ډېرپېښ = CTRL_X_CMDLINE;
 
 	    // Other CTRL-X keys first stop completion, then start another
 	    // completion mode.
 	    ins_compl_prep(' ');
-	    ctrl_x_mode = CTRL_X_NOT_DEFINED_YET;
+	    ctrl_x_ډېرپېښ = CTRL_X_NOT_DEFINED_YET;
 	}
     }
 
     // Set "compl_get_longest" when finding the first matches.
-    if (ctrl_x_mode_not_defined_yet()
-			   || (ctrl_x_mode_normal() && !compl_started))
+    إذا (ctrl_x_ډېرپېښ_not_defined_yet()
+			   || (ctrl_x_ډېرپېښ_نورمال() && !compl_started))
     {
 	compl_get_longest = (get_cot_flags() & COT_LONGEST);
-	compl_used_match = TRUE;
+	compl_کارول_شوی_سمون = TRUE;
     }
 
-    if (ctrl_x_mode_not_defined_yet())
+    إذا (ctrl_x_ډېرپېښ_not_defined_yet())
 	// We have just typed CTRL-X and aren't quite sure which CTRL-X mode
 	// it will be yet.  Now we decide.
-	retval = set_ctrl_x_mode(c);
-    else if (ctrl_x_mode_not_default())
+	retval = سېټ_ctrl_x_ډېرپېښ(c);
+    وإلا إذا (ctrl_x_ډېرپېښ_not_default())
     {
 	// We're already in CTRL-X mode, do we stay in it?
-	if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+	إذا (c != Ctrl_R && !vim_is_ctrl_x_کلی(c))
 	{
-	    ctrl_x_mode = ctrl_x_mode_scroll() ? CTRL_X_NORMAL : CTRL_X_FINISHED;
-	    edit_submode = NULL;
+	    ctrl_x_ډېرپېښ = ctrl_x_ډېرپېښ_scroll() ? CTRL_X_نورمال : CTRL_X_پای_ته_رسېدلی;
+	    edit_submode = عدم;
 	}
 	showmode();
     }
 
-    if (compl_started || ctrl_x_mode == CTRL_X_FINISHED)
+    إذا (compl_started || ctrl_x_ډېرپېښ == CTRL_X_پای_ته_رسېدلی)
     {
 	// Show error message from attempted keyword completion (probably
 	// 'Pattern not found') until another key is hit, then go back to
 	// showing what mode we are in.
 	showmode();
-	if ((ctrl_x_mode_normal() && c != Ctrl_N && c != Ctrl_P
-				       && c != Ctrl_R && !ins_compl_pum_key(c))
-		|| ctrl_x_mode == CTRL_X_FINISHED)
-	    retval = ins_compl_stop(c, prev_mode, retval);
+	إذا ((ctrl_x_ډېرپېښ_نورمال() && c != Ctrl_N && c != Ctrl_P
+				       && c != Ctrl_R && !ins_compl_pum_کلی(c))
+		|| ctrl_x_ډېرپېښ == CTRL_X_پای_ته_رسېدلی)
+	    retval = ins_compl_stop(c, prev_ډېرپېښ, retval);
     }
-    else if (ctrl_x_mode == CTRL_X_LOCAL_MSG)
+    وإلا إذا (ctrl_x_ډېرپېښ == CTRL_X_LOCAL_پیغام)
 	// Trigger the CompleteDone event to give scripts a chance to act
 	// upon the (possibly failed) completion.
-	trigger_complete_done_event(ctrl_x_mode, NULL);
+	trigger_complete_بشپړ_event(ctrl_x_ډېرپېښ, عدم);
 
     may_trigger_modechanged();
 
     // reset continue_* if we left expansion-mode, if we stay they'll be
     // (re)set properly in ins_complete()
-    if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+    إذا (c != Ctrl_R && !vim_is_ctrl_x_کلی(c))
     {
-	compl_cont_status = 0;
-	compl_cont_mode = 0;
+	compl_cont_حالت = 0;
+	compl_cont_ډېرپېښ = 0;
     }
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -3365,36 +3365,36 @@ ins_compl_prep(int c)
  * text.  This inserts backspaces and appends the changed text.
  * "ptr" is the known leader text or NUL.
  */
-    static void
+    ساكن فراغ
 ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
 {
-    int	    len = 0;
+    صحيح	    len = 0;
     char_u  *p;
     char_u  *ptr = ptr_arg;
 
-    if (ptr == NULL)
+    إذا (ptr == عدم)
     {
-	if (compl_leader.string != NULL)
+	إذا (compl_leader.string != عدم)
 	    ptr = compl_leader.string;
-	else
-	    return;  // nothing to do
+	وإلا
+	    أرجع;  // nothing to do
     }
-    if (compl_orig_text.string != NULL)
+    إذا (compl_orig_متن.string != عدم)
     {
-	p = compl_orig_text.string;
+	p = compl_orig_متن.string;
 	// Find length of common prefix between original text and new completion
-	while (p[len] != NUL && p[len] == ptr[len])
+	طالما (p[len] != NUL && p[len] == ptr[len])
 	    len++;
 	// Adjust length to not break inside a multi-byte character
-	if (len > 0)
-	    len -= (*mb_head_off)(p, p + len);
+	إذا (len > 0)
+	    len -= (*mb_سر_off)(p, p + len);
 	// Add backspace characters for each remaining character in
 	// original text
-	for (p += len; *p != NUL; MB_PTR_ADV(p))
-	    AppendCharToRedobuff(K_BS);
+	لكل (p += len; *p != NUL; MB_PTR_ADV(p))
+	    Append_Char_منزل_Redobuff(K_BS);
     }
-    if (ptr != NULL)
-	AppendToRedobuffLit(ptr + len, -1);
+    إذا (ptr != عدم)
+	Append_منزل_Redobuff_Lit(ptr + len, -1);
 }
 
 /*
@@ -3405,100 +3405,100 @@ ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
  *
  * Returns the buffer to scan, if any, otherwise returns curbuf -- Acevedo
  */
-    static buf_T *
-ins_compl_next_buf(buf_T *buf, int flag)
+    ساكن buf_T *
+ins_compl_بل_buf(buf_T *buf, صحيح flag)
 {
-    static win_T    *wp = NULL;
-    int		    skip_buffer;
+    ساكن win_T    *wp = عدم;
+    صحيح		    skip_بفر;
 
-    if (flag == 'w')		// just windows
+    إذا (flag == 'w')		// just windows
     {
-	if (buf == curbuf || !win_valid(wp))
+	إذا (buf == curbuf || !win_valid(wp))
 	    // first call for this flag/expansion or window was closed
 	    wp = curwin;
 
-	while (TRUE)
+	طالما (TRUE)
 	{
 	    // Move to next window (wrap to first window if at the end)
-	    wp = (wp->w_next != NULL) ? wp->w_next : firstwin;
+	    wp = (wp->w_بل != عدم) ? wp->w_بل : firstwin;
 	    // Break if we're back at start or found an unscanned buffer
-	    if (wp == curwin || !wp->w_buffer->b_scanned)
-		break;
+	    إذا (wp == curwin || !wp->w_بفر->b_scanned)
+		اكسر;
 	}
-	buf = wp->w_buffer;
+	buf = wp->w_بفر;
     }
-    else
+    وإلا
     {
 	// 'b' (just loaded buffers), 'u' (just non-loaded buffers) or 'U'
 	// (unlisted buffers)
 	// When completing whole lines skip unloaded buffers.
-	while (TRUE)
+	طالما (TRUE)
 	{
 	    // Move to next buffer (wrap to first buffer if at the end)
-	    buf = (buf->b_next != NULL) ? buf->b_next : firstbuf;
+	    buf = (buf->b_بل != عدم) ? buf->b_بل : firstbuf;
 	    // Break if we're back at start buffer
-	    if (buf == curbuf)
-		break;
+	    إذا (buf == curbuf)
+		اكسر;
 
 	    // Check buffer conditions based on flag
-	    if (flag == 'U')
-		skip_buffer = buf->b_p_bl;
-	    else
-		skip_buffer = !buf->b_p_bl ||
-		    (buf->b_ml.ml_mfp == NULL) != (flag == 'u');
+	    إذا (flag == 'U')
+		skip_بفر = buf->b_p_bl;
+	    وإلا
+		skip_بفر = !buf->b_p_bl ||
+		    (buf->b_ml.ml_mfp == عدم) != (flag == 'u');
 
 	    // Break if we found a buffer that matches our criteria
-	    if (!skip_buffer && !buf->b_scanned)
-		break;
+	    إذا (!skip_بفر && !buf->b_scanned)
+		اكسر;
 	}
     }
-    return buf;
+    أرجع buf;
 }
 
 /*
  * Count the number of entries in the 'complete' option value "cpt".
  * Each non-empty, comma-separated segment is counted as one entry.
  */
-    static int
-get_cpt_sources_count(char_u *cpt)
+    ساكن صحيح
+get_cpt_sources_شمېر(char_u *cpt)
 {
     char_u  dummy[LSIZE];
-    int	    count = 0;
+    صحيح	    شمېر = 0;
     char_u  *p;
 
-    for (p = cpt; *p != NUL; )
+    لكل (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	طالما (*p == ',' || *p == ' ')
 	    p++;  // Skip delimiters
 
-	if (*p != NUL)
+	إذا (*p != NUL)
 	{
-	    (void)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
-	    count++;
+	    (فراغ)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
+	    شمېر++;
 	}
     }
 
-    return count;
+    أرجع شمېر;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
 
 # ifdef FEAT_EVAL
-static callback_T cfu_cb;	    // 'completefunc' callback function
-static callback_T ofu_cb;	    // 'omnifunc' callback function
-static callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
-static callback_T *cpt_cb;	    // Callback functions associated with F{func}
-static int	  cpt_cb_count;	    // Number of cpt callbacks
+ساكن callback_T cfu_cb;	    // 'completefunc' callback function
+ساكن callback_T ofu_cb;	    // 'omnifunc' callback function
+ساكن callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
+ساكن callback_T *cpt_cb;	    // Callback functions associated with F{func}
+ساكن صحيح	  cpt_cb_شمېر;	    // Number of cpt callbacks
 # endif
 
 /*
  * Copy a global callback function to a buffer local callback.
  */
-    static void
-copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
+    ساكن فراغ
+copy_global_منزل_buflocal_cb(callback_T *globcb, callback_T *bufcb)
 {
     free_callback(bufcb);
-    if (globcb->cb_name != NULL && *globcb->cb_name != NUL)
+    إذا (globcb->cb_name != عدم && *globcb->cb_name != NUL)
 	copy_callback(bufcb, globcb);
 }
 
@@ -3508,33 +3508,33 @@ copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_completefunc(optset_T *args)
+    حرف *
+did_سېټ_completefunc(optset_T *دلیلونه)
 {
-    int	retval;
+    صحيح	retval;
 
-    if (args->os_flags & OPT_LOCAL)
-	retval = option_set_callback_func(args->os_newval.string,
+    إذا (دلیلونه->os_flags & OPT_LOCAL)
+	retval = option_سېټ_callback_func(دلیلونه->os_newval.string,
 							    &curbuf->b_cfu_cb);
-    else
+    وإلا
     {
-	retval = option_set_callback_func(args->os_newval.string, &cfu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
-	    set_buflocal_cfu_callback(curbuf);
+	retval = option_سېټ_callback_func(دلیلونه->os_newval.string, &cfu_cb);
+	إذا (retval == OK && !(دلیلونه->os_flags & OPT_GLOBAL))
+	    سېټ_buflocal_cfu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    أرجع retval == FAIL ? e_invalid_دلیل : عدم;
 }
 
 /*
  * Copy the global 'completefunc' callback function to the buffer-local
  * 'completefunc' callback for "buf".
  */
-    void
-set_buflocal_cfu_callback(buf_T *buf UNUSED)
+    فراغ
+سېټ_buflocal_cfu_callback(buf_T *buf ناکارول_شوی)
 {
 # ifdef FEAT_EVAL
-    copy_global_to_buflocal_cb(&cfu_cb, &buf->b_cfu_cb);
+    copy_global_منزل_buflocal_cb(&cfu_cb, &buf->b_cfu_cb);
 # endif
 }
 
@@ -3544,46 +3544,46 @@ set_buflocal_cfu_callback(buf_T *buf UNUSED)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_omnifunc(optset_T *args)
+    حرف *
+did_سېټ_omnifunc(optset_T *دلیلونه)
 {
-    int	retval;
+    صحيح	retval;
 
-    if (args->os_flags & OPT_LOCAL)
-	retval = option_set_callback_func(args->os_newval.string,
+    إذا (دلیلونه->os_flags & OPT_LOCAL)
+	retval = option_سېټ_callback_func(دلیلونه->os_newval.string,
 							    &curbuf->b_ofu_cb);
-    else
+    وإلا
     {
-	retval = option_set_callback_func(args->os_newval.string, &ofu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
-	    set_buflocal_ofu_callback(curbuf);
+	retval = option_سېټ_callback_func(دلیلونه->os_newval.string, &ofu_cb);
+	إذا (retval == OK && !(دلیلونه->os_flags & OPT_GLOBAL))
+	    سېټ_buflocal_ofu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    أرجع retval == FAIL ? e_invalid_دلیل : عدم;
 }
 
 /*
  * Copy the global 'omnifunc' callback function to the buffer-local 'omnifunc'
  * callback for "buf".
  */
-    void
-set_buflocal_ofu_callback(buf_T *buf UNUSED)
+    فراغ
+سېټ_buflocal_ofu_callback(buf_T *buf ناکارول_شوی)
 {
 # ifdef FEAT_EVAL
-    copy_global_to_buflocal_cb(&ofu_cb, &buf->b_ofu_cb);
+    copy_global_منزل_buflocal_cb(&ofu_cb, &buf->b_ofu_cb);
 # endif
 }
 
 /*
  * Free an array of 'complete' F{func} callbacks and set the pointer to NULL.
  */
-    void
-clear_cpt_callbacks(callback_T **callbacks, int count)
+    فراغ
+clear_cpt_callbacks(callback_T **callbacks, صحيح شمېر)
 {
-    if (callbacks == NULL || *callbacks == NULL)
-	return;
+    إذا (callbacks == عدم || *callbacks == عدم)
+	أرجع;
 
-    for (int i = 0; i < count; i++)
+    لكل (صحيح i = 0; i < شمېر; i++)
 	free_callback(&(*callbacks)[i]);
 
     VIM_CLEAR(*callbacks);
@@ -3593,40 +3593,40 @@ clear_cpt_callbacks(callback_T **callbacks, int count)
  * Copies a list of callback_T structs from src to *dest, clearing any existing
  * entries and allocating memory for the destination.
  */
-    static int
-copy_cpt_callbacks(callback_T **dest, int *dest_cnt, callback_T *src, int cnt)
+    ساكن صحيح
+copy_cpt_callbacks(callback_T **dest, صحيح *dest_cnt, callback_T *src, صحيح cnt)
 {
     clear_cpt_callbacks(dest, *dest_cnt);
     *dest_cnt = 0;
 
-    if (cnt == 0)
-	return OK;
+    إذا (cnt == 0)
+	أرجع OK;
 
     *dest = ALLOC_CLEAR_MULT(callback_T, cnt);
-    if (*dest == NULL)
-	return FAIL;
+    إذا (*dest == عدم)
+	أرجع FAIL;
 
     *dest_cnt = cnt;
 
-    for (int i = 0; i < cnt; i++)
-	if (src[i].cb_name != NULL && *(src[i].cb_name) != NUL)
+    لكل (صحيح i = 0; i < cnt; i++)
+	إذا (src[i].cb_name != عدم && *(src[i].cb_name) != NUL)
 	    copy_callback(&(*dest)[i], &src[i]);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Copy global 'complete' F{func} callbacks into the given buffer's local
  * callback array. Clears any existing buffer-local callbacks first.
  */
-    void
-set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
+    فراغ
+سېټ_buflocal_cpt_callbacks(buf_T *buf ناکارول_شوی)
 {
 # ifdef FEAT_EVAL
-    if (buf == NULL)
-	return;
-    (void)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_count, cpt_cb,
-	    cpt_cb_count);
+    إذا (buf == عدم)
+	أرجع;
+    (فراغ)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_شمېر, cpt_cb,
+	    cpt_cb_شمېر);
 # endif
 }
 
@@ -3638,81 +3638,81 @@ set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
  * index.  Any previous array in "*cbp" is cleared.
  * Returns FAIL when out of memory.
  */
-    static int
-parse_cpt_callbacks(char_u *cpt, callback_T **cbp, int *cnt)
+    ساكن صحيح
+parse_cpt_callbacks(char_u *cpt, callback_T **cbp, صحيح *cnt)
 {
     char_u  buf[LSIZE];
     char_u  *p;
-    int	    idx = 0;
-    int	    slen;
-    int	    count;
+    صحيح	    idx = 0;
+    صحيح	    slen;
+    صحيح	    شمېر;
 
     clear_cpt_callbacks(cbp, *cnt);
     *cnt = 0;
 
-    count = get_cpt_sources_count(cpt);
-    if (count == 0)
-	return OK;
+    شمېر = get_cpt_sources_شمېر(cpt);
+    إذا (شمېر == 0)
+	أرجع OK;
 
-    *cbp = ALLOC_CLEAR_MULT(callback_T, count);
-    if (*cbp == NULL)
-	return FAIL;
-    *cnt = count;
+    *cbp = ALLOC_CLEAR_MULT(callback_T, شمېر);
+    إذا (*cbp == عدم)
+	أرجع FAIL;
+    *cnt = شمېر;
 
-    for (p = cpt; *p != NUL; )
+    لكل (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	طالما (*p == ',' || *p == ' ')
 	    p++; // Skip delimiters
 
-	if (*p != NUL)
+	إذا (*p != NUL)
 	{
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
+	    إذا (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
 
-		if (caret != NULL)
+		إذا (caret != عدم)
 		    *caret = NUL;
 
-		if (option_set_callback_func(buf + 1, &(*cbp)[idx]) != OK)
-		    (*cbp)[idx].cb_name = NULL;
+		إذا (option_سېټ_callback_func(buf + 1, &(*cbp)[idx]) != OK)
+		    (*cbp)[idx].cb_name = عدم;
 	    }
 	    idx++;
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Parse 'complete' option and initialize F{func} callbacks.
  * Frees any existing callbacks and allocates new ones.
  */
-    int
-set_cpt_callbacks(optset_T *args)
+    صحيح
+سېټ_cpt_callbacks(optset_T *دلیلونه)
 {
-    int	    opt_flags = args->os_flags;
+    صحيح	    opt_flags = دلیلونه->os_flags;
 
-    if (curbuf == NULL)
-	return FAIL;
+    إذا (curbuf == عدم)
+	أرجع FAIL;
 
     // ":setglobal" does not change the buffer-local option value
-    if (!(opt_flags & OPT_GLOBAL)
+    إذا (!(opt_flags & OPT_GLOBAL)
 	    && parse_cpt_callbacks(curbuf->b_p_cpt, &curbuf->b_p_cpt_cb,
-				   &curbuf->b_p_cpt_count) != OK)
-	return FAIL;
+				   &curbuf->b_p_cpt_شمېر) != OK)
+	أرجع FAIL;
 
     // ":setlocal" does not change the global option value
-    if (opt_flags & OPT_LOCAL)
-	return OK;
+    إذا (opt_flags & OPT_LOCAL)
+	أرجع OK;
 
     // Cache the callbacks for the global value
-    if (opt_flags & OPT_GLOBAL)
-	return parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_count);
+    إذا (opt_flags & OPT_GLOBAL)
+	أرجع parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_شمېر);
 
     // set case
-    return copy_cpt_callbacks(&cpt_cb, &cpt_cb_count, curbuf->b_p_cpt_cb,
-			      curbuf->b_p_cpt_count);
+    أرجع copy_cpt_callbacks(&cpt_cb, &cpt_cb_شمېر, curbuf->b_p_cpt_cb,
+			      curbuf->b_p_cpt_شمېر);
 }
 
 /*
@@ -3721,90 +3721,90 @@ set_cpt_callbacks(optset_T *args)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
-did_set_thesaurusfunc(optset_T *args UNUSED)
+    حرف *
+did_سېټ_thesaurusfunc(optset_T *دلیلونه ناکارول_شوی)
 {
-    int	retval;
+    صحيح	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    إذا (دلیلونه->os_flags & OPT_LOCAL)
 	// buffer-local option set
-	retval = option_set_callback_func(curbuf->b_p_tsrfu,
+	retval = option_سېټ_callback_func(curbuf->b_p_tsrfu,
 							&curbuf->b_tsrfu_cb);
-    else
+    وإلا
     {
 	// global option set
-	retval = option_set_callback_func(p_tsrfu, &tsrfu_cb);
+	retval = option_سېټ_callback_func(p_tsrfu, &tsrfu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	إذا (!(دلیلونه->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_tsrfu_cb);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    أرجع retval == FAIL ? e_invalid_دلیل : عدم;
 }
 
 /*
  * Mark "copyID" references in an array of F{func} callbacks so that they are
  * not garbage collected.
  */
-    int
-set_ref_in_cpt_callbacks(callback_T *callbacks, int count, int copyID)
+    صحيح
+سېټ_ref_دننه_cpt_callbacks(callback_T *callbacks, صحيح شمېر, صحيح copyID)
 {
-    int	abort = FALSE;
+    صحيح	abort = FALSE;
 
-    if (callbacks == NULL)
-	return FALSE;
+    إذا (callbacks == عدم)
+	أرجع FALSE;
 
-    for (int i = 0; i < count; i++)
-	abort = abort || set_ref_in_callback(&callbacks[i], copyID);
-    return abort;
+    لكل (صحيح i = 0; i < شمېر; i++)
+	abort = abort || سېټ_ref_دننه_callback(&callbacks[i], copyID);
+    أرجع abort;
 }
 
 /*
  * Mark the global 'completefunc' 'omnifunc' and 'thesaurusfunc' callbacks with
  * "copyID" so that they are not garbage collected.
  */
-    int
-set_ref_in_insexpand_funcs(int copyID)
+    صحيح
+سېټ_ref_دننه_insexpand_funcs(صحيح copyID)
 {
-    int abort = set_ref_in_callback(&cfu_cb, copyID);
-    abort = abort || set_ref_in_callback(&ofu_cb, copyID);
-    abort = abort || set_ref_in_callback(&tsrfu_cb, copyID);
-    abort = abort || set_ref_in_cpt_callbacks(cpt_cb, cpt_cb_count, copyID);
+    صحيح abort = سېټ_ref_دننه_callback(&cfu_cb, copyID);
+    abort = abort || سېټ_ref_دننه_callback(&ofu_cb, copyID);
+    abort = abort || سېټ_ref_دننه_callback(&tsrfu_cb, copyID);
+    abort = abort || سېټ_ref_دننه_cpt_callbacks(cpt_cb, cpt_cb_شمېر, copyID);
 
-    return abort;
+    أرجع abort;
 }
 
 /*
  * Get the user-defined completion function name for completion "type"
  */
-    static char_u *
-get_complete_funcname(int type)
+    ساكن char_u *
+get_complete_funcname(صحيح type)
 {
-    switch (type)
+    بدل (type)
     {
-	case CTRL_X_FUNCTION:
-	    return curbuf->b_p_cfu;
-	case CTRL_X_OMNI:
-	    return curbuf->b_p_ofu;
-	case CTRL_X_THESAURUS:
-	    return *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
-	default:
-	    return (char_u *)"";
+	حالة CTRL_X_FUNCTION:
+	    أرجع curbuf->b_p_cfu;
+	حالة CTRL_X_OMNI:
+	    أرجع curbuf->b_p_ofu;
+	حالة CTRL_X_THESAURUS:
+	    أرجع *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
+	افتراضي:
+	    أرجع (char_u *)"";
     }
 }
 
 /*
  * Get the callback to use for insert mode completion.
  */
-    static callback_T *
-get_insert_callback(int type)
+    ساكن callback_T *
+get_ورننباسه_callback(صحيح type)
 {
-    if (type == CTRL_X_FUNCTION)
-	return &curbuf->b_cfu_cb;
-    if (type == CTRL_X_OMNI)
-	return &curbuf->b_ofu_cb;
+    إذا (type == CTRL_X_FUNCTION)
+	أرجع &curbuf->b_cfu_cb;
+    إذا (type == CTRL_X_OMNI)
+	أرجع &curbuf->b_ofu_cb;
     // CTRL_X_THESAURUS
-    return (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
+    أرجع (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
 }
 
 /*
@@ -3814,68 +3814,68 @@ get_insert_callback(int type)
  * Callback function "cb" is set if triggered by a function in the 'cpt'
  * option; otherwise, it is NULL.
  */
-    static void
-expand_by_function(int type, char_u *base, callback_T *cb)
+    ساكن فراغ
+expand_by_function(صحيح type, char_u *بنسټ, callback_T *cb)
 {
-    list_T      *matchlist = NULL;
-    dict_T	*matchdict = NULL;
-    typval_T	args[3];
+    list_T      *matchlist = عدم;
+    dict_T	*matchdict = عدم;
+    typval_T	دلیلونه[3];
     char_u	*funcname;
     pos_T	pos;
     typval_T	rettv;
-    int		save_State = State;
-    int		retval;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
-			    && was_set_insecurely(curwin,
+    صحيح		save_State = State;
+    صحيح		retval;
+    صحيح		is_cpt_function = (cb != عدم);
+    صحيح		use_sandbox = is_cpt_function
+			    && was_سېټ_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    إذا (!is_cpt_function)
     {
 	funcname = get_complete_funcname(type);
-	if (*funcname == NUL)
-	    return;
-	cb = get_insert_callback(type);
+	إذا (*funcname == NUL)
+	    أرجع;
+	cb = get_ورننباسه_callback(type);
     }
 
     // Call 'completefunc' to obtain the list of matches.
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 0;
-    args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = base != NULL ? base : (char_u *)"";
-    args[2].v_type = VAR_UNKNOWN;
+    دلیلونه[0].v_type = VAR_شمېره;
+    دلیلونه[0].vval.v_شمېره = 0;
+    دلیلونه[1].v_type = VAR_STRING;
+    دلیلونه[1].vval.v_string = بنسټ != عدم ? بنسټ : (char_u *)"";
+    دلیلونه[2].v_type = VAR_UNKNOWN;
 
     pos = curwin->w_cursor;
     // Lock the text to avoid weird things from happening.  Also disallow
     // switching to another window, it should not be needed and may end up in
     // Insert mode in another buffer.
     ++textlock;
-    if (use_sandbox)
+    إذا (use_sandbox)
 	++sandbox;
 
-    retval = call_callback(cb, 0, &rettv, 2, args);
-    if (use_sandbox)
+    retval = call_callback(cb, 0, &rettv, 2, دلیلونه);
+    إذا (use_sandbox)
 	--sandbox;
 
     // Call a function, which returns a list or dict.
-    if (retval == OK)
+    إذا (retval == OK)
     {
-	switch (rettv.v_type)
+	بدل (rettv.v_type)
 	{
-	    case VAR_LIST:
+	    حالة VAR_LIST:
 		matchlist = rettv.vval.v_list;
-		break;
-	    case VAR_DICT:
+		اكسر;
+	    حالة VAR_DICT:
 		matchdict = rettv.vval.v_dict;
-		break;
-	    case VAR_SPECIAL:
-		if (rettv.vval.v_number == VVAL_NONE)
-		    compl_opt_suppress_empty = TRUE;
+		اكسر;
+	    حالة VAR_SPECIAL:
+		إذا (rettv.vval.v_شمېره == VVAL_NONE)
+		    compl_opt_suppress_تشه = TRUE;
 		// FALLTHROUGH
-	    default:
+	    افتراضي:
 		// TODO: Give error message?
 		clear_tv(&rettv);
-		break;
+		اكسر;
 	}
     }
     --textlock;
@@ -3883,36 +3883,36 @@ expand_by_function(int type, char_u *base, callback_T *cb)
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    إذا (!EQUAL_POS(curwin->w_cursor, pos))
     {
-	emsg(_(e_complete_function_deleted_text));
-	goto theend;
+	emsg(_(e_complete_function_deleted_متن));
+	اذهب theend;
     }
 
-    if (matchlist != NULL)
-	ins_compl_add_list(matchlist);
-    else if (matchdict != NULL)
-	ins_compl_add_dict(matchdict);
+    إذا (matchlist != عدم)
+	ins_compl_جمع_کړه_list(matchlist);
+    وإلا إذا (matchdict != عدم)
+	ins_compl_جمع_کړه_dict(matchdict);
 
 theend:
     // Restore State, it might have been changed.
     State = save_State;
 
-    if (matchdict != NULL)
+    إذا (matchdict != عدم)
 	dict_unref(matchdict);
-    if (matchlist != NULL)
+    إذا (matchlist != عدم)
 	list_unref(matchlist);
 }
-#endif // FEAT_COMPL_FUNC
+#د_که_پای // FEAT_COMPL_FUNC
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#إذا defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 
-    static inline int
+    ساكن مضمن صحيح
 get_user_highlight_id(char_u *hlname)
 {
-    if (hlname != NULL && *hlname != NUL)
-	return syn_check_group(hlname, (int)STRLEN(hlname));
-    return 0;
+    إذا (hlname != عدم && *hlname != NUL)
+	أرجع syn_check_ډله(hlname, (صحيح)STRLEN(hlname));
+    أرجع 0;
 }
 /*
  * Add a match to the list of matches from a typeval_T.
@@ -3921,109 +3921,109 @@ get_user_highlight_id(char_u *hlname)
  * maybe because alloc() returns NULL, then FAIL is returned.
  * When "fast" is TRUE use fast_breakcheck() instead of ui_breakcheck().
  */
-    static int
-ins_compl_add_tv(typval_T *tv, int dir, int fast)
+    ساكن صحيح
+ins_compl_جمع_کړه_tv(typval_T *tv, صحيح dir, صحيح fast)
 {
-    char_u	*word;
-    int		dup = FALSE;
-    int		empty = FALSE;
-    int		flags = fast ? CP_FAST : 0;
-    char_u	*(cptext[CPT_COUNT]);
-    typval_T	user_data;
-    int		status;
+    char_u	*کلمه;
+    صحيح		dup = FALSE;
+    صحيح		تشه_2 = FALSE;
+    صحيح		flags = fast ? CP_FAST : 0;
+    char_u	*(cptext[CPT_شمېر]);
+    typval_T	user_معلومات;
+    صحيح		حالت;
     char_u	*user_abbr_hlname;
-    char_u	*user_kind_hlname;
-    int		user_hl[2] = { 0, 0 };
+    char_u	*user_ډول_hlname;
+    صحيح		user_hl[2] = { 0, 0 };
 
-    user_data.v_type = VAR_UNKNOWN;
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    user_معلومات.v_type = VAR_UNKNOWN;
+    إذا (tv->v_type == VAR_DICT && tv->vval.v_dict != عدم)
     {
-	word = dict_get_string(tv->vval.v_dict, "word", FALSE);
+	کلمه = dict_get_string(tv->vval.v_dict, "word", FALSE);
 	cptext[CPT_ABBR] = dict_get_string(tv->vval.v_dict, "abbr", FALSE);
 	cptext[CPT_MENU] = dict_get_string(tv->vval.v_dict, "menu", FALSE);
-	cptext[CPT_KIND] = dict_get_string(tv->vval.v_dict, "kind", FALSE);
+	cptext[CPT_ډول] = dict_get_string(tv->vval.v_dict, "kind", FALSE);
 	cptext[CPT_INFO] = dict_get_string(tv->vval.v_dict, "info", FALSE);
 
 	user_abbr_hlname = dict_get_string(tv->vval.v_dict, "abbr_hlgroup", FALSE);
 	user_hl[0] = get_user_highlight_id(user_abbr_hlname);
 
-	user_kind_hlname = dict_get_string(tv->vval.v_dict, "kind_hlgroup", FALSE);
-	user_hl[1] = get_user_highlight_id(user_kind_hlname);
+	user_ډول_hlname = dict_get_string(tv->vval.v_dict, "kind_hlgroup", FALSE);
+	user_hl[1] = get_user_highlight_id(user_ډول_hlname);
 
-	dict_get_tv(tv->vval.v_dict, "user_data", &user_data);
-	if (dict_get_string(tv->vval.v_dict, "icase", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "icase"))
+	dict_get_tv(tv->vval.v_dict, "user_data", &user_معلومات);
+	إذا (dict_get_string(tv->vval.v_dict, "icase", FALSE) != عدم
+				  && dict_get_شمېره(tv->vval.v_dict, "icase"))
 	    flags |= CP_ICASE;
-	if (dict_get_string(tv->vval.v_dict, "dup", FALSE) != NULL)
-	    dup = dict_get_number(tv->vval.v_dict, "dup");
-	if (dict_get_string(tv->vval.v_dict, "empty", FALSE) != NULL)
-	    empty = dict_get_number(tv->vval.v_dict, "empty");
-	if (dict_get_string(tv->vval.v_dict, "equal", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "equal"))
+	إذا (dict_get_string(tv->vval.v_dict, "dup", FALSE) != عدم)
+	    dup = dict_get_شمېره(tv->vval.v_dict, "dup");
+	إذا (dict_get_string(tv->vval.v_dict, "empty", FALSE) != عدم)
+	    تشه_2 = dict_get_شمېره(tv->vval.v_dict, "empty");
+	إذا (dict_get_string(tv->vval.v_dict, "equal", FALSE) != عدم
+				  && dict_get_شمېره(tv->vval.v_dict, "equal"))
 	    flags |= CP_EQUAL;
     }
-    else
+    وإلا
     {
-	word = tv_get_string_chk(tv);
-	CLEAR_FIELD(cptext);
+	کلمه = tv_get_string_chk(tv);
+	CLEAR_ډګر(cptext);
     }
-    if (word == NULL || (!empty && *word == NUL))
+    إذا (کلمه == عدم || (!تشه_2 && *کلمه == NUL))
     {
-	clear_tv(&user_data);
-	return FAIL;
+	clear_tv(&user_معلومات);
+	أرجع FAIL;
     }
-    status = ins_compl_add(word, -1, NULL, cptext,
-	    &user_data, dir, flags, dup, user_hl, FUZZY_SCORE_NONE);
-    if (status != OK)
-	clear_tv(&user_data);
-    return status;
+    حالت = ins_compl_جمع_کړه(کلمه, -1, عدم, cptext,
+	    &user_معلومات, dir, flags, dup, user_hl, FUZZY_SCORE_NONE);
+    إذا (حالت != OK)
+	clear_tv(&user_معلومات);
+    أرجع حالت;
 }
 
 /*
  * Add completions from a list.
  */
-    static void
-ins_compl_add_list(list_T *list)
+    ساكن فراغ
+ins_compl_جمع_کړه_list(list_T *list)
 {
     listitem_T	*li;
-    int		dir = compl_direction;
+    صحيح		dir = compl_direction;
 
     // Go through the List with matches and add each of them.
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_توکي(list, li)
     {
-	if (ins_compl_add_tv(&li->li_tv, dir, TRUE) == OK)
+	إذا (ins_compl_جمع_کړه_tv(&li->li_tv, dir, TRUE) == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
-	else if (did_emsg)
-	    break;
+	وإلا إذا (did_emsg)
+	    اكسر;
     }
 }
 
 /*
  * Add completions from a dict.
  */
-    static void
-ins_compl_add_dict(dict_T *dict)
+    ساكن فراغ
+ins_compl_جمع_کړه_dict(dict_T *dict)
 {
     dictitem_T	*di_refresh;
-    dictitem_T	*di_words;
+    dictitem_T	*di_ټکي;
 
     // Check for optional "refresh" item.
     compl_opt_refresh_always = FALSE;
-    di_refresh = dict_find(dict, (char_u *)"refresh", 7);
-    if (di_refresh != NULL && di_refresh->di_tv.v_type == VAR_STRING)
+    di_refresh = dict_پیدا_کړه(dict, (char_u *)"refresh", 7);
+    إذا (di_refresh != عدم && di_refresh->di_tv.v_type == VAR_STRING)
     {
 	char_u	*v = di_refresh->di_tv.vval.v_string;
 
-	if (v != NULL && STRCMP(v, (char_u *)"always") == 0)
+	إذا (v != عدم && STRCMP(v, (char_u *)"always") == 0)
 	    compl_opt_refresh_always = TRUE;
     }
 
     // Add completions from a "words" list.
-    di_words = dict_find(dict, (char_u *)"words", 5);
-    if (di_words != NULL && di_words->di_tv.v_type == VAR_LIST)
-	ins_compl_add_list(di_words->di_tv.vval.v_list);
+    di_ټکي = dict_پیدا_کړه(dict, (char_u *)"words", 5);
+    إذا (di_ټکي != عدم && di_ټکي->di_tv.v_type == VAR_LIST)
+	ins_compl_جمع_کړه_list(di_ټکي->di_tv.vval.v_list);
 }
 
 /*
@@ -4031,127 +4031,127 @@ ins_compl_add_dict(dict_T *dict)
  * "startcol" is where the matched text starts (1 is first column).
  * "list" is the list of matches.
  */
-    static void
-set_completion(colnr_T startcol, list_T *list)
+    ساكن فراغ
+سېټ_completion(colnr_T startcol, list_T *list)
 {
-    int save_w_wrow = curwin->w_wrow;
-    int save_w_leftcol = curwin->w_leftcol;
-    int flags = CP_ORIGINAL_TEXT;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
-    int compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0;
-    int compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
+    صحيح save_w_wrow = curwin->w_wrow;
+    صحيح save_w_leftcol = curwin->w_leftcol;
+    صحيح flags = CP_ORIGINAL_متن;
+    بینښه صحيح cur_cot_flags = get_cot_flags();
+    صحيح compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
+    صحيح compl_no_ورننباسه = (cur_cot_flags & COT_NOINSERT) != 0;
+    صحيح compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
 
     // If already doing completions stop it.
-    if (compl_started || ctrl_x_mode_not_default())
+    إذا (compl_started || ctrl_x_ډېرپېښ_not_default())
 	ins_compl_prep(' ');
     ins_compl_clear();
     ins_compl_free();
     compl_get_longest = compl_longest;
 
     compl_direction = FORWARD;
-    if (startcol > curwin->w_cursor.col)
-	startcol = curwin->w_cursor.col;
-    compl_col = startcol;
+    إذا (startcol > curwin->w_cursor.ستون)
+	startcol = curwin->w_cursor.ستون;
+    compl_ستون = startcol;
     compl_lnum = curwin->w_cursor.lnum;
-    compl_length = (int)curwin->w_cursor.col - (int)startcol;
+    compl_اوږدتیا = (صحيح)curwin->w_cursor.ستون - (صحيح)startcol;
     // compl_pattern doesn't need to be set
-    compl_orig_text.string = vim_strnsave(ml_get_curline() + compl_col,
-							(size_t)compl_length);
-    if (p_ic)
+    compl_orig_متن.string = vim_strnsave(ml_get_curline() + compl_ستون,
+							(size_t)compl_اوږدتیا);
+    إذا (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL)
+    إذا (compl_orig_متن.string == عدم)
     {
-	compl_orig_text.length = 0;
-	return;
+	compl_orig_متن.اوږدتیا = 0;
+	أرجع;
     }
-    compl_orig_text.length = (size_t)compl_length;
-    if (ins_compl_add(compl_orig_text.string,
-			(int)compl_orig_text.length, NULL, NULL, NULL, 0,
-			flags | CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
-	return;
+    compl_orig_متن.اوږدتیا = (size_t)compl_اوږدتیا;
+    إذا (ins_compl_جمع_کړه(compl_orig_متن.string,
+			(صحيح)compl_orig_متن.اوږدتیا, عدم, عدم, عدم, 0,
+			flags | CP_FAST, FALSE, عدم, FUZZY_SCORE_NONE) != OK)
+	أرجع;
 
-    ctrl_x_mode = CTRL_X_EVAL;
+    ctrl_x_ډېرپېښ = CTRL_X_EVAL;
 
-    ins_compl_add_list(list);
+    ins_compl_جمع_کړه_list(list);
     compl_matches = ins_compl_make_cyclic();
     compl_started = TRUE;
-    compl_used_match = TRUE;
-    compl_cont_status = 0;
+    compl_کارول_شوی_سمون = TRUE;
+    compl_cont_حالت = 0;
 
-    compl_curr_match = compl_first_match;
-    int no_select = compl_no_select || compl_longest;
-    if (compl_no_insert || no_select)
+    compl_curr_سمون = compl_لومړی_سمون;
+    صحيح no_select = compl_no_select || compl_longest;
+    إذا (compl_no_ورننباسه || no_select)
     {
-	ins_complete(K_DOWN, FALSE);
-	if (no_select)
+	ins_complete(K_ښکته, FALSE);
+	إذا (no_select)
 	    // Down/Up has no real effect.
-	    ins_complete(K_UP, FALSE);
+	    ins_complete(K_پورته, FALSE);
     }
-    else
+    وإلا
 	ins_complete(Ctrl_N, FALSE);
-    compl_enter_selects = compl_no_insert;
+    compl_enter_selects = compl_no_ورننباسه;
 
     // Lazily show the popup menu, unless we got interrupted.
-    if (!compl_interrupted)
+    إذا (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
     may_trigger_modechanged();
-    out_flush();
+    بهر_flush();
 }
 
 /*
  * "complete()" function
  */
-    void
-f_complete(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_complete(typval_T *argvars, typval_T *rettv ناکارول_شوی)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_شمېره_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    if ((State & MODE_INSERT) == 0)
+    إذا ((State & ډېرپېښ_ورننباسه) == 0)
     {
-	emsg(_(e_complete_can_only_be_used_in_insert_mode));
-	return;
+	emsg(_(e_complete_can_only_be_کارول_شوی_دننه_ورننباسه_ډېرپېښ));
+	أرجع;
     }
 
     // Check for undo allowed here, because if something was already inserted
     // the line was already saved for undo and this check isn't done.
-    if (!undo_allowed())
-	return;
+    إذا (!undo_allowed())
+	أرجع;
 
-    if (check_for_nonnull_list_arg(argvars, 1) != FAIL)
+    إذا (check_for_nonnull_list_arg(argvars, 1) != FAIL)
     {
-	int startcol = (int)tv_get_number_chk(&argvars[0], NULL);
-	if (startcol > 0)
-	    set_completion(startcol - 1, argvars[1].vval.v_list);
+	صحيح startcol = (صحيح)tv_get_شمېره_chk(&argvars[0], عدم);
+	إذا (startcol > 0)
+	    سېټ_completion(startcol - 1, argvars[1].vval.v_list);
     }
 }
 
 /*
  * "complete_add()" function
  */
-    void
-f_complete_add(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_complete_جمع_کړه(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = ins_compl_add_tv(&argvars[0], 0, FALSE);
+    rettv->vval.v_شمېره = ins_compl_جمع_کړه_tv(&argvars[0], 0, FALSE);
 }
 
 /*
  * "complete_check()" function
  */
-    void
-f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_complete_check(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    صحيح save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    ins_compl_check_keys(0, TRUE);
-    rettv->vval.v_number = ins_compl_interrupted();
+    ins_compl_check_کلیګانې(0, TRUE);
+    rettv->vval.v_شمېره = ins_compl_interrupted();
 
     RedrawingDisabled = save_RedrawingDisabled;
 }
@@ -4159,21 +4159,21 @@ f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * Return Insert completion mode name string
  */
-    static void
-ins_compl_mode(string_T *ret)
+    ساكن فراغ
+ins_compl_ډېرپېښ(string_T *ret)
 {
-    if (ctrl_x_mode_not_defined_yet() || ctrl_x_mode_scroll() || compl_started)
+    إذا (ctrl_x_ډېرپېښ_not_defined_yet() || ctrl_x_ډېرپېښ_scroll() || compl_started)
     {
-	string_T    *mode;
+	string_T    *ډېرپېښ;
 
-	mode = &ctrl_x_mode_names[ctrl_x_mode & ~CTRL_X_WANT_IDENT];
-	ret->string = (mode->string == NULL) ? (char_u *)"" : mode->string;
-	ret->length = mode->length;
+	ډېرپېښ = &ctrl_x_ډېرپېښ_نومونه[ctrl_x_ډېرپېښ & ~CTRL_X_WANT_IDENT];
+	ret->string = (ډېرپېښ->string == عدم) ? (char_u *)"" : ډېرپېښ->string;
+	ret->اوږدتیا = ډېرپېښ->اوږدتیا;
     }
-    else
+    وإلا
     {
 	ret->string = (char_u *)"";
-	ret->length = 0;
+	ret->اوږدتیا = 0;
     }
 }
 
@@ -4181,52 +4181,52 @@ ins_compl_mode(string_T *ret)
  * Assign the sequence number to all the completion matches which don't have
  * one assigned yet.
  */
-    static void
-ins_compl_update_sequence_numbers(void)
+    ساكن فراغ
+ins_compl_update_sequence_numbers(فراغ)
 {
-    int		number = 0;
-    compl_T	*match;
+    صحيح		شمېره = 0;
+    compl_T	*سمون;
 
-    if (compl_dir_forward())
+    إذا (compl_dir_forward())
     {
 	// Search backwards for the first valid (!= -1) number.
 	// This should normally succeed already at the first loop
 	// cycle, so it's fast!
-	for (match = compl_curr_match->cp_prev; match != NULL
-		&& !is_first_match(match); match = match->cp_prev)
-	    if (match->cp_number != -1)
+	لكل (سمون = compl_curr_سمون->cp_prev; سمون != عدم
+		&& !is_لومړی_سمون(سمون); سمون = سمون->cp_prev)
+	    إذا (سمون->cp_شمېره != -1)
 	    {
-		number = match->cp_number;
-		break;
+		شمېره = سمون->cp_شمېره;
+		اكسر;
 	    }
-	if (match != NULL)
+	إذا (سمون != عدم)
 	    // go up and assign all numbers which are not assigned yet
-	    for (match = match->cp_next;
-		    match != NULL && match->cp_number == -1;
-					   match = match->cp_next)
-		match->cp_number = ++number;
+	    لكل (سمون = سمون->cp_بل;
+		    سمون != عدم && سمون->cp_شمېره == -1;
+					   سمون = سمون->cp_بل)
+		سمون->cp_شمېره = ++شمېره;
     }
-    else // BACKWARD
+    وإلا // BACKWARD
     {
 	// Search forwards (upwards) for the first valid (!= -1)
 	// number.  This should normally succeed already at the
 	// first loop cycle, so it's fast!
-	for (match = compl_curr_match->cp_next; match != NULL
-		&& !is_first_match(match); match = match->cp_next)
+	لكل (سمون = compl_curr_سمون->cp_بل; سمون != عدم
+		&& !is_لومړی_سمون(سمون); سمون = سمون->cp_بل)
 	{
-	    if (match->cp_number != -1)
+	    إذا (سمون->cp_شمېره != -1)
 	    {
-		number = match->cp_number;
-		break;
+		شمېره = سمون->cp_شمېره;
+		اكسر;
 	    }
 	}
-	if (match != NULL)
+	إذا (سمون != عدم)
 	{
 	    // go down and assign all numbers which are not assigned yet
-	    for (match = match->cp_prev; match
-		    && match->cp_number == -1;
-					   match = match->cp_prev)
-		match->cp_number = ++number;
+	    لكل (سمون = سمون->cp_prev; سمون
+		    && سمون->cp_شمېره == -1;
+					   سمون = سمون->cp_prev)
+		سمون->cp_شمېره = ++شمېره;
 	}
     }
 }
@@ -4234,164 +4234,164 @@ ins_compl_update_sequence_numbers(void)
 /*
  * Fill the dict of complete_info
  */
-    static void
-fill_complete_info_dict(dict_T *di, compl_T *match, int add_match)
+    ساكن فراغ
+fill_complete_info_dict(dict_T *di, compl_T *سمون, صحيح جمع_کړه_سمون)
 {
-    dict_add_string_len(di, "word", match->cp_str.string, (int)match->cp_str.length);
-    dict_add_string(di, "abbr", match->cp_text[CPT_ABBR]);
-    dict_add_string(di, "menu", match->cp_text[CPT_MENU]);
-    dict_add_string(di, "kind", match->cp_text[CPT_KIND]);
-    dict_add_string(di, "info", match->cp_text[CPT_INFO]);
-    dict_add_string(di, "abbr_hlgroup", syn_id2name(match->cp_user_abbr_hl_id));
-    dict_add_string(di, "kind_hlgroup", syn_id2name(match->cp_user_kind_hl_id));
-    if (add_match)
-	dict_add_bool(di, "match", match->cp_in_match_array);
-    if (match->cp_user_data.v_type == VAR_UNKNOWN)
+    dict_جمع_کړه_string_len(di, "word", سمون->cp_str.string, (صحيح)سمون->cp_str.اوږدتیا);
+    dict_جمع_کړه_string(di, "abbr", سمون->cp_متن[CPT_ABBR]);
+    dict_جمع_کړه_string(di, "menu", سمون->cp_متن[CPT_MENU]);
+    dict_جمع_کړه_string(di, "kind", سمون->cp_متن[CPT_ډول]);
+    dict_جمع_کړه_string(di, "info", سمون->cp_متن[CPT_INFO]);
+    dict_جمع_کړه_string(di, "abbr_hlgroup", syn_id2name(سمون->cp_user_abbr_hl_id));
+    dict_جمع_کړه_string(di, "kind_hlgroup", syn_id2name(سمون->cp_user_ډول_hl_id));
+    إذا (جمع_کړه_سمون)
+	dict_جمع_کړه_bool(di, "match", سمون->cp_دننه_سمون_array);
+    إذا (سمون->cp_user_معلومات.v_type == VAR_UNKNOWN)
 	// Add an empty string for backwards compatibility
-	dict_add_string_len(di, "user_data", (char_u *)"", 0);
-    else
-	dict_add_tv(di, "user_data", &match->cp_user_data);
+	dict_جمع_کړه_string_len(di, "user_data", (char_u *)"", 0);
+    وإلا
+	dict_جمع_کړه_tv(di, "user_data", &سمون->cp_user_معلومات);
 }
 
 /*
  * Get complete information
  */
-    static void
+    ساكن فراغ
 get_complete_info(list_T *what_list, dict_T *retdict)
 {
-    int		ret = OK;
-    listitem_T	*item;
-# define CI_WHAT_MODE		    0x01
+    صحيح		ret = OK;
+    listitem_T	*توکی;
+# define CI_WHAT_ډېرپېښ		    0x01
 # define CI_WHAT_PUM_VISIBLE	    0x02
-# define CI_WHAT_ITEMS		    0x04
+# define CI_WHAT_توکي		    0x04
 # define CI_WHAT_SELECTED	    0x08
 # define CI_WHAT_COMPLETED	    0x10
 # define CI_WHAT_MATCHES	    0x20
-# define CI_WHAT_PREINSERTED_TEXT   0x40
+# define CI_WHAT_PREINSERTED_متن   0x40
 # define CI_WHAT_AUTO		    0x80
 # define CI_WHAT_ALL		    0xff
-    int		what_flag;
+    صحيح		what_flag;
 
-    if (what_list == NULL)
+    إذا (what_list == عدم)
 	what_flag = CI_WHAT_ALL
 	    & ~(CI_WHAT_MATCHES | CI_WHAT_COMPLETED | CI_WHAT_AUTO);
-    else
+    وإلا
     {
 	what_flag = 0;
 	CHECK_LIST_MATERIALIZE(what_list);
-	FOR_ALL_LIST_ITEMS(what_list, item)
+	FOR_ALL_LIST_توکي(what_list, توکی)
 	{
-	    char_u *what = tv_get_string(&item->li_tv);
+	    char_u *what = tv_get_string(&توکی->li_tv);
 
-	    if (STRCMP(what, "mode") == 0)
-		what_flag |= CI_WHAT_MODE;
-	    else if (STRCMP(what, "pum_visible") == 0)
+	    إذا (STRCMP(what, "mode") == 0)
+		what_flag |= CI_WHAT_ډېرپېښ;
+	    وإلا إذا (STRCMP(what, "pum_visible") == 0)
 		what_flag |= CI_WHAT_PUM_VISIBLE;
-	    else if (STRCMP(what, "items") == 0)
-		what_flag |= CI_WHAT_ITEMS;
-	    else if (STRCMP(what, "selected") == 0)
+	    وإلا إذا (STRCMP(what, "items") == 0)
+		what_flag |= CI_WHAT_توکي;
+	    وإلا إذا (STRCMP(what, "selected") == 0)
 		what_flag |= CI_WHAT_SELECTED;
-	    else if (STRCMP(what, "completed") == 0)
+	    وإلا إذا (STRCMP(what, "completed") == 0)
 		what_flag |= CI_WHAT_COMPLETED;
-	    else if (STRCMP(what, "preinserted_text") == 0)
-		what_flag |= CI_WHAT_PREINSERTED_TEXT;
-	    else if (STRCMP(what, "matches") == 0)
+	    وإلا إذا (STRCMP(what, "preinserted_text") == 0)
+		what_flag |= CI_WHAT_PREINSERTED_متن;
+	    وإلا إذا (STRCMP(what, "matches") == 0)
 		what_flag |= CI_WHAT_MATCHES;
-	    else if (STRCMP(what, "auto") == 0)
+	    وإلا إذا (STRCMP(what, "auto") == 0)
 		what_flag |= CI_WHAT_AUTO;
 	}
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_MODE))
+    إذا (ret == OK && (what_flag & CI_WHAT_ډېرپېښ))
     {
-	string_T    mode;
+	string_T    ډېرپېښ;
 
-	ins_compl_mode(&mode);
-	ret = dict_add_string_len(retdict, "mode", mode.string, (int)mode.length);
+	ins_compl_ډېرپېښ(&ډېرپېښ);
+	ret = dict_جمع_کړه_string_len(retdict, "mode", ډېرپېښ.string, (صحيح)ډېرپېښ.اوږدتیا);
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
-	ret = dict_add_number(retdict, "pum_visible", pum_visible());
+    إذا (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
+	ret = dict_جمع_کړه_شمېره(retdict, "pum_visible", pum_visible());
 
-    if (ret == OK && (what_flag & CI_WHAT_AUTO))
-	ret = dict_add_number(retdict, "auto", compl_autostarted);
+    إذا (ret == OK && (what_flag & CI_WHAT_AUTO))
+	ret = dict_جمع_کړه_شمېره(retdict, "auto", compl_autostarted);
 
-    if (ret == OK && (what_flag & CI_WHAT_PREINSERTED_TEXT))
+    إذا (ret == OK && (what_flag & CI_WHAT_PREINSERTED_متن))
     {
-	char_u	*line = ml_get_curline();
-	int	len = compl_ins_end_col - curwin->w_cursor.col;
+	char_u	*کرښه = ml_get_curline();
+	صحيح	len = compl_ins_پای_ټکی_ستون - curwin->w_cursor.ستون;
 
-	ret = dict_add_string_len(retdict, "preinserted_text",
-		(len > 0) ? line + curwin->w_cursor.col : (char_u *)"", (len > 0) ? len : 0);
+	ret = dict_جمع_کړه_string_len(retdict, "preinserted_text",
+		(len > 0) ? کرښه + curwin->w_cursor.ستون : (char_u *)"", (len > 0) ? len : 0);
     }
 
-    if (ret == OK && (what_flag & (CI_WHAT_ITEMS | CI_WHAT_SELECTED
+    إذا (ret == OK && (what_flag & (CI_WHAT_توکي | CI_WHAT_SELECTED
 				    | CI_WHAT_MATCHES | CI_WHAT_COMPLETED)))
     {
-	list_T	    *li = NULL;
+	list_T	    *li = عدم;
 	dict_T	    *di;
-	compl_T     *match;
-	int         selected_idx = -1;
-	int	    has_items = what_flag & CI_WHAT_ITEMS;
-	int	    has_matches = what_flag & CI_WHAT_MATCHES;
-	int	    has_completed = what_flag & CI_WHAT_COMPLETED;
+	compl_T     *سمون;
+	صحيح         selected_idx = -1;
+	صحيح	    has_توکي = what_flag & CI_WHAT_توکي;
+	صحيح	    has_matches = what_flag & CI_WHAT_MATCHES;
+	صحيح	    has_completed = what_flag & CI_WHAT_COMPLETED;
 
-	if (has_items || has_matches)
+	إذا (has_توکي || has_matches)
 	{
 	    li = list_alloc();
-	    if (li == NULL)
-		return;
-	    ret = dict_add_list(retdict, (has_matches && !has_items)
+	    إذا (li == عدم)
+		أرجع;
+	    ret = dict_جمع_کړه_list(retdict, (has_matches && !has_توکي)
 						? "matches" : "items", li);
-	    if (ret == FAIL)
+	    إذا (ret == FAIL)
 		list_unref(li);
 	}
-	if (ret == OK && what_flag & CI_WHAT_SELECTED)
-	    if (compl_curr_match != NULL && compl_curr_match->cp_number == -1)
+	إذا (ret == OK && what_flag & CI_WHAT_SELECTED)
+	    إذا (compl_curr_سمون != عدم && compl_curr_سمون->cp_شمېره == -1)
 		ins_compl_update_sequence_numbers();
-	if (ret == OK && compl_first_match != NULL)
+	إذا (ret == OK && compl_لومړی_سمون != عدم)
 	{
-	    int list_idx = 0;
-	    match = compl_first_match;
-	    do
+	    صحيح list_idx = 0;
+	    سمون = compl_لومړی_سمون;
+	    افعل
 	    {
-		if (!match_at_original_text(match))
+		إذا (!سمون_at_original_متن(سمون))
 		{
-		    if (has_items
-			    || (has_matches && match->cp_in_match_array))
+		    إذا (has_توکي
+			    || (has_matches && سمون->cp_دننه_سمون_array))
 		    {
 			di = dict_alloc();
-			if (di == NULL)
-			    return;
+			إذا (di == عدم)
+			    أرجع;
 			ret = list_append_dict(li, di);
-			if (ret != OK)
+			إذا (ret != OK)
 			{
 			    dict_unref(di);
-			    return;
+			    أرجع;
 			}
-			fill_complete_info_dict(di, match, has_matches && has_items);
+			fill_complete_info_dict(di, سمون, has_matches && has_توکي);
 		    }
-		    if (compl_curr_match != NULL
-			    && compl_curr_match->cp_number == match->cp_number)
+		    إذا (compl_curr_سمون != عدم
+			    && compl_curr_سمون->cp_شمېره == سمون->cp_شمېره)
 			selected_idx = list_idx;
-		    if (!has_matches || match->cp_in_match_array)
+		    إذا (!has_matches || سمون->cp_دننه_سمون_array)
 			list_idx++;
 		}
-		match = match->cp_next;
+		سمون = سمون->cp_بل;
 	    }
-	    while (match != NULL && !is_first_match(match));
+	    طالما (سمون != عدم && !is_لومړی_سمون(سمون));
 	}
-	if (ret == OK && (what_flag & CI_WHAT_SELECTED))
-	    ret = dict_add_number(retdict, "selected", selected_idx);
+	إذا (ret == OK && (what_flag & CI_WHAT_SELECTED))
+	    ret = dict_جمع_کړه_شمېره(retdict, "selected", selected_idx);
 
-	if (ret == OK && selected_idx != -1 && has_completed)
+	إذا (ret == OK && selected_idx != -1 && has_completed)
 	{
 	    di = dict_alloc();
-	    if (di == NULL)
-		return;
-	    fill_complete_info_dict(di, compl_curr_match, FALSE);
-	    ret = dict_add_dict(retdict, "completed", di);
-	    if (ret == FAIL)
+	    إذا (di == عدم)
+		أرجع;
+	    fill_complete_info_dict(di, compl_curr_سمون, FALSE);
+	    ret = dict_جمع_کړه_dict(retdict, "completed", di);
+	    إذا (ret == FAIL)
 		dict_unref(di);
 	}
     }
@@ -4400,85 +4400,85 @@ get_complete_info(list_T *what_list, dict_T *retdict)
 /*
  * "complete_info()" function
  */
-    void
+    فراغ
 f_complete_info(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*what_list = NULL;
+    list_T	*what_list = عدم;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_dict_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    إذا (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (check_for_list_arg(argvars, 0) == FAIL)
-	    return;
+	إذا (check_for_list_arg(argvars, 0) == FAIL)
+	    أرجع;
 	what_list = argvars[0].vval.v_list;
     }
     get_complete_info(what_list, rettv->vval.v_dict);
 }
-#endif
+#د_که_پای
 
 /*
  * Returns TRUE when using a user-defined function for thesaurus completion.
  */
-    static int
-thesaurus_func_complete(int type UNUSED)
+    ساكن صحيح
+thesaurus_func_complete(صحيح type ناکارول_شوی)
 {
-#ifdef FEAT_COMPL_FUNC
-    return type == CTRL_X_THESAURUS
+#که_تعریف_شوی FEAT_COMPL_FUNC
+    أرجع type == CTRL_X_THESAURUS
 		&& (*curbuf->b_p_tsrfu != NUL || *p_tsrfu != NUL);
-#else
-    return FALSE;
-#endif
+#وإلا
+    أرجع FALSE;
+#د_که_پای
 }
 
 /*
  * Check if 'cpt' list index can be advanced to the next completion source.
  */
-    static int
-may_advance_cpt_index(char_u *cpt)
+    ساكن صحيح
+may_advance_cpt_شاخص(char_u *cpt)
 {
     char_u  *p = cpt;
 
-    if (cpt_sources_index == -1)
-	return FALSE;
-    while (*p == ',' || *p == ' ') // Skip delimiters
+    إذا (cpt_sources_شاخص == -1)
+	أرجع FALSE;
+    طالما (*p == ',' || *p == ' ') // Skip delimiters
 	p++;
-    return (*p != NUL);
+    أرجع (*p != NUL);
 }
 
 /*
  * Return value of process_next_cpt_value()
  */
-enum
+تعداد
 {
     INS_COMPL_CPT_OK = 1,
     INS_COMPL_CPT_CONT,
-    INS_COMPL_CPT_END
+    INS_COMPL_CPT_پای_ټکی
 };
 
 /*
  * state information used for getting the next set of insert completion
  * matches.
  */
-typedef struct
+تعريفنوع بنية
 {
     char_u	*e_cpt_copy;		// copy of 'complete'
     char_u	*e_cpt;			// current entry in "e_cpt_copy"
     buf_T	*ins_buf;		// buffer being scanned
-    pos_T	*cur_match_pos;		// current match position
-    pos_T	prev_match_pos;		// previous match position
-    int		set_match_pos;		// save first_match_pos/last_match_pos
-    pos_T	first_match_pos;	// first match position
-    pos_T	last_match_pos;		// last match position
-    int		found_all;		// found all matches of a certain type.
+    pos_T	*cur_سمون_pos;		// current match position
+    pos_T	prev_سمون_pos;		// previous match position
+    صحيح		سېټ_سمون_pos;		// save first_match_pos/last_match_pos
+    pos_T	لومړی_سمون_pos;	// first match position
+    pos_T	وروستی_سمون_pos;		// last match position
+    صحيح		وموندل_all;		// found all matches of a certain type.
     char_u	*dict;			// dictionary file to search
-    int		dict_f;			// "dict" is an exact file name or not
+    صحيح		dict_f;			// "dict" is an exact file name or not
     callback_T	*func_cb;		// callback of function in 'cpt' option
-} ins_compl_next_state_T;
+} ins_compl_بل_state_T;
 
 /*
  * Process the next 'complete' option value in st->e_cpt.
@@ -4500,235 +4500,235 @@ typedef struct
  * the "st->e_cpt" option value and process the next matching source.
  * Returns INS_COMPL_CPT_END if all the values in "st->e_cpt" are processed.
  */
-    static int
-process_next_cpt_value(
-	ins_compl_next_state_T *st,
-	int		*compl_type_arg,
-	pos_T		*start_match_pos,
-	int		fuzzy_collect,
-	int		*advance_cpt_idx)
+    ساكن صحيح
+process_بل_cpt_ارزښت(
+	ins_compl_بل_state_T *st,
+	صحيح		*compl_type_arg,
+	pos_T		*پیل_سمون_pos,
+	صحيح		fuzzy_collect,
+	صحيح		*advance_cpt_idx)
 {
-    int	    compl_type = -1;
-    int	    status = INS_COMPL_CPT_OK;
-    int	    skip_source = compl_autocomplete && compl_from_nonkeyword;
+    صحيح	    compl_type = -1;
+    صحيح	    حالت = INS_COMPL_CPT_OK;
+    صحيح	    skip_سرچینه = compl_autocomplete && compl_from_nonkeyword;
 
-    st->found_all = FALSE;
+    st->وموندل_all = FALSE;
     *advance_cpt_idx = FALSE;
 
-    while (*st->e_cpt == ',' || *st->e_cpt == ' ')
+    طالما (*st->e_cpt == ',' || *st->e_cpt == ' ')
 	st->e_cpt++;
 
-    if (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_source
-	    && !compl_time_slice_expired)
+    إذا (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_سرچینه
+	    && !compl_وخت_ټوټه_expired)
     {
 	st->ins_buf = curbuf;
-	st->first_match_pos = *start_match_pos;
+	st->لومړی_سمون_pos = *پیل_سمون_pos;
 	// Move the cursor back one character so that ^N can match the
 	// word immediately after the cursor.
-	if (ctrl_x_mode_normal() && (!fuzzy_collect && dec(&st->first_match_pos) < 0))
+	إذا (ctrl_x_ډېرپېښ_نورمال() && (!fuzzy_collect && dec(&st->لومړی_سمون_pos) < 0))
 	{
 	    // Move the cursor to after the last character in the
 	    // buffer, so that word at start of buffer is found
 	    // correctly.
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count;
-	    st->first_match_pos.col = ml_get_len(st->first_match_pos.lnum);
+	    st->لومړی_سمون_pos.lnum = st->ins_buf->b_ml.ml_کرښه_شمېر;
+	    st->لومړی_سمون_pos.ستون = ml_get_len(st->لومړی_سمون_pos.lnum);
 	}
-	st->last_match_pos = st->first_match_pos;
+	st->وروستی_سمون_pos = st->لومړی_سمون_pos;
 	compl_type = 0;
 
 	// Remember the first match so that the loop stops when we
 	// wrap and come back there a second time.
-	st->set_match_pos = TRUE;
+	st->سېټ_سمون_pos = TRUE;
     }
-    else if (!skip_source && !compl_time_slice_expired
-	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != NULL
-	    && (st->ins_buf = ins_compl_next_buf(
+    وإلا إذا (!skip_سرچینه && !compl_وخت_ټوټه_expired
+	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != عدم
+	    && (st->ins_buf = ins_compl_بل_buf(
 					   st->ins_buf, *st->e_cpt)) != curbuf)
     {
 	// Scan a buffer, but not the current one.
-	if (st->ins_buf->b_ml.ml_mfp != NULL)   // loaded buffer
+	إذا (st->ins_buf->b_ml.ml_mfp != عدم)   // loaded buffer
 	{
 	    compl_started = TRUE;
-	    st->first_match_pos.col = st->last_match_pos.col = 0;
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count + 1;
-	    st->last_match_pos.lnum = 0;
+	    st->لومړی_سمون_pos.ستون = st->وروستی_سمون_pos.ستون = 0;
+	    st->لومړی_سمون_pos.lnum = st->ins_buf->b_ml.ml_کرښه_شمېر + 1;
+	    st->وروستی_سمون_pos.lnum = 0;
 	    compl_type = 0;
 	}
-	else	// unloaded buffer, scan like dictionary
+	وإلا	// unloaded buffer, scan like dictionary
 	{
-	    st->found_all = TRUE;
-	    if (st->ins_buf->b_fname == NULL)
+	    st->وموندل_all = TRUE;
+	    إذا (st->ins_buf->b_fname == عدم)
 	    {
-		status = INS_COMPL_CPT_CONT;
-		goto done;
+		حالت = INS_COMPL_CPT_CONT;
+		اذهب بشپړ;
 	    }
 	    compl_type = CTRL_X_DICTIONARY;
 	    st->dict = st->ins_buf->b_fname;
 	    st->dict_f = DICT_EXACT;
 	}
-	if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+	إذا (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning: %s"),
-		    st->ins_buf->b_fname == NULL
+	    پیغام_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((حرف *)IObuff, IOSIZE, _("Scanning: %s"),
+		    st->ins_buf->b_fname == عدم
 			? buf_spname(st->ins_buf)
-			: st->ins_buf->b_sfname == NULL
+			: st->ins_buf->b_sfname == عدم
 			    ? st->ins_buf->b_fname
 			    : st->ins_buf->b_sfname);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    (فراغ)پیغام_trunc_attr((حرف *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
     }
-    else if (*st->e_cpt == NUL)
-	status = INS_COMPL_CPT_END;
-    else
+    وإلا إذا (*st->e_cpt == NUL)
+	حالت = INS_COMPL_CPT_پای_ټکی;
+    وإلا
     {
-	if (ctrl_x_mode_line_or_eval())
+	إذا (ctrl_x_ډېرپېښ_کرښه_or_eval())
 	    compl_type = -1;
-#ifdef FEAT_COMPL_FUNC
-	else if (*st->e_cpt == 'F' || *st->e_cpt == 'o')
+#که_تعریف_شوی FEAT_COMPL_FUNC
+	وإلا إذا (*st->e_cpt == 'F' || *st->e_cpt == 'o')
 	{
 	    compl_type = CTRL_X_FUNCTION;
-	    st->func_cb = get_callback_if_cpt_func(st->e_cpt, cpt_sources_index);
-	    if (!st->func_cb)
+	    st->func_cb = get_callback_if_cpt_func(st->e_cpt, cpt_sources_شاخص);
+	    إذا (!st->func_cb)
 		compl_type = -1;
 	}
-#endif
-	else if (!skip_source)
+#د_که_پای
+	وإلا إذا (!skip_سرچینه)
 	{
-	    if (*st->e_cpt == 'k' || *st->e_cpt == 's')
+	    إذا (*st->e_cpt == 'k' || *st->e_cpt == 's')
 	    {
-		if (*st->e_cpt == 'k')
+		إذا (*st->e_cpt == 'k')
 		    compl_type = CTRL_X_DICTIONARY;
-		else
+		وإلا
 		    compl_type = CTRL_X_THESAURUS;
-		if (*++st->e_cpt != ',' && *st->e_cpt != NUL)
+		إذا (*++st->e_cpt != ',' && *st->e_cpt != NUL)
 		{
 		    st->dict = st->e_cpt;
-		    st->dict_f = DICT_FIRST;
+		    st->dict_f = DICT_لومړی;
 		}
 	    }
-#ifdef FEAT_FIND_ID
-	    else if (*st->e_cpt == 'i')
-		compl_type = CTRL_X_PATH_PATTERNS;
-	    else if (*st->e_cpt == 'd')
-		compl_type = CTRL_X_PATH_DEFINES;
-#endif
-	    else if (*st->e_cpt == ']' || *st->e_cpt == 't')
+#که_تعریف_شوی FEAT_پیدا_کړه_ID
+	    وإلا إذا (*st->e_cpt == 'i')
+		compl_type = CTRL_X_لار_PATTERNS;
+	    وإلا إذا (*st->e_cpt == 'd')
+		compl_type = CTRL_X_لار_تعریفوي;
+#د_که_پای
+	    وإلا إذا (*st->e_cpt == ']' || *st->e_cpt == 't')
 	    {
-		compl_type = CTRL_X_TAGS;
-		if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+		compl_type = CTRL_X_نښانونه;
+		إذا (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 		{
-		    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-		    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning tags."));
-		    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+		    پیغام_hist_off = TRUE;	// reset in msg_trunc_attr()
+		    vim_snprintf((حرف *)IObuff, IOSIZE, _("Scanning tags."));
+		    (فراغ)پیغام_trunc_attr((حرف *)IObuff, TRUE, HL_ATTR(HLF_R));
 		}
 	    }
-	    else
+	    وإلا
 		compl_type = -1;
 	}
 
 	// in any case e_cpt is advanced to the next entry
-	(void)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
-	*advance_cpt_idx = may_advance_cpt_index(st->e_cpt);
+	(فراغ)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
+	*advance_cpt_idx = may_advance_cpt_شاخص(st->e_cpt);
 
-	st->found_all = TRUE;
-	if (compl_type == -1)
-	    status = INS_COMPL_CPT_CONT;
+	st->وموندل_all = TRUE;
+	إذا (compl_type == -1)
+	    حالت = INS_COMPL_CPT_CONT;
     }
 
-done:
+بشپړ:
     *compl_type_arg = compl_type;
-    return status;
+    أرجع حالت;
 }
 
-#ifdef FEAT_FIND_ID
+#که_تعریف_شوی FEAT_پیدا_کړه_ID
 /*
  * Get the next set of identifiers or defines matching "compl_pattern" in
  * included files.
  */
-    static void
-get_next_include_file_completion(int compl_type)
+    ساكن فراغ
+get_بل_include_file_completion(صحيح compl_type)
 {
-    find_pattern_in_path(compl_pattern.string, compl_direction,
-	    (int)compl_pattern.length, FALSE, FALSE,
-	    (compl_type == CTRL_X_PATH_DEFINES
-	     && !(compl_cont_status & CONT_SOL))
-	    ? FIND_DEFINE : FIND_ANY, 1L, ACTION_EXPAND,
+    پیدا_کړه_نمونه_دننه_لار(compl_نمونه.string, compl_direction,
+	    (صحيح)compl_نمونه.اوږدتیا, FALSE, FALSE,
+	    (compl_type == CTRL_X_لار_تعریفوي
+	     && !(compl_cont_حالت & CONT_SOL))
+	    ? پیدا_کړه_DEFINE : پیدا_کړه_ANY, 1L, ACTION_EXPAND,
 	    (linenr_T)1, (linenr_T)MAXLNUM, FALSE, compl_autocomplete);
 }
-#endif
+#د_که_پای
 
 /*
  * Get the next set of words matching "compl_pattern" in dictionary or
  * thesaurus files.
  */
-    static void
-get_next_dict_tsr_completion(int compl_type, char_u *dict, int dict_f)
+    ساكن فراغ
+get_بل_dict_tsr_completion(صحيح compl_type, char_u *dict, صحيح dict_f)
 {
-#ifdef FEAT_COMPL_FUNC
-    if (thesaurus_func_complete(compl_type))
-	expand_by_function(compl_type, compl_pattern.string, NULL);
-    else
-#endif
+#که_تعریف_شوی FEAT_COMPL_FUNC
+    إذا (thesaurus_func_complete(compl_type))
+	expand_by_function(compl_type, compl_نمونه.string, عدم);
+    وإلا
+#د_که_پای
 	ins_compl_dictionaries(
-		dict != NULL ? dict
+		dict != عدم ? dict
 		: (compl_type == CTRL_X_THESAURUS
 		    ? (*curbuf->b_p_tsr == NUL ? p_tsr : curbuf->b_p_tsr)
 		    : (*curbuf->b_p_dict == NUL ? p_dict : curbuf->b_p_dict)),
-		compl_pattern.string,
-		dict != NULL ? dict_f : 0,
+		compl_نمونه.string,
+		dict != عدم ? dict_f : 0,
 		compl_type == CTRL_X_THESAURUS);
 }
 
 /*
  * Get the next set of tag names matching "compl_pattern".
  */
-    static void
-get_next_tag_completion(void)
+    ساكن فراغ
+get_بل_نښان_completion(فراغ)
 {
-    int		save_p_ic;
+    صحيح		save_p_ic;
     char_u	**matches;
-    int		num_matches;
+    صحيح		عدد_matches;
 
     // set p_ic according to p_ic, p_scs and pat for find_tags().
     save_p_ic = p_ic;
-    p_ic = ignorecase(compl_pattern.string);
+    p_ic = ignorecase(compl_نمونه.string);
 
     // Find up to TAG_MANY matches.  Avoids that an enormous number
     // of matches is found when compl_pattern is empty
-    g_tag_at_cursor = TRUE;
-    if (find_tags(compl_pattern.string, &num_matches, &matches,
-		TAG_REGEXP | TAG_NAMES | TAG_NOIC | TAG_INS_COMP
-		| (ctrl_x_mode_not_default() ? TAG_VERBOSE : 0),
-		TAG_MANY, curbuf->b_ffname) == OK && num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
-    g_tag_at_cursor = FALSE;
+    g_نښان_at_cursor = TRUE;
+    إذا (پیدا_کړه_نښانونه(compl_نمونه.string, &عدد_matches, &matches,
+		نښان_REGEXP | نښان_نومونه | نښان_NOIC | نښان_INS_COMP
+		| (ctrl_x_ډېرپېښ_not_default() ? نښان_VERBOSE : 0),
+		نښان_MANY, curbuf->b_ffname) == OK && عدد_matches > 0)
+	ins_compl_جمع_کړه_matches(عدد_matches, matches, p_ic);
+    g_نښان_at_cursor = FALSE;
     p_ic = save_p_ic;
 }
 
 /*
  * Compare function for qsort
  */
-    static int
-compare_scores(const void *a, const void *b)
+    ساكن صحيح
+compare_scores(ثابت فراغ *a, ثابت فراغ *b)
 {
-    int idx_a = *(const int *)a;
-    int idx_b = *(const int *)b;
-    int score_a = compl_fuzzy_scores[idx_a];
-    int score_b = compl_fuzzy_scores[idx_b];
-    return score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
+    صحيح idx_a = *(ثابت صحيح *)a;
+    صحيح idx_b = *(ثابت صحيح *)b;
+    صحيح score_a = compl_fuzzy_scores[idx_a];
+    صحيح score_b = compl_fuzzy_scores[idx_b];
+    أرجع score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
 			: (score_a > score_b ? -1 : 1);
 }
 
 /*
  * insert prefix with redraw
  */
-    static void
-ins_compl_longest_insert(char_u *prefix)
+    ساكن فراغ
+ins_compl_longest_ورننباسه(char_u *مختاړی)
 {
     ins_compl_delete();
-    ins_compl_insert_bytes(prefix + get_compl_len(), -1);
-    compl_longest_end_col = curwin->w_cursor.col;
+    ins_compl_ورننباسه_بایټونه(مختاړی + get_compl_len(), -1);
+    compl_longest_پای_ټکی_ستون = curwin->w_cursor.ستون;
     ins_redraw(FALSE);
 }
 
@@ -4736,220 +4736,220 @@ ins_compl_longest_insert(char_u *prefix)
  * Calculate the longest common prefix among the best fuzzy matches
  * stored in compl_best_matches, and insert it as the longest.
  */
-    static void
-fuzzy_longest_match(void)
+    ساكن فراغ
+fuzzy_longest_سمون(فراغ)
 {
-    char_u	*prefix = NULL;
-    int		prefix_len = 0;
-    int		i = 0;
-    int		j = 0;
-    char_u	*match_str = NULL;
-    char_u	*prefix_ptr = NULL;
-    char_u	*match_ptr = NULL;
-    char_u	*leader = NULL;
+    char_u	*مختاړی = عدم;
+    صحيح		مختاړی_len = 0;
+    صحيح		i = 0;
+    صحيح		j = 0;
+    char_u	*سمون_str = عدم;
+    char_u	*مختاړی_ptr = عدم;
+    char_u	*سمون_ptr = عدم;
+    char_u	*leader = عدم;
     size_t	leader_len = 0;
-    compl_T	*compl = NULL;
-    int		more_candidates = FALSE;
-    compl_T	*nn_compl = NULL;
+    compl_T	*compl = عدم;
+    صحيح		نور_candidates = FALSE;
+    compl_T	*nn_compl = عدم;
 
-    if (compl_num_bests == 0)
-	return;
+    إذا (compl_عدد_bests == 0)
+	أرجع;
 
-    nn_compl = compl_first_match->cp_next->cp_next;
-    if (nn_compl && nn_compl != compl_first_match)
-	more_candidates = TRUE;
+    nn_compl = compl_لومړی_سمون->cp_بل->cp_بل;
+    إذا (nn_compl && nn_compl != compl_لومړی_سمون)
+	نور_candidates = TRUE;
 
-    compl = ctrl_x_mode_whole_line() ? compl_first_match
-				    : compl_first_match->cp_next;
-    if (compl_num_bests == 1)
+    compl = ctrl_x_ډېرپېښ_ټولیز_کرښه() ? compl_لومړی_سمون
+				    : compl_لومړی_سمون->cp_بل;
+    إذا (compl_عدد_bests == 1)
     {
 	// no more candidates insert the match str
-	if (!more_candidates)
+	إذا (!نور_candidates)
 	{
-	    ins_compl_longest_insert(compl->cp_str.string);
-	    compl_num_bests = 0;
+	    ins_compl_longest_ورننباسه(compl->cp_str.string);
+	    compl_عدد_bests = 0;
 	}
-	compl_num_bests = 0;
-	return;
+	compl_عدد_bests = 0;
+	أرجع;
     }
 
-    if ((size_t)compl_num_bests > SIZE_MAX / sizeof(compl_T *))
-	return;
-    compl_best_matches = (compl_T **)alloc(compl_num_bests * sizeof(compl_T *));
-    if (compl_best_matches == NULL)
-	return;
-    while (compl != NULL && i < compl_num_bests)
+    إذا ((size_t)compl_عدد_bests > اندازه_MAX / حجم(compl_T *))
+	أرجع;
+    compl_غوره_matches = (compl_T **)alloc(compl_عدد_bests * حجم(compl_T *));
+    إذا (compl_غوره_matches == عدم)
+	أرجع;
+    طالما (compl != عدم && i < compl_عدد_bests)
     {
-	compl_best_matches[i] = compl;
-	compl = compl->cp_next;
+	compl_غوره_matches[i] = compl;
+	compl = compl->cp_بل;
 	i++;
     }
 
-    prefix = compl_best_matches[0]->cp_str.string;
-    prefix_len = (int)compl_best_matches[0]->cp_str.length;
+    مختاړی = compl_غوره_matches[0]->cp_str.string;
+    مختاړی_len = (صحيح)compl_غوره_matches[0]->cp_str.اوږدتیا;
 
-    for (i = 1; i < compl_num_bests; i++)
+    لكل (i = 1; i < compl_عدد_bests; i++)
     {
-	match_str = compl_best_matches[i]->cp_str.string;
-	prefix_ptr = prefix;
-	match_ptr = match_str;
+	سمون_str = compl_غوره_matches[i]->cp_str.string;
+	مختاړی_ptr = مختاړی;
+	سمون_ptr = سمون_str;
 	j = 0;
 
-	while (j < prefix_len && *match_ptr != NUL && *prefix_ptr != NUL)
+	طالما (j < مختاړی_len && *سمون_ptr != NUL && *مختاړی_ptr != NUL)
 	{
-	    if (STRNCMP(prefix_ptr, match_ptr, mb_ptr2len(prefix_ptr)) != 0)
-		break;
+	    إذا (STRNCMP(مختاړی_ptr, سمون_ptr, mb_ptr2len(مختاړی_ptr)) != 0)
+		اكسر;
 
-	    MB_PTR_ADV(prefix_ptr);
-	    MB_PTR_ADV(match_ptr);
+	    MB_PTR_ADV(مختاړی_ptr);
+	    MB_PTR_ADV(سمون_ptr);
 	    j++;
 	}
 
-	if (j > 0)
-	    prefix_len = j;
+	إذا (j > 0)
+	    مختاړی_len = j;
     }
 
     leader = ins_compl_leader();
     leader_len = ins_compl_leader_len();
 
     // skip non-consecutive prefixes
-    if (leader_len > 0 && STRNCMP(prefix, leader, leader_len) != 0)
-	goto end;
+    إذا (leader_len > 0 && STRNCMP(مختاړی, leader, leader_len) != 0)
+	اذهب پای_ټکی;
 
-    prefix = vim_strnsave(prefix, prefix_len);
-    if (prefix != NULL)
+    مختاړی = vim_strnsave(مختاړی, مختاړی_len);
+    إذا (مختاړی != عدم)
     {
-	ins_compl_longest_insert(prefix);
-	vim_free(prefix);
+	ins_compl_longest_ورننباسه(مختاړی);
+	vim_free(مختاړی);
     }
 
-end:
-    vim_free(compl_best_matches);
-    compl_best_matches = NULL;
-    compl_num_bests = 0;
+پای_ټکی:
+    vim_free(compl_غوره_matches);
+    compl_غوره_matches = عدم;
+    compl_عدد_bests = 0;
 }
 
 /*
  * Get the next set of filename matching "compl_pattern".
  */
-    static void
-get_next_filename_completion(void)
+    ساكن فراغ
+get_بل_filename_completion(فراغ)
 {
     char_u	**matches;
-    int		num_matches;
+    صحيح		عدد_matches;
     char_u	*ptr;
     garray_T	fuzzy_indices;
-    int		i;
-    int		score;
+    صحيح		i;
+    صحيح		score;
     char_u	*leader = ins_compl_leader();
     size_t	leader_len = ins_compl_leader_len();
-    int		in_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
-    int		*fuzzy_indices_data;
-    char_u	*last_sep = NULL;
-    int		need_collect_bests = in_fuzzy_collect && compl_get_longest;
-    int		max_score = 0;
-    int		current_score = 0;
-    int		dir = compl_direction;
+    صحيح		دننه_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
+    صحيح		*fuzzy_indices_معلومات;
+    char_u	*وروستی_sep = عدم;
+    صحيح		need_collect_bests = دننه_fuzzy_collect && compl_get_longest;
+    صحيح		max_score = 0;
+    صحيح		current_score = 0;
+    صحيح		dir = compl_direction;
 
-#ifdef BACKSLASH_IN_FILENAME
-    char pathsep = (curbuf->b_p_csl[0] == 's') ?
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
+    حرف pathsep = (curbuf->b_p_csl[0] == 's') ?
 	'/' : (curbuf->b_p_csl[0] == 'b') ? '\\' : PATHSEP;
-#else
-    char pathsep = PATHSEP;
-#endif
+#وإلا
+    حرف pathsep = PATHSEP;
+#د_که_پای
 
-    if (in_fuzzy_collect)
+    إذا (دننه_fuzzy_collect)
     {
-#ifdef BACKSLASH_IN_FILENAME
-	if (curbuf->b_p_csl[0] == 's')
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
+	إذا (curbuf->b_p_csl[0] == 's')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    لكل (i = 0; i < (صحيح)leader_len; i++)
 	    {
-		if (leader[i] == '\\')
+		إذا (leader[i] == '\\')
 		    leader[i] = '/';
 	    }
 	}
-	else if (curbuf->b_p_csl[0] == 'b')
+	وإلا إذا (curbuf->b_p_csl[0] == 'b')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    لكل (i = 0; i < (صحيح)leader_len; i++)
 	    {
-		if (leader[i] == '/')
+		إذا (leader[i] == '/')
 		    leader[i] = '\\';
 	    }
 	}
-#endif
-	last_sep = vim_strrchr(leader, pathsep);
-	if (last_sep == NULL)
+#د_که_پای
+	وروستی_sep = vim_strrchr(leader, pathsep);
+	إذا (وروستی_sep == عدم)
 	{
 	    // No path separator or separator is the last character,
 	    // fuzzy match the whole leader
-	    VIM_CLEAR_STRING(compl_pattern);
-	    compl_pattern.string = vim_strnsave((char_u *)"*", 1);
-	    if (compl_pattern.string == NULL)
-		return;
-	    compl_pattern.length = 1;
+	    VIM_CLEAR_STRING(compl_نمونه);
+	    compl_نمونه.string = vim_strnsave((char_u *)"*", 1);
+	    إذا (compl_نمونه.string == عدم)
+		أرجع;
+	    compl_نمونه.اوږدتیا = 1;
 	}
-	else if (*(last_sep + 1) == '\0')
-	    in_fuzzy_collect = FALSE;
-	else
+	وإلا إذا (*(وروستی_sep + 1) == '\0')
+	    دننه_fuzzy_collect = FALSE;
+	وإلا
 	{
 	    // Split leader into path and file parts
-	    int path_len = last_sep - leader + 1;
-	    char_u  *path_with_wildcard;
+	    صحيح لار_len = وروستی_sep - leader + 1;
+	    char_u  *لار_with_wildcard;
 
-	    path_with_wildcard = alloc(path_len + 2);
-	    if (path_with_wildcard != NULL)
+	    لار_with_wildcard = alloc(لار_len + 2);
+	    إذا (لار_with_wildcard != عدم)
 	    {
-		vim_snprintf((char *)path_with_wildcard, path_len + 2, "%*.*s*", path_len, path_len, leader);
-		VIM_CLEAR_STRING(compl_pattern);
-		compl_pattern.string = path_with_wildcard;
-		compl_pattern.length = path_len + 1;
+		vim_snprintf((حرف *)لار_with_wildcard, لار_len + 2, "%*.*s*", لار_len, لار_len, leader);
+		VIM_CLEAR_STRING(compl_نمونه);
+		compl_نمونه.string = لار_with_wildcard;
+		compl_نمونه.اوږدتیا = لار_len + 1;
 
 		// Move leader to the file part
-		leader = last_sep + 1;
-		leader_len -= path_len;
+		leader = وروستی_sep + 1;
+		leader_len -= لار_len;
 	    }
 	}
     }
 
-    if (expand_wildcards(1, &compl_pattern.string, &num_matches, &matches,
+    إذا (expand_wildcards(1, &compl_نمونه.string, &عدد_matches, &matches,
 		EW_FILE|EW_DIR|EW_ADDSLASH|EW_SILENT) != OK)
-	return;
+	أرجع;
 
     // May change home directory back to "~".
-    tilde_replace(compl_pattern.string, num_matches, matches);
-#ifdef BACKSLASH_IN_FILENAME
-    if (curbuf->b_p_csl[0] != NUL)
+    tilde_replace(compl_نمونه.string, عدد_matches, matches);
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
+    إذا (curbuf->b_p_csl[0] != NUL)
     {
-	for (i = 0; i < num_matches; ++i)
+	لكل (i = 0; i < عدد_matches; ++i)
 	{
 	    ptr = matches[i];
-	    while (*ptr != NUL)
+	    طالما (*ptr != NUL)
 	    {
-		if (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
+		إذا (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
+		وإلا إذا (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
 	}
     }
-#endif
+#د_که_پای
 
-    if (in_fuzzy_collect)
+    إذا (دننه_fuzzy_collect)
     {
-	ga_init2(&fuzzy_indices, sizeof(int), 10);
-	compl_fuzzy_scores = (int *)alloc(sizeof(int) * num_matches);
+	ga_init2(&fuzzy_indices, حجم(صحيح), 10);
+	compl_fuzzy_scores = (صحيح *)alloc(حجم(صحيح) * عدد_matches);
 
-	for (i = 0; i < num_matches; i++)
+	لكل (i = 0; i < عدد_matches; i++)
 	{
 	    ptr = matches[i];
-	    score = fuzzy_match_str(ptr, leader);
-	    if (score != FUZZY_SCORE_NONE)
+	    score = fuzzy_سمون_str(ptr, leader);
+	    إذا (score != FUZZY_SCORE_NONE)
 	    {
-		if (ga_grow(&fuzzy_indices, 1) == OK)
+		إذا (ga_grow(&fuzzy_indices, 1) == OK)
 		{
-		    ((int *)fuzzy_indices.ga_data)[fuzzy_indices.ga_len] = i;
+		    ((صحيح *)fuzzy_indices.ga_معلومات)[fuzzy_indices.ga_len] = i;
 		    compl_fuzzy_scores[i] = score;
 		    fuzzy_indices.ga_len++;
 		}
@@ -4957,163 +4957,163 @@ get_next_filename_completion(void)
 	}
 
 	// prevent qsort from deref NULL pointer
-	if (fuzzy_indices.ga_len > 0)
+	إذا (fuzzy_indices.ga_len > 0)
 	{
-	    char_u	*match = NULL;
-	    fuzzy_indices_data = (int *)fuzzy_indices.ga_data;
-	    qsort(fuzzy_indices_data, fuzzy_indices.ga_len, sizeof(int), compare_scores);
+	    char_u	*سمون = عدم;
+	    fuzzy_indices_معلومات = (صحيح *)fuzzy_indices.ga_معلومات;
+	    qsort(fuzzy_indices_معلومات, fuzzy_indices.ga_len, حجم(صحيح), compare_scores);
 
-	    for (i = 0; i < fuzzy_indices.ga_len; ++i)
+	    لكل (i = 0; i < fuzzy_indices.ga_len; ++i)
 	    {
-		match = matches[fuzzy_indices_data[i]];
-		current_score = compl_fuzzy_scores[fuzzy_indices_data[i]];
-		if (ins_compl_add(match, -1, NULL, NULL, NULL, dir,
+		سمون = matches[fuzzy_indices_معلومات[i]];
+		current_score = compl_fuzzy_scores[fuzzy_indices_معلومات[i]];
+		إذا (ins_compl_جمع_کړه(سمون, -1, عدم, عدم, عدم, dir,
 			CP_FAST | ((p_fic || p_wic) ? CP_ICASE : 0),
-			FALSE, NULL, current_score) == OK)
+			FALSE, عدم, current_score) == OK)
 		    dir = FORWARD;
 
-		if (need_collect_bests)
+		إذا (need_collect_bests)
 		{
-		    if (i == 0 || current_score == max_score)
+		    إذا (i == 0 || current_score == max_score)
 		    {
-			compl_num_bests++;
+			compl_عدد_bests++;
 			max_score = current_score;
 		    }
 		}
 	    }
 
-	    FreeWild(num_matches, matches);
+	    FreeWild(عدد_matches, matches);
 	}
-	else if (leader_len > 0)
+	وإلا إذا (leader_len > 0)
 	{
-	    FreeWild(num_matches, matches);
-	    num_matches = 0;
+	    FreeWild(عدد_matches, matches);
+	    عدد_matches = 0;
 	}
 
 	vim_free(compl_fuzzy_scores);
 	ga_clear(&fuzzy_indices);
 
-	if (compl_num_bests > 0 && compl_get_longest)
-	    fuzzy_longest_match();
-	return;
+	إذا (compl_عدد_bests > 0 && compl_get_longest)
+	    fuzzy_longest_سمون();
+	أرجع;
     }
 
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_fic || p_wic);
+    إذا (عدد_matches > 0)
+	ins_compl_جمع_کړه_matches(عدد_matches, matches, p_fic || p_wic);
 }
 
 /*
  * Get the next set of command-line completions matching "compl_pattern".
  */
-    static void
-get_next_cmdline_completion(void)
+    ساكن فراغ
+get_بل_cmdline_completion(فراغ)
 {
     char_u	**matches;
-    int		num_matches;
+    صحيح		عدد_matches;
 
-    if (expand_cmdline(&compl_xp, compl_pattern.string,
-		(int)compl_pattern.length, &num_matches, &matches) == EXPAND_OK)
+    إذا (expand_cmdline(&compl_xp, compl_نمونه.string,
+		(صحيح)compl_نمونه.اوږدتیا, &عدد_matches, &matches) == EXPAND_OK)
     {
-	int		add_r = OK;
-	int		dir = compl_direction;
+	صحيح		جمع_کړه_r = OK;
+	صحيح		dir = compl_direction;
 
-	for (int i = 0; i < num_matches && add_r != FAIL; i++)
+	لكل (صحيح i = 0; i < عدد_matches && جمع_کړه_r != FAIL; i++)
 	{
-	    char_u	*(cptext[CPT_COUNT]) = {NULL, NULL, NULL, NULL};
+	    char_u	*(cptext[CPT_شمېر]) = {عدم, عدم, عدم, عدم};
 
-	    if (compl_xp.xp_files_abbr != NULL)
+	    إذا (compl_xp.xp_files_abbr != عدم)
 		cptext[CPT_ABBR] = compl_xp.xp_files_abbr[i];
-	    if (compl_xp.xp_files_kind != NULL)
-		cptext[CPT_KIND] = compl_xp.xp_files_kind[i];
-	    if (compl_xp.xp_files_menu != NULL)
+	    إذا (compl_xp.xp_files_ډول != عدم)
+		cptext[CPT_ډول] = compl_xp.xp_files_ډول[i];
+	    إذا (compl_xp.xp_files_menu != عدم)
 		cptext[CPT_MENU] = compl_xp.xp_files_menu[i];
-	    if (compl_xp.xp_files_info != NULL)
+	    إذا (compl_xp.xp_files_info != عدم)
 		cptext[CPT_INFO] = compl_xp.xp_files_info[i];
 
-	    add_r = ins_compl_add(matches[i], -1, NULL, cptext, NULL, dir,
-		    CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE);
-	    if (add_r == OK)
+	    جمع_کړه_r = ins_compl_جمع_کړه(matches[i], -1, عدم, cptext, عدم, dir,
+		    CP_FAST, FALSE, عدم, FUZZY_SCORE_NONE);
+	    إذا (جمع_کړه_r == OK)
 		// if dir was BACKWARD then honor it just once
 		dir = FORWARD;
 	}
-	FreeWild(num_matches, matches);
-	free_xp_files_extra(&compl_xp, num_matches);
+	FreeWild(عدد_matches, matches);
+	free_xp_files_extra(&compl_xp, عدد_matches);
     }
 }
 
 /*
  * Get the next set of spell suggestions matching "compl_pattern".
  */
-    static void
-get_next_spell_completion(linenr_T lnum UNUSED)
+    ساكن فراغ
+get_بل_spell_completion(linenr_T lnum ناکارول_شوی)
 {
-#ifdef FEAT_SPELL
+#که_تعریف_شوی FEAT_SPELL
     char_u	**matches;
-    int		num_matches;
+    صحيح		عدد_matches;
 
-    num_matches = expand_spelling(lnum, compl_pattern.string, &matches);
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
-    else
+    عدد_matches = expand_spelling(lnum, compl_نمونه.string, &matches);
+    إذا (عدد_matches > 0)
+	ins_compl_جمع_کړه_matches(عدد_matches, matches, p_ic);
+    وإلا
 	vim_free(matches);
-#endif
+#د_که_پای
 }
 
 /*
  * Return the next word or line from buffer "ins_buf" at position
  * "cur_match_pos" for completion.  The length of the match is set in "len".
  */
-    static char_u *
-ins_compl_get_next_word_or_line(
+    ساكن char_u *
+ins_compl_get_بل_کلمه_or_کرښه(
 	buf_T	*ins_buf,		// buffer being scanned
-	pos_T	*cur_match_pos,		// current match position
-	int	*match_len,
-	int	*cont_s_ipos)		// next ^X<> will set initial_pos
+	pos_T	*cur_سمون_pos,		// current match position
+	صحيح	*سمون_len,
+	صحيح	*cont_s_ipos)		// next ^X<> will set initial_pos
 {
     char_u	*ptr;
-    int		len;
+    صحيح		len;
 
-    *match_len = 0;
-    ptr = ml_get_buf(ins_buf, cur_match_pos->lnum, FALSE) +
-	cur_match_pos->col;
-    len = (int)ml_get_buf_len(ins_buf, cur_match_pos->lnum) - cur_match_pos->col;
-    if (ctrl_x_mode_line_or_eval())
+    *سمون_len = 0;
+    ptr = ml_get_buf(ins_buf, cur_سمون_pos->lnum, FALSE) +
+	cur_سمون_pos->ستون;
+    len = (صحيح)ml_get_buf_len(ins_buf, cur_سمون_pos->lnum) - cur_سمون_pos->ستون;
+    إذا (ctrl_x_ډېرپېښ_کرښه_or_eval())
     {
-	if (compl_status_adding())
+	إذا (compl_حالت_adding())
 	{
-	    if (cur_match_pos->lnum >= ins_buf->b_ml.ml_line_count)
-		return NULL;
-	    ptr = ml_get_buf(ins_buf, cur_match_pos->lnum + 1, FALSE);
-	    len = ml_get_buf_len(ins_buf, cur_match_pos->lnum + 1);
-	    if (!p_paste)
+	    إذا (cur_سمون_pos->lnum >= ins_buf->b_ml.ml_کرښه_شمېر)
+		أرجع عدم;
+	    ptr = ml_get_buf(ins_buf, cur_سمون_pos->lnum + 1, FALSE);
+	    len = ml_get_buf_len(ins_buf, cur_سمون_pos->lnum + 1);
+	    إذا (!p_paste)
 	    {
 		char_u	*tmp_ptr = ptr;
 
 		ptr = skipwhite(tmp_ptr);
-		len -= (int)(ptr - tmp_ptr);
+		len -= (صحيح)(ptr - tmp_ptr);
 	    }
 	}
     }
-    else
+    وإلا
     {
 	char_u	*tmp_ptr = ptr;
 
-	if (compl_status_adding() && compl_length <= len)
+	إذا (compl_حالت_adding() && compl_اوږدتیا <= len)
 	{
-	    tmp_ptr += compl_length;
+	    tmp_ptr += compl_اوږدتیا;
 	    // Skip if already inside a word.
-	    if (vim_iswordp(tmp_ptr))
-		return NULL;
+	    إذا (vim_iswordp(tmp_ptr))
+		أرجع عدم;
 	    // Find start of next word.
-	    tmp_ptr = find_word_start(tmp_ptr);
+	    tmp_ptr = پیدا_کړه_کلمه_پیل(tmp_ptr);
 	}
 	// Find end of this word.
-	tmp_ptr = find_word_end(tmp_ptr);
-	len = (int)(tmp_ptr - ptr);
+	tmp_ptr = پیدا_کړه_کلمه_پای_ټکی(tmp_ptr);
+	len = (صحيح)(tmp_ptr - ptr);
 
-	if (compl_status_adding() && len == compl_length)
+	إذا (compl_حالت_adding() && len == compl_اوږدتیا)
 	{
-	    if (cur_match_pos->lnum < ins_buf->b_ml.ml_line_count)
+	    إذا (cur_سمون_pos->lnum < ins_buf->b_ml.ml_کرښه_شمېر)
 	    {
 		// Try next line, if any. the new word will be
 		// "join" as if the normal command "J" was used.
@@ -5121,44 +5121,44 @@ ins_compl_get_next_word_or_line(
 		// compl_length, so the next STRNCPY always
 		// works -- Acevedo
 		STRNCPY(IObuff, ptr, len);
-		ptr = ml_get_buf(ins_buf, cur_match_pos->lnum + 1, FALSE);
+		ptr = ml_get_buf(ins_buf, cur_سمون_pos->lnum + 1, FALSE);
 		tmp_ptr = ptr = skipwhite(ptr);
 		// Find start of next word.
-		tmp_ptr = find_word_start(tmp_ptr);
+		tmp_ptr = پیدا_کړه_کلمه_پیل(tmp_ptr);
 		// Find end of next word.
-		tmp_ptr = find_word_end(tmp_ptr);
-		if (tmp_ptr > ptr)
+		tmp_ptr = پیدا_کړه_کلمه_پای_ټکی(tmp_ptr);
+		إذا (tmp_ptr > ptr)
 		{
-		    if (*ptr != ')' && IObuff[len - 1] != TAB)
+		    إذا (*ptr != ')' && IObuff[len - 1] != TAB)
 		    {
-			if (IObuff[len - 1] != ' ')
+			إذا (IObuff[len - 1] != ' ')
 			    IObuff[len++] = ' ';
 			// IObuf =~ "\k.* ", thus len >= 2
-			if (p_js
+			إذا (p_js
 				&& (IObuff[len - 2] == '.'
 				    || (vim_strchr(p_cpo, CPO_JOINSP)
-					== NULL
+					== عدم
 					&& (IObuff[len - 2] == '?'
 					    || IObuff[len - 2] == '!'))))
 			    IObuff[len++] = ' ';
 		    }
 		    // copy as much as possible of the new word
-		    if (tmp_ptr - ptr >= IOSIZE - len)
+		    إذا (tmp_ptr - ptr >= IOSIZE - len)
 			tmp_ptr = ptr + IOSIZE - len - 1;
 		    STRNCPY(IObuff + len, ptr, tmp_ptr - ptr);
-		    len += (int)(tmp_ptr - ptr);
+		    len += (صحيح)(tmp_ptr - ptr);
 		    *cont_s_ipos = TRUE;
 		}
 		IObuff[len] = NUL;
 		ptr = IObuff;
 	    }
-	    if (len == compl_length)
-		return NULL;
+	    إذا (len == compl_اوږدتیا)
+		أرجع عدم;
 	}
     }
 
-    *match_len = len;
-    return ptr;
+    *سمون_len = len;
+    أرجع ptr;
 }
 
 /*
@@ -5170,24 +5170,24 @@ ins_compl_get_next_word_or_line(
  * "st->last_match_pos".
  * Returns OK if a new next match is found, otherwise returns FAIL.
  */
-    static int
-get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
+    ساكن صحيح
+get_بل_default_completion(ins_compl_بل_state_T *st, pos_T *پیل_pos)
 {
-    int		found_new_match = FAIL;
-    int		save_p_scs;
-    int		save_p_ws;
-    int		looped_around = FALSE;
-    char_u	*ptr = NULL;
-    int		len = 0;
-    int		in_fuzzy_collect = !compl_status_adding()
-			&& cot_fuzzy() && compl_length > 0;
+    صحيح		وموندل_new_سمون = FAIL;
+    صحيح		save_p_scs;
+    صحيح		save_p_ws;
+    صحيح		looped_around = FALSE;
+    char_u	*ptr = عدم;
+    صحيح		len = 0;
+    صحيح		دننه_fuzzy_collect = !compl_حالت_adding()
+			&& cot_fuzzy() && compl_اوږدتیا > 0;
     char_u	*leader = ins_compl_leader();
-    int		score = FUZZY_SCORE_NONE;
-    int		in_curbuf = st->ins_buf == curbuf;
+    صحيح		score = FUZZY_SCORE_NONE;
+    صحيح		دننه_curbuf = st->ins_buf == curbuf;
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (st->ins_buf->b_p_inf)
+    إذا (st->ins_buf->b_p_inf)
 	p_scs = FALSE;
 
     //	Buffers other than curbuf are scanned from the beginning or the
@@ -5195,245 +5195,245 @@ get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
     //	buffer is a good idea, on the other hand, we always set
     //	wrapscan for curbuf to avoid missing matches -- Acevedo,Webb
     save_p_ws = p_ws;
-    if (!in_curbuf)
+    إذا (!دننه_curbuf)
 	p_ws = FALSE;
-    else if (*st->e_cpt == '.')
+    وإلا إذا (*st->e_cpt == '.')
 	p_ws = TRUE;
     looped_around = FALSE;
-    for (;;)
+    لكل (;;)
     {
-	int	cont_s_ipos = FALSE;
+	صحيح	cont_s_ipos = FALSE;
 
-	++msg_silent;  // Don't want messages for wrapscan.
+	++پیغام_silent;  // Don't want messages for wrapscan.
 
-	if (in_fuzzy_collect)
+	إذا (دننه_fuzzy_collect)
 	{
-	    found_new_match = search_for_fuzzy_match(st->ins_buf,
-			    st->cur_match_pos, leader, compl_direction,
-			    start_pos, &len, &ptr, &score);
+	    وموندل_new_سمون = پلټنه_for_fuzzy_سمون(st->ins_buf,
+			    st->cur_سمون_pos, leader, compl_direction,
+			    پیل_pos, &len, &ptr, &score);
 	}
 	// ctrl_x_mode_line_or_eval() || word-wise search that
 	// has added a word that was at the beginning of the line
-	else if (ctrl_x_mode_whole_line() || ctrl_x_mode_eval() || (compl_cont_status & CONT_SOL))
-	    found_new_match = search_for_exact_line(st->ins_buf,
-			    st->cur_match_pos, compl_direction, compl_pattern.string);
-	else
-	    found_new_match = searchit(NULL, st->ins_buf, st->cur_match_pos,
-				NULL, compl_direction, compl_pattern.string, (int)compl_pattern.length,
-				1L, SEARCH_KEEP + SEARCH_NFMSG, RE_LAST, NULL);
-	--msg_silent;
-	if (!compl_started || st->set_match_pos)
+	وإلا إذا (ctrl_x_ډېرپېښ_ټولیز_کرښه() || ctrl_x_ډېرپېښ_eval() || (compl_cont_حالت & CONT_SOL))
+	    وموندل_new_سمون = پلټنه_for_exact_کرښه(st->ins_buf,
+			    st->cur_سمون_pos, compl_direction, compl_نمونه.string);
+	وإلا
+	    وموندل_new_سمون = searchit(عدم, st->ins_buf, st->cur_سمون_pos,
+				عدم, compl_direction, compl_نمونه.string, (صحيح)compl_نمونه.اوږدتیا,
+				1L, پلټنه_KEEP + پلټنه_NFMSG, RE_وروستی, عدم);
+	--پیغام_silent;
+	إذا (!compl_started || st->سېټ_سمون_pos)
 	{
 	    // set "compl_started" even on fail
 	    compl_started = TRUE;
-	    st->first_match_pos = *st->cur_match_pos;
-	    st->last_match_pos = *st->cur_match_pos;
-	    st->set_match_pos = FALSE;
+	    st->لومړی_سمون_pos = *st->cur_سمون_pos;
+	    st->وروستی_سمون_pos = *st->cur_سمون_pos;
+	    st->سېټ_سمون_pos = FALSE;
 	}
-	else if (st->first_match_pos.lnum == st->last_match_pos.lnum
-		&& st->first_match_pos.col == st->last_match_pos.col)
+	وإلا إذا (st->لومړی_سمون_pos.lnum == st->وروستی_سمون_pos.lnum
+		&& st->لومړی_سمون_pos.ستون == st->وروستی_سمون_pos.ستون)
 	{
-	    found_new_match = FAIL;
+	    وموندل_new_سمون = FAIL;
 	}
-	else if (compl_dir_forward()
-		&& (st->prev_match_pos.lnum > st->cur_match_pos->lnum
-		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
-			&& st->prev_match_pos.col >= st->cur_match_pos->col)))
+	وإلا إذا (compl_dir_forward()
+		&& (st->prev_سمون_pos.lnum > st->cur_سمون_pos->lnum
+		    || (st->prev_سمون_pos.lnum == st->cur_سمون_pos->lnum
+			&& st->prev_سمون_pos.ستون >= st->cur_سمون_pos->ستون)))
 	{
-	    if (looped_around)
-		found_new_match = FAIL;
-	    else
+	    إذا (looped_around)
+		وموندل_new_سمون = FAIL;
+	    وإلا
 		looped_around = TRUE;
 	}
-	else if (!compl_dir_forward()
-		&& (st->prev_match_pos.lnum < st->cur_match_pos->lnum
-		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
-			&& st->prev_match_pos.col <= st->cur_match_pos->col)))
+	وإلا إذا (!compl_dir_forward()
+		&& (st->prev_سمون_pos.lnum < st->cur_سمون_pos->lnum
+		    || (st->prev_سمون_pos.lnum == st->cur_سمون_pos->lnum
+			&& st->prev_سمون_pos.ستون <= st->cur_سمون_pos->ستون)))
 	{
-	    if (looped_around)
-		found_new_match = FAIL;
-	    else
+	    إذا (looped_around)
+		وموندل_new_سمون = FAIL;
+	    وإلا
 		looped_around = TRUE;
 	}
-	st->prev_match_pos = *st->cur_match_pos;
-	if (found_new_match == FAIL)
-	    break;
+	st->prev_سمون_pos = *st->cur_سمون_pos;
+	إذا (وموندل_new_سمون == FAIL)
+	    اكسر;
 
 	// when ADDING, the text before the cursor matches, skip it
-	if (compl_status_adding() && in_curbuf
-		&& start_pos->lnum == st->cur_match_pos->lnum
-		&& start_pos->col  == st->cur_match_pos->col)
-	    continue;
+	إذا (compl_حالت_adding() && دننه_curbuf
+		&& پیل_pos->lnum == st->cur_سمون_pos->lnum
+		&& پیل_pos->ستون  == st->cur_سمون_pos->ستون)
+	    استمر;
 
-	if (!in_fuzzy_collect)
-	    ptr = ins_compl_get_next_word_or_line(st->ins_buf,
-		    st->cur_match_pos, &len, &cont_s_ipos);
-	if (ptr == NULL || (ins_compl_has_preinsert()
+	إذا (!دننه_fuzzy_collect)
+	    ptr = ins_compl_get_بل_کلمه_or_کرښه(st->ins_buf,
+		    st->cur_سمون_pos, &len, &cont_s_ipos);
+	إذا (ptr == عدم || (ins_compl_has_preinsert()
 		    && STRCMP(ptr, ins_compl_leader()) == 0))
-	    continue;
+	    استمر;
 
-	if (is_nearest_active() && in_curbuf)
+	إذا (is_تر_ټولو_نږدې_فعال() && دننه_curbuf)
 	{
-	    score = st->cur_match_pos->lnum - curwin->w_cursor.lnum;
-	    if (score < 0)
+	    score = st->cur_سمون_pos->lnum - curwin->w_cursor.lnum;
+	    إذا (score < 0)
 		score = -score;
 	}
 
-	if (ins_compl_add_infercase(ptr, len, p_ic,
-			in_curbuf ? NULL : st->ins_buf->b_sfname,
+	إذا (ins_compl_جمع_کړه_infercase(ptr, len, p_ic,
+			دننه_curbuf ? عدم : st->ins_buf->b_sfname,
 			0, cont_s_ipos, score) != NOTDONE)
 	{
-	    if (in_fuzzy_collect && score == compl_first_match->cp_next->cp_score)
-		compl_num_bests++;
-	    found_new_match = OK;
-	    break;
+	    إذا (دننه_fuzzy_collect && score == compl_لومړی_سمون->cp_بل->cp_score)
+		compl_عدد_bests++;
+	    وموندل_new_سمون = OK;
+	    اكسر;
 	}
     }
     p_scs = save_p_scs;
     p_ws = save_p_ws;
 
-    return found_new_match;
+    أرجع وموندل_new_سمون;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
 /*
  * Return the callback function associated with "p" if it refers to a
  * user-defined function in the 'complete' option.
  * The "idx" parameter is used for indexing callback entries.
  */
-    static callback_T *
-get_callback_if_cpt_func(char_u *p, int idx)
+    ساكن callback_T *
+get_callback_if_cpt_func(char_u *p, صحيح idx)
 {
-    if (*p == 'o')
-	return &curbuf->b_ofu_cb;
+    إذا (*p == 'o')
+	أرجع &curbuf->b_ofu_cb;
 
-    if (*p == 'F')
+    إذا (*p == 'F')
     {
-	if (*++p != ',' && *p != NUL)
+	إذا (*++p != ',' && *p != NUL)
 	{
 	    // 'F{func}' case
-	    if (curbuf->b_p_cpt_cb == NULL
-		    || idx < 0 || idx >= curbuf->b_p_cpt_count)
-		return NULL;
-	    return curbuf->b_p_cpt_cb[idx].cb_name != NULL
-		? &curbuf->b_p_cpt_cb[idx] : NULL;
+	    إذا (curbuf->b_p_cpt_cb == عدم
+		    || idx < 0 || idx >= curbuf->b_p_cpt_شمېر)
+		أرجع عدم;
+	    أرجع curbuf->b_p_cpt_cb[idx].cb_name != عدم
+		? &curbuf->b_p_cpt_cb[idx] : عدم;
 	}
-	else
-	    return &curbuf->b_cfu_cb; // 'cfu'
+	وإلا
+	    أرجع &curbuf->b_cfu_cb; // 'cfu'
     }
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#د_که_پای
 
 /*
  * Get completion matches from register contents.
  * Extracts words from all available registers and adds them to the completion list.
  */
-    static void
-get_register_completion(void)
+    ساكن فراغ
+get_ثبتوونکی_completion(فراغ)
 {
-    int		dir = compl_direction;
-    yankreg_T	*reg = NULL;
-    void	*reg_ptr = NULL;
-    int		adding_mode = compl_status_adding();
+    صحيح		dir = compl_direction;
+    yankreg_T	*reg = عدم;
+    فراغ	*reg_ptr = عدم;
+    صحيح		adding_ډېرپېښ = compl_حالت_adding();
 
-    for (int i = 0; i < NUM_REGISTERS; i++)
+    لكل (صحيح i = 0; i < عدد_REGISTERS; i++)
     {
-	int regname = 0;
-	if (i == 0)
+	صحيح regname = 0;
+	إذا (i == 0)
 	    regname = '"';    // unnamed register
-	else if (i < 10)
+	وإلا إذا (i < 10)
 	    regname = '0' + i;
-	else if (i == DELETION_REGISTER)
+	وإلا إذا (i == DELETION_ثبتوونکی)
 	    regname = '-';
-#ifdef FEAT_CLIPBOARD
-	else if (i == STAR_REGISTER)
+#که_تعریف_شوی FEAT_CLIPBOARD
+	وإلا إذا (i == ستوری_ثبتوونکی)
 	    regname = '*';
-	else if (i == PLUS_REGISTER)
+	وإلا إذا (i == PLUS_ثبتوونکی)
 	    regname = '+';
-#endif
-	else
+#د_که_پای
+	وإلا
 	    regname = 'a' + i - 10;
 
 	// Skip invalid or black hole register
-	if (!valid_yank_reg(regname, FALSE) || regname == '_')
-	    continue;
+	إذا (!valid_yank_reg(regname, FALSE) || regname == '_')
+	    استمر;
 
-	reg_ptr = get_register(regname, FALSE);
-	if (reg_ptr == NULL)
-	    continue;
+	reg_ptr = get_ثبتوونکی(regname, FALSE);
+	إذا (reg_ptr == عدم)
+	    استمر;
 
 	reg = (yankreg_T *)reg_ptr;
 
-	for (int j = 0; j < reg->y_size; j++)
+	لكل (صحيح j = 0; j < reg->y_اندازه; j++)
 	{
 	    char_u *str = reg->y_array[j].string;
-	    if (str == NULL)
-		continue;
+	    إذا (str == عدم)
+		استمر;
 
-	    if (adding_mode)
+	    إذا (adding_ډېرپېښ)
 	    {
-		int str_len = (int)STRLEN(str);
-		if (str_len == 0)
-		    continue;
+		صحيح str_len = (صحيح)STRLEN(str);
+		إذا (str_len == 0)
+		    استمر;
 
-		if (!compl_orig_text.string
-			|| (p_ic ? STRNICMP(str, compl_orig_text.string,
-					    compl_orig_text.length) == 0
-				: STRNCMP(str, compl_orig_text.string,
-					    compl_orig_text.length) == 0))
+		إذا (!compl_orig_متن.string
+			|| (p_ic ? STRNICMP(str, compl_orig_متن.string,
+					    compl_orig_متن.اوږدتیا) == 0
+				: STRNCMP(str, compl_orig_متن.string,
+					    compl_orig_متن.اوږدتیا) == 0))
 		{
-		    if (ins_compl_add_infercase(str, str_len, p_ic, NULL,
+		    إذا (ins_compl_جمع_کړه_infercase(str, str_len, p_ic, عدم,
 				dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			dir = FORWARD;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// Calculate the safe end of string to avoid null byte issues
-		char_u *str_end = str + STRLEN(str);
+		char_u *str_پای_ټکی = str + STRLEN(str);
 		char_u *p = str;
 
 		// Safely iterate through the string
-		while (p < str_end && *p != NUL)
+		طالما (p < str_پای_ټکی && *p != NUL)
 		{
 		    char_u *old_p = p;
-		    p = find_word_start(p);
-		    if (p >= str_end || *p == NUL)
-			break;
+		    p = پیدا_کړه_کلمه_پیل(p);
+		    إذا (p >= str_پای_ټکی || *p == NUL)
+			اكسر;
 
-		    char_u *word_end = find_word_end(p);
+		    char_u *کلمه_پای_ټکی = پیدا_کړه_کلمه_پای_ټکی(p);
 
-		    if (word_end <= p)
+		    إذا (کلمه_پای_ټکی <= p)
 		    {
-			if (has_mbyte)
-			    word_end = p + (*mb_ptr2len)(p);
-			else
-			    word_end = p + 1;
+			إذا (has_mbyte)
+			    کلمه_پای_ټکی = p + (*mb_ptr2len)(p);
+			وإلا
+			    کلمه_پای_ټکی = p + 1;
 		    }
 
-		    if (word_end > str_end)
-			word_end = str_end;
+		    إذا (کلمه_پای_ټکی > str_پای_ټکی)
+			کلمه_پای_ټکی = str_پای_ټکی;
 
-		    int len = (int)(word_end - p);
-		    if (len > 0 && (!compl_orig_text.string
-				|| (p_ic ? STRNICMP(p, compl_orig_text.string,
-						    compl_orig_text.length) == 0
-					: STRNCMP(p, compl_orig_text.string,
-						    compl_orig_text.length) == 0)))
+		    صحيح len = (صحيح)(کلمه_پای_ټکی - p);
+		    إذا (len > 0 && (!compl_orig_متن.string
+				|| (p_ic ? STRNICMP(p, compl_orig_متن.string,
+						    compl_orig_متن.اوږدتیا) == 0
+					: STRNCMP(p, compl_orig_متن.string,
+						    compl_orig_متن.اوږدتیا) == 0)))
 		    {
-			if (ins_compl_add_infercase(p, len, p_ic, NULL,
+			إذا (ins_compl_جمع_کړه_infercase(p, len, p_ic, عدم,
 				    dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			    dir = FORWARD;
 		    }
 
-		    p = word_end;
+		    p = کلمه_پای_ټکی;
 
-		    if (p <= old_p)
+		    إذا (p <= old_p)
 		    {
 			p = old_p + 1;
-			if (has_mbyte && p < str_end)
+			إذا (has_mbyte && p < str_پای_ټکی)
 			    p = old_p + (*mb_ptr2len)(old_p);
 		    }
 		}
@@ -5441,7 +5441,7 @@ get_register_completion(void)
 	}
 
 	// Free the register copy
-	put_register(regname, reg_ptr);
+	put_ثبتوونکی(regname, reg_ptr);
     }
 }
 
@@ -5449,193 +5449,193 @@ get_register_completion(void)
  * get the next set of completion matches for "type".
  * Returns TRUE if a new match is found. Otherwise returns FALSE.
  */
-    static int
-get_next_completion_match(int type, ins_compl_next_state_T *st, pos_T *ini)
+    ساكن صحيح
+get_بل_completion_سمون(صحيح type, ins_compl_بل_state_T *st, pos_T *ini)
 {
-    int	found_new_match = FALSE;
+    صحيح	وموندل_new_سمون = FALSE;
 
-    switch (type)
+    بدل (type)
     {
-	case -1:
-	    break;
-#ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	case CTRL_X_PATH_DEFINES:
-	    get_next_include_file_completion(type);
-	    break;
-#endif
+	حالة -1:
+	    اكسر;
+#که_تعریف_شوی FEAT_پیدا_کړه_ID
+	حالة CTRL_X_لار_PATTERNS:
+	حالة CTRL_X_لار_تعریفوي:
+	    get_بل_include_file_completion(type);
+	    اكسر;
+#د_که_پای
 
-	case CTRL_X_DICTIONARY:
-	case CTRL_X_THESAURUS:
-	    get_next_dict_tsr_completion(type, st->dict, st->dict_f);
-	    st->dict = NULL;
-	    break;
+	حالة CTRL_X_DICTIONARY:
+	حالة CTRL_X_THESAURUS:
+	    get_بل_dict_tsr_completion(type, st->dict, st->dict_f);
+	    st->dict = عدم;
+	    اكسر;
 
-	case CTRL_X_TAGS:
-	    get_next_tag_completion();
-	    break;
+	حالة CTRL_X_نښانونه:
+	    get_بل_نښان_completion();
+	    اكسر;
 
-	case CTRL_X_FILES:
-	    get_next_filename_completion();
-	    break;
+	حالة CTRL_X_FILES:
+	    get_بل_filename_completion();
+	    اكسر;
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
-	    get_next_cmdline_completion();
-	    break;
+	حالة CTRL_X_CMDLINE:
+	حالة CTRL_X_CMDLINE_CTRL_X:
+	    get_بل_cmdline_completion();
+	    اكسر;
 
-#ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    if (ctrl_x_mode_normal())  // Invoked by a func in 'cpt' option
+#که_تعریف_شوی FEAT_COMPL_FUNC
+	حالة CTRL_X_FUNCTION:
+	    إذا (ctrl_x_ډېرپېښ_نورمال())  // Invoked by a func in 'cpt' option
 		get_cpt_func_completion_matches(st->func_cb);
-	    else
-		expand_by_function(type, compl_pattern.string, NULL);
-	    break;
-	case CTRL_X_OMNI:
-	    expand_by_function(type, compl_pattern.string, NULL);
-	    break;
-#endif
+	    وإلا
+		expand_by_function(type, compl_نمونه.string, عدم);
+	    اكسر;
+	حالة CTRL_X_OMNI:
+	    expand_by_function(type, compl_نمونه.string, عدم);
+	    اكسر;
+#د_که_پای
 
-	case CTRL_X_SPELL:
-	    get_next_spell_completion(st->first_match_pos.lnum);
-	    break;
+	حالة CTRL_X_SPELL:
+	    get_بل_spell_completion(st->لومړی_سمون_pos.lnum);
+	    اكسر;
 
-	case CTRL_X_REGISTER:
-	    get_register_completion();
-	    break;
+	حالة CTRL_X_ثبتوونکی:
+	    get_ثبتوونکی_completion();
+	    اكسر;
 
-	default:	// normal ^P/^N and ^X^L
-	    found_new_match = get_next_default_completion(st, ini);
-	    if (found_new_match == FAIL && st->ins_buf == curbuf)
-		st->found_all = TRUE;
+	افتراضي:	// normal ^P/^N and ^X^L
+	    وموندل_new_سمون = get_بل_default_completion(st, ini);
+	    إذا (وموندل_new_سمون == FAIL && st->ins_buf == curbuf)
+		st->وموندل_all = TRUE;
     }
 
     // check if compl_curr_match has changed, (e.g. other type of
     // expansion added something)
-    if (type != 0 && compl_curr_match != compl_old_match)
-	found_new_match = OK;
+    إذا (type != 0 && compl_curr_سمون != compl_old_سمون)
+	وموندل_new_سمون = OK;
 
-    return found_new_match;
+    أرجع وموندل_new_سمون;
 }
 
 /*
  * Strips carets followed by numbers. This suffix typically represents the
  * max_matches setting.
  */
-    static void
-strip_caret_numbers_in_place(char_u *str)
+    ساكن فراغ
+strip_caret_numbers_دننه_ځای_پرځای_کړه(char_u *str)
 {
-    char_u  *read = str, *write = str, *p;
+    char_u  *اقرأ = str, *اكتب = str, *p;
 
-    if (str == NULL)
-	return;
+    إذا (str == عدم)
+	أرجع;
 
-    while (*read)
+    طالما (*اقرأ)
     {
-	if (*read == '^')
+	إذا (*اقرأ == '^')
 	{
-	    p = read + 1;
-	    while (vim_isdigit(*p))
+	    p = اقرأ + 1;
+	    طالما (vim_isdigit(*p))
 		p++;
-	    if ((*p == ',' || *p == '\0') && p != read + 1)
+	    إذا ((*p == ',' || *p == '\0') && p != اقرأ + 1)
 	    {
-		read = p;
-		continue;
+		اقرأ = p;
+		استمر;
 	    }
-	    else
-		*write++ = *read++;
+	    وإلا
+		*اكتب++ = *اقرأ++;
 	}
-	else
-	    *write++ = *read++;
+	وإلا
+	    *اكتب++ = *اقرأ++;
     }
-    *write = '\0';
+    *اكتب = '\0';
 }
 
 /*
  * Call functions specified in the 'cpt' option with findstart=1,
  * and retrieve the startcol.
  */
-    static int
-prepare_cpt_compl_funcs(void)
+    ساكن صحيح
+prepare_cpt_compl_funcs(فراغ)
 {
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		idx = 0;
-    int		startcol;
+    callback_T	*cb = عدم;
+    صحيح		idx = 0;
+    صحيح		startcol;
 
     // Make a copy of 'cpt' in case the buffer gets wiped out
     cpt = vim_strsave(curbuf->b_p_cpt);
-    if (cpt == NULL)
-	return FAIL;
-    strip_caret_numbers_in_place(cpt);
+    إذا (cpt == عدم)
+	أرجع FAIL;
+    strip_caret_numbers_دننه_ځای_پرځای_کړه(cpt);
 
-    for (p = cpt; *p;)
+    لكل (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	طالما (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	إذا (*p == NUL)
+	    اكسر;
 
 	cb = get_callback_if_cpt_func(p, idx);
-	if (cb)
+	إذا (cb)
 	{
-	    if (get_userdefined_compl_info(curwin->w_cursor.col, cb, &startcol)
+	    إذا (get_userdefined_compl_info(curwin->w_cursor.ستون, cb, &startcol)
 		    == FAIL)
 	    {
-		if (startcol == -3)
+		إذا (startcol == -3)
 		    cpt_sources_array[idx].cs_refresh_always = FALSE;
-		else
+		وإلا
 		    startcol = -2;
 	    }
-	    else if (startcol < 0 || startcol > curwin->w_cursor.col)
-		startcol = curwin->w_cursor.col;
+	    وإلا إذا (startcol < 0 || startcol > curwin->w_cursor.ستون)
+		startcol = curwin->w_cursor.ستون;
 	    cpt_sources_array[idx].cs_startcol = startcol;
 	}
-	else
+	وإلا
 	    cpt_sources_array[idx].cs_startcol = -3;
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	(فراغ)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
 	idx++;
     }
 
     vim_free(cpt);
-    return OK;
-#endif
-    return FAIL;
+    أرجع OK;
+#د_که_پای
+    أرجع FAIL;
 }
 
 /*
  * Start the timer for the current completion source.
  */
-    static void
-compl_source_start_timer(int source_idx UNUSED)
+    ساكن فراغ
+compl_سرچینه_پیل_timer(صحيح سرچینه_idx ناکارول_شوی)
 {
-#ifdef ELAPSED_FUNC
-    if (compl_autocomplete || p_cto > 0)
+#که_تعریف_شوی ELAPSED_FUNC
+    إذا (compl_autocomplete || p_cto > 0)
     {
-	ELAPSED_INIT(cpt_sources_array[source_idx].compl_start_tv);
-	compl_time_slice_expired = FALSE;
+	ELAPSED_INIT(cpt_sources_array[سرچینه_idx].compl_پیل_tv);
+	compl_وخت_ټوټه_expired = FALSE;
     }
-#endif
+#د_که_پای
 }
 
 /*
  * Safely advance the cpt_sources_index by one.
  */
-    static int
-advance_cpt_sources_index_safe(void)
+    ساكن صحيح
+advance_cpt_sources_شاخص_خوندي(فراغ)
 {
-    if (cpt_sources_index >= 0 && cpt_sources_index < cpt_sources_count - 1)
+    إذا (cpt_sources_شاخص >= 0 && cpt_sources_شاخص < cpt_sources_شمېر - 1)
     {
-	cpt_sources_index++;
-	return OK;
+	cpt_sources_شاخص++;
+	أرجع OK;
     }
-#ifdef FEAT_EVAL
-    semsg(_(e_list_index_out_of_range_nr), cpt_sources_index);
-#endif
-    return FAIL;
+#که_تعریف_شوی FEAT_EVAL
+    semsg(_(e_list_شاخص_بهر_د_range_nr), cpt_sources_شاخص);
+#د_که_پای
+    أرجع FAIL;
 }
 
 /*
@@ -5647,64 +5647,64 @@ advance_cpt_sources_index_safe(void)
  * This may return before finding all the matches.
  * Return the total number of matches or -1 if still unknown -- Acevedo
  */
-    static int
+    ساكن صحيح
 ins_compl_get_exp(pos_T *ini)
 {
-    static ins_compl_next_state_T   st;
-    static int			    st_cleared = FALSE;
-    int		match_count;
-    int		found_new_match;
-    int		type = ctrl_x_mode;
-    int		may_advance_cpt_idx = FALSE;
-    pos_T	start_pos = *ini;
-    int		normal_mode_strict = FALSE;
-    long	compl_timeout_save = 0;
+    ساكن ins_compl_بل_state_T   st;
+    ساكن صحيح			    st_cleared = FALSE;
+    صحيح		سمون_شمېر;
+    صحيح		وموندل_new_سمون;
+    صحيح		type = ctrl_x_ډېرپېښ;
+    صحيح		may_advance_cpt_idx = FALSE;
+    pos_T	پیل_pos = *ini;
+    صحيح		نورمال_ډېرپېښ_strict = FALSE;
+    اوږد	compl_timeout_save = 0;
 
-    if (!compl_started)
+    إذا (!compl_started)
     {
 	buf_T *buf;
 
 	FOR_ALL_BUFFERS(buf)
 	    buf->b_scanned = false;
-	if (!st_cleared)
+	إذا (!st_cleared)
 	{
-	    CLEAR_FIELD(st);
+	    CLEAR_ډګر(st);
 	    st_cleared = TRUE;
 	}
-	st.found_all = FALSE;
+	st.وموندل_all = FALSE;
 	st.ins_buf = curbuf;
 	vim_free(st.e_cpt_copy);
 	// Make a copy of 'complete', in case the buffer is wiped out.
-	st.e_cpt_copy = vim_strsave((compl_cont_status & CONT_LOCAL)
+	st.e_cpt_copy = vim_strsave((compl_cont_حالت & CONT_LOCAL)
 					    ? (char_u *)"." : curbuf->b_p_cpt);
-	strip_caret_numbers_in_place(st.e_cpt_copy);
-	st.e_cpt = st.e_cpt_copy == NULL ? (char_u *)"" : st.e_cpt_copy;
+	strip_caret_numbers_دننه_ځای_پرځای_کړه(st.e_cpt_copy);
+	st.e_cpt = st.e_cpt_copy == عدم ? (char_u *)"" : st.e_cpt_copy;
 
 	// In large buffers, timeout may miss nearby matches — search above cursor
-#define LOOKBACK_LINE_COUNT	1000
-	if (compl_autocomplete && is_nearest_active())
+#تعریف_کړه LOOKBACK_کرښه_شمېر	1000
+	إذا (compl_autocomplete && is_تر_ټولو_نږدې_فعال())
 	{
-	    start_pos.lnum = MAX(1, start_pos.lnum - LOOKBACK_LINE_COUNT);
-	    start_pos.col = 0;
+	    پیل_pos.lnum = MAX(1, پیل_pos.lnum - LOOKBACK_کرښه_شمېر);
+	    پیل_pos.ستون = 0;
 	}
-	st.last_match_pos = st.first_match_pos = start_pos;
+	st.وروستی_سمون_pos = st.لومړی_سمون_pos = پیل_pos;
     }
-    else if (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
+    وإلا إذا (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
 	st.ins_buf = curbuf;  // In case the buffer was wiped out.
 
-    compl_old_match = compl_curr_match;	// remember the last current match
-    st.cur_match_pos = (compl_dir_forward())
-				    ? &st.last_match_pos : &st.first_match_pos;
+    compl_old_سمون = compl_curr_سمون;	// remember the last current match
+    st.cur_سمون_pos = (compl_dir_forward())
+				    ? &st.وروستی_سمون_pos : &st.لومړی_سمون_pos;
 
-    normal_mode_strict = ctrl_x_mode_normal() && !ctrl_x_mode_line_or_eval()
-	&& !(compl_cont_status & CONT_LOCAL) && cpt_sources_array != NULL;
-    if (normal_mode_strict)
+    نورمال_ډېرپېښ_strict = ctrl_x_ډېرپېښ_نورمال() && !ctrl_x_ډېرپېښ_کرښه_or_eval()
+	&& !(compl_cont_حالت & CONT_LOCAL) && cpt_sources_array != عدم;
+    إذا (نورمال_ډېرپېښ_strict)
     {
-	cpt_sources_index = 0;
-	if (compl_autocomplete || p_cto > 0)
+	cpt_sources_شاخص = 0;
+	إذا (compl_autocomplete || p_cto > 0)
 	{
-	    compl_source_start_timer(0);
-	    compl_time_slice_expired = FALSE;
+	    compl_سرچینه_پیل_timer(0);
+	    compl_وخت_ټوټه_expired = FALSE;
 	    compl_timeout_ms = compl_autocomplete
 		? MAX(COMPL_INITIAL_TIMEOUT_MS, p_act)
 		: p_cto;
@@ -5712,35 +5712,35 @@ ins_compl_get_exp(pos_T *ini)
     }
 
     // For ^N/^P loop over all the flags/windows/buffers in 'complete'.
-    for (;;)
+    لكل (;;)
     {
-	found_new_match = FAIL;
-	st.set_match_pos = FALSE;
+	وموندل_new_سمون = FAIL;
+	st.سېټ_سمون_pos = FALSE;
 
 	// For ^N/^P pick a new entry from e_cpt if compl_started is off,
 	// or if found_all says this entry is done.  For ^X^L only use the
 	// entries from 'complete' that look in loaded buffers.
-	if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
-					&& (!compl_started || st.found_all))
+	إذا ((ctrl_x_ډېرپېښ_نورمال() || ctrl_x_ډېرپېښ_کرښه_or_eval())
+					&& (!compl_started || st.وموندل_all))
 	{
-	    int status = process_next_cpt_value(&st, &type, &start_pos,
+	    صحيح حالت = process_بل_cpt_ارزښت(&st, &type, &پیل_pos,
 		    cot_fuzzy(), &may_advance_cpt_idx);
 
-	    if (status == INS_COMPL_CPT_END)
-		break;
-	    if (status == INS_COMPL_CPT_CONT)
+	    إذا (حالت == INS_COMPL_CPT_پای_ټکی)
+		اكسر;
+	    إذا (حالت == INS_COMPL_CPT_CONT)
 	    {
-		if (may_advance_cpt_idx)
+		إذا (may_advance_cpt_idx)
 		{
-		    if (!advance_cpt_sources_index_safe())
-			break;
-		    compl_source_start_timer(cpt_sources_index);
+		    إذا (!advance_cpt_sources_شاخص_خوندي())
+			اكسر;
+		    compl_سرچینه_پیل_timer(cpt_sources_شاخص);
 		}
-		continue;
+		استمر;
 	    }
 	}
 
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	إذا (نورمال_ډېرپېښ_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	{
 	    // LSP servers may sporadically take >1s to respond (e.g., while
@@ -5754,133 +5754,133 @@ ins_compl_get_exp(pos_T *ini)
 	}
 
 	// get the next set of completion matches
-	found_new_match = get_next_completion_match(type, &st, &start_pos);
+	وموندل_new_سمون = get_بل_completion_سمون(type, &st, &پیل_pos);
 
 	// If complete() was called then compl_pattern has been reset.  The
 	// following won't work then, bail out.
-	if (compl_pattern.string == NULL)
-	    break;
+	إذا (compl_نمونه.string == عدم)
+	    اكسر;
 
-	if (may_advance_cpt_idx)
+	إذا (may_advance_cpt_idx)
 	{
-	    if (!advance_cpt_sources_index_safe())
-		break;
-	    compl_source_start_timer(cpt_sources_index);
+	    إذا (!advance_cpt_sources_شاخص_خوندي())
+		اكسر;
+	    compl_سرچینه_پیل_timer(cpt_sources_شاخص);
 	}
 
 	// break the loop for specialized modes (use 'complete' just for the
 	// generic ctrl_x_mode == CTRL_X_NORMAL) or when we've found a new
-	// match
-	if ((ctrl_x_mode_not_default() && !ctrl_x_mode_line_or_eval())
-						|| found_new_match != FAIL)
+	//سمون
+	إذا ((ctrl_x_ډېرپېښ_not_default() && !ctrl_x_ډېرپېښ_کرښه_or_eval())
+						|| وموندل_new_سمون != FAIL)
 	{
-	    if (got_int)
-		break;
+	    إذا (got_int)
+		اكسر;
 	    // Fill the popup menu as soon as possible.
-	    if (type != -1)
-		ins_compl_check_keys(0, FALSE);
+	    إذا (type != -1)
+		ins_compl_check_کلیګانې(0, FALSE);
 
-	    if ((ctrl_x_mode_not_default()
-			&& !ctrl_x_mode_line_or_eval()) || compl_interrupted)
-		break;
-	    compl_started = compl_time_slice_expired ? FALSE : TRUE;
+	    إذا ((ctrl_x_ډېرپېښ_not_default()
+			&& !ctrl_x_ډېرپېښ_کرښه_or_eval()) || compl_interrupted)
+		اكسر;
+	    compl_started = compl_وخت_ټوټه_expired ? FALSE : TRUE;
 	}
-	else
+	وإلا
 	{
 	    // Mark a buffer scanned when it has been scanned completely
-	    if (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_PATH_PATTERNS))
+	    إذا (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_لار_PATTERNS))
 		st.ins_buf->b_scanned = true;
 
 	    compl_started = FALSE;
 	}
 
 	// Restore the timeout after collecting matches from function source
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	إذا (نورمال_ډېرپېښ_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	    compl_timeout_ms = compl_timeout_save;
 
 	// For `^P` completion, reset `compl_curr_match` to the head to avoid
 	// mixing matches from different sources.
-	if (!compl_dir_forward())
-	    while (compl_curr_match->cp_prev
-		    && !match_at_original_text(compl_curr_match->cp_prev))
-		compl_curr_match = compl_curr_match->cp_prev;
+	إذا (!compl_dir_forward())
+	    طالما (compl_curr_سمون->cp_prev
+		    && !سمون_at_original_متن(compl_curr_سمون->cp_prev))
+		compl_curr_سمون = compl_curr_سمون->cp_prev;
     }
-    cpt_sources_index = -1;
+    cpt_sources_شاخص = -1;
     compl_started = TRUE;
 
-    if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
+    إذا ((ctrl_x_ډېرپېښ_نورمال() || ctrl_x_ډېرپېښ_کرښه_or_eval())
 	    && *st.e_cpt == NUL)		// Got to end of 'complete'
-	found_new_match = FAIL;
+	وموندل_new_سمون = FAIL;
 
-    match_count = -1;		// total of matches, unknown
-    if (found_new_match == FAIL || (ctrl_x_mode_not_default()
-		&& !ctrl_x_mode_line_or_eval()))
-	match_count = ins_compl_make_cyclic();
+    سمون_شمېر = -1;		// total of matches, unknown
+    إذا (وموندل_new_سمون == FAIL || (ctrl_x_ډېرپېښ_not_default()
+		&& !ctrl_x_ډېرپېښ_کرښه_or_eval()))
+	سمون_شمېر = ins_compl_make_cyclic();
 
-    if (cot_fuzzy() && compl_get_longest && compl_num_bests > 0)
-	fuzzy_longest_match();
+    إذا (cot_fuzzy() && compl_get_longest && compl_عدد_bests > 0)
+	fuzzy_longest_سمون();
 
-    if (compl_old_match != NULL)
+    إذا (compl_old_سمون != عدم)
     {
 	// If several matches were added (FORWARD) or the search failed and has
 	// just been made cyclic then we have to move compl_curr_match to the
 	// next or previous entry (if any) -- Acevedo
-	compl_curr_match = compl_dir_forward() ? compl_old_match->cp_next
-						    : compl_old_match->cp_prev;
-	if (compl_curr_match == NULL)
-	    compl_curr_match = compl_old_match;
+	compl_curr_سمون = compl_dir_forward() ? compl_old_سمون->cp_بل
+						    : compl_old_سمون->cp_prev;
+	إذا (compl_curr_سمون == عدم)
+	    compl_curr_سمون = compl_old_سمون;
     }
     may_trigger_modechanged();
 
-    if (match_count > 0 && !ctrl_x_mode_spell())
+    إذا (سمون_شمېر > 0 && !ctrl_x_ډېرپېښ_spell())
     {
-	if (is_nearest_active() && !ins_compl_has_preinsert())
-	    sort_compl_match_list(cp_compare_nearest);
+	إذا (is_تر_ټولو_نږدې_فعال() && !ins_compl_has_preinsert())
+	    ترتیبول_compl_سمون_list(cp_compare_تر_ټولو_نږدې);
 
-	if (cot_fuzzy() && ins_compl_leader_len() > 0)
-	    ins_compl_fuzzy_sort();
+	إذا (cot_fuzzy() && ins_compl_leader_len() > 0)
+	    ins_compl_fuzzy_ترتیبول();
     }
 
-    return match_count;
+    أرجع سمون_شمېر;
 }
 
 /*
  * Update "compl_shown_match" to the actually shown match, it may differ when
  * "compl_leader" is used to omit some of the matches.
  */
-    static void
-ins_compl_update_shown_match(void)
+    ساكن فراغ
+ins_compl_update_shown_سمون(فراغ)
 {
     string_T	*leader;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
-    leader = get_leader_for_startcol(compl_shown_match, TRUE);
+    (فراغ)get_leader_for_startcol(عدم, TRUE); // Clear the cache
+    leader = get_leader_for_startcol(compl_shown_سمون, TRUE);
 
-    while (!ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && compl_shown_match->cp_next != NULL
-	    && !is_first_match(compl_shown_match->cp_next))
+    طالما (!ins_compl_equal(compl_shown_سمون,
+		leader->string, (صحيح)leader->اوږدتیا)
+	    && compl_shown_سمون->cp_بل != عدم
+	    && !is_لومړی_سمون(compl_shown_سمون->cp_بل))
     {
-	compl_shown_match = compl_shown_match->cp_next;
-	leader = get_leader_for_startcol(compl_shown_match, TRUE);
+	compl_shown_سمون = compl_shown_سمون->cp_بل;
+	leader = get_leader_for_startcol(compl_shown_سمون, TRUE);
     }
 
     // If we didn't find it searching forward, and compl_shows_dir is
     // backward, find the last match.
-    if (compl_shows_dir_backward()
-	    && !ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && (compl_shown_match->cp_next == NULL
-		|| is_first_match(compl_shown_match->cp_next)))
+    إذا (compl_shows_dir_backward()
+	    && !ins_compl_equal(compl_shown_سمون,
+		leader->string, (صحيح)leader->اوږدتیا)
+	    && (compl_shown_سمون->cp_بل == عدم
+		|| is_لومړی_سمون(compl_shown_سمون->cp_بل)))
     {
-	while (!ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
-		&& compl_shown_match->cp_prev != NULL
-		&& !is_first_match(compl_shown_match->cp_prev))
+	طالما (!ins_compl_equal(compl_shown_سمون,
+		    leader->string, (صحيح)leader->اوږدتیا)
+		&& compl_shown_سمون->cp_prev != عدم
+		&& !is_لومړی_سمون(compl_shown_سمون->cp_prev))
 	{
-	    compl_shown_match = compl_shown_match->cp_prev;
-	    leader = get_leader_for_startcol(compl_shown_match, TRUE);
+	    compl_shown_سمون = compl_shown_سمون->cp_prev;
+	    leader = get_leader_for_startcol(compl_shown_سمون, TRUE);
 	}
     }
 }
@@ -5888,105 +5888,105 @@ ins_compl_update_shown_match(void)
 /*
  * Delete the old text being completed.
  */
-    void
-ins_compl_delete(void)
+    فراغ
+ins_compl_delete(فراغ)
 {
     // In insert mode: Delete the typed part.
     // In replace mode: Put the old characters back, if any.
-    int col = compl_col + (compl_status_adding() ? compl_length : 0);
-    string_T	remaining = {NULL, 0};
-    int	    orig_col;
+    صحيح ستون = compl_ستون + (compl_حالت_adding() ? compl_اوږدتیا : 0);
+    string_T	پاتې_شوی = {عدم, 0};
+    صحيح	    orig_ستون;
 
-    if (ins_compl_preinsert_effect())
+    إذا (ins_compl_preinsert_effect())
     {
-	col += (int)ins_compl_leader_len();
-	curwin->w_cursor.col = compl_ins_end_col;
+	ستون += (صحيح)ins_compl_leader_len();
+	curwin->w_cursor.ستون = compl_ins_پای_ټکی_ستون;
     }
 
-    if (curwin->w_cursor.lnum > compl_lnum)
+    إذا (curwin->w_cursor.lnum > compl_lnum)
     {
-	if (curwin->w_cursor.col < ml_get_curline_len())
+	إذا (curwin->w_cursor.ستون < ml_get_curline_len())
 	{
-	    char_u *line = ml_get_cursor();
-	    remaining.length = ml_get_cursor_len();
-	    remaining.string = vim_strnsave(line, remaining.length);
-	    if (remaining.string == NULL)
-		return;
+	    char_u *کرښه = ml_get_cursor();
+	    پاتې_شوی.اوږدتیا = ml_get_cursor_len();
+	    پاتې_شوی.string = vim_strnsave(کرښه, پاتې_شوی.اوږدتیا);
+	    إذا (پاتې_شوی.string == عدم)
+		أرجع;
 	}
-	while (curwin->w_cursor.lnum > compl_lnum)
+	طالما (curwin->w_cursor.lnum > compl_lnum)
 	{
-	    if (ml_delete(curwin->w_cursor.lnum) == FAIL)
+	    إذا (ml_delete(curwin->w_cursor.lnum) == FAIL)
 	    {
-		if (remaining.string)
-		    vim_free(remaining.string);
-		return;
+		إذا (پاتې_شوی.string)
+		    vim_free(پاتې_شوی.string);
+		أرجع;
 	    }
-	    deleted_lines_mark(curwin->w_cursor.lnum, 1L);
+	    deleted_کرښې_mark(curwin->w_cursor.lnum, 1L);
 	    curwin->w_cursor.lnum--;
 	}
 	// move cursor to end of line
-	curwin->w_cursor.col = ml_get_curline_len();
+	curwin->w_cursor.ستون = ml_get_curline_len();
     }
 
-    if ((int)curwin->w_cursor.col > col)
+    إذا ((صحيح)curwin->w_cursor.ستون > ستون)
     {
-	if (stop_arrow() == FAIL)
+	إذا (stop_arrow() == FAIL)
 	{
-	    if (remaining.string)
-		vim_free(remaining.string);
-	    return;
+	    إذا (پاتې_شوی.string)
+		vim_free(پاتې_شوی.string);
+	    أرجع;
 	}
-	backspace_until_column(col);
-	compl_ins_end_col = curwin->w_cursor.col;
+	backspace_until_ستنه(ستون);
+	compl_ins_پای_ټکی_ستون = curwin->w_cursor.ستون;
     }
 
-    if (remaining.string != NULL)
+    إذا (پاتې_شوی.string != عدم)
     {
-	orig_col = curwin->w_cursor.col;
-	ins_str(remaining.string, remaining.length);
-	curwin->w_cursor.col = orig_col;
-	vim_free(remaining.string);
+	orig_ستون = curwin->w_cursor.ستون;
+	ins_str(پاتې_شوی.string, پاتې_شوی.اوږدتیا);
+	curwin->w_cursor.ستون = orig_ستون;
+	vim_free(پاتې_شوی.string);
     }
     // TODO: is this sufficient for redrawing?  Redrawing everything causes
     // flicker, thus we can't do that.
-    changed_cline_bef_curs();
-#ifdef FEAT_EVAL
+    بدل_شوی_cline_bef_curs();
+#که_تعریف_شوی FEAT_EVAL
     // clear v:completed_item
-    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
-#endif
+    سېټ_vim_var_dict(VV_COMPLETED_توکی, dict_alloc_قلف(VAR_FIXED));
+#د_که_پای
 }
 
 /*
  * Insert a completion string that contains newlines.
  * The string is split and inserted line by line.
  */
-    static void
-ins_compl_expand_multiple(char_u *str)
+    ساكن فراغ
+ins_compl_expand_مضرب(char_u *str)
 {
-    char_u	*start = str;
+    char_u	*پیل = str;
     char_u	*curr = str;
-    int		base_indent = get_indent();
+    صحيح		بنسټ_indent = get_indent();
 
-    while (*curr != NUL)
+    طالما (*curr != NUL)
     {
-	if (*curr == '\n')
+	إذا (*curr == '\n')
 	{
 	    // Insert the text chunk before newline
-	    if (curr > start)
-		ins_char_bytes(start, (int)(curr - start));
+	    إذا (curr > پیل)
+		ins_char_بایټونه(پیل, (صحيح)(curr - پیل));
 
 	    // Handle newline
-	    open_line(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, base_indent, NULL);
-	    start = curr + 1;
+	    open_کرښه(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, بنسټ_indent, عدم);
+	    پیل = curr + 1;
 	}
 	curr++;
     }
 
     // Handle remaining text after last newline (if any)
-    if (curr > start)
-	ins_char_bytes(start, (int)(curr - start));
+    إذا (curr > پیل)
+	ins_char_بایټونه(پیل, (صحيح)(curr - پیل));
 
-    compl_ins_end_col = curwin->w_cursor.col;
+    compl_ins_پای_ټکی_ستون = curwin->w_cursor.ستون;
 }
 
 /*
@@ -5996,72 +5996,72 @@ ins_compl_expand_multiple(char_u *str)
  * If "curbuf_only" is TRUE, restrict matches to the current buffer
  * ('.' source in 'complete').
  */
-    static char_u *
-find_common_prefix(size_t *prefix_len, int curbuf_only)
+    ساكن char_u *
+پیدا_کړه_common_مختاړی(size_t *مختاړی_len, صحيح curbuf_only)
 {
     compl_T     *compl;
-    int		*match_count;
-    char_u	*first = NULL;
-    int		len = -1;
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    صحيح		*سمون_شمېر;
+    char_u	*لومړی = عدم;
+    صحيح		len = -1;
+    صحيح		is_cpt_completion = (cpt_sources_array != عدم);
 
-    if (!is_cpt_completion)
-	return NULL;
+    إذا (!is_cpt_completion)
+	أرجع عدم;
 
-    match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-    if (match_count == NULL)
-	return NULL;
+    سمون_شمېر = ALLOC_CLEAR_MULT(صحيح, cpt_sources_شمېر);
+    إذا (سمون_شمېر == عدم)
+	أرجع عدم;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (فراغ)get_leader_for_startcol(عدم, TRUE); // Clear the cache
 
-    compl = compl_first_match;
-    do
+    compl = compl_لومړی_سمون;
+    افعل
     {
 	string_T *leader = get_leader_for_startcol(compl, TRUE);
 
 	// Apply 'smartcase' behavior during normal mode
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
-		&& !ignorecase(compl_orig_text.string))
+	إذا (ctrl_x_ډېرپېښ_نورمال() && !p_inf && compl_orig_متن.string
+		&& !ignorecase(compl_orig_متن.string))
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	إذا (!سمون_at_original_متن(compl)
+		&& (leader->string == عدم
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)))
+			(صحيح)leader->اوږدتیا)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
+	    صحيح سمون_حد_exceeded = FALSE;
+	    صحيح cur_سرچینه = compl->cp_cpt_سرچینه_idx;
 
-	    if (cur_source != -1)
+	    إذا (cur_سرچینه != -1)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
-		    match_limit_exceeded = TRUE;
+		سمون_شمېر[cur_سرچینه]++;
+		صحيح max_matches = cpt_sources_array[cur_سرچینه].cs_max_matches;
+		إذا (max_matches > 0 && سمون_شمېر[cur_سرچینه] > max_matches)
+		    سمون_حد_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded && (!curbuf_only
-			|| (cur_source != -1
-			    && cpt_sources_array[cur_source].cs_flag == '.')))
+	    إذا (!سمون_حد_exceeded && (!curbuf_only
+			|| (cur_سرچینه != -1
+			    && cpt_sources_array[cur_سرچینه].cs_flag == '.')))
 	    {
-		if (first == NULL && STRNCMP(ins_compl_leader(),
+		إذا (لومړی == عدم && STRNCMP(ins_compl_leader(),
 			    compl->cp_str.string, ins_compl_leader_len()) == 0)
 		{
-		    first = compl->cp_str.string;
-		    len = (int)STRLEN(first);
+		    لومړی = compl->cp_str.string;
+		    len = (صحيح)STRLEN(لومړی);
 		}
-		else if (first != NULL)
+		وإلا إذا (لومړی != عدم)
 		{
-		    int j = 0;  // count in bytes
-		    char_u *s1 = first;
+		    صحيح j = 0;  // count in bytes
+		    char_u *s1 = لومړی;
 		    char_u *s2 = compl->cp_str.string;
 
-		    while (j < len && *s1 != NUL && *s2 != NUL)
+		    طالما (j < len && *s1 != NUL && *s2 != NUL)
 		    {
-			if (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
+			إذا (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
 				|| memcmp(s1, s2, MB_BYTE2LEN(*s1)) != 0)
-			    break;
+			    اكسر;
 
 			j += MB_BYTE2LEN(*s1);
 			MB_PTR_ADV(s1);
@@ -6069,38 +6069,38 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
 		    }
 		    len = j;
 
-		    if (len == 0)
-			break;
+		    إذا (len == 0)
+			اكسر;
 		}
 	    }
 	}
-	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+	compl = compl->cp_بل;
+    } طالما (compl != عدم && !is_لومړی_سمون(compl));
 
-    vim_free(match_count);
+    vim_free(سمون_شمېر);
 
-    if (len > (int)ins_compl_leader_len())
+    إذا (len > (صحيح)ins_compl_leader_len())
     {
 	// Avoid inserting text that duplicates the text already present
 	// after the cursor.
-	if (len == (int)STRLEN(first))
+	إذا (len == (صحيح)STRLEN(لومړی))
 	{
-	    char_u *line = ml_get_curline();
-	    char_u *p = line + curwin->w_cursor.col;
-	    if (p && !IS_WHITE_OR_NUL(*p))
+	    char_u *کرښه = ml_get_curline();
+	    char_u *p = کرښه + curwin->w_cursor.ستون;
+	    إذا (p && !IS_WHITE_OR_NUL(*p))
 	    {
-		char_u *end = find_word_end(p);
-		int text_len = end - p;
-		if (text_len > 0
-			&& text_len < (len - (int)ins_compl_leader_len())
-			&& STRNCMP(first + len - text_len, p, text_len) == 0)
-		    len -= text_len;
+		char_u *پای_ټکی = پیدا_کړه_کلمه_پای_ټکی(p);
+		صحيح متن_len = پای_ټکی - p;
+		إذا (متن_len > 0
+			&& متن_len < (len - (صحيح)ins_compl_leader_len())
+			&& STRNCMP(لومړی + len - متن_len, p, متن_len) == 0)
+		    len -= متن_len;
 	    }
 	}
-	*prefix_len = (size_t)len;
-	return first;
+	*مختاړی_len = (size_t)len;
+	أرجع لومړی;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -6110,42 +6110,42 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
  * When "insert_prefix" is TRUE the longest common prefix is inserted instead
  * of shown match.
  */
-    void
-ins_compl_insert(int move_cursor, int insert_prefix)
+    فراغ
+ins_compl_ورننباسه(صحيح move_cursor, صحيح ورننباسه_مختاړی)
 {
-    int		compl_len = get_compl_len();
-    int		preinsert = ins_compl_has_preinsert();
-    char_u	*cp_str = compl_shown_match->cp_str.string;
-    size_t	cp_str_len = compl_shown_match->cp_str.length;
+    صحيح		compl_len = get_compl_len();
+    صحيح		preinsert = ins_compl_has_preinsert();
+    char_u	*cp_str = compl_shown_سمون->cp_str.string;
+    size_t	cp_str_len = compl_shown_سمون->cp_str.اوږدتیا;
     size_t	leader_len = ins_compl_leader_len();
-    char_u	*has_multiple = vim_strchr(cp_str, '\n');
+    char_u	*has_مضرب = vim_strchr(cp_str, '\n');
 
-    if (insert_prefix)
+    إذا (ورننباسه_مختاړی)
     {
-	cp_str = find_common_prefix(&cp_str_len, FALSE);
-	if (cp_str == NULL)
+	cp_str = پیدا_کړه_common_مختاړی(&cp_str_len, FALSE);
+	إذا (cp_str == عدم)
 	{
-	    cp_str = find_common_prefix(&cp_str_len, TRUE);
-	    if (cp_str == NULL)
+	    cp_str = پیدا_کړه_common_مختاړی(&cp_str_len, TRUE);
+	    إذا (cp_str == عدم)
 	    {
-		cp_str = compl_shown_match->cp_str.string;
-		cp_str_len = compl_shown_match->cp_str.length;
+		cp_str = compl_shown_سمون->cp_str.string;
+		cp_str_len = compl_shown_سمون->cp_str.اوږدتیا;
 	    }
 	}
     }
     // Since completion sources may provide matches with varying start
     // positions, insert only the portion of the match that corresponds to the
     // intended replacement range.
-    else if (cpt_sources_array != NULL)
+    وإلا إذا (cpt_sources_array != عدم)
     {
-	int	cpt_idx = compl_shown_match->cp_cpt_source_idx;
-	if (cpt_idx >= 0 && compl_col >= 0)
+	صحيح	cpt_idx = compl_shown_سمون->cp_cpt_سرچینه_idx;
+	إذا (cpt_idx >= 0 && compl_ستون >= 0)
 	{
-	    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
-	    if (startcol >= 0 && startcol < (int)compl_col)
+	    صحيح	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+	    إذا (startcol >= 0 && startcol < (صحيح)compl_ستون)
 	    {
-		int skip = (int)compl_col - startcol;
-		if ((size_t)skip <= cp_str_len)
+		صحيح skip = (صحيح)compl_ستون - startcol;
+		إذا ((size_t)skip <= cp_str_len)
 		{
 		    cp_str_len -= skip;
 		    cp_str += skip;
@@ -6156,67 +6156,67 @@ ins_compl_insert(int move_cursor, int insert_prefix)
 
     // Make sure we don't go over the end of the string, this can happen with
     // illegal bytes.
-    if (compl_len < (int)cp_str_len)
+    إذا (compl_len < (صحيح)cp_str_len)
     {
-	if (has_multiple)
-	    ins_compl_expand_multiple(cp_str + compl_len);
-	else
+	إذا (has_مضرب)
+	    ins_compl_expand_مضرب(cp_str + compl_len);
+	وإلا
 	{
-	    ins_compl_insert_bytes(cp_str + compl_len,
-		    insert_prefix ? (int)cp_str_len - compl_len : -1);
-	    if ((preinsert || insert_prefix) && move_cursor)
-		curwin->w_cursor.col -= (colnr_T)(cp_str_len - leader_len);
+	    ins_compl_ورننباسه_بایټونه(cp_str + compl_len,
+		    ورننباسه_مختاړی ? (صحيح)cp_str_len - compl_len : -1);
+	    إذا ((preinsert || ورننباسه_مختاړی) && move_cursor)
+		curwin->w_cursor.ستون -= (colnr_T)(cp_str_len - leader_len);
 	}
     }
-    if (match_at_original_text(compl_shown_match)
-	    || (preinsert && !insert_prefix))
-	compl_used_match = FALSE;
-    else
-	compl_used_match = TRUE;
-#ifdef FEAT_EVAL
+    إذا (سمون_at_original_متن(compl_shown_سمون)
+	    || (preinsert && !ورننباسه_مختاړی))
+	compl_کارول_شوی_سمون = FALSE;
+    وإلا
+	compl_کارول_شوی_سمون = TRUE;
+#که_تعریف_شوی FEAT_EVAL
     {
-	dict_T *dict = ins_compl_dict_alloc(compl_shown_match);
+	dict_T *dict = ins_compl_dict_alloc(compl_shown_سمون);
 
-	set_vim_var_dict(VV_COMPLETED_ITEM, dict);
+	سېټ_vim_var_dict(VV_COMPLETED_توکی, dict);
     }
-#endif
-    compl_hi_on_autocompl_longest = insert_prefix && move_cursor;
+#د_که_پای
+    compl_hi_on_autocompl_longest = ورننباسه_مختاړی && move_cursor;
 }
 
 /*
  * show the file name for the completion match (if any).  Truncate the file
  * name to avoid a wait for return.
  */
-    static void
-ins_compl_show_filename(void)
+    ساكن فراغ
+ins_compl_show_filename(فراغ)
 {
-    char	*lead = _("match in file");
-    int		space = sc_col - vim_strsize((char_u *)lead) - 2;
+    حرف	*lead = _("match in file");
+    صحيح		space = sc_ستون - vim_strsize((char_u *)lead) - 2;
     char_u	*s;
     char_u	*e;
 
-    if (space <= 0)
-	return;
+    إذا (space <= 0)
+	أرجع;
 
     // We need the tail that fits.  With double-byte encoding going
     // back from the end is very slow, thus go from the start and keep
     // the text that fits in "space" between "s" and "e".
-    for (s = e = compl_shown_match->cp_fname; *e != NUL; MB_PTR_ADV(e))
+    لكل (s = e = compl_shown_سمون->cp_fname; *e != NUL; MB_PTR_ADV(e))
     {
 	space -= ptr2cells(e);
-	while (space < 0)
+	طالما (space < 0)
 	{
 	    space += ptr2cells(s);
 	    MB_PTR_ADV(s);
 	}
     }
-    if (!compl_autocomplete)
+    إذا (!compl_autocomplete)
     {
-	msg_hist_off = TRUE;
-	vim_snprintf((char *)IObuff, IOSIZE, "%s %s%s", lead,
-		s > compl_shown_match->cp_fname ? "<" : "", s);
-	msg((char *)IObuff);
-	msg_hist_off = FALSE;
+	پیغام_hist_off = TRUE;
+	vim_snprintf((حرف *)IObuff, IOSIZE, "%s %s%s", lead,
+		s > compl_shown_سمون->cp_fname ? "<" : "", s);
+	پیغام((حرف *)IObuff);
+	پیغام_hist_off = FALSE;
 	redraw_cmdline = FALSE;	    // don't overwrite!
     }
 }
@@ -6227,17 +6227,17 @@ ins_compl_show_filename(void)
  * 'cp_in_match_array' is set, indicating that the match is also present
  * in 'compl_match_array'.
  */
-    static compl_T *
-find_next_match_in_menu(void)
+    ساكن compl_T *
+پیدا_کړه_بل_سمون_دننه_menu(فراغ)
 {
-    int	    is_forward = compl_shows_dir_forward();
-    compl_T *match = compl_shown_match;
+    صحيح	    is_forward = compl_shows_dir_forward();
+    compl_T *سمون = compl_shown_سمون;
 
-    do
-	match = is_forward ? match->cp_next : match->cp_prev;
-    while (match->cp_next && !match->cp_in_match_array
-	    && !match_at_original_text(match));
-    return match;
+    افعل
+	سمون = is_forward ? سمون->cp_بل : سمون->cp_prev;
+    طالما (سمون->cp_بل && !سمون->cp_دننه_سمون_array
+	    && !سمون_at_original_متن(سمون));
+    أرجع سمون;
 }
 
 /*
@@ -6253,114 +6253,114 @@ find_next_match_in_menu(void)
  *
  * Returns OK on success and -1 if the number of matches are unknown.
  */
-    static int
-find_next_completion_match(
-	int	allow_get_expansion,
-	int	todo,		// repeat completion this many times
-	int	advance,
-	int	*num_matches)
+    ساكن صحيح
+پیدا_کړه_بل_completion_سمون(
+	صحيح	allow_get_expansion,
+	صحيح	todo,		// repeat completion this many times
+	صحيح	advance,
+	صحيح	*عدد_matches)
 {
-    int		found_end = FALSE;
-    compl_T	*found_compl = NULL;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
+    صحيح		وموندل_پای_ټکی = FALSE;
+    compl_T	*وموندل_compl = عدم;
+    بینښه صحيح cur_cot_flags = get_cot_flags();
+    صحيح		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
     string_T	*leader;
 
 
-    while (--todo >= 0)
+    طالما (--todo >= 0)
     {
-	if (compl_shows_dir_forward() && compl_shown_match->cp_next != NULL)
+	إذا (compl_shows_dir_forward() && compl_shown_سمون->cp_بل != عدم)
 	{
-	    if (compl_match_array != NULL)
-		compl_shown_match = find_next_match_in_menu();
-	    else
-		compl_shown_match = compl_shown_match->cp_next;
-	    found_end = (compl_first_match != NULL
-		    && (is_first_match(compl_shown_match->cp_next)
-			|| is_first_match(compl_shown_match)));
+	    إذا (compl_سمون_array != عدم)
+		compl_shown_سمون = پیدا_کړه_بل_سمون_دننه_menu();
+	    وإلا
+		compl_shown_سمون = compl_shown_سمون->cp_بل;
+	    وموندل_پای_ټکی = (compl_لومړی_سمون != عدم
+		    && (is_لومړی_سمون(compl_shown_سمون->cp_بل)
+			|| is_لومړی_سمون(compl_shown_سمون)));
 	}
-	else if (compl_shows_dir_backward()
-		&& compl_shown_match->cp_prev != NULL)
+	وإلا إذا (compl_shows_dir_backward()
+		&& compl_shown_سمون->cp_prev != عدم)
 	{
-	    found_end = is_first_match(compl_shown_match);
-	    if (compl_match_array != NULL)
-		compl_shown_match = find_next_match_in_menu();
-	    else
-		compl_shown_match = compl_shown_match->cp_prev;
-	    found_end |= is_first_match(compl_shown_match);
+	    وموندل_پای_ټکی = is_لومړی_سمون(compl_shown_سمون);
+	    إذا (compl_سمون_array != عدم)
+		compl_shown_سمون = پیدا_کړه_بل_سمون_دننه_menu();
+	    وإلا
+		compl_shown_سمون = compl_shown_سمون->cp_prev;
+	    وموندل_پای_ټکی |= is_لومړی_سمون(compl_shown_سمون);
 	}
-	else
+	وإلا
 	{
-	    if (!allow_get_expansion)
+	    إذا (!allow_get_expansion)
 	    {
-		if (advance)
+		إذا (advance)
 		{
-		    if (compl_shows_dir_backward())
+		    إذا (compl_shows_dir_backward())
 			compl_pending -= todo + 1;
-		    else
+		    وإلا
 			compl_pending += todo + 1;
 		}
-		return -1;
+		أرجع -1;
 	    }
 
-	    if (!compl_no_select && advance)
+	    إذا (!compl_no_select && advance)
 	    {
-		if (compl_shows_dir_backward())
+		إذا (compl_shows_dir_backward())
 		    --compl_pending;
-		else
+		وإلا
 		    ++compl_pending;
 	    }
 
 	    // Find matches.
-	    *num_matches = ins_compl_get_exp(&compl_startpos);
+	    *عدد_matches = ins_compl_get_exp(&compl_startpos);
 
 	    // handle any pending completions
-	    while (compl_pending != 0 && compl_direction == compl_shows_dir
+	    طالما (compl_pending != 0 && compl_direction == compl_shows_dir
 		    && advance)
 	    {
-		if (compl_pending > 0 && compl_shown_match->cp_next != NULL)
+		إذا (compl_pending > 0 && compl_shown_سمون->cp_بل != عدم)
 		{
-		    compl_shown_match = compl_shown_match->cp_next;
+		    compl_shown_سمون = compl_shown_سمون->cp_بل;
 		    --compl_pending;
 		}
-		else if (compl_pending < 0 && compl_shown_match->cp_prev != NULL)
+		وإلا إذا (compl_pending < 0 && compl_shown_سمون->cp_prev != عدم)
 		{
-		    compl_shown_match = compl_shown_match->cp_prev;
+		    compl_shown_سمون = compl_shown_سمون->cp_prev;
 		    ++compl_pending;
 		}
-		else
-		    break;
+		وإلا
+		    اكسر;
 	    }
-	    found_end = FALSE;
+	    وموندل_پای_ټکی = FALSE;
 	}
 
-	leader = get_leader_for_startcol(compl_shown_match, FALSE);
+	leader = get_leader_for_startcol(compl_shown_سمون, FALSE);
 
-	if (!match_at_original_text(compl_shown_match)
-		&& leader->string != NULL
-		&& !ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
+	إذا (!سمون_at_original_متن(compl_shown_سمون)
+		&& leader->string != عدم
+		&& !ins_compl_equal(compl_shown_سمون,
+		    leader->string, (صحيح)leader->اوږدتیا)
 		&& !(cot_fuzzy()
-		    && compl_shown_match->cp_score != FUZZY_SCORE_NONE))
+		    && compl_shown_سمون->cp_score != FUZZY_SCORE_NONE))
 	    ++todo;
-	else
+	وإلا
 	    // Remember a matching item.
-	    found_compl = compl_shown_match;
+	    وموندل_compl = compl_shown_سمون;
 
 	// Stop at the end of the list when we found a usable match.
-	if (found_end)
+	إذا (وموندل_پای_ټکی)
 	{
-	    if (found_compl != NULL)
+	    إذا (وموندل_compl != عدم)
 	    {
-		compl_shown_match = found_compl;
-		break;
+		compl_shown_سمون = وموندل_compl;
+		اكسر;
 	    }
 	    todo = 1;	    // use first usable match after wrapping around
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -6379,45 +6379,45 @@ find_next_completion_match(
  * "allow_get_expansion" TRUE, which calls ins_compl_get_exp(), which in turn
  * calls this function with "allow_get_expansion" FALSE.
  */
-    static int
-ins_compl_next(
-    int	    allow_get_expansion,
-    int	    count,		// repeat completion this many times; should
+    ساكن صحيح
+ins_compl_بل(
+    صحيح	    allow_get_expansion,
+    صحيح	    شمېر,		// repeat completion this many times; should
 				// be at least 1
-    int	    insert_match)	// Insert the newly selected match
+    صحيح	    ورننباسه_سمون)	// Insert the newly selected match
 {
-    int	    num_matches = -1;
-    int	    todo = count;
-    int	    advance;
-    int	    started = compl_started;
+    صحيح	    عدد_matches = -1;
+    صحيح	    todo = شمېر;
+    صحيح	    advance;
+    صحيح	    started = compl_started;
     buf_T   *orig_curbuf = curbuf;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int	    compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0
+    بینښه صحيح cur_cot_flags = get_cot_flags();
+    صحيح	    compl_no_ورننباسه = (cur_cot_flags & COT_NOINSERT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    int	    compl_preinsert = ins_compl_has_preinsert();
+    صحيح	    compl_preinsert = ins_compl_has_preinsert();
 
     // When user complete function return -1 for findstart which is next
     // time of 'always', compl_shown_match become NULL.
-    if (compl_shown_match == NULL)
-	return -1;
+    إذا (compl_shown_سمون == عدم)
+	أرجع -1;
 
-    if (compl_leader.string != NULL
-	    && !match_at_original_text(compl_shown_match)
+    إذا (compl_leader.string != عدم
+	    && !سمون_at_original_متن(compl_shown_سمون)
 	    && !cot_fuzzy())
 	// Update "compl_shown_match" to the actually shown match
-	ins_compl_update_shown_match();
+	ins_compl_update_shown_سمون();
 
-    if (allow_get_expansion && insert_match
-	    && (!compl_get_longest || compl_used_match))
+    إذا (allow_get_expansion && ورننباسه_سمون
+	    && (!compl_get_longest || compl_کارول_شوی_سمون))
 	// Delete old text to be replaced
 	ins_compl_delete();
 
     // When finding the longest common text we stick at the original text,
     // don't let CTRL-N or CTRL-P move to the first match.
-    advance = count != 1 || !allow_get_expansion || !compl_get_longest;
+    advance = شمېر != 1 || !allow_get_expansion || !compl_get_longest;
 
     // When restarting the search don't insert the first match either.
-    if (compl_restarting)
+    إذا (compl_restarting)
     {
 	advance = FALSE;
 	compl_restarting = FALSE;
@@ -6425,63 +6425,63 @@ ins_compl_next(
 
     // Repeat this for when <PageUp> or <PageDown> is typed.  But don't wrap
     // around.
-    if (find_next_completion_match(allow_get_expansion, todo, advance,
-							&num_matches) == -1)
-	return -1;
+    إذا (پیدا_کړه_بل_completion_سمون(allow_get_expansion, todo, advance,
+							&عدد_matches) == -1)
+	أرجع -1;
 
-    if (curbuf != orig_curbuf)
+    إذا (curbuf != orig_curbuf)
     {
 	// In case some completion function switched buffer, don't want to
 	// insert the completion elsewhere.
-	return -1;
+	أرجع -1;
     }
 
     // Insert the text of the new completion, or the compl_leader.
-    if (!started && ins_compl_preinsert_longest())
-	ins_compl_insert(TRUE, TRUE);
-    else if (compl_no_insert && !started && !compl_preinsert)
+    إذا (!started && ins_compl_preinsert_longest())
+	ins_compl_ورننباسه(TRUE, TRUE);
+    وإلا إذا (compl_no_ورننباسه && !started && !compl_preinsert)
     {
-	ins_compl_insert_bytes(compl_orig_text.string + get_compl_len(), -1);
-	compl_used_match = FALSE;
+	ins_compl_ورننباسه_بایټونه(compl_orig_متن.string + get_compl_len(), -1);
+	compl_کارول_شوی_سمون = FALSE;
     }
-    else if (insert_match)
+    وإلا إذا (ورننباسه_سمون)
     {
-	if (!compl_get_longest || compl_used_match)
+	إذا (!compl_get_longest || compl_کارول_شوی_سمون)
 	{
-	    int preinsert_longest = ins_compl_preinsert_longest()
-		&& match_at_original_text(compl_shown_match); // none selected
-	    ins_compl_insert(compl_preinsert || preinsert_longest,
+	    صحيح preinsert_longest = ins_compl_preinsert_longest()
+		&& سمون_at_original_متن(compl_shown_سمون); // none selected
+	    ins_compl_ورننباسه(compl_preinsert || preinsert_longest,
 		    preinsert_longest);
 	}
-	else
-	    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
+	وإلا
+	    ins_compl_ورننباسه_بایټونه(compl_leader.string + get_compl_len(), -1);
     }
-    else
-	compl_used_match = FALSE;
+    وإلا
+	compl_کارول_شوی_سمون = FALSE;
 
-    if (!allow_get_expansion)
+    إذا (!allow_get_expansion)
     {
 	// may undisplay the popup menu first
 	ins_compl_upd_pum();
 
-	if (pum_enough_matches())
+	إذا (pum_enough_matches())
 	    // Will display the popup menu, don't redraw yet to avoid flicker.
 	    pum_call_update_screen();
-	else
+	وإلا
 	    // Not showing the popup menu yet, redraw to show the user what was
 	    // inserted.
 	    update_screen(0);
 
 	// display the updated popup menu
 	ins_compl_show_pum();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#که_تعریف_شوی FEAT_GUI
+	إذا (gui.دننه_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
-	    out_flush_cursor(FALSE, FALSE);
+	    بهر_flush_cursor(FALSE, FALSE);
 	}
-#endif
+#د_که_پای
 
 	// Delete old text to be replaced, since we're still searching and
 	// don't want to match ourselves!
@@ -6490,37 +6490,37 @@ ins_compl_next(
 
     // Enter will select a match when the match wasn't inserted and the popup
     // menu is visible.
-    if (compl_no_insert && !started
-				 && !match_at_original_text(compl_shown_match))
+    إذا (compl_no_ورننباسه && !started
+				 && !سمون_at_original_متن(compl_shown_سمون))
 	compl_enter_selects = TRUE;
-    else
-	compl_enter_selects = !insert_match && compl_match_array != NULL;
+    وإلا
+	compl_enter_selects = !ورننباسه_سمون && compl_سمون_array != عدم;
 
     // Show the file name for the match (if any)
-    if (compl_shown_match->cp_fname != NULL)
+    إذا (compl_shown_سمون->cp_fname != عدم)
 	ins_compl_show_filename();
 
-    return num_matches;
+    أرجع عدد_matches;
 }
 
 /*
  * Check if the current completion source exceeded its timeout. If so, stop
  * collecting, and halve the timeout.
  */
-    static void
-check_elapsed_time(void)
+    ساكن فراغ
+check_elapsed_وخت(فراغ)
 {
-#ifdef ELAPSED_FUNC
-    elapsed_T	*start_tv
-	= &cpt_sources_array[cpt_sources_index].compl_start_tv;
-    long	elapsed_ms = ELAPSED_FUNC(*start_tv);
+#که_تعریف_شوی ELAPSED_FUNC
+    elapsed_T	*پیل_tv
+	= &cpt_sources_array[cpt_sources_شاخص].compl_پیل_tv;
+    اوږد	elapsed_ms = ELAPSED_FUNC(*پیل_tv);
 
-    if (elapsed_ms > compl_timeout_ms)
+    إذا (elapsed_ms > compl_timeout_ms)
     {
-	compl_time_slice_expired = TRUE;
+	compl_وخت_ټوټه_expired = TRUE;
 	DECAY_COMPL_TIMEOUT();
     }
-#endif
+#د_که_پای
 }
 
 /*
@@ -6532,78 +6532,78 @@ check_elapsed_time(void)
  * "in_compl_func" is TRUE when called from complete_check(), don't set
  * compl_curr_match.
  */
-    void
-ins_compl_check_keys(int frequency, int in_compl_func)
+    فراغ
+ins_compl_check_کلیګانې(صحيح frequency, صحيح دننه_compl_func)
 {
-    static int	count = 0;
-    int		c;
+    ساكن صحيح	شمېر = 0;
+    صحيح		c;
 
     // Don't check when reading keys from a script, :normal or feedkeys().
     // That would break the test scripts.  But do check for keys when called
     // from complete_check().
-    if (!in_compl_func && (using_script() || ex_normal_busy))
-	return;
+    إذا (!دننه_compl_func && (using_script() || ex_نورمال_busy))
+	أرجع;
 
     // Only do this at regular intervals
-    if (++count < frequency)
-	return;
-    count = 0;
+    إذا (++شمېر < frequency)
+	أرجع;
+    شمېر = 0;
 
     // Check for a typed key.  Do use mappings, otherwise vim_is_ctrl_x_key()
     // can't do its work correctly.
     c = vpeekc_any();
-    if (c != NUL
-#ifdef FEAT_EVAL
+    إذا (c != NUL
+#که_تعریف_شوی FEAT_EVAL
 	    // If test_override("char_avail", 1) was called, ignore characters
 	    // waiting in the typeahead buffer.
 	    && !disable_char_avail_for_testing
-#endif
+#د_که_پای
        )
     {
-	if (vim_is_ctrl_x_key(c) && c != Ctrl_X && c != Ctrl_R)
+	إذا (vim_is_ctrl_x_کلی(c) && c != Ctrl_X && c != Ctrl_R)
 	{
-	    c = safe_vgetc();	// Eat the character
+	    c = خوندي_vgetc();	// Eat the character
 	    compl_shows_dir = ins_compl_key2dir(c);
-	    (void)ins_compl_next(FALSE, ins_compl_key2count(c),
-				      c != K_UP && c != K_DOWN);
+	    (فراغ)ins_compl_بل(FALSE, ins_compl_key2count(c),
+				      c != K_پورته && c != K_ښکته);
 	}
-	else
+	وإلا
 	{
 	    // Need to get the character to have KeyTyped set.  We'll put it
 	    // back with vungetc() below.  But skip K_IGNORE.
-	    c = safe_vgetc();
-	    if (c != K_IGNORE)
+	    c = خوندي_vgetc();
+	    إذا (c != K_IGNORE)
 	    {
 		// Typed keys that get mapped lose KeyTyped. Still let
 		// complete_check() interrupt, except during @r replay.
-		if (c != Ctrl_R && (KeyTyped
-			    || (in_compl_func && reg_executing == 0)))
+		إذا (c != Ctrl_R && (کلی_Typed
+			    || (دننه_compl_func && reg_executing == 0)))
 		    compl_interrupted = TRUE;
 
 		vungetc(c);
 	    }
 	}
     }
-    else
+    وإلا
     {
-	int normal_mode_strict = ctrl_x_mode_normal()
-	    && !ctrl_x_mode_line_or_eval() && !(compl_cont_status & CONT_LOCAL)
-	    && cpt_sources_array != NULL && cpt_sources_index >= 0;
-	if (normal_mode_strict && (compl_autocomplete || p_cto > 0))
-	    check_elapsed_time();
+	صحيح نورمال_ډېرپېښ_strict = ctrl_x_ډېرپېښ_نورمال()
+	    && !ctrl_x_ډېرپېښ_کرښه_or_eval() && !(compl_cont_حالت & CONT_LOCAL)
+	    && cpt_sources_array != عدم && cpt_sources_شاخص >= 0;
+	إذا (نورمال_ډېرپېښ_strict && (compl_autocomplete || p_cto > 0))
+	    check_elapsed_وخت();
     }
 
-    if (compl_pending
+    إذا (compl_pending
 	    && !got_int
 	    && !(cot_flags & (COT_NOINSERT | COT_FUZZY))
 	    && (!compl_autocomplete || ins_compl_has_preinsert()))
     {
 	// Insert the first match immediately and advance compl_shown_match,
 	// before finding other matches.
-	int todo = compl_pending > 0 ? compl_pending : -compl_pending;
+	صحيح todo = compl_pending > 0 ? compl_pending : -compl_pending;
 
 	compl_pending = 0;
-	(void)ins_compl_next(FALSE, todo, TRUE);
+	(فراغ)ins_compl_بل(FALSE, todo, TRUE);
     }
 }
 
@@ -6611,64 +6611,64 @@ ins_compl_check_keys(int frequency, int in_compl_func)
  * Decide the direction of Insert mode complete from the key typed.
  * Returns BACKWARD or FORWARD.
  */
-    static int
-ins_compl_key2dir(int c)
+    ساكن صحيح
+ins_compl_key2dir(صحيح c)
 {
-    if (c == Ctrl_P || c == Ctrl_L
-	    || c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP || c == K_UP)
-	return BACKWARD;
-    return FORWARD;
+    إذا (c == Ctrl_P || c == Ctrl_L
+	    || c == K_PAGEUP || c == K_KPAGEUP || c == K_S_پورته || c == K_پورته)
+	أرجع BACKWARD;
+    أرجع FORWARD;
 }
 
 /*
  * Return TRUE for keys that are used for completion only when the popup menu
  * is visible.
  */
-    static int
-ins_compl_pum_key(int c)
+    ساكن صحيح
+ins_compl_pum_کلی(صحيح c)
 {
-    return pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP
-		     || c == K_PAGEDOWN || c == K_KPAGEDOWN || c == K_S_DOWN
-		     || c == K_UP || c == K_DOWN);
+    أرجع pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_پورته
+		     || c == K_PAGEDOWN || c == K_KPAGEDOWN || c == K_S_ښکته
+		     || c == K_پورته || c == K_ښکته);
 }
 
 /*
  * Decide the number of completions to move forward.
  * Returns 1 for most keys, height of the popup menu for page-up/down keys.
  */
-    static int
-ins_compl_key2count(int c)
+    ساكن صحيح
+ins_compl_key2count(صحيح c)
 {
-    if (ins_compl_pum_key(c) && c != K_UP && c != K_DOWN)
+    إذا (ins_compl_pum_کلی(c) && c != K_پورته && c != K_ښکته)
     {
-	int h = pum_get_height();
-	if (h > 3)
+	صحيح h = pum_get_لوړوالی();
+	إذا (h > 3)
 	    h -= 2; // keep some context
-	return h;
+	أرجع h;
     }
-    return 1;
+    أرجع 1;
 }
 
 /*
  * Return TRUE if completion with "c" should insert the match, FALSE if only
  * to change the currently selected completion.
  */
-    static int
-ins_compl_use_match(int c)
+    ساكن صحيح
+ins_compl_use_سمون(صحيح c)
 {
-    switch (c)
+    بدل (c)
     {
-	case K_UP:
-	case K_DOWN:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-	case K_S_DOWN:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_S_UP:
-	    return FALSE;
+	حالة K_پورته:
+	حالة K_ښکته:
+	حالة K_PAGEDOWN:
+	حالة K_KPAGEDOWN:
+	حالة K_S_ښکته:
+	حالة K_PAGEUP:
+	حالة K_KPAGEUP:
+	حالة K_S_پورته:
+	    أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -6677,154 +6677,154 @@ ins_compl_use_match(int c)
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variables: compl_cont_status and ctrl_x_mode
  */
-    static int
-get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    ساكن صحيح
+get_نورمال_compl_info(char_u *کرښه, صحيح startcol, colnr_T curs_ستون)
 {
-    if ((compl_cont_status & CONT_SOL) || ctrl_x_mode_path_defines())
+    إذا ((compl_cont_حالت & CONT_SOL) || ctrl_x_ډېرپېښ_لار_تعریفوي())
     {
-	if (!compl_status_adding())
+	إذا (!compl_حالت_adding())
 	{
-	    while (--startcol >= 0 && vim_isIDc(line[startcol]))
+	    طالما (--startcol >= 0 && vim_isIDc(کرښه[startcol]))
 		;
-	    compl_col += ++startcol;
-	    compl_length = curs_col - startcol;
+	    compl_ستون += ++startcol;
+	    compl_اوږدتیا = curs_ستون - startcol;
 	}
-	if (p_ic)
+	إذا (p_ic)
 	{
-	    compl_pattern.string = str_foldcase(line + compl_col,
-		    compl_length, NULL, 0);
-	    if (compl_pattern.string == NULL)
+	    compl_نمونه.string = str_foldcase(کرښه + compl_ستون,
+		    compl_اوږدتیا, عدم, 0);
+	    إذا (compl_نمونه.string == عدم)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_نمونه.اوږدتیا = 0;
+		أرجع FAIL;
 	    }
-	    compl_pattern.length = STRLEN(compl_pattern.string);
+	    compl_نمونه.اوږدتیا = STRLEN(compl_نمونه.string);
 	}
-	else
+	وإلا
 	{
-	    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	    if (compl_pattern.string == NULL)
+	    compl_نمونه.string = vim_strnsave(کرښه + compl_ستون, (size_t)compl_اوږدتیا);
+	    إذا (compl_نمونه.string == عدم)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_نمونه.اوږدتیا = 0;
+		أرجع FAIL;
 	    }
-	    compl_pattern.length = (size_t)compl_length;
+	    compl_نمونه.اوږدتیا = (size_t)compl_اوږدتیا;
 	}
     }
-    else if (compl_status_adding())
+    وإلا إذا (compl_حالت_adding())
     {
-	char_u	    *prefix = (char_u *)"\\<";
+	char_u	    *مختاړی = (char_u *)"\\<";
 	size_t	    prefixlen = STRLEN_LITERAL("\\<");
 	size_t	    n;
 
-	if (!vim_iswordp(line + compl_col)
-		|| (compl_col > 0
-		    && (vim_iswordp(mb_prevptr(line, line + compl_col)))))
+	إذا (!vim_iswordp(کرښه + compl_ستون)
+		|| (compl_ستون > 0
+		    && (vim_iswordp(mb_prevptr(کرښه, کرښه + compl_ستون)))))
 	{
-	    prefix = (char_u *)"";
+	    مختاړی = (char_u *)"";
 	    prefixlen = 0;
 	}
 
 	// we need up to 2 extra chars for the prefix
-	n = quote_meta(NULL, line + compl_col, compl_length) + prefixlen;
-	compl_pattern.string = alloc(n);
-	if (compl_pattern.string == NULL)
+	n = quote_meta(عدم, کرښه + compl_ستون, compl_اوږدتیا) + prefixlen;
+	compl_نمونه.string = alloc(n);
+	إذا (compl_نمونه.string == عدم)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_نمونه.اوږدتیا = 0;
+	    أرجع FAIL;
 	}
-	STRCPY((char *)compl_pattern.string, prefix);
-	(void)quote_meta(compl_pattern.string + prefixlen,
-		line + compl_col, compl_length);
-	compl_pattern.length = n - 1;
+	STRCPY((حرف *)compl_نمونه.string, مختاړی);
+	(فراغ)quote_meta(compl_نمونه.string + prefixlen,
+		کرښه + compl_ستون, compl_اوږدتیا);
+	compl_نمونه.اوږدتیا = n - 1;
     }
-    else if (--startcol < 0
-	    || !vim_iswordp(mb_prevptr(line, line + startcol + 1)))
+    وإلا إذا (--startcol < 0
+	    || !vim_iswordp(mb_prevptr(کرښه, کرښه + startcol + 1)))
     {
 	size_t	len = STRLEN_LITERAL("\\<\\k\\k");
 
 	// Match any word of at least two chars
-	compl_pattern.string = vim_strnsave((char_u *)"\\<\\k\\k", len);
-	if (compl_pattern.string == NULL)
+	compl_نمونه.string = vim_strnsave((char_u *)"\\<\\k\\k", len);
+	إذا (compl_نمونه.string == عدم)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_نمونه.اوږدتیا = 0;
+	    أرجع FAIL;
 	}
-	compl_pattern.length = len;
-	compl_col += curs_col;
-	compl_length = 0;
+	compl_نمونه.اوږدتیا = len;
+	compl_ستون += curs_ستون;
+	compl_اوږدتیا = 0;
 	compl_from_nonkeyword = TRUE;
     }
-    else
+    وإلا
     {
 	// Search the point of change class of multibyte character
 	// or not a word single byte character backward.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    int base_class;
-	    int head_off;
+	    صحيح بنسټ_class;
+	    صحيح سر_off;
 
-	    startcol -= (*mb_head_off)(line, line + startcol);
-	    base_class = mb_get_class(line + startcol);
-	    while (--startcol >= 0)
+	    startcol -= (*mb_سر_off)(کرښه, کرښه + startcol);
+	    بنسټ_class = mb_get_class(کرښه + startcol);
+	    طالما (--startcol >= 0)
 	    {
-		head_off = (*mb_head_off)(line, line + startcol);
-		if (base_class != mb_get_class(line + startcol
-			    - head_off))
-		    break;
-		startcol -= head_off;
+		سر_off = (*mb_سر_off)(کرښه, کرښه + startcol);
+		إذا (بنسټ_class != mb_get_class(کرښه + startcol
+			    - سر_off))
+		    اكسر;
+		startcol -= سر_off;
 	    }
 	}
-	else
+	وإلا
 	{
-	    while (--startcol >= 0 && vim_iswordc(line[startcol]))
+	    طالما (--startcol >= 0 && vim_iswordc(کرښه[startcol]))
 		;
 	}
 
-	compl_col += ++startcol;
-	compl_length = (int)curs_col - startcol;
-	if (compl_length == 1)
+	compl_ستون += ++startcol;
+	compl_اوږدتیا = (صحيح)curs_ستون - startcol;
+	إذا (compl_اوږدتیا == 1)
 	{
 	    // Only match word with at least two chars -- webb
 	    // there's no need to call quote_meta,
 	    // alloc(7) is enough  -- Acevedo
-	    compl_pattern.string = alloc(7);
-	    if (compl_pattern.string == NULL)
+	    compl_نمونه.string = alloc(7);
+	    إذا (compl_نمونه.string == عدم)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_نمونه.اوږدتیا = 0;
+		أرجع FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col, 1);
-	    STRCAT((char *)compl_pattern.string, "\\k");
-	    compl_pattern.length = STRLEN(compl_pattern.string);
+	    STRCPY((حرف *)compl_نمونه.string, "\\<");
+	    (فراغ)quote_meta(compl_نمونه.string + 2, کرښه + compl_ستون, 1);
+	    STRCAT((حرف *)compl_نمونه.string, "\\k");
+	    compl_نمونه.اوږدتیا = STRLEN(compl_نمونه.string);
 	}
-	else
+	وإلا
 	{
-	    size_t  n = quote_meta(NULL, line + compl_col, compl_length) + 2;
+	    size_t  n = quote_meta(عدم, کرښه + compl_ستون, compl_اوږدتیا) + 2;
 
-	    compl_pattern.string = alloc(n);
-	    if (compl_pattern.string == NULL)
+	    compl_نمونه.string = alloc(n);
+	    إذا (compl_نمونه.string == عدم)
 	    {
-		compl_pattern.length = 0;
-		return FAIL;
+		compl_نمونه.اوږدتیا = 0;
+		أرجع FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col,
-		    compl_length);
-	    compl_pattern.length = n - 1;
+	    STRCPY((حرف *)compl_نمونه.string, "\\<");
+	    (فراغ)quote_meta(compl_نمونه.string + 2, کرښه + compl_ستون,
+		    compl_اوږدتیا);
+	    compl_نمونه.اوږدتیا = n - 1;
 	}
     }
 
     // Call functions in 'complete' with 'findstart=1'
-    if (ctrl_x_mode_normal() && !(compl_cont_status & CONT_LOCAL))
+    إذا (ctrl_x_ډېرپېښ_نورمال() && !(compl_cont_حالت & CONT_LOCAL))
     {
 	// ^N completion, not complete() or ^X^N
-	if (setup_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
-	    return FAIL;
+	إذا (تیاری_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
+	    أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -6832,148 +6832,148 @@ get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
  * complete() function.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_wholeline_compl_info(char_u *line, colnr_T curs_col)
+    ساكن صحيح
+get_wholeline_compl_info(char_u *کرښه, colnr_T curs_ستون)
 {
-    compl_col = (colnr_T)getwhitecols(line);
-    compl_length = (int)curs_col - (int)compl_col;
-    if (compl_length < 0)	// cursor in indent: empty pattern
-	compl_length = 0;
-    if (p_ic)
+    compl_ستون = (colnr_T)getwhitecols(کرښه);
+    compl_اوږدتیا = (صحيح)curs_ستون - (صحيح)compl_ستون;
+    إذا (compl_اوږدتیا < 0)	// cursor in indent: empty pattern
+	compl_اوږدتیا = 0;
+    إذا (p_ic)
     {
-	compl_pattern.string = str_foldcase(line + compl_col, compl_length,
-		NULL, 0);
-	if (compl_pattern.string == NULL)
+	compl_نمونه.string = str_foldcase(کرښه + compl_ستون, compl_اوږدتیا,
+		عدم, 0);
+	إذا (compl_نمونه.string == عدم)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_نمونه.اوږدتیا = 0;
+	    أرجع FAIL;
 	}
-	compl_pattern.length = STRLEN(compl_pattern.string);
+	compl_نمونه.اوږدتیا = STRLEN(compl_نمونه.string);
     }
-    else
+    وإلا
     {
-	compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	if (compl_pattern.string == NULL)
+	compl_نمونه.string = vim_strnsave(کرښه + compl_ستون, (size_t)compl_اوږدتیا);
+	إذا (compl_نمونه.string == عدم)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_نمونه.اوږدتیا = 0;
+	    أرجع FAIL;
 	}
-	compl_pattern.length = (size_t)compl_length;
+	compl_نمونه.اوږدتیا = (size_t)compl_اوږدتیا;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get the pattern, column and length for filename completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_filename_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    ساكن صحيح
+get_filename_compl_info(char_u *کرښه, صحيح startcol, colnr_T curs_ستون)
 {
     // Go back to just before the first filename character.
-    if (startcol > 0)
+    إذا (startcol > 0)
     {
-	char_u	*p = line + startcol;
+	char_u	*p = کرښه + startcol;
 
-	MB_PTR_BACK(line, p);
-	while (p > line && vim_isfilec(PTR2CHAR(p)))
-	    MB_PTR_BACK(line, p);
-	if (p == line && vim_isfilec(PTR2CHAR(p)))
+	MB_PTR_شا(کرښه, p);
+	طالما (p > کرښه && vim_isfilec(PTR2CHAR(p)))
+	    MB_PTR_شا(کرښه, p);
+	إذا (p == کرښه && vim_isfilec(PTR2CHAR(p)))
 	    startcol = 0;
-	else
-	    startcol = (int)(p - line) + 1;
+	وإلا
+	    startcol = (صحيح)(p - کرښه) + 1;
     }
 
-    compl_col += startcol;
-    compl_length = (int)curs_col - startcol;
-    compl_pattern.string = addstar(line + compl_col, compl_length, EXPAND_FILES);
-    if (compl_pattern.string == NULL)
+    compl_ستون += startcol;
+    compl_اوږدتیا = (صحيح)curs_ستون - startcol;
+    compl_نمونه.string = addstar(کرښه + compl_ستون, compl_اوږدتیا, EXPAND_FILES);
+    إذا (compl_نمونه.string == عدم)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_نمونه.اوږدتیا = 0;
+	أرجع FAIL;
     }
 
-    compl_pattern.length = STRLEN(compl_pattern.string);
+    compl_نمونه.اوږدتیا = STRLEN(compl_نمونه.string);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get the pattern, column and length for command-line completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_cmdline_compl_info(char_u *line, colnr_T curs_col)
+    ساكن صحيح
+get_cmdline_compl_info(char_u *کرښه, colnr_T curs_ستون)
 {
-    compl_pattern.string = vim_strnsave(line, curs_col);
-    if (compl_pattern.string == NULL)
+    compl_نمونه.string = vim_strnsave(کرښه, curs_ستون);
+    إذا (compl_نمونه.string == عدم)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_نمونه.اوږدتیا = 0;
+	أرجع FAIL;
     }
-    compl_pattern.length = curs_col;
-    set_cmd_context(&compl_xp, compl_pattern.string,
-	    (int)compl_pattern.length, curs_col, FALSE);
-    if (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
+    compl_نمونه.اوږدتیا = curs_ستون;
+    سېټ_cmd_context(&compl_xp, compl_نمونه.string,
+	    (صحيح)compl_نمونه.اوږدتیا, curs_ستون, FALSE);
+    إذا (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
 	    || compl_xp.xp_context == EXPAND_NOTHING)
 	// No completion possible, use an empty pattern to get a
 	// "pattern not found" message.
-	compl_col = curs_col;
-    else
-	compl_col = (int)(compl_xp.xp_pattern - compl_pattern.string);
-    compl_length = curs_col - compl_col;
+	compl_ستون = curs_ستون;
+    وإلا
+	compl_ستون = (صحيح)(compl_xp.xp_نمونه - compl_نمونه.string);
+    compl_اوږدتیا = curs_ستون - compl_ستون;
 
-    return OK;
+    أرجع OK;
 }
 
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
 /*
  * Set global variables related to completion:
  * compl_col, compl_length, compl_pattern, and cpt_compl_pattern.
  */
-    static int
-set_compl_globals(
-    int		startcol UNUSED,
-    colnr_T	curs_col UNUSED,
-    int		is_cpt_compl UNUSED)
+    ساكن صحيح
+سېټ_compl_globals(
+    صحيح		startcol ناکارول_شوی,
+    colnr_T	curs_ستون ناکارول_شوی,
+    صحيح		is_cpt_compl ناکارول_شوی)
 {
-    if (is_cpt_compl)
+    إذا (is_cpt_compl)
     {
-	VIM_CLEAR_STRING(cpt_compl_pattern);
-	if (startcol < compl_col)
-	    return prepend_startcol_text(&cpt_compl_pattern, &compl_orig_text,
+	VIM_CLEAR_STRING(cpt_compl_نمونه);
+	إذا (startcol < compl_ستون)
+	    أرجع prepend_startcol_متن(&cpt_compl_نمونه, &compl_orig_متن,
 		    startcol);
-	else
+	وإلا
 	{
-	    cpt_compl_pattern.string = vim_strnsave(compl_orig_text.string,
-		    compl_orig_text.length);
-	    cpt_compl_pattern.length = compl_orig_text.length;
+	    cpt_compl_نمونه.string = vim_strnsave(compl_orig_متن.string,
+		    compl_orig_متن.اوږدتیا);
+	    cpt_compl_نمونه.اوږدتیا = compl_orig_متن.اوږدتیا;
 	}
     }
-    else
+    وإلا
     {
-	if (startcol < 0 || startcol > curs_col)
-	    startcol = curs_col;
+	إذا (startcol < 0 || startcol > curs_ستون)
+	    startcol = curs_ستون;
 
 	// Re-obtain line in case it has changed
-	char_u	*line = ml_get(curwin->w_cursor.lnum);
-	int	len = curs_col - startcol;
+	char_u	*کرښه = ml_get(curwin->w_cursor.lnum);
+	صحيح	len = curs_ستون - startcol;
 
-	compl_pattern.string = vim_strnsave(line + startcol, (size_t)len);
-	if (compl_pattern.string == NULL)
+	compl_نمونه.string = vim_strnsave(کرښه + startcol, (size_t)len);
+	إذا (compl_نمونه.string == عدم)
 	{
-	    compl_pattern.length = 0;
-	    return FAIL;
+	    compl_نمونه.اوږدتیا = 0;
+	    أرجع FAIL;
 	}
-	compl_pattern.length = (size_t)len;
-	compl_col = startcol;
-	compl_length = len;
+	compl_نمونه.اوږدتیا = (size_t)len;
+	compl_ستون = startcol;
+	compl_اوږدتیا = len;
     }
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#د_که_پای
 
 /*
  * Get the pattern, column and length for user defined completion ('omnifunc',
@@ -6983,52 +6983,52 @@ set_compl_globals(
  * option; otherwise, it is NULL.
  * "startcol", when not NULL, contains the column returned by function.
  */
-    static int
+    ساكن صحيح
 get_userdefined_compl_info(
-    colnr_T	curs_col UNUSED,
-    callback_T	*cb UNUSED,
-    int		*startcol UNUSED)
+    colnr_T	curs_ستون ناکارول_شوی,
+    callback_T	*cb ناکارول_شوی,
+    صحيح		*startcol ناکارول_شوی)
 {
-    int		ret = FAIL;
+    صحيح		ret = FAIL;
 
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
     // Call user defined function 'completefunc' with "a:findstart"
     // set to 1 to obtain the length of text to use for completion.
-    typval_T	args[3];
-    int		col;
-    char_u	*funcname = NULL;
+    typval_T	دلیلونه[3];
+    صحيح		ستون;
+    char_u	*funcname = عدم;
     pos_T	pos;
-    int		save_State = State;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
-			    && was_set_insecurely(curwin,
+    صحيح		save_State = State;
+    صحيح		is_cpt_function = (cb != عدم);
+    صحيح		use_sandbox = is_cpt_function
+			    && was_سېټ_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    إذا (!is_cpt_function)
     {
 	// Call 'completefunc' or 'omnifunc' or 'thesaurusfunc' and get pattern
 	// length as a string
-	funcname = get_complete_funcname(ctrl_x_mode);
-	if (*funcname == NUL)
+	funcname = get_complete_funcname(ctrl_x_ډېرپېښ);
+	إذا (*funcname == NUL)
 	{
-	    semsg(_(e_option_str_is_not_set), ctrl_x_mode_function()
+	    semsg(_(e_option_str_is_not_سېټ), ctrl_x_ډېرپېښ_function()
 		    ? "completefunc" : "omnifunc");
-	    return FAIL;
+	    أرجع FAIL;
 	}
-	cb = get_insert_callback(ctrl_x_mode);
+	cb = get_ورننباسه_callback(ctrl_x_ډېرپېښ);
     }
 
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 1;
-    args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = (char_u *)"";
-    args[2].v_type = VAR_UNKNOWN;
+    دلیلونه[0].v_type = VAR_شمېره;
+    دلیلونه[0].vval.v_شمېره = 1;
+    دلیلونه[1].v_type = VAR_STRING;
+    دلیلونه[1].vval.v_string = (char_u *)"";
+    دلیلونه[2].v_type = VAR_UNKNOWN;
     pos = curwin->w_cursor;
     ++textlock;
-    if (use_sandbox)
+    إذا (use_sandbox)
 	++sandbox;
-    col = call_callback_retnr(cb, 2, args);
-    if (use_sandbox)
+    ستون = call_callback_retnr(cb, 2, دلیلونه);
+    إذا (use_sandbox)
 	--sandbox;
     --textlock;
 
@@ -7036,42 +7036,42 @@ get_userdefined_compl_info(
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    إذا (!EQUAL_POS(curwin->w_cursor, pos))
     {
-	emsg(_(e_complete_function_deleted_text));
-	return FAIL;
+	emsg(_(e_complete_function_deleted_متن));
+	أرجع FAIL;
     }
 
-    if (startcol != NULL)
-	*startcol = col;
+    إذا (startcol != عدم)
+	*startcol = ستون;
 
     // Return value -2 means the user complete function wants to cancel the
     // complete without an error, do the same if the function did not execute
     // successfully.
-    if (col == -2 || aborting())
-	return FAIL;
+    إذا (ستون == -2 || aborting())
+	أرجع FAIL;
 
     // Return value -3 does the same as -2 and leaves CTRL-X mode.
-    if (col == -3)
+    إذا (ستون == -3)
     {
-	if (is_cpt_function)
-	    return FAIL;
-	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	if (!shortmess(SHM_COMPLETIONMENU))
-	    msg_clr_cmdline();
-	return FAIL;
+	إذا (is_cpt_function)
+	    أرجع FAIL;
+	ctrl_x_ډېرپېښ = CTRL_X_نورمال;
+	edit_submode = عدم;
+	إذا (!shortmess(SHM_COMPLETIONMENU))
+	    پیغام_clr_cmdline();
+	أرجع FAIL;
     }
 
     // Reset extended parameters of completion, when starting new
     // completion.
     compl_opt_refresh_always = FALSE;
-    compl_opt_suppress_empty = FALSE;
+    compl_opt_suppress_تشه = FALSE;
 
-    ret = !is_cpt_function ? set_compl_globals(col, curs_col, FALSE) : OK;
-#endif
+    ret = !is_cpt_function ? سېټ_compl_globals(ستون, curs_ستون, FALSE) : OK;
+#د_که_پای
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -7079,42 +7079,42 @@ get_userdefined_compl_info(
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variable: spell_bad_len
  */
-    static int
-get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
+    ساكن صحيح
+get_spell_compl_info(صحيح startcol ناکارول_شوی, colnr_T curs_ستون ناکارول_شوی)
 {
-    int		ret = FAIL;
-#ifdef FEAT_SPELL
-    char_u	*line = NULL;
+    صحيح		ret = FAIL;
+#که_تعریف_شوی FEAT_SPELL
+    char_u	*کرښه = عدم;
 
-    if (spell_bad_len > 0)
-	compl_col = curs_col - spell_bad_len;
-    else
-	compl_col = spell_word_start(startcol);
+    إذا (spell_bad_len > 0)
+	compl_ستون = curs_ستون - spell_bad_len;
+    وإلا
+	compl_ستون = spell_کلمه_پیل(startcol);
 
-    if (compl_col >= (colnr_T)startcol)
+    إذا (compl_ستون >= (colnr_T)startcol)
     {
-	compl_length = 0;
-	compl_col = curs_col;
+	compl_اوږدتیا = 0;
+	compl_ستون = curs_ستون;
     }
-    else
+    وإلا
     {
-	spell_expand_check_cap(compl_col);
-	compl_length = (int)curs_col - compl_col;
+	spell_expand_check_cap(compl_ستون);
+	compl_اوږدتیا = (صحيح)curs_ستون - compl_ستون;
     }
     // Need to obtain "line" again, it may have become invalid.
-    line = ml_get(curwin->w_cursor.lnum);
-    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (compl_pattern.string == NULL)
+    کرښه = ml_get(curwin->w_cursor.lnum);
+    compl_نمونه.string = vim_strnsave(کرښه + compl_ستون, (size_t)compl_اوږدتیا);
+    إذا (compl_نمونه.string == عدم)
     {
-	compl_pattern.length = 0;
-	return FAIL;
+	compl_نمونه.اوږدتیا = 0;
+	أرجع FAIL;
     }
 
-    compl_pattern.length = (size_t)compl_length;
+    compl_نمونه.اوږدتیا = (size_t)compl_اوږدتیا;
     ret = OK;
-#endif
+#د_که_پای
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -7125,49 +7125,49 @@ get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
  * become invalid and needs to be fetched again.
  * Returns OK on success.
  */
-    static int
-compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
+    ساكن صحيح
+compl_get_info(char_u *کرښه, صحيح startcol, colnr_T curs_ستون, صحيح *کرښه_invalid)
 {
-    if (ctrl_x_mode_normal() || ctrl_x_mode_register()
-	    || (ctrl_x_mode & CTRL_X_WANT_IDENT
-		&& !thesaurus_func_complete(ctrl_x_mode)))
+    إذا (ctrl_x_ډېرپېښ_نورمال() || ctrl_x_ډېرپېښ_ثبتوونکی()
+	    || (ctrl_x_ډېرپېښ & CTRL_X_WANT_IDENT
+		&& !thesaurus_func_complete(ctrl_x_ډېرپېښ)))
     {
-	if (get_normal_compl_info(line, startcol, curs_col) != OK)
-	    return FAIL;
-	*line_invalid = TRUE; // 'cpt' func may have invalidated "line"
+	إذا (get_نورمال_compl_info(کرښه, startcol, curs_ستون) != OK)
+	    أرجع FAIL;
+	*کرښه_invalid = TRUE; // 'cpt' func may have invalidated "line"
     }
-    else if (ctrl_x_mode_line_or_eval())
+    وإلا إذا (ctrl_x_ډېرپېښ_کرښه_or_eval())
     {
-	return get_wholeline_compl_info(line, curs_col);
+	أرجع get_wholeline_compl_info(کرښه, curs_ستون);
     }
-    else if (ctrl_x_mode_files())
+    وإلا إذا (ctrl_x_ډېرپېښ_files())
     {
-	return get_filename_compl_info(line, startcol, curs_col);
+	أرجع get_filename_compl_info(کرښه, startcol, curs_ستون);
     }
-    else if (ctrl_x_mode == CTRL_X_CMDLINE)
+    وإلا إذا (ctrl_x_ډېرپېښ == CTRL_X_CMDLINE)
     {
-	return get_cmdline_compl_info(line, curs_col);
+	أرجع get_cmdline_compl_info(کرښه, curs_ستون);
     }
-    else if (ctrl_x_mode_function() || ctrl_x_mode_omni()
-	    || thesaurus_func_complete(ctrl_x_mode))
+    وإلا إذا (ctrl_x_ډېرپېښ_function() || ctrl_x_ډېرپېښ_omni()
+	    || thesaurus_func_complete(ctrl_x_ډېرپېښ))
     {
-	if (get_userdefined_compl_info(curs_col, NULL, NULL) != OK)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	إذا (get_userdefined_compl_info(curs_ستون, عدم, عدم) != OK)
+	    أرجع FAIL;
+	*کرښه_invalid = TRUE;	// "line" may have become invalid
     }
-    else if (ctrl_x_mode_spell())
+    وإلا إذا (ctrl_x_ډېرپېښ_spell())
     {
-	if (get_spell_compl_info(startcol, curs_col) == FAIL)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	إذا (get_spell_compl_info(startcol, curs_ستون) == FAIL)
+	    أرجع FAIL;
+	*کرښه_invalid = TRUE;	// "line" may have become invalid
     }
-    else
+    وإلا
     {
-	internal_error("ins_complete()");
-	return FAIL;
+	دننی_error("ins_complete()");
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -7180,274 +7180,274 @@ compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
  * was longer than 'tw').  if SOL is set then skip the previous pattern, a word
  * at the beginning of the line has been inserted, we'll look for that.
  */
-    static void
-ins_compl_continue_search(char_u *line)
+    ساكن فراغ
+ins_compl_continue_پلټنه(char_u *کرښه)
 {
     // it is a continued search
-    compl_cont_status &= ~CONT_INTRPT;	// remove INTRPT
-    if (ctrl_x_mode_normal() || ctrl_x_mode_path_patterns()
-						|| ctrl_x_mode_path_defines())
+    compl_cont_حالت &= ~CONT_INTRPT;	// remove INTRPT
+    إذا (ctrl_x_ډېرپېښ_نورمال() || ctrl_x_ډېرپېښ_لار_patterns()
+						|| ctrl_x_ډېرپېښ_لار_تعریفوي())
     {
-	if (compl_startpos.lnum != curwin->w_cursor.lnum)
+	إذا (compl_startpos.lnum != curwin->w_cursor.lnum)
 	{
 	    // line (probably) wrapped, set compl_startpos to the
 	    // first non_blank in the line, if it is not a wordchar
 	    // include it to get a better pattern, but then we don't
 	    // want the "\\<" prefix, check it below
-	    compl_col = (colnr_T)getwhitecols(line);
-	    compl_startpos.col = compl_col;
+	    compl_ستون = (colnr_T)getwhitecols(کرښه);
+	    compl_startpos.ستون = compl_ستون;
 	    compl_startpos.lnum = curwin->w_cursor.lnum;
-	    compl_cont_status &= ~CONT_SOL;   // clear SOL if present
+	    compl_cont_حالت &= ~CONT_SOL;   // clear SOL if present
 	}
-	else
+	وإلا
 	{
 	    // S_IPOS was set when we inserted a word that was at the
 	    // beginning of the line, which means that we'll go to SOL
 	    // mode but first we need to redefine compl_startpos
-	    if (compl_cont_status & CONT_S_IPOS)
+	    إذا (compl_cont_حالت & CONT_S_IPOS)
 	    {
-		compl_cont_status |= CONT_SOL;
-		compl_startpos.col = (colnr_T)(skipwhite(
-			    line + compl_length
-			    + compl_startpos.col) - line);
+		compl_cont_حالت |= CONT_SOL;
+		compl_startpos.ستون = (colnr_T)(skipwhite(
+			    کرښه + compl_اوږدتیا
+			    + compl_startpos.ستون) - کرښه);
 	    }
-	    compl_col = compl_startpos.col;
+	    compl_ستون = compl_startpos.ستون;
 	}
-	compl_length = curwin->w_cursor.col - (int)compl_col;
+	compl_اوږدتیا = curwin->w_cursor.ستون - (صحيح)compl_ستون;
 	// IObuff is used to add a "word from the next line" would we
 	// have enough space?  just being paranoid
-#define	MIN_SPACE 75
-	if (compl_length > (IOSIZE - MIN_SPACE))
+#تعریف_کړه	MIN_SPACE 75
+	إذا (compl_اوږدتیا > (IOSIZE - MIN_SPACE))
 	{
-	    compl_cont_status &= ~CONT_SOL;
-	    compl_length = (IOSIZE - MIN_SPACE);
-	    compl_col = curwin->w_cursor.col - compl_length;
+	    compl_cont_حالت &= ~CONT_SOL;
+	    compl_اوږدتیا = (IOSIZE - MIN_SPACE);
+	    compl_ستون = curwin->w_cursor.ستون - compl_اوږدتیا;
 	}
-	compl_cont_status |= CONT_ADDING | CONT_N_ADDS;
-	if (compl_length < 1)
-	    compl_cont_status &= CONT_LOCAL;
+	compl_cont_حالت |= CONT_ADDING | CONT_N_ADDS;
+	إذا (compl_اوږدتیا < 1)
+	    compl_cont_حالت &= CONT_LOCAL;
     }
-    else if (ctrl_x_mode_line_or_eval() || ctrl_x_mode_register())
-	compl_cont_status = CONT_ADDING | CONT_N_ADDS;
-    else
-	compl_cont_status = 0;
+    وإلا إذا (ctrl_x_ډېرپېښ_کرښه_or_eval() || ctrl_x_ډېرپېښ_ثبتوونکی())
+	compl_cont_حالت = CONT_ADDING | CONT_N_ADDS;
+    وإلا
+	compl_cont_حالت = 0;
 }
 
 /*
  * start insert mode completion
  */
-    static int
-ins_compl_start(void)
+    ساكن صحيح
+ins_compl_پیل(فراغ)
 {
-    char_u	*line = NULL;
-    int		startcol = 0;	    // column where searched text starts
-    colnr_T	curs_col;	    // cursor column
-    int		line_invalid = FALSE;
-    int		save_did_ai = did_ai;
-    int		flags = CP_ORIGINAL_TEXT;
+    char_u	*کرښه = عدم;
+    صحيح		startcol = 0;	    // column where searched text starts
+    colnr_T	curs_ستون;	    // cursor column
+    صحيح		کرښه_invalid = FALSE;
+    صحيح		save_did_ai = did_ai;
+    صحيح		flags = CP_ORIGINAL_متن;
 
     // First time we hit ^N or ^P (in a row, I mean)
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
-    can_si_back = FALSE;
-    if (stop_arrow() == FAIL)
+    can_si_شا = FALSE;
+    إذا (stop_arrow() == FAIL)
     {
 	did_ai = save_did_ai;
-	return FAIL;
+	أرجع FAIL;
     }
 
-    line = ml_get(curwin->w_cursor.lnum);
-    curs_col = curwin->w_cursor.col;
+    کرښه = ml_get(curwin->w_cursor.lnum);
+    curs_ستون = curwin->w_cursor.ستون;
     compl_pending = 0;
     compl_lnum = curwin->w_cursor.lnum;
 
-    if ((compl_cont_status & CONT_INTRPT) == CONT_INTRPT
-	    && compl_cont_mode == ctrl_x_mode)
+    إذا ((compl_cont_حالت & CONT_INTRPT) == CONT_INTRPT
+	    && compl_cont_ډېرپېښ == ctrl_x_ډېرپېښ)
 	// this same ctrl-x_mode was interrupted previously. Continue the
 	// completion.
-	ins_compl_continue_search(line);
-    else
-	compl_cont_status &= CONT_LOCAL;
+	ins_compl_continue_پلټنه(کرښه);
+    وإلا
+	compl_cont_حالت &= CONT_LOCAL;
 
-    if (!compl_status_adding())	// normal expansion
+    إذا (!compl_حالت_adding())	// normal expansion
     {
-	compl_cont_mode = ctrl_x_mode;
-	if (ctrl_x_mode_not_default())
+	compl_cont_ډېرپېښ = ctrl_x_ډېرپېښ;
+	إذا (ctrl_x_ډېرپېښ_not_default())
 	    // Remove LOCAL if ctrl_x_mode != CTRL_X_NORMAL
-	    compl_cont_status = 0;
-	compl_cont_status |= CONT_N_ADDS;
+	    compl_cont_حالت = 0;
+	compl_cont_حالت |= CONT_N_ADDS;
 	compl_startpos = curwin->w_cursor;
-	startcol = (int)curs_col;
-	compl_col = 0;
+	startcol = (صحيح)curs_ستون;
+	compl_ستون = 0;
     }
 
     // Work out completion pattern and original text -- webb
-    if (compl_get_info(line, startcol, curs_col, &line_invalid) == FAIL)
+    إذا (compl_get_info(کرښه, startcol, curs_ستون, &کرښه_invalid) == FAIL)
     {
-	if (ctrl_x_mode_function() || ctrl_x_mode_omni()
-				|| thesaurus_func_complete(ctrl_x_mode))
+	إذا (ctrl_x_ډېرپېښ_function() || ctrl_x_ډېرپېښ_omni()
+				|| thesaurus_func_complete(ctrl_x_ډېرپېښ))
 	    // restore did_ai, so that adding comment leader works
 	    did_ai = save_did_ai;
-	return FAIL;
+	أرجع FAIL;
     }
     // If "line" was changed while getting completion info get it again.
-    if (line_invalid)
-	line = ml_get(curwin->w_cursor.lnum);
+    إذا (کرښه_invalid)
+	کرښه = ml_get(curwin->w_cursor.lnum);
 
-    if (compl_status_adding())
+    إذا (compl_حالت_adding())
     {
-	if (!shortmess(SHM_COMPLETIONMENU))
+	إذا (!shortmess(SHM_COMPLETIONMENU))
 	    edit_submode_pre = (char_u *)_(" Adding");
-	if (ctrl_x_mode_line_or_eval())
+	إذا (ctrl_x_ډېرپېښ_کرښه_or_eval())
 	{
 	    // Insert a new line, keep indentation but ignore 'comments'.
 	    char_u *old = curbuf->b_p_com;
 
 	    curbuf->b_p_com = (char_u *)"";
 	    compl_startpos.lnum = curwin->w_cursor.lnum;
-	    compl_startpos.col = compl_col;
+	    compl_startpos.ستون = compl_ستون;
 	    ins_eol('\r');
 	    curbuf->b_p_com = old;
-	    compl_length = 0;
-	    compl_col = curwin->w_cursor.col;
+	    compl_اوږدتیا = 0;
+	    compl_ستون = curwin->w_cursor.ستون;
 	    compl_lnum = curwin->w_cursor.lnum;
 	}
     }
-    else
+    وإلا
     {
-	edit_submode_pre = NULL;
-	compl_startpos.col = compl_col;
+	edit_submode_pre = عدم;
+	compl_startpos.ستون = compl_ستون;
     }
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    إذا (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
-	if (compl_cont_status & CONT_LOCAL)
-	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_MSG]);
-	else
-	    edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
+	إذا (compl_cont_حالت & CONT_LOCAL)
+	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_پیغام]);
+	وإلا
+	    edit_submode = (char_u *)_(CTRL_X_پیغام(ctrl_x_ډېرپېښ));
     }
 
     // If any of the original typed text has been changed we need to fix
     // the redo buffer.
-    ins_compl_fixRedoBufForLeader(NULL);
+    ins_compl_fixRedoBufForLeader(عدم);
 
     // Always add completion for the original text.
-    VIM_CLEAR_STRING(compl_orig_text);
-    compl_orig_text.length = (size_t)compl_length;
-    compl_orig_text.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (p_ic)
+    VIM_CLEAR_STRING(compl_orig_متن);
+    compl_orig_متن.اوږدتیا = (size_t)compl_اوږدتیا;
+    compl_orig_متن.string = vim_strnsave(کرښه + compl_ستون, (size_t)compl_اوږدتیا);
+    إذا (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL
-	    || ins_compl_add(compl_orig_text.string,
-		(int)compl_orig_text.length,
-		NULL, NULL, NULL, 0, flags, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
+    إذا (compl_orig_متن.string == عدم
+	    || ins_compl_جمع_کړه(compl_orig_متن.string,
+		(صحيح)compl_orig_متن.اوږدتیا,
+		عدم, عدم, عدم, 0, flags, FALSE, عدم, FUZZY_SCORE_NONE) != OK)
     {
-	VIM_CLEAR_STRING(compl_pattern);
-	VIM_CLEAR_STRING(compl_orig_text);
+	VIM_CLEAR_STRING(compl_نمونه);
+	VIM_CLEAR_STRING(compl_orig_متن);
 	did_ai = save_did_ai;
-	return FAIL;
+	أرجع FAIL;
     }
 
     // showmode might reset the internal line pointers, so it must
     // be called before line = ml_get(), or when this address is no
     // longer needed.  -- Acevedo.
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    إذا (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
 	edit_submode_extra = (char_u *)_("-- Searching...");
-	edit_submode_highl = HLF_COUNT;
+	edit_submode_highl = HLF_شمېر;
 	showmode();
-	edit_submode_extra = NULL;
-	out_flush();
+	edit_submode_extra = عدم;
+	بهر_flush();
     }
 
     did_ai = save_did_ai;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * display the completion status message
  */
-    static void
-ins_compl_show_statusmsg(void)
+    ساكن فراغ
+ins_compl_show_statusmsg(فراغ)
 {
     // we found no match if the list has only the "compl_orig_text"-entry
-    if (is_first_match(compl_first_match->cp_next))
+    إذا (is_لومړی_سمون(compl_لومړی_سمون->cp_بل))
     {
-	edit_submode_extra = compl_status_adding() && compl_length > 1
+	edit_submode_extra = compl_حالت_adding() && compl_اوږدتیا > 1
 				? (char_u *)_("Hit end of paragraph")
 				: (char_u *)_("Pattern not found");
 	edit_submode_highl = HLF_E;
     }
 
-    if (edit_submode_extra == NULL)
+    إذا (edit_submode_extra == عدم)
     {
-	if (match_at_original_text(compl_curr_match))
+	إذا (سمون_at_original_متن(compl_curr_سمون))
 	{
 	    edit_submode_extra = (char_u *)_("Back at original");
 	    edit_submode_highl = HLF_W;
 	}
-	else if (compl_cont_status & CONT_S_IPOS)
+	وإلا إذا (compl_cont_حالت & CONT_S_IPOS)
 	{
 	    edit_submode_extra = (char_u *)_("Word from other line");
-	    edit_submode_highl = HLF_COUNT;
+	    edit_submode_highl = HLF_شمېر;
 	}
-	else if (compl_curr_match->cp_next == compl_curr_match->cp_prev)
+	وإلا إذا (compl_curr_سمون->cp_بل == compl_curr_سمون->cp_prev)
 	{
 	    edit_submode_extra = (char_u *)_("The only match");
-	    edit_submode_highl = HLF_COUNT;
-	    compl_curr_match->cp_number = 1;
+	    edit_submode_highl = HLF_شمېر;
+	    compl_curr_سمون->cp_شمېره = 1;
 	}
-	else
+	وإلا
 	{
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#إذا defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 	    // Update completion sequence number when needed.
-	    if (compl_curr_match->cp_number == -1)
+	    إذا (compl_curr_سمون->cp_شمېره == -1)
 		ins_compl_update_sequence_numbers();
-#endif
+#د_که_پای
 	    // The match should always have a sequence number now, this is
 	    // just a safety check.
-	    if (compl_curr_match->cp_number != -1)
+	    إذا (compl_curr_سمون->cp_شمېره != -1)
 	    {
 		// Space for 10 text chars. + 2x10-digit no.s = 31.
 		// Translations may need more than twice that.
-		static char_u match_ref[81];
+		ساكن char_u سمون_ref[81];
 
-		if (compl_matches > 0)
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+		إذا (compl_matches > 0)
+		    vim_snprintf((حرف *)سمون_ref, حجم(سمون_ref),
 			    _("match %d of %d"),
-			    compl_curr_match->cp_number, compl_matches);
-		else
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+			    compl_curr_سمون->cp_شمېره, compl_matches);
+		وإلا
+		    vim_snprintf((حرف *)سمون_ref, حجم(سمون_ref),
 			    _("match %d"),
-			    compl_curr_match->cp_number);
-		edit_submode_extra = match_ref;
+			    compl_curr_سمون->cp_شمېره);
+		edit_submode_extra = سمون_ref;
 		edit_submode_highl = HLF_R;
-		if (dollar_vcol >= 0)
+		إذا (dollar_vcol >= 0)
 		    curs_columns(FALSE);
 	    }
 	}
     }
 
     // Show a message about what (completion) mode we're in.
-    if (!compl_opt_suppress_empty)
+    إذا (!compl_opt_suppress_تشه)
     {
 	showmode();
-	if (!shortmess(SHM_COMPLETIONMENU))
+	إذا (!shortmess(SHM_COMPLETIONMENU))
 	{
-	    if (edit_submode_extra != NULL)
+	    إذا (edit_submode_extra != عدم)
 	    {
-		if (!p_smd)
+		إذا (!p_smd)
 		{
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)edit_submode_extra,
-			    edit_submode_highl < HLF_COUNT
+		    پیغام_hist_off = TRUE;
+		    پیغام_attr((حرف *)edit_submode_extra,
+			    edit_submode_highl < HLF_شمېر
 			    ? HL_ATTR(edit_submode_highl) : 0);
-		    msg_hist_off = FALSE;
+		    پیغام_hist_off = FALSE;
 		}
 	    }
-	    else
-		msg_clr_cmdline();	// necessary for "noshowmode"
+	    وإلا
+		پیغام_clr_cmdline();	// necessary for "noshowmode"
 	}
     }
 }
@@ -7457,111 +7457,111 @@ ins_compl_show_statusmsg(void)
  * Called when character "c" was typed, which has a meaning for completion.
  * Returns OK if completion was done, FAIL if something failed (out of mem).
  */
-    int
-ins_complete(int c, int enable_pum)
+    صحيح
+ins_complete(صحيح c, صحيح enable_pum)
 {
-    int		n;
-    int		save_w_wrow;
-    int		save_w_leftcol;
-    int		insert_match;
-    int		no_matches_found;
+    صحيح		n;
+    صحيح		save_w_wrow;
+    صحيح		save_w_leftcol;
+    صحيح		ورننباسه_سمون;
+    صحيح		no_matches_وموندل;
 
     compl_direction = ins_compl_key2dir(c);
-    insert_match = ins_compl_use_match(c);
+    ورننباسه_سمون = ins_compl_use_سمون(c);
 
-    if (!compl_started)
+    إذا (!compl_started)
     {
 	// Only what the automatic trigger armed counts as started by Vim.
 	compl_autostarted = compl_autostart_pending;
 	compl_autostart_pending = false;
-	if (ins_compl_start() == FAIL)
-	    return FAIL;
+	إذا (ins_compl_پیل() == FAIL)
+	    أرجع FAIL;
     }
-    else if (insert_match && stop_arrow() == FAIL)
-	return FAIL;
+    وإلا إذا (ورننباسه_سمون && stop_arrow() == FAIL)
+	أرجع FAIL;
 
     compl_curr_win = curwin;
-    compl_curr_buf = curwin->w_buffer;
-    compl_shown_match = compl_curr_match;
+    compl_curr_buf = curwin->w_بفر;
+    compl_shown_سمون = compl_curr_سمون;
     compl_shows_dir = compl_direction;
-    compl_num_bests = 0;
+    compl_عدد_bests = 0;
 
     // Find next match (and following matches).
     save_w_wrow = curwin->w_wrow;
     save_w_leftcol = curwin->w_leftcol;
-    n = ins_compl_next(TRUE, ins_compl_key2count(c), insert_match);
+    n = ins_compl_بل(TRUE, ins_compl_key2count(c), ورننباسه_سمون);
 
     // Reset autocompletion timer expiry flag
-    if (compl_autocomplete)
-	compl_time_slice_expired = FALSE;
+    إذا (compl_autocomplete)
+	compl_وخت_ټوټه_expired = FALSE;
 
     // may undisplay the popup menu
     ins_compl_upd_pum();
 
-    if (n > 1)		// all matches have been found
+    إذا (n > 1)		// all matches have been found
 	compl_matches = n;
-    compl_curr_match = compl_shown_match;
+    compl_curr_سمون = compl_shown_سمون;
     compl_direction = compl_shows_dir;
 
     // Eat the ESC that vgetc() returns after a CTRL-C to avoid leaving Insert
     // mode.
-    if (got_int && !global_busy)
+    إذا (got_int && !global_busy)
     {
-	(void)vgetc();
+	(فراغ)vgetc();
 	got_int = FALSE;
     }
 
     // we found no match if the list has only the "compl_orig_text"-entry
-    no_matches_found = is_first_match(compl_first_match->cp_next);
-    if (no_matches_found)
+    no_matches_وموندل = is_لومړی_سمون(compl_لومړی_سمون->cp_بل);
+    إذا (no_matches_وموندل)
     {
 	// remove N_ADDS flag, so next ^X<> won't try to go to ADDING mode,
 	// because we couldn't expand anything at first place, but if we used
 	// ^P, ^N, ^X^I or ^X^D we might want to add-expand a single-char-word
 	// (such as M in M'exico) if not tried already.  -- Acevedo
-	if (compl_length > 1
-		|| compl_status_adding()
-		|| (ctrl_x_mode_not_default()
-		    && !ctrl_x_mode_path_patterns()
-		    && !ctrl_x_mode_path_defines()))
-	    compl_cont_status &= ~CONT_N_ADDS;
+	إذا (compl_اوږدتیا > 1
+		|| compl_حالت_adding()
+		|| (ctrl_x_ډېرپېښ_not_default()
+		    && !ctrl_x_ډېرپېښ_لار_patterns()
+		    && !ctrl_x_ډېرپېښ_لار_تعریفوي()))
+	    compl_cont_حالت &= ~CONT_N_ADDS;
     }
 
-    if (compl_curr_match->cp_flags & CP_CONT_S_IPOS)
-	compl_cont_status |= CONT_S_IPOS;
-    else
-	compl_cont_status &= ~CONT_S_IPOS;
+    إذا (compl_curr_سمون->cp_flags & CP_CONT_S_IPOS)
+	compl_cont_حالت |= CONT_S_IPOS;
+    وإلا
+	compl_cont_حالت &= ~CONT_S_IPOS;
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    إذا (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
 	ins_compl_show_statusmsg();
 
     // Show the popup menu, unless we got interrupted.
-    if (enable_pum && !compl_interrupted)
+    إذا (enable_pum && !compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     compl_was_interrupted = compl_interrupted;
     compl_interrupted = FALSE;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Enable autocompletion
  */
-    void
-ins_compl_enable_autocomplete(void)
+    فراغ
+ins_compl_enable_autocomplete(فراغ)
 {
-#ifdef ELAPSED_FUNC
+#که_تعریف_شوی ELAPSED_FUNC
     compl_autocomplete = TRUE;
     compl_get_longest = FALSE;
-#endif
+#د_که_پای
 }
 
 /*
  * Disable autocompletion
  */
-    void
-ins_compl_disable_autocomplete(void)
+    فراغ
+ins_compl_disable_autocomplete(فراغ)
 {
     compl_autocomplete = FALSE;
 }
@@ -7570,8 +7570,8 @@ ins_compl_disable_autocomplete(void)
  * Remember that Vim is about to start a completion by itself, rather than
  * because a key was typed to ask for one.
  */
-    void
-ins_compl_arm_autostart(void)
+    فراغ
+ins_compl_arm_autostart(فراغ)
 {
     compl_autostart_pending = true;
 }
@@ -7579,8 +7579,8 @@ ins_compl_arm_autostart(void)
 /*
  * Forget what the automatic trigger armed, another key was typed since.
  */
-    void
-ins_compl_disarm_autostart(void)
+    فراغ
+ins_compl_disarm_autostart(فراغ)
 {
     compl_autostart_pending = false;
 }
@@ -7590,24 +7590,24 @@ ins_compl_disarm_autostart(void)
  * Return true when the popup should be deferred, false to trigger it now.
  */
     bool
-ins_compl_arm_autocomplete_delay(void)
+ins_compl_arm_autocomplete_delay(فراغ)
 {
-#ifdef ELAPSED_FUNC
-    if (p_acl > 0)
+#که_تعریف_شوی ELAPSED_FUNC
+    إذا (p_acl > 0)
     {
-	ELAPSED_INIT(compl_autocomplete_start_tv);
+	ELAPSED_INIT(compl_autocomplete_پیل_tv);
 	compl_autocomplete_pending = true;
-	return true;
+	أرجع true;
     }
-#endif
-    return false;
+#د_که_پای
+    أرجع false;
 }
 
 /*
  * Clear the pending 'autocompletedelay' state.
  */
-    void
-ins_compl_clear_autocomplete_delay(void)
+    فراغ
+ins_compl_clear_autocomplete_delay(فراغ)
 {
     compl_autocomplete_pending = false;
 }
@@ -7616,38 +7616,38 @@ ins_compl_clear_autocomplete_delay(void)
  * Return true while waiting for 'autocompletedelay' to expire.
  */
     bool
-ins_compl_autocomplete_pending(void)
+ins_compl_autocomplete_pending(فراغ)
 {
-    return compl_autocomplete_pending;
+    أرجع compl_autocomplete_pending;
 }
 
 /*
  * Return the time in msec since the 'autocompletedelay' was armed.
  */
-    long
-ins_compl_autocomplete_elapsed(void)
+    اوږد
+ins_compl_autocomplete_elapsed(فراغ)
 {
-#ifdef ELAPSED_FUNC
-    return ELAPSED_FUNC(compl_autocomplete_start_tv);
-#else
-    return 0;
-#endif
+#که_تعریف_شوی ELAPSED_FUNC
+    أرجع ELAPSED_FUNC(compl_autocomplete_پیل_tv);
+#وإلا
+    أرجع 0;
+#د_که_پای
 }
 
 /*
  * Remove (if needed) and show the popup menu
  */
-    static void
-show_pum(int prev_w_wrow, int prev_w_leftcol)
+    ساكن فراغ
+show_pum(صحيح prev_w_wrow, صحيح prev_w_leftcol)
 {
     // RedrawingDisabled may be set when invoked through complete().
-    int save_RedrawingDisabled = RedrawingDisabled;
+    صحيح save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
     // If the cursor moved or the display scrolled we need to remove the pum
     // first.
     setcursor();
-    if (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
+    إذا (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
 	ins_compl_del_pum();
 
     ins_compl_show_pum();
@@ -7662,357 +7662,357 @@ show_pum(int prev_w_wrow, int prev_w_leftcol)
  * a backslash) the metachars, and dest would be NUL terminated.
  * Returns the length (needed) of dest
  */
-    static unsigned
-quote_meta(char_u *dest, char_u *src, int len)
+    ساكن بینښه
+quote_meta(char_u *dest, char_u *src, صحيح len)
 {
-    unsigned	m = (unsigned)len + 1;  // one extra for the NUL
+    بینښه	m = (بینښه)len + 1;  // one extra for the NUL
 
-    for ( ; --len >= 0; src++)
+    لكل ( ; --len >= 0; src++)
     {
-	switch (*src)
+	بدل (*src)
 	{
-	    case '.':
-	    case '*':
-	    case '[':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    حالة '.':
+	    حالة '*':
+	    حالة '[':
+		إذا (ctrl_x_ډېرپېښ_dictionary() || ctrl_x_ډېرپېښ_thesaurus())
+		    اكسر;
 		// FALLTHROUGH
-	    case '~':
-		if (!magic_isset())	// quote these only if magic is set
-		    break;
+	    حالة '~':
+		إذا (!magic_isset())	// quote these only if magic is set
+		    اكسر;
 		// FALLTHROUGH
-	    case '\\':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    حالة '\\':
+		إذا (ctrl_x_ډېرپېښ_dictionary() || ctrl_x_ډېرپېښ_thesaurus())
+		    اكسر;
 		// FALLTHROUGH
-	    case '^':		// currently it's not needed.
-	    case '$':
+	    حالة '^':		// currently it's not needed.
+	    حالة '$':
 		m++;
-		if (dest != NULL)
+		إذا (dest != عدم)
 		    *dest++ = '\\';
-		break;
+		اكسر;
 	}
-	if (dest != NULL)
+	إذا (dest != عدم)
 	    *dest++ = *src;
 	// Copy remaining bytes of a multibyte character.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(src) - 1;
-	    if (mb_len > 0 && len >= mb_len)
-		for (int i = 0; i < mb_len; ++i)
+	    صحيح mb_len = (*mb_ptr2len)(src) - 1;
+	    إذا (mb_len > 0 && len >= mb_len)
+		لكل (صحيح i = 0; i < mb_len; ++i)
 		{
 		    --len;
 		    ++src;
-		    if (dest != NULL)
+		    إذا (dest != عدم)
 			*dest++ = *src;
 		}
 	}
     }
-    if (dest != NULL)
+    إذا (dest != عدم)
 	*dest = NUL;
 
-    return m;
+    أرجع m;
 }
 
-#if defined(EXITFREE)
-    void
-free_insexpand_stuff(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_insexpand_stuff(فراغ)
 {
-    VIM_CLEAR_STRING(compl_orig_text);
+    VIM_CLEAR_STRING(compl_orig_متن);
 # ifdef FEAT_EVAL
     free_callback(&cfu_cb);
     free_callback(&ofu_cb);
     free_callback(&tsrfu_cb);
-    clear_cpt_callbacks(&cpt_cb, cpt_cb_count);
+    clear_cpt_callbacks(&cpt_cb, cpt_cb_شمېر);
 # endif
 }
-#endif
+#د_که_پای
 
-#ifdef FEAT_SPELL
+#که_تعریف_شوی FEAT_SPELL
 /*
  * Called when starting CTRL_X_SPELL mode: Move backwards to a previous badly
  * spelled word, if there is one.
  */
-    static void
-spell_back_to_badword(void)
+    ساكن فراغ
+spell_شا_منزل_badword(فراغ)
 {
     pos_T	tpos = curwin->w_cursor;
 
-    spell_bad_len = spell_move_to(curwin, BACKWARD, SMT_ALL, TRUE, NULL);
-    if (curwin->w_cursor.col != tpos.col)
-	start_arrow(&tpos);
+    spell_bad_len = spell_move_منزل(curwin, BACKWARD, SMT_ALL, TRUE, عدم);
+    إذا (curwin->w_cursor.ستون != tpos.ستون)
+	پیل_arrow(&tpos);
 }
-#endif
+#د_که_پای
 
 /*
  * Reset the info associated with completion sources.
  */
-    static void
-cpt_sources_clear(void)
+    ساكن فراغ
+cpt_sources_clear(فراغ)
 {
     VIM_CLEAR(cpt_sources_array);
-    cpt_sources_index = -1;
-    cpt_sources_count = 0;
+    cpt_sources_شاخص = -1;
+    cpt_sources_شمېر = 0;
 }
 
 /*
  * Setup completion sources.
  */
-    static int
-setup_cpt_sources(void)
+    ساكن صحيح
+تیاری_cpt_sources(فراغ)
 {
     char_u  buf[LSIZE];
-    int	    slen;
-    int	    idx = 0;
-    int	    count;
+    صحيح	    slen;
+    صحيح	    idx = 0;
+    صحيح	    شمېر;
     char_u  *p;
 
     cpt_sources_clear();
 
-    count = get_cpt_sources_count(curbuf->b_p_cpt);
-    if (count == 0)
-	return OK;
+    شمېر = get_cpt_sources_شمېر(curbuf->b_p_cpt);
+    إذا (شمېر == 0)
+	أرجع OK;
 
-    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_source_T, count);
-    if (cpt_sources_array == NULL)
-	return FAIL;
+    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_سرچینه_T, شمېر);
+    إذا (cpt_sources_array == عدم)
+	أرجع FAIL;
 
-    for (p = curbuf->b_p_cpt; *p;)
+    لكل (p = curbuf->b_p_cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	طالما (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p) // If not end of string, count this segment
+	إذا (*p) // If not end of string, count this segment
 	{
 	    cpt_sources_array[idx].cs_flag = *p;
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0)
+	    إذا (slen > 0)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
-		if (caret != NULL)
+		إذا (caret != عدم)
 		    cpt_sources_array[idx].cs_max_matches
-			= atoi((char *)caret + 1);
+			= atoi((حرف *)caret + 1);
 	    }
 	    idx++;
 	}
     }
 
-    cpt_sources_count = count;
-    return OK;
+    cpt_sources_شمېر = شمېر;
+    أرجع OK;
 }
 
 /*
  * Return TRUE if any of the completion sources have 'refresh' set to 'always'.
  */
-    static int
-is_cpt_func_refresh_always(void)
+    ساكن صحيح
+is_cpt_func_refresh_always(فراغ)
 {
-#ifdef FEAT_COMPL_FUNC
-    for (int i = 0; i < cpt_sources_count; i++)
-	if (cpt_sources_array[i].cs_refresh_always)
-	    return TRUE;
-#endif
-    return FALSE;
+#که_تعریف_شوی FEAT_COMPL_FUNC
+    لكل (صحيح i = 0; i < cpt_sources_شمېر; i++)
+	إذا (cpt_sources_array[i].cs_refresh_always)
+	    أرجع TRUE;
+#د_که_پای
+    أرجع FALSE;
 }
 
 /*
  * Make the completion list non-cyclic.
  */
-    static void
-ins_compl_make_linear(void)
+    ساكن فراغ
+ins_compl_make_خطي(فراغ)
 {
     compl_T *m;
 
-    if (compl_first_match == NULL || compl_first_match->cp_prev == NULL)
-	return;
-    m = compl_first_match->cp_prev;
-    m->cp_next = NULL;
-    compl_first_match->cp_prev = NULL;
+    إذا (compl_لومړی_سمون == عدم || compl_لومړی_سمون->cp_prev == عدم)
+	أرجع;
+    m = compl_لومړی_سمون->cp_prev;
+    m->cp_بل = عدم;
+    compl_لومړی_سمون->cp_prev = عدم;
 }
 
 /*
  * Remove the matches linked to the current completion source (as indicated by
  * cpt_sources_index) from the completion list.
  */
-#ifdef FEAT_COMPL_FUNC
-    static void
-remove_old_matches(void)
+#که_تعریف_شوی FEAT_COMPL_FUNC
+    ساكن فراغ
+remove_old_matches(فراغ)
 {
     compl_T *current;
-    int	    shown_match_removed = FALSE;
-    int	    forward = (compl_first_match->cp_cpt_source_idx < 0);
+    صحيح	    shown_سمون_removed = FALSE;
+    صحيح	    forward = (compl_لومړی_سمون->cp_cpt_سرچینه_idx < 0);
 
-    if (cpt_sources_index < 0)
-	return;
+    إذا (cpt_sources_شاخص < 0)
+	أرجع;
 
     compl_direction = forward ? FORWARD : BACKWARD;
     compl_shows_dir = compl_direction;
 
     // When 'fuzzy' is enabled, items are not ordered by their original source
     // order (cpt_sources_index). So, remove items one by one.
-    for (current = compl_first_match; current != NULL; )
+    لكل (current = compl_لومړی_سمون; current != عدم; )
     {
-	if (current->cp_cpt_source_idx == cpt_sources_index)
+	إذا (current->cp_cpt_سرچینه_idx == cpt_sources_شاخص)
 	{
-	    compl_T *to_delete = current;
+	    compl_T *منزل_delete = current;
 
-	    if (!shown_match_removed && compl_shown_match == current)
-		shown_match_removed = TRUE;
+	    إذا (!shown_سمون_removed && compl_shown_سمون == current)
+		shown_سمون_removed = TRUE;
 
-	    current = current->cp_next;
+	    current = current->cp_بل;
 
-	    if (to_delete == compl_first_match)  // node to remove is at head
+	    إذا (منزل_delete == compl_لومړی_سمون)  // node to remove is at head
 	    {
-		compl_first_match = to_delete->cp_next;
-		compl_first_match->cp_prev = NULL;
+		compl_لومړی_سمون = منزل_delete->cp_بل;
+		compl_لومړی_سمون->cp_prev = عدم;
 	    }
-	    else if (to_delete->cp_next == NULL) // node to remove is at tail
-		to_delete->cp_prev->cp_next = NULL;
-	    else // node is in the moddle
+	    وإلا إذا (منزل_delete->cp_بل == عدم) // node to remove is at tail
+		منزل_delete->cp_prev->cp_بل = عدم;
+	    وإلا // node is in the moddle
 	    {
-		to_delete->cp_prev->cp_next = to_delete->cp_next;
-		to_delete->cp_next->cp_prev = to_delete->cp_prev;
+		منزل_delete->cp_prev->cp_بل = منزل_delete->cp_بل;
+		منزل_delete->cp_بل->cp_prev = منزل_delete->cp_prev;
 	    }
-	    ins_compl_item_free(to_delete);
+	    ins_compl_توکی_free(منزل_delete);
 	}
-	else
-	    current = current->cp_next;
+	وإلا
+	    current = current->cp_بل;
     }
 
     // Re-assign compl_shown_match if necessary
-    if (shown_match_removed)
+    إذا (shown_سمون_removed)
     {
-	if (forward)
-	    compl_shown_match = compl_first_match;
-	else
+	إذا (forward)
+	    compl_shown_سمون = compl_لومړی_سمون;
+	وإلا
 	{  // Last node will have the prefix that is being completed
-	    for (current = compl_first_match; current->cp_next != NULL;
-		    current = current->cp_next)
+	    لكل (current = compl_لومړی_سمون; current->cp_بل != عدم;
+		    current = current->cp_بل)
 		;
-	    compl_shown_match = current;
+	    compl_shown_سمون = current;
 	}
     }
 
     // Re-assign compl_curr_match
-    compl_curr_match = compl_first_match;
-    for (current = compl_first_match; current != NULL; )
+    compl_curr_سمون = compl_لومړی_سمون;
+    لكل (current = compl_لومړی_سمون; current != عدم; )
     {
-	if ((forward ? current->cp_cpt_source_idx < cpt_sources_index
-		    : current->cp_cpt_source_idx > cpt_sources_index))
+	إذا ((forward ? current->cp_cpt_سرچینه_idx < cpt_sources_شاخص
+		    : current->cp_cpt_سرچینه_idx > cpt_sources_شاخص))
 	{
-	    compl_curr_match = forward ? current : current->cp_next;
-	    current = current->cp_next;
+	    compl_curr_سمون = forward ? current : current->cp_بل;
+	    current = current->cp_بل;
 	}
-	else
-	    break;
+	وإلا
+	    اكسر;
     }
 }
-#endif
+#د_که_پای
 
 /*
  * Retrieve completion matches using the callback function "cb" and store the
  * 'refresh:always' flag.
  */
-#ifdef FEAT_COMPL_FUNC
-    static void
-get_cpt_func_completion_matches(callback_T *cb UNUSED)
+#که_تعریف_شوی FEAT_COMPL_FUNC
+    ساكن فراغ
+get_cpt_func_completion_matches(callback_T *cb ناکارول_شوی)
 {
-    cpt_source_T    *cpt_src = &cpt_sources_array[cpt_sources_index];
-    int		    startcol = cpt_src->cs_startcol;
+    cpt_سرچینه_T    *cpt_src = &cpt_sources_array[cpt_sources_شاخص];
+    صحيح		    startcol = cpt_src->cs_startcol;
 
-    if (startcol == -2 || startcol == -3)
-	return;
+    إذا (startcol == -2 || startcol == -3)
+	أرجع;
 
-    if (set_compl_globals(startcol, curwin->w_cursor.col, TRUE) == OK)
+    إذا (سېټ_compl_globals(startcol, curwin->w_cursor.ستون, TRUE) == OK)
     {
 	// Insert the leader string (previously removed) before expansion.
 	// This prevents flicker when `func` (e.g. an LSP client) is slow and
 	// calls 'sleep', which triggers out_flush().
-	if (!cpt_src->cs_refresh_always)
-	    ins_compl_insert_bytes(ins_compl_leader(), -1);
+	إذا (!cpt_src->cs_refresh_always)
+	    ins_compl_ورننباسه_بایټونه(ins_compl_leader(), -1);
 
-	expand_by_function(0, cpt_compl_pattern.string, cb);
+	expand_by_function(0, cpt_compl_نمونه.string, cb);
 
-	if (!cpt_src->cs_refresh_always)
+	إذا (!cpt_src->cs_refresh_always)
 	    ins_compl_delete();
 
 	cpt_src->cs_refresh_always = compl_opt_refresh_always;
 	compl_opt_refresh_always = FALSE;
     }
 }
-#endif
+#د_که_پای
 
 /*
  * Retrieve completion matches from functions in the 'cpt' option where the
  * 'refresh:always' flag is set.
  */
-    static void
-cpt_compl_refresh(void)
+    ساكن فراغ
+cpt_compl_refresh(فراغ)
 {
-#ifdef FEAT_COMPL_FUNC
+#که_تعریف_شوی FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		startcol, ret;
+    callback_T	*cb = عدم;
+    صحيح		startcol, ret;
 
     // Make the completion list linear (non-cyclic)
-    ins_compl_make_linear();
+    ins_compl_make_خطي();
     // Make a copy of 'cpt' in case the buffer gets wiped out
     cpt = vim_strsave(curbuf->b_p_cpt);
-    strip_caret_numbers_in_place(cpt);
+    strip_caret_numbers_دننه_ځای_پرځای_کړه(cpt);
 
-    cpt_sources_index = 0;
-    for (p = cpt; *p;)
+    cpt_sources_شاخص = 0;
+    لكل (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	طالما (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	إذا (*p == NUL)
+	    اكسر;
 
-	if (cpt_sources_array[cpt_sources_index].cs_refresh_always)
+	إذا (cpt_sources_array[cpt_sources_شاخص].cs_refresh_always)
 	{
-	    cb = get_callback_if_cpt_func(p, cpt_sources_index);
-	    if (cb)
+	    cb = get_callback_if_cpt_func(p, cpt_sources_شاخص);
+	    إذا (cb)
 	    {
 		remove_old_matches();
-		ret = get_userdefined_compl_info(curwin->w_cursor.col, cb,
+		ret = get_userdefined_compl_info(curwin->w_cursor.ستون, cb,
 			&startcol);
-		if (ret == FAIL)
+		إذا (ret == FAIL)
 		{
-		    if (startcol == -3)
-			cpt_sources_array[cpt_sources_index].cs_refresh_always
+		    إذا (startcol == -3)
+			cpt_sources_array[cpt_sources_شاخص].cs_refresh_always
 			    = FALSE;
-		    else
+		    وإلا
 			startcol = -2;
 		}
-		else if (startcol < 0 || startcol > curwin->w_cursor.col)
-		    startcol = curwin->w_cursor.col;
-		cpt_sources_array[cpt_sources_index].cs_startcol = startcol;
-		if (ret == OK)
+		وإلا إذا (startcol < 0 || startcol > curwin->w_cursor.ستون)
+		    startcol = curwin->w_cursor.ستون;
+		cpt_sources_array[cpt_sources_شاخص].cs_startcol = startcol;
+		إذا (ret == OK)
 		{
-		    compl_source_start_timer(cpt_sources_index);
+		    compl_سرچینه_پیل_timer(cpt_sources_شاخص);
 		    get_cpt_func_completion_matches(cb);
 		}
 	    }
 	}
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
-	if (may_advance_cpt_index(p))
-	    (void)advance_cpt_sources_index_safe();
+	(فراغ)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	إذا (may_advance_cpt_شاخص(p))
+	    (فراغ)advance_cpt_sources_شاخص_خوندي();
     }
-    cpt_sources_index = -1;
+    cpt_sources_شاخص = -1;
 
     vim_free(cpt);
     // Make the list cyclic
     compl_matches = ins_compl_make_cyclic();
-#endif
+#د_که_پای
 }
 
 /*
  * "preinserted()" function
  */
-    void
-f_preinserted(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_preinserted(typval_T *argvars ناکارول_شوی, typval_T *rettv ناکارول_شوی)
 {
-    if (ins_compl_preinsert_effect())
-	rettv->vval.v_number = 1;
+    إذا (ins_compl_preinsert_effect())
+	rettv->vval.v_شمېره = 1;
 }

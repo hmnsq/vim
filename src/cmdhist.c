@@ -11,69 +11,69 @@
  * cmdhist.c: Functions for the history of the command-line.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+ساكن histentry_T *(history[HIST_شمېر]) = {عدم, عدم, عدم, عدم, عدم};
+ساكن صحيح	hisidx[HIST_شمېر] = {-1, -1, -1, -1, -1};  // lastused entry
+ساكن صحيح	hisnum[HIST_شمېر] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+ساكن صحيح	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
-get_hislen(void)
+    صحيح
+get_hislen(فراغ)
 {
-    return hislen;
+    أرجع hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(صحيح hist_type)
 {
-    return history[hist_type];
+    أرجع history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    void
-set_histentry(int hist_type, histentry_T *entry)
+#إذا defined(FEAT_VIMINFO)
+    فراغ
+سېټ_histentry(صحيح hist_type, histentry_T *ثبت)
 {
-    history[hist_type] = entry;
+    history[hist_type] = ثبت;
 }
-#endif
+#د_که_پای
 
-    int *
-get_hisidx(int hist_type)
+    صحيح *
+get_hisidx(صحيح hist_type)
 {
-    return &hisidx[hist_type];
+    أرجع &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#إذا defined(FEAT_VIMINFO)
+    صحيح *
+get_hisnum(صحيح hist_type)
 {
-    return &hisnum[hist_type];
+    أرجع &hisnum[hist_type];
 }
-#endif
+#د_که_پای
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    صحيح
+hist_char2type(صحيح c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    إذا (c == ':')
+	أرجع HIST_CMD;
+    إذا (c == '=')
+	أرجع HIST_بیان;
+    إذا (c == '@')
+	أرجع HIST_ننوت;
+    إذا (c == '>')
+	أرجع HIST_DEBUG;
+    أرجع HIST_پلټنه;	    // must be '?' or '/'
 }
 
 /*
@@ -82,14 +82,14 @@ hist_char2type(int c)
  * It is sufficient to give the significant prefix of a history name.
  */
 
-static char *(history_names[]) =
+ساكن حرف *(history_نومونه[]) =
 {
     "cmd",
     "search",
     "expr",
     "input",
     "debug",
-    NULL
+    عدم
 };
 
 /*
@@ -97,181 +97,181 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp ناکارول_شوی, صحيح idx)
 {
-    char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    حرف    *short_نومونه = ":=@>?/";
+    صحيح	    short_نومونه_شمېر = (صحيح)STRLEN(short_نومونه);
+    صحيح	    history_name_شمېر = ARRAY_اوږدتیا(history_نومونه) - 1;
 
-    if (idx < short_names_count)
+    إذا (idx < short_نومونه_شمېر)
     {
-	xp->xp_buf[0] = (char_u)short_names[idx];
+	xp->xp_buf[0] = (char_u)short_نومونه[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	أرجع xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    إذا (idx < short_نومونه_شمېر + history_name_شمېر)
+	أرجع (char_u *)history_نومونه[idx - short_نومونه_شمېر];
+    إذا (idx == short_نومونه_شمېر + history_name_شمېر)
+	أرجع (char_u *)"all";
+    أرجع عدم;
 }
 
 /*
  * init_history() - Initialize the command line history.
  * Also used to re-allocate the history when the size changes.
  */
-    void
-init_history(void)
+    فراغ
+init_history(فراغ)
 {
-    int		newlen;	    // new length of history table
-    histentry_T	*temp;
-    int		type;
+    صحيح		newlen;	    // new length of history table
+    histentry_T	*لنډمهاله;
+    صحيح		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (صحيح)p_hi;
+    إذا (newlen == hislen)		// history length didn't change
+	أرجع;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    لكل (type = 0; type < HIST_شمېر; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	إذا (newlen > 0)
 	{
-	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    لنډمهاله = ALLOC_MULT(histentry_T, newlen);
+	    إذا (لنډمهاله == عدم)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		إذا (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
-		    break;
+		    اكسر;
 		}
 		// Already changed one table, now we can only have zero
 		// length for all tables.
 		newlen = 0;
 		type = -1;
-		continue;
+		استمر;
 	    }
 	}
-	else
-	    temp = NULL;
+	وإلا
+	    لنډمهاله = عدم;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	إذا (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    صحيح	i;
 
-	    for (i = 0; i < newlen; ++i)
-		clear_hist_entry(&temp[i]);
+	    لكل (i = 0; i < newlen; ++i)
+		clear_hist_ثبت(&لنډمهاله[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	وإلا إذا (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    صحيح	i;
+	    صحيح	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
-		temp[i] = history[type][i];
+	    لكل (i = 0; i <= hisidx[type]; ++i)
+		لنډمهاله[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
-		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
-		temp[i] = history[type][j];
+	    لكل ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+		clear_hist_ثبت(&لنډمهاله[i]);
+	    لكل ( ; j < hislen; ++i, ++j)
+		لنډمهاله[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	وإلا				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    صحيح	i;
+	    صحيح	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    لكل (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
-		    temp[i] = history[type][j];
-		else			// remove older entries
+		إذا (i >= 0)		// copy newest entries
+		    لنډمهاله[i] = history[type][j];
+		وإلا			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		إذا (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
-		    break;
+		إذا (j == hisidx[type])
+		    اكسر;
 	    }
 	    hisidx[type] = newlen - 1;
 	}
 	vim_free(history[type]);
-	history[type] = temp;
+	history[type] = لنډمهاله;
     }
     hislen = newlen;
 }
 
-    void
-clear_hist_entry(histentry_T *hisptr)
+    فراغ
+clear_hist_ثبت(histentry_T *hisptr)
 {
     hisptr->hisnum = 0;
     hisptr->viminfo = FALSE;
-    hisptr->hisstr = NULL;
+    hisptr->hisstr = عدم;
     hisptr->hisstrlen = 0;
-    hisptr->time_set = 0;
+    hisptr->وخت_سېټ = 0;
 }
 
 /*
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
-in_history(
-    int	    type,
+    صحيح
+دننه_history(
+    صحيح	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    صحيح	    move_منزل_front,	// Move the entry to the front if it exists
+    صحيح	    sep,
+    صحيح	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    صحيح	    i;
+    صحيح	    وروستی_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    إذا (hisidx[type] < 0)
+	أرجع FALSE;
     i = hisidx[type];
-    do
+    افعل
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	إذا (history[type][i].hisstr == عدم)
+	    أرجع FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	إذا (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
-		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
+		&& (type != HIST_پلټنه || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
-	    last_i = i;
-	    break;
+	    إذا (!move_منزل_front)
+		أرجع TRUE;
+	    وروستی_i = i;
+	    اكسر;
 	}
-	if (--i < 0)
+	إذا (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } طالما (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    إذا (وروستی_i < 0)
+	أرجع FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    طالما (i != hisidx[type])
     {
-	if (++i >= hislen)
+	إذا (++i >= hislen)
 	    i = 0;
-	history[type][last_i] = history[type][i];
-	last_i = i;
+	history[type][وروستی_i] = history[type][i];
+	وروستی_i = i;
     }
     history[type][i].hisnum = ++hisnum[type];
     history[type][i].viminfo = FALSE;
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
-    history[type][i].time_set = vim_time();
-    return TRUE;
+    history[type][i].وخت_سېټ = vim_وخت();
+    أرجع TRUE;
 }
 
 /*
@@ -279,80 +279,80 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    ساكن صحيح
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    صحيح		i;
+    صحيح		len = (صحيح)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    إذا (len == 0)
+	أرجع hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    لكل (i = 0; history_نومونه[i] != عدم; ++i)
+	إذا (STRNICMP(name, history_نومونه[i], len) == 0)
+	    أرجع i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    إذا (vim_strchr((char_u *)":=@>?/", name[0]) != عدم && name[1] == NUL)
+	أرجع hist_char2type(name[0]);
 
-    return -1;
+    أرجع -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+ساكن صحيح	وروستی_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
  * history then it is moved to the front.  "histype" may be one of he HIST_
  * values.
  */
-    void
-add_to_history(
-    int		histype,
-    char_u	*new_entry,
+    فراغ
+جمع_کړه_منزل_history(
+    صحيح		histype,
+    char_u	*new_ثبت,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    صحيح		دننه_map,		// consider maptick when inside a mapping
+    صحيح		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    إذا (hislen == 0)		// no history
+	أرجع;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    إذا ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_پلټنه)
+	أرجع;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    إذا (histype == HIST_پلټنه && دننه_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	إذا (maptick == وروستی_maptick && hisidx[HIST_پلټنه] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
-	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
+	    hisptr = &history[HIST_پلټنه][hisidx[HIST_پلټنه]];
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ثبت(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
-		hisidx[HIST_SEARCH] = hislen - 1;
+	    إذا (--hisidx[HIST_پلټنه] < 0)
+		hisidx[HIST_پلټنه] = hislen - 1;
 	}
-	last_maptick = -1;
+	وروستی_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    إذا (دننه_history(histype, new_ثبت, TRUE, sep, FALSE))
+	أرجع;
 
-    if (++hisidx[histype] == hislen)
+    إذا (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
-    hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    hisptr->hisstr = vim_strnsave(new_ثبت, new_entrylen + 2);
+    إذا (hisptr->hisstr == عدم)
 	hisptr->hisstrlen = 0;
-    else
+    وإلا
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -360,25 +360,25 @@ add_to_history(
 
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
-    hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
-	last_maptick = maptick;
+    hisptr->وخت_سېټ = vim_وخت();
+    إذا (histype == HIST_پلټنه && دننه_map)
+	وروستی_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    ساكن صحيح
+get_history_idx(صحيح histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    إذا (hislen == 0 || histype < 0 || histype >= HIST_شمېر
 		    || hisidx[histype] < 0)
-	return -1;
+	أرجع -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    أرجع history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,261 +387,261 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    ساكن صحيح
+calc_hist_idx(صحيح histype, صحيح عدد)
 {
-    int		i;
+    صحيح		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    صحيح		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
-		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+    إذا (hislen == 0 || histype < 0 || histype >= HIST_شمېر
+		    || (i = hisidx[histype]) < 0 || عدد == 0)
+	أرجع -1;
 
     hist = history[histype];
-    if (num > 0)
+    إذا (عدد > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	طالما (hist[i].hisnum > عدد)
+	    إذا (--i < 0)
 	    {
-		if (wrapped)
-		    break;
+		إذا (wrapped)
+		    اكسر;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	إذا (i >= 0 && hist[i].hisnum == عدد && hist[i].hisstr != عدم)
+	    أرجع i;
     }
-    else if (-num <= hislen)
+    وإلا إذا (-عدد <= hislen)
     {
-	i += num + 1;
-	if (i < 0)
+	i += عدد + 1;
+	إذا (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	إذا (hist[i].hisstr != عدم)
+	    أرجع i;
     }
-    return -1;
+    أرجع -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    ساكن صحيح
+clr_history(صحيح histype)
 {
-    int		i;
+    صحيح		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    إذا (hislen != 0 && histype >= 0 && histype < HIST_شمېر)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	لكل (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ثبت(hisptr);
 	    hisptr++;
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	أرجع OK;
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    ساكن صحيح
+del_history_ثبت(صحيح histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    صحيح		idx;
+    صحيح		i;
+    صحيح		وروستی;
+    صحيح		وموندل = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    إذا (hislen == 0 || histype < 0 || histype >= HIST_شمېر || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	أرجع FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    إذا (regmatch.regprog == عدم)
+	أرجع FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
-    i = last = idx;
-    do
+    i = وروستی = idx;
+    افعل
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
-	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	إذا (hisptr->hisstr == عدم)
+	    اكسر;
+	إذا (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
-	    found = TRUE;
+	    وموندل = TRUE;
 	    vim_free(hisptr->hisstr);
-	    clear_hist_entry(hisptr);
+	    clear_hist_ثبت(hisptr);
 	}
-	else
+	وإلا
 	{
-	    if (i != last)
+	    إذا (i != وروستی)
 	    {
-		history[histype][last] = *hisptr;
-		clear_hist_entry(hisptr);
+		history[histype][وروستی] = *hisptr;
+		clear_hist_ثبت(hisptr);
 	    }
-	    if (--last < 0)
-		last += hislen;
+	    إذا (--وروستی < 0)
+		وروستی += hislen;
 	}
-	if (--i < 0)
+	إذا (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } طالما (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    إذا (history[histype][idx].hisstr == عدم)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    أرجع وموندل;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    ساكن صحيح
+del_history_idx(صحيح histype, صحيح idx)
 {
-    int	    i, j;
+    صحيح	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    إذا (i < 0)
+	أرجع FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
-	last_maptick = -1;
+    إذا (histype == HIST_پلټنه && maptick == وروستی_maptick && i == idx)
+	وروستی_maptick = -1;
 
-    while (i != idx)
+    طالما (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
-    clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    clear_hist_ثبت(&history[histype][i]);
+    إذا (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * "histadd()" function
  */
-    void
-f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_histadd(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
-    int		histype;
+    صحيح		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    rettv->vval.v_شمېره = FALSE;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    histype = str != عدم ? get_histtype(str) : -1;
+    إذا (histype < 0)
+	أرجع;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    إذا (*str == NUL)
+	أرجع;
 
     init_history();
-    add_to_history(histype, str, STRLEN(str), FALSE, NUL);
-    rettv->vval.v_number = TRUE;
+    جمع_کړه_منزل_history(histype, str, STRLEN(str), FALSE, NUL);
+    rettv->vval.v_شمېره = TRUE;
 }
 
 /*
  * "histdel()" function
  */
-    void
-f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_histdel(typval_T *argvars ناکارول_شوی, typval_T *rettv ناکارول_شوی)
 {
-    int		n;
+    صحيح		n;
     char_u	*str;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_string_or_شمېره_arg(argvars, 1) == FAIL))
+	أرجع;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    إذا (str == عدم)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    وإلا إذا (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    وإلا إذا (argvars[1].v_type == VAR_شمېره)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (صحيح)tv_get_شمېره(&argvars[1]));
+    وإلا
     {
 	char_u	buf[NUMBUFLEN];
 
 	// string given: remove all matching entries
-	n = del_history_entry(get_histtype(str),
+	n = del_history_ثبت(get_histtype(str),
 				      tv_get_string_buf(&argvars[1], buf));
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_شمېره = n;
 }
 
 /*
  * "histget()" function
  */
-    void
-f_histget(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_histget(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_شمېره_arg(argvars, 1) == FAIL))
+	أرجع;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    إذا (str == عدم)
+	rettv->vval.v_string = عدم;
+    وإلا
     {
-	int type;
-	int idx;
+	صحيح type;
+	صحيح idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	إذا (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	وإلا
+	    idx = (صحيح)tv_get_شمېره_chk(&argvars[1], عدم);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	إذا (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	وإلا
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -650,163 +650,163 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "histnr()" function
  */
-    void
-f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_histnr(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
-    int		i;
+    صحيح		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     histname = tv_get_string_chk(&argvars[0]);
-    i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
-	rettv->vval.v_number = get_history_idx(i);
-    else
-	rettv->vval.v_number = -1;
+    i = histname == عدم ? HIST_CMD - 1 : get_histtype(histname);
+    إذا (i >= HIST_CMD && i < HIST_شمېر)
+	rettv->vval.v_شمېره = get_history_idx(i);
+    وإلا
+	rettv->vval.v_شمېره = -1;
 }
-#endif // FEAT_EVAL
+#د_که_پای // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#إذا defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
  */
-    void
-remove_key_from_history(void)
+    فراغ
+remove_کلی_from_history(فراغ)
 {
-    char_u	*p_start;
-    char_u	*p_end;
+    char_u	*p_پیل;
+    char_u	*p_پای_ټکی;
     char_u	*p;
-    int		i;
+    صحيح		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
-    p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    إذا (i < 0)
+	أرجع;
+    p_پیل = history[HIST_CMD][i].hisstr;
+    إذا (p_پیل == عدم)
+	أرجع;
 
-    p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    p_پای_ټکی = p_پیل + history[HIST_CMD][i].hisstrlen;
+    لكل (p = p_پیل; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	إذا (STRNCMP(p, "key", 3) == 0 && !خوندي_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
-		break;
+	    إذا (p == عدم)
+		اكسر;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    لكل (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		إذا (p[i] == '\\' && p[i + 1])
 		    ++i;
 
-	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
-	    p_end -= i;						    // adjust p_end for shortened string
+	    mch_memmove(p, p + i, (p_پای_ټکی - (p + i)) + 1);	    // +1 for the NUL
+	    p_پای_ټکی -= i;						    // adjust p_end for shortened string
 	    --p;
 	}
     }
 
-    history[HIST_CMD][i].hisstrlen = (size_t)(p_end - p_start);
+    history[HIST_CMD][i].hisstrlen = (size_t)(p_پای_ټکی - p_پیل);
 }
-#endif
+#د_که_پای
 
 /*
  * :history command - print a history
  */
-    void
+    فراغ
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
-    char_u	*end;
+    صحيح		histype1 = HIST_CMD;
+    صحيح		histype2 = HIST_CMD;
+    صحيح		hisidx1 = 1;
+    صحيح		hisidx2 = -1;
+    صحيح		idx;
+    صحيح		i, j, k;
+    char_u	*پای_ټکی;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    إذا (hislen == 0)
     {
-	msg(_("'history' option is zero"));
-	return;
+	پیغام(_("'history' option is zero"));
+	أرجع;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    إذا (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
-	end = arg;
-	while (ASCII_ISALPHA(*end)
-		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
-	    end++;
-	i = *end;
-	*end = NUL;
+	پای_ټکی = arg;
+	طالما (ASCII_ISALPHA(*پای_ټکی)
+		|| vim_strchr((char_u *)":=@>/?", *پای_ټکی) != عدم)
+	    پای_ټکی++;
+	i = *پای_ټکی;
+	*پای_ټکی = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	إذا (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    إذا (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
-		histype2 = HIST_COUNT-1;
+		histype2 = HIST_شمېر-1;
 	    }
-	    else
+	    وإلا
 	    {
-		*end = i;
+		*پای_ټکی = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		أرجع;
 	    }
 	}
-	else
+	وإلا
 	    histype2 = histype1;
-	*end = i;
+	*پای_ټکی = i;
     }
-    else
-	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    وإلا
+	پای_ټکی = arg;
+    إذا (!get_list_range(&پای_ټکی, &hisidx1, &hisidx2) || *پای_ټکی != NUL)
     {
-	if (*end != NUL)
-	    semsg(_(e_trailing_characters_str), end);
-	else
+	إذا (*پای_ټکی != NUL)
+	    semsg(_(e_trailing_characters_str), پای_ټکی);
+	وإلا
 	    semsg(_(e_val_too_large), arg);
-	return;
+	أرجع;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    لكل (; !got_int && histype1 <= histype2; ++histype1)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	vim_snprintf((حرف *)IObuff, IOSIZE, "\n      #  %s history", history_نومونه[histype1]);
+	پیغام_puts_title((حرف *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	إذا (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	إذا (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	إذا (idx >= 0 && j <= k)
+	    لكل (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		إذا (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		إذا (hist[i].hisstr != عدم
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
-			&& !message_filtered(hist[i].hisstr))
+			&& !پیغام_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    صحيح  len;
 
-		    msg_putchar('\n');
-		    len = vim_snprintf((char *)IObuff, IOSIZE,
+		    پیغام_putchar('\n');
+		    len = vim_snprintf((حرف *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    إذا (vim_strsize(hist[i].hisstr) > (صحيح)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (صحيح)Columns - 10, IOSIZE - (صحيح)len);
+		    وإلا
 			STRCPY(IObuff + len, hist[i].hisstr);
-		    msg_outtrans(IObuff);
-		    out_flush();
+		    پیغام_outtrans(IObuff);
+		    بهر_flush();
 		}
-		if (i == idx)
-		    break;
+		إذا (i == idx)
+		    اكسر;
 	    }
     }
 }

@@ -10,20 +10,20 @@
  * Implements communication through a socket or any file handle.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#إذا defined(FEAT_دنده_CHANNEL)
 
 // TRUE when netbeans is running with a GUI.
-#ifdef FEAT_GUI
-# define CH_HAS_GUI (gui.in_use || gui.starting)
-#endif
+#که_تعریف_شوی FEAT_GUI
+# define CH_HAS_GUI (gui.دننه_use || gui.starting)
+#د_که_پای
 
 // Note: when making changes here also adjust configure.ac.
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 // WinSock API is separated from C API, thus we can't use read(), write(),
 // errno...
-# define SOCK_ERRNO errno = WSAGetLastError()
+# define SOCK_ERRNO errno = WSAGet_وروستی_Error()
 # undef ECONNREFUSED
 # define ECONNREFUSED WSAECONNREFUSED
 # undef EWOULDBLOCK
@@ -38,12 +38,12 @@
 # define sock_read(sd, buf, len) recv((SOCKET)sd, buf, len, 0)
 # define sock_close(sd) closesocket((SOCKET)sd)
 // Support for Unix-domain sockets was added in Windows SDK 17061.
-# define UNIX_PATH_MAX 108
-typedef struct sockaddr_un {
-    ADDRESS_FAMILY sun_family;
-    char sun_path[UNIX_PATH_MAX];
+# define UNIX_لار_MAX 108
+تعريفنوع بنية sockaddr_un {
+    پته_FAMILY sun_family;
+    حرف sun_لار[UNIX_لار_MAX];
 } SOCKADDR_UN, *PSOCKADDR_UN;
-#else
+#وإلا
 # include <netdb.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -53,138 +53,138 @@ typedef struct sockaddr_un {
 #  include <libgen.h>
 # endif
 # define SOCK_ERRNO
-# define sock_write(sd, buf, len) write(sd, buf, len)
-# define sock_read(sd, buf, len) read(sd, buf, len)
+# define sock_write(sd, buf, len) اكتب(sd, buf, len)
+# define sock_read(sd, buf, len) اقرأ(sd, buf, len)
 # define sock_close(sd) close(sd)
-# define fd_read(fd, buf, len) read(fd, buf, len)
-# define fd_write(sd, buf, len) write(sd, buf, len)
+# define fd_read(fd, buf, len) اقرأ(fd, buf, len)
+# define fd_write(sd, buf, len) اكتب(sd, buf, len)
 # define fd_close(sd) close(sd)
-#endif
+#د_که_پای
 
-static void channel_read(channel_T *channel, ch_part_T part, char *func);
-static void channel_wait_any(long msec);
-static ch_mode_T channel_get_mode(channel_T *channel, ch_part_T part);
-static int channel_get_timeout(channel_T *channel, ch_part_T part);
-static channel_T *channel_open_stdio(void);
-static ch_part_T channel_part_send(channel_T *channel);
-static ch_part_T channel_part_read(channel_T *channel);
+ساكن فراغ channel_read(channel_T *channel, ch_part_T part, حرف *func);
+ساكن فراغ channel_wait_any(اوږد msec);
+ساكن ch_ډېرپېښ_T channel_get_ډېرپېښ(channel_T *channel, ch_part_T part);
+ساكن صحيح channel_get_timeout(channel_T *channel, ch_part_T part);
+ساكن channel_T *channel_open_stdio(فراغ);
+ساكن ch_part_T channel_part_send(channel_T *channel);
+ساكن ch_part_T channel_part_read(channel_T *channel);
 
-#define FOR_ALL_CHANNELS(ch) \
-    for ((ch) = first_channel; (ch) != NULL; (ch) = (ch)->ch_next)
+#تعریف_کړه FOR_ALL_CHANNELS(ch) \
+    لكل ((ch) = لومړی_channel; (ch) != عدم; (ch) = (ch)->ch_بل)
 
 // Whether we are inside channel_parse_messages() or another situation where it
 // is safe to invoke callbacks.
-static int safe_to_invoke_callback = 0;
+ساكن صحيح خوندي_منزل_invoke_callback = 0;
 
-#ifdef MSWIN
-    static int
-fd_read(sock_T fd, char *buf, size_t len)
+#که_تعریف_شوی MSWIN
+    ساكن صحيح
+fd_read(sock_T fd, حرف *buf, size_t len)
 {
     HANDLE h = (HANDLE)fd;
     DWORD nread;
 
-    if (!ReadFile(h, buf, (DWORD)len, &nread, NULL))
-	return -1;
-    return (int)nread;
+    إذا (!ReadFile(h, buf, (DWORD)len, &nread, عدم))
+	أرجع -1;
+    أرجع (صحيح)nread;
 }
 
-    static int
-fd_write(sock_T fd, char *buf, size_t len)
+    ساكن صحيح
+fd_write(sock_T fd, حرف *buf, size_t len)
 {
     size_t	todo = len;
     HANDLE	h = (HANDLE)fd;
-    DWORD	nwrite, size, done = 0;
+    DWORD	nwrite, اندازه, بشپړ = 0;
     OVERLAPPED	ov;
 
-    while (todo > 0)
+    طالما (todo > 0)
     {
-	if (todo > MAX_NAMED_PIPE_SIZE)
-	    size = MAX_NAMED_PIPE_SIZE;
-	else
-	    size = (DWORD)todo;
+	إذا (todo > MAX_NAMED_PIPE_اندازه)
+	    اندازه = MAX_NAMED_PIPE_اندازه;
+	وإلا
+	    اندازه = (DWORD)todo;
 	// If the pipe overflows while the job does not read the data,
 	// WriteFile() will block forever. This abandons the write.
-	CLEAR_FIELD(ov);
+	CLEAR_ډګر(ov);
 	nwrite = 0;
-	if (!WriteFile(h, buf + done, size, &nwrite, &ov))
+	إذا (!WriteFile(h, buf + بشپړ, اندازه, &nwrite, &ov))
 	{
-	    DWORD err = GetLastError();
+	    DWORD err = Get_وروستی_Error();
 
-	    if (err != ERROR_IO_PENDING)
-		return -1;
-	    if (!GetOverlappedResult(h, &ov, &nwrite, FALSE))
-		return -1;
+	    إذا (err != ERROR_IO_PENDING)
+		أرجع -1;
+	    إذا (!Get_Overlapped_پایله(h, &ov, &nwrite, FALSE))
+		أرجع -1;
 	    FlushFileBuffers(h);
 	}
-	else if (nwrite == 0)
+	وإلا إذا (nwrite == 0)
 	    // WriteFile() returns TRUE but did not write anything. This causes
 	    // a hang, so bail out.
-	    break;
+	    اكسر;
 	todo -= nwrite;
-	done += nwrite;
+	بشپړ += nwrite;
     }
-    return (int)done;
+    أرجع (صحيح)بشپړ;
 }
 
-    static void
+    ساكن فراغ
 fd_close(sock_T fd)
 {
     HANDLE h = (HANDLE)fd;
 
     CloseHandle(h);
 }
-#endif
+#د_که_پای
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 # undef PERROR
-# define PERROR(msg) (void)semsg("%s: %s", msg, strerror_win32(errno))
+# define PERROR(پیغام) (فراغ)semsg("%s: %s", پیغام, strerror_win32(errno))
 
-    static char *
-strerror_win32(int eno)
+    ساكن حرف *
+strerror_win32(صحيح eno)
 {
-    static LPVOID msgbuf = NULL;
+    ساكن LPVOID msgbuf = عدم;
     char_u *ptr;
 
-    if (msgbuf)
+    إذا (msgbuf)
     {
 	LocalFree(msgbuf);
-	msgbuf = NULL;
+	msgbuf = عدم;
     }
-    FormatMessage(
-	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-	FORMAT_MESSAGE_FROM_SYSTEM |
-	FORMAT_MESSAGE_IGNORE_INSERTS,
-	NULL,
+    Format_پیغام(
+	FORMAT_پیغام_ALLOCATE_بفر |
+	FORMAT_پیغام_FROM_SYSTEM |
+	FORMAT_پیغام_IGNORE_INSERTS,
+	عدم,
 	eno,
 	MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
 	(LPTSTR) &msgbuf,
 	0,
-	NULL);
-    if (msgbuf != NULL)
+	عدم);
+    إذا (msgbuf != عدم)
 	// chomp \r or \n
-	for (ptr = (char_u *)msgbuf; *ptr; ptr++)
-	    switch (*ptr)
+	لكل (ptr = (char_u *)msgbuf; *ptr; ptr++)
+	    بدل (*ptr)
 	    {
-		case '\r':
+		حالة '\r':
 		    STRMOVE(ptr, ptr + 1);
 		    ptr--;
-		    break;
-		case '\n':
-		    if (*(ptr + 1) == '\0')
+		    اكسر;
+		حالة '\n':
+		    إذا (*(ptr + 1) == '\0')
 			*ptr = '\0';
-		    else
+		    وإلا
 			*ptr = ' ';
-		    break;
+		    اكسر;
 	    }
-    return msgbuf;
+    أرجع msgbuf;
 }
-#endif
+#د_که_پای
 
 /*
  * The list of all allocated channels.
  */
-static channel_T *first_channel = NULL;
-static int next_ch_id = 0;
+ساكن channel_T *لومړی_channel = عدم;
+ساكن صحيح بل_ch_id = 0;
 
 /*
  * Allocate a new channel.  The refcount is set to 1.
@@ -192,44 +192,44 @@ static int next_ch_id = 0;
  * Returns NULL if out of memory.
  */
     channel_T *
-add_channel(void)
+جمع_کړه_channel(فراغ)
 {
     ch_part_T	part;
     channel_T	*channel = ALLOC_CLEAR_ONE(channel_T);
 
-    if (channel == NULL)
-	return NULL;
+    إذا (channel == عدم)
+	أرجع عدم;
 
-    channel->ch_id = next_ch_id++;
+    channel->ch_id = بل_ch_id++;
     ch_log(channel, "Created channel");
 
-    for (part = PART_SOCK; part < PART_COUNT; ++part)
+    لكل (part = PART_SOCK; part < PART_شمېر; ++part)
     {
 	channel->ch_part[part].ch_fd = INVALID_FD;
-#ifdef FEAT_GUI_X11
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
-#endif
-#ifdef FEAT_GUI_GTK
-	channel->ch_part[part].ch_inputHandler = 0;
-#endif
+#که_تعریف_شوی FEAT_GUI_X11
+	channel->ch_part[part].ch_ننوت_Handler = (Xt_ننوت_Id)عدم;
+#د_که_پای
+#که_تعریف_شوی FEAT_GUI_GTK
+	channel->ch_part[part].ch_ننوت_Handler = 0;
+#د_که_پای
 	channel->ch_part[part].ch_timeout = 2000;
     }
 
-    if (first_channel != NULL)
+    إذا (لومړی_channel != عدم)
     {
-	first_channel->ch_prev = channel;
-	channel->ch_next = first_channel;
+	لومړی_channel->ch_prev = channel;
+	channel->ch_بل = لومړی_channel;
     }
-    first_channel = channel;
+    لومړی_channel = channel;
 
     channel->ch_refcount = 1;
-    return channel;
+    أرجع channel;
 }
 
-    int
-has_any_channel(void)
+    صحيح
+has_any_channel(فراغ)
 {
-    return first_channel != NULL;
+    أرجع لومړی_channel != عدم;
 }
 
 /*
@@ -237,60 +237,60 @@ has_any_channel(void)
  * Return TRUE if "channel" has a callback and the associated job wasn't
  * killed.
  */
-    int
+    صحيح
 channel_still_useful(channel_T *channel)
 {
-    int has_sock_msg;
-    int	has_out_msg;
-    int	has_err_msg;
+    صحيح has_sock_پیغام;
+    صحيح	has_بهر_پیغام;
+    صحيح	has_err_پیغام;
 
     // If the job was killed the channel is not expected to work anymore.
-    if (channel->ch_job_killed && channel->ch_job == NULL)
-	return FALSE;
+    إذا (channel->ch_دنده_killed && channel->ch_دنده == عدم)
+	أرجع FALSE;
 
     // If there is a close callback it may still need to be invoked.
-    if (channel->ch_close_cb.cb_name != NULL)
-	return TRUE;
+    إذا (channel->ch_close_cb.cb_name != عدم)
+	أرجع TRUE;
 
     // If reading from or a buffer it's still useful.
-    if (channel->ch_part[PART_IN].ch_bufref.br_buf != NULL)
-	return TRUE;
+    إذا (channel->ch_part[PART_دننه].ch_bufref.br_buf != عدم)
+	أرجع TRUE;
 
     // If there is no callback then nobody can get readahead.  If the fd is
     // closed and there is no readahead then the callback won't be called.
-    has_sock_msg = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
-		|| channel->ch_part[PART_SOCK].ch_head.rq_next != NULL
-		|| channel->ch_part[PART_SOCK].ch_json_head.jq_next != NULL;
-    has_out_msg = channel->ch_part[PART_OUT].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_OUT].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_OUT].ch_json_head.jq_next != NULL;
-    has_err_msg = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
-		  || channel->ch_part[PART_ERR].ch_head.rq_next != NULL
-		  || channel->ch_part[PART_ERR].ch_json_head.jq_next != NULL;
-    return (channel->ch_callback.cb_name != NULL && (has_sock_msg
-		|| has_out_msg || has_err_msg))
-	    || ((channel->ch_part[PART_OUT].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_OUT].ch_bufref.br_buf != NULL)
-		    && has_out_msg)
-	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != NULL
-		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != NULL)
-		    && has_err_msg);
+    has_sock_پیغام = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
+		|| channel->ch_part[PART_SOCK].ch_سر.rq_بل != عدم
+		|| channel->ch_part[PART_SOCK].ch_json_سر.jq_بل != عدم;
+    has_بهر_پیغام = channel->ch_part[PART_بهر].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_بهر].ch_سر.rq_بل != عدم
+		  || channel->ch_part[PART_بهر].ch_json_سر.jq_بل != عدم;
+    has_err_پیغام = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
+		  || channel->ch_part[PART_ERR].ch_سر.rq_بل != عدم
+		  || channel->ch_part[PART_ERR].ch_json_سر.jq_بل != عدم;
+    أرجع (channel->ch_callback.cb_name != عدم && (has_sock_پیغام
+		|| has_بهر_پیغام || has_err_پیغام))
+	    || ((channel->ch_part[PART_بهر].ch_callback.cb_name != عدم
+		       || channel->ch_part[PART_بهر].ch_bufref.br_buf != عدم)
+		    && has_بهر_پیغام)
+	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != عدم
+		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != عدم)
+		    && has_err_پیغام);
 }
 
 /*
  * Return TRUE if "channel" is closeable (i.e. all readable fds are closed).
  */
-    int
+    صحيح
 channel_can_close(channel_T *channel)
 {
-    return channel->ch_to_be_closed == 0;
+    أرجع channel->ch_منزل_be_closed == 0;
 }
 
 /*
  * Close a channel and free all its resources.
  * The "channel" pointer remains valid.
  */
-    static void
+    ساكن فراغ
 channel_free_contents(channel_T *channel)
 {
     channel_close(channel, TRUE);
@@ -301,27 +301,27 @@ channel_free_contents(channel_T *channel)
 /*
  * Unlink "channel" from the list of channels and free it.
  */
-    static void
+    ساكن فراغ
 channel_free_channel(channel_T *channel)
 {
-    if (channel->ch_next != NULL)
-	channel->ch_next->ch_prev = channel->ch_prev;
-    if (channel->ch_prev == NULL)
-	first_channel = channel->ch_next;
-    else
-	channel->ch_prev->ch_next = channel->ch_next;
+    إذا (channel->ch_بل != عدم)
+	channel->ch_بل->ch_prev = channel->ch_prev;
+    إذا (channel->ch_prev == عدم)
+	لومړی_channel = channel->ch_بل;
+    وإلا
+	channel->ch_prev->ch_بل = channel->ch_بل;
     vim_free(channel);
 }
 
-    static void
+    ساكن فراغ
 channel_free(channel_T *channel)
 {
-    if (in_free_unref_items)
-	return;
+    إذا (دننه_free_unref_توکي)
+	أرجع;
 
-    if (safe_to_invoke_callback == 0)
-	channel->ch_to_be_freed = TRUE;
-    else
+    إذا (خوندي_منزل_invoke_callback == 0)
+	channel->ch_منزل_be_freed = TRUE;
+    وإلا
     {
 	channel_free_contents(channel);
 	channel_free_channel(channel);
@@ -334,15 +334,15 @@ channel_free(channel_T *channel)
  * killed.
  * Return TRUE if the channel was freed.
  */
-    static int
+    ساكن صحيح
 channel_may_free(channel_T *channel)
 {
-    if (!channel_still_useful(channel))
+    إذا (!channel_still_useful(channel))
     {
 	channel_free(channel);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -350,27 +350,27 @@ channel_may_free(channel_T *channel)
  * down to zero.  Don't free it if there is a pending action.
  * Returns TRUE when the channel is no longer referenced.
  */
-    int
+    صحيح
 channel_unref(channel_T *channel)
 {
-    if (channel != NULL && --channel->ch_refcount <= 0)
-	return channel_may_free(channel);
-    return FALSE;
+    إذا (channel != عدم && --channel->ch_refcount <= 0)
+	أرجع channel_may_free(channel);
+    أرجع FALSE;
 }
 
-    int
-free_unused_channels_contents(int copyID, int mask)
+    صحيح
+free_ناکارول_شوی_channels_contents(صحيح copyID, صحيح ماسک)
 {
-    int		did_free = FALSE;
+    صحيح		did_free = FALSE;
     channel_T	*ch;
 
     // This is invoked from the garbage collector, which only runs at a safe
     // point.
-    ++safe_to_invoke_callback;
+    ++خوندي_منزل_invoke_callback;
 
     FOR_ALL_CHANNELS(ch)
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	إذا (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ماسک) != (copyID & ماسک))
 	{
 	    // Free the channel and ordinary items it contains, but don't
 	    // recurse into Lists, Dictionaries etc.
@@ -378,64 +378,64 @@ free_unused_channels_contents(int copyID, int mask)
 	    did_free = TRUE;
 	}
 
-    --safe_to_invoke_callback;
-    return did_free;
+    --خوندي_منزل_invoke_callback;
+    أرجع did_free;
 }
 
-    void
-free_unused_channels(int copyID, int mask)
+    فراغ
+free_ناکارول_شوی_channels(صحيح copyID, صحيح ماسک)
 {
     channel_T	*ch;
-    channel_T	*ch_next;
+    channel_T	*ch_بل;
 
-    for (ch = first_channel; ch != NULL; ch = ch_next)
+    لكل (ch = لومړی_channel; ch != عدم; ch = ch_بل)
     {
-	ch_next = ch->ch_next;
-	if (!channel_still_useful(ch)
-				 && (ch->ch_copyID & mask) != (copyID & mask))
+	ch_بل = ch->ch_بل;
+	إذا (!channel_still_useful(ch)
+				 && (ch->ch_copyID & ماسک) != (copyID & ماسک))
 	    // Free the channel struct itself.
 	    channel_free_channel(ch);
     }
 }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+# إذا defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
 /*
  * Lookup the channel from the socket.  Set "partp" to the fd index.
  * Returns NULL when the socket isn't found.
  */
-    static channel_T *
+    ساكن channel_T *
 channel_fd2channel(sock_T fd, ch_part_T *partp)
 {
     channel_T	*channel;
     ch_part_T	part;
 
-    if (fd == INVALID_FD)
-	return NULL;
+    إذا (fd == INVALID_FD)
+	أرجع عدم;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel->ch_part[part].ch_fd == fd)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
+	    إذا (channel->ch_part[part].ch_fd == fd)
 	    {
 		*partp = part;
-		return channel;
+		أرجع channel;
 	    }
     }
-    return NULL;
+    أرجع عدم;
 }
 
-    static void
-channel_read_fd(int fd)
+    ساكن فراغ
+channel_read_fd(صحيح fd)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     channel = channel_fd2channel(fd, &part);
-    if (channel == NULL)
-	ch_error(NULL, "Channel for fd %d not found", fd);
-    else
+    إذا (channel == عدم)
+	ch_error(عدم, "Channel for fd %d not found", fd);
+    وإلا
 	channel_read(channel, part, "channel_read_fd");
 }
 # endif
@@ -444,206 +444,206 @@ channel_read_fd(int fd)
  * Read a command from netbeans.
  */
 # ifdef FEAT_GUI_X11
-    static void
-messageFromServerX11(XtPointer clientData,
-		  int *unused1 UNUSED,
-		  XtInputId *unused2 UNUSED)
+    ساكن فراغ
+پیغام_From_Server_X11(Xt_اشاره_ګر client_معلومات,
+		  صحيح *unused1 ناکارول_شوی,
+		  Xt_ننوت_Id *unused2 ناکارول_شوی)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((صحيح)(اوږد)client_معلومات);
 }
 # endif
 
 # ifdef FEAT_GUI_GTK
-#  if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
-messageFromServerGtk3(GIOChannel *unused1 UNUSED,
-		  GIOCondition unused2 UNUSED,
-		  gpointer clientData)
+#  إذا GTK_CHECK_نسخه(3,0,0)
+    ساكن gboolean
+پیغام_From_Server_Gtk3(GIOChannel *unused1 ناکارول_شوی,
+		  GIOCondition unused2 ناکارول_شوی,
+		  gpointer client_معلومات)
 {
-    channel_read_fd(GPOINTER_TO_INT(clientData));
-    return TRUE; // Return FALSE instead in case the event source is to
+    channel_read_fd(GPOINTER_منزل_INT(client_معلومات));
+    أرجع TRUE; // Return FALSE instead in case the event source is to
 		 // be removed after this function returns.
 }
-#  else
-    static void
-messageFromServerGtk2(gpointer clientData,
-		  gint unused1 UNUSED,
-		  GdkInputCondition unused2 UNUSED)
+#  وإلا
+    ساكن فراغ
+پیغام_From_Server_Gtk2(gpointer client_معلومات,
+		  gint unused1 ناکارول_شوی,
+		  Gdk_ننوت_Condition unused2 ناکارول_شوی)
 {
-    channel_read_fd((int)(long)clientData);
+    channel_read_fd((صحيح)(اوږد)client_معلومات);
 }
 #  endif
 # endif
 
-    static void
-channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
+    ساكن فراغ
+channel_gui_ثبتوونکی_one(channel_T *channel, ch_part_T part ناکارول_شوی)
 {
-    if (!CH_HAS_GUI)
-	return;
+    إذا (!CH_HAS_GUI)
+	أرجع;
 
     // gets stuck in handling events for a not connected channel
-    if (channel->ch_keep_open)
-	return;
+    إذا (channel->ch_keep_open)
+	أرجع;
 
 # ifdef FEAT_GUI_X11
     // Tell notifier we are interested in being called when there is input on
     // the editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
+    إذا (channel->ch_part[part].ch_ننوت_Handler == (Xt_ننوت_Id)عدم)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
+		ch_part_نومونه[part], channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = XtAppAddInput(
+	channel->ch_part[part].ch_ننوت_Handler = Xt_App_جمع_کړه_ننوت(
 		(XtAppContext)app_context,
 		channel->ch_part[part].ch_fd,
-		(XtPointer)(XtInputReadMask + XtInputExceptMask),
-		messageFromServerX11,
-		(XtPointer)(long)channel->ch_part[part].ch_fd);
+		(Xt_اشاره_ګر)(Xt_ننوت_Read_ماسک + Xt_ننوت_Except_ماسک),
+		پیغام_From_Server_X11,
+		(Xt_اشاره_ګر)(اوږد)channel->ch_part[part].ch_fd);
     }
-# else
+# وإلا
 #  ifdef FEAT_GUI_GTK
     // Tell gdk we are interested in being called when there is input on the
     // editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == 0)
+    إذا (channel->ch_part[part].ch_ننوت_Handler == 0)
     {
 	ch_log(channel, "Registering part %s with fd %d",
-		ch_part_names[part], channel->ch_part[part].ch_fd);
-#   if GTK_CHECK_VERSION(3,0,0)
+		ch_part_نومونه[part], channel->ch_part[part].ch_fd);
+#   إذا GTK_CHECK_نسخه(3,0,0)
 	GIOChannel *chnnl = g_io_channel_unix_new(
 		(gint)channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = g_io_add_watch(
+	channel->ch_part[part].ch_ننوت_Handler = g_io_جمع_کړه_watch(
 		chnnl,
-		G_IO_IN|G_IO_HUP|G_IO_ERR|G_IO_PRI,
-		messageFromServerGtk3,
-		GINT_TO_POINTER(channel->ch_part[part].ch_fd));
+		G_IO_دننه|G_IO_HUP|G_IO_ERR|G_IO_PRI,
+		پیغام_From_Server_Gtk3,
+		GINT_منزل_اشاره_ګر(channel->ch_part[part].ch_fd));
 
 	g_io_channel_unref(chnnl);
-#   else
-	channel->ch_part[part].ch_inputHandler = gdk_input_add(
+#   وإلا
+	channel->ch_part[part].ch_ننوت_Handler = gdk_ننوت_جمع_کړه(
 		(gint)channel->ch_part[part].ch_fd,
-		(GdkInputCondition)
-			     ((int)GDK_INPUT_READ + (int)GDK_INPUT_EXCEPTION),
-		messageFromServerGtk2,
-		(gpointer)(long)channel->ch_part[part].ch_fd);
+		(Gdk_ننوت_Condition)
+			     ((صحيح)GDK_ننوت_READ + (صحيح)GDK_ننوت_EXCEPTION),
+		پیغام_From_Server_Gtk2,
+		(gpointer)(اوږد)channel->ch_part[part].ch_fd);
 #   endif
     }
 #  endif
 # endif
 }
 
-    static void
-channel_gui_register(channel_T *channel)
+    ساكن فراغ
+channel_gui_ثبتوونکی(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD != INVALID_FD)
-	channel_gui_register_one(channel, PART_SOCK);
-    if (channel->CH_OUT_FD != INVALID_FD
-	    && channel->CH_OUT_FD != channel->CH_SOCK_FD)
-	channel_gui_register_one(channel, PART_OUT);
-    if (channel->CH_ERR_FD != INVALID_FD
+    إذا (channel->CH_SOCK_FD != INVALID_FD)
+	channel_gui_ثبتوونکی_one(channel, PART_SOCK);
+    إذا (channel->CH_بهر_FD != INVALID_FD
+	    && channel->CH_بهر_FD != channel->CH_SOCK_FD)
+	channel_gui_ثبتوونکی_one(channel, PART_بهر);
+    إذا (channel->CH_ERR_FD != INVALID_FD
 	    && channel->CH_ERR_FD != channel->CH_SOCK_FD
-	    && channel->CH_ERR_FD != channel->CH_OUT_FD)
-	channel_gui_register_one(channel, PART_ERR);
+	    && channel->CH_ERR_FD != channel->CH_بهر_FD)
+	channel_gui_ثبتوونکی_one(channel, PART_ERR);
 }
 
 /*
  * Register any of our file descriptors with the GUI event handling system.
  * Called when the GUI has started.
  */
-    void
-channel_gui_register_all(void)
+    فراغ
+channel_gui_ثبتوونکی_all(فراغ)
 {
     channel_T *channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_gui_register(channel);
+	channel_gui_ثبتوونکی(channel);
 }
 
-    static void
-channel_gui_unregister_one(channel_T *channel UNUSED, ch_part_T part UNUSED)
+    ساكن فراغ
+channel_gui_unregister_one(channel_T *channel ناکارول_شوی, ch_part_T part ناکارول_شوی)
 {
 # ifdef FEAT_GUI_X11
-    if (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
+    إذا (channel->ch_part[part].ch_ننوت_Handler != (Xt_ننوت_Id)عدم)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-	XtRemoveInput(channel->ch_part[part].ch_inputHandler);
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
+	ch_log(channel, "Unregistering part %s", ch_part_نومونه[part]);
+	Xt_Remove_ننوت(channel->ch_part[part].ch_ننوت_Handler);
+	channel->ch_part[part].ch_ننوت_Handler = (Xt_ننوت_Id)عدم;
     }
-# else
+# وإلا
 #  ifdef FEAT_GUI_GTK
-    if (channel->ch_part[part].ch_inputHandler != 0)
+    إذا (channel->ch_part[part].ch_ننوت_Handler != 0)
     {
-	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-#   if GTK_CHECK_VERSION(3,0,0)
-	g_source_remove(channel->ch_part[part].ch_inputHandler);
-#   else
-	gdk_input_remove(channel->ch_part[part].ch_inputHandler);
+	ch_log(channel, "Unregistering part %s", ch_part_نومونه[part]);
+#   إذا GTK_CHECK_نسخه(3,0,0)
+	g_سرچینه_remove(channel->ch_part[part].ch_ننوت_Handler);
+#   وإلا
+	gdk_ننوت_remove(channel->ch_part[part].ch_ننوت_Handler);
 #   endif
-	channel->ch_part[part].ch_inputHandler = 0;
+	channel->ch_part[part].ch_ننوت_Handler = 0;
     }
 #  endif
 # endif
 }
 
-    static void
+    ساكن فراغ
 channel_gui_unregister(channel_T *channel)
 {
     ch_part_T	part;
 
-    for (part = PART_SOCK; part < PART_IN; ++part)
+    لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	channel_gui_unregister_one(channel, part);
 }
 
-#endif  // FEAT_GUI
+#د_که_پای  // FEAT_GUI
 
 /*
  * For Unix we need to call connect() again after connect() failed.
  * On Win32 one time is sufficient.
  */
-    static int
+    ساكن صحيح
 channel_connect(
 	channel_T *channel,
-	const struct sockaddr *server_addr,
-	int server_addrlen,
-	int *waittime)
+	ثابت بنية sockaddr *server_addr,
+	صحيح server_addrlen,
+	صحيح *waittime)
 {
-    int		sd = -1;
-#ifdef MSWIN
+    صحيح		sd = -1;
+#که_تعریف_شوی MSWIN
     u_long	val = 1;
-#endif
+#د_که_پای
 
-    while (TRUE)
+    طالما (TRUE)
     {
-	long	elapsed_msec = 0;
-	int	waitnow;
-	int	ret;
+	اوږد	elapsed_msec = 0;
+	صحيح	waitnow;
+	صحيح	ret;
 
-	if (sd >= 0)
+	إذا (sd >= 0)
 	    sock_close(sd);
 	sd = socket(server_addr->sa_family, SOCK_STREAM, 0);
-	if (sd == -1)
+	إذا (sd == -1)
 	{
 	    ch_error(channel, "in socket() in channel_connect().");
-	    PERROR(_(e_socket_in_channel_connect));
-	    return -1;
+	    PERROR(_(e_socket_دننه_channel_connect));
+	    أرجع -1;
 	}
 
-	if (*waittime >= 0)
+	إذا (*waittime >= 0)
 	{
 	    // Make connect() non-blocking.
-	    if (
-#ifdef MSWIN
+	    إذا (
+#که_تعریف_شوی MSWIN
 		ioctlsocket(sd, FIONBIO, &val) < 0
-#else
+#وإلا
 		fcntl(sd, F_SETFL, O_NONBLOCK) < 0
-#endif
+#د_که_پای
 	       )
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
 		sock_close(sd);
-		return -1;
+		أرجع -1;
 	    }
 	}
 
@@ -651,29 +651,29 @@ channel_connect(
 	ch_log(channel, "Connecting...");
 
 	ret = connect(sd, server_addr, server_addrlen);
-	if (ret == 0)
+	إذا (ret == 0)
 	    // The connection could be established.
-	    break;
+	    اكسر;
 
 	SOCK_ERRNO;
-	if (*waittime < 0 || (errno != EWOULDBLOCK
+	إذا (*waittime < 0 || (errno != EWOULDBLOCK
 		&& errno != ECONNREFUSED
-#ifdef EINPROGRESS
+#که_تعریف_شوی EINPROGRESS
 		&& errno != EINPROGRESS
-#endif
+#د_که_پای
 		))
 	{
 	    ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-	    PERROR(_(e_cannot_connect_to_port));
+	    PERROR(_(e_cannot_connect_منزل_پورټ));
 	    sock_close(sd);
-	    return -1;
+	    أرجع -1;
 	}
-	else if (errno == ECONNREFUSED)
+	وإلا إذا (errno == ECONNREFUSED)
 	{
 	    ch_error(channel, "channel_connect: Connection refused");
 	    sock_close(sd);
-	    return -1;
+	    أرجع -1;
 	}
 
 	// Limit the waittime to 50 msec.  If it doesn't work within this
@@ -683,15 +683,15 @@ channel_connect(
 	// If connect() didn't finish then try using select() to wait for the
 	// connection to be made. For Win32 always use select() to wait.
 	{
-	    struct timeval	tv;
+	    بنية timeval	tv;
 	    fd_set		rfds;
 	    fd_set		wfds;
-#ifndef MSWIN
-	    int			so_error = 0;
-	    socklen_t		so_error_len = sizeof(so_error);
-	    struct timeval	start_tv;
-	    struct timeval	end_tv;
-#endif
+#که_نه_تعریف_شوی MSWIN
+	    صحيح			so_error = 0;
+	    socklen_t		so_error_len = حجم(so_error);
+	    بنية timeval	پیل_tv;
+	    بنية timeval	پای_ټکی_tv;
+#د_که_پای
 	    FD_ZERO(&rfds);
 	    FD_SET(sd, &rfds);
 	    FD_ZERO(&wfds);
@@ -699,35 +699,35 @@ channel_connect(
 
 	    tv.tv_sec = waitnow / 1000;
 	    tv.tv_usec = (waitnow % 1000) * 1000;
-#ifndef MSWIN
-	    gettimeofday(&start_tv, NULL);
-#endif
+#که_نه_تعریف_شوی MSWIN
+	    gettimeofday(&پیل_tv, عدم);
+#د_که_پای
 	    ch_log(channel,
 		      "Waiting for connection (waiting %d msec)...", waitnow);
 
-	    ret = select(sd + 1, &rfds, &wfds, NULL, &tv);
-	    if (ret < 0)
+	    ret = select(sd + 1, &rfds, &wfds, عدم, &tv);
+	    إذا (ret < 0)
 	    {
 		SOCK_ERRNO;
 		ch_error(channel,
 		      "channel_connect: Connect failed with errno %d", errno);
-		PERROR(_(e_cannot_connect_to_port));
+		PERROR(_(e_cannot_connect_منزل_پورټ));
 		sock_close(sd);
-		return -1;
+		أرجع -1;
 	    }
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 	    // On Win32: select() is expected to work and wait for up to
 	    // "waitnow" msec for the socket to be open.
-	    if (FD_ISSET(sd, &wfds))
-		break;
+	    إذا (FD_ISSET(sd, &wfds))
+		اكسر;
 	    elapsed_msec = waitnow;
-	    if (*waittime > 1 && elapsed_msec < *waittime)
+	    إذا (*waittime > 1 && elapsed_msec < *waittime)
 	    {
 		*waittime -= elapsed_msec;
-		continue;
+		استمر;
 	    }
-#else
+#وإلا
 	    // On Linux-like systems: See socket(7) for the behavior
 	    // After putting the socket in non-blocking mode, connect() will
 	    // return EINPROGRESS, select() will not wait (as if writing is
@@ -735,11 +735,11 @@ channel_connect(
 	    // actually able to connect.
 	    // We detect a failure to connect when either read and write fds
 	    // are set.  Use getsockopt() to find out what kind of failure.
-	    if (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
+	    إذا (FD_ISSET(sd, &rfds) || FD_ISSET(sd, &wfds))
 	    {
 		ret = getsockopt(sd,
 			      SOL_SOCKET, SO_ERROR, &so_error, &so_error_len);
-		if (ret < 0 || (so_error != 0
+		إذا (ret < 0 || (so_error != 0
 			&& so_error != EWOULDBLOCK
 			&& so_error != ECONNREFUSED
 # ifdef EINPROGRESS
@@ -750,30 +750,30 @@ channel_connect(
 		    ch_error(channel,
 			    "channel_connect: Connect failed with errno %d",
 			    so_error);
-		    PERROR(_(e_cannot_connect_to_port));
+		    PERROR(_(e_cannot_connect_منزل_پورټ));
 		    sock_close(sd);
-		    return -1;
+		    أرجع -1;
 		}
-		else if (errno == ECONNREFUSED)
+		وإلا إذا (errno == ECONNREFUSED)
 		{
 		    ch_error(channel, "channel_connect: Connection refused");
 		    sock_close(sd);
-		    return -1;
+		    أرجع -1;
 		}
 	    }
 
-	    if (FD_ISSET(sd, &wfds) && so_error == 0)
+	    إذا (FD_ISSET(sd, &wfds) && so_error == 0)
 		// Did not detect an error, connection is established.
-		break;
+		اكسر;
 
-	    gettimeofday(&end_tv, NULL);
-	    elapsed_msec = (end_tv.tv_sec - start_tv.tv_sec) * 1000
-				 + (end_tv.tv_usec - start_tv.tv_usec) / 1000;
-#endif
+	    gettimeofday(&پای_ټکی_tv, عدم);
+	    elapsed_msec = (پای_ټکی_tv.tv_sec - پیل_tv.tv_sec) * 1000
+				 + (پای_ټکی_tv.tv_usec - پیل_tv.tv_usec) / 1000;
+#د_که_پای
 	}
 
-#ifndef MSWIN
-	if (*waittime > 1 && elapsed_msec < *waittime)
+#که_نه_تعریف_شوی MSWIN
+	إذا (*waittime > 1 && elapsed_msec < *waittime)
 	{
 	    // The port isn't ready but we also didn't get an error.
 	    // This happens when the server didn't open the socket
@@ -781,40 +781,40 @@ channel_connect(
 	    // "waitnow"  and try again.
 	    waitnow -= elapsed_msec;
 	    *waittime -= elapsed_msec;
-	    if (waitnow > 0)
+	    إذا (waitnow > 0)
 	    {
-		mch_delay((long)waitnow, MCH_DELAY_IGNOREINPUT);
+		mch_delay((اوږد)waitnow, MCH_DELAY_IGNOREINPUT);
 		ui_breakcheck();
 		*waittime -= waitnow;
 	    }
-	    if (!got_int)
+	    إذا (!got_int)
 	    {
-		if (*waittime <= 0)
+		إذا (*waittime <= 0)
 		    // give it one more try
 		    *waittime = 1;
-		continue;
+		استمر;
 	    }
 	    // we were interrupted, behave as if timed out
 	}
-#endif
+#د_که_پای
 
 	// We timed out.
 	ch_error(channel, "Connection timed out");
 	sock_close(sd);
-	return -1;
+	أرجع -1;
     }
 
-    if (*waittime >= 0)
+    إذا (*waittime >= 0)
     {
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 	val = 0;
 	ioctlsocket(sd, FIONBIO, &val);
-#else
-	(void)fcntl(sd, F_SETFL, 0);
-#endif
+#وإلا
+	(فراغ)fcntl(sd, F_SETFL, 0);
+#د_که_پای
     }
 
-    return sd;
+    أرجع sd;
 }
 
 /*
@@ -824,62 +824,62 @@ channel_connect(
  */
     channel_T *
 channel_open_unix(
-	const char *path,
-	void (*nb_close_cb)(void))
+	ثابت حرف *لار,
+	فراغ (*nb_close_cb)(فراغ))
 {
-    channel_T		*channel = NULL;
-    int			sd = -1;
-    size_t		path_len = STRLEN(path);
-    struct sockaddr_un	server;
+    channel_T		*channel = عدم;
+    صحيح			sd = -1;
+    size_t		لار_len = STRLEN(لار);
+    بنية sockaddr_un	server;
     size_t		server_len;
-    int			waittime = -1;
+    صحيح			waittime = -1;
 
-    if (*path == NUL || path_len >= sizeof(server.sun_path))
+    إذا (*لار == NUL || لار_len >= حجم(server.sun_لار))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), لار);
+	أرجع عدم;
     }
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     channel_init_winsock();
-#endif
+#د_که_پای
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = جمع_کړه_channel();
+    إذا (channel == عدم)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(عدم, "Cannot allocate channel.");
+	أرجع عدم;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_ډګر(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_لار, لار, حجم(server.sun_لار) - 1);
 
-    ch_log(channel, "Trying to connect to %s", path);
+    ch_log(channel, "Trying to connect to %s", لار);
 
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    sd = channel_connect(channel, (struct sockaddr *)&server, (int)server_len,
+    server_len = offsetof(بنية sockaddr_un, sun_لار) + لار_len + 1;
+    sd = channel_connect(channel, (بنية sockaddr *)&server, (صحيح)server_len,
 								   &waittime);
 
-    if (sd < 0)
+    إذا (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (حرف *)vim_strsave((char_u *)لار);
+    channel->ch_پورټ = 0;
+    channel->ch_منزل_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#که_تعریف_شوی FEAT_GUI
+    channel_gui_ثبتوونکی_one(channel, PART_SOCK);
+#د_که_پای
 
-    return channel;
+    أرجع channel;
 }
 
 /*
@@ -891,41 +891,41 @@ channel_open_unix(
  */
     channel_T *
 channel_open(
-	const char *hostname,
-	int port,
-	int waittime,
-	void (*nb_close_cb)(void))
+	ثابت حرف *hostname,
+	صحيح پورټ,
+	صحيح waittime,
+	فراغ (*nb_close_cb)(فراغ))
 {
-    int			sd = -1;
-    channel_T		*channel = NULL;
-#ifdef FEAT_IPV6
-    int			err;
-    struct addrinfo	hints;
-    struct addrinfo	*res = NULL;
-    struct addrinfo	*addr = NULL;
-#else
-    struct sockaddr_in	server;
-    struct hostent	*host = NULL;
-#endif
+    صحيح			sd = -1;
+    channel_T		*channel = عدم;
+#که_تعریف_شوی FEAT_IPV6
+    صحيح			err;
+    بنية addrinfo	hints;
+    بنية addrinfo	*res = عدم;
+    بنية addrinfo	*addr = عدم;
+#وإلا
+    بنية sockaddr_دننه	server;
+    بنية hostent	*host = عدم;
+#د_که_پای
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     channel_init_winsock();
-#endif
+#د_که_پای
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = جمع_کړه_channel();
+    إذا (channel == عدم)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(عدم, "Cannot allocate channel.");
+	أرجع عدم;
     }
 
     // Get the server internet address and put into addr structure fill in the
     // socket address structure and connect to server.
-#ifdef FEAT_IPV6
-    CLEAR_FIELD(hints);
+#که_تعریف_شوی FEAT_IPV6
+    CLEAR_ډګر(hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-# if defined(__ANDROID__)
+# إذا defined(__ANDROID__)
     hints.ai_flags = AI_ADDRCONFIG;
 # elif defined(AI_ADDRCONFIG) && defined(AI_V4MAPPED)
     hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
@@ -933,192 +933,192 @@ channel_open(
     // Set port number manually in order to prevent name resolution services
     // from being invoked in the environment where AI_NUMERICSERV is not
     // defined.
-    if ((err = getaddrinfo(hostname, NULL, &hints, &res)) != 0)
+    إذا ((err = getaddrinfo(hostname, عدم, &hints, &res)) != 0)
     {
 	ch_error(channel, "in getaddrinfo() in channel_open()");
-	semsg(_(e_getaddrinfo_in_channel_open_str), gai_strerror(err));
+	semsg(_(e_getaddrinfo_دننه_channel_open_str), gai_strerror(err));
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     // Count the number of addresses for timeout distribution
-    int addr_count = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next)
-	addr_count++;
+    صحيح addr_شمېر = 0;
+    لكل (addr = res; addr != عدم; addr = addr->ai_بل)
+	addr_شمېر++;
 
     // On Mac and Solaris a zero timeout almost never works.  Waiting for
     // one millisecond already helps a lot.  Later Mac systems (using IPv6)
     // need more time, 15 milliseconds appears to work well.
     // Let's do it for all systems, because we don't know why this is
     // needed.
-    if (waittime == 0)
+    إذا (waittime == 0)
 	waittime = 15;
 
-    int addr_index = 0;
-    for (addr = res; addr != NULL; addr = addr->ai_next, addr_index++)
+    صحيح addr_شاخص = 0;
+    لكل (addr = res; addr != عدم; addr = addr->ai_بل, addr_شاخص++)
     {
-	const char  *dst = hostname;
+	ثابت حرف  *dst = hostname;
 # ifdef HAVE_INET_NTOP
-	const void  *src = NULL;
-	char	    buf[NUMBUFLEN];
+	ثابت فراغ  *src = عدم;
+	حرف	    buf[NUMBUFLEN];
 # endif
-	int	    try_waittime;
-	int	    before_waittime;
-	int	    consumed;
-	int	    remaining_addrs;
+	صحيح	    try_waittime;
+	صحيح	    before_waittime;
+	صحيح	    consumed;
+	صحيح	    پاتې_شوی_addrs;
 
-	if (addr->ai_family == AF_INET6)
+	إذا (addr->ai_family == AF_INET6)
 	{
-	    struct sockaddr_in6 *sai = (struct sockaddr_in6 *)addr->ai_addr;
+	    بنية sockaddr_in6 *sai = (بنية sockaddr_in6 *)addr->ai_addr;
 
-	    sai->sin6_port = htons(port);
+	    sai->sin6_پورټ = htons(پورټ);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin6_addr;
 # endif
 	}
-	else if (addr->ai_family == AF_INET)
+	وإلا إذا (addr->ai_family == AF_INET)
 	{
-	    struct sockaddr_in *sai = (struct sockaddr_in *)addr->ai_addr;
+	    بنية sockaddr_دننه *sai = (بنية sockaddr_دننه *)addr->ai_addr;
 
-	    sai->sin_port = htons(port);
+	    sai->sin_پورټ = htons(پورټ);
 # ifdef HAVE_INET_NTOP
 	    src = &sai->sin_addr;
 # endif
 	}
 # ifdef HAVE_INET_NTOP
-	if (src != NULL)
+	إذا (src != عدم)
 	{
-	    dst = inet_ntop(addr->ai_family, src, buf, sizeof(buf));
-	    if (dst == NULL)
+	    dst = inet_ntop(addr->ai_family, src, buf, حجم(buf));
+	    إذا (dst == عدم)
 		dst = hostname;
-	    else if (STRCMP(hostname, dst) != 0)
+	    وإلا إذا (STRCMP(hostname, dst) != 0)
 		ch_log(channel, "Resolved %s to %s", hostname, dst);
 	}
 # endif
 
-	ch_log(channel, "Trying to connect to %s port %d", dst, port);
+	ch_log(channel, "Trying to connect to %s port %d", dst, پورټ);
 
 	// Distribute the timeout across addresses for better fallback behavior.
 	// This implements a simplified version of Happy Eyeballs (RFC 8305).
-	if (addr->ai_next == NULL)
+	إذا (addr->ai_بل == عدم)
 	    try_waittime = waittime;
-	else if (addr_index == 0)
+	وإلا إذا (addr_شاخص == 0)
 	{
-	    if (waittime > 500)
+	    إذا (waittime > 500)
 		try_waittime = 250;
-	    else if (waittime > 30)
+	    وإلا إذا (waittime > 30)
 		try_waittime = waittime / 2;
-	    else
+	    وإلا
 		try_waittime = waittime;
 	}
-	else
+	وإلا
 	{
-	    remaining_addrs = addr_count - addr_index;
-	    try_waittime = waittime / remaining_addrs;
+	    پاتې_شوی_addrs = addr_شمېر - addr_شاخص;
+	    try_waittime = waittime / پاتې_شوی_addrs;
 	}
 
 	before_waittime = try_waittime;
-	sd = channel_connect(channel, addr->ai_addr, (int)addr->ai_addrlen,
+	sd = channel_connect(channel, addr->ai_addr, (صحيح)addr->ai_addrlen,
 							   &try_waittime);
 
 	// Update the overall waittime based on consumed time
 	consumed = before_waittime - try_waittime;
 	waittime -= consumed;
-	if (waittime < 0)
+	إذا (waittime < 0)
 	    waittime = 0;
 
-	if (sd >= 0)
-	    break;
+	إذا (sd >= 0)
+	    اكسر;
 
 	// If we have no time left, stop trying
-	if (waittime <= 0 && addr->ai_next != NULL)
+	إذا (waittime <= 0 && addr->ai_بل != عدم)
 	{
 	    ch_log(channel, "Out of time, stopping connection attempts");
-	    break;
+	    اكسر;
 	}
     }
 
     freeaddrinfo(res);
-#else
-    CLEAR_FIELD(server);
+#وإلا
+    CLEAR_ډګر(server);
     server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    if ((host = gethostbyname(hostname)) == NULL)
+    server.sin_پورټ = htons(پورټ);
+    إذا ((host = gethostbyname(hostname)) == عدم)
     {
 	ch_error(channel, "in gethostbyname() in channel_open()");
-	PERROR(_(e_gethostbyname_in_channel_open));
+	PERROR(_(e_gethostbyname_دننه_channel_open));
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
     {
-	char *p;
+	حرف *p;
 
 	// When using host->h_addr_list[0] directly ubsan warns for it to not
 	// be aligned.  First copy the pointer to avoid that.
-	memcpy(&p, &host->h_addr_list[0], sizeof(p));
-	memcpy((char *)&server.sin_addr, p, host->h_length);
+	حافظه_نقل(&p, &host->h_addr_list[0], حجم(p));
+	حافظه_نقل((حرف *)&server.sin_addr, p, host->h_اوږدتیا);
     }
 
-    ch_log(channel, "Trying to connect to %s port %d", hostname, port);
+    ch_log(channel, "Trying to connect to %s port %d", hostname, پورټ);
 
     // On Mac and Solaris a zero timeout almost never works.  At least wait one
     // millisecond.  Let's do it for all systems, because we don't know why
     // this is needed.
-    if (waittime == 0)
+    إذا (waittime == 0)
 	waittime = 1;
 
-    sd = channel_connect(channel, (struct sockaddr *)&server, sizeof(server),
+    sd = channel_connect(channel, (بنية sockaddr *)&server, حجم(server),
 								   &waittime);
-#endif
+#د_که_پای
 
-    if (sd < 0)
+    إذا (sd < 0)
     {
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     ch_log(channel, "Connection made");
 
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)hostname);
-    channel->ch_port = port;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (حرف *)vim_strsave((char_u *)hostname);
+    channel->ch_پورټ = پورټ;
+    channel->ch_منزل_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#که_تعریف_شوی FEAT_GUI
+    channel_gui_ثبتوونکی_one(channel, PART_SOCK);
+#د_که_پای
 
-    return channel;
+    أرجع channel;
 }
 
-    static void
-free_set_callback(callback_T *cbp, callback_T *callback)
+    ساكن فراغ
+free_سېټ_callback(callback_T *cbp, callback_T *callback)
 {
     free_callback(cbp);
 
-    if (callback->cb_name != NULL && *callback->cb_name != NUL)
+    إذا (callback->cb_name != عدم && *callback->cb_name != NUL)
 	copy_callback(cbp, callback);
-    else
-	cbp->cb_name = NULL;
+    وإلا
+	cbp->cb_name = عدم;
 }
 
 /*
  * Prepare buffer "buf" for writing channel output to.
  */
-	static void
-prepare_buffer(buf_T *buf)
+	ساكن فراغ
+prepare_بفر(buf_T *buf)
 {
     buf_T *save_curbuf = curbuf;
 
     buf_copy_options(buf, BCO_ENTER);
     curbuf = buf;
-#ifdef FEAT_QUICKFIX
-    set_option_value_give_err((char_u *)"bt",
+#که_تعریف_شوی FEAT_QUICKFIX
+    سېټ_option_ارزښت_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
-#endif
-    if (curbuf->b_ml.ml_mfp == NULL)
+    سېټ_option_ارزښت_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+#د_که_پای
+    إذا (curbuf->b_ml.ml_mfp == عدم)
 	ml_open(curbuf);
     curbuf = save_curbuf;
 }
@@ -1127,173 +1127,173 @@ prepare_buffer(buf_T *buf)
  * Find a buffer matching "name" or create a new one.
  * Returns NULL if there is something very wrong (error already reported).
  */
-    static buf_T *
-channel_find_buffer(char_u *name, int err, int msg)
+    ساكن buf_T *
+channel_پیدا_کړه_بفر(char_u *name, صحيح err, صحيح پیغام)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = عدم;
     buf_T *save_curbuf = curbuf;
 
-    if (name != NULL && *name != NUL)
+    إذا (name != عدم && *name != NUL)
     {
 	buf = buflist_findname(name);
-	if (buf == NULL)
+	إذا (buf == عدم)
 	    buf = buflist_findname_exp(name);
     }
 
-    if (buf != NULL)
-	return buf;
+    إذا (buf != عدم)
+	أرجع buf;
 
-    buf = buflist_new(name == NULL || *name == NUL ? NULL : name,
-	    NULL, (linenr_T)0, BLN_LISTED | BLN_NEW);
-    if (buf == NULL)
-	return NULL;
-    prepare_buffer(buf);
+    buf = buflist_new(name == عدم || *name == NUL ? عدم : name,
+	    عدم, (linenr_T)0, BLN_LISTED | BLN_NEW);
+    إذا (buf == عدم)
+	أرجع عدم;
+    prepare_بفر(buf);
 
     curbuf = buf;
-    if (msg)
+    إذا (پیغام)
 	ml_replace(1, (char_u *)(err ? "Reading from channel error..."
 		    : "Reading from channel output..."), TRUE);
-    changed_bytes(1, 0);
+    بدل_شوی_بایټونه(1, 0);
     curbuf = save_curbuf;
 
-    return buf;
+    أرجع buf;
 }
 
 /*
  * Set various properties from an "opt" argument.
  */
-    static void
-channel_set_options(channel_T *channel, jobopt_T *opt)
+    ساكن فراغ
+channel_سېټ_options(channel_T *channel, jobopt_T *opt)
 {
     ch_part_T	part;
 
-    if (opt->jo_set & JO_MODE)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
-	    channel->ch_part[part].ch_mode = opt->jo_mode;
-    if (opt->jo_set & JO_IN_MODE)
-	channel->ch_part[PART_IN].ch_mode = opt->jo_in_mode;
-    if (opt->jo_set & JO_OUT_MODE)
-	channel->ch_part[PART_OUT].ch_mode = opt->jo_out_mode;
-    if (opt->jo_set & JO_ERR_MODE)
-	channel->ch_part[PART_ERR].ch_mode = opt->jo_err_mode;
+    إذا (opt->jo_سېټ & JO_ډېرپېښ)
+	لكل (part = PART_SOCK; part < PART_شمېر; ++part)
+	    channel->ch_part[part].ch_ډېرپېښ = opt->jo_ډېرپېښ;
+    إذا (opt->jo_سېټ & JO_دننه_ډېرپېښ)
+	channel->ch_part[PART_دننه].ch_ډېرپېښ = opt->jo_دننه_ډېرپېښ;
+    إذا (opt->jo_سېټ & JO_بهر_ډېرپېښ)
+	channel->ch_part[PART_بهر].ch_ډېرپېښ = opt->jo_بهر_ډېرپېښ;
+    إذا (opt->jo_سېټ & JO_ERR_ډېرپېښ)
+	channel->ch_part[PART_ERR].ch_ډېرپېښ = opt->jo_err_ډېرپېښ;
     channel->ch_nonblock = opt->jo_noblock;
 
-    if (opt->jo_set & JO_TIMEOUT)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+    إذا (opt->jo_سېټ & JO_TIMEOUT)
+	لكل (part = PART_SOCK; part < PART_شمېر; ++part)
 	    channel->ch_part[part].ch_timeout = opt->jo_timeout;
-    if (opt->jo_set & JO_OUT_TIMEOUT)
-	channel->ch_part[PART_OUT].ch_timeout = opt->jo_out_timeout;
-    if (opt->jo_set & JO_ERR_TIMEOUT)
+    إذا (opt->jo_سېټ & JO_بهر_TIMEOUT)
+	channel->ch_part[PART_بهر].ch_timeout = opt->jo_بهر_timeout;
+    إذا (opt->jo_سېټ & JO_ERR_TIMEOUT)
 	channel->ch_part[PART_ERR].ch_timeout = opt->jo_err_timeout;
-    if (opt->jo_set & JO_BLOCK_WRITE)
-	channel->ch_part[PART_IN].ch_block_write = 1;
+    إذا (opt->jo_سېټ & JO_بلاک_WRITE)
+	channel->ch_part[PART_دننه].ch_بلاک_write = 1;
 
-    if (opt->jo_set & JO_CALLBACK)
-	free_set_callback(&channel->ch_callback, &opt->jo_callback);
-    if (opt->jo_set & JO_OUT_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_OUT].ch_callback,
-							      &opt->jo_out_cb);
-    if (opt->jo_set & JO_ERR_CALLBACK)
-	free_set_callback(&channel->ch_part[PART_ERR].ch_callback,
+    إذا (opt->jo_سېټ & JO_CALLBACK)
+	free_سېټ_callback(&channel->ch_callback, &opt->jo_callback);
+    إذا (opt->jo_سېټ & JO_بهر_CALLBACK)
+	free_سېټ_callback(&channel->ch_part[PART_بهر].ch_callback,
+							      &opt->jo_بهر_cb);
+    إذا (opt->jo_سېټ & JO_ERR_CALLBACK)
+	free_سېټ_callback(&channel->ch_part[PART_ERR].ch_callback,
 							      &opt->jo_err_cb);
-    if (opt->jo_set & JO_CLOSE_CALLBACK)
-	free_set_callback(&channel->ch_close_cb, &opt->jo_close_cb);
+    إذا (opt->jo_سېټ & JO_CLOSE_CALLBACK)
+	free_سېټ_callback(&channel->ch_close_cb, &opt->jo_close_cb);
     channel->ch_drop_never = opt->jo_drop_never;
 
-    if ((opt->jo_set & JO_OUT_IO) && opt->jo_io[PART_OUT] == JIO_BUFFER)
+    إذا ((opt->jo_سېټ & JO_بهر_IO) && opt->jo_io[PART_بهر] == JIO_بفر)
     {
 	buf_T *buf;
 
 	// writing output to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_OUT_MODE))
-	    channel->ch_part[PART_OUT].ch_mode = CH_MODE_NL;
-	if (opt->jo_set & JO_OUT_BUF)
+	إذا (!(opt->jo_سېټ & JO_بهر_ډېرپېښ))
+	    channel->ch_part[PART_بهر].ch_ډېرپېښ = CH_ډېرپېښ_NL;
+	إذا (opt->jo_سېټ & JO_بهر_BUF)
 	{
-	    buf = buflist_findnr(opt->jo_io_buf[PART_OUT]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_OUT]);
+	    buf = buflist_findnr(opt->jo_io_buf[PART_بهر]);
+	    إذا (buf == عدم)
+		semsg(_(e_بفر_nr_does_not_exist),
+					       (اوږد)opt->jo_io_buf[PART_بهر]);
 	}
-	else
+	وإلا
 	{
-	    int msg = TRUE;
+	    صحيح پیغام = TRUE;
 
-	    if (opt->jo_set2 & JO2_OUT_MSG)
-		msg = opt->jo_message[PART_OUT];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, msg);
+	    إذا (opt->jo_set2 & JO2_بهر_پیغام)
+		پیغام = opt->jo_پیغام[PART_بهر];
+	    buf = channel_پیدا_کړه_بفر(opt->jo_io_name[PART_بهر], FALSE, پیغام);
 	}
-	if (buf != NULL)
+	إذا (buf != عدم)
 	{
-	    if (opt->jo_set & JO_OUT_MODIFIABLE)
-		channel->ch_part[PART_OUT].ch_nomodifiable =
-						!opt->jo_modifiable[PART_OUT];
+	    إذا (opt->jo_سېټ & JO_بهر_MODIFIABLE)
+		channel->ch_part[PART_بهر].ch_nomodifiable =
+						!opt->jo_modifiable[PART_بهر];
 
-	    if (!buf->b_p_ma && !channel->ch_part[PART_OUT].ch_nomodifiable)
+	    إذا (!buf->b_p_ma && !channel->ch_part[PART_بهر].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    وإلا
 	    {
 		ch_log(channel, "writing out to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_OUT].ch_bufref, buf);
+						       (حرف *)buf->b_ffname);
+		سېټ_bufref(&channel->ch_part[PART_بهر].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		إذا (buf->b_ml.ml_mfp == عدم)
+		    prepare_بفر(buf);
 	    }
 	}
     }
 
-    if ((opt->jo_set & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_BUFFER
-	 || (opt->jo_io[PART_ERR] == JIO_OUT && (opt->jo_set & JO_OUT_IO)
-				       && opt->jo_io[PART_OUT] == JIO_BUFFER)))
+    إذا ((opt->jo_سېټ & JO_ERR_IO) && (opt->jo_io[PART_ERR] == JIO_بفر
+	 || (opt->jo_io[PART_ERR] == JIO_بهر && (opt->jo_سېټ & JO_بهر_IO)
+				       && opt->jo_io[PART_بهر] == JIO_بفر)))
     {
 	buf_T *buf;
 
 	// writing err to a buffer. Default mode is NL.
-	if (!(opt->jo_set & JO_ERR_MODE))
-	    channel->ch_part[PART_ERR].ch_mode = CH_MODE_NL;
-	if (opt->jo_io[PART_ERR] == JIO_OUT)
-	    buf = channel->ch_part[PART_OUT].ch_bufref.br_buf;
-	else if (opt->jo_set & JO_ERR_BUF)
+	إذا (!(opt->jo_سېټ & JO_ERR_ډېرپېښ))
+	    channel->ch_part[PART_ERR].ch_ډېرپېښ = CH_ډېرپېښ_NL;
+	إذا (opt->jo_io[PART_ERR] == JIO_بهر)
+	    buf = channel->ch_part[PART_بهر].ch_bufref.br_buf;
+	وإلا إذا (opt->jo_سېټ & JO_ERR_BUF)
 	{
 	    buf = buflist_findnr(opt->jo_io_buf[PART_ERR]);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist),
-					       (long)opt->jo_io_buf[PART_ERR]);
+	    إذا (buf == عدم)
+		semsg(_(e_بفر_nr_does_not_exist),
+					       (اوږد)opt->jo_io_buf[PART_ERR]);
 	}
-	else
+	وإلا
 	{
-	    int msg = TRUE;
+	    صحيح پیغام = TRUE;
 
-	    if (opt->jo_set2 & JO2_ERR_MSG)
-		msg = opt->jo_message[PART_ERR];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, msg);
+	    إذا (opt->jo_set2 & JO2_ERR_پیغام)
+		پیغام = opt->jo_پیغام[PART_ERR];
+	    buf = channel_پیدا_کړه_بفر(opt->jo_io_name[PART_ERR], TRUE, پیغام);
 	}
-	if (buf != NULL)
+	إذا (buf != عدم)
 	{
-	    if (opt->jo_set & JO_ERR_MODIFIABLE)
+	    إذا (opt->jo_سېټ & JO_ERR_MODIFIABLE)
 		channel->ch_part[PART_ERR].ch_nomodifiable =
 						!opt->jo_modifiable[PART_ERR];
-	    if (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
+	    إذا (!buf->b_p_ma && !channel->ch_part[PART_ERR].ch_nomodifiable)
 	    {
 		emsg(_(e_cannot_make_changes_modifiable_is_off));
 	    }
-	    else
+	    وإلا
 	    {
 		ch_log(channel, "writing err to buffer '%s'",
-						       (char *)buf->b_ffname);
-		set_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
+						       (حرف *)buf->b_ffname);
+		سېټ_bufref(&channel->ch_part[PART_ERR].ch_bufref, buf);
 		// if the buffer was deleted or unloaded resurrect it
-		if (buf->b_ml.ml_mfp == NULL)
-		    prepare_buffer(buf);
+		إذا (buf->b_ml.ml_mfp == عدم)
+		    prepare_بفر(buf);
 	    }
 	}
     }
 
-    channel->ch_part[PART_OUT].ch_io = opt->jo_io[PART_OUT];
+    channel->ch_part[PART_بهر].ch_io = opt->jo_io[PART_بهر];
     channel->ch_part[PART_ERR].ch_io = opt->jo_io[PART_ERR];
-    channel->ch_part[PART_IN].ch_io = opt->jo_io[PART_IN];
+    channel->ch_part[PART_دننه].ch_io = opt->jo_io[PART_دننه];
 }
 
 /*
@@ -1301,159 +1301,159 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
  * "unix_path" if it is a unix domain socket. Returns OK on success and FAIL on
  * failure.
  */
-    int
-channel_parse_socketserver_address(
-	char_u	*address,
-	int	*port,
-	char_u	**unix_path,
+    صحيح
+channel_parse_socketserver_پته(
+	char_u	*پته,
+	صحيح	*پورټ,
+	char_u	**unix_لار,
 	bool	quiet)
 {
-    char    *rest;
-    long    val;
+    حرف    *rest;
+    اوږد    val;
 
-    if (*address == NUL)
-	goto fail;
+    إذا (*پته == NUL)
+	اذهب fail;
 
-    if (STRNCMP(address, "unix:", 5) == 0)
+    إذا (STRNCMP(پته, "unix:", 5) == 0)
     {
-	*unix_path = vim_strsave(address + 5);
-	return OK;
+	*unix_لار = vim_strsave(پته + 5);
+	أرجع OK;
     }
 
-    val = strtol((char *)(address), &rest, 10);
-    if (val < 0 || val >= 65536 || *rest != NUL)
+    val = strtol((حرف *)(پته), &rest, 10);
+    إذا (val < 0 || val >= 65536 || *rest != NUL)
     {
-	if (!quiet)
-	    semsg(_(e_invalid_argument_str), address);
-	return FAIL;
+	إذا (!quiet)
+	    semsg(_(e_invalid_دلیل_str), پته);
+	أرجع FAIL;
     }
-    *port = (int)val;
+    *پورټ = (صحيح)val;
 
-    return OK;
+    أرجع OK;
 fail:
-    if (!quiet)
-	semsg(_(e_invalid_argument_str), address);
-    return FAIL;
+    إذا (!quiet)
+	semsg(_(e_invalid_دلیل_str), پته);
+    أرجع FAIL;
 }
 
 /*
  * Implements ch_open().
  */
-    static channel_T *
+    ساكن channel_T *
 channel_open_func(typval_T *argvars)
 {
-    char_u	*address;
+    char_u	*پته;
     char_u	*p;
-    char	*rest;
-    int		port = 0;
-    int		is_ipv6 = FALSE;
-    int		is_unix = FALSE;
-    int		is_stdio = FALSE;
+    حرف	*rest;
+    صحيح		پورټ = 0;
+    صحيح		is_ipv6 = FALSE;
+    صحيح		is_unix = FALSE;
+    صحيح		is_stdio = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = عدم;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return NULL;
+	أرجع عدم;
 
-    address = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN
+    پته = tv_get_string(&argvars[0]);
+    إذا (argvars[1].v_type != VAR_UNKNOWN
 	    && check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return NULL;
+	أرجع عدم;
 
-    if (*address == NUL)
+    إذا (*پته == NUL)
     {
-	semsg(_(e_invalid_argument_str), address);
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), پته);
+	أرجع عدم;
     }
 
-    if (STRCMP(address, "stdio") == 0)
+    إذا (STRCMP(پته, "stdio") == 0)
 	is_stdio = TRUE;
-    else if (STRNCMP(address, "unix:", 5) == 0)
+    وإلا إذا (STRNCMP(پته, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
-	address += 5;
+	پته += 5;
     }
-    else if (*address == '[')
+    وإلا إذا (*پته == '[')
     {
 	// ipv6 address
 	is_ipv6 = TRUE;
-	p = vim_strchr(address + 1, ']');
-	if (p == NULL || *++p != ':')
+	p = vim_strchr(پته + 1, ']');
+	إذا (p == عدم || *++p != ':')
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_دلیل_str), پته);
+	    أرجع عدم;
 	}
     }
-    else
+    وإلا
     {
 	// ipv4 address
-	p = vim_strchr(address, ':');
-	if (p == NULL)
+	p = vim_strchr(پته, ':');
+	إذا (p == عدم)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_دلیل_str), پته);
+	    أرجع عدم;
 	}
     }
 
-    if (!is_unix && !is_stdio)
+    إذا (!is_unix && !is_stdio)
     {
-	port = strtol((char *)(p + 1), &rest, 10);
-	if (port <= 0 || port >= 65536 || *rest != NUL)
+	پورټ = strtol((حرف *)(p + 1), &rest, 10);
+	إذا (پورټ <= 0 || پورټ >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), address);
-	    return NULL;
+	    semsg(_(e_invalid_دلیل_str), پته);
+	    أرجع عدم;
 	}
-	if (is_ipv6)
+	إذا (is_ipv6)
 	{
 	    // strip '[' and ']'
-	    ++address;
+	    ++پته;
 	    *(p - 1) = NUL;
 	}
-	else
+	وإلا
 	    *p = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_دنده_options(&opt);
+    opt.jo_ډېرپېښ = CH_ډېرپېښ_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
+    إذا (get_دنده_options(&argvars[1], &opt,
+	    JO_ډېرپېښ_ALL + JO_CB_ALL + JO_TIMEOUT_ALL
 		+ (is_unix || is_stdio ? 0 : JO_WAITTIME), 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+	اذهب theend;
+    إذا (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_دلیل));
+	اذهب theend;
     }
 
-    if (is_stdio)
+    إذا (is_stdio)
 	channel = channel_open_stdio();
-    else if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel = channel_open((char *)address, port, opt.jo_waittime, NULL);
-    if (channel != NULL)
+    وإلا إذا (is_unix)
+	channel = channel_open_unix((حرف *)پته, عدم);
+    وإلا
+	channel = channel_open((حرف *)پته, پورټ, opt.jo_waittime, عدم);
+    إذا (channel != عدم)
     {
-	int	user_set = opt.jo_set;
+	صحيح	user_سېټ = opt.jo_سېټ;
 
-	opt.jo_set = JO_ALL;
-	if (is_stdio)
+	opt.jo_سېټ = JO_ALL;
+	إذا (is_stdio)
 	    // "mode" and "timeout" apply to both reading and writing, unless
 	    // given for a part specifically.
-	    opt.jo_set &= ~((JO_IN_MODE | JO_OUT_MODE | JO_ERR_MODE
-				| JO_OUT_TIMEOUT | JO_ERR_TIMEOUT) & ~user_set);
-	channel_set_options(channel, &opt);
+	    opt.jo_سېټ &= ~((JO_دننه_ډېرپېښ | JO_بهر_ډېرپېښ | JO_ERR_ډېرپېښ
+				| JO_بهر_TIMEOUT | JO_ERR_TIMEOUT) & ~user_سېټ);
+	channel_سېټ_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_دنده_options(&opt);
+    أرجع channel;
 }
 
 // The channel on the stdin and stdout of Vim, see --stdio-channel.
-static channel_T *stdio_channel = NULL;
+ساكن channel_T *stdio_channel = عدم;
 
 /*
  * Open a channel that reads from the stdin of Vim and writes to its stdout.
@@ -1461,107 +1461,107 @@ static channel_T *stdio_channel = NULL;
  * Returns the channel for success.
  * Returns NULL for failure.
  */
-    static channel_T *
-channel_open_stdio(void)
+    ساكن channel_T *
+channel_open_stdio(فراغ)
 {
     channel_T	*channel;
-    sock_T	in_fd;		// our stdin, the channel reads from it
-    sock_T	out_fd;		// our stdout, the channel writes to it
+    sock_T	دننه_fd;		// our stdin, the channel reads from it
+    sock_T	بهر_fd;		// our stdout, the channel writes to it
 
-    if (!use_stdio_channel)
+    إذا (!use_stdio_channel)
     {
 	emsg(_(e_not_started_with_stdio_channel));
-	return NULL;
+	أرجع عدم;
     }
-    if (stdio_channel != NULL)
+    إذا (stdio_channel != عدم)
     {
 	emsg(_(e_cannot_open_stdio_channel));
-	return NULL;
+	أرجع عدم;
     }
 
     // Point the original stdin and stdout at the null device, so that neither
     // Vim nor the commands it starts can use the channel.
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     {
 	HANDLE	proc = GetCurrentProcess();
 	HANDLE	hin;
 	HANDLE	hout;
 	HANDLE	hnul;
-	int	nul_fd;
+	صحيح	nul_fd;
 
-	if (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
+	إذا (!DuplicateHandle(proc, GetStdHandle(STD_ننوت_HANDLE), proc, &hin,
 					      0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    أرجع عدم;
 	}
-	if (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
+	إذا (!DuplicateHandle(proc, GetStdHandle(STD_OUTPUT_HANDLE), proc,
 				       &hout, 0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    CloseHandle(hin);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    أرجع عدم;
 	}
 	hnul = CreateFile("NUL", GENERIC_READ | GENERIC_WRITE,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,
-		NULL);
-	if (hnul != INVALID_HANDLE_VALUE)
+		FILE_SHARE_READ | FILE_SHARE_WRITE, عدم, OPEN_EXISTING, 0,
+		عدم);
+	إذا (hnul != INVALID_HANDLE_ارزښت)
 	{
-	    SetStdHandle(STD_INPUT_HANDLE, hnul);
-	    SetStdHandle(STD_OUTPUT_HANDLE, hnul);
+	    سېټ_Std_Handle(STD_ننوت_HANDLE, hnul);
+	    سېټ_Std_Handle(STD_OUTPUT_HANDLE, hnul);
 	}
 	// The C runtime keeps its own stdout, used for messages.
 	nul_fd = _open("NUL", _O_RDWR);
-	if (nul_fd >= 0)
+	إذا (nul_fd >= 0)
 	{
 	    _dup2(nul_fd, 1);
 	    _close(nul_fd);
 	}
-	in_fd = (sock_T)hin;
-	out_fd = (sock_T)hout;
+	دننه_fd = (sock_T)hin;
+	بهر_fd = (sock_T)hout;
     }
-#else
+#وإلا
     {
-	int	nul_fd;
+	صحيح	nul_fd;
 
-	in_fd = dup(0);
-	out_fd = dup(1);
-	if (in_fd < 0 || out_fd < 0)
+	دننه_fd = dup(0);
+	بهر_fd = dup(1);
+	إذا (دننه_fd < 0 || بهر_fd < 0)
 	{
-	    if (in_fd >= 0)
-		close(in_fd);
-	    if (out_fd >= 0)
-		close(out_fd);
+	    إذا (دننه_fd >= 0)
+		close(دننه_fd);
+	    إذا (بهر_fd >= 0)
+		close(بهر_fd);
 	    emsg(_(e_cannot_open_stdio_channel));
-	    return NULL;
+	    أرجع عدم;
 	}
-	(void)fcntl(in_fd, F_SETFD, FD_CLOEXEC);
-	(void)fcntl(out_fd, F_SETFD, FD_CLOEXEC);
+	(فراغ)fcntl(دننه_fd, F_SETFD, FD_CLOEXEC);
+	(فراغ)fcntl(بهر_fd, F_SETFD, FD_CLOEXEC);
 	nul_fd = open("/dev/null", O_RDWR);
-	if (nul_fd >= 0)
+	إذا (nul_fd >= 0)
 	{
 	    dup2(nul_fd, 0);
 	    dup2(nul_fd, 1);
 	    close(nul_fd);
 	}
     }
-#endif
+#د_که_پای
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = جمع_کړه_channel();
+    إذا (channel == عدم)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	fd_close(in_fd);
-	fd_close(out_fd);
-	return NULL;
+	ch_error(عدم, "Cannot allocate channel.");
+	fd_close(دننه_fd);
+	fd_close(بهر_fd);
+	أرجع عدم;
     }
-    channel_set_pipes(channel, out_fd, in_fd, INVALID_FD);
+    channel_سېټ_pipes(channel, بهر_fd, دننه_fd, INVALID_FD);
     ch_log(channel, "Using stdin and stdout as a channel");
 
     // Keep a reference for channel_stdio_loop().
     ++channel->ch_refcount;
     stdio_channel = channel;
-    return channel;
+    أرجع channel;
 }
 
 /*
@@ -1571,65 +1571,65 @@ channel_open_stdio(void)
 channel_listen_func(typval_T *argvars)
 {
     char_u	*arg;
-    char	*rest;
-    int		port;
-    int		is_unix = FALSE;
+    حرف	*rest;
+    صحيح		پورټ;
+    صحيح		is_unix = FALSE;
     jobopt_T    opt;
-    channel_T	*channel = NULL;
+    channel_T	*channel = عدم;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && check_for_string_arg(argvars, 0) == FAIL)
-	return NULL;
+	أرجع عدم;
 
     arg = tv_get_string(&argvars[0]);
-    if (*arg == NUL)
+    إذا (*arg == NUL)
     {
-	semsg(_(e_invalid_argument_str), arg);
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), arg);
+	أرجع عدم;
     }
 
-    if (STRNCMP(arg, "unix:", 5) == 0)
+    إذا (STRNCMP(arg, "unix:", 5) == 0)
     {
 	is_unix = TRUE;
 	arg += 5;
-	port = 0;
+	پورټ = 0;
     }
-    else
+    وإلا
     {
-	port = strtol((char *)(arg), &rest, 10);
-	if (port < 0 || port >= 65536 || *rest != NUL)
+	پورټ = strtol((حرف *)(arg), &rest, 10);
+	إذا (پورټ < 0 || پورټ >= 65536 || *rest != NUL)
 	{
-	    semsg(_(e_invalid_argument_str), arg);
-	    return NULL;
+	    semsg(_(e_invalid_دلیل_str), arg);
+	    أرجع عدم;
 	}
 	*arg = NUL;
     }
 
     // parse options
-    clear_job_options(&opt);
-    opt.jo_mode = CH_MODE_JSON;
+    clear_دنده_options(&opt);
+    opt.jo_ډېرپېښ = CH_ډېرپېښ_JSON;
     opt.jo_timeout = 2000;
-    if (get_job_options(&argvars[1], &opt,
-	    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
-	goto theend;
-    if (opt.jo_timeout < 0)
+    إذا (get_دنده_options(&argvars[1], &opt,
+	    JO_ډېرپېښ_ALL + JO_CB_ALL + JO_TIMEOUT_ALL, 0) == FAIL)
+	اذهب theend;
+    إذا (opt.jo_timeout < 0)
     {
-	emsg(_(e_invalid_argument));
-	goto theend;
+	emsg(_(e_invalid_دلیل));
+	اذهب theend;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)arg, NULL, true);
-    else
-	channel = channel_listen(port, NULL);
-    if (channel != NULL)
+    إذا (is_unix)
+	channel = channel_listen_unix((حرف *)arg, عدم, true);
+    وإلا
+	channel = channel_listen(پورټ, عدم);
+    إذا (channel != عدم)
     {
-	opt.jo_set = JO_ALL;
-	channel_set_options(channel, &opt);
+	opt.jo_سېټ = JO_ALL;
+	channel_سېټ_options(channel, &opt);
     }
 theend:
-    free_job_options(&opt);
-    return channel;
+    free_دنده_options(&opt);
+    أرجع channel;
 }
 
 /*
@@ -1639,104 +1639,104 @@ theend:
  */
     channel_T *
 channel_listen(
-	int port_in,
-	void (*nb_close_cb)(void))
+	صحيح پورټ_دننه,
+	فراغ (*nb_close_cb)(فراغ))
 {
-    int			sd = -1;
-    struct sockaddr_in	server;
-#ifndef FEAT_IPV6
-    struct hostent	*host;
-#endif
-    int			val = 1;
+    صحيح			sd = -1;
+    بنية sockaddr_دننه	server;
+#که_نه_تعریف_شوی FEAT_IPV6
+    بنية hostent	*host;
+#د_که_پای
+    صحيح			val = 1;
     channel_T		*channel;
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     channel_init_winsock();
-#endif
+#د_که_پای
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = جمع_کړه_channel();
+    إذا (channel == عدم)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(عدم, "Cannot allocate channel.");
+	أرجع عدم;
     }
 
     // Get the server internet address and put into addr structure
     // fill in the socket address structure and bind to port
-    vim_memset((char *)&server, 0, sizeof(server));
+    vim_memset((حرف *)&server, 0, حجم(server));
     server.sin_family = AF_INET;
-    server.sin_port = htons(port_in);
+    server.sin_پورټ = htons(پورټ_دننه);
     server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     sd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sd == -1)
+    إذا (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
-#ifdef MSWIN
-    if (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
-				    (const char *)&val, sizeof(val)) < 0)
-#else
-    if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
-				    &val, sizeof(val)) < 0)
-#endif
+#که_تعریف_شوی MSWIN
+    إذا (setsockopt(sd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+				    (ثابت حرف *)&val, حجم(val)) < 0)
+#وإلا
+    إذا (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR,
+				    &val, حجم(val)) < 0)
+#د_که_پای
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in setsockopt() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     // Bind the socket to the port
-    if (bind(sd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    إذا (bind(sd, (بنية sockaddr *)&server, حجم(server)) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (listen(sd, 5) < 0)
+    إذا (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     // When port 0 was specified, retrieve the actual port assigned by the OS.
-    if (port_in == 0)
+    إذا (پورټ_دننه == 0)
     {
-	struct sockaddr_in	addr;
-	socklen_t		addr_len = sizeof(addr);
+	بنية sockaddr_دننه	addr;
+	socklen_t		addr_len = حجم(addr);
 
-	if (getsockname(sd, (struct sockaddr *)&addr, &addr_len) == 0)
-	    port_in = ntohs(addr.sin_port);
+	إذا (getsockname(sd, (بنية sockaddr *)&addr, &addr_len) == 0)
+	    پورټ_دننه = ntohs(addr.sin_پورټ);
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)"");
-    channel->ch_port = port_in;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (حرف *)vim_strsave((char_u *)"");
+    channel->ch_پورټ = پورټ_دننه;
+    channel->ch_منزل_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#که_تعریف_شوی FEAT_GUI
+    channel_gui_ثبتوونکی_one(channel, PART_SOCK);
+#د_که_پای
 
-    return channel;
+    أرجع channel;
 }
 
 /*
@@ -1747,162 +1747,162 @@ channel_listen(
  */
     channel_T *
 channel_listen_unix(
-	char *path,
-	void (*nb_close_cb)(void),
+	حرف *لار,
+	فراغ (*nb_close_cb)(فراغ),
 	bool replace)
 {
-    int			sd = -1;
-    struct sockaddr_un	server;
+    صحيح			sd = -1;
+    بنية sockaddr_un	server;
     channel_T		*channel;
-    size_t		path_len;
+    size_t		لار_len;
     size_t		server_len;
 
-    if (path == NULL || *path == NUL)
+    إذا (لار == عدم || *لار == NUL)
     {
-	semsg(_(e_invalid_argument_str), path == NULL ? (char *)"" : path);
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), لار == عدم ? (حرف *)"" : لار);
+	أرجع عدم;
     }
 
-    path_len = STRLEN(path);
-    if (path_len >= sizeof(server.sun_path))
+    لار_len = STRLEN(لار);
+    إذا (لار_len >= حجم(server.sun_لار))
     {
-	semsg(_(e_invalid_argument_str), path);
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), لار);
+	أرجع عدم;
     }
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     channel_init_winsock();
-#endif
+#د_که_پای
 
-    channel = add_channel();
-    if (channel == NULL)
+    channel = جمع_کړه_channel();
+    إذا (channel == عدم)
     {
-	ch_error(NULL, "Cannot allocate channel.");
-	return NULL;
+	ch_error(عدم, "Cannot allocate channel.");
+	أرجع عدم;
     }
 
-    CLEAR_FIELD(server);
+    CLEAR_ډګر(server);
     server.sun_family = AF_UNIX;
-    STRNCPY(server.sun_path, path, sizeof(server.sun_path) - 1);
+    STRNCPY(server.sun_لار, لار, حجم(server.sun_لار) - 1);
 
     sd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sd == -1)
+    إذا (sd == -1)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in socket() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (replace)
+    إذا (replace)
 	// Unlink the socket in case it already exists
-	unlink(server.sun_path);
+	unlink(server.sun_لار);
 
     // Bind the socket to the path
-    server_len = offsetof(struct sockaddr_un, sun_path) + path_len + 1;
-    if (bind(sd, (struct sockaddr *)&server, (int)server_len) < 0)
+    server_len = offsetof(بنية sockaddr_un, sun_لار) + لار_len + 1;
+    إذا (bind(sd, (بنية sockaddr *)&server, (صحيح)server_len) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in bind() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (listen(sd, 5) < 0)
+    إذا (listen(sd, 5) < 0)
     {
 	SOCK_ERRNO;
 	ch_error(channel, "in listen() in channel_listen_unix().");
-	PERROR(_(e_cannot_listen_on_port));
+	PERROR(_(e_cannot_listen_on_پورټ));
 	sock_close(sd);
 	channel_free(channel);
-	return NULL;
+	أرجع عدم;
     }
 
     channel->ch_listen = TRUE;
     channel->CH_SOCK_FD = (sock_T)sd;
     channel->ch_nb_close_cb = nb_close_cb;
-    channel->ch_hostname = (char *)vim_strsave((char_u *)path);
-    channel->ch_port = 0;
-    channel->ch_to_be_closed |= (1U << PART_SOCK);
+    channel->ch_hostname = (حرف *)vim_strsave((char_u *)لار);
+    channel->ch_پورټ = 0;
+    channel->ch_منزل_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-    channel_gui_register_one(channel, PART_SOCK);
-#endif
+#که_تعریف_شوی FEAT_GUI
+    channel_gui_ثبتوونکی_one(channel, PART_SOCK);
+#د_که_پای
 
-    return channel;
+    أرجع channel;
 }
 
-     void
+     فراغ
 ch_close_part(channel_T *channel, ch_part_T part)
 {
     sock_T *fd = &channel->ch_part[part].ch_fd;
 
-    if (*fd == INVALID_FD)
-	return;
+    إذا (*fd == INVALID_FD)
+	أرجع;
 
-    if (part == PART_SOCK)
+    إذا (part == PART_SOCK)
 	sock_close(*fd);
-    else
+    وإلا
     {
 	// When using a pty the same FD is set on multiple parts, only
 	// close it when the last reference is closed.
-	if ((part == PART_IN || channel->CH_IN_FD != *fd)
-		&& (part == PART_OUT || channel->CH_OUT_FD != *fd)
+	إذا ((part == PART_دننه || channel->CH_دننه_FD != *fd)
+		&& (part == PART_بهر || channel->CH_بهر_FD != *fd)
 		&& (part == PART_ERR || channel->CH_ERR_FD != *fd))
 	{
-#ifdef MSWIN
-	    if (channel->ch_named_pipe)
+#که_تعریف_شوی MSWIN
+	    إذا (channel->ch_named_pipe)
 		DisconnectNamedPipe((HANDLE)fd);
-#endif
+#د_که_پای
 	    fd_close(*fd);
 	}
     }
     *fd = INVALID_FD;
 
     // channel is closed, may want to end the job if it was the last
-    channel->ch_to_be_closed &= ~(1U << part);
+    channel->ch_منزل_be_closed &= ~(1U << part);
 }
 
-    void
-channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
+    فراغ
+channel_سېټ_pipes(channel_T *channel, sock_T دننه, sock_T بهر, sock_T err)
 {
-    if (in != INVALID_FD)
+    إذا (دننه != INVALID_FD)
     {
-	ch_close_part(channel, PART_IN);
-	channel->CH_IN_FD = in;
-#if defined(UNIX)
+	ch_close_part(channel, PART_دننه);
+	channel->CH_دننه_FD = دننه;
+#إذا defined(UNIX)
 	// Do not end the job when all output channels are closed, wait until
 	// the job ended.
-	if (mch_isatty(in))
-	    channel->ch_to_be_closed |= (1U << PART_IN);
-#endif
+	إذا (mch_isatty(دننه))
+	    channel->ch_منزل_be_closed |= (1U << PART_دننه);
+#د_که_پای
     }
-    if (out != INVALID_FD)
+    إذا (بهر != INVALID_FD)
     {
-#if defined(FEAT_GUI)
-	channel_gui_unregister_one(channel, PART_OUT);
-#endif
-	ch_close_part(channel, PART_OUT);
-	channel->CH_OUT_FD = out;
-	channel->ch_to_be_closed |= (1U << PART_OUT);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_OUT);
-#endif
+#إذا defined(FEAT_GUI)
+	channel_gui_unregister_one(channel, PART_بهر);
+#د_که_پای
+	ch_close_part(channel, PART_بهر);
+	channel->CH_بهر_FD = بهر;
+	channel->ch_منزل_be_closed |= (1U << PART_بهر);
+#إذا defined(FEAT_GUI)
+	channel_gui_ثبتوونکی_one(channel, PART_بهر);
+#د_که_پای
     }
-    if (err != INVALID_FD)
+    إذا (err != INVALID_FD)
     {
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 	channel_gui_unregister_one(channel, PART_ERR);
-#endif
+#د_که_پای
 	ch_close_part(channel, PART_ERR);
 	channel->CH_ERR_FD = err;
-	channel->ch_to_be_closed |= (1U << PART_ERR);
-#if defined(FEAT_GUI)
-	channel_gui_register_one(channel, PART_ERR);
-#endif
+	channel->ch_منزل_be_closed |= (1U << PART_ERR);
+#إذا defined(FEAT_GUI)
+	channel_gui_ثبتوونکی_one(channel, PART_ERR);
+#د_که_پای
     }
 }
 
@@ -1910,95 +1910,95 @@ channel_set_pipes(channel_T *channel, sock_T in, sock_T out, sock_T err)
  * Sets the job the channel is associated with and associated options.
  * This does not keep a refcount, when the job is freed ch_job is cleared.
  */
-    void
-channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
+    فراغ
+channel_سېټ_دنده(channel_T *channel, دنده_T *دنده, jobopt_T *options)
 {
-    channel->ch_job = job;
+    channel->ch_دنده = دنده;
 
-    channel_set_options(channel, options);
+    channel_سېټ_options(channel, options);
 
-    if (job->jv_in_buf == NULL)
-	return;
+    إذا (دنده->jv_دننه_buf == عدم)
+	أرجع;
 
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *دننه_part = &channel->ch_part[PART_دننه];
 
-    set_bufref(&in_part->ch_bufref, job->jv_in_buf);
+    سېټ_bufref(&دننه_part->ch_bufref, دنده->jv_دننه_buf);
     ch_log(channel, "reading from buffer '%s'",
-	    (char *)in_part->ch_bufref.br_buf->b_ffname);
-    if (options->jo_set & JO_IN_TOP)
+	    (حرف *)دننه_part->ch_bufref.br_buf->b_ffname);
+    إذا (options->jo_سېټ & JO_دننه_سر)
     {
-	if (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
+	إذا (options->jo_دننه_سر == 0 && !(options->jo_سېټ & JO_دننه_BOT))
 	{
 	    // Special mode: send last-but-one line when appending a line
 	    // to the buffer.
-	    in_part->ch_bufref.br_buf->b_write_to_channel = true;
-	    in_part->ch_buf_append = TRUE;
-	    in_part->ch_buf_top =
-		in_part->ch_bufref.br_buf->b_ml.ml_line_count + 1;
+	    دننه_part->ch_bufref.br_buf->b_write_منزل_channel = true;
+	    دننه_part->ch_buf_append = TRUE;
+	    دننه_part->ch_buf_سر =
+		دننه_part->ch_bufref.br_buf->b_ml.ml_کرښه_شمېر + 1;
 	}
-	else
-	    in_part->ch_buf_top = options->jo_in_top;
+	وإلا
+	    دننه_part->ch_buf_سر = options->jo_دننه_سر;
     }
-    else
-	in_part->ch_buf_top = 1;
-    if (options->jo_set & JO_IN_BOT)
-	in_part->ch_buf_bot = options->jo_in_bot;
-    else
-	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_line_count;
+    وإلا
+	دننه_part->ch_buf_سر = 1;
+    إذا (options->jo_سېټ & JO_دننه_BOT)
+	دننه_part->ch_buf_bot = options->jo_دننه_bot;
+    وإلا
+	دننه_part->ch_buf_bot = دننه_part->ch_bufref.br_buf->b_ml.ml_کرښه_شمېر;
 }
 
 /*
  * Set the callback for "channel"/"part" for the response with "id".
  */
-    static void
-channel_set_req_callback(
+    ساكن فراغ
+channel_سېټ_req_callback(
 	channel_T   *channel,
 	ch_part_T   part,
 	callback_T  *callback,
-	int	    id)
+	صحيح	    id)
 {
-    cbq_T *head = &channel->ch_part[part].ch_cb_head;
-    cbq_T *item = ALLOC_ONE(cbq_T);
+    cbq_T *سر = &channel->ch_part[part].ch_cb_سر;
+    cbq_T *توکی = ALLOC_ONE(cbq_T);
 
-    if (item == NULL)
-	return;
+    إذا (توکی == عدم)
+	أرجع;
 
-    copy_callback(&item->cq_callback, callback);
-    item->cq_seq_nr = id;
-    item->cq_prev = head->cq_prev;
-    head->cq_prev = item;
-    item->cq_next = NULL;
-    if (item->cq_prev == NULL)
-	head->cq_next = item;
-    else
-	item->cq_prev->cq_next = item;
+    copy_callback(&توکی->cq_callback, callback);
+    توکی->cq_seq_nr = id;
+    توکی->cq_prev = سر->cq_prev;
+    سر->cq_prev = توکی;
+    توکی->cq_بل = عدم;
+    إذا (توکی->cq_prev == عدم)
+	سر->cq_بل = توکی;
+    وإلا
+	توکی->cq_prev->cq_بل = توکی;
 }
 
-    static void
-write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
+    ساكن فراغ
+write_buf_کرښه(buf_T *buf, linenr_T lnum, channel_T *channel)
 {
-    char_u  *line = ml_get_buf(buf, lnum, FALSE);
-    int	    len = ml_get_buf_len(buf, lnum);
+    char_u  *کرښه = ml_get_buf(buf, lnum, FALSE);
+    صحيح	    len = ml_get_buf_len(buf, lnum);
     char_u  *p;
-    int	    i;
+    صحيح	    i;
 
     // Need to make a copy to be able to append a NL.
-    if ((p = alloc(len + 2)) == NULL)
-	return;
-    memcpy((char *)p, (char *)line, len);
+    إذا ((p = alloc(len + 2)) == عدم)
+	أرجع;
+    حافظه_نقل((حرف *)p, (حرف *)کرښه, len);
 
-    if (channel->ch_write_text_mode)
+    إذا (channel->ch_write_متن_ډېرپېښ)
 	p[len] = CAR;
-    else
+    وإلا
     {
-	for (i = 0; i < len; ++i)
-	    if (p[i] == NL)
+	لكل (i = 0; i < len; ++i)
+	    إذا (p[i] == NL)
 		p[i] = NUL;
 
 	p[len] = NL;
     }
     p[len + 1] = NUL;
-    channel_send(channel, PART_IN, p, len + 1, "write_buf_line");
+    channel_send(channel, PART_دننه, p, len + 1, "write_buf_line");
     vim_free(p);
 }
 
@@ -2006,153 +2006,153 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
  * Return TRUE if "channel" can be written to.
  * Returns FALSE if the input is closed or the write would block.
  */
-    static int
-can_write_buf_line(channel_T *channel)
+    ساكن صحيح
+can_write_buf_کرښه(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *دننه_part = &channel->ch_part[PART_دننه];
 
-    if (in_part->ch_fd == INVALID_FD)
-	return FALSE;  // pipe was closed
+    إذا (دننه_part->ch_fd == INVALID_FD)
+	أرجع FALSE;  // pipe was closed
 
     // for testing: block every other attempt to write
-    if (in_part->ch_block_write == 1)
-	in_part->ch_block_write = -1;
-    else if (in_part->ch_block_write == -1)
-	in_part->ch_block_write = 1;
+    إذا (دننه_part->ch_بلاک_write == 1)
+	دننه_part->ch_بلاک_write = -1;
+    وإلا إذا (دننه_part->ch_بلاک_write == -1)
+	دننه_part->ch_بلاک_write = 1;
 
     // TODO: Win32 implementation, probably using WaitForMultipleObjects()
-#ifndef MSWIN
+#که_نه_تعریف_شوی MSWIN
     {
-# if defined(HAVE_SELECT)
-	struct timeval	tval;
+# إذا defined(HAVE_SELECT)
+	بنية timeval	tval;
 	fd_set		wfds;
-	int		ret;
+	صحيح		ret;
 
 	FD_ZERO(&wfds);
-	FD_SET((int)in_part->ch_fd, &wfds);
+	FD_SET((صحيح)دننه_part->ch_fd, &wfds);
 	tval.tv_sec = 0;
 	tval.tv_usec = 0;
-	for (;;)
+	لكل (;;)
 	{
-	    ret = select((int)in_part->ch_fd + 1, NULL, &wfds, NULL, &tval);
+	    ret = select((صحيح)دننه_part->ch_fd + 1, عدم, &wfds, عدم, &tval);
 #  ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    إذا (ret == -1 && errno == EINTR)
+		استمر;
 #  endif
-	    if (ret <= 0 || in_part->ch_block_write == 1)
+	    إذا (ret <= 0 || دننه_part->ch_بلاک_write == 1)
 	    {
-		if (ret > 0)
+		إذا (ret > 0)
 		    ch_log(channel, "FAKED Input not ready for writing");
-		else
+		وإلا
 		    ch_log(channel, "Input not ready for writing");
-		return FALSE;
+		أرجع FALSE;
 	    }
-	    break;
+	    اكسر;
 	}
-# else
-	struct pollfd	fds;
+# وإلا
+	بنية pollfd	fds;
 
-	fds.fd = in_part->ch_fd;
+	fds.fd = دننه_part->ch_fd;
 	fds.events = POLLOUT;
-	if (poll(&fds, 1, 0) <= 0)
+	إذا (poll(&fds, 1, 0) <= 0)
 	{
 	    ch_log(channel, "Input not ready for writing");
-	    return FALSE;
+	    أرجع FALSE;
 	}
-	if (in_part->ch_block_write == 1)
+	إذا (دننه_part->ch_بلاک_write == 1)
 	{
 	    ch_log(channel, "FAKED Input not ready for writing");
-	    return FALSE;
+	    أرجع FALSE;
 	}
 # endif
     }
-#endif
-    return TRUE;
+#د_که_پای
+    أرجع TRUE;
 }
 
 /*
  * Write any buffer lines to the input channel.
  */
-    void
-channel_write_in(channel_T *channel)
+    فراغ
+channel_write_دننه(channel_T *channel)
 {
-    chanpart_T *in_part = &channel->ch_part[PART_IN];
+    chanpart_T *دننه_part = &channel->ch_part[PART_دننه];
     linenr_T    lnum;
-    buf_T	*buf = in_part->ch_bufref.br_buf;
-    int		written = 0;
+    buf_T	*buf = دننه_part->ch_bufref.br_buf;
+    صحيح		written = 0;
 
-    if (buf == NULL || in_part->ch_buf_append)
-	return;  // no buffer or using appending
-    if (!bufref_valid(&in_part->ch_bufref) || buf->b_ml.ml_mfp == NULL)
+    إذا (buf == عدم || دننه_part->ch_buf_append)
+	أرجع;  // no buffer or using appending
+    إذا (!bufref_valid(&دننه_part->ch_bufref) || buf->b_ml.ml_mfp == عدم)
     {
 	// buffer was wiped out or unloaded
 	ch_log(channel, "input buffer has been wiped out");
-	in_part->ch_bufref.br_buf = NULL;
-	return;
+	دننه_part->ch_bufref.br_buf = عدم;
+	أرجع;
     }
 
-    for (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
-				   && lnum <= buf->b_ml.ml_line_count; ++lnum)
+    لكل (lnum = دننه_part->ch_buf_سر; lnum <= دننه_part->ch_buf_bot
+				   && lnum <= buf->b_ml.ml_کرښه_شمېر; ++lnum)
     {
-	if (!can_write_buf_line(channel))
-	    break;
-	write_buf_line(buf, lnum, channel);
+	إذا (!can_write_buf_کرښه(channel))
+	    اكسر;
+	write_buf_کرښه(buf, lnum, channel);
 	++written;
     }
 
-    if (written == 1)
-	ch_log(channel, "written line %d to channel", (int)lnum - 1);
-    else if (written > 1)
+    إذا (written == 1)
+	ch_log(channel, "written line %d to channel", (صحيح)lnum - 1);
+    وإلا إذا (written > 1)
 	ch_log(channel, "written %d lines to channel", written);
 
-    in_part->ch_buf_top = lnum;
-    if (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
+    دننه_part->ch_buf_سر = lnum;
+    إذا (lnum > buf->b_ml.ml_کرښه_شمېر || lnum > دننه_part->ch_buf_bot)
     {
-#if defined(FEAT_TERMINAL)
+#إذا defined(FEAT_TERMINAL)
 	// Send CTRL-D or "eof_chars" to close stdin on MS-Windows.
-	if (channel->ch_job != NULL)
-	    term_send_eof(channel);
-#endif
+	إذا (channel->ch_دنده != عدم)
+	    غړی_send_eof(channel);
+#د_که_پای
 
 	// Writing is done, no longer need the buffer.
-	in_part->ch_bufref.br_buf = NULL;
+	دننه_part->ch_bufref.br_buf = عدم;
 	ch_log(channel, "Finished writing all lines to channel");
 
 	// Close the pipe/socket, so that the other side gets EOF.
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 	// At this point, the input part of the conpty channel must not be
 	// closed.  If it is closed, the pipe will be destroyed, the console
 	// that was using it will be destroyed, and the process running within
 	// it will be forcibly terminated, so this needs to be prevented.
-	if (!channel->ch_anonymous_pipe)
-#endif
-	    ch_close_part(channel, PART_IN);
+	إذا (!channel->ch_anonymous_pipe)
+#د_که_پای
+	    ch_close_part(channel, PART_دننه);
     }
-    else
+    وإلا
 	ch_log(channel, "Still %ld more lines to write",
-				   (long)(buf->b_ml.ml_line_count - lnum + 1));
+				   (اوږد)(buf->b_ml.ml_کرښه_شمېر - lnum + 1));
 }
 
 /*
  * Handle buffer "buf" being freed, remove it from any channels.
  */
-    void
-channel_buffer_free(buf_T *buf)
+    فراغ
+channel_بفر_free(buf_T *buf)
 {
     channel_T	*channel;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	لكل (part = PART_SOCK; part < PART_شمېر; ++part)
 	{
 	    chanpart_T  *ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_bufref.br_buf == buf)
+	    إذا (ch_part->ch_bufref.br_buf == buf)
 	    {
 		ch_log(channel, "%s buffer has been wiped out",
-							  ch_part_names[part]);
-		ch_part->ch_bufref.br_buf = NULL;
+							  ch_part_نومونه[part]);
+		ch_part->ch_bufref.br_buf = عدم;
 	    }
 	}
 }
@@ -2160,90 +2160,90 @@ channel_buffer_free(buf_T *buf)
 /*
  * Write any lines waiting to be written to "channel".
  */
-    void
-channel_write_input(channel_T *channel)
+    فراغ
+channel_write_ننوت(channel_T *channel)
 {
-    chanpart_T	*in_part = &channel->ch_part[PART_IN];
+    chanpart_T	*دننه_part = &channel->ch_part[PART_دننه];
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	channel_send(channel, PART_IN, (char_u *)"", 0, "channel_write_input");
-    else if (in_part->ch_bufref.br_buf != NULL)
+    إذا (دننه_part->ch_writeque.wq_بل != عدم)
+	channel_send(channel, PART_دننه, (char_u *)"", 0, "channel_write_input");
+    وإلا إذا (دننه_part->ch_bufref.br_buf != عدم)
     {
-	if (in_part->ch_buf_append)
-	    channel_write_new_lines(in_part->ch_bufref.br_buf);
-	else
-	    channel_write_in(channel);
+	إذا (دننه_part->ch_buf_append)
+	    channel_write_new_کرښې(دننه_part->ch_bufref.br_buf);
+	وإلا
+	    channel_write_دننه(channel);
     }
 }
 
 /*
  * Write any lines waiting to be written to a channel.
  */
-    void
-channel_write_any_lines(void)
+    فراغ
+channel_write_any_کرښې(فراغ)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_write_input(channel);
+	channel_write_ننوت(channel);
 }
 
 /*
  * Write appended lines above the last one in "buf" to the channel.
  */
-    void
-channel_write_new_lines(buf_T *buf)
+    فراغ
+channel_write_new_کرښې(buf_T *buf)
 {
     channel_T	*channel;
-    int		found_one = FALSE;
+    صحيح		وموندل_one = FALSE;
 
     // There could be more than one channel for the buffer, loop over all of
     // them.
     FOR_ALL_CHANNELS(channel)
     {
-	chanpart_T  *in_part = &channel->ch_part[PART_IN];
+	chanpart_T  *دننه_part = &channel->ch_part[PART_دننه];
 	linenr_T    lnum;
-	int	    written = 0;
+	صحيح	    written = 0;
 
-	if (in_part->ch_bufref.br_buf == buf && in_part->ch_buf_append)
+	إذا (دننه_part->ch_bufref.br_buf == buf && دننه_part->ch_buf_append)
 	{
-	    if (in_part->ch_fd == INVALID_FD)
-		continue;  // pipe was closed
-	    found_one = TRUE;
-	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
+	    إذا (دننه_part->ch_fd == INVALID_FD)
+		استمر;  // pipe was closed
+	    وموندل_one = TRUE;
+	    لكل (lnum = دننه_part->ch_buf_bot; lnum < buf->b_ml.ml_کرښه_شمېر;
 								       ++lnum)
 	    {
-		if (!can_write_buf_line(channel))
-		    break;
-		write_buf_line(buf, lnum, channel);
+		إذا (!can_write_buf_کرښه(channel))
+		    اكسر;
+		write_buf_کرښه(buf, lnum, channel);
 		++written;
 	    }
 
-	    if (written == 1)
-		ch_log(channel, "written line %d to channel", (int)lnum - 1);
-	    else if (written > 1)
+	    إذا (written == 1)
+		ch_log(channel, "written line %d to channel", (صحيح)lnum - 1);
+	    وإلا إذا (written > 1)
 		ch_log(channel, "written %d lines to channel", written);
-	    if (lnum < buf->b_ml.ml_line_count)
+	    إذا (lnum < buf->b_ml.ml_کرښه_شمېر)
 		ch_log(channel, "Still %ld more lines to write",
-				       (long)(buf->b_ml.ml_line_count - lnum));
+				       (اوږد)(buf->b_ml.ml_کرښه_شمېر - lnum));
 
-	    in_part->ch_buf_bot = lnum;
+	    دننه_part->ch_buf_bot = lnum;
 	}
     }
-    if (!found_one)
-	buf->b_write_to_channel = false;
+    إذا (!وموندل_one)
+	buf->b_write_منزل_channel = false;
 }
 
 /*
  * Invoke the "callback" on channel "channel".
  * This does not redraw but sets channel_need_redraw;
  */
-    static void
+    ساكن فراغ
 invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
 {
     typval_T	rettv;
 
-    if (safe_to_invoke_callback == 0)
+    إذا (خوندي_منزل_invoke_callback == 0)
 	iemsg("Invoking callback when it is not safe");
 
     argv[0].v_type = VAR_CHANNEL;
@@ -2261,9 +2261,9 @@ invoke_callback(channel_T *channel, callback_T *callback, typval_T *argv)
     readq_T *
 channel_peek(channel_T *channel, ch_part_T part)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *سر = &channel->ch_part[part].ch_سر;
 
-    return head->rq_next;
+    أرجع سر->rq_بل;
 }
 
 /*
@@ -2272,15 +2272,15 @@ channel_peek(channel_T *channel, ch_part_T part)
  * Returns NULL if there is no NL.
  */
     char_u *
-channel_first_nl(readq_T *node)
+channel_لومړی_nl(readq_T *غوټه)
 {
-    char_u  *buffer = node->rq_buffer;
+    char_u  *بفر = غوټه->rq_بفر;
     long_u  i;
 
-    for (i = 0; i < node->rq_buflen; ++i)
-	if (buffer[i] == NL)
-	    return buffer + i;
-    return NULL;
+    لكل (i = 0; i < غوټه->rq_buflen; ++i)
+	إذا (بفر[i] == NL)
+	    أرجع بفر + i;
+    أرجع عدم;
 }
 
 /*
@@ -2289,115 +2289,115 @@ channel_first_nl(readq_T *node)
  * Returns NULL if there is nothing.
  */
     char_u *
-channel_get(channel_T *channel, ch_part_T part, int *outlen)
+channel_get(channel_T *channel, ch_part_T part, صحيح *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
+    readq_T *سر = &channel->ch_part[part].ch_سر;
+    readq_T *غوټه = سر->rq_بل;
     char_u *p;
 
-    if (node == NULL)
-	return NULL;
-    if (outlen != NULL)
-	*outlen += node->rq_buflen;
+    إذا (غوټه == عدم)
+	أرجع عدم;
+    إذا (outlen != عدم)
+	*outlen += غوټه->rq_buflen;
     // dispose of the node but keep the buffer
-    p = node->rq_buffer;
-    head->rq_next = node->rq_next;
-    if (node->rq_next == NULL)
-	head->rq_prev = NULL;
-    else
-	node->rq_next->rq_prev = NULL;
-    vim_free(node);
-    return p;
+    p = غوټه->rq_بفر;
+    سر->rq_بل = غوټه->rq_بل;
+    إذا (غوټه->rq_بل == عدم)
+	سر->rq_prev = عدم;
+    وإلا
+	غوټه->rq_بل->rq_prev = عدم;
+    vim_free(غوټه);
+    أرجع p;
 }
 
 /*
  * Returns the whole buffer contents concatenated for "channel"/"part".
  * Replaces NUL bytes with NL.
  */
-    static char_u *
-channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
+    ساكن char_u *
+channel_get_all(channel_T *channel, ch_part_T part, صحيح *outlen)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node;
+    readq_T *سر = &channel->ch_part[part].ch_سر;
+    readq_T *غوټه;
     long_u  len = 0;
     char_u  *res;
     char_u  *p;
 
     // Concatenate everything into one buffer.
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
-	len += node->rq_buflen;
+    لكل (غوټه = سر->rq_بل; غوټه != عدم; غوټه = غوټه->rq_بل)
+	len += غوټه->rq_buflen;
     res = alloc(len + 1);
-    if (res == NULL)
-	return NULL;
+    إذا (res == عدم)
+	أرجع عدم;
     p = res;
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    لكل (غوټه = سر->rq_بل; غوټه != عدم; غوټه = غوټه->rq_بل)
     {
-	mch_memmove(p, node->rq_buffer, node->rq_buflen);
-	p += node->rq_buflen;
+	mch_memmove(p, غوټه->rq_بفر, غوټه->rq_buflen);
+	p += غوټه->rq_buflen;
     }
     *p = NUL;
 
     // Free all buffers
-    do
+    افعل
     {
-	p = channel_get(channel, part, NULL);
+	p = channel_get(channel, part, عدم);
 	vim_free(p);
-    } while (p != NULL);
+    } طالما (p != عدم);
 
-    if (outlen != NULL)
+    إذا (outlen != عدم)
     {
 	// Returning the length, keep NUL characters.
 	*outlen += len;
-	return res;
+	أرجع res;
     }
 
     // Turn all NUL into NL, so that the result can be used as a string.
     p = res;
-    while (p < res + len)
+    طالما (p < res + len)
     {
-	if (*p == NUL)
+	إذا (*p == NUL)
 	    *p = NL;
-#ifdef MSWIN
-	else if (*p == 0x1b)
+#که_تعریف_شوی MSWIN
+	وإلا إذا (*p == 0x1b)
 	{
 	    // crush the escape sequence OSC 0/1/2: ESC ]0;
-	    if (p + 3 < res + len
+	    إذا (p + 3 < res + len
 		    && p[1] == ']'
 		    && (p[2] == '0' || p[2] == '1' || p[2] == '2')
 		    && p[3] == ';')
 	    {
 		// '\a' becomes a NL
-		while (p < res + (len - 1) && *p != '\a')
+		طالما (p < res + (len - 1) && *p != '\a')
 		    ++p;
 		// BEL is zero width characters, suppress display mistake
 		// ConPTY (after 10.0.18317) requires advance checking
-		if (p[-1] == NUL)
+		إذا (p[-1] == NUL)
 		    p[-1] = 0x07;
 	    }
 	}
-#endif
+#د_که_پای
 	++p;
     }
 
-    return res;
+    أرجع res;
 }
 
 /*
  * Consume "len" bytes from the head of "node".
  * Caller must check these bytes are available.
  */
-    void
-channel_consume(channel_T *channel, ch_part_T part, int len)
+    فراغ
+channel_consume(channel_T *channel, ch_part_T part, صحيح len)
 {
-    readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
-    char_u *buf = node->rq_buffer;
+    readq_T *سر = &channel->ch_part[part].ch_سر;
+    readq_T *غوټه = سر->rq_بل;
+    char_u *buf = غوټه->rq_بفر;
 
-    if (len < 0 || (long_u)len > node->rq_buflen)
-	return;
-    mch_memmove(buf, buf + len, node->rq_buflen - len);
-    node->rq_buflen -= len;
-    node->rq_buffer[node->rq_buflen] = NUL;
+    إذا (len < 0 || (long_u)len > غوټه->rq_buflen)
+	أرجع;
+    mch_memmove(buf, buf + len, غوټه->rq_buflen - len);
+    غوټه->rq_buflen -= len;
+    غوټه->rq_بفر[غوټه->rq_buflen] = NUL;
 }
 
 /*
@@ -2407,62 +2407,62 @@ channel_consume(channel_T *channel, ch_part_T part, int len)
  * When the channel part mode is "lsp", collapse all the buffers as the http
  * header and the JSON content can be present in multiple buffers.
  */
-    int
-channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
+    صحيح
+channel_collapse(channel_T *channel, ch_part_T part, صحيح want_nl)
 {
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    readq_T	*head = &channel->ch_part[part].ch_head;
-    readq_T	*node = head->rq_next;
-    readq_T	*last_node;
+    ch_ډېرپېښ_T	ډېرپېښ = channel->ch_part[part].ch_ډېرپېښ;
+    readq_T	*سر = &channel->ch_part[part].ch_سر;
+    readq_T	*غوټه = سر->rq_بل;
+    readq_T	*وروستی_غوټه;
     readq_T	*n;
     char_u	*newbuf;
     char_u	*p;
     long_u	len;
 
-    if (node == NULL || node->rq_next == NULL)
-	return FAIL;
+    إذا (غوټه == عدم || غوټه->rq_بل == عدم)
+	أرجع FAIL;
 
-    last_node = node->rq_next;
-    len = node->rq_buflen + last_node->rq_buflen;
-    if (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
-	while (last_node->rq_next != NULL
-		&& (mode == CH_MODE_LSP || mode == CH_MODE_DAP
-		    || channel_first_nl(last_node) == NULL))
+    وروستی_غوټه = غوټه->rq_بل;
+    len = غوټه->rq_buflen + وروستی_غوټه->rq_buflen;
+    إذا (want_nl || ډېرپېښ == CH_ډېرپېښ_LSP || ډېرپېښ == CH_ډېرپېښ_DAP)
+	طالما (وروستی_غوټه->rq_بل != عدم
+		&& (ډېرپېښ == CH_ډېرپېښ_LSP || ډېرپېښ == CH_ډېرپېښ_DAP
+		    || channel_لومړی_nl(وروستی_غوټه) == عدم))
 	{
-	    last_node = last_node->rq_next;
-	    len += last_node->rq_buflen;
+	    وروستی_غوټه = وروستی_غوټه->rq_بل;
+	    len += وروستی_غوټه->rq_buflen;
 	}
 
     p = newbuf = alloc(len + 1);
-    if (newbuf == NULL)
-	return FAIL;	    // out of memory
-    mch_memmove(p, node->rq_buffer, node->rq_buflen);
-    p += node->rq_buflen;
-    vim_free(node->rq_buffer);
-    node->rq_buffer = newbuf;
-    for (n = node; n != last_node; )
+    إذا (newbuf == عدم)
+	أرجع FAIL;	    // out of memory
+    mch_memmove(p, غوټه->rq_بفر, غوټه->rq_buflen);
+    p += غوټه->rq_buflen;
+    vim_free(غوټه->rq_بفر);
+    غوټه->rq_بفر = newbuf;
+    لكل (n = غوټه; n != وروستی_غوټه; )
     {
-	n = n->rq_next;
-	mch_memmove(p, n->rq_buffer, n->rq_buflen);
+	n = n->rq_بل;
+	mch_memmove(p, n->rq_بفر, n->rq_buflen);
 	p += n->rq_buflen;
-	vim_free(n->rq_buffer);
+	vim_free(n->rq_بفر);
     }
     *p = NUL;
-    node->rq_buflen = (long_u)(p - newbuf);
+    غوټه->rq_buflen = (long_u)(p - newbuf);
 
     // dispose of the collapsed nodes and their buffers
-    for (n = node->rq_next; n != last_node; )
+    لكل (n = غوټه->rq_بل; n != وروستی_غوټه; )
     {
-	n = n->rq_next;
+	n = n->rq_بل;
 	vim_free(n->rq_prev);
     }
-    node->rq_next = last_node->rq_next;
-    if (last_node->rq_next == NULL)
-	head->rq_prev = node;
-    else
-	last_node->rq_next->rq_prev = node;
-    vim_free(last_node);
-    return OK;
+    غوټه->rq_بل = وروستی_غوټه->rq_بل;
+    إذا (وروستی_غوټه->rq_بل == عدم)
+	سر->rq_prev = غوټه;
+    وإلا
+	وروستی_غوټه->rq_بل->rq_prev = غوټه;
+    vim_free(وروستی_غوټه);
+    أرجع OK;
 }
 
 /*
@@ -2470,110 +2470,110 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
  * When "prepend" is TRUE put in front, otherwise append at the end.
  * Returns OK or FAIL.
  */
-    static int
-channel_save(channel_T *channel, ch_part_T part, char_u *buf, int len,
-						      int prepend, char *lead)
+    ساكن صحيح
+channel_save(channel_T *channel, ch_part_T part, char_u *buf, صحيح len,
+						      صحيح prepend, حرف *lead)
 {
-    readq_T *node;
-    readq_T *head = &channel->ch_part[part].ch_head;
+    readq_T *غوټه;
+    readq_T *سر = &channel->ch_part[part].ch_سر;
     char_u  *p;
-    int	    i;
+    صحيح	    i;
 
-    node = ALLOC_ONE(readq_T);
-    if (node == NULL)
-	return FAIL;	    // out of memory
+    غوټه = ALLOC_ONE(readq_T);
+    إذا (غوټه == عدم)
+	أرجع FAIL;	    // out of memory
     // A NUL is added at the end, because netbeans code expects that.
     // Otherwise a NUL may appear inside the text.
-    node->rq_buffer = alloc(len + 1);
-    if (node->rq_buffer == NULL)
+    غوټه->rq_بفر = alloc(len + 1);
+    إذا (غوټه->rq_بفر == عدم)
     {
-	vim_free(node);
-	return FAIL;	    // out of memory
+	vim_free(غوټه);
+	أرجع FAIL;	    // out of memory
     }
 
-    if (channel->ch_part[part].ch_mode == CH_MODE_NL)
+    إذا (channel->ch_part[part].ch_ډېرپېښ == CH_ډېرپېښ_NL)
     {
 	// Drop any CR before a NL.
-	p = node->rq_buffer;
-	for (i = 0; i < len; ++i)
-	    if (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
+	p = غوټه->rq_بفر;
+	لكل (i = 0; i < len; ++i)
+	    إذا (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
 		*p++ = buf[i];
 	*p = NUL;
-	node->rq_buflen = (long_u)(p - node->rq_buffer);
+	غوټه->rq_buflen = (long_u)(p - غوټه->rq_بفر);
     }
-    else
+    وإلا
     {
-	mch_memmove(node->rq_buffer, buf, len);
-	node->rq_buffer[len] = NUL;
-	node->rq_buflen = (long_u)len;
+	mch_memmove(غوټه->rq_بفر, buf, len);
+	غوټه->rq_بفر[len] = NUL;
+	غوټه->rq_buflen = (long_u)len;
     }
 
-    if (prepend)
+    إذا (prepend)
     {
 	// prepend node to the head of the queue
-	node->rq_next = head->rq_next;
-	node->rq_prev = NULL;
-	if (head->rq_next == NULL)
-	    head->rq_prev = node;
-	else
-	    head->rq_next->rq_prev = node;
-	head->rq_next = node;
+	غوټه->rq_بل = سر->rq_بل;
+	غوټه->rq_prev = عدم;
+	إذا (سر->rq_بل == عدم)
+	    سر->rq_prev = غوټه;
+	وإلا
+	    سر->rq_بل->rq_prev = غوټه;
+	سر->rq_بل = غوټه;
     }
-    else
+    وإلا
     {
 	// append node to the tail of the queue
-	node->rq_next = NULL;
-	node->rq_prev = head->rq_prev;
-	if (head->rq_prev == NULL)
-	    head->rq_next = node;
-	else
-	    head->rq_prev->rq_next = node;
-	head->rq_prev = node;
+	غوټه->rq_بل = عدم;
+	غوټه->rq_prev = سر->rq_prev;
+	إذا (سر->rq_prev == عدم)
+	    سر->rq_بل = غوټه;
+	وإلا
+	    سر->rq_prev->rq_بل = غوټه;
+	سر->rq_prev = غوټه;
     }
 
-    if (ch_log_active() && lead != NULL)
+    إذا (ch_log_فعال() && lead != عدم)
 	ch_log_literal(lead, channel, part, buf, len);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Try to fill the buffer of "reader".
  * Returns FALSE when nothing was added.
  */
-    int
+    صحيح
 channel_fill(js_read_T *reader)
 {
     channel_T	*channel = (channel_T *)reader->js_cookie;
     ch_part_T	part = reader->js_cookie_arg;
-    char_u	*next = channel_get(channel, part, NULL);
-    int		keeplen;
-    int		addlen;
+    char_u	*بل = channel_get(channel, part, عدم);
+    صحيح		keeplen;
+    صحيح		addlen;
     char_u	*p;
 
-    if (next == NULL)
-	return FALSE;
+    إذا (بل == عدم)
+	أرجع FALSE;
 
-    keeplen = reader->js_end - reader->js_buf;
-    if (keeplen > 0)
+    keeplen = reader->js_پای_ټکی - reader->js_buf;
+    إذا (keeplen > 0)
     {
 	// Prepend unused text.
-	addlen = (int)STRLEN(next);
+	addlen = (صحيح)STRLEN(بل);
 	p = alloc(keeplen + addlen + 1);
-	if (p == NULL)
+	إذا (p == عدم)
 	{
-	    vim_free(next);
-	    return FALSE;
+	    vim_free(بل);
+	    أرجع FALSE;
 	}
 	mch_memmove(p, reader->js_buf, keeplen);
-	mch_memmove(p + keeplen, next, addlen + 1);
-	vim_free(next);
-	next = p;
+	mch_memmove(p + keeplen, بل, addlen + 1);
+	vim_free(بل);
+	بل = p;
     }
 
     vim_free(reader->js_buf);
-    reader->js_buf = next;
-    return TRUE;
+    reader->js_buf = بل;
+    أرجع TRUE;
 }
 
 /*
@@ -2599,64 +2599,64 @@ channel_fill(js_read_T *reader)
  * header are not correct. Returns MAYBE if a partial header is received and
  * need to wait for more data to arrive.
  */
-    static int
+    ساكن صحيح
 channel_process_lspdap_http_hdr(js_read_T *reader)
 {
-    char_u	*line_start;
+    char_u	*کرښه_پیل;
     char_u	*p;
     int_u	hdr_len;
-    int		payload_len = -1;
+    صحيح		payload_len = -1;
     int_u	jsbuf_len;
 
     // We find the end once, to avoid calling strlen() many times.
     jsbuf_len = (int_u)STRLEN(reader->js_buf);
-    reader->js_end = reader->js_buf + jsbuf_len;
+    reader->js_پای_ټکی = reader->js_buf + jsbuf_len;
 
     p = reader->js_buf;
 
     // Process each line in the header till an empty line is read (header
     // separator).
-    while (TRUE)
+    طالما (TRUE)
     {
-	line_start = p;
-	while (*p != NUL && *p != '\n')
+	کرښه_پیل = p;
+	طالما (*p != NUL && *p != '\n')
 	    p++;
-	if (*p == NUL)			// partial header
-	    return MAYBE;
+	إذا (*p == NUL)			// partial header
+	    أرجع MAYBE;
 	p++;
 
 	// process the content length field (if present)
-	if ((p - line_start > 16)
-		&& STRNICMP(line_start, "Content-Length: ", 16) == 0)
+	إذا ((p - کرښه_پیل > 16)
+		&& STRNICMP(کرښه_پیل, "Content-Length: ", 16) == 0)
 	{
 	    errno = 0;
-	    payload_len = strtol((char *)line_start + 16, NULL, 10);
-	    if (errno == ERANGE || payload_len < 0)
+	    payload_len = strtol((حرف *)کرښه_پیل + 16, عدم, 10);
+	    إذا (errno == ERANGE || payload_len < 0)
 		// invalid length, discard the payload
-		return FAIL;
+		أرجع FAIL;
 	}
 
-	if ((p - line_start) == 2 && line_start[0] == '\r' &&
-		line_start[1] == '\n')
+	إذا ((p - کرښه_پیل) == 2 && کرښه_پیل[0] == '\r' &&
+		کرښه_پیل[1] == '\n')
 	    // reached the empty line
-	    break;
+	    اكسر;
     }
 
-    if (payload_len == -1)
+    إذا (payload_len == -1)
 	// Content-Length field is not present in the header
-	return FAIL;
+	أرجع FAIL;
 
     hdr_len = p - reader->js_buf;
 
     // if the entire payload is not received, wait for more data to arrive
-    if (jsbuf_len < hdr_len + payload_len)
-	return MAYBE;
+    إذا (jsbuf_len < hdr_len + payload_len)
+	أرجع MAYBE;
 
-    reader->js_used += hdr_len;
+    reader->js_کارول_شوی += hdr_len;
     // recalculate the end based on the length read from the header.
-    reader->js_end = reader->js_buf + hdr_len + payload_len;
+    reader->js_پای_ټکی = reader->js_buf + hdr_len + payload_len;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -2665,216 +2665,216 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
  * then ignore the channel mode.
  * Return TRUE if there is more to read.
  */
-    int
+    صحيح
 channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 {
     js_read_T	reader;
     typval_T	listtv;
-    jsonq_T	*item;
+    jsonq_T	*توکی;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    jsonq_T	*head = &chanpart->ch_json_head;
-    int		status = OK;
-    int		ret;
+    jsonq_T	*سر = &chanpart->ch_json_سر;
+    صحيح		حالت = OK;
+    صحيح		ret;
 
-    if (channel_peek(channel, part) == NULL)
-	return FALSE;
+    إذا (channel_peek(channel, part) == عدم)
+	أرجع FALSE;
 
-    reader.js_buf = channel_get(channel, part, NULL);
-    reader.js_used = 0;
+    reader.js_buf = channel_get(channel, part, عدم);
+    reader.js_کارول_شوی = 0;
     reader.js_fill = channel_fill;
     reader.js_cookie = channel;
     reader.js_cookie_arg = part;
 
-    if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-	    || chanpart->ch_mode == CH_MODE_DAP))
-	status = channel_process_lspdap_http_hdr(&reader);
+    إذا (!socketserver && (chanpart->ch_ډېرپېښ == CH_ډېرپېښ_LSP
+	    || chanpart->ch_ډېرپېښ == CH_ډېرپېښ_DAP))
+	حالت = channel_process_lspdap_http_hdr(&reader);
 
     // When a message is incomplete we wait for a short while for more to
     // arrive.  After the delay drop the input, otherwise a truncated string
     // or list will make us hang.
     // Do not generate error messages, they will be written in a channel log.
-    if (status == OK)
+    إذا (حالت == OK)
     {
 	++emsg_silent;
-	status = json_decode(&reader, &listtv,
-				chanpart->ch_mode == CH_MODE_JS ? JSON_JS : 0);
+	حالت = json_decode(&reader, &listtv,
+				chanpart->ch_ډېرپېښ == CH_ډېرپېښ_JS ? JSON_JS : 0);
 	--emsg_silent;
     }
-    if (status == OK)
+    إذا (حالت == OK)
     {
 	// Only accept the response when it is a list with at least two
 	// items.
-	if (!socketserver && (chanpart->ch_mode == CH_MODE_LSP
-		    || chanpart->ch_mode == CH_MODE_DAP)
+	إذا (!socketserver && (chanpart->ch_ډېرپېښ == CH_ډېرپېښ_LSP
+		    || chanpart->ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 		&& listtv.v_type != VAR_DICT)
 	{
 	    ch_error(channel, "Did not receive a LSP dict, discarding");
 	    clear_tv(&listtv);
 	}
-	else if (!socketserver && chanpart->ch_mode != CH_MODE_LSP
-		&& chanpart->ch_mode != CH_MODE_DAP
+	وإلا إذا (!socketserver && chanpart->ch_ډېرپېښ != CH_ډېرپېښ_LSP
+		&& chanpart->ch_ډېرپېښ != CH_ډېرپېښ_DAP
 		&& (listtv.v_type != VAR_LIST || listtv.vval.v_list->lv_len < 2))
 	{
-	    if (listtv.v_type != VAR_LIST)
+	    إذا (listtv.v_type != VAR_LIST)
 		ch_error(channel, "Did not receive a list, discarding");
-	    else
+	    وإلا
 		ch_error(channel, "Expected list with two items, got %d",
 						  listtv.vval.v_list->lv_len);
 	    clear_tv(&listtv);
 	}
-	else
+	وإلا
 	{
-	    item = ALLOC_ONE(jsonq_T);
-	    if (item == NULL)
+	    توکی = ALLOC_ONE(jsonq_T);
+	    إذا (توکی == عدم)
 		clear_tv(&listtv);
-	    else
+	    وإلا
 	    {
-		item->jq_no_callback = FALSE;
-		item->jq_value = alloc_tv();
-		if (item->jq_value == NULL)
+		توکی->jq_no_callback = FALSE;
+		توکی->jq_ارزښت = alloc_tv();
+		إذا (توکی->jq_ارزښت == عدم)
 		{
-		    vim_free(item);
+		    vim_free(توکی);
 		    clear_tv(&listtv);
 		}
-		else
+		وإلا
 		{
-		    *item->jq_value = listtv;
-		    item->jq_prev = head->jq_prev;
-		    head->jq_prev = item;
-		    item->jq_next = NULL;
-		    if (item->jq_prev == NULL)
-			head->jq_next = item;
-		    else
-			item->jq_prev->jq_next = item;
+		    *توکی->jq_ارزښت = listtv;
+		    توکی->jq_prev = سر->jq_prev;
+		    سر->jq_prev = توکی;
+		    توکی->jq_بل = عدم;
+		    إذا (توکی->jq_prev == عدم)
+			سر->jq_بل = توکی;
+		    وإلا
+			توکی->jq_prev->jq_بل = توکی;
 		}
 	    }
 	}
     }
 
-    if (status == OK)
+    إذا (حالت == OK)
 	chanpart->ch_wait_len = 0;
-    else if (status == MAYBE)
+    وإلا إذا (حالت == MAYBE)
     {
 	size_t buflen = STRLEN(reader.js_buf);
 
-	if (chanpart->ch_wait_len < buflen)
+	إذا (chanpart->ch_wait_len < buflen)
 	{
 	    // First time encountering incomplete message or after receiving
 	    // more (but still incomplete): set a deadline of 100 msec.
 	    ch_log(channel,
 		    "Incomplete message (%d bytes) - wait 100 msec for more",
-		    (int)buflen);
-	    reader.js_used = 0;
+		    (صحيح)buflen);
+	    reader.js_کارول_شوی = 0;
 	    chanpart->ch_wait_len = buflen;
-#ifdef MSWIN
-	    chanpart->ch_deadline = GetTickCount() + 100L;
-#else
-	    gettimeofday(&chanpart->ch_deadline, NULL);
+#که_تعریف_شوی MSWIN
+	    chanpart->ch_deadline = Get_Tick_شمېر() + 100L;
+#وإلا
+	    gettimeofday(&chanpart->ch_deadline, عدم);
 	    chanpart->ch_deadline.tv_usec += 100 * 1000;
-	    if (chanpart->ch_deadline.tv_usec > 1000 * 1000)
+	    إذا (chanpart->ch_deadline.tv_usec > 1000 * 1000)
 	    {
 		chanpart->ch_deadline.tv_usec -= 1000 * 1000;
 		++chanpart->ch_deadline.tv_sec;
 	    }
-#endif
+#د_که_پای
 	}
-	else
+	وإلا
 	{
-	    int timeout;
-#ifdef MSWIN
-	    timeout = (int)(GetTickCount() - chanpart->ch_deadline) > 0;
-#else
+	    صحيح timeout;
+#که_تعریف_شوی MSWIN
+	    timeout = (صحيح)(Get_Tick_شمېر() - chanpart->ch_deadline) > 0;
+#وإلا
 	    {
-		struct timeval now_tv;
+		بنية timeval now_tv;
 
-		gettimeofday(&now_tv, NULL);
+		gettimeofday(&now_tv, عدم);
 		timeout = now_tv.tv_sec > chanpart->ch_deadline.tv_sec
 		      || (now_tv.tv_sec == chanpart->ch_deadline.tv_sec
 			   && now_tv.tv_usec > chanpart->ch_deadline.tv_usec);
 	    }
-#endif
-	    if (timeout)
+#د_که_پای
+	    إذا (timeout)
 	    {
-		status = FAIL;
+		حالت = FAIL;
 		chanpart->ch_wait_len = 0;
 		ch_log(channel, "timed out");
 	    }
-	    else
+	    وإلا
 	    {
-		reader.js_used = 0;
+		reader.js_کارول_شوی = 0;
 		ch_log(channel, "still waiting on incomplete message");
 	    }
 	}
     }
 
-    if (status == FAIL)
+    إذا (حالت == FAIL)
     {
 	ch_error(channel, "Decoding failed - discarding input");
 	ret = FALSE;
 	chanpart->ch_wait_len = 0;
     }
-    else if (reader.js_buf[reader.js_used] != NUL)
+    وإلا إذا (reader.js_buf[reader.js_کارول_شوی] != NUL)
     {
 	// Put the unread part back into the channel.
-	channel_save(channel, part, reader.js_buf + reader.js_used,
-			(int)(reader.js_end - reader.js_buf) - reader.js_used,
-								  TRUE, NULL);
-	ret = status == MAYBE ? FALSE: TRUE;
+	channel_save(channel, part, reader.js_buf + reader.js_کارول_شوی,
+			(صحيح)(reader.js_پای_ټکی - reader.js_buf) - reader.js_کارول_شوی,
+								  TRUE, عدم);
+	ret = حالت == MAYBE ? FALSE: TRUE;
     }
-    else
+    وإلا
 	ret = FALSE;
 
     vim_free(reader.js_buf);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Remove "node" from the queue that it is in.  Does not free it.
  */
-    static void
-remove_cb_node(cbq_T *head, cbq_T *node)
+    ساكن فراغ
+remove_cb_غوټه(cbq_T *سر, cbq_T *غوټه)
 {
-    if (node->cq_prev == NULL)
-	head->cq_next = node->cq_next;
-    else
-	node->cq_prev->cq_next = node->cq_next;
-    if (node->cq_next == NULL)
-	head->cq_prev = node->cq_prev;
-    else
-	node->cq_next->cq_prev = node->cq_prev;
+    إذا (غوټه->cq_prev == عدم)
+	سر->cq_بل = غوټه->cq_بل;
+    وإلا
+	غوټه->cq_prev->cq_بل = غوټه->cq_بل;
+    إذا (غوټه->cq_بل == عدم)
+	سر->cq_prev = غوټه->cq_prev;
+    وإلا
+	غوټه->cq_بل->cq_prev = غوټه->cq_prev;
 }
 
 /*
  * Remove "node" from the queue that it is in and free it.
  * Caller should have freed or used node->jq_value.
  */
-    void
-remove_json_node(jsonq_T *head, jsonq_T *node)
+    فراغ
+remove_json_غوټه(jsonq_T *سر, jsonq_T *غوټه)
 {
-    if (node->jq_prev == NULL)
-	head->jq_next = node->jq_next;
-    else
-	node->jq_prev->jq_next = node->jq_next;
-    if (node->jq_next == NULL)
-	head->jq_prev = node->jq_prev;
-    else
-	node->jq_next->jq_prev = node->jq_prev;
-    vim_free(node);
+    إذا (غوټه->jq_prev == عدم)
+	سر->jq_بل = غوټه->jq_بل;
+    وإلا
+	غوټه->jq_prev->jq_بل = غوټه->jq_بل;
+    إذا (غوټه->jq_بل == عدم)
+	سر->jq_prev = غوټه->jq_prev;
+    وإلا
+	غوټه->jq_بل->jq_prev = غوټه->jq_prev;
+    vim_free(غوټه);
 }
 
 /*
  * Add "id" to the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_add_block_id(chanpart_T *chanpart, int id)
+    ساكن فراغ
+channel_جمع_کړه_بلاک_id(chanpart_T *chanpart, صحيح id)
 {
-    garray_T *gap = &chanpart->ch_block_ids;
+    garray_T *gap = &chanpart->ch_بلاک_ids;
 
-    if (gap->ga_growsize == 0)
-	ga_init2(gap, sizeof(int), 10);
-    if (ga_grow(gap, 1) == OK)
+    إذا (gap->ga_growsize == 0)
+	ga_init2(gap, حجم(صحيح), 10);
+    إذا (ga_grow(gap, 1) == OK)
     {
-	((int *)gap->ga_data)[gap->ga_len] = id;
+	((صحيح *)gap->ga_معلومات)[gap->ga_len] = id;
 	++gap->ga_len;
     }
 }
@@ -2882,23 +2882,23 @@ channel_add_block_id(chanpart_T *chanpart, int id)
 /*
  * Remove "id" from the list of JSON message IDs we are waiting on.
  */
-    static void
-channel_remove_block_id(chanpart_T *chanpart, int id)
+    ساكن فراغ
+channel_remove_بلاک_id(chanpart_T *chanpart, صحيح id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_بلاک_ids;
+    صحيح		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
+    لكل (i = 0; i < gap->ga_len; ++i)
+	إذا (((صحيح *)gap->ga_معلومات)[i] == id)
 	{
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    إذا (i < gap->ga_len)
 	    {
-		int *p = ((int *)gap->ga_data) + i;
+		صحيح *p = ((صحيح *)gap->ga_معلومات) + i;
 
-		mch_memmove(p, p + 1, (gap->ga_len - i) * sizeof(int));
+		mch_memmove(p, p + 1, (gap->ga_len - i) * حجم(صحيح));
 	    }
-	    return;
+	    أرجع;
 	}
     siemsg("channel_remove_block_id(): cannot find id %d", id);
 }
@@ -2906,16 +2906,16 @@ channel_remove_block_id(chanpart_T *chanpart, int id)
 /*
  * Return TRUE if "id" is in the list of JSON message IDs we are waiting on.
  */
-    static int
-channel_has_block_id(chanpart_T *chanpart, int id)
+    ساكن صحيح
+channel_has_بلاک_id(chanpart_T *chanpart, صحيح id)
 {
-    garray_T	*gap = &chanpart->ch_block_ids;
-    int		i;
+    garray_T	*gap = &chanpart->ch_بلاک_ids;
+    صحيح		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	if (((int *)gap->ga_data)[i] == id)
-	    return TRUE;
-    return FALSE;
+    لكل (i = 0; i < gap->ga_len; ++i)
+	إذا (((صحيح *)gap->ga_معلومات)[i] == id)
+	    أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
@@ -2927,294 +2927,294 @@ channel_has_block_id(chanpart_T *chanpart, int id)
  * Return OK when found and return the value in "rettv".
  * Return FAIL otherwise.
  */
-    static int
+    ساكن صحيح
 channel_get_json(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    id,
-	int	    without_callback,
+	صحيح	    id,
+	صحيح	    without_callback,
 	typval_T    **rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *سر = &channel->ch_part[part].ch_json_سر;
+    jsonq_T   *توکی = سر->jq_بل;
 
-    while (item != NULL)
+    طالما (توکی != عدم)
     {
 	list_T	    *l;
 	typval_T    *tv;
 
-	if (channel->ch_part[part].ch_mode != CH_MODE_LSP
-		&& channel->ch_part[part].ch_mode != CH_MODE_DAP)
+	إذا (channel->ch_part[part].ch_ډېرپېښ != CH_ډېرپېښ_LSP
+		&& channel->ch_part[part].ch_ډېرپېښ != CH_ډېرپېښ_DAP)
 	{
-	    l = item->jq_value->vval.v_list;
+	    l = توکی->jq_ارزښت->vval.v_list;
 	    CHECK_LIST_MATERIALIZE(l);
-	    tv = &l->lv_first->li_tv;
+	    tv = &l->lv_لومړی->li_tv;
 	}
-	else
+	وإلا
 	{
 	    dict_T	*d;
 	    dictitem_T	*di;
 
-	    if (channel->ch_part[part].ch_mode == CH_MODE_LSP)
+	    إذا (channel->ch_part[part].ch_ډېرپېښ == CH_ډېرپېښ_LSP)
 	    {
 		// LSP message payload is a JSON-RPC dict. For RPC requests and
 		// responses, the 'id' item will be present. For notifications,
 		// it will not be present.
-		if (id > 0)
+		إذا (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
+		    إذا (توکی->jq_ارزښت->v_type != VAR_DICT)
+			اذهب nextitem;
+		    d = توکی->jq_ارزښت->vval.v_dict;
+		    إذا (d == عدم)
+			اذهب nextitem;
 		    // When looking for a response message from the LSP server,
 		    // ignore new LSP request and notification messages.  LSP
 		    // request and notification messages have the "method" field
 		    // in the header and the response messages do not have this
 		    // field.
-		    if (dict_has_key(d, "method"))
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"id", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    إذا (dict_has_کلی(d, "method"))
+			اذهب nextitem;
+		    di = dict_پیدا_کړه(d, (char_u *)"id", -1);
+		    إذا (di == عدم)
+			اذهب nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		وإلا
+		    tv = توکی->jq_ارزښت;
 	    }
-	    else
+	    وإلا
 	    {
-		if (id > 0)
+		إذا (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
-			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
-		    if (d == NULL)
-			goto nextitem;
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		    if (di == NULL)
-			goto nextitem;
+		    إذا (توکی->jq_ارزښت->v_type != VAR_DICT)
+			اذهب nextitem;
+		    d = توکی->jq_ارزښت->vval.v_dict;
+		    إذا (d == عدم)
+			اذهب nextitem;
+		    di = dict_پیدا_کړه(d, (char_u *)"request_seq", -1);
+		    إذا (di == عدم)
+			اذهب nextitem;
 		    tv = &di->di_tv;
 		}
-		else
-		    tv = item->jq_value;
+		وإلا
+		    tv = توکی->jq_ارزښت;
 	    }
 	}
 
-	if ((without_callback || !item->jq_no_callback)
-	    && ((id > 0 && tv->v_type == VAR_NUMBER && tv->vval.v_number == id)
-	      || (id <= 0 && (tv->v_type != VAR_NUMBER
-		 || tv->vval.v_number == 0
-		 || !channel_has_block_id(
-				&channel->ch_part[part], tv->vval.v_number)))))
+	إذا ((without_callback || !توکی->jq_no_callback)
+	    && ((id > 0 && tv->v_type == VAR_شمېره && tv->vval.v_شمېره == id)
+	      || (id <= 0 && (tv->v_type != VAR_شمېره
+		 || tv->vval.v_شمېره == 0
+		 || !channel_has_بلاک_id(
+				&channel->ch_part[part], tv->vval.v_شمېره)))))
 	{
-	    *rettv = item->jq_value;
-	    if (tv->v_type == VAR_NUMBER)
+	    *rettv = توکی->jq_ارزښت;
+	    إذا (tv->v_type == VAR_شمېره)
 		ch_log(channel, "Getting JSON message %ld",
-						      (long)tv->vval.v_number);
-	    remove_json_node(head, item);
-	    return OK;
+						      (اوږد)tv->vval.v_شمېره);
+	    remove_json_غوټه(سر, توکی);
+	    أرجع OK;
 	}
 nextitem:
-	item = item->jq_next;
+	توکی = توکی->jq_بل;
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Put back "rettv" into the JSON queue, there was no callback for it.
  * Takes over the values in "rettv".
  */
-    static void
-channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
+    ساكن فراغ
+channel_ټېل_json(channel_T *channel, ch_part_T part, typval_T *rettv)
 {
-    jsonq_T   *head = &channel->ch_part[part].ch_json_head;
-    jsonq_T   *item = head->jq_next;
+    jsonq_T   *سر = &channel->ch_part[part].ch_json_سر;
+    jsonq_T   *توکی = سر->jq_بل;
     jsonq_T   *newitem;
 
-    if (head->jq_prev != NULL && head->jq_prev->jq_no_callback)
+    إذا (سر->jq_prev != عدم && سر->jq_prev->jq_no_callback)
 	// last item was pushed back, append to the end
-	item = NULL;
-    else while (item != NULL && item->jq_no_callback)
+	توکی = عدم;
+    وإلا طالما (توکی != عدم && توکی->jq_no_callback)
 	// append after the last item that was pushed back
-	item = item->jq_next;
+	توکی = توکی->jq_بل;
 
     newitem = ALLOC_ONE(jsonq_T);
-    if (newitem == NULL)
+    إذا (newitem == عدم)
     {
 	clear_tv(rettv);
-	return;
+	أرجع;
     }
 
-    newitem->jq_value = alloc_tv();
-    if (newitem->jq_value == NULL)
+    newitem->jq_ارزښت = alloc_tv();
+    إذا (newitem->jq_ارزښت == عدم)
     {
 	vim_free(newitem);
 	clear_tv(rettv);
-	return;
+	أرجع;
     }
 
     newitem->jq_no_callback = FALSE;
-    *newitem->jq_value = *rettv;
-    if (item == NULL)
+    *newitem->jq_ارزښت = *rettv;
+    إذا (توکی == عدم)
     {
 	// append to the end
-	newitem->jq_prev = head->jq_prev;
-	head->jq_prev = newitem;
-	newitem->jq_next = NULL;
-	if (newitem->jq_prev == NULL)
-	    head->jq_next = newitem;
-	else
-	    newitem->jq_prev->jq_next = newitem;
+	newitem->jq_prev = سر->jq_prev;
+	سر->jq_prev = newitem;
+	newitem->jq_بل = عدم;
+	إذا (newitem->jq_prev == عدم)
+	    سر->jq_بل = newitem;
+	وإلا
+	    newitem->jq_prev->jq_بل = newitem;
     }
-    else
+    وإلا
     {
 	// append after "item"
-	newitem->jq_prev = item;
-	newitem->jq_next = item->jq_next;
-	item->jq_next = newitem;
-	if (newitem->jq_next == NULL)
-	    head->jq_prev = newitem;
-	else
-	    newitem->jq_next->jq_prev = newitem;
+	newitem->jq_prev = توکی;
+	newitem->jq_بل = توکی->jq_بل;
+	توکی->jq_بل = newitem;
+	إذا (newitem->jq_بل == عدم)
+	    سر->jq_prev = newitem;
+	وإلا
+	    newitem->jq_بل->jq_prev = newitem;
     }
 }
 
-#define CH_JSON_MAX_ARGS 4
+#تعریف_کړه CH_JSON_MAX_دلیلونه 4
 
 /*
  * Execute a command received over "channel"/"part"
  * "argv[0]" is the command string.
  * "argv[1]" etc. have further arguments, type is VAR_UNKNOWN if missing.
  */
-    static void
+    ساكن فراغ
 channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 {
     char_u  *cmd = argv[0].vval.v_string;
     char_u  *arg;
-    int	    options = channel->ch_part[part].ch_mode == CH_MODE_JS
+    صحيح	    options = channel->ch_part[part].ch_ډېرپېښ == CH_ډېرپېښ_JS
 								 ? JSON_JS : 0;
 
-    if (argv[1].v_type != VAR_STRING)
+    إذا (argv[1].v_type != VAR_STRING)
     {
 	ch_error(channel, "received command with non-string argument");
-	if (p_verbose > 2)
-	    emsg(_(e_received_command_with_non_string_argument));
-	return;
+	إذا (p_verbose > 2)
+	    emsg(_(e_received_command_with_non_string_دلیل));
+	أرجع;
     }
     arg = argv[1].vval.v_string;
-    if (arg == NULL)
+    إذا (arg == عدم)
 	arg = (char_u *)"";
 
-    if (STRCMP(cmd, "ex") == 0)
+    إذا (STRCMP(cmd, "ex") == 0)
     {
-	int	called_emsg_before = called_emsg;
+	صحيح	called_emsg_before = called_emsg;
 	char_u	*p = arg;
-	int	do_emsg_silent;
+	صحيح	do_emsg_silent;
 
-	ch_log(channel, "Executing ex command '%s'", (char *)arg);
+	ch_log(channel, "Executing ex command '%s'", (حرف *)arg);
 	do_emsg_silent = !checkforcmd(&p, "echoerr", 5);
-	if (do_emsg_silent)
+	إذا (do_emsg_silent)
 	    ++emsg_silent;
 	do_cmdline_cmd(arg);
-	if (do_emsg_silent)
+	إذا (do_emsg_silent)
 	    --emsg_silent;
-	if (called_emsg > called_emsg_before)
+	إذا (called_emsg > called_emsg_before)
 	    ch_log(channel, "Ex command error: '%s'",
-					  (char *)get_vim_var_str(VV_ERRMSG));
+					  (حرف *)get_vim_var_str(VV_ERRMSG));
     }
-    else if (STRCMP(cmd, "normal") == 0)
+    وإلا إذا (STRCMP(cmd, "normal") == 0)
     {
 	exarg_T ea;
 
-	ch_log(channel, "Executing normal command '%s'", (char *)arg);
-	CLEAR_FIELD(ea);
+	ch_log(channel, "Executing normal command '%s'", (حرف *)arg);
+	CLEAR_ډګر(ea);
 	ea.arg = arg;
-	ea.addr_count = 0;
+	ea.addr_شمېر = 0;
 	ea.forceit = TRUE; // no mapping
-	ex_normal(&ea);
+	ex_نورمال(&ea);
     }
-    else if (STRCMP(cmd, "redraw") == 0)
+    وإلا إذا (STRCMP(cmd, "redraw") == 0)
     {
 	ch_log(channel, "redraw");
 	redraw_cmd(*arg != NUL);
 	showruler(FALSE);
 	setcursor();
-	out_flush_cursor(TRUE, FALSE);
+	بهر_flush_cursor(TRUE, FALSE);
     }
-    else if (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
+    وإلا إذا (STRCMP(cmd, "expr") == 0 || STRCMP(cmd, "call") == 0)
     {
-	int is_call = cmd[0] == 'c';
-	int id_idx = is_call ? 3 : 2;
+	صحيح is_call = cmd[0] == 'c';
+	صحيح id_idx = is_call ? 3 : 2;
 
-	if (argv[id_idx].v_type != VAR_UNKNOWN
-					 && argv[id_idx].v_type != VAR_NUMBER)
+	إذا (argv[id_idx].v_type != VAR_UNKNOWN
+					 && argv[id_idx].v_type != VAR_شمېره)
 	{
 	    ch_error(channel, "last argument for expr/call must be a number");
-	    if (p_verbose > 2)
-		emsg(_(e_last_argument_for_expr_call_must_be_number));
+	    إذا (p_verbose > 2)
+		emsg(_(e_وروستی_دلیل_for_بیان_call_must_be_شمېره));
 	}
-	else if (is_call && argv[2].v_type != VAR_LIST)
+	وإلا إذا (is_call && argv[2].v_type != VAR_LIST)
 	{
 	    ch_error(channel, "third argument for call must be a list");
-	    if (p_verbose > 2)
-		emsg(_(e_third_argument_for_call_must_be_list));
+	    إذا (p_verbose > 2)
+		emsg(_(e_دریم_دلیل_for_call_must_be_list));
 	}
-	else
+	وإلا
 	{
-	    typval_T	*tv = NULL;
+	    typval_T	*tv = عدم;
 	    typval_T	res_tv;
 	    typval_T	err_tv;
-	    char_u	*json = NULL;
+	    char_u	*json = عدم;
 
 	    // Don't pollute the display with errors.
 	    // Do generate the errors so that try/catch works.
 	    ++emsg_silent;
-	    if (!is_call)
+	    إذا (!is_call)
 	    {
-		ch_log(channel, "Evaluating expression '%s'", (char *)arg);
-		tv = eval_expr(arg, NULL);
+		ch_log(channel, "Evaluating expression '%s'", (حرف *)arg);
+		tv = eval_بیان(arg, عدم);
 	    }
-	    else
+	    وإلا
 	    {
-		ch_log(channel, "Calling '%s'", (char *)arg);
-		if (func_call(arg, &argv[2], NULL, NULL, &res_tv) == OK)
+		ch_log(channel, "Calling '%s'", (حرف *)arg);
+		إذا (func_call(arg, &argv[2], عدم, عدم, &res_tv) == OK)
 		    tv = &res_tv;
 	    }
 
-	    if (argv[id_idx].v_type == VAR_NUMBER)
+	    إذا (argv[id_idx].v_type == VAR_شمېره)
 	    {
-		int id = argv[id_idx].vval.v_number;
+		صحيح id = argv[id_idx].vval.v_شمېره;
 
-		if (tv != NULL)
-		    json = json_encode_nr_expr(id, tv, options | JSON_NL);
-		if (tv == NULL || (json != NULL && *json == NUL))
+		إذا (tv != عدم)
+		    json = json_encode_nr_بیان(id, tv, options | JSON_NL);
+		إذا (tv == عدم || (json != عدم && *json == NUL))
 		{
 		    // If evaluation failed or the result can't be encoded
 		    // then return the string "ERROR".
 		    vim_free(json);
 		    err_tv.v_type = VAR_STRING;
 		    err_tv.vval.v_string = (char_u *)"ERROR";
-		    json = json_encode_nr_expr(id, &err_tv, options | JSON_NL);
+		    json = json_encode_nr_بیان(id, &err_tv, options | JSON_NL);
 		}
-		if (json != NULL)
+		إذا (json != عدم)
 		{
 		    channel_send(channel,
-				 part == PART_SOCK ? PART_SOCK : PART_IN,
-				 json, (int)STRLEN(json), (char *)cmd);
+				 part == PART_SOCK ? PART_SOCK : PART_دننه,
+				 json, (صحيح)STRLEN(json), (حرف *)cmd);
 		    vim_free(json);
 		}
 	    }
 	    --emsg_silent;
-	    if (tv == &res_tv)
+	    إذا (tv == &res_tv)
 		clear_tv(tv);
-	    else
+	    وإلا
 		free_tv(tv);
 	}
     }
-    else if (p_verbose > 2)
+    وإلا إذا (p_verbose > 2)
     {
-	ch_error(channel, "Received unknown command: %s", (char *)cmd);
+	ch_error(channel, "Received unknown command: %s", (حرف *)cmd);
 	semsg(_(e_received_unknown_command_str), cmd);
     }
 }
@@ -3223,165 +3223,165 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
  * Invoke the callback at "cbhead".
  * Does not redraw but sets channel_need_redraw.
  */
-    static void
-invoke_one_time_callback(
+    ساكن فراغ
+invoke_one_وخت_callback(
 	channel_T   *channel,
 	cbq_T	    *cbhead,
-	cbq_T	    *item,
+	cbq_T	    *توکی,
 	typval_T    *argv)
 {
     ch_log(channel, "Invoking one-time callback %s",
-					    (char *)item->cq_callback.cb_name);
+					    (حرف *)توکی->cq_callback.cb_name);
     // Remove the item from the list first, if the callback
     // invokes ch_close() the list will be cleared.
-    remove_cb_node(cbhead, item);
-    invoke_callback(channel, &item->cq_callback, argv);
-    free_callback(&item->cq_callback);
-    vim_free(item);
+    remove_cb_غوټه(cbhead, توکی);
+    invoke_callback(channel, &توکی->cq_callback, argv);
+    free_callback(&توکی->cq_callback);
+    vim_free(توکی);
 }
 
-    static void
-append_to_buffer(
-    buf_T	*buffer,
-    char_u	*msg,
+    ساكن فراغ
+append_منزل_بفر(
+    buf_T	*بفر,
+    char_u	*پیغام,
     channel_T	*channel,
     ch_part_T	part)
 {
     aco_save_T	aco;
-    linenr_T    lnum = buffer->b_ml.ml_line_count;
-    bool	save_write_to = buffer->b_write_to_channel;
+    linenr_T    lnum = بفر->b_ml.ml_کرښه_شمېر;
+    bool	save_write_منزل = بفر->b_write_منزل_channel;
     chanpart_T  *ch_part = &channel->ch_part[part];
-    int		save_p_ma = buffer->b_p_ma;
-    int		empty = (buffer->b_ml.ml_flags & ML_EMPTY) ? 1 : 0;
+    صحيح		save_p_ma = بفر->b_p_ma;
+    صحيح		تشه_2 = (بفر->b_ml.ml_flags & ML_تشه) ? 1 : 0;
 
-    if (!buffer->b_p_ma && !ch_part->ch_nomodifiable)
+    إذا (!بفر->b_p_ma && !ch_part->ch_nomodifiable)
     {
-	if (!ch_part->ch_nomod_error)
+	إذا (!ch_part->ch_nomod_error)
 	{
 	    ch_error(channel, "Buffer is not modifiable, cannot append");
 	    ch_part->ch_nomod_error = TRUE;
 	}
-	return;
+	أرجع;
     }
 
     // If the buffer is also used as input insert above the last
     // line. Don't write these lines.
-    if (save_write_to)
+    إذا (save_write_منزل)
     {
 	--lnum;
-	buffer->b_write_to_channel = false;
+	بفر->b_write_منزل_channel = false;
     }
 
     // Append to the buffer
     ch_log(channel, "appending line %d to buffer %s",
-				       (int)lnum + 1 - empty, buffer->b_fname);
+				       (صحيح)lnum + 1 - تشه_2, بفر->b_fname);
 
-    buffer->b_p_ma = TRUE;
+    بفر->b_p_ma = TRUE;
 
     // Set curbuf to "buffer", temporarily.
-    aucmd_prepbuf(&aco, buffer);
-    if (curbuf != buffer)
+    aucmd_prepbuf(&aco, بفر);
+    إذا (curbuf != بفر)
     {
 	// Could not find a window for this buffer, the following might cause
 	// trouble, better bail out.
-	return;
+	أرجع;
     }
 
     u_sync(TRUE);
     // ignore undo failure, undo is not very useful here
-    vim_ignored = u_save(lnum - empty, lnum + 1);
+    vim_ignored = u_save(lnum - تشه_2, lnum + 1);
 
-    if (empty)
+    إذا (تشه_2)
     {
 	// The buffer is empty, replace the first (dummy) line.
-	ml_replace(lnum, msg, TRUE);
+	ml_replace(lnum, پیغام, TRUE);
 	lnum = 0;
     }
-    else
-	ml_append(lnum, msg, 0, FALSE);
-    appended_lines_mark(lnum, 1L);
+    وإلا
+	ml_append(lnum, پیغام, 0, FALSE);
+    appended_کرښې_mark(lnum, 1L);
 
     // reset notion of buffer
     aucmd_restbuf(&aco);
 
-    if (ch_part->ch_nomodifiable)
-	buffer->b_p_ma = FALSE;
-    else
-	buffer->b_p_ma = save_p_ma;
+    إذا (ch_part->ch_nomodifiable)
+	بفر->b_p_ma = FALSE;
+    وإلا
+	بفر->b_p_ma = save_p_ma;
 
-    if (buffer->b_nwindows > 0)
+    إذا (بفر->b_nwindows > 0)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == buffer)
+	    إذا (wp->w_بفر == بفر)
 	    {
-		int move_cursor = save_write_to
+		صحيح move_cursor = save_write_منزل
 			    ? wp->w_cursor.lnum == lnum + 1
 			    : (wp->w_cursor.lnum == lnum
-				&& wp->w_cursor.col == 0);
+				&& wp->w_cursor.ستون == 0);
 
 		// If the cursor is at or above the new line, move it one line
 		// down.  If the topline is outdated update it now.
-		if (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
+		إذا (move_cursor || wp->w_topline > بفر->b_ml.ml_کرښه_شمېر)
 		{
 		    win_T *save_curwin = curwin;
 
-		    if (move_cursor)
+		    إذا (move_cursor)
 			++wp->w_cursor.lnum;
 		    curwin = wp;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_بفر;
 		    scroll_cursor_bot(0, FALSE);
 		    curwin = save_curwin;
-		    curbuf = curwin->w_buffer;
+		    curbuf = curwin->w_بفر;
 		}
 	    }
 	}
-	redraw_buf_and_status_later(buffer, UPD_VALID);
+	redraw_buf_and_حالت_later(بفر, UPD_VALID);
 	channel_need_redraw = TRUE;
     }
 
-    if (save_write_to)
+    إذا (save_write_منزل)
     {
 	channel_T *ch;
 
 	// Find channels reading from this buffer and adjust their
 	// next-to-read line number.
-	buffer->b_write_to_channel = true;
+	بفر->b_write_منزل_channel = true;
 	FOR_ALL_CHANNELS(ch)
 	{
-	    chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	    chanpart_T  *دننه_part = &ch->ch_part[PART_دننه];
 
-	    if (in_part->ch_bufref.br_buf == buffer)
-		in_part->ch_buf_bot = buffer->b_ml.ml_line_count;
+	    إذا (دننه_part->ch_bufref.br_buf == بفر)
+		دننه_part->ch_buf_bot = بفر->b_ml.ml_کرښه_شمېر;
 	}
     }
 }
 
-    static void
+    ساكن فراغ
 drop_messages(channel_T *channel, ch_part_T part)
 {
-    char_u *msg;
+    char_u *پیغام;
 
-    while ((msg = channel_get(channel, part, NULL)) != NULL)
+    طالما ((پیغام = channel_get(channel, part, عدم)) != عدم)
     {
-	ch_log(channel, "Dropping message '%s'", (char *)msg);
-	vim_free(msg);
+	ch_log(channel, "Dropping message '%s'", (حرف *)پیغام);
+	vim_free(پیغام);
     }
 }
 
 /*
  * Return TRUE if for "channel" / "part" ch_json_head should be used.
  */
-    static int
-channel_use_json_head(channel_T *channel, ch_part_T part)
+    ساكن صحيح
+channel_use_json_سر(channel_T *channel, ch_part_T part)
 {
-    ch_mode_T	ch_mode = channel->ch_part[part].ch_mode;
+    ch_ډېرپېښ_T	ch_ډېرپېښ = channel->ch_part[part].ch_ډېرپېښ;
 
-    return ch_mode == CH_MODE_JSON || ch_mode == CH_MODE_JS
-						     || ch_mode == CH_MODE_LSP
-						     || ch_mode == CH_MODE_DAP;
+    أرجع ch_ډېرپېښ == CH_ډېرپېښ_JSON || ch_ډېرپېښ == CH_ډېرپېښ_JS
+						     || ch_ډېرپېښ == CH_ډېرپېښ_LSP
+						     || ch_ډېرپېښ == CH_ډېرپېښ_DAP;
 }
 
 /*
@@ -3389,379 +3389,379 @@ channel_use_json_head(channel_T *channel, ch_part_T part)
  * This does not redraw but sets channel_need_redraw when redraw is needed.
  * Return TRUE when a message was handled, there might be another one.
  */
-    static int
+    ساكن صحيح
 may_invoke_callback(channel_T *channel, ch_part_T part)
 {
-    char_u	*msg = NULL;
-    blob_T	*blob = NULL;
-    typval_T	*listtv = NULL;
-    typval_T	argv[CH_JSON_MAX_ARGS];
-    int		seq_nr = -1;
+    char_u	*پیغام = عدم;
+    blob_T	*blob = عدم;
+    typval_T	*listtv = عدم;
+    typval_T	argv[CH_JSON_MAX_دلیلونه];
+    صحيح		seq_nr = -1;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    ch_mode_T	ch_mode = ch_part->ch_mode;
-    cbq_T	*cbhead = &ch_part->ch_cb_head;
+    ch_ډېرپېښ_T	ch_ډېرپېښ = ch_part->ch_ډېرپېښ;
+    cbq_T	*cbhead = &ch_part->ch_cb_سر;
     cbq_T	*cbitem;
-    callback_T	*callback = NULL;
-    buf_T	*buffer = NULL;
+    callback_T	*callback = عدم;
+    buf_T	*بفر = عدم;
     char_u	*p;
-    int		called_otc;		// one time callbackup
-    int		raw_len = 0;
+    صحيح		called_otc;		// one time callbackup
+    صحيح		raw_len = 0;
 
-    if (channel->ch_nb_close_cb != NULL
-#ifdef FEAT_SOCKETSERVER
+    إذا (channel->ch_nb_close_cb != عدم
+#که_تعریف_شوی FEAT_SOCKETSERVER
 	    || channel->ch_socketserver
-#endif
+#د_که_پای
 	    )
 	// this channel is handled elsewhere (netbeans or socketserver)
-	return FALSE;
+	أرجع FALSE;
 
     // Use a message-specific callback, part callback or channel callback
-    for (cbitem = cbhead->cq_next; cbitem != NULL; cbitem = cbitem->cq_next)
-	if (cbitem->cq_seq_nr == 0)
-	    break;
-    if (cbitem != NULL)
+    لكل (cbitem = cbhead->cq_بل; cbitem != عدم; cbitem = cbitem->cq_بل)
+	إذا (cbitem->cq_seq_nr == 0)
+	    اكسر;
+    إذا (cbitem != عدم)
 	callback = &cbitem->cq_callback;
-    else if (ch_part->ch_callback.cb_name != NULL)
+    وإلا إذا (ch_part->ch_callback.cb_name != عدم)
 	callback = &ch_part->ch_callback;
-    else if (channel->ch_callback.cb_name != NULL)
+    وإلا إذا (channel->ch_callback.cb_name != عدم)
 	callback = &channel->ch_callback;
 
-    buffer = ch_part->ch_bufref.br_buf;
-    if (buffer != NULL && (!bufref_valid(&ch_part->ch_bufref)
-					       || buffer->b_ml.ml_mfp == NULL))
+    بفر = ch_part->ch_bufref.br_buf;
+    إذا (بفر != عدم && (!bufref_valid(&ch_part->ch_bufref)
+					       || بفر->b_ml.ml_mfp == عدم))
     {
 	// buffer was wiped out or unloaded
-	ch_log(channel, "%s buffer has been wiped out", ch_part_names[part]);
-	ch_part->ch_bufref.br_buf = NULL;
-	buffer = NULL;
+	ch_log(channel, "%s buffer has been wiped out", ch_part_نومونه[part]);
+	ch_part->ch_bufref.br_buf = عدم;
+	بفر = عدم;
     }
 
-    if (channel_use_json_head(channel, part))
+    إذا (channel_use_json_سر(channel, part))
     {
-	listitem_T	*item;
-	int		argc = 0;
+	listitem_T	*توکی;
+	صحيح		argc = 0;
 
 	// Get any json message in the queue.
-	if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+	إذا (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP || ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 		// In the "lsp" or "dap" mode, the http header and the json
 		// payload may be received in multiple messages. So concatenate
 		// all the received messages.
-		(void)channel_collapse(channel, part, FALSE);
+		(فراغ)channel_collapse(channel, part, FALSE);
 
 	    // Parse readahead, return when there is still no message.
 	    channel_parse_json(channel, part, false);
-	    if (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
-		return FALSE;
+	    إذا (channel_get_json(channel, part, -1, FALSE, &listtv) == FAIL)
+		أرجع FALSE;
 	}
 
-	if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP || ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 	{
 	    dict_T	*d = listtv->vval.v_dict;
 	    dictitem_T	*di;
 
 	    seq_nr = 0;
-	    if (d != NULL)
+	    إذا (d != عدم)
 	    {
-		if (ch_mode == CH_MODE_LSP)
-		    di = dict_find(d, (char_u *)"id", -1);
-		else
-		    di = dict_find(d, (char_u *)"request_seq", -1);
-		if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		    seq_nr = di->di_tv.vval.v_number;
+		إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP)
+		    di = dict_پیدا_کړه(d, (char_u *)"id", -1);
+		وإلا
+		    di = dict_پیدا_کړه(d, (char_u *)"request_seq", -1);
+		إذا (di != عدم && di->di_tv.v_type == VAR_شمېره)
+		    seq_nr = di->di_tv.vval.v_شمېره;
 	    }
 
 	    argv[1] = *listtv;
 	}
-	else
+	وإلا
 	{
-	    for (item = listtv->vval.v_list->lv_first;
-		    item != NULL && argc < CH_JSON_MAX_ARGS;
-		    item = item->li_next)
-		argv[argc++] = item->li_tv;
-	    while (argc < CH_JSON_MAX_ARGS)
+	    لكل (توکی = listtv->vval.v_list->lv_لومړی;
+		    توکی != عدم && argc < CH_JSON_MAX_دلیلونه;
+		    توکی = توکی->li_بل)
+		argv[argc++] = توکی->li_tv;
+	    طالما (argc < CH_JSON_MAX_دلیلونه)
 		argv[argc++].v_type = VAR_UNKNOWN;
 
-	    if (argv[0].v_type == VAR_STRING)
+	    إذا (argv[0].v_type == VAR_STRING)
 	    {
 		// ["cmd", arg] or ["cmd", arg, arg] or ["cmd", arg, arg, arg]
 		channel_exe_cmd(channel, part, argv);
 		free_tv(listtv);
-		return TRUE;
+		أرجع TRUE;
 	    }
 
-	    if (argv[0].v_type != VAR_NUMBER)
+	    إذا (argv[0].v_type != VAR_شمېره)
 	    {
 		ch_error(channel,
 			"Dropping message with invalid sequence number type");
 		free_tv(listtv);
-		return FALSE;
+		أرجع FALSE;
 	    }
-	    seq_nr = argv[0].vval.v_number;
+	    seq_nr = argv[0].vval.v_شمېره;
 	}
     }
-    else if (channel_peek(channel, part) == NULL)
+    وإلا إذا (channel_peek(channel, part) == عدم)
     {
 	// nothing to read on RAW or NL channel
-	return FALSE;
+	أرجع FALSE;
     }
-    else
+    وإلا
     {
 	// If there is no callback or buffer drop the message.
-	if (callback == NULL && buffer == NULL)
+	إذا (callback == عدم && بفر == عدم)
 	{
 	    // If there is a close callback it may use ch_read() to get the
 	    // messages.
-	    if (channel->ch_close_cb.cb_name == NULL && !channel->ch_drop_never)
+	    إذا (channel->ch_close_cb.cb_name == عدم && !channel->ch_drop_never)
 		drop_messages(channel, part);
-	    return FALSE;
+	    أرجع FALSE;
 	}
 
-	if (ch_mode == CH_MODE_NL)
+	إذا (ch_ډېرپېښ == CH_ډېرپېښ_NL)
 	{
-	    char_u  *nl = NULL;
+	    char_u  *nl = عدم;
 	    char_u  *buf;
-	    readq_T *node;
+	    readq_T *غوټه;
 
 	    // See if we have a message ending in NL in the first buffer.  If
 	    // not try to concatenate the first and the second buffer.
-	    while (TRUE)
+	    طالما (TRUE)
 	    {
-		node = channel_peek(channel, part);
-		nl = channel_first_nl(node);
-		if (nl != NULL)
-		    break;
-		if (channel_collapse(channel, part, TRUE) == FAIL)
+		غوټه = channel_peek(channel, part);
+		nl = channel_لومړی_nl(غوټه);
+		إذا (nl != عدم)
+		    اكسر;
+		إذا (channel_collapse(channel, part, TRUE) == FAIL)
 		{
-		    if (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
-			break;
-		    return FALSE; // incomplete message
+		    إذا (ch_part->ch_fd == INVALID_FD && غوټه->rq_buflen > 0)
+			اكسر;
+		    أرجع FALSE; // incomplete message
 		}
 	    }
-	    buf = node->rq_buffer;
+	    buf = غوټه->rq_بفر;
 
 	    // Convert NUL to NL, the internal representation.
-	    for (p = buf; (nl == NULL || p < nl)
-					    && p < buf + node->rq_buflen; ++p)
-		if (*p == NUL)
+	    لكل (p = buf; (nl == عدم || p < nl)
+					    && p < buf + غوټه->rq_buflen; ++p)
+		إذا (*p == NUL)
 		    *p = NL;
 
-	    if (nl == NULL)
+	    إذا (nl == عدم)
 	    {
 		// get the whole buffer, drop the NL
-		msg = channel_get(channel, part, NULL);
+		پیغام = channel_get(channel, part, عدم);
 	    }
-	    else if (nl + 1 == buf + node->rq_buflen)
+	    وإلا إذا (nl + 1 == buf + غوټه->rq_buflen)
 	    {
 		// get the whole buffer
-		msg = channel_get(channel, part, NULL);
+		پیغام = channel_get(channel, part, عدم);
 		*nl = NUL;
 	    }
-	    else
+	    وإلا
 	    {
 		// Copy the message into allocated memory (excluding the NL)
 		// and remove it from the buffer (including the NL).
-		msg = vim_strnsave(buf, nl - buf);
-		channel_consume(channel, part, (int)(nl - buf) + 1);
+		پیغام = vim_strnsave(buf, nl - buf);
+		channel_consume(channel, part, (صحيح)(nl - buf) + 1);
 	    }
 	}
-	else
+	وإلا
 	{
 	    // For a raw channel we don't know where the message ends, just
 	    // get everything we have.
 	    raw_len = 0;
-	    msg = channel_get_all(channel, part,
-			ch_mode == CH_MODE_BLOB ? &raw_len : NULL);
+	    پیغام = channel_get_all(channel, part,
+			ch_ډېرپېښ == CH_ډېرپېښ_BLOB ? &raw_len : عدم);
 	}
 
-	if (msg == NULL)
-	    return FALSE; // out of memory (and avoids Coverity warning)
+	إذا (پیغام == عدم)
+	    أرجع FALSE; // out of memory (and avoids Coverity warning)
 
-	if (ch_mode == CH_MODE_BLOB)
+	إذا (ch_ډېرپېښ == CH_ډېرپېښ_BLOB)
 	{
 	    blob = blob_alloc();
-	    if (blob == NULL)
+	    إذا (blob == عدم)
 	    {
-		vim_free(msg);
-		return FALSE;
+		vim_free(پیغام);
+		أرجع FALSE;
 	    }
-	    if (ga_grow(&blob->bv_ga, raw_len) == FAIL)
+	    إذا (ga_grow(&blob->bv_ga, raw_len) == FAIL)
 	    {
 		blob_free(blob);
-		vim_free(msg);
-		return FALSE;
+		vim_free(پیغام);
+		أرجع FALSE;
 	    }
-	    if (raw_len > 0)
+	    إذا (raw_len > 0)
 	    {
-		mch_memmove(blob->bv_ga.ga_data, msg, (size_t)raw_len);
+		mch_memmove(blob->bv_ga.ga_معلومات, پیغام, (size_t)raw_len);
 		blob->bv_ga.ga_len = raw_len;
 	    }
 	    argv[1].v_type = VAR_BLOB;
 	    argv[1].vval.v_blob = blob;
 	    ++blob->bv_refcount;
 	}
-	else
+	وإلا
 	{
 	    argv[1].v_type = VAR_STRING;
-	    argv[1].vval.v_string = msg;
+	    argv[1].vval.v_string = پیغام;
 	}
     }
 
     called_otc = FALSE;
-    if (seq_nr > 0)
+    إذا (seq_nr > 0)
     {
 	// JSON or JS or LSP or DAP mode: invoke the one-time callback with the
 	// matching nr
-	int lsp_req_msg = FALSE;
+	صحيح lsp_req_پیغام = FALSE;
 
 	// Don't use a LSP/DAP server request message with the same sequence
 	// number as the client request message as the response message.
-	if ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	إذا ((ch_ډېرپېښ == CH_ډېرپېښ_LSP || ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 		&& argv[1].v_type == VAR_DICT
-		&& dict_has_key(argv[1].vval.v_dict, "method"))
-	    lsp_req_msg = TRUE;
+		&& dict_has_کلی(argv[1].vval.v_dict, "method"))
+	    lsp_req_پیغام = TRUE;
 
-	if (!lsp_req_msg)
+	إذا (!lsp_req_پیغام)
 	{
-	    for (cbitem = cbhead->cq_next; cbitem != NULL;
-		    cbitem = cbitem->cq_next)
+	    لكل (cbitem = cbhead->cq_بل; cbitem != عدم;
+		    cbitem = cbitem->cq_بل)
 	    {
-		if (cbitem->cq_seq_nr == seq_nr)
+		إذا (cbitem->cq_seq_nr == seq_nr)
 		{
-		    invoke_one_time_callback(channel, cbhead, cbitem, argv);
+		    invoke_one_وخت_callback(channel, cbhead, cbitem, argv);
 		    called_otc = TRUE;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
     }
 
-    if (seq_nr > 0 && ((ch_mode != CH_MODE_LSP && ch_mode != CH_MODE_DAP)
+    إذا (seq_nr > 0 && ((ch_ډېرپېښ != CH_ډېرپېښ_LSP && ch_ډېرپېښ != CH_ډېرپېښ_DAP)
 		|| called_otc))
     {
-	if (!called_otc)
+	إذا (!called_otc)
 	{
 	    // If the 'drop' channel attribute is set to 'never' or if
 	    // ch_evalexpr() is waiting for this response message, then don't
 	    // drop this message.
-	    if (channel->ch_drop_never)
+	    إذا (channel->ch_drop_never)
 	    {
 		// message must be read with ch_read()
-		channel_push_json(channel, part, listtv);
+		channel_ټېل_json(channel, part, listtv);
 
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_شمېره;
 		free_tv(listtv);
-		listtv = NULL;
+		listtv = عدم;
 	    }
-	    else
+	    وإلا
 		ch_log(channel, "Dropping message %d without callback",
 								       seq_nr);
 	}
     }
-    else if (callback != NULL || buffer != NULL)
+    وإلا إذا (callback != عدم || بفر != عدم)
     {
-	if (buffer != NULL)
+	إذا (بفر != عدم)
 	{
-	    if (msg == NULL)
+	    إذا (پیغام == عدم)
 		// JSON or JS mode: re-encode the message.
-		msg = json_encode(listtv, ch_mode);
-	    if (msg != NULL)
+		پیغام = json_encode(listtv, ch_ډېرپېښ);
+	    إذا (پیغام != عدم)
 	    {
-#ifdef FEAT_TERMINAL
-		if (buffer->b_term != NULL)
+#که_تعریف_شوی FEAT_TERMINAL
+		إذا (بفر->b_غړی != عدم)
 		{
 		    // PART_ERR data arrives from a pipe without PTY ONLCR
 		    // conversion, so lone NL must be converted to CR+NL to
 		    // prevent unexpected indentation in the terminal display.
-		    if (part == PART_ERR)
+		    إذا (part == PART_ERR)
 		    {
 			char_u *cp;
-			int    extra = 0;
+			صحيح    extra = 0;
 
-			for (cp = msg; *cp != NUL; ++cp)
-			    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+			لكل (cp = پیغام; *cp != NUL; ++cp)
+			    إذا (*cp == NL && (cp == پیغام || cp[-1] != CAR))
 				++extra;
-			if (extra > 0)
+			إذا (extra > 0)
 			{
-			    char_u *crlf_msg = alloc(STRLEN(msg) + extra + 1);
+			    char_u *crlf_پیغام = alloc(STRLEN(پیغام) + extra + 1);
 
-			    if (crlf_msg != NULL)
+			    إذا (crlf_پیغام != عدم)
 			    {
-				char_u *q = crlf_msg;
+				char_u *q = crlf_پیغام;
 
-				for (cp = msg; *cp != NUL; ++cp)
+				لكل (cp = پیغام; *cp != NUL; ++cp)
 				{
-				    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+				    إذا (*cp == NL && (cp == پیغام || cp[-1] != CAR))
 					*q++ = CAR;
 				    *q++ = *cp;
 				}
 				*q = NUL;
-				write_to_term(buffer, crlf_msg, channel);
-				vim_free(crlf_msg);
+				write_منزل_غړی(بفر, crlf_پیغام, channel);
+				vim_free(crlf_پیغام);
 			    }
 			}
-			else
-			    write_to_term(buffer, msg, channel);
+			وإلا
+			    write_منزل_غړی(بفر, پیغام, channel);
 		    }
-		    else
-			write_to_term(buffer, msg, channel);
+		    وإلا
+			write_منزل_غړی(بفر, پیغام, channel);
 		}
-		else
-#endif
-		    append_to_buffer(buffer, msg, channel, part);
+		وإلا
+#د_که_پای
+		    append_منزل_بفر(بفر, پیغام, channel, part);
 	    }
 	}
 
-	if (callback != NULL)
+	إذا (callback != عدم)
 	{
-	    if (cbitem != NULL)
-		invoke_one_time_callback(channel, cbhead, cbitem, argv);
-	    else
+	    إذا (cbitem != عدم)
+		invoke_one_وخت_callback(channel, cbhead, cbitem, argv);
+	    وإلا
 	    {
 		// invoke the channel callback
 		ch_log(channel, "Invoking channel callback %s",
-						    (char *)callback->cb_name);
+						    (حرف *)callback->cb_name);
 		invoke_callback(channel, callback, argv);
 	    }
 	}
     }
-    else
+    وإلا
 	ch_log(channel, "Dropping message %d", seq_nr);
 
-    if (listtv != NULL)
+    إذا (listtv != عدم)
 	free_tv(listtv);
-    if (blob != NULL)
+    إذا (blob != عدم)
 	blob_unref(blob);
-    vim_free(msg);
+    vim_free(پیغام);
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-#if defined(FEAT_NETBEANS_INTG)
+#إذا defined(FEAT_NETBEANS_INTG)
 /*
  * Return TRUE when channel "channel" is open for writing to.
  * Also returns FALSE or invalid "channel".
  */
-    int
-channel_can_write_to(channel_T *channel)
+    صحيح
+channel_can_write_منزل(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD);
+    أرجع channel != عدم && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_دننه_FD != INVALID_FD);
 }
-#endif
+#د_که_پای
 
 /*
  * Return TRUE when channel "channel" is open for reading or writing.
  * Also returns FALSE for invalid "channel".
  */
-    int
+    صحيح
 channel_is_open(channel_T *channel)
 {
-    return channel != NULL && (channel->CH_SOCK_FD != INVALID_FD
-			  || channel->CH_IN_FD != INVALID_FD
-			  || channel->CH_OUT_FD != INVALID_FD
+    أرجع channel != عدم && (channel->CH_SOCK_FD != INVALID_FD
+			  || channel->CH_دننه_FD != INVALID_FD
+			  || channel->CH_بهر_FD != INVALID_FD
 			  || channel->CH_ERR_FD != INVALID_FD);
 }
 
@@ -3769,177 +3769,177 @@ channel_is_open(channel_T *channel)
  * Return a pointer indicating the readahead.  Can only be compared between
  * calls.  Returns NULL if there is no readahead.
  */
-    static void *
-channel_readahead_pointer(channel_T *channel, ch_part_T part)
+    ساكن فراغ *
+channel_readahead_اشاره_ګر(channel_T *channel, ch_part_T part)
 {
-    if (channel_use_json_head(channel, part))
+    إذا (channel_use_json_سر(channel, part))
     {
-	jsonq_T   *head = &channel->ch_part[part].ch_json_head;
+	jsonq_T   *سر = &channel->ch_part[part].ch_json_سر;
 
-	if (head->jq_next == NULL)
+	إذا (سر->jq_بل == عدم)
 	    // Parse json from readahead, there might be a complete message to
 	    // process.
 	    channel_parse_json(channel, part, false);
 
-	return head->jq_next;
+	أرجع سر->jq_بل;
     }
-    return channel_peek(channel, part);
+    أرجع channel_peek(channel, part);
 }
 
 /*
  * Return TRUE if "channel" has JSON or other typeahead.
  */
-    static int
+    ساكن صحيح
 channel_has_readahead(channel_T *channel, ch_part_T part)
 {
-    return channel_readahead_pointer(channel, part) != NULL;
+    أرجع channel_readahead_اشاره_ګر(channel, part) != عدم;
 }
 
 /*
  * Return a string indicating the status of the channel.
  * If "req_part" is not negative check that part.
  */
-    static char *
-channel_status(channel_T *channel, int req_part)
+    ساكن حرف *
+channel_حالت(channel_T *channel, صحيح req_part)
 {
     ch_part_T part;
-    int has_readahead = FALSE;
+    صحيح has_readahead = FALSE;
 
-    if (channel == NULL)
-	 return "fail";
-    if (req_part == PART_OUT)
+    إذا (channel == عدم)
+	 أرجع "fail";
+    إذا (req_part == PART_بهر)
     {
-	if (channel->CH_OUT_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_OUT))
+	إذا (channel->CH_بهر_FD != INVALID_FD)
+	    أرجع "open";
+	إذا (channel_has_readahead(channel, PART_بهر))
 	    has_readahead = TRUE;
     }
-    else if (req_part == PART_ERR)
+    وإلا إذا (req_part == PART_ERR)
     {
-	if (channel->CH_ERR_FD != INVALID_FD)
-	    return "open";
-	if (channel_has_readahead(channel, PART_ERR))
+	إذا (channel->CH_ERR_FD != INVALID_FD)
+	    أرجع "open";
+	إذا (channel_has_readahead(channel, PART_ERR))
 	    has_readahead = TRUE;
     }
-    else
+    وإلا
     {
-	if (channel_is_open(channel))
-	    return "open";
-	for (part = PART_SOCK; part < PART_IN; ++part)
-	    if (channel_has_readahead(channel, part))
+	إذا (channel_is_open(channel))
+	    أرجع "open";
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
+	    إذا (channel_has_readahead(channel, part))
 	    {
 		has_readahead = TRUE;
-		break;
+		اكسر;
 	    }
     }
 
-    if (has_readahead)
-	return "buffered";
-    return "closed";
+    إذا (has_readahead)
+	أرجع "buffered";
+    أرجع "closed";
 }
 
-    static void
-channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
+    ساكن فراغ
+channel_part_info(channel_T *channel, dict_T *dict, حرف *name, ch_part_T part)
 {
     chanpart_T *chanpart = &channel->ch_part[part];
-    char	namebuf[20];  // longest is "sock_timeout"
-    size_t	tail;
+    حرف	namebuf[20];  // longest is "sock_timeout"
+    size_t	لکۍ;
     string_T	s;
 
     vim_strncpy((char_u *)namebuf, (char_u *)name, 4);
-    tail = STRLEN(namebuf);
-    STRCPY(namebuf + tail, "_");
-    tail += STRLEN_LITERAL("_");
+    لکۍ = STRLEN(namebuf);
+    STRCPY(namebuf + لکۍ, "_");
+    لکۍ += STRLEN_LITERAL("_");
 
-    STRCPY(namebuf + tail, "status");
-    if (chanpart->ch_fd != INVALID_FD)
-	STR_LITERAL_SET(s, "open");
-    else if (channel_has_readahead(channel, part))
-	STR_LITERAL_SET(s, "buffered");
-    else
-	STR_LITERAL_SET(s, "closed");
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    STRCPY(namebuf + لکۍ, "status");
+    إذا (chanpart->ch_fd != INVALID_FD)
+	STR_LITERAL_سېټ(s, "open");
+    وإلا إذا (channel_has_readahead(channel, part))
+	STR_LITERAL_سېټ(s, "buffered");
+    وإلا
+	STR_LITERAL_سېټ(s, "closed");
+    dict_جمع_کړه_string_len(dict, namebuf, s.string, (صحيح)s.اوږدتیا);
 
-    STRCPY(namebuf + tail, "mode");
-    switch (chanpart->ch_mode)
+    STRCPY(namebuf + لکۍ, "mode");
+    بدل (chanpart->ch_ډېرپېښ)
     {
-	case CH_MODE_NL:
-	    STR_LITERAL_SET(s, "NL");
-	    break;
-	case CH_MODE_RAW:
-	    STR_LITERAL_SET(s, "RAW");
-	    break;
-	case CH_MODE_BLOB:
-	    STR_LITERAL_SET(s, "BLOB");
-	    break;
-	case CH_MODE_JSON:
-	    STR_LITERAL_SET(s, "JSON");
-	    break;
-	case CH_MODE_JS:
-	    STR_LITERAL_SET(s, "JS");
-	    break;
-	case CH_MODE_LSP:
-	    STR_LITERAL_SET(s, "LSP");
-	    break;
-	case CH_MODE_DAP:
-	    STR_LITERAL_SET(s, "DAP");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	حالة CH_ډېرپېښ_NL:
+	    STR_LITERAL_سېټ(s, "NL");
+	    اكسر;
+	حالة CH_ډېرپېښ_RAW:
+	    STR_LITERAL_سېټ(s, "RAW");
+	    اكسر;
+	حالة CH_ډېرپېښ_BLOB:
+	    STR_LITERAL_سېټ(s, "BLOB");
+	    اكسر;
+	حالة CH_ډېرپېښ_JSON:
+	    STR_LITERAL_سېټ(s, "JSON");
+	    اكسر;
+	حالة CH_ډېرپېښ_JS:
+	    STR_LITERAL_سېټ(s, "JS");
+	    اكسر;
+	حالة CH_ډېرپېښ_LSP:
+	    STR_LITERAL_سېټ(s, "LSP");
+	    اكسر;
+	حالة CH_ډېرپېښ_DAP:
+	    STR_LITERAL_سېټ(s, "DAP");
+	    اكسر;
+	افتراضي:
+	    STR_LITERAL_سېټ(s, "");
+	    اكسر;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_جمع_کړه_string_len(dict, namebuf, s.string, (صحيح)s.اوږدتیا);
 
-    STRCPY(namebuf + tail, "io");
-    if (part == PART_SOCK)
-	STR_LITERAL_SET(s, "socket");
-    else switch (chanpart->ch_io)
+    STRCPY(namebuf + لکۍ, "io");
+    إذا (part == PART_SOCK)
+	STR_LITERAL_سېټ(s, "socket");
+    وإلا بدل (chanpart->ch_io)
     {
-	case JIO_NULL:
-	    STR_LITERAL_SET(s, "null");
-	    break;
-	case JIO_PIPE:
-	    STR_LITERAL_SET(s, "pipe");
-	    break;
-	case JIO_FILE:
-	    STR_LITERAL_SET(s, "file");
-	    break;
-	case JIO_BUFFER:
-	    STR_LITERAL_SET(s, "buffer");
-	    break;
-	case JIO_OUT:
-	    STR_LITERAL_SET(s, "out");
-	    break;
-	default:
-	    STR_LITERAL_SET(s, "");
-	    break;
+	حالة JIO_NULL:
+	    STR_LITERAL_سېټ(s, "null");
+	    اكسر;
+	حالة JIO_PIPE:
+	    STR_LITERAL_سېټ(s, "pipe");
+	    اكسر;
+	حالة JIO_FILE:
+	    STR_LITERAL_سېټ(s, "file");
+	    اكسر;
+	حالة JIO_بفر:
+	    STR_LITERAL_سېټ(s, "buffer");
+	    اكسر;
+	حالة JIO_بهر:
+	    STR_LITERAL_سېټ(s, "out");
+	    اكسر;
+	افتراضي:
+	    STR_LITERAL_سېټ(s, "");
+	    اكسر;
     }
-    dict_add_string_len(dict, namebuf, s.string, (int)s.length);
+    dict_جمع_کړه_string_len(dict, namebuf, s.string, (صحيح)s.اوږدتیا);
 
-    STRCPY(namebuf + tail, "timeout");
-    dict_add_number(dict, namebuf, chanpart->ch_timeout);
+    STRCPY(namebuf + لکۍ, "timeout");
+    dict_جمع_کړه_شمېره(dict, namebuf, chanpart->ch_timeout);
 }
 
-    static void
+    ساكن فراغ
 channel_info(channel_T *channel, dict_T *dict)
 {
-    dict_add_number(dict, "id", channel->ch_id);
-    dict_add_string(dict, "status", (char_u *)channel_status(channel, -1));
+    dict_جمع_کړه_شمېره(dict, "id", channel->ch_id);
+    dict_جمع_کړه_string(dict, "status", (char_u *)channel_حالت(channel, -1));
 
-    if (channel->ch_hostname != NULL)
+    إذا (channel->ch_hostname != عدم)
     {
-	if (channel->ch_port)
-	    dict_add_number(dict, "port", channel->ch_port);
-	else
+	إذا (channel->ch_پورټ)
+	    dict_جمع_کړه_شمېره(dict, "port", channel->ch_پورټ);
+	وإلا
 	    // Unix-domain socket.
-	    dict_add_string(dict, "path", (char_u *)channel->ch_hostname);
+	    dict_جمع_کړه_string(dict, "path", (char_u *)channel->ch_hostname);
 	channel_part_info(channel, dict, "sock", PART_SOCK);
     }
-    else
+    وإلا
     {
-	channel_part_info(channel, dict, "out", PART_OUT);
+	channel_part_info(channel, dict, "out", PART_بهر);
 	channel_part_info(channel, dict, "err", PART_ERR);
-	channel_part_info(channel, dict, "in", PART_IN);
+	channel_part_info(channel, dict, "in", PART_دننه);
     }
 }
 
@@ -3948,50 +3948,50 @@ channel_info(channel_T *channel, dict_T *dict)
  * Trigger the close callback if "invoke_close_cb" is TRUE.
  * Does not clear the buffers.
  */
-    void
-channel_close(channel_T *channel, int invoke_close_cb)
+    فراغ
+channel_close(channel_T *channel, صحيح invoke_close_cb)
 {
     ch_log(channel, "Closing channel");
 
-#ifdef FEAT_GUI
+#که_تعریف_شوی FEAT_GUI
     channel_gui_unregister(channel);
-#endif
+#د_که_پای
 
     ch_close_part(channel, PART_SOCK);
-    ch_close_part(channel, PART_IN);
-    ch_close_part(channel, PART_OUT);
+    ch_close_part(channel, PART_دننه);
+    ch_close_part(channel, PART_بهر);
     ch_close_part(channel, PART_ERR);
 
-    if (invoke_close_cb)
+    إذا (invoke_close_cb)
     {
 	ch_part_T	part;
 
-#ifdef FEAT_TERMINAL
+#که_تعریف_شوی FEAT_TERMINAL
 	// let the terminal know it is closing to avoid getting stuck
-	term_channel_closing(channel);
-#endif
+	غړی_channel_closing(channel);
+#د_که_پای
 	// Invoke callbacks and flush buffers before the close callback.
-	if (channel->ch_close_cb.cb_name != NULL)
+	إذا (channel->ch_close_cb.cb_name != عدم)
 	    ch_log(channel,
 		     "Invoking callbacks and flushing buffers before closing");
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
-	    if (channel->ch_close_cb.cb_name != NULL
-			    || channel->ch_part[part].ch_bufref.br_buf != NULL)
+	    إذا (channel->ch_close_cb.cb_name != عدم
+			    || channel->ch_part[part].ch_bufref.br_buf != عدم)
 	    {
 		// Increment the refcount to avoid the channel being freed
 		// halfway.
 		++channel->ch_refcount;
-		if (channel->ch_close_cb.cb_name == NULL)
+		إذا (channel->ch_close_cb.cb_name == عدم)
 		    ch_log(channel, "flushing %s buffers before closing",
-							  ch_part_names[part]);
-		while (may_invoke_callback(channel, part))
+							  ch_part_نومونه[part]);
+		طالما (may_invoke_callback(channel, part))
 		    ;
 		--channel->ch_refcount;
 	    }
 	}
 
-	if (channel->ch_close_cb.cb_name != NULL)
+	إذا (channel->ch_close_cb.cb_name != عدم)
 	{
 	      typval_T	argv[1];
 	      typval_T	rettv;
@@ -4000,7 +4000,7 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // halfway.
 	      ++channel->ch_refcount;
 	      ch_log(channel, "Invoking close callback %s",
-					 (char *)channel->ch_close_cb.cb_name);
+					 (حرف *)channel->ch_close_cb.cb_name);
 	      argv[0].v_type = VAR_CHANNEL;
 	      argv[0].vval.v_channel = channel;
 	      call_callback(&channel->ch_close_cb, -1, &rettv, 1, argv);
@@ -4010,204 +4010,204 @@ channel_close(channel_T *channel, int invoke_close_cb)
 	      // the callback is only called once
 	      free_callback(&channel->ch_close_cb);
 
-	      if (channel_need_redraw)
+	      إذا (channel_need_redraw)
 	      {
 		  channel_need_redraw = FALSE;
 		  redraw_after_callback(TRUE, FALSE);
 	      }
 
-	      if (!channel->ch_drop_never)
+	      إذا (!channel->ch_drop_never)
 		  // any remaining messages are useless now
-		  for (part = PART_SOCK; part < PART_IN; ++part)
+		  لكل (part = PART_SOCK; part < PART_دننه; ++part)
 		      drop_messages(channel, part);
 
 	      --channel->ch_refcount;
 	}
     }
 
-    channel->ch_nb_close_cb = NULL;
-#ifdef FEAT_SOCKETSERVER
+    channel->ch_nb_close_cb = عدم;
+#که_تعریف_شوی FEAT_SOCKETSERVER
     channel->ch_socketserver = false;
-    channel->ch_ss_accept_cb = NULL;
-    channel->ch_ss_close_cb = NULL;
-#endif
+    channel->ch_ss_accept_cb = عدم;
+    channel->ch_ss_close_cb = عدم;
+#د_که_پای
 
-#ifdef FEAT_TERMINAL
-    term_channel_closed(channel);
-#endif
+#که_تعریف_شوی FEAT_TERMINAL
+    غړی_channel_closed(channel);
+#د_که_پای
 }
 
 /*
  * Close the "in" part channel "channel".
  */
-    static void
-channel_close_in(channel_T *channel)
+    ساكن فراغ
+channel_close_دننه(channel_T *channel)
 {
-    ch_close_part(channel, PART_IN);
+    ch_close_part(channel, PART_دننه);
 }
 
-    static void
-remove_from_writeque(writeq_T *wq, writeq_T *entry)
+    ساكن فراغ
+remove_from_writeque(writeq_T *wq, writeq_T *ثبت)
 {
-    ga_clear(&entry->wq_ga);
-    wq->wq_next = entry->wq_next;
-    if (wq->wq_next == NULL)
-	wq->wq_prev = NULL;
-    else
-	wq->wq_next->wq_prev = NULL;
-    vim_free(entry);
+    ga_clear(&ثبت->wq_ga);
+    wq->wq_بل = ثبت->wq_بل;
+    إذا (wq->wq_بل == عدم)
+	wq->wq_prev = عدم;
+    وإلا
+	wq->wq_بل->wq_prev = عدم;
+    vim_free(ثبت);
 }
 
 /*
  * Clear the read buffer on "channel"/"part".
  */
-    static void
+    ساكن فراغ
 channel_clear_one(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    jsonq_T *json_head = &ch_part->ch_json_head;
-    cbq_T   *cb_head = &ch_part->ch_cb_head;
+    jsonq_T *json_سر = &ch_part->ch_json_سر;
+    cbq_T   *cb_سر = &ch_part->ch_cb_سر;
 
-    while (channel_peek(channel, part) != NULL)
-	vim_free(channel_get(channel, part, NULL));
+    طالما (channel_peek(channel, part) != عدم)
+	vim_free(channel_get(channel, part, عدم));
 
-    while (cb_head->cq_next != NULL)
+    طالما (cb_سر->cq_بل != عدم)
     {
-	cbq_T *node = cb_head->cq_next;
+	cbq_T *غوټه = cb_سر->cq_بل;
 
-	remove_cb_node(cb_head, node);
-	free_callback(&node->cq_callback);
-	vim_free(node);
+	remove_cb_غوټه(cb_سر, غوټه);
+	free_callback(&غوټه->cq_callback);
+	vim_free(غوټه);
     }
 
-    while (json_head->jq_next != NULL)
+    طالما (json_سر->jq_بل != عدم)
     {
-	free_tv(json_head->jq_next->jq_value);
-	remove_json_node(json_head, json_head->jq_next);
+	free_tv(json_سر->jq_بل->jq_ارزښت);
+	remove_json_غوټه(json_سر, json_سر->jq_بل);
     }
 
     free_callback(&ch_part->ch_callback);
-    ga_clear(&ch_part->ch_block_ids);
+    ga_clear(&ch_part->ch_بلاک_ids);
 
-    while (ch_part->ch_writeque.wq_next != NULL)
+    طالما (ch_part->ch_writeque.wq_بل != عدم)
 	remove_from_writeque(&ch_part->ch_writeque,
-						 ch_part->ch_writeque.wq_next);
+						 ch_part->ch_writeque.wq_بل);
 }
 
 /*
  * Clear all the read buffers on "channel".
  */
-    void
+    فراغ
 channel_clear(channel_T *channel)
 {
     ch_log(channel, "Clearing channel");
     VIM_CLEAR(channel->ch_hostname);
     channel_clear_one(channel, PART_SOCK);
-    channel_clear_one(channel, PART_OUT);
+    channel_clear_one(channel, PART_بهر);
     channel_clear_one(channel, PART_ERR);
-    channel_clear_one(channel, PART_IN);
+    channel_clear_one(channel, PART_دننه);
     free_callback(&channel->ch_callback);
     free_callback(&channel->ch_close_cb);
 }
 
-#if defined(EXITFREE)
-    void
-channel_free_all(void)
+#إذا defined(EXITFREE)
+    فراغ
+channel_free_all(فراغ)
 {
     channel_T *channel;
 
-    ch_log(NULL, "channel_free_all()");
+    ch_log(عدم, "channel_free_all()");
     FOR_ALL_CHANNELS(channel)
 	channel_clear(channel);
 }
-#endif
+#د_که_پای
 
 
 // Sent when the netbeans channel is found closed when reading.
-#define DETACH_MSG_RAW "DETACH\n"
+#تعریف_کړه DETACH_پیغام_RAW "DETACH\n"
 
 // Buffer size for reading incoming messages.
-#define MAXMSGSIZE 4096
+#تعریف_کړه MAXMSGSIZE 4096
 
 /*
  * Check if there are remaining data that should be written for "in_part".
  */
-    static int
-is_channel_write_remaining(chanpart_T *in_part)
+    ساكن صحيح
+is_channel_write_پاتې_شوی(chanpart_T *دننه_part)
 {
-    buf_T *buf = in_part->ch_bufref.br_buf;
+    buf_T *buf = دننه_part->ch_bufref.br_buf;
 
-    if (in_part->ch_writeque.wq_next != NULL)
-	return TRUE;
-    if (buf == NULL)
-	return FALSE;
-    return in_part->ch_buf_append
-	    ? (in_part->ch_buf_bot < buf->b_ml.ml_line_count)
-	    : (in_part->ch_buf_top <= in_part->ch_buf_bot
-			    && in_part->ch_buf_top <= buf->b_ml.ml_line_count);
+    إذا (دننه_part->ch_writeque.wq_بل != عدم)
+	أرجع TRUE;
+    إذا (buf == عدم)
+	أرجع FALSE;
+    أرجع دننه_part->ch_buf_append
+	    ? (دننه_part->ch_buf_bot < buf->b_ml.ml_کرښه_شمېر)
+	    : (دننه_part->ch_buf_سر <= دننه_part->ch_buf_bot
+			    && دننه_part->ch_buf_سر <= buf->b_ml.ml_کرښه_شمېر);
 }
 
-#if defined(HAVE_SELECT)
+#إذا defined(HAVE_SELECT)
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_wfds(int maxfd_arg, fd_set *wfds)
+    ساكن صحيح
+channel_fill_wfds(صحيح maxfd_arg, fd_set *wfds)
 {
-    int		maxfd = maxfd_arg;
+    صحيح		maxfd = maxfd_arg;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *دننه_part = &ch->ch_part[PART_دننه];
 
-	if (in_part->ch_fd != INVALID_FD
+	إذا (دننه_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		&& (int)in_part->ch_fd < FD_SETSIZE
+		&& (صحيح)دننه_part->ch_fd < FD_SETSIZE
 # endif
-		&& is_channel_write_remaining(in_part))
+		&& is_channel_write_پاتې_شوی(دننه_part))
 	{
-	    FD_SET((int)in_part->ch_fd, wfds);
-	    if ((int)in_part->ch_fd >= maxfd)
-		maxfd = (int)in_part->ch_fd + 1;
+	    FD_SET((صحيح)دننه_part->ch_fd, wfds);
+	    إذا ((صحيح)دننه_part->ch_fd >= maxfd)
+		maxfd = (صحيح)دننه_part->ch_fd + 1;
 	}
     }
-    return maxfd;
+    أرجع maxfd;
 }
-#else
+#وإلا
 /*
  * Add write fds where we are waiting for writing to be possible.
  */
-    static int
-channel_fill_poll_write(int nfd_in, struct pollfd *fds)
+    ساكن صحيح
+channel_fill_poll_write(صحيح nfd_دننه, بنية pollfd *fds)
 {
-    int		nfd = nfd_in;
+    صحيح		nfd = nfd_دننه;
     channel_T	*ch;
 
     FOR_ALL_CHANNELS(ch)
     {
-	chanpart_T  *in_part = &ch->ch_part[PART_IN];
+	chanpart_T  *دننه_part = &ch->ch_part[PART_دننه];
 
-	if (in_part->ch_fd != INVALID_FD
-		&& is_channel_write_remaining(in_part))
+	إذا (دننه_part->ch_fd != INVALID_FD
+		&& is_channel_write_پاتې_شوی(دننه_part))
 	{
-	    in_part->ch_poll_idx = nfd;
-	    fds[nfd].fd = in_part->ch_fd;
+	    دننه_part->ch_poll_idx = nfd;
+	    fds[nfd].fd = دننه_part->ch_fd;
 	    fds[nfd].events = POLLOUT;
 	    ++nfd;
 	}
-	else
-	    in_part->ch_poll_idx = -1;
+	وإلا
+	    دننه_part->ch_poll_idx = -1;
     }
-    return nfd;
+    أرجع nfd;
 }
-#endif
+#د_که_پای
 
-typedef enum {
+تعريفنوع تعداد {
     CW_READY,
     CW_NOT_READY,
     CW_ERROR
-} channel_wait_result;
+} channel_wait_پایله;
 
 /*
  * Check for reading from "fd" with "timeout" msec.
@@ -4215,124 +4215,124 @@ typedef enum {
  * Return CW_NOT_READY when there is nothing to read.
  * Return CW_ERROR when there is an error.
  */
-    static channel_wait_result
-channel_wait(channel_T *channel, sock_T fd, int timeout)
+    ساكن channel_wait_پایله
+channel_wait(channel_T *channel, sock_T fd, صحيح timeout)
 {
-    if (timeout > 0)
+    إذا (timeout > 0)
 	ch_log(channel, "Waiting for up to %d msec", timeout);
 
-#ifdef MSWIN
-    if (fd != channel->CH_SOCK_FD)
+#که_تعریف_شوی MSWIN
+    إذا (fd != channel->CH_SOCK_FD)
     {
 	DWORD	nread;
-	int	sleep_time;
-	DWORD	deadline = GetTickCount() + timeout;
-	int	delay = 1;
+	صحيح	sleep_وخت;
+	DWORD	deadline = Get_Tick_شمېر() + timeout;
+	صحيح	delay = 1;
 
 	// reading from a pipe, not a socket
-	while (TRUE)
+	طالما (TRUE)
 	{
-	    int r = PeekNamedPipe((HANDLE)fd, NULL, 0, NULL, &nread, NULL);
+	    صحيح r = PeekNamedPipe((HANDLE)fd, عدم, 0, عدم, &nread, عدم);
 
-	    if (r && nread > 0)
-		return CW_READY;
+	    إذا (r && nread > 0)
+		أرجع CW_READY;
 
-	    if (channel->ch_named_pipe)
+	    إذا (channel->ch_named_pipe)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, عدم);
 	    }
-	    else if (r == 0)
-		return CW_ERROR;
+	    وإلا إذا (r == 0)
+		أرجع CW_ERROR;
 
 	    // perhaps write some buffer lines
-	    channel_write_any_lines();
+	    channel_write_any_کرښې();
 
-	    sleep_time = deadline - GetTickCount();
-	    if (sleep_time <= 0)
-		break;
+	    sleep_وخت = deadline - Get_Tick_شمېر();
+	    إذا (sleep_وخت <= 0)
+		اكسر;
 	    // Wait for a little while.  Very short at first, up to 10 msec
 	    // after looping a few times.
-	    if (sleep_time > delay)
-		sleep_time = delay;
-	    Sleep(sleep_time);
+	    إذا (sleep_وخت > delay)
+		sleep_وخت = delay;
+	    Sleep(sleep_وخت);
 	    delay = delay * 2;
-	    if (delay > 10)
+	    إذا (delay > 10)
 		delay = 10;
 	}
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
-#if defined(HAVE_SELECT)
-	struct timeval	tval;
+#إذا defined(HAVE_SELECT)
+	بنية timeval	tval;
 	fd_set		rfds;
 	fd_set		wfds;
-	int		ret;
-	int		maxfd;
+	صحيح		ret;
+	صحيح		maxfd;
 
 	tval.tv_sec = timeout / 1000;
 	tval.tv_usec = (timeout % 1000) * 1000;
-	for (;;)
+	لكل (;;)
 	{
 	    FD_ZERO(&rfds);
-	    FD_SET((int)fd, &rfds);
+	    FD_SET((صحيح)fd, &rfds);
 
 	    // Write lines to a pipe when a pipe can be written to.  Need to
 	    // set this every time, some buffers may be done.
-	    maxfd = (int)fd + 1;
+	    maxfd = (صحيح)fd + 1;
 	    FD_ZERO(&wfds);
 	    maxfd = channel_fill_wfds(maxfd, &wfds);
 
-	    ret = select(maxfd, &rfds, &wfds, NULL, &tval);
+	    ret = select(maxfd, &rfds, &wfds, عدم, &tval);
 # ifdef EINTR
 	    SOCK_ERRNO;
-	    if (ret == -1 && errno == EINTR)
-		continue;
+	    إذا (ret == -1 && errno == EINTR)
+		استمر;
 # endif
-	    if (ret > 0)
+	    إذا (ret > 0)
 	    {
-		if (FD_ISSET(fd, &rfds))
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		إذا (FD_ISSET(fd, &rfds))
+		    أرجع CW_READY;
+		channel_write_any_کرښې();
+		استمر;
 	    }
-	    break;
+	    اكسر;
 	}
-#else
-	for (;;)
+#وإلا
+	لكل (;;)
 	{
-	    struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	    int		    nfd = 1;
+	    بنية pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	    صحيح		    nfd = 1;
 
 	    fds[0].fd = fd;
 	    fds[0].events = POLLIN;
 	    nfd = channel_fill_poll_write(nfd, fds);
-	    if (poll(fds, nfd, timeout) > 0)
+	    إذا (poll(fds, nfd, timeout) > 0)
 	    {
-		if (fds[0].revents & POLLIN)
-		    return CW_READY;
-		channel_write_any_lines();
-		continue;
+		إذا (fds[0].revents & POLLIN)
+		    أرجع CW_READY;
+		channel_write_any_کرښې();
+		استمر;
 	    }
-	    break;
+	    اكسر;
 	}
-#endif
+#د_که_پای
     }
-    return CW_NOT_READY;
+    أرجع CW_NOT_READY;
 }
 
-    static void
+    ساكن فراغ
 ch_close_part_on_error(
-	channel_T *channel, ch_part_T part, int is_err, char *func)
+	channel_T *channel, ch_part_T part, صحيح is_err, حرف *func)
 {
-    char	msg[] = "%s(): Read %s from ch_part[%d], closing";
+    حرف	پیغام[] = "%s(): Read %s from ch_part[%d], closing";
 
-    if (is_err)
+    إذا (is_err)
 	// Do not call emsg(), most likely the other end just exited.
-	ch_error(channel, msg, func, "error", part);
-    else
-	ch_log(channel, msg, func, "EOF", part);
+	ch_error(channel, پیغام, func, "error", part);
+    وإلا
+	ch_log(channel, پیغام, func, "EOF", part);
 
     // Queue a "DETACH" netbeans message in the command queue in order to
     // terminate the netbeans session later. Do not end the session here
@@ -4344,39 +4344,39 @@ ch_close_part_on_error(
     //		    -> gui event loop or select loop
     //			-> channel_read()
     // Only send "DETACH" for a netbeans channel.
-    if (channel->ch_nb_close_cb != NULL)
-	channel_save(channel, PART_SOCK, (char_u *)DETACH_MSG_RAW,
-			      (int)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
+    إذا (channel->ch_nb_close_cb != عدم)
+	channel_save(channel, PART_SOCK, (char_u *)DETACH_پیغام_RAW,
+			      (صحيح)STRLEN_LITERAL(DETACH_پیغام_RAW), FALSE, "PUT ");
 
     // When reading is not possible close this part of the channel.  Don't
     // close the channel yet, there may be something to read on another part.
     // When stdout and stderr use the same FD we get the error only on one of
     // them, also close the other.
-    if (part == PART_OUT || part == PART_ERR)
+    إذا (part == PART_بهر || part == PART_ERR)
     {
-	ch_part_T other = part == PART_OUT ? PART_ERR : PART_OUT;
+	ch_part_T other = part == PART_بهر ? PART_ERR : PART_بهر;
 
-	if (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
+	إذا (channel->ch_part[part].ch_fd == channel->ch_part[other].ch_fd)
 	    ch_close_part(channel, other);
     }
     ch_close_part(channel, part);
 
-#ifdef FEAT_GUI
+#که_تعریف_شوی FEAT_GUI
     // Stop listening to GUI events right away.
     channel_gui_unregister_one(channel, part);
-#endif
+#د_که_پای
 }
 
-    static void
+    ساكن فراغ
 channel_close_now(channel_T *channel)
 {
     ch_log(channel, "Closing channel because all readable fds are closed");
-    if (channel->ch_nb_close_cb != NULL)
+    إذا (channel->ch_nb_close_cb != عدم)
 	(*channel->ch_nb_close_cb)();
-#ifdef FEAT_SOCKETSERVER
-    if (channel->ch_ss_close_cb != NULL)
+#که_تعریف_شوی FEAT_SOCKETSERVER
+    إذا (channel->ch_ss_close_cb != عدم)
 	channel->ch_ss_close_cb(channel);
-#endif
+#د_که_پای
     channel_close(channel, TRUE);
 }
 
@@ -4385,129 +4385,129 @@ channel_close_now(channel_T *channel)
  * "part" is PART_SOCK, PART_OUT or PART_ERR.
  * The data is put in the read queue.  No callbacks are invoked here.
  */
-    static void
-channel_read(channel_T *channel, ch_part_T part, char *func)
+    ساكن فراغ
+channel_read(channel_T *channel, ch_part_T part, حرف *func)
 {
-    static char_u	*buf = NULL;
-    int			len = 0;
-    int			readlen = 0;
+    ساكن char_u	*buf = عدم;
+    صحيح			len = 0;
+    صحيح			readlen = 0;
     sock_T		fd;
-    int			use_socket = FALSE;
+    صحيح			use_socket = FALSE;
 
     fd = channel->ch_part[part].ch_fd;
-    if (fd == INVALID_FD)
+    إذا (fd == INVALID_FD)
     {
 	ch_error(channel, "channel_read() called while %s part is closed",
-							  ch_part_names[part]);
-	return;
+							  ch_part_نومونه[part]);
+	أرجع;
     }
     use_socket = fd == channel->CH_SOCK_FD;
 
     // Allocate a buffer to read into.
-    if (buf == NULL)
+    إذا (buf == عدم)
     {
 	buf = alloc(MAXMSGSIZE);
-	if (buf == NULL)
-	    return;	// out of memory!
+	إذا (buf == عدم)
+	    أرجع;	// out of memory!
     }
 
     // Keep on reading for as long as there is something to read.
     // Use select() or poll() to avoid blocking on a message that is exactly
     // MAXMSGSIZE long.
-    for (;;)
+    لكل (;;)
     {
-	if (channel_wait(channel, fd, 0) != CW_READY)
-	    break;
-	if (channel->ch_listen)
+	إذا (channel_wait(channel, fd, 0) != CW_READY)
+	    اكسر;
+	إذا (channel->ch_listen)
 	{
 	    sock_T		newfd;
 	    socklen_t		socklen;
 	    channel_T		*newchannel;
 	    typval_T		argv[2];
 	    char_u		namebuf[256];
-	    struct sockaddr_storage	client;
+	    بنية sockaddr_storage	client;
 
-	    newchannel = add_channel();
-	    if (newchannel == NULL)
+	    newchannel = جمع_کړه_channel();
+	    إذا (newchannel == عدم)
 	    {
-		ch_error(NULL, "Cannot allocate channel.");
-		return;
+		ch_error(عدم, "Cannot allocate channel.");
+		أرجع;
 	    }
-	    socklen = sizeof(client);
-	    newfd = accept(fd, (struct sockaddr*)&client, &socklen);
-	    if (newfd < 0)
+	    socklen = حجم(client);
+	    newfd = accept(fd, (بنية sockaddr*)&client, &socklen);
+	    إذا (newfd < 0)
 	    {
-		ch_error(NULL, "Cannot accept channel.");
+		ch_error(عدم, "Cannot accept channel.");
 		channel_free(newchannel);
-		return;
+		أرجع;
 	    }
 	    newchannel->CH_SOCK_FD = (sock_T)newfd;
-	    newchannel->ch_to_be_closed |= (1U << PART_SOCK);
+	    newchannel->ch_منزل_be_closed |= (1U << PART_SOCK);
 
-#ifdef FEAT_GUI
-	    channel_gui_register_one(newchannel, PART_SOCK);
-#endif
+#که_تعریف_شوی FEAT_GUI
+	    channel_gui_ثبتوونکی_one(newchannel, PART_SOCK);
+#د_که_پای
 
-#ifdef FEAT_SOCKETSERVER
-	    if (channel->ch_ss_accept_cb != NULL)
+#که_تعریف_شوی FEAT_SOCKETSERVER
+	    إذا (channel->ch_ss_accept_cb != عدم)
 	    {
 		channel->ch_ss_accept_cb(newchannel);
-		return;
+		أرجع;
 	    }
-#endif
+#د_که_پای
 
-	    if (client.ss_family == AF_INET)
+	    إذا (client.ss_family == AF_INET)
 	    {
-#ifdef HAVE_INET_NTOP
-		char addr[INET_ADDRSTRLEN];
+#که_تعریف_شوی HAVE_INET_NTOP
+		حرف addr[INET_ADDRSTRLEN];
 
 		inet_ntop(AF_INET,
-			&((struct sockaddr_in*)&client)->sin_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
+			&((بنية sockaddr_دننه*)&client)->sin_addr,
+			addr, حجم(addr));
+		vim_snprintf((حرف *)namebuf, حجم(namebuf), "%s:%d",
 			addr,
-			ntohs(((struct sockaddr_in*)&client)->sin_port));
-#else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "%s:%d",
-		    inet_ntoa(((struct sockaddr_in*)&client)->sin_addr),
-		    ntohs(((struct sockaddr_in*)&client)->sin_port));
-#endif
+			ntohs(((بنية sockaddr_دننه*)&client)->sin_پورټ));
+#وإلا
+		vim_snprintf((حرف *)namebuf, حجم(namebuf), "%s:%d",
+		    inet_ntoa(((بنية sockaddr_دننه*)&client)->sin_addr),
+		    ntohs(((بنية sockaddr_دننه*)&client)->sin_پورټ));
+#د_که_پای
 	    }
-#ifdef HAVE_INET_NTOP
-	    else if (client.ss_family == AF_INET6)
+#که_تعریف_شوی HAVE_INET_NTOP
+	    وإلا إذا (client.ss_family == AF_INET6)
 	    {
-		char addr[INET6_ADDRSTRLEN];
+		حرف addr[INET6_ADDRSTRLEN];
 
 		inet_ntop(AF_INET6,
-			&((struct sockaddr_in6*)&client)->sin6_addr,
-			addr, sizeof(addr));
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "[%s]:%d",
+			&((بنية sockaddr_in6*)&client)->sin6_addr,
+			addr, حجم(addr));
+		vim_snprintf((حرف *)namebuf, حجم(namebuf), "[%s]:%d",
 			addr,
-			ntohs(((struct sockaddr_in6*)&client)->sin6_port));
+			ntohs(((بنية sockaddr_in6*)&client)->sin6_پورټ));
 	    }
-#endif
-	    else if (client.ss_family == AF_UNIX)
-		vim_snprintf((char *)namebuf, sizeof(namebuf),
+#د_که_پای
+	    وإلا إذا (client.ss_family == AF_UNIX)
+		vim_snprintf((حرف *)namebuf, حجم(namebuf),
 							    "unix:anonymous");
-	    else
-		vim_snprintf((char *)namebuf, sizeof(namebuf), "unknown");
-	    ++safe_to_invoke_callback;
+	    وإلا
+		vim_snprintf((حرف *)namebuf, حجم(namebuf), "unknown");
+	    ++خوندي_منزل_invoke_callback;
 	    ++newchannel->ch_refcount;
 	    argv[0].v_type = VAR_CHANNEL;
 	    argv[0].vval.v_channel = newchannel;
 	    argv[1].v_type = VAR_STRING;
 	    argv[1].vval.v_string = vim_strsave(namebuf);
 	    invoke_callback(newchannel, &channel->ch_callback, argv);
-	    --safe_to_invoke_callback;
+	    --خوندي_منزل_invoke_callback;
 	    clear_tv(&argv[1]);
-	    return;
+	    أرجع;
 	}
-	if (use_socket)
-	    len = sock_read(fd, (char *)buf, MAXMSGSIZE);
-	else
-	    len = fd_read(fd, (char *)buf, MAXMSGSIZE);
-	if (len <= 0)
-	    break;	// error or nothing more to read
+	إذا (use_socket)
+	    len = sock_read(fd, (حرف *)buf, MAXMSGSIZE);
+	وإلا
+	    len = fd_read(fd, (حرف *)buf, MAXMSGSIZE);
+	إذا (len <= 0)
+	    اكسر;	// error or nothing more to read
 
 	// Store the read message in the queue.
 	channel_save(channel, part, buf, len, FALSE, "RECV ");
@@ -4515,27 +4515,27 @@ channel_read(channel_T *channel, ch_part_T part, char *func)
     }
 
     // Reading a disconnection (readlen == 0), or an error.
-    if (readlen <= 0)
+    إذا (readlen <= 0)
     {
-	if (!channel->ch_keep_open)
+	إذا (!channel->ch_keep_open)
 	    ch_close_part_on_error(channel, part, (len < 0), func);
     }
-#if defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
-    else if (CH_HAS_GUI && gtk_main_level() > 0)
+#إذا defined(CH_HAS_GUI) && defined(FEAT_GUI_GTK)
+    وإلا إذا (CH_HAS_GUI && gtk_main_level() > 0)
 	// signal the main loop that there is something to read
 	gtk_main_quit();
-#endif
+#د_که_پای
 }
 
-#ifdef FEAT_SOCKETSERVER
+#که_تعریف_شوی FEAT_SOCKETSERVER
 
-    void
+    فراغ
 channel_check(channel_T *channel, ch_part_T part)
 {
     channel_read(channel, part, "channel_check");
 }
 
-#endif
+#د_که_پای
 
 /*
  * Read from RAW or NL "channel"/"part".  Blocks until there is something to
@@ -4545,118 +4545,118 @@ channel_check(channel_T *channel, ch_part_T part)
  * Returns what was read in allocated memory.
  * Returns NULL in case of error or timeout.
  */
-    static char_u *
-channel_read_block(
-	channel_T *channel, ch_part_T part, int timeout, int raw, int *outlen)
+    ساكن char_u *
+channel_read_بلاک(
+	channel_T *channel, ch_part_T part, صحيح timeout, صحيح raw, صحيح *outlen)
 {
     char_u	*buf;
-    char_u	*msg;
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
+    char_u	*پیغام;
+    ch_ډېرپېښ_T	ډېرپېښ = channel->ch_part[part].ch_ډېرپېښ;
     sock_T	fd = channel->ch_part[part].ch_fd;
     char_u	*nl;
-    readq_T	*node;
+    readq_T	*غوټه;
 
     ch_log(channel, "Blocking %s read, timeout: %d msec",
-				  mode == CH_MODE_RAW ? "RAW"
-				: mode == CH_MODE_BLOB ? "BLOB" : "NL", timeout);
+				  ډېرپېښ == CH_ډېرپېښ_RAW ? "RAW"
+				: ډېرپېښ == CH_ډېرپېښ_BLOB ? "BLOB" : "NL", timeout);
 
-    while (TRUE)
+    طالما (TRUE)
     {
-	node = channel_peek(channel, part);
-	if (node != NULL)
+	غوټه = channel_peek(channel, part);
+	إذا (غوټه != عدم)
 	{
-	    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
-		    || (mode == CH_MODE_NL
-					   && channel_first_nl(node) != NULL))
+	    إذا (ډېرپېښ == CH_ډېرپېښ_RAW || ډېرپېښ == CH_ډېرپېښ_BLOB
+		    || (ډېرپېښ == CH_ډېرپېښ_NL
+					   && channel_لومړی_nl(غوټه) != عدم))
 		// got a complete message
-		break;
-	    if (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
-		continue;
+		اكسر;
+	    إذا (channel_collapse(channel, part, ډېرپېښ == CH_ډېرپېښ_NL) == OK)
+		استمر;
 	    // If not blocking or nothing more is coming then return what we
 	    // have.
-	    if (raw || fd == INVALID_FD)
-		break;
+	    إذا (raw || fd == INVALID_FD)
+		اكسر;
 	}
 
 	// Wait for up to the channel timeout.
-	if (fd == INVALID_FD)
-	    return NULL;
-	if (channel_wait(channel, fd, timeout) != CW_READY)
+	إذا (fd == INVALID_FD)
+	    أرجع عدم;
+	إذا (channel_wait(channel, fd, timeout) != CW_READY)
 	{
 	    ch_log(channel, "Timed out");
-	    return NULL;
+	    أرجع عدم;
 	}
 	channel_read(channel, part, "channel_read_block");
     }
 
     // We have a complete message now.
-    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
+    إذا (ډېرپېښ == CH_ډېرپېښ_RAW || ډېرپېښ == CH_ډېرپېښ_BLOB || outlen != عدم)
     {
-	msg = channel_get_all(channel, part, outlen);
+	پیغام = channel_get_all(channel, part, outlen);
     }
-    else
+    وإلا
     {
 	char_u *p;
 
-	buf = node->rq_buffer;
-	nl = channel_first_nl(node);
+	buf = غوټه->rq_بفر;
+	nl = channel_لومړی_nl(غوټه);
 
 	// Convert NUL to NL, the internal representation.
-	for (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
-	    if (*p == NUL)
+	لكل (p = buf; (nl == عدم || p < nl) && p < buf + غوټه->rq_buflen; ++p)
+	    إذا (*p == NUL)
 		*p = NL;
 
-	if (nl == NULL)
+	إذا (nl == عدم)
 	{
 	    // must be a closed channel with missing NL
-	    msg = channel_get(channel, part, NULL);
+	    پیغام = channel_get(channel, part, عدم);
 	}
-	else if (nl + 1 == buf + node->rq_buflen)
+	وإلا إذا (nl + 1 == buf + غوټه->rq_buflen)
 	{
 	    // get the whole buffer
-	    msg = channel_get(channel, part, NULL);
+	    پیغام = channel_get(channel, part, عدم);
 	    *nl = NUL;
 	}
-	else
+	وإلا
 	{
 	    // Copy the message into allocated memory and remove it from the
 	    // buffer.
-	    msg = vim_strnsave(buf, nl - buf);
-	    channel_consume(channel, part, (int)(nl - buf) + 1);
+	    پیغام = vim_strnsave(buf, nl - buf);
+	    channel_consume(channel, part, (صحيح)(nl - buf) + 1);
 	}
     }
-    if (ch_log_active())
+    إذا (ch_log_فعال())
 	ch_log(channel, "Returning %d bytes",
-		outlen != NULL ? *outlen : (int)STRLEN(msg));
-    return msg;
+		outlen != عدم ? *outlen : (صحيح)STRLEN(پیغام));
+    أرجع پیغام;
 }
 
-static int channel_blocking_wait = 0;
+ساكن صحيح channel_blocking_wait = 0;
 
 /*
  * Return TRUE if in a blocking wait that might trigger callbacks.
  */
-    int
-channel_in_blocking_wait(void)
+    صحيح
+channel_دننه_blocking_wait(فراغ)
 {
-    return channel_blocking_wait > 0;
+    أرجع channel_blocking_wait > 0;
 }
 
 /*
  * Wait up to "timeout" msec for something to read on "fd" of "channel", and
  * read what arrives on any channel meanwhile.
  */
-    static void
-channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
+    ساكن فراغ
+channel_wait_reading(channel_T *channel ناکارول_شوی, sock_T fd ناکارول_شوی, صحيح timeout)
 {
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     // A pipe cannot be waited for, channel_wait() polls it; the other
     // channels are looked at every 10 msec.
-    (void)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
+    (فراغ)channel_wait(channel, fd, timeout > 10 ? 10 : timeout);
     channel_handle_events(FALSE);
-#else
+#وإلا
     channel_wait_any(timeout);
-#endif
+#د_که_پای
 }
 
 /*
@@ -4667,114 +4667,114 @@ channel_wait_reading(channel_T *channel UNUSED, sock_T fd UNUSED, int timeout)
  * In corner cases this can be called recursively, that is why ch_block_ids is
  * a list.
  */
-    static int
-channel_read_json_block(
+    ساكن صحيح
+channel_read_json_بلاک(
 	channel_T   *channel,
 	ch_part_T   part,
-	int	    timeout_arg,
-	int	    id,
+	صحيح	    timeout_arg,
+	صحيح	    id,
 	typval_T    **rettv)
 {
-    int		more;
+    صحيح		نور;
     sock_T	fd;
-    int		timeout;
+    صحيح		timeout;
     chanpart_T	*chanpart = &channel->ch_part[part];
-    ch_mode_T	mode = channel->ch_part[part].ch_mode;
-    int		retval = FAIL;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
+    ch_ډېرپېښ_T	ډېرپېښ = channel->ch_part[part].ch_ډېرپېښ;
+    صحيح		retval = FAIL;
+#که_تعریف_شوی ELAPSED_FUNC
+    elapsed_T	پیل_tv;
 
-    ELAPSED_INIT(start_tv);
-#endif
+    ELAPSED_INIT(پیل_tv);
+#د_که_پای
 
     ch_log(channel, "Blocking read JSON for id %d", id);
     ++channel_blocking_wait;
 
-    if (id >= 0)
-	channel_add_block_id(chanpart, id);
+    إذا (id >= 0)
+	channel_جمع_کړه_بلاک_id(chanpart, id);
 
-    for (;;)
+    لكل (;;)
     {
-	if (mode == CH_MODE_LSP || mode == CH_MODE_DAP)
+	إذا (ډېرپېښ == CH_ډېرپېښ_LSP || ډېرپېښ == CH_ډېرپېښ_DAP)
 	    // In the "lsp" or "dap" mode, the http header and the json payload
 	    // may be received in multiple messages. So concatenate all the
 	    // received messages.
-	    (void)channel_collapse(channel, part, FALSE);
+	    (فراغ)channel_collapse(channel, part, FALSE);
 
-	more = channel_parse_json(channel, part, false);
+	نور = channel_parse_json(channel, part, false);
 
 	// search for message "id"
-	if (channel_get_json(channel, part, id, TRUE, rettv) == OK)
+	إذا (channel_get_json(channel, part, id, TRUE, rettv) == OK)
 	{
 	    ch_log(channel, "Received JSON for id %d", id);
 	    retval = OK;
-	    break;
+	    اكسر;
 	}
 
-	if (!more)
+	إذا (!نور)
 	{
-	    void *prev_readahead_ptr = channel_readahead_pointer(channel, part);
-	    void *readahead_ptr;
+	    فراغ *prev_readahead_ptr = channel_readahead_اشاره_ګر(channel, part);
+	    فراغ *readahead_ptr;
 
 	    // Handle any other messages in the queue.  If done some more
 	    // messages may have arrived.
-	    if (channel_parse_messages())
-		continue;
+	    إذا (channel_parse_messages())
+		استمر;
 
 	    // channel_parse_messages() may fill the queue with new data to
 	    // process.  Only loop when the readahead changed, otherwise we
 	    // would busy-loop.
-	    readahead_ptr = channel_readahead_pointer(channel, part);
-	    if (readahead_ptr != NULL && readahead_ptr != prev_readahead_ptr)
-		continue;
+	    readahead_ptr = channel_readahead_اشاره_ګر(channel, part);
+	    إذا (readahead_ptr != عدم && readahead_ptr != prev_readahead_ptr)
+		استمر;
 
 	    // Wait for up to what is left of the timeout.
 	    timeout = timeout_arg;
-#ifdef ELAPSED_FUNC
-	    timeout -= (int)ELAPSED_FUNC(start_tv);
-#endif
+#که_تعریف_شوی ELAPSED_FUNC
+	    timeout -= (صحيح)ELAPSED_FUNC(پیل_tv);
+#د_که_پای
 	    fd = chanpart->ch_fd;
-	    if (timeout <= 0 || fd == INVALID_FD)
+	    إذا (timeout <= 0 || fd == INVALID_FD)
 	    {
-		if (fd != INVALID_FD)
+		إذا (fd != INVALID_FD)
 		    ch_log(channel, "Timed out on id %d", id);
-		break;
+		اكسر;
 	    }
 	    // If there was an incomplete message use the deadline for that.
-	    if (chanpart->ch_wait_len > 0)
+	    إذا (chanpart->ch_wait_len > 0)
 	    {
-		int	left;
-#ifdef MSWIN
-		left = chanpart->ch_deadline - GetTickCount() + 1;
-#else
+		صحيح	کیڼ_2;
+#که_تعریف_شوی MSWIN
+		کیڼ_2 = chanpart->ch_deadline - Get_Tick_شمېر() + 1;
+#وإلا
 		{
-		    struct timeval now_tv;
+		    بنية timeval now_tv;
 
-		    gettimeofday(&now_tv, NULL);
-		    left = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
+		    gettimeofday(&now_tv, عدم);
+		    کیڼ_2 = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
 			+ (chanpart->ch_deadline.tv_usec - now_tv.tv_usec)
 								    / 1000 + 1;
 		}
-#endif
-		if (left < 0)
+#د_که_پای
+		إذا (کیڼ_2 < 0)
 		    // Something went wrong, channel_parse_json() didn't
 		    // discard message.  Cancel waiting.
 		    chanpart->ch_wait_len = 0;
-		else if (left < timeout)
-		    timeout = left;
+		وإلا إذا (کیڼ_2 < timeout)
+		    timeout = کیڼ_2;
 	    }
 	    channel_wait_reading(channel, fd, timeout);
-#ifndef ELAPSED_FUNC
+#که_نه_تعریف_شوی ELAPSED_FUNC
 	    // Without a clock the wait counts as the whole timeout.
 	    timeout_arg = 0;
-#endif
+#د_که_پای
 	}
     }
-    if (id >= 0)
-	channel_remove_block_id(chanpart, id);
+    إذا (id >= 0)
+	channel_remove_بلاک_id(chanpart, id);
     --channel_blocking_wait;
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -4785,134 +4785,134 @@ channel_read_json_block(
  * "part" is used to check typeahead, when PART_COUNT use the default part.
  */
     channel_T *
-get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
+get_channel_arg(typval_T *tv, صحيح check_open, صحيح reading, ch_part_T part)
 {
-    channel_T	*channel = NULL;
-    int		has_readahead = FALSE;
+    channel_T	*channel = عدم;
+    صحيح		has_readahead = FALSE;
 
-    if (tv->v_type == VAR_JOB)
+    إذا (tv->v_type == VAR_دنده)
     {
-	if (tv->vval.v_job != NULL)
-	    channel = tv->vval.v_job->jv_channel;
+	إذا (tv->vval.v_دنده != عدم)
+	    channel = tv->vval.v_دنده->jv_channel;
     }
-    else if (tv->v_type == VAR_CHANNEL)
+    وإلا إذا (tv->v_type == VAR_CHANNEL)
     {
 	channel = tv->vval.v_channel;
     }
-    else
+    وإلا
     {
-	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	semsg(_(e_invalid_دلیل_str), tv_get_string(tv));
+	أرجع عدم;
     }
-    if (channel != NULL && reading)
+    إذا (channel != عدم && reading)
 	has_readahead = channel_has_readahead(channel,
-		       part != PART_COUNT ? part : channel_part_read(channel));
+		       part != PART_شمېر ? part : channel_part_read(channel));
 
-    if (check_open && (channel == NULL || (!channel_is_open(channel)
+    إذا (check_open && (channel == عدم || (!channel_is_open(channel)
 					     && !(reading && has_readahead))))
     {
 	emsg(_(e_not_an_open_channel));
-	return NULL;
+	أرجع عدم;
     }
-    return channel;
+    أرجع channel;
 }
 
 /*
  * Common for ch_read() and ch_readraw().
  */
-    static void
-common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
+    ساكن فراغ
+common_channel_read(typval_T *argvars, typval_T *rettv, صحيح raw, صحيح blob)
 {
     channel_T	*channel;
-    ch_part_T	part = PART_COUNT;
+    ch_part_T	part = PART_شمېر;
     jobopt_T	opt;
-    int		mode;
-    int		timeout;
-    int		id = -1;
-    typval_T	*listtv = NULL;
+    صحيح		ډېرپېښ;
+    صحيح		timeout;
+    صحيح		id = -1;
+    typval_T	*listtv = عدم;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
+    clear_دنده_options(&opt);
+    إذا (get_دنده_options(&argvars[1], &opt, JO_TIMEOUT + JO_PART + JO_ID, 0)
 								      == FAIL)
-	goto theend;
+	اذهب theend;
 
-    if (opt.jo_set & JO_PART)
+    إذا (opt.jo_سېټ & JO_PART)
 	part = opt.jo_part;
     channel = get_channel_arg(&argvars[0], TRUE, TRUE, part);
-    if (channel == NULL)
-	goto theend;
+    إذا (channel == عدم)
+	اذهب theend;
 
-    if (part == PART_COUNT)
+    إذا (part == PART_شمېر)
 	part = channel_part_read(channel);
-    mode = channel_get_mode(channel, part);
+    ډېرپېښ = channel_get_ډېرپېښ(channel, part);
     timeout = channel_get_timeout(channel, part);
-    if (opt.jo_set & JO_TIMEOUT)
+    إذا (opt.jo_سېټ & JO_TIMEOUT)
 	timeout = opt.jo_timeout;
 
-    if (blob || mode == CH_MODE_BLOB)
+    إذا (blob || ډېرپېښ == CH_ډېرپېښ_BLOB)
     {
-	int	    outlen = 0;
-	char_u  *p = channel_read_block(channel, part,
+	صحيح	    outlen = 0;
+	char_u  *p = channel_read_بلاک(channel, part,
 		timeout, TRUE, &outlen);
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    blob_T	*b = blob_alloc();
 
-	    if (b != NULL)
+	    إذا (b != عدم)
 	    {
 		b->bv_ga.ga_len = outlen;
-		if (ga_grow(&b->bv_ga, outlen) == FAIL)
+		إذا (ga_grow(&b->bv_ga, outlen) == FAIL)
 		    blob_free(b);
-		else
+		وإلا
 		{
-		    memcpy(b->bv_ga.ga_data, p, outlen);
-		    rettv_blob_set(rettv, b);
+		    حافظه_نقل(b->bv_ga.ga_معلومات, p, outlen);
+		    rettv_blob_سېټ(rettv, b);
 		}
 	    }
 	    vim_free(p);
 	}
     }
-    else if (raw || mode == CH_MODE_RAW || mode == CH_MODE_NL)
-	rettv->vval.v_string = channel_read_block(channel, part,
-		timeout, raw, NULL);
-    else
+    وإلا إذا (raw || ډېرپېښ == CH_ډېرپېښ_RAW || ډېرپېښ == CH_ډېرپېښ_NL)
+	rettv->vval.v_string = channel_read_بلاک(channel, part,
+		timeout, raw, عدم);
+    وإلا
     {
-	if (opt.jo_set & JO_ID)
+	إذا (opt.jo_سېټ & JO_ID)
 	    id = opt.jo_id;
-	channel_read_json_block(channel, part, timeout, id, &listtv);
-	if (listtv != NULL)
+	channel_read_json_بلاک(channel, part, timeout, id, &listtv);
+	إذا (listtv != عدم)
 	{
 	    *rettv = *listtv;
 	    vim_free(listtv);
 	}
-	else
+	وإلا
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NONE;
+	    rettv->vval.v_شمېره = VVAL_NONE;
 	}
     }
 
 theend:
-    free_job_options(&opt);
+    free_دنده_options(&opt);
 }
 
-#if defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
+#إذا defined(MSWIN) || defined(__HAIKU__) || defined(FEAT_GUI)
 /*
  * Check the channels for anything that is ready to be read.
  * The data is put in the read queue.
  * if "only_keep_open" is TRUE only check channels where ch_keep_open is set.
  */
-    void
-channel_handle_events(int only_keep_open)
+    فراغ
+channel_handle_events(صحيح only_keep_open)
 {
     channel_T	*channel;
     ch_part_T	part;
@@ -4920,15 +4920,15 @@ channel_handle_events(int only_keep_open)
 
     FOR_ALL_CHANNELS(channel)
     {
-	if (only_keep_open && !channel->ch_keep_open)
-	    continue;
+	إذا (only_keep_open && !channel->ch_keep_open)
+	    استمر;
 
 	// check the socket and pipes
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
 	    fd = channel->ch_part[part].ch_fd;
-	    if (fd == INVALID_FD)
-		continue;
+	    إذا (fd == INVALID_FD)
+		استمر;
 
 	    // In normal cases, a timeout of 0 is sufficient.
 	    //
@@ -4939,12 +4939,12 @@ channel_handle_events(int only_keep_open)
 	    // received by calling Sleep() once within channel_wait().  Note
 	    // that ch_killing can only be TRUE in conpty terminals, so it has
 	    // no side effects in environments other than conpty.
-	    int r = channel_wait(channel, fd, (channel->ch_killing &&
-			(part == PART_OUT || part == PART_ERR)) ? 1 : 0);
+	    صحيح r = channel_wait(channel, fd, (channel->ch_killing &&
+			(part == PART_بهر || part == PART_ERR)) ? 1 : 0);
 
-	    if (r == CW_READY)
+	    إذا (r == CW_READY)
 		channel_read(channel, part, "channel_handle_events");
-	    else if (r == CW_ERROR)
+	    وإلا إذا (r == CW_ERROR)
 		ch_close_part_on_error(channel, part, TRUE,
 			"channel_handle_events");
 	}
@@ -4953,55 +4953,55 @@ channel_handle_events(int only_keep_open)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	إذا (channel->ch_دنده != عدم)
 	{
-	    job_T *job = channel->ch_job;
+	    دنده_T *دنده = channel->ch_دنده;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    إذا (دنده->jv_tty_بهر != عدم && دنده->jv_حالت == دنده_پای_ته_رسېدلی)
+		لكل (part = PART_SOCK; part < PART_شمېر; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 }
-#endif
+#د_که_پای
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 /*
  * Return TRUE when there is any channel with a keep_open flag.
  */
-    int
-channel_any_keep_open(void)
+    صحيح
+channel_any_keep_open(فراغ)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	if (channel->ch_keep_open)
-	    return TRUE;
-    return FALSE;
+	إذا (channel->ch_keep_open)
+	    أرجع TRUE;
+    أرجع FALSE;
 }
-#endif
+#د_که_پای
 
 /*
  * Set "channel"/"part" to non-blocking.
  * Only works for sockets and pipes.
  */
-    void
-channel_set_nonblock(channel_T *channel, ch_part_T part)
+    فراغ
+channel_سېټ_nonblock(channel_T *channel, ch_part_T part)
 {
     chanpart_T *ch_part = &channel->ch_part[part];
-    int		fd = ch_part->ch_fd;
+    صحيح		fd = ch_part->ch_fd;
 
-    if (fd == INVALID_FD)
-	return;
+    إذا (fd == INVALID_FD)
+	أرجع;
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     u_long	val = 1;
 
     ioctlsocket(fd, FIONBIO, &val);
-#else
-    (void)fcntl(fd, F_SETFL, O_NONBLOCK);
-#endif
+#وإلا
+    (فراغ)fcntl(fd, F_SETFL, O_NONBLOCK);
+#د_که_پای
     ch_part->ch_nonblocking = TRUE;
 }
 
@@ -5010,117 +5010,117 @@ channel_set_nonblock(channel_T *channel, ch_part_T part)
  * When "fun" is not NULL an error message might be given.
  * Return FAIL or OK.
  */
-    int
+    صحيح
 channel_send(
 	channel_T *channel,
 	ch_part_T part,
 	char_u	  *buf_arg,
-	int	  len_arg,
-	char	  *fun)
+	صحيح	  len_arg,
+	حرف	  *fun)
 {
-    int		res;
+    صحيح		res;
     sock_T	fd;
     chanpart_T	*ch_part = &channel->ch_part[part];
-    int		did_use_queue = FALSE;
+    صحيح		did_use_کتار = FALSE;
 
     fd = ch_part->ch_fd;
-    if (fd == INVALID_FD)
+    إذا (fd == INVALID_FD)
     {
-	if (!channel->ch_error && fun != NULL)
+	إذا (!channel->ch_error && fun != عدم)
 	{
 	    ch_error(channel, "%s(): write while not connected", fun);
 	    semsg(_(e_str_write_while_not_connected), fun);
 	}
 	channel->ch_error = TRUE;
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (channel->ch_nonblock && !ch_part->ch_nonblocking)
-	channel_set_nonblock(channel, part);
+    إذا (channel->ch_nonblock && !ch_part->ch_nonblocking)
+	channel_سېټ_nonblock(channel, part);
 
-    if (ch_log_active())
+    إذا (ch_log_فعال())
     {
 	ch_log_literal("SEND ", channel, part, buf_arg, len_arg);
-	did_repeated_msg = 0;
+	did_repeated_پیغام = 0;
     }
 
-    for (;;)
+    لكل (;;)
     {
 	writeq_T    *wq = &ch_part->ch_writeque;
 	char_u	    *buf;
-	int	    len;
+	صحيح	    len;
 
-	if (wq->wq_next != NULL)
+	إذا (wq->wq_بل != عدم)
 	{
 	    // first write what was queued
-	    buf = wq->wq_next->wq_ga.ga_data;
-	    len = wq->wq_next->wq_ga.ga_len;
-	    did_use_queue = TRUE;
+	    buf = wq->wq_بل->wq_ga.ga_معلومات;
+	    len = wq->wq_بل->wq_ga.ga_len;
+	    did_use_کتار = TRUE;
 	}
-	else
+	وإلا
 	{
-	    if (len_arg == 0)
+	    إذا (len_arg == 0)
 		// nothing to write, called from channel_select_check()
-		return OK;
+		أرجع OK;
 	    buf = buf_arg;
 	    len = len_arg;
 	}
 
-	if (part == PART_SOCK)
-	    res = sock_write(fd, (char *)buf, len);
-	else
+	إذا (part == PART_SOCK)
+	    res = sock_write(fd, (حرف *)buf, len);
+	وإلا
 	{
-	    res = fd_write(fd, (char *)buf, len);
-#ifdef MSWIN
-	    if (channel->ch_named_pipe && res < 0)
+	    res = fd_write(fd, (حرف *)buf, len);
+#که_تعریف_شوی MSWIN
+	    إذا (channel->ch_named_pipe && res < 0)
 	    {
 		DisconnectNamedPipe((HANDLE)fd);
-		ConnectNamedPipe((HANDLE)fd, NULL);
+		ConnectNamedPipe((HANDLE)fd, عدم);
 	    }
-#endif
+#د_که_پای
 	}
-	if (res < 0 && (errno == EWOULDBLOCK
-#ifdef EAGAIN
+	إذا (res < 0 && (errno == EWOULDBLOCK
+#که_تعریف_شوی EAGAIN
 			|| errno == EAGAIN
-#endif
+#د_که_پای
 		    ))
 	    res = 0; // nothing got written
 
-	if (res >= 0 && ch_part->ch_nonblocking)
+	إذا (res >= 0 && ch_part->ch_nonblocking)
 	{
-	    writeq_T *entry = wq->wq_next;
+	    writeq_T *ثبت = wq->wq_بل;
 
-	    if (did_use_queue)
+	    إذا (did_use_کتار)
 		ch_log(channel, "Sent %d bytes now", res);
-	    if (res == len)
+	    إذا (res == len)
 	    {
 		// Wrote all the buf[len] bytes.
-		if (entry != NULL)
+		إذا (ثبت != عدم)
 		{
 		    // Remove the entry from the write queue.
-		    remove_from_writeque(wq, entry);
-		    continue;
+		    remove_from_writeque(wq, ثبت);
+		    استمر;
 		}
-		if (did_use_queue)
+		إذا (did_use_کتار)
 		    ch_log(channel, "Write queue empty");
 	    }
-	    else
+	    وإلا
 	    {
 		// Wrote only buf[res] bytes, can't write more now.
-		if (entry != NULL)
+		إذا (ثبت != عدم)
 		{
-		    if (res > 0)
+		    إذا (res > 0)
 		    {
 			// Remove the bytes that were written.
-			mch_memmove(entry->wq_ga.ga_data,
-				    (char *)entry->wq_ga.ga_data + res,
+			mch_memmove(ثبت->wq_ga.ga_معلومات,
+				    (حرف *)ثبت->wq_ga.ga_معلومات + res,
 				    len - res);
-			entry->wq_ga.ga_len -= res;
+			ثبت->wq_ga.ga_len -= res;
 		    }
 		    buf = buf_arg;
 		    len = len_arg;
 		}
-		else
+		وإلا
 		{
 		    buf += res;
 		    len -= res;
@@ -5129,56 +5129,56 @@ channel_send(
 
 		// Append the not written bytes of the argument to the write
 		// buffer.  Limit entries to 4000 bytes.
-		if (wq->wq_prev != NULL
+		إذا (wq->wq_prev != عدم
 			&& wq->wq_prev->wq_ga.ga_len + len < 4000)
 		{
-		    writeq_T *last = wq->wq_prev;
+		    writeq_T *وروستی = wq->wq_prev;
 
 		    // append to the last entry
-		    if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+		    إذا (len > 0 && ga_grow(&وروستی->wq_ga, len) == OK)
 		    {
-			mch_memmove((char *)last->wq_ga.ga_data
-							  + last->wq_ga.ga_len,
+			mch_memmove((حرف *)وروستی->wq_ga.ga_معلومات
+							  + وروستی->wq_ga.ga_len,
 				    buf, len);
-			last->wq_ga.ga_len += len;
+			وروستی->wq_ga.ga_len += len;
 		    }
 		}
-		else
+		وإلا
 		{
-		    writeq_T *last = ALLOC_ONE(writeq_T);
+		    writeq_T *وروستی = ALLOC_ONE(writeq_T);
 
-		    if (last != NULL)
+		    إذا (وروستی != عدم)
 		    {
-			last->wq_prev = wq->wq_prev;
-			last->wq_next = NULL;
-			if (wq->wq_prev == NULL)
-			    wq->wq_next = last;
-			else
-			    wq->wq_prev->wq_next = last;
-			wq->wq_prev = last;
-			ga_init2(&last->wq_ga, 1, 1000);
-			if (len > 0 && ga_grow(&last->wq_ga, len) == OK)
+			وروستی->wq_prev = wq->wq_prev;
+			وروستی->wq_بل = عدم;
+			إذا (wq->wq_prev == عدم)
+			    wq->wq_بل = وروستی;
+			وإلا
+			    wq->wq_prev->wq_بل = وروستی;
+			wq->wq_prev = وروستی;
+			ga_init2(&وروستی->wq_ga, 1, 1000);
+			إذا (len > 0 && ga_grow(&وروستی->wq_ga, len) == OK)
 			{
-			    mch_memmove(last->wq_ga.ga_data, buf, len);
-			    last->wq_ga.ga_len = len;
+			    mch_memmove(وروستی->wq_ga.ga_معلومات, buf, len);
+			    وروستی->wq_ga.ga_len = len;
 			}
 		    }
 		}
 	    }
 	}
-	else if (res != len)
+	وإلا إذا (res != len)
 	{
-	    if (!channel->ch_error && fun != NULL)
+	    إذا (!channel->ch_error && fun != عدم)
 	    {
 		ch_error(channel, "%s(): write failed", fun);
 		semsg(_(e_str_write_failed), fun);
 	    }
 	    channel->ch_error = TRUE;
-	    return FAIL;
+	    أرجع FAIL;
 	}
 
 	channel->ch_error = FALSE;
-	return OK;
+	أرجع OK;
     }
 }
 
@@ -5188,285 +5188,285 @@ channel_send(
  * Sets "part_read" to the read fd.
  * Otherwise returns NULL.
  */
-    static channel_T *
+    ساكن channel_T *
 send_common(
 	typval_T    *argvars,
-	char_u	    *text,
-	int	    len,
-	int	    id,
-	int	    eval,
+	char_u	    *متن,
+	صحيح	    len,
+	صحيح	    id,
+	صحيح	    eval,
 	jobopt_T    *opt,
-	char	    *fun,
+	حرف	    *fun,
 	ch_part_T   *part_read)
 {
     channel_T	*channel;
     ch_part_T	part_send;
 
-    clear_job_options(opt);
+    clear_دنده_options(opt);
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return NULL;
+    إذا (channel == عدم)
+	أرجع عدم;
     part_send = channel_part_send(channel);
     *part_read = channel_part_read(channel);
 
-    if (get_job_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
-	return NULL;
+    إذا (get_دنده_options(&argvars[2], opt, JO_CALLBACK + JO_TIMEOUT, 0) == FAIL)
+	أرجع عدم;
 
     // Set the callback. An empty callback means no callback and not reading
     // the response. With "ch_evalexpr()" and "ch_evalraw()" a callback is not
     // allowed.
-    if (opt->jo_callback.cb_name != NULL && *opt->jo_callback.cb_name != NUL)
+    إذا (opt->jo_callback.cb_name != عدم && *opt->jo_callback.cb_name != NUL)
     {
-	if (eval)
+	إذا (eval)
 	{
 	    semsg(_(e_cannot_use_callback_with_str), fun);
-	    return NULL;
+	    أرجع عدم;
 	}
-	channel_set_req_callback(channel, *part_read, &opt->jo_callback, id);
+	channel_سېټ_req_callback(channel, *part_read, &opt->jo_callback, id);
     }
 
-    if (channel_send(channel, part_send, text, len, fun) == OK
-					   && opt->jo_callback.cb_name == NULL)
-	return channel;
-    return NULL;
+    إذا (channel_send(channel, part_send, متن, len, fun) == OK
+					   && opt->jo_callback.cb_name == عدم)
+	أرجع channel;
+    أرجع عدم;
 }
 
 /*
  * common for "ch_evalexpr()" and "ch_sendexpr()"
  */
-    static void
-ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
+    ساكن فراغ
+ch_بیان_common(typval_T *argvars, typval_T *rettv, صحيح eval)
 {
-    char_u	*text;
+    char_u	*متن;
     typval_T	*listtv;
     channel_T	*channel;
-    int		id;
-    ch_mode_T	ch_mode;
+    صحيح		id;
+    ch_ډېرپېښ_T	ch_ډېرپېښ;
     ch_part_T	part_send;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
-    int		callback_present = FALSE;
+    صحيح		timeout;
+    صحيح		callback_present = FALSE;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    إذا (channel == عدم)
+	أرجع;
     part_send = channel_part_send(channel);
 
-    ch_mode = channel_get_mode(channel, part_send);
-    if (ch_mode == CH_MODE_RAW || ch_mode == CH_MODE_BLOB
-	    || ch_mode == CH_MODE_NL)
+    ch_ډېرپېښ = channel_get_ډېرپېښ(channel, part_send);
+    إذا (ch_ډېرپېښ == CH_ډېرپېښ_RAW || ch_ډېرپېښ == CH_ډېرپېښ_BLOB
+	    || ch_ډېرپېښ == CH_ډېرپېښ_NL)
     {
 	emsg(_(e_cannot_use_evalexpr_sendexpr_with_raw_nl_or_blob_channel));
-	return;
+	أرجع;
     }
 
-    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+    إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP || ch_ډېرپېښ == CH_ډېرپېښ_DAP)
     {
 	dict_T		*d;
 	dictitem_T	*di;
-	char		*key = ch_mode == CH_MODE_LSP ? "id" : "seq";
+	حرف		*کلی = ch_ډېرپېښ == CH_ډېرپېښ_LSP ? "id" : "seq";
 
 	// return an empty dict by default
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	إذا (rettv_dict_alloc(rettv) == FAIL)
+	    أرجع;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	إذا (check_for_dict_arg(argvars, 1) == FAIL)
+	    أرجع;
 
 	d = argvars[1].vval.v_dict;
-	di = dict_find(d, (char_u *)key, -1);
-	if (argvars[2].v_type == VAR_DICT
-		&& dict_has_key(argvars[2].vval.v_dict, "callback"))
+	di = dict_پیدا_کړه(d, (char_u *)کلی, -1);
+	إذا (argvars[2].v_type == VAR_DICT
+		&& dict_has_کلی(argvars[2].vval.v_dict, "callback"))
 	    callback_present = TRUE;
 
 	// The id is what a reply is matched by, so it must be a number when
 	// one is waited for.
-	if (di != NULL && di->di_tv.v_type != VAR_NUMBER
-		&& (ch_mode == CH_MODE_DAP || eval || callback_present))
+	إذا (di != عدم && di->di_tv.v_type != VAR_شمېره
+		&& (ch_ډېرپېښ == CH_ډېرپېښ_DAP || eval || callback_present))
 	{
-	    semsg(_(e_invalid_value_for_argument_str), key);
-	    return;
+	    semsg(_(e_invalid_ارزښت_for_دلیل_str), کلی);
+	    أرجع;
 	}
 
-	if (ch_mode == CH_MODE_DAP)
+	إذا (ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 	{
 	    // DAP message always has a sequence number (id)
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "seq", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_وروستی_پیغام_id;
+	    إذا (di == عدم)
+		dict_جمع_کړه_شمېره(d, "seq", id);
+	    وإلا
+		di->di_tv.vval.v_شمېره = id;
 	}
-	else if (eval || callback_present)
+	وإلا إذا (eval || callback_present)
 	{
 	    // When evaluating an expression or sending an expression with a
 	    // callback, always assign a generated ID
-	    id = ++channel->ch_last_msg_id;
-	    if (di == NULL)
-		dict_add_number(d, "id", id);
-	    else
-		di->di_tv.vval.v_number = id;
+	    id = ++channel->ch_وروستی_پیغام_id;
+	    إذا (di == عدم)
+		dict_جمع_کړه_شمېره(d, "id", id);
+	    وإلا
+		di->di_tv.vval.v_شمېره = id;
 	}
-	else
+	وإلا
 	{
 	    // When sending an expression, if the message has an 'id' item,
 	    // then use it.
 	    id = 0;
-	    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		id = di->di_tv.vval.v_number;
+	    إذا (di != عدم && di->di_tv.v_type == VAR_شمېره)
+		id = di->di_tv.vval.v_شمېره;
 	}
-	if (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
-	    dict_add_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
-	text = json_encode_lsp_msg(&argvars[1]);
+	إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP && !dict_has_کلی(d, "jsonrpc"))
+	    dict_جمع_کړه_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
+	متن = json_encode_lsp_پیغام(&argvars[1]);
     }
-    else
+    وإلا
     {
-	id = ++channel->ch_last_msg_id;
-	text = json_encode_nr_expr(id, &argvars[1],
-			      (ch_mode == CH_MODE_JS ? JSON_JS : 0) | JSON_NL);
+	id = ++channel->ch_وروستی_پیغام_id;
+	متن = json_encode_nr_بیان(id, &argvars[1],
+			      (ch_ډېرپېښ == CH_ډېرپېښ_JS ? JSON_JS : 0) | JSON_NL);
     }
-    if (text == NULL)
-	return;
+    إذا (متن == عدم)
+	أرجع;
 
-    channel = send_common(argvars, text, (int)STRLEN(text), id, eval, &opt,
+    channel = send_common(argvars, متن, (صحيح)STRLEN(متن), id, eval, &opt,
 			    eval ? "ch_evalexpr" : "ch_sendexpr", &part_read);
-    vim_free(text);
-    if (channel != NULL && eval)
+    vim_free(متن);
+    إذا (channel != عدم && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	إذا (opt.jo_سېټ & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	وإلا
 	    timeout = channel_get_timeout(channel, part_read);
-	if (channel_read_json_block(channel, part_read, timeout, id, &listtv)
+	إذا (channel_read_json_بلاک(channel, part_read, timeout, id, &listtv)
 									== OK)
 	{
-	    if (ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
+	    إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP || ch_ډېرپېښ == CH_ډېرپېښ_DAP)
 	    {
 		*rettv = *listtv;
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_شمېره;
 		free_tv(listtv);
 	    }
-	    else
+	    وإلا
 	    {
 		list_T *list = listtv->vval.v_list;
 
 		// Move the item from the list and then change the type to
 		// avoid the value being freed.
-		*rettv = list->lv_u.mat.lv_last->li_tv;
-		list->lv_u.mat.lv_last->li_tv.v_type = VAR_NUMBER;
+		*rettv = list->lv_u.mat.lv_وروستی->li_tv;
+		list->lv_u.mat.lv_وروستی->li_tv.v_type = VAR_شمېره;
 		free_tv(listtv);
 	    }
 	}
     }
-    free_job_options(&opt);
-    if (ch_mode == CH_MODE_DAP && !eval)
+    free_دنده_options(&opt);
+    إذا (ch_ډېرپېښ == CH_ډېرپېښ_DAP && !eval)
     {
 	// A DAP message always has a sequence number.
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "seq", id);
+	إذا (rettv->vval.v_dict != عدم)
+	    dict_جمع_کړه_شمېره(rettv->vval.v_dict, "seq", id);
     }
-    else if (ch_mode == CH_MODE_LSP && !eval && callback_present)
+    وإلا إذا (ch_ډېرپېښ == CH_ډېرپېښ_LSP && !eval && callback_present)
     {
 	// if ch_sendexpr() is used to send a LSP message and a callback
 	// function is specified, then return the generated identifier for the
 	// message.  The user can use this to cancel the request (if needed).
-	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "id", id);
+	إذا (rettv->vval.v_dict != عدم)
+	    dict_جمع_کړه_شمېره(rettv->vval.v_dict, "id", id);
     }
 }
 
 /*
  * common for "ch_evalraw()" and "ch_sendraw()"
  */
-    static void
-ch_raw_common(typval_T *argvars, typval_T *rettv, int eval)
+    ساكن فراغ
+ch_raw_common(typval_T *argvars, typval_T *rettv, صحيح eval)
 {
     char_u	buf[NUMBUFLEN];
-    char_u	*text;
-    int		len;
+    char_u	*متن;
+    صحيح		len;
     channel_T	*channel;
     ch_part_T	part_read;
     jobopt_T    opt;
-    int		timeout;
+    صحيح		timeout;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_string_or_blob_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
-    if (argvars[1].v_type == VAR_BLOB)
+    إذا (argvars[1].v_type == VAR_BLOB)
     {
-	text = argvars[1].vval.v_blob->bv_ga.ga_data;
+	متن = argvars[1].vval.v_blob->bv_ga.ga_معلومات;
 	len = argvars[1].vval.v_blob->bv_ga.ga_len;
     }
-    else
+    وإلا
     {
-	text = tv_get_string_buf(&argvars[1], buf);
-	len = (int)STRLEN(text);
+	متن = tv_get_string_buf(&argvars[1], buf);
+	len = (صحيح)STRLEN(متن);
     }
-    channel = send_common(argvars, text, len, 0, eval, &opt,
+    channel = send_common(argvars, متن, len, 0, eval, &opt,
 			      eval ? "ch_evalraw" : "ch_sendraw", &part_read);
-    if (channel != NULL && eval)
+    إذا (channel != عدم && eval)
     {
-	if (opt.jo_set & JO_TIMEOUT)
+	إذا (opt.jo_سېټ & JO_TIMEOUT)
 	    timeout = opt.jo_timeout;
-	else
+	وإلا
 	    timeout = channel_get_timeout(channel, part_read);
-	rettv->vval.v_string = channel_read_block(channel, part_read,
-							timeout, TRUE, NULL);
+	rettv->vval.v_string = channel_read_بلاک(channel, part_read,
+							timeout, TRUE, عدم);
     }
-    free_job_options(&opt);
+    free_دنده_options(&opt);
 }
 
-#define KEEP_OPEN_TIME 20  // msec
+#تعریف_کړه KEEP_OPEN_وخت 20  // msec
 
-#if defined(UNIX) && !defined(HAVE_SELECT)
+#إذا defined(UNIX) && !defined(HAVE_SELECT)
 /*
  * Add open channels to the poll struct.
  * Return the adjusted struct index.
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_setup(int nfd_in, void *fds_in, int *towait)
+    صحيح
+channel_poll_تیاری(صحيح nfd_دننه, فراغ *fds_دننه, صحيح *towait)
 {
-    int		nfd = nfd_in;
+    صحيح		nfd = nfd_دننه;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    بنية	pollfd *fds = fds_دننه;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
 	    chanpart_T	*ch_part = &channel->ch_part[part];
 
-	    if (ch_part->ch_fd != INVALID_FD)
+	    إذا (ch_part->ch_fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		إذا (channel->ch_keep_open)
 		{
 		    // For unknown reason poll() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the fds add
 		    // a short timeout and check, like polling.
-		    if (*towait < 0 || *towait > KEEP_OPEN_TIME)
-			*towait = KEEP_OPEN_TIME;
+		    إذا (*towait < 0 || *towait > KEEP_OPEN_وخت)
+			*towait = KEEP_OPEN_وخت;
 		}
-		else
+		وإلا
 		{
 		    ch_part->ch_poll_idx = nfd;
 		    fds[nfd].fd = ch_part->ch_fd;
@@ -5474,41 +5474,41 @@ channel_poll_setup(int nfd_in, void *fds_in, int *towait)
 		    nfd++;
 		}
 	    }
-	    else
+	    وإلا
 		channel->ch_part[part].ch_poll_idx = -1;
 	}
     }
 
     nfd = channel_fill_poll_write(nfd, fds);
 
-    return nfd;
+    أرجع nfd;
 }
 
 /*
  * The type of "fds" is hidden to avoid problems with the function proto.
  */
-    int
-channel_poll_check(int ret_in, void *fds_in)
+    صحيح
+channel_poll_check(صحيح ret_دننه, فراغ *fds_دننه)
 {
-    int		ret = ret_in;
+    صحيح		ret = ret_دننه;
     channel_T	*channel;
-    struct	pollfd *fds = fds_in;
+    بنية	pollfd *fds = fds_دننه;
     ch_part_T	part;
-    int		idx;
-    chanpart_T	*in_part;
+    صحيح		idx;
+    chanpart_T	*دننه_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
 	    idx = channel->ch_part[part].ch_poll_idx;
 
-	    if (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
+	    إذا (ret > 0 && idx != -1 && (fds[idx].revents & POLLIN))
 	    {
 		channel_read(channel, part, "channel_poll_check");
 		--ret;
 	    }
-	    else if (channel->ch_part[part].ch_fd != INVALID_FD
+	    وإلا إذا (channel->ch_part[part].ch_fd != INVALID_FD
 						      && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
@@ -5516,70 +5516,70 @@ channel_poll_check(int ret_in, void *fds_in)
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	idx = in_part->ch_poll_idx;
-	if (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
+	دننه_part = &channel->ch_part[PART_دننه];
+	idx = دننه_part->ch_poll_idx;
+	إذا (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
 	{
-	    channel_write_input(channel);
+	    channel_write_ننوت(channel);
 	    --ret;
 	}
     }
 
-    return ret;
+    أرجع ret;
 }
-#endif // UNIX && !HAVE_SELECT
+#د_که_پای // UNIX && !HAVE_SELECT
 
-#if !defined(MSWIN) && defined(HAVE_SELECT)
+#إذا !defined(MSWIN) && defined(HAVE_SELECT)
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_setup(
-	int maxfd_in,
-	void *rfds_in,
-	void *wfds_in,
-	struct timeval *tv,
-	struct timeval **tvp)
+    صحيح
+channel_select_تیاری(
+	صحيح maxfd_دننه,
+	فراغ *rfds_دننه,
+	فراغ *wfds_دننه,
+	بنية timeval *tv,
+	بنية timeval **tvp)
 {
-    int		maxfd = maxfd_in;
+    صحيح		maxfd = maxfd_دننه;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_دننه;
+    fd_set	*wfds = wfds_دننه;
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (fd != INVALID_FD)
+	    إذا (fd != INVALID_FD)
 	    {
-		if (channel->ch_keep_open)
+		إذا (channel->ch_keep_open)
 		{
 		    // For unknown reason select() returns immediately for a
 		    // keep-open channel.  Instead of adding it to the rfds add
 		    // a short timeout and check, like polling.
-		    if (*tvp == NULL || tv->tv_sec > 0
-					|| tv->tv_usec > KEEP_OPEN_TIME * 1000)
+		    إذا (*tvp == عدم || tv->tv_sec > 0
+					|| tv->tv_usec > KEEP_OPEN_وخت * 1000)
 		    {
 			*tvp = tv;
 			tv->tv_sec = 0;
-			tv->tv_usec = KEEP_OPEN_TIME * 1000;
+			tv->tv_usec = KEEP_OPEN_وخت * 1000;
 		    }
 		}
-		else
+		وإلا
 		{
 # ifdef FD_SETSIZE
 		    // An fd that does not fit in the fd_set cannot be watched
 		    // with select(); skip it rather than overflow the set.
-		    if ((int)fd >= FD_SETSIZE)
-			continue;
+		    إذا ((صحيح)fd >= FD_SETSIZE)
+			استمر;
 # endif
-		    FD_SET((int)fd, rfds);
-		    if (maxfd < (int)fd)
-			maxfd = (int)fd;
+		    FD_SET((صحيح)fd, rfds);
+		    إذا (maxfd < (صحيح)fd)
+			maxfd = (صحيح)fd;
 		}
 	    }
 	}
@@ -5587,31 +5587,31 @@ channel_select_setup(
 
     maxfd = channel_fill_wfds(maxfd, wfds);
 
-    return maxfd;
+    أرجع maxfd;
 }
 
 /*
  * The "fd_set" type is hidden to avoid problems with the function proto.
  */
-    int
-channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
+    صحيح
+channel_select_check(صحيح ret_دننه, فراغ *rfds_دننه, فراغ *wfds_دننه)
 {
-    int		ret = ret_in;
+    صحيح		ret = ret_دننه;
     channel_T	*channel;
-    fd_set	*rfds = rfds_in;
-    fd_set	*wfds = wfds_in;
+    fd_set	*rfds = rfds_دننه;
+    fd_set	*wfds = wfds_دننه;
     ch_part_T	part;
-    chanpart_T	*in_part;
+    chanpart_T	*دننه_part;
 
     FOR_ALL_CHANNELS(channel)
     {
-	for (part = PART_SOCK; part < PART_IN; ++part)
+	لكل (part = PART_SOCK; part < PART_دننه; ++part)
 	{
 	    sock_T fd = channel->ch_part[part].ch_fd;
 
-	    if (ret > 0 && fd != INVALID_FD
+	    إذا (ret > 0 && fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)fd < FD_SETSIZE
+		    && (صحيح)fd < FD_SETSIZE
 # endif
 		    && FD_ISSET(fd, rfds))
 	    {
@@ -5619,23 +5619,23 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 		FD_CLR(fd, rfds);
 		--ret;
 	    }
-	    else if (fd != INVALID_FD && channel->ch_keep_open)
+	    وإلا إذا (fd != INVALID_FD && channel->ch_keep_open)
 	    {
 		// polling a keep-open channel
 		channel_read(channel, part, "channel_select_check_keep_open");
 	    }
 	}
 
-	in_part = &channel->ch_part[PART_IN];
-	if (ret > 0 && in_part->ch_fd != INVALID_FD
+	دننه_part = &channel->ch_part[PART_دننه];
+	إذا (ret > 0 && دننه_part->ch_fd != INVALID_FD
 # ifdef FD_SETSIZE
-		    && (int)in_part->ch_fd < FD_SETSIZE
+		    && (صحيح)دننه_part->ch_fd < FD_SETSIZE
 # endif
-					    && FD_ISSET(in_part->ch_fd, wfds))
+					    && FD_ISSET(دننه_part->ch_fd, wfds))
 	{
 	    // Clear the flag first, ch_fd may change in channel_write_input().
-	    FD_CLR(in_part->ch_fd, wfds);
-	    channel_write_input(channel);
+	    FD_CLR(دننه_part->ch_fd, wfds);
+	    channel_write_ننوت(channel);
 	    --ret;
 	}
 
@@ -5643,79 +5643,79 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	// Workaround for Haiku: Since select/poll cannot detect EOF from tty,
 	// should close fds when the job has finished if 'channel' connects to
 	// the pty.
-	if (channel->ch_job != NULL)
+	إذا (channel->ch_دنده != عدم)
 	{
-	    job_T *job = channel->ch_job;
+	    دنده_T *دنده = channel->ch_دنده;
 
-	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+	    إذا (دنده->jv_tty_بهر != عدم && دنده->jv_حالت == دنده_پای_ته_رسېدلی)
+		لكل (part = PART_SOCK; part < PART_شمېر; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
     }
 
-    return ret;
+    أرجع ret;
 }
-#endif // !MSWIN && HAVE_SELECT
+#د_که_پای // !MSWIN && HAVE_SELECT
 
 /*
  * Wait up to "msec" for something to read on any channel and read it.
  * For channel_stdio_loop(), which has no terminal to wait for.
  */
-    static void
-channel_wait_any(long msec)
+    ساكن فراغ
+channel_wait_any(اوږد msec)
 {
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     // A pipe cannot be waited for, channel_wait() polls it.
-    if (stdio_channel->CH_OUT_FD != INVALID_FD)
-	(void)channel_wait(stdio_channel, stdio_channel->CH_OUT_FD,
-						(int)(msec > 20 ? 20 : msec));
+    إذا (stdio_channel->CH_بهر_FD != INVALID_FD)
+	(فراغ)channel_wait(stdio_channel, stdio_channel->CH_بهر_FD,
+						(صحيح)(msec > 20 ? 20 : msec));
     channel_handle_events(FALSE);
-#elif defined(HAVE_SELECT)
+#وإلاإذا defined(HAVE_SELECT)
     fd_set		rfds;
     fd_set		wfds;
-    struct timeval	tv;
-    struct timeval	*tvp = &tv;
-    int			maxfd;
-    int			ret;
+    بنية timeval	tv;
+    بنية timeval	*tvp = &tv;
+    صحيح			maxfd;
+    صحيح			ret;
 
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
     tv.tv_sec = msec / 1000;
     tv.tv_usec = (msec % 1000) * 1000;
-    maxfd = channel_select_setup(-1, &rfds, &wfds, &tv, &tvp);
-    ret = select(maxfd + 1, &rfds, &wfds, NULL, tvp);
-    if (ret >= 0)
-	(void)channel_select_check(ret, &rfds, &wfds);
-#else
-    struct pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
-    int			nfd;
-    int			towait = (int)msec;
-    int			ret;
+    maxfd = channel_select_تیاری(-1, &rfds, &wfds, &tv, &tvp);
+    ret = select(maxfd + 1, &rfds, &wfds, عدم, tvp);
+    إذا (ret >= 0)
+	(فراغ)channel_select_check(ret, &rfds, &wfds);
+#وإلا
+    بنية pollfd	fds[4 * MAX_OPEN_CHANNELS + MAX_CLIENT_CHANNELS];
+    صحيح			nfd;
+    صحيح			towait = (صحيح)msec;
+    صحيح			ret;
 
-    nfd = channel_poll_setup(0, fds, &towait);
+    nfd = channel_poll_تیاری(0, fds, &towait);
     ret = poll(fds, nfd, towait);
-    if (ret >= 0)
-	(void)channel_poll_check(ret, fds);
-#endif
+    إذا (ret >= 0)
+	(فراغ)channel_poll_check(ret, fds);
+#د_که_پای
 }
 
 /*
  * Wait for messages on the stdio channel and handle them, until the channel
  * is closed.  Takes the place of the main loop with --stdio-channel.
  */
-    void
-channel_stdio_loop(void)
+    فراغ
+channel_stdio_loop(فراغ)
 {
-    while (stdio_channel != NULL && channel_is_open(stdio_channel))
+    طالما (stdio_channel != عدم && channel_is_open(stdio_channel))
     {
-	long	msec = 1000;
-#ifdef FEAT_TIMERS
-	long	due_time = check_due_timer();
+	اوږد	msec = 1000;
+#که_تعریف_شوی FEAT_TIMERS
+	اوږد	due_وخت = check_due_timer();
 
-	if (due_time > 0 && due_time < msec)
-	    msec = due_time;
-#endif
+	إذا (due_وخت > 0 && due_وخت < msec)
+	    msec = due_وخت;
+#د_که_پای
 	channel_wait_any(msec);
 	parse_queued_messages();
     }
@@ -5727,249 +5727,249 @@ channel_stdio_loop(void)
  * and during a blocking wait for ch_evalexpr().
  * Return TRUE when something was done.
  */
-    int
-channel_parse_messages(void)
+    صحيح
+channel_parse_messages(فراغ)
 {
-    channel_T	*channel = first_channel;
-    int		ret = FALSE;
-    int		r;
+    channel_T	*channel = لومړی_channel;
+    صحيح		ret = FALSE;
+    صحيح		r;
     ch_part_T	part = PART_SOCK;
-    static int	recursive = 0;
-#ifdef ELAPSED_FUNC
-    elapsed_T	start_tv;
-#endif
+    ساكن صحيح	recursive = 0;
+#که_تعریف_شوی ELAPSED_FUNC
+    elapsed_T	پیل_tv;
+#د_که_پای
 
     // The code below may invoke callbacks, which might call us back.
     // In a recursive call channels will not be closed.
     ++recursive;
-    ++safe_to_invoke_callback;
+    ++خوندي_منزل_invoke_callback;
 
-#ifdef ELAPSED_FUNC
-    ELAPSED_INIT(start_tv);
-#endif
+#که_تعریف_شوی ELAPSED_FUNC
+    ELAPSED_INIT(پیل_tv);
+#د_که_پای
 
     // Only do this message when another message was given, otherwise we get
     // lots of them.
-    if ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
+    إذا ((did_repeated_پیغام & REPEATED_پیغام_LOOKING) == 0)
     {
-	ch_log(NULL, "looking for messages on channels");
+	ch_log(عدم, "looking for messages on channels");
 	// now we should also give the message for SafeState
-	did_repeated_msg = REPEATED_MSG_LOOKING;
+	did_repeated_پیغام = REPEATED_پیغام_LOOKING;
     }
-    while (channel != NULL)
+    طالما (channel != عدم)
     {
-	if (recursive == 1)
+	إذا (recursive == 1)
 	{
-	    if (channel_can_close(channel))
+	    إذا (channel_can_close(channel))
 	    {
-		channel->ch_to_be_closed = (1U << PART_COUNT);
+		channel->ch_منزل_be_closed = (1U << PART_شمېر);
 		channel_close_now(channel);
 		// channel may have been freed, start over
-		channel = first_channel;
-		continue;
+		channel = لومړی_channel;
+		استمر;
 	    }
-	    if (channel->ch_to_be_freed || channel->ch_killing)
+	    إذا (channel->ch_منزل_be_freed || channel->ch_killing)
 	    {
 		channel_free_contents(channel);
-		if (channel->ch_job != NULL)
-		    channel->ch_job->jv_channel = NULL;
+		إذا (channel->ch_دنده != عدم)
+		    channel->ch_دنده->jv_channel = عدم;
 
 		// free the channel and then start over
 		channel_free_channel(channel);
-		channel = first_channel;
-		continue;
+		channel = لومړی_channel;
+		استمر;
 	    }
-	    if (channel->ch_refcount == 0 && !channel_still_useful(channel))
+	    إذا (channel->ch_refcount == 0 && !channel_still_useful(channel))
 	    {
 		// channel is no longer useful, free it
 		channel_free(channel);
-		channel = first_channel;
+		channel = لومړی_channel;
 		part = PART_SOCK;
-		continue;
+		استمر;
 	    }
 	}
 
-#ifdef FEAT_TERMINAL
+#که_تعریف_شوی FEAT_TERMINAL
 	// For a terminal job with a separate stderr pipe, defer processing
 	// PART_OUT until PART_ERR is drained.  Both are filled by
 	// channel_select_check() in the same select() pass, so when both
 	// have readahead the child's write order (stderr before stdout) is
 	// preserved by handling PART_ERR first.
-	if (part == PART_OUT
-		&& channel->ch_job != NULL
-		&& channel->ch_job->jv_tty_out != NULL
+	إذا (part == PART_بهر
+		&& channel->ch_دنده != عدم
+		&& channel->ch_دنده->jv_tty_بهر != عدم
 		&& channel_has_readahead(channel, PART_ERR))
 	{
 	    part = PART_ERR;
-	    continue;
+	    استمر;
 	}
-#endif
-	if (channel->ch_part[part].ch_fd != INVALID_FD
+#د_که_پای
+	إذا (channel->ch_part[part].ch_fd != INVALID_FD
 				      || channel_has_readahead(channel, part))
 	{
 	    // Increase the refcount, in case the handler causes the channel
 	    // to be unreferenced or closed.
 	    ++channel->ch_refcount;
 	    r = may_invoke_callback(channel, part);
-	    if (r == OK)
+	    إذا (r == OK)
 		ret = TRUE;
-	    if (channel_unref(channel) || (r == OK
-#ifdef ELAPSED_FUNC
+	    إذا (channel_unref(channel) || (r == OK
+#که_تعریف_شوی ELAPSED_FUNC
 			// Limit the time we loop here to 100 msec, otherwise
 			// Vim becomes unresponsive when the callback takes
 			// more than a bit of time.
-			&& ELAPSED_FUNC(start_tv) < 100L
-#endif
+			&& ELAPSED_FUNC(پیل_tv) < 100L
+#د_که_پای
 			))
 	    {
 		// channel was freed or something was done, start over
-		channel = first_channel;
+		channel = لومړی_channel;
 		part = PART_SOCK;
-		continue;
+		استمر;
 	    }
 	}
-	if (part < PART_ERR)
+	إذا (part < PART_ERR)
 	    ++part;
-	else
+	وإلا
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_بل;
 	    part = PART_SOCK;
 	}
     }
 
-    if (channel_need_redraw)
+    إذا (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
     }
 
-    --safe_to_invoke_callback;
+    --خوندي_منزل_invoke_callback;
     --recursive;
 
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Return TRUE if any channel has readahead.  That means we should not block on
  * waiting for input.
  */
-    int
-channel_any_readahead(void)
+    صحيح
+channel_any_readahead(فراغ)
 {
-    channel_T	*channel = first_channel;
+    channel_T	*channel = لومړی_channel;
     ch_part_T	part = PART_SOCK;
 
-    while (channel != NULL)
+    طالما (channel != عدم)
     {
-	if (channel_has_readahead(channel, part))
-	    return TRUE;
-	if (part < PART_ERR)
+	إذا (channel_has_readahead(channel, part))
+	    أرجع TRUE;
+	إذا (part < PART_ERR)
 	    ++part;
-	else
+	وإلا
 	{
-	    channel = channel->ch_next;
+	    channel = channel->ch_بل;
 	    part = PART_SOCK;
 	}
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Mark references to lists used in channels.
  */
-    int
-set_ref_in_channel(int copyID)
+    صحيح
+سېټ_ref_دننه_channel(صحيح copyID)
 {
-    int		abort = FALSE;
+    صحيح		abort = FALSE;
     channel_T	*channel;
     typval_T	tv;
 
-    for (channel = first_channel; !abort && channel != NULL;
-						   channel = channel->ch_next)
-	if (channel_still_useful(channel))
+    لكل (channel = لومړی_channel; !abort && channel != عدم;
+						   channel = channel->ch_بل)
+	إذا (channel_still_useful(channel))
 	{
 	    tv.v_type = VAR_CHANNEL;
 	    tv.vval.v_channel = channel;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    abort = abort || سېټ_ref_دننه_توکی(&tv, copyID, عدم, عدم, عدم);
 	}
-    return abort;
+    أرجع abort;
 }
 
 /*
  * Return the "part" to write to for "channel".
  */
-    static ch_part_T
+    ساكن ch_part_T
 channel_part_send(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_IN;
-    return PART_SOCK;
+    إذا (channel->CH_SOCK_FD == INVALID_FD)
+	أرجع PART_دننه;
+    أرجع PART_SOCK;
 }
 
 /*
  * Return the default "part" to read from for "channel".
  */
-    static ch_part_T
+    ساكن ch_part_T
 channel_part_read(channel_T *channel)
 {
-    if (channel->CH_SOCK_FD == INVALID_FD)
-	return PART_OUT;
-    return PART_SOCK;
+    إذا (channel->CH_SOCK_FD == INVALID_FD)
+	أرجع PART_بهر;
+    أرجع PART_SOCK;
 }
 
 /*
  * Return the mode of "channel"/"part"
  * If "channel" is invalid returns CH_MODE_JSON.
  */
-    static ch_mode_T
-channel_get_mode(channel_T *channel, ch_part_T part)
+    ساكن ch_ډېرپېښ_T
+channel_get_ډېرپېښ(channel_T *channel, ch_part_T part)
 {
-    if (channel == NULL)
-	return CH_MODE_JSON;
-    return channel->ch_part[part].ch_mode;
+    إذا (channel == عدم)
+	أرجع CH_ډېرپېښ_JSON;
+    أرجع channel->ch_part[part].ch_ډېرپېښ;
 }
 
 /*
  * Return the timeout of "channel"/"part"
  */
-    static int
+    ساكن صحيح
 channel_get_timeout(channel_T *channel, ch_part_T part)
 {
-    return channel->ch_part[part].ch_timeout;
+    أرجع channel->ch_part[part].ch_timeout;
 }
 
 /*
  * "ch_canread()" function
  */
-    void
+    فراغ
 f_ch_canread(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    rettv->vval.v_number = 0;
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    rettv->vval.v_شمېره = 0;
+    إذا (دننه_vim9script() && check_for_chan_or_دنده_arg(argvars, 0) == FAIL)
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL)
-	rettv->vval.v_number = channel_has_readahead(channel, PART_SOCK)
-			    || channel_has_readahead(channel, PART_OUT)
+    إذا (channel != عدم)
+	rettv->vval.v_شمېره = channel_has_readahead(channel, PART_SOCK)
+			    || channel_has_readahead(channel, PART_بهر)
 			    || channel_has_readahead(channel, PART_ERR);
 }
 
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_ch_close(typval_T *argvars, typval_T *rettv ناکارول_شوی)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_chan_or_دنده_arg(argvars, 0) == FAIL)
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
+    إذا (channel != عدم)
     {
 	channel_close(channel, FALSE);
 	channel_clear(channel);
@@ -5979,118 +5979,118 @@ f_ch_close(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "ch_close()" function
  */
-    void
-f_ch_close_in(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_ch_close_دننه(typval_T *argvars, typval_T *rettv ناکارول_شوی)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_chan_or_دنده_arg(argvars, 0) == FAIL)
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], TRUE, FALSE, 0);
-    if (channel != NULL)
-	channel_close_in(channel);
+    إذا (channel != عدم)
+	channel_close_دننه(channel);
 }
 
 /*
  * "ch_getbufnr()" function
  */
-    void
+    فراغ
 f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_شمېره = -1;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    إذا (channel == عدم)
+	أرجع;
 
     char_u	*what = tv_get_string(&argvars[1]);
-    int		part;
-    if (STRCMP(what, "err") == 0)
+    صحيح		part;
+    إذا (STRCMP(what, "err") == 0)
 	part = PART_ERR;
-    else if (STRCMP(what, "out") == 0)
-	part = PART_OUT;
-    else if (STRCMP(what, "in") == 0)
-	part = PART_IN;
-    else
+    وإلا إذا (STRCMP(what, "out") == 0)
+	part = PART_بهر;
+    وإلا إذا (STRCMP(what, "in") == 0)
+	part = PART_دننه;
+    وإلا
 	part = PART_SOCK;
-    if (channel->ch_part[part].ch_bufref.br_buf != NULL)
-	rettv->vval.v_number =
+    إذا (channel->ch_part[part].ch_bufref.br_buf != عدم)
+	rettv->vval.v_شمېره =
 	    channel->ch_part[part].ch_bufref.br_buf->b_fnum;
 }
 
 /*
  * "ch_getjob()" function
  */
-    void
+    فراغ
 f_ch_getjob(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_chan_or_دنده_arg(argvars, 0) == FAIL)
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
+    إذا (channel == عدم)
+	أرجع;
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = channel->ch_job;
-    if (channel->ch_job != NULL)
-	++channel->ch_job->jv_refcount;
+    rettv->v_type = VAR_دنده;
+    rettv->vval.v_دنده = channel->ch_دنده;
+    إذا (channel->ch_دنده != عدم)
+	++channel->ch_دنده->jv_refcount;
 }
 
 /*
  * "ch_info()" function
  */
-    void
-f_ch_info(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_ch_info(typval_T *argvars, typval_T *rettv ناکارول_شوی)
 {
     channel_T *channel;
 
-    if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_chan_or_دنده_arg(argvars, 0) == FAIL)
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel != NULL && rettv_dict_alloc(rettv) == OK)
+    إذا (channel != عدم && rettv_dict_alloc(rettv) == OK)
 	channel_info(channel, rettv->vval.v_dict);
 }
 
 /*
  * "ch_listen()" function
  */
-    void
+    فراغ
 f_ch_listen(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	أرجع;
     rettv->vval.v_channel = channel_listen_func(argvars);
 }
 
 /*
  * "ch_open()" function
  */
-    void
+    فراغ
 f_ch_open(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	أرجع;
     rettv->vval.v_channel = channel_open_func(argvars);
 }
 
 /*
  * "ch_read()" function
  */
-    void
+    فراغ
 f_ch_read(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, FALSE, FALSE);
@@ -6099,7 +6099,7 @@ f_ch_read(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readblob()" function
  */
-    void
+    فراغ
 f_ch_readblob(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, TRUE);
@@ -6108,7 +6108,7 @@ f_ch_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_readraw()" function
  */
-    void
+    فراغ
 f_ch_readraw(typval_T *argvars, typval_T *rettv)
 {
     common_channel_read(argvars, rettv, TRUE, FALSE);
@@ -6117,25 +6117,25 @@ f_ch_readraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_evalexpr()" function
  */
-    void
+    فراغ
 f_ch_evalexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, TRUE);
+    ch_بیان_common(argvars, rettv, TRUE);
 }
 
 /*
  * "ch_sendexpr()" function
  */
-    void
+    فراغ
 f_ch_sendexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, FALSE);
+    ch_بیان_common(argvars, rettv, FALSE);
 }
 
 /*
  * "ch_evalraw()" function
  */
-    void
+    فراغ
 f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, TRUE);
@@ -6144,7 +6144,7 @@ f_ch_evalraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_sendraw()" function
  */
-    void
+    فراغ
 f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 {
     ch_raw_common(argvars, rettv, FALSE);
@@ -6153,60 +6153,60 @@ f_ch_sendraw(typval_T *argvars, typval_T *rettv)
 /*
  * "ch_setoptions()" function
  */
-    void
-f_ch_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_ch_setoptions(typval_T *argvars, typval_T *rettv ناکارول_شوی)
 {
     channel_T	*channel;
     jobopt_T	opt;
 
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	أرجع;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
-    if (channel == NULL)
-	return;
-    clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt,
-			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_MODE_ALL, 0) == OK)
-	channel_set_options(channel, &opt);
-    free_job_options(&opt);
+    إذا (channel == عدم)
+	أرجع;
+    clear_دنده_options(&opt);
+    إذا (get_دنده_options(&argvars[1], &opt,
+			    JO_CB_ALL + JO_TIMEOUT_ALL + JO_ډېرپېښ_ALL, 0) == OK)
+	channel_سېټ_options(channel, &opt);
+    free_دنده_options(&opt);
 }
 
 /*
  * "ch_status()" function
  */
-    void
-f_ch_status(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_ch_حالت(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
     jobopt_T	opt;
-    int		part = -1;
+    صحيح		part = -1;
 
     // return an empty string by default
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script()
-	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_chan_or_دنده_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
-	clear_job_options(&opt);
-	if (get_job_options(&argvars[1], &opt, JO_PART, 0) == OK
-						     && (opt.jo_set & JO_PART))
+	clear_دنده_options(&opt);
+	إذا (get_دنده_options(&argvars[1], &opt, JO_PART, 0) == OK
+						     && (opt.jo_سېټ & JO_PART))
 	    part = opt.jo_part;
     }
 
-    rettv->vval.v_string = vim_strsave((char_u *)channel_status(channel, part));
+    rettv->vval.v_string = vim_strsave((char_u *)channel_حالت(channel, part));
 }
 
 /*
@@ -6214,30 +6214,30 @@ f_ch_status(typval_T *argvars, typval_T *rettv)
  * "buf" must be at least NUMBUFLEN long.
  */
     char_u *
-channel_to_string_buf(typval_T *varp, char_u *buf)
+channel_منزل_string_buf(typval_T *varp, char_u *buf)
 {
     channel_T *channel = varp->vval.v_channel;
-    char      *status = channel_status(channel, -1);
+    حرف      *حالت = channel_حالت(channel, -1);
 
-    if (channel == NULL)
-	vim_snprintf((char *)buf, NUMBUFLEN, "channel %s", status);
-    else
-	vim_snprintf((char *)buf, NUMBUFLEN,
-				      "channel %d %s", channel->ch_id, status);
-    return buf;
+    إذا (channel == عدم)
+	vim_snprintf((حرف *)buf, NUMBUFLEN, "channel %s", حالت);
+    وإلا
+	vim_snprintf((حرف *)buf, NUMBUFLEN,
+				      "channel %d %s", channel->ch_id, حالت);
+    أرجع buf;
 }
 
 /*
  * Return the channel with the given ID. Returns NULL if not found.
  */
     channel_T *
-channel_find(int ch_id)
+channel_پیدا_کړه(صحيح ch_id)
 {
     channel_T *ch;
     FOR_ALL_CHANNELS(ch)
-	if (ch->ch_id == ch_id)
-	    return ch;
-    return NULL;
+	إذا (ch->ch_id == ch_id)
+	    أرجع ch;
+    أرجع عدم;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#د_که_پای // FEAT_JOB_CHANNEL

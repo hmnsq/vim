@@ -13,33 +13,33 @@
  * Some of these may have been defined in the makefile or feature.h.
  */
 
-#ifndef SYS_VIMRC_FILE
+#که_نه_تعریف_شوی SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE		"$VIM\\vimrc"
-#endif
-#ifndef USR_VIMRC_FILE
+#د_که_پای
+#که_نه_تعریف_شوی USR_VIMRC_FILE
 # define USR_VIMRC_FILE		"$HOME\\_vimrc"
-#endif
-#ifndef USR_VIMRC_FILE2
+#د_که_پای
+#که_نه_تعریف_شوی USR_VIMRC_FILE2
 # define USR_VIMRC_FILE2	"$HOME\\vimfiles\\vimrc"
-#endif
-#ifndef USR_VIMRC_FILE3
+#د_که_پای
+#که_نه_تعریف_شوی USR_VIMRC_FILE3
 # define USR_VIMRC_FILE3	"$VIM\\_vimrc"
-#endif
-#ifndef VIM_DEFAULTS_FILE
+#د_که_پای
+#که_نه_تعریف_شوی VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE	"$VIMRUNTIME\\defaults.vim"
-#endif
-#ifndef EVIM_FILE
+#د_که_پای
+#که_نه_تعریف_شوی EVIM_FILE
 # define EVIM_FILE		"$VIMRUNTIME\\evim.vim"
-#endif
+#د_که_پای
 
-#ifndef USR_EXRC_FILE
+#که_نه_تعریف_شوی USR_EXRC_FILE
 # define USR_EXRC_FILE		"$HOME\\_exrc"
-#endif
-#ifndef USR_EXRC_FILE2
+#د_که_پای
+#که_نه_تعریف_شوی USR_EXRC_FILE2
 # define USR_EXRC_FILE2		"$VIM\\_exrc"
-#endif
+#د_که_پای
 
-#ifdef FEAT_GUI
+#که_تعریف_شوی FEAT_GUI
 # ifndef SYS_GVIMRC_FILE
 #  define SYS_GVIMRC_FILE	"$VIM\\gvimrc"
 # endif
@@ -55,61 +55,61 @@
 # ifndef SYS_MENU_FILE
 #  define SYS_MENU_FILE		"$VIMRUNTIME\\menu.vim"
 # endif
-#endif
+#د_که_پای
 
-#ifndef SYS_OPTWIN_FILE
+#که_نه_تعریف_شوی SYS_OPTWIN_FILE
 # define SYS_OPTWIN_FILE	"$VIMRUNTIME\\optwin.vim"
-#endif
+#د_که_پای
 
-#ifdef FEAT_VIMINFO
+#که_تعریف_شوی FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  define VIMINFO_FILE		"$HOME\\_viminfo"
 # endif
 # ifndef VIMINFO_FILE2
 #  define VIMINFO_FILE2		"$VIM\\_viminfo"
 # endif
-#endif
+#د_که_پای
 
-#ifndef VIMRC_FILE
+#که_نه_تعریف_شوی VIMRC_FILE
 # define VIMRC_FILE	"_vimrc"
-#endif
+#د_که_پای
 
-#ifndef EXRC_FILE
+#که_نه_تعریف_شوی EXRC_FILE
 # define EXRC_FILE	"_exrc"
-#endif
+#د_که_پای
 
-#ifdef FEAT_GUI
+#که_تعریف_شوی FEAT_GUI
 # ifndef GVIMRC_FILE
 #  define GVIMRC_FILE	"_gvimrc"
 # endif
-#endif
+#د_که_پای
 
-#ifndef DFLT_HELPFILE
+#که_نه_تعریف_شوی DFLT_HELPFILE
 # define DFLT_HELPFILE	"$VIMRUNTIME\\doc\\help.txt"
-#endif
+#د_که_پای
 
-#ifndef SYNTAX_FNAME
+#که_نه_تعریف_شوی SYNTAX_FNAME
 # define SYNTAX_FNAME	"$VIMRUNTIME\\syntax\\%s.vim"
-#endif
+#د_که_پای
 
-#ifndef DFLT_BDIR
+#که_نه_تعریف_شوی DFLT_BDIR
 # define DFLT_BDIR	".,$TEMP,c:\\tmp,c:\\temp" // default for 'backupdir'
-#endif
+#د_که_پای
 
-#ifndef DFLT_VDIR
+#که_نه_تعریف_شوی DFLT_VDIR
 # define DFLT_VDIR	"$HOME/vimfiles/view"	// default for 'viewdir'
-#endif
+#د_که_پای
 
-#ifndef DFLT_DIR
+#که_نه_تعریف_شوی DFLT_DIR
 # define DFLT_DIR	".,$TEMP,c:\\tmp,c:\\temp" // default for 'directory'
-#endif
+#د_که_پای
 
-#define DFLT_ERRORFILE		"errors.err"
-#define DFLT_RUNTIMEPATH	"$HOME/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$HOME/vimfiles/after,$VIM/vimfiles/after"
-#define CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
+#تعریف_کړه DFLT_ERRORFILE		"errors.err"
+#تعریف_کړه DFLT_RUNTIMEPATH	"$HOME/vimfiles,$VIM/vimfiles,$VIMRUNTIME,$HOME/vimfiles/after,$VIM/vimfiles/after"
+#تعریف_کړه CLEAN_RUNTIMEPATH	"$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
 
-#define CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
-#define BACKSLASH_IN_FILENAME
-#define USE_CRNL		// lines end in CR-NL instead of NL
-#define HAVE_DUP		// have dup()
-#define HAVE_ST_MODE		// have stat.st_mode
+#تعریف_کړه CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
+#تعریف_کړه BACKSLASH_دننه_FILENAME
+#تعریف_کړه USE_CRNL		// lines end in CR-NL instead of NL
+#تعریف_کړه HAVE_DUP		// have dup()
+#تعریف_کړه HAVE_ST_ډېرپېښ		// have stat.st_mode

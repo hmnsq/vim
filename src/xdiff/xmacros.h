@@ -20,46 +20,46 @@
  *
  */
 
-#if !defined(XMACROS_H)
-#define XMACROS_H
+#إذا !defined(XMACROS_H)
+#تعریف_کړه XMACROS_H
 
 
 // SIZE_MAX may not be defined on older platforms without <stdint.h>.
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t)(-1))
-#endif
+#که_نه_تعریف_شوی اندازه_MAX
+# define اندازه_MAX ((size_t)(-1))
+#د_که_پای
 
-#define XDL_MIN(a, b) ((a) < (b) ? (a): (b))
-#define XDL_MAX(a, b) ((a) > (b) ? (a): (b))
-#define XDL_ABS(v) ((v) >= 0 ? (v): -(v))
-#define XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
-#define XDL_ISSPACE(c) (isspace((unsigned char)(c)))
-#define XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
-#define XDL_MASKBITS(b)		((1UL << (b)) - 1)
-#define XDL_HASHLONG(v,b)	(XDL_ADDBITS((unsigned long)(v), b) & XDL_MASKBITS(b))
-#define XDL_LE32_PUT(p, v) \
-do { \
-	unsigned char *__p = (unsigned char *) (p); \
-	*__p++ = (unsigned char) (v); \
-	*__p++ = (unsigned char) ((v) >> 8); \
-	*__p++ = (unsigned char) ((v) >> 16); \
-	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
-#define XDL_LE32_GET(p, v) \
-do { \
-	unsigned char const *__p = (unsigned char const *) (p); \
-	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
-		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+#تعریف_کړه XDL_MIN(a, b) ((a) < (b) ? (a): (b))
+#تعریف_کړه XDL_MAX(a, b) ((a) > (b) ? (a): (b))
+#تعریف_کړه XDL_ABS(v) ((v) >= 0 ? (v): -(v))
+#تعریف_کړه XDL_ISDIGIT(c) ((c) >= '0' && (c) <= '9')
+#تعریف_کړه XDL_ISSPACE(c) (که_تشه((بینښه حرف)(c)))
+#تعریف_کړه XDL_ADDBITS(v,b)	((v) + ((v) >> (b)))
+#تعریف_کړه XDL_MASKBITS(b)		((1UL << (b)) - 1)
+#تعریف_کړه XDL_HASHLONG(v,b)	(XDL_ADDBITS((بینښه اوږد)(v), b) & XDL_MASKBITS(b))
+#تعریف_کړه XDL_LE32_PUT(p, v) \
+افعل { \
+	بینښه حرف *__p = (بینښه حرف *) (p); \
+	*__p++ = (بینښه حرف) (v); \
+	*__p++ = (بینښه حرف) ((v) >> 8); \
+	*__p++ = (بینښه حرف) ((v) >> 16); \
+	*__p = (بینښه حرف) ((v) >> 24); \
+} طالما (0)
+#تعریف_کړه XDL_LE32_GET(p, v) \
+افعل { \
+	بینښه حرف ثابت *__p = (بینښه حرف ثابت *) (p); \
+	(v) = (بینښه اوږد) __p[0] | ((بینښه اوږد) __p[1]) << 8 | \
+		((بینښه اوږد) __p[2]) << 16 | ((بینښه اوږد) __p[3]) << 24; \
+} طالما (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
-#define XDL_ALLOC_ARRAY(p, nr)				\
-	((p) = SIZE_MAX / sizeof(*(p)) >= (size_t)(nr)	\
-		? xdl_malloc((nr) * sizeof(*(p)))	\
-		: NULL)
+#تعریف_کړه XDL_ALLOC_ARRAY(p, nr)				\
+	((p) = اندازه_MAX / حجم(*(p)) >= (size_t)(nr)	\
+		? xdl_malloc((nr) * حجم(*(p)))	\
+		: عدم)
 
 /* Allocate an array of nr zeroed out elements, returns NULL on failure */
-#define XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, sizeof(*(p))))
+#تعریف_کړه XDL_CALLOC_ARRAY(p, nr)	((p) = xdl_calloc(nr, حجم(*(p))))
 
 /*
  * Ensure array p can accommodate at least nr elements, growing the
@@ -67,8 +67,8 @@ do { \
  * elements) as necessary. Frees p and returns -1 on failure, returns
  * 0 on success
  */
-#define XDL_ALLOC_GROW(p, nr, alloc)	\
+#تعریف_کړه XDL_ALLOC_GROW(p, nr, alloc)	\
 	(-!((nr) <= (alloc) ||		\
-	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), sizeof(*(p))))))
+	    ((p) = xdl_alloc_grow_helper((p), (nr), &(alloc), حجم(*(p))))))
 
-#endif /* #if !defined(XMACROS_H) */
+#د_که_پای /* #if !defined(XMACROS_H) */

@@ -11,9 +11,9 @@
  * filepath.c: dealing with file names and paths.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 /*
  * Functions for ":8" filename modifier: get 8.3 version of a filename.
  */
@@ -26,62 +26,62 @@
  * *fnamelen is the length of "fnamep" and set to 0 for a nonexistent path.
  * Returns OK on success, FAIL on failure.
  */
-    static int
+    ساكن صحيح
 get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
 {
-    int		l, len;
+    صحيح		l, len;
     WCHAR	*newbuf;
     WCHAR	*wfname;
 
     len = MAXPATHL;
-    newbuf = malloc(len * sizeof(*newbuf));
-    if (newbuf == NULL)
-	return FAIL;
+    newbuf = حافظه_ورکړه(len * حجم(*newbuf));
+    إذا (newbuf == عدم)
+	أرجع FAIL;
 
-    wfname = enc_to_utf16(*fnamep, NULL);
-    if (wfname == NULL)
+    wfname = enc_منزل_utf16(*fnamep, عدم);
+    إذا (wfname == عدم)
     {
 	vim_free(newbuf);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    l = GetShortPathNameW(wfname, newbuf, len);
-    if (l > len - 1)
+    l = Get_Short_لار_Name_W(wfname, newbuf, len);
+    إذا (l > len - 1)
     {
 	// If that doesn't work (not enough space), then save the string
 	// and try again with a new buffer big enough.
 	WCHAR *newbuf_t = newbuf;
-	newbuf = vim_realloc(newbuf, (l + 1) * sizeof(*newbuf));
-	if (newbuf == NULL)
+	newbuf = vim_realloc(newbuf, (l + 1) * حجم(*newbuf));
+	إذا (newbuf == عدم)
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf_t);
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	// Really should always succeed, as the buffer is big enough.
-	l = GetShortPathNameW(wfname, newbuf, l+1);
+	l = Get_Short_لار_Name_W(wfname, newbuf, l+1);
     }
-    if (l != 0)
+    إذا (l != 0)
     {
-	char_u *p = utf16_to_enc(newbuf, NULL);
+	char_u *p = utf16_منزل_enc(newbuf, عدم);
 
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    vim_free(*bufp);
 	    *fnamep = *bufp = p;
 	}
-	else
+	وإلا
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf);
-	    return FAIL;
+	    أرجع FAIL;
 	}
     }
     vim_free(wfname);
     vim_free(newbuf);
 
     *fnamelen = l == 0 ? l : STRLEN(*bufp);
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -99,29 +99,29 @@ get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
  *
  * Returns OK on success (or nothing done) and FAIL on failure (out of memory).
  */
-    static int
+    ساكن صحيح
 shortpath_for_invalid_fname(
     char_u	**fname,
     char_u	**bufp,
     size_t	*fnamelen)
 {
     char_u	*save_fname;
-    char_u	*pbuf_unused = NULL;
-    char_u	*short_fname = NULL;
+    char_u	*pbuf_ناکارول_شوی = عدم;
+    char_u	*short_fname = عدم;
     char_u	*endp, *save_endp;
     char_u	ch;
     size_t	old_len;
     size_t	len;
     size_t	new_len, sfx_len;
-    int		retval = OK;
+    صحيح		retval = OK;
 
     // Make a copy
     old_len = *fnamelen;
     save_fname = vim_strnsave(*fname, old_len);
-    if (save_fname == NULL)
+    إذا (save_fname == عدم)
     {
 	retval = FAIL;
-	goto theend;
+	اذهب theend;
     }
 
     endp = save_fname + old_len - 1; // Find the end of the copy
@@ -132,13 +132,13 @@ shortpath_for_invalid_fname(
      * directory at a time from the tail of the path.
      */
     len = 0;
-    for (;;)
+    لكل (;;)
     {
 	// go back one path-separator
-	while (endp > save_fname && !after_pathsep(save_fname, endp + 1))
+	طالما (endp > save_fname && !after_pathsep(save_fname, endp + 1))
 	    --endp;
-	if (endp <= save_fname)
-	    break;		// processed the complete path
+	إذا (endp <= save_fname)
+	    اكسر;		// processed the complete path
 
 	/*
 	 * Replace the path separator with a NUL and try to shorten the
@@ -148,21 +148,21 @@ shortpath_for_invalid_fname(
 	*endp = 0;
 	short_fname = save_fname;
 	len = STRLEN(short_fname) + 1;
-	if (get_short_pathname(&short_fname, &pbuf_unused, &len) == FAIL)
+	إذا (get_short_pathname(&short_fname, &pbuf_ناکارول_شوی, &len) == FAIL)
 	{
 	    retval = FAIL;
-	    goto theend;
+	    اذهب theend;
 	}
 	*endp = ch;	// preserve the string
 
-	if (len > 0)
-	    break;	// successfully shortened the path
+	إذا (len > 0)
+	    اكسر;	// successfully shortened the path
 
 	// failed to shorten the path. Skip the path separator
 	--endp;
     }
 
-    if (len > 0)
+    إذا (len > 0)
     {
 	/*
 	 * Succeeded in shortening the path. Now concatenate the shortened
@@ -175,109 +175,109 @@ shortpath_for_invalid_fname(
 
 	*fnamelen = new_len;
 	vim_free(*bufp);
-	if (new_len > old_len)
+	إذا (new_len > old_len)
 	{
 	    // There is not enough space in the currently allocated string,
 	    // copy it to a buffer big enough.
 	    *fname = *bufp = vim_strnsave(short_fname, new_len);
-	    if (*fname == NULL)
+	    إذا (*fname == عدم)
 	    {
 		retval = FAIL;
-		goto theend;
+		اذهب theend;
 	    }
 	}
-	else
+	وإلا
 	{
 	    // Transfer short_fname to the main buffer (it's big enough),
 	    // unless get_short_pathname() did its work in-place.
 	    *fname = *bufp = save_fname;
-	    if (short_fname != save_fname)
+	    إذا (short_fname != save_fname)
 		STRNCPY(save_fname, short_fname, len);
-	    save_fname = NULL;
+	    save_fname = عدم;
 	}
 
 	// concat the not-shortened part of the path
-	if ((*fname + len) != endp)
+	إذا ((*fname + len) != endp)
 	    vim_strncpy(*fname + len, endp, sfx_len);
 	(*fname)[new_len] = NUL;
     }
 
 theend:
-    vim_free(pbuf_unused);
+    vim_free(pbuf_ناکارول_شوی);
     vim_free(save_fname);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Get a pathname for a partial path.
  * Returns OK for success, FAIL for failure.
  */
-    static int
+    ساكن صحيح
 shortpath_for_partial(
     char_u	**fnamep,
     char_u	**bufp,
     size_t	*fnamelen)
 {
-    int		sepcount;
+    صحيح		sepcount;
     size_t	len, tflen;
     char_u	*p;
     char_u	*pbuf, *tfname;
-    int		hasTilde;
+    صحيح		hasTilde;
 
     // Count up the path separators from the RHS.. so we know which part
     // of the path to return.
     sepcount = 0;
-    for (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
-	if (vim_ispathsep(*p))
+    لكل (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
+	إذا (vim_ispathsep(*p))
 	    ++sepcount;
 
     // Need full path first (use expand_env() to remove a "~/")
     hasTilde = (**fnamep == '~');
-    if (hasTilde)
+    إذا (hasTilde)
 	pbuf = tfname = expand_env_save(*fnamep);
-    else
-	pbuf = tfname = FullName_save(*fnamep, FALSE);
-    if (tfname == NULL)
-	return FAIL;
+    وإلا
+	pbuf = tfname = ډک_Name_save(*fnamep, FALSE);
+    إذا (tfname == عدم)
+	أرجع FAIL;
 
     len = tflen = STRLEN(tfname);
 
-    if (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
-	return FAIL;
+    إذا (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
+	أرجع FAIL;
 
-    if (len == 0)
+    إذا (len == 0)
     {
 	// Don't have a valid filename, so shorten the rest of the
 	// path if we can. This CAN give us invalid 8.3 filenames, but
 	// there's not a lot of point in guessing what it might be.
 	len = tflen;
-	if (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
-	    return FAIL;
+	إذا (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
+	    أرجع FAIL;
     }
 
     // Count the paths backward to find the beginning of the desired string.
-    for (p = tfname + len - 1; p >= tfname; --p)
+    لكل (p = tfname + len - 1; p >= tfname; --p)
     {
-	if (has_mbyte)
-	    p -= mb_head_off(tfname, p);
-	if (vim_ispathsep(*p))
+	إذا (has_mbyte)
+	    p -= mb_سر_off(tfname, p);
+	إذا (vim_ispathsep(*p))
 	{
-	    if (sepcount == 0 || (hasTilde && sepcount == 1))
-		break;
-	    else
+	    إذا (sepcount == 0 || (hasTilde && sepcount == 1))
+		اكسر;
+	    وإلا
 		sepcount --;
 	}
     }
-    if (hasTilde)
+    إذا (hasTilde)
     {
 	--p;
-	if (p >= tfname)
+	إذا (p >= tfname)
 	    *p = '~';
-	else
-	    return FAIL;
+	وإلا
+	    أرجع FAIL;
     }
-    else
+    وإلا
 	++p;
 
     // Copy in the string - p indexes into tfname - allocated at pbuf
@@ -286,9 +286,9 @@ shortpath_for_partial(
     *bufp = pbuf;
     *fnamep = p;
 
-    return OK;
+    أرجع OK;
 }
-#endif // MSWIN
+#د_که_پای // MSWIN
 
 /*
  * Adjust a filename, according to a string of modifiers.
@@ -297,98 +297,98 @@ shortpath_for_partial(
  * Returns VALID_ flags or -1 for failure.
  * When there is an error, *fnamep is set to NULL.
  */
-    int
+    صحيح
 modify_fname(
     char_u	*src,		// string with modifiers
-    int		tilde_file,	// "~" is a file name, not $HOME
+    صحيح		tilde_file,	// "~" is a file name, not $HOME
     size_t	*usedlen,	// characters after src that are used
     char_u	**fnamep,	// file name so far
     char_u	**bufp,		// buffer for allocated file name or NULL
     size_t	*fnamelen)	// length of fnamep
 {
-    int		valid = 0;
-    char_u	*tail;
+    صحيح		valid = 0;
+    char_u	*لکۍ;
     char_u	*s, *p, *pbuf;
     char_u	dirname[MAXPATHL];
-    int		c;
-    int		has_fullname = 0;
-    int		has_homerelative = 0;
-#ifdef MSWIN
-    char_u	*fname_start = *fnamep;
-    int		has_shortname = 0;
-#endif
+    صحيح		c;
+    صحيح		has_fullname = 0;
+    صحيح		has_homerelative = 0;
+#که_تعریف_شوی MSWIN
+    char_u	*fname_پیل = *fnamep;
+    صحيح		has_shortname = 0;
+#د_که_پای
 
 repeat:
     // ":p" - full path/file_name
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
+    إذا (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
     {
 	has_fullname = 1;
 
-	valid |= VALID_PATH;
+	valid |= VALID_لار;
 	*usedlen += 2;
 
 	// Expand "~/path" for all systems and "~user/path" for Unix and VMS
-	if ((*fnamep)[0] == '~'
-#if !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
+	إذا ((*fnamep)[0] == '~'
+#إذا !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
 		&& ((*fnamep)[1] == '/'
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_دننه_FILENAME
 		    || (*fnamep)[1] == '\\'
 # endif
 		    || (*fnamep)[1] == NUL)
-#endif
+#د_که_پای
 		&& !(tilde_file && (*fnamep)[1] == NUL)
 	   )
 	{
 	    *fnamep = expand_env_save(*fnamep);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    إذا (*fnamep == عدم)
+		أرجع -1;
 	}
 
 	// When "/." or "/.." is used: force expansion to get rid of it.
-	for (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
+	لكل (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (vim_ispathsep(*p)
+	    إذا (vim_ispathsep(*p)
 		    && p[1] == '.'
 		    && (p[2] == NUL
 			|| vim_ispathsep(p[2])
 			|| (p[2] == '.'
 			    && (p[3] == NUL || vim_ispathsep(p[3])))))
-		break;
+		اكسر;
 	}
 
 	// FullName_save() is slow, don't use it when not needed.
-	if (*p != NUL || !vim_isAbsName(*fnamep)
-#ifdef MSWIN	// enforce drive letter on Windows paths
+	إذا (*p != NUL || !vim_isAbsName(*fnamep)
+#که_تعریف_شوی MSWIN	// enforce drive letter on Windows paths
 		|| **fnamep == '/' || **fnamep == '\\'
-#endif
+#د_که_پای
 	)
 	{
-	    *fnamep = FullName_save(*fnamep, *p != NUL);
+	    *fnamep = ډک_Name_save(*fnamep, *p != NUL);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    إذا (*fnamep == عدم)
+		أرجع -1;
 	}
 
-#ifdef MSWIN
-# if _WIN32_WINNT >= 0x0500
-	if (vim_strchr(*fnamep, '~') != NULL)
+#که_تعریف_شوی MSWIN
+# إذا _WIN32_WINNT >= 0x0500
+	إذا (vim_strchr(*fnamep, '~') != عدم)
 	{
 	    // Expand 8.3 filename to full path.  Needed to make sure the same
 	    // file does not have two different names.
 	    // Note: problem does not occur if _WIN32_WINNT < 0x0500.
-	    WCHAR *wfname = enc_to_utf16(*fnamep, NULL);
-	    WCHAR buf[_MAX_PATH];
+	    WCHAR *wfname = enc_منزل_utf16(*fnamep, عدم);
+	    WCHAR buf[MAX_لار_2];
 
-	    if (wfname != NULL)
+	    إذا (wfname != عدم)
 	    {
-		if (GetLongPathNameW(wfname, buf, _MAX_PATH))
+		إذا (Get_Long_لار_Name_W(wfname, buf, MAX_لار_2))
 		{
-		    char_u *q = utf16_to_enc(buf, NULL);
+		    char_u *q = utf16_منزل_enc(buf, عدم);
 
-		    if (q != NULL)
+		    إذا (q != عدم)
 		    {
 			vim_free(*bufp);    // free any allocated file name
 			*bufp = *fnamep = q;
@@ -398,96 +398,96 @@ repeat:
 	    }
 	}
 # endif
-#endif
+#د_که_پای
 	// Append a path separator to a directory.
-	if (mch_isdir(*fnamep))
+	إذا (mch_isdir(*fnamep))
 	{
 	    // Make room for one or two extra characters.
 	    *fnamep = vim_strnsave(*fnamep, STRLEN(*fnamep) + 2);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
-	    add_pathsep(*fnamep);
+	    إذا (*fnamep == عدم)
+		أرجع -1;
+	    جمع_کړه_pathsep(*fnamep);
 	}
     }
 
     // ":." - path relative to the current directory
     // ":~" - path relative to the home directory
     // ":8" - shortname path - postponed till after
-    while (src[*usedlen] == ':'
+    طالما (src[*usedlen] == ':'
 		  && ((c = src[*usedlen + 1]) == '.' || c == '~' || c == '8'))
     {
 	*usedlen += 2;
-	if (c == '8')
+	إذا (c == '8')
 	{
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 	    has_shortname = 1; // Postpone this.
-#endif
-	    continue;
+#د_که_پای
+	    استمر;
 	}
-	pbuf = NULL;
+	pbuf = عدم;
 	// Need full path first (use expand_env() to remove a "~/")
-	if (!has_fullname && !has_homerelative)
+	إذا (!has_fullname && !has_homerelative)
 	{
-	    if (**fnamep == '~')
+	    إذا (**fnamep == '~')
 		p = pbuf = expand_env_save(*fnamep);
-	    else
-		p = pbuf = FullName_save(*fnamep, FALSE);
+	    وإلا
+		p = pbuf = ډک_Name_save(*fnamep, FALSE);
 	}
-	else
+	وإلا
 	    p = *fnamep;
 
 	has_fullname = 0;
 
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    size_t  dirnamelen = 0;
 
-	    if (c == '.')
+	    إذا (c == '.')
 	    {
 		mch_dirname(dirname, MAXPATHL);
-		if (has_homerelative)
+		إذا (has_homerelative)
 		{
 		    s = vim_strsave(dirname);
-		    if (s != NULL)
+		    إذا (s != عدم)
 		    {
-			dirnamelen = home_replace(NULL, s, dirname, MAXPATHL, TRUE);
+			dirnamelen = home_replace(عدم, s, dirname, MAXPATHL, TRUE);
 			vim_free(s);
 		    }
 		}
 
-		if (dirnamelen == 0)
+		إذا (dirnamelen == 0)
 		    dirnamelen = STRLEN(dirname);
 
 		// Do not call shorten_fname() here since it removes the prefix
 		// even though the path does not have a prefix.
-		if (fnamencmp(p, dirname, dirnamelen) == 0)
+		إذا (fnamencmp(p, dirname, dirnamelen) == 0)
 		{
 		    p += dirnamelen;
-		    if (vim_ispathsep(*p))
+		    إذا (vim_ispathsep(*p))
 		    {
-			while (*p && vim_ispathsep(*p))
+			طالما (*p && vim_ispathsep(*p))
 			    ++p;
 			*fnamep = p;
-			if (pbuf != NULL)
+			إذا (pbuf != عدم)
 			{
 			    // free any allocated file name
 			    vim_free(*bufp);
 			    *bufp = pbuf;
-			    pbuf = NULL;
+			    pbuf = عدم;
 			}
 		    }
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		dirnamelen = home_replace(NULL, p, dirname, MAXPATHL, TRUE);
+		dirnamelen = home_replace(عدم, p, dirname, MAXPATHL, TRUE);
 		// Only replace it when it starts with '~'
-		if (*dirname == '~')
+		إذا (*dirname == '~')
 		{
 		    s = vim_strnsave(dirname, dirnamelen);
-		    if (s != NULL)
+		    إذا (s != عدم)
 		    {
 			*fnamep = s;
 			vim_free(*bufp);
@@ -500,148 +500,148 @@ repeat:
 	}
     }
 
-    tail = gettail(*fnamep);
+    لکۍ = gettail(*fnamep);
     *fnamelen = STRLEN(*fnamep);
 
     // ":h" - head, remove "/file_name", can be repeated
     // Don't remove the first "/" or "c:\"
-    while (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
+    طالما (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
     {
-	valid |= VALID_HEAD;
+	valid |= VALID_سر;
 	*usedlen += 2;
-	s = get_past_head(*fnamep);
-	while (tail > s && after_pathsep(s, tail))
-	    MB_PTR_BACK(*fnamep, tail);
-	*fnamelen = tail - *fnamep;
-#ifdef VMS
-	if (*fnamelen > 0)
+	s = get_past_سر(*fnamep);
+	طالما (لکۍ > s && after_pathsep(s, لکۍ))
+	    MB_PTR_شا(*fnamep, لکۍ);
+	*fnamelen = لکۍ - *fnamep;
+#که_تعریف_شوی VMS
+	إذا (*fnamelen > 0)
 	    *fnamelen += 1; // the path separator is part of the path
-#endif
-	if (*fnamelen == 0)
+#د_که_پای
+	إذا (*fnamelen == 0)
 	{
 	    // Result is empty.  Turn it into "." to make ":cd %:h" work.
 	    p = vim_strsave((char_u *)".");
-	    if (p == NULL)
-		return -1;
+	    إذا (p == عدم)
+		أرجع -1;
 	    vim_free(*bufp);
-	    *bufp = *fnamep = tail = p;
+	    *bufp = *fnamep = لکۍ = p;
 	    *fnamelen = 1;
 	}
-	else
+	وإلا
 	{
-	    while (tail > s && !after_pathsep(s, tail))
-		MB_PTR_BACK(*fnamep, tail);
+	    طالما (لکۍ > s && !after_pathsep(s, لکۍ))
+		MB_PTR_شا(*fnamep, لکۍ);
 	}
     }
 
     // ":8" - shortname
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
+    إذا (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
     {
 	*usedlen += 2;
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
 	has_shortname = 1;
-#endif
+#د_که_پای
     }
 
-#ifdef MSWIN
+#که_تعریف_شوی MSWIN
     /*
      * Handle ":8" after we have done 'heads' and before we do 'tails'.
      */
-    if (has_shortname)
+    إذا (has_shortname)
     {
 	// Copy the string if it is shortened by :h and when it wasn't copied
 	// yet, because we are going to change it in place.  Avoids changing
 	// the buffer name for "%:8".
-	if (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_start)
+	إذا (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_پیل)
 	{
 	    p = vim_strnsave(*fnamep, *fnamelen);
-	    if (p == NULL)
-		return -1;
+	    إذا (p == عدم)
+		أرجع -1;
 	    vim_free(*bufp);
 	    *bufp = *fnamep = p;
 	}
 
 	// Split into two implementations - makes it easier.  First is where
 	// there isn't a full name already, second is where there is.
-	if (!has_fullname && !vim_isAbsName(*fnamep))
+	إذا (!has_fullname && !vim_isAbsName(*fnamep))
 	{
-	    if (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
-		return -1;
+	    إذا (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
+		أرجع -1;
 	}
-	else
+	وإلا
 	{
 	    size_t	l = *fnamelen;
 
 	    // Simple case, already have the full-name.
 	    // Nearly always shorter, so try first time.
-	    if (get_short_pathname(fnamep, bufp, &l) == FAIL)
-		return -1;
+	    إذا (get_short_pathname(fnamep, bufp, &l) == FAIL)
+		أرجع -1;
 
-	    if (l == 0)
+	    إذا (l == 0)
 	    {
 		// Couldn't find the filename, search the paths.
 		l = *fnamelen;
-		if (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
-		    return -1;
+		إذا (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
+		    أرجع -1;
 	    }
 	    *fnamelen = l;
 	}
 
 	// The name was replaced by the short name, "tail" points into the
 	// previous name.
-	tail = gettail(*fnamep);
+	لکۍ = gettail(*fnamep);
     }
-#endif // MSWIN
+#د_که_پای // MSWIN
 
     // ":t" - tail, just the basename
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
+    إذا (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
     {
 	*usedlen += 2;
-	*fnamelen -= tail - *fnamep;
-	*fnamep = tail;
+	*fnamelen -= لکۍ - *fnamep;
+	*fnamep = لکۍ;
     }
 
     // ":e" - extension, can be repeated
     // ":r" - root, without extension, can be repeated
-    while (src[*usedlen] == ':'
+    طالما (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 'e' || src[*usedlen + 1] == 'r'))
     {
 	// find a '.' in the tail:
 	// - for second :e: before the current fname
 	// - otherwise: The last '.'
-	if (src[*usedlen + 1] == 'e' && *fnamep > tail)
+	إذا (src[*usedlen + 1] == 'e' && *fnamep > لکۍ)
 	    s = *fnamep - 2;
-	else
+	وإلا
 	    s = *fnamep + *fnamelen - 1;
-	for ( ; s > tail; --s)
-	    if (s[0] == '.')
-		break;
-	if (src[*usedlen + 1] == 'e')		// :e
+	لكل ( ; s > لکۍ; --s)
+	    إذا (s[0] == '.')
+		اكسر;
+	إذا (src[*usedlen + 1] == 'e')		// :e
 	{
-	    if (s > tail)
+	    إذا (s > لکۍ)
 	    {
 		*fnamelen += (*fnamep - (s + 1));
 		*fnamep = s + 1;
-#ifdef VMS
+#که_تعریف_شوی VMS
 		// cut version from the extension
 		s = *fnamep + *fnamelen - 1;
-		for ( ; s > *fnamep; --s)
-		    if (s[0] == ';')
-			break;
-		if (s > *fnamep)
+		لكل ( ; s > *fnamep; --s)
+		    إذا (s[0] == ';')
+			اكسر;
+		إذا (s > *fnamep)
 		    *fnamelen = s - *fnamep;
-#endif
+#د_که_پای
 	    }
-	    else if (*fnamep <= tail)
+	    وإلا إذا (*fnamep <= لکۍ)
 		*fnamelen = 0;
 	}
-	else				// :r
+	وإلا				// :r
 	{
-	    char_u *limit = *fnamep;
+	    char_u *حد = *fnamep;
 
-	    if (limit < tail)
-		limit = tail;
-	    if (s > limit)	// remove one extension
+	    إذا (حد < لکۍ)
+		حد = لکۍ;
+	    إذا (s > حد)	// remove one extension
 		*fnamelen = s - *fnamep;
 	}
 	*usedlen += 2;
@@ -649,49 +649,49 @@ repeat:
 
     // ":s?pat?foo?" - substitute
     // ":gs?pat?foo?" - global substitute
-    if (src[*usedlen] == ':'
+    إذا (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 's'
 		|| (src[*usedlen + 1] == 'g' && src[*usedlen + 2] == 's')))
     {
 	char_u	    *str;
 	char_u	    *pat;
 	char_u	    *sub;
-	int	    sep;
+	صحيح	    sep;
 	char_u	    *flags;
-	int	    didit = FALSE;
+	صحيح	    didit = FALSE;
 
 	flags = (char_u *)"";
 	s = src + *usedlen + 2;
-	if (src[*usedlen + 1] == 'g')
+	إذا (src[*usedlen + 1] == 'g')
 	{
 	    flags = (char_u *)"g";
 	    ++s;
 	}
 
 	sep = *s++;
-	if (sep)
+	إذا (sep)
 	{
 	    // find end of pattern
 	    p = vim_strchr(s, sep);
-	    if (p != NULL)
+	    إذا (p != عدم)
 	    {
 		pat = vim_strnsave(s, p - s);
-		if (pat != NULL)
+		إذا (pat != عدم)
 		{
 		    s = p + 1;
 		    // find end of substitution
 		    p = vim_strchr(s, sep);
-		    if (p != NULL)
+		    إذا (p != عدم)
 		    {
 			sub = vim_strnsave(s, p - s);
 			str = vim_strnsave(*fnamep, *fnamelen);
-			if (sub != NULL && str != NULL)
+			إذا (sub != عدم && str != عدم)
 			{
 			    size_t slen;
 
 			    *usedlen = p + 1 - src;
-			    s = do_string_sub(str, *fnamelen, pat, sub, NULL, flags, &slen);
-			    if (s != NULL)
+			    s = do_string_sub(str, *fnamelen, pat, sub, عدم, flags, &slen);
+			    إذا (s != عدم)
 			    {
 				*fnamep = s;
 				*fnamelen = slen;
@@ -707,29 +707,29 @@ repeat:
 		}
 	    }
 	    // after using ":s", repeat all the modifiers
-	    if (didit)
-		goto repeat;
+	    إذا (didit)
+		اذهب repeat;
 	}
     }
 
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
+    إذا (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
     {
 	// vim_strsave_shellescape() needs a NUL terminated string.
 	c = (*fnamep)[*fnamelen];
-	if (c != NUL)
+	إذا (c != NUL)
 	    (*fnamep)[*fnamelen] = NUL;
 	p = vim_strsave_shellescape(*fnamep, FALSE, FALSE);
-	if (c != NUL)
+	إذا (c != NUL)
 	    (*fnamep)[*fnamelen] = c;
-	if (p == NULL)
-	    return -1;
+	إذا (p == عدم)
+	    أرجع -1;
 	vim_free(*bufp);
 	*bufp = *fnamep = p;
 	*fnamelen = STRLEN(p);
 	*usedlen += 2;
     }
 
-    return valid;
+    أرجع valid;
 }
 
 /*
@@ -738,47 +738,47 @@ repeat:
  * Must be 1 or more.
  * It's done in-place.
  */
-    static void
-shorten_dir_len(char_u *str, int trim_len)
+    ساكن فراغ
+shorten_dir_len(char_u *str, صحيح trim_len)
 {
-    char_u	*tail, *s, *d;
-    int		skip = FALSE;
-    int		dirchunk_len = 0;
+    char_u	*لکۍ, *s, *d;
+    صحيح		skip = FALSE;
+    صحيح		dirchunk_len = 0;
 
-    tail = gettail(str);
+    لکۍ = gettail(str);
     d = str;
-    for (s = str; ; ++s)
+    لكل (s = str; ; ++s)
     {
-	if (s >= tail)		    // copy the whole tail
+	إذا (s >= لکۍ)		    // copy the whole tail
 	{
 	    *d++ = *s;
-	    if (*s == NUL)
-		break;
+	    إذا (*s == NUL)
+		اكسر;
 	}
-	else if (vim_ispathsep(*s))	    // copy '/' and next char
+	وإلا إذا (vim_ispathsep(*s))	    // copy '/' and next char
 	{
 	    *d++ = *s;
 	    skip = FALSE;
 	    dirchunk_len = 0;
 	}
-	else if (!skip)
+	وإلا إذا (!skip)
 	{
 	    *d++ = *s;			// copy next char
-	    if (*s != '~' && *s != '.') // and leading "~" and "."
+	    إذا (*s != '~' && *s != '.') // and leading "~" and "."
 	    {
 		++dirchunk_len; // only count word chars for the size
 
 		// keep copying chars until we have our preferred length (or
 		// until the above if/else branches move us along)
-		if (dirchunk_len >= trim_len)
+		إذا (dirchunk_len >= trim_len)
 		    skip = TRUE;
 	    }
 
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
-		int l = mb_ptr2len(s);
+		صحيح l = mb_ptr2len(s);
 
-		while (--l > 0)
+		طالما (--l > 0)
 		    *d++ = *++s;
 	    }
 	}
@@ -789,7 +789,7 @@ shorten_dir_len(char_u *str, int trim_len)
  * Shorten the path of a file from "~/foo/../.bar/fname" to "~/f/../.b/fname"
  * It's done in-place.
  */
-    void
+    فراغ
 shorten_dir(char_u *str)
 {
     shorten_dir_len(str, 1);
@@ -798,58 +798,58 @@ shorten_dir(char_u *str)
 /*
  * Return TRUE if "fname" is a readable file.
  */
-    int
+    صحيح
 file_is_readable(char_u *fname)
 {
-    int		fd;
+    صحيح		fd;
 
-#ifndef O_NONBLOCK
+#که_نه_تعریف_شوی O_NONBLOCK
 # define O_NONBLOCK 0
-#endif
+#د_که_پای
     // Opening a file that does not exist is slow.
-    if (*fname == NUL || mch_isdir_or_missing(fname))
-	return FALSE;
-    if ((fd = mch_open((char *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
+    إذا (*fname == NUL || mch_isdir_or_missing(fname))
+	أرجع FALSE;
+    إذا ((fd = mch_open((حرف *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
     {
 	close(fd);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * "chdir(dir)" function
  */
-    void
+    فراغ
 f_chdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*cwd;
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (argvars[0].v_type != VAR_STRING)
+    إذا (argvars[0].v_type != VAR_STRING)
     {
 	// Returning an empty string means it failed.
 	// No error message, for historic reasons.
-	if (in_vim9script())
-	    (void) check_for_string_arg(argvars, 0);
-	return;
+	إذا (دننه_vim9script())
+	    (فراغ) check_for_string_arg(argvars, 0);
+	أرجع;
     }
 
     // Return the current directory
     cwd = alloc(MAXPATHL);
-    if (cwd != NULL)
+    إذا (cwd != عدم)
     {
-	if (mch_dirname(cwd, MAXPATHL) != FAIL)
+	إذا (mch_dirname(cwd, MAXPATHL) != FAIL)
 	{
-# ifdef BACKSLASH_IN_FILENAME
+# ifdef BACKSLASH_دننه_FILENAME
 	    slash_adjust(cwd);
 # endif
 	    rettv->vval.v_string = vim_strsave(cwd);
@@ -857,27 +857,27 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 	vim_free(cwd);
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *s = tv_get_string(&argvars[1]);
-	if (STRCMP(s, "global") == 0)
+	إذا (STRCMP(s, "global") == 0)
 	    scope = CDSCOPE_GLOBAL;
-	else if (STRCMP(s, "tabpage") == 0)
+	وإلا إذا (STRCMP(s, "tabpage") == 0)
 	    scope = CDSCOPE_TABPAGE;
-	else if (STRCMP(s, "window") == 0)
-	    scope = CDSCOPE_WINDOW;
-	else
+	وإلا إذا (STRCMP(s, "window") == 0)
+	    scope = CDSCOPE_کړکۍ;
+	وإلا
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "scope", s);
-	    return;
+	    semsg(_(e_invalid_ارزښت_for_دلیل_str_str), "scope", s);
+	    أرجع;
 	}
     }
-    else if (curwin->w_localdir != NULL)
-	scope = CDSCOPE_WINDOW;
-    else if (curtab->tp_localdir != NULL)
+    وإلا إذا (curwin->w_localdir != عدم)
+	scope = CDSCOPE_کړکۍ;
+    وإلا إذا (curtab->tp_localdir != عدم)
 	scope = CDSCOPE_TABPAGE;
 
-    if (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
+    إذا (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
 	// Directory change failed
 	VIM_CLEAR(rettv->vval.v_string);
 }
@@ -885,71 +885,71 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 /*
  * "delete()" function
  */
-    void
+    فراغ
 f_delete(typval_T *argvars, typval_T *rettv)
 {
     char_u	nbuf[NUMBUFLEN];
     char_u	*name;
     char_u	*flags;
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_شمېره = -1;
+    إذا (check_restricted() || check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL || *name == NUL)
+    إذا (name == عدم || *name == NUL)
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_دلیل));
+	أرجع;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-    else
+    وإلا
 	flags = (char_u *)"";
 
-    if (*flags == NUL)
+    إذا (*flags == NUL)
 	// delete a file
-	rettv->vval.v_number = mch_remove(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "d") == 0)
+	rettv->vval.v_شمېره = mch_remove(name) == 0 ? 0 : -1;
+    وإلا إذا (STRCMP(flags, "d") == 0)
 	// delete an empty directory
-	rettv->vval.v_number = mch_rmdir(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "rf") == 0)
+	rettv->vval.v_شمېره = mch_rmdir(name) == 0 ? 0 : -1;
+    وإلا إذا (STRCMP(flags, "rf") == 0)
 	// delete a directory recursively
-	rettv->vval.v_number = delete_recursive(name);
-    else
-	semsg(_(e_invalid_expression_str), flags);
+	rettv->vval.v_شمېره = delete_recursive(name);
+    وإلا
+	semsg(_(e_invalid_افاده_str), flags);
 }
 
 /*
  * "executable()" function
  */
-    void
+    فراغ
 f_executable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     // Check in $PATH and also check directly if there is a directory name.
-    rettv->vval.v_number = mch_can_exe(tv_get_string(&argvars[0]), NULL, TRUE);
+    rettv->vval.v_شمېره = mch_can_exe(tv_get_string(&argvars[0]), عدم, TRUE);
 }
 
 /*
  * "exepath()" function
  */
-    void
+    فراغ
 f_exepath(typval_T *argvars, typval_T *rettv)
 {
-    char_u *p = NULL;
+    char_u *p = عدم;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
-    (void)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
+    إذا (دننه_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	أرجع;
+    (فراغ)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = p;
 }
@@ -957,106 +957,106 @@ f_exepath(typval_T *argvars, typval_T *rettv)
 /*
  * "filereadable()" function
  */
-    void
+    فراغ
 f_filereadable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = file_is_readable(tv_get_string(&argvars[0]));
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
+    rettv->vval.v_شمېره = file_is_readable(tv_get_string(&argvars[0]));
 }
 
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    void
+    فراغ
 f_filewritable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = filewritable(tv_get_string(&argvars[0]));
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
+    rettv->vval.v_شمېره = filewritable(tv_get_string(&argvars[0]));
 }
 
-    static void
+    ساكن فراغ
 findfilendir(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		find_what)
+    صحيح		پیدا_کړه_what)
 {
     char_u	*fname;
-    char_u	*fresult = NULL;
-    char_u	*path = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
+    char_u	*fresult = عدم;
+    char_u	*لار = *curbuf->b_p_لار == NUL ? p_لار : curbuf->b_p_لار;
     char_u	*p;
     char_u	pathbuf[NUMBUFLEN];
-    int		count = 1;
-    int		first = TRUE;
-    int		error = FALSE;
+    صحيح		شمېر = 1;
+    صحيح		لومړی = TRUE;
+    صحيح		error = FALSE;
 
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
     rettv->v_type = VAR_STRING;
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_شمېره_arg(argvars, 2) == FAIL)))
+	أرجع;
 
     fname = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	p = tv_get_string_buf_chk(&argvars[1], pathbuf);
-	if (p == NULL)
+	إذا (p == عدم)
 	    error = TRUE;
-	else
+	وإلا
 	{
-	    if (*p != NUL)
-		path = p;
+	    إذا (*p != NUL)
+		لار = p;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		count = (int)tv_get_number_chk(&argvars[2], &error);
+	    إذا (argvars[2].v_type != VAR_UNKNOWN)
+		شمېر = (صحيح)tv_get_شمېره_chk(&argvars[2], &error);
 	}
     }
 
-    if (count < 0 && rettv_list_alloc(rettv) == FAIL)
+    إذا (شمېر < 0 && rettv_list_alloc(rettv) == FAIL)
 	error = TRUE;
 
-    if (*fname != NUL && !error)
+    إذا (*fname != NUL && !error)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_منزل_پیدا_کړه = عدم;
+	حرف	*پلټنه_ctx = عدم;
 
-	do
+	افعل
 	{
-	    if (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
+	    إذا (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
 		vim_free(fresult);
-	    fresult = find_file_in_path_option(first ? fname : NULL,
-					       first ? (int)STRLEN(fname) : 0,
-					0, first, path,
-					find_what,
+	    fresult = پیدا_کړه_file_دننه_لار_option(لومړی ? fname : عدم,
+					       لومړی ? (صحيح)STRLEN(fname) : 0,
+					0, لومړی, لار,
+					پیدا_کړه_what,
 					curbuf->b_ffname,
-					find_what == FINDFILE_DIR
+					پیدا_کړه_what == FINDFILE_DIR
 					    ? (char_u *)"" : curbuf->b_p_sua,
-					    &file_to_find, &search_ctx);
-	    first = FALSE;
+					    &file_منزل_پیدا_کړه, &پلټنه_ctx);
+	    لومړی = FALSE;
 
-	    if (fresult != NULL && rettv->v_type == VAR_LIST)
+	    إذا (fresult != عدم && rettv->v_type == VAR_LIST)
 		list_append_string(rettv->vval.v_list, fresult, -1);
 
-	} while ((rettv->v_type == VAR_LIST || --count > 0) && fresult != NULL);
+	} طالما ((rettv->v_type == VAR_LIST || --شمېر > 0) && fresult != عدم);
 
-	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_free(file_منزل_پیدا_کړه);
+	vim_findfile_cleanup(پلټنه_ctx);
     }
 
-    if (rettv->v_type == VAR_STRING)
+    إذا (rettv->v_type == VAR_STRING)
 	rettv->vval.v_string = fresult;
 }
 
 /*
  * "finddir({fname}[, {path}[, {count}]])" function
  */
-    void
+    فراغ
 f_finddir(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_DIR);
@@ -1065,7 +1065,7 @@ f_finddir(typval_T *argvars, typval_T *rettv)
 /*
  * "findfile({fname}[, {path}[, {count}]])" function
  */
-    void
+    فراغ
 f_findfile(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_FILE);
@@ -1074,36 +1074,36 @@ f_findfile(typval_T *argvars, typval_T *rettv)
 /*
  * "fnamemodify({fname}, {mods})" function
  */
-    void
+    فراغ
 f_fnamemodify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     char_u	*mods;
     size_t	usedlen = 0;
     size_t	len = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = عدم;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     fname = tv_get_string_chk(&argvars[0]);
     mods = tv_get_string_buf_chk(&argvars[1], buf);
-    if (mods == NULL || fname == NULL)
-	fname = NULL;
-    else
+    إذا (mods == عدم || fname == عدم)
+	fname = عدم;
+    وإلا
     {
 	len = STRLEN(fname);
-	if (mods != NULL && *mods != NUL)
-	    (void)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
+	إذا (mods != عدم && *mods != NUL)
+	    (فراغ)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
     }
 
     rettv->v_type = VAR_STRING;
-    if (fname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    إذا (fname == عدم)
+	rettv->vval.v_string = عدم;
+    وإلا
 	rettv->vval.v_string = vim_strnsave(fname, len);
     vim_free(fbuf);
 }
@@ -1125,53 +1125,53 @@ f_fnamemodify(typval_T *argvars, typval_T *rettv)
  * specified window in the specified tab page.
  * If the window or the tab page doesn't exist then return NULL.
  */
-    void
+    فراغ
 f_getcwd(typval_T *argvars, typval_T *rettv)
 {
-    win_T	*wp = NULL;
-    tabpage_T	*tp = NULL;
+    win_T	*wp = عدم;
+    tabpage_T	*tp = عدم;
     char_u	*cwd;
-    int		global = FALSE;
+    صحيح		global = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    إذا (دننه_vim9script()
+	    && (check_for_opt_شمېره_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_شمېره_arg(argvars, 1) == FAIL)))
+	أرجع;
 
-    if (argvars[0].v_type == VAR_NUMBER
-	    && argvars[0].vval.v_number == -1
+    إذا (argvars[0].v_type == VAR_شمېره
+	    && argvars[0].vval.v_شمېره == -1
 	    && argvars[1].v_type == VAR_UNKNOWN)
 	global = TRUE;
-    else
-	wp = find_tabwin(&argvars[0], &argvars[1], &tp);
+    وإلا
+	wp = پیدا_کړه_tabwin(&argvars[0], &argvars[1], &tp);
 
-    if (wp != NULL && wp->w_localdir != NULL
+    إذا (wp != عدم && wp->w_localdir != عدم
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(wp->w_localdir);
-    else if (tp != NULL && tp->tp_localdir != NULL
+    وإلا إذا (tp != عدم && tp->tp_localdir != عدم
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(tp->tp_localdir);
-    else if (wp != NULL || tp != NULL || global)
+    وإلا إذا (wp != عدم || tp != عدم || global)
     {
-	if (globaldir != NULL && argvars[0].v_type != VAR_UNKNOWN)
+	إذا (globaldir != عدم && argvars[0].v_type != VAR_UNKNOWN)
 	    rettv->vval.v_string = vim_strsave(globaldir);
-	else
+	وإلا
 	{
 	    cwd = alloc(MAXPATHL);
-	    if (cwd != NULL)
+	    إذا (cwd != عدم)
 	    {
-		if (mch_dirname(cwd, MAXPATHL) != FAIL)
+		إذا (mch_dirname(cwd, MAXPATHL) != FAIL)
 		    rettv->vval.v_string = vim_strsave(cwd);
 		vim_free(cwd);
 	    }
 	}
     }
-# ifdef BACKSLASH_IN_FILENAME
-    if (rettv->vval.v_string != NULL)
+# ifdef BACKSLASH_دننه_FILENAME
+    إذا (rettv->vval.v_string != عدم)
 	slash_adjust(rettv->vval.v_string);
 # endif
 }
@@ -1183,36 +1183,36 @@ f_getcwd(typval_T *argvars, typval_T *rettv)
 getfpermst(stat_T *st, char_u *perm)
 {
     char_u	    flags[] = "rwx";
-    int		    i;
+    صحيح		    i;
 
-    for (i = 0; i < 9; i++)
+    لكل (i = 0; i < 9; i++)
     {
-	if (st->st_mode & (1 << (8 - i)))
+	إذا (st->st_ډېرپېښ & (1 << (8 - i)))
 	    perm[i] = flags[i % 3];
-	else
+	وإلا
 	    perm[i] = '-';
     }
-    return perm;
+    أرجع perm;
 }
 
 /*
  * "getfperm({fname})" function
  */
-    void
+    فراغ
 f_getfperm(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*perm = NULL;
+    char_u	*perm = عدم;
     char_u	permbuf[] = "---------";
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_stat((char *)fname, &st) >= 0)
+    إذا (mch_stat((حرف *)fname, &st) >= 0)
 	perm = vim_strsave(getfpermst(&st, permbuf));
     rettv->vval.v_string = perm;
 }
@@ -1220,50 +1220,50 @@ f_getfperm(typval_T *argvars, typval_T *rettv)
 /*
  * "getfsize({fname})" function
  */
-    void
+    فراغ
 f_getfsize(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
+    إذا (mch_stat((حرف *)fname, &st) >= 0)
     {
-	if (S_ISDIR(st.st_mode))
-	    rettv->vval.v_number = 0;
-	else
+	إذا (S_ISDIR(st.st_ډېرپېښ))
+	    rettv->vval.v_شمېره = 0;
+	وإلا
 	{
-	    rettv->vval.v_number = (varnumber_T)st.st_size;
+	    rettv->vval.v_شمېره = (varnumber_T)st.st_size;
 
 	    // non-perfect check for overflow
-	    if ((off_T)rettv->vval.v_number != (off_T)st.st_size)
-		rettv->vval.v_number = -2;
+	    إذا ((off_T)rettv->vval.v_شمېره != (off_T)st.st_size)
+		rettv->vval.v_شمېره = -2;
 	}
     }
-    else
-	  rettv->vval.v_number = -1;
+    وإلا
+	  rettv->vval.v_شمېره = -1;
 }
 
 /*
  * "getftime({fname})" function
  */
-    void
+    فراغ
 f_getftime(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
-	rettv->vval.v_number = (varnumber_T)st.st_mtime;
-    else
-	rettv->vval.v_number = -1;
+    إذا (mch_stat((حرف *)fname, &st) >= 0)
+	rettv->vval.v_شمېره = (varnumber_T)st.st_mtime;
+    وإلا
+	rettv->vval.v_شمېره = -1;
 }
 
 /*
@@ -1272,44 +1272,44 @@ f_getftime(typval_T *argvars, typval_T *rettv)
     char_u *
 getftypest(stat_T *st)
 {
-    char    *t;
+    حرف    *t;
 
-    if (S_ISREG(st->st_mode))
+    إذا (S_ISREG(st->st_ډېرپېښ))
 	t = "file";
-    else if (S_ISDIR(st->st_mode))
+    وإلا إذا (S_ISDIR(st->st_ډېرپېښ))
 	t = "dir";
-    else if (S_ISLNK(st->st_mode))
+    وإلا إذا (S_ISLNK(st->st_ډېرپېښ))
 	t = "link";
-    else if (S_ISBLK(st->st_mode))
+    وإلا إذا (S_ISBLK(st->st_ډېرپېښ))
 	t = "bdev";
-    else if (S_ISCHR(st->st_mode))
+    وإلا إذا (S_ISCHR(st->st_ډېرپېښ))
 	t = "cdev";
-    else if (S_ISFIFO(st->st_mode))
+    وإلا إذا (S_ISFIFO(st->st_ډېرپېښ))
 	t = "fifo";
-    else if (S_ISSOCK(st->st_mode))
+    وإلا إذا (S_ISSOCK(st->st_ډېرپېښ))
 	t = "socket";
-    else
+    وإلا
 	t = "other";
-    return (char_u*)t;
+    أرجع (char_u*)t;
 }
 
 /*
  * "getftype({fname})" function
  */
-    void
+    فراغ
 f_getftype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*type = NULL;
+    char_u	*type = عدم;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_lstat((char *)fname, &st) >= 0)
+    إذا (mch_lstat((حرف *)fname, &st) >= 0)
 	type = vim_strsave(getftypest(&st));
     rettv->vval.v_string = type;
 }
@@ -1317,95 +1317,95 @@ f_getftype(typval_T *argvars, typval_T *rettv)
 /*
  * "glob()" function
  */
-    void
+    فراغ
 f_glob(typval_T *argvars, typval_T *rettv)
 {
-    int		options = WILD_SILENT|WILD_USE_NL;
+    صحيح		options = WILD_SILENT|WILD_USE_NL;
     expand_T	xpc;
-    int		error = FALSE;
+    صحيح		error = FALSE;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 2) == FAIL
 			|| (argvars[2].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 3) == FAIL)))))
-	return;
+	أرجع;
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[1], &error))
+	إذا (tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	إذا (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[2], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[3].v_type != VAR_UNKNOWN
+	    إذا (tv_get_bool_chk(&argvars[2], &error))
+		rettv_list_سېټ(rettv, عدم);
+	    إذا (argvars[3].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[3], &error))
 		options |= WILD_ALLLINKS;
 	}
     }
-    if (!error)
+    إذا (!error)
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_FILES;
-	if (p_wic)
+	إذا (p_wic)
 	    options += WILD_ICASE;
-	if (rettv->v_type == VAR_STRING)
+	إذا (rettv->v_type == VAR_STRING)
 	    rettv->vval.v_string = ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						     NULL, options, WILD_ALL);
-	else if (rettv_list_alloc(rettv) == OK)
+						     عدم, options, WILD_ALL);
+	وإلا إذا (rettv_list_alloc(rettv) == OK)
 	{
-	  int i;
+	  صحيح i;
 
 	  ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						NULL, options, WILD_ALL_KEEP);
-	  for (i = 0; i < xpc.xp_numfiles; i++)
+						عدم, options, WILD_ALL_KEEP);
+	  لكل (i = 0; i < xpc.xp_numfiles; i++)
 	      list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 
 	  ExpandCleanup(&xpc);
 	}
     }
-    else
-	rettv->vval.v_string = NULL;
+    وإلا
+	rettv->vval.v_string = عدم;
 }
 
 /*
  * "glob2regpat()" function
  */
-    void
+    فراغ
 f_glob2regpat(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*pat;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    pat = tv_get_string_buf_chk_strict(&argvars[0], buf, in_vim9script());
+    pat = tv_get_string_buf_chk_strict(&argvars[0], buf, دننه_vim9script());
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = (pat == NULL)
-			 ? NULL : file_pat_to_reg_pat(pat, NULL, NULL, FALSE);
+    rettv->vval.v_string = (pat == عدم)
+			 ? عدم : file_pat_منزل_reg_pat(pat, عدم, عدم, FALSE);
 }
 
 /*
  * "globpath()" function
  */
-    void
+    فراغ
 f_globpath(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = WILD_IGNORE_COMPLETESLASH;
+    صحيح		flags = WILD_IGNORE_COMPLETESLASH;
     char_u	buf1[NUMBUFLEN];
     char_u	*file;
-    int		error = FALSE;
+    صحيح		error = FALSE;
     garray_T	ga;
-    int		i;
+    صحيح		i;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
@@ -1413,64 +1413,64 @@ f_globpath(typval_T *argvars, typval_T *rettv)
 		    && (check_for_opt_bool_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 4) == FAIL)))))
-	return;
+	أرجع;
 
     file = tv_get_string_buf_chk(&argvars[1], buf1);
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[2], &error))
+	إذا (tv_get_bool_chk(&argvars[2], &error))
 	    flags |= WILD_KEEP_ALL;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	إذا (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[3], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[4].v_type != VAR_UNKNOWN
+	    إذا (tv_get_bool_chk(&argvars[3], &error))
+		rettv_list_سېټ(rettv, عدم);
+	    إذا (argvars[4].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[4], &error))
 		flags |= WILD_ALLLINKS;
 	}
     }
-    if (file != NULL && !error)
+    إذا (file != عدم && !error)
     {
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, حجم(char_u *), 10);
 	globpath(tv_get_string(&argvars[0]), file, &ga, flags, FALSE);
-	if (rettv->v_type == VAR_STRING)
-	    rettv->vval.v_string = ga_concat_strings(&ga, "\n");
-	else if (rettv_list_alloc(rettv) == OK)
-	    for (i = 0; i < ga.ga_len; ++i)
+	إذا (rettv->v_type == VAR_STRING)
+	    rettv->vval.v_string = ga_concat_مزي_ګانې(&ga, "\n");
+	وإلا إذا (rettv_list_alloc(rettv) == OK)
+	    لكل (i = 0; i < ga.ga_len; ++i)
 		list_append_string(rettv->vval.v_list,
-					    ((char_u **)(ga.ga_data))[i], -1);
-	ga_clear_strings(&ga);
+					    ((char_u **)(ga.ga_معلومات))[i], -1);
+	ga_clear_مزي_ګانې(&ga);
     }
-    else
-	rettv->vval.v_string = NULL;
+    وإلا
+	rettv->vval.v_string = عدم;
 }
 
 /*
  * "isdirectory()" function
  */
-    void
+    فراغ
 f_isdirectory(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = mch_isdir(tv_get_string(&argvars[0]));
+    rettv->vval.v_شمېره = mch_isdir(tv_get_string(&argvars[0]));
 }
 
 /*
  * "isabsolutepath()" function
  */
-    void
+    فراغ
 f_isabsolutepath(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = mch_isFullName(tv_get_string_strict(&argvars[0]));
+    rettv->vval.v_شمېره = mch_is_ډک_Name(tv_get_string_strict(&argvars[0]));
 }
 
 /*
@@ -1480,113 +1480,113 @@ f_isabsolutepath(typval_T *argvars, typval_T *rettv)
  * NULL until that happens.
  * Return OK or FAIL.
  */
-    static int
-mkdir_recurse(char_u *dir, int prot, char_u **created)
+    ساكن صحيح
+mkdir_recurse(char_u *dir, صحيح prot, char_u **created)
 {
     char_u	*p;
     char_u	*updir;
-    int		r = FAIL;
+    صحيح		r = FAIL;
 
     // Get end of directory name in "dir".
     // We're done when it's "/" or "c:/".
     p = gettail_sep(dir);
-    if (p <= get_past_head(dir))
-	return OK;
+    إذا (p <= get_past_سر(dir))
+	أرجع OK;
 
     // If the directory exists we're done.  Otherwise: create it.
     updir = vim_strnsave(dir, p - dir);
-    if (updir == NULL)
-	return FAIL;
-    if (mch_isdir(updir))
+    إذا (updir == عدم)
+	أرجع FAIL;
+    إذا (mch_isdir(updir))
 	r = OK;
-    else if (mkdir_recurse(updir, prot, created) == OK)
+    وإلا إذا (mkdir_recurse(updir, prot, created) == OK)
     {
 	r = vim_mkdir_emsg(updir, prot);
-	if (r == OK && created != NULL && *created == NULL)
-	    *created = FullName_save(updir, FALSE);
+	إذا (r == OK && created != عدم && *created == عدم)
+	    *created = ډک_Name_save(updir, FALSE);
     }
     vim_free(updir);
-    return r;
+    أرجع r;
 }
 
 /*
  * "mkdir()" function
  */
-    void
+    فراغ
 f_mkdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*dir;
     char_u	buf[NUMBUFLEN];
-    int		prot = 0755;
-    int		defer = FALSE;
-    int		defer_recurse = FALSE;
-    char_u	*created = NULL;
+    صحيح		prot = 0755;
+    صحيح		defer = FALSE;
+    صحيح		defer_recurse = FALSE;
+    char_u	*created = عدم;
 
-    rettv->vval.v_number = FAIL;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_شمېره = FAIL;
+    إذا (check_restricted() || check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_شمېره_arg(argvars, 2) == FAIL)))
+	أرجع;
 
     dir = tv_get_string_buf(&argvars[0], buf);
-    if (*dir == NUL)
-	return;
+    إذا (*dir == NUL)
+	أرجع;
 
-    if (*gettail(dir) == NUL)
+    إذا (*gettail(dir) == NUL)
 	// remove trailing slashes
 	*gettail_sep(dir) = NUL;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	إذا (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    prot = (int)tv_get_number_chk(&argvars[2], NULL);
-	    if (prot == -1)
-		return;
+	    prot = (صحيح)tv_get_شمېره_chk(&argvars[2], عدم);
+	    إذا (prot == -1)
+		أرجع;
 	}
 	arg2 = tv_get_string(&argvars[1]);
-	defer = vim_strchr(arg2, 'D') != NULL;
-	defer_recurse = vim_strchr(arg2, 'R') != NULL;
-	if ((defer || defer_recurse) && !can_add_defer())
-	    return;
+	defer = vim_strchr(arg2, 'D') != عدم;
+	defer_recurse = vim_strchr(arg2, 'R') != عدم;
+	إذا ((defer || defer_recurse) && !can_جمع_کړه_defer())
+	    أرجع;
 
-	if (vim_strchr(arg2, 'p') != NULL)
+	إذا (vim_strchr(arg2, 'p') != عدم)
 	{
-	    if (mch_isdir(dir))
+	    إذا (mch_isdir(dir))
 	    {
 		// With the "p" flag it's OK if the dir already exists.
-		rettv->vval.v_number = OK;
-		return;
+		rettv->vval.v_شمېره = OK;
+		أرجع;
 	    }
-	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : NULL);
+	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : عدم);
 	}
     }
-    rettv->vval.v_number = vim_mkdir_emsg(dir, prot);
+    rettv->vval.v_شمېره = vim_mkdir_emsg(dir, prot);
 
     // Handle "D" and "R": deferred deletion of the created directory.
-    if (rettv->vval.v_number == OK
-				&& created == NULL && (defer || defer_recurse))
-	created = FullName_save(dir, FALSE);
-    if (created != NULL)
+    إذا (rettv->vval.v_شمېره == OK
+				&& created == عدم && (defer || defer_recurse))
+	created = ډک_Name_save(dir, FALSE);
+    إذا (created != عدم)
     {
 	typval_T tv[2];
 
 	tv[0].v_type = VAR_STRING;
-	tv[0].v_lock = 0;
+	tv[0].v_قلف = 0;
 	tv[0].vval.v_string = created;
 	tv[1].v_type = VAR_STRING;
-	tv[1].v_lock = 0;
+	tv[1].v_قلف = 0;
 	tv[1].vval.v_string = vim_strsave(
 				       (char_u *)(defer_recurse ? "rf" : "d"));
-	if (tv[0].vval.v_string == NULL || tv[1].vval.v_string == NULL
-		|| add_defer((char_u *)"delete", 2, tv) == FAIL)
+	إذا (tv[0].vval.v_string == عدم || tv[1].vval.v_string == عدم
+		|| جمع_کړه_defer((char_u *)"delete", 2, tv) == FAIL)
 	{
 	    vim_free(tv[0].vval.v_string);
 	    vim_free(tv[1].vval.v_string);
@@ -1597,34 +1597,34 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 /*
  * "pathshorten()" function
  */
-    void
+    فراغ
 f_pathshorten(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		trim_len = 1;
+    صحيح		trim_len = 1;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_شمېره_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
-	trim_len = (int)tv_get_number(&argvars[1]);
-	if (trim_len < 1)
+	trim_len = (صحيح)tv_get_شمېره(&argvars[1]);
+	إذا (trim_len < 1)
 	    trim_len = 1;
     }
 
     rettv->v_type = VAR_STRING;
     p = tv_get_string_chk(&argvars[0]);
 
-    if (p == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    إذا (p == عدم)
+	rettv->vval.v_string = عدم;
+    وإلا
     {
 	p = vim_strsave(p);
 	rettv->vval.v_string = p;
-	if (p != NULL)
+	إذا (p != عدم)
 	    shorten_dir_len(p, trim_len);
     }
 }
@@ -1633,189 +1633,189 @@ f_pathshorten(typval_T *argvars, typval_T *rettv)
  * Common code for readdir_checkitem() and readdirex_checkitem().
  * Either "name" or "dict" is NULL.
  */
-    static int
-checkitem_common(void *context, char_u *name, dict_T *dict)
+    ساكن صحيح
+checkitem_common(فراغ *context, char_u *name, dict_T *dict)
 {
-    typval_T	*expr = (typval_T *)context;
+    typval_T	*بیان = (typval_T *)context;
     typval_T	save_val;
     typval_T	rettv;
     typval_T	argv[2];
-    int		retval = 0;
-    int		error = FALSE;
+    صحيح		retval = 0;
+    صحيح		error = FALSE;
 
     prepare_vimvar(VV_VAL, &save_val);
-    if (name != NULL)
+    إذا (name != عدم)
     {
-	set_vim_var_string(VV_VAL, name, -1);
+	سېټ_vim_var_string(VV_VAL, name, -1);
 	argv[0].v_type = VAR_STRING;
 	argv[0].vval.v_string = name;
     }
-    else
+    وإلا
     {
-	set_vim_var_dict(VV_VAL, dict);
+	سېټ_vim_var_dict(VV_VAL, dict);
 	argv[0].v_type = VAR_DICT;
 	argv[0].vval.v_dict = dict;
     }
 
-    if (eval_expr_typval(expr, FALSE, argv, 1, NULL, &rettv) == FAIL)
-	goto theend;
+    إذا (eval_بیان_typval(بیان, FALSE, argv, 1, عدم, &rettv) == FAIL)
+	اذهب theend;
 
     // We want to use -1, but also true/false should be allowed.
-    if (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
+    إذا (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
     {
-	rettv.v_type = VAR_NUMBER;
-	rettv.vval.v_number = rettv.vval.v_number == VVAL_TRUE;
+	rettv.v_type = VAR_شمېره;
+	rettv.vval.v_شمېره = rettv.vval.v_شمېره == VVAL_TRUE;
     }
-    retval = tv_get_number_chk(&rettv, &error);
-    if (error)
+    retval = tv_get_شمېره_chk(&rettv, &error);
+    إذا (error)
 	retval = -1;
     clear_tv(&rettv);
 
 theend:
-    if (name != NULL)
-	set_vim_var_string(VV_VAL, NULL, 0);
-    else
-	set_vim_var_dict(VV_VAL, NULL);
+    إذا (name != عدم)
+	سېټ_vim_var_string(VV_VAL, عدم, 0);
+    وإلا
+	سېټ_vim_var_dict(VV_VAL, عدم);
     restore_vimvar(VV_VAL, &save_val);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Evaluate "expr" (= "context") for readdir().
  */
-    static int
-readdir_checkitem(void *context, void *item)
+    ساكن صحيح
+readdir_checkitem(فراغ *context, فراغ *توکی)
 {
-    char_u	*name = (char_u *)item;
+    char_u	*name = (char_u *)توکی;
 
-    return checkitem_common(context, name, NULL);
+    أرجع checkitem_common(context, name, عدم);
 }
 
 /*
  * Process the keys in the Dict argument to the readdir() and readdirex()
  * functions.  Assumes the Dict argument is the 3rd argument.
  */
-    static int
-readdirex_dict_arg(typval_T *argvars, int *cmp)
+    ساكن صحيح
+readdirex_dict_arg(typval_T *argvars, صحيح *cmp)
 {
     char_u     *compare;
 
-    if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+    إذا (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	أرجع FAIL;
 
-    if (dict_has_key(argvars[2].vval.v_dict, "sort"))
+    إذا (dict_has_کلی(argvars[2].vval.v_dict, "sort"))
 	compare = dict_get_string(argvars[2].vval.v_dict, "sort", FALSE);
-    else
+    وإلا
     {
-	semsg(_(e_dictionary_key_str_required), "sort");
-	return FAIL;
+	semsg(_(e_dictionary_کلی_str_required), "sort");
+	أرجع FAIL;
     }
 
-    if (STRCMP(compare, (char_u *) "none") == 0)
-	*cmp = READDIR_SORT_NONE;
-    else if (STRCMP(compare, (char_u *) "case") == 0)
-	*cmp = READDIR_SORT_BYTE;
-    else if (STRCMP(compare, (char_u *) "icase") == 0)
-	*cmp = READDIR_SORT_IC;
-    else if (STRCMP(compare, (char_u *) "collate") == 0)
-	*cmp = READDIR_SORT_COLLATE;
-    return OK;
+    إذا (STRCMP(compare, (char_u *) "none") == 0)
+	*cmp = READDIR_ترتیبول_NONE;
+    وإلا إذا (STRCMP(compare, (char_u *) "case") == 0)
+	*cmp = READDIR_ترتیبول_BYTE;
+    وإلا إذا (STRCMP(compare, (char_u *) "icase") == 0)
+	*cmp = READDIR_ترتیبول_IC;
+    وإلا إذا (STRCMP(compare, (char_u *) "collate") == 0)
+	*cmp = READDIR_ترتیبول_COLLATE;
+    أرجع OK;
 }
 
 /*
  * "readdir()" function
  */
-    void
+    فراغ
 f_readdir(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
-    char_u	*path;
+    typval_T	*بیان;
+    صحيح		ret;
+    char_u	*لار;
     char_u	*p;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    صحيح		i;
+    صحيح		ترتیبول = READDIR_ترتیبول_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	أرجع;
 
-    path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    لار = tv_get_string(&argvars[0]);
+    بیان = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
-	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+    إذا (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+	    readdirex_dict_arg(argvars, &ترتیبول) == FAIL)
+	أرجع;
 
-    ret = readdir_core(&ga, path, FALSE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdir_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, لار, FALSE, (فراغ *)بیان,
+	    (بیان->v_type == VAR_UNKNOWN) ? عدم : readdir_checkitem, ترتیبول);
+    إذا (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	لكل (i = 0; i < ga.ga_len; i++)
 	{
-	    p = ((char_u **)ga.ga_data)[i];
+	    p = ((char_u **)ga.ga_معلومات)[i];
 	    list_append_string(rettv->vval.v_list, p, -1);
 	}
     }
-    ga_clear_strings(&ga);
+    ga_clear_مزي_ګانې(&ga);
 }
 
 /*
  * Evaluate "expr" (= "context") for readdirex().
  */
-    static int
-readdirex_checkitem(void *context, void *item)
+    ساكن صحيح
+readdirex_checkitem(فراغ *context, فراغ *توکی)
 {
-    dict_T	*dict = (dict_T*)item;
+    dict_T	*dict = (dict_T*)توکی;
 
-    return checkitem_common(context, NULL, dict);
+    أرجع checkitem_common(context, عدم, dict);
 }
 
 /*
  * "readdirex()" function
  */
-    void
+    فراغ
 f_readdirex(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
-    char_u	*path;
+    typval_T	*بیان;
+    صحيح		ret;
+    char_u	*لار;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    صحيح		i;
+    صحيح		ترتیبول = READDIR_ترتیبول_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	أرجع;
 
-    path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    لار = tv_get_string(&argvars[0]);
+    بیان = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
-	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+    إذا (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+	    readdirex_dict_arg(argvars, &ترتیبول) == FAIL)
+	أرجع;
 
-    ret = readdir_core(&ga, path, TRUE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdirex_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, لار, TRUE, (فراغ *)بیان,
+	    (بیان->v_type == VAR_UNKNOWN) ? عدم : readdirex_checkitem, ترتیبول);
+    إذا (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	لكل (i = 0; i < ga.ga_len; i++)
 	{
-	    dict_T  *dict = ((dict_T**)ga.ga_data)[i];
+	    dict_T  *dict = ((dict_T**)ga.ga_معلومات)[i];
 	    list_append_dict(rettv->vval.v_list, dict);
 	    dict_unref(dict);
 	}
@@ -1826,145 +1826,145 @@ f_readdirex(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    static void
-read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
+    ساكن فراغ
+read_file_or_blob(typval_T *argvars, typval_T *rettv, صحيح always_blob)
 {
-    int		binary = FALSE;
-    int		blob = always_blob;
-    int		failed = FALSE;
+    صحيح		دوګونی = FALSE;
+    صحيح		blob = always_blob;
+    صحيح		failed = FALSE;
     char_u	*fname;
     FILE	*fd;
     char_u	buf[(IOSIZE/256)*256];	// rounded to avoid odd + 1
-    int		io_size = sizeof(buf);
-    int		readlen;		// size of last fread()
-    char_u	*prev	 = NULL;	// previously read bytes, if any
-    long	prevlen  = 0;		// length of data in prev
-    long	prevsize = 0;		// size of prev buffer
-    long	maxline  = MAXLNUM;
-    long	cnt	 = 0;
+    صحيح		io_اندازه = حجم(buf);
+    صحيح		readlen;		// size of last fread()
+    char_u	*prev	 = عدم;	// previously read bytes, if any
+    اوږد	prevlen  = 0;		// length of data in prev
+    اوږد	prevsize = 0;		// size of prev buffer
+    اوږد	maxline  = MAXLNUM;
+    اوږد	cnt	 = 0;
     char_u	*p;			// position in buf
-    char_u	*start;			// start of current line
-    off_T	offset = 0;
-    off_T	size = -1;
+    char_u	*پیل;			// start of current line
+    off_T	دننه_واټن = 0;
+    off_T	اندازه = -1;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (always_blob)
+	إذا (always_blob)
 	{
-	    offset = (off_T)tv_get_number(&argvars[1]);
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		size = (off_T)tv_get_number(&argvars[2]);
+	    دننه_واټن = (off_T)tv_get_شمېره(&argvars[1]);
+	    إذا (argvars[2].v_type != VAR_UNKNOWN)
+		اندازه = (off_T)tv_get_شمېره(&argvars[2]);
 	}
-	else
+	وإلا
 	{
-	    if (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
-		binary = TRUE;
-	    if (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
+	    إذا (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
+		دوګونی = TRUE;
+	    إذا (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
 		blob = TRUE;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		maxline = (long)tv_get_number(&argvars[2]);
+	    إذا (argvars[2].v_type != VAR_UNKNOWN)
+		maxline = (اوږد)tv_get_شمېره(&argvars[2]);
 	}
     }
 
-    if ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
-	return;
+    إذا ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
+	أرجع;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
     fname = tv_get_string(&argvars[0]);
 
-    if (mch_isdir(fname))
+    إذا (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return;
+	أرجع;
     }
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, READBIN)) == NULL)
+    إذا (*fname == NUL || (fd = mch_fopen((حرف *)fname, READBIN)) == عدم)
     {
 	semsg(_(e_cant_open_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	أرجع;
     }
 
-    if (blob)
+    إذا (blob)
     {
-	if (read_blob(fd, rettv, offset, size) == FAIL)
+	إذا (read_blob(fd, rettv, دننه_واټن, اندازه) == FAIL)
 	    semsg(_(e_cant_read_file_str), fname);
 	fclose(fd);
-	return;
+	أرجع;
     }
 
-    while (cnt < maxline || maxline < 0)
+    طالما (cnt < maxline || maxline < 0)
     {
-	readlen = (int)fread(buf, 1, io_size, fd);
+	readlen = (صحيح)fread(buf, 1, io_اندازه, fd);
 
 	// This for loop processes what was read, but is also entered at end
 	// of file so that either:
 	// - an incomplete line gets written
 	// - a "binary" file gets an empty line at the end if it ends in a
 	//   newline.
-	for (p = buf, start = buf;
-		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || binary));
+	لكل (p = buf, پیل = buf;
+		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || دوګونی));
 		++p)
 	{
-	    if (readlen <= 0 || *p == '\n')
+	    إذا (readlen <= 0 || *p == '\n')
 	    {
 		listitem_T  *li;
-		char_u	    *s	= NULL;
-		long_u	    len = p - start;
+		char_u	    *s	= عدم;
+		long_u	    len = p - پیل;
 
 		// Finished a line.  Remove CRs before NL.
-		if (readlen > 0 && !binary)
+		إذا (readlen > 0 && !دوګونی)
 		{
-		    while (len > 0 && start[len - 1] == '\r')
+		    طالما (len > 0 && پیل[len - 1] == '\r')
 			--len;
 		    // removal may cross back to the "prev" string
-		    if (len == 0)
-			while (prevlen > 0 && prev[prevlen - 1] == '\r')
+		    إذا (len == 0)
+			طالما (prevlen > 0 && prev[prevlen - 1] == '\r')
 			    --prevlen;
 		}
-		if (prevlen == 0)
-		    s = vim_strnsave(start, len);
-		else
+		إذا (prevlen == 0)
+		    s = vim_strnsave(پیل, len);
+		وإلا
 		{
 		    // Change "prev" buffer to be the right size.  This way
 		    // the bytes are only copied once, and very long lines are
 		    // allocated only once.
-		    if ((s = vim_realloc(prev, prevlen + len + 1)) != NULL)
+		    إذا ((s = vim_realloc(prev, prevlen + len + 1)) != عدم)
 		    {
-			mch_memmove(s + prevlen, start, len);
+			mch_memmove(s + prevlen, پیل, len);
 			s[prevlen + len] = NUL;
-			prev = NULL; // the list will own the string
+			prev = عدم; // the list will own the string
 			prevlen = prevsize = 0;
 		    }
 		}
-		if (s == NULL)
+		إذا (s == عدم)
 		{
-		    do_outofmem_msg((long_u) prevlen + len + 1);
+		    do_outofmem_پیغام((long_u) prevlen + len + 1);
 		    failed = TRUE;
-		    break;
+		    اكسر;
 		}
 
-		if ((li = listitem_alloc()) == NULL)
+		إذا ((li = listitem_alloc()) == عدم)
 		{
 		    vim_free(s);
 		    failed = TRUE;
-		    break;
+		    اكسر;
 		}
 		li->li_tv.v_type = VAR_STRING;
-		li->li_tv.v_lock = 0;
+		li->li_tv.v_قلف = 0;
 		li->li_tv.vval.v_string = s;
 		list_append(rettv->vval.v_list, li);
 
-		start = p + 1; // step over newline
-		if ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
-		    break;
+		پیل = p + 1; // step over newline
+		إذا ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
+		    اكسر;
 	    }
-	    else if (*p == NUL)
+	    وإلا إذا (*p == NUL)
 		*p = '\n';
 	    // Check for utf8 "bom"; U+FEFF is encoded as EF BB BF.  Do this
 	    // when finding the BF and check the previous two bytes.
-	    else if (*p == 0xbf && enc_utf8 && !binary)
+	    وإلا إذا (*p == 0xbf && enc_utf8 && !دوګونی)
 	    {
 		// Find the two bytes before the 0xbf.	If p is at buf, or buf
 		// + 1, these may be in the "prev" string.
@@ -1974,26 +1974,26 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 			  : p == buf + 1 && prevlen >= 1 ? prev[prevlen - 1]
 			  : prevlen >= 2 ? prev[prevlen - 2] : NUL;
 
-		if (back2 == 0xef && back1 == 0xbb)
+		إذا (back2 == 0xef && back1 == 0xbb)
 		{
 		    char_u *dest = p - 2;
 
 		    // Usually a BOM is at the beginning of a file, and so at
 		    // the beginning of a line; then we can just step over it.
-		    if (start == dest)
-			start = p + 1;
-		    else
+		    إذا (پیل == dest)
+			پیل = p + 1;
+		    وإلا
 		    {
 			// have to shuffle buf to close gap
-			int adjust_prevlen = 0;
+			صحيح adjust_prevlen = 0;
 
-			if (dest < buf)
+			إذا (dest < buf)
 			{
 			    // must be 1 or 2
-			    adjust_prevlen = (int)(buf - dest);
+			    adjust_prevlen = (صحيح)(buf - dest);
 			    dest = buf;
 			}
-			if (readlen > p - buf + 1)
+			إذا (readlen > p - buf + 1)
 			    mch_memmove(dest, p + 1, readlen - (p - buf) - 1);
 			readlen -= 3 - adjust_prevlen;
 			prevlen -= adjust_prevlen;
@@ -2003,12 +2003,12 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 	    }
 	} // for
 
-	if (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
-	    break;
-	if (start < p)
+	إذا (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
+	    اكسر;
+	إذا (پیل < p)
 	{
 	    // There's part of a line in buf, store it in "prev".
-	    if (p - start + prevlen >= prevsize)
+	    إذا (p - پیل + prevlen >= prevsize)
 	    {
 		// need bigger "prev" buffer
 		char_u *newprev;
@@ -2017,39 +2017,39 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		// fragment of a line, so the first allocation is made
 		// small, to avoid repeatedly 'allocing' large and
 		// 'reallocing' small.
-		if (prevsize == 0)
-		    prevsize = (long)(p - start);
-		else
+		إذا (prevsize == 0)
+		    prevsize = (اوږد)(p - پیل);
+		وإلا
 		{
-		    long grow50pc = (prevsize * 3) / 2;
-		    long growmin  = (long)((p - start) * 2 + prevlen);
+		    اوږد grow50pc = (prevsize * 3) / 2;
+		    اوږد growmin  = (اوږد)((p - پیل) * 2 + prevlen);
 		    prevsize = grow50pc > growmin ? grow50pc : growmin;
 		}
 		newprev = vim_realloc(prev, prevsize);
-		if (newprev == NULL)
+		إذا (newprev == عدم)
 		{
-		    do_outofmem_msg((long_u)prevsize);
+		    do_outofmem_پیغام((long_u)prevsize);
 		    failed = TRUE;
-		    break;
+		    اكسر;
 		}
 		prev = newprev;
 	    }
 	    // Add the line part to end of "prev".
-	    mch_memmove(prev + prevlen, start, p - start);
-	    prevlen += (long)(p - start);
+	    mch_memmove(prev + prevlen, پیل, p - پیل);
+	    prevlen += (اوږد)(p - پیل);
 	}
     } // while
 
     // For a negative line count use only the lines at the end of the file,
     // free the rest.
-    if (!failed && maxline < 0)
-	while (cnt > -maxline)
+    إذا (!failed && maxline < 0)
+	طالما (cnt > -maxline)
 	{
-	    listitem_remove(rettv->vval.v_list, rettv->vval.v_list->lv_first);
+	    listitem_remove(rettv->vval.v_list, rettv->vval.v_list->lv_لومړی);
 	    --cnt;
 	}
 
-    if (failed)
+    إذا (failed)
     {
 	// an empty list is returned on error
 	list_free(rettv->vval.v_list);
@@ -2063,18 +2063,18 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 /*
  * "readblob()" function
  */
-    void
+    فراغ
 f_readblob(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_شمېره_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_شمېره_arg(argvars, 2) == FAIL)))
+	أرجع;
 
     read_file_or_blob(argvars, rettv, TRUE);
 }
@@ -2082,18 +2082,18 @@ f_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    void
+    فراغ
 f_readfile(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_شمېره_arg(argvars, 2) == FAIL)))
+	أرجع;
 
     read_file_or_blob(argvars, rettv, FALSE);
 }
@@ -2101,55 +2101,55 @@ f_readfile(typval_T *argvars, typval_T *rettv)
 /*
  * "resolve()" function
  */
-    void
+    فراغ
 f_resolve(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 # ifdef HAVE_READLINK
-    char_u	*buf = NULL;
+    char_u	*buf = عدم;
 # endif
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (دننه_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     p = tv_get_string(&argvars[0]);
 # ifdef FEAT_SHORTCUT
     {
-	char_u	*v = NULL;
+	char_u	*v = عدم;
 
-	v = mch_resolve_path(p, TRUE);
-	if (v != NULL)
+	v = mch_resolve_لار(p, TRUE);
+	إذا (v != عدم)
 	    rettv->vval.v_string = v;
-	else
+	وإلا
 	    rettv->vval.v_string = vim_strsave(p);
     }
-# else
+# وإلا
 #  ifdef HAVE_READLINK
     {
 	char_u	*cpy;
-	int	len;
-	char_u	*remain = NULL;
+	صحيح	len;
+	char_u	*remain = عدم;
 	char_u	*q;
-	int	is_relative_to_current = FALSE;
-	int	has_trailing_pathsep = FALSE;
-	int	limit = 100;
+	صحيح	is_relative_منزل_current = FALSE;
+	صحيح	has_trailing_pathsep = FALSE;
+	صحيح	حد = 100;
 
 	p = vim_strsave(p);
-	if (p == NULL)
-	    goto fail;
-	if (p[0] == '.' && (vim_ispathsep(p[1])
+	إذا (p == عدم)
+	    اذهب fail;
+	إذا (p[0] == '.' && (vim_ispathsep(p[1])
 				   || (p[1] == '.' && (vim_ispathsep(p[2])))))
-	    is_relative_to_current = TRUE;
+	    is_relative_منزل_current = TRUE;
 
 	len = STRLEN(p);
-	if (len > 1 && after_pathsep(p, p + len))
+	إذا (len > 1 && after_pathsep(p, p + len))
 	{
 	    has_trailing_pathsep = TRUE;
 	    p[len - 1] = NUL; // the trailing slash breaks readlink()
 	}
 
 	q = getnextcomp(p);
-	if (*q != NUL)
+	إذا (*q != NUL)
 	{
 	    // Separate the first path component in "p", and keep the
 	    // remainder (beginning with the path separator).
@@ -2158,47 +2158,47 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	}
 
 	buf = alloc(MAXPATHL + 1);
-	if (buf == NULL)
+	إذا (buf == عدم)
 	{
 	    vim_free(p);
 	    vim_free(remain);
-	    goto fail;
+	    اذهب fail;
 	}
 
-	for (;;)
+	لكل (;;)
 	{
-	    for (;;)
+	    لكل (;;)
 	    {
-		len = readlink((char *)p, (char *)buf, MAXPATHL);
-		if (len <= 0)
-		    break;
+		len = readlink((حرف *)p, (حرف *)buf, MAXPATHL);
+		إذا (len <= 0)
+		    اكسر;
 		buf[len] = NUL;
 
-		if (limit-- == 0)
+		إذا (حد-- == 0)
 		{
 		    vim_free(p);
 		    vim_free(remain);
-		    emsg(_(e_too_many_symbolic_links_cycle));
-		    rettv->vval.v_string = NULL;
-		    goto fail;
+		    emsg(_(e_too_many_symbolic_links_دوره));
+		    rettv->vval.v_string = عدم;
+		    اذهب fail;
 		}
 
 		// Ensure that the result will have a trailing path separator
 		// if the argument has one.
-		if (remain == NULL && has_trailing_pathsep)
-		    add_pathsep(buf);
+		إذا (remain == عدم && has_trailing_pathsep)
+		    جمع_کړه_pathsep(buf);
 
 		// Separate the first path component in the link value and
 		// concatenate the remainders.
 		q = getnextcomp(vim_ispathsep(*buf) ? buf + 1 : buf);
-		if (*q != NUL)
+		إذا (*q != NUL)
 		{
-		    if (remain == NULL)
+		    إذا (remain == عدم)
 			remain = vim_strsave(q - 1);
-		    else
+		    وإلا
 		    {
 			cpy = concat_str(q - 1, remain);
-			if (cpy != NULL)
+			إذا (cpy != عدم)
 			{
 			    vim_free(remain);
 			    remain = cpy;
@@ -2208,17 +2208,17 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 		}
 
 		q = gettail(p);
-		if (q > p && *q == NUL)
+		إذا (q > p && *q == NUL)
 		{
 		    // Ignore trailing path separator.
 		    p[q - p - 1] = NUL;
 		    q = gettail(p);
 		}
-		if (q > p && !mch_isFullName(buf))
+		إذا (q > p && !mch_is_ډک_Name(buf))
 		{
 		    // symlink is relative to directory of argument
 		    cpy = alloc(STRLEN(p) + STRLEN(buf) + 1);
-		    if (cpy != NULL)
+		    إذا (cpy != عدم)
 		    {
 			STRCPY(cpy, p);
 			STRCPY(gettail(cpy), buf);
@@ -2226,38 +2226,38 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 			p = cpy;
 		    }
 		}
-		else
+		وإلا
 		{
 		    vim_free(p);
 		    p = vim_strsave(buf);
 		}
 	    }
 
-	    if (remain == NULL)
-		break;
+	    إذا (remain == عدم)
+		اكسر;
 
 	    // Append the first path component of "remain" to "p".
 	    q = getnextcomp(remain + 1);
 	    len = q - remain - (*q != NUL);
 	    cpy = vim_strnsave(p, STRLEN(p) + len);
-	    if (cpy != NULL)
+	    إذا (cpy != عدم)
 	    {
 		STRNCAT(cpy, remain, len);
 		vim_free(p);
 		p = cpy;
 	    }
 	    // Shorten "remain".
-	    if (*q != NUL)
+	    إذا (*q != NUL)
 		STRMOVE(remain, q - 1);
-	    else
+	    وإلا
 		VIM_CLEAR(remain);
 	}
 
 	// If the result is a relative path name, make it explicitly relative to
 	// the current directory if and only if the argument had this form.
-	if (!vim_ispathsep(*p))
+	إذا (!vim_ispathsep(*p))
 	{
-	    if (is_relative_to_current
+	    إذا (is_relative_منزل_current
 		    && *p != NUL
 		    && !(p[0] == '.'
 			&& (p[1] == NUL
@@ -2268,35 +2268,35 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	    {
 		// Prepend "./".
 		cpy = concat_str((char_u *)"./", p);
-		if (cpy != NULL)
+		إذا (cpy != عدم)
 		{
 		    vim_free(p);
 		    p = cpy;
 		}
 	    }
-	    else if (!is_relative_to_current)
+	    وإلا إذا (!is_relative_منزل_current)
 	    {
 		// Strip leading "./".
 		q = p;
-		while (q[0] == '.' && vim_ispathsep(q[1]))
+		طالما (q[0] == '.' && vim_ispathsep(q[1]))
 		    q += 2;
-		if (q > p)
+		إذا (q > p)
 		    STRMOVE(p, p + 2);
 	    }
 	}
 
 	// Ensure that the result will have no trailing path separator
 	// if the argument had none.  But keep "/" or "//".
-	if (!has_trailing_pathsep)
+	إذا (!has_trailing_pathsep)
 	{
 	    q = p + STRLEN(p);
-	    if (after_pathsep(p, q))
+	    إذا (after_pathsep(p, q))
 		*gettail_sep(p) = NUL;
 	}
 
 	rettv->vval.v_string = p;
     }
-#  else
+#  وإلا
     rettv->vval.v_string = vim_strsave(p);
 #  endif
 # endif
@@ -2313,147 +2313,147 @@ fail:
 /*
  * "tempname()" function
  */
-    void
-f_tempname(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_tempname(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
-    static int	x = 'A';
+    ساكن صحيح	x = 'A';
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = vim_tempname(x, FALSE);
 
     // Advance 'x' to use A-Z and 0-9, so that there are at least 34 different
     // names.  Skip 'I' and 'O', they are used for shell redirection.
-    do
+    افعل
     {
-	if (x == 'Z')
+	إذا (x == 'Z')
 	    x = '0';
-	else if (x == '9')
+	وإلا إذا (x == '9')
 	    x = 'A';
-	else
+	وإلا
 	    ++x;
-    } while (x == 'I' || x == 'O');
+    } طالما (x == 'I' || x == 'O');
 }
 
 /*
  * "writefile()" function
  */
-    void
+    فراغ
 f_writefile(typval_T *argvars, typval_T *rettv)
 {
-    int		binary = FALSE;
-    int		append = FALSE;
-    int		defer = FALSE;
+    صحيح		دوګونی = FALSE;
+    صحيح		append = FALSE;
+    صحيح		defer = FALSE;
 # ifdef HAVE_FSYNC
-    int		do_fsync = p_fs;
+    صحيح		do_fsync = p_fs;
 # endif
     char_u	*fname;
     FILE	*fd;
-    int		ret = 0;
+    صحيح		ret = 0;
     listitem_T	*li;
-    list_T	*list = NULL;
-    blob_T	*blob = NULL;
+    list_T	*list = عدم;
+    blob_T	*blob = عدم;
 
-    rettv->vval.v_number = -1;
-    if (check_secure())
-	return;
+    rettv->vval.v_شمېره = -1;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
-    if (argvars[0].v_type == VAR_LIST)
+    إذا (argvars[0].v_type == VAR_LIST)
     {
 	list = argvars[0].vval.v_list;
-	if (list == NULL)
-	    return;
+	إذا (list == عدم)
+	    أرجع;
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, li)
-	    if (tv_get_string_chk(&li->li_tv) == NULL)
-		return;
+	FOR_ALL_LIST_توکي(list, li)
+	    إذا (tv_get_string_chk(&li->li_tv) == عدم)
+		أرجع;
     }
-    else if (argvars[0].v_type == VAR_BLOB)
+    وإلا إذا (argvars[0].v_type == VAR_BLOB)
     {
 	blob = argvars[0].vval.v_blob;
-	if (blob == NULL)
-	    return;
+	إذا (blob == عدم)
+	    أرجع;
     }
-    else
+    وإلا
     {
-	semsg(_(e_invalid_argument_str),
+	semsg(_(e_invalid_دلیل_str),
 		_("writefile() first argument must be a List or a Blob"));
-	return;
+	أرجع;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2 = tv_get_string_chk(&argvars[2]);
 
-	if (arg2 == NULL)
-	    return;
-	if (vim_strchr(arg2, 'b') != NULL)
-	    binary = TRUE;
-	if (vim_strchr(arg2, 'a') != NULL)
+	إذا (arg2 == عدم)
+	    أرجع;
+	إذا (vim_strchr(arg2, 'b') != عدم)
+	    دوګونی = TRUE;
+	إذا (vim_strchr(arg2, 'a') != عدم)
 	    append = TRUE;
-	if (vim_strchr(arg2, 'D') != NULL)
+	إذا (vim_strchr(arg2, 'D') != عدم)
 	    defer = TRUE;
 # ifdef HAVE_FSYNC
-	if (vim_strchr(arg2, 's') != NULL)
+	إذا (vim_strchr(arg2, 's') != عدم)
 	    do_fsync = TRUE;
-	else if (vim_strchr(arg2, 'S') != NULL)
+	وإلا إذا (vim_strchr(arg2, 'S') != عدم)
 	    do_fsync = FALSE;
 # endif
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
+    إذا (fname == عدم)
+	أرجع;
 
-    if (defer && !can_add_defer())
-	return;
+    إذا (defer && !can_جمع_کړه_defer())
+	أرجع;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
-    if (*fname == NUL || (fd = mch_fopen((char *)fname,
-				      append ? APPENDBIN : WRITEBIN)) == NULL)
+    إذا (*fname == NUL || (fd = mch_fopen((حرف *)fname,
+				      append ? APPENDBIN : WRITEBIN)) == عدم)
     {
 	semsg(_(e_cant_create_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
 	ret = -1;
     }
-    else
+    وإلا
     {
-	if (defer)
+	إذا (defer)
 	{
 	    typval_T tv;
 
 	    tv.v_type = VAR_STRING;
-	    tv.v_lock = 0;
-	    tv.vval.v_string = FullName_save(fname, FALSE);
-	    if (tv.vval.v_string == NULL
-		    || add_defer((char_u *)"delete", 1, &tv) == FAIL)
+	    tv.v_قلف = 0;
+	    tv.vval.v_string = ډک_Name_save(fname, FALSE);
+	    إذا (tv.vval.v_string == عدم
+		    || جمع_کړه_defer((char_u *)"delete", 1, &tv) == FAIL)
 	    {
 		ret = -1;
 		fclose(fd);
-		(void)mch_remove(fname);
+		(فراغ)mch_remove(fname);
 	    }
 	}
 
-	if (ret == 0)
+	إذا (ret == 0)
 	{
-	    if (blob)
+	    إذا (blob)
 	    {
-		if (write_blob(fd, blob) == FAIL)
+		إذا (write_blob(fd, blob) == FAIL)
 		    ret = -1;
 	    }
-	    else
+	    وإلا
 	    {
-		if (write_list(fd, list, binary) == FAIL)
+		إذا (write_list(fd, list, دوګونی) == FAIL)
 		    ret = -1;
 	    }
 # ifdef HAVE_FSYNC
-	    if (ret == 0 && do_fsync)
+	    إذا (ret == 0 && do_fsync)
 		// Ignore the error, the user wouldn't know what to do about
 		// it.  May happen for a device.
 		vim_ignored = vim_fsync(fileno(fd));
@@ -2462,19 +2462,19 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    rettv->vval.v_number = ret;
+    rettv->vval.v_شمېره = ret;
 }
 
-#endif // FEAT_EVAL
+#د_که_پای // FEAT_EVAL
 
-#if defined(FEAT_BROWSE)
+#إذا defined(FEAT_BROWSE)
 /*
  * Generic browse function.  Calls gui_mch_browse() when possible.
  * Later this may pop-up a non-GUI file selector (external command?).
  */
     char_u *
 do_browse(
-    int		flags,		// BROWSE_SAVE and BROWSE_DIR
+    صحيح		flags,		// BROWSE_SAVE and BROWSE_DIR
     char_u	*title,		// title for the window
     char_u	*dflt,		// default file name (may include directory)
     char_u	*ext,		// extension added
@@ -2484,37 +2484,37 @@ do_browse(
     buf_T	*buf)		// buffer to read/write for
 {
     char_u		*fname;
-    static char_u	*last_dir = NULL;    // last used directory
-    char_u		*tofree = NULL;
-    int			save_cmod_flags = cmdmod.cmod_flags;
+    ساكن char_u	*وروستی_dir = عدم;    // last used directory
+    char_u		*tofree = عدم;
+    صحيح			save_cmod_flags = cmdmod.cmod_flags;
 
     // Must turn off browse to avoid that autocommands will get the
     // flag too!
     cmdmod.cmod_flags &= ~CMOD_BROWSE;
 
-    if (title == NULL || *title == NUL)
+    إذا (title == عدم || *title == NUL)
     {
-	if (flags & BROWSE_DIR)
+	إذا (flags & BROWSE_DIR)
 	    title = (char_u *)_("Select Directory dialog");
-	else if (flags & BROWSE_SAVE)
+	وإلا إذا (flags & BROWSE_SAVE)
 	    title = (char_u *)_("Save File dialog");
-	else
+	وإلا
 	    title = (char_u *)_("Open File dialog");
     }
 
     // When no directory specified, use default file name, default dir, buffer
     // dir, last dir or current dir
-    if ((initdir == NULL || *initdir == NUL) && dflt != NULL && *dflt != NUL)
+    إذا ((initdir == عدم || *initdir == NUL) && dflt != عدم && *dflt != NUL)
     {
-	if (mch_isdir(dflt))		// default file name is a directory
+	إذا (mch_isdir(dflt))		// default file name is a directory
 	{
 	    initdir = dflt;
-	    dflt = NULL;
+	    dflt = عدم;
 	}
-	else if (gettail(dflt) != dflt)	// default file name includes a path
+	وإلا إذا (gettail(dflt) != dflt)	// default file name includes a path
 	{
 	    tofree = vim_strsave(dflt);
-	    if (tofree != NULL)
+	    إذا (tofree != عدم)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
@@ -2523,69 +2523,69 @@ do_browse(
 	}
     }
 
-    if (initdir == NULL || *initdir == NUL)
+    إذا (initdir == عدم || *initdir == NUL)
     {
 	// When 'browsedir' is a directory, use it
-	if (STRCMP(p_bsdir, "last") != 0
+	إذا (STRCMP(p_bsdir, "last") != 0
 		&& STRCMP(p_bsdir, "buffer") != 0
 		&& STRCMP(p_bsdir, "current") != 0
 		&& mch_isdir(p_bsdir))
 	    initdir = p_bsdir;
 	// When saving or 'browsedir' is "buffer", use buffer fname
-	else if (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
-		&& buf != NULL && buf->b_ffname != NULL)
+	وإلا إذا (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
+		&& buf != عدم && buf->b_ffname != عدم)
 	{
-	    if (dflt == NULL || *dflt == NUL)
+	    إذا (dflt == عدم || *dflt == NUL)
 		dflt = gettail(curbuf->b_ffname);
 	    tofree = vim_strsave(curbuf->b_ffname);
-	    if (tofree != NULL)
+	    إذا (tofree != عدم)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
 	    }
 	}
 	// When 'browsedir' is "last", use dir from last browse
-	else if (*p_bsdir == 'l')
-	    initdir = last_dir;
+	وإلا إذا (*p_bsdir == 'l')
+	    initdir = وروستی_dir;
 	// When 'browsedir is "current", use current directory.  This is the
 	// default already, leave initdir empty.
     }
 
 # ifdef FEAT_GUI
-    if (gui.in_use)		// when this changes, also adjust f_has()!
+    إذا (gui.دننه_use)		// when this changes, also adjust f_has()!
     {
-	if (filter == NULL
+	إذا (filter == عدم
 #  ifdef FEAT_EVAL
-		&& (filter = get_var_value((char_u *)"b:browsefilter")) == NULL
-		&& (filter = get_var_value((char_u *)"g:browsefilter")) == NULL
+		&& (filter = get_var_ارزښت((char_u *)"b:browsefilter")) == عدم
+		&& (filter = get_var_ارزښت((char_u *)"g:browsefilter")) == عدم
 #  endif
 	)
 	    filter = BROWSE_FILTER_DEFAULT;
-	if (flags & BROWSE_DIR)
+	إذا (flags & BROWSE_DIR)
 	{
-#  if defined(FEAT_GUI_GTK) || defined(MSWIN)
+#  إذا defined(FEAT_GUI_GTK) || defined(MSWIN)
 	    // For systems that have a directory dialog.
 	    fname = gui_mch_browsedir(title, initdir);
-#  else
+#  وإلا
 	    // Generic solution for selecting a directory: select a file and
 	    // remove the file name.
 	    fname = gui_mch_browse(0, title, dflt, ext, initdir, (char_u *)"");
 #  endif
-#  if !defined(FEAT_GUI_GTK)
+#  إذا !defined(FEAT_GUI_GTK)
 	    // Win32 adds a dummy file name, others return an arbitrary file
 	    // name.  GTK+ 2 returns only the directory,
-	    if (fname != NULL && *fname != NUL && !mch_isdir(fname))
+	    إذا (fname != عدم && *fname != NUL && !mch_isdir(fname))
 	    {
 		// Remove the file name.
-		char_u	    *tail = gettail_sep(fname);
+		char_u	    *لکۍ = gettail_sep(fname);
 
-		if (tail == fname)
-		    *tail++ = '.';	// use current dir
-		*tail = NUL;
+		إذا (لکۍ == fname)
+		    *لکۍ++ = '.';	// use current dir
+		*لکۍ = NUL;
 	    }
 #  endif
 	}
-	else
+	وإلا
 	    fname = gui_mch_browse(flags & BROWSE_SAVE,
 			       title, dflt, ext, initdir, (char_u *)_(filter));
 
@@ -2595,29 +2595,29 @@ do_browse(
 	need_check_timestamps = TRUE;
 	did_check_timestamps = FALSE;
     }
-    else
+    وإلا
 # endif
     {
 	// TODO: non-GUI file selector here
-	emsg(_(e_sorry_no_file_browser_in_console_mode));
-	fname = NULL;
+	emsg(_(e_sorry_no_file_browser_دننه_console_ډېرپېښ));
+	fname = عدم;
     }
 
     // keep the directory for next time
-    if (fname != NULL)
+    إذا (fname != عدم)
     {
-	vim_free(last_dir);
-	last_dir = vim_strsave(fname);
-	if (last_dir != NULL && !(flags & BROWSE_DIR))
+	vim_free(وروستی_dir);
+	وروستی_dir = vim_strsave(fname);
+	إذا (وروستی_dir != عدم && !(flags & BROWSE_DIR))
 	{
-	    *gettail(last_dir) = NUL;
-	    if (*last_dir == NUL)
+	    *gettail(وروستی_dir) = NUL;
+	    إذا (*وروستی_dir == NUL)
 	    {
 		// filename only returned, must be in current dir
-		vim_free(last_dir);
-		last_dir = alloc(MAXPATHL);
-		if (last_dir != NULL)
-		    mch_dirname(last_dir, MAXPATHL);
+		vim_free(وروستی_dir);
+		وروستی_dir = alloc(MAXPATHL);
+		إذا (وروستی_dir != عدم)
+		    mch_dirname(وروستی_dir, MAXPATHL);
 	    }
 	}
     }
@@ -2625,47 +2625,47 @@ do_browse(
     vim_free(tofree);
     cmdmod.cmod_flags = save_cmod_flags;
 
-    return fname;
+    أرجع fname;
 }
-#endif
+#د_که_پای
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * "browse(save, title, initdir, default)" function
  */
-    void
-f_browse(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_browse(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
-    int		save;
+    صحيح		save;
     char_u	*title;
     char_u	*initdir;
     char_u	*defname;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		error = FALSE;
+    صحيح		error = FALSE;
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_bool_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	أرجع;
 
-    save = (int)tv_get_bool_chk(&argvars[0], &error);
+    save = (صحيح)tv_get_bool_chk(&argvars[0], &error);
     title = tv_get_string_chk(&argvars[1]);
     initdir = tv_get_string_buf_chk(&argvars[2], buf);
     defname = tv_get_string_buf_chk(&argvars[3], buf2);
 
-    if (error || title == NULL || initdir == NULL || defname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    إذا (error || title == عدم || initdir == عدم || defname == عدم)
+	rettv->vval.v_string = عدم;
+    وإلا
 	rettv->vval.v_string =
 		 do_browse(save ? BROWSE_SAVE : 0,
-				 title, defname, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				 title, defname, عدم, initdir, عدم, curbuf);
+# وإلا
+    rettv->vval.v_string = عدم;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2673,29 +2673,29 @@ f_browse(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "browsedir(title, initdir)" function
  */
-    void
-f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_browsedir(typval_T *argvars ناکارول_شوی, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
     char_u	*title;
     char_u	*initdir;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    إذا (دننه_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     title = tv_get_string_chk(&argvars[0]);
     initdir = tv_get_string_buf_chk(&argvars[1], buf);
 
-    if (title == NULL || initdir == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    إذا (title == عدم || initdir == عدم)
+	rettv->vval.v_string = عدم;
+    وإلا
 	rettv->vval.v_string = do_browse(BROWSE_DIR,
-				    title, NULL, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				    title, عدم, عدم, initdir, عدم, curbuf);
+# وإلا
+    rettv->vval.v_string = عدم;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2703,29 +2703,29 @@ f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "filecopy()" function
  */
-    void
+    فراغ
 f_filecopy(typval_T *argvars, typval_T *rettv)
 {
     char_u	*from;
     stat_T	st;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_شمېره = FALSE;
 
-    if (check_restricted() || check_secure()
+    إذا (check_restricted() || check_secure()
 	|| check_for_string_arg(argvars, 0) == FAIL
 	|| check_for_string_arg(argvars, 1) == FAIL)
-	return;
+	أرجع;
 
     from = tv_get_string(&argvars[0]);
 
-    if (mch_lstat((char *)from, &st) >= 0
-	&& (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)))
-	rettv->vval.v_number = vim_copyfile(
+    إذا (mch_lstat((حرف *)from, &st) >= 0
+	&& (S_ISREG(st.st_ډېرپېښ) || S_ISLNK(st.st_ډېرپېښ)))
+	rettv->vval.v_شمېره = vim_copyfile(
 	    tv_get_string(&argvars[0]),
 	    tv_get_string(&argvars[1])) == OK ? TRUE : FALSE;
 }
 
-#endif // FEAT_EVAL
+#د_که_پای // FEAT_EVAL
 
 /*
  * Replace home directory by "~" in each space or comma separated file name in
@@ -2737,70 +2737,70 @@ home_replace(
     buf_T	*buf,	// when not NULL, check for help files
     char_u	*src,	// input file name
     char_u	*dst,	// where to put the result
-    int		dstlen,	// maximum length of the result
-    int		one)	// if TRUE, only replace one file name, include
+    صحيح		dstlen,	// maximum length of the result
+    صحيح		one)	// if TRUE, only replace one file name, include
 			// spaces and commas in the file name.
 {
     size_t	dirlen = 0, envlen = 0;
     size_t	len;
     char_u	*homedir_env, *homedir_env_orig;
     char_u	*p;
-    char_u	*dst_start;
+    char_u	*dst_پیل;
 
-    if (src == NULL)
+    إذا (src == عدم)
     {
 	*dst = NUL;
-	return 0;
+	أرجع 0;
     }
 
     /*
      * If the file is a help file, remove the path completely.
      */
-    if (buf != NULL && buf->b_help)
-	return vim_snprintf_safelen((char *)dst, dstlen, "%s", gettail(src));
+    إذا (buf != عدم && buf->b_help)
+	أرجع vim_snprintf_safelen((حرف *)dst, dstlen, "%s", gettail(src));
 
     /*
      * We check both the value of the $HOME environment variable and the
      * "real" home directory.
      */
-    if (homedir != NULL)
+    إذا (homedir != عدم)
 	dirlen = STRLEN(homedir);
 
-#ifdef VMS
+#که_تعریف_شوی VMS
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#وإلا
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"HOME");
-#endif
-#ifdef MSWIN
-    if (homedir_env == NULL)
+#د_که_پای
+#که_تعریف_شوی MSWIN
+    إذا (homedir_env == عدم)
 	homedir_env_orig = homedir_env = mch_getenv((char_u *)"USERPROFILE");
-#endif
+#د_که_پای
     // Empty is the same as not set.
-    if (homedir_env != NULL && *homedir_env == NUL)
-	homedir_env = NULL;
+    إذا (homedir_env != عدم && *homedir_env == NUL)
+	homedir_env = عدم;
 
-    if (homedir_env != NULL && *homedir_env == '~')
+    إذا (homedir_env != عدم && *homedir_env == '~')
     {
 	size_t	usedlen = 0;
 	size_t	flen;
-	char_u	*fbuf = NULL;
+	char_u	*fbuf = عدم;
 
 	flen = STRLEN(homedir_env);
-	(void)modify_fname((char_u *)":p", FALSE, &usedlen,
+	(فراغ)modify_fname((char_u *)":p", FALSE, &usedlen,
 						  &homedir_env, &fbuf, &flen);
 	flen = STRLEN(homedir_env);
-	if (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
+	إذا (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
 	    // Remove the trailing / that is added to a directory.
 	    homedir_env[flen - 1] = NUL;
     }
 
-    if (homedir_env != NULL)
+    إذا (homedir_env != عدم)
 	envlen = STRLEN(homedir_env);
 
-    if (!one)
+    إذا (!one)
 	src = skipwhite(src);
-    dst_start = dst;		// remember the start
-    while (*src && dstlen > 0)
+    dst_پیل = dst;		// remember the start
+    طالما (*src && dstlen > 0)
     {
 	/*
 	 * Here we are at the beginning of a file name.
@@ -2813,44 +2813,44 @@ home_replace(
 	 */
 	p = homedir;
 	len = dirlen;
-	for (;;)
+	لكل (;;)
 	{
-	    if (   len
+	    إذا (   len
 		&& fnamencmp(src, p, len) == 0
 		&& (vim_ispathsep(src[len])
 		    || (!one && (src[len] == ',' || src[len] == ' '))
 		    || src[len] == NUL))
 	    {
 		src += len;
-		if (--dstlen > 0)
+		إذا (--dstlen > 0)
 		    *dst++ = '~';
 
 		// Do not add directory separator into dst, because dst is
 		// expected to just return the directory name without the
 		// directory separator '/'.
-		break;
+		اكسر;
 	    }
-	    if (p == homedir_env)
-		break;
+	    إذا (p == homedir_env)
+		اكسر;
 	    p = homedir_env;
 	    len = envlen;
 	}
 
 	// if (!one) skip to separator: space or comma
-	while (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
+	طالما (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
 	    *dst++ = *src++;
 	// skip separator
-	while ((*src == ' ' || *src == ',') && --dstlen > 0)
+	طالما ((*src == ' ' || *src == ',') && --dstlen > 0)
 	    *dst++ = *src++;
     }
     // if (dstlen == 0) out of space, what to do???
 
     *dst = NUL;
 
-    if (homedir_env != homedir_env_orig)
+    إذا (homedir_env != homedir_env_orig)
 	vim_free(homedir_env);
 
-    return (size_t)(dst - dst_start);
+    أرجع (size_t)(dst - dst_پیل);
 }
 
 /*
@@ -2863,15 +2863,15 @@ home_replace_save(
     char_u	*src)	// input file name
 {
     char_u	*dst;
-    unsigned	len;
+    بینښه	len;
 
     len = 3;			// space for "~/" and trailing NUL
-    if (src != NULL)		// just in case
-	len += (unsigned)STRLEN(src);
+    إذا (src != عدم)		// just in case
+	len += (بینښه)STRLEN(src);
     dst = alloc(len);
-    if (dst != NULL)
+    إذا (dst != عدم)
 	home_replace(buf, src, dst, len, TRUE);
-    return dst;
+    أرجع dst;
 }
 
 /*
@@ -2884,83 +2884,83 @@ home_replace_save(
  * For the first name environment variables are expanded if "expandenv" is
  * TRUE.
  */
-    int
+    صحيح
 fullpathcmp(
     char_u *s1,
     char_u *s2,
-    int	    checkname,		// when both don't exist, check file names
-    int	    expandenv)
+    صحيح	    checkname,		// when both don't exist, check file names
+    صحيح	    expandenv)
 {
-#ifdef UNIX
+#که_تعریف_شوی UNIX
     char_u	    exp1[MAXPATHL];
     char_u	    full1[MAXPATHL];
     char_u	    full2[MAXPATHL];
     stat_T	    st1, st2;
-    int		    r1, r2;
+    صحيح		    r1, r2;
 
-    if (expandenv)
+    إذا (expandenv)
 	expand_env(s1, exp1, MAXPATHL);
-    else
+    وإلا
 	vim_strncpy(exp1, s1, MAXPATHL - 1);
-    r1 = mch_stat((char *)exp1, &st1);
-    r2 = mch_stat((char *)s2, &st2);
-    if (r1 != 0 && r2 != 0)
+    r1 = mch_stat((حرف *)exp1, &st1);
+    r2 = mch_stat((حرف *)s2, &st2);
+    إذا (r1 != 0 && r2 != 0)
     {
 	// if mch_stat() doesn't work, may compare the names
-	if (checkname)
+	إذا (checkname)
 	{
-	    if (fnamecmp(exp1, s2) == 0)
-		return FPC_SAMEX;
-	    r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
-	    r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
-	    if (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
-		return FPC_SAMEX;
+	    إذا (fnamecmp(exp1, s2) == 0)
+		أرجع FPC_SAMEX;
+	    r1 = vim_ډک_Name(exp1, full1, MAXPATHL, FALSE);
+	    r2 = vim_ډک_Name(s2, full2, MAXPATHL, FALSE);
+	    إذا (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
+		أرجع FPC_SAMEX;
 	}
-	return FPC_NOTX;
+	أرجع FPC_NOTX;
     }
-    if (r1 != 0 || r2 != 0)
-	return FPC_DIFFX;
-    if (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
-	return FPC_SAME;
-    return FPC_DIFF;
-#else
+    إذا (r1 != 0 || r2 != 0)
+	أرجع FPC_DIFFX;
+    إذا (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
+	أرجع FPC_SAME;
+    أرجع FPC_DIFF;
+#وإلا
     char_u  *exp1;		// expanded s1
     char_u  *full1;		// full path of s1
     char_u  *full2;		// full path of s2
-    int	    retval = FPC_DIFF;
-    int	    r1, r2;
+    صحيح	    retval = FPC_DIFF;
+    صحيح	    r1, r2;
 
     // allocate one buffer to store three paths (alloc()/free() is slow!)
-    if ((exp1 = alloc(MAXPATHL * 3)) != NULL)
+    إذا ((exp1 = alloc(MAXPATHL * 3)) != عدم)
     {
 	full1 = exp1 + MAXPATHL;
 	full2 = full1 + MAXPATHL;
 
-	if (expandenv)
+	إذا (expandenv)
 	    expand_env(s1, exp1, MAXPATHL);
-	else
+	وإلا
 	    vim_strncpy(exp1, s1, MAXPATHL - 1);
-	r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
-	r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
+	r1 = vim_ډک_Name(exp1, full1, MAXPATHL, FALSE);
+	r2 = vim_ډک_Name(s2, full2, MAXPATHL, FALSE);
 
 	// If vim_FullName() fails, the file probably doesn't exist.
-	if (r1 != OK && r2 != OK)
+	إذا (r1 != OK && r2 != OK)
 	{
-	    if (checkname && fnamecmp(exp1, s2) == 0)
+	    إذا (checkname && fnamecmp(exp1, s2) == 0)
 		retval = FPC_SAMEX;
-	    else
+	    وإلا
 		retval = FPC_NOTX;
 	}
-	else if (r1 != OK || r2 != OK)
+	وإلا إذا (r1 != OK || r2 != OK)
 	    retval = FPC_DIFFX;
-	else if (fnamecmp(full1, full2))
+	وإلا إذا (fnamecmp(full1, full2))
 	    retval = FPC_DIFF;
-	else
+	وإلا
 	    retval = FPC_SAME;
 	vim_free(exp1);
     }
-    return retval;
-#endif
+    أرجع retval;
+#د_که_پای
 }
 
 /*
@@ -2973,15 +2973,15 @@ gettail(char_u *fname)
 {
     char_u  *p1, *p2;
 
-    if (fname == NULL)
-	return (char_u *)"";
-    for (p1 = p2 = get_past_head(fname); *p2; )	// find last part of path
+    إذا (fname == عدم)
+	أرجع (char_u *)"";
+    لكل (p1 = p2 = get_past_سر(fname); *p2; )	// find last part of path
     {
-	if (vim_ispathsep_nocolon(*p2))
+	إذا (vim_ispathsep_nocolon(*p2))
 	    p1 = p2 + 1;
 	MB_PTR_ADV(p2);
     }
-    return p1;
+    أرجع p1;
 }
 
 /*
@@ -2995,15 +2995,15 @@ gettail_sep(char_u *fname)
     char_u	*p;
     char_u	*t;
 
-    p = get_past_head(fname);	// don't remove the '/' from "c:/file"
+    p = get_past_سر(fname);	// don't remove the '/' from "c:/file"
     t = gettail(fname);
-    while (t > p && after_pathsep(fname, t))
+    طالما (t > p && after_pathsep(fname, t))
 	--t;
-#ifdef VMS
+#که_تعریف_شوی VMS
     // path separator is part of the path
     ++t;
-#endif
-    return t;
+#د_که_پای
+    أرجع t;
 }
 
 /*
@@ -3012,11 +3012,11 @@ gettail_sep(char_u *fname)
     char_u *
 getnextcomp(char_u *fname)
 {
-    while (*fname && !vim_ispathsep(*fname))
+    طالما (*fname && !vim_ispathsep(*fname))
 	MB_PTR_ADV(fname);
-    if (*fname)
+    إذا (*fname)
 	++fname;
-    return fname;
+    أرجع fname;
 }
 
 /*
@@ -3025,67 +3025,67 @@ getnextcomp(char_u *fname)
  * If there is no head, path is returned.
  */
     char_u *
-get_past_head(char_u *path)
+get_past_سر(char_u *لار)
 {
     char_u  *retval;
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
     // may skip "c:"
-    if (SAFE_isalpha(path[0]) && path[1] == ':')
-	retval = path + 2;
-    else
-	retval = path;
-#else
-# if defined(AMIGA)
+    إذا (خوندي_isalpha(لار[0]) && لار[1] == ':')
+	retval = لار + 2;
+    وإلا
+	retval = لار;
+#وإلا
+# إذا defined(AMIGA)
     // may skip "label:"
-    retval = vim_strchr(path, ':');
-    if (retval == NULL)
-	retval = path;
-# else	// Unix
-    retval = path;
+    retval = vim_strchr(لار, ':');
+    إذا (retval == عدم)
+	retval = لار;
+# وإلا	// Unix
+    retval = لار;
 # endif
-#endif
+#د_که_پای
 
-    while (vim_ispathsep(*retval))
+    طالما (vim_ispathsep(*retval))
 	++retval;
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Return TRUE if 'c' is a path separator.
  * Note that for MS-Windows this includes the colon.
  */
-    int
-vim_ispathsep(int c)
+    صحيح
+vim_ispathsep(صحيح c)
 {
-#ifdef UNIX
-    return (c == '/');	    // UNIX has ':' inside file names
-#else
-# ifdef BACKSLASH_IN_FILENAME
-    return (c == ':' || c == '/' || c == '\\');
-# else
+#که_تعریف_شوی UNIX
+    أرجع (c == '/');	    // UNIX has ':' inside file names
+#وإلا
+# ifdef BACKSLASH_دننه_FILENAME
+    أرجع (c == ':' || c == '/' || c == '\\');
+# وإلا
 #  ifdef VMS
     // server"user passwd"::device:[full.path.name]fname.extension;version"
-    return (c == ':' || c == '[' || c == ']' || c == '/'
+    أرجع (c == ':' || c == '[' || c == ']' || c == '/'
 	    || c == '<' || c == '>' || c == '"' );
-#  else
-    return (c == ':' || c == '/');
+#  وإلا
+    أرجع (c == ':' || c == '/');
 #  endif // VMS
 # endif
-#endif
+#د_که_پای
 }
 
 /*
  * Like vim_ispathsep(c), but exclude the colon for MS-Windows.
  */
-    int
-vim_ispathsep_nocolon(int c)
+    صحيح
+vim_ispathsep_nocolon(صحيح c)
 {
-    return vim_ispathsep(c)
-#ifdef BACKSLASH_IN_FILENAME
+    أرجع vim_ispathsep(c)
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
 	&& c != ':'
-#endif
+#د_که_پای
 	;
 }
 
@@ -3094,47 +3094,47 @@ vim_ispathsep_nocolon(int c)
  * Also returns TRUE if there is no directory name.
  * "fname" must be writable!.
  */
-    int
-dir_of_file_exists(char_u *fname)
+    صحيح
+dir_د_file_exists(char_u *fname)
 {
     char_u	*p;
-    int		c;
-    int		retval;
+    صحيح		c;
+    صحيح		retval;
 
     p = gettail_sep(fname);
-    if (p == fname)
-	return TRUE;
+    إذا (p == fname)
+	أرجع TRUE;
     c = *p;
     *p = NUL;
     retval = mch_isdir(fname);
     *p = c;
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Versions of fnamecmp() and fnamencmp() that handle '/' and '\' equally
  * and deal with 'fileignorecase'.
  */
-    int
+    صحيح
 vim_fnamecmp(char_u *x, char_u *y)
 {
-#ifdef BACKSLASH_IN_FILENAME
-    return vim_fnamencmp(x, y, MAXPATHL);
-#else
-    if (p_fic)
-	return MB_STRICMP(x, y);
-    return STRCMP(x, y);
-#endif
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
+    أرجع vim_fnamencmp(x, y, MAXPATHL);
+#وإلا
+    إذا (p_fic)
+	أرجع MB_STRICMP(x, y);
+    أرجع STRCMP(x, y);
+#د_که_پای
 }
 
-    int
+    صحيح
 vim_fnamencmp(char_u *x, char_u *y, size_t len)
 {
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
     char_u	*px = x;
     char_u	*py = y;
-    int		cx = NUL;
-    int		cy = NUL;
+    صحيح		cx = NUL;
+    صحيح		cy = NUL;
 
 # ifdef MSWIN
     /*
@@ -3143,25 +3143,25 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
      *	 - another with implicit drive letter \xxx
      * advance the pointer, of the explicit one, to skip the drive
      */
-    for (int swap = 0, drive = NUL; swap < 2; ++swap)
+    لكل (صحيح بدلون = 0, drive = NUL; بدلون < 2; ++بدلون)
     {
 	// Handle absolute paths with implicit drive letter
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
 
-	if ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
+	إذا ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
 	{
 	    drive = MB_TOUPPER(cy) - 'A' + 1;
 
 	    // Check for the colon
 	    py += mb_ptr2len(py);
 	    cy = PTR2CHAR(py);
-	    if (cy == ':' && drive == _getdrive())
+	    إذا (cy == ':' && drive == _getdrive())
 	    { // skip the drive for comparison
 		py += mb_ptr2len(py);
-		break;
+		اكسر;
 	    }
-	    else // ignore
+	    وإلا // ignore
 		py -= mb_ptr2len(py);
 	}
 
@@ -3172,27 +3172,27 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
     }
 # endif
 
-    while (len > 0)
+    طالما (len > 0)
     {
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
-	if (cx == NUL || cy == NUL
+	إذا (cx == NUL || cy == NUL
 	    || ((p_fic ? MB_TOLOWER(cx) != MB_TOLOWER(cy) : cx != cy)
 		&& !(cx == '/' && cy == '\\')
 		&& !(cx == '\\' && cy == '/')))
-	    break;
+	    اكسر;
 	len -= mb_ptr2len(px);
 	px += mb_ptr2len(px);
 	py += mb_ptr2len(py);
     }
-    if (len == 0)
-	return 0;
-    return (cx - cy);
-#else
-    if (p_fic)
-	return MB_STRNICMP(x, y, len);
-    return STRNCMP(x, y, len);
-#endif
+    إذا (len == 0)
+	أرجع 0;
+    أرجع (cx - cy);
+#وإلا
+    إذا (p_fic)
+	أرجع MB_STRNICMP(x, y, len);
+    أرجع STRNCMP(x, y, len);
+#د_که_پای
 }
 
 /*
@@ -3200,41 +3200,41 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
  * Only add a '/' or '\\' when 'sep' is TRUE and it is necessary.
  */
     char_u  *
-concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, int sep, string_T *ret)
+concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, صحيح sep, string_T *ret)
 {
-    ret->string = alloc(fname1len + (sep ? sizeof(PATHSEP) : 0) + fname2len + 1);
-    if (ret->string == NULL)
-	ret->length = 0;
-    else
+    ret->string = alloc(fname1len + (sep ? حجم(PATHSEP) : 0) + fname2len + 1);
+    إذا (ret->string == عدم)
+	ret->اوږدتیا = 0;
+    وإلا
     {
 	STRCPY(ret->string, fname1);
-	ret->length = fname1len;
-	if (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->length))
+	ret->اوږدتیا = fname1len;
+	إذا (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->اوږدتیا))
 	{
-	    STRCPY(ret->string + ret->length, PATHSEPSTR);
-	    ret->length += sizeof(PATHSEP);
+	    STRCPY(ret->string + ret->اوږدتیا, PATHSEPSTR);
+	    ret->اوږدتیا += حجم(PATHSEP);
 	}
-	STRCPY(ret->string + ret->length, fname2);
-	ret->length += fname2len;
+	STRCPY(ret->string + ret->اوږدتیا, fname2);
+	ret->اوږدتیا += fname2len;
     }
 
-    return ret->string;
+    أرجع ret->string;
 }
 
 /*
  * Add a path separator to a file name, unless it already ends in a path
  * separator.
  */
-    void
-add_pathsep(char_u *p)
+    فراغ
+جمع_کړه_pathsep(char_u *p)
 {
     size_t  plen;
 
-    if (*p == NUL)
-	return;
+    إذا (*p == NUL)
+	أرجع;
 
     plen = STRLEN(p);
-    if (!after_pathsep(p, p + plen))
+    إذا (!after_pathsep(p, p + plen))
 	STRCPY(p + plen, PATHSEPSTR);
 }
 
@@ -3243,40 +3243,40 @@ add_pathsep(char_u *p)
  * Returns NULL when out of memory.
  */
     char_u  *
-FullName_save(
+ډک_Name_save(
     char_u	*fname,
-    int		force)		// force expansion, even when it already looks
+    صحيح		force)		// force expansion, even when it already looks
 				// like a full path name
 {
     char_u	*buf;
-    char_u	*new_fname = NULL;
+    char_u	*new_fname = عدم;
 
-    if (fname == NULL)
-	return NULL;
+    إذا (fname == عدم)
+	أرجع عدم;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return NULL;
+    إذا (buf == عدم)
+	أرجع عدم;
 
-    if (vim_FullName(fname, buf, MAXPATHL, force) != FAIL)
+    إذا (vim_ډک_Name(fname, buf, MAXPATHL, force) != FAIL)
 	new_fname = vim_strsave(buf);
-    else
+    وإلا
 	new_fname = vim_strsave(fname);
     vim_free(buf);
-    return new_fname;
+    أرجع new_fname;
 }
 
 /*
  * return TRUE if "fname" exists.
  */
-    int
+    صحيح
 vim_fexists(char_u *fname)
 {
     stat_T st;
 
-    if (mch_stat((char *)fname, &st))
-	return FALSE;
-    return TRUE;
+    إذا (mch_stat((حرف *)fname, &st))
+	أرجع FALSE;
+    أرجع TRUE;
 }
 
 /*
@@ -3284,50 +3284,50 @@ vim_fexists(char_u *fname)
  * Expand items like "%:h" before the expansion.
  * Returns OK or FAIL.
  */
-    int
+    صحيح
 expand_wildcards_eval(
     char_u	 **pat,		// pointer to input pattern
-    int		  *num_file,	// resulting number of files
+    صحيح		  *عدد_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    صحيح		   flags)	// EW_DIR, etc.
 {
-    int		ret = FAIL;
-    char_u	*eval_pat = NULL;
+    صحيح		ret = FAIL;
+    char_u	*eval_pat = عدم;
     char_u	*exp_pat = *pat;
-    char	*ignored_msg;
+    حرف	*ignored_پیغام;
     size_t	usedlen;
-    int		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
-    int		star_follows = FALSE;
+    صحيح		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
+    صحيح		ستوری_follows = FALSE;
 
-    if (is_cur_alt_file || *exp_pat == '<')
+    إذا (is_cur_alt_file || *exp_pat == '<')
     {
 	++emsg_off;
 	eval_pat = eval_vars(exp_pat, exp_pat, &usedlen,
-					       NULL, &ignored_msg, NULL, TRUE);
+					       عدم, &ignored_پیغام, عدم, TRUE);
 	--emsg_off;
-	if (eval_pat != NULL)
+	إذا (eval_pat != عدم)
 	{
-	    star_follows = STRCMP(exp_pat + usedlen, "*") == 0;
+	    ستوری_follows = STRCMP(exp_pat + usedlen, "*") == 0;
 	    exp_pat = concat_str(eval_pat, exp_pat + usedlen);
 	}
     }
 
-    if (exp_pat != NULL)
-	ret = expand_wildcards(1, &exp_pat, num_file, file, flags);
+    إذا (exp_pat != عدم)
+	ret = expand_wildcards(1, &exp_pat, عدد_file, file, flags);
 
-    if (eval_pat != NULL)
+    إذا (eval_pat != عدم)
     {
-	if (*num_file == 0 && is_cur_alt_file && star_follows)
+	إذا (*عدد_file == 0 && is_cur_alt_file && ستوری_follows)
 	{
 	    // Expanding "%" or "#" and the file does not exist: Add the
 	    // pattern anyway (without the star) so that this works for remote
 	    // files and non-file buffer names.
 	    *file = ALLOC_ONE(char_u *);
-	    if (*file != NULL)
+	    إذا (*file != عدم)
 	    {
 		**file = eval_pat;
-		eval_pat = NULL;
-		*num_file = 1;
+		eval_pat = عدم;
+		*عدد_file = 1;
 		ret = OK;
 	    }
 	}
@@ -3335,7 +3335,7 @@ expand_wildcards_eval(
 	vim_free(eval_pat);
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -3343,58 +3343,58 @@ expand_wildcards_eval(
  * 'wildignore'.
  * Returns OK or FAIL.  When FAIL then "num_files" won't be set.
  */
-    int
+    صحيح
 expand_wildcards(
-    int		   num_pat,	// number of input patterns
+    صحيح		   عدد_pat,	// number of input patterns
     char_u	 **pat,		// array of input patterns
-    int		  *num_files,	// resulting number of files
+    صحيح		  *عدد_files,	// resulting number of files
     char_u	***files,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    صحيح		   flags)	// EW_DIR, etc.
 {
-    int		retval;
-    int		i, j;
+    صحيح		retval;
+    صحيح		i, j;
     char_u	*p;
-    int		non_suf_match;	// number without matching suffix
+    صحيح		non_suf_سمون;	// number without matching suffix
 
-    retval = gen_expand_wildcards(num_pat, pat, num_files, files, flags);
+    retval = gen_expand_wildcards(عدد_pat, pat, عدد_files, files, flags);
 
     // When keeping all matches, return here
-    if ((flags & EW_KEEPALL) || retval == FAIL)
-	return retval;
+    إذا ((flags & EW_KEEPALL) || retval == FAIL)
+	أرجع retval;
 
     /*
      * Remove names that match 'wildignore'.
      */
-    if (*p_wig)
+    إذا (*p_wig)
     {
 	char_u	*ffname;
 
 	// check all files in (*files)[]
-	for (i = 0; i < *num_files; ++i)
+	لكل (i = 0; i < *عدد_files; ++i)
 	{
-	    ffname = FullName_save((*files)[i], FALSE);
-	    if (ffname == NULL)		// out of memory
-		break;
-#ifdef VMS
-	    vms_remove_version(ffname);
-#endif
-	    if (match_file_list(p_wig, (*files)[i], ffname))
+	    ffname = ډک_Name_save((*files)[i], FALSE);
+	    إذا (ffname == عدم)		// out of memory
+		اكسر;
+#که_تعریف_شوی VMS
+	    vms_remove_نسخه(ffname);
+#د_که_پای
+	    إذا (سمون_file_list(p_wig, (*files)[i], ffname))
 	    {
 		// remove this matching file from the list
 		vim_free((*files)[i]);
-		for (j = i; j + 1 < *num_files; ++j)
+		لكل (j = i; j + 1 < *عدد_files; ++j)
 		    (*files)[j] = (*files)[j + 1];
-		--*num_files;
+		--*عدد_files;
 		--i;
 	    }
 	    vim_free(ffname);
 	}
 
 	// If the number of matches is now zero, we fail.
-	if (*num_files == 0)
+	إذا (*عدد_files == 0)
 	{
 	    VIM_CLEAR(*files);
-	    return FAIL;
+	    أرجع FAIL;
 	}
     }
 
@@ -3402,74 +3402,74 @@ expand_wildcards(
      * Move the names where 'suffixes' match to the end.
      * Skip when interrupted, the result probably won't be used.
      */
-    if (*num_files > 1 && !got_int)
+    إذا (*عدد_files > 1 && !got_int)
     {
-	non_suf_match = 0;
-	for (i = 0; i < *num_files; ++i)
+	non_suf_سمون = 0;
+	لكل (i = 0; i < *عدد_files; ++i)
 	{
-	    if (!match_suffix((*files)[i]))
+	    إذا (!سمون_suffix((*files)[i]))
 	    {
 		/*
 		 * Move the name without matching suffix to the front
 		 * of the list.
 		 */
 		p = (*files)[i];
-		for (j = i; j > non_suf_match; --j)
+		لكل (j = i; j > non_suf_سمون; --j)
 		    (*files)[j] = (*files)[j - 1];
-		(*files)[non_suf_match++] = p;
+		(*files)[non_suf_سمون++] = p;
 	    }
 	}
     }
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Return TRUE if "fname" matches with an entry in 'suffixes'.
  */
-    int
-match_suffix(char_u *fname)
+    صحيح
+سمون_suffix(char_u *fname)
 {
-    int		fnamelen, setsuflen;
+    صحيح		fnamelen, setsuflen;
     char_u	*setsuf;
-#define MAXSUFLEN 30	    // maximum length of a file suffix
+#تعریف_کړه MAXSUFLEN 30	    // maximum length of a file suffix
     char_u	suf_buf[MAXSUFLEN];
 
-    fnamelen = (int)STRLEN(fname);
+    fnamelen = (صحيح)STRLEN(fname);
     setsuflen = 0;
-    for (setsuf = p_su; *setsuf; )
+    لكل (setsuf = p_su; *setsuf; )
     {
 	setsuflen = copy_option_part(&setsuf, suf_buf, MAXSUFLEN, ".,");
-	if (setsuflen == 0)
+	إذا (setsuflen == 0)
 	{
-	    char_u *tail = gettail(fname);
+	    char_u *لکۍ = gettail(fname);
 
 	    // empty entry: match name without a '.'
-	    if (vim_strchr(tail, '.') == NULL)
+	    إذا (vim_strchr(لکۍ, '.') == عدم)
 	    {
 		setsuflen = 1;
-		break;
+		اكسر;
 	    }
 	}
-	else
+	وإلا
 	{
-	    if (fnamelen >= setsuflen
+	    إذا (fnamelen >= setsuflen
 		    && fnamencmp(suf_buf, fname + fnamelen - setsuflen,
 						  (size_t)setsuflen) == 0)
-		break;
+		اكسر;
 	    setsuflen = 0;
 	}
     }
-    return (setsuflen != 0);
+    أرجع (setsuflen != 0);
 }
 
 /*
  * Return TRUE if we can expand this backtick thing here.
  */
-    static int
+    ساكن صحيح
 vim_backtick(char_u *p)
 {
-    return (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
+    أرجع (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
 }
 
 /*
@@ -3477,43 +3477,43 @@ vim_backtick(char_u *p)
  * Currently only works when pat[] starts and ends with a `.
  * Returns number of file names found, -1 if an error is encountered.
  */
-    static int
+    ساكن صحيح
 expand_backtick(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)	// EW_* flags
+    صحيح		flags)	// EW_* flags
 {
     char_u	*p;
     char_u	*cmd;
-    char_u	*buffer;
-    int		cnt = 0;
-    int		i;
+    char_u	*بفر;
+    صحيح		cnt = 0;
+    صحيح		i;
 
     // Create the command: lop off the backticks.
     cmd = vim_strnsave(pat + 1, STRLEN(pat) - 2);
-    if (cmd == NULL)
-	return -1;
+    إذا (cmd == عدم)
+	أرجع -1;
 
-#ifdef FEAT_EVAL
-    if (*cmd == '=')	    // `={expr}`: Expand expression
-	buffer = eval_to_string(cmd + 1, TRUE, FALSE);
-    else
-#endif
-	buffer = get_cmd_output(cmd, NULL,
-				(flags & EW_SILENT) ? SHELL_SILENT : 0, NULL);
+#که_تعریف_شوی FEAT_EVAL
+    إذا (*cmd == '=')	    // `={expr}`: Expand expression
+	بفر = eval_منزل_string(cmd + 1, TRUE, FALSE);
+    وإلا
+#د_که_پای
+	بفر = get_cmd_output(cmd, عدم,
+				(flags & EW_SILENT) ? SHELL_SILENT : 0, عدم);
     vim_free(cmd);
-    if (buffer == NULL)
-	return -1;
+    إذا (بفر == عدم)
+	أرجع -1;
 
-    cmd = buffer;
-    while (*cmd != NUL)
+    cmd = بفر;
+    طالما (*cmd != NUL)
     {
 	cmd = skipwhite(cmd);		// skip over white space
 	p = cmd;
-	while (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
+	طالما (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
 	    ++p;
 	// add an entry if it is not empty
-	if (p > cmd)
+	إذا (p > cmd)
 	{
 	    i = *p;
 	    *p = NUL;
@@ -3522,15 +3522,15 @@ expand_backtick(
 	    ++cnt;
 	}
 	cmd = p;
-	while (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
+	طالما (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
 	    ++cmd;
     }
 
-    vim_free(buffer);
-    return cnt;
+    vim_free(بفر);
+    أرجع cnt;
 }
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 /*
  * File name expansion code for MS-DOS, Win16 and Win32.  It's here because
  * it's shared between these systems.
@@ -3539,10 +3539,10 @@ expand_backtick(
 /*
  * comparison function for qsort in dos_expandpath()
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    ساكن صحيح
+pstrcmp(ثابت فراغ *a, ثابت فراغ *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    أرجع (pathcmp(*(حرف **)a, *(حرف **)b, -1));
 }
 
 /*
@@ -3554,47 +3554,47 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to unix_expandpath(), keep in sync!
  */
-    int
+    صحيح
 dos_expandpath(
     garray_T	*gap,
-    char_u	*path,
+    char_u	*لار,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    صحيح		flags,		// EW_* flags
+    صحيح		didstar)	// expanded "**" once already
 {
     char_u	*buf;
-    char_u	*path_end;
+    char_u	*لار_پای_ټکی;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    صحيح		پیل_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    صحيح		starts_with_dot;
+    صحيح		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAW    wfb;
-    WCHAR		*wn = NULL;	// UCS-2 name, NULL when not used.
+    صحيح		starstar = FALSE;
+    ساكن صحيح	stardepth = 0;	    // depth for "**" expansion
+    HANDLE		h_پیدا_کړه = INVALID_HANDLE_ارزښت;
+    WIN32_پیدا_کړه_DATAW    wfb;
+    WCHAR		*wn = عدم;	// UCS-2 name, NULL when not used.
     char_u		*matchname;
-    int			ok;
+    صحيح			ok;
     char_u		*p_alt;
-    int			use_short_name;
+    صحيح			use_short_name;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    إذا (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	إذا (got_int)
+	    أرجع 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
-    buflen = STRLEN(path) + MAXPATHL;
+    buflen = STRLEN(لار) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    إذا (buf == عدم)
+	أرجع 0;
 
     /*
      * Find the first part in the path name that contains a wildcard or a ~1.
@@ -3602,33 +3602,33 @@ dos_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
-    path_end = path;
-    while (*path_end != NUL)
+    e = عدم;
+    لار_پای_ټکی = لار;
+    طالما (*لار_پای_ټکی != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
-	    *p++ = *path_end++;
-	else if (*path_end == '\\' || *path_end == ':' || *path_end == '/')
+	إذا (لار_پای_ټکی >= لار + wildoff && rem_backslash(لار_پای_ټکی))
+	    *p++ = *لار_پای_ټکی++;
+	وإلا إذا (*لار_پای_ټکی == '\\' || *لار_پای_ټکی == ':' || *لار_پای_ټکی == '/')
 	{
-	    if (e != NULL)
-		break;
+	    إذا (e != عدم)
+		اكسر;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && vim_strchr((char_u *)"*?[~", *path_end) != NULL)
+	وإلا إذا (لار_پای_ټکی >= لار + wildoff
+			 && vim_strchr((char_u *)"*?[~", *لار_پای_ټکی) != عدم)
 	    e = p;
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    صحيح charlen = (*mb_ptr2len)(لار_پای_ټکی);
 
-	    STRNCPY(p, path_end, (size_t)charlen);
+	    STRNCPY(p, لار_پای_ټکی, (size_t)charlen);
 	    p += charlen;
-	    path_end += charlen;
+	    لار_پای_ټکی += charlen;
 	}
-	else
-	    *p++ = *path_end++;
+	وإلا
+	    *p++ = *لار_پای_ټکی++;
     }
     e = p;
     *e = NUL;
@@ -3636,8 +3636,8 @@ dos_expandpath(
     // now we have one wildcard component between s and e
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    لكل (p = buf + wildoff; p < s; ++p)
+	إذا (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3645,31 +3645,31 @@ dos_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    لكل (p = s; p < e; ++p)
+	إذا (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_منزل_reg_pat(s, e, عدم, FALSE);
+    إذا (pat == عدم)
     {
 	vim_free(buf);
-	return 0;
+	أرجع 0;
     }
 
     // compile the regexp into a program
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    إذا (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.rm_ic = TRUE;		// Always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    إذا (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    إذا (regmatch.regprog == عدم && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	أرجع 0;
     }
 
     // remember the pattern or file name being looked for
@@ -3677,89 +3677,89 @@ dos_expandpath(
 
     // Only match against the alternate (8.3) file name when the pattern looks
     // like a short name, it contains a '~'.
-    use_short_name = vim_strchr(s, '~') != NULL;
+    use_short_name = vim_strchr(s, '~') != عدم;
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
-							  && *path_end == '/')
+    إذا (!didstar && stardepth < 100 && starstar && e - s == 2
+							  && *لار_پای_ټکی == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((حرف *)s, buflen - len, "%s", لار_پای_ټکی + 1);
 	++stardepth;
-	(void)dos_expandpath(gap, buf, len, flags, TRUE);
+	(فراغ)dos_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // Scan all files in the directory with "dir/ *.*"
-    vim_snprintf((char *)s, buflen - len, "*.*");
-    wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
-	hFind = FindFirstFileW(wn, &wfb);
-    ok = (hFind != INVALID_HANDLE_VALUE);
+    vim_snprintf((حرف *)s, buflen - len, "*.*");
+    wn = enc_منزل_utf16(buf, عدم);
+    إذا (wn != عدم)
+	h_پیدا_کړه = پیدا_کړه_لومړی_File_W(wn, &wfb);
+    ok = (h_پیدا_کړه != INVALID_HANDLE_ارزښت);
 
-    while (ok)
+    طالما (ok)
     {
-	p = utf16_to_enc(wfb.cFileName, NULL);   // p is allocated here
+	p = utf16_منزل_enc(wfb.cFileName, عدم);   // p is allocated here
 
-	if (p == NULL)
-	    break;  // out of memory
+	إذا (p == عدم)
+	    اكسر;  // out of memory
 
 	// Do not use the alternate filename when the file name ends in '~',
 	// because it picks up backup files: short name for "foo.vim~" is
 	// "foo~1.vim", which matches "*.vim".
-	if (!use_short_name || *wfb.cAlternateFileName == NUL
+	إذا (!use_short_name || *wfb.cAlternateFileName == NUL
 						  || p[STRLEN(p) - 1] == '~')
-	    p_alt = NULL;
-	else
-	    p_alt = utf16_to_enc(wfb.cAlternateFileName, NULL);
+	    p_alt = عدم;
+	وإلا
+	    p_alt = utf16_منزل_enc(wfb.cAlternateFileName, عدم);
 
 	len = (size_t)(s - buf);
 	// Ignore entries starting with a dot, unless when asked for.  Accept
 	// all entries found with "matchname".
-	if ((p[0] != '.' || starts_with_dot
+	إذا ((p[0] != '.' || starts_with_dot
 			 || ((flags & EW_DODOT)
 			     && p[1] != NUL && (p[1] != '.' || p[2] != NUL)))
-		&& (matchname == NULL
-		  || (regmatch.regprog != NULL
+		&& (matchname == عدم
+		  || (regmatch.regprog != عدم
 		      && (vim_regexec(&regmatch, p, (colnr_T)0)
-			 || (p_alt != NULL
+			 || (p_alt != عدم
 				&& vim_regexec(&regmatch, p_alt, (colnr_T)0))))
 		  || ((flags & EW_NOTWILD)
-		     && fnamencmp(path + len, p, e - s) == 0)))
+		     && fnamencmp(لار + len, p, e - s) == 0)))
 	{
-	    len += vim_snprintf((char *)s, buflen - len, "%s", p);
-	    if (len + 1 < buflen)
+	    len += vim_snprintf((حرف *)s, buflen - len, "%s", p);
+	    إذا (len + 1 < buflen)
 	    {
-		if (starstar && stardepth < 100
-			  && (wfb.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		إذا (starstar && stardepth < 100
+			  && (wfb.dw_File_ځانګړتیاوې & FILE_ATTRIBUTE_DIRECTORY))
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
-							    "/**%s", path_end);
+		    vim_snprintf((حرف *)buf + len, buflen - len,
+							    "/**%s", لار_پای_ټکی);
 		    ++stardepth;
-		    (void)dos_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (فراغ)dos_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end))
+		vim_snprintf((حرف *)buf + len, buflen - len, "%s", لار_پای_ټکی);
+		إذا (mch_has_exp_wildcard(لار_پای_ټکی))
 		{
-		    if (stardepth < 100)
+		    إذا (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)dos_expandpath(gap, buf, len + 1, flags, FALSE);
+			(فراغ)dos_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		وإلا
 		{
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != 0)
+		    إذا (*لار_پای_ټکی != 0)
 			backslash_halve(buf + len + 1);
 		    // addfile() checks existence; do not stat the same path twice.
 		    // Even with EW_NOTFOUND, a literal suffix must exist.
@@ -3770,32 +3770,32 @@ dos_expandpath(
 
 	vim_free(p_alt);
 	vim_free(p);
-	ok = FindNextFileW(hFind, &wfb);
+	ok = پیدا_کړه_بل_File_W(h_پیدا_کړه, &wfb);
     }
 
-    FindClose(hFind);
+    پیدا_کړه_Close(h_پیدا_کړه);
     vim_free(wn);
     vim_free(buf);
     vim_regfree(regmatch.regprog);
     vim_free(matchname);
 
-    matches = gap->ga_len - start_len;
-    if (matches > 0)
-	qsort(((char_u **)gap->ga_data) + start_len, (size_t)matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+    matches = gap->ga_len - پیل_len;
+    إذا (matches > 0)
+	qsort(((char_u **)gap->ga_معلومات) + پیل_len, (size_t)matches,
+						   حجم(char_u *), pstrcmp);
+    أرجع matches;
 }
-#endif // MSWIN
+#د_که_پای // MSWIN
 
-#if (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
+#إذا (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
 /*
  * Unix style wildcard expansion code.
  * It's here because it's used both for Unix and Mac.
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    ساكن صحيح
+pstrcmp(ثابت فراغ *a, ثابت فراغ *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    أرجع (pathcmp(*(حرف **)a, *(حرف **)b, -1));
 }
 
 /*
@@ -3806,43 +3806,43 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to dos_expandpath(), keep in sync!
  */
-    int
+    صحيح
 unix_expandpath(
     garray_T	*gap,
-    char_u	*path,
+    char_u	*لار,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    صحيح		flags,		// EW_* flags
+    صحيح		didstar)	// expanded "**" once already
 {
     char_u	*buf;
-    char_u	*path_end;
+    char_u	*لار_پای_ټکی;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    صحيح		پیل_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    صحيح		starts_with_dot;
+    صحيح		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
+    صحيح		starstar = FALSE;
+    ساكن صحيح	stardepth = 0;	    // depth for "**" expansion
 
     DIR		*dirp;
-    struct dirent *dp;
+    بنية dirent *dp;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    إذا (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	إذا (got_int)
+	    أرجع 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
-    buflen = STRLEN(path) + MAXPATHL;
+    buflen = STRLEN(لار) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    إذا (buf == عدم)
+	أرجع 0;
 
     /*
      * Find the first part in the path name that contains a wildcard.
@@ -3851,35 +3851,35 @@ unix_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
-    path_end = path;
-    while (*path_end != NUL)
+    e = عدم;
+    لار_پای_ټکی = لار;
+    طالما (*لار_پای_ټکی != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
-	    *p++ = *path_end++;
-	else if (*path_end == '/')
+	إذا (لار_پای_ټکی >= لار + wildoff && rem_backslash(لار_پای_ټکی))
+	    *p++ = *لار_پای_ټکی++;
+	وإلا إذا (*لار_پای_ټکی == '/')
 	{
-	    if (e != NULL)
-		break;
+	    إذا (e != عدم)
+		اكسر;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && (vim_strchr((char_u *)"*?[{~$", *path_end) != NULL
+	وإلا إذا (لار_پای_ټکی >= لار + wildoff
+			 && (vim_strchr((char_u *)"*?[{~$", *لار_پای_ټکی) != عدم
 			     || (!p_fic && (flags & EW_ICASE)
-					  && vim_isalpha(PTR2CHAR(path_end)))))
+					  && vim_isalpha(PTR2CHAR(لار_پای_ټکی)))))
 	    e = p;
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    صحيح charlen = (*mb_ptr2len)(لار_پای_ټکی);
 
-	    STRNCPY(p, path_end, (size_t)charlen);
+	    STRNCPY(p, لار_پای_ټکی, (size_t)charlen);
 	    p += charlen;
-	    path_end += charlen;
+	    لار_پای_ټکی += charlen;
 	}
-	else
-	    *p++ = *path_end++;
+	وإلا
+	    *p++ = *لار_پای_ټکی++;
     }
     e = p;
     *e = NUL;
@@ -3887,8 +3887,8 @@ unix_expandpath(
     // Now we have one wildcard component between "s" and "e".
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    لكل (p = buf + wildoff; p < s; ++p)
+	إذا (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3896,116 +3896,116 @@ unix_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    لكل (p = s; p < e; ++p)
+	إذا (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     // convert the file pattern to a regexp pattern
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_منزل_reg_pat(s, e, عدم, FALSE);
+    إذا (pat == عدم)
     {
 	vim_free(buf);
-	return 0;
+	أرجع 0;
     }
 
     // compile the regexp into a program
-    if (flags & EW_ICASE)
+    إذا (flags & EW_ICASE)
 	regmatch.rm_ic = TRUE;		// 'wildignorecase' set
-    else
+    وإلا
 	regmatch.rm_ic = p_fic;	// ignore case when 'fileignorecase' is set
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    إذا (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    إذا (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    إذا (regmatch.regprog == عدم && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	أرجع 0;
     }
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
-							  && *path_end == '/')
+    إذا (!didstar && stardepth < 100 && starstar && e - s == 2
+							  && *لار_پای_ټکی == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((حرف *)s, buflen - len, "%s", لار_پای_ټکی + 1);
 	++stardepth;
-	(void)unix_expandpath(gap, buf, len, flags, TRUE);
+	(فراغ)unix_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // open the directory for scanning
     *s = NUL;
-    dirp = opendir(*buf == NUL ? "." : (char *)buf);
+    dirp = opendir(*buf == NUL ? "." : (حرف *)buf);
 
     // Find all matching entries
-    if (dirp != NULL)
+    إذا (dirp != عدم)
     {
-	while (!got_int)
+	طالما (!got_int)
 	{
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    إذا (dp == عدم)
+		اكسر;
 	    len = (size_t)(s - buf);
-	    if ((dp->d_name[0] != '.' || starts_with_dot
+	    إذا ((dp->d_name[0] != '.' || starts_with_dot
 			|| ((flags & EW_DODOT)
 			    && dp->d_name[1] != NUL
 			    && (dp->d_name[1] != '.' || dp->d_name[2] != NUL)))
-		 && ((regmatch.regprog != NULL && vim_regexec(&regmatch,
+		 && ((regmatch.regprog != عدم && vim_regexec(&regmatch,
 					     (char_u *)dp->d_name, (colnr_T)0))
 		   || ((flags & EW_NOTWILD)
-		     && fnamencmp(path + len, dp->d_name, e - s) == 0)))
+		     && fnamencmp(لار + len, dp->d_name, e - s) == 0)))
 	    {
-		len += vim_snprintf((char *)s, buflen - len, "%s", dp->d_name);
-		if (len + 1 >= buflen)
-		    continue;
+		len += vim_snprintf((حرف *)s, buflen - len, "%s", dp->d_name);
+		إذا (len + 1 >= buflen)
+		    استمر;
 
-		if (starstar && stardepth < 100)
+		إذا (starstar && stardepth < 100)
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
-							    "/**%s", path_end);
+		    vim_snprintf((حرف *)buf + len, buflen - len,
+							    "/**%s", لار_پای_ټکی);
 		    ++stardepth;
-		    (void)unix_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (فراغ)unix_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end)) // handle more wildcards
+		vim_snprintf((حرف *)buf + len, buflen - len, "%s", لار_پای_ټکی);
+		إذا (mch_has_exp_wildcard(لار_پای_ټکی)) // handle more wildcards
 		{
-		    if (stardepth < 100)
+		    إذا (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)unix_expandpath(gap, buf, len + 1, flags, FALSE);
+			(فراغ)unix_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		وإلا
 		{
 		    stat_T  sb;
 
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != NUL)
+		    إذا (*لار_پای_ټکی != NUL)
 			backslash_halve(buf + len + 1);
 		    // add existing file or symbolic link
-		    if ((flags & EW_ALLLINKS) ? mch_lstat((char *)buf, &sb) >= 0
+		    إذا ((flags & EW_ALLLINKS) ? mch_lstat((حرف *)buf, &sb) >= 0
 						      : mch_getperm(buf) >= 0)
 		    {
 # ifdef MACOS_CONVERT
 			size_t precomp_len = STRLEN(buf)+1;
 			char_u *precomp_buf =
-			    mac_precompose_path(buf, precomp_len, &precomp_len);
+			    mac_precompose_لار(buf, precomp_len, &precomp_len);
 
-			if (precomp_buf)
+			إذا (precomp_buf)
 			{
 			    mch_memmove(buf, precomp_buf, precomp_len);
 			    vim_free(precomp_buf);
@@ -4025,67 +4025,67 @@ unix_expandpath(
 
     // When interrupted the matches probably won't be used and sorting can be
     // slow, thus skip it.
-    matches = gap->ga_len - start_len;
-    if (matches > 0 && !got_int)
-	qsort(((char_u **)gap->ga_data) + start_len, matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+    matches = gap->ga_len - پیل_len;
+    إذا (matches > 0 && !got_int)
+	qsort(((char_u **)gap->ga_معلومات) + پیل_len, matches,
+						   حجم(char_u *), pstrcmp);
+    أرجع matches;
 }
-#endif
+#د_که_پای
 
 /*
  * Return TRUE if "p" contains what looks like an environment variable.
  * Allowing for escaping.
  */
-    static int
+    ساكن صحيح
 has_env_var(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    لكل ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	إذا (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)
-#if defined(MSWIN)
+	وإلا إذا (vim_strchr((char_u *)
+#إذا defined(MSWIN)
 				    "$%"
-#else
+#وإلا
 				    "$"
-#endif
-					, *p) != NULL)
-	    return TRUE;
+#د_که_پای
+					, *p) != عدم)
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-#ifdef SPECIAL_WILDCHAR
+#که_تعریف_شوی SPECIAL_WILDCHAR
 /*
  * Return TRUE if "p" contains a special wildcard character, one that Vim
  * cannot expand, requires using a shell.
  */
-    static int
+    ساكن صحيح
 has_special_wildchar(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    لكل ( ; *p; MB_PTR_ADV(p))
     {
 	// Disallow line break characters.
-	if (*p == '\r' || *p == '\n')
-	    break;
+	إذا (*p == '\r' || *p == '\n')
+	    اكسر;
 	// Allow for escaping.
-	if (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
+	إذا (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
 	    ++p;
-	else if (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != NULL)
+	وإلا إذا (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != عدم)
 	{
 	    // A { must be followed by a matching }.
-	    if (*p == '{' && vim_strchr(p, '}') == NULL)
-		continue;
+	    إذا (*p == '{' && vim_strchr(p, '}') == عدم)
+		استمر;
 	    // A quote and backtick must be followed by another one.
-	    if ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == NULL)
-		continue;
-	    return TRUE;
+	    إذا ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == عدم)
+		استمر;
+	    أرجع TRUE;
 	}
     }
-    return FALSE;
+    أرجع FALSE;
 }
-#endif
+#د_که_پای
 
 /*
  * Generic wildcard expansion code.
@@ -4098,23 +4098,23 @@ has_special_wildchar(char_u *p)
  * Return OK when some files found.  "num_file" is set to the number of
  * matches, "file" to the array of matches.  Call FreeWild() later.
  */
-    int
+    صحيح
 gen_expand_wildcards(
-    int		num_pat,	// number of input patterns
+    صحيح		عدد_pat,	// number of input patterns
     char_u	**pat,		// array of input patterns
-    int		*num_file,	// resulting number of files
+    صحيح		*عدد_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		flags)		// EW_* flags
+    صحيح		flags)		// EW_* flags
 {
-    int			i;
+    صحيح			i;
     garray_T		ga;
     char_u		*p;
-    static int		recursive = FALSE;
-    int			add_pat;
-    int			retval = OK;
-    int			did_expand_in_path = FALSE;
-    char_u		*path_option = *curbuf->b_p_path == NUL ?
-					p_path : curbuf->b_p_path;
+    ساكن صحيح		recursive = FALSE;
+    صحيح			جمع_کړه_pat;
+    صحيح			retval = OK;
+    صحيح			did_expand_دننه_لار = FALSE;
+    char_u		*لار_option = *curbuf->b_p_لار == NUL ?
+					p_لار : curbuf->b_p_لار;
 
     /*
      * expand_env() is called to expand things like "~user".  If this fails,
@@ -4122,73 +4122,73 @@ gen_expand_wildcards(
      * call the machine specific expansion function, if possible.  Otherwise,
      * return FAIL.
      */
-    if (recursive)
-#ifdef SPECIAL_WILDCHAR
-	return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
-#else
-	return FAIL;
-#endif
+    إذا (recursive)
+#که_تعریف_شوی SPECIAL_WILDCHAR
+	أرجع mch_expand_wildcards(عدد_pat, pat, عدد_file, file, flags);
+#وإلا
+	أرجع FAIL;
+#د_که_پای
 
-#ifdef SPECIAL_WILDCHAR
+#که_تعریف_شوی SPECIAL_WILDCHAR
     /*
      * If there are any special wildcard characters which we cannot handle
      * here, call machine specific function for all the expansion.  This
      * avoids starting the shell for each argument separately.
      * For `=expr` do use the internal function.
      */
-    for (i = 0; i < num_pat; i++)
+    لكل (i = 0; i < عدد_pat; i++)
     {
-	if (has_special_wildchar(pat[i])
+	إذا (has_special_wildchar(pat[i])
 		&& !(vim_backtick(pat[i]) && pat[i][1] == '=')
 	   )
-	    return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
+	    أرجع mch_expand_wildcards(عدد_pat, pat, عدد_file, file, flags);
     }
-#endif
+#د_که_پای
 
     recursive = TRUE;
 
     /*
      * The matching file names are stored in a growarray.  Init it empty.
      */
-    ga_init2(&ga, sizeof(char_u *), 30);
+    ga_init2(&ga, حجم(char_u *), 30);
 
-    for (i = 0; i < num_pat && !got_int; ++i)
+    لكل (i = 0; i < عدد_pat && !got_int; ++i)
     {
-	add_pat = -1;
+	جمع_کړه_pat = -1;
 	p = pat[i];
 
-	if (vim_backtick(p))
+	إذا (vim_backtick(p))
 	{
-	    add_pat = expand_backtick(&ga, p, flags);
-	    if (add_pat == -1)
+	    جمع_کړه_pat = expand_backtick(&ga, p, flags);
+	    إذا (جمع_کړه_pat == -1)
 		retval = FAIL;
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * First expand environment variables, "~/" and "~user/".
 	     */
-	    if ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
+	    إذا ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
 	    {
-		p = expand_env_save_opt(p, TRUE, (char_u *)PATH_ESC_WILDCARDS);
-		if (p == NULL)
+		p = expand_env_save_opt(p, TRUE, (char_u *)لار_ESC_WILDCARDS);
+		إذا (p == عدم)
 		    p = pat[i];
-#ifdef UNIX
+#که_تعریف_شوی UNIX
 		/*
 		 * On Unix, if expand_env() can't expand an environment
 		 * variable, use the shell to do that.  Discard previously
 		 * found file names and start all over again.
 		 */
-		else if (has_env_var(p) || *p == '~')
+		وإلا إذا (has_env_var(p) || *p == '~')
 		{
 		    vim_free(p);
-		    ga_clear_strings(&ga);
-		    i = mch_expand_wildcards(num_pat, pat, num_file, file,
+		    ga_clear_مزي_ګانې(&ga);
+		    i = mch_expand_wildcards(عدد_pat, pat, عدد_file, file,
 							 flags|EW_KEEPDOLLAR);
 		    recursive = FALSE;
-		    return i;
+		    أرجع i;
 		}
-#endif
+#د_که_پای
 	    }
 
 	    /*
@@ -4198,10 +4198,10 @@ gen_expand_wildcards(
 	     * Otherwise: Add the file name if it exists or when EW_NOTFOUND is
 	     * given.
 	     */
-	    if (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
+	    إذا (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
 	    {
-		if ((flags & (EW_PATH | EW_CDPATH))
-			&& !mch_isFullName(p)
+		إذا ((flags & (EW_لار | EW_CDPATH))
+			&& !mch_is_ډک_Name(p)
 			&& !(p[0] == '.'
 			    && (vim_ispathsep(p[1])
 				|| (p[1] == '.' && vim_ispathsep(p[2]))))
@@ -4210,47 +4210,47 @@ gen_expand_wildcards(
 		    // :find completion where 'path' is used.
 		    // Recursiveness is OK here.
 		    recursive = FALSE;
-		    add_pat = expand_in_path(&ga, p, flags);
+		    جمع_کړه_pat = expand_دننه_لار(&ga, p, flags);
 		    recursive = TRUE;
-		    did_expand_in_path = TRUE;
+		    did_expand_دننه_لار = TRUE;
 		}
-		else
-		    add_pat = mch_expandpath(&ga, p, flags);
+		وإلا
+		    جمع_کړه_pat = mch_expandpath(&ga, p, flags);
 	    }
 	}
 
-	if (add_pat == -1 || (add_pat == 0 && (flags & EW_NOTFOUND)))
+	إذا (جمع_کړه_pat == -1 || (جمع_کړه_pat == 0 && (flags & EW_NOTFOUND)))
 	{
 	    char_u	*t = backslash_halve_save(p);
 
 	    // When EW_NOTFOUND is used, always add files and dirs.  Makes
 	    // "vim c:/" work.
-	    if (flags & EW_NOTFOUND)
+	    إذا (flags & EW_NOTFOUND)
 		addfile(&ga, t, flags | EW_DIR | EW_FILE);
-	    else
+	    وإلا
 		addfile(&ga, t, flags);
 
-	    if (t != p)
+	    إذا (t != p)
 		vim_free(t);
 	}
 
-	if (did_expand_in_path && ga.ga_len > 0 && (flags & (EW_PATH | EW_CDPATH)))
-	    uniquefy_paths(&ga, p, path_option);
-	if (p != pat[i])
+	إذا (did_expand_دننه_لار && ga.ga_len > 0 && (flags & (EW_لار | EW_CDPATH)))
+	    uniquefy_paths(&ga, p, لار_option);
+	إذا (p != pat[i])
 	    vim_free(p);
     }
 
     // When returning FAIL the array must be freed here.
-    if (retval == FAIL)
-	ga_clear_strings(&ga);
+    إذا (retval == FAIL)
+	ga_clear_مزي_ګانې(&ga);
 
-    *num_file = ga.ga_len;
-    *file = (ga.ga_data != NULL) ? (char_u **)ga.ga_data
+    *عدد_file = ga.ga_len;
+    *file = (ga.ga_معلومات != عدم) ? (char_u **)ga.ga_معلومات
 						  : (char_u **)_("no matches");
 
     recursive = FALSE;
 
-    return ((flags & EW_EMPTYOK) || ga.ga_data != NULL) ? retval : FAIL;
+    أرجع ((flags & EW_EMPTYOK) || ga.ga_معلومات != عدم) ? retval : FAIL;
 }
 
 /*
@@ -4262,82 +4262,82 @@ gen_expand_wildcards(
  * EW_ADDSLASH	add slash after directory name
  * EW_ALLLINKS	add symlink also when the referred file does not exist
  */
-    void
+    فراغ
 addfile(
     garray_T	*gap,
     char_u	*f,	// filename
-    int		flags)
+    صحيح		flags)
 {
     char_u	*p;
-    int		isdir;
+    صحيح		isdir;
     stat_T	sb;
 
-#ifdef MSWIN
-    if (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
+#که_تعریف_شوی MSWIN
+    إذا (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
     {
-	long perm = mch_getperm(f);
+	اوږد perm = mch_getperm(f);
 
-	if (perm < 0)
-	    return;
+	إذا (perm < 0)
+	    أرجع;
 	// The stat result already tells us whether this is a directory.
 	isdir = (perm & S_IFMT) == S_IFDIR;
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
 	// if the file/dir/link doesn't exist, may not add it
-	if (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
-		    ? mch_lstat((char *)f, &sb) < 0 : mch_getperm(f) < 0))
-	    return;
+	إذا (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
+		    ? mch_lstat((حرف *)f, &sb) < 0 : mch_getperm(f) < 0))
+	    أرجع;
 	isdir = mch_isdir(f);
     }
 
-#ifdef FNAME_ILLEGAL
+#که_تعریف_شوی FNAME_ILLEGAL
     // if the file/dir contains illegal characters, don't add it
-    if (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != NULL)
-	return;
-#endif
+    إذا (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != عدم)
+	أرجع;
+#د_که_پای
 
-    if ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
-	return;
+    إذا ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
+	أرجع;
 
     // If the file isn't executable, may not add it.  Do accept directories.
     // When invoked from expand_shellcmd() do not use $PATH.
-    if (!isdir && (flags & EW_EXEC)
-			     && !mch_can_exe(f, NULL, !(flags & EW_SHELLCMD)))
-	return;
+    إذا (!isdir && (flags & EW_EXEC)
+			     && !mch_can_exe(f, عدم, !(flags & EW_SHELLCMD)))
+	أرجع;
 
     // Make room for another item in the file list.
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع;
 
     p = alloc(STRLEN(f) + 1 + isdir);
-    if (p == NULL)
-	return;
+    إذا (p == عدم)
+	أرجع;
 
     STRCPY(p, f);
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
     slash_adjust(p);
-#endif
+#د_که_پای
     /*
      * Append a slash or backslash after directory names if none is present.
      */
-    if (isdir && (flags & EW_ADDSLASH))
-	add_pathsep(p);
-    ((char_u **)gap->ga_data)[gap->ga_len++] = p;
+    إذا (isdir && (flags & EW_ADDSLASH))
+	جمع_کړه_pathsep(p);
+    ((char_u **)gap->ga_معلومات)[gap->ga_len++] = p;
 }
 
 /*
  * Free the list of files returned by expand_wildcards() or other expansion
  * functions.
  */
-    void
-FreeWild(int count, char_u **files)
+    فراغ
+FreeWild(صحيح شمېر, char_u **files)
 {
-    if (count <= 0 || files == NULL)
-	return;
-    while (count--)
-	vim_free(files[count]);
+    إذا (شمېر <= 0 || files == عدم)
+	أرجع;
+    طالما (شمېر--)
+	vim_free(files[شمېر]);
     vim_free(files);
 }
 
@@ -4346,82 +4346,82 @@ FreeWild(int count, char_u **files)
  * If "maxlen" >= 0 compare "p[maxlen]" to "q[maxlen]"
  * Return value like strcmp(p, q), but consider path separators.
  */
-    int
-pathcmp(const char *p, const char *q, int maxlen)
+    صحيح
+pathcmp(ثابت حرف *p, ثابت حرف *q, صحيح maxlen)
 {
-    int		i, j;
-    int		c1, c2;
-    const char	*s = NULL;
+    صحيح		i, j;
+    صحيح		c1, c2;
+    ثابت حرف	*s = عدم;
 
-    for (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
+    لكل (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
     {
 	c1 = PTR2CHAR((char_u *)p + i);
 	c2 = PTR2CHAR((char_u *)q + j);
 
 	// End of "p": check if "q" also ends or just has a slash.
-	if (c1 == NUL)
+	إذا (c1 == NUL)
 	{
-	    if (c2 == NUL)  // full match
-		return 0;
+	    إذا (c2 == NUL)  // full match
+		أرجع 0;
 	    s = q;
 	    i = j;
-	    break;
+	    اكسر;
 	}
 
 	// End of "q": check if "p" just has a slash.
-	if (c2 == NUL)
+	إذا (c2 == NUL)
 	{
 	    s = p;
-	    break;
+	    اكسر;
 	}
 
-	if ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
-#ifdef BACKSLASH_IN_FILENAME
+	إذا ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
 		// consider '/' and '\\' to be equal
 		&& !((c1 == '/' && c2 == '\\')
 		    || (c1 == '\\' && c2 == '/'))
-#endif
+#د_که_پای
 		)
 	{
-	    if (vim_ispathsep(c1))
-		return -1;
-	    if (vim_ispathsep(c2))
-		return 1;
-	    return p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
+	    إذا (vim_ispathsep(c1))
+		أرجع -1;
+	    إذا (vim_ispathsep(c2))
+		أرجع 1;
+	    أرجع p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
 		    : c1 - c2;  // no match
 	}
 
 	i += mb_ptr2len((char_u *)p + i);
 	j += mb_ptr2len((char_u *)q + j);
     }
-    if (s == NULL)	// "i" or "j" ran into "maxlen"
-	return 0;
+    إذا (s == عدم)	// "i" or "j" ran into "maxlen"
+	أرجع 0;
 
     c1 = PTR2CHAR((char_u *)s + i);
     c2 = PTR2CHAR((char_u *)s + i + mb_ptr2len((char_u *)s + i));
     // ignore a trailing slash, but not "//" or ":/"
-    if (c2 == NUL
+    إذا (c2 == NUL
 	    && i > 0
 	    && !after_pathsep((char_u *)s, (char_u *)s + i)
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
 	    && (c1 == '/' || c1 == '\\')
-#else
+#وإلا
 	    && c1 == '/'
-#endif
+#د_که_پای
        )
-	return 0;   // match with trailing slash
-    if (s == q)
-	return -1;	    // no match
-    return 1;
+	أرجع 0;   // match with trailing slash
+    إذا (s == q)
+	أرجع -1;	    // no match
+    أرجع 1;
 }
 
 /*
  * Return TRUE if "name" is a full (absolute) path name or URL.
  */
-    int
+    صحيح
 vim_isAbsName(char_u *name)
 {
-    return (path_with_url(name) != 0 || mch_isFullName(name));
+    أرجع (لار_with_url(name) != 0 || mch_is_ډک_Name(name));
 }
 
 /*
@@ -4429,30 +4429,30 @@ vim_isAbsName(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-vim_FullName(
+    صحيح
+vim_ډک_Name(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)	    // force expansion even when already absolute
+    صحيح		len,
+    صحيح		force)	    // force expansion even when already absolute
 {
-    int		retval = OK;
-    int		url;
+    صحيح		retval = OK;
+    صحيح		url;
 
     *buf = NUL;
-    if (fname == NULL)
-	return FAIL;
+    إذا (fname == عدم)
+	أرجع FAIL;
 
-    url = path_with_url(fname);
-    if (!url)
-	retval = mch_FullName(fname, buf, len, force);
-    if (url || retval == FAIL)
+    url = لار_with_url(fname);
+    إذا (!url)
+	retval = mch_ډک_Name(fname, buf, len, force);
+    إذا (url || retval == FAIL)
     {
 	// something failed; use the file name (truncate when too long)
 	vim_strncpy(buf, fname, len - 1);
     }
-#if defined(MSWIN)
+#إذا defined(MSWIN)
     slash_adjust(buf);
-#endif
-    return retval;
+#د_که_پای
+    أرجع retval;
 }

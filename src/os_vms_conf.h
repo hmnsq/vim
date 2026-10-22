@@ -3,23 +3,23 @@
  *
  */
 
-#if defined(__VMS) || defined(__vms)
-# if !defined(VMS)
+#إذا defined(__VMS) || defined(__vms)
+# إذا !defined(VMS)
 #  define VMS
 # endif
-#endif
+#د_که_پای
 
-#include <decc$types.h>             // Required early for large-file support
+#ضمن <decc$types.h>             // Required early for large-file support
 
-#define CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
-#define FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
-#define BINARY_FILE_IO              // Use binary fileio
-#define USE_GETCWD
-#define USE_SYSTEM
-#define XPMATTRIBUTES_TYPE XpmAttributes
+#تعریف_کړه CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
+#تعریف_کړه FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
+#تعریف_کړه دوګونی_FILE_IO              // Use binary fileio
+#تعریف_کړه USE_GETCWD
+#تعریف_کړه USE_SYSTEM
+#تعریف_کړه XPMATTRIBUTES_TYPE Xpm_ځانګړتیاوې
 
 // Define when terminfo support found
-#undef TERMINFO
+#تعریف_لغوه TERMINFO
 
 // Define when termcap.h contains ospeed
 // #define HAVE_OSPEED
@@ -31,10 +31,10 @@
 //#define HAVE_OUTFUNTYPE
 
 // Define when __DATE__ " " __TIME__ can be used
-#define HAVE_DATE_TIME
+#تعریف_کړه HAVE_DATE_وخت
 
 // #undef USEBCOPY
-#define USEMEMMOVE
+#تعریف_کړه USEMEMMOVE
 // #undef USEMEMCPY
 
 // Define when "man -s 2" is to be used
@@ -71,7 +71,7 @@
 // #undef SYS_SELECT_WITH_SYS_TIME
 
 // Define if struct sigcontext is present
-#define HAVE_SIGCONTEXT
+#تعریف_کړه HAVE_SIGCONTEXT
 
 // Define if toupper/tolower only work on lower/uppercase characters
 // #define BROKEN_TOUPPER
@@ -91,72 +91,72 @@
 // Define if you have the sigset() function.
 // #undef HAVE_SIGSET
 
-#define TGETENT_ZERO_ERR
-#define HAVE_GETCWD
-#define HAVE_STRTOL
-#define HAVE_TGETENT
-#define HAVE_MEMSET
-#define HAVE_STRERROR
-#define HAVE_FCHOWN
-#define HAVE_RENAME
-#define HAVE_QSORT
-#define HAVE_FSYNC
-#define HAVE_GETPWUID
-#define HAVE_GETPWNAM
-#define	HAVE_STDLIB_H
-#define	HAVE_STRING_H
-#define	HAVE_ERRNO_H
-#define HAVE_OPENDIR
-#define HAVE_PUTENV
-#define HAVE_SETENV
-#define HAVE_SETJMP_H
-#define HAVE_MATH_H
-#define HAVE_GETTIMEOFDAY
-#define HAVE_PWD_H
-#define HAVE_NETDB_H
-#define	HAVE_DIRENT_H
+#تعریف_کړه TGETENT_ZERO_ERR
+#تعریف_کړه HAVE_GETCWD
+#تعریف_کړه HAVE_STRTOL
+#تعریف_کړه HAVE_TGETENT
+#تعریف_کړه HAVE_MEMSET
+#تعریف_کړه HAVE_STRERROR
+#تعریف_کړه HAVE_FCHOWN
+#تعریف_کړه HAVE_RENAME
+#تعریف_کړه HAVE_QSORT
+#تعریف_کړه HAVE_FSYNC
+#تعریف_کړه HAVE_GETPWUID
+#تعریف_کړه HAVE_GETPWNAM
+#تعریف_کړه	HAVE_STDLIB_H
+#تعریف_کړه	HAVE_STRING_H
+#تعریف_کړه	HAVE_ERRNO_H
+#تعریف_کړه HAVE_OPENDIR
+#تعریف_کړه HAVE_PUTENV
+#تعریف_کړه HAVE_SETENV
+#تعریف_کړه HAVE_SETJMP_H
+#تعریف_کړه HAVE_MATH_H
+#تعریف_کړه HAVE_GETTIMEOFDAY
+#تعریف_کړه HAVE_PWD_H
+#تعریف_کړه HAVE_NETDB_H
+#تعریف_کړه	HAVE_DIRENT_H
 
-#undef	HAVE_SYS_NDIR_H
-#undef	HAVE_SYS_DIR_H
-#undef	HAVE_NDIR_H
-#undef	HAVE_SYS_WAIT_H
-#undef  HAVE_SYS_SELECT_H
-#undef  HAVE_SYS_UTSNAME_H
-#undef  HAVE_SYS_SYSTEMINFO_H
-#undef  HAVE_TERMCAP_H
-#undef	HAVE_SGTTY_H
-#undef	HAVE_SYS_IOCTL_H
-#undef	HAVE_TERMIO_H
-#undef	HAVE_STROPTS_H
-#undef	HAVE_SYS_STREAM_H
-#undef	HAVE_SYS_PTEM_H
-#undef	HAVE_TERMIOS_H
-#undef	HAVE_LIBC_H
-#undef	HAVE_SYS_STATFS_H
-#undef	HAVE_SYS_POLL_H
-#undef  HAVE_FCHDIR
-#undef  HAVE_LSTAT
-#undef  HAVE_STDINT_H
+#تعریف_لغوه	HAVE_SYS_NDIR_H
+#تعریف_لغوه	HAVE_SYS_DIR_H
+#تعریف_لغوه	HAVE_NDIR_H
+#تعریف_لغوه	HAVE_SYS_WAIT_H
+#تعریف_لغوه  HAVE_SYS_SELECT_H
+#تعریف_لغوه  HAVE_SYS_UTSNAME_H
+#تعریف_لغوه  HAVE_SYS_SYSTEMINFO_H
+#تعریف_لغوه  HAVE_TERMCAP_H
+#تعریف_لغوه	HAVE_SGTTY_H
+#تعریف_لغوه	HAVE_SYS_IOCTL_H
+#تعریف_لغوه	HAVE_TERMIO_H
+#تعریف_لغوه	HAVE_STROPTS_H
+#تعریف_لغوه	HAVE_SYS_بهیر_H
+#تعریف_لغوه	HAVE_SYS_PTEM_H
+#تعریف_لغوه	HAVE_TERMIOS_H
+#تعریف_لغوه	HAVE_LIBC_H
+#تعریف_لغوه	HAVE_SYS_STATFS_H
+#تعریف_لغوه	HAVE_SYS_POLL_H
+#تعریف_لغوه  HAVE_FCHDIR
+#تعریف_لغوه  HAVE_LSTAT
+#تعریف_لغوه  HAVE_STDINT_H
 
 // Default features
-#define FEAT_IPV6
-#define FEAT_XTERM_SAVE
+#تعریف_کړه FEAT_IPV6
+#تعریف_کړه FEAT_XTERM_SAVE
 
-#define VIM_SIZEOF_INT  4
-#define VIM_SIZEOF_LONG 4
+#تعریف_کړه VIM_SIZEOF_INT  4
+#تعریف_کړه VIM_SIZEOF_LONG 4
 
-#if __USE_OFF64_T
+#إذا __USE_OFF64_T
 # define SIZEOF_OFF_T 8
-#else
+#وإلا
 # define SIZEOF_OFF_T 4
-#endif
+#د_که_پای
 
 // Hardware specific
-#if defined(__VAX) || defined(VAX)
+#إذا defined(__VAX) || defined(VAX)
 # undef  HAVE_GETTIMEOFDAY
 # undef  HAVE_USLEEP
 # undef  HAVE_STRCASECMP
-# undef  HAVE_STRINGS_H
+# undef  HAVE_مزي_ګانې_H
 # undef  HAVE_SIGSETJMP
 # undef  HAVE_ISNAN
 # undef  HAVE_XOS_R_H
@@ -165,11 +165,11 @@
 # define LONG_LONG_MAX  (2147483647)
 # define ULONG_LONG_MAX (4294967295U)
 
-#else // ALPHA, IA64, X86_64
+#وإلا // ALPHA, IA64, X86_64
 # define HAVE_GETTIMEOFDAY
 # define HAVE_USLEEP
 # define HAVE_STRCASECMP
-# define HAVE_STRINGS_H
+# define HAVE_مزي_ګانې_H
 # define HAVE_SIGSETJMP
 # undef  HAVE_XOS_R_H
 # undef  HAVE_NO_LONG_LONG
@@ -177,50 +177,50 @@
 # define LONG_LONG_MAX  (9223372036854775807)
 # define ULONG_LONG_MAX (18446744073709551615U)
 
-# if defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
+# إذا defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
 #  define HAVE_ISINF
 #  define HAVE_ISNAN
 # endif
 
-# if defined(X86_64)
+# إذا defined(X86_64)
 #  define HAVE_FSEEKO
 #  define HAVE_STDINT_H
 #  define HAVE_XOS_R_H
 # endif
 
-#endif /* VAX [else] */
+#د_که_پای /* VAX [else] */
 
 // Compiler specific
-#if defined(VAXC) || defined(__VAXC)
+#إذا defined(VAXC) || defined(__VAXC)
 # undef  HAVE_SELECT
 # undef  HAVE_FCNTL_H
 # undef  HAVE_UNISTD_H
-# undef  HAVE_SYS_TIME_H
+# undef  HAVE_SYS_وخت_H
 # undef  HAVE_LOCALE_H
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # undef	HAVE_STRFTIME
-#else   // DECC
+#وإلا   // DECC
 # define HAVE_SELECT
 # define HAVE_FCNTL_H
 # define HAVE_UNISTD_H 1
-# define HAVE_SYS_TIME_H
+# define HAVE_SYS_وخت_H
 # define HAVE_LOCALE_H
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # define HAVE_STRFTIME
-#endif
+#د_که_پای
 
-#if defined(USE_ICONV)
+#إذا defined(USE_ICONV)
 # define HAVE_ICONV_H
 # define HAVE_ICONV
-#else
+#وإلا
 # undef HAVE_ICONV_H
 # undef HAVE_ICONV
-#endif
+#د_که_پای
 
 // GUI support defines
-#if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
+#إذا defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
 # define X_INCLUDE_GRP_H  // To use getgrgid
 # define XUSE_MTSAFE_API
 # define HAVE_X11
@@ -230,11 +230,11 @@
 # endif
 # define USE_FONTSET
 # undef  X_LOCALE
-#endif
+#د_که_پای
 
 // Define needed types from stdint - older VMS do not have stdint.h
-#ifndef HAVE_STDINT_H
-   typedef unsigned char  uint8_t;
-   typedef unsigned short uint16_t;
-   typedef unsigned int   uint32_t;
-#endif
+#که_نه_تعریف_شوی HAVE_STDINT_H
+   تعريفنوع بینښه حرف  uint8_t;
+   تعريفنوع بینښه لنډ uint16_t;
+   تعريفنوع بینښه صحيح   uint32_t;
+#د_که_پای

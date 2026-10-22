@@ -12,18 +12,18 @@
  * here are optional, except "cm" (cursor motion).
  */
 
-#if defined(SASC) && SASC < 658
+#إذا defined(SASC) && SASC < 658
 /*
  * The SAS C compiler has a bug that makes typedefs being forgotten
  * in include files.  Has been fixed in version 6.58.
  */
-typedef unsigned char char_u;
-#endif
+تعريفنوع بینښه حرف char_u;
+#د_که_پای
 
 /*
  * Index of the termcap codes in the term_strings array.
  */
-enum SpecialKey
+تعداد Special_کلی
 {
     KS_NAME = 0,// name of this terminal entry
     KS_CE,	// clear to end of line
@@ -42,7 +42,7 @@ enum SpecialKey
     KS_VS,	// cursor very visible (blink)
     KS_CVS,	// cursor normally visible (no blink)
     KS_CSH,	// cursor shape
-    KS_CRC,	// request cursor blinking
+    KS_دوراني_ازموینه,	// request cursor blinking
     KS_CRS,	// request cursor style
     KS_ME,	// normal mode
     KS_MR,	// reverse mode
@@ -121,7 +121,7 @@ enum SpecialKey
     KS_ESU	// end synchronized update
 };
 
-#define KS_LAST	    KS_ESU
+#تعریف_کړه KS_وروستی	    KS_ESU
 
 /*
  * the terminal capabilities are stored in this array
@@ -131,114 +131,114 @@ enum SpecialKey
  * - there should be code in term.c to obtain the value from the termcap
  */
 
-extern char_u *(term_strings[]);    // current terminal strings
+خارجي char_u *(غړی_مزي_ګانې[]);    // current terminal strings
 
 /*
  * strings used for terminal
  */
-#define T_NAME	(TERM_STR(KS_NAME))	// terminal name
-#define T_CE	(TERM_STR(KS_CE))	// clear to end of line
-#define T_AL	(TERM_STR(KS_AL))	// add new blank line
-#define T_CAL	(TERM_STR(KS_CAL))	// add number of blank lines
-#define T_DL	(TERM_STR(KS_DL))	// delete line
-#define T_CDL	(TERM_STR(KS_CDL))	// delete number of lines
-#define T_CS	(TERM_STR(KS_CS))	// scroll region
-#define T_CSV	(TERM_STR(KS_CSV))	// scroll region vertical
-#define T_CL	(TERM_STR(KS_CL))	// clear screen
-#define T_CD	(TERM_STR(KS_CD))	// clear to end of display
-#define T_UT	(TERM_STR(KS_UT))	// clearing uses background color
-#define T_DA	(TERM_STR(KS_DA))	// text may be scrolled down from up
-#define T_DB	(TERM_STR(KS_DB))	// text may be scrolled up from down
-#define T_VI	(TERM_STR(KS_VI))	// cursor invisible
-#define T_VE	(TERM_STR(KS_VE))	// cursor visible
-#define T_VS	(TERM_STR(KS_VS))	// cursor very visible (blink)
-#define T_CVS	(TERM_STR(KS_CVS))	// cursor normally visible (no blink)
-#define T_CSH	(TERM_STR(KS_CSH))	// cursor shape
-#define T_CRC	(TERM_STR(KS_CRC))	// request cursor blinking
-#define T_CRS	(TERM_STR(KS_CRS))	// request cursor style
-#define T_ME	(TERM_STR(KS_ME))	// normal mode
-#define T_MR	(TERM_STR(KS_MR))	// reverse mode
-#define T_MD	(TERM_STR(KS_MD))	// bold mode
-#define T_SE	(TERM_STR(KS_SE))	// normal mode
-#define T_SO	(TERM_STR(KS_SO))	// standout mode
-#define T_CZH	(TERM_STR(KS_CZH))	// italic mode start
-#define T_CZR	(TERM_STR(KS_CZR))	// italic mode end
-#define T_UE	(TERM_STR(KS_UE))	// exit underscore (underline) mode
-#define T_US	(TERM_STR(KS_US))	// underscore (underline) mode
-#define T_UCE	(TERM_STR(KS_UCE))	// exit undercurl mode
-#define T_UCS	(TERM_STR(KS_UCS))	// undercurl mode
-#define T_USS	(TERM_STR(KS_USS))	// double underline mode
-#define T_DS	(TERM_STR(KS_DS))	// dotted underline mode
-#define T_CDS	(TERM_STR(KS_CDS))	// dashed underline mode
-#define T_STE	(TERM_STR(KS_STE))	// exit strikethrough mode
-#define T_STS	(TERM_STR(KS_STS))	// strikethrough mode
-#define T_MS	(TERM_STR(KS_MS))	// save to move cur in reverse mode
-#define T_CM	(TERM_STR(KS_CM))	// cursor motion
-#define T_SR	(TERM_STR(KS_SR))	// scroll reverse (backward)
-#define T_CRI	(TERM_STR(KS_CRI))	// cursor number of chars right
-#define T_VB	(TERM_STR(KS_VB))	// visual bell
-#define T_KS	(TERM_STR(KS_KS))	// put term in "keypad transmit" mode
-#define T_KE	(TERM_STR(KS_KE))	// out of "keypad transmit" mode
-#define T_TI	(TERM_STR(KS_TI))	// put terminal in termcap mode
-#define T_CTI	(TERM_STR(KS_CTI))	// put terminal in "raw" mode
-#define T_CRK	(TERM_STR(KS_CRK))	// request keyboard protocol status
-#define T_TE	(TERM_STR(KS_TE))	// end of termcap mode
-#define T_CTE	(TERM_STR(KS_CTE))	// end of "raw" mode
-#define T_BC	(TERM_STR(KS_BC))	// backspace character
-#define T_CCS	(TERM_STR(KS_CCS))	// cur is relative to scroll region
-#define T_CCO	(TERM_STR(KS_CCO))	// number of colors
-#define T_CSF	(TERM_STR(KS_CSF))	// set foreground color
-#define T_CSB	(TERM_STR(KS_CSB))	// set background color
-#define T_XS	(TERM_STR(KS_XS))	// standout not erased by overwriting
-#define T_XN	(TERM_STR(KS_XN))	// newline glitch
-#define T_MB	(TERM_STR(KS_MB))	// blink mode
-#define T_CAF	(TERM_STR(KS_CAF))	// set foreground color (ANSI)
-#define T_CAB	(TERM_STR(KS_CAB))	// set background color (ANSI)
-#define T_CAU	(TERM_STR(KS_CAU))	// set underline color (ANSI)
-#define T_CFO	(TERM_STR(KS_CF))	// set alternate font
-#define T_LE	(TERM_STR(KS_LE))	// cursor left
-#define T_ND	(TERM_STR(KS_ND))	// cursor right
-#define T_CIS	(TERM_STR(KS_CIS))	// set icon text start
-#define T_CIE	(TERM_STR(KS_CIE))	// set icon text end
-#define T_TS	(TERM_STR(KS_TS))	// set window title start
-#define T_FS	(TERM_STR(KS_FS))	// set window title end
-#define T_CSC	(TERM_STR(KS_CSC))	// set cursor color start
-#define T_CEC	(TERM_STR(KS_CEC))	// set cursor color end
-#define T_CWP	(TERM_STR(KS_CWP))	// set window position
-#define T_CGP	(TERM_STR(KS_CGP))	// get window position
-#define T_CWS	(TERM_STR(KS_CWS))	// window size
-#define T_CSI	(TERM_STR(KS_CSI))	// start insert mode
-#define T_CEI	(TERM_STR(KS_CEI))	// end insert mode
-#define T_CSR	(TERM_STR(KS_CSR))	// start replace mode
-#define T_CRV	(TERM_STR(KS_CRV))	// request version string
-#define T_CXM	(TERM_STR(KS_CXM))	// enable/disable mouse reporting
-#define T_RFG	(TERM_STR(KS_RFG))	// request foreground RGB
-#define T_RBG	(TERM_STR(KS_RBG))	// request background RGB
-#define T_OP	(TERM_STR(KS_OP))	// original color pair
-#define T_U7	(TERM_STR(KS_U7))	// request cursor position
-#define T_8F	(TERM_STR(KS_8F))	// set foreground color (RGB)
-#define T_8B	(TERM_STR(KS_8B))	// set background color (RGB)
-#define T_8U	(TERM_STR(KS_8U))	// set underline color (RGB)
-#define T_BE	(TERM_STR(KS_CBE))	// enable bracketed paste mode
-#define T_BD	(TERM_STR(KS_CBD))	// disable bracketed paste mode
-#define T_CST	(TERM_STR(KS_CST))	// save window title
-#define T_CRT	(TERM_STR(KS_CRT))	// restore window title
-#define T_SSI	(TERM_STR(KS_SSI))	// save icon text
-#define T_SRI	(TERM_STR(KS_SRI))	// restore icon text
-#define T_FD	(TERM_STR(KS_FD))	// disable focus event tracking
-#define T_FE	(TERM_STR(KS_FE))	// enable focus event tracking
-#define T_XON	(TERM_STR(KS_XON))	// terminal uses xon/xoff handshaking
-#define T_BSU	(TERM_STR(KS_BSU))	// begin synchronized update
-#define T_ESU	(TERM_STR(KS_ESU))	// end synchronized update
+#تعریف_کړه T_NAME	(غړی_STR(KS_NAME))	// terminal name
+#تعریف_کړه T_CE	(غړی_STR(KS_CE))	// clear to end of line
+#تعریف_کړه T_AL	(غړی_STR(KS_AL))	// add new blank line
+#تعریف_کړه T_CAL	(غړی_STR(KS_CAL))	// add number of blank lines
+#تعریف_کړه T_DL	(غړی_STR(KS_DL))	// delete line
+#تعریف_کړه T_CDL	(غړی_STR(KS_CDL))	// delete number of lines
+#تعریف_کړه T_CS	(غړی_STR(KS_CS))	// scroll region
+#تعریف_کړه T_CSV	(غړی_STR(KS_CSV))	// scroll region vertical
+#تعریف_کړه T_CL	(غړی_STR(KS_CL))	// clear screen
+#تعریف_کړه T_CD	(غړی_STR(KS_CD))	// clear to end of display
+#تعریف_کړه T_UT	(غړی_STR(KS_UT))	// clearing uses background color
+#تعریف_کړه T_DA	(غړی_STR(KS_DA))	// text may be scrolled down from up
+#تعریف_کړه T_DB	(غړی_STR(KS_DB))	// text may be scrolled up from down
+#تعریف_کړه T_VI	(غړی_STR(KS_VI))	// cursor invisible
+#تعریف_کړه T_VE	(غړی_STR(KS_VE))	// cursor visible
+#تعریف_کړه T_VS	(غړی_STR(KS_VS))	// cursor very visible (blink)
+#تعریف_کړه T_CVS	(غړی_STR(KS_CVS))	// cursor normally visible (no blink)
+#تعریف_کړه T_CSH	(غړی_STR(KS_CSH))	// cursor shape
+#تعریف_کړه T_دوراني_ازموینه	(غړی_STR(KS_دوراني_ازموینه))	// request cursor blinking
+#تعریف_کړه T_CRS	(غړی_STR(KS_CRS))	// request cursor style
+#تعریف_کړه T_ME	(غړی_STR(KS_ME))	// normal mode
+#تعریف_کړه T_MR	(غړی_STR(KS_MR))	// reverse mode
+#تعریف_کړه T_MD	(غړی_STR(KS_MD))	// bold mode
+#تعریف_کړه T_SE	(غړی_STR(KS_SE))	// normal mode
+#تعریف_کړه T_SO	(غړی_STR(KS_SO))	// standout mode
+#تعریف_کړه T_CZH	(غړی_STR(KS_CZH))	// italic mode start
+#تعریف_کړه T_CZR	(غړی_STR(KS_CZR))	// italic mode end
+#تعریف_کړه T_UE	(غړی_STR(KS_UE))	// exit underscore (underline) mode
+#تعریف_کړه T_US	(غړی_STR(KS_US))	// underscore (underline) mode
+#تعریف_کړه T_UCE	(غړی_STR(KS_UCE))	// exit undercurl mode
+#تعریف_کړه T_UCS	(غړی_STR(KS_UCS))	// undercurl mode
+#تعریف_کړه T_USS	(غړی_STR(KS_USS))	// double underline mode
+#تعریف_کړه T_DS	(غړی_STR(KS_DS))	// dotted underline mode
+#تعریف_کړه T_CDS	(غړی_STR(KS_CDS))	// dashed underline mode
+#تعریف_کړه T_STE	(غړی_STR(KS_STE))	// exit strikethrough mode
+#تعریف_کړه T_STS	(غړی_STR(KS_STS))	// strikethrough mode
+#تعریف_کړه T_MS	(غړی_STR(KS_MS))	// save to move cur in reverse mode
+#تعریف_کړه T_CM	(غړی_STR(KS_CM))	// cursor motion
+#تعریف_کړه T_SR	(غړی_STR(KS_SR))	// scroll reverse (backward)
+#تعریف_کړه T_CRI	(غړی_STR(KS_CRI))	// cursor number of chars right
+#تعریف_کړه T_VB	(غړی_STR(KS_VB))	// visual bell
+#تعریف_کړه T_KS	(غړی_STR(KS_KS))	// put term in "keypad transmit" mode
+#تعریف_کړه T_KE	(غړی_STR(KS_KE))	// out of "keypad transmit" mode
+#تعریف_کړه T_TI	(غړی_STR(KS_TI))	// put terminal in termcap mode
+#تعریف_کړه T_CTI	(غړی_STR(KS_CTI))	// put terminal in "raw" mode
+#تعریف_کړه T_CRK	(غړی_STR(KS_CRK))	// request keyboard protocol status
+#تعریف_کړه T_TE	(غړی_STR(KS_TE))	// end of termcap mode
+#تعریف_کړه T_CTE	(غړی_STR(KS_CTE))	// end of "raw" mode
+#تعریف_کړه T_BC	(غړی_STR(KS_BC))	// backspace character
+#تعریف_کړه T_CCS	(غړی_STR(KS_CCS))	// cur is relative to scroll region
+#تعریف_کړه T_CCO	(غړی_STR(KS_CCO))	// number of colors
+#تعریف_کړه T_CSF	(غړی_STR(KS_CSF))	// set foreground color
+#تعریف_کړه T_CSB	(غړی_STR(KS_CSB))	// set background color
+#تعریف_کړه T_XS	(غړی_STR(KS_XS))	// standout not erased by overwriting
+#تعریف_کړه T_XN	(غړی_STR(KS_XN))	// newline glitch
+#تعریف_کړه T_MB	(غړی_STR(KS_MB))	// blink mode
+#تعریف_کړه T_CAF	(غړی_STR(KS_CAF))	// set foreground color (ANSI)
+#تعریف_کړه T_CAB	(غړی_STR(KS_CAB))	// set background color (ANSI)
+#تعریف_کړه T_CAU	(غړی_STR(KS_CAU))	// set underline color (ANSI)
+#تعریف_کړه T_CFO	(غړی_STR(KS_CF))	// set alternate font
+#تعریف_کړه T_LE	(غړی_STR(KS_LE))	// cursor left
+#تعریف_کړه T_ND	(غړی_STR(KS_ND))	// cursor right
+#تعریف_کړه T_CIS	(غړی_STR(KS_CIS))	// set icon text start
+#تعریف_کړه T_CIE	(غړی_STR(KS_CIE))	// set icon text end
+#تعریف_کړه T_TS	(غړی_STR(KS_TS))	// set window title start
+#تعریف_کړه T_FS	(غړی_STR(KS_FS))	// set window title end
+#تعریف_کړه T_CSC	(غړی_STR(KS_CSC))	// set cursor color start
+#تعریف_کړه T_CEC	(غړی_STR(KS_CEC))	// set cursor color end
+#تعریف_کړه T_CWP	(غړی_STR(KS_CWP))	// set window position
+#تعریف_کړه T_CGP	(غړی_STR(KS_CGP))	// get window position
+#تعریف_کړه T_CWS	(غړی_STR(KS_CWS))	// window size
+#تعریف_کړه T_CSI	(غړی_STR(KS_CSI))	// start insert mode
+#تعریف_کړه T_CEI	(غړی_STR(KS_CEI))	// end insert mode
+#تعریف_کړه T_CSR	(غړی_STR(KS_CSR))	// start replace mode
+#تعریف_کړه T_CRV	(غړی_STR(KS_CRV))	// request version string
+#تعریف_کړه T_CXM	(غړی_STR(KS_CXM))	// enable/disable mouse reporting
+#تعریف_کړه T_RFG	(غړی_STR(KS_RFG))	// request foreground RGB
+#تعریف_کړه T_RBG	(غړی_STR(KS_RBG))	// request background RGB
+#تعریف_کړه T_OP	(غړی_STR(KS_OP))	// original color pair
+#تعریف_کړه T_U7	(غړی_STR(KS_U7))	// request cursor position
+#تعریف_کړه T_8F	(غړی_STR(KS_8F))	// set foreground color (RGB)
+#تعریف_کړه T_8B	(غړی_STR(KS_8B))	// set background color (RGB)
+#تعریف_کړه T_8U	(غړی_STR(KS_8U))	// set underline color (RGB)
+#تعریف_کړه T_BE	(غړی_STR(KS_CBE))	// enable bracketed paste mode
+#تعریف_کړه T_BD	(غړی_STR(KS_CBD))	// disable bracketed paste mode
+#تعریف_کړه T_CST	(غړی_STR(KS_CST))	// save window title
+#تعریف_کړه T_CRT	(غړی_STR(KS_CRT))	// restore window title
+#تعریف_کړه T_SSI	(غړی_STR(KS_SSI))	// save icon text
+#تعریف_کړه T_SRI	(غړی_STR(KS_SRI))	// restore icon text
+#تعریف_کړه T_FD	(غړی_STR(KS_FD))	// disable focus event tracking
+#تعریف_کړه T_FE	(غړی_STR(KS_FE))	// enable focus event tracking
+#تعریف_کړه T_XON	(غړی_STR(KS_XON))	// terminal uses xon/xoff handshaking
+#تعریف_کړه T_BSU	(غړی_STR(KS_BSU))	// begin synchronized update
+#تعریف_کړه T_ESU	(غړی_STR(KS_ESU))	// end synchronized update
 
-typedef enum {
+تعريفنوع تعداد {
     TMODE_COOK,	    // terminal mode for external cmds and Ex mode
     TMODE_SLEEP,    // terminal mode for sleeping (cooked but no echo)
     TMODE_RAW,	    // terminal mode for Normal and Insert mode
     TMODE_UNKNOWN   // after executing a shell
 } tmode_T;
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
-extern const char_u cterm_ansi_idx[];
-#endif
+خارجي ثابت char_u cterm_ansi_idx[];
+#د_که_پای

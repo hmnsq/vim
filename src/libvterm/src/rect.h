@@ -2,55 +2,55 @@
  * Some utility functions on VTermRect structures
  */
 
-#define STRFrect "(%d,%d-%d,%d)"
-#define ARGSrect(r) (r).start_row, (r).start_col, (r).end_row, (r).end_col
+#تعریف_کړه STRFrect "(%d,%d-%d,%d)"
+#تعریف_کړه ARGSrect(r) (r).پیل_لیکه, (r).پیل_ستون, (r).پای_ټکی_لیکه, (r).پای_ټکی_ستون
 
 /* Expand dst to contain src as well */
-static void rect_expand(VTermRect *dst, VTermRect *src)
+ساكن فراغ rect_expand(VTermRect *dst, VTermRect *src)
 {
-  if(dst->start_row > src->start_row) dst->start_row = src->start_row;
-  if(dst->start_col > src->start_col) dst->start_col = src->start_col;
-  if(dst->end_row   < src->end_row)   dst->end_row   = src->end_row;
-  if(dst->end_col   < src->end_col)   dst->end_col   = src->end_col;
+  إذا(dst->پیل_لیکه > src->پیل_لیکه) dst->پیل_لیکه = src->پیل_لیکه;
+  إذا(dst->پیل_ستون > src->پیل_ستون) dst->پیل_ستون = src->پیل_ستون;
+  إذا(dst->پای_ټکی_لیکه   < src->پای_ټکی_لیکه)   dst->پای_ټکی_لیکه   = src->پای_ټکی_لیکه;
+  إذا(dst->پای_ټکی_ستون   < src->پای_ټکی_ستون)   dst->پای_ټکی_ستون   = src->پای_ټکی_ستون;
 }
 
 /* Clip the dst to ensure it does not step outside of bounds */
-static void rect_clip(VTermRect *dst, VTermRect *bounds)
+ساكن فراغ rect_clip(VTermRect *dst, VTermRect *bounds)
 {
-  if(dst->start_row < bounds->start_row) dst->start_row = bounds->start_row;
-  if(dst->start_col < bounds->start_col) dst->start_col = bounds->start_col;
-  if(dst->end_row   > bounds->end_row)   dst->end_row   = bounds->end_row;
-  if(dst->end_col   > bounds->end_col)   dst->end_col   = bounds->end_col;
+  إذا(dst->پیل_لیکه < bounds->پیل_لیکه) dst->پیل_لیکه = bounds->پیل_لیکه;
+  إذا(dst->پیل_ستون < bounds->پیل_ستون) dst->پیل_ستون = bounds->پیل_ستون;
+  إذا(dst->پای_ټکی_لیکه   > bounds->پای_ټکی_لیکه)   dst->پای_ټکی_لیکه   = bounds->پای_ټکی_لیکه;
+  إذا(dst->پای_ټکی_ستون   > bounds->پای_ټکی_ستون)   dst->پای_ټکی_ستون   = bounds->پای_ټکی_ستون;
   /* Ensure it doesn't end up negatively-sized */
-  if(dst->end_row < dst->start_row) dst->end_row = dst->start_row;
-  if(dst->end_col < dst->start_col) dst->end_col = dst->start_col;
+  إذا(dst->پای_ټکی_لیکه < dst->پیل_لیکه) dst->پای_ټکی_لیکه = dst->پیل_لیکه;
+  إذا(dst->پای_ټکی_ستون < dst->پیل_ستون) dst->پای_ټکی_ستون = dst->پیل_ستون;
 }
 
 /* True if the two rectangles are equal */
-static int rect_equal(VTermRect *a, VTermRect *b)
+ساكن صحيح rect_equal(VTermRect *a, VTermRect *b)
 {
-  return (a->start_row == b->start_row) &&
-         (a->start_col == b->start_col) &&
-         (a->end_row   == b->end_row)   &&
-         (a->end_col   == b->end_col);
+  أرجع (a->پیل_لیکه == b->پیل_لیکه) &&
+         (a->پیل_ستون == b->پیل_ستون) &&
+         (a->پای_ټکی_لیکه   == b->پای_ټکی_لیکه)   &&
+         (a->پای_ټکی_ستون   == b->پای_ټکی_ستون);
 }
 
 /* True if small is contained entirely within big */
-static int rect_contains(VTermRect *big, VTermRect *small)
+ساكن صحيح rect_لري(VTermRect *big, VTermRect *small)
 {
-  if(small->start_row < big->start_row) return 0;
-  if(small->start_col < big->start_col) return 0;
-  if(small->end_row   > big->end_row)   return 0;
-  if(small->end_col   > big->end_col)   return 0;
-  return 1;
+  إذا(small->پیل_لیکه < big->پیل_لیکه) أرجع 0;
+  إذا(small->پیل_ستون < big->پیل_ستون) أرجع 0;
+  إذا(small->پای_ټکی_لیکه   > big->پای_ټکی_لیکه)   أرجع 0;
+  إذا(small->پای_ټکی_ستون   > big->پای_ټکی_ستون)   أرجع 0;
+  أرجع 1;
 }
 
 /* True if the rectangles overlap at all */
-static int rect_intersects(VTermRect *a, VTermRect *b)
+ساكن صحيح rect_intersects(VTermRect *a, VTermRect *b)
 {
-  if(a->start_row > b->end_row || b->start_row > a->end_row)
-    return 0;
-  if(a->start_col > b->end_col || b->start_col > a->end_col)
-    return 0;
-  return 1;
+  إذا(a->پیل_لیکه > b->پای_ټکی_لیکه || b->پیل_لیکه > a->پای_ټکی_لیکه)
+    أرجع 0;
+  إذا(a->پیل_ستون > b->پای_ټکی_ستون || b->پیل_ستون > a->پای_ټکی_ستون)
+    أرجع 0;
+  أرجع 1;
 }

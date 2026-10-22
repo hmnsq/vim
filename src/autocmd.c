@@ -11,7 +11,7 @@
  * autocmd.c: Autocommand related functions
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * The autocommands are stored in a list for each event.
@@ -48,30 +48,30 @@
  *   The order of AutoCmds is important, this is the order in which they were
  *   defined and will have to be executed.
  */
-typedef struct AutoCmd
+تعريفنوع بنية AutoCmd
 {
     char_u	    *cmd;		// The command to be executed (NULL
 					// when command has been removed).
-    char	    once;		// "One shot": removed after execution
-    char	    nested;		// If autocommands nest here.
-    char	    last;		// last command in list
+    حرف	    once;		// "One shot": removed after execution
+    حرف	    nested;		// If autocommands nest here.
+    حرف	    وروستی;		// last command in list
     sctx_T	    script_ctx;		// script context where it is defined
-    struct AutoCmd  *next;		// next AutoCmd in list
+    بنية AutoCmd  *بل;		// next AutoCmd in list
 } AutoCmd;
 
-typedef struct AutoPat
+تعريفنوع بنية AutoPat
 {
-    struct AutoPat  *next;		// Next AutoPat in AutoPat list; MUST
+    بنية AutoPat  *بل;		// Next AutoPat in AutoPat list; MUST
 					// be the first entry.
     char_u	    *pat;		// pattern as typed (NULL when pattern
 					// has been removed)
     regprog_T	    *reg_prog;		// compiled regprog for pattern
     AutoCmd	    *cmds;		// list of commands to do
-    int		    group;		// group ID
-    int		    patlen;		// strlen() of pat
-    int		    buflocal_nr;	// !=0 for buffer-local AutoPat
-    char	    allow_dirs;		// Pattern may match whole path
-    char	    last;		// last pattern for apply_autocmds()
+    صحيح		    ډله;		// group ID
+    صحيح		    patlen;		// strlen() of pat
+    صحيح		    buflocal_nr;	// !=0 for buffer-local AutoPat
+    حرف	    allow_dirs;		// Pattern may match whole path
+    حرف	    وروستی;		// last pattern for apply_autocmds()
 } AutoPat;
 
 //
@@ -79,279 +79,279 @@ typedef struct AutoPat
 // BufNewFile and BufRead are searched for ALOT (especially at startup)
 // so we pre-determine their index into the event_tab[] table for fast access.
 // Keep these values in sync with event_tab[]!
-#define BUFNEWFILE_INDEX 9
-#define BUFREAD_INDEX 10
+#تعریف_کړه BUFNEWFILE_شاخص 9
+#تعریف_کړه BUFREAD_شاخص 10
 
 // Must be sorted by the 'value' field because it is used by bsearch()!
 // Events with positive keys aren't allowed in 'eventignorewin'.
-static keyvalue_T event_tab[NUM_EVENTS] = {
-    KEYVALUE_ENTRY(-EVENT_BUFADD, "BufAdd"),
-    KEYVALUE_ENTRY(-EVENT_BUFADD, "BufCreate"),
-    KEYVALUE_ENTRY(-EVENT_BUFDELETE, "BufDelete"),
-    KEYVALUE_ENTRY(-EVENT_BUFENTER, "BufEnter"),
-    KEYVALUE_ENTRY(-EVENT_BUFFILEPOST, "BufFilePost"),
-    KEYVALUE_ENTRY(-EVENT_BUFFILEPRE, "BufFilePre"),
-    KEYVALUE_ENTRY(-EVENT_BUFHIDDEN, "BufHidden"),
-    KEYVALUE_ENTRY(-EVENT_BUFLEAVE, "BufLeave"),
-    KEYVALUE_ENTRY(-EVENT_BUFNEW, "BufNew"),
-    KEYVALUE_ENTRY(-EVENT_BUFNEWFILE, "BufNewFile"),	// BUFNEWFILE_INDEX
-    KEYVALUE_ENTRY(-EVENT_BUFREADPOST, "BufRead"),	// BUFREAD_INDEX
-    KEYVALUE_ENTRY(-EVENT_BUFREADCMD, "BufReadCmd"),
-    KEYVALUE_ENTRY(-EVENT_BUFREADPOST, "BufReadPost"),
-    KEYVALUE_ENTRY(-EVENT_BUFREADPRE, "BufReadPre"),
-    KEYVALUE_ENTRY(-EVENT_BUFUNLOAD, "BufUnload"),
-    KEYVALUE_ENTRY(-EVENT_BUFWINENTER, "BufWinEnter"),
-    KEYVALUE_ENTRY(-EVENT_BUFWINLEAVE, "BufWinLeave"),
-    KEYVALUE_ENTRY(-EVENT_BUFWIPEOUT, "BufWipeout"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPRE, "BufWrite"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITECMD, "BufWriteCmd"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPOST, "BufWritePost"),
-    KEYVALUE_ENTRY(-EVENT_BUFWRITEPRE, "BufWritePre"),
-    KEYVALUE_ENTRY(EVENT_CMDLINECHANGED, "CmdlineChanged"),
-    KEYVALUE_ENTRY(EVENT_CMDLINEENTER, "CmdlineEnter"),
-    KEYVALUE_ENTRY(EVENT_CMDLINELEAVE, "CmdlineLeave"),
-    KEYVALUE_ENTRY(EVENT_CMDLINELEAVEPRE, "CmdlineLeavePre"),
-    KEYVALUE_ENTRY(EVENT_CMDUNDEFINED, "CmdUndefined"),
-    KEYVALUE_ENTRY(EVENT_CMDWINENTER, "CmdwinEnter"),
-    KEYVALUE_ENTRY(EVENT_CMDWINLEAVE, "CmdwinLeave"),
-    KEYVALUE_ENTRY(EVENT_COLORSCHEME, "ColorScheme"),
-    KEYVALUE_ENTRY(EVENT_COLORSCHEMEPRE, "ColorSchemePre"),
-    KEYVALUE_ENTRY(EVENT_COMPLETECHANGED, "CompleteChanged"),
-    KEYVALUE_ENTRY(EVENT_COMPLETEDONE, "CompleteDone"),
-    KEYVALUE_ENTRY(EVENT_COMPLETEDONEPRE, "CompleteDonePre"),
-    KEYVALUE_ENTRY(-EVENT_CURSORHOLD, "CursorHold"),
-    KEYVALUE_ENTRY(-EVENT_CURSORHOLDI, "CursorHoldI"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVED, "CursorMoved"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVEDC, "CursorMovedC"),
-    KEYVALUE_ENTRY(-EVENT_CURSORMOVEDI, "CursorMovedI"),
-    KEYVALUE_ENTRY(EVENT_DIFFUPDATED, "DiffUpdated"),
-    KEYVALUE_ENTRY(EVENT_DIRCHANGED, "DirChanged"),
-    KEYVALUE_ENTRY(EVENT_DIRCHANGEDPRE, "DirChangedPre"),
-    KEYVALUE_ENTRY(EVENT_ENCODINGCHANGED, "EncodingChanged"),
-    KEYVALUE_ENTRY(EVENT_EXITPRE, "ExitPre"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDCMD, "FileAppendCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDPOST, "FileAppendPost"),
-    KEYVALUE_ENTRY(-EVENT_FILEAPPENDPRE, "FileAppendPre"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDRO, "FileChangedRO"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDSHELL, "FileChangedShell"),
-    KEYVALUE_ENTRY(-EVENT_FILECHANGEDSHELLPOST, "FileChangedShellPost"),
-    KEYVALUE_ENTRY(EVENT_ENCODINGCHANGED, "FileEncoding"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADCMD, "FileReadCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADPOST, "FileReadPost"),
-    KEYVALUE_ENTRY(-EVENT_FILEREADPRE, "FileReadPre"),
-    KEYVALUE_ENTRY(-EVENT_FILETYPE, "FileType"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITECMD, "FileWriteCmd"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITEPOST, "FileWritePost"),
-    KEYVALUE_ENTRY(-EVENT_FILEWRITEPRE, "FileWritePre"),
-    KEYVALUE_ENTRY(-EVENT_FILTERREADPOST, "FilterReadPost"),
-    KEYVALUE_ENTRY(-EVENT_FILTERREADPRE, "FilterReadPre"),
-    KEYVALUE_ENTRY(-EVENT_FILTERWRITEPOST, "FilterWritePost"),
-    KEYVALUE_ENTRY(-EVENT_FILTERWRITEPRE, "FilterWritePre"),
-    KEYVALUE_ENTRY(EVENT_FOCUSGAINED, "FocusGained"),
-    KEYVALUE_ENTRY(EVENT_FOCUSLOST, "FocusLost"),
-    KEYVALUE_ENTRY(EVENT_FUNCUNDEFINED, "FuncUndefined"),
-    KEYVALUE_ENTRY(EVENT_GUIENTER, "GUIEnter"),
-    KEYVALUE_ENTRY(EVENT_GUIFAILED, "GUIFailed"),
-    KEYVALUE_ENTRY(-EVENT_INSERTCHANGE, "InsertChange"),
-    KEYVALUE_ENTRY(-EVENT_INSERTCHARPRE, "InsertCharPre"),
-    KEYVALUE_ENTRY(-EVENT_INSERTENTER, "InsertEnter"),
-    KEYVALUE_ENTRY(-EVENT_INSERTLEAVE, "InsertLeave"),
-    KEYVALUE_ENTRY(-EVENT_INSERTLEAVEPRE, "InsertLeavePre"),
-    KEYVALUE_ENTRY(EVENT_KEYINPUTPRE, "KeyInputPre"),
-    KEYVALUE_ENTRY(EVENT_MENUPOPUP, "MenuPopup"),
-    KEYVALUE_ENTRY(EVENT_MODECHANGED, "ModeChanged"),
-    KEYVALUE_ENTRY(EVENT_OPTIONSET, "OptionSet"),
-    KEYVALUE_ENTRY(EVENT_QUICKFIXCMDPOST, "QuickFixCmdPost"),
-    KEYVALUE_ENTRY(EVENT_QUICKFIXCMDPRE, "QuickFixCmdPre"),
-    KEYVALUE_ENTRY(EVENT_QUITPRE, "QuitPre"),
-    KEYVALUE_ENTRY(EVENT_REMOTEREPLY, "RemoteReply"),
-    KEYVALUE_ENTRY(EVENT_SAFESTATE, "SafeState"),
-    KEYVALUE_ENTRY(EVENT_SAFESTATEAGAIN, "SafeStateAgain"),
-    KEYVALUE_ENTRY(EVENT_SESSIONLOADPOST, "SessionLoadPost"),
-    KEYVALUE_ENTRY(EVENT_SESSIONLOADPRE, "SessionLoadPre"),
-    KEYVALUE_ENTRY(EVENT_SESSIONWRITEPOST, "SessionWritePost"),
-    KEYVALUE_ENTRY(EVENT_SHELLCMDPOST, "ShellCmdPost"),
-    KEYVALUE_ENTRY(-EVENT_SHELLFILTERPOST, "ShellFilterPost"),
-    KEYVALUE_ENTRY(EVENT_SIGUSR1, "SigUSR1"),
-    KEYVALUE_ENTRY(EVENT_SOURCECMD, "SourceCmd"),
-    KEYVALUE_ENTRY(EVENT_SOURCEPOST, "SourcePost"),
-    KEYVALUE_ENTRY(EVENT_SOURCEPRE, "SourcePre"),
-    KEYVALUE_ENTRY(EVENT_SPELLFILEMISSING, "SpellFileMissing"),
-    KEYVALUE_ENTRY(EVENT_STDINREADPOST, "StdinReadPost"),
-    KEYVALUE_ENTRY(EVENT_STDINREADPRE, "StdinReadPre"),
-    KEYVALUE_ENTRY(EVENT_SWAPEXISTS, "SwapExists"),
-    KEYVALUE_ENTRY(EVENT_SYNTAX, "Syntax"),
-    KEYVALUE_ENTRY(EVENT_TABCLOSED, "TabClosed"),
-    KEYVALUE_ENTRY(EVENT_TABCLOSEDPRE, "TabClosedPre"),
-    KEYVALUE_ENTRY(EVENT_TABENTER, "TabEnter"),
-    KEYVALUE_ENTRY(EVENT_TABLEAVE, "TabLeave"),
-    KEYVALUE_ENTRY(EVENT_TABNEW, "TabNew"),
-    KEYVALUE_ENTRY(EVENT_TERMCHANGED, "TermChanged"),
-    KEYVALUE_ENTRY(EVENT_TERMINALOPEN, "TerminalOpen"),
-    KEYVALUE_ENTRY(EVENT_TERMINALWINOPEN, "TerminalWinOpen"),
-    KEYVALUE_ENTRY(EVENT_TERMRESPONSE, "TermResponse"),
-    KEYVALUE_ENTRY(EVENT_TERMRESPONSEALL, "TermResponseAll"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGED, "TextChanged"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDI, "TextChangedI"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDP, "TextChangedP"),
-    KEYVALUE_ENTRY(-EVENT_TEXTCHANGEDT, "TextChangedT"),
-    KEYVALUE_ENTRY(-EVENT_TEXTPUTPOST, "TextPutPost"),
-    KEYVALUE_ENTRY(-EVENT_TEXTPUTPRE, "TextPutPre"),
-    KEYVALUE_ENTRY(-EVENT_TEXTYANKPOST, "TextYankPost"),
-    KEYVALUE_ENTRY(EVENT_USER, "User"),
-    KEYVALUE_ENTRY(EVENT_VIMENTER, "VimEnter"),
-    KEYVALUE_ENTRY(EVENT_VIMLEAVE, "VimLeave"),
-    KEYVALUE_ENTRY(EVENT_VIMLEAVEPRE, "VimLeavePre"),
-    KEYVALUE_ENTRY(EVENT_VIMRESIZED, "VimResized"),
-    KEYVALUE_ENTRY(EVENT_VIMRESUME, "VimResume"),
-    KEYVALUE_ENTRY(EVENT_VIMSUSPEND, "VimSuspend"),
-    KEYVALUE_ENTRY(-EVENT_WINCLOSED, "WinClosed"),
-    KEYVALUE_ENTRY(-EVENT_WINENTER, "WinEnter"),
-    KEYVALUE_ENTRY(-EVENT_WINLEAVE, "WinLeave"),
-    KEYVALUE_ENTRY(EVENT_WINNEW, "WinNew"),
-    KEYVALUE_ENTRY(EVENT_WINNEWPRE, "WinNewPre"),
-    KEYVALUE_ENTRY(-EVENT_WINRESIZED, "WinResized"),
-    KEYVALUE_ENTRY(-EVENT_WINSCROLLED, "WinScrolled"),
+ساكن keyvalue_T event_tab[عدد_EVENTS] = {
+    KEYVALUE_ثبت(-EVENT_BUFADD, "BufAdd"),
+    KEYVALUE_ثبت(-EVENT_BUFADD, "BufCreate"),
+    KEYVALUE_ثبت(-EVENT_BUFDELETE, "BufDelete"),
+    KEYVALUE_ثبت(-EVENT_BUFENTER, "BufEnter"),
+    KEYVALUE_ثبت(-EVENT_BUFFILEPOST, "BufFilePost"),
+    KEYVALUE_ثبت(-EVENT_BUFFILEPRE, "BufFilePre"),
+    KEYVALUE_ثبت(-EVENT_BUFHIDDEN, "BufHidden"),
+    KEYVALUE_ثبت(-EVENT_BUFLEAVE, "BufLeave"),
+    KEYVALUE_ثبت(-EVENT_BUFNEW, "BufNew"),
+    KEYVALUE_ثبت(-EVENT_BUFNEWFILE, "BufNewFile"),	// BUFNEWFILE_INDEX
+    KEYVALUE_ثبت(-EVENT_BUFREADPOST, "BufRead"),	// BUFREAD_INDEX
+    KEYVALUE_ثبت(-EVENT_BUFREADCMD, "BufReadCmd"),
+    KEYVALUE_ثبت(-EVENT_BUFREADPOST, "BufReadPost"),
+    KEYVALUE_ثبت(-EVENT_BUFREADPRE, "BufReadPre"),
+    KEYVALUE_ثبت(-EVENT_BUFUNLOAD, "BufUnload"),
+    KEYVALUE_ثبت(-EVENT_BUFWINENTER, "BufWinEnter"),
+    KEYVALUE_ثبت(-EVENT_BUFWINLEAVE, "BufWinLeave"),
+    KEYVALUE_ثبت(-EVENT_BUFWIPEOUT, "BufWipeout"),
+    KEYVALUE_ثبت(-EVENT_BUFWRITEPRE, "BufWrite"),
+    KEYVALUE_ثبت(-EVENT_BUFWRITECMD, "BufWriteCmd"),
+    KEYVALUE_ثبت(-EVENT_BUFWRITEPOST, "BufWritePost"),
+    KEYVALUE_ثبت(-EVENT_BUFWRITEPRE, "BufWritePre"),
+    KEYVALUE_ثبت(EVENT_CMDLINECHANGED, "CmdlineChanged"),
+    KEYVALUE_ثبت(EVENT_CMDLINEENTER, "CmdlineEnter"),
+    KEYVALUE_ثبت(EVENT_CMDLINELEAVE, "CmdlineLeave"),
+    KEYVALUE_ثبت(EVENT_CMDLINELEAVEPRE, "CmdlineLeavePre"),
+    KEYVALUE_ثبت(EVENT_CMDUNDEFINED, "CmdUndefined"),
+    KEYVALUE_ثبت(EVENT_CMDWINENTER, "CmdwinEnter"),
+    KEYVALUE_ثبت(EVENT_CMDWINLEAVE, "CmdwinLeave"),
+    KEYVALUE_ثبت(EVENT_COLORSCHEME, "ColorScheme"),
+    KEYVALUE_ثبت(EVENT_COLORSCHEMEPRE, "ColorSchemePre"),
+    KEYVALUE_ثبت(EVENT_COMPLETECHANGED, "CompleteChanged"),
+    KEYVALUE_ثبت(EVENT_COMPLETEDONE, "CompleteDone"),
+    KEYVALUE_ثبت(EVENT_COMPLETEDONEPRE, "CompleteDonePre"),
+    KEYVALUE_ثبت(-EVENT_CURSORHOLD, "CursorHold"),
+    KEYVALUE_ثبت(-EVENT_CURSORHOLDI, "CursorHoldI"),
+    KEYVALUE_ثبت(-EVENT_CURSORMOVED, "CursorMoved"),
+    KEYVALUE_ثبت(-EVENT_CURSORMOVEDC, "CursorMovedC"),
+    KEYVALUE_ثبت(-EVENT_CURSORMOVEDI, "CursorMovedI"),
+    KEYVALUE_ثبت(EVENT_DIFFUPDATED, "DiffUpdated"),
+    KEYVALUE_ثبت(EVENT_DIRCHANGED, "DirChanged"),
+    KEYVALUE_ثبت(EVENT_DIRCHANGEDPRE, "DirChangedPre"),
+    KEYVALUE_ثبت(EVENT_ENCODINGCHANGED, "EncodingChanged"),
+    KEYVALUE_ثبت(EVENT_EXITPRE, "ExitPre"),
+    KEYVALUE_ثبت(-EVENT_FILEAPPENDCMD, "FileAppendCmd"),
+    KEYVALUE_ثبت(-EVENT_FILEAPPENDPOST, "FileAppendPost"),
+    KEYVALUE_ثبت(-EVENT_FILEAPPENDPRE, "FileAppendPre"),
+    KEYVALUE_ثبت(-EVENT_FILECHANGEDRO, "FileChangedRO"),
+    KEYVALUE_ثبت(-EVENT_FILECHANGEDSHELL, "FileChangedShell"),
+    KEYVALUE_ثبت(-EVENT_FILECHANGEDSHELLPOST, "FileChangedShellPost"),
+    KEYVALUE_ثبت(EVENT_ENCODINGCHANGED, "FileEncoding"),
+    KEYVALUE_ثبت(-EVENT_FILEREADCMD, "FileReadCmd"),
+    KEYVALUE_ثبت(-EVENT_FILEREADPOST, "FileReadPost"),
+    KEYVALUE_ثبت(-EVENT_FILEREADPRE, "FileReadPre"),
+    KEYVALUE_ثبت(-EVENT_FILETYPE, "FileType"),
+    KEYVALUE_ثبت(-EVENT_FILEWRITECMD, "FileWriteCmd"),
+    KEYVALUE_ثبت(-EVENT_FILEWRITEPOST, "FileWritePost"),
+    KEYVALUE_ثبت(-EVENT_FILEWRITEPRE, "FileWritePre"),
+    KEYVALUE_ثبت(-EVENT_FILTERREADPOST, "FilterReadPost"),
+    KEYVALUE_ثبت(-EVENT_FILTERREADPRE, "FilterReadPre"),
+    KEYVALUE_ثبت(-EVENT_FILTERWRITEPOST, "FilterWritePost"),
+    KEYVALUE_ثبت(-EVENT_FILTERWRITEPRE, "FilterWritePre"),
+    KEYVALUE_ثبت(EVENT_FOCUSGAINED, "FocusGained"),
+    KEYVALUE_ثبت(EVENT_FOCUSLOST, "FocusLost"),
+    KEYVALUE_ثبت(EVENT_FUNCUNDEFINED, "FuncUndefined"),
+    KEYVALUE_ثبت(EVENT_GUIENTER, "GUIEnter"),
+    KEYVALUE_ثبت(EVENT_GUIFAILED, "GUIFailed"),
+    KEYVALUE_ثبت(-EVENT_INSERTCHANGE, "InsertChange"),
+    KEYVALUE_ثبت(-EVENT_INSERTCHARPRE, "InsertCharPre"),
+    KEYVALUE_ثبت(-EVENT_INSERTENTER, "InsertEnter"),
+    KEYVALUE_ثبت(-EVENT_INSERTLEAVE, "InsertLeave"),
+    KEYVALUE_ثبت(-EVENT_INSERTLEAVEPRE, "InsertLeavePre"),
+    KEYVALUE_ثبت(EVENT_KEYINPUTPRE, "KeyInputPre"),
+    KEYVALUE_ثبت(EVENT_MENUPOPUP, "MenuPopup"),
+    KEYVALUE_ثبت(EVENT_MODECHANGED, "ModeChanged"),
+    KEYVALUE_ثبت(EVENT_OPTIONSET, "OptionSet"),
+    KEYVALUE_ثبت(EVENT_QUICKFIXCMDPOST, "QuickFixCmdPost"),
+    KEYVALUE_ثبت(EVENT_QUICKFIXCMDPRE, "QuickFixCmdPre"),
+    KEYVALUE_ثبت(EVENT_QUITPRE, "QuitPre"),
+    KEYVALUE_ثبت(EVENT_REMOTEREPLY, "RemoteReply"),
+    KEYVALUE_ثبت(EVENT_SAFESTATE, "SafeState"),
+    KEYVALUE_ثبت(EVENT_SAFESTATEAGAIN, "SafeStateAgain"),
+    KEYVALUE_ثبت(EVENT_SESSIONLOADPOST, "SessionLoadPost"),
+    KEYVALUE_ثبت(EVENT_SESSIONLOADPRE, "SessionLoadPre"),
+    KEYVALUE_ثبت(EVENT_SESSIONWRITEPOST, "SessionWritePost"),
+    KEYVALUE_ثبت(EVENT_SHELLCMDPOST, "ShellCmdPost"),
+    KEYVALUE_ثبت(-EVENT_SHELLFILTERPOST, "ShellFilterPost"),
+    KEYVALUE_ثبت(EVENT_SIGUSR1, "SigUSR1"),
+    KEYVALUE_ثبت(EVENT_SOURCECMD, "SourceCmd"),
+    KEYVALUE_ثبت(EVENT_SOURCEPOST, "SourcePost"),
+    KEYVALUE_ثبت(EVENT_SOURCEPRE, "SourcePre"),
+    KEYVALUE_ثبت(EVENT_SPELLFILEMISSING, "SpellFileMissing"),
+    KEYVALUE_ثبت(EVENT_STDINREADPOST, "StdinReadPost"),
+    KEYVALUE_ثبت(EVENT_STDINREADPRE, "StdinReadPre"),
+    KEYVALUE_ثبت(EVENT_SWAPEXISTS, "SwapExists"),
+    KEYVALUE_ثبت(EVENT_SYNTAX, "Syntax"),
+    KEYVALUE_ثبت(EVENT_TABCLOSED, "TabClosed"),
+    KEYVALUE_ثبت(EVENT_TABCLOSEDPRE, "TabClosedPre"),
+    KEYVALUE_ثبت(EVENT_TABENTER, "TabEnter"),
+    KEYVALUE_ثبت(EVENT_TABLEAVE, "TabLeave"),
+    KEYVALUE_ثبت(EVENT_TABNEW, "TabNew"),
+    KEYVALUE_ثبت(EVENT_TERMCHANGED, "TermChanged"),
+    KEYVALUE_ثبت(EVENT_TERMINALOPEN, "TerminalOpen"),
+    KEYVALUE_ثبت(EVENT_TERMINALWINOPEN, "TerminalWinOpen"),
+    KEYVALUE_ثبت(EVENT_TERMRESPONSE, "TermResponse"),
+    KEYVALUE_ثبت(EVENT_TERMRESPONSEALL, "TermResponseAll"),
+    KEYVALUE_ثبت(-EVENT_TEXTCHANGED, "TextChanged"),
+    KEYVALUE_ثبت(-EVENT_TEXTCHANGEDI, "TextChangedI"),
+    KEYVALUE_ثبت(-EVENT_TEXTCHANGEDP, "TextChangedP"),
+    KEYVALUE_ثبت(-EVENT_TEXTCHANGEDT, "TextChangedT"),
+    KEYVALUE_ثبت(-EVENT_TEXTPUTPOST, "TextPutPost"),
+    KEYVALUE_ثبت(-EVENT_TEXTPUTPRE, "TextPutPre"),
+    KEYVALUE_ثبت(-EVENT_TEXTYANKPOST, "TextYankPost"),
+    KEYVALUE_ثبت(EVENT_USER, "User"),
+    KEYVALUE_ثبت(EVENT_VIMENTER, "VimEnter"),
+    KEYVALUE_ثبت(EVENT_VIMLEAVE, "VimLeave"),
+    KEYVALUE_ثبت(EVENT_VIMLEAVEPRE, "VimLeavePre"),
+    KEYVALUE_ثبت(EVENT_VIMRESIZED, "VimResized"),
+    KEYVALUE_ثبت(EVENT_VIMRESUME, "VimResume"),
+    KEYVALUE_ثبت(EVENT_VIMSUSPEND, "VimSuspend"),
+    KEYVALUE_ثبت(-EVENT_WINCLOSED, "WinClosed"),
+    KEYVALUE_ثبت(-EVENT_WINENTER, "WinEnter"),
+    KEYVALUE_ثبت(-EVENT_WINLEAVE, "WinLeave"),
+    KEYVALUE_ثبت(EVENT_WINNEW, "WinNew"),
+    KEYVALUE_ثبت(EVENT_WINNEWPRE, "WinNewPre"),
+    KEYVALUE_ثبت(-EVENT_WINRESIZED, "WinResized"),
+    KEYVALUE_ثبت(-EVENT_WINSCROLLED, "WinScrolled"),
 };
 
-static AutoPat *first_autopat[NUM_EVENTS] = { NULL };
-static AutoPat *last_autopat[NUM_EVENTS] = { NULL };
+ساكن AutoPat *لومړی_autopat[عدد_EVENTS] = { عدم };
+ساكن AutoPat *وروستی_autopat[عدد_EVENTS] = { عدم };
 
-#define AUGROUP_DEFAULT    (-1)	    // default autocmd group
-#define AUGROUP_ERROR	   (-2)	    // erroneous autocmd group
-#define AUGROUP_ALL	   (-3)	    // all autocmd groups
+#تعریف_کړه AUGROUP_DEFAULT    (-1)	    // default autocmd group
+#تعریف_کړه AUGROUP_ERROR	   (-2)	    // erroneous autocmd group
+#تعریف_کړه AUGROUP_ALL	   (-3)	    // all autocmd groups
 
 /*
  * struct used to keep status while executing autocommands for an event.
  */
-struct AutoPatCmd_S
+بنية AutoPatCmd_S
 {
     AutoPat	*curpat;	// next AutoPat to examine
     AutoCmd	*nextcmd;	// next AutoCmd to execute
-    int		group;		// group being used
+    صحيح		ډله;		// group being used
     char_u	*fname;		// fname to match with
     char_u	*sfname;	// sfname to match with
-    char_u	*tail;		// tail of fname
+    char_u	*لکۍ;		// tail of fname
     event_T	event;		// current event
     sctx_T	script_ctx;	// script context where it is defined
-    int		arg_bufnr;	// Initially equal to <abuf>, set to zero when
+    صحيح		arg_bufnr;	// Initially equal to <abuf>, set to zero when
 				// buf is deleted.
-    AutoPatCmd_T *next;		// chain of active apc-s for auto-invalidation
+    AutoPatCmd_T *بل;		// chain of active apc-s for auto-invalidation
 };
 
-static AutoPatCmd_T *active_apc_list = NULL; // stack of active autocommands
+ساكن AutoPatCmd_T *فعال_apc_list = عدم; // stack of active autocommands
 
 // Macro to loop over all the patterns for an autocmd event
-#define FOR_ALL_AUTOCMD_PATTERNS(event, ap) \
-    for ((ap) = first_autopat[(int)(event)]; (ap) != NULL; (ap) = (ap)->next)
+#تعریف_کړه FOR_ALL_AUTOCMD_PATTERNS(event, ap) \
+    لكل ((ap) = لومړی_autopat[(صحيح)(event)]; (ap) != عدم; (ap) = (ap)->بل)
 
 /*
  * augroups stores a list of autocmd group names.
  */
-static garray_T augroups = {0, 0, sizeof(char_u *), 10, NULL};
-#define AUGROUP_NAME(i) (((char_u **)augroups.ga_data)[i])
+ساكن garray_T augroups = {0, 0, حجم(char_u *), 10, عدم};
+#تعریف_کړه AUGROUP_NAME(i) (((char_u **)augroups.ga_معلومات)[i])
 // use get_deleted_augroup() to get this
-static char_u *deleted_augroup = NULL;
+ساكن char_u *deleted_augroup = عدم;
 
 /*
  * The ID of the current group.  Group 0 is the default one.
  */
-static int current_augroup = AUGROUP_DEFAULT;
+ساكن صحيح current_augroup = AUGROUP_DEFAULT;
 
-static int au_need_clean = FALSE;   // need to delete marked patterns
+ساكن صحيح au_need_clean = FALSE;   // need to delete marked patterns
 
-static event_T event_name2nr(char_u *start, char_u **end);
-static string_T *event_nr2name(event_T event);
-static int au_get_grouparg(char_u **argp);
-static int do_autocmd_event(event_T event, char_u *pat, int once, int nested, char_u *cmd, int forceit, int group, int flags);
-static int apply_autocmds_group(event_T event, char_u *fname, char_u *fname_io, int force, int group, buf_T *buf, exarg_T *eap);
-static void auto_next_pat(AutoPatCmd_T *apc, int stop_at_last);
-static int au_find_group(char_u *name);
+ساكن event_T event_name2nr(char_u *پیل, char_u **پای_ټکی);
+ساكن string_T *event_nr2name(event_T event);
+ساكن صحيح au_get_grouparg(char_u **argp);
+ساكن صحيح do_autocmd_event(event_T event, char_u *pat, صحيح once, صحيح nested, char_u *cmd, صحيح forceit, صحيح ډله, صحيح flags);
+ساكن صحيح apply_autocmds_ډله(event_T event, char_u *fname, char_u *fname_io, صحيح force, صحيح ډله, buf_T *buf, exarg_T *eap);
+ساكن فراغ auto_بل_pat(AutoPatCmd_T *apc, صحيح stop_at_وروستی);
+ساكن صحيح au_پیدا_کړه_ډله(char_u *name);
 
-static event_T	last_event;
-static int	last_group;
-static int	autocmd_blocked = 0;	// block all autocmds
+ساكن event_T	وروستی_event;
+ساكن صحيح	وروستی_ډله;
+ساكن صحيح	autocmd_blocked = 0;	// block all autocmds
 
-    static char_u *
-get_deleted_augroup(void)
+    ساكن char_u *
+get_deleted_augroup(فراغ)
 {
-    if (deleted_augroup == NULL)
+    إذا (deleted_augroup == عدم)
 	deleted_augroup = (char_u *)_("--Deleted--");
-    return deleted_augroup;
+    أرجع deleted_augroup;
 }
 
 /*
  * Show the autocommands for one AutoPat.
  */
-    static void
+    ساكن فراغ
 show_autocmd(AutoPat *ap, event_T event)
 {
     AutoCmd *ac;
 
     // Check for "got_int" (here and at various places below), which is set
     // when "q" has been hit for the "--more--" prompt
-    if (got_int)
-	return;
-    if (ap->pat == NULL)		// pattern has been removed
-	return;
+    إذا (got_int)
+	أرجع;
+    إذا (ap->pat == عدم)		// pattern has been removed
+	أرجع;
 
     // Make sure no info referenced by "ap" is cleared, e.g. when a timer
     // clears an augroup.  Jump to "theend" after this!
     // "ap->pat" may be cleared anyway.
     ++autocmd_busy;
 
-    msg_putchar('\n');
-    if (got_int)
-	goto theend;
-    if (event != last_event || ap->group != last_group)
+    پیغام_putchar('\n');
+    إذا (got_int)
+	اذهب theend;
+    إذا (event != وروستی_event || ap->ډله != وروستی_ډله)
     {
 	string_T    *event_name;
 
-	if (ap->group != AUGROUP_DEFAULT)
+	إذا (ap->ډله != AUGROUP_DEFAULT)
 	{
-	    if (AUGROUP_NAME(ap->group) == NULL)
-		msg_puts_attr((char *)get_deleted_augroup(), HL_ATTR(HLF_E));
-	    else
-		msg_puts_attr((char *)AUGROUP_NAME(ap->group), HL_ATTR(HLF_T));
-	    msg_puts("  ");
+	    إذا (AUGROUP_NAME(ap->ډله) == عدم)
+		پیغام_puts_attr((حرف *)get_deleted_augroup(), HL_ATTR(HLF_E));
+	    وإلا
+		پیغام_puts_attr((حرف *)AUGROUP_NAME(ap->ډله), HL_ATTR(HLF_T));
+	    پیغام_puts("  ");
 	}
 	event_name = event_nr2name(event);
-	msg_puts_attr((char *)event_name->string, HL_ATTR(HLF_T));
-	last_event = event;
-	last_group = ap->group;
-	msg_putchar('\n');
-	if (got_int)
-	    goto theend;
+	پیغام_puts_attr((حرف *)event_name->string, HL_ATTR(HLF_T));
+	وروستی_event = event;
+	وروستی_ډله = ap->ډله;
+	پیغام_putchar('\n');
+	إذا (got_int)
+	    اذهب theend;
     }
 
-    if (ap->pat == NULL)
-	goto theend;  // timer might have cleared the pattern or group
+    إذا (ap->pat == عدم)
+	اذهب theend;  // timer might have cleared the pattern or group
 
-    msg_col = 4;
-    msg_outtrans(ap->pat);
+    پیغام_ستون = 4;
+    پیغام_outtrans(ap->pat);
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    لكل (ac = ap->cmds; ac != عدم; ac = ac->بل)
     {
-	if (ac->cmd == NULL)		// skip removed commands
-	    continue;
+	إذا (ac->cmd == عدم)		// skip removed commands
+	    استمر;
 
-	if (msg_col >= 14)
-	    msg_putchar('\n');
-	msg_col = 14;
-	if (got_int)
-	    goto theend;
-	msg_outtrans(ac->cmd);
-#ifdef FEAT_EVAL
-	if (p_verbose > 0)
-	    last_set_msg(ac->script_ctx);
-#endif
-	if (got_int)
-	    goto theend;
-	if (ac->next != NULL)
+	إذا (پیغام_ستون >= 14)
+	    پیغام_putchar('\n');
+	پیغام_ستون = 14;
+	إذا (got_int)
+	    اذهب theend;
+	پیغام_outtrans(ac->cmd);
+#که_تعریف_شوی FEAT_EVAL
+	إذا (p_verbose > 0)
+	    وروستی_سېټ_پیغام(ac->script_ctx);
+#د_که_پای
+	إذا (got_int)
+	    اذهب theend;
+	إذا (ac->بل != عدم)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		goto theend;
+	    پیغام_putchar('\n');
+	    إذا (got_int)
+		اذهب theend;
 	}
     }
 
@@ -362,7 +362,7 @@ theend:
 /*
  * Mark an autocommand pattern for deletion.
  */
-    static void
+    ساكن فراغ
 au_remove_pat(AutoPat *ap)
 {
     VIM_CLEAR(ap->pat);
@@ -373,18 +373,18 @@ au_remove_pat(AutoPat *ap)
 /*
  * Mark all commands for a pattern for deletion.
  */
-    static void
+    ساكن فراغ
 au_remove_cmds(AutoPat *ap)
 {
     AutoCmd *ac;
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    لكل (ac = ap->cmds; ac != عدم; ac = ac->بل)
 	VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
 }
 
 // Delete one command from an autocmd pattern.
-static void au_del_cmd(AutoCmd *ac)
+ساكن فراغ au_del_cmd(AutoCmd *ac)
 {
     VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
@@ -394,68 +394,68 @@ static void au_del_cmd(AutoCmd *ac)
  * Cleanup autocommands and patterns that have been deleted.
  * This is only done when not executing autocommands.
  */
-    static void
-au_cleanup(void)
+    ساكن فراغ
+au_cleanup(فراغ)
 {
     AutoPat	*ap, **prev_ap;
     AutoCmd	*ac, **prev_ac;
     event_T	event;
 
-    if (autocmd_busy || !au_need_clean)
-	return;
+    إذا (autocmd_busy || !au_need_clean)
+	أرجع;
 
     // loop over all events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+					    event = (event_T)((صحيح)event + 1))
     {
 	// loop over all autocommand patterns
-	prev_ap = &(first_autopat[(int)event]);
-	for (ap = *prev_ap; ap != NULL; ap = *prev_ap)
+	prev_ap = &(لومړی_autopat[(صحيح)event]);
+	لكل (ap = *prev_ap; ap != عدم; ap = *prev_ap)
 	{
-	    int has_cmd = FALSE;
+	    صحيح has_cmd = FALSE;
 
 	    // loop over all commands for this pattern
 	    prev_ac = &(ap->cmds);
-	    for (ac = *prev_ac; ac != NULL; ac = *prev_ac)
+	    لكل (ac = *prev_ac; ac != عدم; ac = *prev_ac)
 	    {
 		// remove the command if the pattern is to be deleted or when
 		// the command has been marked for deletion
-		if (ap->pat == NULL || ac->cmd == NULL)
+		إذا (ap->pat == عدم || ac->cmd == عدم)
 		{
-		    *prev_ac = ac->next;
+		    *prev_ac = ac->بل;
 		    vim_free(ac->cmd);
 		    vim_free(ac);
 		}
-		else
+		وإلا
 		{
 		    has_cmd = TRUE;
-		    prev_ac = &(ac->next);
+		    prev_ac = &(ac->بل);
 		}
 	    }
 
-	    if (ap->pat != NULL && !has_cmd)
+	    إذا (ap->pat != عدم && !has_cmd)
 		// Pattern was not marked for deletion, but all of its
 		// commands were.  So mark the pattern for deletion.
 		au_remove_pat(ap);
 
 	    // remove the pattern if it has been marked for deletion
-	    if (ap->pat == NULL)
+	    إذا (ap->pat == عدم)
 	    {
-		if (ap->next == NULL)
+		إذا (ap->بل == عدم)
 		{
-		    if (prev_ap == &(first_autopat[(int)event]))
-			last_autopat[(int)event] = NULL;
-		    else
+		    إذا (prev_ap == &(لومړی_autopat[(صحيح)event]))
+			وروستی_autopat[(صحيح)event] = عدم;
+		    وإلا
 			// this depends on the "next" field being the first in
 			// the struct
-			last_autopat[(int)event] = (AutoPat *)prev_ap;
+			وروستی_autopat[(صحيح)event] = (AutoPat *)prev_ap;
 		}
-		*prev_ap = ap->next;
+		*prev_ap = ap->بل;
 		vim_regfree(ap->reg_prog);
 		vim_free(ap);
 	    }
-	    else
-		prev_ap = &(ap->next);
+	    وإلا
+		prev_ap = &(ap->بل);
 	}
     }
 
@@ -466,7 +466,7 @@ au_cleanup(void)
  * Called when buffer is freed, to remove/invalidate related buffer-local
  * autocmds.
  */
-    void
+    فراغ
 aubuflocal_remove(buf_T *buf)
 {
     AutoPat	    *ap;
@@ -474,19 +474,19 @@ aubuflocal_remove(buf_T *buf)
     AutoPatCmd_T    *apc;
 
     // invalidate currently executing autocommands
-    for (apc = active_apc_list; apc; apc = apc->next)
-	if (buf->b_fnum == apc->arg_bufnr)
+    لكل (apc = فعال_apc_list; apc; apc = apc->بل)
+	إذا (buf->b_fnum == apc->arg_bufnr)
 	    apc->arg_bufnr = 0;
 
     // invalidate buflocals looping through events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+					    event = (event_T)((صحيح)event + 1))
 	// loop over all autocommand patterns
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->buflocal_nr == buf->b_fnum)
+	    إذا (ap->buflocal_nr == buf->b_fnum)
 	    {
 		au_remove_pat(ap);
-		if (p_verbose >= 6)
+		إذا (p_verbose >= 6)
 		{
 		    string_T	*event_name;
 
@@ -504,173 +504,173 @@ aubuflocal_remove(buf_T *buf)
  * Add an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
-au_new_group(char_u *name)
+    ساكن صحيح
+au_new_ډله(char_u *name)
 {
-    int		i;
+    صحيح		i;
 
-    i = au_find_group(name);
-    if (i != AUGROUP_ERROR)
-	return i;
+    i = au_پیدا_کړه_ډله(name);
+    إذا (i != AUGROUP_ERROR)
+	أرجع i;
 
     // the group doesn't exist yet, add it.  First try using a free entry.
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) == NULL)
-	    break;
-    if (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
-	return AUGROUP_ERROR;
+    لكل (i = 0; i < augroups.ga_len; ++i)
+	إذا (AUGROUP_NAME(i) == عدم)
+	    اكسر;
+    إذا (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
+	أرجع AUGROUP_ERROR;
 
     AUGROUP_NAME(i) = vim_strsave(name);
-    if (AUGROUP_NAME(i) == NULL)
-	return AUGROUP_ERROR;
-    if (i == augroups.ga_len)
+    إذا (AUGROUP_NAME(i) == عدم)
+	أرجع AUGROUP_ERROR;
+    إذا (i == augroups.ga_len)
 	++augroups.ga_len;
 
-    return i;
+    أرجع i;
 }
 
-    static void
-au_del_group(char_u *name)
+    ساكن فراغ
+au_del_ډله(char_u *name)
 {
-    int		i;
+    صحيح		i;
     event_T	event;
     AutoPat	*ap;
-    int		in_use = FALSE;
+    صحيح		دننه_use = FALSE;
 
 
-    i = au_find_group(name);
-    if (i == AUGROUP_ERROR)	// the group doesn't exist
+    i = au_پیدا_کړه_ډله(name);
+    إذا (i == AUGROUP_ERROR)	// the group doesn't exist
     {
-	semsg(_(e_no_such_group_str), name);
-	return;
+	semsg(_(e_no_such_ډله_str), name);
+	أرجع;
     }
-    if (i == current_augroup)
+    إذا (i == current_augroup)
     {
-	emsg(_(e_cannot_delete_current_group));
-	return;
+	emsg(_(e_cannot_delete_current_ډله));
+	أرجع;
     }
 
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+	    event = (event_T)((صحيح)event + 1))
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->group == i && ap->pat != NULL)
+	    إذا (ap->ډله == i && ap->pat != عدم)
 	    {
 		give_warning((char_u *)_("W19: Deleting augroup that is still in use"), TRUE);
-		in_use = TRUE;
-		event = NUM_EVENTS;
-		break;
+		دننه_use = TRUE;
+		event = عدد_EVENTS;
+		اكسر;
 	    }
     }
     vim_free(AUGROUP_NAME(i));
-    if (in_use)
+    إذا (دننه_use)
 	AUGROUP_NAME(i) = get_deleted_augroup();
-    else
-	AUGROUP_NAME(i) = NULL;
+    وإلا
+	AUGROUP_NAME(i) = عدم;
 }
 
 /*
  * Find the ID of an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
-au_find_group(char_u *name)
+    ساكن صحيح
+au_پیدا_کړه_ډله(char_u *name)
 {
-    int	    i;
+    صحيح	    i;
 
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) != NULL && AUGROUP_NAME(i) != get_deleted_augroup()
+    لكل (i = 0; i < augroups.ga_len; ++i)
+	إذا (AUGROUP_NAME(i) != عدم && AUGROUP_NAME(i) != get_deleted_augroup()
 		&& STRCMP(AUGROUP_NAME(i), name) == 0)
-	    return i;
-    return AUGROUP_ERROR;
+	    أرجع i;
+    أرجع AUGROUP_ERROR;
 }
 
 /*
  * Return TRUE if augroup "name" exists.
  */
-    int
-au_has_group(char_u *name)
+    صحيح
+au_has_ډله(char_u *name)
 {
-    return au_find_group(name) != AUGROUP_ERROR;
+    أرجع au_پیدا_کړه_ډله(name) != AUGROUP_ERROR;
 }
 
 /*
  * ":augroup {name}".
  */
-    void
-do_augroup(char_u *arg, int del_group)
+    فراغ
+do_augroup(char_u *arg, صحيح del_ډله)
 {
-    int	    i;
+    صحيح	    i;
 
-    if (del_group)
+    إذا (del_ډله)
     {
-	if (*arg == NUL)
-	    emsg(_(e_argument_required));
-	else
-	    au_del_group(arg);
+	إذا (*arg == NUL)
+	    emsg(_(e_دلیل_required));
+	وإلا
+	    au_del_ډله(arg);
     }
-    else if (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
+    وإلا إذا (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
 	current_augroup = AUGROUP_DEFAULT;
-    else if (*arg)		    // ":aug xxx": switch to group xxx
+    وإلا إذا (*arg)		    // ":aug xxx": switch to group xxx
     {
-	i = au_new_group(arg);
-	if (i != AUGROUP_ERROR)
+	i = au_new_ډله(arg);
+	إذا (i != AUGROUP_ERROR)
 	    current_augroup = i;
     }
-    else			    // ":aug": list the group names
+    وإلا			    // ":aug": list the group names
     {
-	msg_start();
-	for (i = 0; i < augroups.ga_len; ++i)
+	پیغام_پیل();
+	لكل (i = 0; i < augroups.ga_len; ++i)
 	{
-	    if (AUGROUP_NAME(i) != NULL)
+	    إذا (AUGROUP_NAME(i) != عدم)
 	    {
-		msg_puts((char *)AUGROUP_NAME(i));
-		msg_puts("  ");
+		پیغام_puts((حرف *)AUGROUP_NAME(i));
+		پیغام_puts("  ");
 	    }
 	}
-	msg_clr_eos();
-	msg_end();
+	پیغام_clr_eos();
+	پیغام_پای_ټکی();
     }
 }
 
-    void
-autocmd_init(void)
+    فراغ
+autocmd_init(فراغ)
 {
-    CLEAR_FIELD(aucmd_win);
+    CLEAR_ډګر(aucmd_win);
 }
 
-#if defined(EXITFREE)
-    void
-free_all_autocmds(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_all_autocmds(فراغ)
 {
     char_u	*s;
 
-    for (current_augroup = -1; current_augroup < augroups.ga_len;
+    لكل (current_augroup = -1; current_augroup < augroups.ga_len;
 							    ++current_augroup)
-	do_autocmd(NULL, (char_u *)"", TRUE);
+	do_autocmd(عدم, (char_u *)"", TRUE);
 
-    for (int i = 0; i < augroups.ga_len; ++i)
+    لكل (صحيح i = 0; i < augroups.ga_len; ++i)
     {
-	s = ((char_u **)(augroups.ga_data))[i];
-	if (s != get_deleted_augroup())
+	s = ((char_u **)(augroups.ga_معلومات))[i];
+	إذا (s != get_deleted_augroup())
 	    vim_free(s);
     }
     ga_clear(&augroups);
 
     // aucmd_win[] is freed in win_free_all()
 }
-#endif
+#د_که_پای
 
 /*
  * Return TRUE if "win" is an active entry in aucmd_win[].
  */
-    int
+    صحيح
 is_aucmd_win(win_T *win)
 {
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win_used && aucmd_win[i].auc_win == win)
-	    return TRUE;
-    return FALSE;
+    لكل (صحيح i = 0; i < AUCMD_WIN_شمېر; ++i)
+	إذا (aucmd_win[i].auc_win_کارول_شوی && aucmd_win[i].auc_win == win)
+	    أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
@@ -678,132 +678,132 @@ is_aucmd_win(win_T *win)
  * Return NUM_EVENTS if the event name was not found.
  * Return a pointer to the next event name in "end".
  */
-    static event_T
-event_name2nr(char_u *start, char_u **end)
+    ساكن event_T
+event_name2nr(char_u *پیل, char_u **پای_ټکی)
 {
     char_u	*p;
-    keyvalue_T target;
-    keyvalue_T *entry;
-    static keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_INDEX];
-    static keyvalue_T *bufread = &event_tab[BUFREAD_INDEX];
+    keyvalue_T موخه;
+    keyvalue_T *ثبت;
+    ساكن keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_شاخص];
+    ساكن keyvalue_T *bufread = &event_tab[BUFREAD_شاخص];
 
     // the event name ends with end of line, '|', a blank or a comma
-    for (p = start; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
+    لكل (p = پیل; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
 	;
 
-    target.key = 0;
-    target.value.string = start;
-    target.value.length = (size_t)(p - start);
+    موخه.کلی = 0;
+    موخه.ارزښت.string = پیل;
+    موخه.ارزښت.اوږدتیا = (size_t)(p - پیل);
 
     // special cases:
     // BufNewFile and BufRead are searched for ALOT (especially at startup)
     // so we check for them first.
-    if (cmp_keyvalue_value_ni(&target, bufnewfile) == 0)
-	entry = bufnewfile;
-    else if (cmp_keyvalue_value_ni(&target, bufread) == 0)
-	entry = bufread;
-    else
-	entry = (keyvalue_T *)bsearch(&target, &event_tab, NUM_EVENTS,
-				sizeof(event_tab[0]), cmp_keyvalue_value_ni);
+    إذا (cmp_keyvalue_ارزښت_ni(&موخه, bufnewfile) == 0)
+	ثبت = bufnewfile;
+    وإلا إذا (cmp_keyvalue_ارزښت_ni(&موخه, bufread) == 0)
+	ثبت = bufread;
+    وإلا
+	ثبت = (keyvalue_T *)bsearch(&موخه, &event_tab, عدد_EVENTS,
+				حجم(event_tab[0]), cmp_keyvalue_ارزښت_ni);
 
-    if (*p == ',')
+    إذا (*p == ',')
 	++p;
-    *end = p;
+    *پای_ټکی = p;
 
-    return (entry == NULL) ? NUM_EVENTS : (event_T)abs(entry->key);
+    أرجع (ثبت == عدم) ? عدد_EVENTS : (event_T)مطلق_قیمت(ثبت->کلی);
 }
 
 /*
  * Return the name for event "event".
  */
-    static string_T *
+    ساكن string_T *
 event_nr2name(event_T event)
 {
-    int	    i;
-    enum {CACHE_SIZE = 12};
-    static int cache_tab[CACHE_SIZE];
-    static int cache_last_index = -1;
-    static string_T unknown = STR_LITERAL_INIT("Unknown");
+    صحيح	    i;
+    تعداد {CACHE_اندازه = 12};
+    ساكن صحيح cache_tab[CACHE_اندازه];
+    ساكن صحيح cache_وروستی_شاخص = -1;
+    ساكن string_T unknown = STR_LITERAL_INIT("Unknown");
 
-    if (cache_last_index < 0)
+    إذا (cache_وروستی_شاخص < 0)
     {
-	for (i = 0; i < CACHE_SIZE; ++i)
+	لكل (i = 0; i < CACHE_اندازه; ++i)
 	    cache_tab[i] = -1;
-	cache_last_index = CACHE_SIZE - 1;
+	cache_وروستی_شاخص = CACHE_اندازه - 1;
     }
 
     // first look in the cache
     // the cache is circular. to search it we start at the most recent entry
     // and go backwards wrapping around when we get to index 0.
-    for (i = cache_last_index; cache_tab[i] >= 0; )
+    لكل (i = cache_وروستی_شاخص; cache_tab[i] >= 0; )
     {
-	if ((event_T)abs(event_tab[cache_tab[i]].key) == event)
-	    return &event_tab[cache_tab[i]].value;
+	إذا ((event_T)مطلق_قیمت(event_tab[cache_tab[i]].کلی) == event)
+	    أرجع &event_tab[cache_tab[i]].ارزښت;
 
-	if (i == 0)
-	    i = CACHE_SIZE - 1;
-	else
+	إذا (i == 0)
+	    i = CACHE_اندازه - 1;
+	وإلا
 	    --i;
 
 	// are we back at the start?
-	if (i == cache_last_index)
-	    break;
+	إذا (i == cache_وروستی_شاخص)
+	    اكسر;
     }
 
     // look in the event table itself
-    for (i = 0; i < NUM_EVENTS; ++i)
+    لكل (i = 0; i < عدد_EVENTS; ++i)
     {
-	if ((event_T)abs(event_tab[i].key) == event)
+	إذا ((event_T)مطلق_قیمت(event_tab[i].کلی) == event)
 	{
 	    // store the found entry in the next position in the cache,
 	    // wrapping around when we get to the maximum index.
-	    if (cache_last_index == CACHE_SIZE - 1)
-		cache_last_index = 0;
-	    else
-		++cache_last_index;
-	    cache_tab[cache_last_index] = i;
-	    return &event_tab[i].value;
+	    إذا (cache_وروستی_شاخص == CACHE_اندازه - 1)
+		cache_وروستی_شاخص = 0;
+	    وإلا
+		++cache_وروستی_شاخص;
+	    cache_tab[cache_وروستی_شاخص] = i;
+	    أرجع &event_tab[i].ارزښت;
 	}
     }
 
-    return &unknown;
+    أرجع &unknown;
 }
 
 /*
  * Scan over the events.  "*" stands for all events.
  */
-    static char_u *
-find_end_event(
+    ساكن char_u *
+پیدا_کړه_پای_ټکی_event(
     char_u  *arg,
-    int	    have_group)	    // TRUE when group name was found
+    صحيح	    have_ډله)	    // TRUE when group name was found
 {
     char_u  *pat;
     char_u  *p;
 
-    if (*arg == '*')
+    إذا (*arg == '*')
     {
-	if (arg[1] && !VIM_ISWHITE(arg[1]))
+	إذا (arg[1] && !VIM_ISWHITE(arg[1]))
 	{
-	    semsg(_(e_illegal_character_after_star_str), arg);
-	    return NULL;
+	    semsg(_(e_illegal_character_after_ستوری_str), arg);
+	    أرجع عدم;
 	}
 	pat = arg + 1;
     }
-    else
+    وإلا
     {
-	for (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
+	لكل (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
 	{
-	    if ((int)event_name2nr(pat, &p) >= NUM_EVENTS)
+	    إذا ((صحيح)event_name2nr(pat, &p) >= عدد_EVENTS)
 	    {
-		if (have_group)
+		إذا (have_ډله)
 		    semsg(_(e_no_such_event_str), pat);
-		else
-		    semsg(_(e_no_such_group_or_event_str), pat);
-		return NULL;
+		وإلا
+		    semsg(_(e_no_such_ډله_or_event_str), pat);
+		أرجع عدم;
 	    }
 	}
     }
-    return pat;
+    أرجع pat;
 }
 
 /*
@@ -812,104 +812,104 @@ find_end_event(
  * no command.  Does not modify "arg" and gives no error messages.
  */
     char_u *
-au_find_cmd_arg(char_u *arg)
+au_پیدا_کړه_cmd_arg(char_u *arg)
 {
     char_u	*pat;
     char_u	*cmd;
-    int		group;
+    صحيح		ډله;
 
-    if (*arg == '|')
-	return NULL;
+    إذا (*arg == '|')
+	أرجع عدم;
 
     // Errors are reported when the autocommand is actually defined.
     ++emsg_off;
-    group = au_get_grouparg(&arg);
-    pat = group == AUGROUP_ERROR
-			  ? NULL : find_end_event(arg, group != AUGROUP_ALL);
+    ډله = au_get_grouparg(&arg);
+    pat = ډله == AUGROUP_ERROR
+			  ? عدم : پیدا_کړه_پای_ټکی_event(arg, ډله != AUGROUP_ALL);
     --emsg_off;
-    if (pat == NULL)
-	return NULL;
+    إذا (pat == عدم)
+	أرجع عدم;
 
     pat = skipwhite(pat);
-    if (*pat == NUL || *pat == '|')
-	return NULL;
+    إذا (*pat == NUL || *pat == '|')
+	أرجع عدم;
 
     // White space in the pattern can be escaped with a backslash.
     cmd = pat;
-    while (*cmd != NUL
+    طالما (*cmd != NUL
 	    && (!VIM_ISWHITE(*cmd) || (cmd > pat && *(cmd - 1) == '\\')))
 	++cmd;
     cmd = skipwhite(cmd);
 
     // "++once" and "++nested" can come in any order.
-    for (int i = 0; i < 2; ++i)
+    لكل (صحيح i = 0; i < 2; ++i)
     {
-	if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	إذا (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
-	if (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
+	إذا (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
 	    cmd = skipwhite(cmd + 8);
-	if (!in_vim9script() && STRNCMP(cmd, "nested", 6) == 0
+	إذا (!دننه_vim9script() && STRNCMP(cmd, "nested", 6) == 0
 						       && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
     }
 
-    return *cmd == NUL ? NULL : cmd;
+    أرجع *cmd == NUL ? عدم : cmd;
 }
 
 /*
  * Return TRUE if "event" is included in 'eventignore(win)'.
  */
-    int
+    صحيح
 event_ignored(event_T event, char_u *ei)
 {
-    int ignored = FALSE;
-    while (*ei != NUL)
+    صحيح ignored = FALSE;
+    طالما (*ei != NUL)
     {
-	int unignore = *ei == '-';
+	صحيح unignore = *ei == '-';
 	ei += unignore;
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	إذا (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	{
-	    ignored = ei == p_ei || (event_tab[event].key <= 0);
+	    ignored = ei == p_ei || (event_tab[event].کلی <= 0);
 	    ei += 3 + (ei[3] == ',');
 	}
-	else if (event_name2nr(ei, &ei) == event)
+	وإلا إذا (event_name2nr(ei, &ei) == event)
 	{
-	    if (unignore)
-		return FALSE;
-	    else
+	    إذا (unignore)
+		أرجع FALSE;
+	    وإلا
 		ignored = TRUE;
 	}
     }
 
-    return ignored;
+    أرجع ignored;
 }
 
 /*
  * Return OK when the contents of 'eventignore' or 'eventignorewin' is valid,
  * FAIL otherwise.
  */
-    int
+    صحيح
 check_ei(char_u *ei)
 {
-    int	win = ei != p_ei;
+    صحيح	win = ei != p_ei;
 
-    while (*ei)
+    طالما (*ei)
     {
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	إذا (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	    ei += 3 + (ei[3] == ',');
-	else
+	وإلا
 	{
 	    ei += (*ei == '-');
 	    event_T event = event_name2nr(ei, &ei);
-	    if (event == NUM_EVENTS || (win && event_tab[event].key > 0))
-		return FAIL;
+	    إذا (event == عدد_EVENTS || (win && event_tab[event].کلی > 0))
+		أرجع FAIL;
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 
 /*
  * Add "what" to 'eventignore' to skip loading syntax highlighting for every
@@ -917,7 +917,7 @@ check_ei(char_u *ei)
  * Returns the old value of 'eventignore' in allocated memory.
  */
     char_u *
-au_event_disable(char *what)
+au_event_disable(حرف *what)
 {
     char_u	*new_ei;
     char_u	*save_ei;
@@ -925,37 +925,37 @@ au_event_disable(char *what)
 
     p_ei_len = STRLEN(p_ei);
     save_ei = vim_strnsave(p_ei, p_ei_len);
-    if (save_ei == NULL)
-	return NULL;
+    إذا (save_ei == عدم)
+	أرجع عدم;
 
     new_ei = vim_strnsave(p_ei, p_ei_len + STRLEN(what));
-    if (new_ei == NULL)
+    إذا (new_ei == عدم)
     {
 	vim_free(save_ei);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (*what == ',' && *p_ei == NUL)
+    إذا (*what == ',' && *p_ei == NUL)
 	STRCPY(new_ei, what + 1);
-    else
+    وإلا
 	STRCPY(new_ei + p_ei_len, what);
-    set_string_option_direct((char_u *)"ei", -1, new_ei,
+    سېټ_string_option_مستقیم((char_u *)"ei", -1, new_ei,
 	    OPT_FREE, SID_NONE);
     vim_free(new_ei);
-    return save_ei;
+    أرجع save_ei;
 }
 
-    void
+    فراغ
 au_event_restore(char_u *old_ei)
 {
-    if (old_ei != NULL)
+    إذا (old_ei != عدم)
     {
-	set_string_option_direct((char_u *)"ei", -1, old_ei,
+	سېټ_string_option_مستقیم((char_u *)"ei", -1, old_ei,
 							  OPT_FREE, SID_NONE);
 	vim_free(old_ei);
     }
 }
-#endif  // FEAT_SYN_HL
+#د_که_پای  // FEAT_SYN_HL
 
 /*
  * do_autocmd() -- implements the :autocmd command.  Can be used in the
@@ -990,126 +990,126 @@ au_event_restore(char_u *old_ei)
  * Mostly a {group} argument can optionally appear before <event>.
  * "eap" can be NULL.
  */
-    void
-do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
+    فراغ
+do_autocmd(exarg_T *eap, char_u *arg_دننه, صحيح forceit)
 {
-    char_u	*arg = arg_in;
+    char_u	*arg = arg_دننه;
     char_u	*pat;
-    char_u	*envpat = NULL;
+    char_u	*envpat = عدم;
     char_u	*cmd;
-    int		cmd_need_free = FALSE;
+    صحيح		cmd_need_free = FALSE;
     event_T	event;
-    char_u	*tofree = NULL;
-    int		nested = FALSE;
-    int		once = FALSE;
-    int		group;
-    int		i;
-    int		flags = 0;
+    char_u	*tofree = عدم;
+    صحيح		nested = FALSE;
+    صحيح		once = FALSE;
+    صحيح		ډله;
+    صحيح		i;
+    صحيح		flags = 0;
 
-    if (*arg == '|')
+    إذا (*arg == '|')
     {
 	eap->nextcmd = arg + 1;
 	arg = (char_u *)"";
-	group = AUGROUP_ALL;	// no argument, use all groups
+	ډله = AUGROUP_ALL;	// no argument, use all groups
     }
-    else
+    وإلا
     {
 	/*
 	 * Check for a legal group name.  If not, use AUGROUP_ALL.
 	 */
-	group = au_get_grouparg(&arg);
-	if (arg == NULL)	    // out of memory
-	    return;
+	ډله = au_get_grouparg(&arg);
+	إذا (arg == عدم)	    // out of memory
+	    أرجع;
     }
 
     /*
      * Scan over the events.
      * If we find an illegal name, return here, don't do anything.
      */
-    pat = find_end_event(arg, group != AUGROUP_ALL);
-    if (pat == NULL)
-	return;
+    pat = پیدا_کړه_پای_ټکی_event(arg, ډله != AUGROUP_ALL);
+    إذا (pat == عدم)
+	أرجع;
 
     pat = skipwhite(pat);
-    if (*pat == '|')
+    إذا (*pat == '|')
     {
 	eap->nextcmd = pat + 1;
 	pat = (char_u *)"";
 	cmd = (char_u *)"";
     }
-    else
+    وإلا
     {
 	/*
 	 * Scan over the pattern.  Put a NUL at the end.
 	 */
 	cmd = pat;
-	while (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
+	طالما (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
 	    cmd++;
-	if (*cmd)
+	إذا (*cmd)
 	    *cmd++ = NUL;
 
 	// Expand environment variables in the pattern.  Set 'shellslash', we
 	// want forward slashes here.
-	if (vim_strchr(pat, '$') != NULL || vim_strchr(pat, '~') != NULL)
+	إذا (vim_strchr(pat, '$') != عدم || vim_strchr(pat, '~') != عدم)
 	{
-#ifdef BACKSLASH_IN_FILENAME
-	    int	p_ssl_save = p_ssl;
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
+	    صحيح	p_ssl_save = p_ssl;
 
 	    p_ssl = TRUE;
-#endif
+#د_که_پای
 	    envpat = expand_env_save(pat);
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
 	    p_ssl = p_ssl_save;
-#endif
-	    if (envpat != NULL)
+#د_که_پای
+	    إذا (envpat != عدم)
 		pat = envpat;
 	}
 
 	cmd = skipwhite(cmd);
-	for (i = 0; i < 2; i++)
+	لكل (i = 0; i < 2; i++)
 	{
-	    if (*cmd == NUL)
-		continue;
+	    إذا (*cmd == NUL)
+		استمر;
 
 	    // Check for "++once" flag.
-	    if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    إذا (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (once)
+		إذا (once)
 		{
-		    semsg(_(e_duplicate_argument_str), "++once");
-		    goto err_exit;
+		    semsg(_(e_duplicate_دلیل_str), "++once");
+		    اذهب err_exit;
 		}
 		once = TRUE;
 		cmd = skipwhite(cmd + 6);
 	    }
 
 	    // Check for "++nested" flag.
-	    if ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
+	    إذا ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
 	    {
-		if (nested)
+		إذا (nested)
 		{
-		    semsg(_(e_duplicate_argument_str), "++nested");
-		    goto err_exit;
+		    semsg(_(e_duplicate_دلیل_str), "++nested");
+		    اذهب err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 8);
 	    }
 
 	    // Check for the old "nested" flag in legacy script.
-	    if (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    إذا (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (in_vim9script())
+		إذا (دننه_vim9script())
 		{
 		    // If there ever is a :nested command this error should
 		    // be removed and "nested" accepted as the start of the
 		    // command.
-		    emsg(_(e_invalid_command_nested_did_you_mean_plusplus_nested));
-		    goto err_exit;
+		    emsg(_(e_invalid_command_nested_did_you_منځنۍ_plusplus_nested));
+		    اذهب err_exit;
 		}
-		if (nested)
+		إذا (nested)
 		{
-		    semsg(_(e_duplicate_argument_str), "nested");
-		    goto err_exit;
+		    semsg(_(e_duplicate_دلیل_str), "nested");
+		    اذهب err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 6);
@@ -1120,15 +1120,15 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
 	 * Find the start of the commands.
 	 * Expand <sfile> in it.
 	 */
-	if (*cmd != NUL)
+	إذا (*cmd != NUL)
 	{
-	    if (eap != NULL)
+	    إذا (eap != عدم)
 		// Read a {} block if it follows.
-		cmd = may_get_cmd_block(eap, cmd, &tofree, &flags);
+		cmd = may_get_cmd_بلاک(eap, cmd, &tofree, &flags);
 
 	    cmd = expand_sfile(cmd);
-	    if (cmd == NULL)	    // some error
-		goto err_exit;
+	    إذا (cmd == عدم)	    // some error
+		اذهب err_exit;
 	    cmd_need_free = TRUE;
 	}
     }
@@ -1136,36 +1136,36 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
     /*
      * Print header when showing autocommands.
      */
-    if (!forceit && *cmd == NUL)
+    إذا (!forceit && *cmd == NUL)
 	// Highlight title
-	msg_puts_title(_("\n--- Autocommands ---"));
+	پیغام_puts_title(_("\n--- Autocommands ---"));
 
     /*
      * Loop over the events.
      */
-    last_event = (event_T)-1;		// for listing the event name
-    last_group = AUGROUP_ERROR;		// for listing the group name
-    if (*arg == '*' || *arg == NUL || *arg == '|')
+    وروستی_event = (event_T)-1;		// for listing the event name
+    وروستی_ډله = AUGROUP_ERROR;		// for listing the group name
+    إذا (*arg == '*' || *arg == NUL || *arg == '|')
     {
-	if (*cmd != NUL)
+	إذا (*cmd != NUL)
 	    emsg(_(e_cannot_define_autocommands_for_all_events));
-	else
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					     event = (event_T)((int)event + 1))
-		if (do_autocmd_event(event, pat,
-			     once, nested, cmd, forceit, group, flags) == FAIL)
-		    break;
+	وإلا
+	    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+					     event = (event_T)((صحيح)event + 1))
+		إذا (do_autocmd_event(event, pat,
+			     once, nested, cmd, forceit, ډله, flags) == FAIL)
+		    اكسر;
     }
-    else
+    وإلا
     {
-	while (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
-	    if (do_autocmd_event(event_name2nr(arg, &arg), pat,
-			  once, nested,	cmd, forceit, group, flags) == FAIL)
-		break;
+	طالما (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
+	    إذا (do_autocmd_event(event_name2nr(arg, &arg), pat,
+			  once, nested,	cmd, forceit, ډله, flags) == FAIL)
+		اكسر;
     }
 
 err_exit:
-    if (cmd_need_free)
+    إذا (cmd_need_free)
 	vim_free(cmd);
     vim_free(tofree);
     vim_free(envpat);
@@ -1177,29 +1177,29 @@ err_exit:
  *
  * Returns the group ID, AUGROUP_ERROR for error (out of memory).
  */
-    static int
+    ساكن صحيح
 au_get_grouparg(char_u **argp)
 {
-    char_u	*group_name;
+    char_u	*ډله_name;
     char_u	*p;
     char_u	*arg = *argp;
-    int		group = AUGROUP_ALL;
+    صحيح		ډله = AUGROUP_ALL;
 
-    for (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
+    لكل (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
 	;
-    if (p <= arg)
-	return AUGROUP_ALL;
+    إذا (p <= arg)
+	أرجع AUGROUP_ALL;
 
-    group_name = vim_strnsave(arg, p - arg);
-    if (group_name == NULL)		// out of memory
-	return AUGROUP_ERROR;
-    group = au_find_group(group_name);
-    if (group == AUGROUP_ERROR)
-	group = AUGROUP_ALL;	// no match, use all groups
-    else
+    ډله_name = vim_strnsave(arg, p - arg);
+    إذا (ډله_name == عدم)		// out of memory
+	أرجع AUGROUP_ERROR;
+    ډله = au_پیدا_کړه_ډله(ډله_name);
+    إذا (ډله == AUGROUP_ERROR)
+	ډله = AUGROUP_ALL;	// no match, use all groups
+    وإلا
 	*argp = skipwhite(p);	// match, skip over group name
-    vim_free(group_name);
-    return group;
+    vim_free(ډله_name);
+    أرجع ډله;
 }
 
 /*
@@ -1209,49 +1209,49 @@ au_get_grouparg(char_u **argp)
  * If forceit == TRUE delete entries.
  * If group is not AUGROUP_ALL, only use this group.
  */
-    static int
+    ساكن صحيح
 do_autocmd_event(
     event_T	event,
     char_u	*pat,
-    int		once,
-    int		nested,
+    صحيح		once,
+    صحيح		nested,
     char_u	*cmd,
-    int		forceit,
-    int		group,
-    int		flags)
+    صحيح		forceit,
+    صحيح		ډله,
+    صحيح		flags)
 {
     AutoPat	*ap;
     AutoPat	**prev_ap;
     AutoCmd	*ac;
     AutoCmd	**prev_ac;
-    int		brace_level;
+    صحيح		brace_level;
     char_u	*endpat;
-    int		findgroup;
-    int		allgroups;
-    int		patlen;
-    int		is_buflocal;
-    int		buflocal_nr;
+    صحيح		findgroup;
+    صحيح		allgroups;
+    صحيح		patlen;
+    صحيح		is_buflocal;
+    صحيح		buflocal_nr;
     char_u	buflocal_pat[25];	// for "<buffer=X>"
 
-    if (group == AUGROUP_ALL)
+    إذا (ډله == AUGROUP_ALL)
 	findgroup = current_augroup;
-    else
-	findgroup = group;
-    allgroups = (group == AUGROUP_ALL && !forceit && *cmd == NUL);
+    وإلا
+	findgroup = ډله;
+    allgroups = (ډله == AUGROUP_ALL && !forceit && *cmd == NUL);
 
     /*
      * Show or delete all patterns for an event.
      */
-    if (*pat == NUL)
+    إذا (*pat == NUL)
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
 	{
-	    if (forceit)  // delete the AutoPat, if it's in the current group
+	    إذا (forceit)  // delete the AutoPat, if it's in the current group
 	    {
-		if (ap->group == findgroup)
+		إذا (ap->ډله == findgroup)
 		    au_remove_pat(ap);
 	    }
-	    else if (group == AUGROUP_ALL || ap->group == group)
+	    وإلا إذا (ډله == AUGROUP_ALL || ap->ډله == ډله)
 		show_autocmd(ap, event);
 	}
     }
@@ -1259,24 +1259,24 @@ do_autocmd_event(
     /*
      * Loop through all the specified patterns.
      */
-    for ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
+    لكل ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
     {
 	/*
 	 * Find end of the pattern.
 	 * Watch out for a comma in braces, like "*.\{obj,o\}".
 	 */
 	brace_level = 0;
-	for (endpat = pat; *endpat && (*endpat != ',' || brace_level
+	لكل (endpat = pat; *endpat && (*endpat != ',' || brace_level
 			   || (endpat > pat && endpat[-1] == '\\')); ++endpat)
 	{
-	    if (*endpat == '{')
+	    إذا (*endpat == '{')
 		brace_level++;
-	    else if (*endpat == '}')
+	    وإلا إذا (*endpat == '}')
 		brace_level--;
 	}
-	if (pat == endpat)		// ignore single comma
-	    continue;
-	patlen = (int)(endpat - pat);
+	إذا (pat == endpat)		// ignore single comma
+	    استمر;
+	patlen = (صحيح)(endpat - pat);
 
 	/*
 	 * detect special <buflocal[=X]> buffer-local patterns
@@ -1284,45 +1284,45 @@ do_autocmd_event(
 	is_buflocal = FALSE;
 	buflocal_nr = 0;
 
-	if (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
+	إذا (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
 						    && pat[patlen - 1] == '>')
 	{
 	    // "<buffer...>": Error will be printed only for addition.
 	    // printing and removing will proceed silently.
 	    is_buflocal = TRUE;
-	    if (patlen == 8)
+	    إذا (patlen == 8)
 		// "<buffer>"
 		buflocal_nr = curbuf->b_fnum;
-	    else if (patlen > 9 && pat[7] == '=')
+	    وإلا إذا (patlen > 9 && pat[7] == '=')
 	    {
-		if (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
+		إذا (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
 		    // "<buffer=abuf>"
 		    buflocal_nr = autocmd_bufnr;
-		else if (skipdigits(pat + 8) == pat + patlen - 1)
+		وإلا إذا (skipdigits(pat + 8) == pat + patlen - 1)
 		    // "<buffer=123>"
-		    buflocal_nr = atoi((char *)pat + 8);
+		    buflocal_nr = atoi((حرف *)pat + 8);
 	    }
 	}
 
-	if (is_buflocal)
+	إذا (is_buflocal)
 	{
 	    // normalize pat into standard "<buffer>#N" form
-	    sprintf((char *)buflocal_pat, "<buffer=%d>", buflocal_nr);
+	    sprintf((حرف *)buflocal_pat, "<buffer=%d>", buflocal_nr);
 	    pat = buflocal_pat;			// can modify pat and patlen
-	    patlen = (int)STRLEN(buflocal_pat);	//   but not endpat
+	    patlen = (صحيح)STRLEN(buflocal_pat);	//   but not endpat
 	}
 
 	/*
 	 * Find AutoPat entries with this pattern.  When adding a command it
 	 * always goes at or after the last one, so start at the end.
 	 */
-	if (!forceit && *cmd != NUL && last_autopat[(int)event] != NULL)
-	    prev_ap = &last_autopat[(int)event];
-	else
-	    prev_ap = &first_autopat[(int)event];
-	while ((ap = *prev_ap) != NULL)
+	إذا (!forceit && *cmd != NUL && وروستی_autopat[(صحيح)event] != عدم)
+	    prev_ap = &وروستی_autopat[(صحيح)event];
+	وإلا
+	    prev_ap = &لومړی_autopat[(صحيح)event];
+	طالما ((ap = *prev_ap) != عدم)
 	{
-	    if (ap->pat != NULL)
+	    إذا (ap->pat != عدم)
 	    {
 		/*
 		 * Accept a pattern when:
@@ -1334,7 +1334,7 @@ do_autocmd_event(
 		 * For <buffer[=X]>, this condition works because we normalize
 		 * all buffer-local patterns.
 		 */
-		if ((allgroups || ap->group == findgroup)
+		إذا ((allgroups || ap->ډله == findgroup)
 			&& ap->patlen == patlen
 			&& STRNCMP(pat, ap->pat, patlen) == 0)
 		{
@@ -1344,12 +1344,12 @@ do_autocmd_event(
 		     * delete the pattern from the autopat list, append to
 		     * this list.
 		     */
-		    if (forceit)
+		    إذا (forceit)
 		    {
-			if (*cmd != NUL && ap->next == NULL)
+			إذا (*cmd != NUL && ap->بل == عدم)
 			{
 			    au_remove_cmds(ap);
-			    break;
+			    اكسر;
 			}
 			au_remove_pat(ap);
 		    }
@@ -1357,60 +1357,60 @@ do_autocmd_event(
 		    /*
 		     * Show autocmd's for this autopat, or buflocals <buffer=X>
 		     */
-		    else if (*cmd == NUL)
+		    وإلا إذا (*cmd == NUL)
 			show_autocmd(ap, event);
 
 		    /*
 		     * Add autocmd to this autopat, if it's the last one.
 		     */
-		    else if (ap->next == NULL)
-			break;
+		    وإلا إذا (ap->بل == عدم)
+			اكسر;
 		}
 	    }
-	    prev_ap = &ap->next;
+	    prev_ap = &ap->بل;
 	}
 
 	/*
 	 * Add a new command.
 	 */
-	if (*cmd != NUL)
+	إذا (*cmd != NUL)
 	{
 	    /*
 	     * If the pattern we want to add a command to does appear at the
 	     * end of the list (or not is not in the list at all), add the
 	     * pattern at the end of the list.
 	     */
-	    if (ap == NULL)
+	    إذا (ap == عدم)
 	    {
 		// refuse to add buffer-local ap if buffer number is invalid
-		if (is_buflocal && (buflocal_nr == 0
-				      || buflist_findnr(buflocal_nr) == NULL))
+		إذا (is_buflocal && (buflocal_nr == 0
+				      || buflist_findnr(buflocal_nr) == عدم))
 		{
-		    semsg(_(e_buffer_nr_invalid_buffer_number), buflocal_nr);
-		    return FAIL;
+		    semsg(_(e_بفر_nr_invalid_بفر_شمېره), buflocal_nr);
+		    أرجع FAIL;
 		}
 
 		ap = ALLOC_ONE(AutoPat);
-		if (ap == NULL)
-		    return FAIL;
+		إذا (ap == عدم)
+		    أرجع FAIL;
 		ap->pat = vim_strnsave(pat, patlen);
 		ap->patlen = patlen;
-		if (ap->pat == NULL)
+		إذا (ap->pat == عدم)
 		{
 		    vim_free(ap);
-		    return FAIL;
+		    أرجع FAIL;
 		}
 
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
 		// need to initialize last_mode for the first ModeChanged
 		// autocmd
-		if (event == EVENT_MODECHANGED && !has_modechanged())
-		    get_mode(last_mode);
-#endif
+		إذا (event == EVENT_MODECHANGED && !has_modechanged())
+		    get_ډېرپېښ(وروستی_ډېرپېښ);
+#د_که_پای
 		// Initialize the fields checked by the WinScrolled and
 		// WinResized trigger to prevent them from firing right after
 		// the first autocmd is defined.
-		if ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
+		إذا ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
 			&& !(has_winscrolled() || has_winresized()))
 		{
 		    tabpage_T *save_curtab = curtab;
@@ -1419,66 +1419,66 @@ do_autocmd_event(
 		    {
 			unuse_tabpage(curtab);
 			use_tabpage(tp);
-			snapshot_windows_scroll_size();
+			snapshot_windows_scroll_اندازه();
 		    }
 		    unuse_tabpage(curtab);
 		    use_tabpage(save_curtab);
 		}
 
-		if (is_buflocal)
+		إذا (is_buflocal)
 		{
 		    ap->buflocal_nr = buflocal_nr;
-		    ap->reg_prog = NULL;
+		    ap->reg_prog = عدم;
 		}
-		else
+		وإلا
 		{
 		    char_u	*reg_pat;
 
 		    ap->buflocal_nr = 0;
-		    reg_pat = file_pat_to_reg_pat(pat, endpat,
+		    reg_pat = file_pat_منزل_reg_pat(pat, endpat,
 							 &ap->allow_dirs, TRUE);
-		    if (reg_pat != NULL)
+		    إذا (reg_pat != عدم)
 			ap->reg_prog = vim_regcomp(reg_pat, RE_MAGIC);
 		    vim_free(reg_pat);
-		    if (reg_pat == NULL || ap->reg_prog == NULL)
+		    إذا (reg_pat == عدم || ap->reg_prog == عدم)
 		    {
 			vim_free(ap->pat);
 			vim_free(ap);
-			return FAIL;
+			أرجع FAIL;
 		    }
 		}
-		ap->cmds = NULL;
+		ap->cmds = عدم;
 		*prev_ap = ap;
-		last_autopat[(int)event] = ap;
-		ap->next = NULL;
-		if (group == AUGROUP_ALL)
-		    ap->group = current_augroup;
-		else
-		    ap->group = group;
+		وروستی_autopat[(صحيح)event] = ap;
+		ap->بل = عدم;
+		إذا (ډله == AUGROUP_ALL)
+		    ap->ډله = current_augroup;
+		وإلا
+		    ap->ډله = ډله;
 	    }
 
 	    /*
 	     * Add the autocmd at the end of the AutoCmd list.
 	     */
 	    prev_ac = &(ap->cmds);
-	    while ((ac = *prev_ac) != NULL)
-		prev_ac = &ac->next;
+	    طالما ((ac = *prev_ac) != عدم)
+		prev_ac = &ac->بل;
 	    ac = ALLOC_ONE(AutoCmd);
-	    if (ac == NULL)
-		return FAIL;
+	    إذا (ac == عدم)
+		أرجع FAIL;
 	    ac->cmd = vim_strsave(cmd);
 	    ac->script_ctx = current_sctx;
-	    if (flags & UC_VIM9)
-		ac->script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-#ifdef FEAT_EVAL
+	    إذا (flags & UC_VIM9)
+		ac->script_ctx.sc_نسخه = SCRIPT_نسخه_VIM9;
+#که_تعریف_شوی FEAT_EVAL
 	    ac->script_ctx.sc_lnum += SOURCING_LNUM;
-#endif
-	    if (ac->cmd == NULL)
+#د_که_پای
+	    إذا (ac->cmd == عدم)
 	    {
 		vim_free(ac);
-		return FAIL;
+		أرجع FAIL;
 	    }
-	    ac->next = NULL;
+	    ac->بل = عدم;
 	    *prev_ac = ac;
 	    ac->once = once;
 	    ac->nested = nested;
@@ -1486,87 +1486,87 @@ do_autocmd_event(
     }
 
     au_cleanup();	// may really delete removed patterns/commands now
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Implementation of ":doautocmd [group] event [fname]".
  * Return OK for success, FAIL for failure;
  */
-    int
+    صحيح
 do_doautocmd(
-    char_u	*arg_start,
-    int		do_msg,	    // give message for no matching autocmds?
-    int		*did_something)
+    char_u	*arg_پیل,
+    صحيح		do_پیغام,	    // give message for no matching autocmds?
+    صحيح		*did_something)
 {
-    char_u	*arg = arg_start;
+    char_u	*arg = arg_پیل;
     char_u	*fname;
-    int		nothing_done = TRUE;
-    int		group;
+    صحيح		nothing_بشپړ = TRUE;
+    صحيح		ډله;
 
-    if (did_something != NULL)
+    إذا (did_something != عدم)
 	*did_something = FALSE;
 
     /*
      * Check for a legal group name.  If not, use AUGROUP_ALL.
      */
-    group = au_get_grouparg(&arg);
-    if (arg == NULL)	    // out of memory
-	return FAIL;
+    ډله = au_get_grouparg(&arg);
+    إذا (arg == عدم)	    // out of memory
+	أرجع FAIL;
 
-    if (*arg == '*')
+    إذا (*arg == '*')
     {
 	emsg(_(e_cant_execute_autocommands_for_all_events));
-	return FAIL;
+	أرجع FAIL;
     }
 
     /*
      * Scan over the events.
      * If we find an illegal name, return here, don't do anything.
      */
-    fname = find_end_event(arg, group != AUGROUP_ALL);
-    if (fname == NULL)
-	return FAIL;
+    fname = پیدا_کړه_پای_ټکی_event(arg, ډله != AUGROUP_ALL);
+    إذا (fname == عدم)
+	أرجع FAIL;
 
     fname = skipwhite(fname);
 
     /*
      * Loop over the events.
      */
-    while (*arg && !ends_excmd(*arg) && !VIM_ISWHITE(*arg))
-	if (apply_autocmds_group(event_name2nr(arg, &arg),
-				      fname, NULL, TRUE, group, curbuf, NULL))
-	    nothing_done = FALSE;
+    طالما (*arg && !پایونه_excmd(*arg) && !VIM_ISWHITE(*arg))
+	إذا (apply_autocmds_ډله(event_name2nr(arg, &arg),
+				      fname, عدم, TRUE, ډله, curbuf, عدم))
+	    nothing_بشپړ = FALSE;
 
-    if (nothing_done && do_msg
-#ifdef FEAT_EVAL
+    إذا (nothing_بشپړ && do_پیغام
+#که_تعریف_شوی FEAT_EVAL
 		&& !aborting()
-#endif
+#د_که_پای
 	       )
-	smsg(_("No matching autocommands: %s"), arg_start);
-    if (did_something != NULL)
-	*did_something = !nothing_done;
+	smsg(_("No matching autocommands: %s"), arg_پیل);
+    إذا (did_something != عدم)
+	*did_something = !nothing_بشپړ;
 
-#ifdef FEAT_EVAL
-    return aborting() ? FAIL : OK;
-#else
-    return OK;
-#endif
+#که_تعریف_شوی FEAT_EVAL
+    أرجع aborting() ? FAIL : OK;
+#وإلا
+    أرجع OK;
+#د_که_پای
 }
 
 /*
  * ":doautoall": execute autocommands for each loaded buffer.
  */
-    void
+    فراغ
 ex_doautoall(exarg_T *eap)
 {
-    int		retval = OK;
+    صحيح		retval = OK;
     aco_save_T	aco;
     buf_T	*buf;
     bufref_T	bufref;
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    صحيح		call_do_modelines = check_nomodeline(&arg);
+    صحيح		did_aucmd;
 
     /*
      * This is a bit tricky: For some commands curwin->w_buffer needs to be
@@ -1578,25 +1578,25 @@ ex_doautoall(exarg_T *eap)
     FOR_ALL_BUFFERS(buf)
     {
 	// Only do loaded buffers and skip the current buffer, it's done last.
-	if (buf->b_ml.ml_mfp == NULL || buf == curbuf)
-	    continue;
+	إذا (buf->b_ml.ml_mfp == عدم || buf == curbuf)
+	    استمر;
 
 	// Find a window for this buffer and save some values.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	إذا (curbuf != buf)
 	{
 	    // Failed to find a window for this buffer.  Better not execute
 	    // autocommands then.
 	    retval = FAIL;
-	    break;
+	    اكسر;
 	}
 
-	set_bufref(&bufref, buf);
+	سېټ_bufref(&bufref, buf);
 
 	// execute the autocommands for this buffer
 	retval = do_doautocmd(arg, FALSE, &did_aucmd);
 
-	if (call_do_modelines && did_aucmd)
+	إذا (call_do_modelines && did_aucmd)
 	    // Execute the modeline settings, but don't set window-local
 	    // options if we are using the current window for another
 	    // buffer.
@@ -1606,18 +1606,18 @@ ex_doautoall(exarg_T *eap)
 	aucmd_restbuf(&aco);
 
 	// stop if there is some error or buffer was deleted
-	if (retval == FAIL || !bufref_valid(&bufref))
+	إذا (retval == FAIL || !bufref_valid(&bufref))
 	{
 	    retval = FAIL;
-	    break;
+	    اكسر;
 	}
     }
 
     // Execute autocommands for the current buffer last.
-    if (retval == OK)
+    إذا (retval == OK)
     {
 	do_doautocmd(arg, FALSE, &did_aucmd);
-	if (call_do_modelines && did_aucmd)
+	إذا (call_do_modelines && did_aucmd)
 	    do_modelines(0);
     }
 }
@@ -1627,15 +1627,15 @@ ex_doautoall(exarg_T *eap)
  * return TRUE and advance *argp to after it.
  * Thus return TRUE when do_modelines() should be called.
  */
-    int
+    صحيح
 check_nomodeline(char_u **argp)
 {
-    if (STRNCMP(*argp, "<nomodeline>", 12) == 0)
+    إذا (STRNCMP(*argp, "<nomodeline>", 12) == 0)
     {
 	*argp = skipwhite(*argp + 12);
-	return FALSE;
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -1645,57 +1645,57 @@ check_nomodeline(char_u **argp)
  * Set "curbuf" and "curwin" to match "buf".
  * When this fails "curbuf" is not equal "buf".
  */
-    void
+    فراغ
 aucmd_prepbuf(
     aco_save_T	*aco,		// structure to save values in
     buf_T	*buf)		// new curbuf
 {
     win_T	*win;
-    int		save_ea;
-#ifdef FEAT_AUTOCHDIR
-    int		save_acd;
-#endif
-    int		same_buffer = buf == curbuf;
+    صحيح		save_ea;
+#که_تعریف_شوی FEAT_AUTOCHDIR
+    صحيح		save_acd;
+#د_که_پای
+    صحيح		same_بفر = buf == curbuf;
 
     // Find a window that is for the new buffer
-    if (same_buffer)		// be quick when buf is curbuf
+    إذا (same_بفر)		// be quick when buf is curbuf
 	win = curwin;
-    else
+    وإلا
 	FOR_ALL_WINDOWS(win)
-	    if (win->w_buffer == buf)
-		break;
+	    إذا (win->w_بفر == buf)
+		اكسر;
 
     // Allocate a window when needed.
-    win_T *auc_win = NULL;
-    int auc_idx = AUCMD_WIN_COUNT;
-    if (win == NULL)
+    win_T *auc_win = عدم;
+    صحيح auc_idx = AUCMD_WIN_شمېر;
+    إذا (win == عدم)
     {
-	for (auc_idx = 0; auc_idx < AUCMD_WIN_COUNT; ++auc_idx)
-	    if (!aucmd_win[auc_idx].auc_win_used)
+	لكل (auc_idx = 0; auc_idx < AUCMD_WIN_شمېر; ++auc_idx)
+	    إذا (!aucmd_win[auc_idx].auc_win_کارول_شوی)
 	    {
-		if (aucmd_win[auc_idx].auc_win == NULL)
+		إذا (aucmd_win[auc_idx].auc_win == عدم)
 		    aucmd_win[auc_idx].auc_win = win_alloc_popup_win();
 		auc_win = aucmd_win[auc_idx].auc_win;
-		if (auc_win != NULL)
-		    aucmd_win[auc_idx].auc_win_used = TRUE;
-		break;
+		إذا (auc_win != عدم)
+		    aucmd_win[auc_idx].auc_win_کارول_شوی = TRUE;
+		اكسر;
 	    }
 
 	// If this fails (out of memory or using all AUCMD_WIN_COUNT
 	// entries) then we can't reliable execute the autocmd, return with
 	// "curbuf" unequal "buf".
-	if (auc_win == NULL)
-	    return;
+	إذا (auc_win == عدم)
+	    أرجع;
     }
 
     aco->save_curwin_id = curwin->w_id;
-    aco->save_prevwin_id = prevwin == NULL ? 0 : prevwin->w_id;
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
-	aco->save_prompt_insert = curbuf->b_prompt_insert;
-#endif
+    aco->save_prevwin_id = prevwin == عدم ? 0 : prevwin->w_id;
+#که_تعریف_شوی FEAT_دنده_CHANNEL
+    إذا (bt_prompt(curbuf))
+	aco->save_prompt_ورننباسه = curbuf->b_prompt_ورننباسه;
+#د_که_پای
 
-    if (win != NULL)
+    إذا (win != عدم)
     {
 	// There is a window for "buf" in the current tab page, make it the
 	// curwin.  This is preferred, it has the least side effects (esp. if
@@ -1703,7 +1703,7 @@ aucmd_prepbuf(
 	aco->use_aucmd_win_idx = -1;
 	curwin = win;
     }
-    else
+    وإلا
     {
 	// There is no window for "buf", use "auc_win".  To minimize the side
 	// effects, insert it in the current tab page.
@@ -1717,88 +1717,88 @@ aucmd_prepbuf(
 	// chdir() in win_enter_ext().
 	// win_init_popup_win() has already set w_localdir to NULL.
 	aco->tp_localdir = curtab->tp_localdir;
-	curtab->tp_localdir = NULL;
+	curtab->tp_localdir = عدم;
 	aco->globaldir = globaldir;
-	globaldir = NULL;
+	globaldir = عدم;
 
 	// Split the current window, put the auc_win in the upper half.
 	// We don't want the BufEnter or WinEnter autocommands.
-	block_autocmds();
+	بلاک_autocmds();
 	make_snapshot(SNAP_AUCMD_IDX);
 	save_ea = p_ea;
 	p_ea = FALSE;
 
-#ifdef FEAT_AUTOCHDIR
+#که_تعریف_شوی FEAT_AUTOCHDIR
 	// Prevent chdir() call in win_enter_ext(), through do_autochdir().
 	save_acd = p_acd;
 	p_acd = FALSE;
-#endif
+#د_که_پای
 
-	(void)win_split_ins(0, WSP_TOP | WSP_FORCE_ROOM, auc_win, 0, NULL);
+	(فراغ)win_وېشل_ins(0, WSP_سر | WSP_FORCE_ځای, auc_win, 0, عدم);
 	win_comp_pos();   // recompute window positions
 	p_ea = save_ea;
-#ifdef FEAT_AUTOCHDIR
+#که_تعریف_شوی FEAT_AUTOCHDIR
 	p_acd = save_acd;
-#endif
+#د_که_پای
 	unblock_autocmds();
 	curwin = auc_win;
     }
     curbuf = buf;
     aco->new_curwin_id = curwin->w_id;
-    set_bufref(&aco->new_curbuf, curbuf);
+    سېټ_bufref(&aco->new_curbuf, curbuf);
 
-    aco->save_VIsual_active = VIsual_active;
-    if (!same_buffer)
+    aco->save_VIsual_فعال = VIsual_فعال;
+    إذا (!same_بفر)
 	// disable the Visual area, position may be invalid in another buffer
-	VIsual_active = FALSE;
+	VIsual_فعال = FALSE;
 }
 
 /*
  * Cleanup after executing autocommands for a (hidden) buffer.
  * Restore the window as it was (if possible).
  */
-    void
+    فراغ
 aucmd_restbuf(
     aco_save_T	*aco)		// structure holding saved values
 {
-    int	    dummy;
+    صحيح	    dummy;
     win_T   *save_curwin;
 
-    if (aco->use_aucmd_win_idx >= 0)
+    إذا (aco->use_aucmd_win_idx >= 0)
     {
 	win_T *awp = aucmd_win[aco->use_aucmd_win_idx].auc_win;
 
 	// Find "awp", it can't be closed, but it may be in another tab
 	// page. Do not trigger autocommands here.
-	block_autocmds();
-	if (curwin != awp)
+	بلاک_autocmds();
+	إذا (curwin != awp)
 	{
 	    tabpage_T	*tp;
 	    win_T	*wp;
 
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
 	    {
-		if (wp == awp)
+		إذا (wp == awp)
 		{
-		    if (tp != curtab)
+		    إذا (tp != curtab)
 			goto_tabpage_tp(tp, TRUE, TRUE);
 		    win_goto(awp);
-		    goto win_found;
+		    اذهب win_وموندل;
 		}
 	    }
 	}
-win_found:
+win_وموندل:
 	--curbuf->b_nwindows;
 	// Remove the window and frame from the tree of frames.
-	(void)winframe_remove(curwin, &dummy, NULL, NULL);
-	win_remove(curwin, NULL);
+	(فراغ)winframe_remove(curwin, &dummy, عدم, عدم);
+	win_remove(curwin, عدم);
 
 	// The window is marked as not used, but it is not freed, it can be
 	// used again.
-	aucmd_win[aco->use_aucmd_win_idx].auc_win_used = FALSE;
-	last_status(FALSE);	    // may need to remove last status line
+	aucmd_win[aco->use_aucmd_win_idx].auc_win_کارول_شوی = FALSE;
+	وروستی_حالت(FALSE);	    // may need to remove last status line
 
-	if (!valid_tabpage_win(curtab))
+	إذا (!valid_tabpage_win(curtab))
 	    // no valid window in current tabpage
 	    close_tabpage(curtab);
 
@@ -1806,27 +1806,27 @@ win_found:
 	win_comp_pos();   // recompute window positions
 	unblock_autocmds();
 
-	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	save_curwin = win_پیدا_کړه_by_id(aco->save_curwin_id);
+	إذا (save_curwin != عدم)
 	    curwin = save_curwin;
-	else
+	وإلا
 	    // Hmm, original window disappeared.  Just use the first one.
 	    curwin = firstwin;
-	curbuf = curwin->w_buffer;
-#ifdef FEAT_JOB_CHANNEL
+	curbuf = curwin->w_بفر;
+#که_تعریف_شوی FEAT_دنده_CHANNEL
 	// May need to restore insert mode for a prompt buffer.
-	entering_window(curwin);
-	if (bt_prompt(curbuf))
-	    curbuf->b_prompt_insert = aco->save_prompt_insert;
-#endif
-	prevwin = win_find_by_id(aco->save_prevwin_id);
-#ifdef FEAT_EVAL
+	entering_کړکۍ(curwin);
+	إذا (bt_prompt(curbuf))
+	    curbuf->b_prompt_ورننباسه = aco->save_prompt_ورننباسه;
+#د_که_پای
+	prevwin = win_پیدا_کړه_by_id(aco->save_prevwin_id);
+#که_تعریف_شوی FEAT_EVAL
 	vars_clear(&awp->w_vars->dv_hashtab);  // free all w: variables
 	hash_init(&awp->w_vars->dv_hashtab);   // re-use the hashtab
-#endif
+#د_که_پای
 	// If :lcd has been used in the autocommand window, correct current
 	// directory before restoring tp_localdir and globaldir.
-	if (awp->w_localdir != NULL)
+	إذا (awp->w_localdir != عدم)
 	    win_fix_current_dir();
 	vim_free(curtab->tp_localdir);
 	curtab->tp_localdir = aco->tp_localdir;
@@ -1834,99 +1834,99 @@ win_found:
 	globaldir = aco->globaldir;
 
 	// the buffer contents may have changed
-	VIsual_active = aco->save_VIsual_active;
+	VIsual_فعال = aco->save_VIsual_فعال;
 	check_cursor();
-	if (curwin->w_topline > curbuf->b_ml.ml_line_count)
+	إذا (curwin->w_topline > curbuf->b_ml.ml_کرښه_شمېر)
 	{
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
-#ifdef FEAT_DIFF
+	    curwin->w_topline = curbuf->b_ml.ml_کرښه_شمېر;
+#که_تعریف_شوی FEAT_DIFF
 	    curwin->w_topfill = 0;
-#endif
+#د_که_پای
 	}
-#if defined(FEAT_GUI)
-	if (gui.in_use)
+#إذا defined(FEAT_GUI)
+	إذا (gui.دننه_use)
 	{
 	    // Hide the scrollbars from the "awp" and update.
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_LEFT], FALSE);
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_RIGHT], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_کیڼ], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_ښی], FALSE);
 	    gui_may_update_scrollbars();
 	}
-#endif
+#د_که_پای
     }
-    else
+    وإلا
     {
 	// Restore curwin.  Use the window ID, a window may have been closed
 	// and the memory re-used for another one.
-	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	save_curwin = win_پیدا_کړه_by_id(aco->save_curwin_id);
+	إذا (save_curwin != عدم)
 	{
 	    // Restore the buffer which was previously edited by curwin, if
 	    // it was changed, we are still the same window and the buffer is
 	    // valid.
-	    if (curwin->w_id == aco->new_curwin_id
+	    إذا (curwin->w_id == aco->new_curwin_id
 		    && curbuf != aco->new_curbuf.br_buf
 		    && bufref_valid(&aco->new_curbuf)
-		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != NULL)
+		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != عدم)
 	    {
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
-		if (curwin->w_s == &curbuf->b_s)
+#إذا defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+		إذا (curwin->w_s == &curbuf->b_s)
 		    curwin->w_s = &aco->new_curbuf.br_buf->b_s;
-#endif
+#د_که_پای
 		--curbuf->b_nwindows;
 		curbuf = aco->new_curbuf.br_buf;
-		curwin->w_buffer = curbuf;
+		curwin->w_بفر = curbuf;
 		++curbuf->b_nwindows;
 	    }
 
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
-	    prevwin = win_find_by_id(aco->save_prevwin_id);
+	    curbuf = curwin->w_بفر;
+	    prevwin = win_پیدا_کړه_by_id(aco->save_prevwin_id);
 
 	    // In case the autocommand moves the cursor to a position that
 	    // does not exist in curbuf.
-	    VIsual_active = aco->save_VIsual_active;
+	    VIsual_فعال = aco->save_VIsual_فعال;
 	    check_cursor();
 	}
     }
 
-    VIsual_active = aco->save_VIsual_active;
+    VIsual_فعال = aco->save_VIsual_فعال;
     check_cursor();	    // just in case lines got deleted
-    if (VIsual_active)
+    إذا (VIsual_فعال)
 	check_pos(curbuf, &VIsual);
 }
 
-static int	autocmd_nested = FALSE;
+ساكن صحيح	autocmd_nested = FALSE;
 
 /*
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    int
+    صحيح
 apply_autocmds(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    صحيح		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf)	    // buffer for <abuf>
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
+    أرجع apply_autocmds_ډله(event, fname, fname_io, force,
+						      AUGROUP_ALL, buf, عدم);
 }
 
 /*
  * Like apply_autocmds(), but with extra "eap" argument.  This takes care of
  * setting v:filearg.
  */
-    int
+    صحيح
 apply_autocmds_exarg(
     event_T	event,
     char_u	*fname,
     char_u	*fname_io,
-    int		force,
+    صحيح		force,
     buf_T	*buf,
     exarg_T	*eap)
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
+    أرجع apply_autocmds_ډله(event, fname, fname_io, force,
 						       AUGROUP_ALL, buf, eap);
 }
 
@@ -1936,341 +1936,341 @@ apply_autocmds_exarg(
  * conditional, no autocommands are executed.  If otherwise the autocommands
  * cause the script to be aborted, retval is set to FAIL.
  */
-    int
+    صحيح
 apply_autocmds_retval(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    صحيح		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf,	    // buffer for <abuf>
-    int		*retval)    // pointer to caller's retval
+    صحيح		*retval)    // pointer to caller's retval
 {
-    int		did_cmd;
+    صحيح		did_cmd;
 
-#ifdef FEAT_EVAL
-    if (should_abort(*retval))
-	return FALSE;
-#endif
+#که_تعریف_شوی FEAT_EVAL
+    إذا (should_abort(*retval))
+	أرجع FALSE;
+#د_که_پای
 
-    did_cmd = apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
-    if (did_cmd
-#ifdef FEAT_EVAL
+    did_cmd = apply_autocmds_ډله(event, fname, fname_io, force,
+						      AUGROUP_ALL, buf, عدم);
+    إذا (did_cmd
+#که_تعریف_شوی FEAT_EVAL
 	    && aborting()
-#endif
+#د_که_پای
 	    )
 	*retval = FAIL;
-    return did_cmd;
+    أرجع did_cmd;
 }
 
 /*
  * Return TRUE when there is a CursorHold autocommand defined.
  */
-    static int
-has_cursorhold(void)
+    ساكن صحيح
+has_cursorhold(فراغ)
 {
-    return (first_autopat[(int)(get_real_state() == MODE_NORMAL_BUSY
-			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != NULL);
+    أرجع (لومړی_autopat[(صحيح)(get_real_state() == ډېرپېښ_نورمال_BUSY
+			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != عدم);
 }
 
 /*
  * Return TRUE if the CursorHold event can be triggered.
  */
-    int
-trigger_cursorhold(void)
+    صحيح
+trigger_cursorhold(فراغ)
 {
-    int		state;
+    صحيح		state;
 
-    if (!did_cursorhold
+    إذا (!did_cursorhold
 	    && has_cursorhold()
 	    && reg_recording == 0
 	    && typebuf.tb_len == 0
-	    && !ins_compl_active())
+	    && !ins_compl_فعال())
     {
 	state = get_real_state();
-	if (state == MODE_NORMAL_BUSY || (state & MODE_INSERT) != 0)
-	    return TRUE;
+	إذا (state == ډېرپېښ_نورمال_BUSY || (state & ډېرپېښ_ورننباسه) != 0)
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE when there is a WinResized autocommand defined.
  */
-    int
-has_winresized(void)
+    صحيح
+has_winresized(فراغ)
 {
-    return (first_autopat[(int)EVENT_WINRESIZED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_WINRESIZED] != عدم);
 }
 
 /*
  * Return TRUE when there is a WinScrolled autocommand defined.
  */
-    int
-has_winscrolled(void)
+    صحيح
+has_winscrolled(فراغ)
 {
-    return (first_autopat[(int)EVENT_WINSCROLLED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_WINSCROLLED] != عدم);
 }
 
 /*
  * Return TRUE when there is a CursorMoved autocommand defined.
  */
-    int
-has_cursormoved(void)
+    صحيح
+has_cursormoved(فراغ)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_CURSORMOVED] != عدم);
 }
 
 /*
  * Return TRUE when there is a CursorMovedI autocommand defined.
  */
-    int
-has_cursormovedI(void)
+    صحيح
+has_cursormovedI(فراغ)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVEDI] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_CURSORMOVEDI] != عدم);
 }
 
 /*
  * Return TRUE when there is a TextChanged autocommand defined.
  */
-    int
-has_textchanged(void)
+    صحيح
+has_textchanged(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTCHANGED] != عدم);
 }
 
 /*
  * Return TRUE when there is a TextChangedI autocommand defined.
  */
-    int
-has_textchangedI(void)
+    صحيح
+has_textchangedI(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDI] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTCHANGEDI] != عدم);
 }
 
 /*
  * Return TRUE when there is a TextChangedP autocommand defined.
  */
-    int
-has_textchangedP(void)
+    صحيح
+has_textchangedP(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDP] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTCHANGEDP] != عدم);
 }
 
 /*
  * Return TRUE when there is an InsertCharPre autocommand defined.
  */
-    int
-has_insertcharpre(void)
+    صحيح
+has_insertcharpre(فراغ)
 {
-    return (first_autopat[(int)EVENT_INSERTCHARPRE] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_INSERTCHARPRE] != عدم);
 }
 
 /*
  * Return TRUE when there is an KeyInputPre autocommand defined.
  */
-    int
-has_keyinputpre(void)
+    صحيح
+has_keyinputpre(فراغ)
 {
-    return (first_autopat[(int)EVENT_KEYINPUTPRE] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_KEYINPUTPRE] != عدم);
 }
 
 /*
  * Return TRUE when there is an CmdUndefined autocommand defined.
  */
-    int
-has_cmdundefined(void)
+    صحيح
+has_cmdundefined(فراغ)
 {
-    return (first_autopat[(int)EVENT_CMDUNDEFINED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_CMDUNDEFINED] != عدم);
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * Return TRUE when there is a TextPutPost autocommand defined.
  */
-    int
-has_textputpost(void)
+    صحيح
+has_textputpost(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPOST] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTPUTPOST] != عدم);
 }
 
 /*
  * Return TRUE when there is a TextPutPre autocommand defined.
  */
-    int
-has_textputpre(void)
+    صحيح
+has_textputpre(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPRE] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTPUTPRE] != عدم);
 }
 
 /*
  * Return TRUE when there is a TextYankPost autocommand defined.
  */
-    int
-has_textyankpost(void)
+    صحيح
+has_textyankpost(فراغ)
 {
-    return (first_autopat[(int)EVENT_TEXTYANKPOST] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TEXTYANKPOST] != عدم);
 }
-#endif
+#د_که_پای
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a CompleteChanged autocommand defined.
  */
-    int
-has_completechanged(void)
+    صحيح
+has_completechanged(فراغ)
 {
-    return (first_autopat[(int)EVENT_COMPLETECHANGED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_COMPLETECHANGED] != عدم);
 }
-#endif
+#د_که_پای
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a ModeChanged autocommand defined.
  */
-    int
-has_modechanged(void)
+    صحيح
+has_modechanged(فراغ)
 {
-    return (first_autopat[(int)EVENT_MODECHANGED] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_MODECHANGED] != عدم);
 }
-#endif
+#د_که_پای
 
 /*
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    static int
-apply_autocmds_group(
+    ساكن صحيح
+apply_autocmds_ډله(
     event_T	event,
     char_u	*fname,	     // NULL or empty means use actual file name
     char_u	*fname_io,   // fname to use for <afile> on cmdline, NULL means
 			     // use fname
-    int		force,	     // when TRUE, ignore autocmd_busy
-    int		group,	     // group ID, or AUGROUP_ALL
+    صحيح		force,	     // when TRUE, ignore autocmd_busy
+    صحيح		ډله,	     // group ID, or AUGROUP_ALL
     buf_T	*buf,	     // buffer for <abuf>
-    exarg_T	*eap UNUSED) // command arguments
+    exarg_T	*eap ناکارول_شوی) // command arguments
 {
-    char_u	*sfname = NULL;	// short file name
-    char_u	*tail;
-    int		save_changed;
+    char_u	*sfname = عدم;	// short file name
+    char_u	*لکۍ;
+    صحيح		save_بدل_شوی;
     buf_T	*old_curbuf;
-    int		retval = FALSE;
+    صحيح		retval = FALSE;
     char_u	*save_autocmd_fname;
-    int		save_autocmd_fname_full;
-    int		save_autocmd_bufnr;
-    char_u	*save_autocmd_match;
-    int		save_autocmd_busy;
-    int		save_autocmd_nested;
-    static int	nesting = 0;
+    صحيح		save_autocmd_fname_ډک;
+    صحيح		save_autocmd_bufnr;
+    char_u	*save_autocmd_سمون;
+    صحيح		save_autocmd_busy;
+    صحيح		save_autocmd_nested;
+    ساكن صحيح	nesting = 0;
     AutoPatCmd_T patcmd;
     AutoPat	*ap;
     sctx_T	save_current_sctx;
-#ifdef FEAT_EVAL
-    funccal_entry_T funccal_entry;
+#که_تعریف_شوی FEAT_EVAL
+    funccal_ثبت_T funccal_ثبت;
     char_u	*save_cmdarg;
-    long	save_cmdbang;
-#endif
-    static int	filechangeshell_busy = FALSE;
-#ifdef FEAT_PROFILE
-    proftime_T	wait_time;
-#endif
-    int		did_save_redobuff = FALSE;
+    اوږد	save_cmdbang;
+#د_که_پای
+    ساكن صحيح	filechangeshell_busy = FALSE;
+#که_تعریف_شوی FEAT_PROFILE
+    proftime_T	wait_وخت;
+#د_که_پای
+    صحيح		did_save_redobuff = FALSE;
     save_redo_T	save_redo;
-    int		save_KeyTyped = KeyTyped;
+    صحيح		save_کلی_Typed = کلی_Typed;
     ESTACK_CHECK_DECLARATION;
 
     /*
      * Quickly return if there are no autocommands for this event or
      * autocommands are blocked.
      */
-    if (event == NUM_EVENTS || first_autopat[(int)event] == NULL
+    إذا (event == عدد_EVENTS || لومړی_autopat[(صحيح)event] == عدم
 	    || autocmd_blocked > 0)
-	goto BYPASS_AU;
+	اذهب BYPASS_AU;
 
     /*
      * When autocommands are busy, new autocommands are only executed when
      * explicitly enabled with the "nested" flag.
      */
-    if (autocmd_busy && !(force || autocmd_nested))
-	goto BYPASS_AU;
+    إذا (autocmd_busy && !(force || autocmd_nested))
+	اذهب BYPASS_AU;
 
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
     /*
      * Quickly return when immediately aborting on error, or when an interrupt
      * occurred or an exception was thrown but not caught.
      */
-    if (aborting())
-	goto BYPASS_AU;
-#endif
+    إذا (aborting())
+	اذهب BYPASS_AU;
+#د_که_پای
 
     /*
      * FileChangedShell never nests, because it can create an endless loop.
      */
-    if (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
+    إذا (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
 				      || event == EVENT_FILECHANGEDSHELLPOST))
-	goto BYPASS_AU;
+	اذهب BYPASS_AU;
 
     /*
      * Ignore events in 'eventignore'.
      */
-    if (event_ignored(event, p_ei))
-	goto BYPASS_AU;
+    إذا (event_ignored(event, p_ei))
+	اذهب BYPASS_AU;
 
-    int win_ignore = FALSE;
+    صحيح win_ignore = FALSE;
     // If event is allowed in 'eventignorewin', check if curwin or all windows
     // into "buf" are ignoring the event.
-    if (buf == curbuf && event_tab[event].key <= 0)
+    إذا (buf == curbuf && event_tab[event].کلی <= 0)
 	win_ignore = event_ignored(event, curwin->w_p_eiw);
-    else if (buf != NULL && event_tab[event].key <= 0 && buf->b_nwindows > 0)
+    وإلا إذا (buf != عدم && event_tab[event].کلی <= 0 && buf->b_nwindows > 0)
     {
 	tabpage_T *tp;
 	win_T *wp;
 
 	win_ignore = TRUE;
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf && !event_ignored(event, wp->w_p_eiw))
+	    إذا (wp->w_بفر == buf && !event_ignored(event, wp->w_p_eiw))
 	    {
 		win_ignore = FALSE;
-		break;
+		اكسر;
 	    }
     }
-    if (win_ignore)
-	goto BYPASS_AU;
+    إذا (win_ignore)
+	اذهب BYPASS_AU;
 
     /*
      * Allow nesting of autocommands, but restrict the depth, because it's
      * possible to create an endless loop.
      */
-    if (nesting == 10)
+    إذا (nesting == 10)
     {
 	emsg(_(e_autocommand_nesting_too_deep));
-	goto BYPASS_AU;
+	اذهب BYPASS_AU;
     }
 
     /*
      * Check if these autocommands are disabled.  Used when doing ":all" or
      * ":ball".
      */
-    if (       (autocmd_no_enter
+    إذا (       (autocmd_no_enter
 		&& (event == EVENT_WINENTER || event == EVENT_BUFENTER))
 	    || (autocmd_no_leave
 		&& (event == EVENT_WINLEAVE || event == EVENT_BUFLEAVE)))
-	goto BYPASS_AU;
+	اذهب BYPASS_AU;
 
-    if (event == EVENT_CMDLINECHANGED)
-	++aucmd_cmdline_changed_count;
+    إذا (event == EVENT_CMDLINECHANGED)
+	++aucmd_cmdline_بدل_شوی_شمېر;
 
     /*
      * Save the autocmd_* variables and info about the current buffer.
      */
     save_autocmd_fname = autocmd_fname;
-    save_autocmd_fname_full = autocmd_fname_full;
+    save_autocmd_fname_ډک = autocmd_fname_ډک;
     save_autocmd_bufnr = autocmd_bufnr;
-    save_autocmd_match = autocmd_match;
+    save_autocmd_سمون = autocmd_سمون;
     save_autocmd_busy = autocmd_busy;
     save_autocmd_nested = autocmd_nested;
-    save_changed = curbuf->b_changed;
+    save_بدل_شوی = curbuf->b_بدل_شوی;
     old_curbuf = curbuf;
 
     /*
@@ -2278,32 +2278,32 @@ apply_autocmds_group(
      * Make a copy to avoid that changing a buffer name or directory makes it
      * invalid.
      */
-    if (fname_io == NULL)
+    إذا (fname_io == عدم)
     {
-	if (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
+	إذا (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
 						 || event == EVENT_OPTIONSET
 						 || event == EVENT_MODECHANGED
 						 || event == EVENT_TERMRESPONSEALL)
-	    autocmd_fname = NULL;
-	else if (fname != NULL && !ends_excmd(*fname))
+	    autocmd_fname = عدم;
+	وإلا إذا (fname != عدم && !پایونه_excmd(*fname))
 	    autocmd_fname = fname;
-	else if (buf != NULL)
+	وإلا إذا (buf != عدم)
 	    autocmd_fname = buf->b_ffname;
-	else
-	    autocmd_fname = NULL;
+	وإلا
+	    autocmd_fname = عدم;
     }
-    else
+    وإلا
 	autocmd_fname = fname_io;
-    if (autocmd_fname != NULL)
+    إذا (autocmd_fname != عدم)
 	autocmd_fname = vim_strsave(autocmd_fname);
-    autocmd_fname_full = FALSE; // call FullName_save() later
+    autocmd_fname_ډک = FALSE; // call FullName_save() later
 
     /*
      * Set the buffer number to be used for <abuf>.
      */
-    if (buf == NULL)
+    إذا (buf == عدم)
 	autocmd_bufnr = 0;
-    else
+    وإلا
 	autocmd_bufnr = buf->b_fnum;
 
     /*
@@ -2311,36 +2311,36 @@ apply_autocmds_group(
      * Always use the full path of the file name to match with, in case
      * "allow_dirs" is set.
      */
-    if (fname == NULL || *fname == NUL)
+    إذا (fname == عدم || *fname == NUL)
     {
-	if (buf == NULL)
-	    fname = NULL;
-	else
+	إذا (buf == عدم)
+	    fname = عدم;
+	وإلا
 	{
-#ifdef FEAT_SYN_HL
-	    if (event == EVENT_SYNTAX)
+#که_تعریف_شوی FEAT_SYN_HL
+	    إذا (event == EVENT_SYNTAX)
 		fname = buf->b_p_syn;
-	    else
-#endif
-		if (event == EVENT_FILETYPE)
+	    وإلا
+#د_که_پای
+		إذا (event == EVENT_FILETYPE)
 		    fname = buf->b_p_ft;
-		else
+		وإلا
 		{
-		    if (buf->b_sfname != NULL)
+		    إذا (buf->b_sfname != عدم)
 			sfname = vim_strsave(buf->b_sfname);
 		    fname = buf->b_ffname;
 		}
 	}
-	if (fname == NULL)
+	إذا (fname == عدم)
 	    fname = (char_u *)"";
 	fname = vim_strsave(fname);	// make a copy, so we can change it
     }
-    else
+    وإلا
     {
 	sfname = vim_strsave(fname);
 	// Don't try expanding FileType, Syntax, FuncUndefined, WindowID,
 	// ColorScheme, QuickFixCmd*, DirChanged and similar.
-	if (event == EVENT_FILETYPE
+	إذا (event == EVENT_FILETYPE
 		|| event == EVENT_SYNTAX
 		|| event == EVENT_CMDLINECHANGED
 		|| event == EVENT_CMDLINEENTER
@@ -2370,67 +2370,67 @@ apply_autocmds_group(
 		|| event == EVENT_TERMRESPONSEALL)
 	{
 	    fname = vim_strsave(fname);
-	    autocmd_fname_full = TRUE; // don't expand it later
+	    autocmd_fname_ډک = TRUE; // don't expand it later
 	}
-	else
-	    fname = FullName_save(fname, FALSE);
+	وإلا
+	    fname = ډک_Name_save(fname, FALSE);
     }
-    if (fname == NULL)	    // out of memory
+    إذا (fname == عدم)	    // out of memory
     {
 	vim_free(sfname);
 	retval = FALSE;
-	goto BYPASS_AU;
+	اذهب BYPASS_AU;
     }
 
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
     /*
      * Replace all backslashes with forward slashes.  This makes the
      * autocommand patterns portable between Unix and MS-DOS.
      */
-    if (sfname != NULL)
+    إذا (sfname != عدم)
 	forward_slash(sfname);
     forward_slash(fname);
-#endif
+#د_که_پای
 
-#ifdef VMS
+#که_تعریف_شوی VMS
     // remove version for correct match
-    if (sfname != NULL)
-	vms_remove_version(sfname);
-    vms_remove_version(fname);
-#endif
+    إذا (sfname != عدم)
+	vms_remove_نسخه(sfname);
+    vms_remove_نسخه(fname);
+#د_که_پای
 
     /*
      * Set the name to be used for <amatch>.
      */
-    autocmd_match = fname;
+    autocmd_سمون = fname;
 
 
     // Don't redraw while doing autocommands.
     ++RedrawingDisabled;
 
     // name and lnum are filled in later
-    estack_push(ETYPE_AUCMD, NULL, 0);
-    ESTACK_CHECK_SETUP;
+    estack_ټېل(ETYPE_AUCMD, عدم, 0);
+    ESTACK_CHECK_تیاری;
 
     save_current_sctx = current_sctx;
 
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_enter(&wait_time); // doesn't count for the caller itself
+    إذا (do_profiling == PROF_YES)
+	prof_ماشوم_enter(&wait_وخت); // doesn't count for the caller itself
 # endif
 
     // Don't use local function variables, if called from a function.
-    save_funccal(&funccal_entry);
-#endif
+    save_funccal(&funccal_ثبت);
+#د_که_پای
 
     /*
      * When starting to execute autocommands, save the search patterns.
      */
-    if (!autocmd_busy)
+    إذا (!autocmd_busy)
     {
-	save_search_patterns();
-	if (!ins_compl_active())
+	save_پلټنه_patterns();
+	إذا (!ins_compl_فعال())
 	{
 	    saveRedobuff(&save_redo);
 	    did_save_redobuff = TRUE;
@@ -2446,102 +2446,102 @@ apply_autocmds_group(
     ++nesting;		// see matching decrement below
 
     // Remember that FileType was triggered.  Used for did_filetype().
-    if (event == EVENT_FILETYPE)
+    إذا (event == EVENT_FILETYPE)
 	curbuf->b_did_filetype = true;
 
-    tail = gettail(fname);
+    لکۍ = gettail(fname);
 
     // Find first autocommand that matches
-    CLEAR_FIELD(patcmd);
-    patcmd.curpat = first_autopat[(int)event];
-    patcmd.group = group;
+    CLEAR_ډګر(patcmd);
+    patcmd.curpat = لومړی_autopat[(صحيح)event];
+    patcmd.ډله = ډله;
     patcmd.fname = fname;
     patcmd.sfname = sfname;
-    patcmd.tail = tail;
+    patcmd.لکۍ = لکۍ;
     patcmd.event = event;
     patcmd.arg_bufnr = autocmd_bufnr;
-    auto_next_pat(&patcmd, FALSE);
+    auto_بل_pat(&patcmd, FALSE);
 
     // found one, start executing the autocommands
-    if (patcmd.curpat != NULL)
+    إذا (patcmd.curpat != عدم)
     {
 	// add to active_apc_list
-	patcmd.next = active_apc_list;
-	active_apc_list = &patcmd;
+	patcmd.بل = فعال_apc_list;
+	فعال_apc_list = &patcmd;
 
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
 	// set v:cmdarg (only when there is a matching pattern)
-	save_cmdbang = (long)get_vim_var_nr(VV_CMDBANG);
-	if (eap != NULL)
+	save_cmdbang = (اوږد)get_vim_var_nr(VV_CMDBANG);
+	إذا (eap != عدم)
 	{
-	    save_cmdarg = set_cmdarg(eap, NULL);
-	    set_vim_var_nr(VV_CMDBANG, (long)eap->forceit);
+	    save_cmdarg = سېټ_cmdarg(eap, عدم);
+	    سېټ_vim_var_nr(VV_CMDBANG, (اوږد)eap->forceit);
 	}
-	else
-	    save_cmdarg = NULL;	// avoid gcc warning
-#endif
+	وإلا
+	    save_cmdarg = عدم;	// avoid gcc warning
+#د_که_پای
 	retval = TRUE;
 	// mark the last pattern, to avoid an endless loop when more patterns
 	// are added when executing autocommands
-	for (ap = patcmd.curpat; ap->next != NULL; ap = ap->next)
-	    ap->last = FALSE;
-	ap->last = TRUE;
+	لكل (ap = patcmd.curpat; ap->بل != عدم; ap = ap->بل)
+	    ap->وروستی = FALSE;
+	ap->وروستی = TRUE;
 
 	// Make sure cursor and topline are valid.  The first time the current
 	// values are saved, restored by reset_lnums().  When nested only the
 	// values are corrected when needed.
-	if (nesting == 1)
+	إذا (nesting == 1)
 	    check_lnums(TRUE);
-	else
+	وإلا
 	    check_lnums_nested(TRUE);
 
-	int save_did_emsg = did_emsg;
-	int save_ex_pressedreturn = get_pressedreturn();
+	صحيح save_did_emsg = did_emsg;
+	صحيح save_ex_pressedreturn = get_pressedreturn();
 
-	do_cmdline(NULL, getnextac, (void *)&patcmd,
+	do_cmdline(عدم, getnextac, (فراغ *)&patcmd,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
 
 	did_emsg += save_did_emsg;
-	set_pressedreturn(save_ex_pressedreturn);
+	سېټ_pressedreturn(save_ex_pressedreturn);
 
-	if (nesting == 1)
+	إذا (nesting == 1)
 	    // restore cursor and topline, unless they were changed
 	    reset_lnums();
 
-#ifdef FEAT_EVAL
-	if (eap != NULL)
+#که_تعریف_شوی FEAT_EVAL
+	إذا (eap != عدم)
 	{
-	    (void)set_cmdarg(NULL, save_cmdarg);
-	    set_vim_var_nr(VV_CMDBANG, save_cmdbang);
+	    (فراغ)سېټ_cmdarg(عدم, save_cmdarg);
+	    سېټ_vim_var_nr(VV_CMDBANG, save_cmdbang);
 	}
-#endif
+#د_که_پای
 	// delete from active_apc_list
-	if (active_apc_list == &patcmd)	    // just in case
-	    active_apc_list = patcmd.next;
+	إذا (فعال_apc_list == &patcmd)	    // just in case
+	    فعال_apc_list = patcmd.بل;
     }
 
-    if (RedrawingDisabled > 0)
+    إذا (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     autocmd_busy = save_autocmd_busy;
     filechangeshell_busy = FALSE;
     autocmd_nested = save_autocmd_nested;
     vim_free(SOURCING_NAME);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_راوباسه();
     vim_free(autocmd_fname);
     autocmd_fname = save_autocmd_fname;
-    autocmd_fname_full = save_autocmd_fname_full;
+    autocmd_fname_ډک = save_autocmd_fname_ډک;
     autocmd_bufnr = save_autocmd_bufnr;
-    autocmd_match = save_autocmd_match;
+    autocmd_سمون = save_autocmd_سمون;
     current_sctx = save_current_sctx;
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
     restore_funccal();
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	prof_child_exit(&wait_time);
+    إذا (do_profiling == PROF_YES)
+	prof_ماشوم_exit(&wait_وخت);
 # endif
-#endif
-    KeyTyped = save_KeyTyped;
+#د_که_پای
+    کلی_Typed = save_کلی_Typed;
     vim_free(fname);
     vim_free(sfname);
     --nesting;		// see matching increment above
@@ -2551,22 +2551,22 @@ apply_autocmds_group(
      * the redo buffer.  Free any buffers in the au_pending_free_buf list and
      * free any windows in the au_pending_free_win list.
      */
-    if (!autocmd_busy)
+    إذا (!autocmd_busy)
     {
-	restore_search_patterns();
-	if (did_save_redobuff)
+	restore_پلټنه_patterns();
+	إذا (did_save_redobuff)
 	    restoreRedobuff(&save_redo);
 	curbuf->b_did_filetype = false;
-	while (au_pending_free_buf != NULL)
+	طالما (au_pending_free_buf != عدم)
 	{
-	    buf_T *b = au_pending_free_buf->b_next;
+	    buf_T *b = au_pending_free_buf->b_بل;
 
 	    vim_free(au_pending_free_buf);
 	    au_pending_free_buf = b;
 	}
-	while (au_pending_free_win != NULL)
+	طالما (au_pending_free_win != عدم)
 	{
-	    win_T *w = au_pending_free_win->w_next;
+	    win_T *w = au_pending_free_win->w_بل;
 
 	    vim_free(au_pending_free_win);
 	    au_pending_free_win = w;
@@ -2577,16 +2577,16 @@ apply_autocmds_group(
      * Some events don't set or reset the Changed flag.
      * Check if still in the same buffer!
      */
-    if (curbuf == old_curbuf
+    إذا (curbuf == old_curbuf
 	    && (event == EVENT_BUFREADPOST
 		|| event == EVENT_BUFWRITEPOST
 		|| event == EVENT_FILEAPPENDPOST
 		|| event == EVENT_VIMLEAVE
 		|| event == EVENT_VIMLEAVEPRE))
     {
-	if (curbuf->b_changed != save_changed)
+	إذا (curbuf->b_بدل_شوی != save_بدل_شوی)
 	    need_maketitle = TRUE;
-	curbuf->b_changed = save_changed;
+	curbuf->b_بدل_شوی = save_بدل_شوی;
     }
 
     au_cleanup();	// may really delete removed patterns/commands now
@@ -2594,34 +2594,34 @@ apply_autocmds_group(
 BYPASS_AU:
     // When wiping out a buffer make sure all its buffer-local autocommands
     // are deleted.
-    if (event == EVENT_BUFWIPEOUT && buf != NULL)
+    إذا (event == EVENT_BUFWIPEOUT && buf != عدم)
 	aubuflocal_remove(buf);
 
-    if (retval == OK && event == EVENT_FILETYPE)
+    إذا (retval == OK && event == EVENT_FILETYPE)
 	curbuf->b_au_did_filetype = true;
 
-    return retval;
+    أرجع retval;
 }
 
-#ifdef FEAT_EVAL
-static char_u	*old_termresponse = NULL;
-static char_u	*old_termu7resp = NULL;
-static char_u	*old_termblinkresp = NULL;
-static char_u	*old_termrbgresp = NULL;
-static char_u	*old_termrfgresp = NULL;
-static char_u	*old_termstyleresp = NULL;
-#endif
+#که_تعریف_شوی FEAT_EVAL
+ساكن char_u	*old_termresponse = عدم;
+ساكن char_u	*old_termu7resp = عدم;
+ساكن char_u	*old_termblinkresp = عدم;
+ساكن char_u	*old_termrbgresp = عدم;
+ساكن char_u	*old_termrfgresp = عدم;
+ساكن char_u	*old_termstyleresp = عدم;
+#د_که_پای
 
 /*
  * Block triggering autocommands until unblock_autocmd() is called.
  * Can be used recursively, so long as it's symmetric.
  */
-    void
-block_autocmds(void)
+    فراغ
+بلاک_autocmds(فراغ)
 {
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
     // Remember the value of v:termresponse.
-    if (autocmd_blocked == 0)
+    إذا (autocmd_blocked == 0)
     {
 	old_termresponse = get_vim_var_str(VV_TERMRESPONSE);
 	old_termu7resp = get_vim_var_str(VV_TERMU7RESP);
@@ -2630,101 +2630,101 @@ block_autocmds(void)
 	old_termrfgresp = get_vim_var_str(VV_TERMRFGRESP);
 	old_termstyleresp = get_vim_var_str(VV_TERMSTYLERESP);
     }
-#endif
+#د_که_پای
     ++autocmd_blocked;
 }
 
-    void
-unblock_autocmds(void)
+    فراغ
+unblock_autocmds(فراغ)
 {
     --autocmd_blocked;
 
-#ifdef FEAT_EVAL
+#که_تعریف_شوی FEAT_EVAL
     // When v:termresponse, etc, were set while autocommands were blocked,
     // trigger the autocommands now.  Esp. useful when executing a shell
     // command during startup (vimdiff).
-    if (autocmd_blocked == 0)
+    إذا (autocmd_blocked == 0)
     {
-	if (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
+	إذا (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSE, NULL, NULL, FALSE, curbuf);
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSE, عدم, عدم, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", عدم, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
+	إذا (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", عدم, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
+	إذا (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", عدم, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
+	إذا (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", عدم, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
+	إذا (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", عدم, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
+	إذا (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", عدم, FALSE, curbuf);
 	}
     }
-#endif
+#د_که_پای
 }
 
-    int
-is_autocmd_blocked(void)
+    صحيح
+is_autocmd_blocked(فراغ)
 {
-    return autocmd_blocked != 0;
+    أرجع autocmd_blocked != 0;
 }
 
 /*
  * Find next autocommand pattern that matches.
  */
-    static void
-auto_next_pat(
+    ساكن فراغ
+auto_بل_pat(
     AutoPatCmd_T *apc,
-    int		stop_at_last)	    // stop when 'last' flag is set
+    صحيح		stop_at_وروستی)	    // stop when 'last' flag is set
 {
     AutoPat	*ap;
-    estack_T	*entry;
+    estack_T	*ثبت;
 
-    entry = ((estack_T *)exestack.ga_data) + exestack.ga_len - 1;
+    ثبت = ((estack_T *)exestack.ga_معلومات) + exestack.ga_len - 1;
 
     // Clear the exestack entry for this ETYPE_AUCMD entry.
-    VIM_CLEAR(entry->es_name);
-    entry->es_info.aucmd = NULL;
+    VIM_CLEAR(ثبت->es_name);
+    ثبت->es_info.aucmd = عدم;
 
-    for (ap = apc->curpat; ap != NULL && !got_int; ap = ap->next)
+    لكل (ap = apc->curpat; ap != عدم && !got_int; ap = ap->بل)
     {
-	apc->curpat = NULL;
+	apc->curpat = عدم;
 
 	// Only use a pattern when it has not been removed, has commands and
 	// the group matches. For buffer-local autocommands only check the
 	// buffer number.
-	if (ap->pat != NULL && ap->cmds != NULL
-		&& (apc->group == AUGROUP_ALL || apc->group == ap->group))
+	إذا (ap->pat != عدم && ap->cmds != عدم
+		&& (apc->ډله == AUGROUP_ALL || apc->ډله == ap->ډله))
 	{
 	    // execution-condition
-	    if (ap->buflocal_nr == 0
-		    ? (match_file_pat(NULL, &ap->reg_prog, apc->fname,
-				      apc->sfname, apc->tail, ap->allow_dirs))
+	    إذا (ap->buflocal_nr == 0
+		    ? (سمون_file_pat(عدم, &ap->reg_prog, apc->fname,
+				      apc->sfname, apc->لکۍ, ap->allow_dirs))
 		    : ap->buflocal_nr == apc->arg_bufnr)
 	    {
 		string_T    *event_name;
-		char	    *fmt;
+		حرف	    *fmt;
 		char_u	    *namep;
 		AutoCmd	    *cp;
 
 		event_name = event_nr2name(apc->event);
 		fmt = _("%s Autocommands for \"%s\"");
-		namep = alloc(STRLEN(fmt) + event_name->length + ap->patlen + 1);
-		if (namep != NULL)
+		namep = alloc(STRLEN(fmt) + event_name->اوږدتیا + ap->patlen + 1);
+		إذا (namep != عدم)
 		{
-		    sprintf((char *)namep, fmt, (char *)event_name->string, (char *)ap->pat);
-		    if (p_verbose >= 8)
+		    sprintf((حرف *)namep, fmt, (حرف *)event_name->string, (حرف *)ap->pat);
+		    إذا (p_verbose >= 8)
 		    {
 			verbose_enter();
 			smsg(_("Executing %s"), namep);
@@ -2733,35 +2733,35 @@ auto_next_pat(
 		}
 
 		// Update the exestack entry for this autocmd.
-		entry->es_name = namep;
-		entry->es_info.aucmd = apc;
+		ثبت->es_name = namep;
+		ثبت->es_info.aucmd = apc;
 
 		apc->curpat = ap;
 		apc->nextcmd = ap->cmds;
 		// mark last command
-		for (cp = ap->cmds; cp->next != NULL; cp = cp->next)
-		    cp->last = FALSE;
-		cp->last = TRUE;
+		لكل (cp = ap->cmds; cp->بل != عدم; cp = cp->بل)
+		    cp->وروستی = FALSE;
+		cp->وروستی = TRUE;
 	    }
-	    line_breakcheck();
-	    if (apc->curpat != NULL)	    // found a match
-		break;
+	    کرښه_breakcheck();
+	    إذا (apc->curpat != عدم)	    // found a match
+		اكسر;
 	}
-	if (stop_at_last && ap->last)
-	    break;
+	إذا (stop_at_وروستی && ap->وروستی)
+	    اكسر;
     }
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Get the script context where autocommand "acp" is defined.
  */
     sctx_T *
 acp_script_ctx(AutoPatCmd_T *acp)
 {
-    return &acp->script_ctx;
+    أرجع &acp->script_ctx;
 }
-#endif
+#د_که_پای
 
 /*
  * Get next autocommand command.
@@ -2770,114 +2770,114 @@ acp_script_ctx(AutoPatCmd_T *acp)
  */
     char_u *
 getnextac(
-	int c UNUSED,
-	void *cookie,
-	int indent UNUSED,
-	getline_opt_T options UNUSED)
+	صحيح c ناکارول_شوی,
+	فراغ *cookie,
+	صحيح indent ناکارول_شوی,
+	getline_opt_T options ناکارول_شوی)
 {
     AutoPatCmd_T    *acp = (AutoPatCmd_T *)cookie;
     char_u	    *retval;
     AutoCmd	    *ac;
 
     // Can be called again after returning the last line.
-    if (acp->curpat == NULL)
-	return NULL;
+    إذا (acp->curpat == عدم)
+	أرجع عدم;
 
     // repeat until we find an autocommand to execute
-    for (;;)
+    لكل (;;)
     {
 	// skip removed commands
-	while (acp->nextcmd != NULL && acp->nextcmd->cmd == NULL)
-	    if (acp->nextcmd->last)
-		acp->nextcmd = NULL;
-	    else
-		acp->nextcmd = acp->nextcmd->next;
+	طالما (acp->nextcmd != عدم && acp->nextcmd->cmd == عدم)
+	    إذا (acp->nextcmd->وروستی)
+		acp->nextcmd = عدم;
+	    وإلا
+		acp->nextcmd = acp->nextcmd->بل;
 
-	if (acp->nextcmd != NULL)
-	    break;
+	إذا (acp->nextcmd != عدم)
+	    اكسر;
 
 	// at end of commands, find next pattern that matches
-	if (acp->curpat->last)
-	    acp->curpat = NULL;
-	else
-	    acp->curpat = acp->curpat->next;
-	if (acp->curpat != NULL)
-	    auto_next_pat(acp, TRUE);
-	if (acp->curpat == NULL)
-	    return NULL;
+	إذا (acp->curpat->وروستی)
+	    acp->curpat = عدم;
+	وإلا
+	    acp->curpat = acp->curpat->بل;
+	إذا (acp->curpat != عدم)
+	    auto_بل_pat(acp, TRUE);
+	إذا (acp->curpat == عدم)
+	    أرجع عدم;
     }
 
     ac = acp->nextcmd;
 
-    if (p_verbose >= 9)
+    إذا (p_verbose >= 9)
     {
 	verbose_enter_scroll();
 	smsg(_("autocommand %s"), ac->cmd);
-	msg_puts("\n");   // don't overwrite this either
+	پیغام_puts("\n");   // don't overwrite this either
 	verbose_leave_scroll();
     }
     retval = vim_strsave(ac->cmd);
     // Remove one-shot ("once") autocmd in anticipation of its execution.
-    if (ac->once)
+    إذا (ac->once)
 	au_del_cmd(ac);
     autocmd_nested = ac->nested;
     current_sctx = ac->script_ctx;
     acp->script_ctx = current_sctx;
-    if (ac->last)
-	acp->nextcmd = NULL;
-    else
-	acp->nextcmd = ac->next;
-    return retval;
+    إذا (ac->وروستی)
+	acp->nextcmd = عدم;
+    وإلا
+	acp->nextcmd = ac->بل;
+    أرجع retval;
 }
 
 /*
  * Implementation of has_autocmd() and has_autocmd_fullname().
  * When "is_full" is TRUE "sfname" is already a full path name.
  */
-    static int
-has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
+    ساكن صحيح
+has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_ډک)
 {
     AutoPat	*ap;
     char_u	*fname;
-    char_u	*tail = gettail(sfname);
-    int		retval = FALSE;
+    char_u	*لکۍ = gettail(sfname);
+    صحيح		retval = FALSE;
 
-    if (first_autopat[(int)event] == NULL)
-	return FALSE;
+    إذا (لومړی_autopat[(صحيح)event] == عدم)
+	أرجع FALSE;
 
-    fname = is_full ? vim_strsave(sfname) : FullName_save(sfname, FALSE);
-    if (fname == NULL)
-	return FALSE;
+    fname = is_ډک ? vim_strsave(sfname) : ډک_Name_save(sfname, FALSE);
+    إذا (fname == عدم)
+	أرجع FALSE;
 
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
     /*
      * Replace all backslashes with forward slashes.  This makes the
      * autocommand patterns portable between Unix and MS-DOS.
      */
     sfname = vim_strsave(sfname);
-    if (sfname != NULL)
+    إذا (sfname != عدم)
 	forward_slash(sfname);
     forward_slash(fname);
-#endif
+#د_که_پای
 
     FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	if (ap->pat != NULL && ap->cmds != NULL
+	إذا (ap->pat != عدم && ap->cmds != عدم
 	      && (ap->buflocal_nr == 0
-		? match_file_pat(NULL, &ap->reg_prog,
-					  fname, sfname, tail, ap->allow_dirs)
-		: buf != NULL && ap->buflocal_nr == buf->b_fnum
+		? سمون_file_pat(عدم, &ap->reg_prog,
+					  fname, sfname, لکۍ, ap->allow_dirs)
+		: buf != عدم && ap->buflocal_nr == buf->b_fnum
 	   ))
 	{
 	    retval = TRUE;
-	    break;
+	    اكسر;
 	}
 
     vim_free(fname);
-#ifdef BACKSLASH_IN_FILENAME
+#که_تعریف_شوی BACKSLASH_دننه_FILENAME
     vim_free(sfname);
-#endif
+#د_که_پای
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -2885,10 +2885,10 @@ has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
  * To account for buffer-local autocommands, function needs to know
  * in which buffer the file will be opened.
  */
-    int
+    صحيح
 has_autocmd(event_T event, char_u *sfname, buf_T *buf)
 {
-    return has_autocmd_ext(event, sfname, buf, false);
+    أرجع has_autocmd_ext(event, sfname, buf, false);
 }
 
 /*
@@ -2896,10 +2896,10 @@ has_autocmd(event_T event, char_u *sfname, buf_T *buf)
  * returned by fix_fname().  Avoids expanding it again, which is slow on
  * MS-Windows.
  */
-    int
+    صحيح
 has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
 {
-    return has_autocmd_ext(event, fname, buf, true);
+    أرجع has_autocmd_ext(event, fname, buf, true);
 }
 
 /*
@@ -2907,104 +2907,104 @@ has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
  * names.
  */
     char_u *
-get_augroup_name(expand_T *xp UNUSED, int idx)
+get_augroup_name(expand_T *xp ناکارول_شوی, صحيح idx)
 {
-    if (idx == augroups.ga_len)		// add "END" add the end
-	return (char_u *)"END";
-    if (idx < 0 || idx >= augroups.ga_len)	// end of list
-	return NULL;
-    if (AUGROUP_NAME(idx) == NULL || AUGROUP_NAME(idx) == get_deleted_augroup())
+    إذا (idx == augroups.ga_len)		// add "END" add the end
+	أرجع (char_u *)"END";
+    إذا (idx < 0 || idx >= augroups.ga_len)	// end of list
+	أرجع عدم;
+    إذا (AUGROUP_NAME(idx) == عدم || AUGROUP_NAME(idx) == get_deleted_augroup())
 	// skip deleted entries
-	return (char_u *)"";
-    return AUGROUP_NAME(idx);		// return a name
+	أرجع (char_u *)"";
+    أرجع AUGROUP_NAME(idx);		// return a name
 }
 
-static int include_groups = FALSE;
+ساكن صحيح include_groups = FALSE;
 
     char_u  *
-set_context_in_autocmd(
+سېټ_context_دننه_autocmd(
     expand_T	*xp,
     char_u	*arg,
-    int		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
+    صحيح		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
 {
     char_u	*p;
-    int		group;
+    صحيح		ډله;
 
     // check for a group name, skip it if present
     include_groups = FALSE;
     p = arg;
-    group = au_get_grouparg(&arg);
-    if (group == AUGROUP_ERROR)
-	return NULL;
+    ډله = au_get_grouparg(&arg);
+    إذا (ډله == AUGROUP_ERROR)
+	أرجع عدم;
     // If there only is a group name that's what we expand.
-    if (*arg == NUL && group != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
+    إذا (*arg == NUL && ډله != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
     {
 	arg = p;
-	group = AUGROUP_ALL;
+	ډله = AUGROUP_ALL;
     }
 
     // skip over event name
-    for (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
-	if (*p == ',')
+    لكل (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
+	إذا (*p == ',')
 	    arg = p + 1;
-    if (*p == NUL)
+    إذا (*p == NUL)
     {
-	if (group == AUGROUP_ALL)
+	إذا (ډله == AUGROUP_ALL)
 	    include_groups = TRUE;
 	xp->xp_context = EXPAND_EVENTS;	    // expand event name
-	xp->xp_pattern = arg;
-	return NULL;
+	xp->xp_نمونه = arg;
+	أرجع عدم;
     }
 
     // skip over pattern
     arg = skipwhite(p);
-    while (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
+    طالما (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
 	arg++;
-    if (*arg)
+    إذا (*arg)
     {
 	// skip over "++once", "++nested" and "nested"
 	arg = skipwhite(arg);
-	for (int i = 0; i < 2; i++)
+	لكل (صحيح i = 0; i < 2; i++)
 	{
-	    if (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
+	    إذا (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
-	    if (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
+	    إذا (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
 		arg = skipwhite(arg + 8);
-	    if (!in_vim9script() && STRNCMP(arg, "nested", 6) == 0
+	    إذا (!دننه_vim9script() && STRNCMP(arg, "nested", 6) == 0
 						       && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
 	}
-	return arg;			    // expand (next) command
+	أرجع arg;			    // expand (next) command
     }
 
-    if (doautocmd)
+    إذا (doautocmd)
 	xp->xp_context = EXPAND_FILES;	    // expand file names
-    else
+    وإلا
 	xp->xp_context = EXPAND_NOTHING;    // pattern is not expanded
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of event names.
  */
     char_u *
-get_event_name(expand_T *xp UNUSED, int idx)
+get_event_name(expand_T *xp ناکارول_شوی, صحيح idx)
 {
-    int i;
+    صحيح i;
 
-    if (idx < augroups.ga_len)		// First list group names, if wanted
+    إذا (idx < augroups.ga_len)		// First list group names, if wanted
     {
-	if (!include_groups || AUGROUP_NAME(idx) == NULL
+	إذا (!include_groups || AUGROUP_NAME(idx) == عدم
 				 || AUGROUP_NAME(idx) == get_deleted_augroup())
-	    return (char_u *)"";	// skip deleted entries
-	return AUGROUP_NAME(idx);	// return a name
+	    أرجع (char_u *)"";	// skip deleted entries
+	أرجع AUGROUP_NAME(idx);	// return a name
     }
 
     i = idx - augroups.ga_len;
-    if (i < 0 || i >= NUM_EVENTS)
-	return NULL;
+    إذا (i < 0 || i >= عدد_EVENTS)
+	أرجع عدم;
 
-    return event_tab[i].value.string;
+    أرجع event_tab[i].ارزښت.string;
 }
 
 /*
@@ -3012,45 +3012,45 @@ get_event_name(expand_T *xp UNUSED, int idx)
  * include groups.
  */
     char_u *
-get_event_name_no_group(expand_T *xp UNUSED, int idx, int win)
+get_event_name_no_ډله(expand_T *xp ناکارول_شوی, صحيح idx, صحيح win)
 {
-    if (idx < 0 || idx >= NUM_EVENTS)
-	return NULL;
+    إذا (idx < 0 || idx >= عدد_EVENTS)
+	أرجع عدم;
 
-    if (!win)
-	return event_tab[idx].value.string;
+    إذا (!win)
+	أرجع event_tab[idx].ارزښت.string;
 
     // Need to check subset of allowed values for 'eventignorewin'.
-    int j = 0;
-    for (int i = 0; i < NUM_EVENTS; ++i)
+    صحيح j = 0;
+    لكل (صحيح i = 0; i < عدد_EVENTS; ++i)
     {
-	j += event_tab[i].key <= 0;
-	if (j == idx + 1)
-	    return event_tab[i].value.string;
+	j += event_tab[i].کلی <= 0;
+	إذا (j == idx + 1)
+	    أرجع event_tab[i].ارزښت.string;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Return TRUE when there is a TabClosedPre autocommand defined.
  */
-    int
-has_tabclosedpre(void)
+    صحيح
+has_tabclosedpre(فراغ)
 {
-    return (first_autopat[(int)EVENT_TABCLOSEDPRE] != NULL);
+    أرجع (لومړی_autopat[(صحيح)EVENT_TABCLOSEDPRE] != عدم);
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE if autocmd is supported.
  */
-    int
+    صحيح
 autocmd_supported(char_u *name)
 {
     char_u *p;
 
-    return (event_name2nr(name, &p) != NUM_EVENTS);
+    أرجع (event_name2nr(name, &p) != عدد_EVENTS);
 }
 
 /*
@@ -3065,248 +3065,248 @@ autocmd_supported(char_u *name)
  *	exists("#Event") or
  *	exists("#Event#pat")
  */
-    int
+    صحيح
 au_exists(char_u *arg)
 {
     char_u	*arg_save;
-    char_u	*pattern = NULL;
+    char_u	*نمونه = عدم;
     char_u	*event_name;
     char_u	*p;
     event_T	event;
     AutoPat	*ap;
-    buf_T	*buflocal_buf = NULL;
-    int		group;
-    int		retval = FALSE;
+    buf_T	*buflocal_buf = عدم;
+    صحيح		ډله;
+    صحيح		retval = FALSE;
 
     // Make a copy so that we can change the '#' chars to a NUL.
     arg_save = vim_strsave(arg);
-    if (arg_save == NULL)
-	return FALSE;
+    إذا (arg_save == عدم)
+	أرجع FALSE;
     p = vim_strchr(arg_save, '#');
-    if (p != NULL)
+    إذا (p != عدم)
 	*p++ = NUL;
 
     // First, look for an autocmd group name
-    group = au_find_group(arg_save);
-    if (group == AUGROUP_ERROR)
+    ډله = au_پیدا_کړه_ډله(arg_save);
+    إذا (ډله == AUGROUP_ERROR)
     {
 	// Didn't match a group name, assume the first argument is an event.
-	group = AUGROUP_ALL;
+	ډله = AUGROUP_ALL;
 	event_name = arg_save;
     }
-    else
+    وإلا
     {
-	if (p == NULL)
+	إذا (p == عدم)
 	{
 	    // "Group": group name is present and it's recognized
 	    retval = TRUE;
-	    goto theend;
+	    اذهب theend;
 	}
 
 	// Must be "Group#Event" or "Group#Event#pat".
 	event_name = p;
 	p = vim_strchr(event_name, '#');
-	if (p != NULL)
+	إذا (p != عدم)
 	    *p++ = NUL;	    // "Group#Event#pat"
     }
 
-    pattern = p;	    // "pattern" is NULL when there is no pattern
+    نمونه = p;	    // "pattern" is NULL when there is no pattern
 
     // find the index (enum) for the event name
     event = event_name2nr(event_name, &p);
 
     // return FALSE if the event name is not recognized
-    if (event == NUM_EVENTS)
-	goto theend;
+    إذا (event == عدد_EVENTS)
+	اذهب theend;
 
     // Find the first autocommand for this event.
     // If there isn't any, return FALSE;
     // If there is one and no pattern given, return TRUE;
-    ap = first_autopat[(int)event];
-    if (ap == NULL)
-	goto theend;
+    ap = لومړی_autopat[(صحيح)event];
+    إذا (ap == عدم)
+	اذهب theend;
 
     // if pattern is "<buffer>", special handling is needed which uses curbuf
     // for pattern "<buffer=N>, fnamecmp() will work fine
-    if (pattern != NULL && STRICMP(pattern, "<buffer>") == 0)
+    إذا (نمونه != عدم && STRICMP(نمونه, "<buffer>") == 0)
 	buflocal_buf = curbuf;
 
     // Check if there is an autocommand with the given pattern.
-    for ( ; ap != NULL; ap = ap->next)
+    لكل ( ; ap != عدم; ap = ap->بل)
 	// only use a pattern when it has not been removed and has commands.
 	// For buffer-local autocommands, fnamecmp() works fine.
-	if (ap->pat != NULL && ap->cmds != NULL
-	    && (group == AUGROUP_ALL || ap->group == group)
-	    && (pattern == NULL
-		|| (buflocal_buf == NULL
-		    ? fnamecmp(ap->pat, pattern) == 0
+	إذا (ap->pat != عدم && ap->cmds != عدم
+	    && (ډله == AUGROUP_ALL || ap->ډله == ډله)
+	    && (نمونه == عدم
+		|| (buflocal_buf == عدم
+		    ? fnamecmp(ap->pat, نمونه) == 0
 		    : ap->buflocal_nr == buflocal_buf->b_fnum)))
 	{
 	    retval = TRUE;
-	    break;
+	    اكسر;
 	}
 
 theend:
     vim_free(arg_save);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * autocmd_add() and autocmd_delete() functions
  */
-    static void
-autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
+    ساكن فراغ
+autocmd_جمع_کړه_or_delete(typval_T *argvars, typval_T *rettv, صحيح delete)
 {
     list_T	*aucmd_list;
     listitem_T	*li;
     dict_T	*event_dict;
     dictitem_T	*di;
-    char_u	*event_name = NULL;
+    char_u	*event_name = عدم;
     list_T	*event_list;
     listitem_T	*eli;
     event_T	event;
-    char_u	*group_name = NULL;
-    int		group;
-    char_u	*pat = NULL;
+    char_u	*ډله_name = عدم;
+    صحيح		ډله;
+    char_u	*pat = عدم;
     list_T	*pat_list;
     listitem_T	*pli;
-    char_u	*cmd = NULL;
-    char_u	*end;
-    int		once;
-    int		nested;
-    int		replace;		// replace the cmd for a group/event
-    int		retval = VVAL_TRUE;
-    int		save_augroup = current_augroup;
+    char_u	*cmd = عدم;
+    char_u	*پای_ټکی;
+    صحيح		once;
+    صحيح		nested;
+    صحيح		replace;		// replace the cmd for a group/event
+    صحيح		retval = VVAL_TRUE;
+    صحيح		save_augroup = current_augroup;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_شمېره = VVAL_FALSE;
 
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	أرجع;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_list_arg(argvars, 0) == FAIL)
+	أرجع;
 
     aucmd_list = argvars[0].vval.v_list;
-    if (aucmd_list == NULL)
-	return;
+    إذا (aucmd_list == عدم)
+	أرجع;
 
-    FOR_ALL_LIST_ITEMS(aucmd_list, li)
+    FOR_ALL_LIST_توکي(aucmd_list, li)
     {
-	VIM_CLEAR(group_name);
+	VIM_CLEAR(ډله_name);
 	VIM_CLEAR(cmd);
-	event_name = NULL;
-	event_list = NULL;
-	pat = NULL;
-	pat_list = NULL;
+	event_name = عدم;
+	event_list = عدم;
+	pat = عدم;
+	pat_list = عدم;
 
-	if (li->li_tv.v_type != VAR_DICT)
-	    continue;
+	إذا (li->li_tv.v_type != VAR_DICT)
+	    استمر;
 
 	event_dict = li->li_tv.vval.v_dict;
-	if (event_dict == NULL)
-	    continue;
+	إذا (event_dict == عدم)
+	    استمر;
 
-	di = dict_find(event_dict, (char_u *)"event", -1);
-	if (di != NULL)
+	di = dict_پیدا_کړه(event_dict, (char_u *)"event", -1);
+	إذا (di != عدم)
 	{
-	    if (di->di_tv.v_type == VAR_STRING)
+	    إذا (di->di_tv.v_type == VAR_STRING)
 	    {
 		event_name = di->di_tv.vval.v_string;
-		if (event_name == NULL)
+		إذا (event_name == عدم)
 		{
 		    emsg(_(e_string_required));
-		    continue;
+		    استمر;
 		}
 	    }
-	    else if (di->di_tv.v_type == VAR_LIST)
+	    وإلا إذا (di->di_tv.v_type == VAR_LIST)
 	    {
 		event_list = di->di_tv.vval.v_list;
-		if (event_list == NULL)
+		إذا (event_list == عدم)
 		{
 		    emsg(_(e_list_required));
-		    continue;
+		    استمر;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		emsg(_(e_string_or_list_expected));
-		continue;
+		استمر;
 	    }
 	}
 
-	group_name = dict_get_string(event_dict, "group", TRUE);
-	if (group_name == NULL || *group_name == NUL)
+	ډله_name = dict_get_string(event_dict, "group", TRUE);
+	إذا (ډله_name == عدم || *ډله_name == NUL)
 	    // if the autocmd group name is not specified, then use the current
 	    // autocmd group
-	    group = current_augroup;
-	else
+	    ډله = current_augroup;
+	وإلا
 	{
-	    group = au_find_group(group_name);
-	    if (group == AUGROUP_ERROR)
+	    ډله = au_پیدا_کړه_ډله(ډله_name);
+	    إذا (ډله == AUGROUP_ERROR)
 	    {
-		if (delete)
+		إذا (delete)
 		{
-		    semsg(_(e_no_such_group_str), group_name);
+		    semsg(_(e_no_such_ډله_str), ډله_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    اكسر;
 		}
 		// group is not found, create it now
-		group = au_new_group(group_name);
-		if (group == AUGROUP_ERROR)
+		ډله = au_new_ډله(ډله_name);
+		إذا (ډله == AUGROUP_ERROR)
 		{
-		    semsg(_(e_no_such_group_str), group_name);
+		    semsg(_(e_no_such_ډله_str), ډله_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    اكسر;
 		}
 
-		current_augroup = group;
+		current_augroup = ډله;
 	    }
 	}
 
 	// if a buffer number is specified, then generate a pattern of the form
 	// "<buffer=n>. Otherwise, use the pattern supplied by the user.
-	if (dict_has_key(event_dict, "bufnr"))
+	إذا (dict_has_کلی(event_dict, "bufnr"))
 	{
 	    varnumber_T	bnum;
 
-	    bnum = dict_get_number_def(event_dict, "bufnr", -1);
-	    if (bnum == -1)
-		continue;
+	    bnum = dict_get_شمېره_def(event_dict, "bufnr", -1);
+	    إذا (bnum == -1)
+		استمر;
 
-	    vim_snprintf((char *)IObuff, IOSIZE, "<buffer=%d>", (int)bnum);
+	    vim_snprintf((حرف *)IObuff, IOSIZE, "<buffer=%d>", (صحيح)bnum);
 	    pat = IObuff;
 	}
-	else
+	وإلا
 	{
-	    di = dict_find(event_dict, (char_u *)"pattern", -1);
-	    if (di != NULL)
+	    di = dict_پیدا_کړه(event_dict, (char_u *)"pattern", -1);
+	    إذا (di != عدم)
 	    {
-		if (di->di_tv.v_type == VAR_STRING)
+		إذا (di->di_tv.v_type == VAR_STRING)
 		{
 		    pat = di->di_tv.vval.v_string;
-		    if (pat == NULL)
+		    إذا (pat == عدم)
 		    {
 			emsg(_(e_string_required));
-			continue;
+			استمر;
 		    }
 		}
-		else if (di->di_tv.v_type == VAR_LIST)
+		وإلا إذا (di->di_tv.v_type == VAR_LIST)
 		{
 		    pat_list = di->di_tv.vval.v_list;
-		    if (pat_list == NULL)
+		    إذا (pat_list == عدم)
 		    {
 			emsg(_(e_list_required));
-			continue;
+			استمر;
 		    }
 		}
-		else
+		وإلا
 		{
 		    emsg(_(e_string_or_list_expected));
-		    continue;
+		    استمر;
 		}
 	    }
-	    else if (delete)
+	    وإلا إذا (delete)
 		pat = (char_u *)"";
 	}
 
@@ -3317,285 +3317,285 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
 	replace = dict_get_bool(event_dict, "replace", FALSE);
 
 	cmd = dict_get_string(event_dict, "cmd", TRUE);
-	if (cmd == NULL)
+	إذا (cmd == عدم)
 	{
-	    if (delete)
+	    إذا (delete)
 		cmd = vim_strsave((char_u *)"");
-	    else
-		continue;
+	    وإلا
+		استمر;
 	}
 
-	if (delete && (event_name == NULL
+	إذا (delete && (event_name == عدم
 		    || (event_name[0] == '*' && event_name[1] == NUL)))
 	{
 	    // if the event name is not specified or '*', delete all the events
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-		    event = (event_T)((int)event + 1))
+	    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+		    event = (event_T)((صحيح)event + 1))
 	    {
-		if (do_autocmd_event(event, pat, once, nested, cmd, delete,
-							group, 0) == FAIL)
+		إذا (do_autocmd_event(event, pat, once, nested, cmd, delete,
+							ډله, 0) == FAIL)
 		{
 		    retval = VVAL_FALSE;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
-	else
+	وإلا
 	{
-	    char_u *p = NULL;
+	    char_u *p = عدم;
 
-	    eli = NULL;
-	    end = NULL;
-	    while (TRUE)
+	    eli = عدم;
+	    پای_ټکی = عدم;
+	    طالما (TRUE)
 	    {
-		if (event_list != NULL)
+		إذا (event_list != عدم)
 		{
-		    if (eli == NULL)
-			eli = event_list->lv_first;
-		    else
-			eli = eli->li_next;
-		    if (eli == NULL)
-			break;
-		    if (eli->li_tv.v_type != VAR_STRING
-			    || (p = eli->li_tv.vval.v_string) == NULL)
+		    إذا (eli == عدم)
+			eli = event_list->lv_لومړی;
+		    وإلا
+			eli = eli->li_بل;
+		    إذا (eli == عدم)
+			اكسر;
+		    إذا (eli->li_tv.v_type != VAR_STRING
+			    || (p = eli->li_tv.vval.v_string) == عدم)
 		    {
 			emsg(_(e_string_required));
-			break;
+			اكسر;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (p == NULL)
+		    إذا (p == عدم)
 			p = event_name;
-		    if (p == NULL || *p == NUL)
-			break;
+		    إذا (p == عدم || *p == NUL)
+			اكسر;
 		}
 
-		event = event_name2nr(p, &end);
-		if (event == NUM_EVENTS || *end != NUL)
+		event = event_name2nr(p, &پای_ټکی);
+		إذا (event == عدد_EVENTS || *پای_ټکی != NUL)
 		{
 		    // this also catches something following a valid event name
 		    semsg(_(e_no_such_event_str), p);
 		    retval = VVAL_FALSE;
-		    break;
+		    اكسر;
 		}
-		if (pat != NULL)
+		إذا (pat != عدم)
 		{
-		    if (do_autocmd_event(event, pat, once, nested, cmd,
-				delete | replace, group, 0) == FAIL)
+		    إذا (do_autocmd_event(event, pat, once, nested, cmd,
+				delete | replace, ډله, 0) == FAIL)
 		    {
 			retval = VVAL_FALSE;
-			break;
+			اكسر;
 		    }
 		}
-		else if (pat_list != NULL)
+		وإلا إذا (pat_list != عدم)
 		{
-		    FOR_ALL_LIST_ITEMS(pat_list, pli)
+		    FOR_ALL_LIST_توکي(pat_list, pli)
 		    {
-			if (pli->li_tv.v_type != VAR_STRING
-				|| pli->li_tv.vval.v_string == NULL)
+			إذا (pli->li_tv.v_type != VAR_STRING
+				|| pli->li_tv.vval.v_string == عدم)
 			{
 			    emsg(_(e_string_required));
-			    continue;
+			    استمر;
 			}
-			if (do_autocmd_event(event,
+			إذا (do_autocmd_event(event,
 				    pli->li_tv.vval.v_string, once, nested,
-				    cmd, delete | replace, group, 0) ==
+				    cmd, delete | replace, ډله, 0) ==
 				FAIL)
 			{
 			    retval = VVAL_FALSE;
-			    break;
+			    اكسر;
 			}
 		    }
-		    if (retval == VVAL_FALSE)
-			break;
+		    إذا (retval == VVAL_FALSE)
+			اكسر;
 		}
-		if (event_name != NULL)
-		    p = end;
+		إذا (event_name != عدم)
+		    p = پای_ټکی;
 	    }
 	}
 
 	// if only the autocmd group name is specified for delete and the
 	// autocmd event, pattern and cmd are not specified, then delete the
 	// autocmd group.
-	if (delete && group_name != NULL &&
-		(event_name == NULL || event_name[0] == NUL)
-		&& (pat == NULL || pat[0] == NUL)
-		&& (cmd == NULL || cmd[0] == NUL))
-	    au_del_group(group_name);
+	إذا (delete && ډله_name != عدم &&
+		(event_name == عدم || event_name[0] == NUL)
+		&& (pat == عدم || pat[0] == NUL)
+		&& (cmd == عدم || cmd[0] == NUL))
+	    au_del_ډله(ډله_name);
     }
 
-    VIM_CLEAR(group_name);
+    VIM_CLEAR(ډله_name);
     VIM_CLEAR(cmd);
 
     current_augroup = save_augroup;
-    rettv->vval.v_number = retval;
+    rettv->vval.v_شمېره = retval;
 }
 
 /*
  * autocmd_add() function
  */
-    void
-f_autocmd_add(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_autocmd_جمع_کړه(typval_T *argvars, typval_T *rettv)
 {
-    autocmd_add_or_delete(argvars, rettv, FALSE);
+    autocmd_جمع_کړه_or_delete(argvars, rettv, FALSE);
 }
 
 /*
  * autocmd_delete() function
  */
-    void
+    فراغ
 f_autocmd_delete(typval_T *argvars, typval_T *rettv)
 {
-    autocmd_add_or_delete(argvars, rettv, TRUE);
+    autocmd_جمع_کړه_or_delete(argvars, rettv, TRUE);
 }
 
 /*
  * autocmd_get() function
  * Returns a List of autocmds.
  */
-    void
+    فراغ
 f_autocmd_get(typval_T *argvars, typval_T *rettv)
 {
-    event_T	event_arg = NUM_EVENTS;
+    event_T	event_arg = عدد_EVENTS;
     event_T	event;
     AutoPat	*ap;
     AutoCmd	*ac;
     list_T	*event_list;
     dict_T	*event_dict;
-    char_u	*pat = NULL;
-    char_u	*name = NULL;
-    int		group = AUGROUP_ALL;
+    char_u	*pat = عدم;
+    char_u	*name = عدم;
+    صحيح		ډله = AUGROUP_ALL;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
+    إذا (check_for_opt_dict_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (argvars[0].v_type == VAR_DICT)
+    إذا (argvars[0].v_type == VAR_DICT)
     {
 	// return only the autocmds in the specified group
-	if (dict_has_key(argvars[0].vval.v_dict, "group"))
+	إذا (dict_has_کلی(argvars[0].vval.v_dict, "group"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "group", TRUE);
-	    if (name == NULL)
-		return;
+	    إذا (name == عدم)
+		أرجع;
 
-	    if (*name == NUL)
-		group = AUGROUP_DEFAULT;
-	    else
+	    إذا (*name == NUL)
+		ډله = AUGROUP_DEFAULT;
+	    وإلا
 	    {
-		group = au_find_group(name);
-		if (group == AUGROUP_ERROR)
+		ډله = au_پیدا_کړه_ډله(name);
+		إذا (ډله == AUGROUP_ERROR)
 		{
-		    semsg(_(e_no_such_group_str), name);
+		    semsg(_(e_no_such_ډله_str), name);
 		    vim_free(name);
-		    return;
+		    أرجع;
 		}
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified event
-	if (dict_has_key(argvars[0].vval.v_dict, "event"))
+	إذا (dict_has_کلی(argvars[0].vval.v_dict, "event"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "event", TRUE);
-	    if (name == NULL)
-		return;
+	    إذا (name == عدم)
+		أرجع;
 
-	    if (name[0] == '*' && name[1] == NUL)
-		event_arg = NUM_EVENTS;
-	    else
+	    إذا (name[0] == '*' && name[1] == NUL)
+		event_arg = عدد_EVENTS;
+	    وإلا
 	    {
-		keyvalue_T target;
-		keyvalue_T *entry;
+		keyvalue_T موخه;
+		keyvalue_T *ثبت;
 
-		target.key = 0;
-		target.value.string = name;
-		target.value.length = STRLEN(target.value.string);
-		entry = (keyvalue_T *)bsearch(&target, &event_tab,
-		    NUM_EVENTS, sizeof(event_tab[0]), cmp_keyvalue_value_ni);
-		if (entry == NULL)
+		موخه.کلی = 0;
+		موخه.ارزښت.string = name;
+		موخه.ارزښت.اوږدتیا = STRLEN(موخه.ارزښت.string);
+		ثبت = (keyvalue_T *)bsearch(&موخه, &event_tab,
+		    عدد_EVENTS, حجم(event_tab[0]), cmp_keyvalue_ارزښت_ni);
+		إذا (ثبت == عدم)
 		{
 		    semsg(_(e_no_such_event_str), name);
 		    vim_free(name);
-		    return;
+		    أرجع;
 		}
-		event_arg = (event_T)abs(entry->key);
+		event_arg = (event_T)مطلق_قیمت(ثبت->کلی);
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified pattern
-	if (dict_has_key(argvars[0].vval.v_dict, "pattern"))
+	إذا (dict_has_کلی(argvars[0].vval.v_dict, "pattern"))
 	{
 	    pat = dict_get_string(argvars[0].vval.v_dict, "pattern", TRUE);
-	    if (pat == NULL)
-		return;
+	    إذا (pat == عدم)
+		أرجع;
 	}
     }
 
     event_list = rettv->vval.v_list;
 
     // iterate through all the autocmd events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    لكل (event = (event_T)0; (صحيح)event < عدد_EVENTS;
+	    event = (event_T)((صحيح)event + 1))
     {
 	string_T    *event_name;
 
-	if (event_arg != NUM_EVENTS && event != event_arg)
-	    continue;
+	إذا (event_arg != عدد_EVENTS && event != event_arg)
+	    استمر;
 
 	event_name = event_nr2name(event);
 
 	// iterate through all the patterns for this autocmd event
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
 	{
-	    string_T	group_name;
+	    string_T	ډله_name;
 
-	    if (ap->pat == NULL)		// pattern has been removed
-		continue;
+	    إذا (ap->pat == عدم)		// pattern has been removed
+		استمر;
 
-	    if (group != AUGROUP_ALL && group != ap->group)
-		continue;
+	    إذا (ډله != AUGROUP_ALL && ډله != ap->ډله)
+		استمر;
 
-	    if (pat != NULL && STRCMP(pat, ap->pat) != 0)
-		continue;
+	    إذا (pat != عدم && STRCMP(pat, ap->pat) != 0)
+		استمر;
 
-	    group_name.string = get_augroup_name(NULL, ap->group);
-	    if (group_name.string == NULL)
-		STR_LITERAL_SET(group_name, "");
-	    else
-		group_name.length = STRLEN(group_name.string);
+	    ډله_name.string = get_augroup_name(عدم, ap->ډله);
+	    إذا (ډله_name.string == عدم)
+		STR_LITERAL_سېټ(ډله_name, "");
+	    وإلا
+		ډله_name.اوږدتیا = STRLEN(ډله_name.string);
 
 	    // iterate through all the commands for this pattern and add one
 	    // item for each cmd.
-	    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+	    لكل (ac = ap->cmds; ac != عدم; ac = ac->بل)
 	    {
 		event_dict = dict_alloc();
-		if (event_dict == NULL
+		إذا (event_dict == عدم
 			|| list_append_dict(event_list, event_dict) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    أرجع;
 		}
 
-		if (dict_add_string_len(event_dict, "event",
-			event_name->string, (int)event_name->length) == FAIL
-			|| dict_add_string_len(event_dict, "group",
-			    group_name.string, (int)group_name.length) == FAIL
+		إذا (dict_جمع_کړه_string_len(event_dict, "event",
+			event_name->string, (صحيح)event_name->اوږدتیا) == FAIL
+			|| dict_جمع_کړه_string_len(event_dict, "group",
+			    ډله_name.string, (صحيح)ډله_name.اوږدتیا) == FAIL
 			|| (ap->buflocal_nr != 0
-				&& (dict_add_number(event_dict, "bufnr",
+				&& (dict_جمع_کړه_شمېره(event_dict, "bufnr",
 						    ap->buflocal_nr) == FAIL))
-			|| dict_add_string(event_dict, "pattern",
+			|| dict_جمع_کړه_string(event_dict, "pattern",
 							      ap->pat) == FAIL
-			|| dict_add_string(event_dict, "cmd", ac->cmd) == FAIL
-			|| dict_add_bool(event_dict, "once", ac->once) == FAIL
-			|| dict_add_bool(event_dict, "nested",
+			|| dict_جمع_کړه_string(event_dict, "cmd", ac->cmd) == FAIL
+			|| dict_جمع_کړه_bool(event_dict, "once", ac->once) == FAIL
+			|| dict_جمع_کړه_bool(event_dict, "nested",
 							   ac->nested) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    أرجع;
 		}
 	    }
 	}
@@ -3604,4 +3604,4 @@ f_autocmd_get(typval_T *argvars, typval_T *rettv)
     vim_free(pat);
 }
 
-#endif
+#د_که_پای

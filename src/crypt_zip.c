@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_CRYPT)
+#إذا defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,131 +24,131 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+تعريفنوع بینښه صحيح u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+تعريفنوع بنية {
+    u32_T کلیګانې[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+ساكن u32_T دوراني_ازموینه_32_جدول[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    ساكن فراغ
+make_دوراني_ازموینه_tab(فراغ)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    ساكن صحيح	بشپړ = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    إذا (بشپړ)
+	أرجع;
+    لكل (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	لكل (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
-	crc_32_table[t] = v;
+	دوراني_ازموینه_32_جدول[t] = v;
     }
-    done = TRUE;
+    بشپړ = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#تعریف_کړه دوراني_ازموینه_32(c, b) (دوراني_ازموینه_32_جدول[((صحيح)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#تعریف_کړه DECRYPT_BYTE_ZIP(کلیګانې, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u لنډمهاله = (short_u)کلیګانې[2] | 2; \
+    t = (صحيح)(((بینښه)(لنډمهاله * (لنډمهاله ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#تعریف_کړه UPDATE_کلیګانې_ZIP(کلیګانې, c) افعل { \
+    کلیګانې[0] = دوراني_ازموینه_32(کلیګانې[0], (c)); \
+    کلیګانې[1] += کلیګانې[0] & 0xff; \
+    کلیګانې[1] = کلیګانې[1] * 134775813L + 1; \
+    کلیګانې[2] = دوراني_ازموینه_32(کلیګانې[2], (صحيح)(کلیګانې[1] >> 24)); \
+} طالما (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    صحيح
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
-    crypt_arg_T     *arg UNUSED)
+    char_u	    *کلی,
+    crypt_arg_T     *arg ناکارول_شوی)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
-    state->method_state = zs;
+    إذا (zs == عدم)
+	أرجع FAIL;
+    state->لاره_state = zs;
 
-    make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    make_دوراني_ازموینه_tab();
+    zs->کلیګانې[0] = 305419896L;
+    zs->کلیګانې[1] = 591751049L;
+    zs->کلیګانې[2] = 878082192L;
+    لكل (p = کلی; *p != NUL; ++p)
+	UPDATE_کلیګانې_ZIP(zs->کلیګانې, (صحيح)*p);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    فراغ
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*منزل,
+    صحيح		وروستی ناکارول_شوی)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->لاره_state;
     size_t	i;
-    int		ztemp, t;
+    صحيح		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    لكل (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
-	to[i] = t ^ ztemp;
+	DECRYPT_BYTE_ZIP(zs->کلیګانې, t);
+	UPDATE_کلیګانې_ZIP(zs->کلیګانې, ztemp);
+	منزل[i] = t ^ ztemp;
     }
 }
 
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    فراغ
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
-    char_u	*to,
-    int		last UNUSED)
+    char_u	*منزل,
+    صحيح		وروستی ناکارول_شوی)
 {
-    zip_state_T *zs = state->method_state;
+    zip_state_T *zs = state->لاره_state;
     size_t	i;
-    short_u	temp;
+    short_u	لنډمهاله;
 
-    for (i = 0; i < len; ++i)
+    لكل (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	لنډمهاله = (short_u)zs->کلیګانې[2] | 2;
+	لنډمهاله = (صحيح)(((بینښه)(لنډمهاله * (لنډمهاله ^ 1U)) >> 8) & 0xff);
+	UPDATE_کلیګانې_ZIP(zs->کلیګانې, منزل[i] = from[i] ^ لنډمهاله);
     }
 }
 
-#endif // FEAT_CRYPT
+#د_که_پای // FEAT_CRYPT

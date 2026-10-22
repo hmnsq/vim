@@ -14,44 +14,44 @@
  * Split into a separate file to keep os_amiga.c clean.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifndef PROTO
+#که_نه_تعریف_شوی PROTO
 
-#include <proto/dos.h>
+#ضمن <proto/dos.h>
 
 /*
  * Input Method (IM) stubs.
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
-im_get_status(void)
+    صحيح
+im_get_حالت(فراغ)
 {
-    return FALSE;
+    أرجع FALSE;
 }
 
-    void
-im_set_active(int active UNUSED)
+    فراغ
+im_سېټ_فعال(صحيح فعال ناکارول_شوی)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    صحيح
+سېټ_ref_دننه_im_funcs(صحيح copyID ناکارول_شوی)
 {
-    return 0;
+    أرجع 0;
 }
 
-    char *
-did_set_imactivatefunc(optset_T *args UNUSED)
+    حرف *
+did_سېټ_imactivatefunc(optset_T *دلیلونه ناکارول_شوی)
 {
-    return NULL;
+    أرجع عدم;
 }
 
-    char *
-did_set_imstatusfunc(optset_T *args UNUSED)
+    حرف *
+did_سېټ_imstatusfunc(optset_T *دلیلونه ناکارول_شوی)
 {
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    صحيح
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    إذا (DeleteFile((STRPTR)name))
+	أرجع 0;
+    أرجع -1;
 }
 
 /*
@@ -73,25 +73,25 @@ mch_rmdir(char_u *name)
  * The struct declarations exist in the NDK headers but the functions
  * are not implemented in libnix.
  */
-#include <pwd.h>
-#include <grp.h>
+#ضمن <pwd.h>
+#ضمن <grp.h>
 
-    struct passwd *
-getpwuid(uid_t uid UNUSED)
+    بنية passwd *
+getpwuid(uid_t uid ناکارول_شوی)
 {
-    return NULL;
+    أرجع عدم;
 }
 
-    struct group *
-getgrgid(gid_t gid UNUSED)
+    بنية ډله *
+getgrgid(gid_t gid ناکارول_شوی)
 {
-    return NULL;
+    أرجع عدم;
 }
 
     uid_t
-getuid(void)
+getuid(فراغ)
 {
-    return 0;
+    أرجع 0;
 }
 
-#endif // PROTO
+#د_که_پای // PROTO

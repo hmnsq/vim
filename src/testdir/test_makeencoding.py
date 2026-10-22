@@ -3,65 +3,65 @@
 
 # Test program for :make, :grep and :cgetfile.
 
-from __future__ import print_function, unicode_literals
-import locale
-import io
-import sys
+من __future__ استورد print_function, unicode_literals
+استورد locale
+استورد io
+استورد sys
 
-def set_output_encoding(enc=None):
+تعریف سېټ_output_encoding(enc=هیڅ):
     """Set the encoding of stdout and stderr
 
     arguments:
       enc -- Encoding name.
              If omitted, locale.getpreferredencoding() is used.
     """
-    if enc is None:
+    إذا enc دی هیڅ:
         enc = locale.getpreferredencoding()
 
-    def get_text_writer(fo, **kwargs):
+    تعریف get_متن_writer(fo, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
-        kw.setdefault('closefd', False)
+        kw.setdefault('closefd', خطأ)
 
-        if sys.version_info[0] < 3:
+        إذا sys.نسخه_info[0] < 3:
             # Work around for Python 2.x
             # New line conversion isn't needed here. Done in somewhere else.
-            writer = io.open(fo.fileno(), mode='w', newline='', **kw)
-            write = writer.write    # save the original write() function
+            writer = io.open(fo.fileno(), ډېرپېښ='w', newline='', **kw)
+            اكتب = writer.اكتب    # save the original write() function
             enc = locale.getpreferredencoding()
-            def convwrite(s):
-                if isinstance(s, bytes):
-                    write(s.decode(enc))    # convert to unistr
-                else:
-                    write(s)
-                try:
+            تعریف convwrite(s):
+                إذا isinstance(s, بایټونه):
+                    اكتب(s.decode(enc))    # convert to unistr
+                وإلا:
+                    اكتب(s)
+                حاول:
                     writer.flush()  # needed on Windows
-                except IOError:
-                    pass
-            writer.write = convwrite
-        else:
-            writer = io.open(fo.fileno(), mode='w', **kw)
-        return writer
+                استثناء IOError:
+                    تیرشه
+            writer.اكتب = convwrite
+        وإلا:
+            writer = io.open(fo.fileno(), ډېرپېښ='w', **kw)
+        أرجع writer
 
-    sys.stdout = get_text_writer(sys.stdout, encoding=enc)
-    sys.stderr = get_text_writer(sys.stderr, encoding=enc)
+    sys.stdout = get_متن_writer(sys.stdout, encoding=enc)
+    sys.stderr = get_متن_writer(sys.stderr, encoding=enc)
 
 
-def main():
+تعریف اصلي():
     enc = 'utf-8'
-    if len(sys.argv) > 1:
+    إذا اوږدوالی(sys.argv) > 1:
         enc = sys.argv[1]
-    set_output_encoding(enc)
+    سېټ_output_encoding(enc)
 
-    message_tbl = {
+    پیغام_tbl = {
             'utf-8': 'ÀÈÌÒÙ こんにちは 你好',
             'latin1': 'ÀÈÌÒÙ',
             'cp932': 'こんにちは',
             'cp936': '你好',
             }
 
-    print('Xfoobar.c(10) : %s (%s)' % (message_tbl[enc], enc))
+    چاپ('Xfoobar.c(10) : %s (%s)' % (پیغام_tbl[enc], enc))
 
 
-if __name__ == "__main__":
-    main()
+إذا __name__ == "__main__":
+    اصلي()

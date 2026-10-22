@@ -5,11 +5,11 @@
 
 // Next default values for new objects
 //
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE	101
-#define _APS_NEXT_COMMAND_VALUE		40001
-#define _APS_NEXT_CONTROL_VALUE		1000
-#define _APS_NEXT_SYMED_VALUE		101
-#endif
-#endif
+#که_تعریف_شوی APSTUDIO_INVOKED
+#که_نه_تعریف_شوی APSTUDIO_READONLY_SYMBOLS
+#تعریف_کړه APS_بل_RESOURCE_ارزښت	101
+#تعریف_کړه APS_بل_COMMAND_ارزښت		40001
+#تعریف_کړه APS_بل_CONTROL_ارزښت		1000
+#تعریف_کړه APS_بل_SYMED_ارزښت		101
+#د_که_پای
+#د_که_پای

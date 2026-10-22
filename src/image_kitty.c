@@ -7,152 +7,152 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_IMAGE_KITTY)
+#إذا defined(FEAT_IMAGE_KITTY)
 
-typedef struct
+تعريفنوع بنية
 {
     bool transmitted; // If image data has been transmitted to terminal
 } image_kitty_T;
 
-typedef struct
+تعريفنوع بنية
 {
-    int n_ids; // Number of placements ids used for previous redraw
+    صحيح n_ids; // Number of placements ids used for previous redraw
 } image_placement_kitty_T;
 
-    int
+    صحيح
 image_kitty_init(image_T *img)
 {
     image_kitty_T *ctx = ALLOC_CLEAR_ONE(image_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    إذا (ctx == عدم)
+	أرجع FAIL;
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_معلومات = ctx;
+    أرجع OK;
 }
 
-    void
+    فراغ
 image_kitty_uninit(image_T *img)
 {
-    if (((image_kitty_T *)img->backend_data)->transmitted)
+    إذا (((image_kitty_T *)img->backend_معلومات)->transmitted)
     {
 	// Delete image data from terminal
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((حرف *)IObuff, IOSIZE,
 		"\033_Ga=d,d=I,i=%d,q=2\033\\", img->id);
 
-	out_str((char_u *)IObuff);
-	out_flush();
+	بهر_str((char_u *)IObuff);
+	بهر_flush();
     }
-    vim_free(img->backend_data);
+    vim_free(img->backend_معلومات);
 }
 
-    int
-image_placement_kitty_init(image_placement_T *place)
+    صحيح
+image_placement_kitty_init(image_placement_T *ځای_پرځای_کړه)
 {
     image_placement_kitty_T *ctx = ALLOC_CLEAR_ONE(image_placement_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    إذا (ctx == عدم)
+	أرجع FAIL;
 
-    place->backend_data = ctx;
-    return OK;
+    ځای_پرځای_کړه->backend_معلومات = ctx;
+    أرجع OK;
 }
 
-    void
-image_placement_kitty_uninit(image_placement_T *place)
+    فراغ
+image_placement_kitty_uninit(image_placement_T *ځای_پرځای_کړه)
 {
-    vim_free(place->backend_data);
+    vim_free(ځای_پرځای_کړه->backend_معلومات);
 }
 
 /*
  * Transmit image data to terminal if it hasn't already been done.
  */
-    static void
+    ساكن فراغ
 transmit_image(image_T *img)
 {
-    static char buf[4096 + 3]; // Extra bytes for NUL and terminator
+    ساكن حرف buf[4096 + 3]; // Extra bytes for NUL and terminator
 
     int_u   off = 0;
     int_u   sz;
-    bool    first = true;
-    int	    width, height;
+    bool    لومړی = true;
+    صحيح	    پلنوالی, لوړوالی;
 
-    if (likely(((image_kitty_T *)img->backend_data)->transmitted))
-	return;
+    إذا (likely(((image_kitty_T *)img->backend_معلومات)->transmitted))
+	أرجع;
 
-    image_get_dimensions(img, &width, &height);
-    sz = img->fmt * width * height;
+    image_get_dimensions(img, &پلنوالی, &لوړوالی);
+    sz = img->fmt * پلنوالی * لوړوالی;
 
-    while (off < sz)
+    طالما (off < sz)
     {
 	int_u chunk_sz = MIN(4096 * 3 / 4, sz - off);
-	bool more = off + chunk_sz < sz;
-	long encoded;
+	bool نور = off + chunk_sz < sz;
+	اوږد encoded;
 
-	if (unlikely(first))
+	إذا (unlikely(لومړی))
 	{
-	    vim_snprintf(buf, sizeof(buf),
+	    vim_snprintf(buf, حجم(buf),
 		    "\033_Ga=t,i=%d,f=%d,s=%u,v=%u,m=%d,q=2;", img->id,
-		    img->fmt * 8, width, height, more);
-	    first = false;
+		    img->fmt * 8, پلنوالی, لوړوالی, نور);
+	    لومړی = false;
 	}
-	else
-	    vim_snprintf(buf, sizeof(buf), "\033_Gm=%d;", more);
-	out_str((char_u *)buf);
+	وإلا
+	    vim_snprintf(buf, حجم(buf), "\033_Gm=%d;", نور);
+	بهر_str((char_u *)buf);
 
-	encoded = base64_encode_buf((char_u *)buf, img->data + off, chunk_sz);
+	encoded = base64_encode_buf((char_u *)buf, img->معلومات + off, chunk_sz);
 
 	buf[encoded] = '\033';
 	buf[encoded + 1] = '\\';
 	buf[encoded + 2] = NUL;
 
-	out_str((char_u *)buf);
+	بهر_str((char_u *)buf);
 	off += chunk_sz;
     }
 
-    ((image_kitty_T *)img->backend_data)->transmitted = true;
-    out_flush();
+    ((image_kitty_T *)img->backend_معلومات)->transmitted = true;
+    بهر_flush();
 }
 
-    static void
-clear_placement(int id, int place_id)
+    ساكن فراغ
+clear_placement(صحيح id, صحيح ځای_پرځای_کړه_id)
 {
-    vim_snprintf((char *)IObuff, IOSIZE,
-	    "\033_Ga=d,d=i,i=%d,p=%d,q=2\033\\", id, place_id);
+    vim_snprintf((حرف *)IObuff, IOSIZE,
+	    "\033_Ga=d,d=i,i=%d,p=%d,q=2\033\\", id, ځای_پرځای_کړه_id);
 
-    out_str((char_u *)IObuff);
+    بهر_str((char_u *)IObuff);
 }
 
-    void
-image_placement_kitty_draw(image_placement_T *place)
+    فراغ
+image_placement_kitty_draw(image_placement_T *ځای_پرځای_کړه)
 {
-    image_T		    *img = place->img;
-    image_placement_kitty_T *ctx = place->backend_data;
+    image_T		    *img = ځای_پرځای_کړه->img;
+    image_placement_kitty_T *ctx = ځای_پرځای_کړه->backend_معلومات;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    صحيح			    n_rects;
 
-    rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (n_rects > PLACEMENT_ID_INC)
-	return;
+    rects = pixman_region32_rectangles(&ځای_پرځای_کړه->visible, &n_rects);
+    إذا (n_rects > PLACEMENT_ID_INC)
+	أرجع;
 
     transmit_image(img);
 
-    if (rects == NULL)
+    إذا (rects == عدم)
 	// Not sure if this can happen...
-	return;
+	أرجع;
 
-    for (int i = 0; i < n_rects; i++)
+    لكل (صحيح i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	int rect_id = place->id + i; // The placement id of each rect is
+	صحيح rect_id = ځای_پرځای_کړه->id + i; // The placement id of each rect is
 				     // "place->id + i".
-	int row, col;
-	int x, y, w, h;
+	صحيح لیکه, ستون;
+	صحيح x, y, w, h;
 
-	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
+	image_placement_subrect(ځای_پرځای_کړه, rect, &لیکه, &ستون, &x, &y, &w, &h, false);
 
 	// Since we send the image id and the placement id, the existing
 	// placement (if any) will be replaced by this one (essentially moving
@@ -172,36 +172,36 @@ image_placement_kitty_draw(image_placement_T *place)
 	// On kitty terminal it seems to scroll the terminal, messing up the
 	// screen.
 	vim_snprintf(
-		(char *)IObuff, IOSIZE,
+		(حرف *)IObuff, IOSIZE,
 		"\033_Ga=p,i=%d,p=%d,x=%u,y=%u,w=%u,h=%u,z=0,q=2,C=1\033\\",
 		img->id, rect_id,
 		x, y, w, h);
 
-	windgoto(row, col);
-	out_str((char_u *)IObuff);
-	screen_start(); // Probably not needed because of C=1, but do it
+	windgoto(لیکه, ستون);
+	بهر_str((char_u *)IObuff);
+	screen_پیل(); // Probably not needed because of C=1, but do it
 			// anyways...
     }
 
     // Clear all placements that have not been reused.
-    for (int i = n_rects; i < ctx->n_ids; i++)
-	clear_placement(img->id, place->id + i);
+    لكل (صحيح i = n_rects; i < ctx->n_ids; i++)
+	clear_placement(img->id, ځای_پرځای_کړه->id + i);
 
     ctx->n_ids = n_rects;
 }
 
-    void
-image_placement_kitty_clear(image_placement_T *place)
+    فراغ
+image_placement_kitty_clear(image_placement_T *ځای_پرځای_کړه)
 {
-    image_placement_kitty_T *ctx = place->backend_data;
+    image_placement_kitty_T *ctx = ځای_پرځای_کړه->backend_معلومات;
 
-    if (ctx->n_ids == 0)
-	return;
+    إذا (ctx->n_ids == 0)
+	أرجع;
 
-    for (int i = 0; i < ctx->n_ids; i++)
-	clear_placement(place->img->id, place->id + i);
-    out_flush();
+    لكل (صحيح i = 0; i < ctx->n_ids; i++)
+	clear_placement(ځای_پرځای_کړه->img->id, ځای_پرځای_کړه->id + i);
+    بهر_flush();
     ctx->n_ids = 0;
 }
 
-#endif // FEAT_IMAGE_KITTY
+#د_که_پای // FEAT_IMAGE_KITTY

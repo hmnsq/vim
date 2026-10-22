@@ -27,15 +27,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _ISCYGPTY_H
-#define _ISCYGPTY_H
+#که_نه_تعریف_شوی _ISCYGPTY_H
+#تعریف_کړه _ISCYGPTY_H
 
-#ifdef _WIN32
-int is_cygpty(int fd);
-int is_cygpty_used(void);
-#else
+#که_تعریف_شوی _WIN32
+صحيح is_cygpty(صحيح fd);
+صحيح is_cygpty_کارول_شوی(فراغ);
+#وإلا
 # define is_cygpty(fd)		0
-# define is_cygpty_used()	0
-#endif
+# define is_cygpty_کارول_شوی()	0
+#د_که_پای
 
-#endif // _ISCYGPTY_H
+#د_که_پای // _ISCYGPTY_H

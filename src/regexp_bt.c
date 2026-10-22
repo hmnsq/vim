@@ -135,133 +135,133 @@
  */
 
 // definition	number		   opnd?    meaning
-#define END		0	//	End of program or NOMATCH operand.
-#define BOL		1	//	Match "" at beginning of line.
-#define EOL		2	//	Match "" at end of line.
-#define BRANCH		3	// node Match this alternative, or the
+#تعریف_کړه پای_ټکی_3		0	//	End of program or NOMATCH operand.
+#تعریف_کړه BOL		1	//	Match "" at beginning of line.
+#تعریف_کړه EOL		2	//	Match "" at end of line.
+#تعریف_کړه BRANCH		3	// node Match this alternative, or the
 				//	next...
-#define BACK		4	//	Match "", "next" ptr points backward.
-#define EXACTLY		5	// str	Match this string.
-#define NOTHING		6	//	Match empty string.
-#define STAR		7	// node Match this (simple) thing 0 or more
+#تعریف_کړه شا_2		4	//	Match "", "next" ptr points backward.
+#تعریف_کړه EXACTLY		5	// str	Match this string.
+#تعریف_کړه NOTHING		6	//	Match empty string.
+#تعریف_کړه ستوری		7	// node Match this (simple) thing 0 or more
 				//	times.
-#define PLUS		8	// node Match this (simple) thing 1 or more
+#تعریف_کړه PLUS		8	// node Match this (simple) thing 1 or more
 				//	times.
-#define MATCH		9	// node match the operand zero-width
-#define NOMATCH		10	// node check for no match with operand
-#define BEHIND		11	// node look behind for a match with operand
-#define NOBEHIND	12	// node look behind for no match with operand
-#define SUBPAT		13	// node match the operand here
-#define BRACE_SIMPLE	14	// node Match this (simple) thing between m and
+#تعریف_کړه سمون_2		9	// node match the operand zero-width
+#تعریف_کړه NOMATCH		10	// node check for no match with operand
+#تعریف_کړه BEHIND		11	// node look behind for a match with operand
+#تعریف_کړه NOBEHIND	12	// node look behind for no match with operand
+#تعریف_کړه SUBPAT		13	// node match the operand here
+#تعریف_کړه BRACE_SIMPLE	14	// node Match this (simple) thing between m and
 				//	n times (\{m,n\}).
-#define BOW		15	//	Match "" after [^a-zA-Z0-9_]
-#define EOW		16	//	Match "" at    [^a-zA-Z0-9_]
-#define BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
+#تعریف_کړه BOW		15	//	Match "" after [^a-zA-Z0-9_]
+#تعریف_کړه EOW		16	//	Match "" at    [^a-zA-Z0-9_]
+#تعریف_کړه BRACE_LIMITS	17	// nr nr  define the min & max for BRACE_SIMPLE
 				//	and BRACE_COMPLEX.
-#define NEWL		18	//	Match line-break
-#define BHPOS		19	//	End position for BEHIND or NOBEHIND
+#تعریف_کړه NEWL		18	//	Match line-break
+#تعریف_کړه BHPOS		19	//	End position for BEHIND or NOBEHIND
 
 
 // character classes: 20-48 normal, 50-78 include a line-break
-#define ADD_NL		30
-#define FIRST_NL	ANY + ADD_NL
-#define ANY		20	//	Match any one character.
-#define ANYOF		21	// str	Match any character in this string.
-#define ANYBUT		22	// str	Match any character not in this
+#تعریف_کړه جمع_کړه_NL		30
+#تعریف_کړه لومړی_NL	ANY + جمع_کړه_NL
+#تعریف_کړه ANY		20	//	Match any one character.
+#تعریف_کړه ANYOF		21	// str	Match any character in this string.
+#تعریف_کړه ANYBUT		22	// str	Match any character not in this
 				//	string.
-#define IDENT		23	//	Match identifier char
-#define SIDENT		24	//	Match identifier char but no digit
-#define KWORD		25	//	Match keyword char
-#define SKWORD		26	//	Match word char but no digit
-#define FNAME		27	//	Match file name char
-#define SFNAME		28	//	Match file name char but no digit
-#define PRINT		29	//	Match printable char
-#define SPRINT		30	//	Match printable char but no digit
-#define WHITE		31	//	Match whitespace char
-#define NWHITE		32	//	Match non-whitespace char
-#define DIGIT		33	//	Match digit char
-#define NDIGIT		34	//	Match non-digit char
-#define HEX		35	//	Match hex char
-#define NHEX		36	//	Match non-hex char
-#define OCTAL		37	//	Match octal char
-#define NOCTAL		38	//	Match non-octal char
-#define WORD		39	//	Match word char
-#define NWORD		40	//	Match non-word char
-#define HEAD		41	//	Match head char
-#define NHEAD		42	//	Match non-head char
-#define ALPHA		43	//	Match alpha char
-#define NALPHA		44	//	Match non-alpha char
-#define LOWER		45	//	Match lowercase char
-#define NLOWER		46	//	Match non-lowercase char
-#define UPPER		47	//	Match uppercase char
-#define NUPPER		48	//	Match non-uppercase char
-#define LAST_NL		NUPPER + ADD_NL
-#define WITH_NL(op)	((op) >= FIRST_NL && (op) <= LAST_NL)
+#تعریف_کړه IDENT		23	//	Match identifier char
+#تعریف_کړه SIDENT		24	//	Match identifier char but no digit
+#تعریف_کړه KWORD		25	//	Match keyword char
+#تعریف_کړه SKWORD		26	//	Match word char but no digit
+#تعریف_کړه FNAME		27	//	Match file name char
+#تعریف_کړه SFNAME		28	//	Match file name char but no digit
+#تعریف_کړه PRINT		29	//	Match printable char
+#تعریف_کړه SPRINT		30	//	Match printable char but no digit
+#تعریف_کړه WHITE		31	//	Match whitespace char
+#تعریف_کړه NWHITE		32	//	Match non-whitespace char
+#تعریف_کړه DIGIT		33	//	Match digit char
+#تعریف_کړه NDIGIT		34	//	Match non-digit char
+#تعریف_کړه HEX		35	//	Match hex char
+#تعریف_کړه NHEX		36	//	Match non-hex char
+#تعریف_کړه OCTAL		37	//	Match octal char
+#تعریف_کړه NOCTAL		38	//	Match non-octal char
+#تعریف_کړه کلمه_2		39	//	Match word char
+#تعریف_کړه NWORD		40	//	Match non-word char
+#تعریف_کړه سر_4		41	//	Match head char
+#تعریف_کړه NHEAD		42	//	Match non-head char
+#تعریف_کړه ALPHA		43	//	Match alpha char
+#تعریف_کړه NALPHA		44	//	Match non-alpha char
+#تعریف_کړه ښکتنی_2		45	//	Match lowercase char
+#تعریف_کړه NLOWER		46	//	Match non-lowercase char
+#تعریف_کړه پاسنی		47	//	Match uppercase char
+#تعریف_کړه NUPPER		48	//	Match non-uppercase char
+#تعریف_کړه وروستی_NL		NUPPER + جمع_کړه_NL
+#تعریف_کړه WITH_NL(op)	((op) >= لومړی_NL && (op) <= وروستی_NL)
 
-#define MOPEN		80  // -89	 Mark this point in input as start of
+#تعریف_کړه MOPEN		80  // -89	 Mark this point in input as start of
 				//	 \( subexpr.  MOPEN + 0 marks start of
 				//	 match.
-#define MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
+#تعریف_کړه MCLOSE		90  // -99	 Analogous to MOPEN.  MCLOSE + 0 marks
 				//	 end of match.
-#define BACKREF		100 // -109 node Match same string again \1-\9
+#تعریف_کړه BACKREF		100 // -109 node Match same string again \1-\9
 
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
 # define ZOPEN		110 // -119	 Mark this point in input as start of
 				//	 \z( subexpr.
 # define ZCLOSE		120 // -129	 Analogous to ZOPEN.
 # define ZREF		130 // -139 node Match external submatch \z1-\z9
-#endif
+#د_که_پای
 
-#define BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
+#تعریف_کړه BRACE_COMPLEX	140 // -149 node Match nodes between m & n times
 
-#define NOPEN		150	//	Mark this point in input as start of
+#تعریف_کړه NOPEN		150	//	Mark this point in input as start of
 				//	\%( subexpr.
-#define NCLOSE		151	//	Analogous to NOPEN.
+#تعریف_کړه NCLOSE		151	//	Analogous to NOPEN.
 
-#define MULTIBYTECODE	200	// mbc	Match one multi-byte character
-#define RE_BOF		201	//	Match "" at beginning of file.
-#define RE_EOF		202	//	Match "" at end of file.
-#define CURSOR		203	//	Match location of cursor.
+#تعریف_کړه MULTIBYTECODE	200	// mbc	Match one multi-byte character
+#تعریف_کړه RE_BOF		201	//	Match "" at beginning of file.
+#تعریف_کړه RE_EOF		202	//	Match "" at end of file.
+#تعریف_کړه CURSOR		203	//	Match location of cursor.
 
-#define RE_LNUM		204	// nr cmp  Match line number
-#define RE_COL		205	// nr cmp  Match column number
-#define RE_VCOL		206	// nr cmp  Match virtual column number
+#تعریف_کړه RE_LNUM		204	// nr cmp  Match line number
+#تعریف_کړه RE_ستون		205	// nr cmp  Match column number
+#تعریف_کړه RE_VCOL		206	// nr cmp  Match virtual column number
 
-#define RE_MARK		207	// mark cmp  Match mark position
-#define RE_VISUAL	208	//	Match Visual area
-#define RE_COMPOSING	209	// any composing characters
+#تعریف_کړه RE_MARK		207	// mark cmp  Match mark position
+#تعریف_کړه RE_VISUAL	208	//	Match Visual area
+#تعریف_کړه RE_COMPOSING	209	// any composing characters
 
 /*
  * Flags to be passed up and down.
  */
-#define HASWIDTH	0x1	// Known never to match null string.
-#define SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
-#define SPSTART		0x4	// Starts with * or +.
-#define HASNL		0x8	// Contains some \n.
-#define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
-#define WORST		0	// Worst case.
+#تعریف_کړه HASWIDTH	0x1	// Known never to match null string.
+#تعریف_کړه SIMPLE		0x2	// Simple enough to be STAR/PLUS operand.
+#تعریف_کړه SPSTART		0x4	// Starts with * or +.
+#تعریف_کړه HASNL		0x8	// Contains some \n.
+#تعریف_کړه HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
+#تعریف_کړه WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
-static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
-static long	regsize;	// Code size.
-static int	reg_toolong;	// TRUE when offset out of range
-static int	bt_reg_parse_depth;	// nesting depth in reg()
-static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
-static long	brace_min[10];	// Minimums for complex brace repeats
-static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
-static int	one_exactly = FALSE;	// only do one char for EXACTLY
+ساكن صحيح	عدد_complex_braces; // Complex \{...} count
+ساكن char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
+ساكن اوږد	regsize;	// Code size.
+ساكن صحيح	reg_toolong;	// TRUE when offset out of range
+ساكن صحيح	bt_reg_parse_ژوروالی;	// nesting depth in reg()
+ساكن char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
+ساكن اوږد	brace_min[10];	// Minimums for complex brace repeats
+ساكن اوږد	brace_max[10];	// Maximums for complex brace repeats
+ساكن صحيح	brace_شمېر[10]; // Current counts for complex brace repeats
+ساكن صحيح	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
-static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-static const int classcodes[] = {
+ساكن char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
+ساكن ثابت صحيح classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
     FNAME, SFNAME, PRINT, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
     HEX, NHEX, OCTAL, NOCTAL,
-    WORD, NWORD, HEAD, NHEAD,
-    ALPHA, NALPHA, LOWER, NLOWER,
-    UPPER, NUPPER
+    کلمه_2, NWORD, سر_4, NHEAD,
+    ALPHA, NALPHA, ښکتنی_2, NLOWER,
+    پاسنی, NUPPER
 };
 
 /*
@@ -269,73 +269,73 @@ static const int classcodes[] = {
  * "]") and try to recognize a character class in expanded form, for example
  * [0-9].  On success, return the atom to be emitted, on failure 0.
  */
-    static int
-bt_recognize_char_class(char_u *start, char_u *end)
+    ساكن صحيح
+bt_recognize_char_class(char_u *پیل, char_u *پای_ټکی)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    صحيح		newl;
+    صحيح		config = get_char_class_بټونه(پیل, پای_ټکی, &newl);
 
     // A newline would need the ADD_NL variant, don't bother with it here.
-    if (config < 0 || newl)
-	return 0;
+    إذا (config < 0 || newl)
+	أرجع 0;
 
 	// The old engine has no case-insensitive class opcode, so [a-z] and [A-Z]
 	// are left as collections.  The classes below are case-independent.
-    switch (config)
+    بدل (config)
     {
-	case CLASS_o9:
-	    return DIGIT;
-	case CLASS_not | CLASS_o9:
-	    return NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return NHEX;
-	case CLASS_o7:
-	    return OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return NALPHA;
+	حالة CLASS_o9:
+	    أرجع DIGIT;
+	حالة CLASS_not | CLASS_o9:
+	    أرجع NDIGIT;
+	حالة CLASS_af | CLASS_AF | CLASS_o9:
+	    أرجع HEX;
+	حالة CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    أرجع NHEX;
+	حالة CLASS_o7:
+	    أرجع OCTAL;
+	حالة CLASS_not | CLASS_o7:
+	    أرجع NOCTAL;
+	حالة CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    أرجع کلمه_2;
+	حالة CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    أرجع NWORD;
+	حالة CLASS_az | CLASS_AZ | CLASS_underscore:
+	    أرجع سر_4;
+	حالة CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    أرجع NHEAD;
+	حالة CLASS_az | CLASS_AZ:
+	    أرجع ALPHA;
+	حالة CLASS_not | CLASS_az | CLASS_AZ:
+	    أرجع NALPHA;
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * When regcode is set to this value, code is not emitted and size is computed
  * instead.
  */
-#define JUST_CALC_SIZE	((char_u *) -1)
+#تعریف_کړه JUST_CALC_اندازه	((char_u *) -1)
 
 // Values for rs_state in regitem_T.
-typedef enum regstate_E
+تعريفنوع تعداد regstate_E
 {
     RS_NOPEN = 0	// NOPEN and NCLOSE
     , RS_MOPEN		// MOPEN + [0-9]
     , RS_MCLOSE		// MCLOSE + [0-9]
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
     , RS_ZOPEN		// ZOPEN + [0-9]
     , RS_ZCLOSE		// ZCLOSE + [0-9]
-#endif
+#د_که_پای
     , RS_BRANCH		// BRANCH
-    , RS_BRCPLX_MORE	// BRACE_COMPLEX and trying one more match
+    , RS_BRCPLX_نور	// BRACE_COMPLEX and trying one more match
     , RS_BRCPLX_LONG	// BRACE_COMPLEX and trying longest match
     , RS_BRCPLX_SHORT	// BRACE_COMPLEX and trying shortest match
     , RS_NOMATCH	// NOMATCH
     , RS_BEHIND1	// BEHIND / NOBEHIND matching rest
     , RS_BEHIND2	// BEHIND / NOBEHIND matching behind part
-    , RS_STAR_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
-    , RS_STAR_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
+    , RS_ستوری_LONG	// STAR/PLUS/BRACE_SIMPLE longest match
+    , RS_ستوری_SHORT	// STAR/PLUS/BRACE_SIMPLE shortest match
 } regstate_T;
 
 /*
@@ -343,20 +343,20 @@ typedef enum regstate_E
  * restored after trying a match.  Used by reg_save() and reg_restore().
  * Also stores the length of "backpos".
  */
-typedef struct
+تعريفنوع بنية
 {
-    union
+    اتحاد
     {
 	char_u	*ptr;	// rex.input pointer, for single-line regexp
 	lpos_T	pos;	// rex.input pos, for multi-line regexp
     } rs_u;
-    int		rs_len;
+    صحيح		rs_len;
 } regsave_T;
 
 // struct to save start/end pointer/position in for \(\)
-typedef struct
+تعريفنوع بنية
 {
-    union
+    اتحاد
     {
 	char_u	*ptr;
 	lpos_T	pos;
@@ -364,13 +364,13 @@ typedef struct
 } save_se_T;
 
 // used for BEHIND and NOBEHIND matching
-typedef struct regbehind_S
+تعريفنوع بنية regbehind_S
 {
     regsave_T	save_after;
     regsave_T	save_behind;
-    int		save_need_clear_subexpr;
-    save_se_T   save_start[NSUBEXP];
-    save_se_T   save_end[NSUBEXP];
+    صحيح		save_need_clear_subexpr;
+    save_se_T   save_پیل[NSUBEXP];
+    save_se_T   save_پای_ټکی[NSUBEXP];
 } regbehind_T;
 
 /*
@@ -379,12 +379,12 @@ typedef struct regbehind_S
  * Before it may be another type of item, depending on rs_state, to remember
  * more things.
  */
-typedef struct regitem_S
+تعريفنوع بنية regitem_S
 {
     regstate_T	rs_state;	// what we are doing, one of RS_ above
-    short	rs_no;		// submatch nr or BEHIND/NOBEHIND
-    char_u	*rs_scan;	// current node in program
-    union
+    لنډ	rs_no;		// submatch nr or BEHIND/NOBEHIND
+    char_u	*rs_لټون;	// current node in program
+    اتحاد
     {
 	save_se_T  sesave;
 	regsave_T  regsave;
@@ -393,20 +393,20 @@ typedef struct regitem_S
 
 
 // used for STAR, PLUS and BRACE_SIMPLE matching
-typedef struct regstar_S
+تعريفنوع بنية regstar_S
 {
-    int		nextb;		// next byte
-    int		nextb_ic;	// next byte reverse case
-    long	count;
-    long	minval;
-    long	maxval;
+    صحيح		nextb;		// next byte
+    صحيح		nextb_ic;	// next byte reverse case
+    اوږد	شمېر;
+    اوږد	minval;
+    اوږد	maxval;
 } regstar_T;
 
 // used to store input position when a BACK was encountered, so that we now if
 // we made any progress since the last time.
-typedef struct backpos_S
+تعريفنوع بنية backpos_S
 {
-    char_u	*bp_scan;	// "scan" where BACK was encountered
+    char_u	*bp_لټون;	// "scan" where BACK was encountered
     regsave_T	bp_pos;		// last input position
 } backpos_T;
 
@@ -417,10 +417,10 @@ typedef struct backpos_S
  * or regbehind_T.
  * "backpos_T" is a table with backpos_T for BACK
  */
-static garray_T	regstack = {0, 0, 0, 0, NULL};
-static garray_T	backpos = {0, 0, 0, 0, NULL};
+ساكن garray_T	regstack = {0, 0, 0, 0, عدم};
+ساكن garray_T	backpos = {0, 0, 0, 0, عدم};
 
-static regsave_T behind_pos;
+ساكن regsave_T behind_pos;
 
 /*
  * Both for regstack and backpos tables we use the following strategy of
@@ -433,8 +433,8 @@ static regsave_T behind_pos;
  * This makes it fast while not keeping a lot of memory allocated.
  * A three times speed increase was observed when using many simple patterns.
  */
-#define REGSTACK_INITIAL	2048
-#define BACKPOS_INITIAL		64
+#تعریف_کړه REGSTACK_INITIAL	2048
+#تعریف_کړه BACKPOS_INITIAL		64
 
 /*
  * Opcode notes:
@@ -473,73 +473,73 @@ static regsave_T behind_pos;
  * Using two bytes for the "next" pointer is vast overkill for most things,
  * but allows patterns to get big without disasters.
  */
-#define OP(p)		((int)*(p))
-#define NEXT(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
-#define OPERAND(p)	((p) + 3)
+#تعریف_کړه OP(p)		((صحيح)*(p))
+#تعریف_کړه بل_2(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
+#تعریف_کړه عملوند(p)	((p) + 3)
 // Obtain an operand that was stored as four bytes, MSB first.
-#define OPERAND_MIN(p)	(((long)(p)[3] << 24) + ((long)(p)[4] << 16) \
-			+ ((long)(p)[5] << 8) + (long)(p)[6])
+#تعریف_کړه عملوند_MIN(p)	(((اوږد)(p)[3] << 24) + ((اوږد)(p)[4] << 16) \
+			+ ((اوږد)(p)[5] << 8) + (اوږد)(p)[6])
 // Obtain a second operand stored as four bytes.
-#define OPERAND_MAX(p)	OPERAND_MIN((p) + 4)
+#تعریف_کړه عملوند_MAX(p)	عملوند_MIN((p) + 4)
 // Obtain a second single-byte operand stored after a four bytes operand.
-#define OPERAND_CMP(p)	(p)[7]
+#تعریف_کړه عملوند_CMP(p)	(p)[7]
 
-static char_u *reg(int paren, int *flagp);
+ساكن char_u *reg(صحيح paren, صحيح *flagp);
 
-#ifdef BT_REGEXP_DUMP
-static void	regdump(char_u *, bt_regprog_T *);
-#endif
+#که_تعریف_شوی BT_REGEXP_DUMP
+ساكن فراغ	regdump(char_u *, bt_regprog_T *);
+#د_که_پای
 
-static int	re_num_cmp(long_u val, char_u *scan);
+ساكن صحيح	re_عدد_cmp(long_u val, char_u *لټون);
 
-#ifdef DEBUG
-static char_u	*regprop(char_u *);
+#که_تعریف_شوی DEBUG
+ساكن char_u	*regprop(char_u *);
 
-static int	regnarrate = 0;
-#endif
+ساكن صحيح	regnarrate = 0;
+#د_که_پای
 
 
 /*
  * Setup to parse the regexp.  Used once to get the length and once to do it.
  */
-    static void
-regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    ساكن فراغ
+regcomp_پیل(
+    char_u	*بیان,
+    صحيح		re_flags)	    // see vim_regcomp()
 {
-    initchr(expr);
-    if (re_flags & RE_MAGIC)
+    initchr(بیان);
+    إذا (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
-    else
+    وإلا
 	reg_magic = MAGIC_OFF;
     reg_string = (re_flags & RE_STRING);
     reg_strict = (re_flags & RE_STRICT);
     get_cpo_flags();
 
-    num_complex_braces = 0;
+    عدد_complex_braces = 0;
     regnpar = 1;
-    CLEAR_FIELD(had_endbrace);
-#ifdef FEAT_SYN_HL
+    CLEAR_ډګر(had_endbrace);
+#که_تعریف_شوی FEAT_SYN_HL
     regnzpar = 1;
     re_has_z = 0;
-#endif
+#د_که_پای
     regsize = 0L;
     reg_toolong = FALSE;
-    bt_reg_parse_depth = 0;
+    bt_reg_parse_ژوروالی = 0;
     regflags = 0;
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
     had_eol = FALSE;
-#endif
+#د_که_پای
 }
 
 /*
  * Return TRUE if MULTIBYTECODE should be used instead of EXACTLY for
  * character "c".
  */
-    static int
-use_multibytecode(int c)
+    ساكن صحيح
+use_multibytecode(صحيح c)
 {
-    return has_mbyte && (*mb_char2len)(c) > 1
+    أرجع has_mbyte && (*mb_char2len)(c) > 1
 		     && (re_multi_type(peekchr()) != NOT_MULTI
 			     || (enc_utf8 && utf_iscomposing(c)));
 }
@@ -547,26 +547,26 @@ use_multibytecode(int c)
 /*
  * Emit (if appropriate) a byte of code
  */
-    static void
-regc(int b)
+    ساكن فراغ
+regc(صحيح b)
 {
-    if (regcode == JUST_CALC_SIZE)
+    إذا (regcode == JUST_CALC_اندازه)
 	regsize++;
-    else
+    وإلا
 	*regcode++ = b;
 }
 
 /*
  * Emit (if appropriate) a multi-byte character of code
  */
-    static void
-regmbc(int c)
+    ساكن فراغ
+regmbc(صحيح c)
 {
-    if (!has_mbyte && c > 0xff)
-	return;
-    if (regcode == JUST_CALC_SIZE)
+    إذا (!has_mbyte && c > 0xff)
+	أرجع;
+    إذا (regcode == JUST_CALC_اندازه)
 	regsize += (*mb_char2len)(c);
-    else
+    وإلا
 	regcode += (*mb_char2bytes)(c, regcode);
 }
 
@@ -576,21 +576,21 @@ regmbc(int c)
  * Currently only handles latin1, latin9 and utf-8.
  * NOTE: When changing this function, also change nfa_emit_equi_class()
  */
-    static void
-reg_equi_class(int c)
+    ساكن فراغ
+reg_equi_class(صحيح c)
 {
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    إذا (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-	switch (c)
+	بدل (c)
 	{
 	    // Do not use '\300' style, it results in a negative number.
-	    case 'A': case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4:
-	    case 0xc5: case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x202: case 0x226:
-	    case 0x23a: case 0x1e00: case 0x1ea0: case 0x1ea2: case 0x1ea4:
-	    case 0x1ea6: case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    حالة 'A': حالة 0xc0: حالة 0xc1: حالة 0xc2: حالة 0xc3: حالة 0xc4:
+	    حالة 0xc5: حالة 0x100: حالة 0x102: حالة 0x104: حالة 0x1cd:
+	    حالة 0x1de: حالة 0x1e0: حالة 0x1fa: حالة 0x202: حالة 0x226:
+	    حالة 0x23a: حالة 0x1e00: حالة 0x1ea0: حالة 0x1ea2: حالة 0x1ea4:
+	    حالة 0x1ea6: حالة 0x1ea8: حالة 0x1eaa: حالة 0x1eac: حالة 0x1eae:
+	    حالة 0x1eb0: حالة 0x1eb2: حالة 0x1eb4: حالة 0x1eb6:
 		      regmbc('A'); regmbc(0xc0); regmbc(0xc1); regmbc(0xc2);
 		      regmbc(0xc3); regmbc(0xc4); regmbc(0xc5);
 		      regmbc(0x100); regmbc(0x102); regmbc(0x104);
@@ -601,34 +601,34 @@ reg_equi_class(int c)
 		      regmbc(0x1ea8); regmbc(0x1eaa); regmbc(0x1eac);
 		      regmbc(0x1eae); regmbc(0x1eb0); regmbc(0x1eb2);
 		      regmbc(0x1eb4); regmbc(0x1eb6);
-		      return;
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+		      أرجع;
+	    حالة 'B': حالة 0x181: حالة 0x243: حالة 0x1e02:
+	    حالة 0x1e04: حالة 0x1e06:
 		      regmbc('B');
 		      regmbc(0x181); regmbc(0x243); regmbc(0x1e02);
 		      regmbc(0x1e04); regmbc(0x1e06);
-		      return;
-	    case 'C': case 0xc7:
-	    case 0x106: case 0x108: case 0x10a: case 0x10c: case 0x187:
-	    case 0x23b: case 0x1e08: case 0xa792:
+		      أرجع;
+	    حالة 'C': حالة 0xc7:
+	    حالة 0x106: حالة 0x108: حالة 0x10a: حالة 0x10c: حالة 0x187:
+	    حالة 0x23b: حالة 0x1e08: حالة 0xa792:
 		      regmbc('C'); regmbc(0xc7);
 		      regmbc(0x106); regmbc(0x108); regmbc(0x10a);
 		      regmbc(0x10c); regmbc(0x187); regmbc(0x23b);
 		      regmbc(0x1e08); regmbc(0xa792);
-		      return;
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+		      أرجع;
+	    حالة 'D': حالة 0x10e: حالة 0x110: حالة 0x18a:
+	    حالة 0x1e0a: حالة 0x1e0c: حالة 0x1e0e: حالة 0x1e10:
+	    حالة 0x1e12:
 		      regmbc('D'); regmbc(0x10e); regmbc(0x110);
 		      regmbc(0x18a); regmbc(0x1e0a); regmbc(0x1e0c);
 		      regmbc(0x1e0e); regmbc(0x1e10); regmbc(0x1e12);
-		      return;
-	    case 'E': case 0xc8: case 0xc9: case 0xca: case 0xcb:
-	    case 0x112: case 0x114: case 0x116: case 0x118: case 0x11a:
-	    case 0x204: case 0x206: case 0x228: case 0x246: case 0x1e14:
-	    case 0x1e16: case 0x1e18: case 0x1e1a: case 0x1e1c:
-	    case 0x1eb8: case 0x1eba: case 0x1ebc: case 0x1ebe:
-	    case 0x1ec0: case 0x1ec2: case 0x1ec4: case 0x1ec6:
+		      أرجع;
+	    حالة 'E': حالة 0xc8: حالة 0xc9: حالة 0xca: حالة 0xcb:
+	    حالة 0x112: حالة 0x114: حالة 0x116: حالة 0x118: حالة 0x11a:
+	    حالة 0x204: حالة 0x206: حالة 0x228: حالة 0x246: حالة 0x1e14:
+	    حالة 0x1e16: حالة 0x1e18: حالة 0x1e1a: حالة 0x1e1c:
+	    حالة 0x1eb8: حالة 0x1eba: حالة 0x1ebc: حالة 0x1ebe:
+	    حالة 0x1ec0: حالة 0x1ec2: حالة 0x1ec4: حالة 0x1ec6:
 		      regmbc('E'); regmbc(0xc8); regmbc(0xc9);
 		      regmbc(0xca); regmbc(0xcb); regmbc(0x112);
 		      regmbc(0x114); regmbc(0x116); regmbc(0x118);
@@ -638,77 +638,77 @@ reg_equi_class(int c)
 		      regmbc(0x1e1c); regmbc(0x1eb8); regmbc(0x1eba);
 		      regmbc(0x1ebc); regmbc(0x1ebe); regmbc(0x1ec0);
 		      regmbc(0x1ec2); regmbc(0x1ec4); regmbc(0x1ec6);
-		      return;
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+		      أرجع;
+	    حالة 'F': حالة 0x191: حالة 0x1e1e: حالة 0xa798:
 		      regmbc('F'); regmbc(0x191); regmbc(0x1e1e);
 		      regmbc(0xa798);
-		      return;
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+		      أرجع;
+	    حالة 'G': حالة 0x11c: حالة 0x11e: حالة 0x120:
+	    حالة 0x122: حالة 0x193: حالة 0x1e4: حالة 0x1e6:
+	    حالة 0x1f4: حالة 0x1e20: حالة 0xa7a0:
 		      regmbc('G'); regmbc(0x11c); regmbc(0x11e);
 		      regmbc(0x120); regmbc(0x122); regmbc(0x193);
 		      regmbc(0x1e4); regmbc(0x1e6); regmbc(0x1f4);
 		      regmbc(0x1e20); regmbc(0xa7a0);
-		      return;
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26:
-	    case 0x1e28: case 0x1e2a: case 0x2c67:
+		      أرجع;
+	    حالة 'H': حالة 0x124: حالة 0x126: حالة 0x21e:
+	    حالة 0x1e22: حالة 0x1e24: حالة 0x1e26:
+	    حالة 0x1e28: حالة 0x1e2a: حالة 0x2c67:
 		      regmbc('H'); regmbc(0x124); regmbc(0x126);
 		      regmbc(0x21e); regmbc(0x1e22); regmbc(0x1e24);
 		      regmbc(0x1e26); regmbc(0x1e28); regmbc(0x1e2a);
 		      regmbc(0x2c67);
-		      return;
-	    case 'I': case 0xcc: case 0xcd: case 0xce: case 0xcf:
-	    case 0x128: case 0x12a: case 0x12c: case 0x12e:
-	    case 0x130: case 0x197: case 0x1cf: case 0x208:
-	    case 0x20a: case 0x1e2c: case 0x1e2e: case 0x1ec8:
-	    case 0x1eca:
+		      أرجع;
+	    حالة 'I': حالة 0xcc: حالة 0xcd: حالة 0xce: حالة 0xcf:
+	    حالة 0x128: حالة 0x12a: حالة 0x12c: حالة 0x12e:
+	    حالة 0x130: حالة 0x197: حالة 0x1cf: حالة 0x208:
+	    حالة 0x20a: حالة 0x1e2c: حالة 0x1e2e: حالة 0x1ec8:
+	    حالة 0x1eca:
 		      regmbc('I'); regmbc(0xcc); regmbc(0xcd);
 		      regmbc(0xce); regmbc(0xcf); regmbc(0x128);
 		      regmbc(0x12a); regmbc(0x12c); regmbc(0x12e);
 		      regmbc(0x130); regmbc(0x197); regmbc(0x1cf);
 		      regmbc(0x208); regmbc(0x20a); regmbc(0x1e2c);
 		      regmbc(0x1e2e); regmbc(0x1ec8); regmbc(0x1eca);
-		      return;
-	    case 'J': case 0x134: case 0x248:
+		      أرجع;
+	    حالة 'J': حالة 0x134: حالة 0x248:
 		      regmbc('J'); regmbc(0x134); regmbc(0x248);
-		      return;
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+		      أرجع;
+	    حالة 'K': حالة 0x136: حالة 0x198: حالة 0x1e8: حالة 0x1e30:
+	    حالة 0x1e32: حالة 0x1e34: حالة 0x2c69: حالة 0xa740:
 		      regmbc('K'); regmbc(0x136); regmbc(0x198);
 		      regmbc(0x1e8); regmbc(0x1e30); regmbc(0x1e32);
 		      regmbc(0x1e34); regmbc(0x2c69); regmbc(0xa740);
-		      return;
-	    case 'L': case 0x139: case 0x13b: case 0x13d: case 0x13f:
-	    case 0x141: case 0x23d: case 0x1e36: case 0x1e38:
-	    case 0x1e3a: case 0x1e3c: case 0x2c60:
+		      أرجع;
+	    حالة 'L': حالة 0x139: حالة 0x13b: حالة 0x13d: حالة 0x13f:
+	    حالة 0x141: حالة 0x23d: حالة 0x1e36: حالة 0x1e38:
+	    حالة 0x1e3a: حالة 0x1e3c: حالة 0x2c60:
 		      regmbc('L'); regmbc(0x139); regmbc(0x13b);
 		      regmbc(0x13d); regmbc(0x13f); regmbc(0x141);
 		      regmbc(0x23d); regmbc(0x1e36); regmbc(0x1e38);
 		      regmbc(0x1e3a); regmbc(0x1e3c); regmbc(0x2c60);
-		      return;
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+		      أرجع;
+	    حالة 'M': حالة 0x1e3e: حالة 0x1e40: حالة 0x1e42:
 		      regmbc('M'); regmbc(0x1e3e); regmbc(0x1e40);
 		      regmbc(0x1e42);
-		      return;
-	    case 'N': case 0xd1:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+		      أرجع;
+	    حالة 'N': حالة 0xd1:
+	    حالة 0x143: حالة 0x145: حالة 0x147: حالة 0x1f8:
+	    حالة 0x1e44: حالة 0x1e46: حالة 0x1e48: حالة 0x1e4a:
+	    حالة 0xa7a4:
 		      regmbc('N'); regmbc(0xd1);
 		      regmbc(0x143); regmbc(0x145); regmbc(0x147);
 		      regmbc(0x1f8); regmbc(0x1e44); regmbc(0x1e46);
 		      regmbc(0x1e48); regmbc(0x1e4a); regmbc(0xa7a4);
-		      return;
-	    case 'O': case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6:
-	    case 0xd8: case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec: case 0x1fe:
-	    case 0x20c: case 0x20e: case 0x22a: case 0x22c: case 0x22e:
-	    case 0x230: case 0x1e4c: case 0x1e4e: case 0x1e50: case 0x1e52:
-	    case 0x1ecc: case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc: case 0x1ede:
-	    case 0x1ee0: case 0x1ee2:
+		      أرجع;
+	    حالة 'O': حالة 0xd2: حالة 0xd3: حالة 0xd4: حالة 0xd5: حالة 0xd6:
+	    حالة 0xd8: حالة 0x14c: حالة 0x14e: حالة 0x150: حالة 0x19f:
+	    حالة 0x1a0: حالة 0x1d1: حالة 0x1ea: حالة 0x1ec: حالة 0x1fe:
+	    حالة 0x20c: حالة 0x20e: حالة 0x22a: حالة 0x22c: حالة 0x22e:
+	    حالة 0x230: حالة 0x1e4c: حالة 0x1e4e: حالة 0x1e50: حالة 0x1e52:
+	    حالة 0x1ecc: حالة 0x1ece: حالة 0x1ed0: حالة 0x1ed2: حالة 0x1ed4:
+	    حالة 0x1ed6: حالة 0x1ed8: حالة 0x1eda: حالة 0x1edc: حالة 0x1ede:
+	    حالة 0x1ee0: حالة 0x1ee2:
 		      regmbc('O'); regmbc(0xd2); regmbc(0xd3); regmbc(0xd4);
 		      regmbc(0xd5); regmbc(0xd6); regmbc(0xd8);
 		      regmbc(0x14c); regmbc(0x14e); regmbc(0x150);
@@ -722,48 +722,48 @@ reg_equi_class(int c)
 		      regmbc(0x1ed6); regmbc(0x1ed8); regmbc(0x1eda);
 		      regmbc(0x1edc); regmbc(0x1ede); regmbc(0x1ee0);
 		      regmbc(0x1ee2);
-		      return;
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+		      أرجع;
+	    حالة 'P': حالة 0x1a4: حالة 0x1e54: حالة 0x1e56: حالة 0x2c63:
 		      regmbc('P'); regmbc(0x1a4); regmbc(0x1e54);
 		      regmbc(0x1e56); regmbc(0x2c63);
-		      return;
-	    case 'Q': case 0x24a:
+		      أرجع;
+	    حالة 'Q': حالة 0x24a:
 		      regmbc('Q'); regmbc(0x24a);
-		      return;
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+		      أرجع;
+	    حالة 'R': حالة 0x154: حالة 0x156: حالة 0x158: حالة 0x210:
+	    حالة 0x212: حالة 0x24c: حالة 0x1e58: حالة 0x1e5a:
+	    حالة 0x1e5c: حالة 0x1e5e: حالة 0x2c64: حالة 0xa7a6:
 		      regmbc('R'); regmbc(0x154); regmbc(0x156);
 		      regmbc(0x210); regmbc(0x212); regmbc(0x158);
 		      regmbc(0x24c); regmbc(0x1e58); regmbc(0x1e5a);
 		      regmbc(0x1e5c); regmbc(0x1e5e); regmbc(0x2c64);
 		      regmbc(0xa7a6);
-		      return;
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+		      أرجع;
+	    حالة 'S': حالة 0x15a: حالة 0x15c: حالة 0x15e: حالة 0x160:
+	    حالة 0x218: حالة 0x1e60: حالة 0x1e62: حالة 0x1e64:
+	    حالة 0x1e66: حالة 0x1e68: حالة 0x2c7e: حالة 0xa7a8:
 		      regmbc('S'); regmbc(0x15a); regmbc(0x15c);
 		      regmbc(0x15e); regmbc(0x160); regmbc(0x218);
 		      regmbc(0x1e60); regmbc(0x1e62); regmbc(0x1e64);
 		      regmbc(0x1e66); regmbc(0x1e68); regmbc(0x2c7e);
 			  regmbc(0xa7a8);
-		      return;
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+		      أرجع;
+	    حالة 'T': حالة 0x162: حالة 0x164: حالة 0x166: حالة 0x1ac:
+	    حالة 0x1ae: حالة 0x21a: حالة 0x23e: حالة 0x1e6a: حالة 0x1e6c:
+	    حالة 0x1e6e: حالة 0x1e70:
 		      regmbc('T'); regmbc(0x162); regmbc(0x164);
 		      regmbc(0x166); regmbc(0x1ac); regmbc(0x23e);
 		      regmbc(0x1ae); regmbc(0x21a); regmbc(0x1e6a);
 		      regmbc(0x1e6c); regmbc(0x1e6e); regmbc(0x1e70);
-		      return;
-	    case 'U': case 0xd9: case 0xda: case 0xdb: case 0xdc:
-	    case 0x168: case 0x16a: case 0x16c: case 0x16e:
-	    case 0x170: case 0x172: case 0x1af: case 0x1d3:
-	    case 0x1d5: case 0x1d7: case 0x1d9: case 0x1db:
-	    case 0x214: case 0x216: case 0x244: case 0x1e72:
-	    case 0x1e74: case 0x1e76: case 0x1e78: case 0x1e7a:
-	    case 0x1ee4: case 0x1ee6: case 0x1ee8: case 0x1eea:
-	    case 0x1eec: case 0x1eee: case 0x1ef0:
+		      أرجع;
+	    حالة 'U': حالة 0xd9: حالة 0xda: حالة 0xdb: حالة 0xdc:
+	    حالة 0x168: حالة 0x16a: حالة 0x16c: حالة 0x16e:
+	    حالة 0x170: حالة 0x172: حالة 0x1af: حالة 0x1d3:
+	    حالة 0x1d5: حالة 0x1d7: حالة 0x1d9: حالة 0x1db:
+	    حالة 0x214: حالة 0x216: حالة 0x244: حالة 0x1e72:
+	    حالة 0x1e74: حالة 0x1e76: حالة 0x1e78: حالة 0x1e7a:
+	    حالة 0x1ee4: حالة 0x1ee6: حالة 0x1ee8: حالة 0x1eea:
+	    حالة 0x1eec: حالة 0x1eee: حالة 0x1ef0:
 		      regmbc('U'); regmbc(0xd9); regmbc(0xda);
 		      regmbc(0xdb); regmbc(0xdc); regmbc(0x168);
 		      regmbc(0x16a); regmbc(0x16c); regmbc(0x16e);
@@ -775,42 +775,42 @@ reg_equi_class(int c)
 		      regmbc(0x1e7a); regmbc(0x1ee4); regmbc(0x1ee6);
 		      regmbc(0x1ee8); regmbc(0x1eea); regmbc(0x1eec);
 		      regmbc(0x1eee); regmbc(0x1ef0);
-		      return;
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+		      أرجع;
+	    حالة 'V': حالة 0x1b2: حالة 0x1e7c: حالة 0x1e7e:
 		      regmbc('V'); regmbc(0x1b2); regmbc(0x1e7c);
 		      regmbc(0x1e7e);
-		      return;
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82:
-	    case 0x1e84: case 0x1e86: case 0x1e88:
+		      أرجع;
+	    حالة 'W': حالة 0x174: حالة 0x1e80: حالة 0x1e82:
+	    حالة 0x1e84: حالة 0x1e86: حالة 0x1e88:
 		      regmbc('W'); regmbc(0x174); regmbc(0x1e80);
 		      regmbc(0x1e82); regmbc(0x1e84); regmbc(0x1e86);
 		      regmbc(0x1e88);
-		      return;
-	    case 'X': case 0x1e8a: case 0x1e8c:
+		      أرجع;
+	    حالة 'X': حالة 0x1e8a: حالة 0x1e8c:
 		      regmbc('X'); regmbc(0x1e8a); regmbc(0x1e8c);
-		      return;
-	    case 'Y': case 0xdd:
-	    case 0x176: case 0x178: case 0x1b3: case 0x232: case 0x24e:
-	    case 0x1e8e: case 0x1ef2: case 0x1ef6: case 0x1ef4: case 0x1ef8:
+		      أرجع;
+	    حالة 'Y': حالة 0xdd:
+	    حالة 0x176: حالة 0x178: حالة 0x1b3: حالة 0x232: حالة 0x24e:
+	    حالة 0x1e8e: حالة 0x1ef2: حالة 0x1ef6: حالة 0x1ef4: حالة 0x1ef8:
 		      regmbc('Y'); regmbc(0xdd); regmbc(0x176);
 		      regmbc(0x178); regmbc(0x1b3); regmbc(0x232);
 		      regmbc(0x24e); regmbc(0x1e8e); regmbc(0x1ef2);
 		      regmbc(0x1ef4); regmbc(0x1ef6); regmbc(0x1ef8);
-		      return;
-	    case 'Z': case 0x179: case 0x17b: case 0x17d: case 0x1b5:
-	    case 0x1e90: case 0x1e92: case 0x1e94: case 0x2c6b:
+		      أرجع;
+	    حالة 'Z': حالة 0x179: حالة 0x17b: حالة 0x17d: حالة 0x1b5:
+	    حالة 0x1e90: حالة 0x1e92: حالة 0x1e94: حالة 0x2c6b:
 		      regmbc('Z'); regmbc(0x179); regmbc(0x17b);
 		      regmbc(0x17d); regmbc(0x1b5); regmbc(0x1e90);
 		      regmbc(0x1e92); regmbc(0x1e94); regmbc(0x2c6b);
-		      return;
-	    case 'a': case 0xe0: case 0xe1: case 0xe2:
-	    case 0xe3: case 0xe4: case 0xe5: case 0x101: case 0x103:
-	    case 0x105: case 0x1ce: case 0x1df: case 0x1e1: case 0x1fb:
-	    case 0x201: case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+		      أرجع;
+	    حالة 'a': حالة 0xe0: حالة 0xe1: حالة 0xe2:
+	    حالة 0xe3: حالة 0xe4: حالة 0xe5: حالة 0x101: حالة 0x103:
+	    حالة 0x105: حالة 0x1ce: حالة 0x1df: حالة 0x1e1: حالة 0x1fb:
+	    حالة 0x201: حالة 0x203: حالة 0x227: حالة 0x1d8f: حالة 0x1e01:
+	    حالة 0x1e9a: حالة 0x1ea1: حالة 0x1ea3: حالة 0x1ea5:
+	    حالة 0x1ea7: حالة 0x1ea9: حالة 0x1eab: حالة 0x1ead:
+	    حالة 0x1eaf: حالة 0x1eb1: حالة 0x1eb3: حالة 0x1eb5:
+	    حالة 0x1eb7: حالة 0x2c65:
 		      regmbc('a'); regmbc(0xe0); regmbc(0xe1);
 		      regmbc(0xe2); regmbc(0xe3); regmbc(0xe4);
 		      regmbc(0xe5); regmbc(0x101); regmbc(0x103);
@@ -822,37 +822,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ea9); regmbc(0x1eab); regmbc(0x1ead);
 		      regmbc(0x1eaf); regmbc(0x1eb1); regmbc(0x1eb3);
 		      regmbc(0x1eb5); regmbc(0x1eb7); regmbc(0x2c65);
-		      return;
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+		      أرجع;
+	    حالة 'b': حالة 0x180: حالة 0x253: حالة 0x1d6c: حالة 0x1d80:
+	    حالة 0x1e03: حالة 0x1e05: حالة 0x1e07:
 		      regmbc('b');
 		      regmbc(0x180); regmbc(0x253); regmbc(0x1d6c);
 		      regmbc(0x1d80); regmbc(0x1e03); regmbc(0x1e05);
 		      regmbc(0x1e07);
-		      return;
-	    case 'c': case 0xe7:
-	    case 0x107: case 0x109: case 0x10b: case 0x10d: case 0x188:
-	    case 0x23c: case 0x1e09: case 0xa793: case 0xa794:
+		      أرجع;
+	    حالة 'c': حالة 0xe7:
+	    حالة 0x107: حالة 0x109: حالة 0x10b: حالة 0x10d: حالة 0x188:
+	    حالة 0x23c: حالة 0x1e09: حالة 0xa793: حالة 0xa794:
 		      regmbc('c'); regmbc(0xe7); regmbc(0x107);
 		      regmbc(0x109); regmbc(0x10b); regmbc(0x10d);
 		      regmbc(0x188); regmbc(0x23c); regmbc(0x1e09);
 		      regmbc(0xa793); regmbc(0xa794);
-		      return;
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d:
-	    case 0x1e0f: case 0x1e11: case 0x1e13:
+		      أرجع;
+	    حالة 'd': حالة 0x10f: حالة 0x111: حالة 0x257: حالة 0x1d6d:
+	    حالة 0x1d81: حالة 0x1d91: حالة 0x1e0b: حالة 0x1e0d:
+	    حالة 0x1e0f: حالة 0x1e11: حالة 0x1e13:
 		      regmbc('d'); regmbc(0x10f); regmbc(0x111);
 		      regmbc(0x257); regmbc(0x1d6d); regmbc(0x1d81);
 		      regmbc(0x1d91); regmbc(0x1e0b); regmbc(0x1e0d);
 		      regmbc(0x1e0f); regmbc(0x1e11); regmbc(0x1e13);
-		      return;
-	    case 'e': case 0xe8: case 0xe9: case 0xea: case 0xeb:
-	    case 0x113: case 0x115: case 0x117: case 0x119:
-	    case 0x11b: case 0x205: case 0x207: case 0x229:
-	    case 0x247: case 0x1d92: case 0x1e15: case 0x1e17:
-	    case 0x1e19: case 0x1e1b: case 0x1eb9: case 0x1ebb:
-	    case 0x1e1d: case 0x1ebd: case 0x1ebf: case 0x1ec1:
-	    case 0x1ec3: case 0x1ec5: case 0x1ec7:
+		      أرجع;
+	    حالة 'e': حالة 0xe8: حالة 0xe9: حالة 0xea: حالة 0xeb:
+	    حالة 0x113: حالة 0x115: حالة 0x117: حالة 0x119:
+	    حالة 0x11b: حالة 0x205: حالة 0x207: حالة 0x229:
+	    حالة 0x247: حالة 0x1d92: حالة 0x1e15: حالة 0x1e17:
+	    حالة 0x1e19: حالة 0x1e1b: حالة 0x1eb9: حالة 0x1ebb:
+	    حالة 0x1e1d: حالة 0x1ebd: حالة 0x1ebf: حالة 0x1ec1:
+	    حالة 0x1ec3: حالة 0x1ec5: حالة 0x1ec7:
 		      regmbc('e'); regmbc(0xe8); regmbc(0xe9);
 		      regmbc(0xea); regmbc(0xeb); regmbc(0x113);
 		      regmbc(0x115); regmbc(0x117); regmbc(0x119);
@@ -863,83 +863,83 @@ reg_equi_class(int c)
 		      regmbc(0x1ebb); regmbc(0x1ebd); regmbc(0x1ebf);
 		      regmbc(0x1ec1); regmbc(0x1ec3); regmbc(0x1ec5);
 		      regmbc(0x1ec7);
-		      return;
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+		      أرجع;
+	    حالة 'f': حالة 0x192: حالة 0x1d6e: حالة 0x1d82:
+	    حالة 0x1e1f: حالة 0xa799:
 		     regmbc('f'); regmbc(0x192); regmbc(0x1d6e);
 		     regmbc(0x1d82); regmbc(0x1e1f); regmbc(0xa799);
-		     return;
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x260: case 0x1f5: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+		     أرجع;
+	    حالة 'g': حالة 0x11d: حالة 0x11f: حالة 0x121: حالة 0x123:
+	    حالة 0x1e5: حالة 0x1e7: حالة 0x260: حالة 0x1f5: حالة 0x1d83:
+	    حالة 0x1e21: حالة 0xa7a1:
 		      regmbc('g'); regmbc(0x11d); regmbc(0x11f);
 		      regmbc(0x121); regmbc(0x123); regmbc(0x1e5);
 		      regmbc(0x1e7); regmbc(0x1f5); regmbc(0x260);
 		      regmbc(0x1d83); regmbc(0x1e21); regmbc(0xa7a1);
-		      return;
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+		      أرجع;
+	    حالة 'h': حالة 0x125: حالة 0x127: حالة 0x21f: حالة 0x1e23:
+	    حالة 0x1e25: حالة 0x1e27: حالة 0x1e29: حالة 0x1e2b:
+	    حالة 0x1e96: حالة 0x2c68: حالة 0xa795:
 		      regmbc('h'); regmbc(0x125); regmbc(0x127);
 		      regmbc(0x21f); regmbc(0x1e23); regmbc(0x1e25);
 		      regmbc(0x1e27); regmbc(0x1e29); regmbc(0x1e2b);
 		      regmbc(0x1e96); regmbc(0x2c68); regmbc(0xa795);
-		      return;
-	    case 'i': case 0xec: case 0xed: case 0xee: case 0xef:
-	    case 0x129: case 0x12b: case 0x12d: case 0x12f:
-	    case 0x1d0: case 0x209: case 0x20b: case 0x268:
-	    case 0x1d96: case 0x1e2d: case 0x1e2f: case 0x1ec9:
-	    case 0x1ecb:
+		      أرجع;
+	    حالة 'i': حالة 0xec: حالة 0xed: حالة 0xee: حالة 0xef:
+	    حالة 0x129: حالة 0x12b: حالة 0x12d: حالة 0x12f:
+	    حالة 0x1d0: حالة 0x209: حالة 0x20b: حالة 0x268:
+	    حالة 0x1d96: حالة 0x1e2d: حالة 0x1e2f: حالة 0x1ec9:
+	    حالة 0x1ecb:
 		      regmbc('i'); regmbc(0xec); regmbc(0xed);
 		      regmbc(0xee); regmbc(0xef); regmbc(0x129);
 		      regmbc(0x12b); regmbc(0x12d); regmbc(0x12f);
 		      regmbc(0x1d0); regmbc(0x209); regmbc(0x20b);
 		      regmbc(0x268); regmbc(0x1d96); regmbc(0x1e2d);
 		      regmbc(0x1e2f); regmbc(0x1ec9); regmbc(0x1ecb);
-		      return;
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+		      أرجع;
+	    حالة 'j': حالة 0x135: حالة 0x1f0: حالة 0x249:
 		      regmbc('j'); regmbc(0x135); regmbc(0x1f0);
 		      regmbc(0x249);
-		      return;
-	    case 'k': case 0x137: case 0x199: case 0x1e9:
-	    case 0x1d84: case 0x1e31: case 0x1e33: case 0x1e35:
-	    case 0x2c6a: case 0xa741:
+		      أرجع;
+	    حالة 'k': حالة 0x137: حالة 0x199: حالة 0x1e9:
+	    حالة 0x1d84: حالة 0x1e31: حالة 0x1e33: حالة 0x1e35:
+	    حالة 0x2c6a: حالة 0xa741:
 		      regmbc('k'); regmbc(0x137); regmbc(0x199);
 		      regmbc(0x1e9); regmbc(0x1d84); regmbc(0x1e31);
 		      regmbc(0x1e33); regmbc(0x1e35); regmbc(0x2c6a);
 		      regmbc(0xa741);
-		      return;
-	    case 'l': case 0x13a: case 0x13c: case 0x13e:
-	    case 0x140: case 0x142: case 0x19a: case 0x1e37:
-	    case 0x1e39: case 0x1e3b: case 0x1e3d: case 0x2c61:
+		      أرجع;
+	    حالة 'l': حالة 0x13a: حالة 0x13c: حالة 0x13e:
+	    حالة 0x140: حالة 0x142: حالة 0x19a: حالة 0x1e37:
+	    حالة 0x1e39: حالة 0x1e3b: حالة 0x1e3d: حالة 0x2c61:
 		      regmbc('l'); regmbc(0x13a); regmbc(0x13c);
 		      regmbc(0x13e); regmbc(0x140); regmbc(0x142);
 		      regmbc(0x19a); regmbc(0x1e37); regmbc(0x1e39);
 		      regmbc(0x1e3b); regmbc(0x1e3d); regmbc(0x2c61);
-		      return;
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+		      أرجع;
+	    حالة 'm': حالة 0x1d6f: حالة 0x1e3f: حالة 0x1e41: حالة 0x1e43:
 		      regmbc('m'); regmbc(0x1d6f); regmbc(0x1e3f);
 		      regmbc(0x1e41); regmbc(0x1e43);
-		      return;
-	    case 'n': case 0xf1: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87:
-	    case 0x1e45: case 0x1e47: case 0x1e49: case 0x1e4b:
-	    case 0xa7a5:
+		      أرجع;
+	    حالة 'n': حالة 0xf1: حالة 0x144: حالة 0x146: حالة 0x148:
+	    حالة 0x149: حالة 0x1f9: حالة 0x1d70: حالة 0x1d87:
+	    حالة 0x1e45: حالة 0x1e47: حالة 0x1e49: حالة 0x1e4b:
+	    حالة 0xa7a5:
 		      regmbc('n'); regmbc(0xf1); regmbc(0x144);
 		      regmbc(0x146); regmbc(0x148); regmbc(0x149);
 		      regmbc(0x1f9); regmbc(0x1d70); regmbc(0x1d87);
 		      regmbc(0x1e45); regmbc(0x1e47); regmbc(0x1e49);
 		      regmbc(0x1e4b); regmbc(0xa7a5);
-		      return;
-	    case 'o': case 0xf2: case 0xf3: case 0xf4: case 0xf5:
-	    case 0xf6: case 0xf8: case 0x14d: case 0x14f: case 0x151:
-	    case 0x1a1: case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d: case 0x22f:
-	    case 0x231: case 0x275: case 0x1e4d: case 0x1e4f:
-	    case 0x1e51: case 0x1e53: case 0x1ecd: case 0x1ecf:
-	    case 0x1ed1: case 0x1ed3: case 0x1ed5: case 0x1ed7:
-	    case 0x1ed9: case 0x1edb: case 0x1edd: case 0x1edf:
-	    case 0x1ee1: case 0x1ee3:
+		      أرجع;
+	    حالة 'o': حالة 0xf2: حالة 0xf3: حالة 0xf4: حالة 0xf5:
+	    حالة 0xf6: حالة 0xf8: حالة 0x14d: حالة 0x14f: حالة 0x151:
+	    حالة 0x1a1: حالة 0x1d2: حالة 0x1eb: حالة 0x1ed: حالة 0x1ff:
+	    حالة 0x20d: حالة 0x20f: حالة 0x22b: حالة 0x22d: حالة 0x22f:
+	    حالة 0x231: حالة 0x275: حالة 0x1e4d: حالة 0x1e4f:
+	    حالة 0x1e51: حالة 0x1e53: حالة 0x1ecd: حالة 0x1ecf:
+	    حالة 0x1ed1: حالة 0x1ed3: حالة 0x1ed5: حالة 0x1ed7:
+	    حالة 0x1ed9: حالة 0x1edb: حالة 0x1edd: حالة 0x1edf:
+	    حالة 0x1ee1: حالة 0x1ee3:
 		      regmbc('o'); regmbc(0xf2); regmbc(0xf3);
 		      regmbc(0xf4); regmbc(0xf5); regmbc(0xf6);
 		      regmbc(0xf8); regmbc(0x14d); regmbc(0x14f);
@@ -953,54 +953,54 @@ reg_equi_class(int c)
 		      regmbc(0x1ed5); regmbc(0x1ed7); regmbc(0x1ed9);
 		      regmbc(0x1edb); regmbc(0x1edd); regmbc(0x1edf);
 		      regmbc(0x1ee1); regmbc(0x1ee3);
-		      return;
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d88: case 0x1d7d:
-	    case 0x1e55: case 0x1e57:
+		      أرجع;
+	    حالة 'p': حالة 0x1a5: حالة 0x1d71: حالة 0x1d88: حالة 0x1d7d:
+	    حالة 0x1e55: حالة 0x1e57:
 		      regmbc('p'); regmbc(0x1a5); regmbc(0x1d71);
 		      regmbc(0x1d7d); regmbc(0x1d88); regmbc(0x1e55);
 		      regmbc(0x1e57);
-		      return;
-	    case 'q': case 0x24b: case 0x2a0:
+		      أرجع;
+	    حالة 'q': حالة 0x24b: حالة 0x2a0:
 		      regmbc('q'); regmbc(0x24b); regmbc(0x2a0);
-		      return;
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+		      أرجع;
+	    حالة 'r': حالة 0x155: حالة 0x157: حالة 0x159: حالة 0x211:
+	    حالة 0x213: حالة 0x24d: حالة 0x27d: حالة 0x1d72: حالة 0x1d73:
+	    حالة 0x1d89: حالة 0x1e59: حالة 0x1e5b: حالة 0x1e5d: حالة 0x1e5f:
+	    حالة 0xa7a7:
 		      regmbc('r'); regmbc(0x155); regmbc(0x157);
 		      regmbc(0x159); regmbc(0x211); regmbc(0x213);
 		      regmbc(0x24d); regmbc(0x1d72); regmbc(0x1d73);
 		      regmbc(0x1d89); regmbc(0x1e59); regmbc(0x27d);
 		      regmbc(0x1e5b); regmbc(0x1e5d); regmbc(0x1e5f);
 		      regmbc(0xa7a7);
-		      return;
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x1e61: case 0x219: case 0x23f: case 0x1d74: case 0x1d8a:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+		      أرجع;
+	    حالة 's': حالة 0x15b: حالة 0x15d: حالة 0x15f: حالة 0x161:
+	    حالة 0x1e61: حالة 0x219: حالة 0x23f: حالة 0x1d74: حالة 0x1d8a:
+	    حالة 0x1e63: حالة 0x1e65: حالة 0x1e67: حالة 0x1e69: حالة 0xa7a9:
 		      regmbc('s'); regmbc(0x15b); regmbc(0x15d);
 		      regmbc(0x15f); regmbc(0x161); regmbc(0x23f);
 		      regmbc(0x219); regmbc(0x1d74); regmbc(0x1d8a);
 		      regmbc(0x1e61); regmbc(0x1e63); regmbc(0x1e65);
 		      regmbc(0x1e67); regmbc(0x1e69); regmbc(0xa7a9);
-		      return;
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+		      أرجع;
+	    حالة 't': حالة 0x163: حالة 0x165: حالة 0x167: حالة 0x1ab:
+	    حالة 0x1ad: حالة 0x21b: حالة 0x288: حالة 0x1d75: حالة 0x1e6b:
+	    حالة 0x1e6d: حالة 0x1e6f: حالة 0x1e71: حالة 0x1e97: حالة 0x2c66:
 		      regmbc('t'); regmbc(0x163); regmbc(0x165);
 		      regmbc(0x167); regmbc(0x1ab); regmbc(0x21b);
 		      regmbc(0x1ad); regmbc(0x288); regmbc(0x1d75);
 		      regmbc(0x1e6b); regmbc(0x1e6d); regmbc(0x1e6f);
 		      regmbc(0x1e71); regmbc(0x1e97); regmbc(0x2c66);
-		      return;
-	    case 'u': case 0xf9: case 0xfa: case 0xfb: case 0xfc:
-	    case 0x169: case 0x16b: case 0x16d: case 0x16f:
-	    case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc:
-	    case 0x215: case 0x217: case 0x289: case 0x1e73:
-	    case 0x1d7e: case 0x1d99: case 0x1e75: case 0x1e77:
-	    case 0x1e79: case 0x1e7b: case 0x1ee5: case 0x1ee7:
-	    case 0x1ee9: case 0x1eeb: case 0x1eed: case 0x1eef:
-	    case 0x1ef1:
+		      أرجع;
+	    حالة 'u': حالة 0xf9: حالة 0xfa: حالة 0xfb: حالة 0xfc:
+	    حالة 0x169: حالة 0x16b: حالة 0x16d: حالة 0x16f:
+	    حالة 0x171: حالة 0x173: حالة 0x1b0: حالة 0x1d4:
+	    حالة 0x1d6: حالة 0x1d8: حالة 0x1da: حالة 0x1dc:
+	    حالة 0x215: حالة 0x217: حالة 0x289: حالة 0x1e73:
+	    حالة 0x1d7e: حالة 0x1d99: حالة 0x1e75: حالة 0x1e77:
+	    حالة 0x1e79: حالة 0x1e7b: حالة 0x1ee5: حالة 0x1ee7:
+	    حالة 0x1ee9: حالة 0x1eeb: حالة 0x1eed: حالة 0x1eef:
+	    حالة 0x1ef1:
 		      regmbc('u'); regmbc(0xf9); regmbc(0xfa);
 		      regmbc(0xfb); regmbc(0xfc); regmbc(0x169);
 		      regmbc(0x16b); regmbc(0x16d); regmbc(0x16f);
@@ -1013,37 +1013,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ee5); regmbc(0x1ee7); regmbc(0x1ee9);
 		      regmbc(0x1eeb); regmbc(0x1eed); regmbc(0x1eef);
 		      regmbc(0x1ef1);
-		      return;
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+		      أرجع;
+	    حالة 'v': حالة 0x28b: حالة 0x1d8c: حالة 0x1e7d: حالة 0x1e7f:
 		      regmbc('v'); regmbc(0x28b); regmbc(0x1d8c);
 		      regmbc(0x1e7d); regmbc(0x1e7f);
-		      return;
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83:
-	    case 0x1e85: case 0x1e87: case 0x1e89: case 0x1e98:
+		      أرجع;
+	    حالة 'w': حالة 0x175: حالة 0x1e81: حالة 0x1e83:
+	    حالة 0x1e85: حالة 0x1e87: حالة 0x1e89: حالة 0x1e98:
 		      regmbc('w'); regmbc(0x175); regmbc(0x1e81);
 		      regmbc(0x1e83); regmbc(0x1e85); regmbc(0x1e87);
 		      regmbc(0x1e89); regmbc(0x1e98);
-		      return;
-	    case 'x': case 0x1e8b: case 0x1e8d:
+		      أرجع;
+	    حالة 'x': حالة 0x1e8b: حالة 0x1e8d:
 		      regmbc('x'); regmbc(0x1e8b); regmbc(0x1e8d);
-		      return;
-	    case 'y': case 0xfd: case 0xff: case 0x177: case 0x1b4:
-	    case 0x233: case 0x24f: case 0x1e8f: case 0x1e99: case 0x1ef3:
-	    case 0x1ef5: case 0x1ef7: case 0x1ef9:
+		      أرجع;
+	    حالة 'y': حالة 0xfd: حالة 0xff: حالة 0x177: حالة 0x1b4:
+	    حالة 0x233: حالة 0x24f: حالة 0x1e8f: حالة 0x1e99: حالة 0x1ef3:
+	    حالة 0x1ef5: حالة 0x1ef7: حالة 0x1ef9:
 		      regmbc('y'); regmbc(0xfd); regmbc(0xff);
 		      regmbc(0x177); regmbc(0x1b4); regmbc(0x233);
 		      regmbc(0x24f); regmbc(0x1e8f); regmbc(0x1e99);
 		      regmbc(0x1ef3); regmbc(0x1ef5); regmbc(0x1ef7);
 		      regmbc(0x1ef9);
-		      return;
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+		      أرجع;
+	    حالة 'z': حالة 0x17a: حالة 0x17c: حالة 0x17e: حالة 0x1b6:
+	    حالة 0x1d76: حالة 0x1d8e: حالة 0x1e91: حالة 0x1e93:
+	    حالة 0x1e95: حالة 0x2c6c:
 		      regmbc('z'); regmbc(0x17a); regmbc(0x17c);
 		      regmbc(0x17e); regmbc(0x1b6); regmbc(0x1d76);
 		      regmbc(0x1d8e); regmbc(0x1e91); regmbc(0x1e93);
 		      regmbc(0x1e95); regmbc(0x2c6c);
-		      return;
+		      أرجع;
 	}
     }
     regmbc(c);
@@ -1053,34 +1053,34 @@ reg_equi_class(int c)
  * Emit a node.
  * Return pointer to generated code.
  */
-    static char_u *
-regnode(int op)
+    ساكن char_u *
+regnode(صحيح op)
 {
     char_u  *ret;
 
     ret = regcode;
-    if (ret == JUST_CALC_SIZE)
+    إذا (ret == JUST_CALC_اندازه)
 	regsize += 3;
-    else
+    وإلا
     {
 	*regcode++ = op;
 	*regcode++ = NUL;		// Null "next" pointer.
 	*regcode++ = NUL;
     }
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Write a long as four bytes at "p" and return pointer to the next char.
  */
-    static char_u *
+    ساكن char_u *
 re_put_long(char_u *p, long_u val)
 {
     *p++ = (char_u) ((val >> 24) & 0377);
     *p++ = (char_u) ((val >> 16) & 0377);
     *p++ = (char_u) ((val >> 8) & 0377);
     *p++ = (char_u) (val & 0377);
-    return p;
+    أرجع p;
 }
 
 /*
@@ -1088,75 +1088,75 @@ re_put_long(char_u *p, long_u val)
  * Returns NULL when calculating size, when there is no next item and when
  * there is an error.
  */
-    static char_u *
+    ساكن char_u *
 regnext(char_u *p)
 {
-    int	    offset;
+    صحيح	    دننه_واټن;
 
-    if (p == JUST_CALC_SIZE || reg_toolong)
-	return NULL;
+    إذا (p == JUST_CALC_اندازه || reg_toolong)
+	أرجع عدم;
 
-    offset = NEXT(p);
-    if (offset == 0)
-	return NULL;
+    دننه_واټن = بل_2(p);
+    إذا (دننه_واټن == 0)
+	أرجع عدم;
 
-    if (OP(p) == BACK)
-	return p - offset;
-    else
-	return p + offset;
+    إذا (OP(p) == شا_2)
+	أرجع p - دننه_واټن;
+    وإلا
+	أرجع p + دننه_واټن;
 }
 
 /*
  * Set the next-pointer at the end of a node chain.
  */
-    static void
+    ساكن فراغ
 regtail(char_u *p, char_u *val)
 {
-    char_u	*scan;
-    char_u	*temp;
-    int		offset;
+    char_u	*لټون;
+    char_u	*لنډمهاله;
+    صحيح		دننه_واټن;
 
-    if (p == JUST_CALC_SIZE)
-	return;
+    إذا (p == JUST_CALC_اندازه)
+	أرجع;
 
     // Find last node.
-    scan = p;
-    for (;;)
+    لټون = p;
+    لكل (;;)
     {
-	temp = regnext(scan);
-	if (temp == NULL)
-	    break;
-	scan = temp;
+	لنډمهاله = regnext(لټون);
+	إذا (لنډمهاله == عدم)
+	    اكسر;
+	لټون = لنډمهاله;
     }
 
-    if (OP(scan) == BACK)
-	offset = (int)(scan - val);
-    else
-	offset = (int)(val - scan);
+    إذا (OP(لټون) == شا_2)
+	دننه_واټن = (صحيح)(لټون - val);
+    وإلا
+	دننه_واټن = (صحيح)(val - لټون);
     // When the offset uses more than 16 bits it can no longer fit in the two
     // bytes available.  Use a global flag to avoid having to check return
     // values in too many places.
-    if (offset > 0xffff)
+    إذا (دننه_واټن > 0xffff)
 	reg_toolong = TRUE;
-    else
+    وإلا
     {
-	*(scan + 1) = (char_u) (((unsigned)offset >> 8) & 0377);
-	*(scan + 2) = (char_u) (offset & 0377);
+	*(لټون + 1) = (char_u) (((بینښه)دننه_واټن >> 8) & 0377);
+	*(لټون + 2) = (char_u) (دننه_واټن & 0377);
     }
 }
 
 /*
  * Like regtail, on item after a BRANCH; nop if none.
  */
-    static void
+    ساكن فراغ
 regoptail(char_u *p, char_u *val)
 {
     // When op is neither BRANCH nor BRACE_COMPLEX0-9, it is "operandless"
-    if (p == NULL || p == JUST_CALC_SIZE
+    إذا (p == عدم || p == JUST_CALC_اندازه
 	    || (OP(p) != BRANCH
 		&& (OP(p) < BRACE_COMPLEX || OP(p) > BRACE_COMPLEX + 9)))
-	return;
-    regtail(OPERAND(p), val);
+	أرجع;
+    regtail(عملوند(p), val);
 }
 
 /*
@@ -1164,57 +1164,57 @@ regoptail(char_u *p, char_u *val)
  *
  * Means relocating the operand.
  */
-    static void
-reginsert(int op, char_u *opnd)
+    ساكن فراغ
+reginsert(صحيح op, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ځای_پرځای_کړه;
 
-    if (regcode == JUST_CALC_SIZE)
+    إذا (regcode == JUST_CALC_اندازه)
     {
 	regsize += 3;
-	return;
+	أرجع;
     }
     src = regcode;
     regcode += 3;
     dst = regcode;
-    while (src > opnd)
+    طالما (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place = NUL;
+    ځای_پرځای_کړه = opnd;		// Op node, where operand used to be.
+    *ځای_پرځای_کړه++ = op;
+    *ځای_پرځای_کړه++ = NUL;
+    *ځای_پرځای_کړه = NUL;
 }
 
 /*
  * Insert an operator in front of already-emitted operand.
  * Add a number to the operator.
  */
-    static void
-reginsert_nr(int op, long val, char_u *opnd)
+    ساكن فراغ
+reginsert_nr(صحيح op, اوږد val, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ځای_پرځای_کړه;
 
-    if (regcode == JUST_CALC_SIZE)
+    إذا (regcode == JUST_CALC_اندازه)
     {
 	regsize += 7;
-	return;
+	أرجع;
     }
     src = regcode;
     regcode += 7;
     dst = regcode;
-    while (src > opnd)
+    طالما (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    re_put_long(place, (long_u)val);
+    ځای_پرځای_کړه = opnd;		// Op node, where operand used to be.
+    *ځای_پرځای_کړه++ = op;
+    *ځای_پرځای_کړه++ = NUL;
+    *ځای_پرځای_کړه++ = NUL;
+    re_put_long(ځای_پرځای_کړه, (long_u)val);
 }
 
 /*
@@ -1223,35 +1223,35 @@ reginsert_nr(int op, long val, char_u *opnd)
  *
  * Means relocating the operand.
  */
-    static void
+    ساكن فراغ
 reginsert_limits(
-    int		op,
-    long	minval,
-    long	maxval,
+    صحيح		op,
+    اوږد	minval,
+    اوږد	maxval,
     char_u	*opnd)
 {
     char_u	*src;
     char_u	*dst;
-    char_u	*place;
+    char_u	*ځای_پرځای_کړه;
 
-    if (regcode == JUST_CALC_SIZE)
+    إذا (regcode == JUST_CALC_اندازه)
     {
 	regsize += 11;
-	return;
+	أرجع;
     }
     src = regcode;
     regcode += 11;
     dst = regcode;
-    while (src > opnd)
+    طالما (src > opnd)
 	*--dst = *--src;
 
-    place = opnd;		// Op node, where operand used to be.
-    *place++ = op;
-    *place++ = NUL;
-    *place++ = NUL;
-    place = re_put_long(place, (long_u)minval);
-    place = re_put_long(place, (long_u)maxval);
-    regtail(opnd, place);
+    ځای_پرځای_کړه = opnd;		// Op node, where operand used to be.
+    *ځای_پرځای_کړه++ = op;
+    *ځای_پرځای_کړه++ = NUL;
+    *ځای_پرځای_کړه++ = NUL;
+    ځای_پرځای_کړه = re_put_long(ځای_پرځای_کړه, (long_u)minval);
+    ځای_پرځای_کړه = re_put_long(ځای_پرځای_کړه, (long_u)maxval);
+    regtail(opnd, ځای_پرځای_کړه);
 }
 
 /*
@@ -1260,26 +1260,26 @@ reginsert_limits(
  * TODO: Should also check that we don't refer to something that is repeated
  * (+*=): what instance of the repetition should we match?
  */
-    static int
-seen_endbrace(int refnum)
+    ساكن صحيح
+کتل_شوی_endbrace(صحيح refnum)
 {
-    if (!had_endbrace[refnum])
+    إذا (!had_endbrace[refnum])
     {
 	char_u *p;
 
 	// Trick: check if "@<=" or "@<!" follows, in which case
 	// the \1 can appear before the referenced match.
-	for (p = regparse; *p != NUL; ++p)
-	    if (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
-		break;
-	if (*p == NUL)
+	لكل (p = regparse; *p != NUL; ++p)
+	    إذا (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
+		اكسر;
+	إذا (*p == NUL)
 	{
-	    emsg(_(e_illegal_back_reference));
+	    emsg(_(e_illegal_شا_reference));
 	    rc_did_emsg = TRUE;
-	    return FALSE;
+	    أرجع FALSE;
 	}
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -1289,111 +1289,111 @@ seen_endbrace(int refnum)
  * it can turn them into a single node, which is smaller to store and
  * faster to run.  Don't do this when one_exactly is set.
  */
-    static char_u *
-regatom(int *flagp)
+    ساكن char_u *
+regatom(صحيح *flagp)
 {
     char_u	    *ret;
-    int		    flags;
-    int		    c;
+    صحيح		    flags;
+    صحيح		    c;
     char_u	    *p;
-    int		    extra = 0;
-    int		    save_prev_at_start = prev_at_start;
+    صحيح		    extra = 0;
+    صحيح		    save_prev_at_پیل = prev_at_پیل;
 
     *flagp = WORST;		// Tentatively.
 
     c = getchr();
-    switch (c)
+    بدل (c)
     {
-      case Magic('^'):
+      حالة Magic('^'):
 	ret = regnode(BOL);
-	break;
+	اكسر;
 
-      case Magic('$'):
+      حالة Magic('$'):
 	ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 	had_eol = TRUE;
-#endif
-	break;
+#د_که_پای
+	اكسر;
 
-      case Magic('<'):
+      حالة Magic('<'):
 	ret = regnode(BOW);
-	break;
+	اكسر;
 
-      case Magic('>'):
+      حالة Magic('>'):
 	ret = regnode(EOW);
-	break;
+	اكسر;
 
-      case Magic('_'):
+      حالة Magic('_'):
 	c = no_Magic(getchr());
-	if (c == '^')		// "\_^" is start-of-line
+	إذا (c == '^')		// "\_^" is start-of-line
 	{
 	    ret = regnode(BOL);
-	    break;
+	    اكسر;
 	}
-	if (c == '$')		// "\_$" is end-of-line
+	إذا (c == '$')		// "\_$" is end-of-line
 	{
 	    ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
-#endif
-	    break;
+#د_که_پای
+	    اكسر;
 	}
 
-	extra = ADD_NL;
+	extra = جمع_کړه_NL;
 	*flagp |= HASNL;
 
 	// "\_[" is character range plus newline
-	if (c == '[')
-	    goto collection;
+	إذا (c == '[')
+	    اذهب collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
 
 	// Character classes.
-      case Magic('.'):
-      case Magic('i'):
-      case Magic('I'):
-      case Magic('k'):
-      case Magic('K'):
-      case Magic('f'):
-      case Magic('F'):
-      case Magic('p'):
-      case Magic('P'):
-      case Magic('s'):
-      case Magic('S'):
-      case Magic('d'):
-      case Magic('D'):
-      case Magic('x'):
-      case Magic('X'):
-      case Magic('o'):
-      case Magic('O'):
-      case Magic('w'):
-      case Magic('W'):
-      case Magic('h'):
-      case Magic('H'):
-      case Magic('a'):
-      case Magic('A'):
-      case Magic('l'):
-      case Magic('L'):
-      case Magic('u'):
-      case Magic('U'):
+      حالة Magic('.'):
+      حالة Magic('i'):
+      حالة Magic('I'):
+      حالة Magic('k'):
+      حالة Magic('K'):
+      حالة Magic('f'):
+      حالة Magic('F'):
+      حالة Magic('p'):
+      حالة Magic('P'):
+      حالة Magic('s'):
+      حالة Magic('S'):
+      حالة Magic('d'):
+      حالة Magic('D'):
+      حالة Magic('x'):
+      حالة Magic('X'):
+      حالة Magic('o'):
+      حالة Magic('O'):
+      حالة Magic('w'):
+      حالة Magic('W'):
+      حالة Magic('h'):
+      حالة Magic('H'):
+      حالة Magic('a'):
+      حالة Magic('A'):
+      حالة Magic('l'):
+      حالة Magic('L'):
+      حالة Magic('u'):
+      حالة Magic('U'):
 	p = vim_strchr(classchars, no_Magic(c));
-	if (p == NULL)
-	    EMSG_RET_NULL(_(e_invalid_use_of_underscore));
+	إذا (p == عدم)
+	    EMSG_RET_NULL(_(e_invalid_use_د_underscore));
 
 	// When '.' is followed by a composing char ignore the dot, so that
 	// the composing char is matched here.
-	if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	إذا (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	{
 	    c = getchr();
-	    goto do_multibyte;
+	    اذهب do_multibyte;
 	}
 	ret = regnode(classcodes[p - classchars] + extra);
 	*flagp |= HASWIDTH | SIMPLE;
-	break;
+	اكسر;
 
-      case Magic('n'):
-	if (reg_string)
+      حالة Magic('n'):
+	إذا (reg_string)
 	{
 	    // In a string "\n" matches a newline character.
 	    ret = regnode(EXACTLY);
@@ -1401,359 +1401,359 @@ regatom(int *flagp)
 	    regc(NUL);
 	    *flagp |= HASWIDTH | SIMPLE;
 	}
-	else
+	وإلا
 	{
 	    // In buffer text "\n" matches the end of a line.
 	    ret = regnode(NEWL);
 	    *flagp |= HASWIDTH | HASNL;
 	}
-	break;
+	اكسر;
 
-      case Magic('('):
-	if (one_exactly)
+      حالة Magic('('):
+	إذا (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	ret = reg(REG_PAREN, &flags);
-	if (ret == NULL)
-	    return NULL;
+	إذا (ret == عدم)
+	    أرجع عدم;
 	*flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-	break;
+	اكسر;
 
-      case NUL:
-      case Magic('|'):
-      case Magic('&'):
-      case Magic(')'):
-	if (one_exactly)
+      حالة NUL:
+      حالة Magic('|'):
+      حالة Magic('&'):
+      حالة Magic(')'):
+	إذا (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	// Supposed to be caught earlier.
-	IEMSG_RET_NULL(e_internal_error_in_regexp);
+	IEMSG_RET_NULL(e_دننی_error_دننه_regexp);
 	// NOTREACHED
 
-      case Magic('='):
-      case Magic('?'):
-      case Magic('+'):
-      case Magic('@'):
-      case Magic('{'):
-      case Magic('*'):
+      حالة Magic('='):
+      حالة Magic('?'):
+      حالة Magic('+'):
+      حالة Magic('@'):
+      حالة Magic('{'):
+      حالة Magic('*'):
 	c = no_Magic(c);
 	EMSG3_RET_NULL(_(e_str_chr_follows_nothing),
 		(c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL), c);
 	// NOTREACHED
 
-      case Magic('~'):		// previous substitute pattern
-	    if (reg_prev_sub != NULL)
+      حالة Magic('~'):		// previous substitute pattern
+	    إذا (reg_prev_sub != عدم)
 	    {
 		char_u	    *lp;
 
 		ret = regnode(EXACTLY);
 		lp = reg_prev_sub;
-		while (*lp != NUL)
+		طالما (*lp != NUL)
 		    regc(*lp++);
 		regc(NUL);
-		if (*reg_prev_sub != NUL)
+		إذا (*reg_prev_sub != NUL)
 		{
 		    *flagp |= HASWIDTH;
-		    if ((lp - reg_prev_sub) == 1)
+		    إذا ((lp - reg_prev_sub) == 1)
 			*flagp |= SIMPLE;
 		}
 	    }
-	    else
-		EMSG_RET_NULL(_(e_no_previous_substitute_regular_expression));
-	    break;
+	    وإلا
+		EMSG_RET_NULL(_(e_no_پخوانی_substitute_regular_افاده));
+	    اكسر;
 
-      case Magic('1'):
-      case Magic('2'):
-      case Magic('3'):
-      case Magic('4'):
-      case Magic('5'):
-      case Magic('6'):
-      case Magic('7'):
-      case Magic('8'):
-      case Magic('9'):
+      حالة Magic('1'):
+      حالة Magic('2'):
+      حالة Magic('3'):
+      حالة Magic('4'):
+      حالة Magic('5'):
+      حالة Magic('6'):
+      حالة Magic('7'):
+      حالة Magic('8'):
+      حالة Magic('9'):
 	    {
-		int		    refnum;
+		صحيح		    refnum;
 
 		refnum = c - Magic('0');
-		if (!seen_endbrace(refnum))
-		    return NULL;
+		إذا (!کتل_شوی_endbrace(refnum))
+		    أرجع عدم;
 		ret = regnode(BACKREF + refnum);
 	    }
-	    break;
+	    اكسر;
 
-      case Magic('z'):
+      حالة Magic('z'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    بدل (c)
 	    {
-#ifdef FEAT_SYN_HL
-		case '(': if ((reg_do_extmatch & REX_SET) == 0)
-			      EMSG_RET_NULL(_(e_z_not_allowed_here));
-			  if (one_exactly)
+#که_تعریف_شوی FEAT_SYN_HL
+		حالة '(': إذا ((reg_do_extmatch & REX_سېټ) == 0)
+			      EMSG_RET_NULL(_(e_z_not_allowed_دلته));
+			  إذا (one_exactly)
 			      EMSG_ONE_RET_NULL;
 			  ret = reg(REG_ZPAREN, &flags);
-			  if (ret == NULL)
-			      return NULL;
+			  إذا (ret == عدم)
+			      أرجع عدم;
 			  *flagp |= flags & (HASWIDTH|SPSTART|HASNL|HASLOOKBH);
-			  re_has_z = REX_SET;
-			  break;
+			  re_has_z = REX_سېټ;
+			  اكسر;
 
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9': if ((reg_do_extmatch & REX_USE) == 0)
-			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_here));
+		حالة '1':
+		حالة '2':
+		حالة '3':
+		حالة '4':
+		حالة '5':
+		حالة '6':
+		حالة '7':
+		حالة '8':
+		حالة '9': إذا ((reg_do_extmatch & REX_USE) == 0)
+			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_دلته));
 			  ret = regnode(ZREF + c - '0');
 			  re_has_z = REX_USE;
-			  break;
-#endif
+			  اكسر;
+#د_که_پای
 
-		case 's': ret = regnode(MOPEN + 0);
-			  if (re_mult_next("\\zs") == FAIL)
-			      return NULL;
-			  break;
+		حالة 's': ret = regnode(MOPEN + 0);
+			  إذا (re_mult_بل("\\zs") == FAIL)
+			      أرجع عدم;
+			  اكسر;
 
-		case 'e': ret = regnode(MCLOSE + 0);
-			  if (re_mult_next("\\ze") == FAIL)
-			      return NULL;
-			  break;
+		حالة 'e': ret = regnode(MCLOSE + 0);
+			  إذا (re_mult_بل("\\ze") == FAIL)
+			      أرجع عدم;
+			  اكسر;
 
-		default:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
+		افتراضي:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
 	    }
 	}
-	break;
+	اكسر;
 
-      case Magic('%'):
+      حالة Magic('%'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    بدل (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (one_exactly)
+		حالة '(':
+		    إذا (one_exactly)
 			EMSG_ONE_RET_NULL;
 		    ret = reg(REG_NPAREN, &flags);
-		    if (ret == NULL)
-			return NULL;
+		    إذا (ret == عدم)
+			أرجع عدم;
 		    *flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-		    break;
+		    اكسر;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		حالة '^':
 		    ret = regnode(RE_BOF);
-		    break;
+		    اكسر;
 
-		case '$':
+		حالة '$':
 		    ret = regnode(RE_EOF);
-		    break;
+		    اكسر;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		حالة '#':
+		    إذا (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
-			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
+			semsg(_(e_atom_engine_must_be_at_پیل_د_نمونه),
 								  regparse[1]);
-			return FAIL;
+			أرجع FAIL;
 		    }
 		    ret = regnode(CURSOR);
-		    break;
+		    اكسر;
 
-		case 'V':
+		حالة 'V':
 		    ret = regnode(RE_VISUAL);
-		    break;
+		    اكسر;
 
-		case 'C':
+		حالة 'C':
 		    ret = regnode(RE_COMPOSING);
-		    break;
+		    اكسر;
 
 		// \%[abc]: Emit as a list of branches, all ending at the last
 		// branch which matches nothing.
-		case '[':
-			  if (one_exactly)	// doesn't nest
+		حالة '[':
+			  إذا (one_exactly)	// doesn't nest
 			      EMSG_ONE_RET_NULL;
 			  {
 			      char_u	*lastbranch;
-			      char_u	*lastnode = NULL;
+			      char_u	*lastnode = عدم;
 			      char_u	*br;
 
-			      ret = NULL;
-			      while ((c = getchr()) != ']')
+			      ret = عدم;
+			      طالما ((c = getchr()) != ']')
 			      {
-				  if (c == NUL)
+				  إذا (c == NUL)
 				      EMSG2_RET_NULL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 				  br = regnode(BRANCH);
-				  if (ret == NULL)
+				  إذا (ret == عدم)
 				      ret = br;
-				  else
+				  وإلا
 				  {
 				      regtail(lastnode, br);
-				      if (reg_toolong)
-					  return NULL;
+				      إذا (reg_toolong)
+					  أرجع عدم;
 				  }
 
 				  ungetchr();
 				  one_exactly = TRUE;
 				  lastnode = regatom(flagp);
 				  one_exactly = FALSE;
-				  if (lastnode == NULL)
-				      return NULL;
+				  إذا (lastnode == عدم)
+				      أرجع عدم;
 			      }
-			      if (ret == NULL)
-				  EMSG2_RET_NULL(_(e_empty_str_brackets),
+			      إذا (ret == عدم)
+				  EMSG2_RET_NULL(_(e_تشه_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			      lastbranch = regnode(BRANCH);
 			      br = regnode(NOTHING);
-			      if (ret != JUST_CALC_SIZE)
+			      إذا (ret != JUST_CALC_اندازه)
 			      {
 				  regtail(lastnode, br);
 				  regtail(lastbranch, br);
 				  // connect all branches to the NOTHING
 				  // branch at the end
-				  for (br = ret; br != lastnode; )
+				  لكل (br = ret; br != lastnode; )
 				  {
-				      if (OP(br) == BRANCH)
+				      إذا (OP(br) == BRANCH)
 				      {
 					  regtail(br, lastbranch);
-					  if (reg_toolong)
-					      return NULL;
-					  br = OPERAND(br);
+					  إذا (reg_toolong)
+					      أرجع عدم;
+					  br = عملوند(br);
 				      }
-				      else
+				      وإلا
 					  br = regnext(br);
 				  }
 			      }
 			      *flagp &= ~(HASWIDTH | SIMPLE);
-			      break;
+			      اكسر;
 			  }
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		حالة 'd':   // %d123 decimal
+		حالة 'o':   // %o123 octal
+		حالة 'x':   // %xab hex 2
+		حالة 'u':   // %uabcd hex 4
+		حالة 'U':   // %U1234abcd hex 8
 			  {
 			      vimlong_T i;
 
-			      switch (c)
+			      بدل (c)
 			      {
-				  case 'd': i = getdecchrs(); break;
-				  case 'o': i = getoctchrs(); break;
-				  case 'x': i = gethexchrs(2); break;
-				  case 'u': i = gethexchrs(4); break;
-				  case 'U': i = gethexchrs(8); break;
-				  default:  i = -1; break;
+				  حالة 'd': i = getdecchrs(); اكسر;
+				  حالة 'o': i = getoctchrs(); اكسر;
+				  حالة 'x': i = gethexchrs(2); اكسر;
+				  حالة 'u': i = gethexchrs(4); اكسر;
+				  حالة 'U': i = gethexchrs(8); اكسر;
+				  افتراضي:  i = -1; اكسر;
 			      }
 
-			      if (i < 0 || i > INT_MAX)
+			      إذا (i < 0 || i > لوی_عدد)
 				  EMSG2_RET_NULL(
 					    _(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
-			      if (use_multibytecode(i))
+			      إذا (use_multibytecode(i))
 				  ret = regnode(MULTIBYTECODE);
-			      else
+			      وإلا
 				  ret = regnode(EXACTLY);
-			      if (i == 0)
+			      إذا (i == 0)
 				  regc(0x0a);
-			      else
-				  regmbc((int)i);
+			      وإلا
+				  regmbc((صحيح)i);
 			      regc(NUL);
 			      *flagp |= HASWIDTH;
-			      break;
+			      اكسر;
 			  }
 
-		default:
-			  if (VIM_ISDIGIT(c) || c == '<' || c == '>'
+		افتراضي:
+			  إذا (VIM_ISDIGIT(c) || c == '<' || c == '>'
 						|| c == '\'' || c == '.')
 			  {
 			      long_u	n = 0;
-			      int	cmp;
-			      int	cur = FALSE;
-			      int	got_digit = FALSE;
+			      صحيح	cmp;
+			      صحيح	cur = FALSE;
+			      صحيح	got_digit = FALSE;
 
 			      cmp = c;
-			      if (cmp == '<' || cmp == '>')
+			      إذا (cmp == '<' || cmp == '>')
 				  c = getchr();
-			      if (no_Magic(c) == '.')
+			      إذا (no_Magic(c) == '.')
 			      {
 				  cur = TRUE;
 				  c = getchr();
 			      }
-			      while (VIM_ISDIGIT(c))
+			      طالما (VIM_ISDIGIT(c))
 			      {
 				  got_digit = TRUE;
 				  n = n * 10 + (c - '0');
 				  c = getchr();
 			      }
-			      if (no_Magic(c) == '\'' && n == 0)
+			      إذا (no_Magic(c) == '\'' && n == 0)
 			      {
 				  // "\%'m", "\%<'m" and "\%>'m": Mark
 				  c = getchr();
 				  ret = regnode(RE_MARK);
-				  if (ret == JUST_CALC_SIZE)
+				  إذا (ret == JUST_CALC_اندازه)
 				      regsize += 2;
-				  else
+				  وإلا
 				  {
 				      *regcode++ = c;
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  اكسر;
 			      }
-			      else if ((c == 'l' || c == 'c' || c == 'v')
+			      وإلا إذا ((c == 'l' || c == 'c' || c == 'v')
 					  && (cur || got_digit))
 			      {
-				  if (cur && n)
+				  إذا (cur && n)
 				  {
-				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				    semsg(_(e_regexp_شمېره_after_dot_pos_پلټنه_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
-				    return NULL;
+				    أرجع عدم;
 				  }
-				  if (c == 'l')
+				  إذا (c == 'l')
 				  {
-				      if (cur)
+				      إذا (cur)
 					  n = curwin->w_cursor.lnum;
 				      ret = regnode(RE_LNUM);
-				      if (save_prev_at_start)
-					  at_start = TRUE;
+				      إذا (save_prev_at_پیل)
+					  at_پیل = TRUE;
 				  }
-				  else if (c == 'c')
+				  وإلا إذا (c == 'c')
 				  {
-				      if (cur)
+				      إذا (cur)
 				      {
-					  n = curwin->w_cursor.col;
+					  n = curwin->w_cursor.ستون;
 					  n++;
 				      }
-				      ret = regnode(RE_COL);
+				      ret = regnode(RE_ستون);
 				  }
-				  else
+				  وإلا
 				  {
-				      if (cur)
+				      إذا (cur)
 				      {
 					  colnr_T vcol = 0;
 
 					  getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 عدم, عدم, &vcol, 0);
 					  ++vcol;
 					  n = vcol;
 				      }
 				      ret = regnode(RE_VCOL);
 				  }
-				  if (ret == JUST_CALC_SIZE)
+				  إذا (ret == JUST_CALC_اندازه)
 				      regsize += 5;
-				  else
+				  وإلا
 				  {
 				      // put the number and the optional
 				      // comparator after the opcode
 				      regcode = re_put_long(regcode, n);
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  اكسر;
 			      }
 			  }
 
@@ -1761,9 +1761,9 @@ regatom(int *flagp)
 						      reg_magic == MAGIC_ALL);
 	    }
 	}
-	break;
+	اكسر;
 
-      case Magic('['):
+      حالة Magic('['):
 collection:
 	{
 	    char_u	*lp;
@@ -1771,88 +1771,88 @@ collection:
 	    // If there is no matching ']', we assume the '[' is a normal
 	    // character.  This makes 'incsearch' and ":help [" work.
 	    lp = skip_anyof(regparse);
-	    if (*lp == ']')	// there is a matching ']'
+	    إذا (*lp == ']')	// there is a matching ']'
 	    {
-		int	startc = -1;	// > 0 when next '-' is a range
-		int	endc;
+		صحيح	startc = -1;	// > 0 when next '-' is a range
+		صحيح	endc;
 
-		if (extra == 0)
+		إذا (extra == 0)
 		{
-		    int	cl = bt_recognize_char_class(regparse, lp);
+		    صحيح	cl = bt_recognize_char_class(regparse, lp);
 
-		    if (cl != 0)
+		    إذا (cl != 0)
 		    {
 			ret = regnode(cl);
 			regparse = lp;
 			skipchr();
 			*flagp |= HASWIDTH | SIMPLE;
-			break;
+			اكسر;
 		    }
 		}
 
 		// In a character class, different parsing rules apply.
 		// Not even \ is special anymore, nothing is.
-		if (*regparse == '^')	    // Complement of range.
+		إذا (*regparse == '^')	    // Complement of range.
 		{
 		    ret = regnode(ANYBUT + extra);
 		    regparse++;
 		}
-		else
+		وإلا
 		    ret = regnode(ANYOF + extra);
 
 		// At the start ']' and '-' mean the literal character.
-		if (*regparse == ']' || *regparse == '-')
+		إذا (*regparse == ']' || *regparse == '-')
 		{
 		    startc = *regparse;
 		    regc(*regparse++);
 		}
 
-		while (*regparse != NUL && *regparse != ']')
+		طالما (*regparse != NUL && *regparse != ']')
 		{
-		    if (*regparse == '-')
+		    إذا (*regparse == '-')
 		    {
 			++regparse;
 			// The '-' is not used for a range at the end and
 			// after or before a '\n'.
-			if (*regparse == ']' || *regparse == NUL
+			إذا (*regparse == ']' || *regparse == NUL
 				|| startc == -1
 				|| (regparse[0] == '\\' && regparse[1] == 'n'))
 			{
 			    regc('-');
 			    startc = '-';	// [--x] is a range
 			}
-			else
+			وإلا
 			{
 			    // Also accept "a-[.z.]"
 			    endc = 0;
-			    if (*regparse == '[')
+			    إذا (*regparse == '[')
 				endc = get_coll_element(&regparse);
-			    if (endc == 0)
+			    إذا (endc == 0)
 			    {
-				if (has_mbyte)
+				إذا (has_mbyte)
 				    endc = mb_ptr2char_adv(&regparse);
-				else
+				وإلا
 				    endc = *regparse++;
 			    }
 
 			    // Handle \o40, \x20 and \u20AC style sequences
-			    if (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
+			    إذا (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
 				endc = coll_get_char();
 
-			    if (startc > endc)
-				EMSG_RET_NULL(_(e_reverse_range_in_character_class));
-			    if (has_mbyte && ((*mb_char2len)(startc) > 1
+			    إذا (startc > endc)
+				EMSG_RET_NULL(_(e_سرچپه_range_دننه_character_class));
+			    إذا (has_mbyte && ((*mb_char2len)(startc) > 1
 						 || (*mb_char2len)(endc) > 1))
 			    {
 				// Limit to a range of 256 chars.
-				if (endc > startc + 256)
-				    EMSG_RET_NULL(_(e_range_too_large_in_character_class));
-				while (++startc <= endc)
+				إذا (endc > startc + 256)
+				    EMSG_RET_NULL(_(e_range_too_large_دننه_character_class));
+				طالما (++startc <= endc)
 				    regmbc(startc);
 			    }
-			    else
+			    وإلا
 			    {
-				while (++startc <= endc)
+				طالما (++startc <= endc)
 				    regc(startc);
 			    }
 			    startc = -1;
@@ -1862,24 +1862,24 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    else if (*regparse == '\\'
+		    وإلا إذا (*regparse == '\\'
 			    && !reg_cpo_bsl
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != عدم
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR,
-						       regparse[1]) != NULL)))
+						       regparse[1]) != عدم)))
 		    {
 			regparse++;
-			if (*regparse == 'n')
+			إذا (*regparse == 'n')
 			{
 			    // '\n' in range: also match NL
-			    if (ret != JUST_CALC_SIZE)
+			    إذا (ret != JUST_CALC_اندازه)
 			    {
 				// Using \n inside [^] does not change what
 				// matches. "[^\n]" is the same as ".".
-				if (*ret == ANYOF)
+				إذا (*ret == ANYOF)
 				{
-				    *ret = ANYOF + ADD_NL;
+				    *ret = ANYOF + جمع_کړه_NL;
 				    *flagp |= HASNL;
 				}
 				// else: must have had a \n already
@@ -1887,7 +1887,7 @@ collection:
 			    regparse++;
 			    startc = -1;
 			}
-			else if (*regparse == 'd'
+			وإلا إذا (*regparse == 'd'
 				|| *regparse == 'o'
 				|| *regparse == 'x'
 				|| *regparse == 'u'
@@ -1896,154 +1896,154 @@ collection:
 			    startc = coll_get_char();
 			    // max UTF-8 Codepoint is U+10FFFF,
 			    // but allow values until INT_MAX
-			    if (startc == INT_MAX)
+			    إذا (startc == لوی_عدد)
 				EMSG_RET_NULL(_(e_unicode_val_too_large));
-			    if (startc == 0)
+			    إذا (startc == 0)
 				regc(0x0a);
-			    else
+			    وإلا
 				regmbc(startc);
 			}
-			else
+			وإلا
 			{
 			    startc = backslash_trans(*regparse++);
 			    regc(startc);
 			}
 		    }
-		    else if (*regparse == '[')
+		    وإلا إذا (*regparse == '[')
 		    {
-			int c_class;
-			int cu;
+			صحيح c_class;
+			صحيح cu;
 
 			c_class = get_char_class(&regparse);
 			startc = -1;
 			// Characters assumed to be 8 bits!
-			switch (c_class)
+			بدل (c_class)
 			{
-			    case CLASS_NONE:
+			    حالة CLASS_NONE:
 				c_class = get_equi_class(&regparse);
-				if (c_class != 0)
+				إذا (c_class != 0)
 				{
 				    // produce equivalence class
 				    reg_equi_class(c_class);
 				}
-				else if ((c_class =
+				وإلا إذا ((c_class =
 					    get_coll_element(&regparse)) != 0)
 				{
 				    // produce a collating element
 				    regmbc(c_class);
 				}
-				else
+				وإلا
 				{
 				    // literal '[', allow [[-x] as a range
 				    startc = *regparse++;
 				    regc(startc);
 				}
-				break;
-			    case CLASS_ALNUM:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalnum(cu))
+				اكسر;
+			    حالة CLASS_ALNUM:
+				لكل (cu = 1; cu < 128; cu++)
+				    إذا (که_توری_یا_عدد(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_ALPHA:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalpha(cu))
+				اكسر;
+			    حالة CLASS_ALPHA:
+				لكل (cu = 1; cu < 128; cu++)
+				    إذا (که_توری(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_BLANK:
+				اكسر;
+			    حالة CLASS_BLANK:
 				regc(' ');
 				regc('\t');
-				break;
-			    case CLASS_CNTRL:
-				for (cu = 1; cu <= 127; cu++)
-				    if (iscntrl(cu))
+				اكسر;
+			    حالة CLASS_CNTRL:
+				لكل (cu = 1; cu <= 127; cu++)
+				    إذا (iscntrl(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_DIGIT:
-				for (cu = 1; cu <= 127; cu++)
-				    if (VIM_ISDIGIT(cu))
+				اكسر;
+			    حالة CLASS_DIGIT:
+				لكل (cu = 1; cu <= 127; cu++)
+				    إذا (VIM_ISDIGIT(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_GRAPH:
-				for (cu = 1; cu <= 127; cu++)
-				    if (isgraph(cu))
+				اكسر;
+			    حالة CLASS_ګراف:
+				لكل (cu = 1; cu <= 127; cu++)
+				    إذا (isgraph(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_LOWER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISLOWER(cu) && cu != 170
+				اكسر;
+			    حالة CLASS_ښکتنی:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (MB_ISLOWER(cu) && cu != 170
 								 && cu != 186)
 					regmbc(cu);
-				break;
-			    case CLASS_PRINT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isprintc(cu))
+				اكسر;
+			    حالة CLASS_PRINT:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (vim_isprintc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_PUNCT:
-				for (cu = 1; cu < 128; cu++)
-				    if (ispunct(cu))
+				اكسر;
+			    حالة CLASS_PUNCT:
+				لكل (cu = 1; cu < 128; cu++)
+				    إذا (ispunct(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_SPACE:
-				for (cu = 9; cu <= 13; cu++)
+				اكسر;
+			    حالة CLASS_SPACE:
+				لكل (cu = 9; cu <= 13; cu++)
 				    regc(cu);
 				regc(' ');
-				break;
-			    case CLASS_UPPER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISUPPER(cu))
+				اكسر;
+			    حالة CLASS_پاسنی:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (MB_ISUPPER(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_XDIGIT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isxdigit(cu))
+				اكسر;
+			    حالة CLASS_XDIGIT:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (vim_isxdigit(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_TAB:
+				اكسر;
+			    حالة CLASS_TAB:
 				regc('\t');
-				break;
-			    case CLASS_RETURN:
+				اكسر;
+			    حالة CLASS_RETURN:
 				regc('\r');
-				break;
-			    case CLASS_BACKSPACE:
+				اكسر;
+			    حالة CLASS_BACKSPACE:
 				regc('\b');
-				break;
-			    case CLASS_ESCAPE:
+				اكسر;
+			    حالة CLASS_ESCAPE:
 				regc('\033');
-				break;
-			    case CLASS_IDENT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isIDc(cu))
+				اكسر;
+			    حالة CLASS_IDENT:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (vim_isIDc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_KEYWORD:
-				for (cu = 1; cu <= 255; cu++)
-				    if (reg_iswordc(cu))
+				اكسر;
+			    حالة CLASS_KEYWORD:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (reg_iswordc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_FNAME:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isfilec(cu))
+				اكسر;
+			    حالة CLASS_FNAME:
+				لكل (cu = 1; cu <= 255; cu++)
+				    إذا (vim_isfilec(cu))
 					regmbc(cu);
-				break;
+				اكسر;
 			}
 		    }
-		    else
+		    وإلا
 		    {
-			if (has_mbyte)
+			إذا (has_mbyte)
 			{
-			    int	len;
+			    صحيح	len;
 
 			    // produce a multibyte character, including any
 			    // following composing characters
 			    startc = mb_ptr2char(regparse);
 			    len = (*mb_ptr2len)(regparse);
-			    if (enc_utf8 && utf_char2len(startc) != len)
+			    إذا (enc_utf8 && utf_char2len(startc) != len)
 				startc = -1;	// composing chars
-			    while (--len >= 0)
+			    طالما (--len >= 0)
 				regc(*regparse++);
 			}
-			else
+			وإلا
 			{
 			    startc = *regparse++;
 			    regc(startc);
@@ -2052,31 +2052,31 @@ collection:
 		}
 		regc(NUL);
 		prevchr_len = 1;	// last char was the ']'
-		if (*regparse != ']')
+		إذا (*regparse != ']')
 		    EMSG_RET_NULL(_(e_too_many_brackets));  // Cannot happen?
 		skipchr();	    // let's be friends with the lexer again
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		اكسر;
 	    }
-	    else if (reg_strict)
+	    وإلا إذا (reg_strict)
 		EMSG2_RET_NULL(_(e_missing_rsb_after_str_lsb),
 							reg_magic > MAGIC_OFF);
 	}
 	// FALLTHROUGH
 
-      default:
+      افتراضي:
 	{
-	    int		len;
+	    صحيح		len;
 
 	    // A multi-byte character is handled as a separate atom if it's
 	    // before a multi and when it's a composing char.
-	    if (use_multibytecode(c))
+	    إذا (use_multibytecode(c))
 	    {
 do_multibyte:
 		ret = regnode(MULTIBYTECODE);
 		regmbc(c);
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		اكسر;
 	    }
 
 	    ret = regnode(EXACTLY);
@@ -2088,31 +2088,31 @@ do_multibyte:
 	    // - "one_exactly" is not set
 	    // But always emit at least one character.  Might be a Multi,
 	    // e.g., a "[" without matching "]".
-	    for (len = 0; c != NUL && (len == 0
+	    لكل (len = 0; c != NUL && (len == 0
 			|| (re_multi_type(peekchr()) == NOT_MULTI
 			    && !one_exactly
 			    && !is_Magic(c))); ++len)
 	    {
 		c = no_Magic(c);
-		if (has_mbyte)
+		إذا (has_mbyte)
 		{
 		    regmbc(c);
-		    if (enc_utf8)
+		    إذا (enc_utf8)
 		    {
-			int	l;
+			صحيح	l;
 
 			// Need to get composing character too.
-			for (;;)
+			لكل (;;)
 			{
 			    l = utf_ptr2len(regparse);
-			    if (!UTF_COMPOSINGLIKE(regparse, regparse + l))
-				break;
+			    إذا (!UTF_COMPOSINGLIKE(regparse, regparse + l))
+				اكسر;
 			    regmbc(utf_ptr2char(regparse));
 			    skipchr();
 			}
 		    }
 		}
-		else
+		وإلا
 		    regc(c);
 		c = getchr();
 	    }
@@ -2120,13 +2120,13 @@ do_multibyte:
 
 	    regc(NUL);
 	    *flagp |= HASWIDTH;
-	    if (len == 1)
+	    إذا (len == 1)
 		*flagp |= SIMPLE;
 	}
-	break;
+	اكسر;
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -2138,241 +2138,241 @@ do_multibyte:
  * It might seem that this node could be dispensed with entirely, but the
  * endmarker role is not redundant.
  */
-    static char_u *
-regpiece(int *flagp)
+    ساكن char_u *
+regpiece(صحيح *flagp)
 {
     char_u	    *ret;
-    int		    op;
-    char_u	    *next;
-    int		    flags;
-    long	    minval;
-    long	    maxval;
+    صحيح		    op;
+    char_u	    *بل;
+    صحيح		    flags;
+    اوږد	    minval;
+    اوږد	    maxval;
 
     ret = regatom(&flags);
-    if (ret == NULL)
-	return NULL;
+    إذا (ret == عدم)
+	أرجع عدم;
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
+    إذا (re_multi_type(op) == NOT_MULTI)
     {
 	*flagp = flags;
-	return ret;
+	أرجع ret;
     }
     // default flags
     *flagp = (WORST | SPSTART | (flags & (HASNL | HASLOOKBH)));
 
     skipchr();
-    switch (op)
+    بدل (op)
     {
-	case Magic('*'):
-	    if (flags & SIMPLE)
-		reginsert(STAR, ret);
-	    else
+	حالة Magic('*'):
+	    إذا (flags & SIMPLE)
+		reginsert(ستوری, ret);
+	    وإلا
 	    {
 		// Emit x* as (x&|), where & means "self".
 		reginsert(BRANCH, ret); // Either x
-		regoptail(ret, regnode(BACK));	// and loop
-		regoptail(ret, ret);	// back
+		regoptail(ret, regnode(شا_2));	// and loop
+		regoptail(ret, ret);	//شا
 		regtail(ret, regnode(BRANCH));	// or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
-	    break;
+	    اكسر;
 
-	case Magic('+'):
-	    if (flags & SIMPLE)
+	حالة Magic('+'):
+	    إذا (flags & SIMPLE)
 		reginsert(PLUS, ret);
-	    else
+	    وإلا
 	    {
 		// Emit x+ as x(&|), where & means "self".
-		next = regnode(BRANCH); // Either
-		regtail(ret, next);
-		regtail(regnode(BACK), ret);	// loop back
-		regtail(next, regnode(BRANCH)); // or
+		بل = regnode(BRANCH); // Either
+		regtail(ret, بل);
+		regtail(regnode(شا_2), ret);	// loop back
+		regtail(بل, regnode(BRANCH)); // or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
 	    *flagp = (WORST | HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    اكسر;
 
-	case Magic('@'):
+	حالة Magic('@'):
 	    {
-		int	lop = END;
-		long	nr;
+		صحيح	lop = پای_ټکی_3;
+		اوږد	nr;
 
-		nr = (long)getdecchrs();
-		switch (no_Magic(getchr()))
+		nr = (اوږد)getdecchrs();
+		بدل (no_Magic(getchr()))
 		{
-		    case '=': lop = MATCH; break;		  // \@=
-		    case '!': lop = NOMATCH; break;		  // \@!
-		    case '>': lop = SUBPAT; break;		  // \@>
-		    case '<': switch (no_Magic(getchr()))
+		    حالة '=': lop = سمون_2; اكسر;		  // \@=
+		    حالة '!': lop = NOMATCH; اكسر;		  // \@!
+		    حالة '>': lop = SUBPAT; اكسر;		  // \@>
+		    حالة '<': بدل (no_Magic(getchr()))
 			      {
-				  case '=': lop = BEHIND; break;   // \@<=
-				  case '!': lop = NOBEHIND; break; // \@<!
+				  حالة '=': lop = BEHIND; اكسر;   // \@<=
+				  حالة '!': lop = NOBEHIND; اكسر; // \@<!
 			      }
 		}
-		if (lop == END)
+		إذا (lop == پای_ټکی_3)
 		    EMSG2_RET_NULL(_(e_invalid_character_after_str_at),
 						      reg_magic == MAGIC_ALL);
 		// Look behind must match with behind_pos.
-		if (lop == BEHIND || lop == NOBEHIND)
+		إذا (lop == BEHIND || lop == NOBEHIND)
 		{
 		    regtail(ret, regnode(BHPOS));
 		    *flagp |= HASLOOKBH;
 		}
-		regtail(ret, regnode(END)); // operand ends
-		if (lop == BEHIND || lop == NOBEHIND)
+		regtail(ret, regnode(پای_ټکی_3)); // operand ends
+		إذا (lop == BEHIND || lop == NOBEHIND)
 		{
-		    if (nr < 0)
+		    إذا (nr < 0)
 			nr = 0; // no limit is same as zero limit
 		    reginsert_nr(lop, nr, ret);
 		}
-		else
+		وإلا
 		    reginsert(lop, ret);
-		break;
+		اكسر;
 	    }
 
-	case Magic('?'):
-	case Magic('='):
+	حالة Magic('?'):
+	حالة Magic('='):
 	    // Emit x= as (x|)
 	    reginsert(BRANCH, ret);		// Either x
 	    regtail(ret, regnode(BRANCH));	// or
-	    next = regnode(NOTHING);		// null.
-	    regtail(ret, next);
-	    regoptail(ret, next);
-	    break;
+	    بل = regnode(NOTHING);		// null.
+	    regtail(ret, بل);
+	    regoptail(ret, بل);
+	    اكسر;
 
-	case Magic('{'):
-	    if (!read_limits(&minval, &maxval))
-		return NULL;
-	    if (flags & SIMPLE)
+	حالة Magic('{'):
+	    إذا (!read_limits(&minval, &maxval))
+		أرجع عدم;
+	    إذا (flags & SIMPLE)
 	    {
 		reginsert(BRACE_SIMPLE, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 	    }
-	    else
+	    وإلا
 	    {
-		if (num_complex_braces >= 10)
+		إذا (عدد_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
-		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
-		regoptail(ret, regnode(BACK));
+		reginsert(BRACE_COMPLEX + عدد_complex_braces, ret);
+		regoptail(ret, regnode(شا_2));
 		regoptail(ret, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
-		++num_complex_braces;
+		++عدد_complex_braces;
 	    }
-	    if (minval > 0 && maxval > 0)
+	    إذا (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    اكسر;
     }
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    إذا (re_multi_type(peekchr()) != NOT_MULTI)
     {
 	// Can't have a multi follow a multi.
-	if (peekchr() == Magic('*'))
+	إذا (peekchr() == Magic('*'))
 	    EMSG2_RET_NULL(_(e_nested_str), reg_magic >= MAGIC_ON);
 	EMSG3_RET_NULL(_(e_nested_str_chr), reg_magic == MAGIC_ALL,
 							  no_Magic(peekchr()));
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Parse one alternative of an | or & operator.
  * Implements the concatenation operator.
  */
-    static char_u *
-regconcat(int *flagp)
+    ساكن char_u *
+regconcat(صحيح *flagp)
 {
-    char_u	*first = NULL;
-    char_u	*chain = NULL;
+    char_u	*لومړی = عدم;
+    char_u	*chain = عدم;
     char_u	*latest;
-    int		flags;
-    int		cont = TRUE;
+    صحيح		flags;
+    صحيح		cont = TRUE;
 
     *flagp = WORST;		// Tentatively.
 
-    while (cont)
+    طالما (cont)
     {
-	switch (peekchr())
+	بدل (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    حالة NUL:
+	    حالة Magic('|'):
+	    حالة Magic('&'):
+	    حالة Magic(')'):
 			    cont = FALSE;
-			    break;
-	    case Magic('Z'):
+			    اكسر;
+	    حالة Magic('Z'):
 			    regflags |= RF_ICOMBINE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('c'):
+			    اكسر;
+	    حالة Magic('c'):
 			    regflags |= RF_ICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('C'):
+			    اكسر;
+	    حالة Magic('C'):
 			    regflags |= RF_NOICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('v'):
+			    اكسر;
+	    حالة Magic('v'):
 			    reg_magic = MAGIC_ALL;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('m'):
+			    اكسر;
+	    حالة Magic('m'):
 			    reg_magic = MAGIC_ON;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('M'):
+			    اكسر;
+	    حالة Magic('M'):
 			    reg_magic = MAGIC_OFF;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('V'):
+			    اكسر;
+	    حالة Magic('V'):
 			    reg_magic = MAGIC_NONE;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    default:
+			    اكسر;
+	    افتراضي:
 			    latest = regpiece(&flags);
-			    if (latest == NULL || reg_toolong)
-				return NULL;
+			    إذا (latest == عدم || reg_toolong)
+				أرجع عدم;
 			    *flagp |= flags & (HASWIDTH | HASNL | HASLOOKBH);
-			    if (chain == NULL)	// First piece.
+			    إذا (chain == عدم)	// First piece.
 				*flagp |= flags & SPSTART;
-			    else
+			    وإلا
 				regtail(chain, latest);
 			    chain = latest;
-			    if (first == NULL)
-				first = latest;
-			    break;
+			    إذا (لومړی == عدم)
+				لومړی = latest;
+			    اكسر;
 	}
     }
-    if (first == NULL)		// Loop ran zero times.
-	first = regnode(NOTHING);
-    return first;
+    إذا (لومړی == عدم)		// Loop ran zero times.
+	لومړی = regnode(NOTHING);
+    أرجع لومړی;
 }
 
 /*
  * Parse one alternative of an | operator.
  * Implements the & operator.
  */
-    static char_u *
-regbranch(int *flagp)
+    ساكن char_u *
+regbranch(صحيح *flagp)
 {
     char_u	*ret;
-    char_u	*chain = NULL;
+    char_u	*chain = عدم;
     char_u	*latest;
-    int		flags;
+    صحيح		flags;
 
     *flagp = WORST | HASNL;		// Tentatively.
 
     ret = regnode(BRANCH);
-    for (;;)
+    لكل (;;)
     {
 	latest = regconcat(&flags);
-	if (latest == NULL)
-	    return NULL;
+	إذا (latest == عدم)
+	    أرجع عدم;
 	// If one of the branches has width, the whole thing has.  If one of
 	// the branches anchors at start-of-line, the whole thing does.
 	// If one of the branches uses look-behind, the whole thing does.
@@ -2380,19 +2380,19 @@ regbranch(int *flagp)
 	// If one of the branches doesn't match a line-break, the whole thing
 	// doesn't.
 	*flagp &= ~HASNL | (flags & HASNL);
-	if (chain != NULL)
+	إذا (chain != عدم)
 	    regtail(chain, latest);
-	if (peekchr() != Magic('&'))
-	    break;
+	إذا (peekchr() != Magic('&'))
+	    اكسر;
 	skipchr();
-	regtail(latest, regnode(END)); // operand ends
-	if (reg_toolong)
-	    break;
-	reginsert(MATCH, latest);
+	regtail(latest, regnode(پای_ټکی_3)); // operand ends
+	إذا (reg_toolong)
+	    اكسر;
+	reginsert(سمون_2, latest);
 	chain = latest;
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -2404,153 +2404,153 @@ regbranch(int *flagp)
  * is a trifle forced, but the need to tie the tails of the branches to what
  * follows makes it hard to avoid.
  */
-    static char_u *
+    ساكن char_u *
 reg(
-    int		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
-    int		*flagp)
+    صحيح		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    صحيح		*flagp)
 {
     char_u	*ret;
     char_u	*br;
     char_u	*ender;
-    int		parno = 0;
-    int		flags;
+    صحيح		parno = 0;
+    صحيح		flags;
 
     *flagp = HASWIDTH;		// Tentatively.
 
-#ifdef FEAT_SYN_HL
-    if (paren == REG_ZPAREN)
+#که_تعریف_شوی FEAT_SYN_HL
+    إذا (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	إذا (regnzpar >= NSUBEXP)
 	    EMSG_RET_NULL(_(e_too_many_z));
 	parno = regnzpar;
 	regnzpar++;
 	ret = regnode(ZOPEN + parno);
     }
-    else
-#endif
-	if (paren == REG_PAREN)
+    وإلا
+#د_که_پای
+	إذا (paren == REG_PAREN)
     {
 	// Make a MOPEN node.
-	if (regnpar >= NSUBEXP)
+	إذا (regnpar >= NSUBEXP)
 	    EMSG2_RET_NULL(_(e_too_many_str_open), reg_magic == MAGIC_ALL);
 	parno = regnpar;
 	++regnpar;
 	ret = regnode(MOPEN + parno);
     }
-    else if (paren == REG_NPAREN)
+    وإلا إذا (paren == REG_NPAREN)
     {
 	// Make a NOPEN node.
 	ret = regnode(NOPEN);
     }
-    else
-	ret = NULL;
+    وإلا
+	ret = عدم;
 
-    if (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    إذا (bt_reg_parse_ژوروالی >= REG_MAX_PAREN_ژوروالی)
 	EMSG_RET_NULL(_(e_command_too_complex));
-    ++bt_reg_parse_depth;
+    ++bt_reg_parse_ژوروالی;
 
     // Pick up the branches, linking them together.
     br = regbranch(&flags);
-    if (br == NULL)
+    إذا (br == عدم)
     {
-	ret = NULL;
-	goto theend;
+	ret = عدم;
+	اذهب theend;
     }
-    if (ret != NULL)
+    إذا (ret != عدم)
 	regtail(ret, br);	// [MZ]OPEN -> first.
-    else
+    وإلا
 	ret = br;
     // If one of the branches can be zero-width, the whole thing can.
     // If one of the branches has * at start or matches a line-break, the
     // whole thing can.
-    if (!(flags & HASWIDTH))
+    إذا (!(flags & HASWIDTH))
 	*flagp &= ~HASWIDTH;
     *flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
-    while (peekchr() == Magic('|'))
+    طالما (peekchr() == Magic('|'))
     {
 	skipchr();
 	br = regbranch(&flags);
-	if (br == NULL || reg_toolong)
+	إذا (br == عدم || reg_toolong)
 	{
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
 	regtail(ret, br);	// BRANCH -> BRANCH.
-	if (!(flags & HASWIDTH))
+	إذا (!(flags & HASWIDTH))
 	    *flagp &= ~HASWIDTH;
 	*flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
     }
 
     // Make a closing node, and hook it on the end.
     ender = regnode(
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
 	    paren == REG_ZPAREN ? ZCLOSE + parno :
-#endif
+#د_که_پای
 	    paren == REG_PAREN ? MCLOSE + parno :
-	    paren == REG_NPAREN ? NCLOSE : END);
+	    paren == REG_NPAREN ? NCLOSE : پای_ټکی_3);
     regtail(ret, ender);
 
     // Hook the tails of the branches to the closing node.
-    for (br = ret; br != NULL; br = regnext(br))
+    لكل (br = ret; br != عدم; br = regnext(br))
 	regoptail(br, ender);
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    إذا (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-#ifdef FEAT_SYN_HL
-	if (paren == REG_ZPAREN)
+#که_تعریف_شوی FEAT_SYN_HL
+	إذا (paren == REG_ZPAREN)
 	{
 	    emsg(_(e_unmatched_z));
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
-	else
-#endif
-	if (paren == REG_NPAREN)
+	وإلا
+#د_که_پای
+	إذا (paren == REG_NPAREN)
 	{
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
-	else
+	وإلا
 	{
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    وإلا إذا (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (curchr == Magic(')'))
+	إذا (curchr == Magic(')'))
 	{
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
-	else
+	وإلا
 	{
 	    emsg(_(e_trailing_characters));	// "Can't happen".
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = عدم;
+	    اذهب theend;
 	}
     }
     // Here we set the flag allowing back references to this set of
     // parentheses.
-    if (paren == REG_PAREN)
+    إذا (paren == REG_PAREN)
 	had_endbrace[parno] = TRUE;	// have seen the close paren
 
 theend:
-    --bt_reg_parse_depth;
-    return ret;
+    --bt_reg_parse_ژوروالی;
+    أرجع ret;
 }
 
 /*
@@ -2574,92 +2574,92 @@ theend:
  * of the structure of the compiled regexp.
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
-    static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+    ساكن regprog_T *
+bt_regcomp(char_u *بیان, صحيح re_flags)
 {
     bt_regprog_T    *r;
-    char_u	*scan;
+    char_u	*لټون;
     char_u	*longest;
-    int		len;
-    int		flags;
+    صحيح		len;
+    صحيح		flags;
 
-    if (expr == NULL)
-	IEMSG_RET_NULL(e_null_argument);
+    إذا (بیان == عدم)
+	IEMSG_RET_NULL(e_null_دلیل);
 
     init_class_tab();
 
     // First pass: determine size, legality.
-    regcomp_start(expr, re_flags);
-    regcode = JUST_CALC_SIZE;
+    regcomp_پیل(بیان, re_flags);
+    regcode = JUST_CALC_اندازه;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL)
-	return NULL;
+    إذا (reg(REG_NOPAREN, &flags) == عدم)
+	أرجع عدم;
 
     // Allocate space.
-    r = alloc(offsetof(bt_regprog_T, program) + regsize);
-    if (r == NULL)
-	return NULL;
-    r->re_in_use = FALSE;
-#ifdef DEBUG
+    r = alloc(offsetof(bt_regprog_T, پروګرام) + regsize);
+    إذا (r == عدم)
+	أرجع عدم;
+    r->re_دننه_use = FALSE;
+#که_تعریف_شوی DEBUG
     r->regsz = regsize;
-#endif
+#د_که_پای
 
     // Second pass: emit code.
-    regcomp_start(expr, re_flags);
-    regcode = r->program;
+    regcomp_پیل(بیان, re_flags);
+    regcode = r->پروګرام;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
+    إذا (reg(REG_NOPAREN, &flags) == عدم || reg_toolong)
     {
 	vim_free(r);
-	if (reg_toolong)
-	    EMSG_RET_NULL(_(e_pattern_too_long));
-	return NULL;
+	إذا (reg_toolong)
+	    EMSG_RET_NULL(_(e_نمونه_too_long));
+	أرجع عدم;
     }
 
     // Dig out information for optimizations.
     r->regstart = NUL;		// Worst-case defaults.
     r->reganch = 0;
-    r->regmust = NULL;
+    r->regmust = عدم;
     r->regmlen = 0;
     r->regflags = regflags;
-    if (flags & HASNL)
+    إذا (flags & HASNL)
 	r->regflags |= RF_HASNL;
-    if (flags & HASLOOKBH)
+    إذا (flags & HASLOOKBH)
 	r->regflags |= RF_LOOKBH;
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     r->reghasz = re_has_z;
-#endif
-    scan = r->program + 1;	// First BRANCH.
-    if (OP(regnext(scan)) == END)   // Only one top-level choice.
+#د_که_پای
+    لټون = r->پروګرام + 1;	// First BRANCH.
+    إذا (OP(regnext(لټون)) == پای_ټکی_3)   // Only one top-level choice.
     {
-	scan = OPERAND(scan);
+	لټون = عملوند(لټون);
 
 	// Starting-point info.
-	if (OP(scan) == BOL || OP(scan) == RE_BOF)
+	إذا (OP(لټون) == BOL || OP(لټون) == RE_BOF)
 	{
 	    r->reganch++;
-	    scan = regnext(scan);
+	    لټون = regnext(لټون);
 	}
 
-	if (OP(scan) == EXACTLY)
+	إذا (OP(لټون) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(scan));
-	    else
-		r->regstart = *OPERAND(scan);
+	    إذا (has_mbyte)
+		r->regstart = (*mb_ptr2char)(عملوند(لټون));
+	    وإلا
+		r->regstart = *عملوند(لټون);
 	}
-	else if ((OP(scan) == BOW
-		    || OP(scan) == EOW
-		    || OP(scan) == NOTHING
-		    || OP(scan) == MOPEN + 0 || OP(scan) == NOPEN
-		    || OP(scan) == MCLOSE + 0 || OP(scan) == NCLOSE)
-		 && OP(regnext(scan)) == EXACTLY)
+	وإلا إذا ((OP(لټون) == BOW
+		    || OP(لټون) == EOW
+		    || OP(لټون) == NOTHING
+		    || OP(لټون) == MOPEN + 0 || OP(لټون) == NOPEN
+		    || OP(لټون) == MCLOSE + 0 || OP(لټون) == NCLOSE)
+		 && OP(regnext(لټون)) == EXACTLY)
 	{
-	    if (has_mbyte)
-		r->regstart = (*mb_ptr2char)(OPERAND(regnext(scan)));
-	    else
-		r->regstart = *OPERAND(regnext(scan));
+	    إذا (has_mbyte)
+		r->regstart = (*mb_ptr2char)(عملوند(regnext(لټون)));
+	    وإلا
+		r->regstart = *عملوند(regnext(لټون));
 	}
 
 	// If there's something expensive in the r.e., find the longest
@@ -2671,22 +2671,22 @@ bt_regcomp(char_u *expr, int re_flags)
 
 	// When the r.e. starts with BOW, it is faster to look for a regmust
 	// first. Used a lot for "#" and "*" commands. (Added by mool).
-	if ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
+	إذا ((flags & SPSTART || OP(لټون) == BOW || OP(لټون) == EOW)
 							  && !(flags & HASNL))
 	{
 	    size_t  scanlen;
 
-	    longest = NULL;
+	    longest = عدم;
 	    len = 0;
-	    for (; scan != NULL; scan = regnext(scan))
+	    لكل (; لټون != عدم; لټون = regnext(لټون))
 	    {
-		if (OP(scan) == EXACTLY)
+		إذا (OP(لټون) == EXACTLY)
 		{
-		    scanlen = STRLEN(OPERAND(scan));
-		    if (scanlen >= (size_t)len)
+		    scanlen = STRLEN(عملوند(لټون));
+		    إذا (scanlen >= (size_t)len)
 		    {
-			longest = OPERAND(scan);
-			len = (int)scanlen;
+			longest = عملوند(لټون);
+			len = (صحيح)scanlen;
 		    }
 		}
 	    }
@@ -2694,133 +2694,133 @@ bt_regcomp(char_u *expr, int re_flags)
 	    r->regmlen = len;
 	}
     }
-#ifdef BT_REGEXP_DUMP
-    regdump(expr, r);
-#endif
+#که_تعریف_شوی BT_REGEXP_DUMP
+    regdump(بیان, r);
+#د_که_پای
     r->engine = &bt_regengine;
-    return (regprog_T *)r;
+    أرجع (regprog_T *)r;
 }
 
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 /*
  * Check if during the previous call to vim_regcomp the EOL item "$" has been
  * found.  This is messy, but it works fine.
  */
-    int
-vim_regcomp_had_eol(void)
+    صحيح
+vim_regcomp_had_eol(فراغ)
 {
-    return had_eol;
+    أرجع had_eol;
 }
-#endif
+#د_که_پای
 
 /*
  * Get a number after a backslash that is inside [].
  * When nothing is recognized return a backslash.
  */
-    static int
-coll_get_char(void)
+    ساكن صحيح
+coll_get_char(فراغ)
 {
     vimlong_T	nr = -1;
 
-    switch (*regparse++)
+    بدل (*regparse++)
     {
-	case 'd': nr = getdecchrs(); break;
-	case 'o': nr = getoctchrs(); break;
-	case 'x': nr = gethexchrs(2); break;
-	case 'u': nr = gethexchrs(4); break;
-	case 'U': nr = gethexchrs(8); break;
+	حالة 'd': nr = getdecchrs(); اكسر;
+	حالة 'o': nr = getoctchrs(); اكسر;
+	حالة 'x': nr = gethexchrs(2); اكسر;
+	حالة 'u': nr = gethexchrs(4); اكسر;
+	حالة 'U': nr = gethexchrs(8); اكسر;
     }
-    if (nr < 0)
+    إذا (nr < 0)
     {
 	// If getting the number fails be backwards compatible: the character
 	// is a backslash.
 	--regparse;
 	nr = '\\';
     }
-    if (nr > INT_MAX)
-	nr = INT_MAX;
-    return nr;
+    إذا (nr > لوی_عدد)
+	nr = لوی_عدد;
+    أرجع nr;
 }
 
 /*
  * Free a compiled regexp program, returned by bt_regcomp().
  */
-    static void
+    ساكن فراغ
 bt_regfree(regprog_T *prog)
 {
     vim_free(prog);
 }
 
-#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.input)
+#تعریف_کړه ADVANCE_REGINPUT() MB_PTR_ADV(rex.ننوت)
 
 /*
  * The arguments from BRACE_LIMITS are stored here.  They are actually local
  * to regmatch(), but they are here to reduce the amount of stack space used
  * (it can be called recursively many times).
  */
-static long	bl_minval;
-static long	bl_maxval;
+ساكن اوږد	bl_minval;
+ساكن اوږد	bl_maxval;
 
 /*
  * Save the input line and position in a regsave_T.
  */
-    static void
+    ساكن فراغ
 reg_save(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    إذا (REG_MULTI)
     {
-	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
+	save->rs_u.pos.ستون = (colnr_T)(rex.ننوت - rex.کرښه);
 	save->rs_u.pos.lnum = rex.lnum;
     }
-    else
-	save->rs_u.ptr = rex.input;
+    وإلا
+	save->rs_u.ptr = rex.ننوت;
     save->rs_len = gap->ga_len;
 }
 
 /*
  * Restore the input line and position from a regsave_T.
  */
-    static void
+    ساكن فراغ
 reg_restore(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    إذا (REG_MULTI)
     {
-	if (rex.lnum != save->rs_u.pos.lnum)
+	إذا (rex.lnum != save->rs_u.pos.lnum)
 	{
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
 	    rex.lnum = save->rs_u.pos.lnum;
-	    rex.line = reg_getline(rex.lnum);
+	    rex.کرښه = reg_getline(rex.lnum);
 	}
-	rex.input = rex.line + save->rs_u.pos.col;
+	rex.ننوت = rex.کرښه + save->rs_u.pos.ستون;
     }
-    else
-	rex.input = save->rs_u.ptr;
+    وإلا
+	rex.ننوت = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
 
 /*
  * Return TRUE if current position is equal to saved position.
  */
-    static int
+    ساكن صحيح
 reg_save_equal(regsave_T *save)
 {
-    if (REG_MULTI)
-	return rex.lnum == save->rs_u.pos.lnum
-				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+    إذا (REG_MULTI)
+	أرجع rex.lnum == save->rs_u.pos.lnum
+				  && rex.ننوت == rex.کرښه + save->rs_u.pos.ستون;
+    أرجع rex.ننوت == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
-#define save_se(savep, posp, pp) \
+#تعریف_کړه save_se(savep, posp, pp) \
     REG_MULTI ? save_se_multi((savep), (posp)) : save_se_one((savep), (pp))
 
 // After a failed match restore the sub-expressions.
-#define restore_se(savep, posp, pp) \
+#تعریف_کړه restore_se(savep, posp, pp) \
 { \
-    if (REG_MULTI) \
+    إذا (REG_MULTI) \
 	*(posp) = (savep)->se_u.pos; \
-    else \
+    وإلا \
 	*(pp) = (savep)->se_u.ptr; \
 }
 
@@ -2831,498 +2831,498 @@ reg_save_equal(regsave_T *save)
  * Use se_save() to use pointer (save_se_multi()) or position (save_se_one()),
  * depending on REG_MULTI.
  */
-    static void
+    ساكن فراغ
 save_se_multi(save_se_T *savep, lpos_T *posp)
 {
     savep->se_u.pos = *posp;
     posp->lnum = rex.lnum;
-    posp->col = (colnr_T)(rex.input - rex.line);
+    posp->ستون = (colnr_T)(rex.ننوت - rex.کرښه);
 }
 
-    static void
+    ساكن فراغ
 save_se_one(save_se_T *savep, char_u **pp)
 {
     savep->se_u.ptr = *pp;
-    *pp = rex.input;
+    *pp = rex.ننوت;
 }
 
 /*
  * regrepeat - repeatedly match something simple, return how many.
  * Advances rex.input (and rex.lnum) to just after the matched chars.
  */
-    static int
+    ساكن صحيح
 regrepeat(
     char_u	*p,
-    long	maxcount)   // maximum number of matches allowed
+    اوږد	maxcount)   // maximum number of matches allowed
 {
-    long	count = 0;
-    char_u	*scan;
+    اوږد	شمېر = 0;
+    char_u	*لټون;
     char_u	*opnd;
-    int		mask;
-    int		testval = 0;
+    صحيح		ماسک;
+    صحيح		testval = 0;
 
-    scan = rex.input;	    // Make local copy of rex.input for speed.
-    opnd = OPERAND(p);
-    switch (OP(p))
+    لټون = rex.ننوت;	    // Make local copy of rex.input for speed.
+    opnd = عملوند(p);
+    بدل (OP(p))
     {
-      case ANY:
-      case ANY + ADD_NL:
-	while (count < maxcount)
+      حالة ANY:
+      حالة ANY + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    طالما (*لټون != NUL && شمېر < maxcount)
 	    {
-		++count;
-		MB_PTR_ADV(scan);
+		++شمېر;
+		MB_PTR_ADV(لټون);
 	    }
-	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-				      || rex.reg_line_lbr || count == maxcount)
-		break;
-	    ++count;		// count the line-break
+	    إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+				      || rex.reg_کرښه_lbr || شمېر == maxcount)
+		اكسر;
+	    ++شمېر;		// count the line-break
 	    reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    لټون = rex.ننوت;
+	    إذا (got_int)
+		اكسر;
 	}
-	break;
+	اكسر;
 
-      case IDENT:
-      case IDENT + ADD_NL:
+      حالة IDENT:
+      حالة IDENT + جمع_کړه_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SIDENT:
-      case SIDENT + ADD_NL:
-	while (count < maxcount)
+      حالة SIDENT:
+      حالة SIDENT + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
-	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    إذا (vim_isIDc(PTR2CHAR(لټون)) && (testval || !VIM_ISDIGIT(*لټون)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(لټون);
 	    }
-	    else if (*scan == NUL)
+	    وإلا إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا
+		اكسر;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case KWORD:
-      case KWORD + ADD_NL:
+      حالة KWORD:
+      حالة KWORD + جمع_کړه_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SKWORD:
-      case SKWORD + ADD_NL:
-	while (count < maxcount)
+      حالة SKWORD:
+      حالة SKWORD + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
-	    if (vim_iswordp_buf(scan, rex.reg_buf)
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    إذا (vim_iswordp_buf(لټون, rex.reg_buf)
+					  && (testval || !VIM_ISDIGIT(*لټون)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(لټون);
 	    }
-	    else if (*scan == NUL)
+	    وإلا إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا
+		اكسر;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case FNAME:
-      case FNAME + ADD_NL:
+      حالة FNAME:
+      حالة FNAME + جمع_کړه_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SFNAME:
-      case SFNAME + ADD_NL:
-	while (count < maxcount)
+      حالة SFNAME:
+      حالة SFNAME + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
-	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    إذا (vim_isfilec(PTR2CHAR(لټون)) && (testval || !VIM_ISDIGIT(*لټون)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(لټون);
 	    }
-	    else if (*scan == NUL)
+	    وإلا إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا
+		اكسر;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case PRINT:
-      case PRINT + ADD_NL:
+      حالة PRINT:
+      حالة PRINT + جمع_کړه_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SPRINT:
-      case SPRINT + ADD_NL:
-	while (count < maxcount)
+      حالة SPRINT:
+      حالة SPRINT + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
-	    if (*scan == NUL)
+	    إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (vim_isprintc(PTR2CHAR(scan)) == 1
-					  && (testval || !VIM_ISDIGIT(*scan)))
+	    وإلا إذا (vim_isprintc(PTR2CHAR(لټون)) == 1
+					  && (testval || !VIM_ISDIGIT(*لټون)))
 	    {
-		MB_PTR_ADV(scan);
+		MB_PTR_ADV(لټون);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا
+		اكسر;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case WHITE:
-      case WHITE + ADD_NL:
-	testval = mask = RI_WHITE;
+      حالة WHITE:
+      حالة WHITE + جمع_کړه_NL:
+	testval = ماسک = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	طالما (شمېر < maxcount)
 	{
-	    int		l;
+	    صحيح		l;
 
-	    if (*scan == NUL)
+	    إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
+	    وإلا إذا (has_mbyte && (l = (*mb_ptr2len)(لټون)) > 1)
 	    {
-		if (testval != 0)
-		    break;
-		scan += l;
+		إذا (testval != 0)
+		    اكسر;
+		لټون += l;
 	    }
-	    else if ((class_tab[*scan] & mask) == testval)
-		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else
-		break;
-	    ++count;
+	    وإلا إذا ((class_tab[*لټون] & ماسک) == testval)
+		++لټون;
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا
+		اكسر;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case NWHITE:
-      case NWHITE + ADD_NL:
-	mask = RI_WHITE;
-	goto do_class;
-      case DIGIT:
-      case DIGIT + ADD_NL:
-	testval = mask = RI_DIGIT;
-	goto do_class;
-      case NDIGIT:
-      case NDIGIT + ADD_NL:
-	mask = RI_DIGIT;
-	goto do_class;
-      case HEX:
-      case HEX + ADD_NL:
-	testval = mask = RI_HEX;
-	goto do_class;
-      case NHEX:
-      case NHEX + ADD_NL:
-	mask = RI_HEX;
-	goto do_class;
-      case OCTAL:
-      case OCTAL + ADD_NL:
-	testval = mask = RI_OCTAL;
-	goto do_class;
-      case NOCTAL:
-      case NOCTAL + ADD_NL:
-	mask = RI_OCTAL;
-	goto do_class;
-      case WORD:
-      case WORD + ADD_NL:
-	testval = mask = RI_WORD;
-	goto do_class;
-      case NWORD:
-      case NWORD + ADD_NL:
-	mask = RI_WORD;
-	goto do_class;
-      case HEAD:
-      case HEAD + ADD_NL:
-	testval = mask = RI_HEAD;
-	goto do_class;
-      case NHEAD:
-      case NHEAD + ADD_NL:
-	mask = RI_HEAD;
-	goto do_class;
-      case ALPHA:
-      case ALPHA + ADD_NL:
-	testval = mask = RI_ALPHA;
-	goto do_class;
-      case NALPHA:
-      case NALPHA + ADD_NL:
-	mask = RI_ALPHA;
-	goto do_class;
-      case LOWER:
-      case LOWER + ADD_NL:
-	testval = mask = RI_LOWER;
-	goto do_class;
-      case NLOWER:
-      case NLOWER + ADD_NL:
-	mask = RI_LOWER;
-	goto do_class;
-      case UPPER:
-      case UPPER + ADD_NL:
-	testval = mask = RI_UPPER;
-	goto do_class;
-      case NUPPER:
-      case NUPPER + ADD_NL:
-	mask = RI_UPPER;
-	goto do_class;
+      حالة NWHITE:
+      حالة NWHITE + جمع_کړه_NL:
+	ماسک = RI_WHITE;
+	اذهب do_class;
+      حالة DIGIT:
+      حالة DIGIT + جمع_کړه_NL:
+	testval = ماسک = RI_DIGIT;
+	اذهب do_class;
+      حالة NDIGIT:
+      حالة NDIGIT + جمع_کړه_NL:
+	ماسک = RI_DIGIT;
+	اذهب do_class;
+      حالة HEX:
+      حالة HEX + جمع_کړه_NL:
+	testval = ماسک = RI_HEX;
+	اذهب do_class;
+      حالة NHEX:
+      حالة NHEX + جمع_کړه_NL:
+	ماسک = RI_HEX;
+	اذهب do_class;
+      حالة OCTAL:
+      حالة OCTAL + جمع_کړه_NL:
+	testval = ماسک = RI_OCTAL;
+	اذهب do_class;
+      حالة NOCTAL:
+      حالة NOCTAL + جمع_کړه_NL:
+	ماسک = RI_OCTAL;
+	اذهب do_class;
+      حالة کلمه_2:
+      حالة کلمه_2 + جمع_کړه_NL:
+	testval = ماسک = RI_کلمه;
+	اذهب do_class;
+      حالة NWORD:
+      حالة NWORD + جمع_کړه_NL:
+	ماسک = RI_کلمه;
+	اذهب do_class;
+      حالة سر_4:
+      حالة سر_4 + جمع_کړه_NL:
+	testval = ماسک = RI_سر;
+	اذهب do_class;
+      حالة NHEAD:
+      حالة NHEAD + جمع_کړه_NL:
+	ماسک = RI_سر;
+	اذهب do_class;
+      حالة ALPHA:
+      حالة ALPHA + جمع_کړه_NL:
+	testval = ماسک = RI_ALPHA;
+	اذهب do_class;
+      حالة NALPHA:
+      حالة NALPHA + جمع_کړه_NL:
+	ماسک = RI_ALPHA;
+	اذهب do_class;
+      حالة ښکتنی_2:
+      حالة ښکتنی_2 + جمع_کړه_NL:
+	testval = ماسک = RI_ښکتنی;
+	اذهب do_class;
+      حالة NLOWER:
+      حالة NLOWER + جمع_کړه_NL:
+	ماسک = RI_ښکتنی;
+	اذهب do_class;
+      حالة پاسنی:
+      حالة پاسنی + جمع_کړه_NL:
+	testval = ماسک = RI_پاسنی;
+	اذهب do_class;
+      حالة NUPPER:
+      حالة NUPPER + جمع_کړه_NL:
+	ماسک = RI_پاسنی;
+	اذهب do_class;
 
-      case EXACTLY:
+      حالة EXACTLY:
 	{
-	    int	    cu, cl;
+	    صحيح	    cu, cl;
 
 	    // This doesn't do a multi-byte character, because a MULTIBYTECODE
 	    // would have been used for it.  It does handle single-byte
 	    // characters, such as latin1.
-	    if (rex.reg_ic)
+	    إذا (rex.reg_ic)
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		طالما (شمېر < maxcount && (*لټون == cu || *لټون == cl))
 		{
-		    count++;
-		    scan++;
+		    شمېر++;
+		    لټون++;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		طالما (شمېر < maxcount && *لټون == cu)
 		{
-		    count++;
-		    scan++;
+		    شمېر++;
+		    لټون++;
 		}
 	    }
-	    break;
+	    اكسر;
 	}
 
-      case MULTIBYTECODE:
+      حالة MULTIBYTECODE:
 	{
-	    int		i, len, cf = 0;
+	    صحيح		i, len, cf = 0;
 
 	    // Safety check (just in case 'encoding' was changed since
 	    // compiling the program).
-	    if ((len = (*mb_ptr2len)(opnd)) > 1)
+	    إذا ((len = (*mb_ptr2len)(opnd)) > 1)
 	    {
-		if (rex.reg_ic && enc_utf8)
+		إذا (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		طالما (شمېر < maxcount && (*mb_ptr2len)(لټون) >= len)
 		{
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != scan[i])
-			    break;
-		    if (i < len && (!rex.reg_ic || !enc_utf8
-					|| utf_fold(utf_ptr2char(scan)) != cf))
-			break;
-		    scan += len;
-		    ++count;
+		    لكل (i = 0; i < len; ++i)
+			إذا (opnd[i] != لټون[i])
+			    اكسر;
+		    إذا (i < len && (!rex.reg_ic || !enc_utf8
+					|| utf_fold(utf_ptr2char(لټون)) != cf))
+			اكسر;
+		    لټون += len;
+		    ++شمېر;
 		}
 	    }
 	}
-	break;
+	اكسر;
 
-      case ANYOF:
-      case ANYOF + ADD_NL:
+      حالة ANYOF:
+      حالة ANYOF + جمع_کړه_NL:
 	testval = TRUE;
 	// FALLTHROUGH
 
-      case ANYBUT:
-      case ANYBUT + ADD_NL:
-	while (count < maxcount)
+      حالة ANYBUT:
+      حالة ANYBUT + جمع_کړه_NL:
+	طالما (شمېر < maxcount)
 	{
-	    int len;
+	    صحيح len;
 
-	    if (*scan == NUL)
+	    إذا (*لټون == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		إذا (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_کرښه_lbr)
+		    اكسر;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		لټون = rex.ننوت;
+		إذا (got_int)
+		    اكسر;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
-		++scan;
-	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
+	    وإلا إذا (rex.reg_کرښه_lbr && *لټون == '\n' && WITH_NL(OP(p)))
+		++لټون;
+	    وإلا إذا (has_mbyte && (len = (*mb_ptr2len)(لټون)) > 1)
 	    {
-		if ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
-		    break;
-		scan += len;
+		إذا ((cstrchr(opnd, (*mb_ptr2char)(لټون)) == عدم) == testval)
+		    اكسر;
+		لټون += len;
 	    }
-	    else
+	    وإلا
 	    {
-		if ((cstrchr(opnd, *scan) == NULL) == testval)
-		    break;
-		++scan;
+		إذا ((cstrchr(opnd, *لټون) == عدم) == testval)
+		    اكسر;
+		++لټون;
 	    }
-	    ++count;
+	    ++شمېر;
 	}
-	break;
+	اكسر;
 
-      case NEWL:
-	while (count < maxcount
-		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
-				       && !rex.reg_line_lbr && REG_MULTI)
-		    || (*scan == '\n' && rex.reg_line_lbr)))
+      حالة NEWL:
+	طالما (شمېر < maxcount
+		&& ((*لټون == NUL && rex.lnum <= rex.reg_maxline
+				       && !rex.reg_کرښه_lbr && REG_MULTI)
+		    || (*لټون == '\n' && rex.reg_کرښه_lbr)))
 	{
-	    count++;
-	    if (rex.reg_line_lbr)
+	    شمېر++;
+	    إذا (rex.reg_کرښه_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    وإلا
 		reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    لټون = rex.ننوت;
+	    إذا (got_int)
+		اكسر;
 	}
-	break;
+	اكسر;
 
-      default:			// Oh dear.  Called inappropriately.
-	iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	printf("Called regrepeat with op code %d\n", OP(p));
-#endif
-	break;
+      افتراضي:			// Oh dear.  Called inappropriately.
+	iemsg(e_corrupted_regexp_پروګرام);
+#که_تعریف_شوی DEBUG
+	چاپ_کړه("Called regrepeat with op code %d\n", OP(p));
+#د_که_پای
+	اكسر;
     }
 
-    rex.input = scan;
+    rex.ننوت = لټون;
 
-    return (int)count;
+    أرجع (صحيح)شمېر;
 }
 
 /*
  * Push an item onto the regstack.
  * Returns pointer to new item.  Returns NULL when out of memory.
  */
-    static regitem_T *
-regstack_push(regstate_T state, char_u *scan)
+    ساكن regitem_T *
+regstack_ټېل(regstate_T state, char_u *لټون)
 {
     regitem_T	*rp;
 
-    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+    إذا ((اوږد)((بینښه)regstack.ga_len >> 10) >= p_mmp)
     {
-	emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-	return NULL;
+	emsg(_(e_نمونه_کاروي_نور_حافظه_than_maxmempattern));
+	أرجع عدم;
     }
-    if (GA_GROW_FAILS(&regstack, (int)sizeof(regitem_T)))
-	return NULL;
+    إذا (GA_GROW_FAILS(&regstack, (صحيح)حجم(regitem_T)))
+	أرجع عدم;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len);
+    rp = (regitem_T *)((حرف *)regstack.ga_معلومات + regstack.ga_len);
     rp->rs_state = state;
-    rp->rs_scan = scan;
+    rp->rs_لټون = لټون;
 
-    regstack.ga_len += sizeof(regitem_T);
-    return rp;
+    regstack.ga_len += حجم(regitem_T);
+    أرجع rp;
 }
 
 /*
  * Pop an item from the regstack.
  */
-    static void
-regstack_pop(char_u **scan)
+    ساكن فراغ
+regstack_راوباسه(char_u **لټون)
 {
     regitem_T	*rp;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-    *scan = rp->rs_scan;
+    rp = (regitem_T *)((حرف *)regstack.ga_معلومات + regstack.ga_len) - 1;
+    *لټون = rp->rs_لټون;
 
-    regstack.ga_len -= sizeof(regitem_T);
+    regstack.ga_len -= حجم(regitem_T);
 }
 
-#ifdef FEAT_RELTIME
+#که_تعریف_شوی FEAT_RELTIME
 /*
  * Check if the timer expired, return TRUE if so.
  */
-    static int
-bt_did_time_out(int *timed_out)
+    ساكن صحيح
+bt_did_وخت_بهر(صحيح *timed_بهر)
 {
-    if (*timeout_flag)
+    إذا (*timeout_flag)
     {
-	if (timed_out != NULL)
+	إذا (timed_بهر != عدم)
 	{
 # ifdef FEAT_EVAL
-	    if (!*timed_out)
-		ch_log(NULL, "BT regexp timed out");
+	    إذا (!*timed_بهر)
+		ch_log(عدم, "BT regexp timed out");
 # endif
-	    *timed_out = TRUE;
+	    *timed_بهر = TRUE;
 	}
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
-#endif
+#د_که_پای
 
 /*
  * Save the current subexpr to "bp", so that they can be restored
  * later by restore_subexpr().
  */
-    static void
+    ساكن فراغ
 save_subexpr(regbehind_T *bp)
 {
-    int i;
+    صحيح i;
 
     // When "rex.need_clear_subexpr" is set we don't need to save the values,
     // only remember that this flag needs to be set again when restoring.
     bp->save_need_clear_subexpr = rex.need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    إذا (rex.need_clear_subexpr)
+	أرجع;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    لكل (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	إذا (REG_MULTI)
 	{
-	    bp->save_start[i].se_u.pos = rex.reg_startpos[i];
-	    bp->save_end[i].se_u.pos = rex.reg_endpos[i];
+	    bp->save_پیل[i].se_u.pos = rex.reg_startpos[i];
+	    bp->save_پای_ټکی[i].se_u.pos = rex.reg_endpos[i];
 	}
-	else
+	وإلا
 	{
-	    bp->save_start[i].se_u.ptr = rex.reg_startp[i];
-	    bp->save_end[i].se_u.ptr = rex.reg_endp[i];
+	    bp->save_پیل[i].se_u.ptr = rex.reg_startp[i];
+	    bp->save_پای_ټکی[i].se_u.ptr = rex.reg_endp[i];
 	}
     }
 }
@@ -3330,27 +3330,27 @@ save_subexpr(regbehind_T *bp)
 /*
  * Restore the subexpr from "bp".
  */
-    static void
+    ساكن فراغ
 restore_subexpr(regbehind_T *bp)
 {
-    int i;
+    صحيح i;
 
     // Only need to restore saved values when they are not to be cleared.
     rex.need_clear_subexpr = bp->save_need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    إذا (rex.need_clear_subexpr)
+	أرجع;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    لكل (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	إذا (REG_MULTI)
 	{
-	    rex.reg_startpos[i] = bp->save_start[i].se_u.pos;
-	    rex.reg_endpos[i] = bp->save_end[i].se_u.pos;
+	    rex.reg_startpos[i] = bp->save_پیل[i].se_u.pos;
+	    rex.reg_endpos[i] = bp->save_پای_ټکی[i].se_u.pos;
 	}
-	else
+	وإلا
 	{
-	    rex.reg_startp[i] = bp->save_start[i].se_u.ptr;
-	    rex.reg_endp[i] = bp->save_end[i].se_u.ptr;
+	    rex.reg_startp[i] = bp->save_پیل[i].se_u.ptr;
+	    rex.reg_endp[i] = bp->save_پای_ټکی[i].se_u.ptr;
 	}
     }
 }
@@ -3370,17 +3370,17 @@ restore_subexpr(regbehind_T *bp)
  * Returns FALSE when there is no match.  Leaves rex.input and rex.lnum in an
  * undefined state!
  */
-    static int
+    ساكن صحيح
 regmatch(
-    char_u	*scan,		    // Current node.
-    int		*timed_out UNUSED)  // flag set on timeout or NULL
+    char_u	*لټون,		    // Current node.
+    صحيح		*timed_بهر ناکارول_شوی)  // flag set on timeout or NULL
 {
-  char_u	*next;		// Next node.
-  int		op;
-  int		c;
+  char_u	*بل;		// Next node.
+  صحيح		op;
+  صحيح		c;
   regitem_T	*rp;
-  int		no;
-  int		status;		// one of the RA_ values:
+  صحيح		no;
+  صحيح		حالت;		// one of the RA_ values:
 
   // Make "regstack" and "backpos" empty.  They are allocated and freed in
   // bt_regexec_both() to reduce malloc()/free() calls.
@@ -3388,588 +3388,588 @@ regmatch(
   backpos.ga_len = 0;
 
   // Repeat until "regstack" is empty.
-  for (;;)
+  لكل (;;)
   {
     // Some patterns may take a long time to match, e.g., "\([a-z]\+\)\+Q".
     // Allow interrupting them with CTRL-C.
     fast_breakcheck();
 
-#ifdef DEBUG
-    if (scan != NULL && regnarrate)
+#که_تعریف_شوی DEBUG
+    إذا (لټون != عدم && regnarrate)
     {
-	mch_errmsg((char *)regprop(scan));
+	mch_errmsg((حرف *)regprop(لټون));
 	mch_errmsg("(\n");
     }
-#endif
+#د_که_پای
 
     // Repeat for items that can be matched sequentially, without using the
     // regstack.
-    for (;;)
+    لكل (;;)
     {
-	if (got_int || scan == NULL)
+	إذا (got_int || لټون == عدم)
 	{
-	    status = RA_FAIL;
-	    break;
+	    حالت = RA_FAIL;
+	    اكسر;
 	}
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#که_تعریف_شوی FEAT_RELTIME
+	إذا (bt_did_وخت_بهر(timed_بهر))
 	{
-	    status = RA_FAIL;
-	    break;
+	    حالت = RA_FAIL;
+	    اكسر;
 	}
-#endif
-	status = RA_CONT;
+#د_که_پای
+	حالت = RA_CONT;
 
-#ifdef DEBUG
-	if (regnarrate)
+#که_تعریف_شوی DEBUG
+	إذا (regnarrate)
 	{
-	    mch_errmsg((char *)regprop(scan));
+	    mch_errmsg((حرف *)regprop(لټون));
 	    mch_errmsg("...\n");
 # ifdef FEAT_SYN_HL
-	    if (re_extmatch_in != NULL)
+	    إذا (re_extmatch_دننه != عدم)
 	    {
-		int i;
+		صحيح i;
 
 		mch_errmsg(_("External submatches:\n"));
-		for (i = 0; i < NSUBEXP; i++)
+		لكل (i = 0; i < NSUBEXP; i++)
 		{
 		    mch_errmsg("    \"");
-		    if (re_extmatch_in->matches[i] != NULL)
-			mch_errmsg((char *)re_extmatch_in->matches[i]);
+		    إذا (re_extmatch_دننه->matches[i] != عدم)
+			mch_errmsg((حرف *)re_extmatch_دننه->matches[i]);
 		    mch_errmsg("\"\n");
 		}
 	    }
 # endif
 	}
-#endif
-	next = regnext(scan);
+#د_که_پای
+	بل = regnext(لټون);
 
-	op = OP(scan);
+	op = OP(لټون);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
-			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
+	إذا (!rex.reg_کرښه_lbr && WITH_NL(op) && REG_MULTI
+			     && *rex.ننوت == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	وإلا إذا (rex.reg_کرښه_lbr && WITH_NL(op) && *rex.ننوت == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
-	else
+	وإلا
 	{
-	  if (WITH_NL(op))
-	      op -= ADD_NL;
-	  if (has_mbyte)
-	      c = (*mb_ptr2char)(rex.input);
-	  else
-	      c = *rex.input;
-	  switch (op)
+	  إذا (WITH_NL(op))
+	      op -= جمع_کړه_NL;
+	  إذا (has_mbyte)
+	      c = (*mb_ptr2char)(rex.ننوت);
+	  وإلا
+	      c = *rex.ننوت;
+	  بدل (op)
 	  {
-	  case BOL:
-	    if (rex.input != rex.line)
-		status = RA_NOMATCH;
-	    break;
+	  حالة BOL:
+	    إذا (rex.ننوت != rex.کرښه)
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case EOL:
-	    if (c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  حالة EOL:
+	    إذا (c != NUL)
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_BOF:
+	  حالة RE_BOF:
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    إذا (rex.lnum != 0 || rex.ننوت != rex.کرښه
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
-		status = RA_NOMATCH;
-	    break;
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_EOF:
-	    if (rex.lnum != rex.reg_maxline || c != NUL)
-		status = RA_NOMATCH;
-	    break;
+	  حالة RE_EOF:
+	    إذا (rex.lnum != rex.reg_maxline || c != NUL)
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case CURSOR:
+	  حالة CURSOR:
 	    // Check if the buffer is in a window and compare the
 	    // rex.reg_win->w_cursor position to the match position.
-	    if (rex.reg_win == NULL
+	    إذا (rex.reg_win == عدم
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
-		    || ((colnr_T)(rex.input - rex.line)
-						 != rex.reg_win->w_cursor.col))
-		status = RA_NOMATCH;
-	    break;
+		    || ((colnr_T)(rex.ننوت - rex.کرښه)
+						 != rex.reg_win->w_cursor.ستون))
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_MARK:
+	  حالة RE_MARK:
 	    // Compare the mark position to the match position.
 	    {
-		int	mark = OPERAND(scan)[0];
-		int	cmp = OPERAND(scan)[1];
+		صحيح	mark = عملوند(لټون)[0];
+		صحيح	cmp = عملوند(لټون)[1];
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	ستون = REG_MULTI ? rex.ننوت - rex.کرښه : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		إذا (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.کرښه = reg_getline(rex.lnum);
+		    rex.ننوت = rex.کرښه + ستون;
 		}
 
-		if (pos == NULL		     // mark doesn't exist
+		إذا (pos == عدم		     // mark doesn't exist
 			|| pos->lnum <= 0)   // mark isn't set in reg_buf
 		{
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 		}
-		else
+		وإلا
 		{
-		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
-							  && pos->col == MAXCOL
+		    colnr_T pos_ستون = pos->lnum == rex.lnum + rex.reg_firstlnum
+							  && pos->ستون == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
-				      : pos->col;
+				      : pos->ستون;
 
-		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    إذا ((pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_ستون == (colnr_T)(rex.ننوت - rex.کرښه)
 				    ? (cmp == '<' || cmp == '>')
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_ستون < (colnr_T)(rex.ننوت - rex.کرښه)
 					? cmp != '>'
 					: cmp != '<'))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? cmp != '>'
 				    : cmp != '<')))
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case RE_VISUAL:
-	    if (!reg_match_visual())
-		status = RA_NOMATCH;
-	    break;
+	  حالة RE_VISUAL:
+	    إذا (!reg_سمون_visual())
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
-									scan))
-		status = RA_NOMATCH;
-	    break;
+	  حالة RE_LNUM:
+	    إذا (!REG_MULTI || !re_عدد_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+									لټون))
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
-		status = RA_NOMATCH;
-	    break;
+	  حالة RE_ستون:
+	    إذا (!re_عدد_cmp((long_u)(rex.ننوت - rex.کرښه) + 1, لټون))
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case RE_VCOL:
+	  حالة RE_VCOL:
 	    {
-		win_T	    *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		win_T	    *wp = rex.reg_win == عدم ? curwin : rex.reg_win;
 		linenr_T    lnum = REG_MULTI ? rex.reg_firstlnum + rex.lnum : 1;
 		long_u	    vcol;
 
-		if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+		إذا (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_بفر->b_ml.ml_کرښه_شمېر))
 		    lnum = 1;
-		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
-					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
-		    status = RA_NOMATCH;
+		vcol = (long_u)win_linetabsize(wp, lnum, rex.کرښه,
+					      (colnr_T)(rex.ننوت - rex.کرښه));
+		إذا (!re_عدد_cmp(vcol + 1, لټون))
+		    حالت = RA_NOMATCH;
 	    }
-	    break;
+	    اكسر;
 
-	  case BOW:	// \<word; rex.input points to w
-	    if (c == NUL)	// Can't match at end of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  حالة BOW:	// \<word; rex.input points to w
+	    إذا (c == NUL)	// Can't match at end of line
+		حالت = RA_NOMATCH;
+	    وإلا إذا (has_mbyte)
 	    {
-		int this_class;
+		صحيح this_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		if (this_class <= 1)
-		    status = RA_NOMATCH;  // not on a word at all
-		else if (reg_prev_class() == this_class)
-		    status = RA_NOMATCH;  // previous char is in same word
+		this_class = mb_get_class_buf(rex.ننوت, rex.reg_buf);
+		إذا (this_class <= 1)
+		    حالت = RA_NOMATCH;  // not on a word at all
+		وإلا إذا (reg_prev_class() == this_class)
+		    حالت = RA_NOMATCH;  // previous char is in same word
 	    }
-	    else
+	    وإلا
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
-				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    status = RA_NOMATCH;
+		إذا (!vim_iswordc_buf(c, rex.reg_buf) || (rex.ننوت > rex.کرښه
+				&& vim_iswordc_buf(rex.ننوت[-1], rex.reg_buf)))
+		    حالت = RA_NOMATCH;
 	    }
-	    break;
+	    اكسر;
 
-	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
-		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	  حالة EOW:	// word\>; rex.input points after d
+	    إذا (rex.ننوت == rex.کرښه)    // Can't match at start of line
+		حالت = RA_NOMATCH;
+	    وإلا إذا (has_mbyte)
 	    {
-		int this_class, prev_class;
+		صحيح this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.ننوت, rex.reg_buf);
 		prev_class = reg_prev_class();
-		if (this_class == prev_class
+		إذا (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 	    }
-	    else
+	    وإلا
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		إذا (!vim_iswordc_buf(rex.ننوت[-1], rex.reg_buf)
+			|| (rex.ننوت[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 	    }
-	    break; // Matched with EOW
+	    اكسر; // Matched with EOW
 
-	  case ANY:
+	  حالة ANY:
 	    // ANY does not match new lines.
-	    if (c == NUL)
-		status = RA_NOMATCH;
-	    else
+	    إذا (c == NUL)
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case IDENT:
-	    if (!vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة IDENT:
+	    إذا (!vim_isIDc(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة SIDENT:
+	    إذا (VIM_ISDIGIT(*rex.ننوت) || !vim_isIDc(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  حالة KWORD:
+	    إذا (!vim_iswordp_buf(rex.ننوت, rex.reg_buf))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
-				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
-		status = RA_NOMATCH;
-	    else
+	  حالة SKWORD:
+	    إذا (VIM_ISDIGIT(*rex.ننوت)
+				    || !vim_iswordp_buf(rex.ننوت, rex.reg_buf))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case FNAME:
-	    if (!vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة FNAME:
+	    إذا (!vim_isfilec(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة SFNAME:
+	    إذا (VIM_ISDIGIT(*rex.ننوت) || !vim_isfilec(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  حالة PRINT:
+	    إذا (!vim_isprintc(PTR2CHAR(rex.ننوت)))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
-		status = RA_NOMATCH;
-	    else
+	  حالة SPRINT:
+	    إذا (VIM_ISDIGIT(*rex.ننوت) || !vim_isprintc(PTR2CHAR(rex.ننوت)))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case WHITE:
-	    if (!VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة WHITE:
+	    إذا (!VIM_ISWHITE(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NWHITE:
-	    if (c == NUL || VIM_ISWHITE(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NWHITE:
+	    إذا (c == NUL || VIM_ISWHITE(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case DIGIT:
-	    if (!ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة DIGIT:
+	    إذا (!ri_digit(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NDIGIT:
-	    if (c == NUL || ri_digit(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NDIGIT:
+	    إذا (c == NUL || ri_digit(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case HEX:
-	    if (!ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة HEX:
+	    إذا (!ri_hex(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NHEX:
-	    if (c == NUL || ri_hex(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NHEX:
+	    إذا (c == NUL || ri_hex(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case OCTAL:
-	    if (!ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة OCTAL:
+	    إذا (!ri_octal(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NOCTAL:
-	    if (c == NUL || ri_octal(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NOCTAL:
+	    إذا (c == NUL || ri_octal(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case WORD:
-	    if (!ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة کلمه_2:
+	    إذا (!ri_کلمه(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NWORD:
-	    if (c == NUL || ri_word(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NWORD:
+	    إذا (c == NUL || ri_کلمه(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case HEAD:
-	    if (!ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة سر_4:
+	    إذا (!ri_سر(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NHEAD:
-	    if (c == NUL || ri_head(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NHEAD:
+	    إذا (c == NUL || ri_سر(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case ALPHA:
-	    if (!ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة ALPHA:
+	    إذا (!ri_alpha(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NALPHA:
-	    if (c == NUL || ri_alpha(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NALPHA:
+	    إذا (c == NUL || ri_alpha(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case LOWER:
-	    if (!ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة ښکتنی_2:
+	    إذا (!ri_ښکتنی(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NLOWER:
-	    if (c == NUL || ri_lower(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NLOWER:
+	    إذا (c == NUL || ri_ښکتنی(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case UPPER:
-	    if (!ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة پاسنی:
+	    إذا (!ri_پاسنی(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case NUPPER:
-	    if (c == NUL || ri_upper(c))
-		status = RA_NOMATCH;
-	    else
+	  حالة NUPPER:
+	    إذا (c == NUL || ri_پاسنی(c))
+		حالت = RA_NOMATCH;
+	    وإلا
 		ADVANCE_REGINPUT();
-	    break;
+	    اكسر;
 
-	  case EXACTLY:
+	  حالة EXACTLY:
 	    {
-		int	len;
+		صحيح	len;
 		char_u	*opnd;
 
-		opnd = OPERAND(scan);
+		opnd = عملوند(لټون);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		إذا (*opnd != *rex.ننوت
 			&& (!rex.reg_ic
 			    || (!enc_utf8
-			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
-		    status = RA_NOMATCH;
-		else if (*opnd == NUL)
+			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.ننوت))))
+		    حالت = RA_NOMATCH;
+		وإلا إذا (*opnd == NUL)
 		{
 		    // match empty string always works; happens when "~" is
 		    // empty.
 		}
-		else
+		وإلا
 		{
-		    if (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
+		    إذا (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
 		    {
 			len = 1;	// matched a single byte above
 		    }
-		    else
+		    وإلا
 		    {
 			// Need to match first byte again for multi-byte.
-			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (صحيح)STRLEN(opnd);
+			إذا (cstrncmp(opnd, rex.ننوت, &len) != 0)
+			    حالت = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
-		    if (status != RA_NOMATCH
+		    إذا (حالت != RA_NOMATCH
 			    && enc_utf8
-			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
+			    && UTF_COMPOSINGLIKE(rex.ننوت, rex.ننوت + len)
 			    && !rex.reg_icombine
-			    && OP(next) != RE_COMPOSING)
+			    && OP(بل) != RE_COMPOSING)
 		    {
 			// raaron: This code makes a composing character get
 			// ignored, which is the correct behavior (sometimes)
 			// for voweled Hebrew texts.
-			status = RA_NOMATCH;
+			حالت = RA_NOMATCH;
 		    }
-		    if (status != RA_NOMATCH)
-			rex.input += len;
+		    إذا (حالت != RA_NOMATCH)
+			rex.ننوت += len;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case ANYOF:
-	  case ANYBUT:
+	  حالة ANYOF:
+	  حالة ANYBUT:
 	    {
-		char_u  *q = OPERAND(scan);
+		char_u  *q = عملوند(لټون);
 
-		if (c == NUL)
-		    status = RA_NOMATCH;
-		else if ((cstrchr(q, c) == NULL) == (op == ANYOF))
-		    status = RA_NOMATCH;
-		else
+		إذا (c == NUL)
+		    حالت = RA_NOMATCH;
+		وإلا إذا ((cstrchr(q, c) == عدم) == (op == ANYOF))
+		    حالت = RA_NOMATCH;
+		وإلا
 		{
 		    // Check following combining characters
-		    int	len = 0;
-		    int i;
+		    صحيح	len = 0;
+		    صحيح i;
 
-		    if (enc_utf8)
+		    إذا (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
-		    MB_CPTR_ADV(rex.input);
+		    MB_CPTR_ADV(rex.ننوت);
 		    MB_CPTR_ADV(q);
 
-		    if (!enc_utf8 || len == 0)
-			break;
+		    إذا (!enc_utf8 || len == 0)
+			اكسر;
 
-		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+		    لكل (i = 0; i < len; ++i)
+			إذا (q[i] != rex.ننوت[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    حالت = RA_NOMATCH;
+			    اكسر;
 			}
-		    rex.input += len;
+		    rex.ننوت += len;
 		}
-		break;
+		اكسر;
 	    }
 
-	  case MULTIBYTECODE:
-	    if (has_mbyte)
+	  حالة MULTIBYTECODE:
+	    إذا (has_mbyte)
 	    {
-		int	i, len;
+		صحيح	i, len;
 		char_u	*opnd;
-		int	opndc = 0, inpc;
+		صحيح	opndc = 0, inpc;
 
-		opnd = OPERAND(scan);
+		opnd = عملوند(لټون);
 		// Safety check (just in case 'encoding' was changed since
 		// compiling the program).
-		if ((len = (*mb_ptr2len)(opnd)) < 2)
+		إذا ((len = (*mb_ptr2len)(opnd)) < 2)
 		{
-		    status = RA_NOMATCH;
-		    break;
+		    حالت = RA_NOMATCH;
+		    اكسر;
 		}
-		if (enc_utf8)
+		إذا (enc_utf8)
 		    opndc = utf_ptr2char(opnd);
-		if (enc_utf8 && utf_iscomposing(opndc))
+		إذا (enc_utf8 && utf_iscomposing(opndc))
 		{
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
-		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
-						i += utf_ptr2len(rex.input + i))
+		    حالت = RA_NOMATCH;
+		    لكل (i = 0; rex.ننوت[i] != NUL;
+						i += utf_ptr2len(rex.ننوت + i))
 		    {
-			inpc = utf_ptr2char(rex.input + i);
-			if (!utf_iscomposing(inpc))
+			inpc = utf_ptr2char(rex.ننوت + i);
+			إذا (!utf_iscomposing(inpc))
 			{
-			    if (i > 0)
-				break;
+			    إذا (i > 0)
+				اكسر;
 			}
-			else if (opndc == inpc)
+			وإلا إذا (opndc == inpc)
 			{
 			    // Include all following composing chars.
-			    len = i + utfc_ptr2len(rex.input + i);
-			    status = RA_MATCH;
-			    break;
+			    len = i + utfc_ptr2len(rex.ننوت + i);
+			    حالت = RA_سمون;
+			    اكسر;
 			}
 		    }
 		}
-		else if (enc_utf8)
+		وإلا إذا (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    إذا (cstrncmp(opnd, rex.ننوت, &len) != 0)
 		    {
-			status = RA_NOMATCH;
-			break;
+			حالت = RA_NOMATCH;
+			اكسر;
 		    }
 		}
-		else
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+		وإلا
+		    لكل (i = 0; i < len; ++i)
+			إذا (opnd[i] != rex.ننوت[i])
 			{
-			    status = RA_NOMATCH;
-			    break;
+			    حالت = RA_NOMATCH;
+			    اكسر;
 			}
-		rex.input += len;
+		rex.ننوت += len;
 	    }
-	    else
-		status = RA_NOMATCH;
-	    break;
-	  case RE_COMPOSING:
-	    if (enc_utf8)
+	    وإلا
+		حالت = RA_NOMATCH;
+	    اكسر;
+	  حالة RE_COMPOSING:
+	    إذا (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
-		    MB_CPTR_ADV(rex.input);
+		طالما (utf_iscomposing(utf_ptr2char(rex.ننوت)))
+		    MB_CPTR_ADV(rex.ننوت);
 	    }
-	    break;
+	    اكسر;
 
-	  case NOTHING:
-	    break;
+	  حالة NOTHING:
+	    اكسر;
 
-	  case BACK:
+	  حالة شا_2:
 	    {
-		int		i;
+		صحيح		i;
 		backpos_T	*bp;
 
 		// When we run into BACK we need to check if we don't keep
@@ -3978,49 +3978,49 @@ regmatch(
 		// at the same position as the previous time.
 		// The positions are stored in "backpos" and found by the
 		// current value of "scan", the position in the RE program.
-		bp = (backpos_T *)backpos.ga_data;
-		for (i = 0; i < backpos.ga_len; ++i)
-		    if (bp[i].bp_scan == scan)
-			break;
-		if (i == backpos.ga_len)
+		bp = (backpos_T *)backpos.ga_معلومات;
+		لكل (i = 0; i < backpos.ga_len; ++i)
+		    إذا (bp[i].bp_لټون == لټون)
+			اكسر;
+		إذا (i == backpos.ga_len)
 		{
 		    // First time at this BACK, make room to store the pos.
-		    if (GA_GROW_FAILS(&backpos, 1))
-			status = RA_FAIL;
-		    else
+		    إذا (GA_GROW_FAILS(&backpos, 1))
+			حالت = RA_FAIL;
+		    وإلا
 		    {
 			// get "ga_data" again, it may have changed
-			bp = (backpos_T *)backpos.ga_data;
-			bp[i].bp_scan = scan;
+			bp = (backpos_T *)backpos.ga_معلومات;
+			bp[i].bp_لټون = لټون;
 			++backpos.ga_len;
 		    }
 		}
-		else if (reg_save_equal(&bp[i].bp_pos))
+		وإلا إذا (reg_save_equal(&bp[i].bp_pos))
 		    // Still at same position as last time, fail.
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 
-		if (status != RA_FAIL && status != RA_NOMATCH)
+		إذا (حالت != RA_FAIL && حالت != RA_NOMATCH)
 		    reg_save(&bp[i].bp_pos, &backpos);
 	    }
-	    break;
+	    اكسر;
 
-	  case MOPEN + 0:   // Match start: \zs
-	  case MOPEN + 1:   // \(
-	  case MOPEN + 2:
-	  case MOPEN + 3:
-	  case MOPEN + 4:
-	  case MOPEN + 5:
-	  case MOPEN + 6:
-	  case MOPEN + 7:
-	  case MOPEN + 8:
-	  case MOPEN + 9:
+	  حالة MOPEN + 0:   // Match start: \zs
+	  حالة MOPEN + 1:   // \(
+	  حالة MOPEN + 2:
+	  حالة MOPEN + 3:
+	  حالة MOPEN + 4:
+	  حالة MOPEN + 5:
+	  حالة MOPEN + 6:
+	  حالة MOPEN + 7:
+	  حالة MOPEN + 8:
+	  حالة MOPEN + 9:
 	    {
 		no = op - MOPEN;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ټېل(RS_MOPEN, لټون);
+		إذا (rp == عدم)
+		    حالت = RA_FAIL;
+		وإلا
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_startpos[no],
@@ -4028,32 +4028,32 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case NOPEN:	    // \%(
-	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
-		    status = RA_FAIL;
+	  حالة NOPEN:	    // \%(
+	  حالة NCLOSE:	    // \) after \%(
+		إذا (regstack_ټېل(RS_NOPEN, لټون) == عدم)
+		    حالت = RA_FAIL;
 		// We simply continue and handle the result when done.
-		break;
+		اكسر;
 
-#ifdef FEAT_SYN_HL
-	  case ZOPEN + 1:
-	  case ZOPEN + 2:
-	  case ZOPEN + 3:
-	  case ZOPEN + 4:
-	  case ZOPEN + 5:
-	  case ZOPEN + 6:
-	  case ZOPEN + 7:
-	  case ZOPEN + 8:
-	  case ZOPEN + 9:
+#که_تعریف_شوی FEAT_SYN_HL
+	  حالة ZOPEN + 1:
+	  حالة ZOPEN + 2:
+	  حالة ZOPEN + 3:
+	  حالة ZOPEN + 4:
+	  حالة ZOPEN + 5:
+	  حالة ZOPEN + 6:
+	  حالة ZOPEN + 7:
+	  حالة ZOPEN + 8:
+	  حالة ZOPEN + 9:
 	    {
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZOPEN, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ټېل(RS_ZOPEN, لټون);
+		إذا (rp == عدم)
+		    حالت = RA_FAIL;
+		وإلا
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_startzpos[no],
@@ -4061,26 +4061,26 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    اكسر;
+#د_که_پای
 
-	  case MCLOSE + 0:  // Match end: \ze
-	  case MCLOSE + 1:  // \)
-	  case MCLOSE + 2:
-	  case MCLOSE + 3:
-	  case MCLOSE + 4:
-	  case MCLOSE + 5:
-	  case MCLOSE + 6:
-	  case MCLOSE + 7:
-	  case MCLOSE + 8:
-	  case MCLOSE + 9:
+	  حالة MCLOSE + 0:  // Match end: \ze
+	  حالة MCLOSE + 1:  // \)
+	  حالة MCLOSE + 2:
+	  حالة MCLOSE + 3:
+	  حالة MCLOSE + 4:
+	  حالة MCLOSE + 5:
+	  حالة MCLOSE + 6:
+	  حالة MCLOSE + 7:
+	  حالة MCLOSE + 8:
+	  حالة MCLOSE + 9:
 	    {
 		no = op - MCLOSE;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ټېل(RS_MCLOSE, لټون);
+		إذا (rp == عدم)
+		    حالت = RA_FAIL;
+		وإلا
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_endpos[no],
@@ -4088,25 +4088,25 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    اكسر;
 
-#ifdef FEAT_SYN_HL
-	  case ZCLOSE + 1:  // \) after \z(
-	  case ZCLOSE + 2:
-	  case ZCLOSE + 3:
-	  case ZCLOSE + 4:
-	  case ZCLOSE + 5:
-	  case ZCLOSE + 6:
-	  case ZCLOSE + 7:
-	  case ZCLOSE + 8:
-	  case ZCLOSE + 9:
+#که_تعریف_شوی FEAT_SYN_HL
+	  حالة ZCLOSE + 1:  // \) after \z(
+	  حالة ZCLOSE + 2:
+	  حالة ZCLOSE + 3:
+	  حالة ZCLOSE + 4:
+	  حالة ZCLOSE + 5:
+	  حالة ZCLOSE + 6:
+	  حالة ZCLOSE + 7:
+	  حالة ZCLOSE + 8:
+	  حالة ZCLOSE + 9:
 	    {
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZCLOSE, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		rp = regstack_ټېل(RS_ZCLOSE, لټون);
+		إذا (rp == عدم)
+		    حالت = RA_FAIL;
+		وإلا
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_endzpos[no],
@@ -4114,210 +4114,210 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
-#endif
+	    اكسر;
+#د_که_پای
 
-	  case BACKREF + 1:
-	  case BACKREF + 2:
-	  case BACKREF + 3:
-	  case BACKREF + 4:
-	  case BACKREF + 5:
-	  case BACKREF + 6:
-	  case BACKREF + 7:
-	  case BACKREF + 8:
-	  case BACKREF + 9:
+	  حالة BACKREF + 1:
+	  حالة BACKREF + 2:
+	  حالة BACKREF + 3:
+	  حالة BACKREF + 4:
+	  حالة BACKREF + 5:
+	  حالة BACKREF + 6:
+	  حالة BACKREF + 7:
+	  حالة BACKREF + 8:
+	  حالة BACKREF + 9:
 	    {
-		int		len;
+		صحيح		len;
 
 		no = op - BACKREF;
 		cleanup_subexpr();
-		if (!REG_MULTI)		// Single-line regexp
+		إذا (!REG_MULTI)		// Single-line regexp
 		{
-		    if (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
+		    إذا (rex.reg_startp[no] == عدم || rex.reg_endp[no] == عدم)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    وإلا
 		    {
 			// Compare current input with back-ref in the same
 			// line.
-			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
-			    status = RA_NOMATCH;
+			len = (صحيح)(rex.reg_endp[no] - rex.reg_startp[no]);
+			إذا (cstrncmp(rex.reg_startp[no], rex.ننوت, &len) != 0)
+			    حالت = RA_NOMATCH;
 		    }
 		}
-		else				// Multi-line regexp
+		وإلا				// Multi-line regexp
 		{
-		    if (rex.reg_startpos[no].lnum < 0
+		    إذا (rex.reg_startpos[no].lnum < 0
 						|| rex.reg_endpos[no].lnum < 0)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    وإلا
 		    {
-			if (rex.reg_startpos[no].lnum == rex.lnum
+			إذا (rex.reg_startpos[no].lnum == rex.lnum
 				&& rex.reg_endpos[no].lnum == rex.lnum)
 			{
 			    // Compare back-ref within the current line.
-			    len = rex.reg_endpos[no].col
-						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
-							  rex.input, &len) != 0)
-				status = RA_NOMATCH;
+			    len = rex.reg_endpos[no].ستون
+						    - rex.reg_startpos[no].ستون;
+			    إذا (cstrncmp(rex.کرښه + rex.reg_startpos[no].ستون,
+							  rex.ننوت, &len) != 0)
+				حالت = RA_NOMATCH;
 			}
-			else
+			وإلا
 			{
 			    // Messy situation: Need to compare between two
 			    // lines.
-			    int r = match_with_backref(
+			    صحيح r = سمون_with_backref(
 					    rex.reg_startpos[no].lnum,
-					    rex.reg_startpos[no].col,
+					    rex.reg_startpos[no].ستون,
 					    rex.reg_endpos[no].lnum,
-					    rex.reg_endpos[no].col,
+					    rex.reg_endpos[no].ستون,
 					    &len);
 
-			    if (r != RA_MATCH)
-				status = r;
+			    إذا (r != RA_سمون)
+				حالت = r;
 			}
 		    }
 		}
 
 		// Matched the backref, skip over it.
-		rex.input += len;
+		rex.ننوت += len;
 	    }
-	    break;
+	    اكسر;
 
-#ifdef FEAT_SYN_HL
-	  case ZREF + 1:
-	  case ZREF + 2:
-	  case ZREF + 3:
-	  case ZREF + 4:
-	  case ZREF + 5:
-	  case ZREF + 6:
-	  case ZREF + 7:
-	  case ZREF + 8:
-	  case ZREF + 9:
+#که_تعریف_شوی FEAT_SYN_HL
+	  حالة ZREF + 1:
+	  حالة ZREF + 2:
+	  حالة ZREF + 3:
+	  حالة ZREF + 4:
+	  حالة ZREF + 5:
+	  حالة ZREF + 6:
+	  حالة ZREF + 7:
+	  حالة ZREF + 8:
+	  حالة ZREF + 9:
 	    {
-		int	len;
+		صحيح	len;
 
 		cleanup_zsubexpr();
 		no = op - ZREF;
-		if (re_extmatch_in != NULL
-			&& re_extmatch_in->matches[no] != NULL)
+		إذا (re_extmatch_دننه != عدم
+			&& re_extmatch_دننه->matches[no] != عدم)
 		{
-		    len = (int)STRLEN(re_extmatch_in->matches[no]);
-		    if (cstrncmp(re_extmatch_in->matches[no],
-							  rex.input, &len) != 0)
-			status = RA_NOMATCH;
-		    else
-			rex.input += len;
+		    len = (صحيح)STRLEN(re_extmatch_دننه->matches[no]);
+		    إذا (cstrncmp(re_extmatch_دننه->matches[no],
+							  rex.ننوت, &len) != 0)
+			حالت = RA_NOMATCH;
+		    وإلا
+			rex.ننوت += len;
 		}
-		else
+		وإلا
 		{
 		    // Backref was not set: Match an empty string.
 		}
 	    }
-	    break;
-#endif
+	    اكسر;
+#د_که_پای
 
-	  case BRANCH:
+	  حالة BRANCH:
 	    {
-		if (OP(next) != BRANCH) // No choice.
-		    next = OPERAND(scan);	// Avoid recursion.
-		else
+		إذا (OP(بل) != BRANCH) // No choice.
+		    بل = عملوند(لټون);	// Avoid recursion.
+		وإلا
 		{
-		    rp = regstack_push(RS_BRANCH, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
-			status = RA_BREAK;	// rest is below
+		    rp = regstack_ټېل(RS_BRANCH, لټون);
+		    إذا (rp == عدم)
+			حالت = RA_FAIL;
+		    وإلا
+			حالت = RA_BREAK;	// rest is below
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case BRACE_LIMITS:
+	  حالة BRACE_LIMITS:
 	    {
-		if (OP(next) == BRACE_SIMPLE)
+		إذا (OP(بل) == BRACE_SIMPLE)
 		{
-		    bl_minval = OPERAND_MIN(scan);
-		    bl_maxval = OPERAND_MAX(scan);
+		    bl_minval = عملوند_MIN(لټون);
+		    bl_maxval = عملوند_MAX(لټون);
 		}
-		else if (OP(next) >= BRACE_COMPLEX
-			&& OP(next) < BRACE_COMPLEX + 10)
+		وإلا إذا (OP(بل) >= BRACE_COMPLEX
+			&& OP(بل) < BRACE_COMPLEX + 10)
 		{
-		    no = OP(next) - BRACE_COMPLEX;
-		    brace_min[no] = OPERAND_MIN(scan);
-		    brace_max[no] = OPERAND_MAX(scan);
-		    brace_count[no] = 0;
+		    no = OP(بل) - BRACE_COMPLEX;
+		    brace_min[no] = عملوند_MIN(لټون);
+		    brace_max[no] = عملوند_MAX(لټون);
+		    brace_شمېر[no] = 0;
 		}
-		else
+		وإلا
 		{
-		    internal_error("BRACE_LIMITS");
-		    status = RA_FAIL;
+		    دننی_error("BRACE_LIMITS");
+		    حالت = RA_FAIL;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case BRACE_COMPLEX + 0:
-	  case BRACE_COMPLEX + 1:
-	  case BRACE_COMPLEX + 2:
-	  case BRACE_COMPLEX + 3:
-	  case BRACE_COMPLEX + 4:
-	  case BRACE_COMPLEX + 5:
-	  case BRACE_COMPLEX + 6:
-	  case BRACE_COMPLEX + 7:
-	  case BRACE_COMPLEX + 8:
-	  case BRACE_COMPLEX + 9:
+	  حالة BRACE_COMPLEX + 0:
+	  حالة BRACE_COMPLEX + 1:
+	  حالة BRACE_COMPLEX + 2:
+	  حالة BRACE_COMPLEX + 3:
+	  حالة BRACE_COMPLEX + 4:
+	  حالة BRACE_COMPLEX + 5:
+	  حالة BRACE_COMPLEX + 6:
+	  حالة BRACE_COMPLEX + 7:
+	  حالة BRACE_COMPLEX + 8:
+	  حالة BRACE_COMPLEX + 9:
 	    {
 		no = op - BRACE_COMPLEX;
-		++brace_count[no];
+		++brace_شمېر[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		إذا (brace_شمېر[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
-		    rp = regstack_push(RS_BRCPLX_MORE, scan);
-		    if (rp == NULL)
-			status = RA_FAIL;
-		    else
+		    rp = regstack_ټېل(RS_BRCPLX_نور, لټون);
+		    إذا (rp == عدم)
+			حالت = RA_FAIL;
+		    وإلا
 		    {
 			rp->rs_no = no;
 			reg_save(&rp->rs_un.regsave, &backpos);
-			next = OPERAND(scan);
+			بل = عملوند(لټون);
 			// We continue and handle the result when done.
 		    }
-		    break;
+		    اكسر;
 		}
 
 		// If matched enough times, may try matching some more
-		if (brace_min[no] <= brace_max[no])
+		إذا (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    إذا (brace_شمېر[no] <= brace_max[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_LONG, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_ټېل(RS_BRCPLX_LONG, لټون);
+			إذا (rp == عدم)
+			    حالت = RA_FAIL;
+			وإلا
 			{
 			    rp->rs_no = no;
 			    reg_save(&rp->rs_un.regsave, &backpos);
-			    next = OPERAND(scan);
+			    بل = عملوند(لټون);
 			    // We continue and handle the result when done.
 			}
 		    }
 		}
-		else
+		وإلا
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    إذا (brace_شمېر[no] <= brace_min[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			rp = regstack_ټېل(RS_BRCPLX_SHORT, لټون);
+			إذا (rp == عدم)
+			    حالت = RA_FAIL;
+			وإلا
 			{
 			    reg_save(&rp->rs_un.regsave, &backpos);
 			    // We continue and handle the result when done.
@@ -4325,40 +4325,40 @@ regmatch(
 		    }
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case BRACE_SIMPLE:
-	  case STAR:
-	  case PLUS:
+	  حالة BRACE_SIMPLE:
+	  حالة ستوری:
+	  حالة PLUS:
 	    {
 		regstar_T	rst;
 
 		// Lookahead to avoid useless match attempts when we know
 		// what character comes next.
-		if (OP(next) == EXACTLY)
+		إذا (OP(بل) == EXACTLY)
 		{
-		    rst.nextb = *OPERAND(next);
-		    if (rex.reg_ic)
+		    rst.nextb = *عملوند(بل);
+		    إذا (rex.reg_ic)
 		    {
-			if (MB_ISUPPER(rst.nextb))
+			إذا (MB_ISUPPER(rst.nextb))
 			    rst.nextb_ic = MB_TOLOWER(rst.nextb);
-			else
+			وإلا
 			    rst.nextb_ic = MB_TOUPPER(rst.nextb);
 		    }
-		    else
+		    وإلا
 			rst.nextb_ic = rst.nextb;
 		}
-		else
+		وإلا
 		{
 		    rst.nextb = NUL;
 		    rst.nextb_ic = NUL;
 		}
-		if (op != BRACE_SIMPLE)
+		إذا (op != BRACE_SIMPLE)
 		{
-		    rst.minval = (op == STAR) ? 0 : 1;
-		    rst.maxval = MAX_LIMIT;
+		    rst.minval = (op == ستوری) ? 0 : 1;
+		    rst.maxval = MAX_حد;
 		}
-		else
+		وإلا
 		{
 		    rst.minval = bl_minval;
 		    rst.maxval = bl_maxval;
@@ -4368,77 +4368,77 @@ regmatch(
 		// to maxval.  When maxval < minval, try matching at least the
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
-		rst.count = regrepeat(OPERAND(scan), rst.maxval);
-		if (got_int)
+		rst.شمېر = regrepeat(عملوند(لټون), rst.maxval);
+		إذا (got_int)
 		{
-		    status = RA_FAIL;
-		    break;
+		    حالت = RA_FAIL;
+		    اكسر;
 		}
-		if (rst.minval <= rst.maxval
-			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
+		إذا (rst.minval <= rst.maxval
+			  ? rst.شمېر >= rst.minval : rst.شمېر >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
 		    // a regstar_T on the regstack.
-		    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+		    إذا ((اوږد)((بینښه)regstack.ga_len >> 10) >= p_mmp)
 		    {
-			emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-			status = RA_FAIL;
+			emsg(_(e_نمونه_کاروي_نور_حافظه_than_maxmempattern));
+			حالت = RA_FAIL;
 		    }
-		    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regstar_T)))
-			status = RA_FAIL;
-		    else
+		    وإلا إذا (GA_GROW_FAILS(&regstack, (صحيح)حجم(regstar_T)))
+			حالت = RA_FAIL;
+		    وإلا
 		    {
-			regstack.ga_len += sizeof(regstar_T);
-			rp = regstack_push(rst.minval <= rst.maxval
-					? RS_STAR_LONG : RS_STAR_SHORT, scan);
-			if (rp == NULL)
-			    status = RA_FAIL;
-			else
+			regstack.ga_len += حجم(regstar_T);
+			rp = regstack_ټېل(rst.minval <= rst.maxval
+					? RS_ستوری_LONG : RS_ستوری_SHORT, لټون);
+			إذا (rp == عدم)
+			    حالت = RA_FAIL;
+			وإلا
 			{
 			    *(((regstar_T *)rp) - 1) = rst;
-			    status = RA_BREAK;	    // skip the restore bits
+			    حالت = RA_BREAK;	    // skip the restore bits
 			}
 		    }
 		}
-		else
-		    status = RA_NOMATCH;
+		وإلا
+		    حالت = RA_NOMATCH;
 
 	    }
-	    break;
+	    اكسر;
 
-	  case NOMATCH:
-	  case MATCH:
-	  case SUBPAT:
-	    rp = regstack_push(RS_NOMATCH, scan);
-	    if (rp == NULL)
-		status = RA_FAIL;
-	    else
+	  حالة NOMATCH:
+	  حالة سمون_2:
+	  حالة SUBPAT:
+	    rp = regstack_ټېل(RS_NOMATCH, لټون);
+	    إذا (rp == عدم)
+		حالت = RA_FAIL;
+	    وإلا
 	    {
 		rp->rs_no = op;
 		reg_save(&rp->rs_un.regsave, &backpos);
-		next = OPERAND(scan);
+		بل = عملوند(لټون);
 		// We continue and handle the result when done.
 	    }
-	    break;
+	    اكسر;
 
-	  case BEHIND:
-	  case NOBEHIND:
+	  حالة BEHIND:
+	  حالة NOBEHIND:
 	    // Need a bit of room to store extra positions.
-	    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+	    إذا ((اوږد)((بینښه)regstack.ga_len >> 10) >= p_mmp)
 	    {
-		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		status = RA_FAIL;
+		emsg(_(e_نمونه_کاروي_نور_حافظه_than_maxmempattern));
+		حالت = RA_FAIL;
 	    }
-	    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regbehind_T)))
-		status = RA_FAIL;
-	    else
+	    وإلا إذا (GA_GROW_FAILS(&regstack, (صحيح)حجم(regbehind_T)))
+		حالت = RA_FAIL;
+	    وإلا
 	    {
-		regstack.ga_len += sizeof(regbehind_T);
-		rp = regstack_push(RS_BEHIND1, scan);
-		if (rp == NULL)
-		    status = RA_FAIL;
-		else
+		regstack.ga_len += حجم(regbehind_T);
+		rp = regstack_ټېل(RS_BEHIND1, لټون);
+		إذا (rp == عدم)
+		    حالت = RA_FAIL;
+		وإلا
 		{
 		    // Need to save the subexpr to be able to restore them
 		    // when there is a match but we don't use it.
@@ -4450,191 +4450,191 @@ regmatch(
 		    // check the behind match by looping.
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case BHPOS:
-	    if (REG_MULTI)
+	  حالة BHPOS:
+	    إذا (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		إذا (behind_pos.rs_u.pos.ستون != (colnr_T)(rex.ننوت - rex.کرښه)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
-		status = RA_NOMATCH;
-	    break;
+	    وإلا إذا (behind_pos.rs_u.ptr != rex.ننوت)
+		حالت = RA_NOMATCH;
+	    اكسر;
 
-	  case NEWL:
-	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
-			     || rex.reg_line_lbr)
-					   && (c != '\n' || !rex.reg_line_lbr))
-		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	  حالة NEWL:
+	    إذا ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
+			     || rex.reg_کرښه_lbr)
+					   && (c != '\n' || !rex.reg_کرښه_lbr))
+		حالت = RA_NOMATCH;
+	    وإلا إذا (rex.reg_کرښه_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    وإلا
 		reg_nextline();
-	    break;
+	    اكسر;
 
-	  case END:
-	    status = RA_MATCH;	// Success!
-	    break;
+	  حالة پای_ټکی_3:
+	    حالت = RA_سمون;	// Success!
+	    اكسر;
 
-	  default:
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Illegal op code %d\n", op);
-#endif
-	    status = RA_FAIL;
-	    break;
+	  افتراضي:
+	    iemsg(e_corrupted_regexp_پروګرام);
+#که_تعریف_شوی DEBUG
+	    چاپ_کړه("Illegal op code %d\n", op);
+#د_که_پای
+	    حالت = RA_FAIL;
+	    اكسر;
 	  }
 	}
 
 	// If we can't continue sequentially, break the inner loop.
-	if (status != RA_CONT)
-	    break;
+	إذا (حالت != RA_CONT)
+	    اكسر;
 
 	// Continue in inner loop, advance to next item.
-	scan = next;
+	لټون = بل;
 
     } // end of inner loop
 
     // If there is something on the regstack execute the code for the state.
     // If the state is popped then loop and use the older state.
-    while (regstack.ga_len > 0 && status != RA_FAIL)
+    طالما (regstack.ga_len > 0 && حالت != RA_FAIL)
     {
-	rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-	switch (rp->rs_state)
+	rp = (regitem_T *)((حرف *)regstack.ga_معلومات + regstack.ga_len) - 1;
+	بدل (rp->rs_state)
 	{
-	  case RS_NOPEN:
+	  حالة RS_NOPEN:
 	    // Result is passed on as-is, simply pop the state.
-	    regstack_pop(&scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    اكسر;
 
-	  case RS_MOPEN:
+	  حالة RS_MOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    اكسر;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZOPEN:
+#که_تعریف_شوی FEAT_SYN_HL
+	  حالة RS_ZOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_راوباسه(&لټون);
+	    اكسر;
+#د_که_پای
 
-	  case RS_MCLOSE:
+	  حالة RS_MCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    اكسر;
 
-#ifdef FEAT_SYN_HL
-	  case RS_ZCLOSE:
+#که_تعریف_شوی FEAT_SYN_HL
+	  حالة RS_ZCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
-#endif
+	    regstack_راوباسه(&لټون);
+	    اكسر;
+#د_که_پای
 
-	  case RS_BRANCH:
-	    if (status == RA_MATCH)
+	  حالة RS_BRANCH:
+	    إذا (حالت == RA_سمون)
 		// this branch matched, use it
-		regstack_pop(&scan);
-	    else
+		regstack_راوباسه(&لټون);
+	    وإلا
 	    {
-		if (status != RA_BREAK)
+		إذا (حالت != RA_BREAK)
 		{
 		    // After a non-matching branch: try next one.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = rp->rs_scan;
+		    لټون = rp->rs_لټون;
 		}
-		if (scan == NULL || OP(scan) != BRANCH)
+		إذا (لټون == عدم || OP(لټون) != BRANCH)
 		{
 		    // no more branches, didn't find a match
-		    status = RA_NOMATCH;
-		    regstack_pop(&scan);
+		    حالت = RA_NOMATCH;
+		    regstack_راوباسه(&لټون);
 		}
-		else
+		وإلا
 		{
 		    // Prepare to try a branch.
-		    rp->rs_scan = regnext(scan);
+		    rp->rs_لټون = regnext(لټون);
 		    reg_save(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(scan);
+		    لټون = عملوند(لټون);
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case RS_BRCPLX_MORE:
+	  حالة RS_BRCPLX_نور:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];	// decrement match count
+		--brace_شمېر[rp->rs_no];	// decrement match count
 	    }
-	    regstack_pop(&scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    اكسر;
 
-	  case RS_BRCPLX_LONG:
+	  حالة RS_BRCPLX_LONG:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];
+		--brace_شمېر[rp->rs_no];
 		// continue with the items after "\{}"
-		status = RA_CONT;
+		حالت = RA_CONT;
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    إذا (حالت == RA_CONT)
+		لټون = regnext(لټون);
+	    اكسر;
 
-	  case RS_BRCPLX_SHORT:
+	  حالة RS_BRCPLX_SHORT:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    إذا (حالت == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-	    regstack_pop(&scan);
-	    if (status == RA_NOMATCH)
+	    regstack_راوباسه(&لټون);
+	    إذا (حالت == RA_NOMATCH)
 	    {
-		scan = OPERAND(scan);
-		status = RA_CONT;
+		لټون = عملوند(لټون);
+		حالت = RA_CONT;
 	    }
-	    break;
+	    اكسر;
 
-	  case RS_NOMATCH:
+	  حالة RS_NOMATCH:
 	    // Pop the state.  If the operand matches for NOMATCH or
 	    // doesn't match for MATCH/SUBPAT, we fail.  Otherwise backup,
 	    // except for SUBPAT, and continue with the next item.
-	    if (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
-		status = RA_NOMATCH;
-	    else
+	    إذا (حالت == (rp->rs_no == NOMATCH ? RA_سمون : RA_NOMATCH))
+		حالت = RA_NOMATCH;
+	    وإلا
 	    {
-		status = RA_CONT;
-		if (rp->rs_no != SUBPAT)	// zero-width
+		حالت = RA_CONT;
+		إذا (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
-		scan = regnext(scan);
-	    break;
+	    regstack_راوباسه(&لټون);
+	    إذا (حالت == RA_CONT)
+		لټون = regnext(لټون);
+	    اكسر;
 
-	  case RS_BEHIND1:
-	    if (status == RA_NOMATCH)
+	  حالة RS_BEHIND1:
+	    إذا (حالت == RA_NOMATCH)
 	    {
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_راوباسه(&لټون);
+		regstack.ga_len -= حجم(regbehind_T);
 	    }
-	    else
+	    وإلا
 	    {
 		// The stuff after BEHIND/NOBEHIND matches.  Now try if
 		// the behind part does (not) match before the current
@@ -4657,247 +4657,247 @@ regmatch(
 		rp->rs_state = RS_BEHIND2;
 
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		scan = OPERAND(rp->rs_scan) + 4;
+		لټون = عملوند(rp->rs_لټون) + 4;
 	    }
-	    break;
+	    اكسر;
 
-	  case RS_BEHIND2:
+	  حالة RS_BEHIND2:
 	    // Looping for BEHIND / NOBEHIND match.
-	    if (status == RA_MATCH && reg_save_equal(&behind_pos))
+	    إذا (حالت == RA_سمون && reg_save_equal(&behind_pos))
 	    {
 		// found a match that ends where "next" started
 		behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		if (rp->rs_no == BEHIND)
+		إذا (rp->rs_no == BEHIND)
 		    reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-		else
+		وإلا
 		{
 		    // But we didn't want a match.  Need to restore the
 		    // subexpr, because what follows matched, so they have
 		    // been set.
-		    status = RA_NOMATCH;
+		    حالت = RA_NOMATCH;
 		    restore_subexpr(((regbehind_T *)rp) - 1);
 		}
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_راوباسه(&لټون);
+		regstack.ga_len -= حجم(regbehind_T);
 	    }
-	    else
+	    وإلا
 	    {
-		long limit;
+		اوږد حد;
 
 		// No match or a match that doesn't end where we want it: Go
 		// back one character.  May go to previous line once.
 		no = OK;
-		limit = OPERAND_MIN(rp->rs_scan);
-		if (REG_MULTI)
+		حد = عملوند_MIN(rp->rs_لټون);
+		إذا (REG_MULTI)
 		{
-		    if (limit > 0
+		    إذا (حد > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
-				    ? (colnr_T)STRLEN(rex.line)
-				    : behind_pos.rs_u.pos.col)
-				- rp->rs_un.regsave.rs_u.pos.col >= limit))
+				    ? (colnr_T)STRLEN(rex.کرښه)
+				    : behind_pos.rs_u.pos.ستون)
+				- rp->rs_un.regsave.rs_u.pos.ستون >= حد))
 			no = FAIL;
-		    else if (rp->rs_un.regsave.rs_u.pos.col == 0)
+		    وإلا إذا (rp->rs_un.regsave.rs_u.pos.ستون == 0)
 		    {
-			if (rp->rs_un.regsave.rs_u.pos.lnum
+			إذا (rp->rs_un.regsave.rs_u.pos.lnum
 					< behind_pos.rs_u.pos.lnum
 				|| reg_getline(
 					--rp->rs_un.regsave.rs_u.pos.lnum)
-								  == NULL)
+								  == عدم)
 			    no = FAIL;
-			else
+			وإلا
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
-			    rp->rs_un.regsave.rs_u.pos.col =
-						 (colnr_T)STRLEN(rex.line);
+			    rp->rs_un.regsave.rs_u.pos.ستون =
+						 (colnr_T)STRLEN(rex.کرښه);
 			}
 		    }
-		    else
+		    وإلا
 		    {
-			if (has_mbyte)
+			إذا (has_mbyte)
 			{
-			    char_u *line =
+			    char_u *کرښه =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
 
-			    rp->rs_un.regsave.rs_u.pos.col -=
-				(*mb_head_off)(line, line
-				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
+			    rp->rs_un.regsave.rs_u.pos.ستون -=
+				(*mb_سر_off)(کرښه, کرښه
+				    + rp->rs_un.regsave.rs_u.pos.ستون - 1) + 1;
 			}
-			else
-			    --rp->rs_un.regsave.rs_u.pos.col;
+			وإلا
+			    --rp->rs_un.regsave.rs_u.pos.ستون;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    إذا (rp->rs_un.regsave.rs_u.ptr == rex.کرښه)
 			no = FAIL;
-		    else
+		    وإلا
 		    {
-			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
-			if (limit > 0 && (long)(behind_pos.rs_u.ptr
-				     - rp->rs_un.regsave.rs_u.ptr) > limit)
+			MB_PTR_شا(rex.کرښه, rp->rs_un.regsave.rs_u.ptr);
+			إذا (حد > 0 && (اوږد)(behind_pos.rs_u.ptr
+				     - rp->rs_un.regsave.rs_u.ptr) > حد)
 			    no = FAIL;
 		    }
 		}
-		if (no == OK)
+		إذا (no == OK)
 		{
 		    // Advanced, prepare for finding match again.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
-		    scan = OPERAND(rp->rs_scan) + 4;
-		    if (status == RA_MATCH)
+		    لټون = عملوند(rp->rs_لټون) + 4;
+		    إذا (حالت == RA_سمون)
 		    {
 			// We did match, so subexpr may have been changed,
 			// need to restore them for the next try.
-			status = RA_NOMATCH;
+			حالت = RA_NOMATCH;
 			restore_subexpr(((regbehind_T *)rp) - 1);
 		    }
 		}
-		else
+		وإلا
 		{
 		    // Can't advance.  For NOBEHIND that's a match.
 		    behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		    if (rp->rs_no == NOBEHIND)
+		    إذا (rp->rs_no == NOBEHIND)
 		    {
 			reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-			status = RA_MATCH;
+			حالت = RA_سمون;
 		    }
-		    else
+		    وإلا
 		    {
 			// We do want a proper match.  Need to restore the
 			// subexpr if we had a match, because they may have
 			// been set.
-			if (status == RA_MATCH)
+			إذا (حالت == RA_سمون)
 			{
-			    status = RA_NOMATCH;
+			    حالت = RA_NOMATCH;
 			    restore_subexpr(((regbehind_T *)rp) - 1);
 			}
 		    }
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regbehind_T);
+		    regstack_راوباسه(&لټون);
+		    regstack.ga_len -= حجم(regbehind_T);
 		}
 	    }
-	    break;
+	    اكسر;
 
-	  case RS_STAR_LONG:
-	  case RS_STAR_SHORT:
+	  حالة RS_ستوری_LONG:
+	  حالة RS_ستوری_SHORT:
 	    {
 		regstar_T	    *rst = ((regstar_T *)rp) - 1;
 
-		if (status == RA_MATCH)
+		إذا (حالت == RA_سمون)
 		{
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    break;
+		    regstack_راوباسه(&لټون);
+		    regstack.ga_len -= حجم(regstar_T);
+		    اكسر;
 		}
 
 		// Tried once already, restore input pointers.
-		if (status != RA_BREAK)
+		إذا (حالت != RA_BREAK)
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 
 		// Repeat until we found a position where it could match.
-		for (;;)
+		لكل (;;)
 		{
-		    if (status != RA_BREAK)
+		    إذا (حالت != RA_BREAK)
 		    {
 			// Tried first position already, advance.
-			if (rp->rs_state == RS_STAR_LONG)
+			إذا (rp->rs_state == RS_ستوری_LONG)
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
-				break;
-			    if (rex.input == rex.line)
+			    إذا (--rst->شمېر < rst->minval)
+				اكسر;
+			    إذا (rex.ننوت == rex.کرښه)
 			    {
 				// backup to last char of previous line
-				if (rex.lnum == 0)
+				إذا (rex.lnum == 0)
 				{
-				    status = RA_NOMATCH;
-				    break;
+				    حالت = RA_NOMATCH;
+				    اكسر;
 				}
 				--rex.lnum;
-				rex.line = reg_getline(rex.lnum);
+				rex.کرښه = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
-				    break;
-				rex.input = rex.line + reg_getline_len(rex.lnum);
+				إذا (rex.کرښه == عدم)
+				    اكسر;
+				rex.ننوت = rex.کرښه + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
-			    else
-				MB_PTR_BACK(rex.line, rex.input);
+			    وإلا
+				MB_PTR_شا(rex.کرښه, rex.ننوت);
 			}
-			else
+			وإلا
 			{
 			    // Range is backwards, use shortest match first.
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
-				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
-				break;
-			    ++rst->count;
+			    إذا (rst->شمېر == rst->minval
+				  || regrepeat(عملوند(rp->rs_لټون), 1L) == 0)
+				اكسر;
+			    ++rst->شمېر;
 			}
-			if (got_int)
-			    break;
+			إذا (got_int)
+			    اكسر;
 		    }
-		    else
-			status = RA_NOMATCH;
+		    وإلا
+			حالت = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
-					     || *rex.input == rst->nextb_ic)
+		    إذا (rst->nextb == NUL || *rex.ننوت == rst->nextb
+					     || *rex.ننوت == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
-			scan = regnext(rp->rs_scan);
-			status = RA_CONT;
-			break;
+			لټون = regnext(rp->rs_لټون);
+			حالت = RA_CONT;
+			اكسر;
 		    }
 		}
-		if (status != RA_CONT)
+		إذا (حالت != RA_CONT)
 		{
 		    // Failed.
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    status = RA_NOMATCH;
+		    regstack_راوباسه(&لټون);
+		    regstack.ga_len -= حجم(regstar_T);
+		    حالت = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    اكسر;
 	}
 
 	// If we want to continue the inner loop or didn't pop a state
 	// continue matching loop
-	if (status == RA_CONT || rp == (regitem_T *)
-			     ((char *)regstack.ga_data + regstack.ga_len) - 1)
-	    break;
+	إذا (حالت == RA_CONT || rp == (regitem_T *)
+			     ((حرف *)regstack.ga_معلومات + regstack.ga_len) - 1)
+	    اكسر;
 
-#ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+#که_تعریف_شوی FEAT_RELTIME
+	إذا (bt_did_وخت_بهر(timed_بهر))
 	{
-	    status = RA_FAIL;
-	    break;
+	    حالت = RA_FAIL;
+	    اكسر;
 	}
-#endif
+#د_که_پای
     }
 
     // May need to continue with the inner loop, starting at "scan".
-    if (status == RA_CONT)
-	continue;
+    إذا (حالت == RA_CONT)
+	استمر;
 
     // If the regstack is empty or something failed we are done.
-    if (regstack.ga_len == 0 || status == RA_FAIL)
+    إذا (regstack.ga_len == 0 || حالت == RA_FAIL)
     {
-	if (scan == NULL)
+	إذا (لټون == عدم)
 	{
 	    // We get here only if there's trouble -- normally "case END" is
 	    // the terminating point.
-	    iemsg(e_corrupted_regexp_program);
-#ifdef DEBUG
-	    printf("Premature EOL\n");
-#endif
+	    iemsg(e_corrupted_regexp_پروګرام);
+#که_تعریف_شوی DEBUG
+	    چاپ_کړه("Premature EOL\n");
+#د_که_پای
 	}
-	return (status == RA_MATCH);
+	أرجع (حالت == RA_سمون);
     }
 
   } // End of loop until the regstack is empty.
@@ -4909,83 +4909,83 @@ regmatch(
  * regtry - try match of "prog" with at rex.line["col"].
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ساكن اوږد
 regtry(
     bt_regprog_T	*prog,
-    colnr_T		col,
-    int			*timed_out)	// flag set on timeout or NULL
+    colnr_T		ستون,
+    صحيح			*timed_بهر)	// flag set on timeout or NULL
 {
-    rex.input = rex.line + col;
+    rex.ننوت = rex.کرښه + ستون;
     rex.need_clear_subexpr = TRUE;
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    rex.need_clear_zsubexpr = (prog->reghasz == REX_SET);
-#endif
+    rex.need_clear_zsubexpr = (prog->reghasz == REX_سېټ);
+#د_که_پای
 
-    if (regmatch(prog->program + 1, timed_out) == 0)
-	return 0;
+    إذا (regmatch(prog->پروګرام + 1, timed_بهر) == 0)
+	أرجع 0;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    إذا (REG_MULTI)
     {
-	if (rex.reg_startpos[0].lnum < 0)
+	إذا (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
-	    rex.reg_startpos[0].col = col;
+	    rex.reg_startpos[0].ستون = ستون;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	إذا (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].ستون = (صحيح)(rex.ننوت - rex.کرښه);
 	}
-	else
+	وإلا
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    وإلا
     {
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	إذا (rex.reg_startp[0] == عدم)
+	    rex.reg_startp[0] = rex.کرښه + ستون;
+	إذا (rex.reg_endp[0] == عدم)
+	    rex.reg_endp[0] = rex.ننوت;
     }
-#ifdef FEAT_SYN_HL
+#که_تعریف_شوی FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
-    unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    unref_extmatch(re_extmatch_بهر);
+    re_extmatch_بهر = عدم;
 
-    if (prog->reghasz == REX_SET)
+    إذا (prog->reghasz == REX_سېټ)
     {
-	int		i;
+	صحيح		i;
 
 	cleanup_zsubexpr();
-	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
-	for (i = 0; i < NSUBEXP; i++)
+	re_extmatch_بهر = make_extmatch();
+	إذا (re_extmatch_بهر == عدم)
+	    أرجع 0;
+	لكل (i = 0; i < NSUBEXP; i++)
 	{
-	    if (REG_MULTI)
+	    إذا (REG_MULTI)
 	    {
 		// Only accept single line matches.
-		if (reg_startzpos[i].lnum >= 0
+		إذا (reg_startzpos[i].lnum >= 0
 			&& reg_endzpos[i].lnum == reg_startzpos[i].lnum
-			&& reg_endzpos[i].col >= reg_startzpos[i].col)
-		    re_extmatch_out->matches[i] =
+			&& reg_endzpos[i].ستون >= reg_startzpos[i].ستون)
+		    re_extmatch_بهر->matches[i] =
 			vim_strnsave(reg_getline(reg_startzpos[i].lnum)
-						       + reg_startzpos[i].col,
-				   reg_endzpos[i].col - reg_startzpos[i].col);
+						       + reg_startzpos[i].ستون,
+				   reg_endzpos[i].ستون - reg_startzpos[i].ستون);
 	    }
-	    else
+	    وإلا
 	    {
-		if (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
-		    re_extmatch_out->matches[i] =
+		إذا (reg_startzp[i] != عدم && reg_endzp[i] != عدم)
+		    re_extmatch_بهر->matches[i] =
 			    vim_strnsave(reg_startzp[i],
 						reg_endzp[i] - reg_startzp[i]);
 	    }
 	}
     }
-#endif
-    return 1 + rex.lnum;
+#د_که_پای
+    أرجع 1 + rex.lnum;
 }
 
 /*
@@ -4993,230 +4993,230 @@ regtry(
  * lines (if "line" is NULL, use reg_getline()).
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    ساكن اوږد
 bt_regexec_both(
-    char_u	*line,
+    char_u	*کرښه,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    صحيح		*timed_بهر)	// flag set on timeout or NULL
 {
     bt_regprog_T    *prog;
     char_u	    *s;
-    colnr_T	    col = startcol;
-    long	    retval = 0L;
+    colnr_T	    ستون = startcol;
+    اوږد	    retval = 0L;
 
     // Create "regstack" and "backpos" if they are not allocated yet.
     // We allocate *_INITIAL amount of bytes first and then set the grow size
     // to much bigger value to avoid many malloc calls in case of deep regular
     // expressions.
-    if (regstack.ga_data == NULL)
+    إذا (regstack.ga_معلومات == عدم)
     {
 	// Use an item size of 1 byte, since we push different things
 	// onto the regstack.
 	ga_init2(&regstack, 1, REGSTACK_INITIAL);
-	(void)ga_grow(&regstack, REGSTACK_INITIAL);
+	(فراغ)ga_grow(&regstack, REGSTACK_INITIAL);
 	regstack.ga_growsize = REGSTACK_INITIAL * 8;
     }
 
-    if (backpos.ga_data == NULL)
+    إذا (backpos.ga_معلومات == عدم)
     {
-	ga_init2(&backpos, sizeof(backpos_T), BACKPOS_INITIAL);
-	(void)ga_grow(&backpos, BACKPOS_INITIAL);
+	ga_init2(&backpos, حجم(backpos_T), BACKPOS_INITIAL);
+	(فراغ)ga_grow(&backpos, BACKPOS_INITIAL);
 	backpos.ga_growsize = BACKPOS_INITIAL * 8;
     }
 
-    if (REG_MULTI)
+    إذا (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);
+	کرښه = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    وإلا
     {
-	prog = (bt_regprog_T *)rex.reg_match->regprog;
-	rex.reg_startp = rex.reg_match->startp;
-	rex.reg_endp = rex.reg_match->endp;
+	prog = (bt_regprog_T *)rex.reg_سمون->regprog;
+	rex.reg_startp = rex.reg_سمون->startp;
+	rex.reg_endp = rex.reg_سمون->endp;
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    إذا (prog == عدم || کرښه == عدم)
     {
-	iemsg(e_null_argument);
-	goto theend;
+	iemsg(e_null_دلیل);
+	اذهب theend;
     }
 
     // Check validity of program.
-    if (prog_magic_wrong())
-	goto theend;
+    إذا (prog_magic_wrong())
+	اذهب theend;
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    إذا (rex.reg_maxcol > 0 && ستون >= rex.reg_maxcol)
+	اذهب theend;
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    إذا (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    وإلا إذا (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    إذا (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     // If there is a "must appear" string, look for it.
-    if (prog->regmust != NULL)
+    إذا (prog->regmust != عدم)
     {
-	int c;
+	صحيح c;
 
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    c = (*mb_ptr2char)(prog->regmust);
-	else
+	وإلا
 	    c = *prog->regmust;
-	s = line + col;
+	s = کرښه + ستون;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
-	if (!rex.reg_ic && !has_mbyte)
-	    while ((s = vim_strbyte(s, c)) != NULL)
+	إذا (!rex.reg_ic && !has_mbyte)
+	    طالما ((s = vim_strbyte(s, c)) != عدم)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		صحيح len = prog->regmlen;
+		إذا (cstrncmp(s, prog->regmust, &len) == 0)
+		    اكسر;		// Found it.
 		++s;
 	    }
-	else if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	    while ((s = vim_strchr(s, c)) != NULL)
+	وإلا إذا (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	    طالما ((s = vim_strchr(s, c)) != عدم)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		صحيح len = prog->regmlen;
+		إذا (cstrncmp(s, prog->regmust, &len) == 0)
+		    اكسر;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	else
-	    while ((s = cstrchr(s, c)) != NULL)
+	وإلا
+	    طالما ((s = cstrchr(s, c)) != عدم)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		صحيح len = prog->regmlen;
+		إذا (cstrncmp(s, prog->regmust, &len) == 0)
+		    اكسر;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	if (s == NULL)		// Not present.
-	    goto theend;
+	إذا (s == عدم)		// Not present.
+	    اذهب theend;
     }
 
-    rex.line = line;
+    rex.کرښه = کرښه;
     rex.lnum = 0;
     reg_toolong = FALSE;
 
     // Simplest case: Anchored match need be tried only once.
-    if (prog->reganch)
+    إذا (prog->reganch)
     {
-	int	c;
+	صحيح	c;
 
-	if (has_mbyte)
-	    c = (*mb_ptr2char)(rex.line + col);
-	else
-	    c = rex.line[col];
-	if (prog->regstart == NUL
+	إذا (has_mbyte)
+	    c = (*mb_ptr2char)(rex.کرښه + ستون);
+	وإلا
+	    c = rex.کرښه[ستون];
+	إذا (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
 		    && (((enc_utf8 && utf_fold(prog->regstart) == utf_fold(c)))
 			|| (c < 255 && prog->regstart < 255 &&
 			    MB_TOLOWER(prog->regstart) == MB_TOLOWER(c)))))
-	    retval = regtry(prog, col, timed_out);
-	else
+	    retval = regtry(prog, ستون, timed_بهر);
+	وإلا
 	    retval = 0;
     }
-    else
+    وإلا
     {
 	// Messy cases:  unanchored match.
-	while (!got_int)
+	طالما (!got_int)
 	{
-	    if (prog->regstart != NUL)
+	    إذا (prog->regstart != NUL)
 	    {
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
-		if (!rex.reg_ic && !has_mbyte)
-		    s = vim_strbyte(rex.line + col, prog->regstart);
-		else
-		    s = cstrchr(rex.line + col, prog->regstart);
-		if (s == NULL)
+		إذا (!rex.reg_ic && !has_mbyte)
+		    s = vim_strbyte(rex.کرښه + ستون, prog->regstart);
+		وإلا
+		    s = cstrchr(rex.کرښه + ستون, prog->regstart);
+		إذا (s == عدم)
 		{
 		    retval = 0;
-		    break;
+		    اكسر;
 		}
-		col = (int)(s - rex.line);
+		ستون = (صحيح)(s - rex.کرښه);
 	    }
 
 	    // Check for maximum column to try.
-	    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	    إذا (rex.reg_maxcol > 0 && ستون >= rex.reg_maxcol)
 	    {
 		retval = 0;
-		break;
+		اكسر;
 	    }
 
-	    retval = regtry(prog, col, timed_out);
-	    if (retval > 0)
-		break;
+	    retval = regtry(prog, ستون, timed_بهر);
+	    إذا (retval > 0)
+		اكسر;
 
 	    // if not currently on the first line, get it again
-	    if (rex.lnum != 0)
+	    إذا (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
-		rex.line = reg_getline((linenr_T)0);
+		rex.کرښه = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
-		break;
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(rex.line + col);
-	    else
-		++col;
-#ifdef FEAT_RELTIME
-	    if (bt_did_time_out(timed_out))
-		break;
-#endif
+	    إذا (rex.کرښه[ستون] == NUL)
+		اكسر;
+	    إذا (has_mbyte)
+		ستون += (*mb_ptr2len)(rex.کرښه + ستون);
+	    وإلا
+		++ستون;
+#که_تعریف_شوی FEAT_RELTIME
+	    إذا (bt_did_وخت_بهر(timed_بهر))
+		اكسر;
+#د_که_پای
 	}
     }
 
 theend:
     // Free "reg_tofree" when it's a bit big.
     // Free regstack and backpos if they are bigger than their initial size.
-    if (reg_tofreelen > 400)
+    إذا (reg_tofreelen > 400)
 	VIM_CLEAR(reg_tofree);
-    if (regstack.ga_maxlen > REGSTACK_INITIAL)
+    إذا (regstack.ga_maxlen > REGSTACK_INITIAL)
 	ga_clear(&regstack);
-    if (backpos.ga_maxlen > BACKPOS_INITIAL)
+    إذا (backpos.ga_maxlen > BACKPOS_INITIAL)
 	ga_clear(&backpos);
 
-    if (retval > 0)
+    إذا (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs
 	// and \ze are used.
-	if (REG_MULTI)
+	إذا (REG_MULTI)
 	{
-	    lpos_T *start = &rex.reg_mmatch->startpos[0];
-	    lpos_T *end = &rex.reg_mmatch->endpos[0];
+	    lpos_T *پیل = &rex.reg_mmatch->startpos[0];
+	    lpos_T *پای_ټکی = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
-			|| (end->lnum == start->lnum && end->col < start->col))
+	    إذا (پای_ټکی->lnum < پیل->lnum
+			|| (پای_ټکی->lnum == پیل->lnum && پای_ټکی->ستون < پیل->ستون))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_mmatch->rmm_matchcol = col;
+	    rex.reg_mmatch->rmm_matchcol = ستون;
 	}
-	else
+	وإلا
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
-		rex.reg_match->endp[0] = rex.reg_match->startp[0];
+	    إذا (rex.reg_سمون->endp[0] < rex.reg_سمون->startp[0])
+		rex.reg_سمون->endp[0] = rex.reg_سمون->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
 	    // the whole pattern matched.
-	    rex.reg_match->rm_matchcol = col;
+	    rex.reg_سمون->rm_matchcol = ستون;
 	}
     }
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -5227,24 +5227,24 @@ theend:
  *
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    ساكن صحيح
 bt_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
-    colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    char_u	*کرښه,	// string to match against
+    colnr_T	ستون,	// column to start looking for match
+    صحيح		کرښه_lbr)
 {
-    rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_سمون = rmp;
+    rex.reg_mmatch = عدم;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_کرښه_lbr = کرښه_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = عدم;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    أرجع bt_regexec_both(کرښه, ستون, عدم);
 }
 
 /*
@@ -5255,102 +5255,102 @@ bt_regexec_nl(
  * Return zero if there is no match.  Return number of lines contained in the
  * match otherwise.
  */
-    static long
+    ساكن اوږد
 bt_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
-    colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    colnr_T	ستون,		// column to start looking for match
+    صحيح		*timed_بهر)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return bt_regexec_both(NULL, col, timed_out);
+    أرجع bt_regexec_both(عدم, ستون, timed_بهر);
 }
 
 /*
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
-    static int
-re_num_cmp(long_u val, char_u *scan)
+    ساكن صحيح
+re_عدد_cmp(long_u val, char_u *لټون)
 {
-    long_u  n = OPERAND_MIN(scan);
+    long_u  n = عملوند_MIN(لټون);
 
-    if (OPERAND_CMP(scan) == '>')
-	return val > n;
-    if (OPERAND_CMP(scan) == '<')
-	return val < n;
-    return val == n;
+    إذا (عملوند_CMP(لټون) == '>')
+	أرجع val > n;
+    إذا (عملوند_CMP(لټون) == '<')
+	أرجع val < n;
+    أرجع val == n;
 }
 
-#ifdef BT_REGEXP_DUMP
+#که_تعریف_شوی BT_REGEXP_DUMP
 
 /*
  * regdump - dump a regexp onto stdout in vaguely comprehensible form
  */
-    static void
-regdump(char_u *pattern, bt_regprog_T *r)
+    ساكن فراغ
+regdump(char_u *نمونه, bt_regprog_T *r)
 {
     char_u  *s;
-    int	    op = EXACTLY;	// Arbitrary non-END op.
-    char_u  *next;
-    char_u  *end = NULL;
+    صحيح	    op = EXACTLY;	// Arbitrary non-END op.
+    char_u  *بل;
+    char_u  *پای_ټکی = عدم;
     FILE    *f;
 
 # ifdef BT_REGEXP_LOG
     f = fopen("bt_regexp_log.log", "a");
-# else
+# وإلا
     f = stdout;
 # endif
-    if (f == NULL)
-	return;
-    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", pattern);
+    إذا (f == عدم)
+	أرجع;
+    fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", نمونه);
 
-    s = r->program + 1;
+    s = r->پروګرام + 1;
     // Loop until we find the END that isn't before a referred next (an END
     // can also appear in a NOMATCH operand).
-    while ((op != END || s <= end) && s < r->program + r->regsz)
+    طالما ((op != پای_ټکی_3 || s <= پای_ټکی) && s < r->پروګرام + r->regsz)
     {
 	op = OP(s);
-	fprintf(f, "%2d%s", (int)(s - r->program), regprop(s)); // Where, what.
-	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : NULL;
-	if (next == NULL)	// Next ptr.
+	fprintf(f, "%2d%s", (صحيح)(s - r->پروګرام), regprop(s)); // Where, what.
+	بل = (s + 3 <= r->پروګرام + r->regsz) ? regnext(s) : عدم;
+	إذا (بل == عدم)	// Next ptr.
 	    fprintf(f, "(0)");
-	else
-	    fprintf(f, "(%d)", (int)((s - r->program) + (next - s)));
-	if (end < next)
-	    end = next;
-	if (op == BRACE_LIMITS)
+	وإلا
+	    fprintf(f, "(%d)", (صحيح)((s - r->پروګرام) + (بل - s)));
+	إذا (پای_ټکی < بل)
+	    پای_ټکی = بل;
+	إذا (op == BRACE_LIMITS)
 	{
 	    // Two ints
-	    fprintf(f, " minval %ld, maxval %ld", OPERAND_MIN(s), OPERAND_MAX(s));
+	    fprintf(f, " minval %ld, maxval %ld", عملوند_MIN(s), عملوند_MAX(s));
 	    s += 8;
 	}
-	else if (op == BEHIND || op == NOBEHIND)
+	وإلا إذا (op == BEHIND || op == NOBEHIND)
 	{
 	    // one int
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", عملوند_MIN(s));
 	    s += 4;
 	}
-	else if (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
+	وإلا إذا (op == RE_LNUM || op == RE_ستون || op == RE_VCOL)
 	{
 	    // one int plus comparator
-	    fprintf(f, " count %ld", OPERAND_MIN(s));
+	    fprintf(f, " count %ld", عملوند_MIN(s));
 	    s += 5;
 	}
 	s += 3;
-	if (op == MULTIBYTECODE)
+	إذا (op == MULTIBYTECODE)
 	{
 	    fprintf(f, " mbc=%d", utf_ptr2char(s));
 	    s += utfc_ptr2len(s);
 	}
-	if (op == ANYOF || op == ANYOF + ADD_NL
-		|| op == ANYBUT || op == ANYBUT + ADD_NL
+	إذا (op == ANYOF || op == ANYOF + جمع_کړه_NL
+		|| op == ANYBUT || op == ANYBUT + جمع_کړه_NL
 		|| op == EXACTLY)
 	{
 	    // Literal string, where present.
 	    fprintf(f, "\nxxxxxxxxx\n");
-	    while (*s != NUL && s < r->program + r->regsz)
+	    طالما (*s != NUL && s < r->پروګرام + r->regsz)
 	    {
 		fprintf(f, "%c", *s);
 		s += utfc_ptr2len(s);  // advance by full char including combining
@@ -5362,13 +5362,13 @@ regdump(char_u *pattern, bt_regprog_T *r)
     }
 
     // Header fields of interest.
-    if (r->regstart != NUL)
+    إذا (r->regstart != NUL)
 	fprintf(f, "start `%s' 0x%x; ", r->regstart < 256
-		? (char *)transchar(r->regstart)
+		? (حرف *)transchar(r->regstart)
 		: "multibyte", r->regstart);
-    if (r->reganch)
+    إذا (r->reganch)
 	fprintf(f, "anchored; ");
-    if (r->regmust != NULL)
+    إذا (r->regmust != عدم)
 	fprintf(f, "must have \"%s\"", r->regmust);
     fprintf(f, "\r\n");
 
@@ -5376,388 +5376,388 @@ regdump(char_u *pattern, bt_regprog_T *r)
     fclose(f);
 # endif
 }
-#endif	    // BT_REGEXP_DUMP
+#د_که_پای	    // BT_REGEXP_DUMP
 
-#ifdef DEBUG
+#که_تعریف_شوی DEBUG
 /*
  * regprop - printable representation of opcode
  */
-    static char_u *
+    ساكن char_u *
 regprop(char_u *op)
 {
-    char	    *p;
-    static char	    buf[50];
-    static size_t   buflen = 0;
+    حرف	    *p;
+    ساكن حرف	    buf[50];
+    ساكن size_t   buflen = 0;
 
     STRCPY(buf, ":");
     buflen = 1;
 
-    switch ((int) OP(op))
+    بدل ((صحيح) OP(op))
     {
-      case BOL:
+      حالة BOL:
 	p = "BOL";
-	break;
-      case EOL:
+	اكسر;
+      حالة EOL:
 	p = "EOL";
-	break;
-      case RE_BOF:
+	اكسر;
+      حالة RE_BOF:
 	p = "BOF";
-	break;
-      case RE_EOF:
+	اكسر;
+      حالة RE_EOF:
 	p = "EOF";
-	break;
-      case CURSOR:
+	اكسر;
+      حالة CURSOR:
 	p = "CURSOR";
-	break;
-      case RE_VISUAL:
+	اكسر;
+      حالة RE_VISUAL:
 	p = "RE_VISUAL";
-	break;
-      case RE_LNUM:
+	اكسر;
+      حالة RE_LNUM:
 	p = "RE_LNUM";
-	break;
-      case RE_MARK:
+	اكسر;
+      حالة RE_MARK:
 	p = "RE_MARK";
-	break;
-      case RE_COL:
+	اكسر;
+      حالة RE_ستون:
 	p = "RE_COL";
-	break;
-      case RE_VCOL:
+	اكسر;
+      حالة RE_VCOL:
 	p = "RE_VCOL";
-	break;
-      case BOW:
+	اكسر;
+      حالة BOW:
 	p = "BOW";
-	break;
-      case EOW:
+	اكسر;
+      حالة EOW:
 	p = "EOW";
-	break;
-      case ANY:
+	اكسر;
+      حالة ANY:
 	p = "ANY";
-	break;
-      case ANY + ADD_NL:
+	اكسر;
+      حالة ANY + جمع_کړه_NL:
 	p = "ANY+NL";
-	break;
-      case ANYOF:
+	اكسر;
+      حالة ANYOF:
 	p = "ANYOF";
-	break;
-      case ANYOF + ADD_NL:
+	اكسر;
+      حالة ANYOF + جمع_کړه_NL:
 	p = "ANYOF+NL";
-	break;
-      case ANYBUT:
+	اكسر;
+      حالة ANYBUT:
 	p = "ANYBUT";
-	break;
-      case ANYBUT + ADD_NL:
+	اكسر;
+      حالة ANYBUT + جمع_کړه_NL:
 	p = "ANYBUT+NL";
-	break;
-      case IDENT:
+	اكسر;
+      حالة IDENT:
 	p = "IDENT";
-	break;
-      case IDENT + ADD_NL:
+	اكسر;
+      حالة IDENT + جمع_کړه_NL:
 	p = "IDENT+NL";
-	break;
-      case SIDENT:
+	اكسر;
+      حالة SIDENT:
 	p = "SIDENT";
-	break;
-      case SIDENT + ADD_NL:
+	اكسر;
+      حالة SIDENT + جمع_کړه_NL:
 	p = "SIDENT+NL";
-	break;
-      case KWORD:
+	اكسر;
+      حالة KWORD:
 	p = "KWORD";
-	break;
-      case KWORD + ADD_NL:
+	اكسر;
+      حالة KWORD + جمع_کړه_NL:
 	p = "KWORD+NL";
-	break;
-      case SKWORD:
+	اكسر;
+      حالة SKWORD:
 	p = "SKWORD";
-	break;
-      case SKWORD + ADD_NL:
+	اكسر;
+      حالة SKWORD + جمع_کړه_NL:
 	p = "SKWORD+NL";
-	break;
-      case FNAME:
+	اكسر;
+      حالة FNAME:
 	p = "FNAME";
-	break;
-      case FNAME + ADD_NL:
+	اكسر;
+      حالة FNAME + جمع_کړه_NL:
 	p = "FNAME+NL";
-	break;
-      case SFNAME:
+	اكسر;
+      حالة SFNAME:
 	p = "SFNAME";
-	break;
-      case SFNAME + ADD_NL:
+	اكسر;
+      حالة SFNAME + جمع_کړه_NL:
 	p = "SFNAME+NL";
-	break;
-      case PRINT:
+	اكسر;
+      حالة PRINT:
 	p = "PRINT";
-	break;
-      case PRINT + ADD_NL:
+	اكسر;
+      حالة PRINT + جمع_کړه_NL:
 	p = "PRINT+NL";
-	break;
-      case SPRINT:
+	اكسر;
+      حالة SPRINT:
 	p = "SPRINT";
-	break;
-      case SPRINT + ADD_NL:
+	اكسر;
+      حالة SPRINT + جمع_کړه_NL:
 	p = "SPRINT+NL";
-	break;
-      case WHITE:
+	اكسر;
+      حالة WHITE:
 	p = "WHITE";
-	break;
-      case WHITE + ADD_NL:
+	اكسر;
+      حالة WHITE + جمع_کړه_NL:
 	p = "WHITE+NL";
-	break;
-      case NWHITE:
+	اكسر;
+      حالة NWHITE:
 	p = "NWHITE";
-	break;
-      case NWHITE + ADD_NL:
+	اكسر;
+      حالة NWHITE + جمع_کړه_NL:
 	p = "NWHITE+NL";
-	break;
-      case DIGIT:
+	اكسر;
+      حالة DIGIT:
 	p = "DIGIT";
-	break;
-      case DIGIT + ADD_NL:
+	اكسر;
+      حالة DIGIT + جمع_کړه_NL:
 	p = "DIGIT+NL";
-	break;
-      case NDIGIT:
+	اكسر;
+      حالة NDIGIT:
 	p = "NDIGIT";
-	break;
-      case NDIGIT + ADD_NL:
+	اكسر;
+      حالة NDIGIT + جمع_کړه_NL:
 	p = "NDIGIT+NL";
-	break;
-      case HEX:
+	اكسر;
+      حالة HEX:
 	p = "HEX";
-	break;
-      case HEX + ADD_NL:
+	اكسر;
+      حالة HEX + جمع_کړه_NL:
 	p = "HEX+NL";
-	break;
-      case NHEX:
+	اكسر;
+      حالة NHEX:
 	p = "NHEX";
-	break;
-      case NHEX + ADD_NL:
+	اكسر;
+      حالة NHEX + جمع_کړه_NL:
 	p = "NHEX+NL";
-	break;
-      case OCTAL:
+	اكسر;
+      حالة OCTAL:
 	p = "OCTAL";
-	break;
-      case OCTAL + ADD_NL:
+	اكسر;
+      حالة OCTAL + جمع_کړه_NL:
 	p = "OCTAL+NL";
-	break;
-      case NOCTAL:
+	اكسر;
+      حالة NOCTAL:
 	p = "NOCTAL";
-	break;
-      case NOCTAL + ADD_NL:
+	اكسر;
+      حالة NOCTAL + جمع_کړه_NL:
 	p = "NOCTAL+NL";
-	break;
-      case WORD:
+	اكسر;
+      حالة کلمه_2:
 	p = "WORD";
-	break;
-      case WORD + ADD_NL:
+	اكسر;
+      حالة کلمه_2 + جمع_کړه_NL:
 	p = "WORD+NL";
-	break;
-      case NWORD:
+	اكسر;
+      حالة NWORD:
 	p = "NWORD";
-	break;
-      case NWORD + ADD_NL:
+	اكسر;
+      حالة NWORD + جمع_کړه_NL:
 	p = "NWORD+NL";
-	break;
-      case HEAD:
+	اكسر;
+      حالة سر_4:
 	p = "HEAD";
-	break;
-      case HEAD + ADD_NL:
+	اكسر;
+      حالة سر_4 + جمع_کړه_NL:
 	p = "HEAD+NL";
-	break;
-      case NHEAD:
+	اكسر;
+      حالة NHEAD:
 	p = "NHEAD";
-	break;
-      case NHEAD + ADD_NL:
+	اكسر;
+      حالة NHEAD + جمع_کړه_NL:
 	p = "NHEAD+NL";
-	break;
-      case ALPHA:
+	اكسر;
+      حالة ALPHA:
 	p = "ALPHA";
-	break;
-      case ALPHA + ADD_NL:
+	اكسر;
+      حالة ALPHA + جمع_کړه_NL:
 	p = "ALPHA+NL";
-	break;
-      case NALPHA:
+	اكسر;
+      حالة NALPHA:
 	p = "NALPHA";
-	break;
-      case NALPHA + ADD_NL:
+	اكسر;
+      حالة NALPHA + جمع_کړه_NL:
 	p = "NALPHA+NL";
-	break;
-      case LOWER:
+	اكسر;
+      حالة ښکتنی_2:
 	p = "LOWER";
-	break;
-      case LOWER + ADD_NL:
+	اكسر;
+      حالة ښکتنی_2 + جمع_کړه_NL:
 	p = "LOWER+NL";
-	break;
-      case NLOWER:
+	اكسر;
+      حالة NLOWER:
 	p = "NLOWER";
-	break;
-      case NLOWER + ADD_NL:
+	اكسر;
+      حالة NLOWER + جمع_کړه_NL:
 	p = "NLOWER+NL";
-	break;
-      case UPPER:
+	اكسر;
+      حالة پاسنی:
 	p = "UPPER";
-	break;
-      case UPPER + ADD_NL:
+	اكسر;
+      حالة پاسنی + جمع_کړه_NL:
 	p = "UPPER+NL";
-	break;
-      case NUPPER:
+	اكسر;
+      حالة NUPPER:
 	p = "NUPPER";
-	break;
-      case NUPPER + ADD_NL:
+	اكسر;
+      حالة NUPPER + جمع_کړه_NL:
 	p = "NUPPER+NL";
-	break;
-      case BRANCH:
+	اكسر;
+      حالة BRANCH:
 	p = "BRANCH";
-	break;
-      case EXACTLY:
+	اكسر;
+      حالة EXACTLY:
 	p = "EXACTLY";
-	break;
-      case NOTHING:
+	اكسر;
+      حالة NOTHING:
 	p = "NOTHING";
-	break;
-      case BACK:
+	اكسر;
+      حالة شا_2:
 	p = "BACK";
-	break;
-      case END:
+	اكسر;
+      حالة پای_ټکی_3:
 	p = "END";
-	break;
-      case MOPEN + 0:
+	اكسر;
+      حالة MOPEN + 0:
 	p = "MATCH START";
-	break;
-      case MOPEN + 1:
-      case MOPEN + 2:
-      case MOPEN + 3:
-      case MOPEN + 4:
-      case MOPEN + 5:
-      case MOPEN + 6:
-      case MOPEN + 7:
-      case MOPEN + 8:
-      case MOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
-	p = NULL;
-	break;
-      case MCLOSE + 0:
+	اكسر;
+      حالة MOPEN + 1:
+      حالة MOPEN + 2:
+      حالة MOPEN + 3:
+      حالة MOPEN + 4:
+      حالة MOPEN + 5:
+      حالة MOPEN + 6:
+      حالة MOPEN + 7:
+      حالة MOPEN + 8:
+      حالة MOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
+	p = عدم;
+	اكسر;
+      حالة MCLOSE + 0:
 	p = "MATCH END";
-	break;
-      case MCLOSE + 1:
-      case MCLOSE + 2:
-      case MCLOSE + 3:
-      case MCLOSE + 4:
-      case MCLOSE + 5:
-      case MCLOSE + 6:
-      case MCLOSE + 7:
-      case MCLOSE + 8:
-      case MCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
-	p = NULL;
-	break;
-      case BACKREF + 1:
-      case BACKREF + 2:
-      case BACKREF + 3:
-      case BACKREF + 4:
-      case BACKREF + 5:
-      case BACKREF + 6:
-      case BACKREF + 7:
-      case BACKREF + 8:
-      case BACKREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
-	p = NULL;
-	break;
-      case NOPEN:
+	اكسر;
+      حالة MCLOSE + 1:
+      حالة MCLOSE + 2:
+      حالة MCLOSE + 3:
+      حالة MCLOSE + 4:
+      حالة MCLOSE + 5:
+      حالة MCLOSE + 6:
+      حالة MCLOSE + 7:
+      حالة MCLOSE + 8:
+      حالة MCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
+	p = عدم;
+	اكسر;
+      حالة BACKREF + 1:
+      حالة BACKREF + 2:
+      حالة BACKREF + 3:
+      حالة BACKREF + 4:
+      حالة BACKREF + 5:
+      حالة BACKREF + 6:
+      حالة BACKREF + 7:
+      حالة BACKREF + 8:
+      حالة BACKREF + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
+	p = عدم;
+	اكسر;
+      حالة NOPEN:
 	p = "NOPEN";
-	break;
-      case NCLOSE:
+	اكسر;
+      حالة NCLOSE:
 	p = "NCLOSE";
-	break;
+	اكسر;
 # ifdef FEAT_SYN_HL
-      case ZOPEN + 1:
-      case ZOPEN + 2:
-      case ZOPEN + 3:
-      case ZOPEN + 4:
-      case ZOPEN + 5:
-      case ZOPEN + 6:
-      case ZOPEN + 7:
-      case ZOPEN + 8:
-      case ZOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
-	p = NULL;
-	break;
-      case ZCLOSE + 1:
-      case ZCLOSE + 2:
-      case ZCLOSE + 3:
-      case ZCLOSE + 4:
-      case ZCLOSE + 5:
-      case ZCLOSE + 6:
-      case ZCLOSE + 7:
-      case ZCLOSE + 8:
-      case ZCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
-	p = NULL;
-	break;
-      case ZREF + 1:
-      case ZREF + 2:
-      case ZREF + 3:
-      case ZREF + 4:
-      case ZREF + 5:
-      case ZREF + 6:
-      case ZREF + 7:
-      case ZREF + 8:
-      case ZREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZREF%d", OP(op) - ZREF);
-	p = NULL;
-	break;
+      حالة ZOPEN + 1:
+      حالة ZOPEN + 2:
+      حالة ZOPEN + 3:
+      حالة ZOPEN + 4:
+      حالة ZOPEN + 5:
+      حالة ZOPEN + 6:
+      حالة ZOPEN + 7:
+      حالة ZOPEN + 8:
+      حالة ZOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
+	p = عدم;
+	اكسر;
+      حالة ZCLOSE + 1:
+      حالة ZCLOSE + 2:
+      حالة ZCLOSE + 3:
+      حالة ZCLOSE + 4:
+      حالة ZCLOSE + 5:
+      حالة ZCLOSE + 6:
+      حالة ZCLOSE + 7:
+      حالة ZCLOSE + 8:
+      حالة ZCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
+	p = عدم;
+	اكسر;
+      حالة ZREF + 1:
+      حالة ZREF + 2:
+      حالة ZREF + 3:
+      حالة ZREF + 4:
+      حالة ZREF + 5:
+      حالة ZREF + 6:
+      حالة ZREF + 7:
+      حالة ZREF + 8:
+      حالة ZREF + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "ZREF%d", OP(op) - ZREF);
+	p = عدم;
+	اكسر;
 # endif
-      case STAR:
+      حالة ستوری:
 	p = "STAR";
-	break;
-      case PLUS:
+	اكسر;
+      حالة PLUS:
 	p = "PLUS";
-	break;
-      case NOMATCH:
+	اكسر;
+      حالة NOMATCH:
 	p = "NOMATCH";
-	break;
-      case MATCH:
+	اكسر;
+      حالة سمون_2:
 	p = "MATCH";
-	break;
-      case BEHIND:
+	اكسر;
+      حالة BEHIND:
 	p = "BEHIND";
-	break;
-      case NOBEHIND:
+	اكسر;
+      حالة NOBEHIND:
 	p = "NOBEHIND";
-	break;
-      case SUBPAT:
+	اكسر;
+      حالة SUBPAT:
 	p = "SUBPAT";
-	break;
-      case BRACE_LIMITS:
+	اكسر;
+      حالة BRACE_LIMITS:
 	p = "BRACE_LIMITS";
-	break;
-      case BRACE_SIMPLE:
+	اكسر;
+      حالة BRACE_SIMPLE:
 	p = "BRACE_SIMPLE";
-	break;
-      case BRACE_COMPLEX + 0:
-      case BRACE_COMPLEX + 1:
-      case BRACE_COMPLEX + 2:
-      case BRACE_COMPLEX + 3:
-      case BRACE_COMPLEX + 4:
-      case BRACE_COMPLEX + 5:
-      case BRACE_COMPLEX + 6:
-      case BRACE_COMPLEX + 7:
-      case BRACE_COMPLEX + 8:
-      case BRACE_COMPLEX + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
-	p = NULL;
-	break;
-      case MULTIBYTECODE:
+	اكسر;
+      حالة BRACE_COMPLEX + 0:
+      حالة BRACE_COMPLEX + 1:
+      حالة BRACE_COMPLEX + 2:
+      حالة BRACE_COMPLEX + 3:
+      حالة BRACE_COMPLEX + 4:
+      حالة BRACE_COMPLEX + 5:
+      حالة BRACE_COMPLEX + 6:
+      حالة BRACE_COMPLEX + 7:
+      حالة BRACE_COMPLEX + 8:
+      حالة BRACE_COMPLEX + 9:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
+	p = عدم;
+	اكسر;
+      حالة MULTIBYTECODE:
 	p = "MULTIBYTECODE";
-	break;
-      case NEWL:
+	اكسر;
+      حالة NEWL:
 	p = "NEWL";
-	break;
-      default:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "corrupt %d", OP(op));
-	p = NULL;
-	break;
+	اكسر;
+      افتراضي:
+	buflen += vim_snprintf(buf + buflen, حجم(buf) - buflen, "corrupt %d", OP(op));
+	p = عدم;
+	اكسر;
     }
-    if (p != NULL)
-	vim_strncpy((char_u *)buf + buflen, (char_u *)p, sizeof(buf) - buflen - 1);
-    return (char_u *)buf;
+    إذا (p != عدم)
+	vim_strncpy((char_u *)buf + buflen, (char_u *)p, حجم(buf) - buflen - 1);
+    أرجع (char_u *)buf;
 }
-#endif	    // DEBUG
+#د_که_پای	    // DEBUG

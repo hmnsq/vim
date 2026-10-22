@@ -27,16 +27,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef _WIN32
+#که_تعریف_شوی _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#ضمن <ctype.h>
+#ضمن <io.h>
+#ضمن <wchar.h>
+#ضمن <windows.h>
 
-#ifdef USE_FILEEXTD
+#که_تعریف_شوی USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# إذا !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,146 +45,146 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#وإلا // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# إذا defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  وإلا
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
-#endif // USE_FILEEXTD
+#د_که_پای // USE_FILEEXTD
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#که_تعریف_شوی __MINGW32__
+# define ناکارول_شوی __attribute__((ناکارول_شوی_2))
+#وإلا
+# define ناکارول_شوی
+#د_که_پای
 
-#include "iscygpty.h"
+#ضمن "iscygpty.h"
 
 //#define USE_DYNFILEID
-#ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+#که_تعریف_شوی USE_DYNFILEID
+تعريفنوع BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
-		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+		DWORD						dw_بفر_اندازه);
+ساكن pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = عدم;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
-		HANDLE						hFile UNUSED,
-		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
-		LPVOID						lpFileInformation UNUSED,
-		DWORD						dwBufferSize UNUSED)
+ساكن BOOL WINAPI stub_GetFileInformationByHandleEx(
+		HANDLE						hFile ناکارول_شوی,
+		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass ناکارول_شوی,
+		LPVOID						lpFileInformation ناکارول_شوی,
+		DWORD						dw_بفر_اندازه ناکارول_شوی)
 {
-	return FALSE;
+	أرجع FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+ساكن فراغ تیاری_fileid_api(فراغ)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	إذا (pGetFileInformationByHandleEx != عدم) {
+		أرجع;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
-		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		Get_Proc_پته(GetModuleHandle(متن_3("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	إذا (pGetFileInformationByHandleEx == عدم) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# وإلا
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#وإلا
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
-# define setup_fileid_api()
-#endif
+# define تیاری_fileid_api()
+#د_که_پای
 
 
-#define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+#تعریف_کړه is_wprefix(s, مختاړی) \
+	(wcsncmp((s), (مختاړی), حجم(مختاړی) / حجم(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+صحيح is_cygpty(صحيح fd)
 {
-#ifdef STUB_IMPL
-	return 0;
-#else
+#که_تعریف_شوی STUB_IMPL
+	أرجع 0;
+#وإلا
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ثابت صحيح اندازه = حجم(FILE_NAME_INFO) + حجم(WCHAR) * (MAX_لار - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = عدم;
 
-	setup_fileid_api();
+	تیاری_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	إذا (h == INVALID_HANDLE_ارزښت) {
+		أرجع 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	إذا (GetFileType(h) != FILE_TYPE_PIPE) {
+		أرجع 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = حافظه_ورکړه(اندازه + حجم(WCHAR));
+	إذا (nameinfo == عدم) {
+		أرجع 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	إذا (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, اندازه)) {
+		nameinfo->FileName[nameinfo->File_Name_اوږدتیا / حجم(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		إذا (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} وإلا إذا (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} وإلا {
+			p = عدم;
 		}
-		if (p != NULL) {
+		إذا (p != عدم) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			طالما (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			إذا (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} وإلا {
+				p = عدم;
 			}
 		}
-		if (p != NULL) {
+		إذا (p != عدم) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			طالما (*p && iswascii(*p) && که_عدد(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			إذا (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} وإلا إذا (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} وإلا {
+				p = عدم;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
-#endif // STUB_IMPL
+	حرر(nameinfo);
+	أرجع (p != عدم);
+#د_که_پای // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+صحيح is_cygpty_کارول_شوی(فراغ)
 {
-	int fd, ret = 0;
+	صحيح fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	لكل (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	أرجع ret;
 }
 
-#endif // _WIN32
+#د_که_پای // _WIN32
 
 // vim: set ts=4 sw=4:
