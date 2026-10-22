@@ -18,37 +18,37 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#અન્તર્ભાવ <stdio.h>
+#અન્તર્ભાવ <string.h>
 
-	int
-main(int argc, char **argv)
+	પૂર્ણાંક
+મુખ્ય(પૂર્ણાંક argc, અક્ષર **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	અક્ષર buffer[BUFSIZ];
+	અક્ષર *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	જ્યારે (fgets(buffer, BUFSIZ, stdin) != ખાલી)
 	{
-		for (p = buffer; *p != 0; p++)
+		માટે (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			જો (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			નહીંતર જો (strncmp(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				જ્યારે (p[1] != '\n')
 					++p;
 			}
-			else
+			નહીંતર
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				જો (*(unsigned અક્ષર *)p >= 0xA1)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					જો (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

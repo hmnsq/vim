@@ -27,7 +27,7 @@
 		       ? (a)->col < (b)->col \
 		       : (a)->coladd < (b)->coladd)
 #define EQUAL_POS(a, b) (((a).lnum == (b).lnum) && ((a).col == (b).col) && ((a).coladd == (b).coladd))
-#define CLEAR_POS(a) do {(a)->lnum = 0; (a)->col = 0; (a)->coladd = 0;} while (0)
+#define CLEAR_POS(a) કરો {(a)->lnum = 0; (a)->col = 0; (a)->coladd = 0;} જ્યારે (0)
 #define EMPTY_POS(a) ((a).lnum == 0 && (a).col == 0 && (a).coladd == 0)
 
 #define LTOREQ_POS(a, b) (LT_POS(a, b) || EQUAL_POS(a, b))
@@ -48,7 +48,7 @@
 /*
  * BUFEMPTY() - return TRUE if the current buffer is empty
  */
-#define BUFEMPTY() (curbuf->b_ml.ml_line_count == 1 && *ml_get((linenr_T)1) == NUL)
+#define BUFEMPTY() (curbuf->b_ml.ml_લીટી_ગણતરી == 1 && *ml_get((linenr_T)1) == NUL)
 
 // The is*() and to*() functions declared in <ctype.h> have
 // undefined behavior for values other than EOF outside the range of
@@ -57,20 +57,20 @@
 // unsigned char.  (Most implementations behave more or less sanely
 // with negative values, and most character values in practice are
 // positive, but we want to avoid undefined behavior anyway.)
-#define SAFE_isalnum(c)  (isalnum ((unsigned char)(c)))
-#define SAFE_isalpha(c)  (isalpha ((unsigned char)(c)))
-#define SAFE_isblank(c)  (isblank ((unsigned char)(c)))
-#define SAFE_iscntrl(c)  (iscntrl ((unsigned char)(c)))
-#define SAFE_isdigit(c)  (isdigit ((unsigned char)(c)))
-#define SAFE_isgraph(c)  (isgraph ((unsigned char)(c)))
-#define SAFE_islower(c)  (islower ((unsigned char)(c)))
-#define SAFE_isprint(c)  (isprint ((unsigned char)(c)))
-#define SAFE_ispunct(c)  (ispunct ((unsigned char)(c)))
-#define SAFE_isspace(c)  (isspace ((unsigned char)(c)))
-#define SAFE_isupper(c)  (isupper ((unsigned char)(c)))
-#define SAFE_isxdigit(c) (isxdigit((unsigned char)(c)))
-#define SAFE_tolower(c)  (tolower ((unsigned char)(c)))
-#define SAFE_toupper(c)  (toupper ((unsigned char)(c)))
+#define SAFE_isalnum(c)  (isalnum ((unsigned અક્ષર)(c)))
+#define SAFE_isalpha(c)  (isalpha ((unsigned અક્ષર)(c)))
+#define SAFE_isblank(c)  (isblank ((unsigned અક્ષર)(c)))
+#define SAFE_iscntrl(c)  (iscntrl ((unsigned અક્ષર)(c)))
+#define SAFE_isdigit(c)  (isdigit ((unsigned અક્ષર)(c)))
+#define SAFE_isgraph(c)  (isgraph ((unsigned અક્ષર)(c)))
+#define SAFE_islower(c)  (islower ((unsigned અક્ષર)(c)))
+#define SAFE_isprint(c)  (isprint ((unsigned અક્ષર)(c)))
+#define SAFE_ispunct(c)  (ispunct ((unsigned અક્ષર)(c)))
+#define SAFE_isspace(c)  (isspace ((unsigned અક્ષર)(c)))
+#define SAFE_isupper(c)  (isupper ((unsigned અક્ષર)(c)))
+#define SAFE_isxdigit(c) (isxdigit((unsigned અક્ષર)(c)))
+#define SAFE_tolower(c)  (tolower ((unsigned અક્ષર)(c)))
+#define SAFE_toupper(c)  (toupper ((unsigned અક્ષર)(c)))
 
 /*
  * toupper() and tolower() that use the current locale.
@@ -84,11 +84,11 @@
 #ifdef MSWIN
 # define TOUPPER_LOC(c)	toupper_tab[(c) & 255]
 # define TOLOWER_LOC(c)	tolower_tab[(c) & 255]
-#else
+#નહીંતર
 # ifdef BROKEN_TOUPPER
 #  define TOUPPER_LOC(c)	(SAFE_islower(c) ? SAFE_toupper(c) : (c))
 #  define TOLOWER_LOC(c)	(SAFE_isupper(c) ? SAFE_tolower(c) : (c))
-# else
+# નહીંતર
 #  define TOUPPER_LOC		SAFE_toupper
 #  define TOLOWER_LOC		SAFE_tolower
 # endif
@@ -133,20 +133,20 @@
  * The do-while is just to ignore a ';' after the macro.
  */
 # define LANGMAP_ADJUST(c, condition) \
-    do { \
-	if (*p_langmap \
+    કરો { \
+	જો (*p_langmap \
 		&& (condition) \
-		&& (p_lrm || (!p_lrm && KeyTyped)) \
-		&& !KeyStuffed \
+		&& (p_lrm || (!p_lrm && ચાવી_Typed)) \
+		&& !ચાવી_Stuffed \
 		&& (c) >= 0) \
 	{ \
-	    if ((c) < 256) \
+	    જો ((c) < 256) \
 		c = langmap_mapchar[c]; \
-	    else \
+	    નહીંતર \
 		c = langmap_adjust_mb(c); \
 	} \
-    } while (0)
-#else
+    } જ્યારે (0)
+#નહીંતર
 # define LANGMAP_ADJUST(c, condition) // nop
 #endif
 
@@ -167,8 +167,8 @@
 # define mch_fstat(n, p)	fstat((n), (p))
 # undef HAVE_LSTAT		// VMS does not have lstat()
 # define mch_stat(n, p)		stat(vms_fixfilename(n), (p))
-#else
-# if !defined(MSWIN) && !defined(PROTO)
+#નહીંતર
+# જો !defined(MSWIN) && !defined(PROTO)
 #  define mch_access(n, p)	access((n), (p))
 # endif
 
@@ -176,16 +176,16 @@
 // NOTE: This condition is the same as for the stat_T type.
 # ifdef MSWIN
 #  define mch_fstat(n, p)	_fstat64((n), (p))
-# else
+# નહીંતર
 #  define mch_fstat(n, p)	fstat((n), (p))
 # endif
 
 # ifdef MSWIN	// has its own mch_stat() function
 #  define mch_stat(n, p)	vim_stat((n), (p))
-# else
+# નહીંતર
 #  ifdef STAT_IGNORES_SLASH
 #   define mch_stat(n, p)	vim_stat((n), (p))
-#  else
+#  નહીંતર
 #   define mch_stat(n, p)	stat((n), (p))
 #  endif
 # endif
@@ -193,10 +193,10 @@
 
 #ifdef HAVE_LSTAT
 # define mch_lstat(n, p)	lstat((n), (p))
-#else
+#નહીંતર
 # ifdef MSWIN
 #  define mch_lstat(n, p)	vim_lstat((n), (p))
-# else
+# નહીંતર
 #  define mch_lstat(n, p)	mch_stat((n), (p))
 # endif
 #endif
@@ -211,20 +211,20 @@
 #endif
 
 // mch_open_rw(): invoke mch_open() with third argument for user R/W.
-#if defined(UNIX) || defined(VMS)  // open in rw------- mode
+#જો defined(UNIX) || defined(VMS)  // open in rw------- mode
 # define mch_open_rw(n, f)	mch_open((n), (f), (mode_t)0600)
-#else
-# if defined(MSWIN)  // open read/write
+#નહીંતર
+# જો defined(MSWIN)  // open read/write
 #  define mch_open_rw(n, f)	mch_open((n), (f), S_IREAD | S_IWRITE)
-# else
+# નહીંતર
 #  define mch_open_rw(n, f)	mch_open((n), (f), 0)
 # endif
 #endif
 
 #ifdef STARTUPTIME
-# define TIME_MSG(s) do { if (time_fd != NULL) time_msg(s, NULL); } while (0)
-#else
-# define TIME_MSG(s) do { /**/ } while (0)
+# define TIME_સંદેશ(s) કરો { જો (time_fd != ખાલી) time_સંદેશ(s, ખાલી); } જ્યારે (0)
+#નહીંતર
+# define TIME_સંદેશ(s) કરો { /**/ } જ્યારે (0)
 #endif
 
 #define REPLACE_NORMAL(s) (((s) & REPLACE_FLAG) && !((s) & VREPLACE_FLAG))
@@ -232,13 +232,13 @@
 #ifdef FEAT_ARABIC
 # define ARABIC_CHAR(ch)	    (((ch) & 0xFF00) == 0x0600)
 # define UTF_COMPOSINGLIKE(p1, p2)  utf_composinglike((p1), (p2))
-#else
+#નહીંતર
 # define UTF_COMPOSINGLIKE(p1, p2)  utf_iscomposing(utf_ptr2char(p2))
 #endif
 
 #ifdef FEAT_RIGHTLEFT
     // Whether to draw the vertical bar on the right side of the cell.
-# define CURSOR_BAR_RIGHT (curwin->w_p_rl && (!(State & MODE_CMDLINE) || cmdmsg_rl))
+# define CURSOR_BAR_જમણું (curwin->w_p_rl && (!(State & MODE_CMDLINE) || cmdmsg_rl))
 #endif
 
 /*
@@ -258,72 +258,72 @@
 // get length of multi-byte char, not including composing chars
 #define MB_CPTR2LEN(p)	    (enc_utf8 ? utf_ptr2len(p) : (*mb_ptr2len)(p))
 
-#define MB_COPY_CHAR(f, t) do { if (has_mbyte) mb_copy_char(&(f), &(t)); else *(t)++ = *(f)++; } while (0)
-#define MB_CHARLEN(p)	    (has_mbyte ? mb_charlen(p) : (int)STRLEN(p))
+#define MB_COPY_CHAR(f, t) કરો { જો (has_mbyte) mb_copy_char(&(f), &(t)); નહીંતર *(t)++ = *(f)++; } જ્યારે (0)
+#define MB_CHARLEN(p)	    (has_mbyte ? mb_charlen(p) : (પૂર્ણાંક)STRLEN(p))
 #define MB_CHAR2LEN(c)	    (has_mbyte ? mb_char2len(c) : 1)
-#define PTR2CHAR(p)	    (has_mbyte ? mb_ptr2char(p) : (int)*(p))
-#define MB_CHAR2BYTES(c, b) do { if (has_mbyte) (b) += (*mb_char2bytes)((c), (b)); else *(b)++ = (c); } while (0)
+#define PTR2CHAR(p)	    (has_mbyte ? mb_ptr2char(p) : (પૂર્ણાંક)*(p))
+#define MB_CHAR2BYTES(c, b) કરો { જો (has_mbyte) (b) += (*mb_char2bytes)((c), (b)); નહીંતર *(b)++ = (c); } જ્યારે (0)
 
 #ifdef FEAT_AUTOCHDIR
-# define DO_AUTOCHDIR do { if (p_acd) do_autochdir(); } while (0)
-#else
-# define DO_AUTOCHDIR do { /**/ } while (0)
+# define DO_AUTOCHDIR કરો { જો (p_acd) do_autochdir(); } જ્યારે (0)
+#નહીંતર
+# define DO_AUTOCHDIR કરો { /**/ } જ્યારે (0)
 #endif
 
-#define RESET_BINDING(wp)  do { (wp)->w_p_scb = FALSE; (wp)->w_p_crb = FALSE; \
-			    } while (0)
+#define RESET_BINDING(wp)  કરો { (wp)->w_p_scb = FALSE; (wp)->w_p_crb = FALSE; \
+			    } જ્યારે (0)
 
 #ifdef FEAT_DIFF
 # define PLINES_NOFILL(x) plines_nofill(x)
 # define PLINES_WIN_NOFILL(w, l, h) plines_win_nofill((w), (l), (h))
-#else
+#નહીંતર
 # define PLINES_NOFILL(x) plines(x)
 # define PLINES_WIN_NOFILL(w, l, h) plines_win((w), (l), (h))
 #endif
 
-#if defined(FEAT_JOB_CHANNEL) || defined(FEAT_CLIENTSERVER)
+#જો defined(FEAT_JOB_CHANNEL) || defined(FEAT_CLIENTSERVER)
 # define MESSAGE_QUEUE
 #endif
 
-#include <float.h>
-#if defined(HAVE_MATH_H)
+#અન્તર્ભાવ <float.h>
+#જો defined(HAVE_MATH_H)
   // for isnan() and isinf()
 # include <math.h>
 #endif
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 # ifdef USING_FLOAT_STUFF
 #  ifdef MSWIN
 #   ifndef isnan
 #    define isnan(x) _isnan(x)
-     static __inline int isinf(double x)
-	{ return !_finite(x) && !_isnan(x); }
+     સ્થિર __inline પૂર્ણાંક isinf(દ્વિગુણ x)
+	{ પાછા !_finite(x) && !_isnan(x); }
 #   endif
-#  else
+#  નહીંતર
 #   ifndef HAVE_ISNAN
-     static inline int isnan(double x)
-	{ return x != x; }
+     સ્થિર અંતઃરેખ પૂર્ણાંક isnan(દ્વિગુણ x)
+	{ પાછા x != x; }
 #   endif
 #   ifndef HAVE_ISINF
-     static inline int isinf(double x)
-	{ return !isnan(x) && isnan(x - x); }
+     સ્થિર અંતઃરેખ પૂર્ણાંક isinf(દ્વિગુણ x)
+	{ પાછા !isnan(x) && isnan(x - x); }
 #   endif
 #  endif
-#  if !defined(INFINITY)
-#   if defined(DBL_MAX)
+#  જો !defined(INFINITY)
+#   જો defined(DBL_MAX)
 #    ifdef VMS
 #     define INFINITY DBL_MAX
-#    else
+#    નહીંતર
 #     define INFINITY (DBL_MAX+DBL_MAX)
 #    endif
-#   else
+#   નહીંતર
 #    define INFINITY (1.0 / 0.0)
 #   endif
 #  endif
-#  if !defined(NAN)
+#  જો !defined(NAN)
 #   define NAN (INFINITY-INFINITY)
 #  endif
-#  if !defined(DBL_EPSILON)
+#  જો !defined(DBL_EPSILON)
 #   define DBL_EPSILON 2.2204460492503131e-16
 #  endif
 # endif
@@ -340,9 +340,9 @@
  * HIKEY2DI() converts a hashitem key pointer to a dictitem pointer.
  * HI2DI() converts a hashitem pointer to a dictitem pointer.
  */
-#define DI2HIKEY(di) ((di)->di_key)
-#define HIKEY2DI(p)  ((dictitem_T *)((p) - offsetof(dictitem_T, di_key)))
-#define HI2DI(hi)     HIKEY2DI((hi)->hi_key)
+#define DI2HIKEY(di) ((di)->di_ચાવી)
+#define HIKEY2DI(p)  ((dictitem_T *)((p) - offsetof(dictitem_T, di_ચાવી)))
+#define HI2DI(hi)     HIKEY2DI((hi)->hi_ચાવી)
 
 /*
  * Flush control functions.
@@ -350,7 +350,7 @@
 #ifdef FEAT_GUI
 # define mch_enable_flush()	gui_enable_flush()
 # define mch_disable_flush()	gui_disable_flush()
-#else
+#નહીંતર
 # define mch_enable_flush()
 # define mch_disable_flush()
 #endif
@@ -359,75 +359,75 @@
  * Like vim_free(), and also set the pointer to NULL.
  */
 #define VIM_CLEAR(p) \
-    do { \
+    કરો { \
 	vim_free(p); \
-	(p) = NULL; \
-    } while (0)
+	(p) = ખાલી; \
+    } જ્યારે (0)
 
 /*
  * Free a string and set it's pointer to NULL and length to 0
  */
 #define VIM_CLEAR_STRING(s) \
-    do { \
+    કરો { \
 	VIM_CLEAR(s.string); \
 	s.length = 0; \
-    } while (0)
+    } જ્યારે (0)
 
 #define STR_LITERAL_INIT(s) \
     {(char_u *)(s), STRLEN_LITERAL(s)}
 
 #define STR_LITERAL_SET(str, s) \
-    do { \
+    કરો { \
 	(str).string = (char_u *)(s); \
 	(str).length = STRLEN_LITERAL(s); \
-    } while (0)
+    } જ્યારે (0)
 
 // Whether a command index indicates a user command.
-#define IS_USER_CMDIDX(idx) ((int)(idx) < 0)
+#define IS_USER_CMDIDX(idx) ((પૂર્ણાંક)(idx) < 0)
 
 // Give an error in curwin is a popup window and evaluate to TRUE.
 #ifdef FEAT_PROP_POPUP
 # define WIN_IS_POPUP(wp) ((wp)->w_popup_flags != 0)
 # define ERROR_IF_POPUP_WINDOW error_if_popup_window(FALSE)
 # define ERROR_IF_ANY_POPUP_WINDOW error_if_popup_window(TRUE)
-#else
+#નહીંતર
 # define WIN_IS_POPUP(wp) 0
 # define ERROR_IF_POPUP_WINDOW 0
 # define ERROR_IF_ANY_POPUP_WINDOW 0
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+#જો defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
 # define ERROR_IF_TERM_POPUP_WINDOW error_if_term_popup_window()
-#else
+#નહીંતર
 # define ERROR_IF_TERM_POPUP_WINDOW 0
 #endif
 
 
 #ifdef ABORT_ON_INTERNAL_ERROR
-# define ESTACK_CHECK_DECLARATION int estack_len_before
-# define ESTACK_CHECK_SETUP do { estack_len_before = exestack.ga_len; } while (0)
+# define ESTACK_CHECK_DECLARATION પૂર્ણાંક estack_len_before
+# define ESTACK_CHECK_SETUP કરો { estack_len_before = exestack.ga_len; } જ્યારે (0)
 # define ESTACK_CHECK_NOW \
-    do { \
-	if (estack_len_before != exestack.ga_len) \
+    કરો { \
+	જો (estack_len_before != exestack.ga_len) \
 	    siemsg("Exestack length expected: %d, actual: %d", estack_len_before, exestack.ga_len); \
-    } while (0)
+    } જ્યારે (0)
 # define CHECK_CURBUF \
-    do { \
-	if (curwin != NULL && curwin->w_buffer != curbuf) \
+    કરો { \
+	જો (curwin != ખાલી && curwin->w_buffer != curbuf) \
 	    iemsg("curbuf != curwin->w_buffer"); \
-    } while (0)
-#else
-# define ESTACK_CHECK_DECLARATION do { /**/ } while (0)
-# define ESTACK_CHECK_SETUP do { /**/ } while (0)
-# define ESTACK_CHECK_NOW do { /**/ } while (0)
-# define CHECK_CURBUF do { /**/ } while (0)
+    } જ્યારે (0)
+#નહીંતર
+# define ESTACK_CHECK_DECLARATION કરો { /**/ } જ્યારે (0)
+# define ESTACK_CHECK_SETUP કરો { /**/ } જ્યારે (0)
+# define ESTACK_CHECK_NOW કરો { /**/ } જ્યારે (0)
+# define CHECK_CURBUF કરો { /**/ } જ્યારે (0)
 #endif
 
 // Inline the condition for performance.
 #define CHECK_LIST_MATERIALIZE(l) \
-    do { \
-	if ((l)->lv_first == &range_list_item) \
+    કરો { \
+	જો ((l)->lv_first == &range_list_item) \
 	    range_list_materialize(l); \
-    } while (0)
+    } જ્યારે (0)
 
 // Inlined version of ga_grow() with optimized condition that it fails.
 #define GA_GROW_FAILS(gap, n) unlikely((((gap)->ga_maxlen - (gap)->ga_len < (n)) ? ga_grow_inner((gap), (n)) : OK) == FAIL)
@@ -443,66 +443,66 @@
 #endif
 
 // Length of the array.
-#define ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
+#define ARRAY_LENGTH(a) (કદ(a) / કદ((a)[0]))
 
 #ifdef FEAT_MENU
 # define FOR_ALL_MENUS(m) \
-    for ((m) = root_menu; (m) != NULL; (m) = (m)->next)
+    માટે ((m) = મૂળ_menu; (m) != ખાલી; (m) = (m)->next)
 # define FOR_ALL_CHILD_MENUS(p, c) \
-    for ((c) = (p)->children; (c) != NULL; (c) = (c)->next)
+    માટે ((c) = (p)->children; (c) != ખાલી; (c) = (c)->next)
 #endif
 
 #define FOR_ALL_WINDOWS(wp) \
-    for ((wp) = firstwin; (wp) != NULL; (wp) = (wp)->w_next)
+    માટે ((wp) = firstwin; (wp) != ખાલી; (wp) = (wp)->w_next)
 #define FOR_ALL_FRAMES(frp, first_frame) \
-    for ((frp) = first_frame; (frp) != NULL; (frp) = (frp)->fr_next)
+    માટે ((frp) = first_frame; (frp) != ખાલી; (frp) = (frp)->fr_next)
 #define FOR_ALL_TABPAGES(tp) \
-    for ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next)
+    માટે ((tp) = first_tabpage; (tp) != ખાલી; (tp) = (tp)->tp_next)
 #define FOR_ALL_WINDOWS_IN_TAB(tp, wp) \
-    for ((wp) = ((tp) == NULL || (tp) == curtab) \
+    માટે ((wp) = ((tp) == ખાલી || (tp) == curtab) \
 	    ? firstwin : (tp)->tp_firstwin; (wp); (wp) = (wp)->w_next)
 /*
  * When using this macro "break" only breaks out of the inner loop. Use "goto"
  * to break out of the tabpage loop.
  */
 #define FOR_ALL_TAB_WINDOWS(tp, wp) \
-    for ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next) \
-	for ((wp) = ((tp) == curtab) \
+    માટે ((tp) = first_tabpage; (tp) != ખાલી; (tp) = (tp)->tp_next) \
+	માટે ((wp) = ((tp) == curtab) \
 		? firstwin : (tp)->tp_firstwin; (wp); (wp) = (wp)->w_next)
 
 #define FOR_ALL_POPUPWINS(wp) \
-    for ((wp) = first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
+    માટે ((wp) = first_popupwin; (wp) != ખાલી; (wp) = (wp)->w_next)
 #define FOR_ALL_POPUPWINS_IN_TAB(tp, wp) \
-    for ((wp) = (tp)->tp_first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
+    માટે ((wp) = (tp)->tp_first_popupwin; (wp) != ખાલી; (wp) = (wp)->w_next)
 
 #define FOR_ALL_BUFFERS(buf) \
-    for ((buf) = firstbuf; (buf) != NULL; (buf) = (buf)->b_next)
+    માટે ((buf) = firstbuf; (buf) != ખાલી; (buf) = (buf)->b_next)
 
 #define FOR_ALL_BUF_WININFO(buf, wip) \
-    for ((wip) = (buf)->b_wininfo; (wip) != NULL; (wip) = (wip)->wi_next)
+    માટે ((wip) = (buf)->b_wininfo; (wip) != ખાલી; (wip) = (wip)->wi_next)
 
 // Iterate through all the signs placed in a buffer
 #define FOR_ALL_SIGNS_IN_BUF(buf, sign) \
-    for ((sign) = (buf)->b_signlist; (sign) != NULL; (sign) = (sign)->se_next)
+    માટે ((sign) = (buf)->b_signlist; (sign) != ખાલી; (sign) = (sign)->se_next)
 
 #ifdef FEAT_SPELL
 # define FOR_ALL_SPELL_LANGS(slang) \
-    for ((slang) = first_lang; (slang) != NULL; (slang) = (slang)->sl_next)
+    માટે ((slang) = first_lang; (slang) != ખાલી; (slang) = (slang)->sl_next)
 #endif
 
 // Iterate over all the items in a List
-#define FOR_ALL_LIST_ITEMS(l, li) \
-    for ((li) = (l) == NULL ? NULL : (l)->lv_first; (li) != NULL; (li) = (li)->li_next)
+#define FOR_ALL_LIST_વસ્તુઓ(l, li) \
+    માટે ((li) = (l) == ખાલી ? ખાલી : (l)->lv_first; (li) != ખાલી; (li) = (li)->li_next)
 
 // Iterate over all the items in a hash table
-#define FOR_ALL_HASHTAB_ITEMS(ht, hi, todo) \
-    for ((hi) = (ht)->ht_array; (todo) > 0; ++(hi))
+#define FOR_ALL_HASHTAB_વસ્તુઓ(ht, hi, todo) \
+    માટે ((hi) = (ht)->ht_array; (todo) > 0; ++(hi))
 
-#define TUPLE_LEN(t)	    (t->tv_items.ga_len)
+#define TUPLE_LEN(t)	    (t->tv_વસ્તુઓ.ga_len)
 #define TUPLE_ITEM(t, i) \
-	    (((typval_T *)t->tv_items.ga_data) + i)
+	    (((typval_T *)t->tv_વસ્તુઓ.ga_data) + i)
 
 // Avoid open() on a non-existing file on MS-Windows
-#if !defined(MSWIN) && !defined(PROTO)
+#જો !defined(MSWIN) && !defined(PROTO)
 # define mch_isdir_or_missing(f) mch_isdir(f)
 #endif

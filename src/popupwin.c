@@ -11,11 +11,11 @@
  * Implementation of popup windows.  See ":help popup".
  */
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#જો defined(FEAT_PROP_POPUP)
 
-typedef struct {
+પ્રકારવ્યાખ્યા સંરચના {
     string_T	pp_name;
     poppos_T	pp_val;
 } poppos_entry_T;
@@ -24,37 +24,37 @@ typedef struct {
 // exposed when the popup moves, resizes, hides or closes.  "active" is TRUE
 // when the popup is an opacity popup that contributes to the blended
 // background; non-opacity popups rely on popup_mask instead.
-typedef struct {
-    int		active;
-    int		winrow;
-    int		wincol;
-    int		height;
-    int		width;
-    int		leftoff;
-    int		zindex;
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક		active;
+    પૂર્ણાંક		winrow;
+    પૂર્ણાંક		wincol;
+    પૂર્ણાંક		height;
+    પૂર્ણાંક		width;
+    પૂર્ણાંક		leftoff;
+    પૂર્ણાંક		zindex;
 } popup_area_T;
 
 // Snapshot of the screen cells under an opacity popup's padding, captured
 // before win_update() overwrites them so the padding can be re-blended
 // against the original background.  "lines" is NULL when no snapshot was
 // taken; popup_free_saved_screen() releases all owned buffers.
-typedef struct {
-    schar_T	*lines;
-    int		*attrs;
+પ્રકારવ્યાખ્યા સંરચના {
+    schar_T	*લીટીઓ;
+    પૂર્ણાંક		*attrs;
     u8char_T	*linesuc;
-    int		start_row;
-    int		start_col;
-    int		rows;
-    int		cols;
+    પૂર્ણાંક		start_row;
+    પૂર્ણાંક		start_col;
+    પૂર્ણાંક		rows;
+    પૂર્ણાંક		cols;
 } popup_saved_screen_T;
 
 // Snapshot of popup style/option fields used by popup_setoptions() to detect
 // which option changes require a redraw or reposition.
-typedef struct {
+પ્રકારવ્યાખ્યા સંરચના {
     linenr_T	firstline;
-    int		blend;
-    int		flags;
-    int		zindex;
+    પૂર્ણાંક		blend;
+    પૂર્ણાંક		flags;
+    પૂર્ણાંક		zindex;
     char_u	*title;
     char_u	*scrollbar_highlight;
     char_u	*thumb_highlight;
@@ -63,21 +63,21 @@ typedef struct {
 
 // Snapshot of popup layout fields used by popup_adjust_position() to detect
 // whether the position or size changed and the popup mask must be refreshed.
-typedef struct {
-    int		winrow;
-    int		wincol;
-    int		width;
-    int		height;
-    int		leftcol;
-    int		leftoff;
-    int		has_scrollbar;
-    int		topoff;
-    int		bottomoff;
-    int		leftclip;
-    int		rightclip;
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક		winrow;
+    પૂર્ણાંક		wincol;
+    પૂર્ણાંક		width;
+    પૂર્ણાંક		height;
+    પૂર્ણાંક		leftcol;
+    પૂર્ણાંક		leftoff;
+    પૂર્ણાંક		has_scrollbar;
+    પૂર્ણાંક		topoff;
+    પૂર્ણાંક		bottomoff;
+    પૂર્ણાંક		leftclip;
+    પૂર્ણાંક		rightclip;
 } popup_layout_T;
 
-static poppos_entry_T poppos_entries[] = {
+સ્થિર poppos_entry_T poppos_entries[] = {
     {STR_LITERAL_INIT("botleft"), POPPOS_BOTLEFT},
     {STR_LITERAL_INIT("topleft"), POPPOS_TOPLEFT},
     {STR_LITERAL_INIT("botright"), POPPOS_BOTRIGHT},
@@ -87,127 +87,127 @@ static poppos_entry_T poppos_entries[] = {
 
 #ifdef HAS_MESSAGE_WINDOW
 // Window used for ":echowindow"
-static win_T *message_win = NULL;
+સ્થિર win_T *message_win = ખાલી;
 
 // Time used for the next ":echowindow" message in msec.
-static int  message_win_time = 3000;
+સ્થિર પૂર્ણાંક  message_win_time = 3000;
 
 // Flag set when a message is added to the message window, timer is started
 // when the message window is drawn.  This might be after pressing Enter at the
 // hit-enter prompt.
-static int    start_message_win_timer = FALSE;
+સ્થિર પૂર્ણાંક    start_message_win_timer = FALSE;
 
-static void may_start_message_win_timer(win_T *wp);
+સ્થિર શૂન્ય may_start_message_win_timer(win_T *wp);
 #endif
 
-static int popup_on_cmdline = FALSE;
+સ્થિર પૂર્ણાંક popup_on_cmdline = FALSE;
 
-static void popup_adjust_position(win_T *wp);
-static bool popup_area_changed(win_T *wp, popup_area_T *area);
-static void popup_redraw_exposed_area(popup_area_T *area);
-static void popup_save_area(win_T *wp, popup_area_T *area);
-static void popup_free_saved_screen(popup_saved_screen_T *saved_screen);
-static void popup_save_padding_screen(win_T *wp,
+સ્થિર શૂન્ય popup_adjust_position(win_T *wp);
+સ્થિર bool popup_area_changed(win_T *wp, popup_area_T *area);
+સ્થિર શૂન્ય popup_redraw_exposed_area(popup_area_T *area);
+સ્થિર શૂન્ય popup_save_area(win_T *wp, popup_area_T *area);
+સ્થિર શૂન્ય popup_free_saved_screen(popup_saved_screen_T *saved_screen);
+સ્થિર શૂન્ય popup_save_padding_screen(win_T *wp,
 	popup_saved_screen_T *saved_screen);
-static bool popup_layout_changed(win_T *wp, popup_layout_T *layout);
-static bool popup_style_changed(win_T *wp, popup_style_snapshot_T *style);
-static void popup_save_style(win_T *wp, popup_style_snapshot_T *style);
-static void popup_save_layout(win_T *wp, popup_layout_T *layout);
-static void redraw_under_popup_area(int winrow, int wincol, int height,
-	int width, int leftoff);
-static void redraw_overlapped_opacity_popups(int winrow, int wincol,
-	int height, int width, int leftoff, int zindex);
-static void redraw_win_under_opacity_popup(win_T *wp);
+સ્થિર bool popup_layout_changed(win_T *wp, popup_layout_T *layout);
+સ્થિર bool popup_style_changed(win_T *wp, popup_style_snapshot_T *style);
+સ્થિર શૂન્ય popup_save_style(win_T *wp, popup_style_snapshot_T *style);
+સ્થિર શૂન્ય popup_save_layout(win_T *wp, popup_layout_T *layout);
+સ્થિર શૂન્ય redraw_under_popup_area(પૂર્ણાંક winrow, પૂર્ણાંક wincol, પૂર્ણાંક height,
+	પૂર્ણાંક width, પૂર્ણાંક leftoff);
+સ્થિર શૂન્ય redraw_overlapped_opacity_popups(પૂર્ણાંક winrow, પૂર્ણાંક wincol,
+	પૂર્ણાંક height, પૂર્ણાંક width, પૂર્ણાંક leftoff, પૂર્ણાંક zindex);
+સ્થિર શૂન્ય redraw_win_under_opacity_popup(win_T *wp);
 
 /*
  * Get option value for "key", which is "line" or "col".
  * Handles "cursor+N" and "cursor-N".
  * Returns MAXCOL if the entry is not present.
  */
-    static int
-popup_options_one(dict_T *dict, char_u *key)
+    સ્થિર પૂર્ણાંક
+popup_options_one(dict_T *dict, char_u *ચાવી)
 {
     dictitem_T	*di;
     char_u	*val;
     char_u	*s;
     char_u	*endp;
-    int		n = 0;
+    પૂર્ણાંક		n = 0;
 
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return MAXCOL;
+    di = dict_find(dict, ચાવી, -1);
+    જો (di == ખાલી)
+	પાછા MAXCOL;
 
     val = tv_get_string(&di->di_tv);
-    if (STRNCMP(val, "cursor", 6) != 0)
-	return dict_get_number_check(dict, key);
+    જો (STRNCMP(val, "cursor", 6) != 0)
+	પાછા dict_get_સંખ્યા_check(dict, ચાવી);
 
     setcursor_mayforce(TRUE);
     s = val + 6;
-    if (*s != NUL)
+    જો (*s != NUL)
     {
 	endp = s;
-	if (*skipwhite(s) == '+' || *skipwhite(s) == '-')
-	    n = strtol((char *)s, (char **)&endp, 10);
-	if (endp != NULL && *skipwhite(endp) != NUL)
+	જો (*skipwhite(s) == '+' || *skipwhite(s) == '-')
+	    n = strtol((અક્ષર *)s, (અક્ષર **)&endp, 10);
+	જો (endp != ખાલી && *skipwhite(endp) != NUL)
 	{
 	    semsg(_(e_invalid_expression_str), val);
-	    return 0;
+	    પાછા 0;
 	}
     }
 
-    if (STRCMP(key, "line") == 0)
+    જો (STRCMP(ચાવી, "line") == 0)
 	n = screen_screenrow() + 1 + n;
-    else // "col"
+    નહીંતર // "col"
 	n = screen_screencol() + 1 + n;
 
     // Zero means "not set", use -1 instead.
-    if (n == 0)
+    જો (n == 0)
 	n = -1;
-    return n;
+    પાછા n;
 }
 
-    static int
-set_padding_border(dict_T *dict, int *array, char *name, int max_val)
+    સ્થિર પૂર્ણાંક
+set_padding_border(dict_T *dict, પૂર્ણાંક *array, અક્ષર *name, પૂર્ણાંક max_val)
 {
     dictitem_T	*di;
 
     di = dict_find(dict, (char_u *)name, -1);
-    if (di == NULL)
-	return OK;
+    જો (di == ખાલી)
+	પાછા OK;
 
-    if (di->di_tv.v_type != VAR_LIST)
+    જો (di->di_tv.v_type != VAR_LIST)
     {
 	emsg(_(e_list_required));
-	return FAIL;
+	પાછા FAIL;
     }
 
     list_T	*list = di->di_tv.vval.v_list;
     listitem_T	*li;
-    int		i;
-    int		nr;
+    પૂર્ણાંક		i;
+    પૂર્ણાંક		nr;
 
-    for (i = 0; i < 4; ++i)
+    માટે (i = 0; i < 4; ++i)
 	array[i] = 1;
-    if (list == NULL)
-	return OK;
+    જો (list == ખાલી)
+	પાછા OK;
 
     CHECK_LIST_MATERIALIZE(list);
-    for (i = 0, li = list->lv_first; i < 4 && i < list->lv_len;
+    માટે (i = 0, li = list->lv_first; i < 4 && i < list->lv_len;
 	    ++i, li = li->li_next)
     {
-	nr = (int)tv_get_number(&li->li_tv);
-	if (nr >= 0)
+	nr = (પૂર્ણાંક)tv_get_સંખ્યા(&li->li_tv);
+	જો (nr >= 0)
 	    array[i] = nr > max_val ? max_val : nr;
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Used when popup options contain "moved": set default moved values.
  */
-    static void
-set_moved_values(win_T *wp)
+    સ્થિર શૂન્ય
+set_moved_કિંમતો(win_T *wp)
 {
     wp->w_popup_curwin = curwin;
     wp->w_popup_lnum = curwin->w_cursor.lnum;
@@ -218,26 +218,26 @@ set_moved_values(win_T *wp)
 /*
  * Used when popup options contain "moved" with "word" or "WORD".
  */
-    static void
-set_moved_columns(win_T *wp, int flags)
+    સ્થિર શૂન્ય
+set_moved_columns(win_T *wp, પૂર્ણાંક flags)
 {
     char_u	*ptr;
-    int		len = find_ident_under_cursor(&ptr, flags | FIND_NOERROR);
-    int		mincol;
+    પૂર્ણાંક		len = find_ident_under_cursor(&ptr, flags | FIND_NOERROR);
+    પૂર્ણાંક		mincol;
 
-    if (len <= 0)
-	return;
+    જો (len <= 0)
+	પાછા;
 
     // When the cursor is on white space find_ident_under_cursor() skips
     // forward to the next word, whose range does not cover the cursor column.
     // Keep the cursor column then, otherwise popup_check_cursor_pos() would
     // close the popup right away.
-    mincol = (int)(ptr - ml_get_curline());
-    if (curwin->w_cursor.col < mincol)
+    mincol = (પૂર્ણાંક)(ptr - ml_get_curline());
+    જો (curwin->w_cursor.col < mincol)
     {
 	wp->w_popup_mincol = curwin->w_cursor.col;
 	wp->w_popup_maxcol = curwin->w_cursor.col;
-	return;
+	પાછા;
     }
 
     wp->w_popup_mincol = mincol;
@@ -247,61 +247,61 @@ set_moved_columns(win_T *wp, int flags)
 /*
  * Used when popup options contain "mousemoved": set default moved values.
  */
-    static void
-set_mousemoved_values(win_T *wp)
+    સ્થિર શૂન્ય
+set_mousemoved_કિંમતો(win_T *wp)
 {
     wp->w_popup_mouse_row = mouse_row;
     wp->w_popup_mouse_mincol = mouse_col;
     wp->w_popup_mouse_maxcol = mouse_col;
 }
 
-    static void
-update_popup_uses_mouse_move(void)
+    સ્થિર શૂન્ય
+update_popup_uses_mouse_move(શૂન્ય)
 {
     popup_uses_mouse_move = FALSE;
-    if (!popup_visible)
-	return;
+    જો (!popup_visible)
+	પાછા;
 
     win_T *wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_popup_mouse_row != 0)
+	જો (wp->w_popup_mouse_row != 0)
 	{
 	    popup_uses_mouse_move = TRUE;
-	    return;
+	    પાછા;
 	}
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_popup_mouse_row != 0)
+	જો (wp->w_popup_mouse_row != 0)
 	{
 	    popup_uses_mouse_move = TRUE;
-	    return;
+	    પાછા;
 	}
 }
 
 /*
  * Used when popup options contain "moved" with "word" or "WORD".
  */
-    static void
-set_mousemoved_columns(win_T *wp, int flags)
+    સ્થિર શૂન્ય
+set_mousemoved_columns(win_T *wp, પૂર્ણાંક flags)
 {
     win_T	*textwp;
     char_u	*text;
-    int		col;
+    પૂર્ણાંક		col;
     pos_T	pos;
     colnr_T	mcol;
 
-    if (find_word_under_cursor(mouse_row, mouse_col, TRUE, flags,
-				  &textwp, &pos.lnum, &text, NULL, &col) != OK)
-	return;
+    જો (find_word_under_cursor(mouse_row, mouse_col, TRUE, flags,
+				  &textwp, &pos.lnum, &text, ખાલી, &col) != OK)
+	પાછા;
 
     // convert text column to mouse column
     pos.col = col;
     pos.coladd = 0;
-    getvcol(textwp, &pos, &mcol, NULL, NULL, 0);
+    getvcol(textwp, &pos, &mcol, ખાલી, ખાલી, 0);
     wp->w_popup_mouse_mincol = mcol;
 
     pos.col = col + (colnr_T)STRLEN(text) - 1;
-    getvcol(textwp, &pos, NULL, NULL, &mcol, 0);
+    getvcol(textwp, &pos, ખાલી, ખાલી, &mcol, 0);
     wp->w_popup_mouse_maxcol = mcol;
     vim_free(text);
 }
@@ -310,10 +310,10 @@ set_mousemoved_columns(win_T *wp, int flags)
  * Return TRUE if "row"/"col" is on the border of the popup.
  * The values are relative to the top-left corner.
  */
-    int
-popup_on_border(win_T *wp, int row, int col)
+    પૂર્ણાંક
+popup_on_border(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
-    return (row == 0 && wp->w_popup_border[0] > 0)
+    પાછા (row == 0 && wp->w_popup_border[0] > 0)
 	    || (row == popup_height(wp) - 1 && wp->w_popup_border[2] > 0)
 	    || (col == 0 && wp->w_popup_border[3] > 0)
 	    || (col == popup_width(wp) - 1 && wp->w_popup_border[1] > 0);
@@ -326,45 +326,45 @@ popup_on_border(win_T *wp, int row, int col)
  * Caller should check the left mouse button was clicked.
  * Return TRUE if the popup was closed.
  */
-    int
-popup_close_if_on_X(win_T *wp, int row, int col)
+    પૂર્ણાંક
+popup_close_if_on_X(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
-    if (wp->w_popup_close == POPCLOSE_BUTTON
+    જો (wp->w_popup_close == POPCLOSE_BUTTON
 	    && row == 0 && col == popup_width(wp) - 1)
     {
 	popup_close_for_mouse_click(wp);
-	return TRUE;
+	પાછા TRUE;
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 // Values set when dragging a popup window starts.
-static int drag_start_row;
-static int drag_start_col;
-static int drag_start_wantline;
-static int drag_start_wantcol;
-static int drag_on_resize_handle;
+સ્થિર પૂર્ણાંક drag_start_row;
+સ્થિર પૂર્ણાંક drag_start_col;
+સ્થિર પૂર્ણાંક drag_start_wantline;
+સ્થિર પૂર્ણાંક drag_start_wantcol;
+સ્થિર પૂર્ણાંક drag_on_resize_handle;
 
 /*
  * Mouse down on border of popup window: start dragging it.
  * Uses mouse_col and mouse_row.
  */
-    void
-popup_start_drag(win_T *wp, int row, int col)
+    શૂન્ય
+popup_start_drag(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
     drag_start_row = mouse_row;
     drag_start_col = mouse_col;
-    if (wp->w_wantline <= 0)
+    જો (wp->w_wantline <= 0)
 	drag_start_wantline = wp->w_winrow + 1;
-    else
+    નહીંતર
 	drag_start_wantline = wp->w_wantline;
-    if (wp->w_wantcol == 0)
+    જો (wp->w_wantcol == 0)
 	drag_start_wantcol = wp->w_wincol + 1;
-    else
+    નહીંતર
 	drag_start_wantcol = wp->w_wantcol;
 
     // Stop centering the popup
-    if (wp->w_popup_pos == POPPOS_CENTER)
+    જો (wp->w_popup_pos == POPPOS_CENTER)
 	wp->w_popup_pos = POPPOS_TOPLEFT;
 
     drag_on_resize_handle = wp->w_popup_border[1] > 0
@@ -372,12 +372,12 @@ popup_start_drag(win_T *wp, int row, int col)
 			    && row == popup_height(wp) - 1
 			    && col == popup_width(wp) - 1;
 
-    if (wp->w_popup_pos != POPPOS_TOPLEFT && drag_on_resize_handle)
+    જો (wp->w_popup_pos != POPPOS_TOPLEFT && drag_on_resize_handle)
     {
-	if (wp->w_popup_pos == POPPOS_TOPRIGHT
+	જો (wp->w_popup_pos == POPPOS_TOPRIGHT
 		|| wp->w_popup_pos == POPPOS_BOTRIGHT)
 	    wp->w_wantcol = wp->w_wincol + 1;
-	if (wp->w_popup_pos == POPPOS_BOTLEFT)
+	જો (wp->w_popup_pos == POPPOS_BOTLEFT)
 	    wp->w_wantline = wp->w_winrow + 1;
 	wp->w_popup_pos = POPPOS_TOPLEFT;
     }
@@ -387,34 +387,34 @@ popup_start_drag(win_T *wp, int row, int col)
  * Mouse moved while dragging a popup window: adjust the window popup position
  * or resize.
  */
-    void
+    શૂન્ય
 popup_drag(win_T *wp)
 {
     // The popup may be closed before dragging stops.
-    if (!win_valid_popup(wp))
-	return;
+    જો (!win_valid_popup(wp))
+	પાછા;
 
-    if ((wp->w_popup_flags & POPF_RESIZE) && drag_on_resize_handle)
+    જો ((wp->w_popup_flags & POPF_RESIZE) && drag_on_resize_handle)
     {
-	int width_inc = mouse_col - drag_start_col;
-	int height_inc = mouse_row - drag_start_row;
+	પૂર્ણાંક width_inc = mouse_col - drag_start_col;
+	પૂર્ણાંક height_inc = mouse_row - drag_start_row;
 
-	if (width_inc != 0)
+	જો (width_inc != 0)
 	{
-	    int width = wp->w_width + width_inc;
+	    પૂર્ણાંક width = wp->w_width + width_inc;
 
-	    if (width < 1)
+	    જો (width < 1)
 		width = 1;
 	    wp->w_minwidth = width;
 	    wp->w_maxwidth = width;
 	    drag_start_col = mouse_col;
 	}
 
-	if (height_inc != 0)
+	જો (height_inc != 0)
 	{
-	    int height = wp->w_height + height_inc;
+	    પૂર્ણાંક height = wp->w_height + height_inc;
 
-	    if (height < 1)
+	    જો (height < 1)
 		height = 1;
 	    wp->w_minheight = height;
 	    wp->w_maxheight = height;
@@ -422,20 +422,20 @@ popup_drag(win_T *wp)
 	}
 
 	popup_adjust_position(wp);
-	return;
+	પાછા;
     }
 
-    if (!(wp->w_popup_flags & (POPF_DRAG | POPF_DRAGALL)))
-	return;
+    જો (!(wp->w_popup_flags & (POPF_DRAG | POPF_DRAGALL)))
+	પાછા;
     wp->w_wantline = drag_start_wantline + (mouse_row - drag_start_row);
-    if (wp->w_wantline < 1)
+    જો (wp->w_wantline < 1)
 	wp->w_wantline = 1;
-    if (wp->w_wantline > Rows)
+    જો (wp->w_wantline > Rows)
 	wp->w_wantline = Rows;
     wp->w_wantcol = drag_start_wantcol + (mouse_col - drag_start_col);
-    if (wp->w_wantcol < 1)
+    જો (wp->w_wantcol < 1)
 	wp->w_wantcol = 1;
-    if (wp->w_wantcol > Columns)
+    જો (wp->w_wantcol > Columns)
 	wp->w_wantcol = Columns;
 
     popup_adjust_position(wp);
@@ -444,17 +444,17 @@ popup_drag(win_T *wp)
 /*
  * Set w_firstline to match the current "wp->w_topline".
  */
-    void
+    શૂન્ય
 popup_set_firstline(win_T *wp)
 {
-    int	    height = wp->w_height;
+    પૂર્ણાંક	    height = wp->w_height;
 
     wp->w_firstline = wp->w_topline;
     popup_adjust_position(wp);
 
     // we don't want the popup to get smaller, decrement the first line
     // until it doesn't
-    while (wp->w_firstline > 1 && wp->w_height < height)
+    જ્યારે (wp->w_firstline > 1 && wp->w_height < height)
     {
 	--wp->w_firstline;
 	popup_adjust_position(wp);
@@ -464,10 +464,10 @@ popup_set_firstline(win_T *wp)
 /*
  * Return TRUE if the position is in the popup window scrollbar.
  */
-    int
-popup_is_in_scrollbar(win_T *wp, int row, int col)
+    પૂર્ણાંક
+popup_is_in_scrollbar(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
-    return wp->w_has_scrollbar
+    પાછા wp->w_has_scrollbar
 	&& row >= wp->w_popup_border[0]
 	&& row < popup_height(wp) - wp->w_popup_border[2]
 	&& col == popup_width(wp) - wp->w_popup_border[1] - 1;
@@ -477,37 +477,37 @@ popup_is_in_scrollbar(win_T *wp, int row, int col)
 /*
  * Handle a click in a popup window, if it is in the scrollbar.
  */
-    void
-popup_handle_scrollbar_click(win_T *wp, int row, int col)
+    શૂન્ય
+popup_handle_scrollbar_click(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
-    if (!popup_is_in_scrollbar(wp, row, col))
-	return;
+    જો (!popup_is_in_scrollbar(wp, row, col))
+	પાછા;
 
-    int	    height = popup_height(wp);
-    int	    new_topline = wp->w_topline;
+    પૂર્ણાંક	    height = popup_height(wp);
+    પૂર્ણાંક	    new_topline = wp->w_topline;
 
-    if (row >= height / 2)
+    જો (row >= height / 2)
     {
 	// Click in lower half, scroll down.
-	if (wp->w_topline < wp->w_buffer->b_ml.ml_line_count)
+	જો (wp->w_topline < wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
 	    ++new_topline;
     }
-    else if (wp->w_topline > 1)
+    નહીંતર જો (wp->w_topline > 1)
 	// click on upper half, scroll up.
 	--new_topline;
 
-    if (new_topline == wp->w_topline)
-	return;
+    જો (new_topline == wp->w_topline)
+	પાછા;
 
     set_topline(wp, new_topline);
-    if (wp == curwin)
+    જો (wp == curwin)
     {
-	if (wp->w_cursor.lnum < wp->w_topline)
+	જો (wp->w_cursor.lnum < wp->w_topline)
 	{
 	    wp->w_cursor.lnum = wp->w_topline;
 	    check_cursor();
 	}
-	else if (wp->w_cursor.lnum >= wp->w_botline)
+	નહીંતર જો (wp->w_cursor.lnum >= wp->w_botline)
 	{
 	    wp->w_cursor.lnum = wp->w_botline - 1;
 	    check_cursor();
@@ -517,27 +517,27 @@ popup_handle_scrollbar_click(win_T *wp, int row, int col)
     redraw_win_later(wp, UPD_NOT_VALID);
 }
 
-#if defined(FEAT_TIMERS)
+#જો defined(FEAT_TIMERS)
 /*
  * Add a timer to "wp" with "time".
  * If "close" is true use popup_close(), otherwise popup_hide().
  */
-    static void
-popup_add_timeout(win_T *wp, int time, int close)
+    સ્થિર શૂન્ય
+popup_add_timeout(win_T *wp, પૂર્ણાંક time, પૂર્ણાંક close)
 {
     char_u	    cbbuf[50];
     char_u	    *ptr = cbbuf;
     typval_T	    tv;
 
-    vim_snprintf((char *)cbbuf, sizeof(cbbuf),
+    vim_snprintf((અક્ષર *)cbbuf, કદ(cbbuf),
 		close ? "(_) => popup_close(%d)" : "(_) => popup_hide(%d)",
 		wp->w_id);
-    if (get_lambda_tv_and_compile(&ptr, &tv, FALSE, &EVALARG_EVALUATE) != OK)
-	return;
+    જો (get_lambda_tv_and_compile(&ptr, &tv, FALSE, &EVALARG_EVALUATE) != OK)
+	પાછા;
 
     wp->w_popup_timer = create_timer(time, 0);
     callback_T cb = get_callback(&tv);
-    if (cb.cb_name != NULL && !cb.cb_free_name)
+    જો (cb.cb_name != ખાલી && !cb.cb_free_name)
     {
 	cb.cb_name = vim_strsave(cb.cb_name);
 	cb.cb_free_name = TRUE;
@@ -547,178 +547,178 @@ popup_add_timeout(win_T *wp, int time, int close)
 }
 #endif
 
-    static poppos_T
-get_pos_entry(dict_T *d, int give_error)
+    સ્થિર poppos_T
+get_pos_entry(dict_T *d, પૂર્ણાંક give_error)
 {
     char_u  *str = dict_get_string(d, "pos", FALSE);
-    int	    nr;
+    પૂર્ણાંક	    nr;
 
-    if (str == NULL)
-	return POPPOS_NONE;
+    જો (str == ખાલી)
+	પાછા POPPOS_NONE;
 
-    for (nr = 0; nr < (int)ARRAY_LENGTH(poppos_entries); ++nr)
-	if (STRCMP(str, poppos_entries[nr].pp_name.string) == 0)
-	    return poppos_entries[nr].pp_val;
+    માટે (nr = 0; nr < (પૂર્ણાંક)ARRAY_LENGTH(poppos_entries); ++nr)
+	જો (STRCMP(str, poppos_entries[nr].pp_name.string) == 0)
+	    પાછા poppos_entries[nr].pp_val;
 
-    if (give_error)
+    જો (give_error)
 	semsg(_(e_invalid_argument_str), str);
-    return POPPOS_NONE;
+    પાછા POPPOS_NONE;
 }
 
 /*
  * Shared between popup_create() and f_popup_move().
  */
-    static void
+    સ્થિર શૂન્ય
 apply_move_options(win_T *wp, dict_T *d)
 {
-    int		nr;
+    પૂર્ણાંક		nr;
     char_u	*str;
     dictitem_T	*di;
 
-    if ((nr = dict_get_number_def(d, "minwidth", -1)) >= 0)
+    જો ((nr = dict_get_સંખ્યા_def(d, "minwidth", -1)) >= 0)
 	wp->w_minwidth = nr;
-    if ((nr = dict_get_number_def(d, "minheight", -1)) >= 0)
+    જો ((nr = dict_get_સંખ્યા_def(d, "minheight", -1)) >= 0)
 	wp->w_minheight = nr;
-    if ((nr = dict_get_number_def(d, "maxwidth", -1)) >= 0)
+    જો ((nr = dict_get_સંખ્યા_def(d, "maxwidth", -1)) >= 0)
 	wp->w_maxwidth = nr;
-    if ((nr = dict_get_number_def(d, "maxheight", -1)) >= 0)
+    જો ((nr = dict_get_સંખ્યા_def(d, "maxheight", -1)) >= 0)
 	wp->w_maxheight = nr;
 
     nr = popup_options_one(d, (char_u *)"line");
-    if (nr != MAXCOL)
+    જો (nr != MAXCOL)
 	wp->w_wantline = nr;
     nr = popup_options_one(d, (char_u *)"col");
-    if (nr != MAXCOL)
+    જો (nr != MAXCOL)
 	wp->w_wantcol = nr;
 
 
     nr = dict_get_bool(d, "fixed", -1);
-    if (nr != -1)
+    જો (nr != -1)
 	wp->w_popup_fixed = nr != 0;
 
     {
 	poppos_T ppt = get_pos_entry(d, TRUE);
 
-	if (ppt != POPPOS_NONE)
+	જો (ppt != POPPOS_NONE)
 	    wp->w_popup_pos = ppt;
     }
 
     str = dict_get_string(d, "textprop", FALSE);
-    if (str != NULL)
+    જો (str != ખાલી)
     {
 	wp->w_popup_prop_type = 0;
-	if (*str != NUL)
+	જો (*str != NUL)
 	{
 	    wp->w_popup_prop_win = curwin;
 	    di = dict_find(d, (char_u *)"textpropwin", -1);
-	    if (di != NULL)
+	    જો (di != ખાલી)
 	    {
 		wp->w_popup_prop_win = find_win_by_nr_or_id(&di->di_tv);
-		if (!win_valid_any_tab(wp->w_popup_prop_win))
+		જો (!win_valid_any_tab(wp->w_popup_prop_win))
 		    wp->w_popup_prop_win = curwin;
 	    }
 
 	    nr = find_prop_type_id(str, wp->w_popup_prop_win->w_buffer);
-	    if (nr <= 0)
-		nr = find_prop_type_id(str, NULL);
-	    if (nr <= 0)
+	    જો (nr <= 0)
+		nr = find_prop_type_id(str, ખાલી);
+	    જો (nr <= 0)
 		semsg(_(e_invalid_argument_str), str);
-	    else
+	    નહીંતર
 		wp->w_popup_prop_type = nr;
 	}
     }
 
     di = dict_find(d, (char_u *)"textpropid", -1);
-    if (di != NULL)
-	wp->w_popup_prop_id = dict_get_number(d, "textpropid");
+    જો (di != ખાલી)
+	wp->w_popup_prop_id = dict_get_સંખ્યા(d, "textpropid");
 }
 
 /*
  * Handle "moved" and "mousemoved" arguments.
  */
-    static void
-handle_moved_argument(win_T *wp, dictitem_T *di, int mousemoved)
+    સ્થિર શૂન્ય
+handle_moved_argument(win_T *wp, dictitem_T *di, પૂર્ણાંક mousemoved)
 {
-    if (di->di_tv.v_type == VAR_STRING && di->di_tv.vval.v_string != NULL)
+    જો (di->di_tv.v_type == VAR_STRING && di->di_tv.vval.v_string != ખાલી)
     {
 	char_u  *s = di->di_tv.vval.v_string;
-	int	flags = 0;
+	પૂર્ણાંક	flags = 0;
 
-	if (STRCMP(s, "word") == 0)
+	જો (STRCMP(s, "word") == 0)
 	    flags = FIND_IDENT | FIND_STRING;
-	else if (STRCMP(s, "WORD") == 0)
+	નહીંતર જો (STRCMP(s, "WORD") == 0)
 	    flags = FIND_STRING;
-	else if (STRCMP(s, "expr") == 0)
+	નહીંતર જો (STRCMP(s, "expr") == 0)
 	    flags = FIND_IDENT | FIND_STRING | FIND_EVAL;
-	else if (STRCMP(s, "any") != 0)
+	નહીંતર જો (STRCMP(s, "any") != 0)
 	    semsg(_(e_invalid_argument_str), s);
-	if (flags != 0)
+	જો (flags != 0)
 	{
-	    if (mousemoved)
+	    જો (mousemoved)
 		set_mousemoved_columns(wp, flags);
-	    else
+	    નહીંતર
 		set_moved_columns(wp, flags);
 	}
     }
-    else if (di->di_tv.v_type == VAR_LIST
-	    && di->di_tv.vval.v_list != NULL
+    નહીંતર જો (di->di_tv.v_type == VAR_LIST
+	    && di->di_tv.vval.v_list != ખાલી
 	    && (di->di_tv.vval.v_list->lv_len == 2
 	     || di->di_tv.vval.v_list->lv_len == 3))
     {
 	list_T	    *l = di->di_tv.vval.v_list;
 	listitem_T  *li;
-	int	    mincol;
-	int	    maxcol;
+	પૂર્ણાંક	    mincol;
+	પૂર્ણાંક	    maxcol;
 
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
-	if (l->lv_len == 3)
+	જો (l->lv_len == 3)
 	{
-	    varnumber_T nr = tv_get_number(&l->lv_first->li_tv);
+	    varnumber_T nr = tv_get_સંખ્યા(&l->lv_first->li_tv);
 
 	    // Three numbers, might be from popup_getoptions().
-	    if (mousemoved)
+	    જો (mousemoved)
 		wp->w_popup_mouse_row = nr;
-	    else
+	    નહીંતર
 		wp->w_popup_lnum = nr;
 	    li = li->li_next;
-	    if (nr == 0)
-		wp->w_popup_curwin = NULL;
+	    જો (nr == 0)
+		wp->w_popup_curwin = ખાલી;
 	}
 
-	mincol = tv_get_number(&li->li_tv);
-	maxcol = tv_get_number(&li->li_next->li_tv);
-	if (mousemoved)
+	mincol = tv_get_સંખ્યા(&li->li_tv);
+	maxcol = tv_get_સંખ્યા(&li->li_next->li_tv);
+	જો (mousemoved)
 	{
 	    wp->w_popup_mouse_mincol = mincol;
 	    wp->w_popup_mouse_maxcol = maxcol;
 	}
-	else
+	નહીંતર
 	{
 	    wp->w_popup_mincol = mincol;
 	    wp->w_popup_maxcol = maxcol;
 	}
     }
-    else
+    નહીંતર
 	semsg(_(e_invalid_argument_str), tv_get_string(&di->di_tv));
 }
 
-    static void
-check_highlight(dict_T *dict, char *name, char_u **pval)
+    સ્થિર શૂન્ય
+check_highlight(dict_T *dict, અક્ષર *name, char_u **pval)
 {
     dictitem_T  *di;
     char_u	*str;
 
     di = dict_find(dict, (char_u *)name, -1);
-    if (di == NULL)
-	return;
+    જો (di == ખાલી)
+	પાછા;
 
-    if (di->di_tv.v_type != VAR_STRING)
-	semsg(_(e_invalid_value_for_argument_str), name);
-    else
+    જો (di->di_tv.v_type != VAR_STRING)
+	semsg(_(e_invalid_કિંમત_for_argument_str), name);
+    નહીંતર
     {
 	str = tv_get_string(&di->di_tv);
-	if (*str != NUL)
+	જો (*str != NUL)
 	    *pval = vim_strsave(str);
     }
 }
@@ -726,28 +726,28 @@ check_highlight(dict_T *dict, char *name, char_u **pval)
 /*
  * Scroll to show the line with the cursor.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_show_curline(win_T *wp)
 {
-    if (wp->w_cursor.lnum < wp->w_topline)
+    જો (wp->w_cursor.lnum < wp->w_topline)
 	wp->w_topline = wp->w_cursor.lnum;
-    else if (wp->w_cursor.lnum >= wp->w_botline
+    નહીંતર જો (wp->w_cursor.lnum >= wp->w_botline
 					      && (wp->w_valid & VALID_BOTLINE))
     {
 	wp->w_topline = wp->w_cursor.lnum - wp->w_height + 1;
-	if (wp->w_topline < 1)
+	જો (wp->w_topline < 1)
 	    wp->w_topline = 1;
-	else if (wp->w_topline > wp->w_buffer->b_ml.ml_line_count)
-	    wp->w_topline = wp->w_buffer->b_ml.ml_line_count;
-	while (wp->w_topline < wp->w_cursor.lnum
-		&& wp->w_topline < wp->w_buffer->b_ml.ml_line_count
+	નહીંતર જો (wp->w_topline > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
+	    wp->w_topline = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
+	જ્યારે (wp->w_topline < wp->w_cursor.lnum
+		&& wp->w_topline < wp->w_buffer->b_ml.ml_લીટી_ગણતરી
 		&& plines_m_win(wp, wp->w_topline, wp->w_cursor.lnum,
 					    wp->w_height + 1) > wp->w_height)
 	    ++wp->w_topline;
     }
 
     // Don't let "firstline" cause a scroll.
-    if (wp->w_firstline > 0)
+    જો (wp->w_firstline > 0)
 	wp->w_firstline = wp->w_topline;
 }
 
@@ -755,43 +755,43 @@ popup_show_curline(win_T *wp)
  * Get the sign group name for window "wp".
  * Returns a pointer to a static buffer, overwritten on the next call.
  */
-    static char_u *
+    સ્થિર char_u *
 popup_get_sign_name(win_T *wp)
 {
-    static char    buf[30];
+    સ્થિર અક્ષર    buf[30];
 
-    vim_snprintf(buf, sizeof(buf), "popup-%d", wp->w_id);
-    return (char_u *)buf;
+    vim_snprintf(buf, કદ(buf), "popup-%d", wp->w_id);
+    પાછા (char_u *)buf;
 }
 
 /*
  * Highlight the line with the cursor.
  * Also scrolls the text to put the cursor line in view.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_highlight_curline(win_T *wp)
 {
-    int	    sign_id = 0;
+    પૂર્ણાંક	    sign_id = 0;
     char_u  *sign_name = popup_get_sign_name(wp);
 
     buf_delete_signs(wp->w_buffer, (char_u *)"PopUpMenu");
 
-    if ((wp->w_popup_flags & POPF_CURSORLINE) != 0)
+    જો ((wp->w_popup_flags & POPF_CURSORLINE) != 0)
     {
 	popup_show_curline(wp);
 
-	if (!sign_exists_by_name(sign_name))
+	જો (!sign_exists_by_name(sign_name))
 	{
-	    char *linehl = "PopupSelected";
-	    sign_define_by_name(sign_name, NULL, (char_u *)linehl, NULL, NULL, NULL,
-		    NULL, SIGN_DEF_PRIO);
+	    અક્ષર *linehl = "PopupSelected";
+	    sign_define_by_name(sign_name, ખાલી, (char_u *)linehl, ખાલી, ખાલી, ખાલી,
+		    ખાલી, SIGN_DEF_PRIO);
 	}
 
 	sign_place(&sign_id, (char_u *)"PopUpMenu", sign_name,
 			       wp->w_buffer, wp->w_cursor.lnum, SIGN_DEF_PRIO);
 	redraw_win_later(wp, UPD_NOT_VALID);
     }
-    else
+    નહીંતર
 	sign_undefine_by_name(sign_name, FALSE);
     wp->w_popup_last_curline = wp->w_cursor.lnum;
 }
@@ -799,11 +799,11 @@ popup_highlight_curline(win_T *wp)
 /*
  * Shared between popup_create() and f_popup_setoptions().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 apply_general_options(win_T *wp, dict_T *dict)
 {
     dictitem_T	*di;
-    int		nr;
+    પૂર્ણાંક		nr;
     char_u	*str;
 
 #ifdef FEAT_IMAGE_POPUP
@@ -813,23 +813,23 @@ apply_general_options(win_T *wp, dict_T *dict)
     // TODO: flip
 
     di = dict_find(dict, (char_u *)"firstline", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	wp->w_firstline = dict_get_number(dict, "firstline");
-	if (wp->w_firstline < 0)
+	wp->w_firstline = dict_get_સંખ્યા(dict, "firstline");
+	જો (wp->w_firstline < 0)
 	    wp->w_firstline = -1;
     }
 
     nr = dict_get_bool(dict, "scrollbar", -1);
-    if (nr != -1)
+    જો (nr != -1)
 	wp->w_want_scrollbar = nr;
 
     str = dict_get_string(dict, "title", FALSE);
-    if (str != NULL)
+    જો (str != ખાલી)
     {
 	char_u	*title = vim_strsave(str);
 
-	if (title != NULL)
+	જો (title != ખાલી)
 	{
 	    vim_free(wp->w_popup_title);
 	    wp->w_popup_title = title;
@@ -837,77 +837,77 @@ apply_general_options(win_T *wp, dict_T *dict)
     }
 
     nr = dict_get_bool(dict, "wrap", -1);
-    if (nr != -1)
+    જો (nr != -1)
 	wp->w_p_wrap = nr != 0;
 
     nr = dict_get_bool(dict, "drag", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_DRAG;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_DRAG;
     }
     nr = dict_get_bool(dict, "dragall", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_DRAGALL;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_DRAGALL;
     }
 
     nr = dict_get_bool(dict, "posinvert", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_POSINVERT;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_POSINVERT;
     }
 
     nr = dict_get_bool(dict, "clipwindow", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_CLIPWINDOW;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_CLIPWINDOW;
     }
 
     nr = dict_get_bool(dict, "resize", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_RESIZE;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_RESIZE;
     }
 
     di = dict_find(dict, (char_u *)"opacity", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	nr = dict_get_number(dict, "opacity");
-	if (nr == 0)
+	nr = dict_get_સંખ્યા(dict, "opacity");
+	જો (nr == 0)
 	{
 	    // opacity: 0, fully transparent
 	    wp->w_popup_flags |= POPF_OPACITY;
 	    wp->w_popup_blend = 100;
 	}
-	else if (nr > 0 && nr < 100)
+	નહીંતર જો (nr > 0 && nr < 100)
 	{
 	    // opacity: 1-99, partially transparent
 	    // Convert to blend (0=opaque, 100=transparent)
 	    wp->w_popup_flags |= POPF_OPACITY;
 	    wp->w_popup_blend = 100 - nr;
 	}
-	else if (nr == 100)
+	નહીંતર જો (nr == 100)
 	{
 	    // Fully opaque, same as no opacity set.
 	    wp->w_popup_flags &= ~POPF_OPACITY;
 	    wp->w_popup_blend = 0;
 	}
-	else
+	નહીંતર
 	{
 	    wp->w_popup_flags &= ~POPF_OPACITY;
 	    wp->w_popup_blend = 0;
@@ -915,9 +915,9 @@ apply_general_options(win_T *wp, dict_T *dict)
     }
 
 #ifdef FEAT_IMAGE_POPUP
-    if (wp->w_popup_flags & POPF_GLOBAL)
+    જો (wp->w_popup_flags & POPF_GLOBAL)
 	iplace_use = IMAGE_PLACEMENT_USE_POPUP_GLOBAL;
-    else
+    નહીંતર
 	iplace_use = IMAGE_PLACEMENT_USE_POPUP_LOCAL;
 
     di = dict_find(dict, (char_u *)"image", -1);
@@ -926,182 +926,182 @@ apply_general_options(win_T *wp, dict_T *dict)
     // draw_image_placements() may be drawn before the popup window text is
     // drawn (e.g. inside a hit-enter prompt). Instead only enable once we draw
     // the popup window.
-    if (di != NULL && di->di_tv.v_type == VAR_DICT
-	    && di->di_tv.vval.v_dict != NULL)
+    જો (di != ખાલી && di->di_tv.v_type == VAR_DICT
+	    && di->di_tv.vval.v_dict != ખાલી)
     {
 	image_T		    *img;
-	image_T		    *cur_img = NULL;
+	image_T		    *cur_img = ખાલી;
 	image_placement_T   *place;
-	int		    cw, ch;
+	પૂર્ણાંક		    cw, ch;
 
-	if (dict_len(di->di_tv.vval.v_dict) == 0)
+	જો (dict_len(di->di_tv.vval.v_dict) == 0)
 	{
-	    if (wp->w_popup_imagep != NULL)
+	    જો (wp->w_popup_imagep != ખાલી)
 	    {
 		image_placement_free(wp->w_popup_imagep);
-		wp->w_popup_imagep = NULL;
+		wp->w_popup_imagep = ખાલી;
 	    }
-	    goto image_done;
+	    જાઓ image_done;
 	}
 
 	// Check if image size and format is the same, if so, then just update
 	// the existing data.
-	if (wp->w_popup_imagep != NULL && wp->w_popup_imagep->img != NULL)
+	જો (wp->w_popup_imagep != ખાલી && wp->w_popup_imagep->img != ખાલી)
 	    cur_img = wp->w_popup_imagep->img;
 
 	img = add_image(di->di_tv.vval.v_dict, cur_img, true);
-	if (img == NULL)
-	    return FAIL;
+	જો (img == ખાલી)
+	    પાછા FAIL;
 
-	if (img == cur_img)
-	    goto image_done;
+	જો (img == cur_img)
+	    જાઓ image_done;
 
 	// Create image view for this popup. Use window id as generation number,
 	// so that newer image placements are always placed below older image
 	// placements with same zindex.
 	place = image_placement_new(img, wp->w_id, iplace_use, false);
 
-	if (place == NULL)
+	જો (place == ખાલી)
 	{
 	    image_unref(img);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	if (wp->w_popup_imagep != NULL)
+	જો (wp->w_popup_imagep != ખાલી)
 	    image_placement_free(wp->w_popup_imagep);
 	wp->w_popup_imagep = place;
 
 	image_get_cell_dimensions(img, &cw, &ch);
 
 	// Set the dimensions of the popup that were not specified by the user.
-	if (dict_find(dict, (char_u *)"minwidth", -1) == NULL)
+	જો (dict_find(dict, (char_u *)"minwidth", -1) == ખાલી)
 	    wp->w_minwidth = cw;
-	if (dict_find(dict, (char_u *)"maxwidth", -1) == NULL)
+	જો (dict_find(dict, (char_u *)"maxwidth", -1) == ખાલી)
 	    wp->w_maxwidth = cw;
-	if (dict_find(dict, (char_u *)"minheight", -1) == NULL)
+	જો (dict_find(dict, (char_u *)"minheight", -1) == ખાલી)
 	    wp->w_minheight = ch;
-	if (dict_find(dict, (char_u *)"maxheight", -1) == NULL)
+	જો (dict_find(dict, (char_u *)"maxheight", -1) == ખાલી)
 	    wp->w_maxheight = ch;
 image_done:
 	;
     }
-    else
+    નહીંતર
     {
 	// Create a image placement with no backing images. This is so that it
 	// will affect the calculations of other popup images.
-	if (wp->w_popup_imagep != NULL)
+	જો (wp->w_popup_imagep != ખાલી)
 	    image_placement_free(wp->w_popup_imagep);
-	wp->w_popup_imagep = image_placement_new(NULL, wp->w_id,
+	wp->w_popup_imagep = image_placement_new(ખાલી, wp->w_id,
 		iplace_use, true);
 
 	// Not really needed because we always update the position before
 	// drawing, but do it anyways.
-	if (wp->w_popup_imagep != NULL)
+	જો (wp->w_popup_imagep != ખાલી)
 	    image_placement_set_bounding_box(wp->w_popup_imagep,
 		    wp->w_winrow, wp->w_wincol, wp->w_height, wp->w_width);
     }
 #endif
 
     di = dict_find(dict, (char_u *)"close", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	int ok = TRUE;
+	પૂર્ણાંક ok = TRUE;
 
-	if (di->di_tv.v_type == VAR_STRING && di->di_tv.vval.v_string != NULL)
+	જો (di->di_tv.v_type == VAR_STRING && di->di_tv.vval.v_string != ખાલી)
 	{
 	    char_u  *s = di->di_tv.vval.v_string;
 
-	    if (STRCMP(s, "none") == 0)
+	    જો (STRCMP(s, "none") == 0)
 		wp->w_popup_close = POPCLOSE_NONE;
-	    else if (STRCMP(s, "button") == 0)
+	    નહીંતર જો (STRCMP(s, "button") == 0)
 		wp->w_popup_close = POPCLOSE_BUTTON;
-	    else if (STRCMP(s, "click") == 0)
+	    નહીંતર જો (STRCMP(s, "click") == 0)
 		wp->w_popup_close = POPCLOSE_CLICK;
-	    else
+	    નહીંતર
 		ok = FALSE;
 	}
-	else
+	નહીંતર
 	    ok = FALSE;
-	if (!ok)
-	    semsg(_(e_invalid_value_for_argument_str_str), "close", tv_get_string(&di->di_tv));
+	જો (!ok)
+	    semsg(_(e_invalid_કિંમત_for_argument_str_str), "close", tv_get_string(&di->di_tv));
     }
 
     str = dict_get_string(dict, "highlight", FALSE);
-    if (str != NULL)
+    જો (str != ખાલી)
     {
-	char *errmsg = update_wincolor(wp, str);
+	અક્ષર *errmsg = update_wincolor(wp, str);
 
-	if (errmsg == NULL)
+	જો (errmsg == ખાલી)
 	    set_string_option_direct_in_win(wp, (char_u *)"wincolor", -1,
 		    str, OPT_FREE|OPT_LOCAL, 0);
-	else
+	નહીંતર
 	    emsg(_(errmsg));
     }
 
     str = dict_get_string(dict, "highlights", FALSE);
-    if (str != NULL)
+    જો (str != ખાલી)
     {
-	char *errmsg = update_winhighlight(wp, str);
+	અક્ષર *errmsg = update_winhighlight(wp, str);
 
-	if (errmsg == NULL)
+	જો (errmsg == ખાલી)
 	    set_string_option_direct_in_win(wp, (char_u *)"winhighlight", -1,
 		    str, OPT_FREE|OPT_LOCAL, 0);
-	else
+	નહીંતર
 	    emsg(_(errmsg));
     }
 
-    if (set_padding_border(dict, wp->w_popup_padding, "padding", 999) == FAIL ||
+    જો (set_padding_border(dict, wp->w_popup_padding, "padding", 999) == FAIL ||
 	set_padding_border(dict, wp->w_popup_border, "border", 1) == FAIL)
-	return FAIL;
+	પાછા FAIL;
 
     di = dict_find(dict, (char_u *)"borderhighlight", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	if (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == NULL)
+	જો (di->di_tv.v_type != VAR_LIST || di->di_tv.vval.v_list == ખાલી)
 	{
 	    emsg(_(e_list_required));
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    list_T	*list = di->di_tv.vval.v_list;
 	    listitem_T	*li;
-	    int		i;
+	    પૂર્ણાંક		i;
 
 	    CHECK_LIST_MATERIALIZE(list);
 	    wp->w_border_highlight_isset = true;
 	    // Clear all highlights if list is empty
-	    if (list->lv_len == 0)
+	    જો (list->lv_len == 0)
 	    {
-		for (i = 0; i < 4; ++i)
+		માટે (i = 0; i < 4; ++i)
 		{
 		    vim_free(wp->w_border_highlight[i]);
-		    wp->w_border_highlight[i] = NULL;
+		    wp->w_border_highlight[i] = ખાલી;
 		}
 	    }
-	    else
+	    નહીંતર
 	    {
-		for (i = 0, li = list->lv_first; i < 4 && i < list->lv_len;
+		માટે (i = 0, li = list->lv_first; i < 4 && i < list->lv_len;
 						     ++i, li = li->li_next)
 		{
 		    str = tv_get_string(&li->li_tv);
-		    if (*str != NUL)
+		    જો (*str != NUL)
 		    {
 			char_u	*hl = vim_strsave(str);
 
-			if (hl != NULL)
+			જો (hl != ખાલી)
 			{
 			    vim_free(wp->w_border_highlight[i]);
 			    wp->w_border_highlight[i] = hl;
 			}
 		    }
 		}
-		if (list->lv_len == 1 && wp->w_border_highlight[0] != NULL)
-		    for (i = 1; i < 4; ++i)
+		જો (list->lv_len == 1 && wp->w_border_highlight[0] != ખાલી)
+		    માટે (i = 1; i < 4; ++i)
 		    {
 			char_u	*hl = vim_strsave(wp->w_border_highlight[0]);
 
-			if (hl != NULL)
+			જો (hl != ખાલી)
 			{
 			    vim_free(wp->w_border_highlight[i]);
 			    wp->w_border_highlight[i] = hl;
@@ -1112,37 +1112,37 @@ image_done:
     }
 
     di = dict_find(dict, (char_u *)"borderchars", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	if (di->di_tv.v_type != VAR_LIST)
+	જો (di->di_tv.v_type != VAR_LIST)
 	{
 	    emsg(_(e_list_required));
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    list_T	*list = di->di_tv.vval.v_list;
 	    listitem_T	*li;
-	    int		i;
+	    પૂર્ણાંક		i;
 
-	    if (list != NULL)
+	    જો (list != ખાલી)
 	    {
 		CHECK_LIST_MATERIALIZE(list);
-		for (i = 0, li = list->lv_first; i < 8 && i < list->lv_len;
+		માટે (i = 0, li = list->lv_first; i < 8 && i < list->lv_len;
 							 ++i, li = li->li_next)
 		{
 		    str = tv_get_string(&li->li_tv);
-		    if (*str != NUL)
+		    જો (*str != NUL)
 			wp->w_border_char[i] = mb_ptr2char(str);
 		}
-		if (list->lv_len == 1)
-		    for (i = 1; i < 8; ++i)
+		જો (list->lv_len == 1)
+		    માટે (i = 1; i < 8; ++i)
 			wp->w_border_char[i] = wp->w_border_char[0];
-		if (list->lv_len == 2)
+		જો (list->lv_len == 2)
 		{
-		    for (i = 4; i < 8; ++i)
+		    માટે (i = 4; i < 8; ++i)
 			wp->w_border_char[i] = wp->w_border_char[1];
-		    for (i = 1; i < 4; ++i)
+		    માટે (i = 1; i < 4; ++i)
 			wp->w_border_char[i] = wp->w_border_char[0];
 		}
 	    }
@@ -1153,188 +1153,188 @@ image_done:
     check_highlight(dict, "thumbhighlight", &wp->w_thumb_highlight);
 
     di = dict_find(dict, (char_u *)"zindex", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	wp->w_zindex = dict_get_number(dict, "zindex");
-	if (wp->w_zindex < 1)
+	wp->w_zindex = dict_get_સંખ્યા(dict, "zindex");
+	જો (wp->w_zindex < 1)
 	    wp->w_zindex = POPUPWIN_DEFAULT_ZINDEX;
-	if (wp->w_zindex > 32000)
+	જો (wp->w_zindex > 32000)
 	    wp->w_zindex = 32000;
     }
 
     di = dict_find(dict, (char_u *)"mask", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	int ok = FALSE;
+	પૂર્ણાંક ok = FALSE;
 
-	if (di->di_tv.v_type == VAR_LIST && di->di_tv.vval.v_list != NULL)
+	જો (di->di_tv.v_type == VAR_LIST && di->di_tv.vval.v_list != ખાલી)
 	{
 	    listitem_T *li;
 
 	    ok = TRUE;
-	    FOR_ALL_LIST_ITEMS(di->di_tv.vval.v_list, li)
+	    FOR_ALL_LIST_વસ્તુઓ(di->di_tv.vval.v_list, li)
 	    {
-		if (li->li_tv.v_type != VAR_LIST
-			|| li->li_tv.vval.v_list == NULL
+		જો (li->li_tv.v_type != VAR_LIST
+			|| li->li_tv.vval.v_list == ખાલી
 			|| li->li_tv.vval.v_list->lv_len != 4)
 		{
 		    ok = FALSE;
-		    break;
+		    તોડો;
 		}
-		else
+		નહીંતર
 		    CHECK_LIST_MATERIALIZE(li->li_tv.vval.v_list);
 	    }
 	}
-	if (ok)
+	જો (ok)
 	{
 	    wp->w_popup_mask = di->di_tv.vval.v_list;
 	    ++wp->w_popup_mask->lv_refcount;
 	    VIM_CLEAR(wp->w_popup_mask_cells);
 	}
-	else
+	નહીંતર
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "mask");
-	    return FAIL;
+	    semsg(_(e_invalid_કિંમત_for_argument_str), "mask");
+	    પાછા FAIL;
 	}
     }
 
-#if defined(FEAT_TIMERS)
+#જો defined(FEAT_TIMERS)
     // Add timer to close the popup after some time.
-    nr = dict_get_number(dict, "time");
-    if (nr > 0)
+    nr = dict_get_સંખ્યા(dict, "time");
+    જો (nr > 0)
 	popup_add_timeout(wp, nr, TRUE);
 #endif
 
     di = dict_find(dict, (char_u *)"moved", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	set_moved_values(wp);
+	set_moved_કિંમતો(wp);
 	handle_moved_argument(wp, di, FALSE);
     }
 
     di = dict_find(dict, (char_u *)"mousemoved", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
-	set_mousemoved_values(wp);
+	set_mousemoved_કિંમતો(wp);
 	handle_moved_argument(wp, di, TRUE);
     }
 
     nr = dict_get_bool(dict, "cursorline", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr != 0)
+	જો (nr != 0)
 	    wp->w_popup_flags |= POPF_CURSORLINE;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_CURSORLINE;
     }
 
     di = dict_find(dict, (char_u *)"filter", -1);
-    if (di != NULL)
+    જો (di != ખાલી)
     {
 	callback_T	callback = get_callback(&di->di_tv);
 
-	if (callback.cb_name != NULL)
+	જો (callback.cb_name != ખાલી)
 	{
 	    free_callback(&wp->w_filter_cb);
 	    set_callback(&wp->w_filter_cb, &callback);
 	}
     }
     nr = dict_get_bool(dict, "mapping", -1);
-    if (nr != -1)
+    જો (nr != -1)
     {
-	if (nr)
+	જો (nr)
 	    wp->w_popup_flags |= POPF_MAPPING;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_MAPPING;
     }
 
     str = dict_get_string(dict, "filtermode", FALSE);
-    if (str != NULL)
+    જો (str != ખાલી)
     {
-	if (STRCMP(str, "a") == 0)
+	જો (STRCMP(str, "a") == 0)
 	    wp->w_filter_mode = MODE_ALL;
-	else
+	નહીંતર
 	    wp->w_filter_mode = mode_str2flags(str);
     }
 
     di = dict_find(dict, (char_u *)"callback", -1);
-    if (di == NULL)
-	return OK;
+    જો (di == ખાલી)
+	પાછા OK;
 
     callback_T	callback = get_callback(&di->di_tv);
-    if (callback.cb_name == NULL)
-	return OK;
+    જો (callback.cb_name == ખાલી)
+	પાછા OK;
 
     free_callback(&wp->w_close_cb);
     set_callback(&wp->w_close_cb, &callback);
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Go through the options in "dict" and apply them to popup window "wp".
  * "create" is TRUE when creating a new popup window.
  */
-    static int
-apply_options(win_T *wp, dict_T *dict, int create)
+    સ્થિર પૂર્ણાંક
+apply_options(win_T *wp, dict_T *dict, પૂર્ણાંક create)
 {
-    int		nr;
+    પૂર્ણાંક		nr;
 
     apply_move_options(wp, dict);
 
-    if (create)
+    જો (create)
 	set_string_option_direct_in_win(wp, (char_u *)"signcolumn", -1,
 					(char_u *)"no", OPT_FREE|OPT_LOCAL, 0);
 
-    if (apply_general_options(wp, dict) == FAIL)
-	return FAIL;
+    જો (apply_general_options(wp, dict) == FAIL)
+	પાછા FAIL;
 
     nr = dict_get_bool(dict, "hidden", FALSE);
-    if (nr > 0)
+    જો (nr > 0)
 	wp->w_popup_flags |= POPF_HIDDEN | POPF_HIDDEN_FORCE;
 
     // when "firstline" and "cursorline" are both set and the cursor would be
     // above or below the displayed lines, move the cursor to "firstline".
-    if (wp->w_firstline > 0 && (wp->w_popup_flags & POPF_CURSORLINE))
+    જો (wp->w_firstline > 0 && (wp->w_popup_flags & POPF_CURSORLINE))
     {
-	if (wp->w_firstline > wp->w_buffer->b_ml.ml_line_count)
-	    wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_line_count;
-	else if (wp->w_cursor.lnum < wp->w_firstline
+	જો (wp->w_firstline > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
+	    wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
+	નહીંતર જો (wp->w_cursor.lnum < wp->w_firstline
 		|| wp->w_cursor.lnum >= wp->w_firstline + wp->w_height)
 	    wp->w_cursor.lnum = wp->w_firstline;
 	wp->w_topline = wp->w_firstline;
 	wp->w_valid &= ~VALID_BOTLINE;
     }
 
-    if (create)
+    જો (create)
 	popup_mask_refresh = TRUE;
     popup_highlight_curline(wp);
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Add lines to the popup from a list of strings.
  */
-    static void
+    સ્થિર શૂન્ય
 add_popup_strings(buf_T *buf, list_T *l)
 {
     listitem_T  *li;
     linenr_T    lnum = 0;
     char_u	*p;
 
-    FOR_ALL_LIST_ITEMS(l, li)
-	if (li->li_tv.v_type == VAR_STRING)
+    FOR_ALL_LIST_વસ્તુઓ(l, li)
+	જો (li->li_tv.v_type == VAR_STRING)
 	{
 	    p = li->li_tv.vval.v_string;
 	    ml_append_buf(buf, lnum++,
-			       p == NULL ? (char_u *)"" : p, (colnr_T)0, TRUE);
+			       p == ખાલી ? (char_u *)"" : p, (colnr_T)0, TRUE);
 	}
 }
 
 /*
  * Add lines to the popup from a list of dictionaries.
  */
-    static void
+    સ્થિર શૂન્ય
 add_popup_dicts(buf_T *buf, list_T *l)
 {
     listitem_T  *li;
@@ -1344,51 +1344,51 @@ add_popup_dicts(buf_T *buf, list_T *l)
     dict_T	*dict;
 
     // first add the text lines
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_વસ્તુઓ(l, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
+	જો (li->li_tv.v_type != VAR_DICT)
 	{
 	    semsg(_(e_argument_1_list_item_nr_dictionary_required), lnum + 1);
-	    return;
+	    પાછા;
 	}
 	dict = li->li_tv.vval.v_dict;
-	p = dict == NULL ? NULL : dict_get_string(dict, "text", FALSE);
+	p = dict == ખાલી ? ખાલી : dict_get_string(dict, "text", FALSE);
 	ml_append_buf(buf, lnum++,
-			       p == NULL ? (char_u *)"" : p, (colnr_T)0, TRUE);
+			       p == ખાલી ? (char_u *)"" : p, (colnr_T)0, TRUE);
     }
 
     // add the text properties
     lnum = 1;
-    for (li = l->lv_first; li != NULL; li = li->li_next, ++lnum)
+    માટે (li = l->lv_first; li != ખાલી; li = li->li_next, ++lnum)
     {
 	dictitem_T	*di;
 	list_T		*plist;
 
 	dict = li->li_tv.vval.v_dict;
 	di = dict_find(dict, (char_u *)"props", -1);
-	if (di != NULL)
+	જો (di != ખાલી)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    જો (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		પાછા;
 	    }
 	    plist = di->di_tv.vval.v_list;
-	    if (plist != NULL)
+	    જો (plist != ખાલી)
 	    {
-		FOR_ALL_LIST_ITEMS(plist, pli)
+		FOR_ALL_LIST_વસ્તુઓ(plist, pli)
 		{
-		    if (pli->li_tv.v_type != VAR_DICT)
+		    જો (pli->li_tv.v_type != VAR_DICT)
 		    {
 			emsg(_(e_dictionary_required));
-			return;
+			પાછા;
 		    }
 		    dict = pli->li_tv.vval.v_dict;
-		    if (dict != NULL)
+		    જો (dict != ખાલી)
 		    {
-			int col = dict_get_number(dict, "col");
+			પૂર્ણાંક col = dict_get_સંખ્યા(dict, "col");
 
-			prop_add_common(lnum, col, dict, buf, NULL);
+			prop_add_common(lnum, col, dict, buf, ખાલી);
 		    }
 		}
 	    }
@@ -1399,33 +1399,33 @@ add_popup_dicts(buf_T *buf, list_T *l)
 /*
  * Get the padding plus border at the top, adjusted to 1 if there is a title.
  */
-    int
-popup_top_extra(win_T *wp)
+    પૂર્ણાંક
+popup_ટોચ_extra(win_T *wp)
 {
-    int	extra = wp->w_popup_border[0] + wp->w_popup_padding[0];
+    પૂર્ણાંક	extra = wp->w_popup_border[0] + wp->w_popup_padding[0];
 
-    if (extra == 0 && wp->w_popup_title != NULL && *wp->w_popup_title != NUL)
-	return 1;
-    return extra;
+    જો (extra == 0 && wp->w_popup_title != ખાલી && *wp->w_popup_title != NUL)
+	પાછા 1;
+    પાછા extra;
 }
 
 /*
  * Get the padding plus border at the left.
  */
-    int
-popup_left_extra(win_T *wp)
+    પૂર્ણાંક
+popup_ડાબું_extra(win_T *wp)
 {
-    return wp->w_popup_border[3] + wp->w_popup_padding[3];
+    પાછા wp->w_popup_border[3] + wp->w_popup_padding[3];
 }
 
 /*
  * Return the height of popup window "wp", including border and padding.
  */
-    int
+    પૂર્ણાંક
 popup_height(win_T *wp)
 {
-    return wp->w_height
-	    + popup_top_extra(wp)
+    પાછા wp->w_height
+	    + popup_ટોચ_extra(wp)
 	    + wp->w_popup_padding[2] + wp->w_popup_border[2];
 }
 
@@ -1433,11 +1433,11 @@ popup_height(win_T *wp)
  * Return the width of popup window "wp", including border, padding and
  * scrollbar.
  */
-    int
+    પૂર્ણાંક
 popup_width(win_T *wp)
 {
     // w_popup_rightoff is how many columns of the core are right of the screen
-    return wp->w_width
+    પાછા wp->w_width
 	    + popup_extra_width(wp)
 	    + wp->w_popup_rightoff;
 }
@@ -1445,10 +1445,10 @@ popup_width(win_T *wp)
 /*
  * Return the extra width of popup window "wp": border, padding and scrollbar.
  */
-    int
+    પૂર્ણાંક
 popup_extra_width(win_T *wp)
 {
-    return wp->w_popup_padding[3] + wp->w_popup_border[3]
+    પાછા wp->w_popup_padding[3] + wp->w_popup_border[3]
 	    + wp->w_popup_padding[1] + wp->w_popup_border[1]
 	    + wp->w_has_scrollbar;
 }
@@ -1459,14 +1459,14 @@ popup_extra_width(win_T *wp)
  * is no longer valid).  The textprop window is used as the host; popups not
  * anchored to a textprop are not clipped.
  */
-    static win_T *
+    સ્થિર win_T *
 popup_get_clipwin(win_T *wp)
 {
-    if (!(wp->w_popup_flags & POPF_CLIPWINDOW))
-	return NULL;
-    if (win_valid(wp->w_popup_prop_win))
-	return wp->w_popup_prop_win;
-    return NULL;
+    જો (!(wp->w_popup_flags & POPF_CLIPWINDOW))
+	પાછા ખાલી;
+    જો (win_valid(wp->w_popup_prop_win))
+	પાછા wp->w_popup_prop_win;
+    પાછા ખાલી;
 }
 
 // Per-popup clip geometry derived from w_popup_{top,bottom}off and
@@ -1488,87 +1488,87 @@ popup_get_clipwin(win_T *wp)
 //   eff_height     : drawn extent = eff_top_extra + visible content + eff_bot_extra.
 //   eff_width      : drawn extent = eff_left_extra + visible content + eff_right_extra
 //                    (does NOT include w_leftcol or scrollbar; see callers).
-typedef struct {
-    int top_extra;
-    int bot_extra;
-    int left_extra;
-    int right_extra;
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક ટોચ_extra;
+    પૂર્ણાંક bot_extra;
+    પૂર્ણાંક ડાબું_extra;
+    પૂર્ણાંક જમણું_extra;
 
-    int clip_top_content;
-    int clip_bot_content;
-    int clip_left_content;
-    int clip_right_content;
+    પૂર્ણાંક clip_ટોચ_content;
+    પૂર્ણાંક clip_bot_content;
+    પૂર્ણાંક clip_ડાબું_content;
+    પૂર્ણાંક clip_જમણું_content;
 
-    int eff_top_extra;
-    int eff_bot_extra;
-    int eff_left_extra;
-    int eff_right_extra;
+    પૂર્ણાંક eff_ટોચ_extra;
+    પૂર્ણાંક eff_bot_extra;
+    પૂર્ણાંક eff_ડાબું_extra;
+    પૂર્ણાંક eff_જમણું_extra;
 
-    int eff_border[4];
-    int eff_padding[4];
+    પૂર્ણાંક eff_border[4];
+    પૂર્ણાંક eff_padding[4];
 
-    int eff_height;
-    int eff_width;
+    પૂર્ણાંક eff_height;
+    પૂર્ણાંક eff_width;
 } popup_clip_T;
 
-    static void
+    સ્થિર શૂન્ય
 popup_compute_clip(win_T *wp, popup_clip_T *cl)
 {
-    int h, w;
+    પૂર્ણાંક h, w;
 
-    cl->top_extra = popup_top_extra(wp);
+    cl->ટોચ_extra = popup_ટોચ_extra(wp);
     cl->bot_extra = wp->w_popup_padding[2] + wp->w_popup_border[2];
-    cl->left_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
-    cl->right_extra = wp->w_popup_border[1] + wp->w_popup_padding[1];
+    cl->ડાબું_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
+    cl->જમણું_extra = wp->w_popup_border[1] + wp->w_popup_padding[1];
 
-    cl->clip_top_content = wp->w_popup_topoff - cl->top_extra;
-    if (cl->clip_top_content < 0)
-	cl->clip_top_content = 0;
+    cl->clip_ટોચ_content = wp->w_popup_topoff - cl->ટોચ_extra;
+    જો (cl->clip_ટોચ_content < 0)
+	cl->clip_ટોચ_content = 0;
     cl->clip_bot_content = wp->w_popup_bottomoff - cl->bot_extra;
-    if (cl->clip_bot_content < 0)
+    જો (cl->clip_bot_content < 0)
 	cl->clip_bot_content = 0;
-    cl->clip_left_content = wp->w_popup_leftclip - cl->left_extra;
-    if (cl->clip_left_content < 0)
-	cl->clip_left_content = 0;
-    cl->clip_right_content = wp->w_popup_rightclip - cl->right_extra;
-    if (cl->clip_right_content < 0)
-	cl->clip_right_content = 0;
+    cl->clip_ડાબું_content = wp->w_popup_leftclip - cl->ડાબું_extra;
+    જો (cl->clip_ડાબું_content < 0)
+	cl->clip_ડાબું_content = 0;
+    cl->clip_જમણું_content = wp->w_popup_rightclip - cl->જમણું_extra;
+    જો (cl->clip_જમણું_content < 0)
+	cl->clip_જમણું_content = 0;
 
     // Border is consumed before padding: when only the border row/column is
     // clipped, the adjacent padding row/column is still visible.  Horizontal
     // edges keep the previous all-or-nothing behaviour for now; the drawing
     // code there still uses original w_popup_border / w_popup_padding offsets.
     {
-	int clip = wp->w_popup_topoff;
-	int b = wp->w_popup_border[0];
-	int p = wp->w_popup_padding[0];
-	int rem;
+	પૂર્ણાંક clip = wp->w_popup_topoff;
+	પૂર્ણાંક b = wp->w_popup_border[0];
+	પૂર્ણાંક p = wp->w_popup_padding[0];
+	પૂર્ણાંક rem;
 
-	if (clip >= b)
+	જો (clip >= b)
 	{
 	    cl->eff_border[0] = 0;
 	    rem = clip - b;
 	    cl->eff_padding[0] = (rem >= p) ? 0 : p - rem;
 	}
-	else
+	નહીંતર
 	{
 	    cl->eff_border[0] = b;
 	    cl->eff_padding[0] = p;
 	}
     }
     {
-	int clip = wp->w_popup_bottomoff;
-	int b = wp->w_popup_border[2];
-	int p = wp->w_popup_padding[2];
-	int rem;
+	પૂર્ણાંક clip = wp->w_popup_bottomoff;
+	પૂર્ણાંક b = wp->w_popup_border[2];
+	પૂર્ણાંક p = wp->w_popup_padding[2];
+	પૂર્ણાંક rem;
 
-	if (clip >= b)
+	જો (clip >= b)
 	{
 	    cl->eff_border[2] = 0;
 	    rem = clip - b;
 	    cl->eff_padding[2] = (rem >= p) ? 0 : p - rem;
 	}
-	else
+	નહીંતર
 	{
 	    cl->eff_border[2] = b;
 	    cl->eff_padding[2] = p;
@@ -1584,54 +1584,54 @@ popup_compute_clip(win_T *wp, popup_clip_T *cl)
     // padding/border can land outside the host (e.g. a popup whose body is
     // wholly below the host still drew its top padding onto the status row).
     {
-	int excess = wp->w_popup_bottomoff - cl->bot_extra - wp->w_height;
-	if (excess > 0)
+	પૂર્ણાંક excess = wp->w_popup_bottomoff - cl->bot_extra - wp->w_height;
+	જો (excess > 0)
 	{
-	    if (excess >= cl->eff_padding[0])
+	    જો (excess >= cl->eff_padding[0])
 	    {
 		excess -= cl->eff_padding[0];
 		cl->eff_padding[0] = 0;
-		if (excess >= cl->eff_border[0])
+		જો (excess >= cl->eff_border[0])
 		    cl->eff_border[0] = 0;
-		else
+		નહીંતર
 		    cl->eff_border[0] -= excess;
 	    }
-	    else
+	    નહીંતર
 		cl->eff_padding[0] -= excess;
 	}
     }
     {
-	int excess = wp->w_popup_topoff - cl->top_extra - wp->w_height;
-	if (excess > 0)
+	પૂર્ણાંક excess = wp->w_popup_topoff - cl->ટોચ_extra - wp->w_height;
+	જો (excess > 0)
 	{
-	    if (excess >= cl->eff_padding[2])
+	    જો (excess >= cl->eff_padding[2])
 	    {
 		excess -= cl->eff_padding[2];
 		cl->eff_padding[2] = 0;
-		if (excess >= cl->eff_border[2])
+		જો (excess >= cl->eff_border[2])
 		    cl->eff_border[2] = 0;
-		else
+		નહીંતર
 		    cl->eff_border[2] -= excess;
 	    }
-	    else
+	    નહીંતર
 		cl->eff_padding[2] -= excess;
 	}
     }
 
-    cl->eff_top_extra = cl->eff_border[0] + cl->eff_padding[0];
+    cl->eff_ટોચ_extra = cl->eff_border[0] + cl->eff_padding[0];
     cl->eff_bot_extra = cl->eff_border[2] + cl->eff_padding[2];
-    cl->eff_left_extra = wp->w_popup_leftclip > 0 ? 0 : cl->left_extra;
-    cl->eff_right_extra = wp->w_popup_rightclip > 0 ? 0 : cl->right_extra;
+    cl->eff_ડાબું_extra = wp->w_popup_leftclip > 0 ? 0 : cl->ડાબું_extra;
+    cl->eff_જમણું_extra = wp->w_popup_rightclip > 0 ? 0 : cl->જમણું_extra;
 
-    h = wp->w_height - cl->clip_top_content - cl->clip_bot_content;
-    if (h < 0)
+    h = wp->w_height - cl->clip_ટોચ_content - cl->clip_bot_content;
+    જો (h < 0)
 	h = 0;
-    cl->eff_height = cl->eff_top_extra + h + cl->eff_bot_extra;
+    cl->eff_height = cl->eff_ટોચ_extra + h + cl->eff_bot_extra;
 
-    w = wp->w_width - cl->clip_left_content - cl->clip_right_content;
-    if (w < 0)
+    w = wp->w_width - cl->clip_ડાબું_content - cl->clip_જમણું_content;
+    જો (w < 0)
 	w = 0;
-    cl->eff_width = cl->eff_left_extra + w + cl->eff_right_extra;
+    cl->eff_width = cl->eff_ડાબું_extra + w + cl->eff_જમણું_extra;
 }
 
 // Snapshot of the popup window geometry that update_popups() temporarily
@@ -1640,17 +1640,17 @@ popup_compute_clip(win_T *wp, popup_clip_T *cl)
 // callers continue to see the popup's logical geometry.
 // Field names omit the "w_" prefix to avoid clashing with struct-field
 // macros like w_p_wrap (= w_onebuf_opt.wo_wrap).
-typedef struct {
-    int		height;
-    int		width;
-    int		winrow;
-    int		wincol;
-    int		leftcol;
-    int		p_wrap;
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક		height;
+    પૂર્ણાંક		width;
+    પૂર્ણાંક		winrow;
+    પૂર્ણાંક		wincol;
+    પૂર્ણાંક		leftcol;
+    પૂર્ણાંક		p_wrap;
     linenr_T	topline;
 } popup_geom_save_T;
 
-    static void
+    સ્થિર શૂન્ય
 popup_geom_save(win_T *wp, popup_geom_save_T *sv)
 {
     sv->height  = wp->w_height;
@@ -1662,7 +1662,7 @@ popup_geom_save(win_T *wp, popup_geom_save_T *sv)
     sv->topline = wp->w_topline;
 }
 
-    static void
+    સ્થિર શૂન્ય
 popup_geom_restore(win_T *wp, popup_geom_save_T *sv)
 {
     wp->w_p_wrap  = sv->p_wrap;
@@ -1686,29 +1686,29 @@ popup_geom_restore(win_T *wp, popup_geom_save_T *sv)
  * stops / multi-byte widths, so the popup's wincol would jitter every time
  * a wider/narrower line scrolled into the topmost position.
  */
-    static void
-popup_screenpos_above_top(
+    સ્થિર શૂન્ય
+popup_screenpos_above_ટોચ(
 	win_T	    *prop_win,
 	pos_T	    *pos,
 	linenr_T    prop_lnum,
-	int	    *screen_row,
-	int	    *screen_scol,
-	int	    *screen_ccol,
-	int	    *screen_ecol)
+	પૂર્ણાંક	    *screen_row,
+	પૂર્ણાંક	    *screen_scol,
+	પૂર્ણાંક	    *screen_ccol,
+	પૂર્ણાંક	    *screen_ecol)
 {
     pos_T   probe = *pos;
     colnr_T scol = 0, ccol = 0, ecol = 0;
-    int	    coloff;
+    પૂર્ણાંક	    coloff;
 
     probe.lnum = prop_lnum;
     getvcol(prop_win, &probe, &scol, &ccol, &ecol, 0);
-    coloff = (int)win_col_off(prop_win) - (int)prop_win->w_leftcol
+    coloff = (પૂર્ણાંક)win_col_off(prop_win) - (પૂર્ણાંક)prop_win->w_leftcol
 					+ prop_win->w_wincol + 1;
-    *screen_scol = (int)scol + coloff;
-    *screen_ccol = (int)ccol + coloff;
-    *screen_ecol = (int)ecol + coloff;
+    *screen_scol = (પૂર્ણાંક)scol + coloff;
+    *screen_ccol = (પૂર્ણાંક)ccol + coloff;
+    *screen_ecol = (પૂર્ણાંક)ecol + coloff;
     *screen_row = prop_win->w_winrow + 1
-				 - (int)(prop_win->w_topline - prop_lnum);
+				 - (પૂર્ણાંક)(prop_win->w_topline - prop_lnum);
 }
 
 /*
@@ -1716,13 +1716,13 @@ popup_screenpos_above_top(
  * Marks the popup as POPF_HIDDEN (no-op when already hidden) and schedules a
  * redraw of the host window so any leftover decorations are cleared.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_hide_for_textprop(win_T *wp)
 {
-    if ((wp->w_popup_flags & POPF_HIDDEN) != 0)
-	return;
+    જો ((wp->w_popup_flags & POPF_HIDDEN) != 0)
+	પાછા;
     wp->w_popup_flags |= POPF_HIDDEN;
-    if (win_valid(wp->w_popup_prop_win))
+    જો (win_valid(wp->w_popup_prop_win))
 	redraw_win_later(wp->w_popup_prop_win, UPD_SOME_VALID);
 }
 
@@ -1733,23 +1733,23 @@ popup_hide_for_textprop(win_T *wp)
  * scanned; pass 0 to scan all lines from line 1.  Returns false when the
  * popup is not "clipwindow", topline is already at line 1, or no prop matches.
  */
-    static bool
-popup_find_prop_above_top(
+    સ્થિર bool
+popup_find_prop_above_ટોચ(
 	win_T	    *wp,
 	win_T	    *prop_win,
-	int	    max_reach,
+	પૂર્ણાંક	    max_reach,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     linenr_T	first;
 
-    if (!(wp->w_popup_flags & POPF_CLIPWINDOW) || prop_win->w_topline <= 1)
-	return false;
+    જો (!(wp->w_popup_flags & POPF_CLIPWINDOW) || prop_win->w_topline <= 1)
+	પાછા false;
 
     first = max_reach > 0 ? prop_win->w_topline - max_reach : 1;
-    if (first < 1)
+    જો (first < 1)
 	first = 1;
-    return find_prop_in_lines(prop_win,
+    પાછા find_prop_in_લીટીઓ(prop_win,
 		    wp->w_popup_prop_type, wp->w_popup_prop_id,
 		    prop, found_lnum, first, prop_win->w_topline - 1);
 }
@@ -1762,38 +1762,38 @@ popup_find_prop_above_top(
  * Returns true when the popup has scrolled completely past one of the host
  * edges, in which case the caller must hide it.
  */
-    static bool
+    સ્થિર bool
 popup_compute_clipwindow_offsets(win_T *wp)
 {
     win_T   *cw = popup_get_clipwin(wp);
-    int	    extra_h, extra_w;
-    int	    popup_top, popup_bottom, popup_left, popup_right;
-    int	    total_h, total_w;
+    પૂર્ણાંક	    extra_h, extra_w;
+    પૂર્ણાંક	    popup_ટોચ, popup_bottom, popup_ડાબું, popup_જમણું;
+    પૂર્ણાંક	    total_h, total_w;
 
-    if (cw == NULL)
-	return false;
+    જો (cw == ખાલી)
+	પાછા false;
 
-    extra_h = popup_top_extra(wp)
+    extra_h = popup_ટોચ_extra(wp)
 		    + wp->w_popup_padding[2] + wp->w_popup_border[2];
     extra_w = popup_extra_width(wp);
 
-    popup_top = wp->w_winrow;
+    popup_ટોચ = wp->w_winrow;
     popup_bottom = wp->w_winrow + wp->w_height + extra_h;
-    popup_left = wp->w_wincol;
-    popup_right = wp->w_wincol + wp->w_width + extra_w;
+    popup_ડાબું = wp->w_wincol;
+    popup_જમણું = wp->w_wincol + wp->w_width + extra_w;
     total_h = wp->w_height + extra_h;
     total_w = wp->w_width + extra_w;
 
-    if (popup_top < cw->w_winrow)
-	wp->w_popup_topoff = cw->w_winrow - popup_top;
-    if (popup_bottom > cw->w_winrow + cw->w_height)
+    જો (popup_ટોચ < cw->w_winrow)
+	wp->w_popup_topoff = cw->w_winrow - popup_ટોચ;
+    જો (popup_bottom > cw->w_winrow + cw->w_height)
 	wp->w_popup_bottomoff = popup_bottom - (cw->w_winrow + cw->w_height);
-    if (popup_left < cw->w_wincol)
-	wp->w_popup_leftclip = cw->w_wincol - popup_left;
-    if (popup_right > cw->w_wincol + cw->w_width)
-	wp->w_popup_rightclip = popup_right - (cw->w_wincol + cw->w_width);
+    જો (popup_ડાબું < cw->w_wincol)
+	wp->w_popup_leftclip = cw->w_wincol - popup_ડાબું;
+    જો (popup_જમણું > cw->w_wincol + cw->w_width)
+	wp->w_popup_rightclip = popup_જમણું - (cw->w_wincol + cw->w_width);
 
-    return wp->w_popup_topoff >= total_h
+    પાછા wp->w_popup_topoff >= total_h
 	|| wp->w_popup_bottomoff >= total_h
 	|| wp->w_popup_leftclip >= total_w
 	|| wp->w_popup_rightclip >= total_w;
@@ -1816,34 +1816,34 @@ popup_compute_clipwindow_offsets(win_T *wp)
  * not reflow wrapped lines: the popup's logical width is unchanged, we just
  * want to truncate cells that fall outside the host at draw time.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_apply_winupdate_clip(win_T *wp, popup_clip_T *cl)
 {
-    if (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
+    જો (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
     {
-	wp->w_height -= cl->clip_top_content + cl->clip_bot_content;
-	if (wp->w_height < 0)
+	wp->w_height -= cl->clip_ટોચ_content + cl->clip_bot_content;
+	જો (wp->w_height < 0)
 	    wp->w_height = 0;
-	if (cl->clip_top_content > 0)
+	જો (cl->clip_ટોચ_content > 0)
 	    // w_winrow already points at the first visible row.
-	    wp->w_topline += cl->clip_top_content;
+	    wp->w_topline += cl->clip_ટોચ_content;
     }
-    if (wp->w_popup_leftclip > 0 || wp->w_popup_rightclip > 0)
+    જો (wp->w_popup_leftclip > 0 || wp->w_popup_rightclip > 0)
     {
-	if (cl->clip_left_content > 0 || cl->clip_right_content > 0)
+	જો (cl->clip_ડાબું_content > 0 || cl->clip_જમણું_content > 0)
 	    wp->w_p_wrap = FALSE;
-	if (cl->clip_right_content > 0)
+	જો (cl->clip_જમણું_content > 0)
 	{
-	    wp->w_width -= cl->clip_right_content;
-	    if (wp->w_width < 0)
+	    wp->w_width -= cl->clip_જમણું_content;
+	    જો (wp->w_width < 0)
 		wp->w_width = 0;
 	}
-	if (cl->clip_left_content > 0)
+	જો (cl->clip_ડાબું_content > 0)
 	{
-	    wp->w_leftcol += cl->clip_left_content;
-	    wp->w_wincol += cl->clip_left_content;
-	    wp->w_width -= cl->clip_left_content;
-	    if (wp->w_width < 0)
+	    wp->w_leftcol += cl->clip_ડાબું_content;
+	    wp->w_wincol += cl->clip_ડાબું_content;
+	    wp->w_width -= cl->clip_ડાબું_content;
+	    જો (wp->w_width < 0)
 		wp->w_width = 0;
 	}
     }
@@ -1853,25 +1853,25 @@ popup_apply_winupdate_clip(win_T *wp, popup_clip_T *cl)
 /*
  * Position the image associated with this popup window (if any).
  */
-    static void
+    સ્થિર શૂન્ય
 popup_position_image(win_T *wp)
 {
     linenr_T	    row;
     colnr_T	    col;
 
-    int iw, ih;
+    પૂર્ણાંક iw, ih;
 
     // Visible cell width and height of popup itself (not image!)
-    int	visible_width;
-    int	visible_height;
+    પૂર્ણાંક	visible_width;
+    પૂર્ણાંક	visible_height;
 
     // Crop dimensions of image (in pixels).
-    int	crop_x, crop_y, crop_width, crop_height;
+    પૂર્ણાંક	crop_x, crop_y, crop_width, crop_height;
 
     popup_clip_T clip;
 
-    if (wp->w_popup_imagep == NULL || wp->w_popup_flags & POPF_HIDDEN)
-	return;
+    જો (wp->w_popup_imagep == ખાલી || wp->w_popup_flags & POPF_HIDDEN)
+	પાછા;
 
     image_placement_set_enable(wp->w_popup_imagep, true);
 
@@ -1880,23 +1880,23 @@ popup_position_image(win_T *wp)
 
     popup_compute_clip(wp, &clip);
 
-    if (wp->w_popup_imagep->img == NULL)
+    જો (wp->w_popup_imagep->img == ખાલી)
 	// Just set the bounding box
-	goto exit;
+	જાઓ exit;
 
     visible_width =
-	wp->w_width - clip.clip_left_content - clip.clip_right_content;
+	wp->w_width - clip.clip_ડાબું_content - clip.clip_જમણું_content;
     visible_height =
-	wp->w_height - clip.clip_top_content - clip.clip_bot_content;
+	wp->w_height - clip.clip_ટોચ_content - clip.clip_bot_content;
 
-    if (visible_width < 0 || visible_height < 0)
-	return;
+    જો (visible_width < 0 || visible_height < 0)
+	પાછા;
 
     image_get_cell_dimensions(wp->w_popup_imagep->img, &iw, &ih);
 
-    crop_x = clip.clip_left_content;
-    crop_y = clip.clip_top_content;
-    crop_width = iw - crop_x - clip.clip_right_content;
+    crop_x = clip.clip_ડાબું_content;
+    crop_y = clip.clip_ટોચ_content;
+    crop_width = iw - crop_x - clip.clip_જમણું_content;
     crop_height = ih - crop_y - clip.clip_bot_content;
 
     // Must account for border and padding (only cells that have been clipped).
@@ -1908,9 +1908,9 @@ popup_position_image(win_T *wp)
 
     // Clamp to the popup's actual visible cell box in pixels, so the
     // crop can never claim more cells than the popup has
-    if (crop_width > visible_width)
+    જો (crop_width > visible_width)
 	crop_width = visible_width;
-    if (crop_height > visible_height)
+    જો (crop_height > visible_height)
 	crop_height = visible_height;
 
     image_placement_set_crop(wp->w_popup_imagep, crop_x, crop_y,
@@ -1929,36 +1929,36 @@ exit:
 /*
  * Adjust the position and size of the popup to fit on the screen.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_adjust_position(win_T *wp)
 {
     linenr_T	lnum;
-    int		wrapped = 0;
-    int		maxwidth;
-    int		maxwidth_no_scrollbar;
-    int		width_with_scrollbar = 0;
-    int		used_maxwidth = FALSE;
-    int		margin_width = 0;
-    int		maxspace;
-    int		center_vert = FALSE;
-    int		center_hor = FALSE;
-    int		allow_adjust_left = !wp->w_popup_fixed;
-    int		top_extra = popup_top_extra(wp);
-    int		right_extra = wp->w_popup_border[1] + wp->w_popup_padding[1]
+    પૂર્ણાંક		wrapped = 0;
+    પૂર્ણાંક		maxwidth;
+    પૂર્ણાંક		maxwidth_no_scrollbar;
+    પૂર્ણાંક		width_with_scrollbar = 0;
+    પૂર્ણાંક		used_maxwidth = FALSE;
+    પૂર્ણાંક		margin_width = 0;
+    પૂર્ણાંક		maxspace;
+    પૂર્ણાંક		center_vert = FALSE;
+    પૂર્ણાંક		center_hor = FALSE;
+    પૂર્ણાંક		allow_adjust_ડાબું = !wp->w_popup_fixed;
+    પૂર્ણાંક		ટોચ_extra = popup_ટોચ_extra(wp);
+    પૂર્ણાંક		જમણું_extra = wp->w_popup_border[1] + wp->w_popup_padding[1]
 		    + (wp->w_popup_shadow ? 2 : 0);
-    int		bot_extra = wp->w_popup_border[2] + wp->w_popup_padding[2]
+    પૂર્ણાંક		bot_extra = wp->w_popup_border[2] + wp->w_popup_padding[2]
 		    + wp->w_popup_shadow;
-    int		left_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
-    int		extra_height = top_extra + bot_extra;
-    int		extra_width = left_extra + right_extra;
-    int		w_height_before_limit;
+    પૂર્ણાંક		ડાબું_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
+    પૂર્ણાંક		extra_height = ટોચ_extra + bot_extra;
+    પૂર્ણાંક		extra_width = ડાબું_extra + જમણું_extra;
+    પૂર્ણાંક		w_height_before_limit;
     popup_layout_T org_layout;
-    int		minwidth, minheight;
-    int		maxheight = Rows;
-    int		wantline = wp->w_wantline;  // adjusted for textprop
-    int		wantcol = wp->w_wantcol;    // adjusted for textprop
-    int		use_wantcol = wantcol != 0;
-    int		adjust_height_for_top_aligned = FALSE;
+    પૂર્ણાંક		minwidth, minheight;
+    પૂર્ણાંક		maxheight = Rows;
+    પૂર્ણાંક		wantline = wp->w_wantline;  // adjusted for textprop
+    પૂર્ણાંક		wantcol = wp->w_wantcol;    // adjusted for textprop
+    પૂર્ણાંક		use_wantcol = wantcol != 0;
+    પૂર્ણાંક		adjust_height_for_ટોચ_aligned = FALSE;
 
     popup_save_layout(wp, &org_layout);
 
@@ -1974,46 +1974,46 @@ popup_adjust_position(win_T *wp)
 
     // May need to update the "cursorline" highlighting, which may also change
     // "topline"
-    if (wp->w_popup_last_curline != wp->w_cursor.lnum)
+    જો (wp->w_popup_last_curline != wp->w_cursor.lnum)
 	popup_highlight_curline(wp);
 
-    if (wp->w_popup_prop_type > 0 && win_valid(wp->w_popup_prop_win))
+    જો (wp->w_popup_prop_type > 0 && win_valid(wp->w_popup_prop_win))
     {
 	win_T	    *prop_win = wp->w_popup_prop_win;
 	textprop_T  prop;
 	linenr_T    prop_lnum;
 	pos_T	    pos;
-	int	    screen_row;
-	int	    screen_scol;
-	int	    screen_ccol;
-	int	    screen_ecol;
+	પૂર્ણાંક	    screen_row;
+	પૂર્ણાંક	    screen_scol;
+	પૂર્ણાંક	    screen_ccol;
+	પૂર્ણાંક	    screen_ecol;
 
 	// Popup window is positioned relative to a text property.  With
 	// "clipwindow", keep the popup visible while the textprop has just
 	// scrolled above the host's top: extrapolate a negative screen_row
 	// from a prop above topline so the top-clip path can roll the popup
 	// off the top edge.  Unhiding is done in check_popup_unhidden().
-	bool prop_above_top = false;
-	if (!find_visible_prop(prop_win,
+	bool prop_above_ટોચ = false;
+	જો (!find_visible_prop(prop_win,
 				wp->w_popup_prop_type, wp->w_popup_prop_id,
 				&prop, &prop_lnum))
 	{
-	    if (popup_find_prop_above_top(wp, prop_win, 0,
+	    જો (popup_find_prop_above_ટોચ(wp, prop_win, 0,
 							    &prop, &prop_lnum))
-		prop_above_top = true;
-	    else
+		prop_above_ટોચ = true;
+	    નહીંતર
 	    {
-		if ((wp->w_popup_flags & POPF_HIDDEN) == 0)
+		જો ((wp->w_popup_flags & POPF_HIDDEN) == 0)
 		{
 #ifdef FEAT_IMAGE_POPUP
-		    if (wp->w_popup_imagep != NULL)
+		    જો (wp->w_popup_imagep != ખાલી)
 			image_placement_clear(wp->w_popup_imagep);
 #endif
 		    popup_hide_for_textprop(wp);
-		    if (wp->w_winrow + popup_height(wp) >= cmdline_row)
+		    જો (wp->w_winrow + popup_height(wp) >= cmdline_row)
 			clear_cmdline = TRUE;
 		}
-		return;
+		પાછા;
 	    }
 	}
 
@@ -2021,95 +2021,95 @@ popup_adjust_position(win_T *wp)
 	// property.  Use "wantline" and "wantcol" as offsets.
 	pos.lnum = prop_lnum;
 	pos.col = prop.tp_col;
-	if (wp->w_popup_pos == POPPOS_TOPLEFT
+	જો (wp->w_popup_pos == POPPOS_TOPLEFT
 		|| wp->w_popup_pos == POPPOS_BOTLEFT)
 	    pos.col += prop.tp_len - 1;
-	if (prop_above_top)
-	    popup_screenpos_above_top(prop_win, &pos, prop_lnum, &screen_row,
+	જો (prop_above_ટોચ)
+	    popup_screenpos_above_ટોચ(prop_win, &pos, prop_lnum, &screen_row,
 				     &screen_scol, &screen_ccol, &screen_ecol);
-	else
+	નહીંતર
 	    textpos2screenpos(prop_win, &pos, &screen_row,
 				     &screen_scol, &screen_ccol, &screen_ecol);
 
-	if (screen_scol == 0)
+	જો (screen_scol == 0)
 	{
 	    // position is off screen, make the width zero to hide it.
 	    wp->w_width = 0;
-	    return;
+	    પાછા;
 	}
-	if (wp->w_popup_pos == POPPOS_TOPLEFT
+	જો (wp->w_popup_pos == POPPOS_TOPLEFT
 		|| wp->w_popup_pos == POPPOS_TOPRIGHT)
 	    // below the text
 	    wantline = screen_row + wantline + 1;
-	else
+	નહીંતર
 	    // above the text
 	    wantline = screen_row + wantline - 1;
 	center_vert = FALSE;
-	if (wp->w_popup_pos == POPPOS_TOPLEFT
+	જો (wp->w_popup_pos == POPPOS_TOPLEFT
 		|| wp->w_popup_pos == POPPOS_BOTLEFT)
 	    // right of the text
 	    wantcol = screen_ecol + wantcol;
-	else
+	નહીંતર
 	    // left of the text
 	    wantcol = screen_scol + wantcol - 2;
 	use_wantcol = TRUE;
     }
-    else
+    નહીંતર
     {
 	// If no line was specified default to vertical centering.
-	if (wantline == 0)
+	જો (wantline == 0)
 	    center_vert = TRUE;
-	else if (wantline < 0)
+	નહીંતર જો (wantline < 0)
 	    // If "wantline" is negative it actually means zero.
 	    wantline = 0;
-	if (wantcol < 0)
+	જો (wantcol < 0)
 	    // If "wantcol" is negative it actually means zero.
 	    wantcol = 0;
     }
 
-    if (wp->w_popup_pos == POPPOS_CENTER)
+    જો (wp->w_popup_pos == POPPOS_CENTER)
     {
 	// center after computing the size
 	center_vert = TRUE;
 	center_hor = TRUE;
     }
-    else
+    નહીંતર
     {
-	if (wantline > 0 && (wp->w_popup_pos == POPPOS_TOPLEFT
+	જો (wantline > 0 && (wp->w_popup_pos == POPPOS_TOPLEFT
 					|| wp->w_popup_pos == POPPOS_TOPRIGHT))
 	{
 	    wp->w_winrow = wantline - 1;
-	    if (wp->w_winrow >= Rows)
+	    જો (wp->w_winrow >= Rows)
 		wp->w_winrow = Rows - 1;
 	}
-	if (wp->w_popup_pos == POPPOS_BOTTOM)
+	જો (wp->w_popup_pos == POPPOS_BOTTOM)
 	{
 	    // Assume that each buffer line takes one screen line, and one line
 	    // for the top border.  First make sure cmdline_row is valid,
 	    // calling update_screen() will set it only later.
 	    compute_cmdrow();
 	    wp->w_winrow = MAX(cmdline_row
-				    - wp->w_buffer->b_ml.ml_line_count - 1, 0);
+				    - wp->w_buffer->b_ml.ml_લીટી_ગણતરી - 1, 0);
 	}
 
-	if (!use_wantcol)
+	જો (!use_wantcol)
 	    center_hor = TRUE;
-	else if (wantcol > 0 && (wp->w_popup_pos == POPPOS_TOPLEFT
+	નહીંતર જો (wantcol > 0 && (wp->w_popup_pos == POPPOS_TOPLEFT
 		|| wp->w_popup_pos == POPPOS_BOTLEFT))
 	{
 	    wp->w_wincol = wantcol - 1;
 	    // Need to see at least one character of content plus the right
 	    // border/padding/shadow after the decoration.
-	    if (wp->w_wincol > firstwin->w_wincol + topframe->fr_width
-						- left_extra - right_extra - 1)
+	    જો (wp->w_wincol > firstwin->w_wincol + topframe->fr_width
+						- ડાબું_extra - જમણું_extra - 1)
 		wp->w_wincol = firstwin->w_wincol + topframe->fr_width
-						- left_extra - right_extra - 1;
+						- ડાબું_extra - જમણું_extra - 1;
 	}
     }
 
     // Keep the popup out of the tabpanel area so the available width is
     // computed correctly below.
-    if (wp->w_wincol < firstwin->w_wincol)
+    જો (wp->w_wincol < firstwin->w_wincol)
 	wp->w_wincol = firstwin->w_wincol;
 
     // When centering or right aligned, use maximum width.
@@ -2117,24 +2117,24 @@ popup_adjust_position(win_T *wp)
     // hit the right of the screen.
     // Reserve room for the right border/padding/shadow so the popup fits.
     maxspace = firstwin->w_wincol + topframe->fr_width
-					- wp->w_wincol - left_extra - right_extra;
+					- wp->w_wincol - ડાબું_extra - જમણું_extra;
     maxwidth = maxspace;
-    if (wp->w_maxwidth > 0 && maxwidth > wp->w_maxwidth)
+    જો (wp->w_maxwidth > 0 && maxwidth > wp->w_maxwidth)
     {
-	allow_adjust_left = FALSE;
+	allow_adjust_ડાબું = FALSE;
 	maxwidth = wp->w_maxwidth;
     }
 
-    if (wp->w_p_nu || wp->w_p_rnu)
-	margin_width = number_width(wp) + 1;
+    જો (wp->w_p_nu || wp->w_p_rnu)
+	margin_width = સંખ્યા_width(wp) + 1;
 #ifdef FEAT_FOLDING
     margin_width += wp->w_p_fdc;
 #endif
 #ifdef FEAT_SIGNS
-    if (signcolumn_on(wp))
+    જો (signcolumn_on(wp))
 	margin_width += 2;
 #endif
-    if (margin_width >= maxwidth)
+    જો (margin_width >= maxwidth)
 	margin_width = maxwidth - 1;
 
     minwidth = wp->w_minwidth;
@@ -2142,35 +2142,35 @@ popup_adjust_position(win_T *wp)
 #ifdef FEAT_TERMINAL
     // A terminal popup initially does not have content, use a default minimal
     // width of 20 characters and height of 5 lines.
-    if (wp->w_buffer->b_term != NULL)
+    જો (wp->w_buffer->b_term != ખાલી)
     {
-	if (minwidth == 0)
+	જો (minwidth == 0)
 	    minwidth = 20;
-	if (minheight == 0)
+	જો (minheight == 0)
 	    minheight = 5;
     }
 #endif
 
-    if (wp->w_maxheight > 0)
+    જો (wp->w_maxheight > 0)
 	maxheight = wp->w_maxheight;
-    else if (wp->w_popup_pos == POPPOS_BOTTOM)
+    નહીંતર જો (wp->w_popup_pos == POPPOS_BOTTOM)
 	maxheight = cmdline_row - 1;
 
     // start at the desired first line
-    if (wp->w_firstline > 0)
+    જો (wp->w_firstline > 0)
     {
 	// If firstline is beyond the buffer content, reset it to auto-position.
 	// This can happen when the popup was scrolled and then the buffer
 	// content was changed to have fewer lines.
-	if (wp->w_firstline > wp->w_buffer->b_ml.ml_line_count)
+	જો (wp->w_firstline > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
 	    wp->w_firstline = 0;
-	else
+	નહીંતર
 	    wp->w_topline = wp->w_firstline;
     }
-    if (wp->w_topline < 1)
+    જો (wp->w_topline < 1)
 	wp->w_topline = 1;
-    else if (wp->w_topline > wp->w_buffer->b_ml.ml_line_count)
-	wp->w_topline = wp->w_buffer->b_ml.ml_line_count;
+    નહીંતર જો (wp->w_topline > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
+	wp->w_topline = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
 
     // Compute width based on longest text line and the 'wrap' option.
     // Use a minimum width of one, so that something shows when there is no
@@ -2183,70 +2183,70 @@ popup_adjust_position(win_T *wp)
     // stays stable when scrolling changes which lines are visible.
     {
 	linenr_T ln;
-	int saved_w_width = wp->w_width;
+	પૂર્ણાંક saved_w_width = wp->w_width;
 
-	if (wp->w_width < maxwidth)
+	જો (wp->w_width < maxwidth)
 	    wp->w_width = maxwidth;
-	for (ln = 1; ln <= wp->w_buffer->b_ml.ml_line_count; ++ln)
+	માટે (ln = 1; ln <= wp->w_buffer->b_ml.ml_લીટી_ગણતરી; ++ln)
 	{
-	    int len = linetabsize(wp, ln) + margin_width;
+	    પૂર્ણાંક len = linetabsize(wp, ln) + margin_width;
 
-	    if (wp->w_maxwidth > 0 && len > wp->w_maxwidth)
+	    જો (wp->w_maxwidth > 0 && len > wp->w_maxwidth)
 		len = wp->w_maxwidth;
-	    if (saved_w_width < len)
+	    જો (saved_w_width < len)
 		saved_w_width = len;
-	    if (wp->w_maxwidth > 0 && saved_w_width >= wp->w_maxwidth)
-		break;
+	    જો (wp->w_maxwidth > 0 && saved_w_width >= wp->w_maxwidth)
+		તોડો;
 	}
 	wp->w_width = saved_w_width;
     }
-    if (wp->w_firstline < 0)
-	lnum = wp->w_buffer->b_ml.ml_line_count;
-    else
+    જો (wp->w_firstline < 0)
+	lnum = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
+    નહીંતર
 	lnum = wp->w_topline;
-    while (lnum >= 1 && lnum <= wp->w_buffer->b_ml.ml_line_count)
+    જ્યારે (lnum >= 1 && lnum <= wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
     {
-	int len;
-	int w_width = wp->w_width;
+	પૂર્ણાંક len;
+	પૂર્ણાંક w_width = wp->w_width;
 
 	// Count Tabs for what they are worth and compute the length based on
 	// the maximum width (matters when 'showbreak' is set).
 	// "margin_width" is added to "len" where it matters.
-	if (wp->w_width < maxwidth)
+	જો (wp->w_width < maxwidth)
 	    wp->w_width = maxwidth;
 	len = linetabsize(wp, lnum);
 	wp->w_width = w_width;
 
-	if (len + margin_width > maxwidth
-		&& allow_adjust_left
+	જો (len + margin_width > maxwidth
+		&& allow_adjust_ડાબું
 		&& (wp->w_popup_pos == POPPOS_TOPLEFT
 		    || wp->w_popup_pos == POPPOS_BOTLEFT))
 	{
 	    // adjust leftwise to fit text on screen
-	    int shift_by = len + margin_width - maxwidth;
+	    પૂર્ણાંક shift_by = len + margin_width - maxwidth;
 
-	    if (shift_by > wp->w_wincol)
+	    જો (shift_by > wp->w_wincol)
 	    {
-		int truncate_shift = shift_by - wp->w_wincol;
+		પૂર્ણાંક truncate_shift = shift_by - wp->w_wincol;
 
 		shift_by -= truncate_shift;
 	    }
 
 	    // When maxwidth is explicitly set, don't shift beyond it, the text
 	    // is wrapped or truncated instead.
-	    if (wp->w_maxwidth > 0 && maxwidth + shift_by > wp->w_maxwidth)
+	    જો (wp->w_maxwidth > 0 && maxwidth + shift_by > wp->w_maxwidth)
 		shift_by = wp->w_maxwidth - maxwidth;
 
-	    if (shift_by > 0)
+	    જો (shift_by > 0)
 	    {
 		wp->w_wincol -= shift_by;
 		maxwidth += shift_by;
 	    }
 	    wp->w_width = maxwidth;
 	}
-	if (wp->w_p_wrap)
+	જો (wp->w_p_wrap)
 	{
-	    while (len + margin_width > maxwidth)
+	    જ્યારે (len + margin_width > maxwidth)
 	    {
 		++wrapped;
 		len -= maxwidth - margin_width;
@@ -2254,175 +2254,175 @@ popup_adjust_position(win_T *wp)
 		used_maxwidth = TRUE;
 	    }
 	}
-	if (wp->w_width < len + margin_width)
+	જો (wp->w_width < len + margin_width)
 	{
 	    wp->w_width = len + margin_width;
-	    if (wp->w_maxwidth > 0 && wp->w_width > wp->w_maxwidth)
+	    જો (wp->w_maxwidth > 0 && wp->w_width > wp->w_maxwidth)
 		wp->w_width = wp->w_maxwidth;
 	}
 
-	if (wp->w_firstline < 0)
+	જો (wp->w_firstline < 0)
 	    --lnum;
-	else
+	નહીંતર
 	    ++lnum;
 
 	// stop at the last line that is going to be shown; the width was
 	// already computed above from every buffer line
-	if (maxheight > 0
+	જો (maxheight > 0
 		   && (wp->w_firstline >= 0
 			       ? lnum - wp->w_topline
-			       : wp->w_buffer->b_ml.ml_line_count - lnum)
+			       : wp->w_buffer->b_ml.ml_લીટી_ગણતરી - lnum)
 		       + wrapped >= maxheight)
-	    break;
+	    તોડો;
     }
 
-    if (wp->w_firstline < 0)
+    જો (wp->w_firstline < 0)
 	wp->w_topline = lnum + 1;
 
     wp->w_has_scrollbar = wp->w_want_scrollbar
-	   && (wp->w_topline > 1 || lnum <= wp->w_buffer->b_ml.ml_line_count);
+	   && (wp->w_topline > 1 || lnum <= wp->w_buffer->b_ml.ml_લીટી_ગણતરી);
 #ifdef FEAT_TERMINAL
-    if (wp->w_buffer->b_term != NULL && !term_is_finished(wp->w_buffer))
+    જો (wp->w_buffer->b_term != ખાલી && !term_is_finished(wp->w_buffer))
 	// Terminal window with running job never has a scrollbar, adjusts to
 	// window height.
 	wp->w_has_scrollbar = false;
 #endif
     maxwidth_no_scrollbar = maxwidth;
-    if (wp->w_has_scrollbar)
+    જો (wp->w_has_scrollbar)
     {
-	++right_extra;
+	++જમણું_extra;
 	++extra_width;
 	// give up the right padding when the popup would not fit, when lines
 	// wrap and when applying minwidth
-	if (maxwidth + right_extra >= maxspace
+	જો (maxwidth + જમણું_extra >= maxspace
 		&& (used_maxwidth || (minwidth > 0 && wp->w_width < minwidth)))
 	    maxwidth -= wp->w_popup_padding[1];
     }
 
-    if (wp->w_popup_title != NULL && *wp->w_popup_title != NUL)
+    જો (wp->w_popup_title != ખાલી && *wp->w_popup_title != NUL)
     {
-	int title_len = vim_strsize(wp->w_popup_title) + 2 - extra_width;
+	પૂર્ણાંક title_len = vim_strsize(wp->w_popup_title) + 2 - extra_width;
 
-	if (minwidth < title_len)
+	જો (minwidth < title_len)
 	    minwidth = title_len;
     }
 
-    if (minwidth > 0 && wp->w_width < minwidth)
+    જો (minwidth > 0 && wp->w_width < minwidth)
 	wp->w_width = minwidth;
-    if (wp->w_width > maxwidth)
+    જો (wp->w_width > maxwidth)
     {
-	if (wp->w_width > maxspace && !wp->w_p_wrap)
+	જો (wp->w_width > maxspace && !wp->w_p_wrap)
 	    // some columns cut off on the right
 	    wp->w_popup_rightoff = wp->w_width - maxspace;
 
 	// If the window doesn't fit because 'minwidth' is set then the
 	// scrollbar is at the far right of the screen, use the size without
 	// the scrollbar.
-	if (wp->w_has_scrollbar && wp->w_minwidth > 0)
+	જો (wp->w_has_scrollbar && wp->w_minwidth > 0)
 	{
-	    int off = wp->w_width - maxwidth;
-	    extra_width -= MIN(off, right_extra);
+	    પૂર્ણાંક off = wp->w_width - maxwidth;
+	    extra_width -= MIN(off, જમણું_extra);
 	    wp->w_width = maxwidth_no_scrollbar;
 	}
-	else
+	નહીંતર
 	{
 	    wp->w_width = maxwidth;
 
 	    // when adding a scrollbar below need to adjust the width
-	    width_with_scrollbar = maxwidth_no_scrollbar - right_extra;
+	    width_with_scrollbar = maxwidth_no_scrollbar - જમણું_extra;
 	}
     }
-    if (center_hor)
+    જો (center_hor)
     {
 	wp->w_wincol = firstwin->w_wincol
 		    + (topframe->fr_width - wp->w_width - extra_width) / 2;
-	if (wp->w_wincol < firstwin->w_wincol)
+	જો (wp->w_wincol < firstwin->w_wincol)
 	    wp->w_wincol = firstwin->w_wincol;
     }
-    else if (wp->w_popup_pos == POPPOS_BOTRIGHT
+    નહીંતર જો (wp->w_popup_pos == POPPOS_BOTRIGHT
 	    || wp->w_popup_pos == POPPOS_TOPRIGHT)
     {
-	int leftoff = wantcol - (wp->w_width + extra_width);
+	પૂર્ણાંક leftoff = wantcol - (wp->w_width + extra_width);
 
 	// Right aligned: move to the right if needed.
 	// No truncation, because that would change the height.
-	if (leftoff >= 0)
+	જો (leftoff >= 0)
 	    wp->w_wincol = leftoff;
-	else if (wp->w_popup_fixed)
+	નહીંતર જો (wp->w_popup_fixed)
 	{
 	    // "col" specifies the right edge, but the popup doesn't fit.
 	    // Scroll the text instead of moving the border off the screen.
 	    wp->w_leftcol = -leftoff;
 	    wp->w_width -= wp->w_leftcol;
-	    if (wp->w_width < 0)
+	    જો (wp->w_width < 0)
 		wp->w_width = 0;
 	}
     }
 
-    if (wp->w_p_wrap || (!wp->w_popup_fixed
+    જો (wp->w_p_wrap || (!wp->w_popup_fixed
 			    && (wp->w_popup_pos == POPPOS_TOPLEFT
 				|| wp->w_popup_pos == POPPOS_BOTLEFT)))
     {
-	int want_col = 0;
+	પૂર્ણાંક want_col = 0;
 
 	// try to show the right border and any scrollbar
-	want_col = left_extra + wp->w_width + right_extra;
-	if (want_col > 0 && wp->w_wincol > 0
+	want_col = ડાબું_extra + wp->w_width + જમણું_extra;
+	જો (want_col > 0 && wp->w_wincol > 0
 					 && wp->w_wincol + want_col >= firstwin->w_wincol + topframe->fr_width)
 	{
 	    wp->w_wincol = firstwin->w_wincol + topframe->fr_width - want_col;
-	    if (wp->w_wincol < 0)
+	    જો (wp->w_wincol < 0)
 		wp->w_wincol = 0;
 	}
     }
 
-    wp->w_height = wp->w_buffer->b_ml.ml_line_count - wp->w_topline
+    wp->w_height = wp->w_buffer->b_ml.ml_લીટી_ગણતરી - wp->w_topline
 								 + 1 + wrapped;
-    if (minheight > 0 && wp->w_height < minheight)
+    જો (minheight > 0 && wp->w_height < minheight)
 	wp->w_height = minheight;
-    if (maxheight > 0 && wp->w_height > maxheight)
+    જો (maxheight > 0 && wp->w_height > maxheight)
 	wp->w_height = maxheight;
     w_height_before_limit = wp->w_height;
-    if (wp->w_height > Rows - wp->w_winrow)
+    જો (wp->w_height > Rows - wp->w_winrow)
 	wp->w_height = Rows - wp->w_winrow;
 
-    if (center_vert)
+    જો (center_vert)
     {
 	wp->w_winrow = (Rows - wp->w_height - extra_height) / 2;
-	if (wp->w_winrow < 0)
+	જો (wp->w_winrow < 0)
 	    wp->w_winrow = 0;
     }
-    else if (wp->w_popup_pos == POPPOS_BOTRIGHT
+    નહીંતર જો (wp->w_popup_pos == POPPOS_BOTRIGHT
 		|| wp->w_popup_pos == POPPOS_BOTLEFT)
     {
-	if ((wp->w_height + extra_height) <= wantline
+	જો ((wp->w_height + extra_height) <= wantline
 		|| (wp->w_popup_flags & POPF_CLIPWINDOW))
 	    // bottom aligned: may move down.  With "clipwindow" the popup
 	    // keeps its natural position even if it overflows the screen,
 	    // because the clip logic handles the overflow.
 	    wp->w_winrow = wantline - (wp->w_height + extra_height);
-	else if (wantline * 2 >= Rows || !(wp->w_popup_flags & POPF_POSINVERT))
+	નહીંતર જો (wantline * 2 >= Rows || !(wp->w_popup_flags & POPF_POSINVERT))
 	{
 	    // Bottom aligned but does not fit, and less space on the other
 	    // side or "posinvert" is off: reduce height.
 	    wp->w_winrow = 0;
 	    wp->w_height = wantline - extra_height;
 	}
-	else
+	નહીંતર
 	{
 	    // Not enough space and more space on the other side: make top
 	    // aligned.
 	    wp->w_winrow = (wantline < 0 ? 0 : wantline) + 1;
-	    adjust_height_for_top_aligned = TRUE;
+	    adjust_height_for_ટોચ_aligned = TRUE;
 	}
     }
-    else if (wp->w_popup_pos == POPPOS_TOPRIGHT
+    નહીંતર જો (wp->w_popup_pos == POPPOS_TOPRIGHT
 		|| wp->w_popup_pos == POPPOS_TOPLEFT)
     {
 
-	int check_height = (wp->w_popup_flags & POPF_INFO) ? wp->w_height
+	પૂર્ણાંક check_height = (wp->w_popup_flags & POPF_INFO) ? wp->w_height
 						    : w_height_before_limit;
-	if (wp != popup_dragwin
+	જો (wp != popup_dragwin
 		&& wantline + (check_height + extra_height) - 1 > Rows
 		&& wantline * 2 > Rows
 		&& (wp->w_popup_flags & POPF_POSINVERT))
@@ -2431,22 +2431,22 @@ popup_adjust_position(win_T *wp)
 	    // make bottom aligned and recompute the height
 	    wp->w_height = w_height_before_limit;
 	    wp->w_winrow = wantline - 2 - wp->w_height - extra_height;
-	    if (wp->w_popup_flags & POPF_INFO)
+	    જો (wp->w_popup_flags & POPF_INFO)
 		wp->w_winrow += extra_height + 2;
-	    if (wp->w_winrow < 0)
+	    જો (wp->w_winrow < 0)
 	    {
 		wp->w_height += wp->w_winrow;
 		wp->w_winrow = 0;
 	    }
 	}
-	else
+	નહીંતર
 	{
 	    wp->w_winrow = wantline - 1;
-	    adjust_height_for_top_aligned = TRUE;
+	    adjust_height_for_ટોચ_aligned = TRUE;
 	}
     }
 
-    if (adjust_height_for_top_aligned && wp->w_want_scrollbar
+    જો (adjust_height_for_ટોચ_aligned && wp->w_want_scrollbar
 			  && !(wp->w_popup_flags & POPF_CLIPWINDOW)
 			  && wp->w_winrow + wp->w_height + extra_height > Rows)
     {
@@ -2457,16 +2457,16 @@ popup_adjust_position(win_T *wp)
 	// column the moment its decoration crossed the screen edge.
 	wp->w_height = Rows - wp->w_winrow - extra_height;
 #ifdef FEAT_TERMINAL
-	if (wp->w_buffer->b_term == NULL || term_is_finished(wp->w_buffer))
+	જો (wp->w_buffer->b_term == ખાલી || term_is_finished(wp->w_buffer))
 #endif
 	{
 	    // The width already accounts for a scrollbar that was there.
-	    if (!wp->w_has_scrollbar)
+	    જો (!wp->w_has_scrollbar)
 	    {
 		wp->w_has_scrollbar = true;
-		if (width_with_scrollbar > 0)
+		જો (width_with_scrollbar > 0)
 		    wp->w_width = width_with_scrollbar;
-		else
+		નહીંતર
 		    // The width and the position were computed without the
 		    // scrollbar, reserve a column for it.
 		    ++extra_width;
@@ -2475,27 +2475,27 @@ popup_adjust_position(win_T *wp)
     }
 
     // make sure w_winrow is valid
-    if (wp->w_winrow >= Rows)
+    જો (wp->w_winrow >= Rows)
 	wp->w_winrow = Rows - 1;
-    else if (wp->w_winrow < 0 && !(wp->w_popup_flags & POPF_CLIPWINDOW))
+    નહીંતર જો (wp->w_winrow < 0 && !(wp->w_popup_flags & POPF_CLIPWINDOW))
 	wp->w_winrow = 0;
 
-    if (wp->w_wincol + wp->w_width + extra_width
+    જો (wp->w_wincol + wp->w_width + extra_width
 				    > firstwin->w_wincol + topframe->fr_width)
 	wp->w_wincol = firstwin->w_wincol + topframe->fr_width
 						- wp->w_width - extra_width;
-    if (wp->w_wincol < firstwin->w_wincol)
+    જો (wp->w_wincol < firstwin->w_wincol)
 	wp->w_wincol = firstwin->w_wincol;
-    if (wp->w_wincol < 0)
+    જો (wp->w_wincol < 0)
 	wp->w_wincol = 0;
     // If the popup is wider than the available area (e.g. minwidth larger than
     // the work area between tabpanels), clip the content width so the right
     // border/padding/shadow stays visible instead of being pushed off the
     // screen or into the tabpanel.
-    if (wp->w_wincol + wp->w_width + extra_width
+    જો (wp->w_wincol + wp->w_width + extra_width
 				    > firstwin->w_wincol + topframe->fr_width)
     {
-	int avail = firstwin->w_wincol + topframe->fr_width
+	પૂર્ણાંક avail = firstwin->w_wincol + topframe->fr_width
 						- wp->w_wincol - extra_width;
 	wp->w_width = avail > 0 ? avail : 0;
     }
@@ -2506,20 +2506,20 @@ popup_adjust_position(win_T *wp)
     // skip these screen-edge clamps -- otherwise a synthesised negative
     // w_winrow (popup partially above the host's top edge) would be snapped
     // back to 0 and defeat the top-clip animation.
-    if (!(wp->w_popup_flags & POPF_CLIPWINDOW))
+    જો (!(wp->w_popup_flags & POPF_CLIPWINDOW))
     {
-	if (wp->w_winrow + wp->w_height + extra_height > Rows)
+	જો (wp->w_winrow + wp->w_height + extra_height > Rows)
 	    wp->w_winrow = Rows - wp->w_height - extra_height;
-	if (wp->w_winrow < 0)
+	જો (wp->w_winrow < 0)
 	    wp->w_winrow = 0;
-	if (wp->w_winrow + wp->w_height + extra_height > Rows)
+	જો (wp->w_winrow + wp->w_height + extra_height > Rows)
 	{
-	    int avail = Rows - wp->w_winrow - extra_height;
+	    પૂર્ણાંક avail = Rows - wp->w_winrow - extra_height;
 	    wp->w_height = avail > 0 ? avail : 0;
 	}
     }
 
-    if (wp->w_height != org_layout.height)
+    જો (wp->w_height != org_layout.height)
 	win_comp_scroll(wp);
 
     // Confine the popup to its host window for "clipwindow".  The popup's
@@ -2528,17 +2528,17 @@ popup_adjust_position(win_T *wp)
     // outside the host so the drawing code can skip them.  When the popup
     // has fully scrolled past one of the host edges, hide it instead of
     // leaving stray decorations behind.
-    if (popup_compute_clipwindow_offsets(wp))
+    જો (popup_compute_clipwindow_offsets(wp))
     {
 #ifdef FEAT_IMAGE_POPUP
-	if (!(wp->w_popup_flags & POPF_HIDDEN))
+	જો (!(wp->w_popup_flags & POPF_HIDDEN))
 	    // Clear placement before hiding, like popup_hide()
-	    if (wp->w_popup_imagep != NULL)
+	    જો (wp->w_popup_imagep != ખાલી)
 		image_placement_clear(wp->w_popup_imagep);
 #endif
 
 	popup_hide_for_textprop(wp);
-	return;
+	પાછા;
     }
 
     // Make w_winrow the first visible screen row (>= 0); the clipped-off top
@@ -2546,7 +2546,7 @@ popup_adjust_position(win_T *wp)
     wp->w_winrow += wp->w_popup_topoff;
 
     wp->w_popup_last_changedtick = CHANGEDTICK(wp->w_buffer);
-    if (win_valid(wp->w_popup_prop_win))
+    જો (win_valid(wp->w_popup_prop_win))
     {
 	wp->w_popup_prop_changedtick =
 				   CHANGEDTICK(wp->w_popup_prop_win->w_buffer);
@@ -2559,10 +2559,10 @@ popup_adjust_position(win_T *wp)
 
     // Need to update popup_mask if the position or size changed.
     // And redraw windows and statuslines that were behind the popup.
-    if (popup_layout_changed(wp, &org_layout))
+    જો (popup_layout_changed(wp, &org_layout))
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
-	if (wp->w_popup_flags & POPF_ON_CMDLINE)
+	જો (wp->w_popup_flags & POPF_ON_CMDLINE)
 	    clear_cmdline = TRUE;
 	popup_mask_refresh = TRUE;
     }
@@ -2572,7 +2572,7 @@ popup_adjust_position(win_T *wp)
 #endif
 }
 
-typedef enum
+પ્રકારવ્યાખ્યા ગણના
 {
     TYPE_NORMAL,
     TYPE_ATCURSOR,
@@ -2588,47 +2588,47 @@ typedef enum
 /*
  * Return TRUE if "type" is TYPE_NOTIFICATION or TYPE_MESSAGE_WIN.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 popup_is_notification(create_type_T type)
 {
-    return type == TYPE_NOTIFICATION || type == TYPE_MESSAGE_WIN;
+    પાછા type == TYPE_NOTIFICATION || type == TYPE_MESSAGE_WIN;
 }
 
 /*
  * Make "buf" empty and set the contents to "text".
  * Used by popup_create() and popup_settext().
  */
-    static void
+    સ્થિર શૂન્ય
 popup_set_buffer_text(buf_T *buf, typval_T text)
 {
-    int	    lnum;
+    પૂર્ણાંક	    lnum;
 
     // Clear the buffer, then replace the lines.
     curbuf = buf;
-    for (lnum = buf->b_ml.ml_line_count; lnum > 0; --lnum)
+    માટે (lnum = buf->b_ml.ml_લીટી_ગણતરી; lnum > 0; --lnum)
 	ml_delete(lnum);
     curbuf = curwin->w_buffer;
 
     // Add text to the buffer.
-    if (text.v_type == VAR_STRING)
+    જો (text.v_type == VAR_STRING)
     {
 	char_u *s = text.vval.v_string;
 
 	// just a string
-	ml_append_buf(buf, 0, s == NULL ? (char_u *)"" : s, (colnr_T)0, TRUE);
+	ml_append_buf(buf, 0, s == ખાલી ? (char_u *)"" : s, (colnr_T)0, TRUE);
     }
-    else
+    નહીંતર
     {
 	list_T *l = text.vval.v_list;
 
-	if (l != NULL && l->lv_len > 0)
+	જો (l != ખાલી && l->lv_len > 0)
 	{
-	    if (l->lv_first == &range_list_item)
-		emsg(_(e_using_number_as_string));
-	    else if (l->lv_first->li_tv.v_type == VAR_STRING)
+	    જો (l->lv_first == &range_list_item)
+		emsg(_(e_using_સંખ્યા_as_string));
+	    નહીંતર જો (l->lv_first->li_tv.v_type == VAR_STRING)
 		// list of strings
 		add_popup_strings(buf, l);
-	    else
+	    નહીંતર
 		// list of dictionaries
 		add_popup_dicts(buf, l);
 	}
@@ -2636,13 +2636,13 @@ popup_set_buffer_text(buf_T *buf, typval_T text)
 
     // delete the line that was in the empty buffer
     curbuf = buf;
-    ml_delete(buf->b_ml.ml_line_count);
+    ml_delete(buf->b_ml.ml_લીટી_ગણતરી);
     curbuf = curwin->w_buffer;
 }
 
 #define SET_BORDER_CHARS(a0, a1, a2, a3, a4, a5, a6, a7)    \
-    do {						    \
-	if (wp != NULL)					    \
+    કરો {						    \
+	જો (wp != ખાલી)					    \
 	{						    \
 	    wp->w_border_char[0] = (a0);		    \
 	    wp->w_border_char[1] = (a1);		    \
@@ -2653,264 +2653,264 @@ popup_set_buffer_text(buf_T *buf, typval_T text)
 	    wp->w_border_char[6] = (a6);		    \
 	    wp->w_border_char[7] = (a7);		    \
 	}						    \
-    } while (0)
+    } જ્યારે (0)
 
 /*
  * Parse the 'previewpopup' or 'completepopup' option and apply the values to
  * window "wp" if it is not NULL.
  * Return FAIL if the parsing fails.
  */
-    static int
-parse_popup_option(win_T *wp, int is_preview)
+    સ્થિર પૂર્ણાંક
+parse_popup_option(win_T *wp, પૂર્ણાંક is_preview)
 {
     char_u *p =
 #ifdef FEAT_QUICKFIX
 	!is_preview ? p_cpp :
 #endif
 	p_pvp;
-    int	    border_enabled = FALSE;
+    પૂર્ણાંક	    border_enabled = FALSE;
 
-    if (wp != NULL)
+    જો (wp != ખાલી)
 	wp->w_popup_flags &= ~POPF_INFO_MENU;
 
-    for ( ; *p != NUL; p += (*p == ',' ? 1 : 0))
+    માટે ( ; *p != NUL; p += (*p == ',' ? 1 : 0))
     {
 	char_u	*e, *dig;
 	char_u	*s = p;
-	int	x;
+	પૂર્ણાંક	x;
 
 	e = vim_strchr(p, ':');
-	if (e == NULL || e[1] == NUL)
-	    return FAIL;
+	જો (e == ખાલી || e[1] == NUL)
+	    પાછા FAIL;
 
 	p = vim_strchr(e, ',');
-	if (p == NULL)
+	જો (p == ખાલી)
 	    p = e + STRLEN(e);
 	dig = e + 1;
 	x = getdigits(&dig);
 
 	// Note: Keep this in sync with p_popup_option_values.
-	if (STRNCMP(s, "height:", 7) == 0)
+	જો (STRNCMP(s, "height:", 7) == 0)
 	{
-	    if (dig != p)
-		return FAIL;
-	    if (wp != NULL)
+	    જો (dig != p)
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 	    {
-		if (is_preview)
+		જો (is_preview)
 		    wp->w_minheight = x;
 		wp->w_maxheight = x;
 	    }
 	}
-	else if (STRNCMP(s, "width:", 6) == 0)
+	નહીંતર જો (STRNCMP(s, "width:", 6) == 0)
 	{
-	    if (dig != p)
-		return FAIL;
-	    if (wp != NULL)
+	    જો (dig != p)
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 	    {
-		if (is_preview)
+		જો (is_preview)
 		    wp->w_minwidth = x;
 		wp->w_maxwidth = x;
 		wp->w_maxwidth_opt = x;
 	    }
 	}
-	else if (STRNCMP(s, "highlight:", 10) == 0)
+	નહીંતર જો (STRNCMP(s, "highlight:", 10) == 0)
 	{
-	    if (wp != NULL)
+	    જો (wp != ખાલી)
 	    {
-		char *errmsg;
-		int c = *p;
+		અક્ષર *errmsg;
+		પૂર્ણાંક c = *p;
 
 		*p = NUL;
 
 		errmsg = update_wincolor(wp, s + 10);
-		if (errmsg == NULL)
+		જો (errmsg == ખાલી)
 		    set_string_option_direct_in_win(wp, (char_u *)"wincolor",
 			    -1, s + 10, OPT_FREE|OPT_LOCAL, 0);
-		else
+		નહીંતર
 		    emsg(_(errmsg));
 
 		*p = c;
 	    }
 	}
-	else if (STRNCMP(s, "borderhighlight:", 16) == 0)
+	નહીંતર જો (STRNCMP(s, "borderhighlight:", 16) == 0)
 	{
 	    char_u	*arg = s + 16;
 
-	    if (*arg == NUL || *arg == ',')
-		return FAIL;
-	    if (wp != NULL)
+	    જો (*arg == NUL || *arg == ',')
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 	    {
-		for (int i = 0; i < 4; ++i)
+		માટે (પૂર્ણાંક i = 0; i < 4; ++i)
 		{
 		    VIM_CLEAR(wp->w_border_highlight[i]);
 		    wp->w_border_highlight[i] = vim_strnsave(arg, p - arg);
 		}
 	    }
 	}
-	else if (STRNCMP(s, "border:", 7) == 0)
+	નહીંતર જો (STRNCMP(s, "border:", 7) == 0)
 	{
 	    char_u	*arg = s + 7;
-	    int		i;
-	    int		token_len = p - arg;
+	    પૂર્ણાંક		i;
+	    પૂર્ણાંક		token_len = p - arg;
 	    char_u	*token;
 	    // Use box-drawing characters only when 'encoding' is "utf-8" and
 	    // 'ambiwidth' is "single".
-	    int		can_use_box_chars = (enc_utf8 && *p_ambw == 's');
+	    પૂર્ણાંક		can_use_box_chars = (enc_utf8 && *p_ambw == 's');
 
-	    if (token_len == 0
+	    જો (token_len == 0
 			|| (STRNCMP(arg, "off", 3) == 0 && arg + 3 == p))
 	    {
-		if (wp != NULL)
+		જો (wp != ખાલી)
 		{
-		    for (i = 0; i < 4; ++i)
+		    માટે (i = 0; i < 4; ++i)
 			wp->w_popup_border[i] = 0;
 		    SET_BORDER_CHARS(0, 0, 0, 0, 0, 0, 0, 0);
 		    // only show the X for close when there is a border
 		    wp->w_popup_close = POPCLOSE_NONE;
 		}
-		continue;
+		ચાલુ;
 	    }
 
 	    token = vim_strnsave(arg, token_len);
-	    if (token == NULL)
-		return FAIL;
+	    જો (token == ખાલી)
+		પાછા FAIL;
 
-	    if ((can_use_box_chars && (STRCMP(token, "single") == 0
+	    જો ((can_use_box_chars && (STRCMP(token, "single") == 0
 			    || STRCMP(token, "double") == 0
 			    || STRCMP(token, "on") == 0
 			    || STRCMP(token, "round") == 0))
 		    || STRCMP(token, "ascii") == 0
 		    || (STRNCMP(token, "custom:", 7) == 0))
 	    {
-		if (STRCMP(token, "single") == 0)
+		જો (STRCMP(token, "single") == 0)
 		    SET_BORDER_CHARS(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 			    0x250c, 0x2510, 0x2518, 0x2514); // ┌ ┐ ┘ └
-		else if (STRCMP(token, "double") == 0)
+		નહીંતર જો (STRCMP(token, "double") == 0)
 		    SET_BORDER_CHARS(0x2550, 0x2551, 0x2550, 0x2551, // ═ ║ ═ ║
 			    0x2554, 0x2557, 0x255D, 0x255A); // ╔ ╗ ╝  ╚
-		else if (STRCMP(token, "round") == 0)
+		નહીંતર જો (STRCMP(token, "round") == 0)
 		    SET_BORDER_CHARS(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 			    0x256d, 0x256e, 0x256f, 0x2570); // ╭ ╮ ╯ ╰
-		else if (STRCMP(token, "on") == 0)
+		નહીંતર જો (STRCMP(token, "on") == 0)
 		    SET_BORDER_CHARS(0, 0, 0, 0, 0, 0, 0, 0);
-		else if (STRCMP(token, "ascii") == 0)
+		નહીંતર જો (STRCMP(token, "ascii") == 0)
 		    SET_BORDER_CHARS('-', '|', '-', '|', '+', '+', '+', '+');
-		else if (STRNCMP(token, "custom:", 7) == 0)
+		નહીંતર જો (STRNCMP(token, "custom:", 7) == 0)
 		{
 		    char_u	*q = token + 7;
-		    int		out[8];
-		    int		failed = FALSE;
+		    પૂર્ણાંક		out[8];
+		    પૂર્ણાંક		failed = FALSE;
 
 		    SET_BORDER_CHARS(0, 0, 0, 0, 0, 0, 0, 0);
 
-		    for (i = 0; i < 8 && !failed; i++)
+		    માટે (i = 0; i < 8 && !failed; i++)
 		    {
-			if (*q == NUL)
+			જો (*q == NUL)
 			    failed = TRUE;
-			else
+			નહીંતર
 			{
 			    out[i] = mb_ptr2char(q);
 			    mb_ptr2char_adv(&q);
-			    if (i < 7)
+			    જો (i < 7)
 			    {
-				if (*q != ';')
+				જો (*q != ';')
 				    failed = TRUE; // must be semicolon
 				q++;
 			    }
 			}
 		    }
-		    if (failed || *q != NUL) // must end exactly after the 8th char
+		    જો (failed || *q != NUL) // must end exactly after the 8th char
 		    {
 			vim_free(token);
-			return FAIL;
+			પાછા FAIL;
 		    }
 		    SET_BORDER_CHARS(out[0], out[1], out[2], out[3], out[4],
 			    out[5], out[6], out[7]);
 		}
 	    }
-	    else
+	    નહીંતર
 	    {
 		vim_free(token);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
-	    if (wp != NULL)
+	    જો (wp != ખાલી)
 	    {
-		for (i = 0; i < 4; ++i)
+		માટે (i = 0; i < 4; ++i)
 		    wp->w_popup_border[i] = 1;
 	    }
 	    border_enabled = TRUE;
 
 	    vim_free(token);
 	}
-	else if (STRNCMP(s, "close:", 6) == 0)
+	નહીંતર જો (STRNCMP(s, "close:", 6) == 0)
 	{
 	    char_u	*arg = s + 6;
-	    int		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
-	    int		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
+	    પૂર્ણાંક		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
+	    પૂર્ણાંક		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
 
-	    if (!on && !off)
-		return FAIL;
-	    on = on && mouse_has(MOUSE_INSERT) && (border_enabled || is_preview);
-	    if (wp != NULL)
+	    જો (!on && !off)
+		પાછા FAIL;
+	    on = on && mouse_has(MOUSE_ઉમેરો) && (border_enabled || is_preview);
+	    જો (wp != ખાલી)
 		wp->w_popup_close = on ? POPCLOSE_BUTTON : POPCLOSE_NONE;
 	}
-	else if (STRNCMP(s, "resize:", 7) == 0)
+	નહીંતર જો (STRNCMP(s, "resize:", 7) == 0)
 	{
 	    char_u	*arg = s + 7;
-	    int		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
-	    int		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
+	    પૂર્ણાંક		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
+	    પૂર્ણાંક		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
 
-	    if (!on && !off)
-		return FAIL;
-	    if (wp != NULL)
+	    જો (!on && !off)
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 	    {
-		if (on && mouse_has(MOUSE_INSERT))
+		જો (on && mouse_has(MOUSE_ઉમેરો))
 		    wp->w_popup_flags |= POPF_RESIZE;
-		else
+		નહીંતર
 		    wp->w_popup_flags &= ~POPF_RESIZE;
 	    }
 	}
-	else if (STRNCMP(s, "shadow:", 7) == 0)
+	નહીંતર જો (STRNCMP(s, "shadow:", 7) == 0)
 	{
 	    char_u	*arg = s + 7;
-	    int		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
-	    int		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
+	    પૂર્ણાંક		on = STRNCMP(arg, "on", 2) == 0 && arg + 2 == p;
+	    પૂર્ણાંક		off = STRNCMP(arg, "off", 3) == 0 && arg + 3 == p;
 
-	    if (!on && !off)
-		return FAIL;
-	    if (wp != NULL)
+	    જો (!on && !off)
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 		wp->w_popup_shadow = on ? 1 : 0;
 	}
-	else if (STRNCMP(s, "align:", 6) == 0)
+	નહીંતર જો (STRNCMP(s, "align:", 6) == 0)
 	{
 	    // Note: Keep this in sync with p_popup_option_align_values.
 	    char_u	*arg = s + 6;
-	    int		item = STRNCMP(arg, "item", 4) == 0 && arg + 4 == p;
-	    int		menu = STRNCMP(arg, "menu", 4) == 0 && arg + 4 == p;
+	    પૂર્ણાંક		item = STRNCMP(arg, "item", 4) == 0 && arg + 4 == p;
+	    પૂર્ણાંક		menu = STRNCMP(arg, "menu", 4) == 0 && arg + 4 == p;
 
-	    if (!menu && !item)
-		return FAIL;
-	    if (wp != NULL && menu)
+	    જો (!menu && !item)
+		પાછા FAIL;
+	    જો (wp != ખાલી && menu)
 		wp->w_popup_flags |= POPF_INFO_MENU;
 	}
-	else if (STRNCMP(s, "opacity:", 8) == 0)
+	નહીંતર જો (STRNCMP(s, "opacity:", 8) == 0)
 	{
-	    if (dig != p || x < 0 || x > 100)
-		return FAIL;
-	    if (wp != NULL)
+	    જો (dig != p || x < 0 || x > 100)
+		પાછા FAIL;
+	    જો (wp != ખાલી)
 	    {
-		if (x < 100)
+		જો (x < 100)
 		    wp->w_popup_flags |= POPF_OPACITY;
-		else
+		નહીંતર
 		    wp->w_popup_flags &= ~POPF_OPACITY;
 		wp->w_popup_blend = 100 - x;
 	    }
 	}
-	else
-	    return FAIL;
+	નહીંતર
+	    પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -2918,10 +2918,10 @@ parse_popup_option(win_T *wp, int is_preview)
  * is not NULL.
  * Return FAIL if the parsing fails.
  */
-    int
+    પૂર્ણાંક
 parse_previewpopup(win_T *wp)
 {
-    return parse_popup_option(wp, TRUE);
+    પાછા parse_popup_option(wp, TRUE);
 }
 
 /*
@@ -2929,33 +2929,33 @@ parse_previewpopup(win_T *wp)
  * is not NULL.
  * Return FAIL if the parsing fails.
  */
-    int
+    પૂર્ણાંક
 parse_completepopup(win_T *wp)
 {
-    return parse_popup_option(wp, FALSE);
+    પાછા parse_popup_option(wp, FALSE);
 }
 
 /*
  * Set w_wantline and w_wantcol for the cursor position in the current window.
  * Keep at least "width" columns from the right of the screen.
  */
-    void
-popup_set_wantpos_cursor(win_T *wp, int width, dict_T *d)
+    શૂન્ય
+popup_set_wantpos_cursor(win_T *wp, પૂર્ણાંક width, dict_T *d)
 {
     poppos_T ppt = POPPOS_NONE;
 
-    if (d != NULL)
+    જો (d != ખાલી)
 	ppt = get_pos_entry(d, FALSE);
 
     setcursor_mayforce(TRUE);
-    if (ppt == POPPOS_TOPRIGHT || ppt == POPPOS_TOPLEFT)
+    જો (ppt == POPPOS_TOPRIGHT || ppt == POPPOS_TOPLEFT)
     {
 	wp->w_wantline = curwin->w_winrow + curwin->w_wrow + 2;
     }
-    else
+    નહીંતર
     {
 	wp->w_wantline = curwin->w_winrow + curwin->w_wrow;
-	if (wp->w_wantline == 0)  // cursor in first line
+	જો (wp->w_wantline == 0)  // cursor in first line
 	{
 	    wp->w_wantline = 2;
 	    wp->w_popup_pos = ppt == POPPOS_BOTRIGHT
@@ -2964,10 +2964,10 @@ popup_set_wantpos_cursor(win_T *wp, int width, dict_T *d)
     }
 
     wp->w_wantcol = curwin->w_wincol + curwin->w_wcol + 1;
-    if (wp->w_wantcol > Columns - width)
+    જો (wp->w_wantcol > Columns - width)
     {
 	wp->w_wantcol = Columns - width;
-	if (wp->w_wantcol < 1)
+	જો (wp->w_wantcol < 1)
 	    wp->w_wantcol = 1;
     }
 
@@ -2978,8 +2978,8 @@ popup_set_wantpos_cursor(win_T *wp, int width, dict_T *d)
  * Set w_wantline and w_wantcol for the a given screen position.
  * Caller must take care of running into the window border.
  */
-    void
-popup_set_wantpos_rowcol(win_T *wp, int row, int col)
+    શૂન્ય
+popup_set_wantpos_rowcol(win_T *wp, પૂર્ણાંક row, પૂર્ણાંક col)
 {
     wp->w_wantline = row;
     wp->w_wantcol = col;
@@ -2989,12 +2989,12 @@ popup_set_wantpos_rowcol(win_T *wp, int row, int col)
 /*
  * Add a border and lef&right padding.
  */
-    static void
-add_border_left_right_padding(win_T *wp)
+    સ્થિર શૂન્ય
+add_border_ડાબું_જમણું_padding(win_T *wp)
 {
-    int i;
+    પૂર્ણાંક i;
 
-    for (i = 0; i < 4; ++i)
+    માટે (i = 0; i < 4; ++i)
     {
 	wp->w_popup_border[i] = 1;
 	wp->w_popup_padding[i] = (i & 1) ? 1 : 0;
@@ -3005,28 +3005,28 @@ add_border_left_right_padding(win_T *wp)
 /*
  * Return TRUE if there is any popup window with a terminal buffer.
  */
-    static int
-popup_terminal_exists(void)
+    સ્થિર પૂર્ણાંક
+popup_terminal_exists(શૂન્ય)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_buffer->b_term != NULL)
-	    return TRUE;
+	જો (wp->w_buffer->b_term != ખાલી)
+	    પાછા TRUE;
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (wp->w_buffer->b_term != NULL)
-		return TRUE;
-    return FALSE;
+	    જો (wp->w_buffer->b_term != ખાલી)
+		પાછા TRUE;
+    પાછા FALSE;
 }
 #endif
 
 /*
  * Mark all popup windows in the current tab and global for redrawing.
  */
-    void
-popup_redraw_all(void)
+    શૂન્ય
+popup_redraw_all(શૂન્ય)
 {
     win_T	*wp;
 
@@ -3039,35 +3039,35 @@ popup_redraw_all(void)
 /*
  * Return TRUE if any visible popup window needs a redraw.
  */
-    int
-popup_need_redraw(void)
+    પૂર્ણાંક
+popup_need_redraw(શૂન્ય)
 {
     win_T	*wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if ((wp->w_popup_flags & POPF_HIDDEN) == 0 && wp->w_redr_type != 0)
-	    return TRUE;
+	જો ((wp->w_popup_flags & POPF_HIDDEN) == 0 && wp->w_redr_type != 0)
+	    પાછા TRUE;
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if ((wp->w_popup_flags & POPF_HIDDEN) == 0 && wp->w_redr_type != 0)
-	    return TRUE;
-    return FALSE;
+	જો ((wp->w_popup_flags & POPF_HIDDEN) == 0 && wp->w_redr_type != 0)
+	    પાછા TRUE;
+    પાછા FALSE;
 }
 
 /*
  * Set the color for a notification window.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_update_color(win_T *wp, create_type_T type)
 {
-    char    *hiname = type == TYPE_MESSAGE_WIN
+    અક્ષર    *hiname = type == TYPE_MESSAGE_WIN
 				       ? "MessageWindow" : "PopupNotification";
-    char    *errmsg;
+    અક્ષર    *errmsg;
 
     errmsg = update_wincolor(wp, (char_u *)hiname);
-    if (errmsg == NULL)
+    જો (errmsg == ખાલી)
 	set_string_option_direct_in_win(wp, (char_u *)"wincolor", -1,
 		(char_u *)hiname, OPT_FREE|OPT_LOCAL, 0);
-    else
+    નહીંતર
 	emsg(_(errmsg));
 }
 
@@ -3077,96 +3077,96 @@ popup_update_color(win_T *wp, create_type_T type)
  * etc.
  * When creating a preview or info popup "argvars" and "rettv" are NULL.
  */
-    static win_T *
+    સ્થિર win_T *
 popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 {
     win_T	*wp;
-    tabpage_T	*tp = NULL;
-    int		tabnr = 0;
-    int		new_buffer;
-    buf_T	*buf = NULL;
-    dict_T	*d = NULL;
-    int		i;
+    tabpage_T	*tp = ખાલી;
+    પૂર્ણાંક		tabnr = 0;
+    પૂર્ણાંક		new_buffer;
+    buf_T	*buf = ખાલી;
+    dict_T	*d = ખાલી;
+    પૂર્ણાંક		i;
 
-    if (check_secure())
-	return NULL;
+    જો (check_secure())
+	પાછા ખાલી;
 
-    if (argvars != NULL)
+    જો (argvars != ખાલી)
     {
-	if (in_vim9script()
-		&& (check_for_string_or_number_or_list_arg(argvars, 0) == FAIL
+	જો (in_vim9script()
+		&& (check_for_string_or_સંખ્યા_or_list_arg(argvars, 0) == FAIL
 		    || check_for_dict_arg(argvars, 1) == FAIL))
-	    return NULL;
+	    પાછા ખાલી;
 
 	// Check that arguments look OK.
-	if (argvars[0].v_type == VAR_NUMBER)
+	જો (argvars[0].v_type == VAR_સંખ્યા)
 	{
-	    buf = buflist_findnr(argvars[0].vval.v_number);
-	    if (buf == NULL)
+	    buf = buflist_findnr(argvars[0].vval.v_સંખ્યા);
+	    જો (buf == ખાલી)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[0].vval.v_number);
-		return NULL;
+		semsg(_(e_buffer_nr_does_not_exist), argvars[0].vval.v_સંખ્યા);
+		પાછા ખાલી;
 	    }
 #ifdef FEAT_TERMINAL
-	    if (buf->b_term != NULL && popup_terminal_exists())
+	    જો (buf->b_term != ખાલી && popup_terminal_exists())
 	    {
 		emsg(_(e_cannot_open_second_popup_with_terminal));
-		return NULL;
+		પાછા ખાલી;
 	    }
 #endif
 	}
-	else if (!(argvars[0].v_type == VAR_STRING
-			&& argvars[0].vval.v_string != NULL)
+	નહીંતર જો (!(argvars[0].v_type == VAR_STRING
+			&& argvars[0].vval.v_string != ખાલી)
 		    && !(argvars[0].v_type == VAR_LIST
-			&& argvars[0].vval.v_list != NULL))
+			&& argvars[0].vval.v_list != ખાલી))
 	{
-	    emsg(_(e_buffer_number_text_or_list_required));
-	    return NULL;
+	    emsg(_(e_buffer_સંખ્યા_text_or_list_required));
+	    પાછા ખાલી;
 	}
-	if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	    return NULL;
+	જો (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+	    પાછા ખાલી;
 	d = argvars[1].vval.v_dict;
     }
 
-    if (d != NULL)
+    જો (d != ખાલી)
     {
-	if (dict_has_key(d, "tabpage"))
-	    tabnr = (int)dict_get_number(d, "tabpage");
-	else if (popup_is_notification(type))
+	જો (dict_has_ચાવી(d, "tabpage"))
+	    tabnr = (પૂર્ણાંક)dict_get_સંખ્યા(d, "tabpage");
+	નહીંતર જો (popup_is_notification(type))
 	    tabnr = -1;  // notifications are global by default
-	else
+	નહીંતર
 	    tabnr = 0;
-	if (tabnr > 0)
+	જો (tabnr > 0)
 	{
 	    tp = find_tabpage(tabnr);
-	    if (tp == NULL)
+	    જો (tp == ખાલી)
 	    {
 		semsg(_(e_tabpage_not_found_nr), tabnr);
-		return NULL;
+		પાછા ખાલી;
 	    }
 	}
     }
-    else if (popup_is_notification(type))
+    નહીંતર જો (popup_is_notification(type))
 	tabnr = -1;  // show on all tabs
 
-    if (buf != NULL && buf->b_locked_split)
+    જો (buf != ખાલી && buf->b_locked_split)
     {
 	// disallow opening a popup to a closing buffer, which like splitting,
 	// can result in more windows displaying it
 	emsg(_(e_cannot_open_a_popup_window_to_a_closing_buffer));
-	return NULL;
+	પાછા ખાલી;
     }
 
     // Create the window and buffer.
     wp = win_alloc_popup_win();
-    if (wp == NULL)
-	return NULL;
-    if (rettv != NULL)
-	rettv->vval.v_number = wp->w_id;
+    જો (wp == ખાલી)
+	પાછા ખાલી;
+    જો (rettv != ખાલી)
+	rettv->vval.v_સંખ્યા = wp->w_id;
     wp->w_popup_pos = POPPOS_TOPLEFT;
     wp->w_popup_flags = POPF_IS_POPUP | POPF_MAPPING | POPF_POSINVERT;
 
-    if (buf != NULL)
+    જો (buf != ખાલી)
     {
 	// use existing buffer
 	new_buffer = FALSE;
@@ -3176,15 +3176,15 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 	buffer_ensure_loaded(buf);
 	swap_exists_action = SEA_NONE;
     }
-    else
+    નહીંતર
     {
 	// create a new buffer associated with the popup
 	new_buffer = TRUE;
-	buf = buflist_new(NULL, NULL, (linenr_T)0, BLN_NEW|BLN_DUMMY|BLN_REUSE);
-	if (buf == NULL)
+	buf = buflist_new(ખાલી, ખાલી, (linenr_T)0, BLN_NEW|BLN_DUMMY|BLN_REUSE);
+	જો (buf == ખાલી)
 	{
 	    win_free_popup(wp);
-	    return NULL;
+	    પાછા ખાલી;
 	}
 	ml_open(buf);
 
@@ -3207,29 +3207,29 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
     wp->w_p_so = 0;		// 'scrolloff' zero
     wp->w_p_sop = 0;		// 'scrolloffpad' zero
 
-    if (tp != NULL)
+    જો (tp != ખાલી)
     {
 	// popup on specified tab page
 	wp->w_next = tp->tp_first_popupwin;
 	tp->tp_first_popupwin = wp;
     }
-    else if (tabnr == 0)
+    નહીંતર જો (tabnr == 0)
     {
 	// popup on current tab page
 	wp->w_next = curtab->tp_first_popupwin;
 	curtab->tp_first_popupwin = wp;
     }
-    else // (tabnr < 0)
+    નહીંતર // (tabnr < 0)
     {
 	win_T *prev = first_popupwin;
 
 	// Global popup: add at the end, so that it gets displayed on top of
 	// older ones with the same zindex. Matters for notifications.
-	if (first_popupwin == NULL)
+	જો (first_popupwin == ખાલી)
 	    first_popupwin = wp;
-	else
+	નહીંતર
 	{
-	    while (prev->w_next != NULL)
+	    જ્યારે (prev->w_next != ખાલી)
 		prev = prev->w_next;
 	    prev->w_next = wp;
 	}
@@ -3238,33 +3238,33 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 #endif
     }
 
-    if (new_buffer && argvars != NULL)
+    જો (new_buffer && argvars != ખાલી)
 	popup_set_buffer_text(buf, argvars[0]);
 
-    if (type == TYPE_ATCURSOR || type == TYPE_PREVIEW)
+    જો (type == TYPE_ATCURSOR || type == TYPE_PREVIEW)
     {
 	wp->w_popup_pos = POPPOS_BOTLEFT;
     }
-    if (type == TYPE_ATCURSOR)
+    જો (type == TYPE_ATCURSOR)
     {
 	popup_set_wantpos_cursor(wp, 0, d);
-	set_moved_values(wp);
+	set_moved_કિંમતો(wp);
 	set_moved_columns(wp, FIND_STRING);
     }
 
-    if (type == TYPE_BEVAL)
+    જો (type == TYPE_BEVAL)
     {
 	wp->w_popup_pos = POPPOS_BOTLEFT;
 
 	// by default use the mouse position
 	wp->w_wantline = mouse_row;
-	if (wp->w_wantline <= 0)  // mouse on first line
+	જો (wp->w_wantline <= 0)  // mouse on first line
 	{
 	    wp->w_wantline = 2;
 	    wp->w_popup_pos = POPPOS_TOPLEFT;
 	}
 	wp->w_wantcol = mouse_col + 1;
-	set_mousemoved_values(wp);
+	set_mousemoved_કિંમતો(wp);
 	set_mousemoved_columns(wp, FIND_IDENT + FIND_STRING + FIND_EVAL);
     }
 
@@ -3272,18 +3272,18 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
     wp->w_zindex = POPUPWIN_DEFAULT_ZINDEX;
     wp->w_popup_close = POPCLOSE_NONE;
 
-    if (popup_is_notification(type))
+    જો (popup_is_notification(type))
     {
 	win_T  *twp, *nextwin;
-	int	height = buf->b_ml.ml_line_count + 3;
+	પૂર્ણાંક	height = buf->b_ml.ml_લીટી_ગણતરી + 3;
 
 	// Try to not overlap with another global popup.  Guess we need 3
 	// more screen lines than buffer lines.
 	wp->w_wantline = 1;
-	for (twp = first_popupwin; twp != NULL; twp = nextwin)
+	માટે (twp = first_popupwin; twp != ખાલી; twp = nextwin)
 	{
 	    nextwin = twp->w_next;
-	    if (twp != wp
+	    જો (twp != wp
 		    && twp->w_zindex == POPUPWIN_NOTIFICATION_ZINDEX
 		    && twp->w_winrow <= wp->w_wantline - 1 + height
 		    && twp->w_winrow + popup_height(twp) > wp->w_wantline - 1)
@@ -3294,7 +3294,7 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 		nextwin = first_popupwin;
 	    }
 	}
-	if (wp->w_wantline + height > Rows)
+	જો (wp->w_wantline + height > Rows)
 	{
 	    // can't avoid overlap, put on top in the hope that message goes
 	    // away soon.
@@ -3306,7 +3306,7 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 	wp->w_minwidth = 20;
 	wp->w_popup_flags |= POPF_DRAG;
 	wp->w_popup_close = POPCLOSE_CLICK;
-	for (i = 0; i < 4; ++i)
+	માટે (i = 0; i < 4; ++i)
 	    wp->w_popup_border[i] = 1;
 	wp->w_popup_padding[1] = 1;
 	wp->w_popup_padding[3] = 1;
@@ -3314,16 +3314,16 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 	popup_update_color(wp, type);
     }
 
-    if (type == TYPE_DIALOG || type == TYPE_MENU)
+    જો (type == TYPE_DIALOG || type == TYPE_MENU)
     {
 	wp->w_popup_pos = POPPOS_CENTER;
 	wp->w_zindex = POPUPWIN_DIALOG_ZINDEX;
 	wp->w_popup_flags |= POPF_DRAG;
 	wp->w_popup_flags &= ~POPF_MAPPING;
-	add_border_left_right_padding(wp);
+	add_border_ડાબું_જમણું_padding(wp);
     }
 
-    if (type == TYPE_MENU)
+    જો (type == TYPE_MENU)
     {
 	typval_T	tv;
 	callback_T	callback;
@@ -3331,7 +3331,7 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 	tv.v_type = VAR_STRING;
 	tv.vval.v_string = (char_u *)"popup_filter_menu";
 	callback = get_callback(&tv);
-	if (callback.cb_name != NULL)
+	જો (callback.cb_name != ખાલી)
 	{
 	    set_callback(&wp->w_filter_cb, &callback);
 	}
@@ -3340,34 +3340,34 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 	wp->w_popup_flags |= POPF_CURSORLINE;
     }
 
-    for (i = 0; i < 4; ++i)
+    માટે (i = 0; i < 4; ++i)
 	VIM_CLEAR(wp->w_border_highlight[i]);
-    for (i = 0; i < 8; ++i)
+    માટે (i = 0; i < 8; ++i)
 	wp->w_border_char[i] = 0;
 
-    if (type == TYPE_PREVIEW)
+    જો (type == TYPE_PREVIEW)
     {
-	if (mouse_has(MOUSE_INSERT))
+	જો (mouse_has(MOUSE_ઉમેરો))
 	{
 	    wp->w_popup_flags |= POPF_DRAG | POPF_RESIZE;
 	    wp->w_popup_close = POPCLOSE_BUTTON;
 	}
-	for (i = 0; i < 4; ++i)
+	માટે (i = 0; i < 4; ++i)
 	    wp->w_popup_border[i] = 1;
 	parse_previewpopup(wp);
 	popup_set_wantpos_cursor(wp, wp->w_minwidth, d);
     }
 
 #ifdef FEAT_QUICKFIX
-    if (type == TYPE_INFO)
+    જો (type == TYPE_INFO)
     {
 	wp->w_popup_pos = POPPOS_TOPLEFT;
-	if (mouse_has(MOUSE_INSERT))
+	જો (mouse_has(MOUSE_ઉમેરો))
 	{
 	    wp->w_popup_flags |= POPF_DRAG | POPF_RESIZE;
 	    wp->w_popup_close = POPCLOSE_BUTTON;
 	}
-	add_border_left_right_padding(wp);
+	add_border_ડાબું_જમણું_padding(wp);
 	parse_completepopup(wp);
     }
 #endif
@@ -3376,18 +3376,18 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
     wp->w_popup_fixed = 0;
     wp->w_filter_mode = MODE_ALL;
 
-    if (d != NULL)
+    જો (d != ખાલી)
     {
 	// Deal with options.
-	if (apply_options(wp, d, TRUE) == FAIL)
+	જો (apply_options(wp, d, TRUE) == FAIL)
 	{
-	    (void)popup_close(wp->w_id, FALSE);
-	    return NULL;
+	    (શૂન્ય)popup_close(wp->w_id, FALSE);
+	    પાછા ખાલી;
 	}
     }
 
 #ifdef FEAT_TIMERS
-    if (popup_is_notification(type) && wp->w_popup_timer == NULL)
+    જો (popup_is_notification(type) && wp->w_popup_timer == ખાલી)
 	popup_add_timeout(wp, 3000, type == TYPE_NOTIFICATION);
 #endif
 
@@ -3400,33 +3400,33 @@ popup_create(typval_T *argvars, typval_T *rettv, create_type_T type)
 
 #ifdef FEAT_TERMINAL
     // When running a terminal in the popup it becomes the current window.
-    if (buf->b_term != NULL)
+    જો (buf->b_term != ખાલી)
 	win_enter(wp, FALSE);
 #endif
 
-    return wp;
+    પાછા wp;
 }
 
 /*
  * popup_clear()
  */
-    void
+    શૂન્ય
 f_popup_clear(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int force = FALSE;
+    પૂર્ણાંક force = FALSE;
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
-	force = (int)tv_get_bool(&argvars[0]);
+    જો (argvars[0].v_type != VAR_UNKNOWN)
+	force = (પૂર્ણાંક)tv_get_bool(&argvars[0]);
     close_all_popups(force);
 }
 
 /*
  * popup_create({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_create(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_NORMAL);
@@ -3435,7 +3435,7 @@ f_popup_create(typval_T *argvars, typval_T *rettv)
 /*
  * popup_atcursor({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_atcursor(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_ATCURSOR);
@@ -3444,7 +3444,7 @@ f_popup_atcursor(typval_T *argvars, typval_T *rettv)
 /*
  * popup_beval({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_beval(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_BEVAL);
@@ -3454,7 +3454,7 @@ f_popup_beval(typval_T *argvars, typval_T *rettv)
  * Invoke the close callback for window "wp" with value "result".
  * Careful: The callback may make "wp" invalid!
  */
-    static void
+    સ્થિર શૂન્ય
 invoke_popup_callback(win_T *wp, typval_T *result)
 {
     typval_T	rettv;
@@ -3462,21 +3462,21 @@ invoke_popup_callback(win_T *wp, typval_T *result)
 
     rettv.v_type = VAR_UNKNOWN;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = (varnumber_T)wp->w_id;
+    argv[0].v_type = VAR_સંખ્યા;
+    argv[0].vval.v_સંખ્યા = (varnumber_T)wp->w_id;
 
-    if (result != NULL && result->v_type != VAR_UNKNOWN)
+    જો (result != ખાલી && result->v_type != VAR_UNKNOWN)
 	copy_tv(result, &argv[1]);
-    else
+    નહીંતર
     {
-	argv[1].v_type = VAR_NUMBER;
-	argv[1].vval.v_number = 0;
+	argv[1].v_type = VAR_સંખ્યા;
+	argv[1].vval.v_સંખ્યા = 0;
     }
 
     argv[2].v_type = VAR_UNKNOWN;
 
     call_callback(&wp->w_close_cb, -1, &rettv, 2, argv);
-    if (result != NULL)
+    જો (result != ખાલી)
 	clear_tv(&argv[1]);
     clear_tv(&rettv);
 }
@@ -3485,12 +3485,12 @@ invoke_popup_callback(win_T *wp, typval_T *result)
  * Make "prevwin" the current window, unless it's equal to "wp".
  * Otherwise make "firstwin" the current window.
  */
-    static void
+    સ્થિર શૂન્ય
 back_to_prevwin(win_T *wp)
 {
-    if (win_valid(prevwin) && wp != prevwin)
+    જો (win_valid(prevwin) && wp != prevwin)
 	win_enter(prevwin, FALSE);
-    else
+    નહીંતર
 	win_enter(firstwin, FALSE);
 }
 
@@ -3498,18 +3498,18 @@ back_to_prevwin(win_T *wp)
  * Close popup "wp" and invoke any close callback for it.
  * Careful: callback function might have freed the popup window already
  */
-    static void
+    સ્થિર શૂન્ય
 popup_close_and_callback(win_T *wp, typval_T *arg)
 {
-    int id;
+    પૂર્ણાંક id;
 
-    if (!win_valid(wp))
-       return;
+    જો (!win_valid(wp))
+       પાછા;
 
     id = wp->w_id;
 
 #ifdef FEAT_TERMINAL
-    if (wp == curwin && curbuf->b_term != NULL)
+    જો (wp == curwin && curbuf->b_term != ખાલી)
     {
 	win_T *owp;
 
@@ -3519,35 +3519,35 @@ popup_close_and_callback(win_T *wp, typval_T *arg)
 	// - the previous window
 	// - the first one.
 	FOR_ALL_POPUPWINS(owp)
-	    if (owp != curwin && owp->w_buffer->b_term != NULL)
-		break;
-	if (owp != NULL)
+	    જો (owp != curwin && owp->w_buffer->b_term != ખાલી)
+		તોડો;
+	જો (owp != ખાલી)
 	    win_enter(owp, FALSE);
-	else
+	નહીંતર
 	{
 	    FOR_ALL_POPUPWINS_IN_TAB(curtab, owp)
-		if (owp != curwin && owp->w_buffer->b_term != NULL)
-		    break;
-	    if (owp != NULL)
+		જો (owp != curwin && owp->w_buffer->b_term != ખાલી)
+		    તોડો;
+	    જો (owp != ખાલી)
 		win_enter(owp, FALSE);
-	    else
+	    નહીંતર
 		back_to_prevwin(wp);
 	}
     }
 #endif
 
     // Just in case a check higher up is missing.
-    if (wp == curwin && ERROR_IF_POPUP_WINDOW)
+    જો (wp == curwin && ERROR_IF_POPUP_WINDOW)
     {
 	// To avoid getting stuck when win_execute() does something that causes
 	// an error, stop calling the filter callback.
 	free_callback(&wp->w_filter_cb);
 
-	return;
+	પાછા;
     }
 
     CHECK_CURBUF;
-    if (wp->w_close_cb.cb_name != NULL)
+    જો (wp->w_close_cb.cb_name != ખાલી)
 	// Careful: This may make "wp" invalid.
 	invoke_popup_callback(wp, arg);
 
@@ -3555,26 +3555,26 @@ popup_close_and_callback(win_T *wp, typval_T *arg)
     CHECK_CURBUF;
 }
 
-    void
-popup_close_with_retval(win_T *wp, int retval)
+    શૂન્ય
+popup_close_with_retval(win_T *wp, પૂર્ણાંક retval)
 {
     typval_T res;
 
-    res.v_type = VAR_NUMBER;
-    res.vval.v_number = retval;
+    res.v_type = VAR_સંખ્યા;
+    res.vval.v_સંખ્યા = retval;
     popup_close_and_callback(wp, &res);
 }
 
 /*
  * Close popup "wp" because of a mouse click.
  */
-    void
+    શૂન્ય
 popup_close_for_mouse_click(win_T *wp)
 {
     popup_close_with_retval(wp, -2);
 }
 
-    static void
+    સ્થિર શૂન્ય
 check_mouse_moved(win_T *wp, win_T *mouse_wp)
 {
     // Close the popup when all if these are true:
@@ -3582,7 +3582,7 @@ check_mouse_moved(win_T *wp, win_T *mouse_wp)
     // - "mousemoved" was used
     // - the mouse is no longer on the same screen row or the mouse column is
     //   outside of the relevant text
-    if (wp != mouse_wp
+    જો (wp != mouse_wp
 	    && wp->w_popup_mouse_row != 0
 	    && (wp->w_popup_mouse_row != mouse_row
 		|| mouse_col < wp->w_popup_mouse_mincol
@@ -3596,23 +3596,23 @@ check_mouse_moved(win_T *wp, win_T *mouse_wp)
 /*
  * Called when the mouse moved: may close a popup with "mousemoved".
  */
-    void
-popup_handle_mouse_moved(void)
+    શૂન્ય
+popup_handle_mouse_moved(શૂન્ય)
 {
     win_T   *wp, *nextwp;
     win_T   *mouse_wp;
-    int	    row = mouse_row;
-    int	    col = mouse_col;
+    પૂર્ણાંક	    row = mouse_row;
+    પૂર્ણાંક	    col = mouse_col;
 
     // find the window where the mouse is in
     mouse_wp = mouse_find_win(&row, &col, FIND_POPUP);
 
-    for (wp = first_popupwin; wp != NULL; wp = nextwp)
+    માટે (wp = first_popupwin; wp != ખાલી; wp = nextwp)
     {
 	nextwp = wp->w_next;
 	check_mouse_moved(wp, mouse_wp);
     }
-    for (wp = curtab->tp_first_popupwin; wp != NULL; wp = nextwp)
+    માટે (wp = curtab->tp_first_popupwin; wp != ખાલી; wp = nextwp)
     {
 	nextwp = wp->w_next;
 	check_mouse_moved(wp, mouse_wp);
@@ -3623,88 +3623,88 @@ popup_handle_mouse_moved(void)
  * In a filter: check if the typed key is a mouse event that is used for
  * dragging the popup.
  */
-    static void
-filter_handle_drag(win_T *wp, int c, typval_T *rettv)
+    સ્થિર શૂન્ય
+filter_handle_drag(win_T *wp, પૂર્ણાંક c, typval_T *rettv)
 {
-    int	row = mouse_row;
-    int	col = mouse_col;
+    પૂર્ણાંક	row = mouse_row;
+    પૂર્ણાંક	col = mouse_col;
 
-    if ((wp->w_popup_flags & (POPF_DRAG | POPF_DRAGALL))
-	    && is_mouse_key(c)
+    જો ((wp->w_popup_flags & (POPF_DRAG | POPF_DRAGALL))
+	    && is_mouse_ચાવી(c)
 	    && (wp == popup_dragwin
 			  || wp == mouse_find_win(&row, &col, FIND_POPUP)))
 	// do not consume the key, allow for dragging the popup
-	rettv->vval.v_number = 0;
+	rettv->vval.v_સંખ્યા = 0;
 }
 
 /*
  * popup_filter_menu({id}, {key})
  */
-    void
+    શૂન્ય
 f_popup_filter_menu(typval_T *argvars, typval_T *rettv)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
-    char_u	*key;
+    char_u	*ચાવી;
     typval_T	res;
-    int		c;
+    પૂર્ણાંક		c;
     linenr_T	old_lnum;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
-    id = tv_get_number(&argvars[0]);
+    id = tv_get_સંખ્યા(&argvars[0]);
     wp = win_id2wp(id);
-    key = tv_get_string(&argvars[1]);
+    ચાવી = tv_get_string(&argvars[1]);
     // If the popup has been closed do not consume the key.
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
-    c = *key;
-    if (c == K_SPECIAL && key[1] != NUL)
-	c = TO_SPECIAL(key[1], key[2]);
+    c = *ચાવી;
+    જો (c == K_SPECIAL && ચાવી[1] != NUL)
+	c = TO_SPECIAL(ચાવી[1], ચાવી[2]);
 
     // consume all keys until done
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_TRUE;
-    res.v_type = VAR_NUMBER;
+    rettv->vval.v_સંખ્યા = VVAL_TRUE;
+    res.v_type = VAR_સંખ્યા;
 
     old_lnum = wp->w_cursor.lnum;
-    if (c == 'k' || c == 'K' || c == K_UP || c == Ctrl_P)
+    જો (c == 'k' || c == 'K' || c == K_UP || c == Ctrl_P)
     {
-	if (wp->w_cursor.lnum > 1)
+	જો (wp->w_cursor.lnum > 1)
 	    --wp->w_cursor.lnum;
-	else
-	    wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_line_count;
+	નહીંતર
+	    wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
     }
-    if (c == 'j' || c == 'J' || c == K_DOWN || c == Ctrl_N)
+    જો (c == 'j' || c == 'J' || c == K_DOWN || c == Ctrl_N)
     {
-	if (wp->w_cursor.lnum < wp->w_buffer->b_ml.ml_line_count)
+	જો (wp->w_cursor.lnum < wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
 	    ++wp->w_cursor.lnum;
-	else
+	નહીંતર
 	    wp->w_cursor.lnum = 1;
     }
-    if (old_lnum != wp->w_cursor.lnum)
+    જો (old_lnum != wp->w_cursor.lnum)
     {
 	// caller will call popup_highlight_curline()
-	return;
+	પાછા;
     }
 
-    if (c == 'x' || c == 'X' || c == ESC || c == Ctrl_C)
+    જો (c == 'x' || c == 'X' || c == ESC || c == Ctrl_C)
     {
 	// Cancelled, invoke callback with -1
-	res.vval.v_number = -1;
+	res.vval.v_સંખ્યા = -1;
 	popup_close_and_callback(wp, &res);
-	return;
+	પાછા;
     }
-    if (c == ' ' || c == K_KENTER || c == CAR || c == NL)
+    જો (c == ' ' || c == K_KENTER || c == CAR || c == NL)
     {
 	// Invoke callback with current index.
-	res.vval.v_number = wp->w_cursor.lnum;
+	res.vval.v_સંખ્યા = wp->w_cursor.lnum;
 	popup_close_and_callback(wp, &res);
-	return;
+	પાછા;
     }
 
     filter_handle_drag(wp, c, rettv);
@@ -3713,56 +3713,56 @@ f_popup_filter_menu(typval_T *argvars, typval_T *rettv)
 /*
  * popup_filter_yesno({id}, {key})
  */
-    void
+    શૂન્ય
 f_popup_filter_yesno(typval_T *argvars, typval_T *rettv)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
-    char_u	*key;
+    char_u	*ચાવી;
     typval_T	res;
-    int		c;
+    પૂર્ણાંક		c;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
-    id = tv_get_number(&argvars[0]);
+    id = tv_get_સંખ્યા(&argvars[0]);
     wp = win_id2wp(id);
-    key = tv_get_string(&argvars[1]);
+    ચાવી = tv_get_string(&argvars[1]);
     // If the popup has been closed don't consume the key.
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
-    c = *key;
-    if (c == CAR && need_wait_return)
-	return;
-    if (c == K_SPECIAL && key[1] != NUL)
-	c = TO_SPECIAL(key[1], key[2]);
+    c = *ચાવી;
+    જો (c == CAR && need_wait_return)
+	પાછા;
+    જો (c == K_SPECIAL && ચાવી[1] != NUL)
+	c = TO_SPECIAL(ચાવી[1], ચાવી[2]);
 
     // consume all keys until done
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_TRUE;
+    rettv->vval.v_સંખ્યા = VVAL_TRUE;
 
-    if (c == 'y' || c == 'Y')
-	res.vval.v_number = 1;
-    else if (c == 'n' || c == 'N' || c == 'x' || c == 'X' || c == ESC)
-	res.vval.v_number = 0;
-    else
+    જો (c == 'y' || c == 'Y')
+	res.vval.v_સંખ્યા = 1;
+    નહીંતર જો (c == 'n' || c == 'N' || c == 'x' || c == 'X' || c == ESC)
+	res.vval.v_સંખ્યા = 0;
+    નહીંતર
     {
 	filter_handle_drag(wp, c, rettv);
-	return;
+	પાછા;
     }
 
     // Invoke callback
-    res.v_type = VAR_NUMBER;
+    res.v_type = VAR_સંખ્યા;
     popup_close_and_callback(wp, &res);
 }
 
 /*
  * popup_dialog({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_dialog(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_DIALOG);
@@ -3771,7 +3771,7 @@ f_popup_dialog(typval_T *argvars, typval_T *rettv)
 /*
  * popup_menu({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_menu(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_MENU);
@@ -3780,7 +3780,7 @@ f_popup_menu(typval_T *argvars, typval_T *rettv)
 /*
  * popup_notification({text}, {options})
  */
-    void
+    શૂન્ય
 f_popup_notification(typval_T *argvars, typval_T *rettv)
 {
     popup_create(argvars, rettv, TYPE_NOTIFICATION);
@@ -3791,42 +3791,42 @@ f_popup_notification(typval_T *argvars, typval_T *rettv)
  * If the popup window does not exist NULL is returned.
  * If the window is not a popup window, and error message is given.
  */
-    static win_T *
-find_popup_win(int id)
+    સ્થિર win_T *
+find_popup_win(પૂર્ણાંક id)
 {
     win_T *wp = win_id2wp(id);
 
-    if (wp != NULL && !WIN_IS_POPUP(wp))
+    જો (wp != ખાલી && !WIN_IS_POPUP(wp))
     {
 	semsg(_(e_window_nr_is_not_popup_window), id);
-	return NULL;
+	પાછા ખાલી;
     }
-    return wp;
+    પાછા wp;
 }
 
 /*
  * popup_close({id})
  */
-    void
+    શૂન્ય
 f_popup_close(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
-    if (
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
+    જો (
 #ifdef FEAT_TERMINAL
 	// if the popup contains a terminal it will become hidden
-	curbuf->b_term == NULL &&
+	curbuf->b_term == ખાલી &&
 #endif
 	    ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+	પાછા;
 
     wp = find_popup_win(id);
-    if (wp != NULL)
+    જો (wp != ખાલી)
 	popup_close_and_callback(wp, &argvars[1]);
 }
 
@@ -3838,103 +3838,103 @@ f_popup_close(typval_T *argvars, typval_T *rettv UNUSED)
  * on screen until may_update_popup_mask() runs and the affected cells
  * happen to be redrawn.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_clear_mask_for(win_T *wp)
 {
-    int r, c;
-    int row_start, col_start, row_end, col_end;
+    પૂર્ણાંક r, c;
+    પૂર્ણાંક row_start, col_start, row_end, col_end;
 
-    if (popup_mask == NULL || !popup_visible)
-	return;
+    જો (popup_mask == ખાલી || !popup_visible)
+	પાછા;
 
     row_start = MAX(wp->w_winrow, 0);
     col_start = MAX(wp->w_wincol, 0);
-    row_end = MIN(wp->w_winrow + popup_height(wp), (int)screen_Rows);
-    col_end = MIN(wp->w_wincol + popup_width(wp), (int)screen_Columns);
+    row_end = MIN(wp->w_winrow + popup_height(wp), (પૂર્ણાંક)screen_Rows);
+    col_end = MIN(wp->w_wincol + popup_width(wp), (પૂર્ણાંક)screen_Columns);
 
-    for (r = row_start; r < row_end; ++r)
-	for (c = col_start; c < col_end; ++c)
+    માટે (r = row_start; r < row_end; ++r)
+	માટે (c = col_start; c < col_end; ++c)
 	    popup_mask[r * screen_Columns + c] = 0;
 }
 
-    void
+    શૂન્ય
 popup_hide(win_T *wp)
 {
     popup_area_T	old_area;
-    int			was_visible = (wp->w_popup_flags & POPF_HIDDEN) == 0;
+    પૂર્ણાંક			was_visible = (wp->w_popup_flags & POPF_HIDDEN) == 0;
 
 #ifdef FEAT_TERMINAL
-    if (error_if_term_popup_window())
-	return;
+    જો (error_if_term_popup_window())
+	પાછા;
 #endif
-    if ((wp->w_popup_flags & POPF_HIDDEN) != 0)
-	return;
+    જો ((wp->w_popup_flags & POPF_HIDDEN) != 0)
+	પાછા;
 
     popup_save_area(wp, &old_area);
 
 #ifdef FEAT_IMAGE_POPUP
-    if (wp->w_popup_imagep != NULL)
+    જો (wp->w_popup_imagep != ખાલી)
 	image_placement_clear(wp->w_popup_imagep);
 #endif
 
     wp->w_popup_flags |= POPF_HIDDEN;
 
     // Do not decrement b_nwindows, we still reference the buffer.
-    if (wp->w_winrow + popup_height(wp) >= cmdline_row)
+    જો (wp->w_winrow + popup_height(wp) >= cmdline_row)
 	clear_cmdline = TRUE;
 
-    if (was_visible)
+    જો (was_visible)
 	popup_clear_mask_for(wp);
 
-    if (old_area.active)
+    જો (old_area.active)
 	popup_redraw_exposed_area(&old_area);
-    else
+    નહીંતર
 	redraw_all_later(UPD_NOT_VALID);
 
     status_redraw_all();
-    if (!old_area.active)
+    જો (!old_area.active)
 	popup_mask_refresh = TRUE;
 }
 
 /*
  * popup_hide({id})
  */
-    void
+    શૂન્ય
 f_popup_hide(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
     popup_hide(wp);
     wp->w_popup_flags |= POPF_HIDDEN_FORCE;
 }
 
-    void
+    શૂન્ય
 popup_show(win_T *wp)
 {
     bool popup_active;
 
-    if ((wp->w_popup_flags & POPF_HIDDEN) == 0)
-	return;
+    જો ((wp->w_popup_flags & POPF_HIDDEN) == 0)
+	પાછા;
 
     popup_active = (wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0;
     wp->w_popup_flags &= ~POPF_HIDDEN;
-    if (popup_active)
+    જો (popup_active)
     {
 	wp->w_redr_type = UPD_NOT_VALID;
-	wp->w_lines_valid = 0;
-	if (must_redraw < UPD_VALID)
+	wp->w_લીટીઓ_valid = 0;
+	જો (must_redraw < UPD_VALID)
 	    must_redraw = UPD_VALID;
     }
-    else
+    નહીંતર
     {
 	redraw_all_later(UPD_NOT_VALID);
 	popup_mask_refresh = TRUE;
@@ -3944,57 +3944,57 @@ popup_show(win_T *wp)
 /*
  * popup_show({id})
  */
-    void
+    શૂન્ય
 f_popup_show(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = -1;
+    rettv->v_type = VAR_સંખ્યા;
+    rettv->vval.v_સંખ્યા = -1;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
     wp->w_popup_flags &= ~POPF_HIDDEN_FORCE;
     popup_show(wp);
 #ifdef FEAT_QUICKFIX
-    if (wp->w_popup_flags & POPF_INFO)
+    જો (wp->w_popup_flags & POPF_INFO)
 	pum_position_info_popup(wp);
 #endif
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_સંખ્યા = 0;
 }
 
 /*
  * popup_settext({id}, {text})
  */
-    void
+    શૂન્ય
 f_popup_settext(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
     popup_area_T	old_area;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_string_or_list_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(&argvars[0]);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
     popup_save_area(wp, &old_area);
 
-    if (check_for_string_or_list_arg(argvars, 1) == FAIL)
-	return;
+    જો (check_for_string_or_list_arg(argvars, 1) == FAIL)
+	પાછા;
 
     popup_set_buffer_text(wp->w_buffer, argvars[1]);
 
@@ -4003,51 +4003,51 @@ f_popup_settext(typval_T *argvars, typval_T *rettv UNUSED)
     // must_redraw, causing may_update_popup_mask() to refresh the mask and
     // redraw windows behind the popup, resulting in flickering.
     wp->w_redr_type = UPD_NOT_VALID;
-    wp->w_lines_valid = 0;
-    if (must_redraw < UPD_VALID)
+    wp->w_લીટીઓ_valid = 0;
+    જો (must_redraw < UPD_VALID)
 	must_redraw = UPD_VALID;
     popup_adjust_position(wp);
 
-    if (popup_area_changed(wp, &old_area))
+    જો (popup_area_changed(wp, &old_area))
 	popup_redraw_exposed_area(&old_area);
 }
 
 /*
  * popup_setbuf({id}, {bufnr})
  */
-    void
+    શૂન્ય
 f_popup_setbuf(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int			id;
+    પૂર્ણાંક			id;
     win_T		*wp;
     buf_T		*buf;
     popup_area_T	old_area;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_સંખ્યા = VVAL_FALSE;
 
-    if (check_for_number_arg(argvars, 0) == FAIL
+    જો (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_buffer_arg(argvars, 1) == FAIL)
-	return;
+	પાછા;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(&argvars[0]);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
     buf = tv_get_buf_from_arg(&argvars[1]);
 
-    if (buf == NULL)
-	return;
+    જો (buf == ખાલી)
+	પાછા;
 #ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL && popup_terminal_exists())
+    જો (buf->b_term != ખાલી && popup_terminal_exists())
     {
 	emsg(_(e_cannot_open_second_popup_with_terminal));
-	return;
+	પાછા;
     }
 #endif
 
-    if (wp->w_buffer != buf)
+    જો (wp->w_buffer != buf)
     {
 	popup_save_area(wp, &old_area);
 
@@ -4060,31 +4060,31 @@ f_popup_setbuf(typval_T *argvars, typval_T *rettv UNUSED)
 	redraw_win_later(wp, UPD_NOT_VALID);
 	popup_adjust_position(wp);
 
-	if (popup_area_changed(wp, &old_area))
+	જો (popup_area_changed(wp, &old_area))
 	    popup_redraw_exposed_area(&old_area);
     }
-    rettv->vval.v_number = VVAL_TRUE;
+    rettv->vval.v_સંખ્યા = VVAL_TRUE;
 }
 
-    static void
+    સ્થિર શૂન્ય
 popup_free(win_T *wp)
 {
     popup_area_T	old_area;
-    int			was_visible = (wp->w_popup_flags & POPF_HIDDEN) == 0;
+    પૂર્ણાંક			was_visible = (wp->w_popup_flags & POPF_HIDDEN) == 0;
 
     popup_save_area(wp, &old_area);
 
 #ifdef FEAT_IMAGE_POPUP
-    if (wp->w_popup_imagep != NULL)
+    જો (wp->w_popup_imagep != ખાલી)
 	image_placement_free(wp->w_popup_imagep);
 #endif
 
     sign_undefine_by_name(popup_get_sign_name(wp), FALSE);
     wp->w_buffer->b_locked = FALSE;
-    if (wp->w_winrow + popup_height(wp) >= cmdline_row)
+    જો (wp->w_winrow + popup_height(wp) >= cmdline_row)
 	clear_cmdline = TRUE;
 
-    if (was_visible)
+    જો (was_visible)
 	popup_clear_mask_for(wp);
 
     popup_redraw_exposed_area(&old_area);
@@ -4092,39 +4092,39 @@ popup_free(win_T *wp)
     win_free_popup(wp);
 
 #ifdef HAS_MESSAGE_WINDOW
-    if (wp == message_win)
-	message_win = NULL;
+    જો (wp == message_win)
+	message_win = ખાલી;
 #endif
 
-    if (!old_area.active)
+    જો (!old_area.active)
 	redraw_all_later(UPD_NOT_VALID);
     status_redraw_all();
-    if (!old_area.active)
+    જો (!old_area.active)
 	popup_mask_refresh = TRUE;
 }
 
-    static void
-error_for_popup_window(void)
+    સ્થિર શૂન્ય
+error_for_popup_window(શૂન્ય)
 {
     emsg(_(e_not_allowed_in_popup_window));
 }
 
-    int
-error_if_popup_window(int also_with_term UNUSED)
+    પૂર્ણાંક
+error_if_popup_window(પૂર્ણાંક also_with_term UNUSED)
 {
     // win_execute() may set "curwin" to a popup window temporarily, but many
     // commands are disallowed then.  When a terminal runs in the popup most
     // things are allowed.  When a terminal is finished it can be closed.
-    if (WIN_IS_POPUP(curwin)
+    જો (WIN_IS_POPUP(curwin)
 #ifdef FEAT_TERMINAL
-	    && (also_with_term || curbuf->b_term == NULL)
+	    && (also_with_term || curbuf->b_term == ખાલી)
 #endif
 	    )
     {
 	error_for_popup_window();
-	return TRUE;
+	પાછા TRUE;
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
@@ -4132,29 +4132,29 @@ error_if_popup_window(int also_with_term UNUSED)
  * Does not invoke the callback.
  * Return OK if the popup was closed, FAIL otherwise.
  */
-    int
-popup_close(int id, int force)
+    પૂર્ણાંક
+popup_close(પૂર્ણાંક id, પૂર્ણાંક force)
 {
     win_T	*wp;
     tabpage_T	*tp;
-    win_T	*prev = NULL;
+    win_T	*prev = ખાલી;
 
     // go through global popups
-    for (wp = first_popupwin; wp != NULL; prev = wp, wp = wp->w_next)
-	if (wp->w_id == id)
+    માટે (wp = first_popupwin; wp != ખાલી; prev = wp, wp = wp->w_next)
+	જો (wp->w_id == id)
 	{
-	    if (wp == curwin)
+	    જો (wp == curwin)
 	    {
-		if (!force)
+		જો (!force)
 		{
 		    error_for_popup_window();
-		    return FAIL;
+		    પાછા FAIL;
 		}
 		back_to_prevwin(wp);
 	    }
-	    if (prev == NULL)
+	    જો (prev == ખાલી)
 		first_popupwin = wp->w_next;
-	    else
+	    નહીંતર
 		prev->w_next = wp->w_next;
 #ifdef FEAT_TERMINAL
 	    // If the popup to be closed is opaque, terminal windows under
@@ -4162,47 +4162,47 @@ popup_close(int id, int force)
 	    redraw_win_under_opacity_popup(wp);
 #endif
 	    popup_free(wp);
-	    return OK;
+	    પાછા OK;
 	}
 
     // go through tab-local popups
     FOR_ALL_TABPAGES(tp)
-	if (popup_close_tabpage(tp, id, force) == OK)
-	    return OK;
-    return FAIL;
+	જો (popup_close_tabpage(tp, id, force) == OK)
+	    પાછા OK;
+    પાછા FAIL;
 }
 
 /*
  * Close a popup window with Window-id "id" in tabpage "tp".
  */
-    int
-popup_close_tabpage(tabpage_T *tp, int id, int force)
+    પૂર્ણાંક
+popup_close_tabpage(tabpage_T *tp, પૂર્ણાંક id, પૂર્ણાંક force)
 {
     win_T	*wp;
-    win_T	**root = &tp->tp_first_popupwin;
-    win_T	*prev = NULL;
+    win_T	**મૂળ = &tp->tp_first_popupwin;
+    win_T	*prev = ખાલી;
 
-    for (wp = *root; wp != NULL; prev = wp, wp = wp->w_next)
-	if (wp->w_id == id)
+    માટે (wp = *મૂળ; wp != ખાલી; prev = wp, wp = wp->w_next)
+	જો (wp->w_id == id)
 	{
-	    if (wp == curwin)
+	    જો (wp == curwin)
 	    {
-		if (!force)
+		જો (!force)
 		{
 		    error_for_popup_window();
-		    return FAIL;
+		    પાછા FAIL;
 		}
 		back_to_prevwin(wp);
 	    }
 
 	    // Set curwin for tabpage to a valid window, in case we try
 	    // accessing it later.
-	    if (tp->tp_curwin == wp)
+	    જો (tp->tp_curwin == wp)
 		tp->tp_curwin = tp->tp_firstwin;
 
-	    if (prev == NULL)
-		*root = wp->w_next;
-	    else
+	    જો (prev == ખાલી)
+		*મૂળ = wp->w_next;
+	    નહીંતર
 		prev->w_next = wp->w_next;
 #ifdef FEAT_TERMINAL
 	    // If the popup to be closed is opaque, terminal windows under
@@ -4210,28 +4210,28 @@ popup_close_tabpage(tabpage_T *tp, int id, int force)
 	    redraw_win_under_opacity_popup(wp);
 #endif
 	    popup_free(wp);
-	    return OK;
+	    પાછા OK;
 	}
-    return FAIL;
+    પાછા FAIL;
 }
 
-    void
-close_all_popups(int force)
+    શૂન્ય
+close_all_popups(પૂર્ણાંક force)
 {
-    if (!force && ERROR_IF_ANY_POPUP_WINDOW)
-	return;
-    while (first_popupwin != NULL)
-	if (popup_close(first_popupwin->w_id, force) == FAIL)
-	    return;
-    while (curtab->tp_first_popupwin != NULL)
-	if (popup_close(curtab->tp_first_popupwin->w_id, force) == FAIL)
-	    return;
+    જો (!force && ERROR_IF_ANY_POPUP_WINDOW)
+	પાછા;
+    જ્યારે (first_popupwin != ખાલી)
+	જો (popup_close(first_popupwin->w_id, force) == FAIL)
+	    પાછા;
+    જ્યારે (curtab->tp_first_popupwin != ખાલી)
+	જો (popup_close(curtab->tp_first_popupwin->w_id, force) == FAIL)
+	    પાછા;
 }
 
 /*
  * Save the current popup area that may need to be restored later.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_save_area(win_T *wp, popup_area_T *area)
 {
     area->active = (wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0;
@@ -4246,10 +4246,10 @@ popup_save_area(win_T *wp, popup_area_T *area)
 /*
  * Save popup style-related fields that affect redraw/reposition decisions.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_save_style(win_T *wp, popup_style_snapshot_T *style)
 {
-    int i;
+    પૂર્ણાંક i;
 
     style->firstline = wp->w_firstline;
     style->blend = wp->w_popup_blend;
@@ -4258,34 +4258,34 @@ popup_save_style(win_T *wp, popup_style_snapshot_T *style)
     style->title = wp->w_popup_title;
     style->scrollbar_highlight = wp->w_scrollbar_highlight;
     style->thumb_highlight = wp->w_thumb_highlight;
-    for (i = 0; i < 4; i++)
+    માટે (i = 0; i < 4; i++)
 	style->border_highlight[i] = wp->w_border_highlight[i];
 }
 
 /*
  * Return true if style changes require at least a popup redraw.
  */
-    static bool
+    સ્થિર bool
 popup_style_changed(win_T *wp, popup_style_snapshot_T *style)
 {
-    int i;
+    પૂર્ણાંક i;
 
-    if (style->firstline != wp->w_firstline
+    જો (style->firstline != wp->w_firstline
 	    || style->flags != wp->w_popup_flags
 	    || style->title != wp->w_popup_title
 	    || style->scrollbar_highlight != wp->w_scrollbar_highlight
 	    || style->thumb_highlight != wp->w_thumb_highlight)
-	return true;
-    for (i = 0; i < 4; i++)
-	if (style->border_highlight[i] != wp->w_border_highlight[i])
-	    return true;
-    return false;
+	પાછા true;
+    માટે (i = 0; i < 4; i++)
+	જો (style->border_highlight[i] != wp->w_border_highlight[i])
+	    પાછા true;
+    પાછા false;
 }
 
 /*
  * Save popup layout fields that affect mask refresh and local redraw.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_save_layout(win_T *wp, popup_layout_T *layout)
 {
     layout->winrow = wp->w_winrow;
@@ -4304,10 +4304,10 @@ popup_save_layout(win_T *wp, popup_layout_T *layout)
 /*
  * Return true when the popup layout changed.
  */
-    static bool
+    સ્થિર bool
 popup_layout_changed(win_T *wp, popup_layout_T *layout)
 {
-    return layout->winrow != wp->w_winrow
+    પાછા layout->winrow != wp->w_winrow
 	|| layout->wincol != wp->w_wincol
 	|| layout->leftcol != wp->w_leftcol
 	|| layout->leftoff != wp->w_popup_leftoff
@@ -4323,10 +4323,10 @@ popup_layout_changed(win_T *wp, popup_layout_T *layout)
 /*
  * Return true when the popup no longer covers the saved area.
  */
-    static bool
+    સ્થિર bool
 popup_area_changed(win_T *wp, popup_area_T *area)
 {
-    return area->winrow != wp->w_winrow
+    પાછા area->winrow != wp->w_winrow
 	|| area->wincol != wp->w_wincol
 	|| area->height != popup_height(wp)
 	|| area->width != popup_width(wp)
@@ -4338,47 +4338,47 @@ popup_area_changed(win_T *wp, popup_area_T *area)
  * overlaps the rectangle, mark it for full redraw so its blended background
  * is recomputed.
  */
-    static void
-mark_overlapped_opacity_popup(win_T *wp, int area_top, int area_bot,
-	int area_left, int area_right, int zindex)
+    સ્થિર શૂન્ય
+mark_overlapped_opacity_popup(win_T *wp, પૂર્ણાંક area_ટોચ, પૂર્ણાંક area_bot,
+	પૂર્ણાંક area_ડાબું, પૂર્ણાંક area_જમણું, પૂર્ણાંક zindex)
 {
-    if ((wp->w_popup_flags & POPF_HIDDEN)
+    જો ((wp->w_popup_flags & POPF_HIDDEN)
 	    || (wp->w_popup_flags & POPF_OPACITY) == 0
 	    || wp->w_popup_blend == 0
 	    || wp->w_zindex > zindex
 	    || wp->w_winrow >= area_bot
-	    || wp->w_winrow + popup_height(wp) <= area_top
-	    || wp->w_wincol >= area_right
+	    || wp->w_winrow + popup_height(wp) <= area_ટોચ
+	    || wp->w_wincol >= area_જમણું
 	    || wp->w_wincol + popup_width(wp) - wp->w_popup_leftoff
-							      <= area_left)
-	return;
+							      <= area_ડાબું)
+	પાછા;
 
     wp->w_redr_type = UPD_NOT_VALID;
-    wp->w_lines_valid = 0;
+    wp->w_લીટીઓ_valid = 0;
 }
 
 /*
  * Mark lower or equal zindex opacity popups that overlap with a popup area
  * for redraw.  Their blended background may have included the old popup.
  */
-    static void
-redraw_overlapped_opacity_popups(int winrow, int wincol, int height, int width,
-	int leftoff, int zindex)
+    સ્થિર શૂન્ય
+redraw_overlapped_opacity_popups(પૂર્ણાંક winrow, પૂર્ણાંક wincol, પૂર્ણાંક height, પૂર્ણાંક width,
+	પૂર્ણાંક leftoff, પૂર્ણાંક zindex)
 {
     win_T	*wp;
-    int		area_top = winrow;
-    int		area_bot = winrow + height;
-    int		area_left = wincol;
-    int		area_right = wincol + width - leftoff;
+    પૂર્ણાંક		area_ટોચ = winrow;
+    પૂર્ણાંક		area_bot = winrow + height;
+    પૂર્ણાંક		area_ડાબું = wincol;
+    પૂર્ણાંક		area_જમણું = wincol + width - leftoff;
 
     FOR_ALL_POPUPWINS(wp)
-	mark_overlapped_opacity_popup(wp, area_top, area_bot, area_left,
-		area_right, zindex);
+	mark_overlapped_opacity_popup(wp, area_ટોચ, area_bot, area_ડાબું,
+		area_જમણું, zindex);
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	mark_overlapped_opacity_popup(wp, area_top, area_bot, area_left,
-		area_right, zindex);
+	mark_overlapped_opacity_popup(wp, area_ટોચ, area_bot, area_ડાબું,
+		area_જમણું, zindex);
 
-    if (must_redraw < UPD_VALID)
+    જો (must_redraw < UPD_VALID)
 	must_redraw = UPD_VALID;
 }
 
@@ -4396,112 +4396,112 @@ redraw_overlapped_opacity_popups(int winrow, int wincol, int height, int width,
  * other rendering features fall back to a space, which still beats showing a
  * stale popup char.
  */
-    static void
-refill_pum_bg_row_from_buffer(int r, int left, int right)
+    સ્થિર શૂન્ય
+refill_pum_bg_row_from_buffer(પૂર્ણાંક r, પૂર્ણાંક ડાબું, પૂર્ણાંક જમણું)
 {
-    int		line_cp = r;
-    int		col_cp = left;
+    પૂર્ણાંક		લીટી_cp = r;
+    પૂર્ણાંક		col_cp = ડાબું;
     win_T	*wp;
     linenr_T	lnum;
-    int		row_for_lnum;
-    int		col_for_lnum = 0;
-    char_u	*line;
+    પૂર્ણાંક		row_for_lnum;
+    પૂર્ણાંક		col_for_lnum = 0;
+    char_u	*લીટી;
     char_u	*p;
-    int		win_text_col;
-    int		screen_col;
-    int		soff_base = (r - pum_bg_top) * pum_bg_cols;
-    int		c;
+    પૂર્ણાંક		win_text_col;
+    પૂર્ણાંક		screen_col;
+    પૂર્ણાંક		soff_base = (r - pum_bg_ટોચ) * pum_bg_cols;
+    પૂર્ણાંક		c;
 
     // Default: fill the range with spaces so trailing/empty cells render as
     // plain pum bg through opacity.
-    for (c = left; c < right; ++c)
+    માટે (c = ડાબું; c < જમણું; ++c)
     {
-	pum_bg_lines[soff_base + c] = ' ';
-	if (pum_bg_attrs != NULL)
+	pum_bg_લીટીઓ[soff_base + c] = ' ';
+	જો (pum_bg_attrs != ખાલી)
 	    pum_bg_attrs[soff_base + c] = 0;
-	if (enc_utf8 && pum_bg_linesUC != NULL)
-	    pum_bg_linesUC[soff_base + c] = 0;
-	if (enc_utf8)
+	જો (enc_utf8 && pum_bg_લીટીઓ_UC != ખાલી)
+	    pum_bg_લીટીઓ_UC[soff_base + c] = 0;
+	જો (enc_utf8)
 	{
-	    int k;
-	    for (k = 0; k < MAX_MCO; ++k)
-		if (pum_bg_linesC[k] != NULL)
-		    pum_bg_linesC[k][soff_base + c] = 0;
+	    પૂર્ણાંક k;
+	    માટે (k = 0; k < MAX_MCO; ++k)
+		જો (pum_bg_લીટીઓ_C[k] != ખાલી)
+		    pum_bg_લીટીઓ_C[k][soff_base + c] = 0;
 	}
     }
 
-    wp = mouse_find_win(&line_cp, &col_cp, IGNORE_POPUP);
-    if (wp == NULL || line_cp < 0 || line_cp >= wp->w_height)
-	return;
-    if (wp->w_buffer == NULL || wp->w_buffer->b_ml.ml_mfp == NULL)
-	return;
+    wp = mouse_find_win(&લીટી_cp, &col_cp, IGNORE_POPUP);
+    જો (wp == ખાલી || લીટી_cp < 0 || લીટી_cp >= wp->w_height)
+	પાછા;
+    જો (wp->w_buffer == ખાલી || wp->w_buffer->b_ml.ml_mfp == ખાલી)
+	પાછા;
 
     // Compute the buffer line for this screen row.
-    row_for_lnum = line_cp;
-    if (mouse_comp_pos(wp, &row_for_lnum, &col_for_lnum, &lnum, NULL))
-	return;	// past end of buffer
-    if (lnum < 1 || lnum > wp->w_buffer->b_ml.ml_line_count)
-	return;
+    row_for_lnum = લીટી_cp;
+    જો (mouse_comp_pos(wp, &row_for_lnum, &col_for_lnum, &lnum, ખાલી))
+	પાછા;	// past end of buffer
+    જો (lnum < 1 || lnum > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
+	પાછા;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    if (line == NULL)
-	return;
+    લીટી = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    જો (લીટી == ખાલી)
+	પાછા;
 
     // Walk the buffer line and write each displayed cell into pum_bg_*.
     // win_text_col is the screen column where the buffer text starts inside
     // the window (after sign/number/fold columns and horizontal scroll).
     win_text_col = wp->w_wincol + win_col_off(wp);
-    if (!wp->w_p_wrap)
+    જો (!wp->w_p_wrap)
 	win_text_col -= wp->w_leftcol;
     screen_col = win_text_col;
-    p = line;
-    while (*p != NUL && screen_col < right)
+    p = લીટી;
+    જ્યારે (*p != NUL && screen_col < જમણું)
     {
-	int char_cells;
-	int byte_count;
-	int soff = soff_base + screen_col;
-	int in_range = (screen_col >= left && screen_col < right);
+	પૂર્ણાંક char_cells;
+	પૂર્ણાંક byte_ગણતરી;
+	પૂર્ણાંક soff = soff_base + screen_col;
+	પૂર્ણાંક in_range = (screen_col >= ડાબું && screen_col < જમણું);
 
-	if (*p == '\t')
+	જો (*p == '\t')
 	{
-	    int ts = (int)wp->w_buffer->b_p_ts;
+	    પૂર્ણાંક ts = (પૂર્ણાંક)wp->w_buffer->b_p_ts;
 	    char_cells = ts > 0 ? ts - ((screen_col - win_text_col) % ts) : 1;
-	    byte_count = 1;
-	    if (in_range)
+	    byte_ગણતરી = 1;
+	    જો (in_range)
 	    {
-		pum_bg_lines[soff] = ' ';
-		if (enc_utf8 && pum_bg_linesUC != NULL)
-		    pum_bg_linesUC[soff] = 0;
+		pum_bg_લીટીઓ[soff] = ' ';
+		જો (enc_utf8 && pum_bg_લીટીઓ_UC != ખાલી)
+		    pum_bg_લીટીઓ_UC[soff] = 0;
 	    }
 	}
-	else if (has_mbyte)
+	નહીંતર જો (has_mbyte)
 	{
 	    char_cells = mb_ptr2cells(p);
-	    byte_count = mb_ptr2len(p);
-	    if (in_range)
+	    byte_ગણતરી = mb_ptr2len(p);
+	    જો (in_range)
 	    {
-		pum_bg_lines[soff] = *p;
-		if (enc_utf8 && pum_bg_linesUC != NULL)
-		    pum_bg_linesUC[soff] = (*p < 0x80) ? 0 : mb_ptr2char(p);
+		pum_bg_લીટીઓ[soff] = *p;
+		જો (enc_utf8 && pum_bg_લીટીઓ_UC != ખાલી)
+		    pum_bg_લીટીઓ_UC[soff] = (*p < 0x80) ? 0 : mb_ptr2char(p);
 	    }
 	}
-	else
+	નહીંતર
 	{
 	    char_cells = 1;
-	    byte_count = 1;
-	    if (in_range)
+	    byte_ગણતરી = 1;
+	    જો (in_range)
 	    {
-		pum_bg_lines[soff] = (*p < 0x20) ? ' ' : *p;
-		if (enc_utf8 && pum_bg_linesUC != NULL)
-		    pum_bg_linesUC[soff] = 0;
+		pum_bg_લીટીઓ[soff] = (*p < 0x20) ? ' ' : *p;
+		જો (enc_utf8 && pum_bg_લીટીઓ_UC != ખાલી)
+		    pum_bg_લીટીઓ_UC[soff] = 0;
 	    }
 	}
-	if (in_range && pum_bg_attrs != NULL)
+	જો (in_range && pum_bg_attrs != ખાલી)
 	    pum_bg_attrs[soff] = 0;
 
 	// For wide chars / tabs the trailing cells are zeroed already (by the
 	// initial space fill we did above).  Just skip past them.
-	p += byte_count;
+	p += byte_ગણતરી;
 	screen_col += char_cells;
     }
 }
@@ -4509,11 +4509,11 @@ refill_pum_bg_row_from_buffer(int r, int left, int right)
 /*
  * Redraw what becomes exposed when an opacity popup moves, resizes or closes.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_redraw_exposed_area(popup_area_T *area)
 {
-    if (!area->active)
-	return;
+    જો (!area->active)
+	પાછા;
 
     redraw_under_popup_area(area->winrow, area->wincol, area->height,
 	    area->width, area->leftoff);
@@ -4530,28 +4530,28 @@ popup_redraw_exposed_area(popup_area_T *area)
     // Instead, replace the overlapping pum_bg_* cells with the actual
     // underlying buffer text so the pum's opacity padding shows the buffer
     // through, just as it would if the popup had never been there.
-    if (pum_bg_lines != NULL
+    જો (pum_bg_લીટીઓ != ખાલી
 	    && area->winrow < pum_bg_bot
-	    && area->winrow + area->height > pum_bg_top)
+	    && area->winrow + area->height > pum_bg_ટોચ)
     {
-	int top = MAX(area->winrow, pum_bg_top);
-	int bot = MIN(area->winrow + area->height, pum_bg_bot);
-	int left = MAX(area->wincol, 0);
-	int right = MIN(area->wincol + area->width, pum_bg_cols);
-	int r;
+	પૂર્ણાંક ટોચ = MAX(area->winrow, pum_bg_ટોચ);
+	પૂર્ણાંક bot = MIN(area->winrow + area->height, pum_bg_bot);
+	પૂર્ણાંક ડાબું = MAX(area->wincol, 0);
+	પૂર્ણાંક જમણું = MIN(area->wincol + area->width, pum_bg_cols);
+	પૂર્ણાંક r;
 
-	for (r = top; r < bot; ++r)
-	    refill_pum_bg_row_from_buffer(r, left, right);
+	માટે (r = ટોચ; r < bot; ++r)
+	    refill_pum_bg_row_from_buffer(r, ડાબું, જમણું);
     }
 }
 
 /*
  * Release saved screen data used for opacity padding redraw.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_free_saved_screen(popup_saved_screen_T *saved_screen)
 {
-    vim_free(saved_screen->lines);
+    vim_free(saved_screen->લીટીઓ);
     vim_free(saved_screen->attrs);
     vim_free(saved_screen->linesuc);
     CLEAR_POINTER(saved_screen);
@@ -4564,13 +4564,13 @@ popup_free_saved_screen(popup_saved_screen_T *saved_screen)
  * left NULL and callers should fall back to plain screen_fill().  The caller
  * must always release the snapshot with popup_free_saved_screen().
  */
-    static void
+    સ્થિર શૂન્ય
 popup_save_padding_screen(win_T *wp, popup_saved_screen_T *saved_screen)
 {
-    if (screen_opacity_popup == NULL
+    જો (screen_opacity_popup == ખાલી
 	    || (wp->w_popup_padding[0] == 0 && wp->w_popup_padding[1] == 0
 		&& wp->w_popup_padding[2] == 0 && wp->w_popup_padding[3] == 0))
-	return;
+	પાછા;
 
     saved_screen->start_row = wp->w_winrow + wp->w_popup_border[0];
     saved_screen->start_col = wp->w_wincol + wp->w_popup_border[3];
@@ -4581,41 +4581,41 @@ popup_save_padding_screen(win_T *wp, popup_saved_screen_T *saved_screen)
 
     // Include one column to the left to handle wide chars that overlap the
     // padding boundary.
-    if (saved_screen->start_col > 0)
+    જો (saved_screen->start_col > 0)
     {
 	--saved_screen->start_col;
 	++saved_screen->cols;
     }
 
-    saved_screen->lines = ALLOC_CLEAR_MULT(schar_T,
+    saved_screen->લીટીઓ = ALLOC_CLEAR_MULT(schar_T,
 				  saved_screen->rows * saved_screen->cols);
-    saved_screen->attrs = ALLOC_CLEAR_MULT(int,
+    saved_screen->attrs = ALLOC_CLEAR_MULT(પૂર્ણાંક,
 				  saved_screen->rows * saved_screen->cols);
-    if (enc_utf8)
+    જો (enc_utf8)
 	saved_screen->linesuc = ALLOC_CLEAR_MULT(u8char_T,
 				  saved_screen->rows * saved_screen->cols);
 
-    if (saved_screen->lines == NULL || saved_screen->attrs == NULL)
-	return;
+    જો (saved_screen->લીટીઓ == ખાલી || saved_screen->attrs == ખાલી)
+	પાછા;
 
-    for (int r = 0; r < saved_screen->rows; r++)
+    માટે (પૂર્ણાંક r = 0; r < saved_screen->rows; r++)
     {
-	int screen_row = saved_screen->start_row + r;
+	પૂર્ણાંક screen_row = saved_screen->start_row + r;
 
-	if (screen_row >= 0 && screen_row < screen_Rows)
-	    for (int c = 0; c < saved_screen->cols; c++)
+	જો (screen_row >= 0 && screen_row < screen_Rows)
+	    માટે (પૂર્ણાંક c = 0; c < saved_screen->cols; c++)
 	    {
-		int screen_col = saved_screen->start_col + c;
+		પૂર્ણાંક screen_col = saved_screen->start_col + c;
 
-		if (screen_col >= 0 && screen_col < screen_Columns)
+		જો (screen_col >= 0 && screen_col < screen_Columns)
 		{
-		    int off = LineOffset[screen_row] + screen_col;
-		    int save_off = r * saved_screen->cols + c;
+		    પૂર્ણાંક off = લીટી_Offset[screen_row] + screen_col;
+		    પૂર્ણાંક save_off = r * saved_screen->cols + c;
 
-		    saved_screen->lines[save_off] = ScreenLines[off];
+		    saved_screen->લીટીઓ[save_off] = Screen_લીટીઓ[off];
 		    saved_screen->attrs[save_off] = ScreenAttrs[off];
-		    if (enc_utf8 && saved_screen->linesuc != NULL)
-			saved_screen->linesuc[save_off] = ScreenLinesUC[off];
+		    જો (enc_utf8 && saved_screen->linesuc != ખાલી)
+			saved_screen->linesuc[save_off] = Screen_લીટીઓ_UC[off];
 		}
 	    }
     }
@@ -4624,40 +4624,40 @@ popup_save_padding_screen(win_T *wp, popup_saved_screen_T *saved_screen)
 /*
  * Force windows under a popup area to redraw.
  */
-    static void
-redraw_under_popup_area(int winrow, int wincol, int height, int width, int leftoff)
+    સ્થિર શૂન્ય
+redraw_under_popup_area(પૂર્ણાંક winrow, પૂર્ણાંક wincol, પૂર્ણાંક height, પૂર્ણાંક width, પૂર્ણાંક leftoff)
 {
-    int	    r;
+    પૂર્ણાંક	    r;
 
-    for (r = winrow; r < winrow + height && r < screen_Rows; ++r)
+    માટે (r = winrow; r < winrow + height && r < screen_Rows; ++r)
     {
-	int	    c;
-	win_T	    *prev_twp = NULL;
+	પૂર્ણાંક	    c;
+	win_T	    *prev_twp = ખાલી;
 
-	if (r >= cmdline_row)
+	જો (r >= cmdline_row)
 	{
 	    clear_cmdline = TRUE;
-	    continue;
+	    ચાલુ;
 	}
 
-	for (c = wincol; c < wincol + width - leftoff && c < screen_Columns; ++c)
+	માટે (c = wincol; c < wincol + width - leftoff && c < screen_Columns; ++c)
 	{
-	    int	    line_cp = r;
-	    int	    col_cp = c;
+	    પૂર્ણાંક	    લીટી_cp = r;
+	    પૂર્ણાંક	    col_cp = c;
 	    win_T   *twp;
 
-	    twp = mouse_find_win(&line_cp, &col_cp, IGNORE_POPUP);
-	    if (twp != NULL && twp != prev_twp)
+	    twp = mouse_find_win(&લીટી_cp, &col_cp, IGNORE_POPUP);
+	    જો (twp != ખાલી && twp != prev_twp)
 	    {
 		prev_twp = twp;
-		if (line_cp < twp->w_height)
+		જો (લીટી_cp < twp->w_height)
 		{
 		    linenr_T lnum;
 
-		    (void)mouse_comp_pos(twp, &line_cp, &col_cp, &lnum, NULL);
+		    (શૂન્ય)mouse_comp_pos(twp, &લીટી_cp, &col_cp, &lnum, ખાલી);
 		    redrawWinline(twp, lnum);
 		}
-		else if (line_cp == twp->w_height)
+		નહીંતર જો (લીટી_cp == twp->w_height)
 		    twp->w_redr_status = true;
 	    }
 	}
@@ -4667,33 +4667,33 @@ redraw_under_popup_area(int winrow, int wincol, int height, int width, int lefto
 /*
  * popup_move({id}, {options})
  */
-    void
+    શૂન્ય
 f_popup_move(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
     popup_area_T	old_area;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;  // invalid {id}
+    જો (wp == ખાલી)
+	પાછા;  // invalid {id}
 
-    if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return;
+    જો (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+	પાછા;
     dict = argvars[1].vval.v_dict;
 
     popup_save_area(wp, &old_area);
 
     apply_move_options(wp, dict);
 
-    if (wp->w_winrow + wp->w_height >= cmdline_row)
+    જો (wp->w_winrow + wp->w_height >= cmdline_row)
 	clear_cmdline = TRUE;
     popup_adjust_position(wp);
 
@@ -4702,7 +4702,7 @@ f_popup_move(typval_T *argvars, typval_T *rettv UNUSED)
     // redrawing the affected lines in regular windows to clear the old
     // position.  Transparent popups don't participate in popup_mask, so
     // we need to manually mark the old area's lines for redraw.
-    if (popup_area_changed(wp, &old_area))
+    જો (popup_area_changed(wp, &old_area))
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
 
@@ -4713,75 +4713,75 @@ f_popup_move(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * popup_setoptions({id}, {options})
  */
-    void
+    શૂન્ય
 f_popup_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
     popup_area_T	old_area;
     popup_style_snapshot_T old_style;
-    int		need_redraw = FALSE;
-    int		need_reposition = FALSE;
+    પૂર્ણાંક		need_redraw = FALSE;
+    પૂર્ણાંક		need_reposition = FALSE;
 
-    if (check_secure())
-	return;
+    જો (check_secure())
+	પાછા;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;  // invalid {id}
+    જો (wp == ખાલી)
+	પાછા;  // invalid {id}
 
-    if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-	return;
+    જો (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+	પાછા;
     dict = argvars[1].vval.v_dict;
     popup_save_area(wp, &old_area);
     popup_save_style(wp, &old_style);
 
-    (void)apply_options(wp, dict, FALSE);
+    (શૂન્ય)apply_options(wp, dict, FALSE);
 
     // Keep "firstline" sticky across popup_setoptions(): when it is set, any
     // property update should reapply it and restore the displayed top line.
-    if (wp->w_firstline > 0
-	    && wp->w_firstline <= wp->w_buffer->b_ml.ml_line_count)
+    જો (wp->w_firstline > 0
+	    && wp->w_firstline <= wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
 	wp->w_topline = wp->w_firstline;
 
     // Check if visual options changed and redraw if needed
-    if (old_style.zindex != wp->w_zindex)
+    જો (old_style.zindex != wp->w_zindex)
     {
 	need_redraw = TRUE;
 	need_reposition = TRUE;
     }
-    else if (popup_style_changed(wp, &old_style))
+    નહીંતર જો (popup_style_changed(wp, &old_style))
 	need_redraw = TRUE;
 
-    if (old_style.flags != wp->w_popup_flags)
+    જો (old_style.flags != wp->w_popup_flags)
 	need_reposition = TRUE;
 
-    if (need_reposition)
+    જો (need_reposition)
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
 	popup_mask_refresh = TRUE;
     }
-    else if (need_redraw)
+    નહીંતર જો (need_redraw)
     {
 	// Only content changed (e.g. firstline, highlight): redraw the
 	// popup window without updating the popup mask or triggering a
 	// full screen redraw.  This avoids flickering of windows behind
 	// the popup.
 	wp->w_redr_type = UPD_NOT_VALID;
-	wp->w_lines_valid = 0;
-	if (must_redraw < UPD_VALID)
+	wp->w_લીટીઓ_valid = 0;
+	જો (must_redraw < UPD_VALID)
 	    must_redraw = UPD_VALID;
     }
 
     // Force redraw if opacity value changed
-    if (old_style.blend != wp->w_popup_blend)
+    જો (old_style.blend != wp->w_popup_blend)
     {
 	redraw_win_later(wp, UPD_NOT_VALID);
 	// Also redraw windows below the popup
@@ -4795,55 +4795,55 @@ f_popup_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
     // position or size actually changed.
     popup_adjust_position(wp);
 
-    if (popup_area_changed(wp, &old_area))
+    જો (popup_area_changed(wp, &old_area))
 	popup_redraw_exposed_area(&old_area);
 }
 
 /*
  * popup_getpos({id})
  */
-    void
+    શૂન્ય
 f_popup_getpos(typval_T *argvars, typval_T *rettv)
 {
     dict_T	*dict;
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
-    int		top_extra;
-    int		left_extra;
+    પૂર્ણાંક		ટોચ_extra;
+    પૂર્ણાંક		ડાબું_extra;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    જો (rettv_dict_alloc(rettv) == FAIL)
+	પાછા;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;  // invalid {id}
-    top_extra = popup_top_extra(wp);
-    left_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
+    જો (wp == ખાલી)
+	પાછા;  // invalid {id}
+    ટોચ_extra = popup_ટોચ_extra(wp);
+    ડાબું_extra = wp->w_popup_border[3] + wp->w_popup_padding[3];
 
     // we know how much space we need, avoid resizing halfway
     dict = rettv->vval.v_dict;
     hash_lock_size(&dict->dv_hashtab, 11);
 
-    dict_add_number(dict, "line", wp->w_winrow + 1);
-    dict_add_number(dict, "col", wp->w_wincol + 1);
-    dict_add_number(dict, "width", wp->w_width + left_extra
+    dict_add_સંખ્યા(dict, "line", wp->w_winrow + 1);
+    dict_add_સંખ્યા(dict, "col", wp->w_wincol + 1);
+    dict_add_સંખ્યા(dict, "width", wp->w_width + ડાબું_extra
 	    + wp->w_popup_border[1] + wp->w_popup_padding[1]);
-    dict_add_number(dict, "height", wp->w_height + top_extra
+    dict_add_સંખ્યા(dict, "height", wp->w_height + ટોચ_extra
 	    + wp->w_popup_border[2] + wp->w_popup_padding[2]);
 
-    dict_add_number(dict, "core_line", wp->w_winrow + 1 + top_extra);
-    dict_add_number(dict, "core_col", wp->w_wincol + 1 + left_extra);
-    dict_add_number(dict, "core_width", wp->w_width);
-    dict_add_number(dict, "core_height", wp->w_height);
+    dict_add_સંખ્યા(dict, "core_line", wp->w_winrow + 1 + ટોચ_extra);
+    dict_add_સંખ્યા(dict, "core_col", wp->w_wincol + 1 + ડાબું_extra);
+    dict_add_સંખ્યા(dict, "core_width", wp->w_width);
+    dict_add_સંખ્યા(dict, "core_height", wp->w_height);
 
-    dict_add_number(dict, "scrollbar", wp->w_has_scrollbar);
-    dict_add_number(dict, "firstline", wp->w_topline);
-    dict_add_number(dict, "lastline", wp->w_botline - 1);
-    dict_add_number(dict, "visible",
+    dict_add_સંખ્યા(dict, "scrollbar", wp->w_has_scrollbar);
+    dict_add_સંખ્યા(dict, "firstline", wp->w_topline);
+    dict_add_સંખ્યા(dict, "lastline", wp->w_botline - 1);
+    dict_add_સંખ્યા(dict, "visible",
 	    win_valid(wp) && (wp->w_popup_flags & POPF_HIDDEN) == 0);
 
     hash_unlock(&dict->dv_hashtab);
@@ -4852,129 +4852,129 @@ f_popup_getpos(typval_T *argvars, typval_T *rettv)
 /*
  * popup_list()
  */
-    void
+    શૂન્ય
 f_popup_list(typval_T *argvars UNUSED, typval_T *rettv)
 {
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    જો (rettv_list_alloc(rettv) == FAIL)
+	પાછા;
     FOR_ALL_POPUPWINS(wp)
-	list_append_number(rettv->vval.v_list, wp->w_id);
+	list_append_સંખ્યા(rettv->vval.v_list, wp->w_id);
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    list_append_number(rettv->vval.v_list, wp->w_id);
+	    list_append_સંખ્યા(rettv->vval.v_list, wp->w_id);
 }
 
 /*
  * popup_locate({row}, {col})
  */
-    void
+    શૂન્ય
 f_popup_locate(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
+    પૂર્ણાંક		row;
+    પૂર્ણાંક		col;
     win_T	*wp;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
+		|| check_for_સંખ્યા_arg(argvars, 1) == FAIL))
+	પાછા;
 
-    row = tv_get_number(&argvars[0]) - 1;
-    col = tv_get_number(&argvars[1]) - 1;
+    row = tv_get_સંખ્યા(&argvars[0]) - 1;
+    col = tv_get_સંખ્યા(&argvars[1]) - 1;
     wp = mouse_find_win(&row, &col, FIND_POPUP);
-    if (wp != NULL && WIN_IS_POPUP(wp))
-	rettv->vval.v_number = wp->w_id;
+    જો (wp != ખાલી && WIN_IS_POPUP(wp))
+	rettv->vval.v_સંખ્યા = wp->w_id;
 }
 
 /*
  * For popup_getoptions(): add a "border" or "padding" entry to "dict".
  */
-    static void
-get_padding_border(dict_T *dict, int *array, char *name)
+    સ્થિર શૂન્ય
+get_padding_border(dict_T *dict, પૂર્ણાંક *array, અક્ષર *name)
 {
     list_T  *list;
-    int	    i;
+    પૂર્ણાંક	    i;
 
-    if (array[0] == 0 && array[1] == 0 && array[2] == 0 && array[3] == 0)
-	return;
+    જો (array[0] == 0 && array[1] == 0 && array[2] == 0 && array[3] == 0)
+	પાછા;
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    જો (list == ખાલી)
+	પાછા;
 
-    if (dict_add_list(dict, name, list) == FAIL)
+    જો (dict_add_list(dict, name, list) == FAIL)
     {
 	list_unref(list);
-	return;
+	પાછા;
     }
-    if (array[0] != 1 || array[1] != 1 || array[2] != 1 || array[3] != 1)
-	for (i = 0; i < 4; ++i)
-	    list_append_number(list, array[i]);
+    જો (array[0] != 1 || array[1] != 1 || array[2] != 1 || array[3] != 1)
+	માટે (i = 0; i < 4; ++i)
+	    list_append_સંખ્યા(list, array[i]);
 }
 
 /*
  * For popup_getoptions(): add a "borderhighlight" entry to "dict".
  */
-    static void
+    સ્થિર શૂન્ય
 get_borderhighlight(dict_T *dict, win_T *wp)
 {
     list_T  *list;
-    int	    i;
+    પૂર્ણાંક	    i;
 
-    for (i = 0; i < 4; ++i)
-	if (wp->w_border_highlight[i] != NULL)
-	    break;
+    માટે (i = 0; i < 4; ++i)
+	જો (wp->w_border_highlight[i] != ખાલી)
+	    તોડો;
     // Only include "borderhighlight" if it was explicitly set (even if empty)
     // or if at least one highlight is set.
-    if (i == 4 && !wp->w_border_highlight_isset)
-	return;
+    જો (i == 4 && !wp->w_border_highlight_isset)
+	પાછા;
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    જો (list == ખાલી)
+	પાછા;
 
-    if (dict_add_list(dict, "borderhighlight", list) == FAIL)
+    જો (dict_add_list(dict, "borderhighlight", list) == FAIL)
     {
 	list_unref(list);
-	return;
+	પાછા;
     }
     // When all highlights are NULL (cleared to empty list), return empty list.
-    if (i == 4)
-	return;
-    for (i = 0; i < 4; ++i)
+    જો (i == 4)
+	પાછા;
+    માટે (i = 0; i < 4; ++i)
 	list_append_string(list, wp->w_border_highlight[i], -1);
 }
 
 /*
  * For popup_getoptions(): add a "borderchars" entry to "dict".
  */
-    static void
+    સ્થિર શૂન્ય
 get_borderchars(dict_T *dict, win_T *wp)
 {
     list_T  *list;
-    int	    i;
+    પૂર્ણાંક	    i;
     char_u  buf[NUMBUFLEN];
-    int	    len;
+    પૂર્ણાંક	    len;
 
-    for (i = 0; i < 8; ++i)
-	if (wp->w_border_char[i] != 0)
-	    break;
-    if (i == 8)
-	return;
+    માટે (i = 0; i < 8; ++i)
+	જો (wp->w_border_char[i] != 0)
+	    તોડો;
+    જો (i == 8)
+	પાછા;
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    જો (list == ખાલી)
+	પાછા;
 
-    if (dict_add_list(dict, "borderchars", list) == FAIL)
+    જો (dict_add_list(dict, "borderchars", list) == FAIL)
     {
 	list_unref(list);
-	return;
+	પાછા;
     }
-    for (i = 0; i < 8; ++i)
+    માટે (i = 0; i < 8; ++i)
     {
 	len = mb_char2bytes(wp->w_border_char[i], buf);
 	list_append_string(list, buf, len);
@@ -4984,116 +4984,116 @@ get_borderchars(dict_T *dict, win_T *wp)
 /*
  * For popup_getoptions(): add a "moved" and "mousemoved" entry to "dict".
  */
-    static void
+    સ્થિર શૂન્ય
 get_moved_list(dict_T *dict, win_T *wp)
 {
     list_T  *list;
 
     list = list_alloc();
-    if (list != NULL)
+    જો (list != ખાલી)
     {
-	if (dict_add_list(dict, "moved", list) == FAIL)
+	જો (dict_add_list(dict, "moved", list) == FAIL)
 	    list_unref(list);
-	else
+	નહીંતર
 	{
-	    list_append_number(list, wp->w_popup_lnum);
-	    list_append_number(list, wp->w_popup_mincol);
-	    list_append_number(list, wp->w_popup_maxcol);
+	    list_append_સંખ્યા(list, wp->w_popup_lnum);
+	    list_append_સંખ્યા(list, wp->w_popup_mincol);
+	    list_append_સંખ્યા(list, wp->w_popup_maxcol);
 	}
     }
     list = list_alloc();
-    if (list == NULL)
-	return;
+    જો (list == ખાલી)
+	પાછા;
 
-    if (dict_add_list(dict, "mousemoved", list) == FAIL)
+    જો (dict_add_list(dict, "mousemoved", list) == FAIL)
     {
 	list_unref(list);
-	return;
+	પાછા;
     }
-    list_append_number(list, wp->w_popup_mouse_row);
-    list_append_number(list, wp->w_popup_mouse_mincol);
-    list_append_number(list, wp->w_popup_mouse_maxcol);
+    list_append_સંખ્યા(list, wp->w_popup_mouse_row);
+    list_append_સંખ્યા(list, wp->w_popup_mouse_mincol);
+    list_append_સંખ્યા(list, wp->w_popup_mouse_maxcol);
 }
 
 /*
  * popup_getoptions({id})
  */
-    void
+    શૂન્ય
 f_popup_getoptions(typval_T *argvars, typval_T *rettv)
 {
     dict_T	*dict;
-    int		id;
+    પૂર્ણાંક		id;
     win_T	*wp;
     tabpage_T	*tp;
-    int		i;
+    પૂર્ણાંક		i;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    જો (rettv_dict_alloc(rettv) == FAIL)
+	પાછા;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    id = (int)tv_get_number(argvars);
+    id = (પૂર્ણાંક)tv_get_સંખ્યા(argvars);
     wp = find_popup_win(id);
-    if (wp == NULL)
-	return;
+    જો (wp == ખાલી)
+	પાછા;
 
     dict = rettv->vval.v_dict;
-    dict_add_number(dict, "line", wp->w_wantline);
-    dict_add_number(dict, "col", wp->w_wantcol);
-    dict_add_number(dict, "minwidth", wp->w_minwidth);
-    dict_add_number(dict, "minheight", wp->w_minheight);
-    dict_add_number(dict, "maxheight", wp->w_maxheight);
-    dict_add_number(dict, "maxwidth", wp->w_maxwidth);
-    dict_add_number(dict, "firstline", wp->w_firstline);
-    dict_add_number(dict, "scrollbar", wp->w_want_scrollbar);
-    dict_add_number(dict, "zindex", wp->w_zindex);
-    dict_add_number(dict, "fixed", wp->w_popup_fixed);
-    if (wp->w_popup_prop_type && win_valid_any_tab(wp->w_popup_prop_win))
+    dict_add_સંખ્યા(dict, "line", wp->w_wantline);
+    dict_add_સંખ્યા(dict, "col", wp->w_wantcol);
+    dict_add_સંખ્યા(dict, "minwidth", wp->w_minwidth);
+    dict_add_સંખ્યા(dict, "minheight", wp->w_minheight);
+    dict_add_સંખ્યા(dict, "maxheight", wp->w_maxheight);
+    dict_add_સંખ્યા(dict, "maxwidth", wp->w_maxwidth);
+    dict_add_સંખ્યા(dict, "firstline", wp->w_firstline);
+    dict_add_સંખ્યા(dict, "scrollbar", wp->w_want_scrollbar);
+    dict_add_સંખ્યા(dict, "zindex", wp->w_zindex);
+    dict_add_સંખ્યા(dict, "fixed", wp->w_popup_fixed);
+    જો (wp->w_popup_prop_type && win_valid_any_tab(wp->w_popup_prop_win))
     {
 	proptype_T *pt = text_prop_type_by_id(
 		wp->w_popup_prop_win->w_buffer,
 		wp->w_popup_prop_type);
 
-	if (pt != NULL)
+	જો (pt != ખાલી)
 	    dict_add_string(dict, "textprop", pt->pt_name);
-	dict_add_number(dict, "textpropwin", wp->w_popup_prop_win->w_id);
-	dict_add_number(dict, "textpropid", wp->w_popup_prop_id);
+	dict_add_સંખ્યા(dict, "textpropwin", wp->w_popup_prop_win->w_id);
+	dict_add_સંખ્યા(dict, "textpropid", wp->w_popup_prop_id);
     }
 
 #ifdef FEAT_IMAGE_POPUP
-    if (wp->w_popup_imagep != NULL && wp->w_popup_imagep->img != NULL)
+    જો (wp->w_popup_imagep != ખાલી && wp->w_popup_imagep->img != ખાલી)
     {
 	dict_T *img_dict = get_image_info(wp->w_popup_imagep->img);
 
-	if (dict_add_dict(dict, "image", img_dict) == FAIL)
+	જો (dict_add_dict(dict, "image", img_dict) == FAIL)
 	    dict_unref(img_dict);
     }
 #endif
 
     dict_add_string(dict, "title", wp->w_popup_title);
-    dict_add_number(dict, "wrap", wp->w_p_wrap);
-    dict_add_number(dict, "drag", (wp->w_popup_flags & POPF_DRAG) != 0);
-    dict_add_number(dict, "dragall",
+    dict_add_સંખ્યા(dict, "wrap", wp->w_p_wrap);
+    dict_add_સંખ્યા(dict, "drag", (wp->w_popup_flags & POPF_DRAG) != 0);
+    dict_add_સંખ્યા(dict, "dragall",
 	    (wp->w_popup_flags & POPF_DRAGALL) != 0);
-    dict_add_number(dict, "mapping",
+    dict_add_સંખ્યા(dict, "mapping",
 	    (wp->w_popup_flags & POPF_MAPPING) != 0);
-    dict_add_number(dict, "resize", (wp->w_popup_flags & POPF_RESIZE) != 0);
-    dict_add_number(dict, "posinvert",
+    dict_add_સંખ્યા(dict, "resize", (wp->w_popup_flags & POPF_RESIZE) != 0);
+    dict_add_સંખ્યા(dict, "posinvert",
 	    (wp->w_popup_flags & POPF_POSINVERT) != 0);
-    dict_add_number(dict, "clipwindow",
+    dict_add_સંખ્યા(dict, "clipwindow",
 	    (wp->w_popup_flags & POPF_CLIPWINDOW) != 0);
     // Return opacity (0-100) by converting from internal blend value
-    dict_add_number(dict, "opacity",
+    dict_add_સંખ્યા(dict, "opacity",
 	    (wp->w_popup_flags & POPF_OPACITY) ? 100 - wp->w_popup_blend : 100);
-    dict_add_number(dict, "cursorline",
+    dict_add_સંખ્યા(dict, "cursorline",
 	    (wp->w_popup_flags & POPF_CURSORLINE) != 0);
     dict_add_string(dict, "highlight", syn_id2name(hlf_get_id(wp, HLF_WIN)));
     dict_add_string(dict, "highlights", wp->w_p_whl);
-    if (wp->w_scrollbar_highlight != NULL)
+    જો (wp->w_scrollbar_highlight != ખાલી)
 	dict_add_string(dict, "scrollbarhighlight",
 		wp->w_scrollbar_highlight);
-    if (wp->w_thumb_highlight != NULL)
+    જો (wp->w_thumb_highlight != ખાલી)
 	dict_add_string(dict, "thumbhighlight", wp->w_thumb_highlight);
 
     // find the tabpage that holds this popup
@@ -5103,17 +5103,17 @@ f_popup_getoptions(typval_T *argvars, typval_T *rettv)
 	win_T *twp;
 
 	FOR_ALL_POPUPWINS_IN_TAB(tp, twp)
-	    if (twp->w_id == id)
-		break;
-	if (twp != NULL)
-	    break;
+	    જો (twp->w_id == id)
+		તોડો;
+	જો (twp != ખાલી)
+	    તોડો;
 	++i;
     }
-    if (tp == NULL)
+    જો (tp == ખાલી)
 	i = -1;  // must be global
-    else if (tp == curtab)
+    નહીંતર જો (tp == curtab)
 	i = 0;
-    dict_add_number(dict, "tabpage", i);
+    dict_add_સંખ્યા(dict, "tabpage", i);
 
     get_padding_border(dict, wp->w_popup_padding, "padding");
     get_padding_border(dict, wp->w_popup_border, "border");
@@ -5121,48 +5121,48 @@ f_popup_getoptions(typval_T *argvars, typval_T *rettv)
     get_borderchars(dict, wp);
     get_moved_list(dict, wp);
 
-    if (wp->w_filter_cb.cb_name != NULL)
+    જો (wp->w_filter_cb.cb_name != ખાલી)
 	dict_add_callback(dict, "filter", &wp->w_filter_cb);
-    if (wp->w_close_cb.cb_name != NULL)
+    જો (wp->w_close_cb.cb_name != ખાલી)
 	dict_add_callback(dict, "callback", &wp->w_close_cb);
 
-    for (i = 0; i < (int)ARRAY_LENGTH(poppos_entries); ++i)
-	if (wp->w_popup_pos == poppos_entries[i].pp_val)
+    માટે (i = 0; i < (પૂર્ણાંક)ARRAY_LENGTH(poppos_entries); ++i)
+	જો (wp->w_popup_pos == poppos_entries[i].pp_val)
 	{
 	    dict_add_string_len(dict, "pos",
 		poppos_entries[i].pp_name.string,
-		(int)poppos_entries[i].pp_name.length);
-	    break;
+		(પૂર્ણાંક)poppos_entries[i].pp_name.length);
+	    તોડો;
 	}
 
-    if (wp->w_popup_close == POPCLOSE_BUTTON)
+    જો (wp->w_popup_close == POPCLOSE_BUTTON)
 	dict_add_string_len(dict, "close", (char_u *)"button", STRLEN_LITERAL("button"));
-    else if (wp->w_popup_close == POPCLOSE_CLICK)
+    નહીંતર જો (wp->w_popup_close == POPCLOSE_CLICK)
 	dict_add_string_len(dict, "close", (char_u *)"click", STRLEN_LITERAL("click"));
-    else
+    નહીંતર
 	dict_add_string_len(dict, "close", (char_u *)"none", STRLEN_LITERAL("none"));
 
-#if defined(FEAT_TIMERS)
-    dict_add_number(dict, "time", wp->w_popup_timer != NULL
+#જો defined(FEAT_TIMERS)
+    dict_add_સંખ્યા(dict, "time", wp->w_popup_timer != ખાલી
 	    ?  (long)wp->w_popup_timer->tr_interval : 0L);
 #endif
 }
 
-#if defined(FEAT_TERMINAL)
+#જો defined(FEAT_TERMINAL)
 /*
  * Return TRUE if the current window is running a terminal in a popup window.
  * Return FALSE when the job has ended.
  */
-    int
-error_if_term_popup_window(void)
+    પૂર્ણાંક
+error_if_term_popup_window(શૂન્ય)
 {
-    if (WIN_IS_POPUP(curwin) && curbuf->b_term != NULL
+    જો (WIN_IS_POPUP(curwin) && curbuf->b_term != ખાલી
 					   && term_job_running(curbuf->b_term))
     {
 	emsg(_(e_not_allowed_for_terminal_in_popup_window));
-	return TRUE;
+	પાછા TRUE;
     }
-    return FALSE;
+    પાછા FALSE;
 }
 #endif
 
@@ -5172,8 +5172,8 @@ error_if_term_popup_window(void)
  * Each calling function should use a different flag, see the list at
  * POPUP_HANDLED_1.  This won't work with recursive calls though.
  */
-    void
-popup_reset_handled(int handled_flag)
+    શૂન્ય
+popup_reset_handled(પૂર્ણાંક handled_flag)
 {
     win_T *wp;
 
@@ -5190,16 +5190,16 @@ popup_reset_handled(int handled_flag)
  * popup with the highest zindex.
  */
     win_T *
-find_next_popup(int lowest, int handled_flag)
+find_next_popup(પૂર્ણાંક lowest, પૂર્ણાંક handled_flag)
 {
     win_T   *wp;
     win_T   *found_wp;
-    int	    found_zindex;
+    પૂર્ણાંક	    found_zindex;
 
     found_zindex = lowest ? INT_MAX : 0;
-    found_wp = NULL;
+    found_wp = ખાલી;
     FOR_ALL_POPUPWINS(wp)
-	if ((wp->w_popup_handled & handled_flag) == 0
+	જો ((wp->w_popup_handled & handled_flag) == 0
 		&& (wp->w_popup_flags & POPF_HIDDEN) == 0
 		&& (lowest ? wp->w_zindex < found_zindex
 		    : wp->w_zindex > found_zindex))
@@ -5208,7 +5208,7 @@ find_next_popup(int lowest, int handled_flag)
 	    found_wp = wp;
 	}
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if ((wp->w_popup_handled & handled_flag) == 0
+	જો ((wp->w_popup_handled & handled_flag) == 0
 		&& (wp->w_popup_flags & POPF_HIDDEN) == 0
 		&& (lowest ? wp->w_zindex < found_zindex
 		    : wp->w_zindex > found_zindex))
@@ -5217,9 +5217,9 @@ find_next_popup(int lowest, int handled_flag)
 	    found_wp = wp;
 	}
 
-    if (found_wp != NULL)
+    જો (found_wp != ખાલી)
 	found_wp->w_popup_handled |= handled_flag;
-    return found_wp;
+    પાછા found_wp;
 }
 
 /*
@@ -5229,21 +5229,21 @@ find_next_popup(int lowest, int handled_flag)
  * window.
  * Careful: The filter may make "wp" invalid!
  */
-    static int
-invoke_popup_filter(win_T *wp, int c)
+    સ્થિર પૂર્ણાંક
+invoke_popup_filter(win_T *wp, પૂર્ણાંક c)
 {
-    int		res;
+    પૂર્ણાંક		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	buf[NUMBUFLEN];
     linenr_T	old_lnum = wp->w_cursor.lnum;
-    int		prev_did_emsg = did_emsg;
+    પૂર્ણાંક		prev_did_emsg = did_emsg;
 
     // Emergency exit: CTRL-C closes the popup.
-    if (c == Ctrl_C)
+    જો (c == Ctrl_C)
     {
-	int save_got_int = got_int;
-	int was_curwin = wp == curwin;
+	પૂર્ણાંક save_got_int = got_int;
+	પૂર્ણાંક was_curwin = wp == curwin;
 
 	// Reset got_int to avoid the callback isn't called.
 	got_int = FALSE;
@@ -5252,13 +5252,13 @@ invoke_popup_filter(win_T *wp, int c)
 
 	// If the popup is the current window it probably fails to close.  Then
 	// do not consume the key.
-	if (was_curwin && wp == curwin)
-	    return -1;
-	return TRUE;
+	જો (was_curwin && wp == curwin)
+	    પાછા -1;
+	પાછા TRUE;
     }
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = (varnumber_T)wp->w_id;
+    argv[0].v_type = VAR_સંખ્યા;
+    argv[0].vval.v_સંખ્યા = (varnumber_T)wp->w_id;
 
     // Convert the number to a string, so that the function can use:
     //	    if a:c == "\<F2>"
@@ -5269,16 +5269,16 @@ invoke_popup_filter(win_T *wp, int c)
     argv[2].v_type = VAR_UNKNOWN;
 
     // NOTE: The callback might close the popup and make "wp" invalid.
-    if (call_callback(&wp->w_filter_cb, -1, &rettv, 2, argv) == FAIL)
+    જો (call_callback(&wp->w_filter_cb, -1, &rettv, 2, argv) == FAIL)
     {
 	// Cannot call the function, close the popup to avoid that the filter
 	// eats keys and the user is stuck.  Might as well eat the key.
 	popup_close_with_retval(wp, -1);
 	res = TRUE;
     }
-    else
+    નહીંતર
     {
-	if (win_valid_popup(wp) && old_lnum != wp->w_cursor.lnum)
+	જો (win_valid_popup(wp) && old_lnum != wp->w_cursor.lnum)
 	    popup_highlight_curline(wp);
 
 	// If an error message was given always return FALSE, so that keys are
@@ -5286,16 +5286,16 @@ invoke_popup_filter(win_T *wp, int c)
 	// If we get three errors in a row then close the popup.  Decrement the
 	// error count by 1/10 if there are no errors, thus allowing up to 1 in
 	// 10 calls to cause an error.
-	if (win_valid_popup(wp) && did_emsg > prev_did_emsg)
+	જો (win_valid_popup(wp) && did_emsg > prev_did_emsg)
 	{
 	    wp->w_filter_errors += 10;
-	    if (wp->w_filter_errors >= 30)
+	    જો (wp->w_filter_errors >= 30)
 		popup_close_with_retval(wp, -1);
 	    res = FALSE;
 	}
-	else
+	નહીંતર
 	{
-	    if (win_valid_popup(wp) && wp->w_filter_errors > 0)
+	    જો (win_valid_popup(wp) && wp->w_filter_errors > 0)
 		--wp->w_filter_errors;
 	    res = tv_get_bool(&rettv);
 	}
@@ -5303,61 +5303,61 @@ invoke_popup_filter(win_T *wp, int c)
 
     vim_free(argv[1].vval.v_string);
     clear_tv(&rettv);
-    return res;
+    પાછા res;
 }
 
 /*
  * Called when "c" was typed: invoke popup filter callbacks.
  * Returns TRUE when the character was consumed,
  */
-    int
-popup_do_filter(int c)
+    પૂર્ણાંક
+popup_do_filter(પૂર્ણાંક c)
 {
-    static int	recursive = FALSE;
-    int		res = FALSE;
+    સ્થિર પૂર્ણાંક	recursive = FALSE;
+    પૂર્ણાંક		res = FALSE;
     win_T	*wp;
-    int		save_KeyTyped = KeyTyped;
-    int		state;
-    int		was_must_redraw = must_redraw;
+    પૂર્ણાંક		save_ચાવી_Typed = ચાવી_Typed;
+    પૂર્ણાંક		state;
+    પૂર્ણાંક		was_must_redraw = must_redraw;
 
 #ifdef FEAT_TERMINAL
     // Popup window with terminal always gets focus.
-    if (popup_is_popup(curwin) && curbuf->b_term != NULL)
-	return FALSE;
+    જો (popup_is_popup(curwin) && curbuf->b_term != ખાલી)
+	પાછા FALSE;
 #endif
 
     // Vim is waiting for a key at a prompt of its own, the key is not meant
     // for a popup filter. MODE_HITRETURN includes MODE_NORMAL, thus the
     // filter mode check below would match.
-    if (State == MODE_HITRETURN || State == MODE_ASKMORE
+    જો (State == MODE_HITRETURN || State == MODE_ASKMORE
 	    || State == MODE_CONFIRM || State == MODE_EXTERNCMD)
-	return FALSE;
+	પાછા FALSE;
 
-    if (recursive)
-	return FALSE;
+    જો (recursive)
+	પાછા FALSE;
     recursive = TRUE;
 
-    if (c == K_LEFTMOUSE)
+    જો (c == K_LEFTMOUSE)
     {
-	int row = mouse_row;
-	int col = mouse_col;
+	પૂર્ણાંક row = mouse_row;
+	પૂર્ણાંક col = mouse_col;
 
 	wp = mouse_find_win(&row, &col, FIND_POPUP);
-	if (wp != NULL && popup_close_if_on_X(wp, row, col))
+	જો (wp != ખાલી && popup_close_if_on_X(wp, row, col))
 	    res = TRUE;
     }
 
     popup_reset_handled(POPUP_HANDLED_2);
     state = get_real_state();
-    while (res == FALSE
-		     && (wp = find_next_popup(FALSE, POPUP_HANDLED_2)) != NULL)
-	if (wp->w_filter_cb.cb_name != NULL
+    જ્યારે (res == FALSE
+		     && (wp = find_next_popup(FALSE, POPUP_HANDLED_2)) != ખાલી)
+	જો (wp->w_filter_cb.cb_name != ખાલી
 		&& (wp->w_filter_mode & state) != 0)
 	    res = invoke_popup_filter(wp, c);
 
-    if (must_redraw > was_must_redraw)
+    જો (must_redraw > was_must_redraw)
     {
-	int save_got_int = got_int;
+	પૂર્ણાંક save_got_int = got_int;
 
 	// Reset got_int to avoid a function used in the statusline aborts.
 	got_int = FALSE;
@@ -5365,43 +5365,43 @@ popup_do_filter(int c)
 	got_int |= save_got_int;
     }
     recursive = FALSE;
-    KeyTyped = save_KeyTyped;
+    ચાવી_Typed = save_ચાવી_Typed;
 
     // When interrupted return FALSE to avoid looping.
-    return res == -1 ? FALSE : res;
+    પાછા res == -1 ? FALSE : res;
 }
 
 /*
  * Return TRUE if there is a popup visible with a filter callback and the
  * "mapping" property off.
  */
-    int
-popup_no_mapping(void)
+    પૂર્ણાંક
+popup_no_mapping(શૂન્ય)
 {
-    int	    round;
+    પૂર્ણાંક	    round;
     win_T   *wp;
 
-    for (round = 1; round <= 2; ++round)
-	for (wp = round == 1 ? first_popupwin : curtab->tp_first_popupwin;
-						   wp != NULL; wp = wp->w_next)
-	    if (wp->w_filter_cb.cb_name != NULL
+    માટે (round = 1; round <= 2; ++round)
+	માટે (wp = round == 1 ? first_popupwin : curtab->tp_first_popupwin;
+						   wp != ખાલી; wp = wp->w_next)
+	    જો (wp->w_filter_cb.cb_name != ખાલી
 		    && (wp->w_popup_flags & (POPF_HIDDEN | POPF_MAPPING)) == 0)
-		return TRUE;
-    return FALSE;
+		પાછા TRUE;
+    પાછા FALSE;
 }
 
 /*
  * Called when the cursor moved: check if any popup needs to be closed if the
  * cursor moved far enough.
  */
-    void
-popup_check_cursor_pos(void)
+    શૂન્ય
+popup_check_cursor_pos(શૂન્ય)
 {
     win_T *wp;
 
     popup_reset_handled(POPUP_HANDLED_3);
-    while ((wp = find_next_popup(TRUE, POPUP_HANDLED_3)) != NULL)
-	if (wp->w_popup_curwin != NULL
+    જ્યારે ((wp = find_next_popup(TRUE, POPUP_HANDLED_3)) != ખાલી)
+	જો (wp->w_popup_curwin != ખાલી
 		&& (curwin != wp->w_popup_curwin
 		    || curwin->w_cursor.lnum != wp->w_popup_lnum
 		    || curwin->w_cursor.col < wp->w_popup_mincol
@@ -5412,66 +5412,66 @@ popup_check_cursor_pos(void)
 /*
  * Update "w_popup_mask_cells".
  */
-    static void
-popup_update_mask(win_T *wp, int width, int height)
+    સ્થિર શૂન્ય
+popup_update_mask(win_T *wp, પૂર્ણાંક width, પૂર્ણાંક height)
 {
     listitem_T	*lio, *li;
     char_u	*cells;
-    int		row, col;
+    પૂર્ણાંક		row, col;
 
-    if (wp->w_popup_mask == NULL || width == 0 || height == 0)
+    જો (wp->w_popup_mask == ખાલી || width == 0 || height == 0)
     {
 	VIM_CLEAR(wp->w_popup_mask_cells);
-	return;
+	પાછા;
     }
-    if (wp->w_popup_mask_cells != NULL
+    જો (wp->w_popup_mask_cells != ખાલી
 	    && wp->w_popup_mask_height == height
 	    && wp->w_popup_mask_width == width)
-	return;  // cache is still valid
+	પાછા;  // cache is still valid
 
     vim_free(wp->w_popup_mask_cells);
-    if (width > 0 && (size_t)height > SIZE_MAX / (size_t)width)
+    જો (width > 0 && (size_t)height > SIZE_MAX / (size_t)width)
     {
-	wp->w_popup_mask_cells = NULL;
-	return;
+	wp->w_popup_mask_cells = ખાલી;
+	પાછા;
     }
     wp->w_popup_mask_cells = alloc_clear((size_t)width * height);
-    if (wp->w_popup_mask_cells == NULL)
-	return;
+    જો (wp->w_popup_mask_cells == ખાલી)
+	પાછા;
     cells = wp->w_popup_mask_cells;
 
-    FOR_ALL_LIST_ITEMS(wp->w_popup_mask, lio)
+    FOR_ALL_LIST_વસ્તુઓ(wp->w_popup_mask, lio)
     {
-	int cols, cole;
-	int lines, linee;
+	પૂર્ણાંક cols, cole;
+	પૂર્ણાંક લીટીઓ, linee;
 
 	li = lio->li_tv.vval.v_list->lv_first;
-	cols = tv_get_number(&li->li_tv);
-	if (cols < 0)
+	cols = tv_get_સંખ્યા(&li->li_tv);
+	જો (cols < 0)
 	    cols = width + cols + 1;
-	if (cols <= 0)
+	જો (cols <= 0)
 	    cols = 1;
 	li = li->li_next;
-	cole = tv_get_number(&li->li_tv);
-	if (cole < 0)
+	cole = tv_get_સંખ્યા(&li->li_tv);
+	જો (cole < 0)
 	    cole = width + cole + 1;
-	if (cole > width)
+	જો (cole > width)
 	    cole = width;
 	li = li->li_next;
-	lines = tv_get_number(&li->li_tv);
-	if (lines < 0)
-	    lines = height + lines + 1;
-	if (lines <= 0)
-	    lines = 1;
+	લીટીઓ = tv_get_સંખ્યા(&li->li_tv);
+	જો (લીટીઓ < 0)
+	    લીટીઓ = height + લીટીઓ + 1;
+	જો (લીટીઓ <= 0)
+	    લીટીઓ = 1;
 	li = li->li_next;
-	linee = tv_get_number(&li->li_tv);
-	if (linee < 0)
+	linee = tv_get_સંખ્યા(&li->li_tv);
+	જો (linee < 0)
 	    linee = height + linee + 1;
-	if (linee > height)
+	જો (linee > height)
 	    linee = height;
 
-	for (row = lines - 1; row < linee; ++row)
-	    for (col = cols - 1; col < cole; ++col)
+	માટે (row = લીટીઓ - 1; row < linee; ++row)
+	    માટે (col = cols - 1; col < cole; ++col)
 		cells[row * width + col] = 1;
     }
 }
@@ -5480,65 +5480,65 @@ popup_update_mask(win_T *wp, int width, int height)
  * Return TRUE if "col" / "line" matches with an entry in w_popup_mask.
  * "col" and "line" are screen coordinates.
  */
-    static int
-popup_masked(win_T *wp, int width, int height, int screencol, int screenline)
+    સ્થિર પૂર્ણાંક
+popup_masked(win_T *wp, પૂર્ણાંક width, પૂર્ણાંક height, પૂર્ણાંક screencol, પૂર્ણાંક screenline)
 {
-    int col = screencol - wp->w_wincol + wp->w_popup_leftoff;
-    int line = screenline - wp->w_winrow;
+    પૂર્ણાંક col = screencol - wp->w_wincol + wp->w_popup_leftoff;
+    પૂર્ણાંક લીટી = screenline - wp->w_winrow;
 
-    return col >= 0 && col < width
-	    && line >= 0 && line < height
-	    && wp->w_popup_mask_cells[line * width + col];
+    પાછા col >= 0 && col < width
+	    && લીટી >= 0 && લીટી < height
+	    && wp->w_popup_mask_cells[લીટી * width + col];
 }
 
 /*
  * Set flags in popup_transparent[] for window "wp" to "val".
  */
-    static void
-update_popup_transparent(win_T *wp, int val)
+    સ્થિર શૂન્ય
+update_popup_transparent(win_T *wp, પૂર્ણાંક val)
 {
-    if (wp->w_popup_mask == NULL)
-	return;
+    જો (wp->w_popup_mask == ખાલી)
+	પાછા;
 
-    int		width = popup_width(wp);
-    int		height = popup_height(wp);
+    પૂર્ણાંક		width = popup_width(wp);
+    પૂર્ણાંક		height = popup_height(wp);
     listitem_T	*lio, *li;
-    int		cols, cole;
-    int		lines, linee;
-    int		col, line;
+    પૂર્ણાંક		cols, cole;
+    પૂર્ણાંક		લીટીઓ, linee;
+    પૂર્ણાંક		col, લીટી;
 
-    FOR_ALL_LIST_ITEMS(wp->w_popup_mask, lio)
+    FOR_ALL_LIST_વસ્તુઓ(wp->w_popup_mask, lio)
     {
 	li = lio->li_tv.vval.v_list->lv_first;
-	cols = tv_get_number(&li->li_tv);
-	if (cols < 0)
+	cols = tv_get_સંખ્યા(&li->li_tv);
+	જો (cols < 0)
 	    cols = width + cols + 1;
 	li = li->li_next;
-	cole = tv_get_number(&li->li_tv);
-	if (cole < 0)
+	cole = tv_get_સંખ્યા(&li->li_tv);
+	જો (cole < 0)
 	    cole = width + cole + 1;
 	li = li->li_next;
-	lines = tv_get_number(&li->li_tv);
-	if (lines < 0)
-	    lines = height + lines + 1;
+	લીટીઓ = tv_get_સંખ્યા(&li->li_tv);
+	જો (લીટીઓ < 0)
+	    લીટીઓ = height + લીટીઓ + 1;
 	li = li->li_next;
-	linee = tv_get_number(&li->li_tv);
-	if (linee < 0)
+	linee = tv_get_સંખ્યા(&li->li_tv);
+	જો (linee < 0)
 	    linee = height + linee + 1;
 
 	--cols;
 	cols -= wp->w_popup_leftoff;
-	if (cols < 0)
+	જો (cols < 0)
 	    cols = 0;
 	cole -= wp->w_popup_leftoff;
-	--lines;
-	if (lines < 0)
-	    lines = 0;
-	for (line = lines; line < linee
-		&& line + wp->w_winrow < screen_Rows; ++line)
-	    for (col = cols; col < cole
+	--લીટીઓ;
+	જો (લીટીઓ < 0)
+	    લીટીઓ = 0;
+	માટે (લીટી = લીટીઓ; લીટી < linee
+		&& લીટી + wp->w_winrow < screen_Rows; ++લીટી)
+	    માટે (col = cols; col < cole
 		    && col + wp->w_wincol < screen_Columns; ++col)
-		popup_transparent[(line + wp->w_winrow) * screen_Columns
+		popup_transparent[(લીટી + wp->w_winrow) * screen_Columns
 		    + col + wp->w_wincol] = val;
     }
 }
@@ -5550,18 +5550,18 @@ update_popup_transparent(win_T *wp, int val)
  * popup_adjust_position().
  * Return TRUE if the popup became unhidden.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 check_popup_unhidden(win_T *wp)
 {
-    if (wp->w_popup_prop_type > 0 && win_valid(wp->w_popup_prop_win))
+    જો (wp->w_popup_prop_type > 0 && win_valid(wp->w_popup_prop_win))
     {
 	textprop_T  prop;
 	linenr_T    lnum;
 	bool	    found = false;
 
-	if ((wp->w_popup_flags & POPF_HIDDEN_FORCE) != 0)
-	    return FALSE;
-	if (find_visible_prop(wp->w_popup_prop_win,
+	જો ((wp->w_popup_flags & POPF_HIDDEN_FORCE) != 0)
+	    પાછા FALSE;
+	જો (find_visible_prop(wp->w_popup_prop_win,
 				wp->w_popup_prop_type, wp->w_popup_prop_id,
 						       &prop, &lnum))
 	    found = true;
@@ -5570,17 +5570,17 @@ check_popup_unhidden(win_T *wp)
 	// onto the host's top edge via the top-clip path.  Limit the search
 	// to the popup's own height so we do not resurrect a popup whose
 	// prop is already further off-screen than the popup can extend.
-	else if (popup_find_prop_above_top(wp, wp->w_popup_prop_win,
+	નહીંતર જો (popup_find_prop_above_ટોચ(wp, wp->w_popup_prop_win,
 					    popup_height(wp), &prop, &lnum))
 	    found = true;
-	if (found)
+	જો (found)
 	{
 	    wp->w_popup_flags &= ~POPF_HIDDEN;
 	    wp->w_popup_prop_topline = 0; // force repositioning
-	    return TRUE;
+	    પાછા TRUE;
 	}
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
@@ -5589,12 +5589,12 @@ check_popup_unhidden(win_T *wp)
  * a textprop and the referenced buffer was changed.
  * Or when the cursor line changed and "cursorline" is set.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 popup_need_position_adjust(win_T *wp)
 {
-    if (wp->w_popup_last_changedtick != CHANGEDTICK(wp->w_buffer))
-	return TRUE;
-    if (win_valid(wp->w_popup_prop_win)
+    જો (wp->w_popup_last_changedtick != CHANGEDTICK(wp->w_buffer))
+	પાછા TRUE;
+    જો (win_valid(wp->w_popup_prop_win)
 	    && (wp->w_popup_prop_changedtick
 				 != CHANGEDTICK(wp->w_popup_prop_win->w_buffer)
 	       || wp->w_popup_prop_topline != wp->w_popup_prop_win->w_topline
@@ -5602,46 +5602,46 @@ popup_need_position_adjust(win_T *wp)
 	       || wp->w_popup_prop_wincol != wp->w_popup_prop_win->w_wincol
 	       || wp->w_popup_prop_width != wp->w_popup_prop_win->w_width
 	       || wp->w_popup_prop_winheight != wp->w_popup_prop_win->w_height))
-	return TRUE;
+	પાછા TRUE;
 
     // May need to adjust the width if the cursor moved.
-    return wp->w_cursor.lnum != wp->w_popup_last_curline;
+    પાછા wp->w_cursor.lnum != wp->w_popup_last_curline;
 }
 
 // Cached array with max zindex of opacity popups covering each cell.
 // Allocated in may_update_popup_mask() when opacity popups exist.
-static short *opacity_zindex = NULL;
-static int    opacity_zindex_rows = 0;
-static int    opacity_zindex_cols = 0;
+સ્થિર short *opacity_zindex = ખાલી;
+સ્થિર પૂર્ણાંક    opacity_zindex_rows = 0;
+સ્થિર પૂર્ણાંક    opacity_zindex_cols = 0;
 
 /*
  * Mark cells covered by opacity popup "wp" in opacity_zindex[].
  * Stores the maximum zindex so that lower popups can be suppressed too.
  */
-    static void
+    સ્થિર શૂન્ય
 popup_mark_opacity_zindex(win_T *wp)
 {
-    int	    width;
-    int	    height;
-    int	    r, c;
+    પૂર્ણાંક	    width;
+    પૂર્ણાંક	    height;
+    પૂર્ણાંક	    r, c;
 
-    if (!(wp->w_popup_flags & POPF_OPACITY) || wp->w_popup_blend <= 0
+    જો (!(wp->w_popup_flags & POPF_OPACITY) || wp->w_popup_blend <= 0
 	    || (wp->w_popup_flags & POPF_HIDDEN))
-	return;
+	પાછા;
 
     width = popup_width(wp);
     height = popup_height(wp);
     // w_winrow/w_wincol are visible cells (>= 0); w_popup_topoff rows are
     // clipped off the top.
-    for (r = wp->w_winrow;
+    માટે (r = wp->w_winrow;
 		       r < wp->w_winrow + height - wp->w_popup_topoff
 						&& r < screen_Rows; ++r)
-	for (c = wp->w_wincol;
+	માટે (c = wp->w_wincol;
 		 c < wp->w_wincol + width - wp->w_popup_leftoff
 						&& c < screen_Columns; ++c)
 	{
-	    int off = r * screen_Columns + c;
-	    if (wp->w_zindex > opacity_zindex[off])
+	    પૂર્ણાંક off = r * screen_Columns + c;
+	    જો (wp->w_zindex > opacity_zindex[off])
 		opacity_zindex[off] = wp->w_zindex;
 	}
 }
@@ -5649,39 +5649,39 @@ popup_mark_opacity_zindex(win_T *wp)
 /*
  * Force background windows to redraw rows under an opacity popup.
  */
-    static void
+    સ્થિર શૂન્ય
 redraw_win_under_opacity_popup(win_T *wp)
 {
-    int	    height;
-    int	    width;
-    int	    r;
+    પૂર્ણાંક	    height;
+    પૂર્ણાંક	    width;
+    પૂર્ણાંક	    r;
 
-    if (!(wp->w_popup_flags & POPF_OPACITY) || wp->w_popup_blend <= 0
+    જો (!(wp->w_popup_flags & POPF_OPACITY) || wp->w_popup_blend <= 0
 	    || (wp->w_popup_flags & POPF_HIDDEN))
-	return;
+	પાછા;
 
     height = popup_height(wp);
     width = popup_width(wp);
-    for (r = wp->w_winrow;
+    માટે (r = wp->w_winrow;
 		       r < wp->w_winrow + height && r < screen_Rows; ++r)
     {
-	int	    col;
-	win_T	    *prev_twp = NULL;
+	પૂર્ણાંક	    col;
+	win_T	    *prev_twp = ખાલી;
 
 	// Check across the full width of the popup to find all underlying
 	// windows (e.g., when the popup spans a vertical split).
-	for (col = wp->w_wincol;
+	માટે (col = wp->w_wincol;
 		col < wp->w_wincol + width && col < screen_Columns; ++col)
 	{
-	    int	    line_cp = r;
-	    int	    col_cp = col;
+	    પૂર્ણાંક	    લીટી_cp = r;
+	    પૂર્ણાંક	    col_cp = col;
 	    win_T   *twp;
 
-	    twp = mouse_find_win(&line_cp, &col_cp, IGNORE_POPUP);
-	    if (twp != NULL && twp != prev_twp)
+	    twp = mouse_find_win(&લીટી_cp, &col_cp, IGNORE_POPUP);
+	    જો (twp != ખાલી && twp != prev_twp)
 	    {
 		prev_twp = twp;
-		if (line_cp < twp->w_height)
+		જો (લીટી_cp < twp->w_height)
 		{
 		    linenr_T lnum;
 
@@ -5689,19 +5689,19 @@ redraw_win_under_opacity_popup(win_T *wp)
 		    // A terminal only repaints vterm-damaged rows; force a
 		    // full repaint so the opacity blend sees the true
 		    // background, not stale blended cells.
-		    if (term_do_update_window(twp))
+		    જો (term_do_update_window(twp))
 			twp->w_redr_type = UPD_NOT_VALID;
-		    else
+		    નહીંતર
 #endif
 		    {
-			(void)mouse_comp_pos(twp, &line_cp, &col_cp, &lnum,
-									NULL);
+			(શૂન્ય)mouse_comp_pos(twp, &લીટી_cp, &col_cp, &lnum,
+									ખાલી);
 			// Called from inside update_screen(); raising
 			// must_redraw would loop the outer redraw indefinitely.
 			redraw_win_range_now(twp, lnum, lnum);
 		    }
 		}
-		else if (line_cp == twp->w_height)
+		નહીંતર જો (લીટી_cp == twp->w_height)
 		    // Status bar line: mark for redraw to prevent
 		    // opacity blend accumulation.
 		    twp->w_redr_status = true;
@@ -5714,26 +5714,26 @@ redraw_win_under_opacity_popup(win_T *wp)
 /*
  * Return TRUE if cell (row, col) is covered by a higher-zindex opacity popup.
  */
-    int
-popup_is_under_opacity(int row, int col)
+    પૂર્ણાંક
+popup_is_under_opacity(પૂર્ણાંક row, પૂર્ણાંક col)
 {
-    if (opacity_zindex == NULL
+    જો (opacity_zindex == ખાલી
 	    || row < 0 || row >= opacity_zindex_rows
 	    || col < 0 || col >= opacity_zindex_cols)
-	return FALSE;
-    return opacity_zindex[row * opacity_zindex_cols + col] > screen_zindex;
+	પાછા FALSE;
+    પાછા opacity_zindex[row * opacity_zindex_cols + col] > screen_zindex;
 }
 
 /*
  * Return TRUE if cell (row, col) is covered by a lower-zindex opacity popup.
  */
-    int
-popup_is_over_opacity(int row, int col)
+    પૂર્ણાંક
+popup_is_over_opacity(પૂર્ણાંક row, પૂર્ણાંક col)
 {
     win_T *wp;
 
     FOR_ALL_POPUPWINS(wp)
-	if ((wp->w_popup_flags & POPF_OPACITY)
+	જો ((wp->w_popup_flags & POPF_OPACITY)
 		&& wp->w_popup_blend > 0
 		&& !(wp->w_popup_flags & POPF_HIDDEN)
 		&& wp->w_zindex < screen_zindex
@@ -5741,9 +5741,9 @@ popup_is_over_opacity(int row, int col)
 		&& row < wp->w_winrow + popup_height(wp)
 		&& col >= wp->w_wincol
 		&& col < wp->w_wincol + popup_width(wp))
-	    return TRUE;
+	    પાછા TRUE;
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if ((wp->w_popup_flags & POPF_OPACITY)
+	જો ((wp->w_popup_flags & POPF_OPACITY)
 		&& wp->w_popup_blend > 0
 		&& !(wp->w_popup_flags & POPF_HIDDEN)
 		&& wp->w_zindex < screen_zindex
@@ -5751,26 +5751,26 @@ popup_is_over_opacity(int row, int col)
 		&& row < wp->w_winrow + popup_height(wp)
 		&& col >= wp->w_wincol
 		&& col < wp->w_wincol + popup_width(wp))
-	    return TRUE;
-    return FALSE;
+	    પાછા TRUE;
+    પાછા FALSE;
 }
 
 /*
  * Return TRUE if any cell in row "row" from "start_col" to "end_col"
  * (exclusive) is covered by a higher-zindex opacity popup.
  */
-    int
-popup_is_under_opacity_range(int row, int start_col, int end_col)
+    પૂર્ણાંક
+popup_is_under_opacity_range(પૂર્ણાંક row, પૂર્ણાંક start_col, પૂર્ણાંક end_col)
 {
-    int col;
+    પૂર્ણાંક col;
 
-    if (opacity_zindex == NULL
+    જો (opacity_zindex == ખાલી
 	    || row < 0 || row >= opacity_zindex_rows)
-	return FALSE;
-    for (col = start_col; col < end_col && col < opacity_zindex_cols; ++col)
-	if (opacity_zindex[row * opacity_zindex_cols + col] > screen_zindex)
-	    return TRUE;
-    return FALSE;
+	પાછા FALSE;
+    માટે (col = start_col; col < end_col && col < opacity_zindex_cols; ++col)
+	જો (opacity_zindex[row * opacity_zindex_cols + col] > screen_zindex)
+	    પાછા TRUE;
+    પાછા FALSE;
 }
 
 /*
@@ -5779,19 +5779,19 @@ popup_is_under_opacity_range(int row, int start_col, int end_col)
  * Also updates "popup_visible" and "popup_uses_mouse_move".
  * Also marks window lines for redrawing.
  */
-    void
-may_update_popup_mask(int type)
+    શૂન્ય
+may_update_popup_mask(પૂર્ણાંક type)
 {
     win_T	*wp;
     short	*mask;
-    int		line, col;
-    int		redraw_all_popups = FALSE;
-    int		redrawing_all_win;
+    પૂર્ણાંક		લીટી, col;
+    પૂર્ણાંક		redraw_all_popups = FALSE;
+    પૂર્ણાંક		redrawing_all_win;
 
     // Need to recompute when switching tabs.
     // Also recompute when the type is UPD_CLEAR or UPD_NOT_VALID, something
     // basic (such as the screen size) must have changed.
-    if (popup_mask_tab != curtab || type >= UPD_NOT_VALID)
+    જો (popup_mask_tab != curtab || type >= UPD_NOT_VALID)
     {
 	popup_mask_refresh = TRUE;
 	redraw_all_popups = TRUE;
@@ -5800,14 +5800,14 @@ may_update_popup_mask(int type)
     // Check if any popup window buffer has changed and if any popup connected
     // to a text property has become visible.
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_popup_flags & POPF_HIDDEN)
+	જો (wp->w_popup_flags & POPF_HIDDEN)
 	    popup_mask_refresh |= check_popup_unhidden(wp);
-	else if (popup_need_position_adjust(wp))
+	નહીંતર જો (popup_need_position_adjust(wp))
 	    popup_mask_refresh = TRUE;
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_popup_flags & POPF_HIDDEN)
+	જો (wp->w_popup_flags & POPF_HIDDEN)
 	    popup_mask_refresh |= check_popup_unhidden(wp);
-	else if (popup_need_position_adjust(wp))
+	નહીંતર જો (popup_need_position_adjust(wp))
 	    popup_mask_refresh = TRUE;
 
     // Force background windows to redraw rows under opacity popups.
@@ -5819,12 +5819,12 @@ may_update_popup_mask(int type)
     // Also build the opacity_zindex array used by screen_char() to suppress
     // output for cells under opacity popups during background draw.
     {
-	int has_opacity = FALSE;
+	પૂર્ણાંક has_opacity = FALSE;
 
 	FOR_ALL_POPUPWINS(wp)
 	{
 	    redraw_win_under_opacity_popup(wp);
-	    if ((wp->w_popup_flags & POPF_OPACITY)
+	    જો ((wp->w_popup_flags & POPF_OPACITY)
 		    && wp->w_popup_blend > 0
 		    && !(wp->w_popup_flags & POPF_HIDDEN))
 		has_opacity = TRUE;
@@ -5832,21 +5832,21 @@ may_update_popup_mask(int type)
 	FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
 	{
 	    redraw_win_under_opacity_popup(wp);
-	    if ((wp->w_popup_flags & POPF_OPACITY)
+	    જો ((wp->w_popup_flags & POPF_OPACITY)
 		    && wp->w_popup_blend > 0
 		    && !(wp->w_popup_flags & POPF_HIDDEN))
 		has_opacity = TRUE;
 	}
 
-	if (!has_opacity)
+	જો (!has_opacity)
 	{
 	    VIM_CLEAR(opacity_zindex);
 	    opacity_zindex_rows = 0;
 	    opacity_zindex_cols = 0;
 	}
-	else
+	નહીંતર
 	{
-	    if (opacity_zindex_rows != screen_Rows
+	    જો (opacity_zindex_rows != screen_Rows
 		    || opacity_zindex_cols != screen_Columns)
 	    {
 		vim_free(opacity_zindex);
@@ -5855,10 +5855,10 @@ may_update_popup_mask(int type)
 		opacity_zindex_rows = screen_Rows;
 		opacity_zindex_cols = screen_Columns;
 	    }
-	    if (opacity_zindex != NULL)
+	    જો (opacity_zindex != ખાલી)
 	    {
 		vim_memset(opacity_zindex, 0,
-		    (size_t)screen_Rows * screen_Columns * sizeof(short));
+		    (size_t)screen_Rows * screen_Columns * કદ(short));
 
 		FOR_ALL_POPUPWINS(wp)
 		    popup_mark_opacity_zindex(wp);
@@ -5868,8 +5868,8 @@ may_update_popup_mask(int type)
 	}
     }
 
-    if (!popup_mask_refresh)
-	return;
+    જો (!popup_mask_refresh)
+	પાછા;
 
     // Need to update the mask, something has changed.
     popup_mask_refresh = FALSE;
@@ -5881,137 +5881,137 @@ may_update_popup_mask(int type)
     // compare with "popup_mask" to see what changed.
     redrawing_all_win = TRUE;
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_redr_type < UPD_SOME_VALID)
+	જો (wp->w_redr_type < UPD_SOME_VALID)
 	    redrawing_all_win = FALSE;
-    if (redrawing_all_win)
+    જો (redrawing_all_win)
 	mask = popup_mask;
-    else
+    નહીંતર
 	mask = popup_mask_next;
-    vim_memset(mask, 0, (size_t)screen_Rows * screen_Columns * sizeof(short));
+    vim_memset(mask, 0, (size_t)screen_Rows * screen_Columns * કદ(short));
 
     // Find the window with the lowest zindex that hasn't been handled yet,
     // so that the window with a higher zindex overwrites the value in
     // popup_mask.
     popup_reset_handled(POPUP_HANDLED_4);
-    while ((wp = find_next_popup(TRUE, POPUP_HANDLED_4)) != NULL)
+    જ્યારે ((wp = find_next_popup(TRUE, POPUP_HANDLED_4)) != ખાલી)
     {
-	int width;
-	int height;
+	પૂર્ણાંક width;
+	પૂર્ણાંક height;
 
 	popup_visible = TRUE;
 
 	// Recompute the position if the text changed.  It may make the popup
 	// hidden if it's attach to a text property that is no longer visible.
-	if (redraw_all_popups || popup_need_position_adjust(wp))
+	જો (redraw_all_popups || popup_need_position_adjust(wp))
 	{
 	    popup_adjust_position(wp);
-	    if (wp->w_popup_flags & POPF_HIDDEN)
-		continue;
+	    જો (wp->w_popup_flags & POPF_HIDDEN)
+		ચાલુ;
 	}
 
 	width = popup_width(wp);
 	// Match the drawn extent computed by update_popups so that cells
 	// outside the clipped popup are not marked as popup-owned and the
 	// background window can draw through them.
-	if (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
+	જો (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
 	{
 	    popup_clip_T cl;
 
 	    popup_compute_clip(wp, &cl);
 	    height = cl.eff_height;
 	}
-	else
+	નહીંતર
 	    height = popup_height(wp);
 	popup_update_mask(wp, width, height);
 
 	// Popup with partial transparency do not block lower layers from
 	// drawing, so they don't participate in the popup_mask.
 	// Fully opaque popups (blend == 0) still block lower layers.
-	if ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
-	    continue;
+	જો ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
+	    ચાલુ;
 
 	{
-	    int mask_start = wp->w_winrow;
-	    int mask_end = mask_start + height;
-	    int mask_col_start = wp->w_wincol + wp->w_popup_leftclip;
-	    int mask_col_end = wp->w_wincol + width - wp->w_popup_leftoff
+	    પૂર્ણાંક mask_start = wp->w_winrow;
+	    પૂર્ણાંક mask_end = mask_start + height;
+	    પૂર્ણાંક mask_col_start = wp->w_wincol + wp->w_popup_leftclip;
+	    પૂર્ણાંક mask_col_end = wp->w_wincol + width - wp->w_popup_leftoff
 						    - wp->w_popup_rightclip;
 
-	    for (line = mask_start;
-			    line < mask_end && line < screen_Rows; ++line)
-		for (col = mask_col_start;
+	    માટે (લીટી = mask_start;
+			    લીટી < mask_end && લીટી < screen_Rows; ++લીટી)
+		માટે (col = mask_col_start;
 		     col < mask_col_end && col < screen_Columns; ++col)
-		    if (wp->w_zindex < POPUPMENU_ZINDEX
+		    જો (wp->w_zindex < POPUPMENU_ZINDEX
 			    && pum_visible()
-			    && pum_under_menu(line, col, FALSE))
-			mask[line * screen_Columns + col] = POPUPMENU_ZINDEX;
-		    else if (wp->w_popup_mask_cells == NULL
-				    || !popup_masked(wp, width, height, col, line))
-			mask[line * screen_Columns + col] = wp->w_zindex;
+			    && pum_under_menu(લીટી, col, FALSE))
+			mask[લીટી * screen_Columns + col] = POPUPMENU_ZINDEX;
+		    નહીંતર જો (wp->w_popup_mask_cells == ખાલી
+				    || !popup_masked(wp, width, height, col, લીટી))
+			mask[લીટી * screen_Columns + col] = wp->w_zindex;
 	}
     }
 
     // Only check which lines are to be updated if not already
     // updating all lines.
-    if (mask == popup_mask_next)
+    જો (mask == popup_mask_next)
     {
-	int	    *plines_cache = ALLOC_CLEAR_MULT(int, Rows);
-	win_T	    *prev_wp = NULL;
+	પૂર્ણાંક	    *plines_cache = ALLOC_CLEAR_MULT(પૂર્ણાંક, Rows);
+	win_T	    *prev_wp = ખાલી;
 
-	for (line = 0; line < screen_Rows; ++line)
+	માટે (લીટી = 0; લીટી < screen_Rows; ++લીટી)
 	{
-	    int	    col_done = 0;
+	    પૂર્ણાંક	    col_done = 0;
 
-	    for (col = 0; col < screen_Columns; ++col)
+	    માટે (col = 0; col < screen_Columns; ++col)
 	    {
-		int off = line * screen_Columns + col;
+		પૂર્ણાંક off = લીટી * screen_Columns + col;
 
-		if (popup_mask[off] != popup_mask_next[off])
+		જો (popup_mask[off] != popup_mask_next[off])
 		{
 		    popup_mask[off] = popup_mask_next[off];
 
-		    if (line >= cmdline_row)
+		    જો (લીટી >= cmdline_row)
 		    {
 			// the command line needs to be cleared if text below
 			// the popup is now visible.
-			if (!msg_scrolled && popup_mask_next[off] == 0)
+			જો (!સંદેશ_scrolled && popup_mask_next[off] == 0)
 			    clear_cmdline = TRUE;
 		    }
-		    else if (col >= col_done)
+		    નહીંતર જો (col >= col_done)
 		    {
 			linenr_T	lnum;
-			int		line_cp = line;
-			int		col_cp = col;
+			પૂર્ણાંક		લીટી_cp = લીટી;
+			પૂર્ણાંક		col_cp = col;
 
 			// The screen position "line" / "col" needs to be
 			// redrawn.  Figure out what window that is and update
 			// w_redraw_top and w_redraw_bot.  Only needs to be
 			// done once for each window line.
-			wp = mouse_find_win(&line_cp, &col_cp, IGNORE_POPUP);
-			if (wp != NULL)
+			wp = mouse_find_win(&લીટી_cp, &col_cp, IGNORE_POPUP);
+			જો (wp != ખાલી)
 			{
-#if defined(FEAT_TERMINAL)
+#જો defined(FEAT_TERMINAL)
 			    // A terminal window needs to be redrawn.
-			    if (bt_terminal(wp->w_buffer))
+			    જો (bt_terminal(wp->w_buffer))
 				redraw_win_later(wp, UPD_NOT_VALID);
-			    else
+			    નહીંતર
 #endif
 			    {
-				if (wp != prev_wp)
+				જો (wp != prev_wp)
 				{
 				    vim_memset(plines_cache, 0,
-							   sizeof(int) * Rows);
+							   કદ(પૂર્ણાંક) * Rows);
 				    prev_wp = wp;
 				}
 
-				if (line_cp >= wp->w_height)
+				જો (લીટી_cp >= wp->w_height)
 				    // In (or below) status line
 				    wp->w_redr_status = true;
-				else
+				નહીંતર
 				{
 				    // compute the position in the buffer line
 				    // from the position in the window
-				    (void)mouse_comp_pos(wp, &line_cp, &col_cp,
+				    (શૂન્ય)mouse_comp_pos(wp, &લીટી_cp, &col_cp,
 							  &lnum, plines_cache);
 				    redrawWinline(wp, lnum);
 				}
@@ -6036,66 +6036,66 @@ may_update_popup_mask(int type)
  * If the current window is a popup and something relevant changed, recompute
  * the position and size.
  */
-    void
-may_update_popup_position(void)
+    શૂન્ય
+may_update_popup_position(શૂન્ય)
 {
-    if (popup_is_popup(curwin) && popup_need_position_adjust(curwin))
+    જો (popup_is_popup(curwin) && popup_need_position_adjust(curwin))
 	popup_adjust_position(curwin);
 }
 
 #ifdef FEAT_PROP_POPUP
-static schar_T *base_screenlines = NULL;
-static int *base_screenattrs = NULL;
-static u8char_T *base_screenlinesuc = NULL;
-static int base_screen_rows = 0;
-static int base_screen_cols = 0;
+સ્થિર schar_T *base_screenlines = ખાલી;
+સ્થિર પૂર્ણાંક *base_screenattrs = ખાલી;
+સ્થિર u8char_T *base_screenlinesuc = ખાલી;
+સ્થિર પૂર્ણાંક base_screen_rows = 0;
+સ્થિર પૂર્ણાંક base_screen_cols = 0;
 
 /*
  * Get the base screen cell saved before drawing opacity popups.
  * Returns TRUE if the cell is available.
  */
-    int
-popup_get_base_screen_cell(int row, int col, schar_T *linep, int *attrp,
+    પૂર્ણાંક
+popup_get_base_screen_cell(પૂર્ણાંક row, પૂર્ણાંક col, schar_T *linep, પૂર્ણાંક *attrp,
 							  u8char_T *ucp)
 {
-    if (base_screenlines == NULL || base_screenattrs == NULL)
-	return FALSE;
-    if (row < 0 || col < 0 || row >= base_screen_rows
+    જો (base_screenlines == ખાલી || base_screenattrs == ખાલી)
+	પાછા FALSE;
+    જો (row < 0 || col < 0 || row >= base_screen_rows
 						     || col >= base_screen_cols)
-	return FALSE;
+	પાછા FALSE;
 
-    int off = row * base_screen_cols + col;
-    if (linep != NULL)
+    પૂર્ણાંક off = row * base_screen_cols + col;
+    જો (linep != ખાલી)
 	*linep = base_screenlines[off];
-    if (attrp != NULL)
+    જો (attrp != ખાલી)
 	*attrp = base_screenattrs[off];
-    if (ucp != NULL)
+    જો (ucp != ખાલી)
     {
-	if (enc_utf8 && base_screenlinesuc != NULL)
+	જો (enc_utf8 && base_screenlinesuc != ખાલી)
 	    *ucp = base_screenlinesuc[off];
-	else
+	નહીંતર
 	    *ucp = 0;
     }
-    return TRUE;
+    પાછા TRUE;
 }
 
 /*
  * Set the base screen cell saved before drawing opacity popups.
  * Used to update the snapshot after blending a layer.
  */
-    void
-popup_set_base_screen_cell(int row, int col, schar_T line, int attr, u8char_T uc)
+    શૂન્ય
+popup_set_base_screen_cell(પૂર્ણાંક row, પૂર્ણાંક col, schar_T લીટી, પૂર્ણાંક attr, u8char_T uc)
 {
-    if (base_screenlines == NULL || base_screenattrs == NULL)
-	return;
-    if (row < 0 || col < 0 || row >= base_screen_rows
+    જો (base_screenlines == ખાલી || base_screenattrs == ખાલી)
+	પાછા;
+    જો (row < 0 || col < 0 || row >= base_screen_rows
 						     || col >= base_screen_cols)
-	return;
+	પાછા;
 
-    int off = row * base_screen_cols + col;
-    base_screenlines[off] = line;
+    પૂર્ણાંક off = row * base_screen_cols + col;
+    base_screenlines[off] = લીટી;
     base_screenattrs[off] = attr;
-    if (enc_utf8 && base_screenlinesuc != NULL)
+    જો (enc_utf8 && base_screenlinesuc != ખાલી)
 	base_screenlinesuc[off] = uc;
 }
 #endif
@@ -6104,109 +6104,109 @@ popup_set_base_screen_cell(int row, int col, schar_T line, int attr, u8char_T uc
  * Draw a single padding cell with opacity blending.
  * Restores background from saved data and blends with popup attribute.
  */
-static void
+સ્થિર શૂન્ય
 draw_opacity_padding_cell(
-	int		row,
-	int		col,
+	પૂર્ણાંક		row,
+	પૂર્ણાંક		col,
 	popup_saved_screen_T *saved_screen,
-	int		pad_start_col,
-	int		pad_end_col)
+	પૂર્ણાંક		pad_start_col,
+	પૂર્ણાંક		pad_end_col)
 {
-    if (LineOffset == NULL || ScreenLines == NULL || ScreenAttrs == NULL
-	    || (enc_utf8 && ScreenLinesUC == NULL))
-	return;
+    જો (લીટી_Offset == ખાલી || Screen_લીટીઓ == ખાલી || ScreenAttrs == ખાલી
+	    || (enc_utf8 && Screen_લીટીઓ_UC == ખાલી))
+	પાછા;
 
-    int off = LineOffset[row] + col;
-    int r = row - saved_screen->start_row;
-    int c = col - saved_screen->start_col;
+    પૂર્ણાંક off = લીટી_Offset[row] + col;
+    પૂર્ણાંક r = row - saved_screen->start_row;
+    પૂર્ણાંક c = col - saved_screen->start_col;
 
-    if (r >= 0 && r < saved_screen->rows && c >= 0 && c < saved_screen->cols)
+    જો (r >= 0 && r < saved_screen->rows && c >= 0 && c < saved_screen->cols)
     {
-	int save_off = r * saved_screen->cols + c;
+	પૂર્ણાંક save_off = r * saved_screen->cols + c;
 	// If this is the second cell of a wide background character, blend
 	// the wide character instead of overwriting it.
-	if (enc_utf8 && saved_screen->linesuc != NULL)
+	જો (enc_utf8 && saved_screen->linesuc != ખાલી)
 	{
-	    int base_col = col - 1;
-	    int base_off = off - 1;
-	    int base_save_off = save_off - 1;
-	    int wide_prev = FALSE;
+	    પૂર્ણાંક base_col = col - 1;
+	    પૂર્ણાંક base_off = off - 1;
+	    પૂર્ણાંક base_save_off = save_off - 1;
+	    પૂર્ણાંક wide_prev = FALSE;
 
 	    // Prefer current screen state for detecting a wide char, since the
 	    // saved data may not contain a reliable right-half marker.
-	    if (base_off >= 0)
+	    જો (base_off >= 0)
 	    {
-		if (ScreenLinesUC[base_off] != 0
-			&& utf_char2cells(ScreenLinesUC[base_off]) == 2
-			&& ScreenLines[off] == 0)
+		જો (Screen_લીટીઓ_UC[base_off] != 0
+			&& utf_char2cells(Screen_લીટીઓ_UC[base_off]) == 2
+			&& Screen_લીટીઓ[off] == 0)
 		    wide_prev = TRUE;
 	    }
-	    if (!wide_prev && save_off > 0)
+	    જો (!wide_prev && save_off > 0)
 	    {
-		if (saved_screen->linesuc[save_off - 1] != 0
+		જો (saved_screen->linesuc[save_off - 1] != 0
 			&& utf_char2cells(saved_screen->linesuc[save_off - 1]) == 2
-			&& saved_screen->lines[save_off] == 0)
+			&& saved_screen->લીટીઓ[save_off] == 0)
 		    wide_prev = TRUE;
 	    }
 
-	    if (wide_prev && base_col >= 0)
+	    જો (wide_prev && base_col >= 0)
 	    {
 		// If the wide character starts outside the padding area, do not
 		// overwrite it. Use the base screen cell if available.
-		if (base_col < pad_start_col)
+		જો (base_col < pad_start_col)
 		{
-		    if (ScreenLinesUC[base_off] != 0
-			    && utf_char2cells(ScreenLinesUC[base_off]) == 2)
+		    જો (Screen_લીટીઓ_UC[base_off] != 0
+			    && utf_char2cells(Screen_લીટીઓ_UC[base_off]) == 2)
 		    {
 			// The left half still has the wide char on screen.
 			// Clear it to an unblended space: only the right half is
 			// covered by the popup background.
-			ScreenLines[base_off] = ' ';
-			ScreenLinesUC[base_off] = 0;
+			Screen_લીટીઓ[base_off] = ' ';
+			Screen_લીટીઓ_UC[base_off] = 0;
 			ScreenAttrs[base_off] = saved_screen->attrs[base_save_off];
 			popup_set_base_screen_cell(row, base_col,
-				ScreenLines[base_off],
+				Screen_લીટીઓ[base_off],
 				ScreenAttrs[base_off],
-				ScreenLinesUC[base_off]);
+				Screen_લીટીઓ_UC[base_off]);
 			screen_char(base_off, row, base_col);
 
 			// Draw padding in the right half.
 			// Use left half's attr since the right half of a
 			// wide char may have an unreliable attr value.
-			ScreenLines[off] = ' ';
+			Screen_લીટીઓ[off] = ' ';
 			ScreenAttrs[off] = saved_screen->attrs[base_save_off];
-			if (enc_utf8)
-			    ScreenLinesUC[off] = 0;
-			int popup_attr_val =
+			જો (enc_utf8)
+			    Screen_લીટીઓ_UC[off] = 0;
+			પૂર્ણાંક popup_attr_val =
 					get_win_attr(screen_opacity_popup);
-			int blend = screen_opacity_popup->w_popup_blend;
+			પૂર્ણાંક blend = screen_opacity_popup->w_popup_blend;
 			ScreenAttrs[off] = hl_blend_attr(ScreenAttrs[off],
 					popup_attr_val, blend, TRUE);
 			popup_set_base_screen_cell(row, col,
-				ScreenLines[off], ScreenAttrs[off],
-				ScreenLinesUC[off]);
+				Screen_લીટીઓ[off], ScreenAttrs[off],
+				Screen_લીટીઓ_UC[off]);
 			screen_char(off, row, col);
-			return;
+			પાછા;
 		    }
 		    // The content drawing cleared the left half to a
 		    // space (wide char didn't fit at content edge),
 		    // but the saved data has a wide char.  Restore it
 		    // spanning both the content cell and padding cell.
-		    if (base_save_off >= 0
+		    જો (base_save_off >= 0
 			    && saved_screen->linesuc[base_save_off] != 0
 			    && utf_char2cells(
 				saved_screen->linesuc[base_save_off]) == 2
-			    && ScreenLines[base_off] == ' '
-			    && ScreenLinesUC[base_off] == 0)
+			    && Screen_લીટીઓ[base_off] == ' '
+			    && Screen_લીટીઓ_UC[base_off] == 0)
 		    {
-			int popup_attr_val =
+			પૂર્ણાંક popup_attr_val =
 				    get_win_attr(screen_opacity_popup);
-			int blend =
+			પૂર્ણાંક blend =
 				    screen_opacity_popup->w_popup_blend;
 
-			ScreenLines[base_off] =
-				    saved_screen->lines[base_save_off];
-			ScreenLinesUC[base_off] =
+			Screen_લીટીઓ[base_off] =
+				    saved_screen->લીટીઓ[base_save_off];
+			Screen_લીટીઓ_UC[base_off] =
 				    saved_screen->linesuc[base_save_off];
 			ScreenAttrs[base_off] =
 				    saved_screen->attrs[base_save_off];
@@ -6214,86 +6214,86 @@ draw_opacity_padding_cell(
 				    ScreenAttrs[base_off],
 				    popup_attr_val, blend, TRUE);
 
-			ScreenLines[off] = 0;
-			ScreenLinesUC[off] = 0;
+			Screen_લીટીઓ[off] = 0;
+			Screen_લીટીઓ_UC[off] = 0;
 			ScreenAttrs[off] = ScreenAttrs[base_off];
 
 			popup_set_base_screen_cell(row, base_col,
-				    ScreenLines[base_off],
+				    Screen_લીટીઓ[base_off],
 				    ScreenAttrs[base_off],
-				    ScreenLinesUC[base_off]);
+				    Screen_લીટીઓ_UC[base_off]);
 			popup_set_base_screen_cell(row, col,
-				    ScreenLines[off],
+				    Screen_લીટીઓ[off],
 				    ScreenAttrs[off],
-				    ScreenLinesUC[off]);
+				    Screen_લીટીઓ_UC[off]);
 			screen_char(base_off, row, base_col);
-			return;
+			પાછા;
 		    }
 
 		    // Draw padding in the right half.
 		    // Use left half's attr since the right half of a
 		    // wide char may have an unreliable attr value.
-		    ScreenLines[off] = ' ';
+		    Screen_લીટીઓ[off] = ' ';
 		    ScreenAttrs[off] = saved_screen->attrs[base_save_off];
-		    if (enc_utf8)
-			ScreenLinesUC[off] = 0;
-		    int popup_attr_val = get_win_attr(screen_opacity_popup);
-		    int blend = screen_opacity_popup->w_popup_blend;
+		    જો (enc_utf8)
+			Screen_લીટીઓ_UC[off] = 0;
+		    પૂર્ણાંક popup_attr_val = get_win_attr(screen_opacity_popup);
+		    પૂર્ણાંક blend = screen_opacity_popup->w_popup_blend;
 		    ScreenAttrs[off] = hl_blend_attr(ScreenAttrs[off],
 				    popup_attr_val, blend, TRUE);
-		    popup_set_base_screen_cell(row, col, ScreenLines[off],
-					       ScreenAttrs[off], ScreenLinesUC[off]);
+		    popup_set_base_screen_cell(row, col, Screen_લીટીઓ[off],
+					       ScreenAttrs[off], Screen_લીટીઓ_UC[off]);
 		    screen_char(off, row, col);
-		    return;
+		    પાછા;
 		}
 
 		// Base cell is inside the saved area, redraw the wide char.
-		if (save_off > 0)
+		જો (save_off > 0)
 		{
-		    ScreenLines[base_off] = saved_screen->lines[base_save_off];
+		    Screen_લીટીઓ[base_off] = saved_screen->લીટીઓ[base_save_off];
 		    ScreenAttrs[base_off] = saved_screen->attrs[base_save_off];
-		    ScreenLines[off] = saved_screen->lines[save_off];
+		    Screen_લીટીઓ[off] = saved_screen->લીટીઓ[save_off];
 		    ScreenAttrs[off] = saved_screen->attrs[save_off];
-		    ScreenLinesUC[base_off] = saved_screen->linesuc[base_save_off];
-		    ScreenLinesUC[off] = saved_screen->linesuc[save_off];
+		    Screen_લીટીઓ_UC[base_off] = saved_screen->linesuc[base_save_off];
+		    Screen_લીટીઓ_UC[off] = saved_screen->linesuc[save_off];
 
-		    int popup_attr_val = get_win_attr(screen_opacity_popup);
-		    int blend = screen_opacity_popup->w_popup_blend;
+		    પૂર્ણાંક popup_attr_val = get_win_attr(screen_opacity_popup);
+		    પૂર્ણાંક blend = screen_opacity_popup->w_popup_blend;
 		    ScreenAttrs[base_off] = hl_blend_attr(ScreenAttrs[base_off],
 				    popup_attr_val, blend, TRUE);
 		    ScreenAttrs[off] = ScreenAttrs[base_off];
-		    popup_set_base_screen_cell(row, base_col, ScreenLines[base_off],
-					       ScreenAttrs[base_off], ScreenLinesUC[base_off]);
-		    popup_set_base_screen_cell(row, col, ScreenLines[off],
-					       ScreenAttrs[off], ScreenLinesUC[off]);
+		    popup_set_base_screen_cell(row, base_col, Screen_લીટીઓ[base_off],
+					       ScreenAttrs[base_off], Screen_લીટીઓ_UC[base_off]);
+		    popup_set_base_screen_cell(row, col, Screen_લીટીઓ[off],
+					       ScreenAttrs[off], Screen_લીટીઓ_UC[off]);
 		    screen_char(base_off, row, base_col);
 		}
-		return;
+		પાછા;
 	    }
 	}
-	ScreenLines[off] = saved_screen->lines[save_off];
+	Screen_લીટીઓ[off] = saved_screen->લીટીઓ[save_off];
 	ScreenAttrs[off] = saved_screen->attrs[save_off];
-	if (enc_utf8)
-	    ScreenLinesUC[off] = saved_screen->linesuc != NULL
+	જો (enc_utf8)
+	    Screen_લીટીઓ_UC[off] = saved_screen->linesuc != ખાલી
 					? saved_screen->linesuc[save_off] : 0;
 
 	// If the saved character is wide and would extend past the padding
 	// area into the content area, replace with a space to avoid
 	// corrupting the content.
-	if (enc_utf8 && ScreenLinesUC[off] != 0
-		&& utf_char2cells(ScreenLinesUC[off]) == 2
+	જો (enc_utf8 && Screen_લીટીઓ_UC[off] != 0
+		&& utf_char2cells(Screen_લીટીઓ_UC[off]) == 2
 		&& col + 1 >= pad_end_col)
 	{
-	    ScreenLines[off] = ' ';
-	    ScreenLinesUC[off] = 0;
+	    Screen_લીટીઓ[off] = ' ';
+	    Screen_લીટીઓ_UC[off] = 0;
 	}
 
-	int popup_attr_val = get_win_attr(screen_opacity_popup);
-	int blend = screen_opacity_popup->w_popup_blend;
+	પૂર્ણાંક popup_attr_val = get_win_attr(screen_opacity_popup);
+	પૂર્ણાંક blend = screen_opacity_popup->w_popup_blend;
 	ScreenAttrs[off] = hl_blend_attr(ScreenAttrs[off],
 				popup_attr_val, blend, TRUE);
-	popup_set_base_screen_cell(row, col, ScreenLines[off],
-				   ScreenAttrs[off], ScreenLinesUC[off]);
+	popup_set_base_screen_cell(row, col, Screen_લીટીઓ[off],
+				   ScreenAttrs[off], Screen_લીટીઓ_UC[off]);
 	screen_char(off, row, col);
     }
 }
@@ -6301,16 +6301,16 @@ draw_opacity_padding_cell(
 /*
  * Fill a rectangular padding area with opacity blending.
  */
-static void
+સ્થિર શૂન્ય
 fill_opacity_padding(
-	int		start_row,
-	int		end_row,
-	int		start_col,
-	int		end_col,
+	પૂર્ણાંક		start_row,
+	પૂર્ણાંક		end_row,
+	પૂર્ણાંક		start_col,
+	પૂર્ણાંક		end_col,
 	popup_saved_screen_T *saved_screen)
 {
-    for (int pad_row = start_row; pad_row < end_row; pad_row++)
-	for (int pad_col = start_col; pad_col < end_col; pad_col++)
+    માટે (પૂર્ણાંક pad_row = start_row; pad_row < end_row; pad_row++)
+	માટે (પૂર્ણાંક pad_col = start_col; pad_col < end_col; pad_col++)
 	    draw_opacity_padding_cell(pad_row, pad_col, saved_screen,
 		    start_col, end_col);
 }
@@ -6319,28 +6319,28 @@ fill_opacity_padding(
  * Update popup windows.  They are drawn on top of normal windows.
  * "win_update" is called for each popup window, lowest zindex first.
  */
-    void
-update_popups(void (*win_update)(win_T *wp))
+    શૂન્ય
+update_popups(શૂન્ય (*win_update)(win_T *wp))
 {
     win_T   *wp;
-    int	    top_off;
-    int	    left_extra;
-    int	    total_width;
-    int	    total_height;
-    int	    top_padding;
-    int	    popup_attr;
-    int	    border_attr[4];
-    int	    border_char[8];
+    પૂર્ણાંક	    ટોચ_off;
+    પૂર્ણાંક	    ડાબું_extra;
+    પૂર્ણાંક	    total_width;
+    પૂર્ણાંક	    total_height;
+    પૂર્ણાંક	    ટોચ_padding;
+    પૂર્ણાંક	    popup_attr;
+    પૂર્ણાંક	    border_attr[4];
+    પૂર્ણાંક	    border_char[8];
     char_u  buf[MB_MAXBYTES];
-    int	    row;
-    int	    wincol;
-    int	    padcol = 0;
-    int	    padendcol = 0;
-    int	    i;
-    int	    sb_thumb_top = 0;
-    int	    sb_thumb_height = 0;
-    int	    attr_scroll = 0;
-    int	    attr_thumb = 0;
+    પૂર્ણાંક	    row;
+    પૂર્ણાંક	    wincol;
+    પૂર્ણાંક	    padcol = 0;
+    પૂર્ણાંક	    padendcol = 0;
+    પૂર્ણાંક	    i;
+    પૂર્ણાંક	    sb_thumb_ટોચ = 0;
+    પૂર્ણાંક	    sb_thumb_height = 0;
+    પૂર્ણાંક	    attr_scroll = 0;
+    પૂર્ણાંક	    attr_thumb = 0;
     bool    override_success;
 
     // hide the cursor until redrawing is done.
@@ -6351,29 +6351,29 @@ update_popups(void (*win_update)(win_T *wp))
     // top.
     popup_reset_handled(POPUP_HANDLED_5);
 #ifdef FEAT_PROP_POPUP
-    if (base_screenlines != NULL)
+    જો (base_screenlines != ખાલી)
     {
 	vim_free(base_screenlines);
-	base_screenlines = NULL;
+	base_screenlines = ખાલી;
     }
-    if (base_screenattrs != NULL)
+    જો (base_screenattrs != ખાલી)
     {
 	vim_free(base_screenattrs);
-	base_screenattrs = NULL;
+	base_screenattrs = ખાલી;
     }
-    if (base_screenlinesuc != NULL)
+    જો (base_screenlinesuc != ખાલી)
     {
 	vim_free(base_screenlinesuc);
-	base_screenlinesuc = NULL;
+	base_screenlinesuc = ખાલી;
     }
     base_screen_rows = 0;
     base_screen_cols = 0;
 #endif
 
-    while ((wp = find_next_popup(TRUE, POPUP_HANDLED_5)) != NULL)
+    જ્યારે ((wp = find_next_popup(TRUE, POPUP_HANDLED_5)) != ખાલી)
     {
-	int	    title_len = 0;
-	int	    title_wincol;
+	પૂર્ણાંક	    title_len = 0;
+	પૂર્ણાંક	    title_wincol;
 	popup_clip_T cl;
 
 	// Compute the clip geometry once per iteration; w_popup_*off/clip,
@@ -6383,7 +6383,7 @@ update_popups(void (*win_update)(win_T *wp))
 	// before any code below reads cl again).
 	popup_compute_clip(wp, &cl);
 
-	override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	override_success = ધકેલો_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 	// This drawing uses the zindex of the popup window, so that it's on
 	// top of the text but doesn't draw when another popup with higher
@@ -6392,53 +6392,53 @@ update_popups(void (*win_update)(win_T *wp))
 
 	// Set popup with opacity context for screen drawing.
 	// Only enable transparency rendering when blend > 0 (not fully opaque).
-	if ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
+	જો ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
 	    screen_opacity_popup = wp;
-	else
-	    screen_opacity_popup = NULL;
+	નહીંતર
+	    screen_opacity_popup = ખાલી;
 
 #ifdef FEAT_PROP_POPUP
-	if (screen_opacity_popup != NULL)
+	જો (screen_opacity_popup != ખાલી)
 	{
-	    if (base_screenlines != NULL)
+	    જો (base_screenlines != ખાલી)
 	    {
 		vim_free(base_screenlines);
-		base_screenlines = NULL;
+		base_screenlines = ખાલી;
 	    }
-	    if (base_screenattrs != NULL)
+	    જો (base_screenattrs != ખાલી)
 	    {
 		vim_free(base_screenattrs);
-		base_screenattrs = NULL;
+		base_screenattrs = ખાલી;
 	    }
-	    if (base_screenlinesuc != NULL)
+	    જો (base_screenlinesuc != ખાલી)
 	    {
 		vim_free(base_screenlinesuc);
-		base_screenlinesuc = NULL;
+		base_screenlinesuc = ખાલી;
 	    }
 
 	    base_screen_rows = screen_Rows;
 	    base_screen_cols = screen_Columns;
 	    base_screenlines = ALLOC_MULT(schar_T,
 				    base_screen_rows * base_screen_cols);
-	    base_screenattrs = ALLOC_MULT(int,
+	    base_screenattrs = ALLOC_MULT(પૂર્ણાંક,
 				    base_screen_rows * base_screen_cols);
-	    if (enc_utf8)
+	    જો (enc_utf8)
 		base_screenlinesuc = ALLOC_MULT(u8char_T,
 				    base_screen_rows * base_screen_cols);
 
-	    if (base_screenlines != NULL && base_screenattrs != NULL)
+	    જો (base_screenlines != ખાલી && base_screenattrs != ખાલી)
 	    {
-		for (int r = 0; r < base_screen_rows; r++)
+		માટે (પૂર્ણાંક r = 0; r < base_screen_rows; r++)
 		{
-		    int off = LineOffset[r];
-		    int base_off = r * base_screen_cols;
-		    for (int c = 0; c < base_screen_cols; c++)
+		    પૂર્ણાંક off = લીટી_Offset[r];
+		    પૂર્ણાંક base_off = r * base_screen_cols;
+		    માટે (પૂર્ણાંક c = 0; c < base_screen_cols; c++)
 		    {
-			base_screenlines[base_off + c] = ScreenLines[off + c];
+			base_screenlines[base_off + c] = Screen_લીટીઓ[off + c];
 			base_screenattrs[base_off + c] = ScreenAttrs[off + c];
-			if (enc_utf8 && base_screenlinesuc != NULL)
+			જો (enc_utf8 && base_screenlinesuc != ખાલી)
 			    base_screenlinesuc[base_off + c] =
-					ScreenLinesUC[off + c];
+					Screen_લીટીઓ_UC[off + c];
 		    }
 		}
 	    }
@@ -6456,17 +6456,17 @@ update_popups(void (*win_update)(win_T *wp))
 
 	// adjust w_winrow and w_wincol for border and padding, since
 	// win_update() doesn't handle them.
-	top_off = popup_top_extra(wp);
-	left_extra = wp->w_popup_padding[3] + wp->w_popup_border[3]
+	ટોચ_off = popup_ટોચ_extra(wp);
+	ડાબું_extra = wp->w_popup_padding[3] + wp->w_popup_border[3]
 							- wp->w_popup_leftoff;
-	if (wp->w_wincol + left_extra < 0)
-	    left_extra = -wp->w_wincol;
+	જો (wp->w_wincol + ડાબું_extra < 0)
+	    ડાબું_extra = -wp->w_wincol;
 	// Move to the content top, skipping any clipped top border/padding.
-	wp->w_winrow += MAX(top_off - wp->w_popup_topoff, 0);
-	wp->w_wincol += left_extra;
+	wp->w_winrow += MAX(ટોચ_off - wp->w_popup_topoff, 0);
+	wp->w_wincol += ડાબું_extra;
 
 	// Draw the popup text, unless it's off screen.
-	if (wp->w_winrow < screen_Rows && wp->w_wincol < screen_Columns)
+	જો (wp->w_winrow < screen_Rows && wp->w_wincol < screen_Columns)
 	{
 	    popup_geom_save_T saved;
 
@@ -6474,7 +6474,7 @@ update_popups(void (*win_update)(win_T *wp))
 
 	    // May need to update the "cursorline" highlighting, which may also
 	    // change "topline"
-	    if (wp->w_popup_last_curline != wp->w_cursor.lnum)
+	    જો (wp->w_popup_last_curline != wp->w_cursor.lnum)
 		popup_highlight_curline(wp);
 
 	    // Clip the buffer's drawn extent to the host window when
@@ -6489,24 +6489,24 @@ update_popups(void (*win_update)(win_T *wp))
 
 	    // move the cursor into the visible lines, otherwise executing
 	    // commands with win_execute() may cause the text to jump.
-	    if (wp->w_cursor.lnum < wp->w_topline)
+	    જો (wp->w_cursor.lnum < wp->w_topline)
 		wp->w_cursor.lnum = wp->w_topline;
-	    else if (wp->w_cursor.lnum >= wp->w_botline)
+	    નહીંતર જો (wp->w_cursor.lnum >= wp->w_botline)
 		wp->w_cursor.lnum = wp->w_botline - 1;
 	}
 
-	wp->w_winrow -= MAX(top_off - wp->w_popup_topoff, 0);
-	wp->w_wincol -= left_extra;
+	wp->w_winrow -= MAX(ટોચ_off - wp->w_popup_topoff, 0);
+	wp->w_wincol -= ડાબું_extra;
 
 	// Add offset for border and padding if not done already.
-	if ((wp->w_flags & WFLAG_WCOL_OFF_ADDED) == 0)
+	જો ((wp->w_flags & WFLAG_WCOL_OFF_ADDED) == 0)
 	{
-	    wp->w_wcol += left_extra;
+	    wp->w_wcol += ડાબું_extra;
 	    wp->w_flags |= WFLAG_WCOL_OFF_ADDED;
 	}
-	if ((wp->w_flags & WFLAG_WROW_OFF_ADDED) == 0)
+	જો ((wp->w_flags & WFLAG_WROW_OFF_ADDED) == 0)
 	{
-	    wp->w_wrow += top_off;
+	    wp->w_wrow += ટોચ_off;
 	    wp->w_flags |= WFLAG_WROW_OFF_ADDED;
 	}
 
@@ -6516,26 +6516,26 @@ update_popups(void (*win_update)(win_T *wp))
 	// and starts on the first visible row when top-clipped.  When
 	// unclipped, fall back to the full popup geometry (cl.eff_width
 	// excludes w_leftcol and the scrollbar, which popup_width() folds in).
-	if (wp->w_popup_leftclip > 0 || wp->w_popup_rightclip > 0)
+	જો (wp->w_popup_leftclip > 0 || wp->w_popup_rightclip > 0)
 	    total_width = cl.eff_width;
-	else
+	નહીંતર
 	    total_width = popup_width(wp) - wp->w_popup_rightoff;
-	if (total_width < 0)
+	જો (total_width < 0)
 	    total_width = 0;
-	if (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
+	જો (wp->w_popup_topoff > 0 || wp->w_popup_bottomoff > 0)
 	    total_height = cl.eff_height;
-	else
+	નહીંતર
 	    total_height = popup_height(wp);
 	popup_attr = get_win_attr(wp);
 
-	if (wp->w_winrow + total_height > cmdline_row)
+	જો (wp->w_winrow + total_height > cmdline_row)
 	    wp->w_popup_flags |= POPF_ON_CMDLINE;
-	else
+	નહીંતર
 	    wp->w_popup_flags &= ~POPF_ON_CMDLINE;
 
 	// We can only use these line drawing characters when 'encoding' is
 	// "utf-8" and 'ambiwidth' is "single".
-	if (enc_utf8 && *p_ambw == 's')
+	જો (enc_utf8 && *p_ambw == 's')
 	{
 	    border_char[0] = border_char[2] = 0x2550;
 	    border_char[1] = border_char[3] = 0x2551;
@@ -6545,63 +6545,63 @@ update_popups(void (*win_update)(win_T *wp))
 							     ? 0x21f2 : 0x255d;
 	    border_char[7] = 0x255a;
 	}
-	else
+	નહીંતર
 	{
 	    border_char[0] = border_char[2] = '-';
 	    border_char[1] = border_char[3] = '|';
-	    for (i = 4; i < 8; ++i)
+	    માટે (i = 4; i < 8; ++i)
 		border_char[i] = '+';
-	    if (wp->w_popup_flags & POPF_RESIZE)
+	    જો (wp->w_popup_flags & POPF_RESIZE)
 		border_char[6] = '@';
 	}
-	for (i = 0; i < 8; ++i)
-	    if (wp->w_border_char[i] != 0)
+	માટે (i = 0; i < 8; ++i)
+	    જો (wp->w_border_char[i] != 0)
 		border_char[i] = wp->w_border_char[i];
 
-	for (i = 0; i < 4; ++i)
+	માટે (i = 0; i < 4; ++i)
 	{
-	    if (wp->w_border_highlight[i] != NULL)
+	    જો (wp->w_border_highlight[i] != ખાલી)
 		border_attr[i] = syn_name2attr(wp->w_border_highlight[i]);
-	    else if (wp->w_hlfwin_id != 0
+	    નહીંતર જો (wp->w_hlfwin_id != 0
 				       || (wp->w_popup_flags & POPF_INFO))
 		border_attr[i] = popup_attr;
-	    else
+	    નહીંતર
 		border_attr[i] = HL_ATTR(HLF_POPB);
 
 	    // Apply blend to border attributes for popup with opacitys
-	    if ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
+	    જો ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
 		border_attr[i] = hl_blend_attr(0, border_attr[i],
 					       wp->w_popup_blend, FALSE);
 	}
 
 	// Apply blend to popup_attr for padding areas
-	if ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
+	જો ((wp->w_popup_flags & POPF_OPACITY) && wp->w_popup_blend > 0)
 	    popup_attr = hl_blend_attr(0, popup_attr, wp->w_popup_blend, FALSE);
 
 
 	// Title goes on top of border or padding.
 	title_wincol = wp->w_wincol + 1;
-	if (wp->w_popup_title != NULL)
+	જો (wp->w_popup_title != ખાલી)
 	{
-	    int	    title_attr;
+	    પૂર્ણાંક	    title_attr;
 
-	    if (wp->w_popup_border[0] > 0 && wp->w_border_highlight[0] != NULL)
+	    જો (wp->w_popup_border[0] > 0 && wp->w_border_highlight[0] != ખાલી)
 		title_attr = border_attr[0];
-	    else if (wp->w_hlfwin_id != 0
+	    નહીંતર જો (wp->w_hlfwin_id != 0
 				       || (wp->w_popup_flags & POPF_INFO))
 		title_attr = popup_attr;
-	    else
+	    નહીંતર
 		title_attr = HL_ATTR(HLF_POPT);
 
 	    title_len = vim_strsize(wp->w_popup_title);
 
 	    // truncate the title if too long
-	    if (title_len > total_width - 2)
+	    જો (title_len > total_width - 2)
 	    {
-		int	title_byte_len = (int)STRLEN(wp->w_popup_title);
+		પૂર્ણાંક	title_byte_len = (પૂર્ણાંક)STRLEN(wp->w_popup_title);
 		char_u  *title_text = alloc(title_byte_len + 1);
 
-		if (title_text != NULL)
+		જો (title_text != ખાલી)
 		{
 		    trunc_string(wp->w_popup_title, title_text,
 					  total_width - 2, title_byte_len + 1);
@@ -6612,17 +6612,17 @@ update_popups(void (*win_update)(win_T *wp))
 
 		title_len = total_width - 2;
 	    }
-	    else
+	    નહીંતર
 		screen_puts(wp->w_popup_title, wp->w_winrow, title_wincol,
 								   title_attr);
 	}
 
 	wincol = wp->w_wincol - wp->w_popup_leftoff + wp->w_popup_leftclip;
-	top_padding = cl.eff_padding[0];
-	if (cl.eff_border[0] > 0)
+	ટોચ_padding = cl.eff_padding[0];
+	જો (cl.eff_border[0] > 0)
 	{
 	    // top border; do not draw over the title
-	    if (title_len > 0)
+	    જો (title_len > 0)
 	    {
 		screen_fill(wp->w_winrow, wp->w_winrow + 1,
 			wincol < 0 ? 0 : wincol, title_wincol,
@@ -6633,7 +6633,7 @@ update_popups(void (*win_update)(win_T *wp))
 			title_wincol + title_len, wincol + total_width,
 			border_char[0], border_char[0], border_attr[0]);
 	    }
-	    else
+	    નહીંતર
 	    {
 		screen_fill(wp->w_winrow, wp->w_winrow + 1,
 			wincol < 0 ? 0 : wincol, wincol + total_width,
@@ -6641,35 +6641,35 @@ update_popups(void (*win_update)(win_T *wp))
 					     ? border_char[4] : border_char[0],
 			border_char[0], border_attr[0]);
 	    }
-	    if (cl.eff_border[1] > 0)
+	    જો (cl.eff_border[1] > 0)
 	    {
 		buf[mb_char2bytes(border_char[5], buf)] = NUL;
 		screen_puts(buf, wp->w_winrow,
 			       wincol + total_width - 1, border_attr[1]);
 	    }
 	}
-	else if (cl.eff_padding[0] == 0 && popup_top_extra(wp) > 0
+	નહીંતર જો (cl.eff_padding[0] == 0 && popup_ટોચ_extra(wp) > 0
 						    && wp->w_popup_topoff == 0)
-	    top_padding = 1;
+	    ટોચ_padding = 1;
 
-	if (top_padding > 0 || wp->w_popup_padding[2] > 0)
+	જો (ટોચ_padding > 0 || wp->w_popup_padding[2] > 0)
 	{
 	    padcol = wincol + wp->w_popup_border[3];
 	    padendcol = wp->w_wincol + total_width - wp->w_popup_border[1]
 							- wp->w_has_scrollbar;
-	    if (padcol < 0)
+	    જો (padcol < 0)
 	    {
 		padendcol += padcol;
 		padcol = 0;
 	    }
 	}
-	if (top_padding > 0)
+	જો (ટોચ_padding > 0)
 	{
 	    row = wp->w_winrow + cl.eff_border[0];
-	    if (title_len > 0 && row == wp->w_winrow)
+	    જો (title_len > 0 && row == wp->w_winrow)
 	    {
 		// top padding and no border; do not draw over the title
-		if (screen_opacity_popup != NULL && saved_screen.lines != NULL)
+		જો (screen_opacity_popup != ખાલી && saved_screen.લીટીઓ != ખાલી)
 		{
 		    // Left of title
 		    fill_opacity_padding(row, row + 1, padcol, title_wincol,
@@ -6678,7 +6678,7 @@ update_popups(void (*win_update)(win_T *wp))
 		    fill_opacity_padding(row, row + 1,
 			    title_wincol + title_len, padendcol, &saved_screen);
 		}
-		else
+		નહીંતર
 		{
 		    screen_fill(row, row + 1, padcol, title_wincol,
 							     ' ', ' ', popup_attr);
@@ -6686,141 +6686,141 @@ update_popups(void (*win_update)(win_T *wp))
 						  padendcol, ' ', ' ', popup_attr);
 		}
 		row += 1;
-		top_padding -= 1;
+		ટોચ_padding -= 1;
 	    }
 	    // Draw remaining top padding rows
-	    if (screen_opacity_popup != NULL && saved_screen.lines != NULL)
+	    જો (screen_opacity_popup != ખાલી && saved_screen.લીટીઓ != ખાલી)
 	    {
-		fill_opacity_padding(row, row + top_padding, padcol, padendcol,
+		fill_opacity_padding(row, row + ટોચ_padding, padcol, padendcol,
 			&saved_screen);
 	    }
-	    else
+	    નહીંતર
 	    {
-		screen_fill(row, row + top_padding, padcol, padendcol,
+		screen_fill(row, row + ટોચ_padding, padcol, padendcol,
 							     ' ', ' ', popup_attr);
 	    }
 	}
 
 	// Compute scrollbar thumb position and size.
-	if (wp->w_has_scrollbar)
+	જો (wp->w_has_scrollbar)
 	{
-	    linenr_T	linecount = wp->w_buffer->b_ml.ml_line_count;
-	    int		height = wp->w_height;
-	    int		last;
+	    linenr_T	linecount = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
+	    પૂર્ણાંક		height = wp->w_height;
+	    પૂર્ણાંક		last;
 
 	    sb_thumb_height = ((linenr_T)height * height + linecount / 2)
 								   / linecount;
-	    if (wp->w_topline > 1 && sb_thumb_height == height)
+	    જો (wp->w_topline > 1 && sb_thumb_height == height)
 		--sb_thumb_height;  // scrolled, no full thumb
-	    if (sb_thumb_height == 0)
+	    જો (sb_thumb_height == 0)
 		sb_thumb_height = 1;
-	    if (linecount <= wp->w_height || wp->w_height == 0)
+	    જો (linecount <= wp->w_height || wp->w_height == 0)
 		// it just fits, avoid divide by zero
-		sb_thumb_top = 0;
-	    else
-		sb_thumb_top = (wp->w_topline - 1
+		sb_thumb_ટોચ = 0;
+	    નહીંતર
+		sb_thumb_ટોચ = (wp->w_topline - 1
 				+ (linecount / wp->w_height) / 2)
 				* (wp->w_height - sb_thumb_height)
 						  / (linecount - wp->w_height);
-	    if (wp->w_topline > 1 && sb_thumb_top == 0 && height > 1)
-		sb_thumb_top = 1;  // show it's scrolled
-	    last = total_height - top_off - wp->w_popup_border[2];
-	    if (sb_thumb_top >= last)
+	    જો (wp->w_topline > 1 && sb_thumb_ટોચ == 0 && height > 1)
+		sb_thumb_ટોચ = 1;  // show it's scrolled
+	    last = total_height - ટોચ_off - wp->w_popup_border[2];
+	    જો (sb_thumb_ટોચ >= last)
 		// show at least one character
-		sb_thumb_top = last - 1;
+		sb_thumb_ટોચ = last - 1;
 
-	    if (wp->w_scrollbar_highlight != NULL)
+	    જો (wp->w_scrollbar_highlight != ખાલી)
 		attr_scroll = syn_name2attr(wp->w_scrollbar_highlight);
-	    else
+	    નહીંતર
 		attr_scroll = highlight_attr[HLF_PSB];
-	    if (wp->w_thumb_highlight != NULL)
+	    જો (wp->w_thumb_highlight != ખાલી)
 		attr_thumb = syn_name2attr(wp->w_thumb_highlight);
-	    else
+	    નહીંતર
 		attr_thumb = highlight_attr[HLF_PST];
 	}
 
 	// The side-border loop spans the popup's drawn extent.  cl.eff_border
 	// and cl.eff_padding collapse the clipped edges to 0 so the loop
 	// covers the full visible area without leaving an empty trailing row.
-	for (i = cl.eff_border[0]; i < total_height - cl.eff_border[2]; ++i)
+	માટે (i = cl.eff_border[0]; i < total_height - cl.eff_border[2]; ++i)
 	{
-	    int	pad_left;
+	    પૂર્ણાંક	pad_ડાબું;
 	    // left and right padding only needed next to the body
-	    int do_padding =
+	    પૂર્ણાંક do_padding =
 		    i >= cl.eff_border[0] + cl.eff_padding[0]
 		    && i < total_height - cl.eff_border[2] - cl.eff_padding[2];
 
 	    row = wp->w_winrow + i;
 
 	    // left border
-	    if (cl.eff_border[3] > 0 && wincol >= 0)
+	    જો (cl.eff_border[3] > 0 && wincol >= 0)
 	    {
 		buf[mb_char2bytes(border_char[3], buf)] = NUL;
 		screen_puts(buf, row, wincol, border_attr[3]);
 	    }
-	    if (do_padding && cl.eff_padding[3] > 0)
+	    જો (do_padding && cl.eff_padding[3] > 0)
 	    {
-		int col = wincol + wp->w_popup_border[3];
+		પૂર્ણાંક col = wincol + wp->w_popup_border[3];
 
 		// left padding
-		pad_left = wp->w_popup_padding[3];
-		if (col < 0)
+		pad_ડાબું = wp->w_popup_padding[3];
+		જો (col < 0)
 		{
-		    pad_left += col;
+		    pad_ડાબું += col;
 		    col = 0;
 		}
-		if (pad_left > 0)
+		જો (pad_ડાબું > 0)
 		{
-		    if (screen_opacity_popup != NULL && saved_screen.lines != NULL)
-			fill_opacity_padding(row, row + 1, col, col + pad_left,
+		    જો (screen_opacity_popup != ખાલી && saved_screen.લીટીઓ != ખાલી)
+			fill_opacity_padding(row, row + 1, col, col + pad_ડાબું,
 				&saved_screen);
-		    else
-			screen_fill(row, row + 1, col, col + pad_left,
+		    નહીંતર
+			screen_fill(row, row + 1, col, col + pad_ડાબું,
 							 ' ', ' ', popup_attr);
 		}
 	    }
 	    // scrollbar
-	    if (wp->w_has_scrollbar)
+	    જો (wp->w_has_scrollbar)
 	    {
-		int line = i - top_off;
-		int scroll_col = wp->w_wincol + total_width - 1
+		પૂર્ણાંક લીટી = i - ટોચ_off;
+		પૂર્ણાંક scroll_col = wp->w_wincol + total_width - 1
 						       - wp->w_popup_border[1];
 
-		if (line >= 0 && line < wp->w_height)
+		જો (લીટી >= 0 && લીટી < wp->w_height)
 		    screen_putchar(' ', row, scroll_col,
-			    line >= sb_thumb_top
-				       && line < sb_thumb_top + sb_thumb_height
+			    લીટી >= sb_thumb_ટોચ
+				       && લીટી < sb_thumb_ટોચ + sb_thumb_height
 						  ? attr_thumb : attr_scroll);
-		else
+		નહીંતર
 		    screen_putchar(' ', row, scroll_col, popup_attr);
 	    }
 	    // right border
-	    if (cl.eff_border[1] > 0)
+	    જો (cl.eff_border[1] > 0)
 	    {
 		buf[mb_char2bytes(border_char[1], buf)] = NUL;
 		screen_puts(buf, row, wincol + total_width - 1, border_attr[1]);
 	    }
 	    // right padding
-	    if (do_padding && cl.eff_padding[1] > 0)
+	    જો (do_padding && cl.eff_padding[1] > 0)
 	    {
-		int pad_col_start = wincol + wp->w_popup_border[3]
+		પૂર્ણાંક pad_col_start = wincol + wp->w_popup_border[3]
 			+ wp->w_popup_padding[3] + wp->w_width;
-		int pad_col_end = pad_col_start + wp->w_popup_padding[1];
+		પૂર્ણાંક pad_col_end = pad_col_start + wp->w_popup_padding[1];
 
-		if (screen_opacity_popup != NULL && saved_screen.lines != NULL)
+		જો (screen_opacity_popup != ખાલી && saved_screen.લીટીઓ != ખાલી)
 		    fill_opacity_padding(row, row + 1, pad_col_start, pad_col_end,
 			    &saved_screen);
-		else
+		નહીંતર
 		    screen_fill(row, row + 1, pad_col_start, pad_col_end,
 							     ' ', ' ', popup_attr);
 	    }
 	}
 
 	// right shadow
-	if (wp->w_popup_shadow)
+	જો (wp->w_popup_shadow)
 	{
-	    int col = wincol + total_width;
-	    for (i = 0; i < total_height; ++i)
+	    પૂર્ણાંક col = wincol + total_width;
+	    માટે (i = 0; i < total_height; ++i)
 	    {
 		row = wp->w_winrow + i + 1;
 		put_shadow_char(row, col);
@@ -6828,7 +6828,7 @@ update_popups(void (*win_update)(win_T *wp))
 	    }
 	}
 
-	if (cl.eff_padding[2] > 0)
+	જો (cl.eff_padding[2] > 0)
 	{
 	    // bottom padding -- sits right after the visible content rows.
 	    // Derive the row from total_height so it always lands inside the
@@ -6839,15 +6839,15 @@ update_popups(void (*win_update)(win_T *wp))
 	    // there and would draw the padding above w_winrow.
 	    row = wp->w_winrow + total_height
 		    - cl.eff_padding[2] - cl.eff_border[2];
-	    if (screen_opacity_popup != NULL && saved_screen.lines != NULL)
+	    જો (screen_opacity_popup != ખાલી && saved_screen.લીટીઓ != ખાલી)
 		fill_opacity_padding(row, row + cl.eff_padding[2],
 			padcol, padendcol, &saved_screen);
-	    else
+	    નહીંતર
 		screen_fill(row, row + cl.eff_padding[2],
 					   padcol, padendcol, ' ', ' ', popup_attr);
 	}
 
-	if (cl.eff_border[2] > 0)
+	જો (cl.eff_border[2] > 0)
 	{
 	    // bottom border
 	    row = wp->w_winrow + total_height - 1;
@@ -6857,23 +6857,23 @@ update_popups(void (*win_update)(win_T *wp))
 		    cl.eff_border[3] != 0 && wp->w_popup_leftoff == 0
 					     ? border_char[7] : border_char[2],
 		    border_char[2], border_attr[2]);
-	    if (cl.eff_border[1] > 0)
+	    જો (cl.eff_border[1] > 0)
 	    {
 		buf[mb_char2bytes(border_char[6], buf)] = NUL;
 		screen_puts(buf, row, wincol + total_width - 1, border_attr[2]);
 	    }
 	}
 
-	if (wp->w_popup_shadow && wp->w_popup_bottomoff == 0)
+	જો (wp->w_popup_shadow && wp->w_popup_bottomoff == 0)
 	{
 	    // bottom shadow
 	    row = wp->w_winrow + total_height;
-	    for (int col = 2 + (wincol < 0 ? 0 : wincol);
+	    માટે (પૂર્ણાંક col = 2 + (wincol < 0 ? 0 : wincol);
 		    col < wincol + total_width; col++)
 		put_shadow_char(row, col);
 	}
 
-	if (wp->w_popup_close == POPCLOSE_BUTTON)
+	જો (wp->w_popup_close == POPCLOSE_BUTTON)
 	{
 	    // close button goes on top of anything at the top-right corner
 	    buf[mb_char2bytes('X', buf)] = NUL;
@@ -6886,7 +6886,7 @@ update_popups(void (*win_update)(win_T *wp))
 	popup_free_saved_screen(&saved_screen);
 
 	// Clear popup with opacity context.
-	screen_opacity_popup = NULL;
+	screen_opacity_popup = ખાલી;
 
 	// Back to the normal zindex.
 	screen_zindex = 0;
@@ -6896,8 +6896,8 @@ update_popups(void (*win_update)(win_T *wp))
 	may_start_message_win_timer(wp);
 #endif
 
-	if (override_success)
-	    pop_highlight_overrides();
+	જો (override_success)
+	    કાઢો_highlight_overrides();
 
 #ifdef FEAT_IMAGE_POPUP
 	popup_position_image(wp);
@@ -6912,81 +6912,81 @@ update_popups(void (*win_update)(win_T *wp))
     base_screen_cols = 0;
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#જો defined(FEAT_શોધ_EXTRA)
     // In case win_update() called start_search_hl().
-    end_search_hl();
+    end_શોધ_hl();
 #endif
 }
 
 /*
  * Mark references in callbacks of one popup window.
  */
-    static int
-set_ref_in_one_popup(win_T *wp, int copyID)
+    સ્થિર પૂર્ણાંક
+set_ref_in_one_popup(win_T *wp, પૂર્ણાંક copyID)
 {
-    int		abort = FALSE;
+    પૂર્ણાંક		abort = FALSE;
     typval_T	tv;
 
-    if (wp->w_close_cb.cb_partial != NULL)
+    જો (wp->w_close_cb.cb_partial != ખાલી)
     {
 	tv.v_type = VAR_PARTIAL;
 	tv.vval.v_partial = wp->w_close_cb.cb_partial;
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || set_ref_in_item(&tv, copyID, ખાલી, ખાલી, ખાલી);
     }
-    if (wp->w_filter_cb.cb_partial != NULL)
+    જો (wp->w_filter_cb.cb_partial != ખાલી)
     {
 	tv.v_type = VAR_PARTIAL;
 	tv.vval.v_partial = wp->w_filter_cb.cb_partial;
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || set_ref_in_item(&tv, copyID, ખાલી, ખાલી, ખાલી);
     }
     abort = abort || set_ref_in_list(wp->w_popup_mask, copyID);
-    return abort;
+    પાછા abort;
 }
 
 /*
  * Set reference in callbacks of popup windows.
  */
-    int
-set_ref_in_popups(int copyID)
+    પૂર્ણાંક
+set_ref_in_popups(પૂર્ણાંક copyID)
 {
-    int		abort = FALSE;
+    પૂર્ણાંક		abort = FALSE;
     win_T	*wp;
     tabpage_T	*tp;
 
-    for (wp = first_popupwin; !abort && wp != NULL; wp = wp->w_next)
+    માટે (wp = first_popupwin; !abort && wp != ખાલી; wp = wp->w_next)
 	abort = abort || set_ref_in_one_popup(wp, copyID);
 
     FOR_ALL_TABPAGES(tp)
     {
-	for (wp = tp->tp_first_popupwin; !abort && wp != NULL; wp = wp->w_next)
+	માટે (wp = tp->tp_first_popupwin; !abort && wp != ખાલી; wp = wp->w_next)
 	    abort = abort || set_ref_in_one_popup(wp, copyID);
-	if (abort)
-	    break;
+	જો (abort)
+	    તોડો;
     }
-    return abort;
+    પાછા abort;
 }
 
-    int
+    પૂર્ણાંક
 popup_is_popup(win_T *wp)
 {
-    return wp->w_popup_flags != 0;
+    પાછા wp->w_popup_flags != 0;
 }
 
-#if defined(FEAT_QUICKFIX)
+#જો defined(FEAT_QUICKFIX)
 /*
  * Find an existing popup used as the preview window, in the current tab page.
  * Return NULL if not found.
  */
     win_T *
-popup_find_preview_window(void)
+popup_find_preview_window(શૂન્ય)
 {
     win_T *wp;
 
     // Preview window popup is always local to tab page.
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_p_pvw)
-	    return wp;
-    return NULL;
+	જો (wp->w_p_pvw)
+	    પાછા wp;
+    પાછા ખાલી;
 }
 
 /*
@@ -6994,15 +6994,15 @@ popup_find_preview_window(void)
  * Return NULL if not found.
  */
     win_T *
-popup_find_info_window(void)
+popup_find_info_window(શૂન્ય)
 {
     win_T *wp;
 
     // info window popup is always local to tab page.
     FOR_ALL_POPUPWINS_IN_TAB(curtab, wp)
-	if (wp->w_popup_flags & POPF_INFO)
-	    return wp;
-    return NULL;
+	જો (wp->w_popup_flags & POPF_INFO)
+	    પાછા wp;
+    પાછા ખાલી;
 }
 #endif
 
@@ -7012,127 +7012,127 @@ popup_find_info_window(void)
  * Returns true when an info popup was found.
  */
     bool
-popup_scroll_info(int dir, bool by_page)
+popup_scroll_info(પૂર્ણાંક dir, bool by_page)
 {
 #ifdef FEAT_QUICKFIX
     win_T	*wp = popup_find_info_window();
-    int		by;
+    પૂર્ણાંક		by;
     linenr_T	new_topline;
 
-    if (wp == NULL)
-	return false;
+    જો (wp == ખાલી)
+	પાછા false;
 
     by = by_page ? (wp->w_height > 2 ? wp->w_height - 1 : 1) : 1;
     new_topline = wp->w_topline + (dir < 0 ? -by : by);
-    if (new_topline < 1)
+    જો (new_topline < 1)
 	new_topline = 1;
-    if (new_topline > wp->w_buffer->b_ml.ml_line_count)
-	new_topline = wp->w_buffer->b_ml.ml_line_count;
-    if (new_topline != wp->w_topline)
+    જો (new_topline > wp->w_buffer->b_ml.ml_લીટી_ગણતરી)
+	new_topline = wp->w_buffer->b_ml.ml_લીટી_ગણતરી;
+    જો (new_topline != wp->w_topline)
     {
 	set_topline(wp, new_topline);
 	popup_set_firstline(wp);
 	redraw_win_later(wp, UPD_NOT_VALID);
     }
-    return true;
-#else
-    return false;
+    પાછા true;
+#નહીંતર
+    પાછા false;
 #endif
 }
 
-    void
+    શૂન્ય
 f_popup_findecho(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef HAS_MESSAGE_WINDOW
-    rettv->vval.v_number = message_win == NULL ? 0 : message_win->w_id;
-#else
-    rettv->vval.v_number = 0;
+    rettv->vval.v_સંખ્યા = message_win == ખાલી ? 0 : message_win->w_id;
+#નહીંતર
+    rettv->vval.v_સંખ્યા = 0;
 #endif
 }
 
-    void
+    શૂન્ય
 f_popup_findinfo(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_QUICKFIX
     win_T   *wp = popup_find_info_window();
 
-    rettv->vval.v_number = wp == NULL ? 0 : wp->w_id;
-#else
-    rettv->vval.v_number = 0;
+    rettv->vval.v_સંખ્યા = wp == ખાલી ? 0 : wp->w_id;
+#નહીંતર
+    rettv->vval.v_સંખ્યા = 0;
 #endif
 }
 
-    void
+    શૂન્ય
 f_popup_findpreview(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_QUICKFIX
     win_T   *wp = popup_find_preview_window();
 
-    rettv->vval.v_number = wp == NULL ? 0 : wp->w_id;
-#else
-    rettv->vval.v_number = 0;
+    rettv->vval.v_સંખ્યા = wp == ખાલી ? 0 : wp->w_id;
+#નહીંતર
+    rettv->vval.v_સંખ્યા = 0;
 #endif
 }
 
-#if defined(FEAT_QUICKFIX)
+#જો defined(FEAT_QUICKFIX)
 /*
  * Create a popup to be used as the preview or info window.
  * NOTE: this makes the popup the current window, so that the file can be
  * edited.  However, it must not remain to be the current window, the caller
  * must make sure of that.
  */
-    int
-popup_create_preview_window(int info)
+    પૂર્ણાંક
+popup_create_preview_window(પૂર્ણાંક info)
 {
-    win_T *wp = popup_create(NULL, NULL, info ? TYPE_INFO : TYPE_PREVIEW);
+    win_T *wp = popup_create(ખાલી, ખાલી, info ? TYPE_INFO : TYPE_PREVIEW);
 
-    if (wp == NULL)
-	return FAIL;
-    if (info)
+    જો (wp == ખાલી)
+	પાછા FAIL;
+    જો (info)
 	wp->w_popup_flags |= POPF_INFO;
-    else
+    નહીંતર
 	wp->w_p_pvw = TRUE;
 
     // Set the width to a reasonable value, so that w_topline can be computed.
-    if (wp->w_minwidth > 0)
+    જો (wp->w_minwidth > 0)
 	wp->w_width = wp->w_minwidth;
-    else if (wp->w_maxwidth > 0)
+    નહીંતર જો (wp->w_maxwidth > 0)
 	wp->w_width = wp->w_maxwidth;
-    else
+    નહીંતર
 	wp->w_width = curwin->w_width;
 
     // Will switch to another buffer soon, dummy one can be wiped.
     wp->w_buffer->b_locked = FALSE;
 
     win_enter(wp, FALSE);
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Close any preview popup.
  */
-    void
-popup_close_preview(void)
+    શૂન્ય
+popup_close_preview(શૂન્ય)
 {
     win_T *wp = popup_find_preview_window();
 
-    if (wp != NULL)
+    જો (wp != ખાલી)
 	popup_close_with_retval(wp, -1);
 }
 
 /*
  * Hide the info popup.
  */
-    void
-popup_hide_info(void)
+    શૂન્ય
+popup_hide_info(શૂન્ય)
 {
     win_T *wp = popup_find_info_window();
 
-    if (wp != NULL)
+    જો (wp != ખાલી)
     {
 	popup_on_cmdline = wp->w_popup_flags & POPF_ON_CMDLINE;
 	popup_hide(wp);
-	if (State & MODE_CMDLINE)
+	જો (State & MODE_CMDLINE)
 	    // Cmdline mode doesn't normally call update_screen(), so it's
 	    // necessary to use pum_call_update_screen() here.
 	    pum_call_update_screen();
@@ -7142,12 +7142,12 @@ popup_hide_info(void)
 /*
  * Close any info popup.
  */
-    void
-popup_close_info(void)
+    શૂન્ય
+popup_close_info(શૂન્ય)
 {
     win_T *wp = popup_find_info_window();
 
-    if (wp != NULL)
+    જો (wp != ખાલી)
 	popup_close_with_retval(wp, -1);
 }
 #endif
@@ -7155,30 +7155,30 @@ popup_close_info(void)
 /*
  * Returns TRUE if a popup extends into the cmdline area.
  */
-    int
-popup_overlaps_cmdline(void)
+    પૂર્ણાંક
+popup_overlaps_cmdline(શૂન્ય)
 {
-    return popup_on_cmdline;
+    પાછા popup_on_cmdline;
 }
 
-#if defined(HAS_MESSAGE_WINDOW)
+#જો defined(HAS_MESSAGE_WINDOW)
 
 /*
  * Get the message window.
  * Returns NULL if something failed.
  */
     win_T *
-popup_get_message_win(void)
+popup_get_message_win(શૂન્ય)
 {
-    if (message_win != NULL)
-	return message_win;
+    જો (message_win != ખાલી)
+	પાછા message_win;
 
-    int i;
+    પૂર્ણાંક i;
 
-    message_win = popup_create(NULL, NULL, TYPE_MESSAGE_WIN);
+    message_win = popup_create(ખાલી, ખાલી, TYPE_MESSAGE_WIN);
 
-    if (message_win == NULL)
-	return NULL;
+    જો (message_win == ખાલી)
+	પાછા ખાલી;
 
     // use the full screen width
     message_win->w_width = Columns;
@@ -7190,27 +7190,27 @@ popup_get_message_win(void)
     message_win->w_firstline = -1;
 
     // no padding, border at the top
-    for (i = 0; i < 4; ++i)
+    માટે (i = 0; i < 4; ++i)
 	message_win->w_popup_padding[i] = 0;
-    for (i = 1; i < 4; ++i)
+    માટે (i = 1; i < 4; ++i)
 	message_win->w_popup_border[i] = 0;
 
-    if (message_win->w_popup_timer != NULL)
+    જો (message_win->w_popup_timer != ખાલી)
 	message_win->w_popup_timer->tr_keep = TRUE;
-    return message_win;
+    પાછા message_win;
 }
 
 /*
  * If the message window is not visible: show it
  * If the message window is visible: reset the timeout
  */
-    void
-popup_show_message_win(void)
+    શૂન્ય
+popup_show_message_win(શૂન્ય)
 {
-    if (message_win == NULL)
-	return;
+    જો (message_win == ખાલી)
+	પાછા;
 
-    if ((message_win->w_popup_flags & POPF_HIDDEN) != 0)
+    જો ((message_win->w_popup_flags & POPF_HIDDEN) != 0)
     {
 	// the highlight may have changed.
 	popup_update_color(message_win, TYPE_MESSAGE_WIN);
@@ -7219,12 +7219,12 @@ popup_show_message_win(void)
     start_message_win_timer = TRUE;
 }
 
-    static void
+    સ્થિર શૂન્ય
 may_start_message_win_timer(win_T *wp)
 {
-    if (wp == message_win && start_message_win_timer)
+    જો (wp == message_win && start_message_win_timer)
     {
-	if (message_win->w_popup_timer != NULL)
+	જો (message_win->w_popup_timer != ખાલી)
 	{
 	    message_win->w_popup_timer->tr_interval = message_win_time;
 	    timer_start(message_win->w_popup_timer);
@@ -7234,63 +7234,63 @@ may_start_message_win_timer(win_T *wp)
     }
 }
 
-    int
-popup_message_win_visible(void)
+    પૂર્ણાંક
+popup_message_win_visible(શૂન્ય)
 {
-    return message_win != NULL
+    પાછા message_win != ખાલી
 	&& (message_win->w_popup_flags & POPF_HIDDEN) == 0;
 }
 
 /*
  * If the message window is visible: hide it.
  */
-    void
-popup_hide_message_win(void)
+    શૂન્ય
+popup_hide_message_win(શૂન્ય)
 {
-    if (message_win != NULL)
+    જો (message_win != ખાલી)
 	popup_hide(message_win);
 }
 
 // Values saved in start_echowindow() and restored in end_echowindow()
-static int save_msg_didout = FALSE;
-static int save_msg_col = 0;
+સ્થિર પૂર્ણાંક save_સંદેશ_didout = FALSE;
+સ્થિર પૂર્ણાંક save_સંદેશ_col = 0;
 // Values saved in end_echowindow() and restored in start_echowindow()
-static int ew_msg_didout = FALSE;
-static int ew_msg_col = 0;
+સ્થિર પૂર્ણાંક ew_સંદેશ_didout = FALSE;
+સ્થિર પૂર્ણાંક ew_સંદેશ_col = 0;
 
 /*
  * Invoked before outputting a message for ":echowindow".
  * "time_sec" is the display time, zero means using the default 3 sec.
  */
-    void
-start_echowindow(int time_sec)
+    શૂન્ય
+start_echowindow(પૂર્ણાંક time_sec)
 {
     in_echowindow = TRUE;
-    save_msg_didout = msg_didout;
-    save_msg_col = msg_col;
-    msg_didout = ew_msg_didout;
-    msg_col = ew_msg_col;
-    if (time_sec != 0)
+    save_સંદેશ_didout = સંદેશ_didout;
+    save_સંદેશ_col = સંદેશ_col;
+    સંદેશ_didout = ew_સંદેશ_didout;
+    સંદેશ_col = ew_સંદેશ_col;
+    જો (time_sec != 0)
 	message_win_time = time_sec * 1000;
 }
 
 /*
  * Invoked after outputting a message for ":echowindow".
  */
-    void
-end_echowindow(void)
+    શૂન્ય
+end_echowindow(શૂન્ય)
 {
     in_echowindow = FALSE;
 
-    if ((State & MODE_HITRETURN) == 0)
+    જો ((State & MODE_HITRETURN) == 0)
 	// show the message window now
 	redraw_cmd(FALSE);
 
     // do not overwrite messages
-    ew_msg_didout = TRUE;
-    ew_msg_col = msg_col == 0 ? 1 : msg_col;
-    msg_didout = save_msg_didout;
-    msg_col = save_msg_col;
+    ew_સંદેશ_didout = TRUE;
+    ew_સંદેશ_col = સંદેશ_col == 0 ? 1 : સંદેશ_col;
+    સંદેશ_didout = save_સંદેશ_didout;
+    સંદેશ_col = save_સંદેશ_col;
 }
 #endif
 
@@ -7298,36 +7298,36 @@ end_echowindow(void)
  * Close any popup for a text property associated with "win".
  * Return TRUE if a popup was closed.
  */
-    int
+    પૂર્ણાંક
 popup_win_closed(win_T *win)
 {
-    int	    round;
+    પૂર્ણાંક	    round;
     win_T   *wp;
     win_T   *next;
-    int	    ret = FALSE;
+    પૂર્ણાંક	    ret = FALSE;
 
-    for (round = 1; round <= 2; ++round)
-	for (wp = round == 1 ? first_popupwin : curtab->tp_first_popupwin;
-							 wp != NULL; wp = next)
+    માટે (round = 1; round <= 2; ++round)
+	માટે (wp = round == 1 ? first_popupwin : curtab->tp_first_popupwin;
+							 wp != ખાલી; wp = next)
 	{
 	    next = wp->w_next;
-	    if (wp->w_popup_prop_win == win)
+	    જો (wp->w_popup_prop_win == win)
 	    {
 		popup_close_with_retval(wp, -1);
 		ret = TRUE;
 	    }
 	}
-    return ret;
+    પાછા ret;
 }
 
 /*
  * Set the title of the popup window to the file name.
  */
-    void
+    શૂન્ય
 popup_set_title(win_T *wp)
 {
-    if (wp->w_buffer->b_fname == NULL)
-	return;
+    જો (wp->w_buffer->b_fname == ખાલી)
+	પાછા;
 
     char_u	dirname[MAXPATHL];
     size_t	len;
@@ -7338,23 +7338,23 @@ popup_set_title(win_T *wp)
     vim_free(wp->w_popup_title);
     len = STRLEN(wp->w_buffer->b_fname) + 3;
     wp->w_popup_title = alloc(len);
-    if (wp->w_popup_title != NULL)
-	vim_snprintf((char *)wp->w_popup_title, len, " %s ",
+    જો (wp->w_popup_title != ખાલી)
+	vim_snprintf((અક્ષર *)wp->w_popup_title, len, " %s ",
 		wp->w_buffer->b_fname);
     redraw_win_later(wp, UPD_VALID);
 }
 
-#if defined(FEAT_QUICKFIX)
+#જો defined(FEAT_QUICKFIX)
 /*
  * If there is a preview window, update the title.
  * Used after changing directory.
  */
-    void
-popup_update_preview_title(void)
+    શૂન્ય
+popup_update_preview_title(શૂન્ય)
 {
     win_T *wp = popup_find_preview_window();
 
-    if (wp != NULL)
+    જો (wp != ખાલી)
 	popup_set_title(wp);
 }
 #endif

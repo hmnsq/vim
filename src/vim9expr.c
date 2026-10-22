@@ -12,57 +12,57 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 
 // flag passed from compile_subscript() to compile_load_scriptvar()
-static int paren_follows_after_expr = 0;
+સ્થિર પૂર્ણાંક paren_follows_after_પદાવલિ = 0;
 
 /*
  * Generate code for any ppconst entries.
  */
-    int
+    પૂર્ણાંક
 generate_ppconst(cctx_T *cctx, ppconst_T *ppconst)
 {
-    int	    i;
-    int	    ret = OK;
-    int	    save_skip = cctx->ctx_skip;
+    પૂર્ણાંક	    i;
+    પૂર્ણાંક	    ret = OK;
+    પૂર્ણાંક	    save_skip = cctx->ctx_skip;
 
     cctx->ctx_skip = SKIP_NOT;
-    for (i = 0; i < ppconst->pp_used; ++i)
-	if (generate_tv_PUSH(cctx, &ppconst->pp_tv[i]) == FAIL)
+    માટે (i = 0; i < ppconst->pp_used; ++i)
+	જો (generate_tv_ધકેલો(cctx, &ppconst->pp_tv[i]) == FAIL)
 	    ret = FAIL;
     ppconst->pp_used = 0;
     cctx->ctx_skip = save_skip;
-    return ret;
+    પાછા ret;
 }
 
 /*
  * Check that the last item of "ppconst" is a bool, if there is an item.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 check_ppconst_bool(ppconst_T *ppconst)
 {
-    if (ppconst->pp_used > 0)
+    જો (ppconst->pp_used > 0)
     {
 	typval_T    *tv = &ppconst->pp_tv[ppconst->pp_used - 1];
 	where_T	    where = WHERE_INIT;
 
-	return check_typval_type(&t_bool, tv, where);
+	પાછા check_typval_type(&t_bool, tv, where);
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Clear ppconst constants.  Used when failing.
  */
-    void
+    શૂન્ય
 clear_ppconst(ppconst_T *ppconst)
 {
-    int	    i;
+    પૂર્ણાંક	    i;
 
-    for (i = 0; i < ppconst->pp_used; ++i)
+    માટે (i = 0; i < ppconst->pp_used; ++i)
 	clear_tv(&ppconst->pp_tv[i]);
     ppconst->pp_used = 0;
 }
@@ -71,67 +71,67 @@ clear_ppconst(ppconst_T *ppconst)
  * Compile getting a member from a tuple.  Stack has the indexable value and
  * the index or the two indexes of a slice.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_tuple_member(
     type2_T	*typep,
-    int		is_slice,
+    પૂર્ણાંક		is_slice,
     cctx_T	*cctx)
 {
-    if (is_slice)
+    જો (is_slice)
     {
-	if (generate_instr_drop(cctx, ISN_TUPLESLICE, 2) == FAIL)
-	    return FAIL;
+	જો (generate_instr_drop(cctx, ISN_TUPLESLICE, 2) == FAIL)
+	    પાછા FAIL;
 	// a copy is made so the member type is no longer declared
-	if (typep->type_decl->tt_type == VAR_TUPLE)
+	જો (typep->type_decl->tt_type == VAR_TUPLE)
 	    typep->type_decl = &t_tuple_any;
 
 	// a copy is made, the composite is no longer "const"
-	if (typep->type_curr->tt_flags & TTFLAG_CONST)
+	જો (typep->type_curr->tt_flags & TTFLAG_CONST)
 	{
 	    type_T *type = copy_type(typep->type_curr, cctx->ctx_type_list);
 
-	    if (type != typep->type_curr)  // did get a copy
+	    જો (type != typep->type_curr)  // did get a copy
 	    {
 		type->tt_flags &= ~(TTFLAG_CONST | TTFLAG_STATIC);
 		typep->type_curr = type;
 	    }
 	}
     }
-    else
+    નહીંતર
     {
-	if (typep->type_curr->tt_type == VAR_TUPLE)
+	જો (typep->type_curr->tt_type == VAR_TUPLE)
 	{
-	    if (typep->type_curr->tt_argcount == 1)
+	    જો (typep->type_curr->tt_argcount == 1)
 	    {
-		if (typep->type_curr->tt_flags & TTFLAG_VARARGS)
+		જો (typep->type_curr->tt_flags & TTFLAG_VARARGS)
 		    typep->type_curr
 				= typep->type_curr->tt_args[0]->tt_member;
-		else
+		નહીંતર
 		    typep->type_curr = typep->type_curr->tt_args[0];
 	    }
-	    else
+	    નહીંતર
 		typep->type_curr = &t_any;
-	    if (typep->type_decl->tt_type == VAR_TUPLE)
+	    જો (typep->type_decl->tt_type == VAR_TUPLE)
 	    {
-		if (typep->type_decl->tt_argcount == 1)
+		જો (typep->type_decl->tt_argcount == 1)
 		{
-		    if (typep->type_decl->tt_flags & TTFLAG_VARARGS)
+		    જો (typep->type_decl->tt_flags & TTFLAG_VARARGS)
 			typep->type_decl
 				= typep->type_decl->tt_args[0]->tt_member;
-		    else
+		    નહીંતર
 			typep->type_decl = typep->type_decl->tt_args[0];
 		}
-		else
+		નહીંતર
 		    typep->type_curr = &t_any;
 	    }
-	    else
+	    નહીંતર
 		typep->type_decl = typep->type_curr;
 	}
-	if (generate_instr_drop(cctx, ISN_TUPLEINDEX, 1) == FAIL)
-	    return FAIL;
+	જો (generate_instr_drop(cctx, ISN_TUPLEINDEX, 1) == FAIL)
+	    પાછા FAIL;
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -139,11 +139,11 @@ compile_tuple_member(
  * indexable value and the index or the two indexes of a slice.
  * "keeping_dict" is used for dict[func](arg) to pass dict to func.
  */
-    int
-compile_member(int is_slice, int *keeping_dict, cctx_T *cctx)
+    પૂર્ણાંક
+compile_member(પૂર્ણાંક is_slice, પૂર્ણાંક *keeping_dict, cctx_T *cctx)
 {
     type2_T	*typep;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*ઢગલો = &cctx->ctx_type_ઢગલો;
     vartype_T	vartype;
     type_T	*idxtype;
 
@@ -151,235 +151,235 @@ compile_member(int is_slice, int *keeping_dict, cctx_T *cctx)
     // we can use the index value type.  If we still don't know use an "ANY"
     // instruction.
     // TODO: what about the decl type?
-    typep = (((type2_T *)stack->ga_data) + stack->ga_len - (is_slice ? 3 : 2));
+    typep = (((type2_T *)ઢગલો->ga_data) + ઢગલો->ga_len - (is_slice ? 3 : 2));
     vartype = typep->type_curr->tt_type;
-    idxtype = (((type2_T *)stack->ga_data) + stack->ga_len - 1)->type_curr;
+    idxtype = (((type2_T *)ઢગલો->ga_data) + ઢગલો->ga_len - 1)->type_curr;
     // If the index is a string, the variable must be a Dict.
-    if ((typep->type_curr->tt_type == VAR_ANY
+    જો ((typep->type_curr->tt_type == VAR_ANY
 		|| typep->type_curr->tt_type == VAR_UNKNOWN)
 						       && idxtype == &t_string)
 	vartype = VAR_DICT;
-    if (vartype == VAR_STRING || vartype == VAR_LIST || vartype == VAR_BLOB
+    જો (vartype == VAR_STRING || vartype == VAR_LIST || vartype == VAR_BLOB
 						|| vartype == VAR_TUPLE)
     {
-	if (need_type(idxtype, &t_number, 0,
+	જો (need_type(idxtype, &t_સંખ્યા, 0,
 					    -1, 0, cctx, FALSE, FALSE) == FAIL)
-	    return FAIL;
-	if (is_slice)
+	    પાછા FAIL;
+	જો (is_slice)
 	{
-	    idxtype = get_type_on_stack(cctx, 1);
-	    if (need_type(idxtype, &t_number, 0,
+	    idxtype = get_type_on_ઢગલો(cctx, 1);
+	    જો (need_type(idxtype, &t_સંખ્યા, 0,
 					    -2, 0, cctx, FALSE, FALSE) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	}
     }
 
-    if (vartype == VAR_DICT)
+    જો (vartype == VAR_DICT)
     {
-	if (is_slice)
+	જો (is_slice)
 	{
 	    emsg(_(e_cannot_slice_dictionary));
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (typep->type_curr->tt_type == VAR_DICT)
+	જો (typep->type_curr->tt_type == VAR_DICT)
 	{
 	    typep->type_curr = typep->type_curr->tt_member;
-	    if (typep->type_curr == &t_unknown)
+	    જો (typep->type_curr == &t_unknown)
 		// empty dict was used
 		typep->type_curr = &t_any;
-	    if (typep->type_decl->tt_type == VAR_DICT)
+	    જો (typep->type_decl->tt_type == VAR_DICT)
 	    {
 		typep->type_decl = typep->type_decl->tt_member;
-		if (typep->type_decl == &t_unknown)
+		જો (typep->type_decl == &t_unknown)
 		    // empty dict was used
 		    typep->type_decl = &t_any;
 	    }
-	    else
+	    નહીંતર
 		typep->type_decl = typep->type_curr;
 	}
-	else
+	નહીંતર
 	{
-	    if (need_type(typep->type_curr, &t_dict_any, 0,
+	    જો (need_type(typep->type_curr, &t_dict_any, 0,
 					    -2, 0, cctx, FALSE, FALSE) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	    typep->type_curr = &t_any;
 	    typep->type_decl = &t_any;
 	}
-	if (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL
+	જો (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL
 		|| generate_instr_drop(cctx, ISN_MEMBER, 1) == FAIL)
-	    return FAIL;
-	if (keeping_dict != NULL)
+	    પાછા FAIL;
+	જો (keeping_dict != ખાલી)
 	    *keeping_dict = TRUE;
     }
-    else if (vartype == VAR_STRING)
+    નહીંતર જો (vartype == VAR_STRING)
     {
 	typep->type_curr = &t_string;
 	typep->type_decl = &t_string;
-	if ((is_slice
+	જો ((is_slice
 		? generate_instr_drop(cctx, ISN_STRSLICE, 2)
 		: generate_instr_drop(cctx, ISN_STRINDEX, 1)) == FAIL)
-	    return FAIL;
+	    પાછા FAIL;
     }
-    else if (vartype == VAR_BLOB)
+    નહીંતર જો (vartype == VAR_BLOB)
     {
-	if (is_slice)
+	જો (is_slice)
 	{
 	    typep->type_curr = &t_blob;
 	    typep->type_decl = &t_blob;
-	    if (generate_instr_drop(cctx, ISN_BLOBSLICE, 2) == FAIL)
-		return FAIL;
+	    જો (generate_instr_drop(cctx, ISN_BLOBSLICE, 2) == FAIL)
+		પાછા FAIL;
 	}
-	else
+	નહીંતર
 	{
-	    typep->type_curr = &t_number;
-	    typep->type_decl = &t_number;
-	    if (generate_instr_drop(cctx, ISN_BLOBINDEX, 1) == FAIL)
-		return FAIL;
+	    typep->type_curr = &t_સંખ્યા;
+	    typep->type_decl = &t_સંખ્યા;
+	    જો (generate_instr_drop(cctx, ISN_BLOBINDEX, 1) == FAIL)
+		પાછા FAIL;
 	}
     }
-    else if (vartype == VAR_TUPLE)
+    નહીંતર જો (vartype == VAR_TUPLE)
     {
-	if (compile_tuple_member(typep, is_slice, cctx) == FAIL)
-	    return FAIL;
+	જો (compile_tuple_member(typep, is_slice, cctx) == FAIL)
+	    પાછા FAIL;
     }
-    else if (vartype == VAR_LIST || typep->type_curr->tt_type == VAR_ANY
+    નહીંતર જો (vartype == VAR_LIST || typep->type_curr->tt_type == VAR_ANY
 				 || typep->type_curr->tt_type == VAR_UNKNOWN)
     {
-	if (is_slice)
+	જો (is_slice)
 	{
-	    if (generate_instr_drop(cctx,
+	    જો (generate_instr_drop(cctx,
 		     vartype == VAR_LIST ?  ISN_LISTSLICE : ISN_ANYSLICE,
 							    2) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	    // a copy is made so the member type is no longer declared
-	    if (typep->type_decl->tt_type == VAR_LIST)
+	    જો (typep->type_decl->tt_type == VAR_LIST)
 		typep->type_decl = &t_list_any;
 
 	    // a copy is made, the composite is no longer "const"
-	    if (typep->type_curr->tt_flags & TTFLAG_CONST)
+	    જો (typep->type_curr->tt_flags & TTFLAG_CONST)
 	    {
 		type_T *type = copy_type(typep->type_curr, cctx->ctx_type_list);
 
-		if (type != typep->type_curr)  // did get a copy
+		જો (type != typep->type_curr)  // did get a copy
 		{
 		    type->tt_flags &= ~(TTFLAG_CONST | TTFLAG_STATIC);
 		    typep->type_curr = type;
 		}
 	    }
 	}
-	else
+	નહીંતર
 	{
-	    if (typep->type_curr->tt_type == VAR_LIST)
+	    જો (typep->type_curr->tt_type == VAR_LIST)
 	    {
 		typep->type_curr = typep->type_curr->tt_member;
-		if (typep->type_curr == &t_unknown)
+		જો (typep->type_curr == &t_unknown)
 		    // empty list was used
 		    typep->type_curr = &t_any;
-		if (typep->type_decl->tt_type == VAR_LIST)
+		જો (typep->type_decl->tt_type == VAR_LIST)
 		{
 		    typep->type_decl = typep->type_decl->tt_member;
-		    if (typep->type_decl == &t_unknown)
+		    જો (typep->type_decl == &t_unknown)
 			// empty list was used
 			typep->type_decl = &t_any;
 		}
-		else
+		નહીંતર
 			typep->type_decl = typep->type_curr;
 	    }
-	    if (generate_instr_drop(cctx,
+	    જો (generate_instr_drop(cctx,
 			vartype == VAR_LIST ?  ISN_LISTINDEX : ISN_ANYINDEX, 1)
 								       == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	}
     }
-    else
+    નહીંતર
     {
-	switch (vartype)
+	પસંદગી (vartype)
 	{
-	    case VAR_FUNC:
-	    case VAR_PARTIAL:
+	    સ્થિતિ VAR_FUNC:
+	    સ્થિતિ VAR_PARTIAL:
 		emsg(_(e_cannot_index_a_funcref));
-		break;
-	    case VAR_BOOL:
-	    case VAR_SPECIAL:
-	    case VAR_JOB:
-	    case VAR_CHANNEL:
-	    case VAR_INSTR:
-	    case VAR_CLASS:
-	    case VAR_OBJECT:
-	    case VAR_TYPEALIAS:
-	    case VAR_UNKNOWN:
-	    case VAR_ANY:
-	    case VAR_VOID:
+		તોડો;
+	    સ્થિતિ VAR_BOOL:
+	    સ્થિતિ VAR_SPECIAL:
+	    સ્થિતિ VAR_JOB:
+	    સ્થિતિ VAR_CHANNEL:
+	    સ્થિતિ VAR_INSTR:
+	    સ્થિતિ VAR_CLASS:
+	    સ્થિતિ VAR_OBJECT:
+	    સ્થિતિ VAR_TYPEALIAS:
+	    સ્થિતિ VAR_UNKNOWN:
+	    સ્થિતિ VAR_ANY:
+	    સ્થિતિ VAR_VOID:
 		emsg(_(e_cannot_index_special_variable));
-		break;
-	    default:
+		તોડો;
+	    મૂળભૂત:
 		emsg(_(e_string_list_dict_or_blob_required));
 	}
-	return FAIL;
+	પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Returns TRUE if the current function is inside the class "cl" or one of the
  * parent classes.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 inside_class_hierarchy(cctx_T *cctx_arg, class_T *cl)
 {
-    for (cctx_T *cctx = cctx_arg; cctx != NULL; cctx = cctx->ctx_outer)
+    માટે (cctx_T *cctx = cctx_arg; cctx != ખાલી; cctx = cctx->ctx_outer)
     {
-	if (cctx->ctx_ufunc != NULL && cctx->ctx_ufunc->uf_class != NULL)
+	જો (cctx->ctx_ufunc != ખાલી && cctx->ctx_ufunc->uf_class != ખાલી)
 	{
 	    class_T	*clp = cctx->ctx_ufunc->uf_class;
-	    while (clp != NULL)
+	    જ્યારે (clp != ખાલી)
 	    {
-		if (clp == cl)
-		    return TRUE;
+		જો (clp == cl)
+		    પાછા TRUE;
 		clp = clp->class_extends;
 	    }
 	}
     }
 
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Compile ".member" coming after an object or class.
  */
-    int
+    પૂર્ણાંક
 compile_class_object_index(cctx_T *cctx, char_u **arg, type_T *type)
 {
-    int		m_idx;
-    int		ret = FAIL;
+    પૂર્ણાંક		m_idx;
+    પૂર્ણાંક		ret = FAIL;
 
-    if (VIM_ISWHITE((*arg)[1]))
+    જો (VIM_ISWHITE((*arg)[1]))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str), ".", *arg);
-	return FAIL;
+	પાછા FAIL;
     }
 
     class_T *cl = type->tt_class;
-    int is_super = ((type->tt_flags & TTFLAG_SUPER) == TTFLAG_SUPER);
-    if (type == &t_super)
+    પૂર્ણાંક is_super = ((type->tt_flags & TTFLAG_SUPER) == TTFLAG_SUPER);
+    જો (type == &t_super)
     {
-	if (cctx->ctx_ufunc == NULL || cctx->ctx_ufunc->uf_class == NULL)
+	જો (cctx->ctx_ufunc == ખાલી || cctx->ctx_ufunc->uf_class == ખાલી)
 	{
 	    emsg(_(e_using_super_not_in_class_method));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	is_super = TRUE;
 	cl = cctx->ctx_ufunc->uf_class;
 	// Remove &t_super from the stack.
-	--cctx->ctx_type_stack.ga_len;
+	--cctx->ctx_type_ઢગલો.ga_len;
     }
-    else if (type->tt_type == VAR_CLASS)
+    નહીંતર જો (type->tt_type == VAR_CLASS)
     {
 	garray_T *instr = &cctx->ctx_instr;
-	if (instr->ga_len > 0)
+	જો (instr->ga_len > 0)
 	{
 	    isn_T *isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
-	    if (isn->isn_type == ISN_LOADSCRIPT)
+	    જો (isn->isn_type == ISN_LOADSCRIPT)
 	    {
 		// The class was recognized as a script item.  We only need
 		// to know what class it is, drop the instruction.
@@ -389,20 +389,20 @@ compile_class_object_index(cctx_T *cctx, char_u **arg, type_T *type)
 	}
     }
 
-    if (cl == NULL)
+    જો (cl == ખાલી)
     {
 	// TODO: this should not give an error but be handled at runtime
 	emsg(_(e_incomplete_type));
-	return FAIL;
+	પાછા FAIL;
     }
 
     ++*arg;
     char_u *name = *arg;
-    char_u *name_end = find_name_end(name, NULL, NULL, FNE_CHECK_START);
-    if (name_end == name)
+    char_u *name_end = find_name_end(name, ખાલી, ખાલી, FNE_CHECK_START);
+    જો (name_end == name)
     {
 	emsg(_(e_missing_name_after_dot));
-	return FAIL;
+	પાછા FAIL;
     }
     size_t len = name_end - name;
 
@@ -410,227 +410,227 @@ compile_class_object_index(cctx_T *cctx, char_u **arg, type_T *type)
 
     generic_func_args_table_init(&gfatab);
 
-    if (*name_end == '<')
+    જો (*name_end == '<')
     {
 	// generic method call
 	name_end = parse_generic_func_type_args(name, len, name_end,
 							&gfatab, cctx);
-	if (name_end == NULL)
-	    goto done;
+	જો (name_end == ખાલી)
+	    જાઓ done;
     }
 
-    if (*name_end == '(')
+    જો (*name_end == '(')
     {
-	int	function_count;
-	int	child_count;
+	પૂર્ણાંક	function_ગણતરી;
+	પૂર્ણાંક	child_ગણતરી;
 	ufunc_T	**functions;
 
-	if (type->tt_type == VAR_CLASS)
+	જો (type->tt_type == VAR_CLASS)
 	{
-	    function_count = cl->class_class_function_count;
-	    child_count = cl->class_class_function_count_child;
+	    function_ગણતરી = cl->class_class_function_ગણતરી;
+	    child_ગણતરી = cl->class_class_function_ગણતરી_child;
 	    functions = cl->class_class_functions;
 	}
-	else
+	નહીંતર
 	{
 	    // type->tt_type == VAR_OBJECT: method call
 	    // When compiling Func and doing "super.SomeFunc()", must be in the
 	    // class context that defines Func.
-	    if (is_super)
+	    જો (is_super)
 		cl = cctx->ctx_ufunc->uf_defclass;
 
-	    function_count = cl->class_obj_method_count;
-	    child_count = cl->class_obj_method_count_child;
+	    function_ગણતરી = cl->class_obj_method_ગણતરી;
+	    child_ગણતરી = cl->class_obj_method_ગણતરી_child;
 	    functions = cl->class_obj_methods;
 	}
 
-	ufunc_T *ufunc = NULL;
-	int fi;
-	for (fi = is_super ? child_count : 0; fi < function_count; ++fi)
+	ufunc_T *ufunc = ખાલી;
+	પૂર્ણાંક fi;
+	માટે (fi = is_super ? child_ગણતરી : 0; fi < function_ગણતરી; ++fi)
 	{
 	    ufunc_T *fp = functions[fi];
 	    // Use a separate pointer to avoid that ASAN complains about
 	    // uf_name[] only being 4 characters.
 	    char_u *ufname = (char_u *)fp->uf_name;
-	    if (STRNCMP(name, ufname, len) == 0 && ufname[len] == NUL)
+	    જો (STRNCMP(name, ufname, len) == 0 && ufname[len] == NUL)
 	    {
 		ufunc = fp;
-		break;
+		તોડો;
 	    }
 	}
 
-	ocmember_T  *ocm = NULL;
-	if (ufunc == NULL)
+	ocmember_T  *ocm = ખાલી;
+	જો (ufunc == ખાલી)
 	{
 	    // could be a funcref in a member variable
 	    ocm = member_lookup(cl, type->tt_type, name, len, &m_idx);
-	    if (ocm == NULL || ocm->ocm_type->tt_type != VAR_FUNC)
+	    જો (ocm == ખાલી || ocm->ocm_type->tt_type != VAR_FUNC)
 	    {
-		method_not_found_msg(cl, type->tt_type, name, len);
-		goto done;
+		method_not_found_સંદેશ(cl, type->tt_type, name, len);
+		જાઓ done;
 	    }
-	    if (type->tt_type == VAR_CLASS)
+	    જો (type->tt_type == VAR_CLASS)
 	    {
 		// Remove the class type from the stack
-		--cctx->ctx_type_stack.ga_len;
-		if (generate_CLASSMEMBER(cctx, TRUE, cl, m_idx) == FAIL)
-		    goto done;
+		--cctx->ctx_type_ઢગલો.ga_len;
+		જો (generate_CLASSMEMBER(cctx, TRUE, cl, m_idx) == FAIL)
+		    જાઓ done;
 	    }
-	    else
+	    નહીંતર
 	    {
-		int status;
+		પૂર્ણાંક status;
 
-		if (IS_INTERFACE(cl))
+		જો (IS_INTERFACE(cl))
 		    status = generate_GET_ITF_MEMBER(cctx, cl, m_idx,
 							ocm->ocm_type);
-		else
+		નહીંતર
 		    status = generate_GET_OBJ_MEMBER(cctx, m_idx,
 							ocm->ocm_type);
-		if (status == FAIL)
-		    goto done;
+		જો (status == FAIL)
+		    જાઓ done;
 	    }
 	}
 
-	if (is_super && ufunc != NULL && IS_ABSTRACT_METHOD(ufunc))
+	જો (is_super && ufunc != ખાલી && IS_ABSTRACT_METHOD(ufunc))
 	{
 	    // Trying to invoke an abstract method in a super class is not
 	    // allowed.
 	    semsg(_(e_abstract_method_str_direct), ufunc->uf_name,
 		    ufunc->uf_defclass->class_name.string);
-	    goto done;
+	    જાઓ done;
 	}
 
 	// A private object method can be used only inside the class where it
 	// is defined or in one of the child classes.
 	// A private class method can be used only in the class where it is
 	// defined.
-	if (ocm == NULL && *ufunc->uf_name == '_' &&
+	જો (ocm == ખાલી && *ufunc->uf_name == '_' &&
 		((type->tt_type == VAR_OBJECT
 		  && !inside_class_hierarchy(cctx, cl))
 		 || (type->tt_type == VAR_CLASS
 		     && cctx->ctx_ufunc->uf_defclass != cl)))
 	{
 	    semsg(_(e_cannot_access_protected_method_str), name);
-	    goto done;
+	    જાઓ done;
 	}
 
 	// process generic function call
-	if (ufunc != NULL)
+	જો (ufunc != ખાલી)
 	{
 	    ufunc = generic_func_get(ufunc, &gfatab);
-	    if (ufunc == NULL)
-		goto done;
+	    જો (ufunc == ખાલી)
+		જાઓ done;
 	}
 
 	// Compile the arguments and call the class function or object method.
 	// The object method will know that the object is on the stack, just
 	// before the arguments.
 	*arg = skipwhite(name_end + 1);
-	int argcount = 0;
-	if (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
-	    goto done;
+	પૂર્ણાંક argcount = 0;
+	જો (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
+	    જાઓ done;
 
-	if (ocm != NULL)
+	જો (ocm != ખાલી)
 	{
 	    ret = generate_PCALL(cctx, argcount, name, ocm->ocm_type, TRUE);
-	    goto done;
+	    જાઓ done;
 	}
-	if (type->tt_type == VAR_OBJECT
+	જો (type->tt_type == VAR_OBJECT
 		     && (cl->class_flags & (CLASS_INTERFACE | CLASS_EXTENDED)))
 	    ret = generate_CALL(cctx, ufunc, cl, fi, argcount, is_super);
-	else
-	    ret = generate_CALL(cctx, ufunc, NULL, 0, argcount, FALSE);
-	goto done;
+	નહીંતર
+	    ret = generate_CALL(cctx, ufunc, ખાલી, 0, argcount, FALSE);
+	જાઓ done;
     }
 
-    if (type->tt_type == VAR_OBJECT)
+    જો (type->tt_type == VAR_OBJECT)
     {
 	ocmember_T *m = object_member_lookup(cl, name, len, &m_idx);
-	if (m_idx >= 0)
+	જો (m_idx >= 0)
 	{
-	    if (*name == '_' && !inside_class(cctx, cl))
+	    જો (*name == '_' && !inside_class(cctx, cl))
 	    {
 		emsg_var_cl_define(e_cannot_access_protected_variable_str,
 							m->ocm_name.string, 0, cl);
-		goto done;
+		જાઓ done;
 	    }
 
 	    *arg = name_end;
-	    if (cl->class_flags & (CLASS_INTERFACE | CLASS_EXTENDED))
+	    જો (cl->class_flags & (CLASS_INTERFACE | CLASS_EXTENDED))
 		ret = generate_GET_ITF_MEMBER(cctx, cl, m_idx, m->ocm_type);
-	    else
+	    નહીંતર
 		ret = generate_GET_OBJ_MEMBER(cctx, m_idx, m->ocm_type);
-	    goto done;
+	    જાઓ done;
 	}
 
 	// Could be an object method reference: "obj.Func".
 	m_idx = object_method_idx(cl, name, len);
-	if (m_idx >= 0)
+	જો (m_idx >= 0)
 	{
 	    ufunc_T *fp = cl->class_obj_methods[m_idx];
 	    // Private object methods are not accessible outside the class
-	    if (*name == '_' && !inside_class(cctx, cl))
+	    જો (*name == '_' && !inside_class(cctx, cl))
 	    {
 		semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
-		goto done;
+		જાઓ done;
 	    }
 	    *arg = name_end;
 	    // Remove the object type from the stack
-	    --cctx->ctx_type_stack.ga_len;
-	    ret = generate_FUNCREF(cctx, fp, cl, TRUE, m_idx, NULL);
-	    goto done;
+	    --cctx->ctx_type_ઢગલો.ga_len;
+	    ret = generate_FUNCREF(cctx, fp, cl, TRUE, m_idx, ખાલી);
+	    જાઓ done;
 	}
 
-	member_not_found_msg(cl, VAR_OBJECT, name, len);
+	member_not_found_સંદેશ(cl, VAR_OBJECT, name, len);
     }
-    else
+    નહીંતર
     {
 	// load class member
-	int idx;
+	પૂર્ણાંક idx;
 	ocmember_T *m = class_member_lookup(cl, name, len, &idx);
-	if (m != NULL)
+	જો (m != ખાલી)
 	{
 	    // Note: type->tt_type = VAR_CLASS
 	    // A private class variable can be accessed only in the class where
 	    // it is defined.
-	    if (*name == '_' && cctx->ctx_ufunc->uf_class != cl)
+	    જો (*name == '_' && cctx->ctx_ufunc->uf_class != cl)
 	    {
 		emsg_var_cl_define(e_cannot_access_protected_variable_str,
 							m->ocm_name.string, 0, cl);
-		goto done;
+		જાઓ done;
 	    }
 
 	    *arg = name_end;
 	    // Remove the class type from the stack
-	    --cctx->ctx_type_stack.ga_len;
+	    --cctx->ctx_type_ઢગલો.ga_len;
 	    ret = generate_CLASSMEMBER(cctx, TRUE, cl, idx);
-	    goto done;
+	    જાઓ done;
 	}
 
 	// Could be a class method reference: "class.Func".
 	m_idx = class_method_idx(cl, name, len);
-	if (m_idx >= 0)
+	જો (m_idx >= 0)
 	{
 	    ufunc_T *fp = cl->class_class_functions[m_idx];
 	    // Private class methods are not accessible outside the class
-	    if (*name == '_' && !inside_class(cctx, cl))
+	    જો (*name == '_' && !inside_class(cctx, cl))
 	    {
 		semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
-		goto done;
+		જાઓ done;
 	    }
 	    *arg = name_end;
 	    // Remove the class type from the stack
-	    --cctx->ctx_type_stack.ga_len;
-	    ret = generate_FUNCREF(cctx, fp, cl, FALSE, m_idx, NULL);
-	    goto done;
+	    --cctx->ctx_type_ઢગલો.ga_len;
+	    ret = generate_FUNCREF(cctx, fp, cl, FALSE, m_idx, ખાલી);
+	    જાઓ done;
 	}
 
-	member_not_found_msg(cl, VAR_CLASS, name, len);
+	member_not_found_સંદેશ(cl, VAR_CLASS, name, len);
     }
 
 done:
     generic_func_args_table_clear(&gfatab);
-    return ret;
+    પાછા ret;
 }
 
 /*
@@ -638,7 +638,7 @@ done:
  * leading "s:".
  * Also finds imported variables.
  */
-    int
+    પૂર્ણાંક
 compile_load_scriptvar(
 	cctx_T *cctx,
 	char_u *name,	    // variable NUL terminated
@@ -647,71 +647,71 @@ compile_load_scriptvar(
 	imported_T *import) // found imported item, can be NULL
 {
     scriptitem_T    *si;
-    int		    idx;
+    પૂર્ણાંક		    idx;
     imported_T	    *imp;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
-	return FAIL;
+    જો (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+	પાછા FAIL;
     si = SCRIPT_ITEM(current_sctx.sc_sid);
-    idx = get_script_item_idx(current_sctx.sc_sid, name, 0, cctx, NULL);
-    if (idx >= 0)
+    idx = get_script_item_idx(current_sctx.sc_sid, name, 0, cctx, ખાલી);
+    જો (idx >= 0)
     {
 	svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
 
 	generate_VIM9SCRIPT(cctx, ISN_LOADSCRIPT,
 					current_sctx.sc_sid, idx, sv->sv_type);
-	return OK;
+	પાછા OK;
     }
 
-    if (end == NULL)
-	imp = NULL;
-    else if (import == NULL)
+    જો (end == ખાલી)
+	imp = ખાલી;
+    નહીંતર જો (import == ખાલી)
 	imp = find_imported(name, 0, FALSE);
-    else
+    નહીંતર
 	imp = import;
 
-    if (imp != NULL)
+    જો (imp != ખાલી)
     {
 	char_u	*p = skipwhite(*end);
 	char_u	*exp_name;
-	int	cc;
-	ufunc_T	*ufunc = NULL;
+	પૂર્ણાંક	cc;
+	ufunc_T	*ufunc = ખાલી;
 	type_T	*type;
-	int	done = FALSE;
-	int	res = OK;
+	પૂર્ણાંક	done = FALSE;
+	પૂર્ણાંક	res = OK;
 
 	check_script_symlink(imp->imp_sid);
 	import_check_sourced_sid(&imp->imp_sid);
 
 	// Need to lookup the member.
-	if (*p != '.')
+	જો (*p != '.')
 	{
 	    semsg(_(e_expected_dot_after_name_str), start);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	++p;
-	if (VIM_ISWHITE(*p))
+	જો (VIM_ISWHITE(*p))
 	{
 	    emsg(_(e_no_white_space_allowed_after_dot));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	// isolate one name
 	exp_name = p;
-	while (eval_isnamec(*p))
+	જ્યારે (eval_isnamec(*p))
 	    ++p;
 	cc = *p;
 	*p = NUL;
 
 	si = SCRIPT_ITEM(imp->imp_sid);
-	if (si->sn_import_autoload && si->sn_state == SN_STATE_NOT_LOADED)
+	જો (si->sn_import_autoload && si->sn_state == SN_STATE_NOT_LOADED)
 	    // "import autoload './dir/script.vim'" or
 	    // "import autoload './autoload/script.vim'" - load script first
 	    res = generate_SOURCE(cctx, imp->imp_sid);
 
-	if (res == OK)
+	જો (res == OK)
 	{
-	    if (si->sn_autoload_prefix != NULL
+	    જો (si->sn_autoload_prefix != ખાલી
 					&& si->sn_state == SN_STATE_NOT_LOADED)
 	    {
 		char_u  *auto_name =
@@ -720,58 +720,58 @@ compile_load_scriptvar(
 		// autoload script must be loaded later, access by the autoload
 		// name.  If a '(' follows it must be a function.  Otherwise we
 		// don't know, it can be "script.Func".
-		if (cc == '(' || paren_follows_after_expr)
+		જો (cc == '(' || paren_follows_after_પદાવલિ)
 		    res = generate_PUSHFUNC(cctx, auto_name, &t_func_any, TRUE);
-		else
+		નહીંતર
 		    res = generate_AUTOLOAD(cctx, auto_name, &t_any);
 		vim_free(auto_name);
 		done = TRUE;
 	    }
-	    else if (si->sn_import_autoload
+	    નહીંતર જો (si->sn_import_autoload
 					&& si->sn_state == SN_STATE_NOT_LOADED)
 	    {
 		// If a '(' follows it must be a function.  Otherwise we don't
 		// know, it can be "script.Func".
-		if (cc == '(' || paren_follows_after_expr)
+		જો (cc == '(' || paren_follows_after_પદાવલિ)
 		{
 		    char_u sid_name[MAX_FUNC_NAME_LEN];
 
 		    func_name_with_sid(exp_name, imp->imp_sid, sid_name);
 		    res = generate_PUSHFUNC(cctx, sid_name, &t_func_any, TRUE);
 		}
-		else
+		નહીંતર
 		    res = generate_OLDSCRIPT(cctx, ISN_LOADEXPORT, exp_name,
 						      imp->imp_sid, &t_any);
 		done = TRUE;
 	    }
-	    else
+	    નહીંતર
 	    {
 		idx = find_exported(imp->imp_sid, exp_name, &ufunc, &type,
-							     cctx, NULL, TRUE);
+							     cctx, ખાલી, TRUE);
 	    }
 	}
 
 	*p = cc;
 	*end = p;
-	if (done)
-	    return res;
+	જો (done)
+	    પાછા res;
 
-	if (idx < 0)
+	જો (idx < 0)
 	{
-	    if (ufunc != NULL)
+	    જો (ufunc != ખાલી)
 	    {
 		gfargs_tab_T	gfatab;
 
 		generic_func_args_table_init(&gfatab);
 
-		if (IS_GENERIC_FUNC(ufunc))
+		જો (IS_GENERIC_FUNC(ufunc))
 		{
-		    if (*p == '<')
+		    જો (*p == '<')
 		    {
 			// generic function call
 			p = parse_generic_func_type_args(name, STRLEN(name), p,
 								&gfatab, cctx);
-			if (p != NULL)
+			જો (p != ખાલી)
 			{
 			    *end = p;
 
@@ -781,73 +781,73 @@ compile_load_scriptvar(
 
 			generic_func_args_table_clear(&gfatab);
 
-			if (p == NULL || ufunc == NULL)
-			    return FAIL;
+			જો (p == ખાલી || ufunc == ખાલી)
+			    પાછા FAIL;
 		    }
-		    else
+		    નહીંતર
 		    {
 			emsg_funcname(e_generic_func_missing_type_args_str,
 									name);
-			return FAIL;
+			પાછા FAIL;
 		    }
 		}
-		else if (*p == '<')
+		નહીંતર જો (*p == '<')
 		{
 		    emsg_funcname(e_not_a_generic_function_str, name);
-		    return FAIL;
+		    પાછા FAIL;
 		}
 
 		// function call or function reference
-		generate_PUSHFUNC(cctx, ufunc->uf_name, NULL, TRUE);
-		return OK;
+		generate_PUSHFUNC(cctx, ufunc->uf_name, ખાલી, TRUE);
+		પાછા OK;
 	    }
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	generate_VIM9SCRIPT(cctx, ISN_LOADSCRIPT,
 		imp->imp_sid,
 		idx,
 		type);
-	return OK;
+	પાછા OK;
     }
 
     // Can only get here if we know "name" is a script variable and not in a
     // Vim9 script (variable is not in sn_var_vals): old style script.
-    return generate_OLDSCRIPT(cctx, ISN_LOADS, name, current_sctx.sc_sid,
+    પાછા generate_OLDSCRIPT(cctx, ISN_LOADS, name, current_sctx.sc_sid,
 								       &t_any);
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 generate_funcref(
     cctx_T		*cctx,
     char_u		*name,
     gfargs_tab_T	*gfatab,
-    int			has_g_prefix)
+    પૂર્ણાંક			has_g_prefix)
 {
     ufunc_T *ufunc = find_func(name, FALSE);
     compiletype_T compile_type;
 
     // Reject a global non-autoload function found without the "g:" prefix.
-    if (ufunc == NULL || (!has_g_prefix && func_requires_g_prefix(ufunc)))
-	return FAIL;
+    જો (ufunc == ખાલી || (!has_g_prefix && func_requires_g_prefix(ufunc)))
+	પાછા FAIL;
 
     // process generic function call
     ufunc = generic_func_get(ufunc, gfatab);
-    if (ufunc == NULL)
-	return FAIL;
+    જો (ufunc == ખાલી)
+	પાછા FAIL;
 
     // Need to compile any default values to get the argument types.
     compile_type = get_compile_type(ufunc);
-    if (func_needs_compiling(ufunc, compile_type)
-	      && compile_def_function(ufunc, TRUE, compile_type, NULL) == FAIL)
-	return FAIL;
-    return generate_PUSHFUNC(cctx, ufunc->uf_name, ufunc->uf_func_type, TRUE);
+    જો (func_needs_compiling(ufunc, compile_type)
+	      && compile_def_function(ufunc, TRUE, compile_type, ખાલી) == FAIL)
+	પાછા FAIL;
+    પાછા generate_PUSHFUNC(cctx, ufunc->uf_name, ufunc->uf_func_type, TRUE);
 }
 
 /*
  * Returns TRUE if compiling a class method.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compiling_a_class_method(cctx_T *cctx)
 {
     // For an object method, the FC_OBJECT flag will be set.
@@ -855,11 +855,11 @@ compiling_a_class_method(cctx_T *cctx)
     // Excluding these methods, the others are class methods.
     // When compiling a closure function inside an object method,
     // cctx->ctx_outer->ctx_func will point to the object method.
-    return cctx->ctx_ufunc != NULL
+    પાછા cctx->ctx_ufunc != ખાલી
 	&& (cctx->ctx_ufunc->uf_flags & (FC_OBJECT|FC_NEW)) == 0
-	&& (cctx->ctx_outer == NULL
-		|| cctx->ctx_outer->ctx_ufunc == NULL
-		|| cctx->ctx_outer->ctx_ufunc->uf_class == NULL
+	&& (cctx->ctx_outer == ખાલી
+		|| cctx->ctx_outer->ctx_ufunc == ખાલી
+		|| cctx->ctx_outer->ctx_ufunc->uf_class == ખાલી
 		|| (cctx->ctx_outer->ctx_ufunc->uf_flags
 		    & (FC_OBJECT|FC_NEW)) == 0);
 }
@@ -871,75 +871,75 @@ compiling_a_class_method(cctx_T *cctx)
  * function being compiled: zero when it is defined in the current function,
  * non-zero when used in a closure or in a recursive call.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_nested_generic_func(
     cctx_T		*cctx,
     ufunc_T		*ufunc,
     gfargs_tab_T	*gfatab,
-    int			outer_depth)
+    પૂર્ણાંક			outer_depth)
 {
     ufunc_T	*fp = generic_func_get(ufunc, gfatab);
     cctx_T	*outer_cctx = cctx;
-    int		isn_idx;
+    પૂર્ણાંક		isn_idx;
 
-    if (fp == NULL)
-	return FAIL;
+    જો (fp == ખાલી)
+	પાછા FAIL;
 
-    for (int depth = 0; depth < outer_depth; ++depth)
+    માટે (પૂર્ણાંક depth = 0; depth < outer_depth; ++depth)
     {
-	if (outer_cctx->ctx_outer == NULL)
+	જો (outer_cctx->ctx_outer == ખાલી)
 	{
 	    siemsg("generic function %s outer context missing", ufunc->uf_name);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	outer_cctx = outer_cctx->ctx_outer;
     }
 
     // copy over the block scope IDs before compiling
-    if (fp->uf_block_ids == NULL && ufunc->uf_block_depth > 0)
+    જો (fp->uf_block_ids == ખાલી && ufunc->uf_block_depth > 0)
     {
-	fp->uf_block_ids = ALLOC_MULT(int, ufunc->uf_block_depth);
-	if (fp->uf_block_ids != NULL)
+	fp->uf_block_ids = ALLOC_MULT(પૂર્ણાંક, ufunc->uf_block_depth);
+	જો (fp->uf_block_ids != ખાલી)
 	{
 	    mch_memmove(fp->uf_block_ids, ufunc->uf_block_ids,
-					    sizeof(int) * ufunc->uf_block_depth);
+					    કદ(પૂર્ણાંક) * ufunc->uf_block_depth);
 	    fp->uf_block_depth = ufunc->uf_block_depth;
 	}
     }
 
     compiletype_T compile_type = get_compile_type(fp);
-    if (func_needs_compiling(fp, compile_type)
+    જો (func_needs_compiling(fp, compile_type)
 	    && compile_def_function(fp, TRUE, compile_type, outer_cctx) == FAIL)
-	return FAIL;
+	પાછા FAIL;
 
-    if (generate_FUNCREF(cctx, fp, NULL, FALSE, 0, &isn_idx) == FAIL)
-	return FAIL;
-    if (cctx->ctx_skip == SKIP_YES)
-	return OK;
+    જો (generate_FUNCREF(cctx, fp, ખાલી, FALSE, 0, &isn_idx) == FAIL)
+	પાછા FAIL;
+    જો (cctx->ctx_skip == SKIP_YES)
+	પાછા OK;
 
     // The function is owned by the generic function, the reference is
     // dropped when the instruction is deleted.  It may be a recursive call
     // in the function itself.
     func_ptr_ref(fp);
 
-    if (outer_depth > 0)
+    જો (outer_depth > 0)
     {
 	// The closure uses the context of the function where the generic
 	// function is defined, not the current function.
 	isn_T		*isn = ((isn_T *)cctx->ctx_instr.ga_data) + isn_idx;
 	funcref_extra_T *extra = isn->isn_arg.funcref.fr_extra;
 
-	if (extra == NULL)
+	જો (extra == ખાલી)
 	{
 	    extra = ALLOC_CLEAR_ONE(funcref_extra_T);
-	    if (extra == NULL)
-		return FAIL;
+	    જો (extra == ખાલી)
+		પાછા FAIL;
 	    isn->isn_arg.funcref.fr_extra = extra;
 	}
 	extra->fre_outer_depth = outer_depth;
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -948,112 +948,112 @@ compile_nested_generic_func(
  * "is_expr" is TRUE when evaluating an expression, might be a funcref.
  * When "error" is FALSE do not give an error when not found.
  */
-    int
+    પૂર્ણાંક
 compile_load(
 	char_u **arg,
 	size_t  namelen,
 	char_u *end_arg,
 	cctx_T	*cctx,
-	int	is_expr,
-	int	error)
+	પૂર્ણાંક	is_પદાવલિ,
+	પૂર્ણાંક	error)
 {
     type_T	*type;
-    char_u	*name = NULL;
+    char_u	*name = ખાલી;
     char_u	*end = end_arg;
-    int		res = FAIL;
-    int		prev_called_emsg = called_emsg;
+    પૂર્ણાંક		res = FAIL;
+    પૂર્ણાંક		prev_called_emsg = called_emsg;
     gfargs_tab_T gfatab;
-    char_u	*lt = NULL;
+    char_u	*lt = ખાલી;
 
     generic_func_args_table_init(&gfatab);
 
-    if (*(*arg + namelen) == '<')
+    જો (*(*arg + namelen) == '<')
     {
 	// generic function call
-	if (parse_generic_func_type_args(*arg, namelen,
-			*arg + namelen, &gfatab, cctx) == NULL)
+	જો (parse_generic_func_type_args(*arg, namelen,
+			*arg + namelen, &gfatab, cctx) == ખાલી)
 	{
 	    generic_func_args_table_clear(&gfatab);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	// Temporarily terminate the name, the line may be compiled again.
 	lt = *arg + namelen;
 	*lt = NUL;
     }
 
-    if (*(*arg + 1) == ':')
+    જો (*(*arg + 1) == ':')
     {
-	if (end <= *arg + 2)
+	જો (end <= *arg + 2)
 	{
 	    isntype_T  isn_type;
 
 	    // load dictionary of namespace
-	    switch (**arg)
+	    પસંદગી (**arg)
 	    {
-		case 'g': isn_type = ISN_LOADGDICT; break;
-		case 'w': isn_type = ISN_LOADWDICT; break;
-		case 't': isn_type = ISN_LOADTDICT; break;
-		case 'b': isn_type = ISN_LOADBDICT; break;
-		default:
+		સ્થિતિ 'g': isn_type = ISN_LOADGDICT; તોડો;
+		સ્થિતિ 'w': isn_type = ISN_LOADWDICT; તોડો;
+		સ્થિતિ 't': isn_type = ISN_LOADTDICT; તોડો;
+		સ્થિતિ 'b': isn_type = ISN_LOADBDICT; તોડો;
+		મૂળભૂત:
 		    semsg(_(e_namespace_not_supported_str), *arg);
-		    goto theend;
+		    જાઓ theend;
 	    }
-	    if (generate_instr_type(cctx, isn_type, &t_dict_any) == NULL)
-		goto theend;
+	    જો (generate_instr_type(cctx, isn_type, &t_dict_any) == ખાલી)
+		જાઓ theend;
 	    res = OK;
 	}
-	else
+	નહીંતર
 	{
 	    isntype_T  isn_type = ISN_DROP;
 
 	    // load namespaced variable
 	    name = vim_strnsave(*arg + 2, end - (*arg + 2));
-	    if (name == NULL)
-		goto theend;
+	    જો (name == ખાલી)
+		જાઓ theend;
 
-	    switch (**arg)
+	    પસંદગી (**arg)
 	    {
-		case 'v': res = generate_LOADV(cctx, name);
-			  break;
-		case 's': if (current_script_is_vim9())
+		સ્થિતિ 'v': res = generate_LOADV(cctx, name);
+			  તોડો;
+		સ્થિતિ 's': જો (current_script_is_vim9())
 			  {
 			      semsg(_(e_cannot_use_s_colon_in_vim9_script_str),
 									 *arg);
-			      goto theend;
+			      જાઓ theend;
 			  }
-			  if (is_expr && find_func(name, FALSE) != NULL)
+			  જો (is_પદાવલિ && find_func(name, FALSE) != ખાલી)
 			      res = generate_funcref(cctx, name, &gfatab, FALSE);
-			  else
+			  નહીંતર
 			      res = compile_load_scriptvar(cctx, name,
-							    NULL, &end, NULL);
-			  break;
-		case 'g': if (vim_strchr(name, AUTOLOAD_CHAR) == NULL)
+							    ખાલી, &end, ખાલી);
+			  તોડો;
+		સ્થિતિ 'g': જો (vim_strchr(name, AUTOLOAD_CHAR) == ખાલી)
 			  {
-			      if (is_expr && ASCII_ISUPPER(*name)
-				       && (find_func(name, TRUE) != NULL
+			      જો (is_પદાવલિ && ASCII_ISUPPER(*name)
+				       && (find_func(name, TRUE) != ખાલી
 					   || gfatab.gfat_args.ga_len > 0))
 				  res = generate_funcref(cctx, name, &gfatab,
 								TRUE);
-			      else
+			      નહીંતર
 				  isn_type = ISN_LOADG;
 			  }
-			  else
+			  નહીંતર
 			  {
 			      isn_type = ISN_LOADAUTO;
 			      vim_free(name);
 			      name = vim_strnsave(*arg, end - *arg);
-			      if (name == NULL)
-				  goto theend;
+			      જો (name == ખાલી)
+				  જાઓ theend;
 			  }
-			  break;
-		case 'w': isn_type = ISN_LOADW; break;
-		case 't': isn_type = ISN_LOADT; break;
-		case 'b': isn_type = ISN_LOADB; break;
-		default:  // cannot happen, just in case
+			  તોડો;
+		સ્થિતિ 'w': isn_type = ISN_LOADW; તોડો;
+		સ્થિતિ 't': isn_type = ISN_LOADT; તોડો;
+		સ્થિતિ 'b': isn_type = ISN_LOADB; તોડો;
+		મૂળભૂત:  // cannot happen, just in case
 			  semsg(_(e_namespace_not_supported_str), *arg);
-			  goto theend;
+			  જાઓ theend;
 	    }
-	    if (isn_type != ISN_DROP)
+	    જો (isn_type != ISN_DROP)
 	    {
 		// Global, Buffer-local, Window-local and Tabpage-local
 		// variables can be defined later, thus we don't check if it
@@ -1062,48 +1062,48 @@ compile_load(
 	    }
 	}
     }
-    else
+    નહીંતર
     {
-	int	    idx;
-	int	    method_idx;
-	int	    gen_load = FALSE;
-	int	    gen_load_outer = 0;
-	int	    outer_loop_depth = -1;
-	int	    outer_loop_idx = -1;
+	પૂર્ણાંક	    idx;
+	પૂર્ણાંક	    method_idx;
+	પૂર્ણાંક	    gen_load = FALSE;
+	પૂર્ણાંક	    gen_load_outer = 0;
+	પૂર્ણાંક	    outer_loop_depth = -1;
+	પૂર્ણાંક	    outer_loop_idx = -1;
 
 	name = vim_strnsave(*arg, namelen);
-	if (name == NULL)
-	    goto theend;
+	જો (name == ખાલી)
+	    જાઓ theend;
 
-	if (STRCMP(name, "super") == 0 && compiling_a_class_method(cctx))
+	જો (STRCMP(name, "super") == 0 && compiling_a_class_method(cctx))
 	{
 	    // super.SomeFunc() in a class function: push &t_super type, this
 	    // is recognized in compile_subscript().
-	    res = push_type_stack(cctx, &t_super);
-	    if (*end != '.')
+	    res = ધકેલો_type_ઢગલો(cctx, &t_super);
+	    જો (*end != '.')
 		emsg(_(e_super_must_be_followed_by_dot));
 	}
-	else if (vim_strchr(name, AUTOLOAD_CHAR) != NULL)
+	નહીંતર જો (vim_strchr(name, AUTOLOAD_CHAR) != ખાલી)
 	{
 	    script_autoload(name, FALSE);
 	    res = generate_LOAD(cctx, ISN_LOADAUTO, 0, name, &t_any);
 	}
-	else if (arg_exists(*arg, namelen, &idx, &type, &gen_load_outer, cctx)
+	નહીંતર જો (arg_exists(*arg, namelen, &idx, &type, &gen_load_outer, cctx)
 									 == OK)
 	{
-	    if (gen_load_outer == 0)
+	    જો (gen_load_outer == 0)
 		gen_load = TRUE;
 	}
-	else
+	નહીંતર
 	{
 	    lvar_T  lvar;
-	    class_T *cl = NULL;
+	    class_T *cl = ખાલી;
 
-	    if (lookup_local(*arg, namelen, &lvar, cctx) == OK)
+	    જો (lookup_local(*arg, namelen, &lvar, cctx) == OK)
 	    {
 		type = lvar.lv_type;
 		idx = lvar.lv_idx;
-		if (lvar.lv_ufunc != NULL && IS_GENERIC_FUNC(lvar.lv_ufunc)
+		જો (lvar.lv_ufunc != ખાલી && IS_GENERIC_FUNC(lvar.lv_ufunc)
 			&& gfatab.gfat_args.ga_len > 0)
 		{
 		    // The function with the types is compiled in the context
@@ -1111,16 +1111,16 @@ compile_load(
 		    res = compile_nested_generic_func(cctx, lvar.lv_ufunc,
 					    &gfatab, lvar.lv_from_outer);
 		}
-		else if (lvar.lv_from_outer != 0)
+		નહીંતર જો (lvar.lv_from_outer != 0)
 		{
 		    gen_load_outer = lvar.lv_from_outer;
 		    outer_loop_depth = lvar.lv_loop_depth;
 		    outer_loop_idx = lvar.lv_loop_idx;
 		}
-		else
+		નહીંતર
 		    gen_load = TRUE;
 	    }
-	    else if (cctx->ctx_ufunc->uf_defclass != NULL &&
+	    નહીંતર જો (cctx->ctx_ufunc->uf_defclass != ખાલી &&
 		    (((idx =
 		       cctx_class_member_idx(cctx, *arg, namelen, &cl)) >= 0)
 		     || ((method_idx =
@@ -1130,44 +1130,44 @@ compile_load(
 		// name.  A class variable or method can be referenced without
 		// the class name only in the class where the function is
 		// defined.
-		if (cctx->ctx_ufunc->uf_defclass == cl)
+		જો (cctx->ctx_ufunc->uf_defclass == cl)
 		{
-		    if (idx >= 0)
+		    જો (idx >= 0)
 			res = generate_CLASSMEMBER(cctx, TRUE, cl, idx);
-		    else
+		    નહીંતર
 		    {
 			ufunc_T *fp = cl->class_class_functions[method_idx];
 			res = generate_FUNCREF(cctx, fp, cl, FALSE, method_idx,
-									NULL);
+									ખાલી);
 		    }
 		}
-		else
+		નહીંતર
 		{
 		    semsg(_(e_class_variable_str_accessible_only_inside_class_str),
 			    name, cl->class_name.string);
 		    res = FAIL;
 		}
 	    }
-	    else
+	    નહીંતર
 	    {
-		imported_T *imp = NULL;
+		imported_T *imp = ખાલી;
 
 		// "var" can be script-local even without using "s:" if it
 		// already exists in a Vim9 script or when it's imported.
-		if (script_var_exists(*arg, namelen, cctx, NULL) == OK
-			    || (imp = find_imported(name, 0, FALSE)) != NULL)
+		જો (script_var_exists(*arg, namelen, cctx, ખાલી) == OK
+			    || (imp = find_imported(name, 0, FALSE)) != ખાલી)
 		    res = compile_load_scriptvar(cctx, name, *arg, &end, imp);
 
 		// When evaluating an expression and the name starts with an
 		// uppercase letter it can be a user defined function.
 		// generate_funcref() will fail if the function can't be found.
-		if (res == FAIL && is_expr && ASCII_ISUPPER(*name))
+		જો (res == FAIL && is_પદાવલિ && ASCII_ISUPPER(*name))
 		    res = generate_funcref(cctx, name, &gfatab, FALSE);
 	    }
 	}
-	if (gen_load)
-	    res = generate_LOAD(cctx, ISN_LOAD, idx, NULL, type);
-	if (gen_load_outer > 0)
+	જો (gen_load)
+	    res = generate_LOAD(cctx, ISN_LOAD, idx, ખાલી, type);
+	જો (gen_load_outer > 0)
 	{
 	    res = generate_LOADOUTER(cctx, idx, gen_load_outer,
 				       outer_loop_depth, outer_loop_idx, type);
@@ -1178,13 +1178,13 @@ compile_load(
     *arg = end;
 
 theend:
-    if (lt != NULL)
+    જો (lt != ખાલી)
 	*lt = '<';
-    if (res == FAIL && error && called_emsg == prev_called_emsg)
+    જો (res == FAIL && error && called_emsg == prev_called_emsg)
 	semsg(_(e_variable_not_found_str), name);
     vim_free(name);
     generic_func_args_table_clear(&gfatab);
-    return res;
+    પાછા res;
 }
 
 /*
@@ -1192,168 +1192,168 @@ theend:
  * "str_offset" is the number of leading bytes to skip from the string.
  * Returns FAIL if compilation fails.
  */
-    static int
-compile_string(isn_T *isn, cctx_T *cctx, int str_offset)
+    સ્થિર પૂર્ણાંક
+compile_string(isn_T *isn, cctx_T *cctx, પૂર્ણાંક str_offset)
 {
     char_u	*s = isn->isn_arg.string + str_offset;
     garray_T	save_ga = cctx->ctx_instr;
-    int		expr_res;
-    int		trailing_error;
-    int		instr_count;
-    isn_T	*instr = NULL;
+    પૂર્ણાંક		પદાવલિ_res;
+    પૂર્ણાંક		trailing_error;
+    પૂર્ણાંક		instr_ગણતરી;
+    isn_T	*instr = ખાલી;
 
     // Remove the string type from the stack.
-    --cctx->ctx_type_stack.ga_len;
+    --cctx->ctx_type_ઢગલો.ga_len;
 
     // Temporarily reset the list of instructions so that the jump labels are
     // correct.
     cctx->ctx_instr.ga_len = 0;
     cctx->ctx_instr.ga_maxlen = 0;
-    cctx->ctx_instr.ga_data = NULL;
+    cctx->ctx_instr.ga_data = ખાલી;
 
     // avoid peeking a next line
-    int galen_save = cctx->ctx_ufunc->uf_lines.ga_len;
-    cctx->ctx_ufunc->uf_lines.ga_len = 0;
+    પૂર્ણાંક galen_save = cctx->ctx_ufunc->uf_લીટીઓ.ga_len;
+    cctx->ctx_ufunc->uf_લીટીઓ.ga_len = 0;
 
-    expr_res = compile_expr0(&s, cctx);
+    પદાવલિ_res = compile_expr0(&s, cctx);
 
-    cctx->ctx_ufunc->uf_lines.ga_len = galen_save;
+    cctx->ctx_ufunc->uf_લીટીઓ.ga_len = galen_save;
 
     s = skipwhite(s);
     trailing_error = *s != NUL;
 
-    if (expr_res == FAIL || trailing_error
+    જો (પદાવલિ_res == FAIL || trailing_error
 				       || GA_GROW_FAILS(&cctx->ctx_instr, 1))
     {
-	if (trailing_error)
+	જો (trailing_error)
 	    semsg(_(e_trailing_characters_str), s);
 	clear_instr_ga(&cctx->ctx_instr);
 	cctx->ctx_instr = save_ga;
-	++cctx->ctx_type_stack.ga_len;
-	return FAIL;
+	++cctx->ctx_type_ઢગલો.ga_len;
+	પાછા FAIL;
     }
 
     // Move the generated instructions into the ISN_INSTR instruction, then
     // restore the list of instructions.
-    instr_count = cctx->ctx_instr.ga_len;
+    instr_ગણતરી = cctx->ctx_instr.ga_len;
     instr = cctx->ctx_instr.ga_data;
-    instr[instr_count].isn_type = ISN_FINISH;
+    instr[instr_ગણતરી].isn_type = ISN_FINISH;
 
     cctx->ctx_instr = save_ga;
     vim_free(isn->isn_arg.string);
     isn->isn_type = ISN_INSTR;
     isn->isn_arg.instr = instr;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Compile the argument expressions.
  * "arg" points to just after the "(" and is advanced to after the ")"
  */
-    int
+    પૂર્ણાંક
 compile_arguments(
 	char_u	     **arg,
 	cctx_T	     *cctx,
-	int	     *argcount,
+	પૂર્ણાંક	     *argcount,
 	ca_special_T special_fn)
 {
     char_u  *p = *arg;
     char_u  *whitep = *arg;
-    int	    must_end = FALSE;
-    int	    instr_count;
+    પૂર્ણાંક	    must_end = FALSE;
+    પૂર્ણાંક	    instr_ગણતરી;
 
-    for (;;)
+    માટે (;;)
     {
-	if (may_get_next_line(whitep, &p, cctx) == FAIL)
-	    goto failret;
-	if (*p == ')')
+	જો (may_get_next_લીટી(whitep, &p, cctx) == FAIL)
+	    જાઓ failret;
+	જો (*p == ')')
 	{
 	    *arg = p + 1;
-	    return OK;
+	    પાછા OK;
 	}
-	if (must_end)
+	જો (must_end)
 	{
 	    semsg(_(e_missing_comma_before_argument_str), p);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	instr_count = cctx->ctx_instr.ga_len;
-	if (compile_expr0(&p, cctx) == FAIL)
-	    return FAIL;
+	instr_ગણતરી = cctx->ctx_instr.ga_len;
+	જો (compile_expr0(&p, cctx) == FAIL)
+	    પાછા FAIL;
 	++*argcount;
 
-	if (special_fn == CA_SEARCHPAIR && *argcount == 5
-		&& cctx->ctx_instr.ga_len == instr_count + 1)
+	જો (special_fn == CA_SEARCHPAIR && *argcount == 5
+		&& cctx->ctx_instr.ga_len == instr_ગણતરી + 1)
 	{
-	    isn_T *isn = ((isn_T *)cctx->ctx_instr.ga_data) + instr_count;
+	    isn_T *isn = ((isn_T *)cctx->ctx_instr.ga_data) + instr_ગણતરી;
 
 	    // {skip} argument of searchpair() can be compiled if not empty
-	    if (isn->isn_type == ISN_PUSHS
-		    && isn->isn_arg.string != NULL
+	    જો (isn->isn_type == ISN_PUSHS
+		    && isn->isn_arg.string != ખાલી
 		    && *isn->isn_arg.string != NUL)
 		compile_string(isn, cctx, 0);
 	}
-	else if (special_fn == CA_SUBSTITUTE && *argcount == 3
-		&& cctx->ctx_instr.ga_len == instr_count + 1)
+	નહીંતર જો (special_fn == CA_SUBSTITUTE && *argcount == 3
+		&& cctx->ctx_instr.ga_len == instr_ગણતરી + 1)
 	{
-	    isn_T *isn = ((isn_T *)cctx->ctx_instr.ga_data) + instr_count;
+	    isn_T *isn = ((isn_T *)cctx->ctx_instr.ga_data) + instr_ગણતરી;
 
 	    // {sub} argument of substitute() can be compiled if it starts
 	    // with \=
-	    if (isn->isn_type == ISN_PUSHS
-		    && isn->isn_arg.string != NULL
+	    જો (isn->isn_type == ISN_PUSHS
+		    && isn->isn_arg.string != ખાલી
 		    && isn->isn_arg.string[0] == '\\'
 		    && isn->isn_arg.string[1] == '=')
 		compile_string(isn, cctx, 2);
 	}
 
-	if (*p != ',' && *skipwhite(p) == ',')
+	જો (*p != ',' && *skipwhite(p) == ',')
 	{
 	    semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (*p == ',')
+	જો (*p == ',')
 	{
 	    ++p;
-	    if (*p != NUL && !VIM_ISWHITE(*p))
+	    જો (*p != NUL && !VIM_ISWHITE(*p))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", p - 1);
-		return FAIL;
+		પાછા FAIL;
 	    }
 	}
-	else
+	નહીંતર
 	    must_end = TRUE;
 	whitep = p;
 	p = skipwhite(p);
     }
 failret:
     emsg(_(e_missing_closing_paren));
-    return FAIL;
+    પાછા FAIL;
 }
 
 /*
  * Compile a builtin method call of an object (e.g. string(), len(), empty(),
  * etc.) if the class implements it.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_builtin_method_call(cctx_T *cctx, class_builtin_T builtin_method)
 {
-    type_T	*type = get_decl_type_on_stack(cctx, 0);
-    int		res = FAIL;
+    type_T	*type = get_decl_type_on_ઢગલો(cctx, 0);
+    પૂર્ણાંક		res = FAIL;
 
     // If the built in function is invoked on an object and the class
     // implements the corresponding built in method, then invoke the object
     // method.
-    if (type->tt_type == VAR_OBJECT)
+    જો (type->tt_type == VAR_OBJECT)
     {
-	int	method_idx;
+	પૂર્ણાંક	method_idx;
 	ufunc_T *uf = class_get_builtin_method(type->tt_class, builtin_method,
 							&method_idx);
-	if (uf != NULL)
+	જો (uf != ખાલી)
 	    res = generate_CALL(cctx, uf, type->tt_class, method_idx, 0, FALSE);
     }
 
-    return res;
+    પાછા res;
 }
 
 
@@ -1366,165 +1366,165 @@ compile_builtin_method_call(cctx_T *cctx, class_builtin_T builtin_method)
  *	EVAL arg2
  *	BCALL / DCALL / UCALL
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_call(
 	char_u	    **arg,
 	size_t	    varlen,
 	cctx_T	    *cctx,
 	ppconst_T   *ppconst,
-	int	    argcount_init)
+	પૂર્ણાંક	    argcount_init)
 {
     char_u	*name = *arg;
     char_u	*p;
-    int		argcount = argcount_init;
+    પૂર્ણાંક		argcount = argcount_init;
     char_u	namebuf[MAX_FUNC_NAME_LEN];
     char_u	fname_buf[FLEN_FIXED + 1];
-    char_u	*tofree = NULL;
-    char_u	*gname = NULL;
-    ufunc_T	*ufunc = NULL;
-    int		res = FAIL;
-    int		is_autoload;
-    int		has_g_namespace;
+    char_u	*tofree = ખાલી;
+    char_u	*gname = ખાલી;
+    ufunc_T	*ufunc = ખાલી;
+    પૂર્ણાંક		res = FAIL;
+    પૂર્ણાંક		is_autoload;
+    પૂર્ણાંક		has_g_namespace;
     ca_special_T special_fn;
     imported_T	*import;
 
-    if (varlen >= sizeof(namebuf))
+    જો (varlen >= કદ(namebuf))
     {
 	semsg(_(e_name_too_long_str), name);
-	return FAIL;
+	પાછા FAIL;
     }
     vim_strncpy(namebuf, *arg, varlen);
 
     import = find_imported(name, varlen, FALSE);
-    if (import != NULL)
+    જો (import != ખાલી)
     {
 	semsg(_(e_cannot_use_str_itself_it_is_imported), namebuf);
-	return FAIL;
+	પાછા FAIL;
     }
 
     // We can evaluate "has('name')" at compile time.
     // We can evaluate "len('string')" at compile time.
     // We always evaluate "exists_compiled()" at compile time.
-    if ((varlen == 3
+    જો ((varlen == 3
 	     && (STRNCMP(*arg, "has", 3) == 0 || STRNCMP(*arg, "len", 3) == 0))
 	    || (varlen == 15 && STRNCMP(*arg, "exists_compiled", 6) == 0))
     {
 	char_u	    *s = skipwhite(*arg + varlen + 1);
 	typval_T    argvars[2];
-	int	    is_has = **arg == 'h';
-	int	    is_len = **arg == 'l';
+	પૂર્ણાંક	    is_has = **arg == 'h';
+	પૂર્ણાંક	    is_len = **arg == 'l';
 
 	argvars[0].v_type = VAR_UNKNOWN;
-	if (*s == '"')
-	    (void)eval_string(&s, &argvars[0], TRUE, FALSE);
-	else if (*s == '\'')
-	    (void)eval_lit_string(&s, &argvars[0], TRUE, FALSE);
+	જો (*s == '"')
+	    (શૂન્ય)eval_string(&s, &argvars[0], TRUE, FALSE);
+	નહીંતર જો (*s == '\'')
+	    (શૂન્ય)eval_lit_string(&s, &argvars[0], TRUE, FALSE);
 	s = skipwhite(s);
-	if (*s == ')' && argvars[0].v_type == VAR_STRING
+	જો (*s == ')' && argvars[0].v_type == VAR_STRING
 	       && ((is_has && !dynamic_feature(argvars[0].vval.v_string))
 		    || !is_has))
 	{
 
 	    *arg = s + 1;
 
-	    if (cctx->ctx_skip != SKIP_YES)
+	    જો (cctx->ctx_skip != SKIP_YES)
 	    {
 		typval_T	*tv = &ppconst->pp_tv[ppconst->pp_used];
 
 		argvars[1].v_type = VAR_UNKNOWN;
-		tv->v_type = VAR_NUMBER;
-		tv->vval.v_number = 0;
-		if (is_has)
+		tv->v_type = VAR_સંખ્યા;
+		tv->vval.v_સંખ્યા = 0;
+		જો (is_has)
 		    f_has(argvars, tv);
-		else if (is_len)
+		નહીંતર જો (is_len)
 		    f_len(argvars, tv);
-		else
+		નહીંતર
 		    f_exists(argvars, tv);
 		++ppconst->pp_used;
 	    }
 	    clear_tv(&argvars[0]);
-	    return OK;
+	    પાછા OK;
 	}
 	clear_tv(&argvars[0]);
-	if (!is_has && !is_len)
+	જો (!is_has && !is_len)
 	{
 	    emsg(_(e_argument_of_exists_compiled_must_be_literal_string));
-	    return FAIL;
+	    પાછા FAIL;
 	}
     }
 
-    if (generate_ppconst(cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (generate_ppconst(cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     funcerror_T	error;
     name = fname_trans_sid(namebuf, fname_buf, &tofree, &error);
 
     // We handle the "skip" argument of searchpair() and searchpairpos()
     // differently.
-    if ((varlen == 6 && STRNCMP(*arg, "search", 6) == 0)
+    જો ((varlen == 6 && STRNCMP(*arg, "search", 6) == 0)
 	    || (varlen == 9 && STRNCMP(*arg, "searchpos", 9) == 0)
 	    || (varlen == 10 && STRNCMP(*arg, "searchpair", 10) == 0)
 	    || (varlen == 13 && STRNCMP(*arg, "searchpairpos", 13) == 0))
 	special_fn = CA_SEARCHPAIR;
-    else if (varlen == 10 && STRNCMP(*arg, "substitute", 10) == 0)
+    નહીંતર જો (varlen == 10 && STRNCMP(*arg, "substitute", 10) == 0)
 	special_fn = CA_SUBSTITUTE;
-    else
+    નહીંતર
 	special_fn = CA_NOT_SPECIAL;
 
     gfargs_tab_T    gfatab;
 
     generic_func_args_table_init(&gfatab);
 
-    if (*(*arg + varlen) == '<')
+    જો (*(*arg + varlen) == '<')
     {
 	char_u	*start = *arg;
 
 	// generic function
 	*arg = parse_generic_func_type_args(*arg, varlen, *arg + varlen,
 								&gfatab, cctx);
-	if (*arg == NULL)
-	    goto theend;
+	જો (*arg == ખાલી)
+	    જાઓ theend;
 	// the name with the type arguments, used for a nested function
 	gname = vim_strnsave(start, *arg - start);
-	if (gname == NULL)
-	    goto theend;
+	જો (gname == ખાલી)
+	    જાઓ theend;
 	++*arg;			// skip '('
     }
-    else
+    નહીંતર
 	*arg += varlen + 1;
 
-    if (compile_arguments(arg, cctx, &argcount, special_fn) == FAIL)
-	goto theend;
+    જો (compile_arguments(arg, cctx, &argcount, special_fn) == FAIL)
+	જાઓ theend;
 
-    is_autoload = vim_strchr(name, AUTOLOAD_CHAR) != NULL;
-    if (ASCII_ISLOWER(*name) && name[1] != ':' && !is_autoload)
+    is_autoload = vim_strchr(name, AUTOLOAD_CHAR) != ખાલી;
+    જો (ASCII_ISLOWER(*name) && name[1] != ':' && !is_autoload)
     {
-	int	    idx;
+	પૂર્ણાંક	    idx;
 
 	// builtin function
 	idx = find_internal_func(name);
-	if (idx >= 0)
+	જો (idx >= 0)
 	{
-	    if (STRCMP(name, "flatten") == 0)
+	    જો (STRCMP(name, "flatten") == 0)
 	    {
 		emsg(_(e_cannot_use_flatten_in_vim9_script));
-		goto theend;
+		જાઓ theend;
 	    }
 
-	    if (STRCMP(name, "add") == 0 && argcount == 2)
+	    જો (STRCMP(name, "add") == 0 && argcount == 2)
 	    {
-		type_T	    *type = get_decl_type_on_stack(cctx, 1);
-		if (check_type_is_value(get_type_on_stack(cctx, 0)) == FAIL)
-		    goto theend;
+		type_T	    *type = get_decl_type_on_ઢગલો(cctx, 1);
+		જો (check_type_is_કિંમત(get_type_on_ઢગલો(cctx, 0)) == FAIL)
+		    જાઓ theend;
 
 		// add() can be compiled to instructions if we know the type
-		if (type->tt_type == VAR_LIST)
+		જો (type->tt_type == VAR_LIST)
 		{
 		    // inline "add(list, item)" so that the type can be checked
 		    res = generate_LISTAPPEND(cctx);
 		    idx = -1;
 		}
-		else if (type->tt_type == VAR_BLOB)
+		નહીંતર જો (type->tt_type == VAR_BLOB)
 		{
 		    // inline "add(blob, nr)" so that the type can be checked
 		    res = generate_BLOBAPPEND(cctx);
@@ -1532,124 +1532,124 @@ compile_call(
 		}
 	    }
 
-	    if ((STRCMP(name, "writefile") == 0 && argcount > 2)
+	    જો ((STRCMP(name, "writefile") == 0 && argcount > 2)
 		    || (STRCMP(name, "mkdir") == 0 && argcount > 1))
 	    {
 		// May have the "D" or "R" flag, reserve a variable for a
 		// deferred function call.
-		if (get_defer_var_idx(cctx) == 0)
+		જો (get_defer_var_idx(cctx) == 0)
 		    idx = -1;
 	    }
 
 	    class_builtin_T	builtin_method = CLASS_BUILTIN_INVALID;
-	    if (STRCMP(name, "string") == 0)
+	    જો (STRCMP(name, "string") == 0)
 		builtin_method = CLASS_BUILTIN_STRING;
-	    else if (STRCMP(name, "empty") == 0)
+	    નહીંતર જો (STRCMP(name, "empty") == 0)
 		builtin_method = CLASS_BUILTIN_EMPTY;
-	    else if (STRCMP(name, "len") == 0)
+	    નહીંતર જો (STRCMP(name, "len") == 0)
 		builtin_method = CLASS_BUILTIN_LEN;
-	    if (builtin_method != CLASS_BUILTIN_INVALID)
+	    જો (builtin_method != CLASS_BUILTIN_INVALID)
 	    {
 		res = compile_builtin_method_call(cctx, builtin_method);
-		if (res == OK)
+		જો (res == OK)
 		    idx = -1;
 	    }
 
-	    if (idx >= 0)
+	    જો (idx >= 0)
 		res = generate_BCALL(cctx, idx, argcount, argcount_init == 1);
 	}
-	else
+	નહીંતર
 	    emsg_funcname(e_unknown_function_str, namebuf);
-	goto theend;
+	જાઓ theend;
     }
 
     has_g_namespace = STRNCMP(namebuf, "g:", 2) == 0;
 
     // An argument or local variable can be a function reference, this
     // overrules a function name.
-    if (lookup_local(namebuf, varlen, NULL, cctx) == FAIL
-	    && arg_exists(namebuf, varlen, NULL, NULL, NULL, cctx) != OK)
+    જો (lookup_local(namebuf, varlen, ખાલી, cctx) == FAIL
+	    && arg_exists(namebuf, varlen, ખાલી, ખાલી, ખાલી, cctx) != OK)
     {
-	class_T		*cl = NULL;
-	int		mi = 0;
+	class_T		*cl = ખાલી;
+	પૂર્ણાંક		mi = 0;
 
 	// If we can find the function by name generate the right call.
 	// Skip global functions here, a local funcref takes precedence.
 	ufunc = find_func(name, FALSE);
-	if (ufunc != NULL)
+	જો (ufunc != ખાલી)
 	{
 	    // process generic function call
 	    ufunc = generic_func_get(ufunc, &gfatab);
-	    if (ufunc == NULL)
-		goto theend;
+	    જો (ufunc == ખાલી)
+		જાઓ theend;
 
-	    if (!func_is_global(ufunc))
+	    જો (!func_is_global(ufunc))
 	    {
-		res = generate_CALL(cctx, ufunc, NULL, 0, argcount, FALSE);
-		goto theend;
+		res = generate_CALL(cctx, ufunc, ખાલી, 0, argcount, FALSE);
+		જાઓ theend;
 	    }
-	    if (!has_g_namespace
-			  && vim_strchr(ufunc->uf_name, AUTOLOAD_CHAR) == NULL
+	    જો (!has_g_namespace
+			  && vim_strchr(ufunc->uf_name, AUTOLOAD_CHAR) == ખાલી
 			  && !IS_GENERIC_FUNC(ufunc))
 	    {
 		// A function name without g: prefix must be found locally
 		// A generic function has the name emptied out.
 		emsg_funcname(e_unknown_function_str, namebuf);
-		goto theend;
+		જાઓ theend;
 	    }
 	}
-	else if ((mi = cctx_class_method_idx(cctx, name, varlen, &cl)) >= 0)
+	નહીંતર જો ((mi = cctx_class_method_idx(cctx, name, varlen, &cl)) >= 0)
 	{
 	    // Class method invocation without the class name.
 	    // A class method can be referenced without the class name only in
 	    // the class where the function is defined.
-	    if (cctx->ctx_ufunc->uf_defclass == cl)
+	    જો (cctx->ctx_ufunc->uf_defclass == cl)
 	    {
-		res = generate_CALL(cctx, cl->class_class_functions[mi], NULL,
+		res = generate_CALL(cctx, cl->class_class_functions[mi], ખાલી,
 							0, argcount, FALSE);
 	    }
-	    else
+	    નહીંતર
 	    {
 		semsg(_(e_class_method_str_accessible_only_inside_class_str),
 			name, cl->class_name.string);
 		res = FAIL;
 	    }
-	    goto theend;
+	    જાઓ theend;
 	}
     }
 
     // If the name is a variable, load it and use PCALL.
     // Not for g:Func(), we don't know if it is a variable or not.
     // Not for some#Func(), it will be loaded later.
-    p = ufunc == NULL && gname != NULL ? gname : namebuf;
-    if (!has_g_namespace && !is_autoload
+    p = ufunc == ખાલી && gname != ખાલી ? gname : namebuf;
+    જો (!has_g_namespace && !is_autoload
 	    && compile_load(&p, varlen, p + varlen, cctx, FALSE, FALSE) == OK)
     {
-	type_T	    *s_type = get_type_on_stack(cctx, 0);
+	type_T	    *s_type = get_type_on_ઢગલો(cctx, 0);
 
 	res = generate_PCALL(cctx, argcount, namebuf, s_type, FALSE);
-	goto theend;
+	જાઓ theend;
     }
 
     // If we can find a global function by name generate the right call.
-    if (ufunc != NULL)
+    જો (ufunc != ખાલી)
     {
-	res = generate_CALL(cctx, ufunc, NULL, 0, argcount, FALSE);
-	goto theend;
+	res = generate_CALL(cctx, ufunc, ખાલી, 0, argcount, FALSE);
+	જાઓ theend;
     }
 
     // A global function may be defined only later.  Need to figure out at
     // runtime.  Also handles a FuncRef at runtime.
-    if (has_g_namespace || is_autoload)
+    જો (has_g_namespace || is_autoload)
 	res = generate_UCALL(cctx, name, argcount);
-    else
+    નહીંતર
 	emsg_funcname(e_unknown_function_str, namebuf);
 
 theend:
     generic_func_args_table_clear(&gfatab);
     vim_free(tofree);
     vim_free(gname);
-    return res;
+    પાછા res;
 }
 
 // like NAMESPACE_CHAR but with 'a' and 'l'.
@@ -1663,22 +1663,22 @@ theend:
  * valid name.
  */
     char_u *
-to_name_end(char_u *arg, int use_namespace)
+to_name_end(char_u *arg, પૂર્ણાંક use_namespace)
 {
     char_u	*p;
 
     // Quick check for valid starting character.
-    if (!eval_isnamec1(*arg))
-	return arg;
+    જો (!eval_isnamec1(*arg))
+	પાછા arg;
 
-    for (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
+    માટે (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
 	// Include a namespace such as "s:var" and "v:var".  But "n:" is not
 	// and can be used in slice "[n:]".
-	if (*p == ':' && (p != arg + 1
+	જો (*p == ':' && (p != arg + 1
 			     || !use_namespace
-			     || vim_strchr(VIM9_NAMESPACE_CHAR, *arg) == NULL))
-	    break;
-    return p;
+			     || vim_strchr(VIM9_NAMESPACE_CHAR, *arg) == ખાલી))
+	    તોડો;
+    પાછા p;
 }
 
 /*
@@ -1692,17 +1692,17 @@ to_name_const_end(char_u *arg)
     char_u	*p = arg;
     typval_T	rettv;
 
-    if (STRNCMP(p, "<SNR>", 5) == 0)
+    જો (STRNCMP(p, "<SNR>", 5) == 0)
 	p = skipdigits(p + 5);
     p = to_name_end(p, TRUE);
-    if (p == arg && *arg == '[')
+    જો (p == arg && *arg == '[')
     {
 
 	// Can be "[1, 2, 3]->Func()".
-	if (eval_list(&p, &rettv, NULL, FALSE) == FAIL)
+	જો (eval_list(&p, &rettv, ખાલી, FALSE) == FAIL)
 	    p = arg;
     }
-    return p;
+    પાછા p;
 }
 
 /*
@@ -1710,53 +1710,53 @@ to_name_const_end(char_u *arg)
  * "*arg" points to the '['.
  * ppconst->pp_is_const is set if all items are a constant.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_list(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
     char_u	*p = skipwhite(*arg + 1);
     char_u	*whitep = *arg + 1;
-    int		count = 0;
-    int		is_const;
-    int		is_all_const = TRUE;	// reset when non-const encountered
-    int		must_end = FALSE;
+    પૂર્ણાંક		ગણતરી = 0;
+    પૂર્ણાંક		is_const;
+    પૂર્ણાંક		is_all_const = TRUE;	// reset when non-const encountered
+    પૂર્ણાંક		must_end = FALSE;
 
-    for (;;)
+    માટે (;;)
     {
-	if (may_get_next_line(whitep, &p, cctx) == FAIL)
+	જો (may_get_next_લીટી(whitep, &p, cctx) == FAIL)
 	{
 	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (*p == ',')
+	જો (*p == ',')
 	{
 	    semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (*p == ']')
+	જો (*p == ']')
 	{
 	    ++p;
-	    break;
+	    તોડો;
 	}
-	if (must_end)
+	જો (must_end)
 	{
 	    semsg(_(e_missing_comma_in_list_str), p);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (compile_expr0_ext(&p, cctx, &is_const) == FAIL)
-	    return FAIL;
-	if (!is_const)
+	જો (compile_expr0_ext(&p, cctx, &is_const) == FAIL)
+	    પાછા FAIL;
+	જો (!is_const)
 	    is_all_const = FALSE;
-	++count;
-	if (*p == ',')
+	++ગણતરી;
+	જો (*p == ',')
 	{
 	    ++p;
-	    if (*p != ']' && !IS_WHITE_OR_NUL(*p))
+	    જો (*p != ']' && !IS_WHITE_OR_NUL(*p))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", p - 1);
-		return FAIL;
+		પાછા FAIL;
 	    }
 	}
-	else
+	નહીંતર
 	    must_end = TRUE;
 	whitep = p;
 	p = skipwhite(p);
@@ -1764,7 +1764,7 @@ compile_list(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
     *arg = p;
 
     ppconst->pp_is_const = is_all_const;
-    return generate_NEWLIST(cctx, count, FALSE);
+    પાછા generate_NEWLIST(cctx, ગણતરી, FALSE);
 }
 
 /*
@@ -1772,66 +1772,66 @@ compile_list(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  * "*arg" points to the ','.
  * ppconst->pp_is_const is set if all the items are constants.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_tuple(
     char_u **arg,
     cctx_T *cctx,
     ppconst_T *ppconst,
-    int first_item_const)
+    પૂર્ણાંક first_item_const)
 {
     char_u	*p = *arg + 1;
     char_u	*whitep = *arg + 1;
-    int		count = 0;
-    int		is_const;
-    int		is_all_const = TRUE;	// reset when non-const encountered
-    int		must_end = FALSE;
+    પૂર્ણાંક		ગણતરી = 0;
+    પૂર્ણાંક		is_const;
+    પૂર્ણાંક		is_all_const = TRUE;	// reset when non-const encountered
+    પૂર્ણાંક		must_end = FALSE;
 
-    if (**arg != ')')
+    જો (**arg != ')')
     {
-	if (*p != ')' && !IS_WHITE_OR_NUL(*p))
+	જો (*p != ')' && !IS_WHITE_OR_NUL(*p))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ",", p - 1);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	count = 1;	// the first tuple item is already processed
+	ગણતરી = 1;	// the first tuple item is already processed
 	is_all_const = first_item_const;
-	for (;;)
+	માટે (;;)
 	{
-	    if (may_get_next_line(whitep, &p, cctx) == FAIL)
+	    જો (may_get_next_લીટી(whitep, &p, cctx) == FAIL)
 	    {
 		semsg(_(e_missing_end_of_tuple_rsp_str), *arg);
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (*p == ',')
+	    જો (*p == ',')
 	    {
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (*p == ')')
+	    જો (*p == ')')
 	    {
 		++p;
-		break;
+		તોડો;
 	    }
-	    if (must_end)
+	    જો (must_end)
 	    {
 		semsg(_(e_missing_comma_in_tuple_str), p);
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (compile_expr0_ext(&p, cctx, &is_const) == FAIL)
-		return FAIL;
-	    if (!is_const)
+	    જો (compile_expr0_ext(&p, cctx, &is_const) == FAIL)
+		પાછા FAIL;
+	    જો (!is_const)
 		is_all_const = FALSE;
-	    ++count;
-	    if (*p == ',')
+	    ++ગણતરી;
+	    જો (*p == ',')
 	    {
 		++p;
-		if (*p != ')' && !IS_WHITE_OR_NUL(*p))
+		જો (*p != ')' && !IS_WHITE_OR_NUL(*p))
 		{
 		    semsg(_(e_white_space_required_after_str_str), ",", p - 1);
-		    return FAIL;
+		    પાછા FAIL;
 		}
 	    }
-	    else
+	    નહીંતર
 		must_end = TRUE;
 	    whitep = p;
 	    p = skipwhite(p);
@@ -1840,29 +1840,29 @@ compile_tuple(
     *arg = p;
 
     ppconst->pp_is_const = is_all_const;
-    return generate_NEWTUPLE(cctx, count, FALSE);
+    પાછા generate_NEWTUPLE(cctx, ગણતરી, FALSE);
 }
 
 /*
  * Restore "*arg" from a temporary cmdline copy.
  */
-    static void
+    સ્થિર શૂન્ય
 restore_cmdline_arg(evalarg_T *evalarg, char_u **arg, cctx_T *cctx)
 {
     garray_T    *gap;
-    char_u	*line;
+    char_u	*લીટી;
     size_t	off;
 
-    if (!evalarg->eval_using_cmdline || cctx == NULL)
-	return;
+    જો (!evalarg->eval_using_cmdline || cctx == ખાલી)
+	પાછા;
 
     gap = &evalarg->eval_tofree_ga;
-    if (gap->ga_len == 0)
-	return;
+    જો (gap->ga_len == 0)
+	પાછા;
 
     off = *arg - ((char_u **)gap->ga_data)[gap->ga_len - 1];
-    line = ((char_u **)cctx->ctx_ufunc->uf_lines.ga_data)[cctx->ctx_lnum];
-    *arg = line + off;
+    લીટી = ((char_u **)cctx->ctx_ufunc->uf_લીટીઓ.ga_data)[cctx->ctx_lnum];
+    *arg = લીટી + off;
     evalarg->eval_using_cmdline = FALSE;
 }
 
@@ -1873,10 +1873,10 @@ restore_cmdline_arg(evalarg_T *evalarg, char_u **arg, cctx_T *cctx)
  * lambda, which goes on top of them on the stack.
  * Returns OK/FAIL when a lambda is recognized, NOTDONE if it's not a lambda.
  */
-    int
+    પૂર્ણાંક
 compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    int		r;
+    પૂર્ણાંક		r;
     typval_T	rettv;
     ufunc_T	*ufunc;
     evalarg_T	evalarg;
@@ -1887,17 +1887,17 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 
     // Get the funcref in "rettv".
     r = get_lambda_tv(arg, &rettv, TRUE, &evalarg, cctx);
-    if (r != OK)
+    જો (r != OK)
     {
-	clear_evalarg(&evalarg, NULL);
-	return r;
+	clear_evalarg(&evalarg, ખાલી);
+	પાછા r;
     }
 
-    if (ppconst != NULL && generate_ppconst(cctx, ppconst) == FAIL)
+    જો (ppconst != ખાલી && generate_ppconst(cctx, ppconst) == FAIL)
     {
 	clear_tv(&rettv);
-	clear_evalarg(&evalarg, NULL);
-	return FAIL;
+	clear_evalarg(&evalarg, ખાલી);
+	પાછા FAIL;
     }
 
     // "rettv" will now be a partial referencing the function.
@@ -1905,7 +1905,7 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
     ++ufunc->uf_refcount;
     clear_tv(&rettv);
 
-    if (cctx->ctx_ufunc != NULL)
+    જો (cctx->ctx_ufunc != ખાલી)
     {
 	// This lambda might be defined in a class method.  Inherit the class
 	// from the current function.
@@ -1913,15 +1913,15 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 
 	// Copy over the block scope IDs, so that a script variable declared in
 	// an enclosing block can be found.
-	int block_depth = cctx->ctx_ufunc->uf_block_depth;
+	પૂર્ણાંક block_depth = cctx->ctx_ufunc->uf_block_depth;
 
-	if (block_depth > 0)
+	જો (block_depth > 0)
 	{
-	    ufunc->uf_block_ids = ALLOC_MULT(int, block_depth);
-	    if (ufunc->uf_block_ids != NULL)
+	    ufunc->uf_block_ids = ALLOC_MULT(પૂર્ણાંક, block_depth);
+	    જો (ufunc->uf_block_ids != ખાલી)
 	    {
 		mch_memmove(ufunc->uf_block_ids, cctx->ctx_ufunc->uf_block_ids,
-						    sizeof(int) * block_depth);
+						    કદ(પૂર્ણાંક) * block_depth);
 		ufunc->uf_block_depth = block_depth;
 	    }
 	}
@@ -1930,14 +1930,14 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
     // Compile it here to get the return type.  The return type is optional,
     // when it's missing use t_unknown.  This is recognized in
     // compile_return().
-    if (ufunc->uf_ret_type->tt_type == VAR_VOID)
+    જો (ufunc->uf_ret_type->tt_type == VAR_VOID)
 	ufunc->uf_ret_type = &t_unknown;
     compile_def_function(ufunc, FALSE, cctx->ctx_compile_type, cctx);
 
     // When the outer function is compiled for profiling or debugging, the
     // lambda may be called without profiling or debugging.  Compile it here in
     // the right context.
-    if (cctx->ctx_compile_type == CT_DEBUG
+    જો (cctx->ctx_compile_type == CT_DEBUG
 #ifdef FEAT_PROFILE
 	    || cctx->ctx_compile_type == CT_PROFILE
 #endif
@@ -1946,19 +1946,19 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 
     // if the outer function is not compiled for debugging or profiling, this
     // one might be
-    if (cctx->ctx_compile_type == CT_NONE)
+    જો (cctx->ctx_compile_type == CT_NONE)
     {
 	compiletype_T compile_type = get_compile_type(ufunc);
 
-	if (compile_type != CT_NONE)
+	જો (compile_type != CT_NONE)
 	    compile_def_function(ufunc, FALSE, compile_type, cctx);
     }
 
     restore_cmdline_arg(&evalarg, arg, cctx);
 
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ખાલી);
 
-    if (ufunc->uf_def_status == UF_COMPILED)
+    જો (ufunc->uf_def_status == UF_COMPILED)
     {
 	// The return type will now be known.
 	set_function_type(ufunc);
@@ -1966,33 +1966,33 @@ compile_lambda(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 	// The function reference count will be 1.  When the ISN_FUNCREF
 	// instruction is deleted the reference count is decremented and the
 	// function is freed.
-	return generate_FUNCREF(cctx, ufunc, NULL, FALSE, 0, NULL);
+	પાછા generate_FUNCREF(cctx, ufunc, ખાલી, FALSE, 0, ખાલી);
     }
 
     func_ptr_unref(ufunc);
-    return FAIL;
+    પાછા FAIL;
 }
 
 /*
  * Get a lambda and compile it.  Uses Vim9 syntax.
  */
-    int
+    પૂર્ણાંક
 get_lambda_tv_and_compile(
 	char_u	    **arg,
 	typval_T    *rettv,
-	int	    types_optional,
+	પૂર્ણાંક	    types_optional,
 	evalarg_T   *evalarg)
 {
-    int		r;
+    પૂર્ણાંક		r;
     ufunc_T	*ufunc;
-    int		save_sc_version = current_sctx.sc_version;
+    પૂર્ણાંક		save_sc_version = current_sctx.sc_version;
 
     // Get the funcref in "rettv".
     current_sctx.sc_version = SCRIPT_VERSION_VIM9;
-    r = get_lambda_tv(arg, rettv, types_optional, evalarg, NULL);
+    r = get_lambda_tv(arg, rettv, types_optional, evalarg, ખાલી);
     current_sctx.sc_version = save_sc_version;
-    if (r != OK)
-	return r;  // currently unreachable
+    જો (r != OK)
+	પાછા r;  // currently unreachable
 
     // "rettv" will now be a partial referencing the function.
     ufunc = rettv->vval.v_partial->pt_func;
@@ -2000,18 +2000,18 @@ get_lambda_tv_and_compile(
     // Compile it here to get the return type.  The return type is optional,
     // when it's missing use t_unknown.  This is recognized in
     // compile_return().
-    if (ufunc->uf_ret_type == NULL || ufunc->uf_ret_type->tt_type == VAR_VOID)
+    જો (ufunc->uf_ret_type == ખાલી || ufunc->uf_ret_type->tt_type == VAR_VOID)
 	ufunc->uf_ret_type = &t_unknown;
-    compile_def_function(ufunc, FALSE, CT_NONE, NULL);
+    compile_def_function(ufunc, FALSE, CT_NONE, ખાલી);
 
-    if (ufunc->uf_def_status == UF_COMPILED)
+    જો (ufunc->uf_def_status == UF_COMPILED)
     {
 	// The return type will now be known.
 	set_function_type(ufunc);
-	return OK;
+	પાછા OK;
     }
     clear_tv(rettv);
-    return FAIL;
+    પાછા FAIL;
 }
 
 /*
@@ -2019,149 +2019,149 @@ get_lambda_tv_and_compile(
  * "*arg" points to the '{'.
  * ppconst->pp_is_const is set if all item values are a constant.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_dict(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
     garray_T	*instr = &cctx->ctx_instr;
-    int		count = 0;
+    પૂર્ણાંક		ગણતરી = 0;
     dict_T	*d = dict_alloc();
     dictitem_T	*item;
     char_u	*whitep = *arg + 1;
     char_u	*p;
-    int		is_const;
-    int		is_all_const = TRUE;	// reset when non-const encountered
+    પૂર્ણાંક		is_const;
+    પૂર્ણાંક		is_all_const = TRUE;	// reset when non-const encountered
 
-    if (d == NULL)
-	return FAIL;
-    if (generate_ppconst(cctx, ppconst) == FAIL)
+    જો (d == ખાલી)
+	પાછા FAIL;
+    જો (generate_ppconst(cctx, ppconst) == FAIL)
     {
 	dict_unref(d);
-	return FAIL;
+	પાછા FAIL;
     }
-    for (;;)
+    માટે (;;)
     {
-	char_u	    *key = NULL;
+	char_u	    *ચાવી = ખાલી;
 
-	if (may_get_next_line(whitep, arg, cctx) == FAIL)
+	જો (may_get_next_લીટી(whitep, arg, cctx) == FAIL)
 	{
-	    *arg = NULL;
-	    goto failret;
+	    *arg = ખાલી;
+	    જાઓ failret;
 	}
 
-	if (**arg == '}')
-	    break;
+	જો (**arg == '}')
+	    તોડો;
 
-	if (**arg == '[')
+	જો (**arg == '[')
 	{
 	    isn_T	*isn;
 
 	    // {[expr]: value} uses an evaluated key.
 	    *arg = skipwhite(*arg + 1);
-	    if (compile_expr0(arg, cctx) == FAIL)
-		goto failret;
+	    જો (compile_expr0(arg, cctx) == FAIL)
+		જાઓ failret;
 	    isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
-	    if (isn->isn_type == ISN_PUSHNR)
+	    જો (isn->isn_type == ISN_PUSHNR)
 	    {
-		char buf[NUMBUFLEN];
+		અક્ષર buf[NUMBUFLEN];
 
 		// Convert to string at compile time.
-		vim_snprintf(buf, NUMBUFLEN, "%lld", isn->isn_arg.number);
+		vim_snprintf(buf, NUMBUFLEN, "%lld", isn->isn_arg.સંખ્યા);
 		isn->isn_type = ISN_PUSHS;
 		isn->isn_arg.string = vim_strsave((char_u *)buf);
 	    }
-	    if (isn->isn_type == ISN_PUSHS)
-		key = isn->isn_arg.string;
-	    else if (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL)
-		goto failret;
+	    જો (isn->isn_type == ISN_PUSHS)
+		ચાવી = isn->isn_arg.string;
+	    નહીંતર જો (may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL)
+		જાઓ failret;
 	    *arg = skipwhite(*arg);
-	    if (**arg != ']')
+	    જો (**arg != ']')
 	    {
-		emsg(_(e_missing_matching_bracket_after_dict_key));
-		goto failret;
+		emsg(_(e_missing_matching_bracket_after_dict_ચાવી));
+		જાઓ failret;
 	    }
 	    ++*arg;
 	}
-	else
+	નહીંતર
 	{
 	    // {"name": value},
 	    // {'name': value},
 	    // {name: value} use "name" as a literal key
-	    key = get_literal_key(arg);
-	    if (key == NULL)
-		goto failret;
-	    if (generate_PUSHS(cctx, &key) == FAIL)
-		goto failret;
+	    ચાવી = get_literal_ચાવી(arg);
+	    જો (ચાવી == ખાલી)
+		જાઓ failret;
+	    જો (generate_PUSHS(cctx, &ચાવી) == FAIL)
+		જાઓ failret;
 	}
 
 	// Check for duplicate keys, if using string keys.
-	if (key != NULL)
+	જો (ચાવી != ખાલી)
 	{
-	    item = dict_find(d, key, -1);
-	    if (item != NULL)
+	    item = dict_find(d, ચાવી, -1);
+	    જો (item != ખાલી)
 	    {
-		semsg(_(e_duplicate_key_in_dictionary_str), key);
-		goto failret;
+		semsg(_(e_duplicate_ચાવી_in_dictionary_str), ચાવી);
+		જાઓ failret;
 	    }
-	    item = dictitem_alloc(key);
-	    if (item != NULL)
+	    item = dictitem_alloc(ચાવી);
+	    જો (item != ખાલી)
 	    {
 		item->di_tv.v_type = VAR_UNKNOWN;
 		item->di_tv.v_lock = 0;
-		if (dict_add(d, item) == FAIL)
+		જો (dict_add(d, item) == FAIL)
 		    dictitem_free(item);
 	    }
 	}
 
-	if (**arg != ':')
+	જો (**arg != ':')
 	{
-	    if (*skipwhite(*arg) == ':')
+	    જો (*skipwhite(*arg) == ':')
 		semsg(_(e_no_white_space_allowed_before_str_str), ":", *arg);
-	    else
+	    નહીંતર
 		semsg(_(e_missing_colon_in_dictionary_str), *arg);
-	    goto failret;
+	    જાઓ failret;
 	}
 	whitep = *arg + 1;
-	if (!IS_WHITE_OR_NUL(*whitep))
+	જો (!IS_WHITE_OR_NUL(*whitep))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg);
-	    goto failret;
+	    જાઓ failret;
 	}
 
-	if (may_get_next_line(whitep, arg, cctx) == FAIL)
+	જો (may_get_next_લીટી(whitep, arg, cctx) == FAIL)
 	{
-	    *arg = NULL;
-	    goto failret;
+	    *arg = ખાલી;
+	    જાઓ failret;
 	}
 
-	if (compile_expr0_ext(arg, cctx, &is_const) == FAIL)
-	    goto failret;
-	if (!is_const)
+	જો (compile_expr0_ext(arg, cctx, &is_const) == FAIL)
+	    જાઓ failret;
+	જો (!is_const)
 	    is_all_const = FALSE;
-	++count;
+	++ગણતરી;
 
 	whitep = *arg;
-	if (may_get_next_line(whitep, arg, cctx) == FAIL)
+	જો (may_get_next_લીટી(whitep, arg, cctx) == FAIL)
 	{
-	    *arg = NULL;
-	    goto failret;
+	    *arg = ખાલી;
+	    જાઓ failret;
 	}
-	if (**arg == '}')
-	    break;
-	if (**arg != ',')
+	જો (**arg == '}')
+	    તોડો;
+	જો (**arg != ',')
 	{
 	    semsg(_(e_missing_comma_in_dictionary_str), *arg);
-	    goto failret;
+	    જાઓ failret;
 	}
-	if (IS_WHITE_OR_NUL(*whitep))
+	જો (IS_WHITE_OR_NUL(*whitep))
 	{
 	    semsg(_(e_no_white_space_allowed_before_str_str), ",", whitep);
-	    goto failret;
+	    જાઓ failret;
 	}
 	whitep = *arg + 1;
-	if (!IS_WHITE_OR_NUL(*whitep))
+	જો (!IS_WHITE_OR_NUL(*whitep))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ",", *arg);
-	    goto failret;
+	    જાઓ failret;
 	}
 	*arg = skipwhite(whitep);
     }
@@ -2170,88 +2170,88 @@ compile_dict(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 
     // Allow for following comment, after at least one space.
     p = skipwhite(*arg);
-    if (VIM_ISWHITE(**arg) && vim9_comment_start(p))
+    જો (VIM_ISWHITE(**arg) && vim9_comment_start(p))
 	*arg += STRLEN(*arg);
 
     dict_unref(d);
     ppconst->pp_is_const = is_all_const;
-    return generate_NEWDICT(cctx, count, FALSE);
+    પાછા generate_NEWDICT(cctx, ગણતરી, FALSE);
 
 failret:
-    if (*arg == NULL)
+    જો (*arg == ખાલી)
     {
 	semsg(_(e_missing_dict_end_str), _("[end of lines]"));
 	*arg = (char_u *)"";
     }
     dict_unref(d);
-    return FAIL;
+    પાછા FAIL;
 }
 
 /*
  * Compile "&option".
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_get_option(char_u **arg, cctx_T *cctx)
 {
     typval_T	rettv;
     char_u	*start = *arg;
-    int		ret;
+    પૂર્ણાંક		ret;
 
     // parse the option and get the current value to get the type.
     rettv.v_type = VAR_UNKNOWN;
     ret = eval_option(arg, &rettv, TRUE);
-    if (ret == OK)
+    જો (ret == OK)
     {
 	// include the '&' in the name, eval_option() expects it.
 	char_u	*name = vim_strnsave(start, *arg - start);
 	type_T	*type = rettv.v_type == VAR_BOOL ? &t_bool
-			  : rettv.v_type == VAR_NUMBER ? &t_number : &t_string;
+			  : rettv.v_type == VAR_સંખ્યા ? &t_સંખ્યા : &t_string;
 
 	ret = generate_LOAD(cctx, ISN_LOADOPT, 0, name, type);
 	vim_free(name);
     }
     clear_tv(&rettv);
 
-    return ret;
+    પાછા ret;
 }
 
 /*
  * Compile "$VAR".
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_get_env(char_u **arg, cctx_T *cctx)
 {
     char_u	*start = *arg;
-    int		len;
-    int		ret;
+    પૂર્ણાંક		len;
+    પૂર્ણાંક		ret;
     char_u	*name;
 
     ++*arg;
     len = get_env_len(arg);
-    if (len == 0)
+    જો (len == 0)
     {
 	semsg(_(e_syntax_error_at_str), start);
-	return FAIL;
+	પાછા FAIL;
     }
 
     // include the '$' in the name, eval_env_var() expects it.
     name = vim_strnsave(start, len + 1);
     ret = generate_LOAD(cctx, ISN_LOADENV, 0, name, &t_string);
     vim_free(name);
-    return ret;
+    પાછા ret;
 }
 
 /*
  * Compile $"string" or $'string'.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_interp_string(char_u **arg, cctx_T *cctx)
 {
     typval_T	tv;
-    int		ret;
-    int		quote;
-    int		evaluate = cctx->ctx_skip != SKIP_YES;
-    int		count = 0;
+    પૂર્ણાંક		ret;
+    પૂર્ણાંક		quote;
+    પૂર્ણાંક		evaluate = cctx->ctx_skip != SKIP_YES;
+    પૂર્ણાંક		ગણતરી = 0;
     char_u	*p;
 
     // *arg is on the '$' character, move it to the first string character.
@@ -2259,269 +2259,269 @@ compile_interp_string(char_u **arg, cctx_T *cctx)
     quote = **arg;
     ++*arg;
 
-    for (;;)
+    માટે (;;)
     {
 	// Get the string up to the matching quote or to a single '{'.
 	// "arg" is advanced to either the quote or the '{'.
-	if (quote == '"')
+	જો (quote == '"')
 	    ret = eval_string(arg, &tv, evaluate, TRUE);
-	else
+	નહીંતર
 	    ret = eval_lit_string(arg, &tv, evaluate, TRUE);
-	if (ret == FAIL)
-	    break;
-	if (evaluate)
+	જો (ret == FAIL)
+	    તોડો;
+	જો (evaluate)
 	{
-	    if ((tv.vval.v_string != NULL && *tv.vval.v_string != NUL)
-		    || (**arg != '{' && count == 0))
+	    જો ((tv.vval.v_string != ખાલી && *tv.vval.v_string != NUL)
+		    || (**arg != '{' && ગણતરી == 0))
 	    {
 		// generate non-empty string or empty string if it's the only
 		// one
-		if (generate_PUSHS(cctx, &tv.vval.v_string) == FAIL)
-		    return FAIL;
-		tv.vval.v_string = NULL;  // don't free it now
-		++count;
+		જો (generate_PUSHS(cctx, &tv.vval.v_string) == FAIL)
+		    પાછા FAIL;
+		tv.vval.v_string = ખાલી;  // don't free it now
+		++ગણતરી;
 	    }
 	    clear_tv(&tv);
 	}
 
-	if (**arg != '{')
+	જો (**arg != '{')
 	{
 	    // found terminating quote
 	    ++*arg;
-	    break;
+	    તોડો;
 	}
 
-	p = compile_one_expr_in_str(*arg, cctx);
-	if (p == NULL)
+	p = compile_one_પદાવલિ_in_str(*arg, cctx);
+	જો (p == ખાલી)
 	{
 	    ret = FAIL;
-	    break;
+	    તોડો;
 	}
-	++count;
+	++ગણતરી;
 	*arg = p;
     }
 
-    if (ret == FAIL || !evaluate)
-	return ret;
+    જો (ret == FAIL || !evaluate)
+	પાછા ret;
 
     // Small optimization, if there's only a single piece skip the ISN_CONCAT.
-    if (count > 1)
-	return generate_CONCAT(cctx, count);
+    જો (ગણતરી > 1)
+	પાછા generate_CONCAT(cctx, ગણતરી);
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Compile "@r".
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_get_register(char_u **arg, cctx_T *cctx)
 {
-    int		ret;
+    પૂર્ણાંક		ret;
 
     ++*arg;
-    if (**arg == NUL)
+    જો (**arg == NUL)
     {
 	semsg(_(e_syntax_error_at_str), *arg - 1);
-	return FAIL;
+	પાછા FAIL;
     }
-    if (!valid_yank_reg(**arg, FALSE))
+    જો (!valid_yank_reg(**arg, FALSE))
     {
 	emsg_invreg(**arg);
-	return FAIL;
+	પાછા FAIL;
     }
-    ret = generate_LOAD(cctx, ISN_LOADREG, **arg, NULL, &t_string);
+    ret = generate_LOAD(cctx, ISN_LOADREG, **arg, ખાલી, &t_string);
     ++*arg;
-    return ret;
+    પાછા ret;
 }
 
 /*
  * Apply leading '!', '-' and '+' to constant "rettv".
  * When "numeric_only" is TRUE do not apply '!'.
  */
-    static int
-apply_leader(typval_T *rettv, int numeric_only, char_u *start, char_u **end)
+    સ્થિર પૂર્ણાંક
+apply_leader(typval_T *rettv, પૂર્ણાંક numeric_only, char_u *start, char_u **end)
 {
     char_u *p = *end;
 
     // this works from end to start
-    while (p > start)
+    જ્યારે (p > start)
     {
 	--p;
-	if (*p == '-' || *p == '+')
+	જો (*p == '-' || *p == '+')
 	{
 	    // only '-' has an effect, for '+' we only check the type
-	    if (rettv->v_type == VAR_FLOAT)
+	    જો (rettv->v_type == VAR_FLOAT)
 	    {
-		if (*p == '-')
+		જો (*p == '-')
 		    rettv->vval.v_float = -rettv->vval.v_float;
 	    }
-	    else
+	    નહીંતર
 	    {
 		varnumber_T	val;
-		int		error = FALSE;
+		પૂર્ણાંક		error = FALSE;
 
 		// tv_get_number_chk() accepts a string, but we don't want that
 		// here
-		if (check_not_string(rettv) == FAIL)
-		    return FAIL;
-		val = tv_get_number_chk(rettv, &error);
+		જો (check_not_string(rettv) == FAIL)
+		    પાછા FAIL;
+		val = tv_get_સંખ્યા_chk(rettv, &error);
 		clear_tv(rettv);
-		if (error)
-		    return FAIL;
-		if (*p == '-')
+		જો (error)
+		    પાછા FAIL;
+		જો (*p == '-')
 		    val = -val;
-		rettv->v_type = VAR_NUMBER;
-		rettv->vval.v_number = val;
+		rettv->v_type = VAR_સંખ્યા;
+		rettv->vval.v_સંખ્યા = val;
 	    }
 	}
-	else if (numeric_only)
+	નહીંતર જો (numeric_only)
 	{
 	    ++p;
-	    break;
+	    તોડો;
 	}
-	else if (*p == '!')
+	નહીંતર જો (*p == '!')
 	{
-	    int v = tv2bool(rettv);
+	    પૂર્ણાંક v = tv2bool(rettv);
 
 	    // '!' is permissive in the type.
 	    clear_tv(rettv);
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = v ? VVAL_FALSE : VVAL_TRUE;
+	    rettv->vval.v_સંખ્યા = v ? VVAL_FALSE : VVAL_TRUE;
 	}
     }
     *end = p;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Recognize v: variables that are constants and set "rettv".
  */
-    static void
+    સ્થિર શૂન્ય
 get_vim_constant(char_u **arg, typval_T *rettv)
 {
-    if (STRNCMP(*arg, "v:true", 6) == 0)
+    જો (STRNCMP(*arg, "v:true", 6) == 0)
     {
 	rettv->v_type = VAR_BOOL;
-	rettv->vval.v_number = VVAL_TRUE;
+	rettv->vval.v_સંખ્યા = VVAL_TRUE;
 	*arg += 6;
     }
-    else if (STRNCMP(*arg, "v:false", 7) == 0)
+    નહીંતર જો (STRNCMP(*arg, "v:false", 7) == 0)
     {
 	rettv->v_type = VAR_BOOL;
-	rettv->vval.v_number = VVAL_FALSE;
+	rettv->vval.v_સંખ્યા = VVAL_FALSE;
 	*arg += 7;
     }
-    else if (STRNCMP(*arg, "v:null", 6) == 0)
+    નહીંતર જો (STRNCMP(*arg, "v:null", 6) == 0)
     {
 	rettv->v_type = VAR_SPECIAL;
-	rettv->vval.v_number = VVAL_NULL;
+	rettv->vval.v_સંખ્યા = VVAL_NULL;
 	*arg += 6;
     }
-    else if (STRNCMP(*arg, "v:none", 6) == 0)
+    નહીંતર જો (STRNCMP(*arg, "v:none", 6) == 0)
     {
 	rettv->v_type = VAR_SPECIAL;
-	rettv->vval.v_number = VVAL_NONE;
+	rettv->vval.v_સંખ્યા = VVAL_NONE;
 	*arg += 6;
     }
 }
 
     exprtype_T
-get_compare_type(char_u *p, int *len, int *type_is)
+get_compare_type(char_u *p, પૂર્ણાંક *len, પૂર્ણાંક *type_is)
 {
-    exprtype_T	type = EXPR_UNKNOWN;
-    int		i;
+    exprtype_T	type = પદાવલિ_UNKNOWN;
+    પૂર્ણાંક		i;
 
-    switch (p[0])
+    પસંદગી (p[0])
     {
-	case '=':   if (p[1] == '=')
-			type = EXPR_EQUAL;
-		    else if (p[1] == '~')
-			type = EXPR_MATCH;
-		    break;
-	case '!':   if (p[1] == '=')
-			type = EXPR_NEQUAL;
-		    else if (p[1] == '~')
-			type = EXPR_NOMATCH;
-		    break;
-	case '>':   if (p[1] != '=')
+	સ્થિતિ '=':   જો (p[1] == '=')
+			type = પદાવલિ_EQUAL;
+		    નહીંતર જો (p[1] == '~')
+			type = પદાવલિ_MATCH;
+		    તોડો;
+	સ્થિતિ '!':   જો (p[1] == '=')
+			type = પદાવલિ_NEQUAL;
+		    નહીંતર જો (p[1] == '~')
+			type = પદાવલિ_NOMATCH;
+		    તોડો;
+	સ્થિતિ '>':   જો (p[1] != '=')
 		    {
-			type = EXPR_GREATER;
+			type = પદાવલિ_GREATER;
 			*len = 1;
 		    }
-		    else
-			type = EXPR_GEQUAL;
-		    break;
-	case '<':   if (p[1] != '=')
+		    નહીંતર
+			type = પદાવલિ_GEQUAL;
+		    તોડો;
+	સ્થિતિ '<':   જો (p[1] != '=')
 		    {
-			type = EXPR_SMALLER;
+			type = પદાવલિ_SMALLER;
 			*len = 1;
 		    }
-		    else
-			type = EXPR_SEQUAL;
-		    break;
-	case 'i':   if (p[1] == 's')
+		    નહીંતર
+			type = પદાવલિ_SEQUAL;
+		    તોડો;
+	સ્થિતિ 'i':   જો (p[1] == 's')
 		    {
 			// "is" and "isnot"; but not a prefix of a name
-			if (p[2] == 'n' && p[3] == 'o' && p[4] == 't')
+			જો (p[2] == 'n' && p[3] == 'o' && p[4] == 't')
 			    *len = 5;
 			i = p[*len];
-			if (!SAFE_isalnum(i) && i != '_')
+			જો (!SAFE_isalnum(i) && i != '_')
 			{
-			    type = *len == 2 ? EXPR_IS : EXPR_ISNOT;
+			    type = *len == 2 ? પદાવલિ_IS : પદાવલિ_ISNOT;
 			    *type_is = TRUE;
 			}
 		    }
-		    break;
+		    તોડો;
     }
-    return type;
+    પાછા type;
 }
 
 /*
  * Skip over an expression, ignoring most errors.
  */
-    void
-skip_expr_cctx(char_u **arg, cctx_T *cctx)
+    શૂન્ય
+skip_પદાવલિ_cctx(char_u **arg, cctx_T *cctx)
 {
     evalarg_T	evalarg;
 
     init_evalarg(&evalarg);
     evalarg.eval_cctx = cctx;
-    skip_expr(arg, &evalarg);
+    skip_પદાવલિ(arg, &evalarg);
     restore_cmdline_arg(&evalarg, arg, cctx);
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ખાલી);
 }
 
 /*
  * Check that the top of the type stack has a type that can be used as a
  * condition.  Give an error and return FAIL if not.
  */
-    int
-bool_on_stack(cctx_T *cctx)
+    પૂર્ણાંક
+bool_on_ઢગલો(cctx_T *cctx)
 {
     type_T	*type;
 
-    type = get_type_on_stack(cctx, 0);
-    if (type == &t_bool)
-	return OK;
+    type = get_type_on_ઢગલો(cctx, 0);
+    જો (type == &t_bool)
+	પાછા OK;
 
-    if (type->tt_type == VAR_ANY
+    જો (type->tt_type == VAR_ANY
 	    || type->tt_type == VAR_UNKNOWN
-	    || type->tt_type == VAR_NUMBER
-	    || type == &t_number_bool
-	    || type == &t_const_number_bool)
+	    || type->tt_type == VAR_સંખ્યા
+	    || type == &t_સંખ્યા_bool
+	    || type == &t_const_સંખ્યા_bool)
 	// Number 0 and 1 are OK to use as a bool.  "any" could also be a bool.
 	// This requires a runtime type check.
-	return generate_COND2BOOL(cctx);
+	પાછા generate_COND2BOOL(cctx);
 
-    return need_type(type, &t_bool, 0, -1, 0, cctx, FALSE, FALSE);
+    પાછા need_type(type, &t_bool, 0, -1, 0, cctx, FALSE, FALSE);
 }
 
 /*
  * Give the "white on both sides" error, taking the operator from "p[len]".
  */
-    void
-error_white_both(char_u *op, int len)
+    શૂન્ય
+error_white_both(char_u *op, પૂર્ણાંક len)
 {
     char_u	buf[10];
 
@@ -2533,109 +2533,109 @@ error_white_both(char_u *op, int len)
  * Compile code to apply '-', '+' and '!'.
  * When "numeric_only" is TRUE do not apply '!'.
  */
-    static int
-compile_leader(cctx_T *cctx, int numeric_only, char_u *start, char_u **end)
+    સ્થિર પૂર્ણાંક
+compile_leader(cctx_T *cctx, પૂર્ણાંક numeric_only, char_u *start, char_u **end)
 {
     char_u	*p = *end;
 
     // this works from end to start
-    while (p > start)
+    જ્યારે (p > start)
     {
 	--p;
-	while (VIM_ISWHITE(*p))
+	જ્યારે (VIM_ISWHITE(*p))
 	    --p;
-	if (*p == '-' || *p == '+')
+	જો (*p == '-' || *p == '+')
 	{
-	    type_T *type = get_type_on_stack(cctx, 0);
-	    if (type->tt_type != VAR_FLOAT && need_type(type, &t_number,
+	    type_T *type = get_type_on_ઢગલો(cctx, 0);
+	    જો (type->tt_type != VAR_FLOAT && need_type(type, &t_સંખ્યા,
 				     0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 
 	    // only '-' has an effect, for '+' we only check the type
-	    if (*p == '-' && generate_instr(cctx, ISN_NEGATENR) == NULL)
-		return FAIL;
+	    જો (*p == '-' && generate_instr(cctx, ISN_NEGATENR) == ખાલી)
+		પાછા FAIL;
 	}
-	else if (numeric_only)
+	નહીંતર જો (numeric_only)
 	{
 	    ++p;
-	    break;
+	    તોડો;
 	}
-	else
+	નહીંતર
 	{
-	    int  invert = *p == '!';
+	    પૂર્ણાંક  invert = *p == '!';
 
-	    while (p > start && (p[-1] == '!' || VIM_ISWHITE(p[-1])))
+	    જ્યારે (p > start && (p[-1] == '!' || VIM_ISWHITE(p[-1])))
 	    {
-		if (p[-1] == '!')
+		જો (p[-1] == '!')
 		    invert = !invert;
 		--p;
 	    }
-	    if (check_type_is_value(get_type_on_stack(cctx, 0)) == FAIL)
-		return FAIL;
-	    if (generate_2BOOL(cctx, invert, -1) == FAIL)
-		return FAIL;
+	    જો (check_type_is_કિંમત(get_type_on_ઢગલો(cctx, 0)) == FAIL)
+		પાછા FAIL;
+	    જો (generate_2BOOL(cctx, invert, -1) == FAIL)
+		પાછા FAIL;
 	}
     }
     *end = p;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Compile "(expression)": recursive!
  * Return FAIL/OK.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_parenthesis(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    int	    ret;
+    પૂર્ણાંક	    ret;
     char_u  *p = *arg + 1;
 
-    if (may_get_next_line_error(p, arg, cctx) == FAIL)
-	return FAIL;
+    જો (may_get_next_લીટી_error(p, arg, cctx) == FAIL)
+	પાછા FAIL;
 
-    if (**arg == ')')
+    જો (**arg == ')')
 	// empty tuple
-	return compile_tuple(arg, cctx, ppconst, FALSE);
+	પાછા compile_tuple(arg, cctx, ppconst, FALSE);
 
-    if (ppconst->pp_used <= PPSIZE - 10)
+    જો (ppconst->pp_used <= PPSIZE - 10)
     {
 	ret = compile_expr1(arg, cctx, ppconst);
     }
-    else
+    નહીંતર
     {
 	// Not enough space in ppconst, flush constants.
-	if (generate_ppconst(cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (generate_ppconst(cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 	ret = compile_expr0(arg, cctx);
     }
-    if (may_get_next_line_error(*arg, arg, cctx) == FAIL)
-	return FAIL;
-    if (ret == OK && **arg == ',')
+    જો (may_get_next_લીટી_error(*arg, arg, cctx) == FAIL)
+	પાછા FAIL;
+    જો (ret == OK && **arg == ',')
     {
 	// tuple
-	int is_const = ppconst->pp_used > 0 || ppconst->pp_is_const;
-	if (generate_ppconst(cctx, ppconst) == FAIL)
-	    return FAIL;
-	return compile_tuple(arg, cctx, ppconst, is_const);
+	પૂર્ણાંક is_const = ppconst->pp_used > 0 || ppconst->pp_is_const;
+	જો (generate_ppconst(cctx, ppconst) == FAIL)
+	    પાછા FAIL;
+	પાછા compile_tuple(arg, cctx, ppconst, is_const);
     }
 
-    if (**arg == ')')
+    જો (**arg == ')')
 	++*arg;
-    else if (ret == OK)
+    નહીંતર જો (ret == OK)
     {
 	emsg(_(e_missing_closing_paren));
 	ret = FAIL;
     }
-    return ret;
+    પાછા ret;
 }
 
-static int compile_expr9(char_u **arg,  cctx_T *cctx, ppconst_T *ppconst);
+સ્થિર પૂર્ણાંક compile_expr9(char_u **arg,  cctx_T *cctx, ppconst_T *ppconst);
 
 /*
  * Compile whatever comes after "name" or "name()".
  * Advances "*arg" only when something was recognized.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_subscript(
 	char_u **arg,
 	cctx_T *cctx,
@@ -2644,30 +2644,30 @@ compile_subscript(
 	ppconst_T *ppconst)
 {
     char_u	*name_start = *end_leader;
-    int		keeping_dict = FALSE;
+    પૂર્ણાંક		keeping_dict = FALSE;
 
-    for (;;)
+    માટે (;;)
     {
 	char_u *p = skipwhite(*arg);
 	type_T *type;
 
-	if (*p == NUL || (VIM_ISWHITE(**arg) && vim9_comment_start(p)))
+	જો (*p == NUL || (VIM_ISWHITE(**arg) && vim9_comment_start(p)))
 	{
-	    char_u *next = peek_next_line_from_context(cctx);
+	    char_u *next = peek_next_લીટી_from_context(cctx);
 
 	    // If a following line starts with "->{", "->(" or "->X" advance to
 	    // that line, so that a line break before "->" is allowed.
 	    // Also if a following line starts with ".x".
-	    if (next != NULL &&
+	    જો (next != ખાલી &&
 		    ((next[0] == '-' && next[1] == '>'
 				 && (next[2] == '{'
 				       || *skipwhite(next + 2) == '('
 				       || ASCII_ISALPHA(*skipwhite(next + 2))))
 		    || (next[0] == '.' && eval_isdictc(next[1]))))
 	    {
-		next = next_line_from_context(cctx, TRUE);
-		if (next == NULL)
-		    return FAIL;
+		next = next_લીટી_from_context(cctx, TRUE);
+		જો (next == ખાલી)
+		    પાછા FAIL;
 		*arg = next;
 		p = skipwhite(*arg);
 	    }
@@ -2675,51 +2675,51 @@ compile_subscript(
 
 	// Do not skip over white space to find the "(", "execute 'x' (expr)"
 	// is not a function call.
-	if (**arg == '(')
+	જો (**arg == '(')
 	{
-	    int		argcount = 0;
+	    પૂર્ણાંક		argcount = 0;
 
-	    if (generate_ppconst(cctx, ppconst) == FAIL)
-		return FAIL;
+	    જો (generate_ppconst(cctx, ppconst) == FAIL)
+		પાછા FAIL;
 	    ppconst->pp_is_const = FALSE;
 
 	    // funcref(arg)
-	    type = get_type_on_stack(cctx, 0);
+	    type = get_type_on_ઢગલો(cctx, 0);
 
 	    *arg = skipwhite(p + 1);
-	    if (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
-		return FAIL;
-	    if (generate_PCALL(cctx, argcount, name_start, type, TRUE) == FAIL)
-		return FAIL;
-	    if (keeping_dict)
+	    જો (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL) == FAIL)
+		પાછા FAIL;
+	    જો (generate_PCALL(cctx, argcount, name_start, type, TRUE) == FAIL)
+		પાછા FAIL;
+	    જો (keeping_dict)
 	    {
 		keeping_dict = FALSE;
-		if (generate_instr(cctx, ISN_CLEARDICT) == NULL)
-		    return FAIL;
+		જો (generate_instr(cctx, ISN_CLEARDICT) == ખાલી)
+		    પાછા FAIL;
 	    }
 	}
-	else if (*p == '-' && p[1] == '>')
+	નહીંતર જો (*p == '-' && p[1] == '>')
 	{
 	    char_u  *pstart = p;
-	    int	    alt;
+	    પૂર્ણાંક	    alt;
 	    char_u  *paren;
 
 	    // something->method()
-	    if (generate_ppconst(cctx, ppconst) == FAIL)
-		return FAIL;
+	    જો (generate_ppconst(cctx, ppconst) == FAIL)
+		પાછા FAIL;
 	    ppconst->pp_is_const = FALSE;
 
-	    type = get_type_on_stack(cctx, 0);
-	    if (type->tt_type == VAR_VOID)
+	    type = get_type_on_ઢગલો(cctx, 0);
+	    જો (type->tt_type == VAR_VOID)
 	    {
-		emsg(_(e_cannot_use_void_value));
-		return FAIL;
+		emsg(_(e_cannot_use_void_કિંમત));
+		પાછા FAIL;
 	    }
 
 	    // Apply the '!', '-' and '+' first:
 	    //   -1.0->func() works like (-1.0)->func()
-	    if (compile_leader(cctx, TRUE, start_leader, end_leader) == FAIL)
-		return FAIL;
+	    જો (compile_leader(cctx, TRUE, start_leader, end_leader) == FAIL)
+		પાછા FAIL;
 
 	    p += 2;
 	    *arg = skipwhite(p);
@@ -2729,243 +2729,243 @@ compile_subscript(
 	    // 1. "base->name("  only a name, use compile_call()
 	    // 2. "base->(expr)(" evaluate "expr", then use PCALL
 	    // 3. "base->expr("  Same, find the end of "expr" by "("
-	    if (**arg == '(')
+	    જો (**arg == '(')
 		alt = 2;
-	    else
+	    નહીંતર
 	    {
 		// alternative 1 or 3
 		p = *arg;
-		if (!eval_isnamec1(*p))
+		જો (!eval_isnamec1(*p))
 		{
 		    semsg(_(e_trailing_characters_str), pstart);
-		    return FAIL;
+		    પાછા FAIL;
 		}
-		if (ASCII_ISALPHA(*p) && p[1] == ':')
+		જો (ASCII_ISALPHA(*p) && p[1] == ':')
 		    p += 2;
-		for ( ; eval_isnamec(*p); ++p)
+		માટે ( ; eval_isnamec(*p); ++p)
 		    ;
-		if (*p == '(')
+		જો (*p == '(')
 		{
 		    // alternative 1
 		    alt = 1;
-		    if (compile_call(arg, p - *arg, cctx, ppconst, 1) == FAIL)
-			return FAIL;
+		    જો (compile_call(arg, p - *arg, cctx, ppconst, 1) == FAIL)
+			પાછા FAIL;
 		}
-		else
+		નહીંતર
 		{
 		    // Must be alternative 3, find the "(". Only works within
 		    // one line.
 		    alt = 3;
 		    paren = vim_strchr(p, '(');
-		    if (paren == NULL)
+		    જો (paren == ખાલી)
 		    {
 			semsg(_(e_missing_parenthesis_str), *arg);
-			return FAIL;
+			પાછા FAIL;
 		    }
 		}
 	    }
 
-	    if (alt != 1)
+	    જો (alt != 1)
 	    {
-		int	    argcount = 1;
-		garray_T    *stack = &cctx->ctx_type_stack;
-		int	    type_idx_start = stack->ga_len;
-		int	    expr_isn_start = cctx->ctx_instr.ga_len;
-		int	    expr_isn_end;
-		int	    arg_isn_count;
+		પૂર્ણાંક	    argcount = 1;
+		garray_T    *ઢગલો = &cctx->ctx_type_ઢગલો;
+		પૂર્ણાંક	    type_idx_start = ઢગલો->ga_len;
+		પૂર્ણાંક	    પદાવલિ_isn_start = cctx->ctx_instr.ga_len;
+		પૂર્ણાંક	    પદાવલિ_isn_end;
+		પૂર્ણાંક	    arg_isn_ગણતરી;
 
-		if (alt == 2)
+		જો (alt == 2)
 		{
 		    // Funcref call:  list->(Refs[2])(arg)
 		    // or lambda:	  list->((arg) => expr)(arg)
 		    //
 		    // Fist compile the function expression.
-		    if (compile_parenthesis(arg, cctx, ppconst) == FAIL)
-			return FAIL;
+		    જો (compile_parenthesis(arg, cctx, ppconst) == FAIL)
+			પાછા FAIL;
 		}
-		else
+		નહીંતર
 		{
-		    int fail;
-		    int save_len = cctx->ctx_ufunc->uf_lines.ga_len;
-		    int	prev_did_emsg = did_emsg;
+		    પૂર્ણાંક fail;
+		    પૂર્ણાંક save_len = cctx->ctx_ufunc->uf_લીટીઓ.ga_len;
+		    પૂર્ણાંક	prev_did_emsg = did_emsg;
 
 		    *paren = NUL;
 
 		    // instead of using LOADG for "import.Func" use PUSHFUNC
-		    ++paren_follows_after_expr;
+		    ++paren_follows_after_પદાવલિ;
 
 		    // do not look in the next line
-		    cctx->ctx_ufunc->uf_lines.ga_len = 1;
+		    cctx->ctx_ufunc->uf_લીટીઓ.ga_len = 1;
 
 		    fail = compile_expr9(arg, cctx, ppconst) == FAIL
 						    || *skipwhite(*arg) != NUL;
 		    *paren = '(';
-		    --paren_follows_after_expr;
-		    cctx->ctx_ufunc->uf_lines.ga_len = save_len;
+		    --paren_follows_after_પદાવલિ;
+		    cctx->ctx_ufunc->uf_લીટીઓ.ga_len = save_len;
 
-		    if (fail)
+		    જો (fail)
 		    {
-			if (did_emsg == prev_did_emsg)
+			જો (did_emsg == prev_did_emsg)
 			    semsg(_(e_invalid_expression_str), pstart);
-			return FAIL;
+			પાછા FAIL;
 		    }
 		}
 
 		// Compile the arguments.
-		if (**arg != '(')
+		જો (**arg != '(')
 		{
-		    if (*skipwhite(*arg) == '(')
+		    જો (*skipwhite(*arg) == '(')
 			emsg(_(e_no_white_space_allowed_before_parenthesis));
-		    else
+		    નહીંતર
 			semsg(_(e_missing_parenthesis_str), *arg);
-		    return FAIL;
+		    પાછા FAIL;
 		}
 
 		// Remember the next instruction index, where the instructions
 		// for arguments are being written.
-		expr_isn_end = cctx->ctx_instr.ga_len;
+		પદાવલિ_isn_end = cctx->ctx_instr.ga_len;
 
 		*arg = skipwhite(*arg + 1);
-		if (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL)
+		જો (compile_arguments(arg, cctx, &argcount, CA_NOT_SPECIAL)
 								       == FAIL)
-		    return FAIL;
+		    પાછા FAIL;
 
 		// Move the instructions for the arguments to before the
 		// instructions of the expression and move the type of the
 		// expression after the argument types.  This is what ISN_PCALL
 		// expects.
-		arg_isn_count = cctx->ctx_instr.ga_len - expr_isn_end;
-		if (arg_isn_count > 0)
+		arg_isn_ગણતરી = cctx->ctx_instr.ga_len - પદાવલિ_isn_end;
+		જો (arg_isn_ગણતરી > 0)
 		{
-		    int	    expr_isn_count = expr_isn_end - expr_isn_start;
-		    isn_T   *isn = ALLOC_MULT(isn_T, expr_isn_count);
+		    પૂર્ણાંક	    પદાવલિ_isn_ગણતરી = પદાવલિ_isn_end - પદાવલિ_isn_start;
+		    isn_T   *isn = ALLOC_MULT(isn_T, પદાવલિ_isn_ગણતરી);
 		    type_T  *decl_type;
 		    type2_T  *typep;
 
-		    if (isn == NULL)
-			return FAIL;
+		    જો (isn == ખાલી)
+			પાછા FAIL;
 		    mch_memmove(isn, ((isn_T *)cctx->ctx_instr.ga_data)
-							      + expr_isn_start,
-					       sizeof(isn_T) * expr_isn_count);
+							      + પદાવલિ_isn_start,
+					       કદ(isn_T) * પદાવલિ_isn_ગણતરી);
 		    mch_memmove(((isn_T *)cctx->ctx_instr.ga_data)
-							      + expr_isn_start,
-			     ((isn_T *)cctx->ctx_instr.ga_data) + expr_isn_end,
-						sizeof(isn_T) * arg_isn_count);
+							      + પદાવલિ_isn_start,
+			     ((isn_T *)cctx->ctx_instr.ga_data) + પદાવલિ_isn_end,
+						કદ(isn_T) * arg_isn_ગણતરી);
 		    mch_memmove(((isn_T *)cctx->ctx_instr.ga_data)
-					      + expr_isn_start + arg_isn_count,
-					  isn, sizeof(isn_T) * expr_isn_count);
+					      + પદાવલિ_isn_start + arg_isn_ગણતરી,
+					  isn, કદ(isn_T) * પદાવલિ_isn_ગણતરી);
 		    vim_free(isn);
 
-		    typep = ((type2_T *)stack->ga_data) + type_idx_start;
+		    typep = ((type2_T *)ઢગલો->ga_data) + type_idx_start;
 		    type = typep->type_curr;
 		    decl_type = typep->type_decl;
-		    mch_memmove(((type2_T *)stack->ga_data) + type_idx_start,
-			      ((type2_T *)stack->ga_data) + type_idx_start + 1,
-			      sizeof(type2_T)
-				       * (stack->ga_len - type_idx_start - 1));
-		    typep = ((type2_T *)stack->ga_data) + stack->ga_len - 1;
+		    mch_memmove(((type2_T *)ઢગલો->ga_data) + type_idx_start,
+			      ((type2_T *)ઢગલો->ga_data) + type_idx_start + 1,
+			      કદ(type2_T)
+				       * (ઢગલો->ga_len - type_idx_start - 1));
+		    typep = ((type2_T *)ઢગલો->ga_data) + ઢગલો->ga_len - 1;
 		    typep->type_curr = type;
 		    typep->type_decl = decl_type;
 		}
 
-		type = get_type_on_stack(cctx, 0);
-		if (generate_PCALL(cctx, argcount, p - 2, type, FALSE) == FAIL)
-		    return FAIL;
+		type = get_type_on_ઢગલો(cctx, 0);
+		જો (generate_PCALL(cctx, argcount, p - 2, type, FALSE) == FAIL)
+		    પાછા FAIL;
 	    }
 
-	    if (keeping_dict)
+	    જો (keeping_dict)
 	    {
 		keeping_dict = FALSE;
-		if (generate_instr(cctx, ISN_CLEARDICT) == NULL)
-		    return FAIL;
+		જો (generate_instr(cctx, ISN_CLEARDICT) == ખાલી)
+		    પાછા FAIL;
 	    }
 	}
-	else if (**arg == '[')
+	નહીંતર જો (**arg == '[')
 	{
-	    int		is_slice = FALSE;
+	    પૂર્ણાંક		is_slice = FALSE;
 
 	    // list index: list[123]
 	    // tuple index: tuple[123]
 	    // dict member: dict[key]
 	    // string index: text[123]
 	    // blob index: blob[123]
-	    if (generate_ppconst(cctx, ppconst) == FAIL)
-		return FAIL;
+	    જો (generate_ppconst(cctx, ppconst) == FAIL)
+		પાછા FAIL;
 	    ppconst->pp_is_const = FALSE;
 
 	    ++p;
-	    if (may_get_next_line_error(p, arg, cctx) == FAIL)
-		return FAIL;
-	    if (**arg == ':')
+	    જો (may_get_next_લીટી_error(p, arg, cctx) == FAIL)
+		પાછા FAIL;
+	    જો (**arg == ':')
 	    {
 		// missing first index is equal to zero
 		generate_PUSHNR(cctx, 0);
 	    }
-	    else
+	    નહીંતર
 	    {
-		if (compile_expr0(arg, cctx) == FAIL)
-		    return FAIL;
-		if (**arg == ':')
+		જો (compile_expr0(arg, cctx) == FAIL)
+		    પાછા FAIL;
+		જો (**arg == ':')
 		{
 		    semsg(_(e_white_space_required_before_and_after_str_at_str),
 								    ":", *arg);
-		    return FAIL;
+		    પાછા FAIL;
 		}
-		if (may_get_next_line_error(*arg, arg, cctx) == FAIL)
-		    return FAIL;
+		જો (may_get_next_લીટી_error(*arg, arg, cctx) == FAIL)
+		    પાછા FAIL;
 		*arg = skipwhite(*arg);
 	    }
-	    if (**arg == ':')
+	    જો (**arg == ':')
 	    {
 		is_slice = TRUE;
 		++*arg;
-		if (!IS_WHITE_OR_NUL(**arg) && **arg != ']')
+		જો (!IS_WHITE_OR_NUL(**arg) && **arg != ']')
 		{
 		    semsg(_(e_white_space_required_before_and_after_str_at_str),
 								    ":", *arg);
-		    return FAIL;
+		    પાછા FAIL;
 		}
-		if (may_get_next_line_error(*arg, arg, cctx) == FAIL)
-		    return FAIL;
-		if (**arg == ']')
+		જો (may_get_next_લીટી_error(*arg, arg, cctx) == FAIL)
+		    પાછા FAIL;
+		જો (**arg == ']')
 		    // missing second index is equal to end of string
 		    generate_PUSHNR(cctx, -1);
-		else
+		નહીંતર
 		{
-		    if (compile_expr0(arg, cctx) == FAIL)
-			return FAIL;
-		    if (may_get_next_line_error(*arg, arg, cctx) == FAIL)
-			return FAIL;
+		    જો (compile_expr0(arg, cctx) == FAIL)
+			પાછા FAIL;
+		    જો (may_get_next_લીટી_error(*arg, arg, cctx) == FAIL)
+			પાછા FAIL;
 		    *arg = skipwhite(*arg);
 		}
 	    }
 
-	    if (**arg != ']')
+	    જો (**arg != ']')
 	    {
 		emsg(_(e_missing_closing_square_brace));
-		return FAIL;
+		પાછા FAIL;
 	    }
 	    *arg = *arg + 1;
 
-	    if (keeping_dict)
+	    જો (keeping_dict)
 	    {
 		keeping_dict = FALSE;
-		if (generate_instr(cctx, ISN_CLEARDICT) == NULL)
-		    return FAIL;
+		જો (generate_instr(cctx, ISN_CLEARDICT) == ખાલી)
+		    પાછા FAIL;
 	    }
-	    if (cctx->ctx_skip != SKIP_YES
+	    જો (cctx->ctx_skip != SKIP_YES
 		    && compile_member(is_slice, &keeping_dict, cctx) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	}
-	else if (*p == '.' && p[1] != '.')
+	નહીંતર જો (*p == '.' && p[1] != '.')
 	{
 	    // dictionary member: dict.name
-	    if (generate_ppconst(cctx, ppconst) == FAIL)
-		return FAIL;
+	    જો (generate_ppconst(cctx, ppconst) == FAIL)
+		પાછા FAIL;
 	    ppconst->pp_is_const = FALSE;
 
-	    type = get_type_on_stack(cctx, 0);
-	    if (type != &t_unknown
+	    type = get_type_on_ઢગલો(cctx, 0);
+	    જો (type != &t_unknown
 		    && (type->tt_type == VAR_CLASS
 			|| (type->tt_type == VAR_OBJECT
 			    && type != &t_object_any)))
@@ -2976,44 +2976,44 @@ compile_subscript(
 		// object member: someObject.varname, this.varname
 		// object method: someObject.SomeMethod(), this.SomeMethod()
 		*arg = p;
-		if (compile_class_object_index(cctx, arg, type) == FAIL)
-		    return FAIL;
+		જો (compile_class_object_index(cctx, arg, type) == FAIL)
+		    પાછા FAIL;
 	    }
-	    else
+	    નહીંતર
 	    {
 		*arg = p + 1;
-		if (IS_WHITE_OR_NUL(**arg))
+		જો (IS_WHITE_OR_NUL(**arg))
 		{
 		    emsg(_(e_missing_name_after_dot));
-		    return FAIL;
+		    પાછા FAIL;
 		}
 		p = *arg;
-		while (eval_isdictc(*p))
+		જ્યારે (eval_isdictc(*p))
 		    MB_PTR_ADV(p);
-		if (p == *arg)
+		જો (p == *arg)
 		{
 		    semsg(_(e_syntax_error_at_str), *arg);
-		    return FAIL;
+		    પાછા FAIL;
 		}
-		if (keeping_dict && generate_instr(cctx, ISN_CLEARDICT) == NULL)
-		    return FAIL;
-		if (generate_STRINGMEMBER(cctx, *arg, p - *arg) == FAIL)
-		    return FAIL;
+		જો (keeping_dict && generate_instr(cctx, ISN_CLEARDICT) == ખાલી)
+		    પાછા FAIL;
+		જો (generate_STRINGMEMBER(cctx, *arg, p - *arg) == FAIL)
+		    પાછા FAIL;
 		keeping_dict = TRUE;
 		*arg = p;
 	    }
 	}
-	else
-	    break;
+	નહીંતર
+	    તોડો;
     }
 
     // Turn "dict.Func" into a partial for "Func" bound to "dict".
     // This needs to be done at runtime to be able to check the type.
-    if (keeping_dict && cctx->ctx_skip != SKIP_YES
-				  && generate_instr(cctx, ISN_USEDICT) == NULL)
-	return FAIL;
+    જો (keeping_dict && cctx->ctx_skip != SKIP_YES
+				  && generate_instr(cctx, ISN_USEDICT) == ખાલી)
+	પાછા FAIL;
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3049,16 +3049,16 @@ compile_subscript(
  *  trailing .name	entry in Dictionary
  *  trailing ->name()	method call
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr9(
 	char_u **arg,
 	cctx_T *cctx,
 	ppconst_T *ppconst)
 {
     char_u	*start_leader, *end_leader;
-    int		ret = OK;
+    પૂર્ણાંક		ret = OK;
     typval_T	*rettv = &ppconst->pp_tv[ppconst->pp_used];
-    int		used_before = ppconst->pp_used;
+    પૂર્ણાંક		used_before = ppconst->pp_used;
 
     ppconst->pp_is_const = FALSE;
 
@@ -3066,291 +3066,291 @@ compile_expr9(
      * Skip '!', '-' and '+' characters.  They are handled later.
      */
     start_leader = *arg;
-    if (eval_leader(arg, TRUE) == FAIL)
-	return FAIL;
+    જો (eval_leader(arg, TRUE) == FAIL)
+	પાછા FAIL;
     end_leader = *arg;
 
     rettv->v_type = VAR_UNKNOWN;
-    switch (**arg)
+    પસંદગી (**arg)
     {
 	/*
 	 * Number constant.
 	 */
-	case '0':	// also for blob starting with 0z
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
-	case '.':   if (eval_number(arg, rettv, TRUE, FALSE) == FAIL)
-			return FAIL;
+	સ્થિતિ '0':	// also for blob starting with 0z
+	સ્થિતિ '1':
+	સ્થિતિ '2':
+	સ્થિતિ '3':
+	સ્થિતિ '4':
+	સ્થિતિ '5':
+	સ્થિતિ '6':
+	સ્થિતિ '7':
+	સ્થિતિ '8':
+	સ્થિતિ '9':
+	સ્થિતિ '.':   જો (eval_સંખ્યા(arg, rettv, TRUE, FALSE) == FAIL)
+			પાછા FAIL;
 		    // Apply "-" and "+" just before the number now, right to
 		    // left.  Matters especially when "->" follows.  Stops at
 		    // '!'.
-		    if (apply_leader(rettv, TRUE,
+		    જો (apply_leader(rettv, TRUE,
 					    start_leader, &end_leader) == FAIL)
 		    {
 			clear_tv(rettv);
-			return FAIL;
+			પાછા FAIL;
 		    }
-		    break;
+		    તોડો;
 
 	/*
 	 * String constant: "string".
 	 */
-	case '"':   if (eval_string(arg, rettv, TRUE, FALSE) == FAIL)
-			return FAIL;
-		    break;
+	સ્થિતિ '"':   જો (eval_string(arg, rettv, TRUE, FALSE) == FAIL)
+			પાછા FAIL;
+		    તોડો;
 
 	/*
 	 * Literal string constant: 'str''ing'.
 	 */
-	case '\'':  if (eval_lit_string(arg, rettv, TRUE, FALSE) == FAIL)
-			return FAIL;
-		    break;
+	સ્થિતિ '\'':  જો (eval_lit_string(arg, rettv, TRUE, FALSE) == FAIL)
+			પાછા FAIL;
+		    તોડો;
 
 	/*
 	 * Constant Vim variable.
 	 */
-	case 'v':   get_vim_constant(arg, rettv);
+	સ્થિતિ 'v':   get_vim_constant(arg, rettv);
 		    ret = NOTDONE;
-		    break;
+		    તોડો;
 
 	/*
 	 * "true" constant
 	 */
-	case 't':   if (STRNCMP(*arg, "true", 4) == 0
+	સ્થિતિ 't':   જો (STRNCMP(*arg, "true", 4) == 0
 						   && !eval_isnamec((*arg)[4]))
 		    {
 			*arg += 4;
 			rettv->v_type = VAR_BOOL;
-			rettv->vval.v_number = VVAL_TRUE;
+			rettv->vval.v_સંખ્યા = VVAL_TRUE;
 		    }
-		    else
+		    નહીંતર
 			ret = NOTDONE;
-		    break;
+		    તોડો;
 
 	/*
 	 * "false" constant
 	 */
-	case 'f':   if (STRNCMP(*arg, "false", 5) == 0
+	સ્થિતિ 'f':   જો (STRNCMP(*arg, "false", 5) == 0
 						   && !eval_isnamec((*arg)[5]))
 		    {
 			*arg += 5;
 			rettv->v_type = VAR_BOOL;
-			rettv->vval.v_number = VVAL_FALSE;
+			rettv->vval.v_સંખ્યા = VVAL_FALSE;
 		    }
-		    else
+		    નહીંતર
 			ret = NOTDONE;
-		    break;
+		    તોડો;
 
 	/*
 	 * "null" or "null_*" constant
 	 */
-	case 'n':   if (STRNCMP(*arg, "null", 4) == 0)
+	સ્થિતિ 'n':   જો (STRNCMP(*arg, "null", 4) == 0)
 		    {
 			char_u  *p = *arg + 4;
-			int	len;
+			પૂર્ણાંક	len;
 
-			for (len = 0; eval_isnamec(p[len]); ++len)
+			માટે (len = 0; eval_isnamec(p[len]); ++len)
 			    ;
 			ret = handle_predefined(*arg, len + 4, rettv);
-			if (ret == FAIL)
+			જો (ret == FAIL)
 			    ret = NOTDONE;
-			else
+			નહીંતર
 			    *arg += len + 4;
 		    }
-		    else
+		    નહીંતર
 			ret = NOTDONE;
-		    break;
+		    તોડો;
 
 	/*
 	 * List: [expr, expr]
 	 */
-	case '[':   if (generate_ppconst(cctx, ppconst) == FAIL)
-			return FAIL;
+	સ્થિતિ '[':   જો (generate_ppconst(cctx, ppconst) == FAIL)
+			પાછા FAIL;
 		    ret = compile_list(arg, cctx, ppconst);
-		    break;
+		    તોડો;
 
 	/*
 	 * Dictionary: {'key': val, 'key': val}
 	 */
-	case '{':   if (generate_ppconst(cctx, ppconst) == FAIL)
-			return FAIL;
+	સ્થિતિ '{':   જો (generate_ppconst(cctx, ppconst) == FAIL)
+			પાછા FAIL;
 		    ret = compile_dict(arg, cctx, ppconst);
-		    break;
+		    તોડો;
 
 	/*
 	 * Option value: &name
 	 */
-	case '&':	if (generate_ppconst(cctx, ppconst) == FAIL)
-			    return FAIL;
+	સ્થિતિ '&':	જો (generate_ppconst(cctx, ppconst) == FAIL)
+			    પાછા FAIL;
 			ret = compile_get_option(arg, cctx);
-			break;
+			તોડો;
 
 	/*
 	 * Environment variable: $VAR.
 	 * Interpolated string: $"string" or $'string'.
 	 */
-	case '$':	if (generate_ppconst(cctx, ppconst) == FAIL)
-			    return FAIL;
-			if ((*arg)[1] == '"' || (*arg)[1] == '\'')
+	સ્થિતિ '$':	જો (generate_ppconst(cctx, ppconst) == FAIL)
+			    પાછા FAIL;
+			જો ((*arg)[1] == '"' || (*arg)[1] == '\'')
 			    ret = compile_interp_string(arg, cctx);
-			else
+			નહીંતર
 			    ret = compile_get_env(arg, cctx);
-			break;
+			તોડો;
 
 	/*
 	 * Register contents: @r.
 	 */
-	case '@':	if (generate_ppconst(cctx, ppconst) == FAIL)
-			    return FAIL;
+	સ્થિતિ '@':	જો (generate_ppconst(cctx, ppconst) == FAIL)
+			    પાછા FAIL;
 			ret = compile_get_register(arg, cctx);
-			break;
+			તોડો;
 	/*
 	 * nested expression: (expression).
 	 * lambda: (arg, arg) => expr
 	 * funcref: (arg, arg) => { statement }
 	 */
-	case '(':   // if compile_lambda returns NOTDONE then it must be (expr)
+	સ્થિતિ '(':   // if compile_lambda returns NOTDONE then it must be (expr)
 		    ret = compile_lambda(arg, cctx, ppconst);
-		    if (ret == NOTDONE)
+		    જો (ret == NOTDONE)
 			ret = compile_parenthesis(arg, cctx, ppconst);
-		    break;
+		    તોડો;
 
-	default:    ret = NOTDONE;
-		    break;
+	મૂળભૂત:    ret = NOTDONE;
+		    તોડો;
     }
-    if (ret == FAIL)
-	return FAIL;
+    જો (ret == FAIL)
+	પાછા FAIL;
 
-    if (rettv->v_type != VAR_UNKNOWN && used_before == ppconst->pp_used)
+    જો (rettv->v_type != VAR_UNKNOWN && used_before == ppconst->pp_used)
     {
-	if (cctx->ctx_skip == SKIP_YES)
+	જો (cctx->ctx_skip == SKIP_YES)
 	    clear_tv(rettv);
-	else
+	નહીંતર
 	    // A constant expression can possibly be handled compile time,
 	    // return the value instead of generating code.
 	    ++ppconst->pp_used;
     }
-    else if (ret == NOTDONE)
+    નહીંતર જો (ret == NOTDONE)
     {
 	char_u	    *p;
-	int	    r;
+	પૂર્ણાંક	    r;
 
-	if (!eval_isnamec1(**arg))
+	જો (!eval_isnamec1(**arg))
 	{
-	    if (!vim9_bad_comment(*arg))
+	    જો (!vim9_bad_comment(*arg))
 	    {
-		if (ends_excmd(*skipwhite(*arg)))
+		જો (ends_excmd(*skipwhite(*arg)))
 		    semsg(_(e_empty_expression_str), *arg);
-		else
+		નહીંતર
 		    semsg(_(e_name_expected_str), *arg);
 	    }
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	// "name" or "name()"
 	p = to_name_end(*arg, TRUE);
-	if (p - *arg == (size_t)1 && **arg == '_')
+	જો (p - *arg == (size_t)1 && **arg == '_')
 	{
 	    emsg(_(e_cannot_use_underscore_here));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	size_t namelen = p - *arg;
-	if (*p == '<')
+	જો (*p == '<')
 	{
-	    if (skip_generic_func_type_args(&p) == FAIL)
-		return FAIL;
+	    જો (skip_generic_func_type_args(&p) == FAIL)
+		પાછા FAIL;
 	}
 
-	if (*p == '(')
+	જો (*p == '(')
 	{
 	    r = compile_call(arg, namelen, cctx, ppconst, 0);
 	}
-	else
+	નહીંતર
 	{
-	    if (cctx->ctx_skip != SKIP_YES
+	    જો (cctx->ctx_skip != SKIP_YES
 				    && generate_ppconst(cctx, ppconst) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	    r = compile_load(arg, namelen, p, cctx, TRUE, TRUE);
 	}
-	if (r == FAIL)
-	    return FAIL;
+	જો (r == FAIL)
+	    પાછા FAIL;
     }
 
     // Handle following "[]", ".member", etc.
     // Then deal with prefixed '-', '+' and '!', if not done already.
-    if (compile_subscript(arg, cctx, start_leader, &end_leader,
+    જો (compile_subscript(arg, cctx, start_leader, &end_leader,
 							     ppconst) == FAIL)
-	return FAIL;
-    if ((ppconst->pp_used > 0) && (cctx->ctx_skip != SKIP_YES))
+	પાછા FAIL;
+    જો ((ppconst->pp_used > 0) && (cctx->ctx_skip != SKIP_YES))
     {
 	// apply the '!', '-' and '+' before the constant
 	rettv = &ppconst->pp_tv[ppconst->pp_used - 1];
-	if (apply_leader(rettv, FALSE, start_leader, &end_leader) == FAIL)
-	    return FAIL;
-	return OK;
+	જો (apply_leader(rettv, FALSE, start_leader, &end_leader) == FAIL)
+	    પાછા FAIL;
+	પાછા OK;
     }
-    if (compile_leader(cctx, FALSE, start_leader, &end_leader) == FAIL)
-	return FAIL;
-    return OK;
+    જો (compile_leader(cctx, FALSE, start_leader, &end_leader) == FAIL)
+	પાછા FAIL;
+    પાછા OK;
 }
 
 /*
  * <type>expr9: runtime type check / conversion
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr8(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    type_T *want_type = NULL;
+    type_T *want_type = ખાલી;
 
     // Recognize <type>
-    if (**arg == '<' && eval_isnamec1((*arg)[1]))
+    જો (**arg == '<' && eval_isnamec1((*arg)[1]))
     {
 	++*arg;
 	want_type = parse_type(arg, cctx->ctx_type_list, cctx->ctx_ufunc, cctx, TRUE);
-	if (want_type == NULL)
-	    return FAIL;
+	જો (want_type == ખાલી)
+	    પાછા FAIL;
 
-	if (**arg != '>')
+	જો (**arg != '>')
 	{
-	    if (*skipwhite(*arg) == '>')
+	    જો (*skipwhite(*arg) == '>')
 		semsg(_(e_no_white_space_allowed_before_str_str), ">", *arg);
-	    else
+	    નહીંતર
 		emsg(_(e_missing_gt));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	++*arg;
-	if (may_get_next_line_error(*arg, arg, cctx) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(*arg, arg, cctx) == FAIL)
+	    પાછા FAIL;
     }
 
-    if (compile_expr9(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr9(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
-    if (want_type != NULL)
+    જો (want_type != ખાલી)
     {
 	type_T	    *actual;
 	where_T	    where = WHERE_INIT;
 
 	where.wt_kind = WT_CAST;
 	generate_ppconst(cctx, ppconst);
-	actual = get_type_on_stack(cctx, 0);
-	if (check_type_maybe(want_type, actual, FALSE, where) != OK)
+	actual = get_type_on_ઢગલો(cctx, 0);
+	જો (check_type_maybe(want_type, actual, FALSE, where) != OK)
 	{
-	    if (need_type_where(actual, want_type, 0, -1, where, cctx, FALSE,
+	    જો (need_type_where(actual, want_type, 0, -1, where, cctx, FALSE,
 							FALSE) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 	}
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3358,77 +3358,77 @@ compile_expr8(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  *	/	number division
  *	%	number modulo
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr7(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
     char_u	*op;
     char_u	*next;
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
 
     // get the first expression
-    if (compile_expr8(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr8(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     /*
      * Repeat computing, until no "*", "/" or "%" is following.
      */
-    for (;;)
+    માટે (;;)
     {
-	op = may_peek_next_line(cctx, *arg, &next);
-	if (*op != '*' && *op != '/' && *op != '%')
-	    break;
-	if (next != NULL)
+	op = may_peek_next_લીટી(cctx, *arg, &next);
+	જો (*op != '*' && *op != '/' && *op != '%')
+	    તોડો;
+	જો (next != ખાલી)
 	{
-	    *arg = next_line_from_context(cctx, TRUE);
+	    *arg = next_લીટી_from_context(cctx, TRUE);
 	    op = skipwhite(*arg);
 	}
 
-	if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(op[1]))
+	જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(op[1]))
 	{
 	    error_white_both(op, 1);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (may_get_next_line_error(op + 1, arg, cctx) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(op + 1, arg, cctx) == FAIL)
+	    પાછા FAIL;
 
 	// get the second expression
-	if (compile_expr8(arg, cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (compile_expr8(arg, cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 
-	if (ppconst->pp_used == ppconst_used + 2
-		&& ppconst->pp_tv[ppconst_used].v_type == VAR_NUMBER
-		&& ppconst->pp_tv[ppconst_used + 1].v_type == VAR_NUMBER)
+	જો (ppconst->pp_used == ppconst_used + 2
+		&& ppconst->pp_tv[ppconst_used].v_type == VAR_સંખ્યા
+		&& ppconst->pp_tv[ppconst_used + 1].v_type == VAR_સંખ્યા)
 	{
 	    typval_T	    *tv1 = &ppconst->pp_tv[ppconst_used];
 	    typval_T	    *tv2 = &ppconst->pp_tv[ppconst_used + 1];
 	    varnumber_T	    res = 0;
-	    int		    failed = FALSE;
+	    પૂર્ણાંક		    failed = FALSE;
 
 	    // both are numbers: compute the result
-	    switch (*op)
+	    પસંદગી (*op)
 	    {
-		case '*': res = tv1->vval.v_number * tv2->vval.v_number;
-			  break;
-		case '/': res = num_divide(tv1->vval.v_number,
-						  tv2->vval.v_number, &failed);
-			  break;
-		case '%': res = num_modulus(tv1->vval.v_number,
-						  tv2->vval.v_number, &failed);
-			  break;
+		સ્થિતિ '*': res = tv1->vval.v_સંખ્યા * tv2->vval.v_સંખ્યા;
+			  તોડો;
+		સ્થિતિ '/': res = અંક_divide(tv1->vval.v_સંખ્યા,
+						  tv2->vval.v_સંખ્યા, &failed);
+			  તોડો;
+		સ્થિતિ '%': res = અંક_modulus(tv1->vval.v_સંખ્યા,
+						  tv2->vval.v_સંખ્યા, &failed);
+			  તોડો;
 	    }
-	    if (failed)
-		return FAIL;
-	    tv1->vval.v_number = res;
+	    જો (failed)
+		પાછા FAIL;
+	    tv1->vval.v_સંખ્યા = res;
 	    --ppconst->pp_used;
 	}
-	else
+	નહીંતર
 	{
 	    generate_ppconst(cctx, ppconst);
 	    generate_two_op(cctx, op);
 	}
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3436,66 +3436,66 @@ compile_expr7(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  *      -	number subtraction
  *      ..	string concatenation
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr6(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
     char_u	*op;
     char_u	*next;
-    int		oplen;
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		oplen;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
 
     // get the first variable
-    if (compile_expr7(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr7(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     /*
      * Repeat computing, until no "+", "-" or ".." is following.
      */
-    for (;;)
+    માટે (;;)
     {
-	op = may_peek_next_line(cctx, *arg, &next);
-	if (*op != '+' && *op != '-' && !(*op == '.' && *(op + 1) == '.'))
-	    break;
-	if (op[0] == op[1] && *op != '.' && next)
+	op = may_peek_next_લીટી(cctx, *arg, &next);
+	જો (*op != '+' && *op != '-' && !(*op == '.' && *(op + 1) == '.'))
+	    તોડો;
+	જો (op[0] == op[1] && *op != '.' && next)
 	    // Finding "++" or "--" on the next line is a separate command.
 	    // But ".." is concatenation.
-	    break;
+	    તોડો;
 	oplen = (*op == '.' ? 2 : 1);
-	if (next != NULL)
+	જો (next != ખાલી)
 	{
-	    *arg = next_line_from_context(cctx, TRUE);
+	    *arg = next_લીટી_from_context(cctx, TRUE);
 	    op = skipwhite(*arg);
 	}
 
-	if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(op[oplen]))
+	જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(op[oplen]))
 	{
 	    error_white_both(op, oplen);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	if (may_get_next_line_error(op + oplen, arg, cctx) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(op + oplen, arg, cctx) == FAIL)
+	    પાછા FAIL;
 
 	// get the second expression
-	if (compile_expr7(arg, cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (compile_expr7(arg, cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 
-	if (ppconst->pp_used == ppconst_used + 2
+	જો (ppconst->pp_used == ppconst_used + 2
 		&& (*op == '.'
 		    ? (ppconst->pp_tv[ppconst_used].v_type == VAR_STRING
 		    && ppconst->pp_tv[ppconst_used + 1].v_type == VAR_STRING)
-		    : (ppconst->pp_tv[ppconst_used].v_type == VAR_NUMBER
-		    && ppconst->pp_tv[ppconst_used + 1].v_type == VAR_NUMBER)))
+		    : (ppconst->pp_tv[ppconst_used].v_type == VAR_સંખ્યા
+		    && ppconst->pp_tv[ppconst_used + 1].v_type == VAR_સંખ્યા)))
 	{
 	    typval_T *tv1 = &ppconst->pp_tv[ppconst_used];
 	    typval_T *tv2 = &ppconst->pp_tv[ppconst_used + 1];
 
 	    // concat/subtract/add constant numbers
-	    if (*op == '+')
-		tv1->vval.v_number = tv1->vval.v_number + tv2->vval.v_number;
-	    else if (*op == '-')
-		tv1->vval.v_number = tv1->vval.v_number - tv2->vval.v_number;
-	    else
+	    જો (*op == '+')
+		tv1->vval.v_સંખ્યા = tv1->vval.v_સંખ્યા + tv2->vval.v_સંખ્યા;
+	    નહીંતર જો (*op == '-')
+		tv1->vval.v_સંખ્યા = tv1->vval.v_સંખ્યા - tv2->vval.v_સંખ્યા;
+	    નહીંતર
 	    {
 		// concatenate constant strings
 		char_u *s1 = tv1->vval.v_string;
@@ -3503,11 +3503,11 @@ compile_expr6(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 		size_t len1 = STRLEN(s1);
 
 		tv1->vval.v_string = alloc(len1 + STRLEN(s2) + 1);
-		if (tv1->vval.v_string == NULL)
+		જો (tv1->vval.v_string == ખાલી)
 		{
 		    vim_free(s1);
 		    clear_ppconst(ppconst);
-		    return FAIL;
+		    પાછા FAIL;
 		}
 		mch_memmove(tv1->vval.v_string, s1, len1);
 		STRCPY(tv1->vval.v_string + len1, s2);
@@ -3516,24 +3516,24 @@ compile_expr6(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 	    }
 	    --ppconst->pp_used;
 	}
-	else
+	નહીંતર
 	{
 	    generate_ppconst(cctx, ppconst);
 	    ppconst->pp_is_const = FALSE;
-	    if (*op == '.')
+	    જો (*op == '.')
 	    {
-		if (may_generate_2STRING(-2, TOSTRING_NONE, cctx) == FAIL
+		જો (may_generate_2STRING(-2, TOSTRING_NONE, cctx) == FAIL
 			|| may_generate_2STRING(-1, TOSTRING_NONE, cctx) == FAIL)
-		    return FAIL;
-		if (generate_CONCAT(cctx, 2) == FAIL)
-		    return FAIL;
+		    પાછા FAIL;
+		જો (generate_CONCAT(cctx, 2) == FAIL)
+		    પાછા FAIL;
 	    }
-	    else
+	    નહીંતર
 		generate_two_op(cctx, op);
 	}
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3543,124 +3543,124 @@ compile_expr6(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  * Produces instructions:
  *	OPNR			bitwise left or right shift
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr5(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    exprtype_T	type = EXPR_UNKNOWN;
+    exprtype_T	type = પદાવલિ_UNKNOWN;
     char_u	*p;
     char_u	*next;
-    int		len = 2;
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		len = 2;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
     isn_T	*isn;
 
     // get the first variable
-    if (compile_expr6(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr6(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     /*
      * Repeat computing, until no "+", "-" or ".." is following.
      */
-    for (;;)
+    માટે (;;)
     {
-	type = EXPR_UNKNOWN;
+	type = પદાવલિ_UNKNOWN;
 
-	p = may_peek_next_line(cctx, *arg, &next);
-	if (p[0] == '<' && p[1] == '<')
-	    type = EXPR_LSHIFT;
-	else if (p[0] == '>' && p[1] == '>')
-	    type = EXPR_RSHIFT;
+	p = may_peek_next_લીટી(cctx, *arg, &next);
+	જો (p[0] == '<' && p[1] == '<')
+	    type = પદાવલિ_LSHIFT;
+	નહીંતર જો (p[0] == '>' && p[1] == '>')
+	    type = પદાવલિ_RSHIFT;
 
-	if (type == EXPR_UNKNOWN)
-	    return OK;
+	જો (type == પદાવલિ_UNKNOWN)
+	    પાછા OK;
 
 	// Handle a bitwise left or right shift operator
-	if (ppconst->pp_used == ppconst_used + 1)
+	જો (ppconst->pp_used == ppconst_used + 1)
 	{
-	    if (ppconst->pp_tv[ppconst->pp_used - 1].v_type != VAR_NUMBER)
+	    જો (ppconst->pp_tv[ppconst->pp_used - 1].v_type != VAR_સંખ્યા)
 	    {
 		// left operand should be a number
-		emsg(_(e_bitshift_ops_must_be_number));
-		return FAIL;
+		emsg(_(e_bitshift_ops_must_be_સંખ્યા));
+		પાછા FAIL;
 	    }
 	}
-	else
+	નહીંતર
 	{
-	    type_T	*t = get_type_on_stack(cctx, 0);
+	    type_T	*t = get_type_on_ઢગલો(cctx, 0);
 
-	    if (need_type(t, &t_number, 0, 0, 0, cctx, FALSE, FALSE) == FAIL)
+	    જો (need_type(t, &t_સંખ્યા, 0, 0, 0, cctx, FALSE, FALSE) == FAIL)
 	    {
-		emsg(_(e_bitshift_ops_must_be_number));
-		return FAIL;
+		emsg(_(e_bitshift_ops_must_be_સંખ્યા));
+		પાછા FAIL;
 	    }
 	}
 
-	if (next != NULL)
+	જો (next != ખાલી)
 	{
-	    *arg = next_line_from_context(cctx, TRUE);
+	    *arg = next_લીટી_from_context(cctx, TRUE);
 	    p = skipwhite(*arg);
 	}
 
-	if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[len]))
+	જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[len]))
 	{
 	    error_white_both(p, len);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	// get the second variable
-	if (may_get_next_line_error(p + len, arg, cctx) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(p + len, arg, cctx) == FAIL)
+	    પાછા FAIL;
 
-	if (compile_expr6(arg, cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (compile_expr6(arg, cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 
-	if (ppconst->pp_used == ppconst_used + 2)
+	જો (ppconst->pp_used == ppconst_used + 2)
 	{
 	    typval_T	*tv1 = &ppconst->pp_tv[ppconst->pp_used - 2];
 	    typval_T	*tv2 = &ppconst->pp_tv[ppconst->pp_used - 1];
 
 	    // Both sides are a constant, compute the result now.
-	    if (tv2->v_type != VAR_NUMBER || tv2->vval.v_number < 0)
+	    જો (tv2->v_type != VAR_સંખ્યા || tv2->vval.v_સંખ્યા < 0)
 	    {
 		// right operand should be a positive number
-		if (tv2->v_type != VAR_NUMBER)
-		    emsg(_(e_bitshift_ops_must_be_number));
-		else
+		જો (tv2->v_type != VAR_સંખ્યા)
+		    emsg(_(e_bitshift_ops_must_be_સંખ્યા));
+		નહીંતર
 		    emsg(_(e_bitshift_ops_must_be_positive));
-		return FAIL;
+		પાછા FAIL;
 	    }
 
-	    if (tv2->vval.v_number > MAX_LSHIFT_BITS)
-		tv1->vval.v_number = 0;
-	    else if (type == EXPR_LSHIFT)
-		tv1->vval.v_number =
-			(uvarnumber_T)tv1->vval.v_number << tv2->vval.v_number;
-	    else
-		tv1->vval.v_number =
-			(uvarnumber_T)tv1->vval.v_number >> tv2->vval.v_number;
+	    જો (tv2->vval.v_સંખ્યા > MAX_LSHIFT_BITS)
+		tv1->vval.v_સંખ્યા = 0;
+	    નહીંતર જો (type == પદાવલિ_LSHIFT)
+		tv1->vval.v_સંખ્યા =
+			(uvarnumber_T)tv1->vval.v_સંખ્યા << tv2->vval.v_સંખ્યા;
+	    નહીંતર
+		tv1->vval.v_સંખ્યા =
+			(uvarnumber_T)tv1->vval.v_સંખ્યા >> tv2->vval.v_સંખ્યા;
 	    clear_tv(tv2);
 	    --ppconst->pp_used;
 	}
-	else
+	નહીંતર
 	{
-	    if (need_type(get_type_on_stack(cctx, 0), &t_number, 0,
+	    જો (need_type(get_type_on_ઢગલો(cctx, 0), &t_સંખ્યા, 0,
 					     0, 0, cctx, FALSE, FALSE) == FAIL)
 	    {
-		emsg(_(e_bitshift_ops_must_be_number));
-		return FAIL;
+		emsg(_(e_bitshift_ops_must_be_સંખ્યા));
+		પાછા FAIL;
 	    }
 
 	    generate_ppconst(cctx, ppconst);
 
 	    isn = generate_instr_drop(cctx, ISN_OPNR, 1);
-	    if (isn == NULL)
-		return FAIL;
+	    જો (isn == ખાલી)
+		પાછા FAIL;
 
-	    if (isn != NULL)
+	    જો (isn != ખાલી)
 		isn->isn_arg.op.op_type = type;
 	}
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3680,145 +3680,145 @@ compile_expr5(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  *	EVAL expr5b		Push result of "expr5b"
  *	COMPARE			one of the compare instructions
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr4(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    exprtype_T	type = EXPR_UNKNOWN;
+    exprtype_T	type = પદાવલિ_UNKNOWN;
     char_u	*p;
     char_u	*next;
-    int		len = 2;
-    int		type_is = FALSE;
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		len = 2;
+    પૂર્ણાંક		type_is = FALSE;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
 
     // get the first variable
-    if (compile_expr5(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr5(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
-    p = may_peek_next_line(cctx, *arg, &next);
+    p = may_peek_next_લીટી(cctx, *arg, &next);
 
     type = get_compare_type(p, &len, &type_is);
 
     /*
      * If there is a comparative operator, use it.
      */
-    if (type != EXPR_UNKNOWN)
+    જો (type != પદાવલિ_UNKNOWN)
     {
-	int ic = FALSE;  // Default: do not ignore case
+	પૂર્ણાંક ic = FALSE;  // Default: do not ignore case
 
-	if (next != NULL)
+	જો (next != ખાલી)
 	{
-	    *arg = next_line_from_context(cctx, TRUE);
+	    *arg = next_લીટી_from_context(cctx, TRUE);
 	    p = skipwhite(*arg);
 	}
-	if (type_is && (p[len] == '?' || p[len] == '#'))
+	જો (type_is && (p[len] == '?' || p[len] == '#'))
 	{
 	    semsg(_(e_invalid_expression_str), *arg);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	// extra question mark appended: ignore case
-	if (p[len] == '?')
+	જો (p[len] == '?')
 	{
 	    ic = TRUE;
 	    ++len;
 	}
 	// extra '#' appended: match case (ignored)
-	else if (p[len] == '#')
+	નહીંતર જો (p[len] == '#')
 	    ++len;
 	// nothing appended: match case
 
-	if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[len]))
+	જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[len]))
 	{
 	    error_white_both(p, len);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	// get the second variable
-	if (may_get_next_line_error(p + len, arg, cctx) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(p + len, arg, cctx) == FAIL)
+	    પાછા FAIL;
 
-	if (compile_expr5(arg, cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (compile_expr5(arg, cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 
-	if (ppconst->pp_used == ppconst_used + 2)
+	જો (ppconst->pp_used == ppconst_used + 2)
 	{
 	    typval_T	*tv1 = &ppconst->pp_tv[ppconst->pp_used - 2];
 	    typval_T	*tv2 = &ppconst->pp_tv[ppconst->pp_used - 1];
-	    int		ret;
+	    પૂર્ણાંક		ret;
 
 	    // Both sides are a constant, compute the result now.
 	    // First check for a valid combination of types, this is more
 	    // strict than typval_compare().
-	    if (check_compare_types(type, tv1, tv2) == FAIL)
+	    જો (check_compare_types(type, tv1, tv2) == FAIL)
 		ret = FAIL;
-	    else
+	    નહીંતર
 	    {
 		ret = typval_compare(tv1, tv2, type, ic);
 		tv1->v_type = VAR_BOOL;
-		tv1->vval.v_number = tv1->vval.v_number
+		tv1->vval.v_સંખ્યા = tv1->vval.v_સંખ્યા
 						      ? VVAL_TRUE : VVAL_FALSE;
 		clear_tv(tv2);
 		--ppconst->pp_used;
 	    }
-	    return ret;
+	    પાછા ret;
 	}
 
 	generate_ppconst(cctx, ppconst);
-	return generate_COMPARE(cctx, type, ic);
+	પાછા generate_COMPARE(cctx, type, ic);
     }
 
-    return OK;
+    પાછા OK;
 }
 
-static int compile_expr3(char_u **arg,  cctx_T *cctx, ppconst_T *ppconst);
+સ્થિર પૂર્ણાંક compile_expr3(char_u **arg,  cctx_T *cctx, ppconst_T *ppconst);
 
 /*
  * Compile || or &&.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_and_or(
 	char_u **arg,
 	cctx_T	*cctx,
-	char	*op,
+	અક્ષર	*op,
 	ppconst_T *ppconst,
-	int	ppconst_used UNUSED)
+	પૂર્ણાંક	ppconst_used UNUSED)
 {
     char_u	*next;
-    char_u	*p = may_peek_next_line(cctx, *arg, &next);
-    int		opchar = *op;
+    char_u	*p = may_peek_next_લીટી(cctx, *arg, &next);
+    પૂર્ણાંક		opchar = *op;
 
-    if (p[0] == opchar && p[1] == opchar)
+    જો (p[0] == opchar && p[1] == opchar)
     {
 	garray_T	*instr = &cctx->ctx_instr;
 	garray_T	end_ga;
-	int		save_skip = cctx->ctx_skip;
+	પૂર્ણાંક		save_skip = cctx->ctx_skip;
 
 	/*
 	 * Repeat until there is no following "||" or "&&"
 	 */
-	ga_init2(&end_ga, sizeof(int), 10);
-	while (p[0] == opchar && p[1] == opchar)
+	ga_init2(&end_ga, કદ(પૂર્ણાંક), 10);
+	જ્યારે (p[0] == opchar && p[1] == opchar)
 	{
 	    long	start_lnum = SOURCING_LNUM;
 	    long	save_sourcing_lnum;
-	    int		start_ctx_lnum = cctx->ctx_lnum;
-	    int		save_lnum;
-	    int		const_used;
-	    int		status;
+	    પૂર્ણાંક		start_ctx_lnum = cctx->ctx_lnum;
+	    પૂર્ણાંક		save_lnum;
+	    પૂર્ણાંક		const_used;
+	    પૂર્ણાંક		status;
 	    jumpwhen_T	jump_when = opchar == '|'
 				      ? JUMP_IF_COND_TRUE : JUMP_IF_COND_FALSE;
 
-	    if (next != NULL)
+	    જો (next != ખાલી)
 	    {
-		*arg = next_line_from_context(cctx, TRUE);
+		*arg = next_લીટી_from_context(cctx, TRUE);
 		p = skipwhite(*arg);
 	    }
 
-	    if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[2]))
+	    જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[2]))
 	    {
 		semsg(_(e_white_space_required_before_and_after_str_at_str),
 									op, p);
 		ga_clear(&end_ga);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
 	    save_sourcing_lnum = SOURCING_LNUM;
@@ -3827,15 +3827,15 @@ compile_and_or(
 	    cctx->ctx_lnum = start_ctx_lnum;
 
 	    status = check_ppconst_bool(ppconst);
-	    if (status != FAIL)
+	    જો (status != FAIL)
 	    {
 		// Use the last ppconst if possible.
-		if (ppconst->pp_used > 0)
+		જો (ppconst->pp_used > 0)
 		{
 		    typval_T	*tv = &ppconst->pp_tv[ppconst->pp_used - 1];
-		    int		is_true = tv2bool(tv);
+		    પૂર્ણાંક		is_true = tv2bool(tv);
 
-		    if ((is_true && opchar == '|')
+		    જો ((is_true && opchar == '|')
 						|| (!is_true && opchar == '&'))
 		    {
 			// For "false && expr" and "true || expr" the "expr"
@@ -3843,9 +3843,9 @@ compile_and_or(
 			cctx->ctx_skip = SKIP_YES;
 			clear_tv(tv);
 			tv->v_type = VAR_BOOL;
-			tv->vval.v_number = is_true ? VVAL_TRUE : VVAL_FALSE;
+			tv->vval.v_સંખ્યા = is_true ? VVAL_TRUE : VVAL_FALSE;
 		    }
-		    else
+		    નહીંતર
 		    {
 			// For "true && expr" and "false || expr" only "expr"
 			// needs to be evaluated.
@@ -3853,26 +3853,26 @@ compile_and_or(
 			jump_when = JUMP_NEVER;
 		    }
 		}
-		else
+		નહીંતર
 		{
 		    // Every part must evaluate to a bool.
-		    status = bool_on_stack(cctx);
+		    status = bool_on_ઢગલો(cctx);
 		}
 	    }
-	    if (status != FAIL)
+	    જો (status != FAIL)
 		status = ga_grow(&end_ga, 1);
 	    cctx->ctx_lnum = save_lnum;
-	    if (status == FAIL)
+	    જો (status == FAIL)
 	    {
 		ga_clear(&end_ga);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
-	    if (jump_when != JUMP_NEVER)
+	    જો (jump_when != JUMP_NEVER)
 	    {
-		if (cctx->ctx_skip != SKIP_YES)
+		જો (cctx->ctx_skip != SKIP_YES)
 		{
-		    *(((int *)end_ga.ga_data) + end_ga.ga_len) = instr->ga_len;
+		    *(((પૂર્ણાંક *)end_ga.ga_data) + end_ga.ga_len) = instr->ga_len;
 		    ++end_ga.ga_len;
 		}
 		generate_JUMP(cctx, jump_when, 0);
@@ -3880,62 +3880,62 @@ compile_and_or(
 
 	    // eval the next expression
 	    SOURCING_LNUM = save_sourcing_lnum;
-	    if (may_get_next_line_error(p + 2, arg, cctx) == FAIL)
+	    જો (may_get_next_લીટી_error(p + 2, arg, cctx) == FAIL)
 	    {
 		ga_clear(&end_ga);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
 	    const_used = ppconst->pp_used;
-	    if ((opchar == '|' ? compile_expr3(arg, cctx, ppconst)
+	    જો ((opchar == '|' ? compile_expr3(arg, cctx, ppconst)
 				  : compile_expr4(arg, cctx, ppconst)) == FAIL)
 	    {
 		ga_clear(&end_ga);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
 	    // "0 || 1" results in true, "1 && 0" results in false.
-	    if (ppconst->pp_used == const_used + 1)
+	    જો (ppconst->pp_used == const_used + 1)
 	    {
 		typval_T	*tv = &ppconst->pp_tv[ppconst->pp_used - 1];
 
-		if (tv->v_type == VAR_NUMBER
-			 && (tv->vval.v_number == 1 || tv->vval.v_number == 0))
+		જો (tv->v_type == VAR_સંખ્યા
+			 && (tv->vval.v_સંખ્યા == 1 || tv->vval.v_સંખ્યા == 0))
 		{
-		    tv->vval.v_number = tv->vval.v_number == 1
+		    tv->vval.v_સંખ્યા = tv->vval.v_સંખ્યા == 1
 						      ? VVAL_TRUE : VVAL_FALSE;
 		    tv->v_type = VAR_BOOL;
 		}
 	    }
 
-	    p = may_peek_next_line(cctx, *arg, &next);
+	    p = may_peek_next_લીટી(cctx, *arg, &next);
 	}
 
-	if (check_ppconst_bool(ppconst) == FAIL)
+	જો (check_ppconst_bool(ppconst) == FAIL)
 	{
 	    ga_clear(&end_ga);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	if (cctx->ctx_skip != SKIP_YES && ppconst->pp_used == 0)
+	જો (cctx->ctx_skip != SKIP_YES && ppconst->pp_used == 0)
 	    // Every part must evaluate to a bool.
-	    if (bool_on_stack(cctx) == FAIL)
+	    જો (bool_on_ઢગલો(cctx) == FAIL)
 	    {
 		ga_clear(&end_ga);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
-	if (end_ga.ga_len > 0)
+	જો (end_ga.ga_len > 0)
 	{
 	    // Fill in the end label in all jumps.
 	    generate_ppconst(cctx, ppconst);
-	    while (end_ga.ga_len > 0)
+	    જ્યારે (end_ga.ga_len > 0)
 	    {
 		isn_T	*isn;
 
 		--end_ga.ga_len;
 		isn = ((isn_T *)instr->ga_data)
-				  + *(((int *)end_ga.ga_data) + end_ga.ga_len);
+				  + *(((પૂર્ણાંક *)end_ga.ga_data) + end_ga.ga_len);
 		isn->isn_arg.jump.jump_where = instr->ga_len;
 	    }
 	}
@@ -3944,7 +3944,7 @@ compile_and_or(
 	cctx->ctx_skip = save_skip;
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3959,17 +3959,17 @@ compile_and_or(
  *	EVAL expr4c		Push result of "expr4c"
  * end:
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr3(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
 
     // get the first variable
-    if (compile_expr4(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr4(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     // || and && work almost the same
-    return compile_and_or(arg, cctx, "&&", ppconst, ppconst_used);
+    પાછા compile_and_or(arg, cctx, "&&", ppconst, ppconst_used);
 }
 
 /*
@@ -3984,17 +3984,17 @@ compile_expr3(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  *	EVAL expr3c		Push result of "expr3c"
  * end:
  */
-    static int
+    સ્થિર પૂર્ણાંક
 compile_expr2(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
 
     // eval the first expression
-    if (compile_expr3(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr3(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
     // || and && work almost the same
-    return compile_and_or(arg, cctx, "||", ppconst, ppconst_used);
+    પાછા compile_and_or(arg, cctx, "||", ppconst, ppconst_used);
 }
 
 /*
@@ -4014,111 +4014,111 @@ compile_expr2(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  *      EVAL expr1
  * end:
  */
-    int
+    પૂર્ણાંક
 compile_expr1(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 {
     char_u	*p;
-    int		ppconst_used = ppconst->pp_used;
+    પૂર્ણાંક		ppconst_used = ppconst->pp_used;
     char_u	*next;
 
     // Ignore all kinds of errors when not producing code.
-    if (cctx->ctx_skip == SKIP_YES)
+    જો (cctx->ctx_skip == SKIP_YES)
     {
-	int		prev_did_emsg = did_emsg;
+	પૂર્ણાંક		prev_did_emsg = did_emsg;
 
-	skip_expr_cctx(arg, cctx);
-	return did_emsg == prev_did_emsg ? OK : FAIL;
+	skip_પદાવલિ_cctx(arg, cctx);
+	પાછા did_emsg == prev_did_emsg ? OK : FAIL;
     }
 
     // Evaluate the first expression.
-    if (compile_expr2(arg, cctx, ppconst) == FAIL)
-	return FAIL;
+    જો (compile_expr2(arg, cctx, ppconst) == FAIL)
+	પાછા FAIL;
 
-    p = may_peek_next_line(cctx, *arg, &next);
-    if (*p == '?')
+    p = may_peek_next_લીટી(cctx, *arg, &next);
+    જો (*p == '?')
     {
-	int		op_falsy = p[1] == '?';
+	પૂર્ણાંક		op_falsy = p[1] == '?';
 	garray_T	*instr = &cctx->ctx_instr;
-	garray_T	*stack = &cctx->ctx_type_stack;
-	int		alt_idx = instr->ga_len;
-	int		end_idx = 0;
+	garray_T	*ઢગલો = &cctx->ctx_type_ઢગલો;
+	પૂર્ણાંક		alt_idx = instr->ga_len;
+	પૂર્ણાંક		end_idx = 0;
 	isn_T		*isn;
-	type_T		*type1 = NULL;
-	int		has_const_expr = FALSE;
-	int		const_value = FALSE;
-	int		save_skip = cctx->ctx_skip;
+	type_T		*type1 = ખાલી;
+	પૂર્ણાંક		has_const_પદાવલિ = FALSE;
+	પૂર્ણાંક		const_કિંમત = FALSE;
+	પૂર્ણાંક		save_skip = cctx->ctx_skip;
 
-	if (next != NULL)
+	જો (next != ખાલી)
 	{
-	    *arg = next_line_from_context(cctx, TRUE);
+	    *arg = next_લીટી_from_context(cctx, TRUE);
 	    p = skipwhite(*arg);
 	}
 
-	if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[1 + op_falsy]))
+	જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[1 + op_falsy]))
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 						     op_falsy ? "??" : "?", p);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	if (ppconst->pp_used == ppconst_used + 1)
+	જો (ppconst->pp_used == ppconst_used + 1)
 	{
 	    // the condition is a constant, we know whether the ? or the :
 	    // expression is to be evaluated.
-	    has_const_expr = TRUE;
-	    if (op_falsy)
-		const_value = tv2bool(&ppconst->pp_tv[ppconst_used]);
-	    else
+	    has_const_પદાવલિ = TRUE;
+	    જો (op_falsy)
+		const_કિંમત = tv2bool(&ppconst->pp_tv[ppconst_used]);
+	    નહીંતર
 	    {
-		int error = FALSE;
+		પૂર્ણાંક error = FALSE;
 
-		const_value = tv_get_bool_chk(&ppconst->pp_tv[ppconst_used],
+		const_કિંમત = tv_get_bool_chk(&ppconst->pp_tv[ppconst_used],
 								       &error);
-		if (error)
-		    return FAIL;
+		જો (error)
+		    પાછા FAIL;
 	    }
 	    cctx->ctx_skip = save_skip == SKIP_YES ||
-		 (op_falsy ? const_value : !const_value) ? SKIP_YES : SKIP_NOT;
+		 (op_falsy ? const_કિંમત : !const_કિંમત) ? SKIP_YES : SKIP_NOT;
 
-	    if (op_falsy && cctx->ctx_skip == SKIP_YES)
+	    જો (op_falsy && cctx->ctx_skip == SKIP_YES)
 		// "left ?? right" and "left" is truthy: produce "left"
 		generate_ppconst(cctx, ppconst);
-	    else
+	    નહીંતર
 	    {
 		clear_tv(&ppconst->pp_tv[ppconst_used]);
 		--ppconst->pp_used;
 	    }
 	}
-	else
+	નહીંતર
 	{
 	    generate_ppconst(cctx, ppconst);
-	    if (op_falsy)
+	    જો (op_falsy)
 		end_idx = instr->ga_len;
 	    generate_JUMP(cctx, op_falsy
 				   ? JUMP_AND_KEEP_IF_TRUE : JUMP_IF_FALSE, 0);
-	    if (op_falsy)
+	    જો (op_falsy)
 	    {
-		type1 = get_type_on_stack(cctx, -1);
-		if (check_type_is_value(type1) == FAIL)
-		    return FAIL;
+		type1 = get_type_on_ઢગલો(cctx, -1);
+		જો (check_type_is_કિંમત(type1) == FAIL)
+		    પાછા FAIL;
 	    }
 	}
 
 	// evaluate the second expression; any type is accepted
-	if (may_get_next_line_error(p + 1 + op_falsy, arg, cctx) == FAIL)
-	    return FAIL;
-	if (compile_expr1(arg, cctx, ppconst) == FAIL)
-	    return FAIL;
+	જો (may_get_next_લીટી_error(p + 1 + op_falsy, arg, cctx) == FAIL)
+	    પાછા FAIL;
+	જો (compile_expr1(arg, cctx, ppconst) == FAIL)
+	    પાછા FAIL;
 
-	if (!has_const_expr)
+	જો (!has_const_પદાવલિ)
 	{
 	    generate_ppconst(cctx, ppconst);
 
-	    if (!op_falsy)
+	    જો (!op_falsy)
 	    {
 		// remember the type and drop it
-		type1 = get_type_on_stack(cctx, 0);
-		--stack->ga_len;
+		type1 = get_type_on_ઢગલો(cctx, 0);
+		--ઢગલો->ga_len;
 
 		end_idx = instr->ga_len;
 		generate_JUMP(cctx, JUMP_ALWAYS, 0);
@@ -4129,39 +4129,39 @@ compile_expr1(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 	    }
 	}
 
-	if (!op_falsy)
+	જો (!op_falsy)
 	{
 	    // Check for the ":".
-	    p = may_peek_next_line(cctx, *arg, &next);
-	    if (*p != ':')
+	    p = may_peek_next_લીટી(cctx, *arg, &next);
+	    જો (*p != ':')
 	    {
 		emsg(_(e_missing_colon_after_questionmark));
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (next != NULL)
+	    જો (next != ખાલી)
 	    {
-		*arg = next_line_from_context(cctx, TRUE);
+		*arg = next_લીટી_from_context(cctx, TRUE);
 		p = skipwhite(*arg);
 	    }
 
-	    if (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[1]))
+	    જો (!IS_WHITE_OR_NUL(**arg) || !IS_WHITE_OR_NUL(p[1]))
 	    {
 		semsg(_(e_white_space_required_before_and_after_str_at_str),
 								       ":", p);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
 	    // evaluate the third expression
-	    if (has_const_expr)
-		cctx->ctx_skip = save_skip == SKIP_YES || const_value
+	    જો (has_const_પદાવલિ)
+		cctx->ctx_skip = save_skip == SKIP_YES || const_કિંમત
 							 ? SKIP_YES : SKIP_NOT;
-	    if (may_get_next_line_error(p + 1, arg, cctx) == FAIL)
-		return FAIL;
-	    if (compile_expr1(arg, cctx, ppconst) == FAIL)
-		return FAIL;
+	    જો (may_get_next_લીટી_error(p + 1, arg, cctx) == FAIL)
+		પાછા FAIL;
+	    જો (compile_expr1(arg, cctx, ppconst) == FAIL)
+		પાછા FAIL;
 	}
 
-	if (!has_const_expr)
+	જો (!has_const_પદાવલિ)
 	{
 	    type_T	**typep;
 
@@ -4169,8 +4169,8 @@ compile_expr1(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 	    ppconst->pp_is_const = FALSE;
 
 	    // If the types differ, the result has a more generic type.
-	    typep = &((((type2_T *)stack->ga_data)
-					      + stack->ga_len - 1)->type_curr);
+	    typep = &((((type2_T *)ઢગલો->ga_data)
+					      + ઢગલો->ga_len - 1)->type_curr);
 	    common_type(type1, *typep, typep, cctx->ctx_type_list);
 
 	    // jump here from JUMP_ALWAYS or JUMP_AND_KEEP_IF_TRUE
@@ -4180,7 +4180,7 @@ compile_expr1(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
 
 	cctx->ctx_skip = save_skip;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -4188,31 +4188,31 @@ compile_expr1(char_u **arg, cctx_T *cctx, ppconst_T *ppconst)
  * Sets "is_const" (if not NULL) to indicate the value is a constant.
  * Returns OK or FAIL.
  */
-    int
-compile_expr0_ext(char_u **arg,  cctx_T *cctx, int *is_const)
+    પૂર્ણાંક
+compile_expr0_ext(char_u **arg,  cctx_T *cctx, પૂર્ણાંક *is_const)
 {
     ppconst_T	ppconst;
 
     CLEAR_FIELD(ppconst);
-    if (compile_expr1(arg, cctx, &ppconst) == FAIL)
+    જો (compile_expr1(arg, cctx, &ppconst) == FAIL)
     {
 	clear_ppconst(&ppconst);
-	return FAIL;
+	પાછા FAIL;
     }
-    if (is_const != NULL)
+    જો (is_const != ખાલી)
 	*is_const = ppconst.pp_used > 0 || ppconst.pp_is_const;
-    if (generate_ppconst(cctx, &ppconst) == FAIL)
-	return FAIL;
-    return OK;
+    જો (generate_ppconst(cctx, &ppconst) == FAIL)
+	પાછા FAIL;
+    પાછા OK;
 }
 
 /*
  * Toplevel expression.
  */
-    int
+    પૂર્ણાંક
 compile_expr0(char_u **arg,  cctx_T *cctx)
 {
-    return compile_expr0_ext(arg, cctx, NULL);
+    પાછા compile_expr0_ext(arg, cctx, ખાલી);
 }
 
 

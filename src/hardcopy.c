@@ -11,12 +11,12 @@
  * hardcopy.c: printing to paper
  */
 
-#include "vim.h"
-#include "version.h"
+#અન્તર્ભાવ "vim.h"
+#અન્તર્ભાવ "version.h"
 
-#if defined(FEAT_PRINTER)
+#જો defined(FEAT_PRINTER)
 
-#include "hardcopy.h"
+#અન્તર્ભાવ "hardcopy.h"
 #ifdef FEAT_POSTSCRIPT
 # include "hardcopy_postscript.h"
 #endif
@@ -81,13 +81,13 @@
  */
 
 #ifdef FEAT_SYN_HL
-static const long_u  cterm_color_8[8] =
+સ્થિર અચલ long_u  cterm_color_8[8] =
 {
     (long_u)0x000000L, (long_u)0xff0000L, (long_u)0x00ff00L, (long_u)0xffff00L,
     (long_u)0x0000ffL, (long_u)0xff00ffL, (long_u)0x00ffffL, (long_u)0xffffffL
 };
 
-static const long_u  cterm_color_16[16] =
+સ્થિર અચલ long_u  cterm_color_16[16] =
 {
     (long_u)0x000000L, (long_u)0x0000c0L, (long_u)0x008000L, (long_u)0x004080L,
     (long_u)0xc00000L, (long_u)0xc000c0L, (long_u)0x808000L, (long_u)0xc0c0c0L,
@@ -95,30 +95,30 @@ static const long_u  cterm_color_16[16] =
     (long_u)0xff8080L, (long_u)0xff40ffL, (long_u)0xffff00L, (long_u)0xffffffL
 };
 
-static int		current_syn_id;
+સ્થિર પૂર્ણાંક		current_syn_id;
 #endif
 
-int	prt_curr_italic;
-int	prt_curr_bold;
-int	prt_curr_underline;
+પૂર્ણાંક	prt_curr_italic;
+પૂર્ણાંક	prt_curr_bold;
+પૂર્ણાંક	prt_curr_underline;
 long_u	prt_curr_bg;
 long_u	prt_curr_fg;
-int	prt_page_count;
+પૂર્ણાંક	prt_page_ગણતરી;
 
 /*
  * These values determine the print position on a page.
  */
-typedef struct
+પ્રકારવ્યાખ્યા સંરચના
 {
-    int		lead_spaces;	    // remaining spaces for a TAB
-    int		print_pos;	    // virtual column for computing TABs
+    પૂર્ણાંક		lead_spaces;	    // remaining spaces for a TAB
+    પૂર્ણાંક		print_pos;	    // virtual column for computing TABs
     colnr_T	column;		    // byte column
-    linenr_T	file_line;	    // line nr in the buffer
+    linenr_T	file_લીટી;	    // line nr in the buffer
     long_u	bytes_printed;	    // bytes printed so far
-    int		ff;		    // seen form feed character
+    પૂર્ણાંક		ff;		    // seen form feed character
 } prt_pos_T;
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#જો defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
     {"A4",		595.0,  842.0},
     {"letter",	612.0,  792.0},
@@ -137,29 +137,29 @@ prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
 };
 #endif
 
-static char *parse_list_options(char_u *option_str, option_table_T *table, int table_size);
+સ્થિર અક્ષર *parse_list_options(char_u *option_str, option_table_T *table, પૂર્ણાંક table_size);
 
-static colnr_T hardcopy_line(prt_settings_T *psettings, int page_line, prt_pos_T *ppos);
+સ્થિર colnr_T hardcopy_લીટી(prt_settings_T *psettings, પૂર્ણાંક page_લીટી, prt_pos_T *ppos);
 
 /*
  * Parse 'printoptions' and set the flags in "printer_opts".
  * Returns an error message or NULL;
  */
-    char *
+    અક્ષર *
 parse_printoptions(optset_T *args UNUSED)
 {
-    return parse_list_options(p_popt, printer_opts, OPT_PRINT_NUM_OPTIONS);
+    પાછા parse_list_options(p_popt, printer_opts, OPT_PRINT_અંક_OPTIONS);
 }
 
-#if defined(FEAT_POSTSCRIPT)
+#જો defined(FEAT_POSTSCRIPT)
 /*
  * Parse 'printmbfont' and set the flags in "mbfont_opts".
  * Returns an error message or NULL;
  */
-    char *
+    અક્ષર *
 parse_printmbfont(optset_T *args UNUSED)
 {
-    return parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_NUM_OPTIONS);
+    પાછા parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_અંક_OPTIONS);
 }
 #endif
 
@@ -172,27 +172,27 @@ parse_printmbfont(optset_T *args UNUSED)
  * Returns an error message for an illegal option, NULL otherwise.
  * Only used for the printer at the moment...
  */
-    static char *
+    સ્થિર અક્ષર *
 parse_list_options(
     char_u		*option_str,
     option_table_T	*table,
-    int			table_size)
+    પૂર્ણાંક			table_size)
 {
     option_table_T *old_opts;
-    char	*ret = NULL;
+    અક્ષર	*ret = ખાલી;
     char_u	*stringp;
     char_u	*colonp;
     char_u	*commap;
     char_u	*p;
-    int		idx = 0;		// init for GCC
-    int		len;
+    પૂર્ણાંક		idx = 0;		// init for GCC
+    પૂર્ણાંક		len;
 
     // Save the old values, so that they can be restored in case of an error.
     old_opts = ALLOC_MULT(option_table_T, table_size);
-    if (old_opts == NULL)
-	return NULL;
+    જો (old_opts == ખાલી)
+	પાછા ખાલી;
 
-    for (idx = 0; idx < table_size; ++idx)
+    માટે (idx = 0; idx < table_size; ++idx)
     {
 	old_opts[idx] = table[idx];
 	table[idx].present = FALSE;
@@ -202,59 +202,59 @@ parse_list_options(
      * Repeat for all comma separated parts.
      */
     stringp = option_str;
-    while (*stringp)
+    જ્યારે (*stringp)
     {
 	colonp = vim_strchr(stringp, ':');
-	if (colonp == NULL)
+	જો (colonp == ખાલી)
 	{
 	    ret = e_missing_colon_3;
-	    break;
+	    તોડો;
 	}
 	commap = vim_strchr(stringp, ',');
-	if (commap == NULL)
+	જો (commap == ખાલી)
 	    commap = option_str + STRLEN(option_str);
 
-	len = (int)(colonp - stringp);
+	len = (પૂર્ણાંક)(colonp - stringp);
 
-	for (idx = 0; idx < table_size; ++idx)
-	    if (STRNICMP(stringp, table[idx].name, len) == 0)
-		break;
+	માટે (idx = 0; idx < table_size; ++idx)
+	    જો (STRNICMP(stringp, table[idx].name, len) == 0)
+		તોડો;
 
-	if (idx == table_size)
+	જો (idx == table_size)
 	{
 	    ret = e_illegal_component;
-	    break;
+	    તોડો;
 	}
 	p = colonp + 1;
 	table[idx].present = TRUE;
 
-	if (table[idx].hasnum)
+	જો (table[idx].hasnum)
 	{
-	    if (!VIM_ISDIGIT(*p))
+	    જો (!VIM_ISDIGIT(*p))
 	    {
 		ret = e_digit_expected_2;
-		break;
+		તોડો;
 	    }
 
-	    table[idx].number = getdigits(&p); // advances p
+	    table[idx].સંખ્યા = getdigits(&p); // advances p
 	}
 
 	table[idx].string = p;
-	table[idx].strlen = (int)(commap - p);
+	table[idx].strlen = (પૂર્ણાંક)(commap - p);
 
 	stringp = commap;
-	if (*stringp == ',')
+	જો (*stringp == ',')
 	    ++stringp;
     }
 
-    if (ret != NULL)
+    જો (ret != ખાલી)
     {
 	// Restore old options in case of error
-	for (idx = 0; idx < table_size; ++idx)
+	માટે (idx = 0; idx < table_size; ++idx)
 	    table[idx] = old_opts[idx];
     }
     vim_free(old_opts);
-    return ret;
+    પાછા ret;
 }
 
 
@@ -263,69 +263,69 @@ parse_list_options(
  * If using a dark background, the colors will probably be too bright to show
  * up well on white paper, so reduce their brightness.
  */
-    static long_u
+    સ્થિર long_u
 darken_rgb(long_u rgb)
 {
-    return	((rgb >> 17) << 16)
+    પાછા	((rgb >> 17) << 16)
 	    +	(((rgb & 0xff00) >> 9) << 8)
 	    +	((rgb & 0xff) >> 1);
 }
 
-    static long_u
-prt_get_term_color(int colorindex)
+    સ્થિર long_u
+prt_get_term_color(પૂર્ણાંક colorindex)
 {
     // TODO: Should check for xterm with 88 or 256 colors.
-    if (t_colors > 8)
-	return cterm_color_16[colorindex % 16];
-    return cterm_color_8[colorindex % 8];
+    જો (t_colors > 8)
+	પાછા cterm_color_16[colorindex % 16];
+    પાછા cterm_color_8[colorindex % 8];
 }
 
-    static void
+    સ્થિર શૂન્ય
 prt_get_attr(
-    int			hl_id,
+    પૂર્ણાંક			hl_id,
     prt_text_attr_T	*pattr,
-    int			modec)
+    પૂર્ણાંક			modec)
 {
-    int     colorindex;
+    પૂર્ણાંક     colorindex;
     long_u  fg_color;
     long_u  bg_color;
-    char    *color;
+    અક્ષર    *color;
 
-    pattr->bold = (highlight_has_attr(hl_id, HL_BOLD, modec) != NULL);
-    pattr->italic = (highlight_has_attr(hl_id, HL_ITALIC, modec) != NULL);
-    pattr->underline = (highlight_has_attr(hl_id, HL_UNDERLINE, modec) != NULL);
-    pattr->undercurl = (highlight_has_attr(hl_id, HL_UNDERCURL, modec) != NULL);
+    pattr->bold = (highlight_has_attr(hl_id, HL_BOLD, modec) != ખાલી);
+    pattr->italic = (highlight_has_attr(hl_id, HL_ITALIC, modec) != ખાલી);
+    pattr->underline = (highlight_has_attr(hl_id, HL_UNDERLINE, modec) != ખાલી);
+    pattr->undercurl = (highlight_has_attr(hl_id, HL_UNDERCURL, modec) != ખાલી);
     // TODO: HL_UNDERDOUBLE, HL_UNDERDOTTED, HL_UNDERDASHED
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+# જો defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    જો (USE_24BIT)
     {
 	bg_color = highlight_gui_color_rgb(hl_id, FALSE);
-	if (bg_color == PRCOLOR_BLACK)
+	જો (bg_color == PRCOLOR_BLACK)
 	    bg_color = PRCOLOR_WHITE;
 
 	fg_color = highlight_gui_color_rgb(hl_id, TRUE);
     }
-    else
+    નહીંતર
 # endif
     {
 	bg_color = PRCOLOR_WHITE;
 
-	color = (char *)highlight_color(hl_id, (char_u *)"fg", modec);
-	if (color == NULL)
+	color = (અક્ષર *)highlight_color(hl_id, (char_u *)"fg", modec);
+	જો (color == ખાલી)
 	    colorindex = 0;
-	else
+	નહીંતર
 	    colorindex = atoi(color);
 
-	if (colorindex >= 0 && colorindex < t_colors)
+	જો (colorindex >= 0 && colorindex < t_colors)
 	    fg_color = prt_get_term_color(colorindex);
-	else
+	નહીંતર
 	    fg_color = PRCOLOR_BLACK;
     }
 
-    if (fg_color == PRCOLOR_WHITE)
+    જો (fg_color == PRCOLOR_WHITE)
 	fg_color = PRCOLOR_BLACK;
-    else if (*p_bg == 'd')
+    નહીંતર જો (*p_bg == 'd')
 	fg_color = darken_rgb(fg_color);
 
     pattr->fg_color = fg_color;
@@ -333,33 +333,33 @@ prt_get_attr(
 }
 #endif // FEAT_SYN_HL
 
-    static void
+    સ્થિર શૂન્ય
 prt_set_fg(long_u fg)
 {
-    if (fg == prt_curr_fg)
-	return;
+    જો (fg == prt_curr_fg)
+	પાછા;
 
     prt_curr_fg = fg;
     mch_print_set_fg(fg);
 }
 
-    static void
+    સ્થિર શૂન્ય
 prt_set_bg(long_u bg)
 {
-    if (bg == prt_curr_bg)
-	return;
+    જો (bg == prt_curr_bg)
+	પાછા;
 
     prt_curr_bg = bg;
     mch_print_set_bg(bg);
 }
 
-    static void
-prt_set_font(int bold, int italic, int underline)
+    સ્થિર શૂન્ય
+prt_set_font(પૂર્ણાંક bold, પૂર્ણાંક italic, પૂર્ણાંક underline)
 {
-    if (prt_curr_bold == bold
+    જો (prt_curr_bold == bold
 	    && prt_curr_italic == italic
 	    && prt_curr_underline == underline)
-	return;
+	પાછા;
 
     prt_curr_underline = underline;
     prt_curr_italic = italic;
@@ -370,31 +370,31 @@ prt_set_font(int bold, int italic, int underline)
 /*
  * Print the line number in the left margin.
  */
-    static void
-prt_line_number(
+    સ્થિર શૂન્ય
+prt_લીટી_સંખ્યા(
     prt_settings_T *psettings,
-    int		page_line,
+    પૂર્ણાંક		page_લીટી,
     linenr_T	lnum)
 {
-    int		i;
+    પૂર્ણાંક		i;
     char_u	tbuf[20];
 
-    prt_set_fg(psettings->number.fg_color);
-    prt_set_bg(psettings->number.bg_color);
-    prt_set_font(psettings->number.bold, psettings->number.italic, psettings->number.underline);
-    mch_print_start_line(TRUE, page_line);
+    prt_set_fg(psettings->સંખ્યા.fg_color);
+    prt_set_bg(psettings->સંખ્યા.bg_color);
+    prt_set_font(psettings->સંખ્યા.bold, psettings->સંખ્યા.italic, psettings->સંખ્યા.underline);
+    mch_print_start_લીટી(TRUE, page_લીટી);
 
     // Leave two spaces between the number and the text; depends on
     // PRINT_NUMBER_WIDTH.
-    sprintf((char *)tbuf, "%6ld", (long)lnum);
-    for (i = 0; i < 6; i++)
-	(void)mch_print_text_out(&tbuf[i], 1);
+    sprintf((અક્ષર *)tbuf, "%6ld", (long)lnum);
+    માટે (i = 0; i < 6; i++)
+	(શૂન્ય)mch_print_text_out(&tbuf[i], 1);
 
 #ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+    જો (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
+    નહીંતર
 #endif
     {
 	// Set colors and font back to normal.
@@ -407,72 +407,72 @@ prt_line_number(
 /*
  * Get the currently effective header height.
  */
-    int
-prt_header_height(void)
+    પૂર્ણાંક
+prt_header_height(શૂન્ય)
 {
-    if (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
-	return printer_opts[OPT_PRINT_HEADERHEIGHT].number;
-    return 2;
+    જો (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
+	પાછા printer_opts[OPT_PRINT_HEADERHEIGHT].સંખ્યા;
+    પાછા 2;
 }
 
 /*
  * Return TRUE if using a line number for printing.
  */
-    int
-prt_use_number(void)
+    પૂર્ણાંક
+prt_use_સંખ્યા(શૂન્ય)
 {
-    return (printer_opts[OPT_PRINT_NUMBER].present
-	    && TOLOWER_ASC(printer_opts[OPT_PRINT_NUMBER].string[0]) == 'y');
+    પાછા (printer_opts[OPT_PRINT_સંખ્યા].present
+	    && TOLOWER_ASC(printer_opts[OPT_PRINT_સંખ્યા].string[0]) == 'y');
 }
 
 /*
  * Return the unit used in a margin item in 'printoptions'.
  * Returns PRT_UNIT_NONE if not recognized.
  */
-    int
-prt_get_unit(int idx)
+    પૂર્ણાંક
+prt_get_unit(પૂર્ણાંક idx)
 {
-    int		u = PRT_UNIT_NONE;
-    int		i;
-    static char *(units[4]) = PRT_UNIT_NAMES;
+    પૂર્ણાંક		u = PRT_UNIT_NONE;
+    પૂર્ણાંક		i;
+    સ્થિર અક્ષર *(units[4]) = PRT_UNIT_NAMES;
 
-    if (!printer_opts[idx].present)
-	return PRT_UNIT_NONE;
+    જો (!printer_opts[idx].present)
+	પાછા PRT_UNIT_NONE;
 
-    for (i = 0; i < 4; ++i)
-	if (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
+    માટે (i = 0; i < 4; ++i)
+	જો (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
 	{
 	    u = i;
-	    break;
+	    તોડો;
 	}
-    return u;
+    પાછા u;
 }
 
 /*
  * Print the page header.
  */
-    static void
+    સ્થિર શૂન્ય
 prt_header(
     prt_settings_T  *psettings,
-    int		pagenum,
+    પૂર્ણાંક		pagenum,
     linenr_T	lnum UNUSED)
 {
-    int		width = psettings->chars_per_line;
-    int		page_line;
+    પૂર્ણાંક		width = psettings->chars_per_લીટી;
+    પૂર્ણાંક		page_લીટી;
     char_u	*tbuf;
     char_u	*p;
-    int		l;
+    પૂર્ણાંક		l;
 
     // Also use the space for the line number.
-    if (prt_use_number())
-	width += PRINT_NUMBER_WIDTH;
+    જો (prt_use_સંખ્યા())
+	width += PRINT_સંખ્યા_WIDTH;
 
     tbuf = alloc(width + IOSIZE);
-    if (tbuf == NULL)
-	return;
+    જો (tbuf == ખાલી)
+	પાછા;
 
 #ifdef FEAT_STL_OPT
-    if (*p_header != NUL)
+    જો (*p_header != NUL)
     {
 	linenr_T	tmp_lnum, tmp_topline, tmp_botline;
 
@@ -488,36 +488,36 @@ prt_header(
 	curwin->w_cursor.lnum = lnum;
 	curwin->w_topline = lnum;
 	curwin->w_botline = lnum + 63;
-	printer_page_num = pagenum;
+	printer_page_અંક = pagenum;
 
 	build_stl_str_hl(curwin, tbuf, (size_t)(width + IOSIZE), p_header,
-			 (char_u *)"printheader", 0, ' ', width, NULL, NULL,
-			 NULL);
+			 (char_u *)"printheader", 0, ' ', width, ખાલી, ખાલી,
+			 ખાલી);
 
 	// Reset line numbers
 	curwin->w_cursor.lnum = tmp_lnum;
 	curwin->w_topline = tmp_topline;
 	curwin->w_botline = tmp_botline;
     }
-    else
+    નહીંતર
 #endif
-	sprintf((char *)tbuf, _("Page %d"), pagenum);
+	sprintf((અક્ષર *)tbuf, _("Page %d"), pagenum);
 
     prt_set_fg(PRCOLOR_BLACK);
     prt_set_bg(PRCOLOR_WHITE);
     prt_set_font(TRUE, FALSE, FALSE);
 
     // Use a negative line number to indicate printing in the top margin.
-    page_line = 0 - prt_header_height();
-    mch_print_start_line(TRUE, page_line);
-    for (p = tbuf; *p != NUL; )
+    page_લીટી = 0 - prt_header_height();
+    mch_print_start_લીટી(TRUE, page_લીટી);
+    માટે (p = tbuf; *p != NUL; )
     {
-	if (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
+	જો (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
 	{
-	    ++page_line;
-	    if (page_line >= 0) // out of room in header
-		break;
-	    mch_print_start_line(TRUE, page_line);
+	    ++page_લીટી;
+	    જો (page_લીટી >= 0) // out of room in header
+		તોડો;
+	    mch_print_start_લીટી(TRUE, page_લીટી);
 	}
 	p += l;
     }
@@ -525,10 +525,10 @@ prt_header(
     vim_free(tbuf);
 
 #ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+    જો (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
+    નહીંતર
 #endif
     {
 	// Set colors and font back to normal.
@@ -541,45 +541,45 @@ prt_header(
 /*
  * Display a print status message.
  */
-    void
+    શૂન્ય
 prt_message(char_u *s)
 {
-    screen_fill((int)Rows - 1, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-    screen_puts(s, (int)Rows - 1, 0, HL_ATTR(HLF_R));
+    screen_fill((પૂર્ણાંક)Rows - 1, (પૂર્ણાંક)Rows, 0, (પૂર્ણાંક)Columns, ' ', ' ', 0);
+    screen_puts(s, (પૂર્ણાંક)Rows - 1, 0, HL_ATTR(HLF_R));
     out_flush();
 }
 
-    void
+    શૂન્ય
 ex_hardcopy(exarg_T *eap)
 {
     linenr_T		lnum;
-    int			collated_copies, uncollated_copies;
+    પૂર્ણાંક			collated_copies, uncollated_copies;
     prt_settings_T	settings;
     long_u		bytes_to_print = 0;
-    int			page_line;
-    int			jobsplit;
+    પૂર્ણાંક			page_લીટી;
+    પૂર્ણાંક			jobsplit;
 
     CLEAR_FIELD(settings);
     settings.has_color = TRUE;
 #ifdef FEAT_PRINT_PANGO
-    settings.user_abort_msg = TRUE;
+    settings.user_abort_સંદેશ = TRUE;
 #endif
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    if (*eap->arg == '>')
+#જો defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    જો (*eap->arg == '>')
     {
-	char	*errormsg = NULL;
+	અક્ષર	*errormsg = ખાલી;
 
 	// Expand things like "%.ps".
-	if (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
+	જો (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
 	{
-	    if (errormsg != NULL)
+	    જો (errormsg != ખાલી)
 		emsg(errormsg);
-	    return;
+	    પાછા;
 	}
 	settings.outfile = skipwhite(eap->arg + 1);
     }
-    else if (*eap->arg != NUL)
+    નહીંતર જો (*eap->arg != NUL)
 	settings.arguments = eap->arg;
 #endif
 
@@ -590,67 +590,67 @@ ex_hardcopy(exarg_T *eap)
      * not be a real printer - for example the engine might generate HTML or
      * PS.)
      */
-    if (mch_print_init(&settings,
-			curbuf->b_fname == NULL
+    જો (mch_print_init(&settings,
+			curbuf->b_fname == ખાલી
 			    ? buf_spname(curbuf)
-			    : curbuf->b_sfname == NULL
+			    : curbuf->b_sfname == ખાલી
 				? curbuf->b_fname
 				: curbuf->b_sfname,
 			eap->forceit) == FAIL)
-	return;
+	પાછા;
 
 #ifdef FEAT_SYN_HL
 # ifdef  FEAT_GUI
-    if (gui.in_use)
+    જો (gui.in_use)
 	settings.modec = 'g';
-    else
+    નહીંતર
 # endif
-	if (t_colors > 1)
+	જો (t_colors > 1)
 	    settings.modec = 'c';
-	else
+	નહીંતર
 	    settings.modec = 't';
 
-    if (!syntax_present(curwin))
+    જો (!syntax_present(curwin))
 	settings.do_syntax = FALSE;
-    else if (printer_opts[OPT_PRINT_SYNTAX].present
+    નહીંતર જો (printer_opts[OPT_PRINT_SYNTAX].present
 	    && TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) != 'a')
 	settings.do_syntax =
 	       (TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) == 'y');
-    else
+    નહીંતર
 	settings.do_syntax = settings.has_color;
 #endif
 
     // Set up printing attributes for line numbers
-    settings.number.fg_color = PRCOLOR_BLACK;
-    settings.number.bg_color = PRCOLOR_WHITE;
-    settings.number.bold = FALSE;
-    settings.number.italic = TRUE;
-    settings.number.underline = FALSE;
+    settings.સંખ્યા.fg_color = PRCOLOR_BLACK;
+    settings.સંખ્યા.bg_color = PRCOLOR_WHITE;
+    settings.સંખ્યા.bold = FALSE;
+    settings.સંખ્યા.italic = TRUE;
+    settings.સંખ્યા.underline = FALSE;
 #ifdef FEAT_SYN_HL
     /*
      * Syntax highlighting of line numbers.
      */
-    if (prt_use_number() && settings.do_syntax)
+    જો (prt_use_સંખ્યા() && settings.do_syntax)
     {
-	int		id;
+	પૂર્ણાંક		id;
 
 	id = syn_name2id((char_u *)"LineNr");
-	if (id > 0)
+	જો (id > 0)
 	    id = syn_get_final_id(id);
 
-	prt_get_attr(id, &settings.number, settings.modec);
+	prt_get_attr(id, &settings.સંખ્યા, settings.modec);
     }
 #endif
 
     /*
      * Estimate the total lines to be printed
      */
-    for (lnum = eap->line1; lnum <= eap->line2; lnum++)
+    માટે (lnum = eap->line1; lnum <= eap->line2; lnum++)
 	bytes_to_print += (long_u)STRLEN(skipwhite(ml_get(lnum)));
-    if (bytes_to_print == 0)
+    જો (bytes_to_print == 0)
     {
-	msg(_("No text to be printed"));
-	goto print_fail_no_begin;
+	સંદેશ(_("No text to be printed"));
+	જાઓ print_fail_no_begin;
     }
 
     // Set colors and font to normal.
@@ -670,43 +670,43 @@ ex_hardcopy(exarg_T *eap)
     jobsplit = (printer_opts[OPT_PRINT_JOBSPLIT].present
 	   && TOLOWER_ASC(printer_opts[OPT_PRINT_JOBSPLIT].string[0]) == 'y');
 
-    if (!mch_print_begin(&settings))
-	goto print_fail_no_begin;
+    જો (!mch_print_begin(&settings))
+	જાઓ print_fail_no_begin;
 
     /*
      * Loop over collated copies: 1 2 3, 1 2 3, ...
      */
-    prt_page_count = 0;
-    for (collated_copies = 0;
+    prt_page_ગણતરી = 0;
+    માટે (collated_copies = 0;
 	    collated_copies < settings.n_collated_copies;
 	    collated_copies++)
     {
 	prt_pos_T	prtpos;		// current print position
 	prt_pos_T	page_prtpos;	// print position at page start
-	int		side;
+	પૂર્ણાંક		side;
 
 	CLEAR_FIELD(page_prtpos);
-	page_prtpos.file_line = eap->line1;
+	page_prtpos.file_લીટી = eap->line1;
 	prtpos = page_prtpos;
 
-	if (jobsplit && collated_copies > 0)
+	જો (jobsplit && collated_copies > 0)
 	{
 	    // Splitting jobs: Stop a previous job and start a new one.
 	    mch_print_end(&settings);
-	    if (!mch_print_begin(&settings))
-		goto print_fail_no_begin;
+	    જો (!mch_print_begin(&settings))
+		જાઓ print_fail_no_begin;
 	}
 
 	/*
 	 * Loop over all pages in the print job: 1 2 3 ...
 	 */
-	for (prt_page_count = 0; prtpos.file_line <= eap->line2; ++prt_page_count)
+	માટે (prt_page_ગણતરી = 0; prtpos.file_લીટી <= eap->line2; ++prt_page_ગણતરી)
 	{
 	    /*
 	     * Loop over uncollated copies: 1 1 1, 2 2 2, 3 3 3, ...
 	     * For duplex: 12 12 12 34 34 34, ...
 	     */
-	    for (uncollated_copies = 0;
+	    માટે (uncollated_copies = 0;
 		    uncollated_copies < settings.n_uncollated_copies;
 		    uncollated_copies++)
 	    {
@@ -716,7 +716,7 @@ ex_hardcopy(exarg_T *eap)
 		/*
 		 * Do front and rear side of a page.
 		 */
-		for (side = 0; side <= settings.duplex; ++side)
+		માટે (side = 0; side <= settings.duplex; ++side)
 		{
 		    /*
 		     * Print one page.
@@ -724,21 +724,21 @@ ex_hardcopy(exarg_T *eap)
 
 		    // Check for interrupt character every page.
 		    ui_breakcheck();
-		    if (got_int || settings.user_abort)
-			goto print_fail;
+		    જો (got_int || settings.user_abort)
+			જાઓ print_fail;
 
-		    sprintf((char *)IObuff, _("Printing page %d (%d%%)"),
-			    prt_page_count + 1 + side,
+		    sprintf((અક્ષર *)IObuff, _("Printing page %d (%d%%)"),
+			    prt_page_ગણતરી + 1 + side,
 			    prtpos.bytes_printed > 1000000
-				? (int)(prtpos.bytes_printed /
+				? (પૂર્ણાંક)(prtpos.bytes_printed /
 						       (bytes_to_print / 100))
-				: (int)((prtpos.bytes_printed * 100)
+				: (પૂર્ણાંક)((prtpos.bytes_printed * 100)
 							   / bytes_to_print));
-		    if (!mch_print_begin_page(IObuff))
-			goto print_fail;
+		    જો (!mch_print_begin_page(IObuff))
+			જાઓ print_fail;
 
-		    if (settings.n_collated_copies > 1)
-			sprintf((char *)IObuff + STRLEN(IObuff),
+		    જો (settings.n_collated_copies > 1)
+			sprintf((અક્ષર *)IObuff + STRLEN(IObuff),
 				_(" Copy %d of %d"),
 				collated_copies + 1,
 				settings.n_collated_copies);
@@ -747,69 +747,69 @@ ex_hardcopy(exarg_T *eap)
 		    /*
 		     * Output header if required
 		     */
-		    if (prt_header_height() > 0)
-			prt_header(&settings, prt_page_count + 1 + side,
-							prtpos.file_line);
+		    જો (prt_header_height() > 0)
+			prt_header(&settings, prt_page_ગણતરી + 1 + side,
+							prtpos.file_લીટી);
 
-		    for (page_line = 0; page_line < settings.lines_per_page;
-								  ++page_line)
+		    માટે (page_લીટી = 0; page_લીટી < settings.લીટીઓ_per_page;
+								  ++page_લીટી)
 		    {
-			prtpos.column = hardcopy_line(&settings,
-							   page_line, &prtpos);
-			if (prtpos.column == 0)
+			prtpos.column = hardcopy_લીટી(&settings,
+							   page_લીટી, &prtpos);
+			જો (prtpos.column == 0)
 			{
 			    // finished a file line
 			    prtpos.bytes_printed +=
-				  STRLEN(skipwhite(ml_get(prtpos.file_line)));
-			    if (++prtpos.file_line > eap->line2)
-				break; // reached the end
+				  STRLEN(skipwhite(ml_get(prtpos.file_લીટી)));
+			    જો (++prtpos.file_લીટી > eap->line2)
+				તોડો; // reached the end
 			}
-			else if (prtpos.ff)
+			નહીંતર જો (prtpos.ff)
 			{
 			    // Line had a formfeed in it - start new page but
 			    // stay on the current line
-			    break;
+			    તોડો;
 			}
 		    }
 
-		    if (!mch_print_end_page())
-			goto print_fail;
-		    if (prtpos.file_line > eap->line2)
-			break; // reached the end
+		    જો (!mch_print_end_page())
+			જાઓ print_fail;
+		    જો (prtpos.file_લીટી > eap->line2)
+			તોડો; // reached the end
 		}
 
 		/*
 		 * Extra blank page for duplexing with odd number of pages and
 		 * more copies to come.
 		 */
-		if (prtpos.file_line > eap->line2 && settings.duplex
+		જો (prtpos.file_લીટી > eap->line2 && settings.duplex
 								 && side == 0
 		    && uncollated_copies + 1 < settings.n_uncollated_copies)
 		{
-		    if (!mch_print_blank_page())
-			goto print_fail;
+		    જો (!mch_print_blank_page())
+			જાઓ print_fail;
 		}
 	    }
-	    if (settings.duplex && prtpos.file_line <= eap->line2)
-		++prt_page_count;
+	    જો (settings.duplex && prtpos.file_લીટી <= eap->line2)
+		++prt_page_ગણતરી;
 
 	    // Remember the position where the next page starts.
 	    page_prtpos = prtpos;
 	}
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Printed: %s"),
+	vim_snprintf((અક્ષર *)IObuff, IOSIZE, _("Printed: %s"),
 							    settings.jobname);
 	prt_message(IObuff);
     }
 
 print_fail:
-    if (got_int || (settings.user_abort
+    જો (got_int || (settings.user_abort
 #ifdef FEAT_PRINT_PANGO
-		&& settings.user_abort_msg
+		&& settings.user_abort_સંદેશ
 #endif
 		))
     {
-	sprintf((char *)IObuff, "%s", _("Printing aborted"));
+	sprintf((અક્ષર *)IObuff, "%s", _("Printing aborted"));
 	prt_message(IObuff);
     }
     mch_print_end(&settings);
@@ -822,64 +822,64 @@ print_fail_no_begin:
  * Print one page line.
  * Return the next column to print, or zero if the line is finished.
  */
-    static colnr_T
-hardcopy_line(
+    સ્થિર colnr_T
+hardcopy_લીટી(
     prt_settings_T	*psettings,
-    int			page_line,
+    પૂર્ણાંક			page_લીટી,
     prt_pos_T		*ppos)
 {
     colnr_T	col;
-    char_u	*line;
-    int		need_break = FALSE;
-    int		outputlen;
-    int		tab_spaces;
+    char_u	*લીટી;
+    પૂર્ણાંક		need_break = FALSE;
+    પૂર્ણાંક		outputlen;
+    પૂર્ણાંક		tab_spaces;
     long_u	print_pos;
 #ifdef FEAT_SYN_HL
     prt_text_attr_T attr;
-    int		id;
+    પૂર્ણાંક		id;
 #endif
 
-    if (ppos->column == 0 || ppos->ff)
+    જો (ppos->column == 0 || ppos->ff)
     {
 	print_pos = 0;
 	tab_spaces = 0;
-	if (!ppos->ff && prt_use_number())
-	    prt_line_number(psettings, page_line, ppos->file_line);
+	જો (!ppos->ff && prt_use_સંખ્યા())
+	    prt_લીટી_સંખ્યા(psettings, page_લીટી, ppos->file_લીટી);
 	ppos->ff = FALSE;
     }
-    else
+    નહીંતર
     {
 	// left over from wrap halfway a tab
 	print_pos = ppos->print_pos;
 	tab_spaces = ppos->lead_spaces;
     }
 
-    mch_print_start_line(0, page_line);
-    line = ml_get(ppos->file_line);
+    mch_print_start_લીટી(0, page_લીટી);
+    લીટી = ml_get(ppos->file_લીટી);
 
     /*
      * Loop over the columns until the end of the file line or right margin.
      */
-    for (col = ppos->column; line[col] != NUL && !need_break; col += outputlen)
+    માટે (col = ppos->column; લીટી[col] != NUL && !need_break; col += outputlen)
     {
 	outputlen = 1;
-	if (has_mbyte && (outputlen = (*mb_ptr2len)(line + col)) < 1)
+	જો (has_mbyte && (outputlen = (*mb_ptr2len)(લીટી + col)) < 1)
 	    outputlen = 1;
 #ifdef FEAT_SYN_HL
 	/*
 	 * syntax highlighting stuff.
 	 */
-	if (psettings->do_syntax)
+	જો (psettings->do_syntax)
 	{
-	    id = syn_get_id(curwin, ppos->file_line, col, 1, NULL, FALSE);
-	    if (id > 0)
+	    id = syn_get_id(curwin, ppos->file_લીટી, col, 1, ખાલી, FALSE);
+	    જો (id > 0)
 		id = syn_get_final_id(id);
-	    else
+	    નહીંતર
 		id = 0;
 	    // Get the line again, a multi-line regexp may invalidate it.
-	    line = ml_get(ppos->file_line);
+	    લીટી = ml_get(ppos->file_લીટી);
 
-	    if (id != current_syn_id)
+	    જો (id != current_syn_id)
 	    {
 		current_syn_id = id;
 		prt_get_attr(id, &attr, psettings->modec);
@@ -893,29 +893,29 @@ hardcopy_line(
 	/*
 	 * Appropriately expand any tabs to spaces.
 	 */
-	if (line[col] == TAB || tab_spaces != 0)
+	જો (લીટી[col] == TAB || tab_spaces != 0)
 	{
-	    if (tab_spaces == 0)
+	    જો (tab_spaces == 0)
 #ifdef FEAT_VARTABS
 		tab_spaces = tabstop_padding(print_pos, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_spaces = (int)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
+#નહીંતર
+		tab_spaces = (પૂર્ણાંક)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
 #endif
 
-	    while (tab_spaces > 0)
+	    જ્યારે (tab_spaces > 0)
 	    {
 		need_break = mch_print_text_out((char_u *)" ", 1);
 		print_pos++;
 		tab_spaces--;
-		if (need_break)
-		    break;
+		જો (need_break)
+		    તોડો;
 	    }
 	    // Keep the TAB if we didn't finish it.
-	    if (need_break && tab_spaces > 0)
-		break;
+	    જો (need_break && tab_spaces > 0)
+		તોડો;
 	}
-	else if (line[col] == FF
+	નહીંતર જો (લીટી[col] == FF
 		&& printer_opts[OPT_PRINT_FORMFEED].present
 		&& TOLOWER_ASC(printer_opts[OPT_PRINT_FORMFEED].string[0])
 								       == 'y')
@@ -923,30 +923,30 @@ hardcopy_line(
 	    ppos->ff = TRUE;
 	    need_break = 1;
 	}
-	else
+	નહીંતર
 	{
-	    need_break = mch_print_text_out(line + col, outputlen);
-	    if (has_mbyte)
-		print_pos += (*mb_ptr2cells)(line + col);
-	    else
+	    need_break = mch_print_text_out(લીટી + col, outputlen);
+	    જો (has_mbyte)
+		print_pos += (*mb_ptr2cells)(લીટી + col);
+	    નહીંતર
 		print_pos++;
 	}
     }
 
     ppos->lead_spaces = tab_spaces;
-    ppos->print_pos = (int)print_pos;
+    ppos->print_pos = (પૂર્ણાંક)print_pos;
 
     /*
      * Start next line of file if we clip lines, or have reached end of the
      * line, unless we are doing a formfeed.
      */
-    if (!ppos->ff
-	    && (line[col] == NUL
+    જો (!ppos->ff
+	    && (લીટી[col] == NUL
 		|| (printer_opts[OPT_PRINT_WRAP].present
 		    && TOLOWER_ASC(printer_opts[OPT_PRINT_WRAP].string[0])
 								     == 'n')))
-	return 0;
-    return col;
+	પાછા 0;
+    પાછા col;
 }
 
 #endif //FEAT_PRINTER

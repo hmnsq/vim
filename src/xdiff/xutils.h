@@ -20,37 +20,37 @@
  *
  */
 
-#if !defined(XUTILS_H)
+#જો !defined(XUTILS_H)
 #define XUTILS_H
 
 
 
 long xdl_bogosqrt(long n);
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+પૂર્ણાંક xdl_emit_diffrec(અક્ષર અચલ *rec, long size, અક્ષર અચલ *pre, long psize,
 		     xdemitcb_t *ecb);
-int xdl_cha_init(chastore_t *cha, long isize, long icount);
-void xdl_cha_free(chastore_t *cha);
-void *xdl_cha_alloc(chastore_t *cha);
-long xdl_guess_lines(mmfile_t *mf, long sample);
-int xdl_blankline(const char *line, long size, long flags);
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags);
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top);
-unsigned long xdl_hash_record_with_whitespace(char const **data, char const *top, long flags);
-static inline unsigned long xdl_hash_record(char const **data, char const *top, long flags)
+પૂર્ણાંક xdl_cha_init(chastore_t *cha, long isize, long icount);
+શૂન્ય xdl_cha_free(chastore_t *cha);
+શૂન્ય *xdl_cha_alloc(chastore_t *cha);
+long xdl_guess_લીટીઓ(mmfile_t *mf, long sample);
+પૂર્ણાંક xdl_blankline(અચલ અક્ષર *લીટી, long size, long flags);
+પૂર્ણાંક xdl_recmatch(અચલ અક્ષર *l1, long s1, અચલ અક્ષર *l2, long s2, long flags);
+unsigned long xdl_hash_record_verbatim(અક્ષર અચલ **data, અક્ષર અચલ *ટોચ);
+unsigned long xdl_hash_record_with_whitespace(અક્ષર અચલ **data, અક્ષર અચલ *ટોચ, long flags);
+સ્થિર અંતઃરેખ unsigned long xdl_hash_record(અક્ષર અચલ **data, અક્ષર અચલ *ટોચ, long flags)
 {
-	if (flags & XDF_WHITESPACE_FLAGS)
-		return xdl_hash_record_with_whitespace(data, top, flags);
-	else
-		return xdl_hash_record_verbatim(data, top);
+	જો (flags & XDF_WHITESPACE_FLAGS)
+		પાછા xdl_hash_record_with_whitespace(data, ટોચ, flags);
+	નહીંતર
+		પાછા xdl_hash_record_verbatim(data, ટોચ);
 }
-unsigned int xdl_hashbits(unsigned int size);
-int xdl_num_out(char *out, long val);
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen, xdemitcb_t *ecb);
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		       int line1, int count1, int line2, int count2);
+unsigned પૂર્ણાંક xdl_hashbits(unsigned પૂર્ણાંક size);
+પૂર્ણાંક xdl_અંક_out(અક્ષર *out, long val);
+પૂર્ણાંક xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
+		      અચલ અક્ષર *func, long funclen, xdemitcb_t *ecb);
+પૂર્ણાંક xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t અચલ *xpp,
+		       પૂર્ણાંક line1, પૂર્ણાંક count1, પૂર્ણાંક line2, પૂર્ણાંક count2);
 
 /* Do not call this function, use XDL_ALLOC_GROW instead */
-void* xdl_alloc_grow_helper(void* p, long nr, long* alloc, size_t size);
+શૂન્ય* xdl_alloc_grow_helper(શૂન્ય* p, long nr, long* alloc, size_t size);
 
 #endif /* #if !defined(XUTILS_H) */

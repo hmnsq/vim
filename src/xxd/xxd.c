@@ -87,25 +87,25 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#જો _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#જો !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
 #endif
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+#જો (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
 # define _XOPEN_SOURCE 700   /* for fdopen() */
 #endif
 
-#include <stdio.h>
+#અન્તર્ભાવ <stdio.h>
 #ifdef VAXC
 # include <file.h>
-#else
+#નહીંતર
 # include <fcntl.h>
 #endif
-#if defined(WIN32) || defined(CYGWIN)
+#જો defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
 #endif
 #ifdef WIN32
@@ -114,11 +114,11 @@
 #ifdef UNIX
 # include <unistd.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#અન્તર્ભાવ <stdlib.h>
+#અન્તર્ભાવ <string.h>
+#અન્તર્ભાવ <ctype.h>
+#અન્તર્ભાવ <limits.h>
+#જો __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
 #endif
 
@@ -127,7 +127,7 @@
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#જો defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
@@ -141,42 +141,42 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# જો defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+બાહ્ય પૂર્ણાંક fprintf __P((FILE *, અક્ષર *, ...));
+બાહ્ય પૂર્ણાંક fputs   __P((અક્ષર *, FILE *));
+બાહ્ય પૂર્ણાંક _flsbuf __P((unsigned અક્ષર, FILE *));
+બાહ્ય પૂર્ણાંક _filbuf __P((FILE *));
+બાહ્ય પૂર્ણાંક fflush  __P((FILE *));
+બાહ્ય પૂર્ણાંક fclose  __P((FILE *));
+બાહ્ય પૂર્ણાંક fseek   __P((FILE *, long, પૂર્ણાંક));
+બાહ્ય પૂર્ણાંક rewind  __P((FILE *));
 
-extern void perror __P((char *));
+બાહ્ય શૂન્ય perror __P((અક્ષર *));
 # endif
 #endif
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+અક્ષર version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
 #ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
+અક્ષર osver[] = " (Win32)";
+#નહીંતર
+અક્ષર osver[] = "";
 #endif
 
-#if defined(WIN32)
+#જો defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_દ્વિઅંકી) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_દ્વિઅંકી : O_TEXT)
 # define PATH_SEP '\\'
-#elif defined(CYGWIN)
+#અથવાજો defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_દ્વિઅંકી) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) ((yes) ? (શૂન્ય) setmode(fileno(fp), O_દ્વિઅંકી) : (શૂન્ય) (fp))
 # define PATH_SEP '/'
-#else
+#નહીંતર
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
@@ -184,7 +184,7 @@ char osver[] = "";
 #  define BIN_ASSIGN(fp, dummy) fp
 #  define PATH_SEP ']'
 #  define FILE_SEP '.'
-# else
+# નહીંતર
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
@@ -194,22 +194,22 @@ char osver[] = "";
 #endif
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
+#જો __MWERKS__
 # define OPEN(name, mode, umask) open(name, mode)
-#else
+#નહીંતર
 # define OPEN(name, mode, umask) open(name, mode, umask)
 #endif
 
 #ifdef AMIGA
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
+#નહીંતર
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
 #endif
 
 #ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+# જો defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# નહીંતર
 #  define __P(a) ()
 # endif
 #endif
@@ -242,7 +242,7 @@ char osver[] = "";
     + COLS         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+અક્ષર hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
 #define HEX_NORMAL         0x00 /* no flags set */
@@ -251,7 +251,7 @@ char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 #define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
 #define HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned અક્ષર)(c)) : (c))
 
 #define COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
@@ -273,10 +273,10 @@ l_colored[c++] = 'm';
 #define COLOR_BLUE '4'
 #define COLOR_WHITE '7'
 
-static char *pname;
+સ્થિર અક્ષર *pname;
 
-  static void
-exit_with_usage(void)
+  સ્થિર શૂન્ય
+exit_with_usage(શૂન્ય)
 {
   fprintf(stderr, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
   fprintf(stderr, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
@@ -301,7 +301,7 @@ exit_with_usage(void)
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
 #ifdef TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#નહીંતર
 	  "", "");
 #endif
   fprintf(stderr, "    -u          use upper case hex letters.\n"
@@ -310,53 +310,53 @@ exit_with_usage(void)
   exit(1);
 }
 
-  static void
-perror_exit(int ret)
+  સ્થિર શૂન્ય
+perror_exit(પૂર્ણાંક ret)
 {
   fprintf(stderr, "%s: ", pname);
-  perror(NULL);
+  perror(ખાલી);
   exit(ret);
 }
 
-  static void
-error_exit(int ret, char *msg)
+  સ્થિર શૂન્ય
+error_exit(પૂર્ણાંક ret, અક્ષર *સંદેશ)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
+  fprintf(stderr, "%s: %s\n", pname, સંદેશ);
   exit(ret);
 }
 
-  static int
+  સ્થિર પૂર્ણાંક
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  પૂર્ણાંક c = getc(fpi);
+  જો (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  પાછા c;
 }
 
-  static void
-putc_or_die(int c, FILE *fpo)
+  સ્થિર શૂન્ય
+putc_or_die(પૂર્ણાંક c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  જો (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
-  static void
-fputs_or_die(char *s, FILE *fpo)
+  સ્થિર શૂન્ય
+fputs_or_die(અક્ષર *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  જો (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(args) જો (fprintf args < 0) perror_exit(3)
 
-  static void
+  સ્થિર શૂન્ય
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  જો (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  જો (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  સ્થિર પૂર્ણાંક
+parse_hex_digit(પૂર્ણાંક c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  પાછા (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  સ્થિર પૂર્ણાંક
+parse_bin_digit(પૂર્ણાંક c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  પાછા (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  સ્થિર પૂર્ણાંક
+skip_to_eol(FILE *fpi, પૂર્ણાંક c)
 {
-  while (c != '\n' && c != EOF)
+  જ્યારે (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  પાછા c;
 }
 
 /*
@@ -404,169 +404,169 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  સ્થિર પૂર્ણાંક
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
+  પૂર્ણાંક cols,
+  પૂર્ણાંક hextype,
   long base_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
+  પૂર્ણાંક c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
   long have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  જ્યારે ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
-	continue;
+      જો (c == '\r')	/* Doze style input file? */
+	ચાલુ;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
-	continue;
+      જો (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+	ચાલુ;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      જો (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  જો (n1 == -1 && ign_garb)
+	    ચાલુ;
 	}
-      else /* HEX_BITS */
+      નહીંતર /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  જો (n1 == -1 && ign_garb)
+	    ચાલુ;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  જો (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (પૂર્ણાંક)(((unsigned)b << 1) | (unsigned)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      જો ((hextype != HEX_POSTSCRIPT) && (p >= cols))
 	{
-	  if (hextype == HEX_NORMAL)
+	  જો (hextype == HEX_NORMAL)
 	    {
-	      if (n1 < 0)
+	      જો (n1 < 0)
 		{
 		  p = 0;
-		  continue;
+		  ચાલુ;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  else /* HEX_BITS */
+	  નહીંતર /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      જો (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
-		  continue;
+		  ચાલુ;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  continue;
+	  ચાલુ;
 	}
 
-      if (base_off + want_off != have_off)
+      જો (base_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  જો (fflush(fpo) != 0)
 	    perror_exit(3);
 #ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
+	  જો (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
 	    have_off = base_off + want_off;
 #endif
-	  if (base_off + want_off < have_off)
+	  જો (base_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  માટે (; have_off < base_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      જો (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  જો (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      જો (!hextype && (++p >= cols))
 	      /* skip the rest of the line as garbage */
 	      c = skip_to_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  નહીંતર જો (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
 	    c = skip_to_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      નહીંતર /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  જો (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      જો (++p >= cols)
 		/* skip the rest of the line as garbage */
 		 c = skip_to_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      જો (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  જો (hextype == HEX_NORMAL || hextype == HEX_BITS)
 	    want_off = 0;
 	  p = cols;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  જો (fflush(fpo) != 0)
     perror_exit(3);
 #ifdef TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
 #endif
   fclose_or_die(fpi, fpo);
-  return 0;
+  પાછા 0;
 }
 
 
 /*
  * Print line l with given colors.
  */
-  static void
-print_colored_line(FILE *fp, char *l, char *colors)
+  સ્થિર શૂન્ય
+print_colored_લીટી(FILE *fp, અક્ષર *l, અક્ષર *colors)
 {
-  static char l_colored[LLEN+1];
+  સ્થિર અક્ષર l_colored[LLEN+1];
 
-  if (colors)
+  જો (colors)
     {
-      int c = 0;
-      if (colors[0])
+      પૂર્ણાંક c = 0;
+      જો (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      પૂર્ણાંક i;
+      માટે (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  જો (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      જો (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      જો (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      જો (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  નહીંતર
     fputs_or_die(l, fp);
 }
 
@@ -598,47 +598,47 @@ print_colored_line(FILE *fp, char *l, char *colors)
  *
  * If nz is always positive, lines are never suppressed.
  */
-  static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+  સ્થિર શૂન્ય
+xxdline(FILE *fp, અક્ષર *l, અક્ષર *colors, પૂર્ણાંક nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  સ્થિર અક્ષર z[LLEN_NO_COLOR+1];
+  સ્થિર અક્ષર z_colors[LLEN_NO_COLOR+1];
+  સ્થિર signed અક્ષર zero_seen = 0;
 
-  if (!nz && zero_seen == 1)
+  જો (!nz && zero_seen == 1)
     {
       strcpy(z, l);
-      if (colors)
+      જો (colors)
 	  memcpy(z_colors, colors, strlen(z));
     }
 
-  if (nz || !zero_seen++)
+  જો (nz || !zero_seen++)
     {
-      if (nz)
+      જો (nz)
 	{
-	  if (nz < 0)
+	  જો (nz < 0)
 	    zero_seen--;
-	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  જો (zero_seen == 2)
+	    print_colored_લીટી(fp, z, z_colors);
+	  જો (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+      જો (nz >= 0 || zero_seen > 0)
+	print_colored_લીટી(fp, l, colors);
 
-      if (nz)
+      જો (nz)
 	zero_seen = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
+  જો (zero_seen >= 0x7F)
     zero_seen = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+સ્થિર unsigned અક્ષર etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,329 +666,329 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  સ્થિર અક્ષર
+get_color_char (પૂર્ણાંક e, પૂર્ણાંક ebcdic)
 {
-  if (ebcdic)
+  જો (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      જો ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	પાછા COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      નહીંતર જો (e == 37 || e == 13 || e == 5)
+	પાછા COLOR_YELLOW;
+      નહીંતર જો (e == 0)
+	પાછા COLOR_WHITE;
+      નહીંતર જો (e == 255)
+	પાછા COLOR_BLUE;
+      નહીંતર
+	પાછા COLOR_RED;
     }
-  else  /* ASCII */
+  નહીંતર  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
+#જો defined(__MVS__) && __CHARSET_LIB == 0
+      જો (e >= 64)
+	પાછા COLOR_GREEN;
+#નહીંતર
+      જો (e > 31 && e < 127)
+	પાછા COLOR_GREEN;
 #endif
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      નહીંતર જો (e == 9 || e == 10 || e == 13)
+	પાછા COLOR_YELLOW;
+      નહીંતર જો (e == 0)
+	પાછા COLOR_WHITE;
+      નહીંતર જો (e == 255)
+	પાછા COLOR_BLUE;
+      નહીંતર
+	પાછા COLOR_RED;
     }
-    return 0;
+    પાછા 0;
 }
 
-  static int
-enable_color(void)
+  સ્થિર પૂર્ણાંક
+enable_color(શૂન્ય)
 {
 #ifdef WIN32
   DWORD   mode;
   HANDLE  out;
 
-  if (!isatty(1))
-    return 0;
+  જો (!isatty(1))
+    પાછા 0;
 
   out = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleMode(out, &mode);
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
-#elif defined(UNIX)
-  char *term;
+  પાછા (પૂર્ણાંક)SetConsoleMode(out, mode);
+#અથવાજો defined(UNIX)
+  અક્ષર *term;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  જો (!isatty(STDOUT_FILENO))
+    પાછા 0;
 
   term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  જો (term == ખાલી || *term == '\0' || !strcmp(term, "dumb"))
+    પાછા 0;
 
-  return 1;
-#else
-  return 0;
+  પાછા 1;
+#નહીંતર
+  પાછા 0;
 #endif
 }
 
-  int
-main(int argc, char *argv[])
+  પૂર્ણાંક
+મુખ્ય(પૂર્ણાંક argc, અક્ષર *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
+  પૂર્ણાંક c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  પૂર્ણાંક cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
+  પૂર્ણાંક capitalize = 0, decimal_offset = 0;
+  પૂર્ણાંક ebcdic = 0;
+  પૂર્ણાંક termination = 0;
+  પૂર્ણાંક octspergrp = -1;	/* number of octets grouped in output */
+  પૂર્ણાંક grplen;		/* total chars per octet group excluding colors */
   long length = -1, n = 0, seekoff = 0;
   unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  સ્થિર અક્ષર l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  સ્થિર અક્ષર colors[LLEN_NO_COLOR+1]; /* color array */
+  અક્ષર *pp;
+  અક્ષર *varname = ખાલી;
+  પૂર્ણાંક addrlen = 9;
+  પૂર્ણાંક color = 0;
+  પૂર્ણાંક color_forced = 0;	/* set when -R always is used */
+  અક્ષર *no_color;
+  અક્ષર cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  જો (no_color == ખાલી || no_color[0] == '\0')
     color = enable_color();
 
 #ifdef AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
+  જો (argc == 0)
     exit(1);
 #endif
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  માટે (pp = pname; *pp; )
+    જો (*pp++ == PATH_SEP)
       pname = pp;
 #ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+  માટે (pp = pname; *pp; pp++)
+    જો (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	તોડો;
       }
 #endif
 
-  while (argc >= 2)
+  જ્યારે (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   જો (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      નહીંતર જો (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
+      નહીંતર જો (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      નહીંતર જો (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      નહીંતર જો (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      નહીંતર જો (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      નહીંતર જો (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      નહીંતર જો (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
+      નહીંતર જો (!STRNCMP(pp, "-r", 2)) revert++;
+      નહીંતર જો (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      નહીંતર જો (!STRNCMP(pp, "-t", 2)) termination++;
+      નહીંતર જો (!STRNCMP(pp, "-v", 2))
 	{
 	  fprintf(stderr, "%s%s\n", version, osver);
 	  exit(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      નહીંતર જો (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  જો (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  નહીંતર જો (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      cols = (પૂર્ણાંક)strtol(pp + 2, ખાલી, 0);
 	    }
-	  else
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      cols = (પૂર્ણાંક)strtol(argv[2], ખાલી, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      નહીંતર જો (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  જો (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (પૂર્ણાંક)strtol(pp + 2, ખાલી, 0);
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (પૂર્ણાંક)strtol(argv[2], ખાલી, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      નહીંતર જો (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
-	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  પૂર્ણાંક reloffset = 0;
+	  પૂર્ણાંક negoffset = 0;
+	  જો (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	    displayoff = strtoul(pp + 2, ખાલી, 0);
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      જો (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     જો (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
-	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
-	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
+	     જો (negoffset)
+	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, ખાલી, 0) + 1;
+	     નહીંતર
+	       displayoff = strtoul(argv[2] + reloffset+negoffset, ખાલી, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      નહીંતર જો (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  જો (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
 #ifdef TRY_SEEK
-	      if (pp[2] == '+')
+	      જો (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      જો (pp[2+relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(pp + 2+relseek+negseek, (અક્ષર **)ખાલી, 0);
 	    }
-	  else
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
 #ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+	      જો (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      જો (argv[2][relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(argv[2] + relseek+negseek, (અક્ષર **)ખાલી, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      નહીંતર જો (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  જો (pp[2] && STRNCMP("en", pp + 2, 2))
+	    length = strtol(pp + 2, (અક્ષર **)ખાલી, 0);
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      length = strtol(argv[2], (અક્ષર **)ખાલી, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      નહીંતર જો (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  જો (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  નહીંતર
 	    {
-	      if (!argv[2])
+	      જો (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      નહીંતર જો (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  અક્ષર *pw = pp + 2;
+	  જો (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  જો (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  જો (!STRNCMP(pw, "always", 6))
 	    {
-	      (void)enable_color();
+	      (શૂન્ય)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  નહીંતર જો (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  નહીંતર જો (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  નહીંતર
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      નહીંતર જો (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  તોડો;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      નહીંતર જો (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      નહીંતર
+	તોડો;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  જો (hextype != (HEX_CINCLUDE | HEX_BITS))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	જો (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
-    switch (hextype)
+  જો (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
+    પસંદગી (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      સ્થિતિ HEX_POSTSCRIPT:	cols = 30; તોડો;
+      સ્થિતિ HEX_CINCLUDE:	cols = 12; તોડો;
+      સ્થિતિ HEX_CINCLUDE | HEX_BITS:
+      સ્થિતિ HEX_BITS:		cols = 6; તોડો;
+      સ્થિતિ HEX_NORMAL:
+      સ્થિતિ HEX_LITTLEENDIAN:
+      મૂળભૂત:			cols = 16; તોડો;
       }
 
-  if (octspergrp < 0)
-    switch (hextype)
+  જો (octspergrp < 0)
+    પસંદગી (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      સ્થિતિ HEX_CINCLUDE | HEX_BITS:
+      સ્થિતિ HEX_BITS:		octspergrp = 1; તોડો;
+      સ્થિતિ HEX_NORMAL:		octspergrp = 2; તોડો;
+      સ્થિતિ HEX_LITTLEENDIAN:	octspergrp = 4; તોડો;
+      સ્થિતિ HEX_POSTSCRIPT:
+      સ્થિતિ HEX_CINCLUDE:
+      મૂળભૂત:			octspergrp = 0; તોડો;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
+  જો ((hextype == HEX_POSTSCRIPT && cols < 0) ||
       (hextype != HEX_POSTSCRIPT && cols < 1) ||
       ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
 							    && (cols > COLS)))
@@ -997,193 +997,193 @@ main(int argc, char *argv[])
       exit(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
+  જો (octspergrp < 1 || octspergrp > cols)
     octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  નહીંતર જો (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  જો (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+  જો (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
     BIN_ASSIGN(fp = stdin, !revert);
-  else
+  નહીંતર
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      જો ((fp = fopen(argv[1], BIN_READ(!revert))) == ખાલી)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  પાછા 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+  જો (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
     BIN_ASSIGN(fpo = stdout, revert);
-  else
+  નહીંતર
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      પૂર્ણાંક fd;
+      પૂર્ણાંક mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
-	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
+      જો (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
+	  (fpo = fdopen(fd, BIN_WRITE(revert))) == ખાલી)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  પાછા 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      જો (!color_forced)
 	color = 0;
     }
 
-  if (revert)
-    switch (hextype)
+  જો (revert)
+    પસંદગી (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      સ્થિતિ HEX_NORMAL:
+      સ્થિતિ HEX_POSTSCRIPT:
+      સ્થિતિ HEX_BITS:
+	પાછા huntype(fp, fpo, cols, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
-      default:
+	તોડો;
+      મૂળભૂત:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  જો (seekoff || negseek || !relseek)
     {
 #ifdef TRY_SEEK
-      if (relseek)
+      જો (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      નહીંતર
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      જો (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      જો (e >= 0)
 	seekoff = ftell(fp);
-      else
+      નહીંતર
 #endif
 	{
 	  long s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  જ્યારે (s--)
+	    જો (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  જો (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      જો (varname == ખાલી && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      જો (varname != ખાલી)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned અક્ષર)varname[0]) ? "__" : ""));
+	  માટે (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(isalnum((unsigned અક્ષર)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      જ્યારે ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  જો (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  જો (hextype & HEX_BITS)
 	    {
-	      if (p == 0)
+	      જો (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      નહીંતર જો (p % cols == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      નહીંતર
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      માટે (પૂર્ણાંક j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  નહીંતર
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
 		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  જો (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      તોડો ;
 	    }
 	}
 
-      if (p)
+      જો (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      જો (varname != ખાલી)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned અક્ષર)varname[0]) ? "__" : ""));
+	  માટે (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(isalnum((unsigned અક્ષર)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      પાછા 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  જો (hextype == HEX_POSTSCRIPT)
     {
       p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      જ્યારે ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  જો (cols > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
 	      p = cols;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      જો (cols == 0 || p < cols)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      પાછા 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  જો (hextype != HEX_BITS)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  નહીંતર	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  જ્યારે ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      જો (p == 0)
 	{
 	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
 				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  માટે (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      જો (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  જો (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,71 +1193,71 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      નહીંતર /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  જો (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  માટે (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      જો (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      જો (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      જો (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
 	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
+      નહીંતર
 	c = (grplen * cols - 1) / octspergrp;
 
 
-      if (ebcdic)
+      જો (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      જો (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      જો (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#જો defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#નહીંતર
 	  (e > 31 && e < 127)
 #endif
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      જો (++p == cols)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
 
-	  xxdline(fpo, l, color ? colors : NULL, autoskip ? nonzero : 1);
+	  xxdline(fpo, l, color ? colors : ખાલી, autoskip ? nonzero : 1);
 	  memset(colors, 0, c);
 	  nonzero = 0;
 	  p = 0;
 	}
     }
-  if (p)
+  જો (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      જો (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  જો (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      પૂર્ણાંક fill = octspergrp - (p % octspergrp);
+	      જો (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      માટે (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  જો (hextype != HEX_BITS)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
 	      c += cols - p;
 	      c += (cols - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      માટે (i = cols - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
-	xxdline(fpo, l, NULL, 1);
+      નહીંતર
+	xxdline(fpo, l, ખાલી, 1);
     }
-  else if (autoskip)
-    xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
+  નહીંતર જો (autoskip)
+    xxdline(fpo, l, color ? colors : ખાલી, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  પાછા 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

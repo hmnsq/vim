@@ -27,16 +27,16 @@
 
 #ifdef NBDEBUG
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-FILE		*nb_debug = NULL;
+FILE		*nb_debug = ખાલી;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+શૂન્ય		 nbdb(અક્ષર *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
+સ્થિર પૂર્ણાંક	 lookup(અક્ષર *);
 #ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
+સ્થિર પૂર્ણાંક	 errorHandler(Display *, XErrorEvent *);
 #endif
 
 /*
@@ -46,10 +46,10 @@ static int	 errorHandler(Display *, XErrorEvent *);
  *		    from a background process this is the only way to debug
  *		    startup problems.
  */
-	void
+	શૂન્ય
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	અક્ષર		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
@@ -59,44 +59,44 @@ nbdebug_wait(
 #endif
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	જો (wait_flags & WT_ENV && wait_var && getenv(wait_var) != ખાલી)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	નહીંતર જો (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	નહીંતર જો (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		પૂર્ણાંક w = 1;
+		જ્યારે (w)
 		{
 			;
 		}
 	}
 }
 
-	void
+	શૂન્ય
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	અક્ષર		*log_var,	// env var with log file
+	અક્ષર		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	અક્ષર		*file;		// possible nb_debug output file
+	અક્ષર		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	જો (log_var && (file = getenv(log_var)) != ખાલી)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
 		time(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		જો (level_var && (cp = getenv(level_var)) != ખાલી)
 		{
-			nb_dlevel = strtoul(cp, NULL, 0);
+			nb_dlevel = strtoul(cp, ખાલી, 0);
 		}
-		else
+		નહીંતર
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
@@ -107,12 +107,12 @@ nbdebug_log_init(
 
 }
 
-	void
-nbdbg(char *fmt, ...)
+	શૂન્ય
+nbdbg(અક્ષર *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	જો (nb_debug != ખાલી && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,45 +122,45 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
-lookup(char *file)
+	સ્થિર પૂર્ણાંક
+lookup(અક્ષર *file)
 {
-	char		 buf[BUFSIZ];
+	અક્ષર		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
+	પાછા
 #ifndef FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#નહીંતર
 		(access(buf, 0) == 0);
 #endif
 
 }
 
 #ifdef USE_NB_ERRORHANDLER
-	static int
+	સ્થિર પૂર્ણાંક
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	અક્ષર		 સંદેશ[256];
+	અક્ષર		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGetErrorText(dpy, err->error_code, સંદેશ, કદ(સંદેશ));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", સંદેશ);
 
 	sprintf(buf, "%d", err->request_code);
 	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	    "XRequest", buf, "Unknown", સંદેશ, કદ(સંદેશ));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
-	if (err->request_code > 128)
+	    err->request_code, સંદેશ);
+	જો (err->request_code > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
 		    err->minor_code);
 	}
 
-	return 0;
+	પાછા 0;
 }
 #endif
 

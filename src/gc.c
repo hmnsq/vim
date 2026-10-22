@@ -11,28 +11,28 @@
  * gc.c: Garbage Collection
  */
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+સ્થિર પૂર્ણાંક current_copyID = 0;
 
-static int free_unref_items(int copyID);
+સ્થિર પૂર્ણાંક free_unref_વસ્તુઓ(પૂર્ણાંક copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
-get_copyID(void)
+    પૂર્ણાંક
+get_copyID(શૂન્ય)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    પાછા current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    પૂર્ણાંક
+garbage_collect(પૂર્ણાંક testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    પૂર્ણાંક		copyID;
+    પૂર્ણાંક		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    પૂર્ણાંક		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    જો (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    જો (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	પૂર્ણાંક	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	જો (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	જો (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    જો (pp == ખાલી)
+		પાછા FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -123,38 +123,38 @@ garbage_collect(int testing)
     FOR_ALL_BUFFERS(buf)
     {
 	abort = abort || set_ref_in_item(&buf->b_bufvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							ખાલી, ખાલી, ખાલી);
 	abort = abort || set_ref_in_list(buf->b_recorded_changes, copyID);
     }
 
     // window-local variables
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							ખાલી, ખાલી, ખાલી);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    માટે (પૂર્ણાંક i = 0; i < AUCMD_WIN_ગણતરી; ++i)
+	જો (aucmd_win[i].auc_win != ખાલી)
 	    abort = abort || set_ref_in_item(
-		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
+		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, ખાલી, ખાલી, ખાલી);
 #ifdef FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ખાલી, ખાલી, ખાલી);
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
 		abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ખાલી, ખાલી, ખાલી);
 #endif
 
     // tabpage-local variables
     FOR_ALL_TABPAGES(tp)
 	abort = abort || set_ref_in_item(&tp->tp_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ખાલી, ખાલી, ખાલી);
     // global variables
     abort = abort || garbage_collect_globvars(copyID);
 
     // function-local variables
-    abort = abort || set_ref_in_call_stack(copyID);
+    abort = abort || set_ref_in_call_ઢગલો(copyID);
 
     // named functions (matters for closures)
     abort = abort || set_ref_in_functions(copyID);
@@ -230,12 +230,12 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    જો (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
 	 */
-	did_free = free_unref_items(copyID);
+	did_free = free_unref_વસ્તુઓ(copyID);
 
 	/*
 	 * 3. Check if any funccal can be freed now.
@@ -243,26 +243,26 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    નહીંતર જો (p_verbose > 0)
     {
-	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
+	verb_સંદેશ(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    પાછા did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    સ્થિર પૂર્ણાંક
+free_unref_વસ્તુઓ(પૂર્ણાંક copyID)
 {
-    int		did_free = FALSE;
+    પૂર્ણાંક		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
     // do that here.
-    in_free_unref_items = TRUE;
+    in_free_unref_વસ્તુઓ = TRUE;
 
     /*
      * PASS 1: free the contents of the items.  We don't free the items
@@ -297,10 +297,10 @@ free_unref_items(int copyID)
     /*
      * PASS 2: free the items themselves.
      */
-    object_free_items(copyID);
-    dict_free_items(copyID);
-    list_free_items(copyID);
-    tuple_free_items(copyID);
+    object_free_વસ્તુઓ(copyID);
+    dict_free_વસ્તુઓ(copyID);
+    list_free_વસ્તુઓ(copyID);
+    tuple_free_વસ્તુઓ(copyID);
 
 #ifdef FEAT_JOB_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
@@ -312,9 +312,9 @@ free_unref_items(int copyID)
     free_unused_channels(copyID, COPYID_MASK);
 #endif
 
-    in_free_unref_items = FALSE;
+    in_free_unref_વસ્તુઓ = FALSE;
 
-    return did_free;
+    પાછા did_free;
 }
 
 /*
@@ -323,66 +323,66 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    પૂર્ણાંક
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    int		todo;
-    int		abort = FALSE;
+    પૂર્ણાંક		todo;
+    પૂર્ણાંક		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
-    ht_stack_T	*ht_stack = NULL;
-    ht_stack_T	*tempitem;
+    ht_ઢગલો_T	*ht_ઢગલો = ખાલી;
+    ht_ઢગલો_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    માટે (;;)
     {
-	if (!abort)
+	જો (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (પૂર્ણાંક)cur_ht->ht_used;
+	    FOR_ALL_HASHTAB_વસ્તુઓ(cur_ht, hi, todo)
+		જો (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
 			|| set_ref_in_item(&HI2DI(hi)->di_tv, copyID,
-				       &ht_stack, list_stack, tuple_stack);
+				       &ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	જો (ht_ઢગલો == ખાલી)
+	    તોડો;
 
 	// take an item from the stack
-	cur_ht = ht_stack->ht;
-	tempitem = ht_stack;
-	ht_stack = ht_stack->prev;
-	free(tempitem);
+	cur_ht = ht_ઢગલો->ht;
+	tempitem = ht_ઢગલો;
+	ht_ઢગલો = ht_ઢગલો->prev;
+	મુક્ત(tempitem);
     }
 
-    return abort;
+    પાછા abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#જો defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    પૂર્ણાંક
+set_ref_in_dict(dict_T *d, પૂર્ણાંક copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    જો (d != ખાલી && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	પાછા set_ref_in_ht(&d->dv_hashtab, copyID, ખાલી, ખાલી);
     }
-    return FALSE;
+    પાછા FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    પૂર્ણાંક
+set_ref_in_list(list_T *ll, પૂર્ણાંક copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    જો (ll != ખાલી && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	પાછા set_ref_in_list_વસ્તુઓ(ll, copyID, ખાલી, ખાલી);
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
@@ -407,55 +407,55 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list_items(
+    પૂર્ણાંક
+set_ref_in_list_વસ્તુઓ(
     list_T		*l,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    પૂર્ણાંક		 abort = FALSE;
     list_T	 *cur_l;
-    list_stack_T *list_stack = NULL;
-    list_stack_T *tempitem;
+    list_ઢગલો_T *list_ઢગલો = ખાલી;
+    list_ઢગલો_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    માટે (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	જો (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    માટે (li = cur_l->lv_first; !abort && li != ખાલી; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
-				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+				       ht_ઢગલો, &list_ઢગલો, tuple_ઢગલો);
+	જો (list_ઢગલો == ખાલી)
+	    તોડો;
 
 	// take an item from the stack
-	cur_l = list_stack->list;
-	tempitem = list_stack;
-	list_stack = list_stack->prev;
-	free(tempitem);
+	cur_l = list_ઢગલો->list;
+	tempitem = list_ઢગલો;
+	list_ઢગલો = list_ઢગલો->prev;
+	મુક્ત(tempitem);
     }
 
-    return abort;
+    પાછા abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    પૂર્ણાંક
+set_ref_in_tuple(tuple_T *tuple, પૂર્ણાંક copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    જો (tuple != ખાલી && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	પાછા set_ref_in_tuple_વસ્તુઓ(tuple, copyID, ખાલી, ખાલી);
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
@@ -464,198 +464,198 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple_items(
+    પૂર્ણાંક
+set_ref_in_tuple_વસ્તુઓ(
     tuple_T		*tuple,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો)
 {
-    int			abort = FALSE;
+    પૂર્ણાંક			abort = FALSE;
     tuple_T		*cur_t;
-    tuple_stack_T	*tuple_stack = NULL;
-    tuple_stack_T	*tempitem;
+    tuple_ઢગલો_T	*tuple_ઢગલો = ખાલી;
+    tuple_ઢગલો_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    માટે (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	માટે (પૂર્ણાંક i = 0; i < cur_t->tv_વસ્તુઓ.ga_len; i++)
 	{
-	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
+	    typval_T *tv = ((typval_T *)cur_t->tv_વસ્તુઓ.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
-			ht_stack, list_stack, &tuple_stack);
+			ht_ઢગલો, list_ઢગલો, &tuple_ઢગલો);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	જો (tuple_ઢગલો == ખાલી)
+	    તોડો;
 
 	// take an item from the stack
-	cur_t = tuple_stack->tuple;
-	tempitem = tuple_stack;
-	tuple_stack = tuple_stack->prev;
-	free(tempitem);
+	cur_t = tuple_ઢગલો->tuple;
+	tempitem = tuple_ઢગલો;
+	tuple_ઢગલો = tuple_ઢગલો->prev;
+	મુક્ત(tempitem);
     }
 
-    return abort;
+    પાછા abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    પૂર્ણાંક
+set_ref_in_callback(callback_T *cb, પૂર્ણાંક copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    જો (cb->cb_name == ખાલી || *cb->cb_name == NUL || cb->cb_partial == ખાલી)
+	પાછા FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    પાછા set_ref_in_item(&tv, copyID, ખાલી, ખાલી, ખાલી);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    જો (dd == ખાલી || dd->dv_copyID == copyID)
+	પાછા FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    જો (ht_ઢગલો == ખાલી)
+	પાછા set_ref_in_ht(&dd->dv_hashtab, copyID, list_ઢગલો, tuple_ઢગલો);
 
-    ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ht_ઢગલો_T *newitem = ALLOC_ONE(ht_ઢગલો_T);
+    જો (newitem == ખાલી)
+	પાછા TRUE;
 
     newitem->ht = &dd->dv_hashtab;
-    newitem->prev = *ht_stack;
-    *ht_stack = newitem;
+    newitem->prev = *ht_ઢગલો;
+    *ht_ઢગલો = newitem;
 
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    જો (ll == ખાલી || ll->lv_copyID == copyID)
+	પાછા FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    જો (list_ઢગલો == ખાલી)
+	પાછા set_ref_in_list_વસ્તુઓ(ll, copyID, ht_ઢગલો, tuple_ઢગલો);
 
-    list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    list_ઢગલો_T *newitem = ALLOC_ONE(list_ઢગલો_T);
+    જો (newitem == ખાલી)
+	પાછા TRUE;
 
     newitem->list = ll;
-    newitem->prev = *list_stack;
-    *list_stack = newitem;
+    newitem->prev = *list_ઢગલો;
+    *list_ઢગલો = newitem;
 
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    જો (tt == ખાલી || tt->tv_copyID == copyID)
+	પાછા FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    જો (tuple_ઢગલો == ખાલી)
+	પાછા set_ref_in_tuple_વસ્તુઓ(tt, copyID, ht_ઢગલો, list_ઢગલો);
 
-    tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    tuple_ઢગલો_T *newitem = ALLOC_ONE(tuple_ઢગલો_T);
+    જો (newitem == ખાલી)
+	પાછા TRUE;
 
     newitem->tuple = tt;
-    newitem->prev = *tuple_stack;
-    *tuple_stack = newitem;
+    newitem->prev = *tuple_ઢગલો;
+    *tuple_ઢગલો = newitem;
 
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    જો (pt == ખાલી || pt->pt_copyID == copyID)
+	પાછા FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    પૂર્ણાંક abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    જો (pt->pt_dict != ખાલી)
     {
 	typval_T dtv;
 
 	dtv.v_type = VAR_DICT;
 	dtv.vval.v_dict = pt->pt_dict;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
 
-    if (pt->pt_obj != NULL)
+    જો (pt->pt_obj != ખાલી)
     {
 	typval_T objtv;
 
 	objtv.v_type = VAR_OBJECT;
 	objtv.vval.v_object = pt->pt_obj;
-	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&objtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    માટે (પૂર્ણાંક i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    પાછા abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    જો (job == ખાલી || job->jv_copyID == copyID)
+	પાછા FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    જો (job->jv_channel != ખાલી)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    જો (job->jv_exit_cb.cb_partial != ખાલી)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
 
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    જો (ch == ખાલી || ch->ch_copyID == copyID)
+	પાછા FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    માટે (ch_part_T part = PART_SOCK; part < PART_ગણતરી; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
-		jq != NULL; jq = jq->jq_next)
-	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	માટે (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+		jq != ખાલી; jq = jq->jq_next)
+	    set_ref_in_item(jq->jq_કિંમત, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
+	માટે (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != ખાલી;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    જો (cq->cq_callback.cb_partial != ખાલી)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
-		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+		set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	જો (ch->ch_part[part].ch_callback.cb_partial != ખાલી)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
-	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	    set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    જો (ch->ch_callback.cb_partial != ખાલી)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    જો (ch->ch_close_cb.cb_partial != ખાલી)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
 
-    return FALSE;
+    પાછા FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    પૂર્ણાંક
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    int abort = FALSE;
+    પૂર્ણાંક abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    જો (cl == ખાલી || cl->class_copyID == copyID)
+	પાછા FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    જો (cl->class_members_tv != ખાલી)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	માટે (પૂર્ણાંક i = 0; !abort && i < cl->class_class_member_ગણતરી; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
-		    copyID, ht_stack, list_stack, tuple_stack);
+		    copyID, ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    માટે (પૂર્ણાંક i = 0; !abort && i < cl->class_class_function_ગણતરી; ++i)
+	abort = abort || set_ref_in_func(ખાલી,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    માટે (પૂર્ણાંક i = 0; !abort && i < cl->class_obj_method_ગણતરી; ++i)
+	abort = abort || set_ref_in_func(ખાલી,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    પાછા abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    સ્થિર પૂર્ણાંક
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    પૂર્ણાંક			copyID,
+    ht_ઢગલો_T		**ht_ઢગલો,
+    list_ઢગલો_T	**list_ઢગલો,
+    tuple_ઢગલો_T	**tuple_ઢગલો)
 {
-    int abort = FALSE;
+    પૂર્ણાંક abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    જો (obj == ખાલી || obj->obj_copyID == copyID)
+	પાછા FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
-	    && i < obj->obj_class->class_obj_member_count; ++i)
+    માટે (પૂર્ણાંક i = 0; !abort
+	    && i < obj->obj_class->class_obj_member_ગણતરી; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-    return abort;
+    પાછા abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    પૂર્ણાંક
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
-    ht_stack_T	    **ht_stack,
-    list_stack_T    **list_stack,
-    tuple_stack_T   **tuple_stack)
+    પૂર્ણાંક		    copyID,
+    ht_ઢગલો_T	    **ht_ઢગલો,
+    list_ઢગલો_T    **list_ઢગલો,
+    tuple_ઢગલો_T   **tuple_ઢગલો)
 {
-    int		abort = FALSE;
+    પૂર્ણાંક		abort = FALSE;
 
-    switch (tv->v_type)
+    પસંદગી (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	સ્થિતિ VAR_DICT:
+	    પાછા set_ref_in_item_dict(tv->vval.v_dict, copyID,
+					 ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	સ્થિતિ VAR_LIST:
+	    પાછા set_ref_in_item_list(tv->vval.v_list, copyID,
+					 ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
-					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	સ્થિતિ VAR_TUPLE:
+	    પાછા set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+					 ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
+	સ્થિતિ VAR_FUNC:
 	{
-	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    abort = set_ref_in_func(tv->vval.v_string, ખાલી, copyID);
+	    તોડો;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
-					ht_stack, list_stack, tuple_stack);
+	સ્થિતિ VAR_PARTIAL:
+	    પાછા set_ref_in_item_partial(tv->vval.v_partial, copyID,
+					ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-	case VAR_JOB:
+	સ્થિતિ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    પાછા set_ref_in_item_job(tv->vval.v_job, copyID,
+					ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
+#નહીંતર
+	    તોડો;
 #endif
 
-	case VAR_CHANNEL:
+	સ્થિતિ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    પાછા set_ref_in_item_channel(tv->vval.v_channel, copyID,
+					ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
+#નહીંતર
+	    તોડો;
 #endif
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
-					ht_stack, list_stack, tuple_stack);
+	સ્થિતિ VAR_CLASS:
+	    પાછા set_ref_in_item_class(tv->vval.v_class, copyID,
+					ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
-					ht_stack, list_stack, tuple_stack);
+	સ્થિતિ VAR_OBJECT:
+	    પાછા set_ref_in_item_object(tv->vval.v_object, copyID,
+					ht_ઢગલો, list_ઢગલો, tuple_ઢગલો);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	સ્થિતિ VAR_UNKNOWN:
+	સ્થિતિ VAR_ANY:
+	સ્થિતિ VAR_VOID:
+	સ્થિતિ VAR_BOOL:
+	સ્થિતિ VAR_SPECIAL:
+	સ્થિતિ VAR_સંખ્યા:
+	સ્થિતિ VAR_FLOAT:
+	સ્થિતિ VAR_STRING:
+	સ્થિતિ VAR_BLOB:
+	સ્થિતિ VAR_TYPEALIAS:
+	સ્થિતિ VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    તોડો;
     }
 
-    return abort;
+    પાછા abort;
 }
 
 #endif

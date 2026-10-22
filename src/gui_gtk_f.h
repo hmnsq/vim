@@ -11,14 +11,14 @@
 
 #ifdef USE_GTK3
 # include <gtk/gtk.h>
-#else
+#નહીંતર
 # include <gdk/gdk.h>
 # include <gtk/gtkcontainer.h>
 #endif
 
 
 #ifdef __cplusplus
-extern "C" {
+બાહ્ય "C" {
 #endif
 
 #define GTK_TYPE_FORM		       (gui_gtk_form_get_type ())
@@ -27,7 +27,7 @@ extern "C" {
 # define GTK_FORM_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_FORM))
 # define GTK_IS_FORM_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE((klass), GTK_TYPE_FORM))
-#else
+#નહીંતર
 # define GTK_FORM(obj)		       (GTK_CHECK_CAST ((obj), GTK_TYPE_FORM, GtkForm))
 # define GTK_FORM_CLASS(klass)	       (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (GTK_CHECK_TYPE ((obj), GTK_TYPE_FORM))
@@ -35,43 +35,43 @@ extern "C" {
 #endif
 
 
-typedef struct _GtkForm GtkForm;
-typedef struct _GtkFormClass GtkFormClass;
+પ્રકારવ્યાખ્યા સંરચના _GtkForm GtkForm;
+પ્રકારવ્યાખ્યા સંરચના _GtkFormClass GtkFormClass;
 
-struct _GtkForm
+સંરચના _GtkForm
 {
     GtkContainer container;
 
     GList *children;
     GdkWindow *bin_window;
-    gint freeze_count;
+    gint freeze_ગણતરી;
 };
 
-struct _GtkFormClass
+સંરચના _GtkFormClass
 {
     GtkContainerClass parent_class;
 };
 
 #ifdef USE_GTK3
-GType gui_gtk_form_get_type(void);
-#else
-GtkType gui_gtk_form_get_type(void);
+GType gui_gtk_form_get_type(શૂન્ય);
+#નહીંતર
+GtkType gui_gtk_form_get_type(શૂન્ય);
 #endif
 
-GtkWidget *gui_gtk_form_new(void);
+GtkWidget *gui_gtk_form_new(શૂન્ય);
 
-void gui_gtk_form_put(GtkForm * form, GtkWidget * widget, gint x, gint y);
+શૂન્ય gui_gtk_form_put(GtkForm * form, GtkWidget * widget, gint x, gint y);
 
-void gui_gtk_form_move(GtkForm *form, GtkWidget * widget, gint x, gint y);
+શૂન્ય gui_gtk_form_move(GtkForm *form, GtkWidget * widget, gint x, gint y);
 
-void gui_gtk_form_move_resize(GtkForm * form, GtkWidget * widget, gint x, gint y, gint w, gint h);
+શૂન્ય gui_gtk_form_move_resize(GtkForm * form, GtkWidget * widget, gint x, gint y, gint w, gint h);
 
 // These disable and enable moving and repainting respectively.  If you
 // want to update the layout's offsets but do not want it to repaint
 // itself, you should use these functions.
 
-void gui_gtk_form_freeze(GtkForm *form);
-void gui_gtk_form_thaw(GtkForm *form);
+શૂન્ય gui_gtk_form_freeze(GtkForm *form);
+શૂન્ય gui_gtk_form_thaw(GtkForm *form);
 
 
 #ifdef __cplusplus

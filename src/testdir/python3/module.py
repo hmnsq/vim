@@ -1,2 +1,2 @@
-import before_1
+આયાત before_1
 dir = '3'

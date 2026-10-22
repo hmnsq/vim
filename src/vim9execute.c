@@ -12,39 +12,39 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 
 // Structure put on ec_trystack when ISN_TRY is encountered.
-typedef struct {
-    int	    tcd_frame_idx;	// ec_frame_idx at ISN_TRY
-    int	    tcd_stack_len;	// size of ectx.ec_stack at ISN_TRY
-    int	    tcd_in_catch;	// in catch or finally block
-    int	    tcd_did_throw;	// set did_throw in :endtry
-    int	    tcd_catch_idx;	// instruction of the first :catch or :finally
-    int	    tcd_finally_idx;	// instruction of the :finally block or zero
-    int	    tcd_endtry_idx;	// instruction of the :endtry
-    int	    tcd_caught;		// catch block entered
-    int	    tcd_cont;		// :continue encountered, jump here (minus one)
-    int	    tcd_return;		// when TRUE return from end of :finally
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક	    tcd_frame_idx;	// ec_frame_idx at ISN_TRY
+    પૂર્ણાંક	    tcd_ઢગલો_len;	// size of ectx.ec_stack at ISN_TRY
+    પૂર્ણાંક	    tcd_in_catch;	// in catch or finally block
+    પૂર્ણાંક	    tcd_did_throw;	// set did_throw in :endtry
+    પૂર્ણાંક	    tcd_catch_idx;	// instruction of the first :catch or :finally
+    પૂર્ણાંક	    tcd_finally_idx;	// instruction of the :finally block or zero
+    પૂર્ણાંક	    tcd_endtry_idx;	// instruction of the :endtry
+    પૂર્ણાંક	    tcd_caught;		// catch block entered
+    પૂર્ણાંક	    tcd_cont;		// :continue encountered, jump here (minus one)
+    પૂર્ણાંક	    tcd_return;		// when TRUE return from end of :finally
 } trycmd_T;
 
 // Data local to a function.
 // On a function call, if not empty, is saved on the stack and restored when
 // returning.
-typedef struct {
-    int		floc_restore_cmdmod;
+પ્રકારવ્યાખ્યા સંરચના {
+    પૂર્ણાંક		floc_restore_cmdmod;
     cmdmod_T	floc_save_cmdmod;
-    int		floc_restore_cmdmod_stacklen;
+    પૂર્ણાંક		floc_restore_cmdmod_stacklen;
 } funclocal_T;
 
 // Structure to hold a reference to an outer_T, with information of whether it
 // was allocated.
-typedef struct {
+પ્રકારવ્યાખ્યા સંરચના {
     outer_T	*or_outer;
     partial_T	*or_partial;	// decrement "or_partial->pt_refcount" later
-    int		or_outer_allocated;  // free "or_outer" later
+    પૂર્ણાંક		or_outer_allocated;  // free "or_outer" later
 } outer_ref_T;
 
 // A stack is used to store:
@@ -69,10 +69,10 @@ typedef struct {
 /*
  * Execution context.
  */
-struct ectx_S {
-    garray_T	ec_stack;	// stack of typval_T values
-    int		ec_frame_idx;	// index in ec_stack: context of ec_dfunc_idx
-    int		ec_initial_frame_idx;	// frame index when called
+સંરચના ectx_S {
+    garray_T	ec_ઢગલો;	// stack of typval_T values
+    પૂર્ણાંક		ec_frame_idx;	// index in ec_stack: context of ec_dfunc_idx
+    પૂર્ણાંક		ec_initial_frame_idx;	// frame index when called
 
     outer_ref_T	*ec_outer_ref;	// outer scope used for closures, allocated
     funclocal_T ec_funclocal;
@@ -80,36 +80,36 @@ struct ectx_S {
     garray_T	ec_trystack;	// stack of trycmd_T values
 
     isn_T	*ec_instr;	// array with instructions
-    int		ec_dfunc_idx;	// current function index
-    int		ec_iidx;	// index in ec_instr: instruction to execute
+    પૂર્ણાંક		ec_dfunc_idx;	// current function index
+    પૂર્ણાંક		ec_iidx;	// index in ec_instr: instruction to execute
 
     garray_T	ec_funcrefs;	// partials that might be a closure
 
-    int		ec_did_emsg_before;
-    int		ec_trylevel_at_start;
+    પૂર્ણાંક		ec_did_emsg_before;
+    પૂર્ણાંક		ec_trylevel_at_start;
     where_T	ec_where;
 };
 
 #ifdef FEAT_PROFILE
 // stack of profinfo_T used when profiling.
-static garray_T profile_info_ga = {0, 0, sizeof(profinfo_T), 20, NULL};
+સ્થિર garray_T profile_info_ga = {0, 0, કદ(profinfo_T), 20, ખાલી};
 #endif
 
 // Get pointer to item in the stack.
-#define STACK_TV(idx) (((typval_T *)ectx->ec_stack.ga_data) + idx)
+#define ઢગલો_TV(idx) (((typval_T *)ectx->ec_ઢગલો.ga_data) + idx)
 
 // Get pointer to item relative to the bottom of the stack, -1 is the last one.
-#define STACK_TV_BOT(idx) (((typval_T *)ectx->ec_stack.ga_data) + ectx->ec_stack.ga_len + (idx))
+#define ઢગલો_TV_BOT(idx) (((typval_T *)ectx->ec_ઢગલો.ga_data) + ectx->ec_ઢગલો.ga_len + (idx))
 
 // Get pointer to a local variable on the stack.  Negative for arguments.
-#define STACK_TV_VAR(idx) (((typval_T *)ectx->ec_stack.ga_data) + ectx->ec_frame_idx + STACK_FRAME_SIZE + idx)
+#define ઢગલો_TV_VAR(idx) (((typval_T *)ectx->ec_ઢગલો.ga_data) + ectx->ec_frame_idx + ઢગલો_FRAME_SIZE + idx)
 
 // Return value for functions used to execute instructions
 #define EXEC_FAIL	0
 #define EXEC_OK		1
 #define EXEC_DONE	2
 
-    void
+    શૂન્ય
 to_string_error(vartype_T vartype)
 {
     semsg(_(e_cannot_convert_str_to_string), vartype_name(vartype));
@@ -118,10 +118,10 @@ to_string_error(vartype_T vartype)
 /*
  * Return the number of arguments, including optional arguments and any vararg.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 ufunc_argcount(ufunc_T *ufunc)
 {
-    return ufunc->uf_args.ga_len + (ufunc->uf_va_name != NULL ? 1 : 0);
+    પાછા ufunc->uf_args.ga_len + (ufunc->uf_va_name != ખાલી ? 1 : 0);
 }
 
 /*
@@ -129,18 +129,18 @@ ufunc_argcount(ufunc_T *ufunc)
  * A trailing NUL is appended.
  * When "count" is zero an empty string is added to the stack.
  */
-    static int
-exe_concat(int count, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+exe_concat(પૂર્ણાંક ગણતરી, ectx_T *ectx)
 {
-    int		idx;
+    પૂર્ણાંક		idx;
     size_t	len = 0;
     garray_T	ga;
-    typedef struct
+    પ્રકારવ્યાખ્યા સંરચના
     {
 	typval_T    *tv;
 	size_t	    length;
     } string_segment_T;
-    enum
+    ગણના
     {
 	STRING_SEGMENT_CACHE_SIZE = 10
     };
@@ -148,38 +148,38 @@ exe_concat(int count, ectx_T *ectx)
     string_segment_T	*string_segment_tab = &fixed_string_segment_tab[0];	// an array of cached typevals and lengths
     string_segment_T    *segment;
 
-    if (count > (int)ARRAY_LENGTH(fixed_string_segment_tab))
+    જો (ગણતરી > (પૂર્ણાંક)ARRAY_LENGTH(fixed_string_segment_tab))
     {
 	// make an array big enough to store the length of each string segment
-	string_segment_tab = ALLOC_MULT(string_segment_T, count);
-	if (string_segment_tab == NULL)
-	    return FAIL;
+	string_segment_tab = ALLOC_MULT(string_segment_T, ગણતરી);
+	જો (string_segment_tab == ખાલી)
+	    પાછા FAIL;
     }
 
-    ga_init2(&ga, sizeof(char), 1);
+    ga_init2(&ga, કદ(અક્ષર), 1);
     // Preallocate enough space for the whole string to avoid having to grow
     // and copy.
-    for (idx = 0; idx < count; ++idx)
+    માટે (idx = 0; idx < ગણતરી; ++idx)
     {
 	segment = &string_segment_tab[idx];
-	segment->tv = STACK_TV_BOT(idx - count);
-	if (segment->tv->vval.v_string != NULL)
+	segment->tv = ઢગલો_TV_BOT(idx - ગણતરી);
+	જો (segment->tv->vval.v_string != ખાલી)
 	{
 	    segment->length = STRLEN(segment->tv->vval.v_string);
 	    len += segment->length;
 	}
-	else
+	નહીંતર
 	    segment->length = 0;    // Ensure clean state for the second pass
     }
 
-    if (ga_grow(&ga, (int)len + 1) == FAIL)
+    જો (ga_grow(&ga, (પૂર્ણાંક)len + 1) == FAIL)
     {
-	if (string_segment_tab != fixed_string_segment_tab)
+	જો (string_segment_tab != fixed_string_segment_tab)
 	    vim_free(string_segment_tab);
-	return FAIL;
+	પાછા FAIL;
     }
 
-    for (idx = 0; idx < count; ++idx)
+    માટે (idx = 0; idx < ગણતરી; ++idx)
     {
 	segment = &string_segment_tab[idx];
 	ga_concat_len(&ga, segment->tv->vval.v_string, segment->length);
@@ -189,13 +189,13 @@ exe_concat(int count, ectx_T *ectx)
     // add a terminating NUL
     ga_append(&ga, NUL);
 
-    ectx->ec_stack.ga_len -= count - 1;
-    STACK_TV_BOT(-1)->vval.v_string = ga.ga_data;
+    ectx->ec_ઢગલો.ga_len -= ગણતરી - 1;
+    ઢગલો_TV_BOT(-1)->vval.v_string = ga.ga_data;
 
-    if (string_segment_tab != fixed_string_segment_tab)
+    જો (string_segment_tab != fixed_string_segment_tab)
 	vim_free(string_segment_tab);
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -203,38 +203,38 @@ exe_concat(int count, ectx_T *ectx)
  * When "count" is zero an empty list is added to the stack.
  * When "count" is -1 a NULL list is added to the stack.
  */
-    static int
-exe_newlist(int count, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+exe_newlist(પૂર્ણાંક ગણતરી, ectx_T *ectx)
 {
-    list_T	*list = NULL;
-    int		idx;
+    list_T	*list = ખાલી;
+    પૂર્ણાંક		idx;
     typval_T	*tv;
 
-    if (count >= 0)
+    જો (ગણતરી >= 0)
     {
-	list = list_alloc_with_items(count);
-	if (list == NULL)
-	    return FAIL;
-	for (idx = 0; idx < count; ++idx)
-	    list_set_item(list, idx, STACK_TV_BOT(idx - count));
+	list = list_alloc_with_વસ્તુઓ(ગણતરી);
+	જો (list == ખાલી)
+	    પાછા FAIL;
+	માટે (idx = 0; idx < ગણતરી; ++idx)
+	    list_set_item(list, idx, ઢગલો_TV_BOT(idx - ગણતરી));
     }
 
-    if (count > 0)
-	ectx->ec_stack.ga_len -= count - 1;
-    else if (GA_GROW_FAILS(&ectx->ec_stack, 1))
+    જો (ગણતરી > 0)
+	ectx->ec_ઢગલો.ga_len -= ગણતરી - 1;
+    નહીંતર જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
     {
 	list_unref(list);
-	return FAIL;
+	પાછા FAIL;
     }
-    else
-	++ectx->ec_stack.ga_len;
-    tv = STACK_TV_BOT(-1);
+    નહીંતર
+	++ectx->ec_ઢગલો.ga_len;
+    tv = ઢગલો_TV_BOT(-1);
     tv->v_type = VAR_LIST;
     tv->vval.v_list = list;
     tv->v_lock = 0;
-    if (list != NULL)
+    જો (list != ખાલી)
 	++list->lv_refcount;
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -242,120 +242,120 @@ exe_newlist(int count, ectx_T *ectx)
  * When "count" is zero an empty tuple is added to the stack.
  * When "count" is -1 a NULL tuple is added to the stack.
  */
-    static int
-exe_newtuple(int count, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+exe_newtuple(પૂર્ણાંક ગણતરી, ectx_T *ectx)
 {
-    tuple_T	*tuple = NULL;
-    int		idx;
+    tuple_T	*tuple = ખાલી;
+    પૂર્ણાંક		idx;
     typval_T	*tv;
 
-    if (count >= 0)
+    જો (ગણતરી >= 0)
     {
-	tuple = tuple_alloc_with_items(count);
-	if (tuple == NULL)
-	    return FAIL;
-	for (idx = 0; idx < count; ++idx)
-	    tuple_set_item(tuple, idx, STACK_TV_BOT(idx - count));
+	tuple = tuple_alloc_with_વસ્તુઓ(ગણતરી);
+	જો (tuple == ખાલી)
+	    પાછા FAIL;
+	માટે (idx = 0; idx < ગણતરી; ++idx)
+	    tuple_set_item(tuple, idx, ઢગલો_TV_BOT(idx - ગણતરી));
     }
 
-    if (count > 0)
-	ectx->ec_stack.ga_len -= count - 1;
-    else if (GA_GROW_FAILS(&ectx->ec_stack, 1))
+    જો (ગણતરી > 0)
+	ectx->ec_ઢગલો.ga_len -= ગણતરી - 1;
+    નહીંતર જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
     {
 	tuple_unref(tuple);
-	return FAIL;
+	પાછા FAIL;
     }
-    else
-	++ectx->ec_stack.ga_len;
-    tv = STACK_TV_BOT(-1);
+    નહીંતર
+	++ectx->ec_ઢગલો.ga_len;
+    tv = ઢગલો_TV_BOT(-1);
     tv->v_type = VAR_TUPLE;
     tv->vval.v_tuple = tuple;
     tv->v_lock = 0;
-    if (tuple != NULL)
+    જો (tuple != ખાલી)
 	++tuple->tv_refcount;
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Implementation of ISN_NEWDICT.
  * Returns FAIL on total failure, MAYBE on error.
  */
-    static int
-exe_newdict(int count, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+exe_newdict(પૂર્ણાંક ગણતરી, ectx_T *ectx)
 {
-    dict_T	*dict = NULL;
+    dict_T	*dict = ખાલી;
     dictitem_T	*item;
-    char_u	*key;
-    int		idx;
+    char_u	*ચાવી;
+    પૂર્ણાંક		idx;
     typval_T	*tv;
 
-    if (count >= 0)
+    જો (ગણતરી >= 0)
     {
 	dict = dict_alloc();
-	if (unlikely(dict == NULL))
-	    return FAIL;
-	for (idx = 0; idx < count; ++idx)
+	જો (unlikely(dict == ખાલી))
+	    પાછા FAIL;
+	માટે (idx = 0; idx < ગણતરી; ++idx)
 	{
 	    // have already checked key type is VAR_STRING
-	    tv = STACK_TV_BOT(2 * (idx - count));
+	    tv = ઢગલો_TV_BOT(2 * (idx - ગણતરી));
 	    // check key is unique
-	    key = tv->vval.v_string == NULL ? (char_u *)"" : tv->vval.v_string;
-	    item = dict_find(dict, key, -1);
-	    if (item != NULL)
+	    ચાવી = tv->vval.v_string == ખાલી ? (char_u *)"" : tv->vval.v_string;
+	    item = dict_find(dict, ચાવી, -1);
+	    જો (item != ખાલી)
 	    {
-		semsg(_(e_duplicate_key_in_dictionary_str), key);
+		semsg(_(e_duplicate_ચાવી_in_dictionary_str), ચાવી);
 		dict_unref(dict);
-		return MAYBE;
+		પાછા MAYBE;
 	    }
-	    item = dictitem_alloc(key);
+	    item = dictitem_alloc(ચાવી);
 	    clear_tv(tv);
-	    if (unlikely(item == NULL))
+	    જો (unlikely(item == ખાલી))
 	    {
 		dict_unref(dict);
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    tv = STACK_TV_BOT(2 * (idx - count) + 1);
+	    tv = ઢગલો_TV_BOT(2 * (idx - ગણતરી) + 1);
 	    item->di_tv = *tv;
 	    item->di_tv.v_lock = 0;
 	    tv->v_type = VAR_UNKNOWN;
-	    if (dict_add(dict, item) == FAIL)
+	    જો (dict_add(dict, item) == FAIL)
 	    {
 		// can this ever happen?
 		dictitem_free(item);
 		dict_unref(dict);
-		return FAIL;
+		પાછા FAIL;
 	    }
 	}
     }
 
-    if (count > 0)
-	ectx->ec_stack.ga_len -= 2 * count - 1;
-    else if (GA_GROW_FAILS(&ectx->ec_stack, 1))
+    જો (ગણતરી > 0)
+	ectx->ec_ઢગલો.ga_len -= 2 * ગણતરી - 1;
+    નહીંતર જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
     {
 	dict_unref(dict);
-	return FAIL;
+	પાછા FAIL;
     }
-    else
-	++ectx->ec_stack.ga_len;
-    tv = STACK_TV_BOT(-1);
+    નહીંતર
+	++ectx->ec_ઢગલો.ga_len;
+    tv = ઢગલો_TV_BOT(-1);
     tv->v_type = VAR_DICT;
     tv->v_lock = 0;
     tv->vval.v_dict = dict;
-    if (dict != NULL)
+    જો (dict != ખાલી)
 	++dict->dv_refcount;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * If debug_tick changed check if "ufunc" has a breakpoint and update
  * "uf_has_breakpoint".
  */
-    void
+    શૂન્ય
 update_has_breakpoint(ufunc_T *ufunc)
 {
-    if (ufunc->uf_debug_tick == debug_tick)
-	return;
+    જો (ufunc->uf_debug_tick == debug_tick)
+	પાછા;
 
     linenr_T breakpoint;
 
@@ -364,90 +364,90 @@ update_has_breakpoint(ufunc_T *ufunc)
     ufunc->uf_has_breakpoint = breakpoint > 0;
 }
 
-static garray_T dict_stack = GA_EMPTY;
+સ્થિર garray_T dict_ઢગલો = GA_EMPTY;
 
 /*
  * Put a value on the dict stack.  This consumes "tv".
  */
-    static int
-dict_stack_save(typval_T *tv)
+    સ્થિર પૂર્ણાંક
+dict_ઢગલો_save(typval_T *tv)
 {
-    if (dict_stack.ga_growsize == 0)
-	ga_init2(&dict_stack, sizeof(typval_T), 10);
-    if (ga_grow(&dict_stack, 1) == FAIL)
-	return FAIL;
-    ((typval_T *)dict_stack.ga_data)[dict_stack.ga_len] = *tv;
-    ++dict_stack.ga_len;
-    return OK;
+    જો (dict_ઢગલો.ga_growsize == 0)
+	ga_init2(&dict_ઢગલો, કદ(typval_T), 10);
+    જો (ga_grow(&dict_ઢગલો, 1) == FAIL)
+	પાછા FAIL;
+    ((typval_T *)dict_ઢગલો.ga_data)[dict_ઢગલો.ga_len] = *tv;
+    ++dict_ઢગલો.ga_len;
+    પાછા OK;
 }
 
 /*
  * Get the typval at top of the dict stack.
  */
-    static typval_T *
-dict_stack_get_tv(void)
+    સ્થિર typval_T *
+dict_ઢગલો_get_tv(શૂન્ય)
 {
-    if (dict_stack.ga_len == 0)
-	return NULL;
-    return ((typval_T *)dict_stack.ga_data) + dict_stack.ga_len - 1;
+    જો (dict_ઢગલો.ga_len == 0)
+	પાછા ખાલી;
+    પાછા ((typval_T *)dict_ઢગલો.ga_data) + dict_ઢગલો.ga_len - 1;
 }
 
 /*
  * Get the dict at top of the dict stack.
  */
-    static dict_T *
-dict_stack_get_dict(void)
+    સ્થિર dict_T *
+dict_ઢગલો_get_dict(શૂન્ય)
 {
     typval_T *tv;
 
-    if (dict_stack.ga_len == 0)
-	return NULL;
-    tv = ((typval_T *)dict_stack.ga_data) + dict_stack.ga_len - 1;
-    if (tv->v_type == VAR_DICT)
-	return tv->vval.v_dict;
-    return NULL;
+    જો (dict_ઢગલો.ga_len == 0)
+	પાછા ખાલી;
+    tv = ((typval_T *)dict_ઢગલો.ga_data) + dict_ઢગલો.ga_len - 1;
+    જો (tv->v_type == VAR_DICT)
+	પાછા tv->vval.v_dict;
+    પાછા ખાલી;
 }
 
 /*
  * Drop an item from the dict stack.
  */
-    static void
-dict_stack_drop(void)
+    સ્થિર શૂન્ય
+dict_ઢગલો_drop(શૂન્ય)
 {
-    if (dict_stack.ga_len == 0)
+    જો (dict_ઢગલો.ga_len == 0)
     {
 	iemsg("Dict stack underflow");
-	return;
+	પાછા;
     }
-    --dict_stack.ga_len;
-    clear_tv(((typval_T *)dict_stack.ga_data) + dict_stack.ga_len);
+    --dict_ઢગલો.ga_len;
+    clear_tv(((typval_T *)dict_ઢગલો.ga_data) + dict_ઢગલો.ga_len);
 }
 
 /*
  * Drop items from the dict stack until the length is equal to "len".
  */
-    static void
-dict_stack_clear(int len)
+    સ્થિર શૂન્ય
+dict_ઢગલો_clear(પૂર્ણાંક len)
 {
-    while (dict_stack.ga_len > len)
-	dict_stack_drop();
+    જ્યારે (dict_ઢગલો.ga_len > len)
+	dict_ઢગલો_drop();
 }
 
 /*
  * Get a pointer to useful "pt_outer" of "pt".
  */
-    static outer_T *
+    સ્થિર outer_T *
 get_pt_outer(partial_T *pt)
 {
     partial_T *ptref = pt->pt_outer_partial;
 
-    if (ptref == NULL)
-	return &pt->pt_outer;
+    જો (ptref == ખાલી)
+	પાછા &pt->pt_outer;
 
     // partial using partial (recursively)
-    while (ptref->pt_outer_partial != NULL)
+    જ્યારે (ptref->pt_outer_partial != ખાલી)
 	ptref = ptref->pt_outer_partial;
-    return &ptref->pt_outer;
+    પાછા &ptref->pt_outer;
 }
 
 /*
@@ -455,37 +455,37 @@ get_pt_outer(partial_T *pt)
  * "off" is the offset of arguments on the stack.
  * Return OK or FAIL.
  */
-    static int
-check_ufunc_arg_types(ufunc_T *ufunc, int argcount, int off, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+check_ufunc_arg_types(ufunc_T *ufunc, પૂર્ણાંક argcount, પૂર્ણાંક off, ectx_T *ectx)
 {
-    if (ufunc->uf_arg_types == NULL && ufunc->uf_va_type == NULL)
-	return OK;
+    જો (ufunc->uf_arg_types == ખાલી && ufunc->uf_va_type == ખાલી)
+	પાછા OK;
 
-    typval_T	*argv = STACK_TV_BOT(0) - argcount - off;
+    typval_T	*argv = ઢગલો_TV_BOT(0) - argcount - off;
 
     // The function can change at runtime, check that the argument
     // types are correct.
-    for (int i = 0; i < argcount; ++i)
+    માટે (પૂર્ણાંક i = 0; i < argcount; ++i)
     {
-	type_T *type = NULL;
+	type_T *type = ખાલી;
 
 	// assume a v:none argument, using the default value, is always OK
-	if (argv[i].v_type == VAR_SPECIAL
-		&& argv[i].vval.v_number == VVAL_NONE)
-	    continue;
+	જો (argv[i].v_type == VAR_SPECIAL
+		&& argv[i].vval.v_સંખ્યા == VVAL_NONE)
+	    ચાલુ;
 	// only pass values to user functions, never types
-	if (check_typval_is_value(&argv[i]) == FAIL)
-	    return FAIL;
+	જો (check_typval_is_કિંમત(&argv[i]) == FAIL)
+	    પાછા FAIL;
 
-	if (i < ufunc->uf_args.ga_len && ufunc->uf_arg_types != NULL)
+	જો (i < ufunc->uf_args.ga_len && ufunc->uf_arg_types != ખાલી)
 	    type = ufunc->uf_arg_types[i];
-	else if (ufunc->uf_va_type != NULL)
+	નહીંતર જો (ufunc->uf_va_type != ખાલી)
 	    type = ufunc->uf_va_type->tt_member;
-	if (type != NULL && check_typval_arg_type(type,
-		    &argv[i], NULL, i + 1) == FAIL)
-	    return FAIL;
+	જો (type != ખાલી && check_typval_arg_type(type,
+		    &argv[i], ખાલી, i + 1) == FAIL)
+	    પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -503,38 +503,38 @@ check_ufunc_arg_types(ufunc_T *ufunc, int argcount, int off, ectx_T *ectx)
  *	- previous frame pointer
  * - reserved space for local variables
  */
-    static int
+    સ્થિર પૂર્ણાંક
 call_dfunc(
-	int		cdf_idx,
+	પૂર્ણાંક		cdf_idx,
 	partial_T	*pt_arg,
-	int		argcount_arg,
+	પૂર્ણાંક		argcount_arg,
 	ectx_T		*ectx)
 {
-    int		argcount = argcount_arg;
+    પૂર્ણાંક		argcount = argcount_arg;
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data) + cdf_idx;
     ufunc_T	*ufunc = dfunc->df_ufunc;
-    int		did_emsg_before = did_emsg_cumul + did_emsg;
-    int		arg_to_add;
-    int		vararg_count = 0;
-    int		varcount;
-    int		idx;
+    પૂર્ણાંક		did_emsg_before = did_emsg_cumul + did_emsg;
+    પૂર્ણાંક		arg_to_add;
+    પૂર્ણાંક		vararg_ગણતરી = 0;
+    પૂર્ણાંક		varcount;
+    પૂર્ણાંક		idx;
     estack_T	*entry;
-    funclocal_T	*floc = NULL;
-    int		res = OK;
+    funclocal_T	*floc = ખાલી;
+    પૂર્ણાંક		res = OK;
     compiletype_T compile_type;
 
-    if (dfunc->df_deleted)
+    જો (dfunc->df_deleted)
     {
 	// don't use ufunc->uf_name, it may have been freed
 	emsg_funcname(e_function_was_deleted_str,
-		dfunc->df_name == NULL ? (char_u *)"unknown" : dfunc->df_name);
-	return FAIL;
+		dfunc->df_name == ખાલી ? (char_u *)"unknown" : dfunc->df_name);
+	પાછા FAIL;
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    જો (do_profiling == PROF_YES)
     {
-	if (GA_GROW_OK(&profile_info_ga, 1))
+	જો (GA_GROW_OK(&profile_info_ga, 1))
 	{
 	    profinfo_T *info = ((profinfo_T *)profile_info_ga.ga_data)
 						      + profile_info_ga.ga_len;
@@ -550,22 +550,22 @@ call_dfunc(
     // When debugging and using "cont" switches to the not-debugged
     // instructions, may need to still compile them.
     compile_type = get_compile_type(ufunc);
-    if (func_needs_compiling(ufunc, compile_type))
+    જો (func_needs_compiling(ufunc, compile_type))
     {
-	res = compile_def_function(ufunc, FALSE, compile_type, NULL);
+	res = compile_def_function(ufunc, FALSE, compile_type, ખાલી);
 
 	// compile_def_function() may cause def_functions.ga_data to change
 	dfunc = ((dfunc_T *)def_functions.ga_data) + cdf_idx;
     }
-    if (res == FAIL || INSTRUCTIONS(dfunc) == NULL)
+    જો (res == FAIL || INSTRUCTIONS(dfunc) == ખાલી)
     {
-	if (did_emsg_cumul + did_emsg == did_emsg_before)
+	જો (did_emsg_cumul + did_emsg == did_emsg_before)
 	    semsg(_(e_function_is_not_compiled_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	પાછા FAIL;
     }
 
-    if (ufunc->uf_va_name != NULL)
+    જો (ufunc->uf_va_name != ખાલી)
     {
 	// Need to make a list out of the vararg arguments.
 	// Stack at time of call with 2 varargs:
@@ -583,48 +583,48 @@ call_dfunc(
 	//    normal_arg
 	//    (space for optional_arg)
 	//    vararg-list
-	vararg_count = argcount - ufunc->uf_args.ga_len;
-	if (vararg_count < 0)
-	    vararg_count = 0;
-	else
-	    argcount -= vararg_count;
-	if (exe_newlist(vararg_count, ectx) == FAIL)
-	    return FAIL;
+	vararg_ગણતરી = argcount - ufunc->uf_args.ga_len;
+	જો (vararg_ગણતરી < 0)
+	    vararg_ગણતરી = 0;
+	નહીંતર
+	    argcount -= vararg_ગણતરી;
+	જો (exe_newlist(vararg_ગણતરી, ectx) == FAIL)
+	    પાછા FAIL;
 
-	vararg_count = 1;
+	vararg_ગણતરી = 1;
     }
 
     arg_to_add = ufunc->uf_args.ga_len - argcount;
-    if (arg_to_add < 0)
+    જો (arg_to_add < 0)
     {
 	semsg(NGETTEXT(e_one_argument_too_many, e_nr_arguments_too_many,
 			-arg_to_add), -arg_to_add);
-	return FAIL;
+	પાછા FAIL;
     }
-    else if (arg_to_add > ufunc->uf_def_args.ga_len)
+    નહીંતર જો (arg_to_add > ufunc->uf_def_args.ga_len)
     {
-	int missing = arg_to_add - ufunc->uf_def_args.ga_len;
+	પૂર્ણાંક missing = arg_to_add - ufunc->uf_def_args.ga_len;
 
 	semsg(NGETTEXT(e_one_argument_too_few, e_nr_arguments_too_few,
 			missing), missing);
-	return FAIL;
+	પાછા FAIL;
     }
 
     // If this is an object method, the object is just before the arguments.
-    typval_T	*obj = STACK_TV_BOT(0) - argcount - vararg_count - 1;
+    typval_T	*obj = ઢગલો_TV_BOT(0) - argcount - vararg_ગણતરી - 1;
 
-    if (IS_OBJECT_METHOD(ufunc) && !IS_CONSTRUCTOR_METHOD(ufunc)
-	    && obj->v_type == VAR_OBJECT && obj->vval.v_object == NULL)
+    જો (IS_OBJECT_METHOD(ufunc) && !IS_CONSTRUCTOR_METHOD(ufunc)
+	    && obj->v_type == VAR_OBJECT && obj->vval.v_object == ખાલી)
     {
 	// If this is not a constructor method, then a valid object is
 	// needed.
 	emsg(_(e_using_null_object));
-	return FAIL;
+	પાછા FAIL;
     }
 
     // Check the argument types.
-    if (check_ufunc_arg_types(ufunc, argcount, vararg_count, ectx) == FAIL)
-	return FAIL;
+    જો (check_ufunc_arg_types(ufunc, argcount, vararg_ગણતરી, ectx) == FAIL)
+	પાછા FAIL;
 
     // While check_ufunc_arg_types call, def function compilation process may
     // run.  If so many def functions are compiled, def_functions array may be
@@ -639,110 +639,110 @@ call_dfunc(
     // - if needed: a counter for number of closures created in
     //   ectx->ec_funcrefs.
     varcount = dfunc->df_varcount + dfunc->df_has_closure;
-    if (GA_GROW_FAILS(&ectx->ec_stack,
-				     arg_to_add + STACK_FRAME_SIZE + varcount))
-	return FAIL;
+    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો,
+				     arg_to_add + ઢગલો_FRAME_SIZE + varcount))
+	પાછા FAIL;
 
     // The object pointer is in the execution typval stack.  The GA_GROW call
     // above may have reallocated the execution typval stack.  So the object
     // pointer may not be valid anymore.  Get the object pointer again from the
     // execution stack.
-    obj = STACK_TV_BOT(0) - argcount - vararg_count - 1;
+    obj = ઢગલો_TV_BOT(0) - argcount - vararg_ગણતરી - 1;
 
     // If depth of calling is getting too high, don't execute the function.
-    if (funcdepth_increment() == FAIL)
-	return FAIL;
+    જો (funcdepth_increment() == FAIL)
+	પાછા FAIL;
     ++ex_nesting_level;
 
     // Only make a copy of funclocal if it contains something to restore.
-    if (ectx->ec_funclocal.floc_restore_cmdmod)
+    જો (ectx->ec_funclocal.floc_restore_cmdmod)
     {
 	floc = ALLOC_ONE(funclocal_T);
-	if (floc == NULL)
-	    return FAIL;
+	જો (floc == ખાલી)
+	    પાછા FAIL;
 	*floc = ectx->ec_funclocal;
 	ectx->ec_funclocal.floc_restore_cmdmod = FALSE;
     }
 
     // Move the vararg-list to below the missing optional arguments.
-    if (vararg_count > 0 && arg_to_add > 0)
-	*STACK_TV_BOT(arg_to_add - 1) = *STACK_TV_BOT(-1);
+    જો (vararg_ગણતરી > 0 && arg_to_add > 0)
+	*ઢગલો_TV_BOT(arg_to_add - 1) = *ઢગલો_TV_BOT(-1);
 
     // Reserve space for omitted optional arguments, filled in soon.
-    for (idx = 0; idx < arg_to_add; ++idx)
-	STACK_TV_BOT(idx - vararg_count)->v_type = VAR_UNKNOWN;
-    ectx->ec_stack.ga_len += arg_to_add;
+    માટે (idx = 0; idx < arg_to_add; ++idx)
+	ઢગલો_TV_BOT(idx - vararg_ગણતરી)->v_type = VAR_UNKNOWN;
+    ectx->ec_ઢગલો.ga_len += arg_to_add;
 
     // Store current execution state in stack frame for ISN_RETURN.
-    STACK_TV_BOT(STACK_FRAME_FUNC_OFF)->vval.v_number = ectx->ec_dfunc_idx;
-    STACK_TV_BOT(STACK_FRAME_IIDX_OFF)->vval.v_number = ectx->ec_iidx;
-    STACK_TV_BOT(STACK_FRAME_INSTR_OFF)->vval.v_string = (void *)ectx->ec_instr;
-    STACK_TV_BOT(STACK_FRAME_OUTER_OFF)->vval.v_string =
-						    (void *)ectx->ec_outer_ref;
-    STACK_TV_BOT(STACK_FRAME_FUNCLOCAL_OFF)->vval.v_string = (void *)floc;
-    STACK_TV_BOT(STACK_FRAME_IDX_OFF)->vval.v_number = ectx->ec_frame_idx;
-    ectx->ec_frame_idx = ectx->ec_stack.ga_len;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_FUNC_OFF)->vval.v_સંખ્યા = ectx->ec_dfunc_idx;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_IIDX_OFF)->vval.v_સંખ્યા = ectx->ec_iidx;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_INSTR_OFF)->vval.v_string = (શૂન્ય *)ectx->ec_instr;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_OUTER_OFF)->vval.v_string =
+						    (શૂન્ય *)ectx->ec_outer_ref;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_FUNCLOCAL_OFF)->vval.v_string = (શૂન્ય *)floc;
+    ઢગલો_TV_BOT(ઢગલો_FRAME_IDX_OFF)->vval.v_સંખ્યા = ectx->ec_frame_idx;
+    ectx->ec_frame_idx = ectx->ec_ઢગલો.ga_len;
 
     // Initialize all local variables to number zero.  Also initialize the
     // variable that counts how many closures were created.  This is used in
     // handle_closure_in_use().
-    int initcount = dfunc->df_varcount + (dfunc->df_has_closure ? 1 : 0);
-    for (idx = 0; idx < initcount; ++idx)
+    પૂર્ણાંક initcount = dfunc->df_varcount + (dfunc->df_has_closure ? 1 : 0);
+    માટે (idx = 0; idx < initcount; ++idx)
     {
-	typval_T *tv = STACK_TV_BOT(STACK_FRAME_SIZE + idx);
+	typval_T *tv = ઢગલો_TV_BOT(ઢગલો_FRAME_SIZE + idx);
 
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = 0;
+	tv->v_type = VAR_સંખ્યા;
+	tv->vval.v_સંખ્યા = 0;
     }
-    ectx->ec_stack.ga_len += STACK_FRAME_SIZE + varcount;
+    ectx->ec_ઢગલો.ga_len += ઢગલો_FRAME_SIZE + varcount;
 
     // For an object method move the object from just before the arguments to
     // the first local variable.
-    if (IS_OBJECT_METHOD(ufunc))
+    જો (IS_OBJECT_METHOD(ufunc))
     {
-	if (obj->v_type != VAR_OBJECT)
+	જો (obj->v_type != VAR_OBJECT)
 	{
 	    semsg(_(e_internal_error_str), "type in stack is not an object");
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	*STACK_TV_VAR(0) = *obj;
+	*ઢગલો_TV_VAR(0) = *obj;
 	obj->v_type = VAR_UNKNOWN;
     }
 
-    partial_T *pt = pt_arg != NULL ? pt_arg : ufunc->uf_partial;
-    if (pt != NULL || (ufunc->uf_flags & FC_CLOSURE))
+    partial_T *pt = pt_arg != ખાલી ? pt_arg : ufunc->uf_partial;
+    જો (pt != ખાલી || (ufunc->uf_flags & FC_CLOSURE))
     {
 	outer_ref_T *ref = ALLOC_CLEAR_ONE(outer_ref_T);
 
-	if (ref == NULL)
-	    return FAIL;
-	if (pt != NULL)
+	જો (ref == ખાલી)
+	    પાછા FAIL;
+	જો (pt != ખાલી)
 	{
 	    ref->or_outer = get_pt_outer(pt);
 	    ++pt->pt_refcount;
 	    ref->or_partial = pt;
 	}
-	else
+	નહીંતર
 	{
 	    ref->or_outer = ALLOC_CLEAR_ONE(outer_T);
-	    if (unlikely(ref->or_outer == NULL))
+	    જો (unlikely(ref->or_outer == ખાલી))
 	    {
 		vim_free(ref);
-		return FAIL;
+		પાછા FAIL;
 	    }
 	    ref->or_outer_allocated = TRUE;
-	    ref->or_outer->out_stack = &ectx->ec_stack;
+	    ref->or_outer->out_ઢગલો = &ectx->ec_ઢગલો;
 	    ref->or_outer->out_frame_idx = ectx->ec_frame_idx;
-	    if (ectx->ec_outer_ref != NULL)
+	    જો (ectx->ec_outer_ref != ખાલી)
 		ref->or_outer->out_up = ectx->ec_outer_ref->or_outer;
 	}
 	ectx->ec_outer_ref = ref;
     }
-    else
-	ectx->ec_outer_ref = NULL;
+    નહીંતર
+	ectx->ec_outer_ref = ખાલી;
 
-    if (ufunc->uf_flags & FC_SANDBOX)
+    જો (ufunc->uf_flags & FC_SANDBOX)
 	++sandbox;
 
     ++ufunc->uf_calls;
@@ -750,8 +750,8 @@ call_dfunc(
     // Set execution state to the start of the called function.
     ectx->ec_dfunc_idx = cdf_idx;
     ectx->ec_instr = INSTRUCTIONS(dfunc);
-    entry = estack_push_ufunc(ufunc, 1);
-    if (entry != NULL)
+    entry = estack_ધકેલો_ufunc(ufunc, 1);
+    જો (entry != ખાલી)
     {
 	// Set the script context to the script where the function was defined.
 	// Save the current context so it can be restored on return.
@@ -762,31 +762,31 @@ call_dfunc(
     // Start execution at the first instruction.
     ectx->ec_iidx = 0;
 
-    return OK;
+    પાછા OK;
 }
 
 // Double linked list of funcstack_T in use.
-static funcstack_T *first_funcstack = NULL;
+સ્થિર funcstack_T *first_funcstack = ખાલી;
 
-    static void
+    સ્થિર શૂન્ય
 add_funcstack_to_list(funcstack_T *funcstack)
 {
 	// Link in list of funcstacks.
-    if (first_funcstack != NULL)
+    જો (first_funcstack != ખાલી)
 	first_funcstack->fs_prev = funcstack;
     funcstack->fs_next = first_funcstack;
-    funcstack->fs_prev = NULL;
+    funcstack->fs_prev = ખાલી;
     first_funcstack = funcstack;
 }
 
-    static void
+    સ્થિર શૂન્ય
 remove_funcstack_from_list(funcstack_T *funcstack)
 {
-    if (funcstack->fs_prev == NULL)
+    જો (funcstack->fs_prev == ખાલી)
 	first_funcstack = funcstack->fs_next;
-    else
+    નહીંતર
 	funcstack->fs_prev->fs_next = funcstack->fs_next;
-    if (funcstack->fs_next != NULL)
+    જો (funcstack->fs_next != ખાલી)
 	funcstack->fs_next->fs_prev = funcstack->fs_prev;
 }
 
@@ -797,147 +797,147 @@ remove_funcstack_from_list(funcstack_T *funcstack)
  * When "free_arguments" is TRUE the arguments are to be freed.
  * Returns FAIL when out of memory.
  */
-    static int
-handle_closure_in_use(ectx_T *ectx, int free_arguments)
+    સ્થિર પૂર્ણાંક
+handle_closure_in_use(ectx_T *ectx, પૂર્ણાંક free_arguments)
 {
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 							  + ectx->ec_dfunc_idx;
-    int		argcount;
-    int		top;
-    int		idx;
+    પૂર્ણાંક		argcount;
+    પૂર્ણાંક		ટોચ;
+    પૂર્ણાંક		idx;
     typval_T	*tv;
-    int		closure_in_use = FALSE;
+    પૂર્ણાંક		closure_in_use = FALSE;
     garray_T	*gap = &ectx->ec_funcrefs;
-    varnumber_T	closure_count;
+    varnumber_T	closure_ગણતરી;
 
-    if (dfunc->df_ufunc == NULL)
-	return OK;  // function was freed
-    if (dfunc->df_has_closure == 0)
-	return OK;  // no closures
-    tv = STACK_TV(ectx->ec_frame_idx + STACK_FRAME_SIZE + dfunc->df_varcount);
-    closure_count = tv->vval.v_number;
-    if (closure_count == 0)
-	return OK;  // no funcrefs created
+    જો (dfunc->df_ufunc == ખાલી)
+	પાછા OK;  // function was freed
+    જો (dfunc->df_has_closure == 0)
+	પાછા OK;  // no closures
+    tv = ઢગલો_TV(ectx->ec_frame_idx + ઢગલો_FRAME_SIZE + dfunc->df_varcount);
+    closure_ગણતરી = tv->vval.v_સંખ્યા;
+    જો (closure_ગણતરી == 0)
+	પાછા OK;  // no funcrefs created
 
     // Compute "top": the first entry in the stack used by the function.
     // This is the first argument (after that comes the stack frame and then
     // the local variables).
     argcount = ufunc_argcount(dfunc->df_ufunc);
-    top = ectx->ec_frame_idx - argcount;
+    ટોચ = ectx->ec_frame_idx - argcount;
 
     // Check if any created closure is still in use.
-    for (idx = 0; idx < closure_count; ++idx)
+    માટે (idx = 0; idx < closure_ગણતરી; ++idx)
     {
 	partial_T   *pt;
-	int	    off = gap->ga_len - closure_count + idx;
+	પૂર્ણાંક	    off = gap->ga_len - closure_ગણતરી + idx;
 
-	if (off < 0)
-	    continue;  // count is off or already done
+	જો (off < 0)
+	    ચાલુ;  // count is off or already done
 	pt = ((partial_T **)gap->ga_data)[off];
-	if (pt->pt_refcount > 1)
+	જો (pt->pt_refcount > 1)
 	{
-	    int refcount = pt->pt_refcount;
-	    int i;
+	    પૂર્ણાંક refcount = pt->pt_refcount;
+	    પૂર્ણાંક i;
 
 	    // A Reference in a local variable doesn't count, it gets
 	    // unreferenced on return.
-	    for (i = 0; i < dfunc->df_varcount; ++i)
+	    માટે (i = 0; i < dfunc->df_varcount; ++i)
 	    {
-		typval_T *stv = STACK_TV(ectx->ec_frame_idx
-						       + STACK_FRAME_SIZE + i);
-		if (stv->v_type == VAR_PARTIAL && pt == stv->vval.v_partial)
+		typval_T *stv = ઢગલો_TV(ectx->ec_frame_idx
+						       + ઢગલો_FRAME_SIZE + i);
+		જો (stv->v_type == VAR_PARTIAL && pt == stv->vval.v_partial)
 		    --refcount;
 	    }
-	    if (refcount > 1)
+	    જો (refcount > 1)
 	    {
 		closure_in_use = TRUE;
-		break;
+		તોડો;
 	    }
 	}
     }
 
-    if (closure_in_use)
+    જો (closure_in_use)
     {
 	funcstack_T *funcstack = ALLOC_CLEAR_ONE(funcstack_T);
-	typval_T    *stack;
+	typval_T    *ઢગલો;
 
 	// A closure is using the arguments and/or local variables.
 	// Move them to the called function.
-	if (funcstack == NULL)
-	    return FAIL;
+	જો (funcstack == ખાલી)
+	    પાછા FAIL;
 
-	funcstack->fs_var_offset = argcount + STACK_FRAME_SIZE;
+	funcstack->fs_var_offset = argcount + ઢગલો_FRAME_SIZE;
 	funcstack->fs_ga.ga_len = funcstack->fs_var_offset
 							  + dfunc->df_varcount;
-	stack = ALLOC_CLEAR_MULT(typval_T, funcstack->fs_ga.ga_len);
-	funcstack->fs_ga.ga_data = stack;
-	if (stack == NULL)
+	ઢગલો = ALLOC_CLEAR_MULT(typval_T, funcstack->fs_ga.ga_len);
+	funcstack->fs_ga.ga_data = ઢગલો;
+	જો (ઢગલો == ખાલી)
 	{
 	    vim_free(funcstack);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	add_funcstack_to_list(funcstack);
 
 	// Move or copy the arguments.
-	for (idx = 0; idx < argcount; ++idx)
+	માટે (idx = 0; idx < argcount; ++idx)
 	{
-	    tv = STACK_TV(top + idx);
-	    if (free_arguments)
+	    tv = ઢગલો_TV(ટોચ + idx);
+	    જો (free_arguments)
 	    {
-		*(stack + idx) = *tv;
+		*(ઢગલો + idx) = *tv;
 		tv->v_type = VAR_UNKNOWN;
 	    }
-	    else if (tv->v_type != VAR_UNKNOWN)
+	    નહીંતર જો (tv->v_type != VAR_UNKNOWN)
 		// Skip an argument that was not set, the stack was cleared.
-		copy_tv(tv, stack + idx);
+		copy_tv(tv, ઢગલો + idx);
 	}
 	// Skip the stack frame.
 	// Move the local variables.
-	for (idx = 0; idx < dfunc->df_varcount; ++idx)
+	માટે (idx = 0; idx < dfunc->df_varcount; ++idx)
 	{
-	    tv = STACK_TV(ectx->ec_frame_idx + STACK_FRAME_SIZE + idx);
+	    tv = ઢગલો_TV(ectx->ec_frame_idx + ઢગલો_FRAME_SIZE + idx);
 
 	    // A partial created for a local function, that is also used as a
 	    // local variable, has a reference count for the variable, thus
 	    // will never go down to zero.  When all these refcounts are one
 	    // then the funcstack is unused.  We need to count how many we have
 	    // so we know when to check.
-	    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+	    જો (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != ખાલી)
 	    {
-		int	    i;
+		પૂર્ણાંક	    i;
 
-		for (i = 0; i < closure_count; ++i)
-		    if (tv->vval.v_partial == ((partial_T **)gap->ga_data)[
-					      gap->ga_len - closure_count + i])
+		માટે (i = 0; i < closure_ગણતરી; ++i)
+		    જો (tv->vval.v_partial == ((partial_T **)gap->ga_data)[
+					      gap->ga_len - closure_ગણતરી + i])
 			++funcstack->fs_min_refcount;
 	    }
 
-	    *(stack + funcstack->fs_var_offset + idx) = *tv;
+	    *(ઢગલો + funcstack->fs_var_offset + idx) = *tv;
 	    tv->v_type = VAR_UNKNOWN;
 	}
 
-	for (idx = 0; idx < closure_count; ++idx)
+	માટે (idx = 0; idx < closure_ગણતરી; ++idx)
 	{
 	    partial_T *pt = ((partial_T **)gap->ga_data)[gap->ga_len
-							- closure_count + idx];
-	    if (pt->pt_refcount > 1)
+							- closure_ગણતરી + idx];
+	    જો (pt->pt_refcount > 1)
 	    {
 		++funcstack->fs_refcount;
 		pt->pt_funcstack = funcstack;
-		pt->pt_outer.out_stack = &funcstack->fs_ga;
-		pt->pt_outer.out_frame_idx = ectx->ec_frame_idx - top;
+		pt->pt_outer.out_ઢગલો = &funcstack->fs_ga;
+		pt->pt_outer.out_frame_idx = ectx->ec_frame_idx - ટોચ;
 	    }
 	}
     }
 
-    for (idx = 0; idx < closure_count; ++idx)
+    માટે (idx = 0; idx < closure_ગણતરી; ++idx)
 	partial_unref(((partial_T **)gap->ga_data)[gap->ga_len
-						       - closure_count + idx]);
-    gap->ga_len -= closure_count;
-    if (gap->ga_len == 0)
+						       - closure_ગણતરી + idx]);
+    gap->ga_len -= closure_ગણતરી;
+    જો (gap->ga_len == 0)
 	ga_clear(gap);
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -948,75 +948,75 @@ handle_closure_in_use(ectx_T *ectx, int free_arguments)
  * Returns TRUE if the funcstack is freed, the partial referencing it will then
  * also have been freed.
  */
-    int
+    પૂર્ણાંક
 funcstack_check_refcount(funcstack_T *funcstack)
 {
-    int		i;
+    પૂર્ણાંક		i;
     garray_T	*gap = &funcstack->fs_ga;
-    int		done = 0;
-    typval_T	*stack;
+    પૂર્ણાંક		done = 0;
+    typval_T	*ઢગલો;
 
-    if (funcstack->fs_refcount > funcstack->fs_min_refcount)
-	return FALSE;
-    for (i = funcstack->fs_var_offset; i < gap->ga_len; ++i)
+    જો (funcstack->fs_refcount > funcstack->fs_min_refcount)
+	પાછા FALSE;
+    માટે (i = funcstack->fs_var_offset; i < gap->ga_len; ++i)
     {
 	typval_T *tv = ((typval_T *)gap->ga_data) + i;
 
-	if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
+	જો (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != ખાલી
 		&& tv->vval.v_partial->pt_funcstack == funcstack
 		&& tv->vval.v_partial->pt_refcount == 1)
 	    ++done;
     }
-    if (done != funcstack->fs_min_refcount)
-	return FALSE;
+    જો (done != funcstack->fs_min_refcount)
+	પાછા FALSE;
 
-    stack = gap->ga_data;
+    ઢગલો = gap->ga_data;
 
     // All partials referencing the funcstack have a reference count of
     // one, thus the funcstack is no longer of use.
-    for (i = 0; i < gap->ga_len; ++i)
-	clear_tv(stack + i);
-    vim_free(stack);
+    માટે (i = 0; i < gap->ga_len; ++i)
+	clear_tv(ઢગલો + i);
+    vim_free(ઢગલો);
     remove_funcstack_from_list(funcstack);
     vim_free(funcstack);
 
-    return TRUE;
+    પાછા TRUE;
 }
 
 /*
  * For garbage collecting: set references in all variables referenced by
  * all funcstacks.
  */
-    int
-set_ref_in_funcstacks(int copyID)
+    પૂર્ણાંક
+set_ref_in_funcstacks(પૂર્ણાંક copyID)
 {
     funcstack_T *funcstack;
 
-    for (funcstack = first_funcstack; funcstack != NULL;
+    માટે (funcstack = first_funcstack; funcstack != ખાલી;
 						funcstack = funcstack->fs_next)
     {
-	typval_T    *stack = funcstack->fs_ga.ga_data;
-	int	    i;
+	typval_T    *ઢગલો = funcstack->fs_ga.ga_data;
+	પૂર્ણાંક	    i;
 
-	for (i = 0; i < funcstack->fs_ga.ga_len; ++i)
-	    if (set_ref_in_item(stack + i, copyID, NULL, NULL, NULL))
-		return TRUE;  // abort
+	માટે (i = 0; i < funcstack->fs_ga.ga_len; ++i)
+	    જો (set_ref_in_item(ઢગલો + i, copyID, ખાલી, ખાલી, ખાલી))
+		પાછા TRUE;  // abort
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 // Ugly static to avoid passing the execution context around through many
 // layers.
-static ectx_T *current_ectx = NULL;
+સ્થિર ectx_T *current_ectx = ખાલી;
 
 /*
  * Return TRUE if currently executing a :def function.
  * Can be used by builtin functions only.
  */
-    int
-in_def_function(void)
+    પૂર્ણાંક
+in_def_function(શૂન્ય)
 {
-    return current_ectx != NULL;
+    પાછા current_ectx != ખાલી;
 }
 
 /*
@@ -1027,31 +1027,31 @@ in_def_function(void)
  *
  * Return FAIL and do nothing if not executing in a class; otherwise OK.
  */
-    int
-fill_exec_lval_root(lval_root_T *root)
+    પૂર્ણાંક
+fill_exec_lval_મૂળ(lval_મૂળ_T *મૂળ)
 {
     ectx_T *ectx = current_ectx;
-    if (ectx != NULL)
+    જો (ectx != ખાલી)
     {
 	dfunc_T	    *dfunc = ((dfunc_T *)def_functions.ga_data)
 						  + current_ectx->ec_dfunc_idx;
 	ufunc_T    *ufunc = dfunc->df_ufunc;
-	if (ufunc->uf_class != NULL)	// executing a method?
+	જો (ufunc->uf_class != ખાલી)	// executing a method?
 	{
 	    typval_T *tv = alloc_tv();
-	    if (tv != NULL)
+	    જો (tv != ખાલી)
 	    {
-		CLEAR_POINTER(root);
-		root->lr_tv = tv;
-		copy_tv(STACK_TV_VAR(0), root->lr_tv);
-		root->lr_cl_exec = ufunc->uf_class;
-		++root->lr_cl_exec->class_refcount;
-		return OK;
+		CLEAR_POINTER(મૂળ);
+		મૂળ->lr_tv = tv;
+		copy_tv(ઢગલો_TV_VAR(0), મૂળ->lr_tv);
+		મૂળ->lr_cl_exec = ufunc->uf_class;
+		++મૂળ->lr_cl_exec->class_refcount;
+		પાછા OK;
 	    }
 	}
     }
 
-    return FAIL;
+    પાછા FAIL;
 }
 
 /*
@@ -1059,18 +1059,18 @@ fill_exec_lval_root(lval_root_T *root)
  * a user function.
  */
     ectx_T *
-clear_current_ectx(void)
+clear_current_ectx(શૂન્ય)
 {
     ectx_T *r = current_ectx;
 
-    current_ectx = NULL;
-    return r;
+    current_ectx = ખાલી;
+    પાછા r;
 }
 
-    void
+    શૂન્ય
 restore_current_ectx(ectx_T *ectx)
 {
-    if (current_ectx != NULL)
+    જો (current_ectx != ખાલી)
 	iemsg("Restoring current_ectx while it is not NULL");
     current_ectx = ectx;
 }
@@ -1080,35 +1080,35 @@ restore_current_ectx(ectx_T *ectx)
  * function.
  * Return the list or NULL when failed.
  */
-    static list_T *
-add_defer_item(int var_idx, int argcount, ectx_T *ectx)
+    સ્થિર list_T *
+add_defer_item(પૂર્ણાંક var_idx, પૂર્ણાંક argcount, ectx_T *ectx)
 {
-    typval_T	*defer_tv = STACK_TV_VAR(var_idx);
+    typval_T	*defer_tv = ઢગલો_TV_VAR(var_idx);
     list_T	*defer_l;
     list_T	*l;
     typval_T	listval;
 
-    if (defer_tv->v_type != VAR_LIST)
+    જો (defer_tv->v_type != VAR_LIST)
     {
 	// first time, allocate the list
-	if (rettv_list_alloc(defer_tv) == FAIL)
-	    return NULL;
+	જો (rettv_list_alloc(defer_tv) == FAIL)
+	    પાછા ખાલી;
     }
     defer_l = defer_tv->vval.v_list;
 
-    l = list_alloc_with_items(argcount + 1);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_વસ્તુઓ(argcount + 1);
+    જો (l == ખાલી)
+	પાછા ખાલી;
     listval.v_type = VAR_LIST;
     listval.vval.v_list = l;
     listval.v_lock = 0;
-    if (list_insert_tv(defer_l, &listval, defer_l->lv_first) == FAIL)
+    જો (list_ઉમેરો_tv(defer_l, &listval, defer_l->lv_first) == FAIL)
     {
 	list_free(l);
-	return NULL;
+	પાછા ખાલી;
     }
 
-    return l;
+    પાછા l;
 }
 
 /*
@@ -1116,30 +1116,30 @@ add_defer_item(int var_idx, int argcount, ectx_T *ectx)
  * The local variable that lists deferred functions is "var_idx".
  * Returns OK or FAIL.
  */
-    static int
-defer_command(int var_idx, int argcount, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+defer_command(પૂર્ણાંક var_idx, પૂર્ણાંક argcount, ectx_T *ectx)
 {
     list_T	*l = add_defer_item(var_idx, argcount, ectx);
-    int		i;
+    પૂર્ણાંક		i;
     typval_T	*func_tv;
 
-    if (l == NULL)
-	return FAIL;
+    જો (l == ખાલી)
+	પાછા FAIL;
 
-    func_tv = STACK_TV_BOT(-argcount - 1);
-    if (func_tv->v_type != VAR_PARTIAL && func_tv->v_type != VAR_FUNC)
+    func_tv = ઢગલો_TV_BOT(-argcount - 1);
+    જો (func_tv->v_type != VAR_PARTIAL && func_tv->v_type != VAR_FUNC)
     {
 	semsg(_(e_expected_str_but_got_str),
 		"function or partial",
 		vartype_name(func_tv->v_type));
-	return FAIL;
+	પાછા FAIL;
     }
     list_set_item(l, 0, func_tv);
 
-    for (i = 0; i < argcount; ++i)
-	list_set_item(l, i + 1, STACK_TV_BOT(-argcount + i));
-    ectx->ec_stack.ga_len -= argcount + 1;
-    return OK;
+    માટે (i = 0; i < argcount; ++i)
+	list_set_item(l, i + 1, ઢગલો_TV_BOT(-argcount + i));
+    ectx->ec_ઢગલો.ga_len -= argcount + 1;
+    પાછા OK;
 }
 
 /*
@@ -1147,27 +1147,27 @@ defer_command(int var_idx, int argcount, ectx_T *ectx)
  * Consumes "name", also on failure.
  * Only to be called when in_def_function() returns TRUE.
  */
-    int
-add_defer_function(char_u *name, int argcount, typval_T *argvars)
+    પૂર્ણાંક
+add_defer_function(char_u *name, પૂર્ણાંક argcount, typval_T *argvars)
 {
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 						  + current_ectx->ec_dfunc_idx;
     list_T	*l;
     typval_T	func_tv;
-    int		i;
+    પૂર્ણાંક		i;
 
-    if (dfunc->df_defer_var_idx == 0)
+    જો (dfunc->df_defer_var_idx == 0)
     {
 	iemsg("df_defer_var_idx is zero");
 	vim_free(name);
-	return FAIL;
+	પાછા FAIL;
     }
 
     l = add_defer_item(dfunc->df_defer_var_idx - 1, argcount, current_ectx);
-    if (l == NULL)
+    જો (l == ખાલી)
     {
 	vim_free(name);
-	return FAIL;
+	પાછા FAIL;
     }
 
     func_tv.v_type = VAR_FUNC;
@@ -1175,67 +1175,67 @@ add_defer_function(char_u *name, int argcount, typval_T *argvars)
     func_tv.vval.v_string = name;
     list_set_item(l, 0, &func_tv);
 
-    for (i = 0; i < argcount; ++i)
+    માટે (i = 0; i < argcount; ++i)
 	list_set_item(l, i + 1, argvars + i);
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Invoked when returning from a function: Invoke any deferred calls.
  */
-    static void
+    સ્થિર શૂન્ય
 invoke_defer_funcs(ectx_T *ectx)
 {
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 							  + ectx->ec_dfunc_idx;
-    typval_T	*defer_tv = STACK_TV_VAR(dfunc->df_defer_var_idx - 1);
+    typval_T	*defer_tv = ઢગલો_TV_VAR(dfunc->df_defer_var_idx - 1);
     listitem_T	*li;
 
-    if (defer_tv->v_type != VAR_LIST)
-	return;	 // no function added
-    FOR_ALL_LIST_ITEMS(defer_tv->vval.v_list, li)
+    જો (defer_tv->v_type != VAR_LIST)
+	પાછા;	 // no function added
+    FOR_ALL_LIST_વસ્તુઓ(defer_tv->vval.v_list, li)
     {
 	list_T	    *l = li->li_tv.vval.v_list;
 	typval_T    rettv;
 	typval_T    argvars[MAX_FUNC_ARGS];
-	int	    i;
+	પૂર્ણાંક	    i;
 	listitem_T  *arg_li = l->lv_first;
 	typval_T    *functv = &l->lv_first->li_tv;
-	int	    argcount = l->lv_len - 1;
+	પૂર્ણાંક	    argcount = l->lv_len - 1;
 
-	if (functv->vval.v_string == NULL)
+	જો (functv->vval.v_string == ખાલી)
 	    // already being called, can happen if function does ":qa"
-	    continue;
+	    ચાલુ;
 
-	for (i = 0; i < argcount; ++i)
+	માટે (i = 0; i < argcount; ++i)
 	{
 	    arg_li = arg_li->li_next;
 	    argvars[i] = arg_li->li_tv;
 	}
 
 	funcexe_T	funcexe;
-	char_u		*name = NULL;
-	partial_T	*pt = NULL;
+	char_u		*name = ખાલી;
+	partial_T	*pt = ખાલી;
 
 	CLEAR_FIELD(funcexe);
 	funcexe.fe_evaluate = TRUE;
 	rettv.v_type = VAR_UNKNOWN;
 
-	if (functv->v_type == VAR_PARTIAL)
+	જો (functv->v_type == VAR_PARTIAL)
 	{
 	    pt = functv->vval.v_partial;
-	    functv->vval.v_partial = NULL;
+	    functv->vval.v_partial = ખાલી;
 
 	    name = pt->pt_func->uf_name;
 	    funcexe.fe_partial = pt;
 	    funcexe.fe_object = pt->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    જો (funcexe.fe_object != ખાલી)
 		++funcexe.fe_object->obj_refcount;
 	}
-	else
+	નહીંતર
 	{
 	    name = functv->vval.v_string;
-	    functv->vval.v_string = NULL;
+	    functv->vval.v_string = ખાલી;
 	}
 
 	// If the deferred function is called after an exception, then only the
@@ -1246,14 +1246,14 @@ invoke_defer_funcs(ectx_T *ectx)
 	exception_state_save(&estate);
 	exception_state_clear();
 
-	(void)call_func(name, -1, &rettv, argcount, argvars, &funcexe);
+	(શૂન્ય)call_func(name, -1, &rettv, argcount, argvars, &funcexe);
 
 	exception_state_restore(&estate);
 
 	clear_tv(&rettv);
-	if (functv->v_type == VAR_PARTIAL)
+	જો (functv->v_type == VAR_PARTIAL)
 	    partial_unref(pt);
-	else
+	નહીંતર
 	    vim_free(name);
     }
 }
@@ -1261,28 +1261,28 @@ invoke_defer_funcs(ectx_T *ectx)
 /*
  * Return from the current function.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 func_return(ectx_T *ectx)
 {
-    int		idx;
-    int		ret_idx;
+    પૂર્ણાંક		idx;
+    પૂર્ણાંક		ret_idx;
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 							  + ectx->ec_dfunc_idx;
-    int		argcount = ufunc_argcount(dfunc->df_ufunc);
+    પૂર્ણાંક		argcount = ufunc_argcount(dfunc->df_ufunc);
     estack_T	*entry;
-    int		prev_dfunc_idx = STACK_TV(ectx->ec_frame_idx
-					+ STACK_FRAME_FUNC_OFF)->vval.v_number;
+    પૂર્ણાંક		prev_dfunc_idx = ઢગલો_TV(ectx->ec_frame_idx
+					+ ઢગલો_FRAME_FUNC_OFF)->vval.v_સંખ્યા;
     funclocal_T	*floc;
 #ifdef FEAT_PROFILE
     dfunc_T	*prev_dfunc = ((dfunc_T *)def_functions.ga_data)
 							      + prev_dfunc_idx;
 
-    if (do_profiling == PROF_YES)
+    જો (do_profiling == PROF_YES)
     {
 	ufunc_T *caller = prev_dfunc->df_ufunc;
 
-	if (dfunc->df_ufunc->uf_profiling
-				   || (caller != NULL && caller->uf_profiling))
+	જો (dfunc->df_ufunc->uf_profiling
+				   || (caller != ખાલી && caller->uf_profiling))
 	{
 	    profile_may_end_func(((profinfo_T *)profile_info_ga.ga_data)
 			+ profile_info_ga.ga_len - 1, dfunc->df_ufunc, caller);
@@ -1291,10 +1291,10 @@ func_return(ectx_T *ectx)
     }
 #endif
 
-    if (dfunc->df_defer_var_idx > 0)
+    જો (dfunc->df_defer_var_idx > 0)
 	invoke_defer_funcs(ectx);
 
-    if (dfunc->df_ufunc->uf_flags & FC_SANDBOX)
+    જો (dfunc->df_ufunc->uf_flags & FC_SANDBOX)
 	--sandbox;
 
     // No check for uf_refcount being zero, cannot think of a way that would
@@ -1302,35 +1302,35 @@ func_return(ectx_T *ectx)
     --dfunc->df_ufunc->uf_calls;
 
     // execution context goes one level up
-    entry = estack_pop();
-    if (entry != NULL)
+    entry = estack_કાઢો();
+    જો (entry != ખાલી)
 	current_sctx = entry->es_save_sctx;
 
-    if (handle_closure_in_use(ectx, TRUE) == FAIL)
-	return FAIL;
+    જો (handle_closure_in_use(ectx, TRUE) == FAIL)
+	પાછા FAIL;
 
     // Clear the arguments.  If this was an object method also clear the
     // object, it is just before the arguments.
-    int top = ectx->ec_frame_idx - argcount;
-    if (IS_OBJECT_METHOD(dfunc->df_ufunc))
-	--top;
-    for (idx = top; idx < ectx->ec_frame_idx; ++idx)
-	clear_tv(STACK_TV(idx));
+    પૂર્ણાંક ટોચ = ectx->ec_frame_idx - argcount;
+    જો (IS_OBJECT_METHOD(dfunc->df_ufunc))
+	--ટોચ;
+    માટે (idx = ટોચ; idx < ectx->ec_frame_idx; ++idx)
+	clear_tv(ઢગલો_TV(idx));
 
     // Clear local variables and temp values, but not the return value.
-    for (idx = ectx->ec_frame_idx + STACK_FRAME_SIZE;
-					idx < ectx->ec_stack.ga_len - 1; ++idx)
-	clear_tv(STACK_TV(idx));
+    માટે (idx = ectx->ec_frame_idx + ઢગલો_FRAME_SIZE;
+					idx < ectx->ec_ઢગલો.ga_len - 1; ++idx)
+	clear_tv(ઢગલો_TV(idx));
 
     // The return value should be on top of the stack.  However, when aborting
     // it may not be there and ec_frame_idx is the top of the stack.
-    ret_idx = ectx->ec_stack.ga_len - 1;
-    if (ret_idx == ectx->ec_frame_idx + STACK_FRAME_IDX_OFF)
+    ret_idx = ectx->ec_ઢગલો.ga_len - 1;
+    જો (ret_idx == ectx->ec_frame_idx + ઢગલો_FRAME_IDX_OFF)
 	ret_idx = 0;
 
-    if (ectx->ec_outer_ref != NULL)
+    જો (ectx->ec_outer_ref != ખાલી)
     {
-	if (ectx->ec_outer_ref->or_outer_allocated)
+	જો (ectx->ec_outer_ref->or_outer_allocated)
 	    vim_free(ectx->ec_outer_ref->or_outer);
 	partial_unref(ectx->ec_outer_ref->or_partial);
 	vim_free(ectx->ec_outer_ref);
@@ -1338,96 +1338,96 @@ func_return(ectx_T *ectx)
 
     // Restore the previous frame.
     ectx->ec_dfunc_idx = prev_dfunc_idx;
-    ectx->ec_iidx = STACK_TV(ectx->ec_frame_idx
-					+ STACK_FRAME_IIDX_OFF)->vval.v_number;
-    ectx->ec_instr = (void *)STACK_TV(ectx->ec_frame_idx
-				       + STACK_FRAME_INSTR_OFF)->vval.v_string;
-    ectx->ec_outer_ref = (void *)STACK_TV(ectx->ec_frame_idx
-				       + STACK_FRAME_OUTER_OFF)->vval.v_string;
-    floc = (void *)STACK_TV(ectx->ec_frame_idx
-				   + STACK_FRAME_FUNCLOCAL_OFF)->vval.v_string;
+    ectx->ec_iidx = ઢગલો_TV(ectx->ec_frame_idx
+					+ ઢગલો_FRAME_IIDX_OFF)->vval.v_સંખ્યા;
+    ectx->ec_instr = (શૂન્ય *)ઢગલો_TV(ectx->ec_frame_idx
+				       + ઢગલો_FRAME_INSTR_OFF)->vval.v_string;
+    ectx->ec_outer_ref = (શૂન્ય *)ઢગલો_TV(ectx->ec_frame_idx
+				       + ઢગલો_FRAME_OUTER_OFF)->vval.v_string;
+    floc = (શૂન્ય *)ઢગલો_TV(ectx->ec_frame_idx
+				   + ઢગલો_FRAME_FUNCLOCAL_OFF)->vval.v_string;
     // restoring ec_frame_idx must be last
-    ectx->ec_frame_idx = STACK_TV(ectx->ec_frame_idx
-				       + STACK_FRAME_IDX_OFF)->vval.v_number;
+    ectx->ec_frame_idx = ઢગલો_TV(ectx->ec_frame_idx
+				       + ઢગલો_FRAME_IDX_OFF)->vval.v_સંખ્યા;
 
-    if (floc == NULL)
+    જો (floc == ખાલી)
 	ectx->ec_funclocal.floc_restore_cmdmod = FALSE;
-    else
+    નહીંતર
     {
 	ectx->ec_funclocal = *floc;
 	vim_free(floc);
     }
 
-    if (ret_idx > 0)
+    જો (ret_idx > 0)
     {
 	// Reset the stack to the position before the call, with a spot for the
 	// return value, moved there from above the frame.
-	ectx->ec_stack.ga_len = top + 1;
-	*STACK_TV_BOT(-1) = *STACK_TV(ret_idx);
+	ectx->ec_ઢગલો.ga_len = ટોચ + 1;
+	*ઢગલો_TV_BOT(-1) = *ઢગલો_TV(ret_idx);
     }
-    else
+    નહીંતર
 	// Reset the stack to the position before the call.
-	ectx->ec_stack.ga_len = top;
+	ectx->ec_ઢગલો.ga_len = ટોચ;
 
     funcdepth_decrement();
     --ex_nesting_level;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Prepare arguments and rettv for calling a builtin or user function.
  */
-    static int
-call_prepare(int argcount, typval_T *argvars, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+call_prepare(પૂર્ણાંક argcount, typval_T *argvars, ectx_T *ectx)
 {
-    int		idx;
+    પૂર્ણાંક		idx;
     typval_T	*tv;
 
     // Move arguments from bottom of the stack to argvars[] and add terminator.
-    for (idx = 0; idx < argcount; ++idx)
-	argvars[idx] = *STACK_TV_BOT(idx - argcount);
+    માટે (idx = 0; idx < argcount; ++idx)
+	argvars[idx] = *ઢગલો_TV_BOT(idx - argcount);
     argvars[argcount].v_type = VAR_UNKNOWN;
 
     // Result replaces the arguments on the stack.
-    if (argcount > 0)
-	ectx->ec_stack.ga_len -= argcount - 1;
-    else if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-	return FAIL;
-    else
-	++ectx->ec_stack.ga_len;
+    જો (argcount > 0)
+	ectx->ec_ઢગલો.ga_len -= argcount - 1;
+    નહીંતર જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+	પાછા FAIL;
+    નહીંતર
+	++ectx->ec_ઢગલો.ga_len;
 
     // Default return value is zero.
-    tv = STACK_TV_BOT(-1);
-    tv->v_type = VAR_NUMBER;
-    tv->vval.v_number = 0;
+    tv = ઢગલો_TV_BOT(-1);
+    tv->v_type = VAR_સંખ્યા;
+    tv->vval.v_સંખ્યા = 0;
     tv->v_lock = 0;
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Call a builtin function by index.
  */
-    static int
-call_bfunc(int func_idx, int argcount, ectx_T *ectx)
+    સ્થિર પૂર્ણાંક
+call_bfunc(પૂર્ણાંક func_idx, પૂર્ણાંક argcount, ectx_T *ectx)
 {
     typval_T	argvars[MAX_FUNC_ARGS];
-    int		idx;
-    int		did_emsg_before = did_emsg;
+    પૂર્ણાંક		idx;
+    પૂર્ણાંક		did_emsg_before = did_emsg;
     ectx_T	*prev_ectx = current_ectx;
-    char	*save_func_name = ectx->ec_where.wt_func_name;
+    અક્ષર	*save_func_name = ectx->ec_where.wt_func_name;
 
-    if (call_prepare(argcount, argvars, ectx) == FAIL)
-	return FAIL;
+    જો (call_prepare(argcount, argvars, ectx) == FAIL)
+	પાછા FAIL;
 
     // Check for void value being passed as an argument.
-    for (idx = 0; idx < argcount; ++idx)
-	if (argvars[idx].v_type == VAR_VOID)
+    માટે (idx = 0; idx < argcount; ++idx)
+	જો (argvars[idx].v_type == VAR_VOID)
 	{
-	    emsg(_(e_cannot_use_void_value));
-	    for (idx = 0; idx < argcount; ++idx)
+	    emsg(_(e_cannot_use_void_કિંમત));
+	    માટે (idx = 0; idx < argcount; ++idx)
 		clear_tv(&argvars[idx]);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
     ectx->ec_where.wt_func_name = internal_func_name(func_idx);
@@ -1435,17 +1435,17 @@ call_bfunc(int func_idx, int argcount, ectx_T *ectx)
     // Call the builtin function.  Set "current_ectx" so that when it
     // recursively invokes call_def_function() a closure context can be set.
     current_ectx = ectx;
-    call_internal_func_by_idx(func_idx, argvars, STACK_TV_BOT(-1));
+    call_internal_func_by_idx(func_idx, argvars, ઢગલો_TV_BOT(-1));
     current_ectx = prev_ectx;
     ectx->ec_where.wt_func_name = save_func_name;
 
     // Clear the arguments.
-    for (idx = 0; idx < argcount; ++idx)
+    માટે (idx = 0; idx < argcount; ++idx)
 	clear_tv(&argvars[idx]);
 
-    if (did_emsg > did_emsg_before)
-	return FAIL;
-    return OK;
+    જો (did_emsg > did_emsg_before)
+	પાછા FAIL;
+    પાછા OK;
 }
 
 /*
@@ -1456,11 +1456,11 @@ call_bfunc(int func_idx, int argcount, ectx_T *ectx)
  * If "pt" is not null use "pt->pt_outer" for ec_outer_ref->or_outer.
  * "iptr" can be used to replace the instruction with a more efficient one.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 call_ufunc(
 	ufunc_T	    *ufunc,
 	partial_T   *pt,
-	int	    argcount,
+	પૂર્ણાંક	    argcount,
 	ectx_T	    *ectx,
 	isn_T	    *iptr,
 	dict_T	    *selfdict)
@@ -1468,75 +1468,75 @@ call_ufunc(
     typval_T	argvars[MAX_FUNC_ARGS];
     funcexe_T   funcexe;
     funcerror_T	error;
-    int		idx;
-    int		did_emsg_before = did_emsg;
+    પૂર્ણાંક		idx;
+    પૂર્ણાંક		did_emsg_before = did_emsg;
     compiletype_T compile_type = get_compile_type(ufunc);
 
-    if (func_needs_compiling(ufunc, compile_type)
-		&& compile_def_function(ufunc, FALSE, compile_type, NULL)
+    જો (func_needs_compiling(ufunc, compile_type)
+		&& compile_def_function(ufunc, FALSE, compile_type, ખાલી)
 								       == FAIL)
-	return FAIL;
-    if (ufunc->uf_def_status == UF_COMPILED)
+	પાછા FAIL;
+    જો (ufunc->uf_def_status == UF_COMPILED)
     {
 	error = check_user_func_argcount(ufunc, argcount);
-	if (error != FCERR_UNKNOWN)
+	જો (error != FCERR_UNKNOWN)
 	{
-	    if (error == FCERR_TOOMANY)
+	    જો (error == FCERR_TOOMANY)
 		semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	    else
+	    નહીંતર
 		semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
 	// The function has been compiled, can call it quickly.  For a function
 	// that was defined later: we can call it directly next time.
-	if (iptr != NULL)
+	જો (iptr != ખાલી)
 	{
 	    delete_instr(iptr);
 	    iptr->isn_type = ISN_DCALL;
 	    iptr->isn_arg.dfunc.cdf_idx = ufunc->uf_dfunc_idx;
 	    iptr->isn_arg.dfunc.cdf_argcount = argcount;
 	}
-	return call_dfunc(ufunc->uf_dfunc_idx, pt, argcount, ectx);
+	પાછા call_dfunc(ufunc->uf_dfunc_idx, pt, argcount, ectx);
     }
 
-    if (call_prepare(argcount, argvars, ectx) == FAIL)
-	return FAIL;
+    જો (call_prepare(argcount, argvars, ectx) == FAIL)
+	પાછા FAIL;
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
-    funcexe.fe_selfdict = selfdict != NULL ? selfdict : dict_stack_get_dict();
+    funcexe.fe_selfdict = selfdict != ખાલી ? selfdict : dict_ઢગલો_get_dict();
 
     // Call the user function.  Result goes in last position on the stack.
     error = call_user_func_check(ufunc, argcount, argvars,
-			      STACK_TV_BOT(-1), &funcexe, funcexe.fe_selfdict);
+			      ઢગલો_TV_BOT(-1), &funcexe, funcexe.fe_selfdict);
 
     // Clear the arguments.
-    for (idx = 0; idx < argcount; ++idx)
+    માટે (idx = 0; idx < argcount; ++idx)
 	clear_tv(&argvars[idx]);
 
-    if (error != FCERR_NONE)
+    જો (error != FCERR_NONE)
     {
 	user_func_error(error, printable_func_name(ufunc),
 							 funcexe.fe_found_var);
-	return FAIL;
+	પાછા FAIL;
     }
-    if (did_emsg > did_emsg_before)
+    જો (did_emsg > did_emsg_before)
 	// Error other than from calling the function itself.
-	return FAIL;
-    return OK;
+	પાછા FAIL;
+    પાછા OK;
 }
 
 /*
  * If command modifiers were applied restore them.
  */
-    static void
+    સ્થિર શૂન્ય
 may_restore_cmdmod(funclocal_T *funclocal)
 {
-    if (funclocal->floc_restore_cmdmod)
+    જો (funclocal->floc_restore_cmdmod)
     {
-	cmdmod.cmod_filter_regmatch.regprog = NULL;
+	cmdmod.cmod_filter_regmatch.regprog = ખાલી;
 	undo_cmdmod(&cmdmod);
 	cmdmod = funclocal->floc_save_cmdmod;
 	funclocal->floc_restore_cmdmod = FALSE;
@@ -1547,10 +1547,10 @@ may_restore_cmdmod(funclocal_T *funclocal)
  * Return TRUE if an error was given (not caught in try/catch) or CTRL-C was
  * pressed.
  */
-    static int
-vim9_aborting(int prev_uncaught_emsg)
+    સ્થિર પૂર્ણાંક
+vim9_aborting(પૂર્ણાંક prev_uncaught_emsg)
 {
-    return uncaught_emsg > prev_uncaught_emsg || got_int || did_throw;
+    પાછા uncaught_emsg > prev_uncaught_emsg || got_int || did_throw;
 }
 
 /*
@@ -1559,30 +1559,30 @@ vim9_aborting(int prev_uncaught_emsg)
  * "iptr" can be used to replace the instruction with a more efficient one.
  * Returns FAIL if not found without an error message.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 call_by_name(
 	char_u	    *name,
-	int	    argcount,
+	પૂર્ણાંક	    argcount,
 	ectx_T	    *ectx,
 	isn_T	    *iptr,
 	dict_T	    *selfdict)
 {
     ufunc_T *ufunc;
 
-    if (builtin_function(name, -1))
+    જો (builtin_function(name, -1))
     {
-	int func_idx = find_internal_func(name);
+	પૂર્ણાંક func_idx = find_internal_func(name);
 
-	if (func_idx < 0)  // Impossible?
-	    return FAIL;
-	if (check_internal_func(func_idx, argcount) < 0)
-	    return FAIL;
-	return call_bfunc(func_idx, argcount, ectx);
+	જો (func_idx < 0)  // Impossible?
+	    પાછા FAIL;
+	જો (check_internal_func(func_idx, argcount) < 0)
+	    પાછા FAIL;
+	પાછા call_bfunc(func_idx, argcount, ectx);
     }
 
     char_u	cc = NUL;
     char_u	*start_bracket = generic_func_find_open_bracket(name);
-    if (start_bracket != NULL)
+    જો (start_bracket != ખાલી)
     {
 	cc = *start_bracket;
 	*start_bracket = NUL;
@@ -1590,182 +1590,182 @@ call_by_name(
 
     ufunc = find_func(name, FALSE);
 
-    if (ufunc == NULL)
+    જો (ufunc == ખાલી)
     {
-	int prev_uncaught_emsg = uncaught_emsg;
+	પૂર્ણાંક prev_uncaught_emsg = uncaught_emsg;
 
-	if (script_autoload(name, TRUE))
+	જો (script_autoload(name, TRUE))
 	    // loaded a package, search for the function again
 	    ufunc = find_func(name, FALSE);
 
-	if (vim9_aborting(prev_uncaught_emsg))
+	જો (vim9_aborting(prev_uncaught_emsg))
 	{
-	    if (start_bracket != NULL)
+	    જો (start_bracket != ખાલી)
 		*start_bracket = cc;
-	    return FAIL;  // bail out if loading the script caused an error
+	    પાછા FAIL;  // bail out if loading the script caused an error
 	}
     }
 
-    if (start_bracket != NULL)
+    જો (start_bracket != ખાલી)
 	*start_bracket = cc;
 
-    if (ufunc != NULL)
+    જો (ufunc != ખાલી)
     {
-	if (IS_GENERIC_FUNC(ufunc))
+	જો (IS_GENERIC_FUNC(ufunc))
 	{
-	    if (start_bracket != NULL)
+	    જો (start_bracket != ખાલી)
 		ufunc = find_generic_func(ufunc, name, &start_bracket);
-	    else
+	    નહીંતર
 	    {
 		emsg_funcname(e_generic_func_missing_type_args_str, name);
-		ufunc = NULL;
+		ufunc = ખાલી;
 	    }
-	    if (ufunc == NULL)
-		return FAIL;
+	    જો (ufunc == ખાલી)
+		પાછા FAIL;
 	}
-	else if (start_bracket != NULL)
+	નહીંતર જો (start_bracket != ખાલી)
 	{
 	    emsg_funcname(e_not_a_generic_function_str, name);
-	    return FAIL;
+	    પાછા FAIL;
 	}
 
-	if (check_ufunc_arg_types(ufunc, argcount, 0, ectx) == FAIL)
-	    return FAIL;
+	જો (check_ufunc_arg_types(ufunc, argcount, 0, ectx) == FAIL)
+	    પાછા FAIL;
 
-	return call_ufunc(ufunc, NULL, argcount, ectx, iptr, selfdict);
+	પાછા call_ufunc(ufunc, ખાલી, argcount, ectx, iptr, selfdict);
     }
 
-    return FAIL;
+    પાછા FAIL;
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 call_partial(
 	typval_T    *tv,
-	int	    argcount_arg,
+	પૂર્ણાંક	    argcount_arg,
 	ectx_T	    *ectx)
 {
-    int		argcount = argcount_arg;
-    char_u	*name = NULL;
-    int		called_emsg_before = called_emsg;
-    int		res = FAIL;
-    dict_T	*selfdict = NULL;
+    પૂર્ણાંક		argcount = argcount_arg;
+    char_u	*name = ખાલી;
+    પૂર્ણાંક		called_emsg_before = called_emsg;
+    પૂર્ણાંક		res = FAIL;
+    dict_T	*selfdict = ખાલી;
 
-    if (tv->v_type == VAR_PARTIAL)
+    જો (tv->v_type == VAR_PARTIAL)
     {
 	partial_T   *pt = tv->vval.v_partial;
-	int	    i;
+	પૂર્ણાંક	    i;
 
-	if (pt->pt_obj != NULL)
+	જો (pt->pt_obj != ખાલી)
 	{
 	    // partial with an object method.  Push the object before the
 	    // function arguments.
-	    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		return FAIL;
-	    for (i = 1; i <= argcount; ++i)
-		*STACK_TV_BOT(-i + 1) = *STACK_TV_BOT(-i);
+	    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		પાછા FAIL;
+	    માટે (i = 1; i <= argcount; ++i)
+		*ઢગલો_TV_BOT(-i + 1) = *ઢગલો_TV_BOT(-i);
 
-	    typval_T *obj_tv = STACK_TV_BOT(-argcount);
+	    typval_T *obj_tv = ઢગલો_TV_BOT(-argcount);
 	    obj_tv->v_type = VAR_OBJECT;
 	    obj_tv->v_lock = 0;
 	    obj_tv->vval.v_object = pt->pt_obj;
 	    ++pt->pt_obj->obj_refcount;
-	    ++ectx->ec_stack.ga_len;
+	    ++ectx->ec_ઢગલો.ga_len;
 	}
 
-	if (pt->pt_argc > 0)
+	જો (pt->pt_argc > 0)
 	{
 	    // Make space for arguments from the partial, shift the "argcount"
 	    // arguments up.
-	    if (GA_GROW_FAILS(&ectx->ec_stack, pt->pt_argc))
-		return FAIL;
-	    for (i = 1; i <= argcount; ++i)
-		*STACK_TV_BOT(-i + pt->pt_argc) = *STACK_TV_BOT(-i);
-	    ectx->ec_stack.ga_len += pt->pt_argc;
+	    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, pt->pt_argc))
+		પાછા FAIL;
+	    માટે (i = 1; i <= argcount; ++i)
+		*ઢગલો_TV_BOT(-i + pt->pt_argc) = *ઢગલો_TV_BOT(-i);
+	    ectx->ec_ઢગલો.ga_len += pt->pt_argc;
 	    argcount += pt->pt_argc;
 
 	    // copy the arguments from the partial onto the stack
-	    for (i = 0; i < pt->pt_argc; ++i)
-		copy_tv(&pt->pt_argv[i], STACK_TV_BOT(-argcount + i));
+	    માટે (i = 0; i < pt->pt_argc; ++i)
+		copy_tv(&pt->pt_argv[i], ઢગલો_TV_BOT(-argcount + i));
 	}
 	selfdict = pt->pt_dict;
 
-	if (pt->pt_func != NULL)
-	    return call_ufunc(pt->pt_func, pt, argcount, ectx, NULL, selfdict);
+	જો (pt->pt_func != ખાલી)
+	    પાછા call_ufunc(pt->pt_func, pt, argcount, ectx, ખાલી, selfdict);
 
 	name = pt->pt_name;
     }
-    else if (tv->v_type == VAR_FUNC)
+    નહીંતર જો (tv->v_type == VAR_FUNC)
 	name = tv->vval.v_string;
-    if (name != NULL)
+    જો (name != ખાલી)
     {
 	char_u	    fname_buf[FLEN_FIXED + 1];
-	char_u	    *tofree = NULL;
+	char_u	    *tofree = ખાલી;
 	funcerror_T error = FCERR_NONE;
 	char_u	    *fname;
 
 	// May need to translate <SNR>123_ to K_SNR.
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
-	if (error != FCERR_NONE)
+	જો (error != FCERR_NONE)
 	    res = FAIL;
-	else
-	    res = call_by_name(fname, argcount, ectx, NULL, selfdict);
+	નહીંતર
+	    res = call_by_name(fname, argcount, ectx, ખાલી, selfdict);
 	vim_free(tofree);
     }
 
-    if (res == FAIL)
+    જો (res == FAIL)
     {
-	if (called_emsg == called_emsg_before)
+	જો (called_emsg == called_emsg_before)
 	    emsg_funcname(e_unknown_function_str,
-				  name == NULL ? (char_u *)"[unknown]" : name);
-	return FAIL;
+				  name == ખાલી ? (char_u *)"[unknown]" : name);
+	પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Check if "lock" is VAR_LOCKED or VAR_FIXED.  If so give an error and return
  * TRUE.
  */
-    static int
-error_if_locked(int lock, char *error)
+    સ્થિર પૂર્ણાંક
+error_if_locked(પૂર્ણાંક lock, અક્ષર *error)
 {
-    if (lock & (VAR_LOCKED | VAR_FIXED))
+    જો (lock & (VAR_LOCKED | VAR_FIXED))
     {
 	emsg(_(error));
-	return TRUE;
+	પાછા TRUE;
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Give an error if "tv" is not a number and return FAIL.
  */
-    static int
-check_for_number(typval_T *tv)
+    સ્થિર પૂર્ણાંક
+check_for_સંખ્યા(typval_T *tv)
 {
-    if (tv->v_type != VAR_NUMBER)
+    જો (tv->v_type != VAR_સંખ્યા)
     {
 	semsg(_(e_expected_str_but_got_str),
-		vartype_name(VAR_NUMBER), vartype_name(tv->v_type));
-	return FAIL;
+		vartype_name(VAR_સંખ્યા), vartype_name(tv->v_type));
+	પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Store "tv" in variable "name".
  * This is for s: and g: variables.
  */
-    static void
+    સ્થિર શૂન્ય
 store_var(char_u *name, typval_T *tv)
 {
     funccal_entry_T entry;
-    int		    flags = ASSIGN_DECL;
+    પૂર્ણાંક		    flags = ASSIGN_DECL;
 
-    if (tv->v_lock)
+    જો (tv->v_lock)
 	flags |= ASSIGN_CONST;
     save_funccal(&entry);
-    set_var_const(name, 0, NULL, tv, FALSE, flags, 0);
+    set_var_const(name, 0, ખાલી, tv, FALSE, flags, 0);
     restore_funccal();
 }
 
@@ -1773,46 +1773,46 @@ store_var(char_u *name, typval_T *tv)
  * Convert "tv" to a string.
  * Return FAIL if not allowed.
  */
-    static int
-do_2string(typval_T *tv, int is_2string_any, int tostring_flags)
+    સ્થિર પૂર્ણાંક
+do_2string(typval_T *tv, પૂર્ણાંક is_2string_any, પૂર્ણાંક tostring_flags)
 {
-    if (tv->v_type == VAR_STRING)
-	return OK;
+    જો (tv->v_type == VAR_STRING)
+	પાછા OK;
 
     char_u *str;
 
-    if (is_2string_any)
+    જો (is_2string_any)
     {
-	switch (tv->v_type)
+	પસંદગી (tv->v_type)
 	{
-	    case VAR_SPECIAL:
-	    case VAR_BOOL:
-	    case VAR_NUMBER:
-	    case VAR_FLOAT:
-	    case VAR_DICT:
-	    case VAR_BLOB:	break;
+	    સ્થિતિ VAR_SPECIAL:
+	    સ્થિતિ VAR_BOOL:
+	    સ્થિતિ VAR_સંખ્યા:
+	    સ્થિતિ VAR_FLOAT:
+	    સ્થિતિ VAR_DICT:
+	    સ્થિતિ VAR_BLOB:	તોડો;
 
-	    case VAR_LIST:
-				if (tostring_flags & TOSTRING_TOLERANT)
+	    સ્થિતિ VAR_LIST:
+				જો (tostring_flags & TOSTRING_TOLERANT)
 				{
 				    char_u	*s, *e, *p;
 				    garray_T	ga;
 
-				    ga_init2(&ga, sizeof(char_u *), 1);
+				    ga_init2(&ga, કદ(char_u *), 1);
 
 				    // Convert to NL separated items, then
 				    // escape the items and replace the NL with
 				    // a space.
 				    str = typval2string(tv, TRUE);
-				    if (str == NULL)
-					return FAIL;
+				    જો (str == ખાલી)
+					પાછા FAIL;
 				    s = str;
-				    while ((e = vim_strchr(s, '\n')) != NULL)
+				    જ્યારે ((e = vim_strchr(s, '\n')) != ખાલી)
 				    {
 					*e = NUL;
 					p = vim_strsave_fnameescape(s,
 						VSE_NONE);
-					if (p != NULL)
+					જો (p != ખાલી)
 					{
 					    ga_concat(&ga, p);
 					    GA_CONCAT_LITERAL(&ga, " ");
@@ -1824,50 +1824,50 @@ do_2string(typval_T *tv, int is_2string_any, int tostring_flags)
 				    clear_tv(tv);
 				    tv->v_type = VAR_STRING;
 				    tv->vval.v_string = ga.ga_data;
-				    return OK;
+				    પાછા OK;
 				}
-				if (tostring_flags & TOSTRING_INTERPOLATE)
-				    break;
+				જો (tostring_flags & TOSTRING_INTERPOLATE)
+				    તોડો;
 				// FALLTHROUGH
-	    default:	to_string_error(tv->v_type);
-			return FAIL;
+	    મૂળભૂત:	to_string_error(tv->v_type);
+			પાછા FAIL;
 	}
     }
     str = typval_tostring(tv, TRUE);
     clear_tv(tv);
     tv->v_type = VAR_STRING;
     tv->vval.v_string = str;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * When the value of "sv" is a null list of dict, allocate it.
  */
-    static void
+    સ્થિર શૂન્ય
 allocate_if_null(svar_T *sv)
 {
     typval_T *tv = sv->sv_tv;
 
-    switch (tv->v_type)
+    પસંદગી (tv->v_type)
     {
-	case VAR_LIST:
-	    if (tv->vval.v_list == NULL && sv->sv_type != &t_list_empty)
-		(void)rettv_list_alloc(tv);
-	    break;
-	case VAR_TUPLE:
-	    if (tv->vval.v_tuple == NULL && sv->sv_type != &t_tuple_empty)
-		(void)rettv_tuple_alloc(tv);
-	    break;
-	case VAR_DICT:
-	    if (tv->vval.v_dict == NULL && sv->sv_type != &t_dict_empty)
-		(void)rettv_dict_alloc(tv);
-	    break;
-	case VAR_BLOB:
-	    if (tv->vval.v_blob == NULL && sv->sv_type != &t_blob_null)
-		(void)rettv_blob_alloc(tv);
-	    break;
-	default:
-	    break;
+	સ્થિતિ VAR_LIST:
+	    જો (tv->vval.v_list == ખાલી && sv->sv_type != &t_list_empty)
+		(શૂન્ય)rettv_list_alloc(tv);
+	    તોડો;
+	સ્થિતિ VAR_TUPLE:
+	    જો (tv->vval.v_tuple == ખાલી && sv->sv_type != &t_tuple_empty)
+		(શૂન્ય)rettv_tuple_alloc(tv);
+	    તોડો;
+	સ્થિતિ VAR_DICT:
+	    જો (tv->vval.v_dict == ખાલી && sv->sv_type != &t_dict_empty)
+		(શૂન્ય)rettv_dict_alloc(tv);
+	    તોડો;
+	સ્થિતિ VAR_BLOB:
+	    જો (tv->vval.v_blob == ખાલી && sv->sv_type != &t_blob_null)
+		(શૂન્ય)rettv_blob_alloc(tv);
+	    તોડો;
+	મૂળભૂત:
+	    તોડો;
     }
 }
 
@@ -1883,44 +1883,44 @@ char_from_string(char_u *str, varnumber_T index)
     varnumber_T	    nchar = index;
     size_t	    slen;
 
-    if (str == NULL)
-	return NULL;
+    જો (str == ખાલી)
+	પાછા ખાલી;
     slen = STRLEN(str);
 
     // Do the same as for a list: a negative index counts from the end.
     // Optimization to check the first byte to be below 0x80 (and no composing
     // character follows) makes this a lot faster.
-    if (index < 0)
+    જો (index < 0)
     {
-	int	clen = 0;
+	પૂર્ણાંક	clen = 0;
 
-	for (nbyte = 0; nbyte < slen; ++clen)
+	માટે (nbyte = 0; nbyte < slen; ++clen)
 	{
-	    if (str[nbyte] < 0x80 && str[nbyte + 1] < 0x80)
+	    જો (str[nbyte] < 0x80 && str[nbyte + 1] < 0x80)
 		++nbyte;
-	    else if (enc_utf8)
+	    નહીંતર જો (enc_utf8)
 		nbyte += utfc_ptr2len(str + nbyte);
-	    else
+	    નહીંતર
 		nbyte += mb_ptr2len(str + nbyte);
 	}
 	nchar = clen + index;
-	if (nchar < 0)
+	જો (nchar < 0)
 	    // unlike list: index out of range results in empty string
-	    return NULL;
+	    પાછા ખાલી;
     }
 
-    for (nbyte = 0; nchar > 0 && nbyte < slen; --nchar)
+    માટે (nbyte = 0; nchar > 0 && nbyte < slen; --nchar)
     {
-	if (str[nbyte] < 0x80 && str[nbyte + 1] < 0x80)
+	જો (str[nbyte] < 0x80 && str[nbyte + 1] < 0x80)
 	    ++nbyte;
-	else if (enc_utf8)
+	નહીંતર જો (enc_utf8)
 	    nbyte += utfc_ptr2len(str + nbyte);
-	else
+	નહીંતર
 	    nbyte += mb_ptr2len(str + nbyte);
     }
-    if (nbyte >= slen)
-	return NULL;
-    return vim_strnsave(str + nbyte, mb_ptr2len(str + nbyte));
+    જો (nbyte >= slen)
+	પાછા ખાલી;
+    પાછા vim_strnsave(str + nbyte, mb_ptr2len(str + nbyte));
 }
 
 /*
@@ -1930,33 +1930,33 @@ char_from_string(char_u *str, varnumber_T index)
  * If "idx" is negative count from the end, -1 is the last character.
  * When going over the start return -1.
  */
-    static long
+    સ્થિર long
 char_idx2byte(char_u *str, size_t str_len, varnumber_T idx)
 {
     varnumber_T nchar = idx;
     size_t	nbyte = 0;
 
-    if (nchar >= 0)
+    જો (nchar >= 0)
     {
-	while (nchar > 0 && nbyte < str_len)
+	જ્યારે (nchar > 0 && nbyte < str_len)
 	{
 	    nbyte += mb_ptr2len(str + nbyte);
 	    --nchar;
 	}
     }
-    else
+    નહીંતર
     {
 	nbyte = str_len;
-	while (nchar < 0 && nbyte > 0)
+	જ્યારે (nchar < 0 && nbyte > 0)
 	{
 	    --nbyte;
 	    nbyte -= mb_head_off(str, str + nbyte);
 	    ++nchar;
 	}
-	if (nchar < 0)
-	    return -1;
+	જો (nchar < 0)
+	    પાછા -1;
     }
-    return (long)nbyte;
+    પાછા (long)nbyte;
 }
 
 /*
@@ -1966,30 +1966,30 @@ char_idx2byte(char_u *str, size_t str_len, varnumber_T idx)
  * Return NULL when the result is empty.
  */
     char_u *
-string_slice(char_u *str, varnumber_T first, varnumber_T last, int exclusive)
+string_slice(char_u *str, varnumber_T first, varnumber_T last, પૂર્ણાંક exclusive)
 {
     long	start_byte, end_byte;
     size_t	slen;
 
-    if (str == NULL)
-	return NULL;
+    જો (str == ખાલી)
+	પાછા ખાલી;
     slen = STRLEN(str);
     start_byte = char_idx2byte(str, slen, first);
-    if (start_byte < 0)
+    જો (start_byte < 0)
 	start_byte = 0; // first index very negative: use zero
-    if ((last == -1 && !exclusive) || last == VARNUM_MAX)
+    જો ((last == -1 && !exclusive) || last == VARNUM_MAX)
 	end_byte = (long)slen;
-    else
+    નહીંતર
     {
 	end_byte = char_idx2byte(str, slen, last);
-	if (!exclusive && end_byte >= 0 && end_byte < (long)slen)
+	જો (!exclusive && end_byte >= 0 && end_byte < (long)slen)
 	    // end index is inclusive
 	    end_byte += mb_ptr2len(str + end_byte);
     }
 
-    if (start_byte >= (long)slen || end_byte <= start_byte)
-	return NULL;
-    return vim_strnsave(str + start_byte, end_byte - start_byte);
+    જો (start_byte >= (long)slen || end_byte <= start_byte)
+	પાછા ખાલી;
+    પાછા vim_strnsave(str + start_byte, end_byte - start_byte);
 }
 
 /*
@@ -1997,74 +1997,74 @@ string_slice(char_u *str, varnumber_T first, varnumber_T last, int exclusive)
  * When "dfunc_idx" is negative don't give an error.
  * Returns NULL for an error.
  */
-    static svar_T *
-get_script_svar(scriptref_T *sref, int dfunc_idx)
+    સ્થિર svar_T *
+get_script_svar(scriptref_T *sref, પૂર્ણાંક dfunc_idx)
 {
     scriptitem_T    *si = SCRIPT_ITEM(sref->sref_sid);
-    dfunc_T	    *dfunc = dfunc_idx < 0 ? NULL
+    dfunc_T	    *dfunc = dfunc_idx < 0 ? ખાલી
 			      : ((dfunc_T *)def_functions.ga_data) + dfunc_idx;
     svar_T	    *sv;
 
-    if (sref->sref_seq != si->sn_script_seq)
+    જો (sref->sref_seq != si->sn_script_seq)
     {
 	// The script was reloaded after the function was compiled, the
 	// script_idx may not be valid.
-	if (dfunc != NULL)
+	જો (dfunc != ખાલી)
 	    semsg(_(e_script_variable_invalid_after_reload_in_function_str),
 					 printable_func_name(dfunc->df_ufunc));
-	return NULL;
+	પાછા ખાલી;
     }
     sv = ((svar_T *)si->sn_var_vals.ga_data) + sref->sref_idx;
-    if (sv->sv_name == NULL)
+    જો (sv->sv_name == ખાલી)
     {
-	if (dfunc != NULL)
+	જો (dfunc != ખાલી)
 	    emsg(_(e_script_variable_was_deleted));
-	return NULL;
+	પાછા ખાલી;
     }
-    if (!equal_type(sv->sv_type, sref->sref_type, 0))
+    જો (!equal_type(sv->sv_type, sref->sref_type, 0))
     {
-	if (dfunc != NULL)
+	જો (dfunc != ખાલી)
 	    emsg(_(e_script_variable_type_changed));
-	return NULL;
+	પાછા ખાલી;
     }
 
-    if ((sv->sv_flags & SVFLAG_EXPORTED) == 0
+    જો ((sv->sv_flags & SVFLAG_EXPORTED) == 0
 				      && sref->sref_sid != current_sctx.sc_sid)
     {
-	if (dfunc != NULL)
+	જો (dfunc != ખાલી)
 	    semsg(_(e_item_not_exported_in_script_str), sv->sv_name);
-	return NULL;
+	પાછા ખાલી;
     }
-    return sv;
+    પાછા sv;
 }
 
 /*
  * Function passed to do_cmdline() for splitting a script joined by NL
  * characters.
  */
-    static char_u *
+    સ્થિર char_u *
 get_split_sourceline(
-	int c UNUSED,
-	void *cookie,
-	int indent UNUSED,
+	પૂર્ણાંક c UNUSED,
+	શૂન્ય *cookie,
+	પૂર્ણાંક indent UNUSED,
 	getline_opt_T options UNUSED)
 {
     source_cookie_T	*sp = (source_cookie_T *)cookie;
     char_u		*p;
-    char_u		*line;
+    char_u		*લીટી;
 
     p = vim_strchr(sp->nextline, '\n');
-    if (p == NULL)
+    જો (p == ખાલી)
     {
-	line = vim_strsave(sp->nextline);
+	લીટી = vim_strsave(sp->nextline);
 	sp->nextline += STRLEN(sp->nextline);
     }
-    else
+    નહીંતર
     {
-	line = vim_strnsave(sp->nextline, p - sp->nextline);
+	લીટી = vim_strnsave(sp->nextline, p - sp->nextline);
 	sp->nextline = p + 1;
     }
-    return line;
+    પાછા લીટી;
 }
 
 /*
@@ -2072,38 +2072,38 @@ get_split_sourceline(
  * This can be a builtin function, user function or a funcref.
  * "iptr" can be used to replace the instruction with a more efficient one.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 call_eval_func(
 	char_u	    *name,
-	int	    argcount,
+	પૂર્ણાંક	    argcount,
 	ectx_T	    *ectx,
 	isn_T	    *iptr)
 {
-    int	    called_emsg_before = called_emsg;
-    int	    res;
+    પૂર્ણાંક	    called_emsg_before = called_emsg;
+    પૂર્ણાંક	    res;
 
-    res = call_by_name(name, argcount, ectx, iptr, NULL);
-    if (res == FAIL && called_emsg == called_emsg_before)
+    res = call_by_name(name, argcount, ectx, iptr, ખાલી);
+    જો (res == FAIL && called_emsg == called_emsg_before)
     {
 	dictitem_T	*v;
 
-	v = find_var(name, NULL, FALSE);
-	if (v == NULL || (v->di_tv.v_type != VAR_PARTIAL
+	v = find_var(name, ખાલી, FALSE);
+	જો (v == ખાલી || (v->di_tv.v_type != VAR_PARTIAL
 					       && v->di_tv.v_type != VAR_FUNC))
 	{
 	    emsg_funcname(e_unknown_function_str, name);
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	return call_partial(&v->di_tv, argcount, ectx);
+	પાછા call_partial(&v->di_tv, argcount, ectx);
     }
-    return res;
+    પાછા res;
 }
 
 /*
  * When a function reference is used, fill a partial with the information
  * needed, especially when it is used as a closure.
  */
-    int
+    પૂર્ણાંક
 fill_partial_and_closure(
 	partial_T	*pt,
 	ufunc_T		*ufunc,
@@ -2113,57 +2113,57 @@ fill_partial_and_closure(
     pt->pt_func = ufunc;
     pt->pt_refcount = 1;
 
-    if (ufunc->uf_flags & FC_CLOSURE)
+    જો (ufunc->uf_flags & FC_CLOSURE)
     {
 	dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 							  + ectx->ec_dfunc_idx;
 
 	// The closure may need to find arguments and local variables of the
 	// current function in the stack.
-	pt->pt_outer.out_stack = &ectx->ec_stack;
+	pt->pt_outer.out_ઢગલો = &ectx->ec_ઢગલો;
 	pt->pt_outer.out_frame_idx = ectx->ec_frame_idx;
-	if (ectx->ec_outer_ref != NULL)
+	જો (ectx->ec_outer_ref != ખાલી)
 	{
 	    // The current context already has a context, link to that one.
 	    pt->pt_outer.out_up = ectx->ec_outer_ref->or_outer;
-	    if (ectx->ec_outer_ref->or_partial != NULL)
+	    જો (ectx->ec_outer_ref->or_partial != ખાલી)
 	    {
 		pt->pt_outer.out_up_partial = ectx->ec_outer_ref->or_partial;
 		++pt->pt_outer.out_up_partial->pt_refcount;
 	    }
 	}
 
-	if (lvi != NULL)
+	જો (lvi != ખાલી)
 	{
-	    int	depth;
+	    પૂર્ણાંક	depth;
 
 	    // The closure may need to find variables defined inside a loop,
 	    // for every nested loop.  A new reference is made every time,
 	    // ISN_ENDLOOP will check if they are actually used.
-	    for (depth = 0; depth < lvi->lvi_depth; ++depth)
+	    માટે (depth = 0; depth < lvi->lvi_depth; ++depth)
 	    {
-		pt->pt_outer.out_loop[depth].stack = &ectx->ec_stack;
+		pt->pt_outer.out_loop[depth].ઢગલો = &ectx->ec_ઢગલો;
 		pt->pt_outer.out_loop[depth].var_idx = ectx->ec_frame_idx
-			 + STACK_FRAME_SIZE + lvi->lvi_loop[depth].var_idx;
-		pt->pt_outer.out_loop[depth].var_count =
-					    lvi->lvi_loop[depth].var_count;
+			 + ઢગલો_FRAME_SIZE + lvi->lvi_loop[depth].var_idx;
+		pt->pt_outer.out_loop[depth].var_ગણતરી =
+					    lvi->lvi_loop[depth].var_ગણતરી;
 	    }
 	    pt->pt_outer.out_loop_size = lvi->lvi_depth;
 	}
-	else
+	નહીંતર
 	    pt->pt_outer.out_loop_size = 0;
 
 	// If the function currently executing returns and the closure is still
 	// being referenced, we need to make a copy of the context (arguments
 	// and local variables) so that the closure can use it later.
 	// Store a reference to the partial so we can handle that.
-	if (GA_GROW_FAILS(&ectx->ec_funcrefs, 1))
+	જો (GA_GROW_FAILS(&ectx->ec_funcrefs, 1))
 	    // caller needs to free pt
-	    return FAIL;
+	    પાછા FAIL;
 	// Extra variable keeps the count of closures created in the current
 	// function call.
-	++(((typval_T *)ectx->ec_stack.ga_data) + ectx->ec_frame_idx
-		       + STACK_FRAME_SIZE + dfunc->df_varcount)->vval.v_number;
+	++(((typval_T *)ectx->ec_ઢગલો.ga_data) + ectx->ec_frame_idx
+		       + ઢગલો_FRAME_SIZE + dfunc->df_varcount)->vval.v_સંખ્યા;
 
 	((partial_T **)ectx->ec_funcrefs.ga_data)[ectx->ec_funcrefs.ga_len]
 									  = pt;
@@ -2171,13 +2171,13 @@ fill_partial_and_closure(
 	++ectx->ec_funcrefs.ga_len;
     }
     ++ufunc->uf_refcount;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Execute iptr->isn_arg.string as an Ex command.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 exec_command(isn_T *iptr, char_u *cmd_string)
 {
     source_cookie_T cookie;
@@ -2186,11 +2186,11 @@ exec_command(isn_T *iptr, char_u *cmd_string)
     // Pass getsourceline to get an error for a missing ":end" command.
     CLEAR_FIELD(cookie);
     cookie.sourcing_lnum = iptr->isn_lnum - 1;
-    if (do_cmdline(cmd_string, getsourceline, &cookie,
+    જો (do_cmdline(cmd_string, getsourceline, &cookie,
 			     DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED) == FAIL
 		|| did_emsg)
-	return FAIL;
-    return OK;
+	પાછા FAIL;
+    પાછા OK;
 }
 
 /*
@@ -2199,39 +2199,39 @@ exec_command(isn_T *iptr, char_u *cmd_string)
  * "loaded" is set to TRUE if the script had to be loaded.
  * Returns FAIL if loading fails, OK if already loaded or loaded now.
  */
-    int
-may_load_script(int sid, int *loaded)
+    પૂર્ણાંક
+may_load_script(પૂર્ણાંક sid, પૂર્ણાંક *loaded)
 {
     scriptitem_T *si = SCRIPT_ITEM(sid);
 
-    if (si->sn_state == SN_STATE_NOT_LOADED)
+    જો (si->sn_state == SN_STATE_NOT_LOADED)
     {
 	*loaded = TRUE;
-	if (do_source(si->sn_name, FALSE, DOSO_NONE, NULL) == FAIL)
+	જો (do_source(si->sn_name, FALSE, DOSO_NONE, ખાલી) == FAIL)
 	{
 	    semsg(_(e_cant_open_file_str), si->sn_name);
-	    return FAIL;
+	    પાછા FAIL;
 	}
     }
-    return OK;
+    પાછા OK;
 }
 
 // used for v_instr of typval of VAR_INSTR
-struct instr_S {
+સંરચના instr_S {
     ectx_T	*instr_ectx;
     isn_T	*instr_instr;
 };
 
 // used for substitute_instr
-typedef struct subs_expr_S {
+પ્રકારવ્યાખ્યા સંરચના subs_પદાવલિ_S {
     ectx_T	*subs_ectx;
     isn_T	*subs_instr;
-    int		subs_status;
-} subs_expr_T;
+    પૂર્ણાંક		subs_status;
+} subs_પદાવલિ_T;
 
 // Set when calling do_debug().
-static ectx_T	*debug_context = NULL;
-static int	debug_var_count;
+સ્થિર ectx_T	*debug_context = ખાલી;
+સ્થિર પૂર્ણાંક	debug_var_ગણતરી;
 
 /*
  * When debugging lookup "name" and return the typeval.
@@ -2240,117 +2240,117 @@ static int	debug_var_count;
     typval_T *
 lookup_debug_var(char_u *name)
 {
-    int		    idx;
+    પૂર્ણાંક		    idx;
     dfunc_T	    *dfunc;
     ufunc_T	    *ufunc;
     ectx_T	    *ectx = debug_context;
-    int		    varargs_off;
+    પૂર્ણાંક		    varargs_off;
 
-    if (ectx == NULL)
-	return NULL;
+    જો (ectx == ખાલી)
+	પાછા ખાલી;
     dfunc = ((dfunc_T *)def_functions.ga_data) + ectx->ec_dfunc_idx;
 
     // Go through the local variable names, from last to first.
-    for (idx = debug_var_count - 1; idx >= 0; --idx)
+    માટે (idx = debug_var_ગણતરી - 1; idx >= 0; --idx)
     {
 	char_u *varname = ((char_u **)dfunc->df_var_names.ga_data)[idx];
 
 	// the variable name may be NULL when not available in this block
-	if (varname != NULL && STRCMP(varname, name) == 0)
-	    return STACK_TV_VAR(idx);
+	જો (varname != ખાલી && STRCMP(varname, name) == 0)
+	    પાછા ઢગલો_TV_VAR(idx);
     }
 
     // Go through argument names.
     ufunc = dfunc->df_ufunc;
-    varargs_off = ufunc->uf_va_name == NULL ? 0 : 1;
-    for (idx = 0; idx < ufunc->uf_args.ga_len; ++idx)
-	if (STRCMP(((char_u **)(ufunc->uf_args.ga_data))[idx], name) == 0)
-	    return STACK_TV(ectx->ec_frame_idx - ufunc->uf_args.ga_len
+    varargs_off = ufunc->uf_va_name == ખાલી ? 0 : 1;
+    માટે (idx = 0; idx < ufunc->uf_args.ga_len; ++idx)
+	જો (STRCMP(((char_u **)(ufunc->uf_args.ga_data))[idx], name) == 0)
+	    પાછા ઢગલો_TV(ectx->ec_frame_idx - ufunc->uf_args.ga_len
 							  - varargs_off + idx);
-    if (ufunc->uf_va_name != NULL && STRCMP(ufunc->uf_va_name, name) == 0)
-	return STACK_TV(ectx->ec_frame_idx - 1);
+    જો (ufunc->uf_va_name != ખાલી && STRCMP(ufunc->uf_va_name, name) == 0)
+	પાછા ઢગલો_TV(ectx->ec_frame_idx - 1);
 
-    return NULL;
+    પાછા ખાલી;
 }
 
 /*
  * Return TRUE if there might be a breakpoint in "ufunc", which is when a
  * breakpoint was set in that function or when there is any expression.
  */
-    int
+    પૂર્ણાંક
 may_break_in_function(ufunc_T *ufunc)
 {
-    return ufunc->uf_has_breakpoint || debug_has_expr_breakpoint();
+    પાછા ufunc->uf_has_breakpoint || debug_has_પદાવલિ_breakpoint();
 }
 
-    static void
+    સ્થિર શૂન્ય
 handle_debug(isn_T *iptr, ectx_T *ectx)
 {
-    char_u	*line;
+    char_u	*લીટી;
     ufunc_T	*ufunc = (((dfunc_T *)def_functions.ga_data)
 					       + ectx->ec_dfunc_idx)->df_ufunc;
     isn_T	*ni;
-    int		end_lnum = iptr->isn_lnum;
+    પૂર્ણાંક		end_lnum = iptr->isn_lnum;
     garray_T	ga;
-    int		lnum;
+    પૂર્ણાંક		lnum;
 
-    if (ex_nesting_level > debug_break_level)
+    જો (ex_nesting_level > debug_break_level)
     {
 	linenr_T breakpoint;
 
-	if (!may_break_in_function(ufunc))
-	    return;
+	જો (!may_break_in_function(ufunc))
+	    પાછા;
 
 	// check for the next breakpoint if needed
 	breakpoint = dbg_find_breakpoint(FALSE, ufunc->uf_name,
 					   iptr->isn_arg.debug.dbg_break_lnum);
-	if (breakpoint <= 0 || breakpoint > iptr->isn_lnum)
-	    return;
+	જો (breakpoint <= 0 || breakpoint > iptr->isn_lnum)
+	    પાછા;
     }
 
     SOURCING_LNUM = iptr->isn_lnum;
     debug_context = ectx;
-    debug_var_count = iptr->isn_arg.debug.dbg_var_names_len;
+    debug_var_ગણતરી = iptr->isn_arg.debug.dbg_var_names_len;
 
-    for (ni = iptr + 1; ni->isn_type != ISN_FINISH; ++ni)
-	if (ni->isn_type == ISN_DEBUG
+    માટે (ni = iptr + 1; ni->isn_type != ISN_FINISH; ++ni)
+	જો (ni->isn_type == ISN_DEBUG
 		  || ni->isn_type == ISN_RETURN
 		  || ni->isn_type == ISN_RETURN_OBJECT
 		  || ni->isn_type == ISN_RETURN_VOID)
 	{
 	    end_lnum = ni->isn_lnum + (ni->isn_type == ISN_DEBUG ? 0 : 1);
-	    break;
+	    તોડો;
 	}
 
-    if (end_lnum > iptr->isn_lnum)
+    જો (end_lnum > iptr->isn_lnum)
     {
-	ga_init2(&ga, sizeof(char_u *), 10);
-	for (lnum = iptr->isn_lnum; lnum < end_lnum
-				     && lnum <= ufunc->uf_lines.ga_len; ++lnum)
+	ga_init2(&ga, કદ(char_u *), 10);
+	માટે (lnum = iptr->isn_lnum; lnum < end_lnum
+				     && lnum <= ufunc->uf_લીટીઓ.ga_len; ++lnum)
 	{
-	    char_u *p = ((char_u **)ufunc->uf_lines.ga_data)[lnum - 1];
+	    char_u *p = ((char_u **)ufunc->uf_લીટીઓ.ga_data)[lnum - 1];
 
-	    if (p == NULL)
-		continue;  // left over from continuation line
+	    જો (p == ખાલી)
+		ચાલુ;  // left over from continuation line
 	    p = skipwhite(p);
-	    if (*p == '#')
-		break;
-	    if (GA_GROW_OK(&ga, 1))
+	    જો (*p == '#')
+		તોડો;
+	    જો (GA_GROW_OK(&ga, 1))
 		((char_u **)(ga.ga_data))[ga.ga_len++] = p;
-	    if (STRNCMP(p, "def ", 4) == 0)
-		break;
+	    જો (STRNCMP(p, "def ", 4) == 0)
+		તોડો;
 	}
-	line = ga_concat_strings(&ga, "  ");
+	લીટી = ga_concat_strings(&ga, "  ");
 	vim_free(ga.ga_data);
     }
-    else
-	line = ((char_u **)ufunc->uf_lines.ga_data)[iptr->isn_lnum - 1];
+    નહીંતર
+	લીટી = ((char_u **)ufunc->uf_લીટીઓ.ga_data)[iptr->isn_lnum - 1];
 
-    do_debug(line == NULL ? (char_u *)"[empty]" : line);
-    debug_context = NULL;
+    do_debug(લીટી == ખાલી ? (char_u *)"[empty]" : લીટી);
+    debug_context = ખાલી;
 
-    if (end_lnum > iptr->isn_lnum)
-	vim_free(line);
+    જો (end_lnum > iptr->isn_lnum)
+	vim_free(લીટી);
 }
 
 /*
@@ -2359,16 +2359,16 @@ handle_debug(isn_T *iptr, ectx_T *ectx)
  * at runtime if compile time type check cannot be performed (VAR_ANY).
  * Returns FAIL if there is a type mismatch.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 storeindex_check_list_member_type(
     list_T	*lhs_list,
     typval_T	*rhs_tv,
     ectx_T	*ectx)
 {
-    if (lhs_list->lv_type == NULL || lhs_list->lv_type->tt_member == NULL)
-	return OK;
+    જો (lhs_list->lv_type == ખાલી || lhs_list->lv_type->tt_member == ખાલી)
+	પાછા OK;
 
-    return check_typval_type(lhs_list->lv_type->tt_member, rhs_tv,
+    પાછા check_typval_type(lhs_list->lv_type->tt_member, rhs_tv,
 			     ectx->ec_where);
 }
 
@@ -2376,56 +2376,56 @@ storeindex_check_list_member_type(
  * Store a value in a list, dict, blob or object variable.
  * Returns OK, FAIL or NOTDONE (uncatchable error).
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_storeindex(isn_T *iptr, ectx_T *ectx)
 {
     vartype_T	dest_type = iptr->isn_arg.storeindex.si_vartype;
     typval_T	*tv;
-    typval_T	*tv_idx = STACK_TV_BOT(-2);
+    typval_T	*tv_idx = ઢગલો_TV_BOT(-2);
     long	lidx = 0;
-    typval_T	*tv_dest = STACK_TV_BOT(-1);
-    int		status = OK;
-    int		check_rhs_type = FALSE;
+    typval_T	*tv_dest = ઢગલો_TV_BOT(-1);
+    પૂર્ણાંક		status = OK;
+    પૂર્ણાંક		check_rhs_type = FALSE;
 
-    if (tv_idx->v_type == VAR_NUMBER)
-	lidx = (long)tv_idx->vval.v_number;
+    જો (tv_idx->v_type == VAR_સંખ્યા)
+	lidx = (long)tv_idx->vval.v_સંખ્યા;
 
     // Stack contains:
     // -3 value to be stored
     // -2 index
     // -1 dict, list, blob, object or class
-    tv = STACK_TV_BOT(-3);
+    tv = ઢગલો_TV_BOT(-3);
     SOURCING_LNUM = iptr->isn_lnum;
 
     // Make sure an object has been initialized
-    if (dest_type == VAR_OBJECT && tv_dest->vval.v_object == NULL)
+    જો (dest_type == VAR_OBJECT && tv_dest->vval.v_object == ખાલી)
     {
 	emsg(_(e_using_null_object));
 	status = FAIL;
     }
-    else if (dest_type == VAR_ANY)
+    નહીંતર જો (dest_type == VAR_ANY)
     {
 	check_rhs_type = TRUE;
 	dest_type = tv_dest->v_type;
-	if (dest_type == VAR_DICT)
+	જો (dest_type == VAR_DICT)
 	    status = do_2string(tv_idx, TRUE, FALSE);
-	else if (dest_type == VAR_OBJECT && tv_idx->v_type == VAR_STRING)
+	નહીંતર જો (dest_type == VAR_OBJECT && tv_idx->v_type == VAR_STRING)
 	{
 	    // Need to get the member index now that the class is known.
 	    object_T *obj = tv_dest->vval.v_object;
-	    if (obj == NULL)
+	    જો (obj == ખાલી)
 	    {
 		emsg(_(e_using_null_object));
 		status = FAIL;
 	    }
-	    else
+	    નહીંતર
 	    {
 		class_T *cl = obj->obj_class;
 		char_u  *member = tv_idx->vval.v_string;
 
-		int		m_idx;
+		પૂર્ણાંક		m_idx;
 		ocmember_T *m = object_member_lookup(cl, member, 0, &m_idx);
-		if (m != NULL)
+		જો (m != ખાલી)
 		{
 		    // Get the current function
 		    ufunc_T *ufunc = (((dfunc_T *)def_functions.ga_data)
@@ -2433,176 +2433,176 @@ execute_storeindex(isn_T *iptr, ectx_T *ectx)
 		    where_T where = WHERE_INIT;
 
 		    // Check whether the member variable is writeable
-		    if ((m->ocm_access != VIM_ACCESS_ALL) &&
-			    (ufunc->uf_class == NULL ||
+		    જો ((m->ocm_access != VIM_ACCESS_ALL) &&
+			    (ufunc->uf_class == ખાલી ||
 			     !class_instance_of(ufunc->uf_class, cl)))
 		    {
-			char *msg = (m->ocm_access == VIM_ACCESS_PRIVATE)
+			અક્ષર *સંદેશ = (m->ocm_access == VIM_ACCESS_PRIVATE)
 			    ? e_cannot_access_protected_variable_str
 			    : e_variable_is_not_writable_str;
-			emsg_var_cl_define(msg, m->ocm_name.string, 0, cl);
+			emsg_var_cl_define(સંદેશ, m->ocm_name.string, 0, cl);
 			status = FAIL;
 		    }
 		    // Fail if the variable is a const or final or the type
 		    // is not compatible
-		    else if (oc_var_check_ro(cl, m) ||
+		    નહીંતર જો (oc_var_check_ro(cl, m) ||
 			     check_typval_type(m->ocm_type, tv, where)
 								== FAIL)
 			status = FAIL;
-		    else
+		    નહીંતર
 			lidx = m_idx;
 		}
-		else
+		નહીંતર
 		{
-		    member_not_found_msg(cl, VAR_OBJECT, member, 0);
+		    member_not_found_સંદેશ(cl, VAR_OBJECT, member, 0);
 		    status = FAIL;
 		}
 	    }
 	}
-	else if (dest_type == VAR_OBJECT)
+	નહીંતર જો (dest_type == VAR_OBJECT)
 	{
 	    emsg(_(e_string_required));
 	    status = FAIL;
 	}
-	else if (dest_type == VAR_LIST && tv_idx->v_type != VAR_NUMBER)
+	નહીંતર જો (dest_type == VAR_LIST && tv_idx->v_type != VAR_સંખ્યા)
 	{
-	    emsg(_(e_number_expected));
+	    emsg(_(e_સંખ્યા_expected));
 	    status = FAIL;
 	}
     }
 
-    if (status == OK)
+    જો (status == OK)
     {
-	if (dest_type == VAR_LIST)
+	જો (dest_type == VAR_LIST)
 	{
 	    list_T	    *list = tv_dest->vval.v_list;
 
-	    if (list == NULL)
+	    જો (list == ખાલી)
 	    {
 		emsg(_(e_list_not_set));
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (lidx < 0 && list->lv_len + lidx >= 0)
+	    જો (lidx < 0 && list->lv_len + lidx >= 0)
 		// negative index is relative to the end
 		lidx = list->lv_len + lidx;
-	    if (lidx < 0 || lidx > list->lv_len)
+	    જો (lidx < 0 || lidx > list->lv_len)
 	    {
 		semsg(_(e_list_index_out_of_range_nr), lidx);
-		return FAIL;
+		પાછા FAIL;
 	    }
 
 	    // Do a runtime type check for VAR_ANY
-	    if (check_rhs_type &&
+	    જો (check_rhs_type &&
 		    storeindex_check_list_member_type(list, tv, ectx) == FAIL)
-		return FAIL;
+		પાછા FAIL;
 
-	    if (lidx < list->lv_len)
+	    જો (lidx < list->lv_len)
 	    {
 		listitem_T *li = list_find(list, lidx);
-		if (li == NULL)
-		    return FAIL;
-		if (error_if_locked(li->li_tv.v_lock,
+		જો (li == ખાલી)
+		    પાછા FAIL;
+		જો (error_if_locked(li->li_tv.v_lock,
 					     e_cannot_change_locked_list_item))
-		    return FAIL;
+		    પાછા FAIL;
 		// overwrite existing list item
 		clear_tv(&li->li_tv);
 		li->li_tv = *tv;
 	    }
-	    else
+	    નહીંતર
 	    {
-		if (error_if_locked(list->lv_lock, e_cannot_change_locked_list))
-		    return FAIL;
+		જો (error_if_locked(list->lv_lock, e_cannot_change_locked_list))
+		    પાછા FAIL;
 		// append to list, only fails when out of memory
-		if (list_append_tv(list, tv) == FAIL)
-		    return NOTDONE;
+		જો (list_append_tv(list, tv) == FAIL)
+		    પાછા NOTDONE;
 		clear_tv(tv);
 	    }
 	}
-	else if (dest_type == VAR_DICT)
+	નહીંતર જો (dest_type == VAR_DICT)
 	{
-	    char_u		*key = tv_idx->vval.v_string;
+	    char_u		*ચાવી = tv_idx->vval.v_string;
 	    dict_T		*dict = tv_dest->vval.v_dict;
 	    dictitem_T	*di;
 
 	    SOURCING_LNUM = iptr->isn_lnum;
-	    if (dict == NULL)
+	    જો (dict == ખાલી)
 	    {
 		emsg(_(e_dictionary_not_set));
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (key == NULL)
-		key = (char_u *)"";
-	    di = dict_find(dict, key, -1);
-	    if (di != NULL)
+	    જો (ચાવી == ખાલી)
+		ચાવી = (char_u *)"";
+	    di = dict_find(dict, ચાવી, -1);
+	    જો (di != ખાલી)
 	    {
-		if (error_if_locked(di->di_tv.v_lock,
+		જો (error_if_locked(di->di_tv.v_lock,
 						    e_cannot_change_dict_item))
-		    return FAIL;
+		    પાછા FAIL;
 		// overwrite existing value
 		clear_tv(&di->di_tv);
 		di->di_tv = *tv;
 	    }
-	    else
+	    નહીંતર
 	    {
-		if (error_if_locked(dict->dv_lock, e_cannot_change_dict))
-		    return FAIL;
+		જો (error_if_locked(dict->dv_lock, e_cannot_change_dict))
+		    પાછા FAIL;
 		// add to dict, only fails when out of memory
-		if (dict_add_tv(dict, (char *)key, tv) == FAIL)
-		    return NOTDONE;
+		જો (dict_add_tv(dict, (અક્ષર *)ચાવી, tv) == FAIL)
+		    પાછા NOTDONE;
 		clear_tv(tv);
 	    }
 	}
-	else if (dest_type == VAR_BLOB)
+	નહીંતર જો (dest_type == VAR_BLOB)
 	{
 	    blob_T	    *blob = tv_dest->vval.v_blob;
 	    varnumber_T	    nr;
-	    int		    error = FALSE;
-	    int		    len;
+	    પૂર્ણાંક		    error = FALSE;
+	    પૂર્ણાંક		    len;
 
-	    if (blob == NULL)
+	    જો (blob == ખાલી)
 	    {
 		emsg(_(e_blob_not_set));
-		return FAIL;
+		પાછા FAIL;
 	    }
 	    len = blob_len(blob);
-	    if (lidx < 0 && len + lidx >= 0)
+	    જો (lidx < 0 && len + lidx >= 0)
 		// negative index is relative to the end
 		lidx = len + lidx;
 
 	    // Can add one byte at the end.
-	    if (lidx < 0 || lidx > len)
+	    જો (lidx < 0 || lidx > len)
 	    {
 		semsg(_(e_blob_index_out_of_range_nr), lidx);
-		return FAIL;
+		પાછા FAIL;
 	    }
-	    if (value_check_lock(blob->bv_lock, (char_u *)"blob", FALSE))
-		return FAIL;
-	    nr = tv_get_number_chk(tv, &error);
-	    if (error)
-		return FAIL;
-	    if (nr < 0 || nr > 255)
+	    જો (કિંમત_check_lock(blob->bv_lock, (char_u *)"blob", FALSE))
+		પાછા FAIL;
+	    nr = tv_get_સંખ્યા_chk(tv, &error);
+	    જો (error)
+		પાછા FAIL;
+	    જો (nr < 0 || nr > 255)
 	    {
-		semsg(_(e_invalid_value_for_blob_nr), nr);
-		return FAIL;
+		semsg(_(e_invalid_કિંમત_for_blob_nr), nr);
+		પાછા FAIL;
 	    }
 	    blob_set_append(blob, lidx, nr);
 	}
-	else if (dest_type == VAR_CLASS || dest_type == VAR_OBJECT)
+	નહીંતર જો (dest_type == VAR_CLASS || dest_type == VAR_OBJECT)
 	{
 	    typval_T	    *otv;
 
-	    if (dest_type == VAR_OBJECT)
+	    જો (dest_type == VAR_OBJECT)
 	    {
 		object_T	*obj = tv_dest->vval.v_object;
 
 		otv = (typval_T *)(obj + 1);
 		class_T	    *itf = iptr->isn_arg.storeindex.si_class;
-		if (itf != NULL)
+		જો (itf != ખાલી)
 		    // convert interface member index to class member index
 		    lidx = object_index_from_itf_index(itf, FALSE, lidx,
 						       obj->obj_class);
 	    }
-	    else
+	    નહીંતર
 	    {
 		// VAR_CLASS
 		class_T	*class = tv_dest->vval.v_class;
@@ -2612,12 +2612,12 @@ execute_storeindex(isn_T *iptr, ectx_T *ectx)
 	    clear_tv(&otv[lidx]);
 	    otv[lidx] = *tv;
 	}
-	else if (dest_type == VAR_TUPLE)
+	નહીંતર જો (dest_type == VAR_TUPLE)
 	{
 	    emsg(_(e_tuple_is_immutable));
 	    status = FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    status = FAIL;
 	    semsg(_(e_cannot_index_str), vartype_name(dest_type));
@@ -2626,55 +2626,55 @@ execute_storeindex(isn_T *iptr, ectx_T *ectx)
 
     clear_tv(tv_idx);
     clear_tv(tv_dest);
-    ectx->ec_stack.ga_len -= 3;
-    if (status == FAIL)
+    ectx->ec_ઢગલો.ga_len -= 3;
+    જો (status == FAIL)
     {
 	clear_tv(tv);
-	return FAIL;
+	પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Store a value in a list or blob range.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_storerange(isn_T *iptr, ectx_T *ectx)
 {
     typval_T	*tv;
-    typval_T	*tv_idx1 = STACK_TV_BOT(-3);
-    typval_T	*tv_idx2 = STACK_TV_BOT(-2);
-    typval_T	*tv_dest = STACK_TV_BOT(-1);
-    int		status = OK;
+    typval_T	*tv_idx1 = ઢગલો_TV_BOT(-3);
+    typval_T	*tv_idx2 = ઢગલો_TV_BOT(-2);
+    typval_T	*tv_dest = ઢગલો_TV_BOT(-1);
+    પૂર્ણાંક		status = OK;
 
     // Stack contains:
     // -4 value to be stored
     // -3 first index or "none"
     // -2 second index or "none"
     // -1 destination list or blob
-    tv = STACK_TV_BOT(-4);
+    tv = ઢગલો_TV_BOT(-4);
     SOURCING_LNUM = iptr->isn_lnum;
-    if (tv_dest->v_type == VAR_LIST)
+    જો (tv_dest->v_type == VAR_LIST)
     {
 	long	    n1;
 	long	    n2;
 	listitem_T  *li1;
 
-	n1 = (long)tv_get_number_chk(tv_idx1, NULL);
-	if (tv_idx2->v_type == VAR_SPECIAL
-		    && tv_idx2->vval.v_number == VVAL_NONE)
+	n1 = (long)tv_get_સંખ્યા_chk(tv_idx1, ખાલી);
+	જો (tv_idx2->v_type == VAR_SPECIAL
+		    && tv_idx2->vval.v_સંખ્યા == VVAL_NONE)
 	    n2 = list_len(tv_dest->vval.v_list) - 1;
-	else
-	    n2 = (long)tv_get_number_chk(tv_idx2, NULL);
+	નહીંતર
+	    n2 = (long)tv_get_સંખ્યા_chk(tv_idx2, ખાલી);
 
 	li1 = check_range_index_one(tv_dest->vval.v_list, &n1, TRUE, FALSE);
-	if (li1 == NULL)
+	જો (li1 == ખાલી)
 	    status = FAIL;
-	else
+	નહીંતર
 	{
 	    status = check_range_index_two(tv_dest->vval.v_list,
 							 &n1, li1, &n2, FALSE);
-	    if (status != FAIL)
+	    જો (status != FAIL)
 		status = list_assign_range(
 			tv_dest->vval.v_list,
 			tv->vval.v_list,
@@ -2685,27 +2685,27 @@ execute_storerange(isn_T *iptr, ectx_T *ectx)
 			(char_u *)"[unknown]");
 	}
     }
-    else if (tv_dest->v_type == VAR_BLOB)
+    નહીંતર જો (tv_dest->v_type == VAR_BLOB)
     {
 	varnumber_T n1;
 	varnumber_T n2;
 	long	    bloblen;
 
-	n1 = tv_get_number_chk(tv_idx1, NULL);
-	if (tv_idx2->v_type == VAR_SPECIAL
-					&& tv_idx2->vval.v_number == VVAL_NONE)
+	n1 = tv_get_સંખ્યા_chk(tv_idx1, ખાલી);
+	જો (tv_idx2->v_type == VAR_SPECIAL
+					&& tv_idx2->vval.v_સંખ્યા == VVAL_NONE)
 	    n2 = blob_len(tv_dest->vval.v_blob) - 1;
-	else
-	    n2 = tv_get_number_chk(tv_idx2, NULL);
+	નહીંતર
+	    n2 = tv_get_સંખ્યા_chk(tv_idx2, ખાલી);
 	bloblen = blob_len(tv_dest->vval.v_blob);
 
-	if (check_blob_index(bloblen, n1, FALSE) == FAIL
+	જો (check_blob_index(bloblen, n1, FALSE) == FAIL
 		|| check_blob_range(bloblen, n1, n2, FALSE) == FAIL)
 	    status = FAIL;
-	else
+	નહીંતર
 	    status = blob_set_range(tv_dest->vval.v_blob, n1, n2, tv);
     }
-    else
+    નહીંતર
     {
 	status = FAIL;
 	emsg(_(e_list_or_blob_required));
@@ -2714,105 +2714,105 @@ execute_storerange(isn_T *iptr, ectx_T *ectx)
     clear_tv(tv_idx1);
     clear_tv(tv_idx2);
     clear_tv(tv_dest);
-    ectx->ec_stack.ga_len -= 4;
+    ectx->ec_ઢગલો.ga_len -= 4;
     clear_tv(tv);
 
-    return status;
+    પાછા status;
 }
 
 /*
  * Unlet item in list or dict variable.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_unletindex(isn_T *iptr, ectx_T *ectx)
 {
-    typval_T	*tv_idx = STACK_TV_BOT(-2);
-    typval_T	*tv_dest = STACK_TV_BOT(-1);
-    int		status = OK;
+    typval_T	*tv_idx = ઢગલો_TV_BOT(-2);
+    typval_T	*tv_dest = ઢગલો_TV_BOT(-1);
+    પૂર્ણાંક		status = OK;
 
     // Stack contains:
     // -2 index
     // -1 dict or list
     SOURCING_LNUM = iptr->isn_lnum;
-    if (tv_dest->v_type == VAR_DICT)
+    જો (tv_dest->v_type == VAR_DICT)
     {
 	// unlet a dict item, index must be a string
-	if (tv_idx->v_type != VAR_STRING && tv_idx->v_type != VAR_NUMBER)
+	જો (tv_idx->v_type != VAR_STRING && tv_idx->v_type != VAR_સંખ્યા)
 	{
 	    semsg(_(e_expected_str_but_got_str),
 			vartype_name(VAR_STRING),
 			vartype_name(tv_idx->v_type));
 	    status = FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    dict_T	*d = tv_dest->vval.v_dict;
-	    char_u	*key;
-	    dictitem_T  *di = NULL;
+	    char_u	*ચાવી;
+	    dictitem_T  *di = ખાલી;
 
-	    if (d != NULL && value_check_lock(
-				      d->dv_lock, NULL, FALSE))
+	    જો (d != ખાલી && કિંમત_check_lock(
+				      d->dv_lock, ખાલી, FALSE))
 		status = FAIL;
-	    else
+	    નહીંતર
 	    {
-		if (tv_idx->v_type == VAR_STRING)
+		જો (tv_idx->v_type == VAR_STRING)
 		{
-		    key = tv_idx->vval.v_string;
-		    if (key == NULL)
-			key = (char_u *)"";
+		    ચાવી = tv_idx->vval.v_string;
+		    જો (ચાવી == ખાલી)
+			ચાવી = (char_u *)"";
 		}
-		else
+		નહીંતર
 		{
-		    key = tv_get_string(tv_idx);
+		    ચાવી = tv_get_string(tv_idx);
 		}
-		if (d != NULL)
-		    di = dict_find(d, key, (int)STRLEN(key));
-		if (di == NULL)
+		જો (d != ખાલી)
+		    di = dict_find(d, ચાવી, (પૂર્ણાંક)STRLEN(ચાવી));
+		જો (di == ખાલી)
 		{
 		    // NULL dict is equivalent to empty dict
-		    semsg(_(e_key_not_present_in_dictionary_str), key);
+		    semsg(_(e_ચાવી_not_present_in_dictionary_str), ચાવી);
 		    status = FAIL;
 		}
-		else if (var_check_fixed(di->di_flags,
-						   NULL, FALSE)
+		નહીંતર જો (var_check_fixed(di->di_flags,
+						   ખાલી, FALSE)
 			|| var_check_ro(di->di_flags,
-						  NULL, FALSE))
+						  ખાલી, FALSE))
 		    status = FAIL;
-		else
+		નહીંતર
 		    dictitem_remove(d, di, "unlet");
 	    }
 	}
     }
-    else if (tv_dest->v_type == VAR_LIST)
+    નહીંતર જો (tv_dest->v_type == VAR_LIST)
     {
 	// unlet a List item, index must be a number
-	if (check_for_number(tv_idx) == FAIL)
+	જો (check_for_સંખ્યા(tv_idx) == FAIL)
 	{
 	    status = FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    list_T	*l = tv_dest->vval.v_list;
-	    long	n = (long)tv_idx->vval.v_number;
+	    long	n = (long)tv_idx->vval.v_સંખ્યા;
 
-	    if (l != NULL && value_check_lock(
-				      l->lv_lock, NULL, FALSE))
+	    જો (l != ખાલી && કિંમત_check_lock(
+				      l->lv_lock, ખાલી, FALSE))
 		status = FAIL;
-	    else
+	    નહીંતર
 	    {
 		listitem_T	*li = list_find(l, n);
 
-		if (li == NULL)
+		જો (li == ખાલી)
 		{
 		    semsg(_(e_list_index_out_of_range_nr), n);
 		    status = FAIL;
 		}
-		else
+		નહીંતર
 		    listitem_remove(l, li);
 	    }
 	}
     }
-    else
+    નહીંતર
     {
 	status = FAIL;
 	semsg(_(e_cannot_index_str),
@@ -2821,81 +2821,81 @@ execute_unletindex(isn_T *iptr, ectx_T *ectx)
 
     clear_tv(tv_idx);
     clear_tv(tv_dest);
-    ectx->ec_stack.ga_len -= 2;
+    ectx->ec_ઢગલો.ga_len -= 2;
 
-    return status;
+    પાછા status;
 }
 
 /*
  * Unlet a range of items in a list variable.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_unletrange(isn_T *iptr, ectx_T *ectx)
 {
     // Stack contains:
     // -3 index1
     // -2 index2
     // -1 dict or list
-    typval_T	*tv_idx1 = STACK_TV_BOT(-3);
-    typval_T	*tv_idx2 = STACK_TV_BOT(-2);
-    typval_T	*tv_dest = STACK_TV_BOT(-1);
-    int		status = OK;
+    typval_T	*tv_idx1 = ઢગલો_TV_BOT(-3);
+    typval_T	*tv_idx2 = ઢગલો_TV_BOT(-2);
+    typval_T	*tv_dest = ઢગલો_TV_BOT(-1);
+    પૂર્ણાંક		status = OK;
 
-    if (tv_dest->v_type == VAR_LIST)
+    જો (tv_dest->v_type == VAR_LIST)
     {
 	// indexes must be a number
 	SOURCING_LNUM = iptr->isn_lnum;
-	if (check_for_number(tv_idx1) == FAIL
+	જો (check_for_સંખ્યા(tv_idx1) == FAIL
 		|| (tv_idx2->v_type != VAR_SPECIAL
-			 && check_for_number(tv_idx2) == FAIL))
+			 && check_for_સંખ્યા(tv_idx2) == FAIL))
 	{
 	    status = FAIL;
 	}
-	else
+	નહીંતર
 	{
 	    list_T	*l = tv_dest->vval.v_list;
-	    long	n1 = (long)tv_idx1->vval.v_number;
+	    long	n1 = (long)tv_idx1->vval.v_સંખ્યા;
 	    long	n2 = tv_idx2->v_type == VAR_SPECIAL
-			    ? 0 : (long)tv_idx2->vval.v_number;
+			    ? 0 : (long)tv_idx2->vval.v_સંખ્યા;
 	    listitem_T	*li;
 
 	    li = list_find_index(l, &n1);
-	    if (li == NULL)
+	    જો (li == ખાલી)
 	    {
 		semsg(_(e_list_index_out_of_range_nr),
-						 (long)tv_idx1->vval.v_number);
+						 (long)tv_idx1->vval.v_સંખ્યા);
 		status = FAIL;
 	    }
-	    else
+	    નહીંતર
 	    {
-		if (n1 < 0)
+		જો (n1 < 0)
 		    n1 = list_idx_of_item(l, li);
-		if (n2 < 0)
+		જો (n2 < 0)
 		{
 		    listitem_T *li2 = list_find(l, n2);
 
-		    if (li2 == NULL)
+		    જો (li2 == ખાલી)
 		    {
 			semsg(_(e_list_index_out_of_range_nr), n2);
 			status = FAIL;
 		    }
-		    else
+		    નહીંતર
 			n2 = list_idx_of_item(l, li2);
 		}
-		if (status != FAIL
+		જો (status != FAIL
 			&& tv_idx2->v_type != VAR_SPECIAL
 			&& n2 < n1)
 		{
 		    semsg(_(e_list_index_out_of_range_nr), n2);
 		    status = FAIL;
 		}
-		if (status != FAIL)
+		જો (status != FAIL)
 		    list_unlet_range(l, li, n1,
 					   tv_idx2->v_type != VAR_SPECIAL, n2);
 	    }
 	}
     }
-    else
+    નહીંતર
     {
 	status = FAIL;
 	SOURCING_LNUM = iptr->isn_lnum;
@@ -2906,102 +2906,102 @@ execute_unletrange(isn_T *iptr, ectx_T *ectx)
     clear_tv(tv_idx1);
     clear_tv(tv_idx2);
     clear_tv(tv_dest);
-    ectx->ec_stack.ga_len -= 3;
+    ectx->ec_ઢગલો.ga_len -= 3;
 
-    return status;
+    પાછા status;
 }
 
 /*
  * Top of a for loop.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_for(isn_T *iptr, ectx_T *ectx)
 {
     typval_T	*tv;
-    int		jump = FALSE;
-    typval_T	*ltv = STACK_TV_BOT(-1);
+    પૂર્ણાંક		jump = FALSE;
+    typval_T	*ltv = ઢગલો_TV_BOT(-1);
     typval_T	*idxtv =
-		   STACK_TV_VAR(iptr->isn_arg.forloop.for_loop_idx);
+		   ઢગલો_TV_VAR(iptr->isn_arg.forloop.for_loop_idx);
 
-    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-	return FAIL;
-    if (ltv->v_type == VAR_LIST)
+    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+	પાછા FAIL;
+    જો (ltv->v_type == VAR_LIST)
     {
 	list_T *list = ltv->vval.v_list;
 
 	// push the next item from the list
-	++idxtv->vval.v_number;
-	if (list == NULL
-		       || idxtv->vval.v_number >= list->lv_len)
+	++idxtv->vval.v_સંખ્યા;
+	જો (list == ખાલી
+		       || idxtv->vval.v_સંખ્યા >= list->lv_len)
 	{
 	    jump = TRUE;
 	}
-	else if (list->lv_first == &range_list_item)
+	નહીંતર જો (list->lv_first == &range_list_item)
 	{
 	    // non-materialized range() list
-	    tv = STACK_TV_BOT(0);
-	    tv->v_type = VAR_NUMBER;
+	    tv = ઢગલો_TV_BOT(0);
+	    tv->v_type = VAR_સંખ્યા;
 	    tv->v_lock = 0;
-	    tv->vval.v_number = list_find_nr(
-			     list, idxtv->vval.v_number, NULL);
-	    ++ectx->ec_stack.ga_len;
+	    tv->vval.v_સંખ્યા = list_find_nr(
+			     list, idxtv->vval.v_સંખ્યા, ખાલી);
+	    ++ectx->ec_ઢગલો.ga_len;
 	}
-	else
+	નહીંતર
 	{
 	    listitem_T *li = list_find(list,
-					 idxtv->vval.v_number);
-	    if (li == NULL)
-		return FAIL;
-	    copy_tv(&li->li_tv, STACK_TV_BOT(0));
-	    ++ectx->ec_stack.ga_len;
+					 idxtv->vval.v_સંખ્યા);
+	    જો (li == ખાલી)
+		પાછા FAIL;
+	    copy_tv(&li->li_tv, ઢગલો_TV_BOT(0));
+	    ++ectx->ec_ઢગલો.ga_len;
 	}
     }
-    else if (ltv->v_type == VAR_TUPLE)
+    નહીંતર જો (ltv->v_type == VAR_TUPLE)
     {
 	tuple_T *tuple = ltv->vval.v_tuple;
 
 	// push the next item from the tuple
-	++idxtv->vval.v_number;
-	if (tuple == NULL || idxtv->vval.v_number >= TUPLE_LEN(tuple))
+	++idxtv->vval.v_સંખ્યા;
+	જો (tuple == ખાલી || idxtv->vval.v_સંખ્યા >= TUPLE_LEN(tuple))
 	    jump = TRUE;
-	else
+	નહીંતર
 	{
-	    copy_tv(TUPLE_ITEM(tuple, idxtv->vval.v_number), STACK_TV_BOT(0));
-	    ++ectx->ec_stack.ga_len;
+	    copy_tv(TUPLE_ITEM(tuple, idxtv->vval.v_સંખ્યા), ઢગલો_TV_BOT(0));
+	    ++ectx->ec_ઢગલો.ga_len;
 	}
     }
-    else if (ltv->v_type == VAR_STRING)
+    નહીંતર જો (ltv->v_type == VAR_STRING)
     {
 	char_u	*str = ltv->vval.v_string;
 
 	// The index is for the last byte of the previous
 	// character.
-	++idxtv->vval.v_number;
-	if (str == NULL || str[idxtv->vval.v_number] == NUL)
+	++idxtv->vval.v_સંખ્યા;
+	જો (str == ખાલી || str[idxtv->vval.v_સંખ્યા] == NUL)
 	{
 	    jump = TRUE;
 	}
-	else
+	નહીંતર
 	{
-	    int	clen = mb_ptr2len(str + idxtv->vval.v_number);
+	    પૂર્ણાંક	clen = mb_ptr2len(str + idxtv->vval.v_સંખ્યા);
 
 	    // Push the next character from the string.
-	    tv = STACK_TV_BOT(0);
+	    tv = ઢગલો_TV_BOT(0);
 	    tv->v_type = VAR_STRING;
 	    tv->vval.v_string = vim_strnsave(
-			     str + idxtv->vval.v_number, clen);
-	    ++ectx->ec_stack.ga_len;
-	    idxtv->vval.v_number += clen - 1;
+			     str + idxtv->vval.v_સંખ્યા, clen);
+	    ++ectx->ec_ઢગલો.ga_len;
+	    idxtv->vval.v_સંખ્યા += clen - 1;
 	}
     }
-    else if (ltv->v_type == VAR_BLOB)
+    નહીંતર જો (ltv->v_type == VAR_BLOB)
     {
 	blob_T	*blob = ltv->vval.v_blob;
 
 	// When we get here the first time make a copy of the
 	// blob, so that the iteration still works when it is
 	// changed.
-	if (idxtv->vval.v_number == -1 && blob != NULL)
+	જો (idxtv->vval.v_સંખ્યા == -1 && blob != ખાલી)
 	{
 	    ltv->v_lock = 0;
 	    ltv->vval.v_blob = blob_copy(blob);
@@ -3010,44 +3010,44 @@ execute_for(isn_T *iptr, ectx_T *ectx)
 	}
 
 	// The index is for the previous byte.
-	++idxtv->vval.v_number;
-	if (blob == NULL || idxtv->vval.v_number >= blob_len(blob))
+	++idxtv->vval.v_સંખ્યા;
+	જો (blob == ખાલી || idxtv->vval.v_સંખ્યા >= blob_len(blob))
 	{
 	    jump = TRUE;
 	}
-	else
+	નહીંતર
 	{
 	    // Push the next byte from the blob.
-	    tv = STACK_TV_BOT(0);
-	    tv->v_type = VAR_NUMBER;
-	    tv->vval.v_number = blob_get(blob,
-					 idxtv->vval.v_number);
-	    ++ectx->ec_stack.ga_len;
+	    tv = ઢગલો_TV_BOT(0);
+	    tv->v_type = VAR_સંખ્યા;
+	    tv->vval.v_સંખ્યા = blob_get(blob,
+					 idxtv->vval.v_સંખ્યા);
+	    ++ectx->ec_ઢગલો.ga_len;
 	}
     }
-    else
+    નહીંતર
     {
 	semsg(_(e_for_loop_on_str_not_supported),
 				    vartype_name(ltv->v_type));
-	return FAIL;
+	પાછા FAIL;
     }
 
-    if (jump)
+    જો (jump)
     {
 	// past the end of the list/string/blob, jump to "endfor"
 	ectx->ec_iidx = iptr->isn_arg.forloop.for_end;
 	may_restore_cmdmod(&ectx->ec_funclocal);
     }
-    else
+    નહીંતર
     {
 	// Store the current number of funcrefs, this may be used in
 	// ISN_LOOPEND.  The variable index is always one more than the loop
 	// variable index.
-	tv = STACK_TV_VAR(iptr->isn_arg.forloop.for_loop_idx + 1);
-	tv->vval.v_number = ectx->ec_funcrefs.ga_len;
+	tv = ઢગલો_TV_VAR(iptr->isn_arg.forloop.for_loop_idx + 1);
+	tv->vval.v_સંખ્યા = ectx->ec_funcrefs.ga_len;
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3058,120 +3058,120 @@ execute_for(isn_T *iptr, ectx_T *ectx)
  */
 
 // Double linked list of loopvars_T in use.
-static loopvars_T *first_loopvars = NULL;
+સ્થિર loopvars_T *first_loopvars = ખાલી;
 
-    static void
+    સ્થિર શૂન્ય
 add_loopvars_to_list(loopvars_T *loopvars)
 {
 	// Link in list of loopvarss.
-    if (first_loopvars != NULL)
+    જો (first_loopvars != ખાલી)
 	first_loopvars->lvs_prev = loopvars;
     loopvars->lvs_next = first_loopvars;
-    loopvars->lvs_prev = NULL;
+    loopvars->lvs_prev = ખાલી;
     first_loopvars = loopvars;
 }
 
-    static void
+    સ્થિર શૂન્ય
 remove_loopvars_from_list(loopvars_T *loopvars)
 {
-    if (loopvars->lvs_prev == NULL)
+    જો (loopvars->lvs_prev == ખાલી)
 	first_loopvars = loopvars->lvs_next;
-    else
+    નહીંતર
 	loopvars->lvs_prev->lvs_next = loopvars->lvs_next;
-    if (loopvars->lvs_next != NULL)
+    જો (loopvars->lvs_next != ખાલી)
 	loopvars->lvs_next->lvs_prev = loopvars->lvs_prev;
 }
 
 /*
  * End of a for or while loop: Handle any variables used by a closure.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 execute_endloop(isn_T *iptr, ectx_T *ectx)
 {
     endloop_T	*endloop = &iptr->isn_arg.endloop;
-    typval_T	*tv_refcount = STACK_TV_VAR(endloop->end_funcref_idx);
-    int		prev_closure_count = tv_refcount->vval.v_number;
-    int		depth = endloop->end_depth;
+    typval_T	*tv_refcount = ઢગલો_TV_VAR(endloop->end_funcref_idx);
+    પૂર્ણાંક		prev_closure_ગણતરી = tv_refcount->vval.v_સંખ્યા;
+    પૂર્ણાંક		depth = endloop->end_depth;
     garray_T	*gap = &ectx->ec_funcrefs;
-    int		closure_in_use = FALSE;
+    પૂર્ણાંક		closure_in_use = FALSE;
     loopvars_T  *loopvars;
-    typval_T    *stack;
-    int		idx;
+    typval_T    *ઢગલો;
+    પૂર્ણાંક		idx;
 
     // Check if any created closure is still being referenced and loopvars have
     // not been saved yet for the current depth.
-    for (idx = prev_closure_count; idx < gap->ga_len; ++idx)
+    માટે (idx = prev_closure_ગણતરી; idx < gap->ga_len; ++idx)
     {
 	partial_T   *pt = ((partial_T **)gap->ga_data)[idx];
 
-	if (pt->pt_refcount > 1 && pt->pt_loopvars[depth] == NULL)
+	જો (pt->pt_refcount > 1 && pt->pt_loopvars[depth] == ખાલી)
 	{
-	    int refcount = pt->pt_refcount;
-	    int i;
+	    પૂર્ણાંક refcount = pt->pt_refcount;
+	    પૂર્ણાંક i;
 
 	    // A Reference in a variable inside the loop doesn't count, it gets
 	    // unreferenced at the end of the loop.
-	    for (i = 0; i < endloop->end_var_count; ++i)
+	    માટે (i = 0; i < endloop->end_var_ગણતરી; ++i)
 	    {
-		typval_T *stv = STACK_TV_VAR(endloop->end_var_idx + i);
+		typval_T *stv = ઢગલો_TV_VAR(endloop->end_var_idx + i);
 
-		if (stv->v_type == VAR_PARTIAL && pt == stv->vval.v_partial)
+		જો (stv->v_type == VAR_PARTIAL && pt == stv->vval.v_partial)
 		    --refcount;
 	    }
-	    if (refcount > 1)
+	    જો (refcount > 1)
 	    {
 		closure_in_use = TRUE;
-		break;
+		તોડો;
 	    }
 	}
     }
 
     // If no function reference were created since the start of the loop block
     // or it is no longer referenced there is nothing to do.
-    if (!closure_in_use)
-	return OK;
+    જો (!closure_in_use)
+	પાછા OK;
 
     // A closure is using variables declared inside the loop.
     // Move them to the called function.
     loopvars = ALLOC_CLEAR_ONE(loopvars_T);
-    if (loopvars == NULL)
-	return FAIL;
+    જો (loopvars == ખાલી)
+	પાછા FAIL;
 
-    loopvars->lvs_ga.ga_len = endloop->end_var_count;
-    stack = ALLOC_CLEAR_MULT(typval_T, loopvars->lvs_ga.ga_len);
-    loopvars->lvs_ga.ga_data = stack;
-    if (stack == NULL)
+    loopvars->lvs_ga.ga_len = endloop->end_var_ગણતરી;
+    ઢગલો = ALLOC_CLEAR_MULT(typval_T, loopvars->lvs_ga.ga_len);
+    loopvars->lvs_ga.ga_data = ઢગલો;
+    જો (ઢગલો == ખાલી)
     {
 	vim_free(loopvars);
-	return FAIL;
+	પાછા FAIL;
     }
     add_loopvars_to_list(loopvars);
 
     // Move the variable values.
-    for (idx = 0; idx < endloop->end_var_count; ++idx)
+    માટે (idx = 0; idx < endloop->end_var_ગણતરી; ++idx)
     {
-	typval_T *tv = STACK_TV_VAR(endloop->end_var_idx + idx);
+	typval_T *tv = ઢગલો_TV_VAR(endloop->end_var_idx + idx);
 
-	*(stack + idx) = *tv;
+	*(ઢગલો + idx) = *tv;
 	tv->v_type = VAR_UNKNOWN;
     }
 
-    for (idx = prev_closure_count; idx < gap->ga_len; ++idx)
+    માટે (idx = prev_closure_ગણતરી; idx < gap->ga_len; ++idx)
     {
 	partial_T   *pt = ((partial_T **)gap->ga_data)[idx];
 
-	if (pt->pt_refcount > 1 && pt->pt_loopvars[depth] == NULL)
+	જો (pt->pt_refcount > 1 && pt->pt_loopvars[depth] == ખાલી)
 	{
 	    ++loopvars->lvs_refcount;
 	    pt->pt_loopvars[depth] = loopvars;
 
-	    pt->pt_outer.out_loop[depth].stack = &loopvars->lvs_ga;
+	    pt->pt_outer.out_loop[depth].ઢગલો = &loopvars->lvs_ga;
 	    pt->pt_outer.out_loop[depth].var_idx -=
-		  ectx->ec_frame_idx + STACK_FRAME_SIZE + endloop->end_var_idx;
+		  ectx->ec_frame_idx + ઢગલો_FRAME_SIZE + endloop->end_var_idx;
 	}
     }
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -3181,157 +3181,157 @@ execute_endloop(isn_T *iptr, ectx_T *ectx)
  * referencing the loopvars have a reference count of one.
  * Return TRUE if it was freed.
  */
-    int
+    પૂર્ણાંક
 loopvars_check_refcount(loopvars_T *loopvars)
 {
-    int		    i;
+    પૂર્ણાંક		    i;
     garray_T	    *gap = &loopvars->lvs_ga;
-    int		    done = 0;
-	typval_T	*stack = gap->ga_data;
+    પૂર્ણાંક		    done = 0;
+	typval_T	*ઢગલો = gap->ga_data;
 
-    if (loopvars->lvs_refcount > loopvars->lvs_min_refcount)
-	return FALSE;
-    for (i = 0; i < gap->ga_len; ++i)
+    જો (loopvars->lvs_refcount > loopvars->lvs_min_refcount)
+	પાછા FALSE;
+    માટે (i = 0; i < gap->ga_len; ++i)
     {
 	typval_T    *tv = ((typval_T *)gap->ga_data) + i;
 
-	if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
+	જો (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != ખાલી
 		&& tv->vval.v_partial->pt_refcount == 1)
 	{
-	    int	    depth;
+	    પૂર્ણાંક	    depth;
 
-	    for (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
-		if (tv->vval.v_partial->pt_loopvars[depth] == loopvars)
+	    માટે (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
+		જો (tv->vval.v_partial->pt_loopvars[depth] == loopvars)
 		    ++done;
 	}
     }
-    if (done != loopvars->lvs_min_refcount)
-	return FALSE;
+    જો (done != loopvars->lvs_min_refcount)
+	પાછા FALSE;
 
     // All partials referencing the loopvars have a reference count of
     // one, thus the loopvars is no longer of use.
-    stack = gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
-	clear_tv(stack + i);
-    vim_free(stack);
+    ઢગલો = gap->ga_data;
+    માટે (i = 0; i < gap->ga_len; ++i)
+	clear_tv(ઢગલો + i);
+    vim_free(ઢગલો);
     remove_loopvars_from_list(loopvars);
     vim_free(loopvars);
-    return TRUE;
+    પાછા TRUE;
 }
 
 /*
  * For garbage collecting: set references in all variables referenced by
  * all loopvars.
  */
-    int
-set_ref_in_loopvars(int copyID)
+    પૂર્ણાંક
+set_ref_in_loopvars(પૂર્ણાંક copyID)
 {
     loopvars_T *loopvars;
 
-    for (loopvars = first_loopvars; loopvars != NULL;
+    માટે (loopvars = first_loopvars; loopvars != ખાલી;
 						 loopvars = loopvars->lvs_next)
     {
-	typval_T    *stack = loopvars->lvs_ga.ga_data;
-	int	    i;
+	typval_T    *ઢગલો = loopvars->lvs_ga.ga_data;
+	પૂર્ણાંક	    i;
 
-	for (i = 0; i < loopvars->lvs_ga.ga_len; ++i)
-	    if (set_ref_in_item(stack + i, copyID, NULL, NULL, NULL))
-		return TRUE;  // abort
+	માટે (i = 0; i < loopvars->lvs_ga.ga_len; ++i)
+	    જો (set_ref_in_item(ઢગલો + i, copyID, ખાલી, ખાલી, ખાલી))
+		પાછા TRUE;  // abort
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
 /*
  * Load instruction for w:/b:/g:/t: variable.
  * "isn_type" is used instead of "iptr->isn_type".
  */
-    static int
+    સ્થિર પૂર્ણાંક
 load_namespace_var(ectx_T *ectx, isntype_T isn_type, isn_T *iptr)
 {
-    dictitem_T	*di = NULL;
-    hashtab_T	*ht = NULL;
-    char	namespace;
+    dictitem_T	*di = ખાલી;
+    hashtab_T	*ht = ખાલી;
+    અક્ષર	namespace;
 
-    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-	return NOTDONE;
-    switch (isn_type)
+    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+	પાછા NOTDONE;
+    પસંદગી (isn_type)
     {
-	case ISN_LOADG:
+	સ્થિતિ ISN_LOADG:
 	    ht = get_globvar_ht();
 	    namespace = 'g';
-	    break;
-	case ISN_LOADB:
+	    તોડો;
+	સ્થિતિ ISN_LOADB:
 	    ht = &curbuf->b_vars->dv_hashtab;
 	    namespace = 'b';
-	    break;
-	case ISN_LOADW:
+	    તોડો;
+	સ્થિતિ ISN_LOADW:
 	    ht = &curwin->w_vars->dv_hashtab;
 	    namespace = 'w';
-	    break;
-	case ISN_LOADT:
+	    તોડો;
+	સ્થિતિ ISN_LOADT:
 	    ht = &curtab->tp_vars->dv_hashtab;
 	    namespace = 't';
-	    break;
-	default:  // Cannot reach here
-	    return NOTDONE;
+	    તોડો;
+	મૂળભૂત:  // Cannot reach here
+	    પાછા NOTDONE;
     }
     di = find_var_in_ht(ht, 0, iptr->isn_arg.string, TRUE);
 
-    if (di == NULL)
+    જો (di == ખાલી)
     {
-	if (isn_type == ISN_LOADG)
+	જો (isn_type == ISN_LOADG)
 	{
 	    ufunc_T *ufunc = find_func(iptr->isn_arg.string, TRUE);
 
 	    // g:Something could be a function
-	    if (ufunc != NULL)
+	    જો (ufunc != ખાલી)
 	    {
-		typval_T    *tv = STACK_TV_BOT(0);
+		typval_T    *tv = ઢગલો_TV_BOT(0);
 
-		++ectx->ec_stack.ga_len;
+		++ectx->ec_ઢગલો.ga_len;
 		tv->v_type = VAR_FUNC;
 		tv->vval.v_string = alloc(STRLEN(iptr->isn_arg.string) + 3);
-		if (tv->vval.v_string == NULL)
-		    return FAIL;
+		જો (tv->vval.v_string == ખાલી)
+		    પાછા FAIL;
 		STRCPY(tv->vval.v_string, "g:");
 		STRCPY(tv->vval.v_string + 2, iptr->isn_arg.string);
-		return OK;
+		પાછા OK;
 	    }
 	}
 	SOURCING_LNUM = iptr->isn_lnum;
-	if (vim_strchr(iptr->isn_arg.string, AUTOLOAD_CHAR) != NULL)
+	જો (vim_strchr(iptr->isn_arg.string, AUTOLOAD_CHAR) != ખાલી)
 	    // no check if the item exists in the script but
 	    // isn't exported, it is too complicated
 	    semsg(_(e_item_not_found_in_script_str), iptr->isn_arg.string);
-	else
+	નહીંતર
 	    semsg(_(e_undefined_variable_char_str),
 					      namespace, iptr->isn_arg.string);
 	// Push a value anyway, the stack must have the expected size when the
 	// error is ignored because of ":silent!" in a calling function.
-	typval_T *tv = STACK_TV_BOT(0);
-	tv->v_type = VAR_NUMBER;
+	typval_T *tv = ઢગલો_TV_BOT(0);
+	tv->v_type = VAR_સંખ્યા;
 	tv->v_lock = 0;
-	tv->vval.v_number = 0;
-	++ectx->ec_stack.ga_len;
-	return FAIL;
+	tv->vval.v_સંખ્યા = 0;
+	++ectx->ec_ઢગલો.ga_len;
+	પાછા FAIL;
     }
-    else
+    નહીંતર
     {
-	copy_tv(&di->di_tv, STACK_TV_BOT(0));
-	++ectx->ec_stack.ga_len;
+	copy_tv(&di->di_tv, ઢગલો_TV_BOT(0));
+	++ectx->ec_ઢગલો.ga_len;
     }
-    return OK;
+    પાછા OK;
 }
 
 
-    static void
+    સ્થિર શૂન્ય
 object_required_error(typval_T *tv)
 {
     garray_T type_list;
-    ga_init2(&type_list, sizeof(type_T *), 10);
+    ga_init2(&type_list, કદ(type_T *), 10);
     type_T *type = typval2type(tv, get_copyID(), &type_list, TVTT_DO_MEMBER);
-    char *tofree = NULL;
-    char *typename = type_name(type, &tofree);
+    અક્ષર *tofree = ખાલી;
+    અક્ષર *typename = type_name(type, &tofree);
     semsg(_(e_object_required_found_str), typename);
     vim_free(tofree);
     clear_type_list(&type_list);
@@ -3343,33 +3343,33 @@ object_required_error(typval_T *tv)
  * Returns OK if the member variable is present.
  * Returns FAIL if the variable is not found.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 var_any_get_oc_member(class_T *current_class, isn_T *iptr, typval_T *tv)
 {
-    int		is_object = tv->v_type == VAR_OBJECT;
+    પૂર્ણાંક		is_object = tv->v_type == VAR_OBJECT;
     class_T	*tv_cl;
-    object_T	*obj = NULL;
+    object_T	*obj = ખાલી;
     typval_T	mtv;
 
-    if (is_object)
+    જો (is_object)
     {
 	obj = tv->vval.v_object;
-	if (obj == NULL)
+	જો (obj == ખાલી)
 	{
 	    SOURCING_LNUM = iptr->isn_lnum;
 	    emsg(_(e_using_null_object));
-	    return FAIL;
+	    પાછા FAIL;
 	}
 	tv_cl = obj->obj_class;
     }
-    else
+    નહીંતર
     {
 	tv_cl = tv->vval.v_class;
-	if (tv_cl == NULL)
+	જો (tv_cl == ખાલી)
 	{
 	    SOURCING_LNUM = iptr->isn_lnum;
 	    emsg(_(e_using_null_class));
-	    return FAIL;
+	    પાછા FAIL;
 	}
     }
 
@@ -3378,157 +3378,157 @@ var_any_get_oc_member(class_T *current_class, isn_T *iptr, typval_T *tv)
     copy_tv(tv, &mtv);
 
     // 'name' can either be an instance or class variable or method
-    int		namelen = (int)STRLEN(iptr->isn_arg.string);
-    int		save_did_emsg = did_emsg;
+    પૂર્ણાંક		namelen = (પૂર્ણાંક)STRLEN(iptr->isn_arg.string);
+    પૂર્ણાંક		save_did_emsg = did_emsg;
 
-    if (get_member_tv(tv_cl, is_object, iptr->isn_arg.string, namelen,
+    જો (get_member_tv(tv_cl, is_object, iptr->isn_arg.string, namelen,
 						current_class, &mtv) == OK)
     {
 	// instance or class variable
 	copy_tv(&mtv, tv);
 	clear_tv(&mtv);
-	return OK;
+	પાછા OK;
     }
 
-    if (did_emsg != save_did_emsg)
-	return FAIL;
+    જો (did_emsg != save_did_emsg)
+	પાછા FAIL;
 
     // could be a class or instance method
     ufunc_T	*oc_method;
-    int		oc_method_idx;
+    પૂર્ણાંક		oc_method_idx;
 
     oc_method = method_lookup(tv_cl, tv->v_type, iptr->isn_arg.string,
 						namelen, &oc_method_idx);
-    if (oc_method == NULL)
+    જો (oc_method == ખાલી)
     {
-	char	*msg;
+	અક્ષર	*સંદેશ;
 
 	SOURCING_LNUM = iptr->isn_lnum;
-	if (is_object)
-	    msg = e_variable_not_found_on_object_str_str;
-	else
-	    msg = e_class_variable_str_not_found_in_class_str;
-	semsg(_(msg), iptr->isn_arg.string, tv_cl->class_name.string);
-	return FAIL;
+	જો (is_object)
+	    સંદેશ = e_variable_not_found_on_object_str_str;
+	નહીંતર
+	    સંદેશ = e_class_variable_str_not_found_in_class_str;
+	semsg(_(સંદેશ), iptr->isn_arg.string, tv_cl->class_name.string);
+	પાછા FAIL;
     }
 
     // Protected methods are not accessible outside the class
-    if (*oc_method->uf_name == '_'
+    જો (*oc_method->uf_name == '_'
 			&& !class_instance_of(current_class, tv_cl))
     {
 	semsg(_(e_cannot_access_protected_method_str), oc_method->uf_name);
-	return FAIL;
+	પાછા FAIL;
     }
 
     // Create a partial for the instance or class method
-    if (obj_method_to_partial_tv(is_object ? obj : NULL, oc_method, tv)
+    જો (obj_method_to_partial_tv(is_object ? obj : ખાલી, oc_method, tv)
 								== FAIL)
-	return FAIL;
+	પાછા FAIL;
 
-    return OK;
+    પાછા OK;
 }
 
 /*
  * do ISN_PUT or ISN_IPUT instruction depending on fixindent parameter
  */
-    static void
-isn_put_do(ectx_T *ectx, isn_T *iptr, typval_T *tv, int fixindent)
+    સ્થિર શૂન્ય
+isn_put_do(ectx_T *ectx, isn_T *iptr, typval_T *tv, પૂર્ણાંક fixindent)
 {
-    int		regname = iptr->isn_arg.put.put_regname;
+    પૂર્ણાંક		regname = iptr->isn_arg.put.put_regname;
     linenr_T	lnum = iptr->isn_arg.put.put_lnum;
-    char_u	*expr = NULL;
-    int		dir = FORWARD;
+    char_u	*પદાવલિ = ખાલી;
+    પૂર્ણાંક		dir = FORWARD;
 
-    if (lnum < -2)
+    જો (lnum < -2)
     {
 	// line number was put on the stack by ISN_RANGE
-	tv = STACK_TV_BOT(-1);
-	curwin->w_cursor.lnum = tv->vval.v_number;
-	if (lnum == LNUM_VARIABLE_RANGE_ABOVE)
+	tv = ઢગલો_TV_BOT(-1);
+	curwin->w_cursor.lnum = tv->vval.v_સંખ્યા;
+	જો (lnum == LNUM_VARIABLE_RANGE_ABOVE)
 	    dir = BACKWARD;
-	--ectx->ec_stack.ga_len;
+	--ectx->ec_ઢગલો.ga_len;
     }
-    else if (lnum == -2)
+    નહીંતર જો (lnum == -2)
 	// :put! above cursor
 	dir = BACKWARD;
-    else if (lnum >= 0)
+    નહીંતર જો (lnum >= 0)
     {
 	curwin->w_cursor.lnum = lnum;
-	if (lnum == 0)
+	જો (lnum == 0)
 	    // check_cursor() below will move to line 1
 	    dir = BACKWARD;
     }
 
-    if (regname == '=')
+    જો (regname == '=')
     {
-	tv = STACK_TV_BOT(-1);
-	if (tv->v_type == VAR_STRING)
-	    expr = tv->vval.v_string;
-	else
+	tv = ઢગલો_TV_BOT(-1);
+	જો (tv->v_type == VAR_STRING)
+	    પદાવલિ = tv->vval.v_string;
+	નહીંતર
 	{
-	    expr = typval2string(tv, TRUE); // allocates value
+	    પદાવલિ = typval2string(tv, TRUE); // allocates value
 	    clear_tv(tv);
 	}
-	--ectx->ec_stack.ga_len;
+	--ectx->ec_ઢગલો.ga_len;
     }
     check_cursor();
 
-    if (fixindent)
-	do_put(regname, expr, dir, 1L, PUT_LINE|PUT_CURSLINE|PUT_FIXINDENT);
-    else
-	do_put(regname, expr, dir, 1L, PUT_LINE|PUT_CURSLINE);
-    vim_free(expr);
+    જો (fixindent)
+	do_put(regname, પદાવલિ, dir, 1L, PUT_લીટી|PUT_CURSLINE|PUT_FIXINDENT);
+    નહીંતર
+	do_put(regname, પદાવલિ, dir, 1L, PUT_લીટી|PUT_CURSLINE);
+    vim_free(પદાવલિ);
 }
 
 /*
  * Execute the ISN_UNPACK instruction for a List
  */
-    static int
+    સ્થિર પૂર્ણાંક
 exec_unpack_list(ectx_T *ectx, isn_T *iptr, typval_T *tv)
 {
-    int		count = iptr->isn_arg.unpack.unp_count;
-    int		semicolon = iptr->isn_arg.unpack.unp_semicolon;
+    પૂર્ણાંક		ગણતરી = iptr->isn_arg.unpack.unp_ગણતરી;
+    પૂર્ણાંક		semicolon = iptr->isn_arg.unpack.unp_semicolon;
     list_T	*l;
     listitem_T	*li;
-    int		i;
+    પૂર્ણાંક		i;
 
     l = tv->vval.v_list;
-    if (l == NULL
-	    || l->lv_len < (semicolon ? count - 1 : count))
+    જો (l == ખાલી
+	    || l->lv_len < (semicolon ? ગણતરી - 1 : ગણતરી))
     {
 	SOURCING_LNUM = iptr->isn_lnum;
-	emsg(_(e_list_value_does_not_have_enough_items));
-	return EXEC_FAIL;
+	emsg(_(e_list_કિંમત_does_not_have_enough_વસ્તુઓ));
+	પાછા EXEC_FAIL;
     }
-    else if (!semicolon && l->lv_len > count)
+    નહીંતર જો (!semicolon && l->lv_len > ગણતરી)
     {
 	SOURCING_LNUM = iptr->isn_lnum;
-	emsg(_(e_list_value_has_more_items_than_targets));
-	return EXEC_FAIL;
+	emsg(_(e_list_કિંમત_has_more_વસ્તુઓ_than_targets));
+	પાછા EXEC_FAIL;
     }
 
     CHECK_LIST_MATERIALIZE(l);
-    if (GA_GROW_FAILS(&ectx->ec_stack, count - 1))
-	return EXEC_DONE;
-    ectx->ec_stack.ga_len += count - 1;
+    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, ગણતરી - 1))
+	પાછા EXEC_DONE;
+    ectx->ec_ઢગલો.ga_len += ગણતરી - 1;
 
     // Variable after semicolon gets a list with the remaining
     // items.
-    if (semicolon)
+    જો (semicolon)
     {
 	list_T	*rem_list =
-	    list_alloc_with_items(l->lv_len - count + 1);
+	    list_alloc_with_વસ્તુઓ(l->lv_len - ગણતરી + 1);
 
-	if (rem_list == NULL)
-	    return EXEC_DONE;
-	tv = STACK_TV_BOT(-count);
+	જો (rem_list == ખાલી)
+	    પાછા EXEC_DONE;
+	tv = ઢગલો_TV_BOT(-ગણતરી);
 	tv->vval.v_list = rem_list;
 	++rem_list->lv_refcount;
 	tv->v_lock = 0;
 	li = l->lv_first;
-	for (i = 0; i < count - 1; ++i)
+	માટે (i = 0; i < ગણતરી - 1; ++i)
 	    li = li->li_next;
-	for (i = 0; li != NULL; ++i)
+	માટે (i = 0; li != ખાલી; ++i)
 	{
 	    typval_T tvcopy;
 
@@ -3536,99 +3536,99 @@ exec_unpack_list(ectx_T *ectx, isn_T *iptr, typval_T *tv)
 	    list_set_item(rem_list, i, &tvcopy);
 	    li = li->li_next;
 	}
-	--count;
+	--ગણતરી;
     }
 
     // Produce the values in reverse order, first item last.
     li = l->lv_first;
-    for (i = 0; i < count; ++i)
+    માટે (i = 0; i < ગણતરી; ++i)
     {
-	tv = STACK_TV_BOT(-i - 1);
+	tv = ઢગલો_TV_BOT(-i - 1);
 	copy_tv(&li->li_tv, tv);
 	li = li->li_next;
     }
 
     list_unref(l);
 
-    return EXEC_OK;
+    પાછા EXEC_OK;
 }
 
 /*
  * Execute the ISN_UNPACK instruction for a Tuple
  */
-    static int
+    સ્થિર પૂર્ણાંક
 exec_unpack_tuple(ectx_T *ectx, isn_T *iptr, typval_T *tv)
 {
-    int		count = iptr->isn_arg.unpack.unp_count;
-    int		semicolon = iptr->isn_arg.unpack.unp_semicolon;
+    પૂર્ણાંક		ગણતરી = iptr->isn_arg.unpack.unp_ગણતરી;
+    પૂર્ણાંક		semicolon = iptr->isn_arg.unpack.unp_semicolon;
     tuple_T	*tuple;
-    int		i;
+    પૂર્ણાંક		i;
 
     tuple = tv->vval.v_tuple;
-    if (tuple == NULL
-	    || TUPLE_LEN(tuple) < (semicolon ? count - 1 : count))
+    જો (tuple == ખાલી
+	    || TUPLE_LEN(tuple) < (semicolon ? ગણતરી - 1 : ગણતરી))
     {
 	SOURCING_LNUM = iptr->isn_lnum;
-	emsg(_(e_more_targets_than_tuple_items));
-	return EXEC_FAIL;
+	emsg(_(e_more_targets_than_tuple_વસ્તુઓ));
+	પાછા EXEC_FAIL;
     }
-    else if (!semicolon && TUPLE_LEN(tuple) > count)
+    નહીંતર જો (!semicolon && TUPLE_LEN(tuple) > ગણતરી)
     {
 	SOURCING_LNUM = iptr->isn_lnum;
-	emsg(_(e_less_targets_than_tuple_items));
-	return EXEC_FAIL;
+	emsg(_(e_less_targets_than_tuple_વસ્તુઓ));
+	પાછા EXEC_FAIL;
     }
 
-    if (GA_GROW_FAILS(&ectx->ec_stack, count - 1))
-	return EXEC_DONE;
-    ectx->ec_stack.ga_len += count - 1;
+    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, ગણતરી - 1))
+	પાછા EXEC_DONE;
+    ectx->ec_ઢગલો.ga_len += ગણતરી - 1;
 
     // Variable after semicolon gets a list with the remaining
     // items.
-    if (semicolon)
+    જો (semicolon)
     {
 	list_T	*rem_list =
-	    list_alloc_with_items(TUPLE_LEN(tuple) - count + 1);
+	    list_alloc_with_વસ્તુઓ(TUPLE_LEN(tuple) - ગણતરી + 1);
 
-	if (rem_list == NULL)
-	    return EXEC_DONE;
-	tv = STACK_TV_BOT(-count);
+	જો (rem_list == ખાલી)
+	    પાછા EXEC_DONE;
+	tv = ઢગલો_TV_BOT(-ગણતરી);
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = rem_list;
 	++rem_list->lv_refcount;
 	tv->v_lock = 0;
-	for (i = count - 1; i < TUPLE_LEN(tuple); ++i)
+	માટે (i = ગણતરી - 1; i < TUPLE_LEN(tuple); ++i)
 	{
 	    typval_T tvcopy;
 
 	    copy_tv(TUPLE_ITEM(tuple, i), &tvcopy);
-	    list_set_item(rem_list, i - (count - 1), &tvcopy);
+	    list_set_item(rem_list, i - (ગણતરી - 1), &tvcopy);
 	}
-	--count;
+	--ગણતરી;
     }
 
     // Produce the values in reverse order, first item last.
-    for (i = 0; i < count; ++i)
+    માટે (i = 0; i < ગણતરી; ++i)
     {
-	tv = STACK_TV_BOT(-i - 1);
+	tv = ઢગલો_TV_BOT(-i - 1);
 	copy_tv(TUPLE_ITEM(tuple, i), tv);
     }
 
     tuple_unref(tuple);
 
-    return EXEC_OK;
+    પાછા EXEC_OK;
 }
 
 /*
  * Execute instructions in execution context "ectx".
  * Return OK or FAIL;
  */
-    static int
+    સ્થિર પૂર્ણાંક
 exec_instructions(ectx_T *ectx)
 {
-    int		ret = FAIL;
-    int		save_trylevel_at_start = ectx->ec_trylevel_at_start;
-    int		dict_stack_len_at_start = dict_stack.ga_len;
+    પૂર્ણાંક		ret = FAIL;
+    પૂર્ણાંક		save_trylevel_at_start = ectx->ec_trylevel_at_start;
+    પૂર્ણાંક		dict_ઢગલો_len_at_start = dict_ઢગલો.ga_len;
 
     // Start execution at the first instruction.
     ectx->ec_iidx = 0;
@@ -3636,94 +3636,94 @@ exec_instructions(ectx_T *ectx)
     // Only catch exceptions in this instruction list.
     ectx->ec_trylevel_at_start = trylevel;
 
-    for (;;)
+    માટે (;;)
     {
-	static int  breakcheck_count = 0;  // using "static" makes it faster
+	સ્થિર પૂર્ણાંક  breakcheck_ગણતરી = 0;  // using "static" makes it faster
 	isn_T	    *iptr;
 	typval_T    *tv;
 
-	if (unlikely(++breakcheck_count >= 100))
+	જો (unlikely(++breakcheck_ગણતરી >= 100))
 	{
-	    line_breakcheck();
-	    breakcheck_count = 0;
+	    લીટી_breakcheck();
+	    breakcheck_ગણતરી = 0;
 	}
-	if (unlikely(got_int))
+	જો (unlikely(got_int))
 	{
 	    // Turn CTRL-C into an exception.
 	    got_int = FALSE;
-	    if (throw_exception("Vim:Interrupt", ET_INTERRUPT, NULL) == FAIL)
-		goto theend;
+	    જો (throw_exception("Vim:Interrupt", ET_INTERRUPT, ખાલી) == FAIL)
+		જાઓ theend;
 	    did_throw = TRUE;
 	}
 
-	if (unlikely(did_emsg && msg_list != NULL && *msg_list != NULL))
+	જો (unlikely(did_emsg && સંદેશ_list != ખાલી && *સંદેશ_list != ખાલી))
 	{
 	    // Turn an error message into an exception.
 	    did_emsg = FALSE;
-	    if (throw_exception(*msg_list, ET_ERROR, NULL) == FAIL)
-		goto theend;
+	    જો (throw_exception(*સંદેશ_list, ET_ERROR, ખાલી) == FAIL)
+		જાઓ theend;
 	    did_throw = TRUE;
-	    *msg_list = NULL;
+	    *સંદેશ_list = ખાલી;
 
 	    // This exception was not caught (yet).
 	    garray_T	*trystack = &ectx->ec_trystack;
-	    if (trystack->ga_len > 0)
+	    જો (trystack->ga_len > 0)
 	    {
 		trycmd_T *trycmd = ((trycmd_T *)trystack->ga_data)
 							+ trystack->ga_len - 1;
-		if (trycmd->tcd_frame_idx == ectx->ec_frame_idx)
+		જો (trycmd->tcd_frame_idx == ectx->ec_frame_idx)
 		{
-		    if (trycmd->tcd_caught)
+		    જો (trycmd->tcd_caught)
 		    {
 			// Inside a "catch" we need to first discard the caught
 			// exception.
-			finish_exception(caught_stack);
+			finish_exception(caught_ઢગલો);
 			trycmd->tcd_caught = FALSE;
 		    }
 		}
 	    }
 	}
 
-	if (unlikely(did_throw))
+	જો (unlikely(did_throw))
 	{
 	    garray_T	*trystack = &ectx->ec_trystack;
-	    trycmd_T    *trycmd = NULL;
-	    int		index = trystack->ga_len;
+	    trycmd_T    *trycmd = ખાલી;
+	    પૂર્ણાંક		index = trystack->ga_len;
 
 	    // An exception jumps to the first catch, finally, or returns from
 	    // the current function.
-	    while (index > 0)
+	    જ્યારે (index > 0)
 	    {
 		trycmd = ((trycmd_T *)trystack->ga_data) + index - 1;
 		// 1. after :try and before :catch - jump to first :catch
 		// 2. in :catch block - jump to :finally
 		// 3. in :catch block and no finally - jump to :endtry
-		if (!trycmd->tcd_in_catch || trycmd->tcd_finally_idx != 0
+		જો (!trycmd->tcd_in_catch || trycmd->tcd_finally_idx != 0
 				|| trycmd->tcd_frame_idx == ectx->ec_frame_idx)
-		    break;
+		    તોડો;
 		// In the catch and finally block of this try we have to go up
 		// one level.
 		--index;
-		trycmd = NULL;
+		trycmd = ખાલી;
 	    }
-	    if (trycmd != NULL && trycmd->tcd_frame_idx == ectx->ec_frame_idx)
+	    જો (trycmd != ખાલી && trycmd->tcd_frame_idx == ectx->ec_frame_idx)
 	    {
-		if (trycmd->tcd_in_catch)
+		જો (trycmd->tcd_in_catch)
 		{
-		    if (trycmd->tcd_finally_idx > 0)
+		    જો (trycmd->tcd_finally_idx > 0)
 		    {
 			// exception inside ":catch", jump to ":finally" once
 			ectx->ec_iidx = trycmd->tcd_finally_idx;
 			trycmd->tcd_finally_idx = 0;
 		    }
-		    else
+		    નહીંતર
 		    {
 			// exception inside ":catch" or ":finally", jump to
 			// ":endtry"
 			ectx->ec_iidx = trycmd->tcd_endtry_idx;
 		    }
 		}
-		else
+		નહીંતર
 		{
 		    // jump to first ":catch"
 		    ectx->ec_iidx = trycmd->tcd_catch_idx;
@@ -3732,29 +3732,29 @@ exec_instructions(ectx_T *ectx)
 		did_throw = FALSE;  // don't come back here until :endtry
 		trycmd->tcd_did_throw = TRUE;
 	    }
-	    else
+	    નહીંતર
 	    {
 		// Not inside try or need to return from current function.
 		// Push a dummy return value.
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_BOT(0);
-		tv->v_type = VAR_NUMBER;
-		tv->vval.v_number = 0;
-		++ectx->ec_stack.ga_len;
-		if (ectx->ec_frame_idx == ectx->ec_initial_frame_idx)
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_BOT(0);
+		tv->v_type = VAR_સંખ્યા;
+		tv->vval.v_સંખ્યા = 0;
+		++ectx->ec_ઢગલો.ga_len;
+		જો (ectx->ec_frame_idx == ectx->ec_initial_frame_idx)
 		{
 		    // At the toplevel we are done.
 		    need_rethrow = TRUE;
-		    if (handle_closure_in_use(ectx, FALSE) == FAIL)
-			goto theend;
-		    goto done;
+		    જો (handle_closure_in_use(ectx, FALSE) == FAIL)
+			જાઓ theend;
+		    જાઓ done;
 		}
 
-		if (func_return(ectx) == FAIL)
-		    goto theend;
+		જો (func_return(ectx) == FAIL)
+		    જાઓ theend;
 	    }
-	    continue;
+	    ચાલુ;
 	}
 
 	/*
@@ -3764,128 +3764,128 @@ exec_instructions(ectx_T *ectx)
 	 * most efficient way.
 	 */
 	iptr = &ectx->ec_instr[ectx->ec_iidx++];
-	switch (iptr->isn_type)
+	પસંદગી (iptr->isn_type)
 	{
 	    // Constructor, first instruction in a new() method.
-	    case ISN_CONSTRUCT:
+	    સ્થિતિ ISN_CONSTRUCT:
 		// "this" is always the local variable at index zero
-		tv = STACK_TV_VAR(0);
+		tv = ઢગલો_TV_VAR(0);
 		tv->v_type = VAR_OBJECT;
 		tv->vval.v_object =
 		    alloc_object(iptr->isn_arg.construct.construct_class);
-		break;
+		તોડો;
 
 	    // execute Ex command line
-	    case ISN_EXEC:
-		if (exec_command(iptr, iptr->isn_arg.string) == FAIL)
-		    goto on_error;
-		break;
+	    સ્થિતિ ISN_EXEC:
+		જો (exec_command(iptr, iptr->isn_arg.string) == FAIL)
+		    જાઓ on_error;
+		તોડો;
 
 	    // execute Ex command line split at NL characters.
-	    case ISN_EXEC_SPLIT:
+	    સ્થિતિ ISN_EXEC_SPLIT:
 		{
 		    source_cookie_T cookie;
-		    char_u	    *line;
+		    char_u	    *લીટી;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    CLEAR_FIELD(cookie);
 		    cookie.sourcing_lnum = iptr->isn_lnum - 1;
 		    cookie.nextline = iptr->isn_arg.string;
-		    line = get_split_sourceline(0, &cookie, 0, 0);
-		    if (do_cmdline(line,
+		    લીટી = get_split_sourceline(0, &cookie, 0, 0);
+		    જો (do_cmdline(લીટી,
 				get_split_sourceline, &cookie,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED)
 									== FAIL
 				|| did_emsg)
 		    {
-			vim_free(line);
-			goto on_error;
+			vim_free(લીટી);
+			જાઓ on_error;
 		    }
-		    vim_free(line);
+		    vim_free(લીટી);
 		}
-		break;
+		તોડો;
 
 	    // execute Ex command line that is only a range
-	    case ISN_EXECRANGE:
+	    સ્થિતિ ISN_EXECRANGE:
 		{
 		    exarg_T	ea;
-		    char	*error = NULL;
+		    અક્ષર	*error = ખાલી;
 
 		    CLEAR_FIELD(ea);
 		    ea.cmdidx = CMD_SIZE;
-		    ea.addr_type = ADDR_LINES;
+		    ea.addr_type = ADDR_લીટીઓ;
 		    ea.cmd = iptr->isn_arg.string;
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    parse_cmd_address(&ea, &error, FALSE);
-		    if (ea.cmd == NULL)
-			goto on_error;
+		    જો (ea.cmd == ખાલી)
+			જાઓ on_error;
 		    // error is always NULL when using ADDR_LINES
 		    error = ex_range_without_command(&ea);
-		    if (error != NULL)
+		    જો (error != ખાલી)
 		    {
 			emsg(error);
-			goto on_error;
+			જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
 	    // Evaluate an expression with legacy syntax, push it onto the
 	    // stack.
-	    case ISN_LEGACY_EVAL:
+	    સ્થિતિ ISN_LEGACY_EVAL:
 		{
 		    char_u  *arg = iptr->isn_arg.string;
-		    int	    res;
-		    int	    save_flags = cmdmod.cmod_flags;
+		    પૂર્ણાંક	    res;
+		    પૂર્ણાંક	    save_flags = cmdmod.cmod_flags;
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    tv = STACK_TV_BOT(0);
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    tv = ઢગલો_TV_BOT(0);
 		    init_tv(tv);
 		    cmdmod.cmod_flags |= CMOD_LEGACY;
-		    res = eval0(arg, tv, NULL, &EVALARG_EVALUATE);
+		    res = eval0(arg, tv, ખાલી, &EVALARG_EVALUATE);
 		    cmdmod.cmod_flags = save_flags;
-		    if (res == FAIL)
-			goto on_error;
-		    ++ectx->ec_stack.ga_len;
+		    જો (res == FAIL)
+			જાઓ on_error;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // push typeval VAR_INSTR with instructions to be executed
-	    case ISN_INSTR:
+	    સ્થિતિ ISN_INSTR:
 		{
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    tv = STACK_TV_BOT(0);
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    tv = ઢગલો_TV_BOT(0);
 		    tv->vval.v_instr = ALLOC_ONE(instr_T);
-		    if (tv->vval.v_instr == NULL)
-			goto on_error;
-		    ++ectx->ec_stack.ga_len;
+		    જો (tv->vval.v_instr == ખાલી)
+			જાઓ on_error;
+		    ++ectx->ec_ઢગલો.ga_len;
 
 		    tv->v_type = VAR_INSTR;
 		    tv->vval.v_instr->instr_ectx = ectx;
 		    tv->vval.v_instr->instr_instr = iptr->isn_arg.instr;
 		}
-		break;
+		તોડો;
 
-	    case ISN_SOURCE:
+	    સ્થિતિ ISN_SOURCE:
 		{
-		    int notused;
+		    પૂર્ણાંક notused;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (may_load_script((int)iptr->isn_arg.number, &notused)
+		    જો (may_load_script((પૂર્ણાંક)iptr->isn_arg.સંખ્યા, &notused)
 								       == FAIL)
-			goto on_error;
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
 	    // execute :substitute with an expression
-	    case ISN_SUBSTITUTE:
+	    સ્થિતિ ISN_SUBSTITUTE:
 		{
 		    subs_T		*subs = &iptr->isn_arg.subs;
 		    source_cookie_T	cookie;
-		    struct subs_expr_S	*save_instr = substitute_instr;
-		    struct subs_expr_S	subs_instr;
-		    int			res;
+		    સંરચના subs_પદાવલિ_S	*save_instr = substitute_instr;
+		    સંરચના subs_પદાવલિ_S	subs_instr;
+		    પૂર્ણાંક			res;
 
 		    subs_instr.subs_ectx = ectx;
 		    subs_instr.subs_instr = subs->subs_instr;
@@ -3901,27 +3901,27 @@ exec_instructions(ectx_T *ectx)
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 		    substitute_instr = save_instr;
 
-		    if (res == FAIL || did_emsg
+		    જો (res == FAIL || did_emsg
 					     || subs_instr.subs_status == FAIL)
-			goto on_error;
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
-	    case ISN_FINISH:
-		goto done;
+	    સ્થિતિ ISN_FINISH:
+		જાઓ done;
 
-	    case ISN_REDIRSTART:
+	    સ્થિતિ ISN_REDIRSTART:
 		// create a dummy entry for var_redir_str()
-		if (alloc_redir_lval() == FAIL)
-		    goto on_error;
+		જો (alloc_redir_lval() == FAIL)
+		    જાઓ on_error;
 
 		// The output is stored in growarray "redir_ga" until
 		// redirection ends.
 		init_redir_ga();
 		redir_vname = 1;
-		break;
+		તોડો;
 
-	    case ISN_REDIREND:
+	    સ્થિતિ ISN_REDIREND:
 		{
 		    char_u *res = get_clear_redir_ga();
 
@@ -3929,78 +3929,78 @@ exec_instructions(ectx_T *ectx)
 		    clear_redir_lval();
 		    redir_vname = 0;
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
 		    {
 			vim_free(res);
-			goto theend;
+			જાઓ theend;
 		    }
-		    tv = STACK_TV_BOT(0);
+		    tv = ઢગલો_TV_BOT(0);
 		    tv->v_type = VAR_STRING;
 		    tv->vval.v_string = res;
-		    ++ectx->ec_stack.ga_len;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
-	    case ISN_CEXPR_AUCMD:
+	    સ્થિતિ ISN_CEXPR_AUCMD:
 #ifdef FEAT_QUICKFIX
 		force_abort = TRUE;
-		if (trigger_cexpr_autocmd(iptr->isn_arg.number) == FAIL)
-		    goto on_error;
+		જો (trigger_cexpr_autocmd(iptr->isn_arg.સંખ્યા) == FAIL)
+		    જાઓ on_error;
 		force_abort = FALSE;
 #endif
-		break;
+		તોડો;
 
-	    case ISN_CEXPR_CORE:
+	    સ્થિતિ ISN_CEXPR_CORE:
 #ifdef FEAT_QUICKFIX
 		{
 		    exarg_T ea;
-		    int	    res;
+		    પૂર્ણાંક	    res;
 
 		    CLEAR_FIELD(ea);
 		    ea.cmdidx = iptr->isn_arg.cexpr.cexpr_ref->cer_cmdidx;
 		    ea.forceit = iptr->isn_arg.cexpr.cexpr_ref->cer_forceit;
 		    ea.cmdlinep = &iptr->isn_arg.cexpr.cexpr_ref->cer_cmdline;
-		    --ectx->ec_stack.ga_len;
-		    tv = STACK_TV_BOT(0);
+		    --ectx->ec_ઢગલો.ga_len;
+		    tv = ઢગલો_TV_BOT(0);
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    res = cexpr_core(&ea, tv);
 		    clear_tv(tv);
-		    if (res == FAIL)
-			goto on_error;
+		    જો (res == FAIL)
+			જાઓ on_error;
 		}
 #endif
-		break;
+		તોડો;
 
 	    // execute Ex command from pieces on the stack
-	    case ISN_EXECCONCAT:
+	    સ્થિતિ ISN_EXECCONCAT:
 		{
-		    int	    count = iptr->isn_arg.number;
+		    પૂર્ણાંક	    ગણતરી = iptr->isn_arg.સંખ્યા;
 		    size_t  len = 0;
-		    int	    pass;
-		    int	    i;
-		    char_u  *cmd = NULL;
+		    પૂર્ણાંક	    pass;
+		    પૂર્ણાંક	    i;
+		    char_u  *cmd = ખાલી;
 		    char_u  *str;
 
-		    for (pass = 1; pass <= 2; ++pass)
+		    માટે (pass = 1; pass <= 2; ++pass)
 		    {
-			for (i = 0; i < count; ++i)
+			માટે (i = 0; i < ગણતરી; ++i)
 			{
-			    tv = STACK_TV_BOT(i - count);
+			    tv = ઢગલો_TV_BOT(i - ગણતરી);
 			    str = tv->vval.v_string;
-			    if (str != NULL && *str != NUL)
+			    જો (str != ખાલી && *str != NUL)
 			    {
-				if (pass == 2)
+				જો (pass == 2)
 				    STRCPY(cmd + len, str);
 				len += STRLEN(str);
 			    }
-			    if (pass == 2)
+			    જો (pass == 2)
 				clear_tv(tv);
 			}
-			if (pass == 1)
+			જો (pass == 1)
 			{
 			    cmd = alloc(len + 1);
-			    if (unlikely(cmd == NULL))
-				goto theend;
+			    જો (unlikely(cmd == ખાલી))
+				જાઓ theend;
 			    len = 0;
 			}
 		    }
@@ -4009,130 +4009,130 @@ exec_instructions(ectx_T *ectx)
 		    do_cmdline_cmd(cmd);
 		    vim_free(cmd);
 		}
-		break;
+		તોડો;
 
 	    // execute :echo {string} ...
-	    case ISN_ECHO:
+	    સ્થિતિ ISN_ECHO:
 		{
-		    int count = iptr->isn_arg.echo.echo_count;
-		    int	atstart = TRUE;
-		    int needclr = TRUE;
-		    int	idx;
+		    પૂર્ણાંક ગણતરી = iptr->isn_arg.echo.echo_ગણતરી;
+		    પૂર્ણાંક	atstart = TRUE;
+		    પૂર્ણાંક needclr = TRUE;
+		    પૂર્ણાંક	idx;
 
-		    for (idx = 0; idx < count; ++idx)
+		    માટે (idx = 0; idx < ગણતરી; ++idx)
 		    {
-			tv = STACK_TV_BOT(idx - count);
+			tv = ઢગલો_TV_BOT(idx - ગણતરી);
 			echo_one(tv, iptr->isn_arg.echo.echo_with_white,
 							   &atstart, &needclr);
 			clear_tv(tv);
 		    }
-		    if (needclr)
-			msg_clr_eos();
-		    ectx->ec_stack.ga_len -= count;
+		    જો (needclr)
+			સંદેશ_clr_eos();
+		    ectx->ec_ઢગલો.ga_len -= ગણતરી;
 		}
-		break;
+		તોડો;
 
 	    // :execute {string} ...
 	    // :echomsg {string} ...
 	    // :echowindow {string} ...
 	    // :echoconsole {string} ...
 	    // :echoerr {string} ...
-	    case ISN_EXECUTE:
-	    case ISN_ECHOMSG:
-	    case ISN_ECHOWINDOW:
-	    case ISN_ECHOCONSOLE:
-	    case ISN_ECHOERR:
+	    સ્થિતિ ISN_EXECUTE:
+	    સ્થિતિ ISN_ECHOMSG:
+	    સ્થિતિ ISN_ECHOWINDOW:
+	    સ્થિતિ ISN_ECHOCONSOLE:
+	    સ્થિતિ ISN_ECHOERR:
 		{
-		    int		count;
+		    પૂર્ણાંક		ગણતરી;
 		    garray_T	ga;
 		    char_u	buf[NUMBUFLEN];
 		    char_u	*p;
-		    int		len;
-		    int		failed = FALSE;
-		    int		idx;
+		    પૂર્ણાંક		len;
+		    પૂર્ણાંક		failed = FALSE;
+		    પૂર્ણાંક		idx;
 
-		    if (iptr->isn_type == ISN_ECHOWINDOW)
-			count = iptr->isn_arg.echowin.ewin_count;
-		    else
-			count = iptr->isn_arg.number;
+		    જો (iptr->isn_type == ISN_ECHOWINDOW)
+			ગણતરી = iptr->isn_arg.echowin.ewin_ગણતરી;
+		    નહીંતર
+			ગણતરી = iptr->isn_arg.સંખ્યા;
 		    ga_init2(&ga, 1, 80);
-		    for (idx = 0; idx < count; ++idx)
+		    માટે (idx = 0; idx < ગણતરી; ++idx)
 		    {
-			tv = STACK_TV_BOT(idx - count);
-			if (iptr->isn_type == ISN_EXECUTE)
+			tv = ઢગલો_TV_BOT(idx - ગણતરી);
+			જો (iptr->isn_type == ISN_EXECUTE)
 			{
-			    if (tv->v_type == VAR_CHANNEL
+			    જો (tv->v_type == VAR_CHANNEL
 						      || tv->v_type == VAR_JOB)
 			    {
 				SOURCING_LNUM = iptr->isn_lnum;
-				semsg(_(e_using_invalid_value_as_string_str),
+				semsg(_(e_using_invalid_કિંમત_as_string_str),
 						    vartype_name(tv->v_type));
-				break;
+				તોડો;
 			    }
-			    else
+			    નહીંતર
 				p = tv_get_string_buf(tv, buf);
 			}
-			else
+			નહીંતર
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    p = tv_stringify(tv, buf);
 			}
 
-			len = (int)STRLEN(p);
-			if (GA_GROW_FAILS(&ga, len + 2))
+			len = (પૂર્ણાંક)STRLEN(p);
+			જો (GA_GROW_FAILS(&ga, len + 2))
 			    failed = TRUE;
-			else
+			નહીંતર
 			{
-			    if (ga.ga_len > 0)
+			    જો (ga.ga_len > 0)
 				((char_u *)(ga.ga_data))[ga.ga_len++] = ' ';
 			    STRCPY((char_u *)(ga.ga_data) + ga.ga_len, p);
 			    ga.ga_len += len;
 			}
 			clear_tv(tv);
 		    }
-		    ectx->ec_stack.ga_len -= count;
-		    if (failed)
+		    ectx->ec_ઢગલો.ga_len -= ગણતરી;
+		    જો (failed)
 		    {
 			ga_clear(&ga);
-			goto on_error;
+			જાઓ on_error;
 		    }
 
-		    if (ga.ga_data != NULL)
+		    જો (ga.ga_data != ખાલી)
 		    {
-			if (iptr->isn_type == ISN_EXECUTE)
+			જો (iptr->isn_type == ISN_EXECUTE)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    do_cmdline_cmd((char_u *)ga.ga_data);
-			    if (did_emsg)
+			    જો (did_emsg)
 			    {
 				ga_clear(&ga);
-				goto on_error;
+				જાઓ on_error;
 			    }
 			}
-			else
+			નહીંતર
 			{
-			    msg_sb_eol();
-			    if (iptr->isn_type == ISN_ECHOMSG)
+			    સંદેશ_sb_eol();
+			    જો (iptr->isn_type == ISN_ECHOMSG)
 			    {
-				msg_attr(ga.ga_data, echo_attr);
+				સંદેશ_attr(ga.ga_data, echo_attr);
 				out_flush();
 			    }
 #ifdef HAS_MESSAGE_WINDOW
-			    else if (iptr->isn_type == ISN_ECHOWINDOW)
+			    નહીંતર જો (iptr->isn_type == ISN_ECHOWINDOW)
 			    {
 				start_echowindow(
 					      iptr->isn_arg.echowin.ewin_time);
-				msg_attr(ga.ga_data, echo_attr);
+				સંદેશ_attr(ga.ga_data, echo_attr);
 				end_echowindow();
 			    }
 #endif
-			    else if (iptr->isn_type == ISN_ECHOCONSOLE)
+			    નહીંતર જો (iptr->isn_type == ISN_ECHOCONSOLE)
 			    {
-				ui_write(ga.ga_data, (int)STRLEN(ga.ga_data),
+				ui_write(ga.ga_data, (પૂર્ણાંક)STRLEN(ga.ga_data),
 									 TRUE);
 				ui_write((char_u *)"\r\n", 2, TRUE);
 			    }
-			    else
+			    નહીંતર
 			    {
 				SOURCING_LNUM = iptr->isn_lnum;
 				emsg(ga.ga_data);
@@ -4141,817 +4141,817 @@ exec_instructions(ectx_T *ectx)
 		    }
 		    ga_clear(&ga);
 		}
-		break;
+		તોડો;
 
 	    // load local variable or argument
-	    case ISN_LOAD:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_VAR(iptr->isn_arg.number);
-		if (tv->v_type == VAR_UNKNOWN)
+	    સ્થિતિ ISN_LOAD:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_VAR(iptr->isn_arg.સંખ્યા);
+		જો (tv->v_type == VAR_UNKNOWN)
 		{
 		    // missing argument or default value v:none
-		    STACK_TV_BOT(0)->v_type = VAR_SPECIAL;
-		    STACK_TV_BOT(0)->vval.v_number = VVAL_NONE;
+		    ઢગલો_TV_BOT(0)->v_type = VAR_SPECIAL;
+		    ઢગલો_TV_BOT(0)->vval.v_સંખ્યા = VVAL_NONE;
 		}
-		else
-		    copy_tv(tv, STACK_TV_BOT(0));
-		++ectx->ec_stack.ga_len;
-		break;
+		નહીંતર
+		    copy_tv(tv, ઢગલો_TV_BOT(0));
+		++ectx->ec_ઢગલો.ga_len;
+		તોડો;
 
 	    // load v: variable
-	    case ISN_LOADV:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		copy_tv(get_vim_var_tv(iptr->isn_arg.number), STACK_TV_BOT(0));
-		++ectx->ec_stack.ga_len;
-		break;
+	    સ્થિતિ ISN_LOADV:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		copy_tv(get_vim_var_tv(iptr->isn_arg.સંખ્યા), ઢગલો_TV_BOT(0));
+		++ectx->ec_ઢગલો.ga_len;
+		તોડો;
 
 	    // load s: variable in Vim9 script
-	    case ISN_LOADSCRIPT:
+	    સ્થિતિ ISN_LOADSCRIPT:
 		{
 		    scriptref_T	*sref = iptr->isn_arg.script.scriptref;
 		    svar_T	 *sv;
 
 		    sv = get_script_svar(sref, ectx->ec_dfunc_idx);
-		    if (sv == NULL)
-			goto theend;
+		    જો (sv == ખાલી)
+			જાઓ theend;
 		    allocate_if_null(sv);
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    copy_tv(sv->sv_tv, STACK_TV_BOT(0));
-		    ++ectx->ec_stack.ga_len;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    copy_tv(sv->sv_tv, ઢગલો_TV_BOT(0));
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // load s: variable in old script or autoload import
-	    case ISN_LOADS:
-	    case ISN_LOADEXPORT:
+	    સ્થિતિ ISN_LOADS:
+	    સ્થિતિ ISN_LOADEXPORT:
 		{
-		    int		sid = iptr->isn_arg.loadstore.ls_sid;
+		    પૂર્ણાંક		sid = iptr->isn_arg.loadstore.ls_sid;
 		    hashtab_T	*ht = &SCRIPT_VARS(sid);
 		    char_u	*name = iptr->isn_arg.loadstore.ls_name;
 		    dictitem_T	*di = find_var_in_ht(ht, 0, name, TRUE);
 
-		    if (di == NULL)
+		    જો (di == ખાલી)
 		    {
-			ufunc_T	*ufunc = NULL;
+			ufunc_T	*ufunc = ખાલી;
 
-			if (iptr->isn_type == ISN_LOADEXPORT)
+			જો (iptr->isn_type == ISN_LOADEXPORT)
 			{
 			    type_T	*type;
 
 			    // Not a variable, it can be an exported function
 			    // used as a value.
-			    (void)find_exported(sid, name, &ufunc, &type,
-							 NULL, NULL, FALSE);
+			    (શૂન્ય)find_exported(sid, name, &ufunc, &type,
+							 ખાલી, ખાલી, FALSE);
 			}
-			if (ufunc == NULL)
+			જો (ufunc == ખાલી)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    semsg(_(e_undefined_variable_str), name);
-			    goto on_error;
+			    જાઓ on_error;
 			}
-			if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			    goto theend;
-			tv = STACK_TV_BOT(0);
+			જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			    જાઓ theend;
+			tv = ઢગલો_TV_BOT(0);
 			tv->v_lock = 0;
-			++ectx->ec_stack.ga_len;
+			++ectx->ec_ઢગલો.ga_len;
 			tv->v_type = VAR_FUNC;
 			tv->vval.v_string = vim_strsave(ufunc->uf_name);
 		    }
-		    else
+		    નહીંતર
 		    {
-			if (iptr->isn_type == ISN_LOADEXPORT)
+			જો (iptr->isn_type == ISN_LOADEXPORT)
 			{
-			    int idx = get_script_item_idx(sid, name, 0,
-								   NULL, NULL);
+			    પૂર્ણાંક idx = get_script_item_idx(sid, name, 0,
+								   ખાલી, ખાલી);
 			    svar_T	*sv;
 
-			    if (idx >= 0)
+			    જો (idx >= 0)
 			    {
 				sv = ((svar_T *)SCRIPT_ITEM(sid)
 						  ->sn_var_vals.ga_data) + idx;
-				if ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
+				જો ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
 				{
 				    SOURCING_LNUM = iptr->isn_lnum;
 				    semsg(_(e_item_not_exported_in_script_str),
 									 name);
-				    goto on_error;
+				    જાઓ on_error;
 				}
 			    }
 			}
-			if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			    goto theend;
-			copy_tv(&di->di_tv, STACK_TV_BOT(0));
-			++ectx->ec_stack.ga_len;
+			જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			    જાઓ theend;
+			copy_tv(&di->di_tv, ઢગલો_TV_BOT(0));
+			++ectx->ec_ઢગલો.ga_len;
 		    }
 		}
-		break;
+		તોડો;
 
 	    // load g:/b:/w:/t: variable
-	    case ISN_LOADG:
-	    case ISN_LOADB:
-	    case ISN_LOADW:
-	    case ISN_LOADT:
+	    સ્થિતિ ISN_LOADG:
+	    સ્થિતિ ISN_LOADB:
+	    સ્થિતિ ISN_LOADW:
+	    સ્થિતિ ISN_LOADT:
 		{
-		    int res = load_namespace_var(ectx, iptr->isn_type, iptr);
+		    પૂર્ણાંક res = load_namespace_var(ectx, iptr->isn_type, iptr);
 
-		    if (res == NOTDONE)
-			goto theend;
-		    if (res == FAIL)
-			goto on_error;
+		    જો (res == NOTDONE)
+			જાઓ theend;
+		    જો (res == FAIL)
+			જાઓ on_error;
 		}
 
-		break;
+		તોડો;
 
 	    // load autoload variable
-	    case ISN_LOADAUTO:
+	    સ્થિતિ ISN_LOADAUTO:
 		{
 		    char_u *name = iptr->isn_arg.string;
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (eval_variable(name, (int)STRLEN(name), 0,
-			      STACK_TV_BOT(0), NULL, EVAL_VAR_VERBOSE) == FAIL)
+		    જો (eval_variable(name, (પૂર્ણાંક)STRLEN(name), 0,
+			      ઢગલો_TV_BOT(0), ખાલી, EVAL_VAR_VERBOSE) == FAIL)
 		    {
-			tv = STACK_TV_BOT(0);
-			tv->v_type = VAR_NUMBER;
+			tv = ઢગલો_TV_BOT(0);
+			tv->v_type = VAR_સંખ્યા;
 			tv->v_lock = 0;
-			tv->vval.v_number = 0;
-			++ectx->ec_stack.ga_len;
-			goto on_error;
+			tv->vval.v_સંખ્યા = 0;
+			++ectx->ec_ઢગલો.ga_len;
+			જાઓ on_error;
 		    }
-		    ++ectx->ec_stack.ga_len;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // load g:/b:/w:/t: namespace
-	    case ISN_LOADGDICT:
-	    case ISN_LOADBDICT:
-	    case ISN_LOADWDICT:
-	    case ISN_LOADTDICT:
+	    સ્થિતિ ISN_LOADGDICT:
+	    સ્થિતિ ISN_LOADBDICT:
+	    સ્થિતિ ISN_LOADWDICT:
+	    સ્થિતિ ISN_LOADTDICT:
 		{
-		    dict_T *d = NULL;
+		    dict_T *d = ખાલી;
 
-		    switch (iptr->isn_type)
+		    પસંદગી (iptr->isn_type)
 		    {
-			case ISN_LOADGDICT: d = get_globvar_dict(); break;
-			case ISN_LOADBDICT: d = curbuf->b_vars; break;
-			case ISN_LOADWDICT: d = curwin->w_vars; break;
-			case ISN_LOADTDICT: d = curtab->tp_vars; break;
-			default:  // Cannot reach here
-			    goto theend;
+			સ્થિતિ ISN_LOADGDICT: d = get_globvar_dict(); તોડો;
+			સ્થિતિ ISN_LOADBDICT: d = curbuf->b_vars; તોડો;
+			સ્થિતિ ISN_LOADWDICT: d = curwin->w_vars; તોડો;
+			સ્થિતિ ISN_LOADTDICT: d = curtab->tp_vars; તોડો;
+			મૂળભૂત:  // Cannot reach here
+			    જાઓ theend;
 		    }
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    tv = STACK_TV_BOT(0);
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    tv = ઢગલો_TV_BOT(0);
 		    tv->v_type = VAR_DICT;
 		    tv->v_lock = 0;
 		    tv->vval.v_dict = d;
 		    ++d->dv_refcount;
-		    ++ectx->ec_stack.ga_len;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // load &option
-	    case ISN_LOADOPT:
+	    સ્થિતિ ISN_LOADOPT:
 		{
 		    typval_T	optval;
 		    char_u	*name = iptr->isn_arg.string;
 
 		    // This is not expected to fail, name is checked during
 		    // compilation: don't set SOURCING_LNUM.
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    if (eval_option(&name, &optval, TRUE) == FAIL)
-			goto theend;
-		    *STACK_TV_BOT(0) = optval;
-		    ++ectx->ec_stack.ga_len;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    જો (eval_option(&name, &optval, TRUE) == FAIL)
+			જાઓ theend;
+		    *ઢગલો_TV_BOT(0) = optval;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // load $ENV
-	    case ISN_LOADENV:
+	    સ્થિતિ ISN_LOADENV:
 		{
 		    typval_T	optval;
 		    char_u	*name = iptr->isn_arg.string;
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
 		    // name is always valid, checked when compiling
-		    (void)eval_env_var(&name, &optval, TRUE);
-		    *STACK_TV_BOT(0) = optval;
-		    ++ectx->ec_stack.ga_len;
+		    (શૂન્ય)eval_env_var(&name, &optval, TRUE);
+		    *ઢગલો_TV_BOT(0) = optval;
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // load @register
-	    case ISN_LOADREG:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_BOT(0);
+	    સ્થિતિ ISN_LOADREG:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_BOT(0);
 		tv->v_type = VAR_STRING;
 		tv->v_lock = 0;
 		// This may result in NULL, which should be equivalent to an
 		// empty string.
 		tv->vval.v_string = get_reg_contents(
-					  iptr->isn_arg.number, GREG_EXPR_SRC);
-		++ectx->ec_stack.ga_len;
-		break;
+					  iptr->isn_arg.સંખ્યા, GREG_પદાવલિ_SRC);
+		++ectx->ec_ઢગલો.ga_len;
+		તોડો;
 
 	    // store local variable
-	    case ISN_STORE:
-		--ectx->ec_stack.ga_len;
-		tv = STACK_TV_VAR(iptr->isn_arg.number);
-		if (check_typval_is_value(STACK_TV_BOT(0)) == FAIL
-			|| STACK_TV_BOT(0)->v_type == VAR_VOID)
+	    સ્થિતિ ISN_STORE:
+		--ectx->ec_ઢગલો.ga_len;
+		tv = ઢગલો_TV_VAR(iptr->isn_arg.સંખ્યા);
+		જો (check_typval_is_કિંમત(ઢગલો_TV_BOT(0)) == FAIL
+			|| ઢગલો_TV_BOT(0)->v_type == VAR_VOID)
 		{
-		    if (STACK_TV_BOT(0)->v_type == VAR_VOID)
-			emsg(_(e_cannot_use_void_value));
-		    clear_tv(STACK_TV_BOT(0));
-		    goto on_error;
+		    જો (ઢગલો_TV_BOT(0)->v_type == VAR_VOID)
+			emsg(_(e_cannot_use_void_કિંમત));
+		    clear_tv(ઢગલો_TV_BOT(0));
+		    જાઓ on_error;
 		}
 		clear_tv(tv);
-		*tv = *STACK_TV_BOT(0);
-		break;
+		*tv = *ઢગલો_TV_BOT(0);
+		તોડો;
 
 	    // store s: variable in old script or autoload import
-	    case ISN_STORES:
-	    case ISN_STOREEXPORT:
+	    સ્થિતિ ISN_STORES:
+	    સ્થિતિ ISN_STOREEXPORT:
 		{
-		    int		sid = iptr->isn_arg.loadstore.ls_sid;
+		    પૂર્ણાંક		sid = iptr->isn_arg.loadstore.ls_sid;
 		    char_u	*name = iptr->isn_arg.loadstore.ls_name;
-		    dictitem_T	*di = NULL;
+		    dictitem_T	*di = ખાલી;
 		    // First check for a variable from an exported autoload
 		    // with an autoload_prefix; it would be in globals.
-		    if (iptr->isn_type == ISN_STOREEXPORT)
-			di = find_var_autoload_prefix(name, sid, NULL, NULL);
+		    જો (iptr->isn_type == ISN_STOREEXPORT)
+			di = find_var_autoload_prefix(name, sid, ખાલી, ખાલી);
 		    // Then look for a variable in the script's variables.
-		    if (di == NULL)
+		    જો (di == ખાલી)
 		    {
 			hashtab_T	*ht = &SCRIPT_VARS(sid);
 			di = find_var_in_ht(ht, 0, STRNCMP("s:", name, 2) == 0
 						     ? name + 2 : name, TRUE);
 		    }
 
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (di == NULL)
+		    જો (di == ખાલી)
 		    {
-			if (iptr->isn_type == ISN_STOREEXPORT)
+			જો (iptr->isn_type == ISN_STOREEXPORT)
 			{
 			    semsg(_(e_undefined_variable_str), name);
-			    clear_tv(STACK_TV_BOT(0));
-			    goto on_error;
+			    clear_tv(ઢગલો_TV_BOT(0));
+			    જાઓ on_error;
 			}
-			store_var(name, STACK_TV_BOT(0));
+			store_var(name, ઢગલો_TV_BOT(0));
 		    }
-		    else
+		    નહીંતર
 		    {
-			if (iptr->isn_type == ISN_STOREEXPORT)
+			જો (iptr->isn_type == ISN_STOREEXPORT)
 			{
-			    int idx = get_script_item_idx(sid, name, 0,
-								   NULL, NULL);
+			    પૂર્ણાંક idx = get_script_item_idx(sid, name, 0,
+								   ખાલી, ખાલી);
 
 			    // can this ever fail?
-			    if (idx >= 0)
+			    જો (idx >= 0)
 			    {
 				svar_T	*sv = ((svar_T *)SCRIPT_ITEM(sid)
 						  ->sn_var_vals.ga_data) + idx;
 
-				if ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
+				જો ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
 				{
 				    semsg(_(e_item_not_exported_in_script_str),
 									 name);
-				    clear_tv(STACK_TV_BOT(0));
-				    goto on_error;
+				    clear_tv(ઢગલો_TV_BOT(0));
+				    જાઓ on_error;
 				}
 			    }
 			}
-			if (var_check_permission(di, name) == FAIL)
+			જો (var_check_permission(di, name) == FAIL)
 			{
-			    clear_tv(STACK_TV_BOT(0));
-			    goto on_error;
+			    clear_tv(ઢગલો_TV_BOT(0));
+			    જાઓ on_error;
 			}
 			clear_tv(&di->di_tv);
-			di->di_tv = *STACK_TV_BOT(0);
+			di->di_tv = *ઢગલો_TV_BOT(0);
 		    }
 		}
-		break;
+		તોડો;
 
 	    // store script-local variable in Vim9 script
-	    case ISN_STORESCRIPT:
+	    સ્થિતિ ISN_STORESCRIPT:
 		{
 		    scriptref_T	    *sref = iptr->isn_arg.script.scriptref;
 		    svar_T	    *sv;
 
 		    sv = get_script_svar(sref, ectx->ec_dfunc_idx);
-		    if (sv == NULL)
-			goto theend;
-		    --ectx->ec_stack.ga_len;
+		    જો (sv == ખાલી)
+			જાઓ theend;
+		    --ectx->ec_ઢગલો.ga_len;
 
 		    // "const" and "final" are checked at compile time, locking
 		    // the value needs to be checked here.
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (value_check_lock(sv->sv_tv->v_lock, sv->sv_name, FALSE))
+		    જો (કિંમત_check_lock(sv->sv_tv->v_lock, sv->sv_name, FALSE))
 		    {
-			clear_tv(STACK_TV_BOT(0));
-			goto on_error;
+			clear_tv(ઢગલો_TV_BOT(0));
+			જાઓ on_error;
 		    }
 
 		    clear_tv(sv->sv_tv);
-		    *sv->sv_tv = *STACK_TV_BOT(0);
+		    *sv->sv_tv = *ઢગલો_TV_BOT(0);
 		}
-		break;
+		તોડો;
 
 	    // store option
-	    case ISN_STOREOPT:
-	    case ISN_STOREFUNCOPT:
+	    સ્થિતિ ISN_STOREOPT:
+	    સ્થિતિ ISN_STOREFUNCOPT:
 		{
 		    char_u	*opt_name = iptr->isn_arg.storeopt.so_name;
-		    int		opt_flags = iptr->isn_arg.storeopt.so_flags;
+		    પૂર્ણાંક		opt_flags = iptr->isn_arg.storeopt.so_flags;
 		    long	n = 0;
-		    char_u	*s = NULL;
-		    char	*msg;
+		    char_u	*s = ખાલી;
+		    અક્ષર	*સંદેશ;
 		    char_u	numbuf[NUMBUFLEN];
-		    char_u	*tofree = NULL;
+		    char_u	*tofree = ખાલી;
 
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    tv = STACK_TV_BOT(0);
-		    if (tv->v_type == VAR_STRING)
+		    tv = ઢગલો_TV_BOT(0);
+		    જો (tv->v_type == VAR_STRING)
 		    {
 			s = tv->vval.v_string;
-			if (s == NULL)
+			જો (s == ખાલી)
 			    s = (char_u *)"";
 		    }
-		    else if (iptr->isn_type == ISN_STOREFUNCOPT)
+		    નહીંતર જો (iptr->isn_type == ISN_STOREFUNCOPT)
 		    {
 			// If the option can be set to a function reference or
 			// a lambda and the passed value is a function
 			// reference, then convert it to the name (string) of
 			// the function reference.
 			s = tv2string(tv, &tofree, numbuf, 0);
-			if (s == NULL || *s == NUL)
+			જો (s == ખાલી || *s == NUL)
 			{
 			    // cannot happen?
 			    clear_tv(tv);
 			    vim_free(tofree);
-			    goto on_error;
+			    જાઓ on_error;
 			}
 		    }
-		    else
+		    નહીંતર
 			// must be VAR_NUMBER, CHECKTYPE makes sure
-			n = tv->vval.v_number;
-		    msg = set_option_value(opt_name, n, s, opt_flags);
+			n = tv->vval.v_સંખ્યા;
+		    સંદેશ = set_option_કિંમત(opt_name, n, s, opt_flags);
 		    clear_tv(tv);
 		    vim_free(tofree);
-		    if (msg != NULL)
+		    જો (સંદેશ != ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			emsg(_(msg));
-			goto on_error;
+			emsg(_(સંદેશ));
+			જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
 	    // store $ENV
-	    case ISN_STOREENV:
-		if (check_secure() || check_restricted())
-		    goto theend;
-		--ectx->ec_stack.ga_len;
-		tv = STACK_TV_BOT(0);
+	    સ્થિતિ ISN_STOREENV:
+		જો (check_secure() || check_restricted())
+		    જાઓ theend;
+		--ectx->ec_ઢગલો.ga_len;
+		tv = ઢગલો_TV_BOT(0);
 		vim_setenv_ext(iptr->isn_arg.string, tv_get_string(tv));
 		clear_tv(tv);
-		break;
+		તોડો;
 
 	    // store @r
-	    case ISN_STOREREG:
+	    સ્થિતિ ISN_STOREREG:
 		{
-		    int	reg = iptr->isn_arg.number;
+		    પૂર્ણાંક	reg = iptr->isn_arg.સંખ્યા;
 
-		    --ectx->ec_stack.ga_len;
-		    tv = STACK_TV_BOT(0);
+		    --ectx->ec_ઢગલો.ga_len;
+		    tv = ઢગલો_TV_BOT(0);
 		    write_reg_contents(reg, tv_get_string(tv), -1, FALSE);
 		    clear_tv(tv);
 		}
-		break;
+		તોડો;
 
 	    // store v: variable
-	    case ISN_STOREV:
-		--ectx->ec_stack.ga_len;
-		if (set_vim_var_tv(iptr->isn_arg.number, STACK_TV_BOT(0))
+	    સ્થિતિ ISN_STOREV:
+		--ectx->ec_ઢગલો.ga_len;
+		જો (set_vim_var_tv(iptr->isn_arg.સંખ્યા, ઢગલો_TV_BOT(0))
 								       == FAIL)
 		    // should not happen, type is checked when compiling
-		    goto on_error;
-		break;
+		    જાઓ on_error;
+		તોડો;
 
 	    // store g:/b:/w:/t: variable
-	    case ISN_STOREG:
-	    case ISN_STOREB:
-	    case ISN_STOREW:
-	    case ISN_STORET:
+	    સ્થિતિ ISN_STOREG:
+	    સ્થિતિ ISN_STOREB:
+	    સ્થિતિ ISN_STOREW:
+	    સ્થિતિ ISN_STORET:
 		{
 		    dictitem_T	*di;
 		    hashtab_T	*ht;
 		    char_u	*name = iptr->isn_arg.string + 2;
 
-		    switch (iptr->isn_type)
+		    પસંદગી (iptr->isn_type)
 		    {
-			case ISN_STOREG:
+			સ્થિતિ ISN_STOREG:
 			    ht = get_globvar_ht();
-			    break;
-			case ISN_STOREB:
+			    તોડો;
+			સ્થિતિ ISN_STOREB:
 			    ht = &curbuf->b_vars->dv_hashtab;
-			    break;
-			case ISN_STOREW:
+			    તોડો;
+			સ્થિતિ ISN_STOREW:
 			    ht = &curwin->w_vars->dv_hashtab;
-			    break;
-			case ISN_STORET:
+			    તોડો;
+			સ્થિતિ ISN_STORET:
 			    ht = &curtab->tp_vars->dv_hashtab;
-			    break;
-			default:  // Cannot reach here
-			    goto theend;
+			    તોડો;
+			મૂળભૂત:  // Cannot reach here
+			    જાઓ theend;
 		    }
 
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    di = find_var_in_ht(ht, 0, name, TRUE);
-		    if (di == NULL)
-			store_var(iptr->isn_arg.string, STACK_TV_BOT(0));
-		    else
+		    જો (di == ખાલી)
+			store_var(iptr->isn_arg.string, ઢગલો_TV_BOT(0));
+		    નહીંતર
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			if (var_check_permission(di, name) == FAIL)
-			    goto on_error;
+			જો (var_check_permission(di, name) == FAIL)
+			    જાઓ on_error;
 			clear_tv(&di->di_tv);
-			di->di_tv = *STACK_TV_BOT(0);
+			di->di_tv = *ઢગલો_TV_BOT(0);
 		    }
 		}
-		break;
+		તોડો;
 
 	    // store an autoload variable
-	    case ISN_STOREAUTO:
+	    સ્થિતિ ISN_STOREAUTO:
 		SOURCING_LNUM = iptr->isn_lnum;
-		set_var(iptr->isn_arg.string, STACK_TV_BOT(-1), TRUE);
-		clear_tv(STACK_TV_BOT(-1));
-		--ectx->ec_stack.ga_len;
-		break;
+		set_var(iptr->isn_arg.string, ઢગલો_TV_BOT(-1), TRUE);
+		clear_tv(ઢગલો_TV_BOT(-1));
+		--ectx->ec_ઢગલો.ga_len;
+		તોડો;
 
 	    // store number in local variable
-	    case ISN_STORENR:
-		tv = STACK_TV_VAR(iptr->isn_arg.storenr.stnr_idx);
+	    સ્થિતિ ISN_STORENR:
+		tv = ઢગલો_TV_VAR(iptr->isn_arg.storenr.stnr_idx);
 		clear_tv(tv);
-		tv->v_type = VAR_NUMBER;
-		tv->vval.v_number = iptr->isn_arg.storenr.stnr_val;
-		break;
+		tv->v_type = VAR_સંખ્યા;
+		tv->vval.v_સંખ્યા = iptr->isn_arg.storenr.stnr_val;
+		તોડો;
 
 	    // Store a value in a list, tuple, dict, blob or object variable.
-	    case ISN_STOREINDEX:
+	    સ્થિતિ ISN_STOREINDEX:
 		{
-		    int res = execute_storeindex(iptr, ectx);
+		    પૂર્ણાંક res = execute_storeindex(iptr, ectx);
 
-		    if (res == FAIL)
-			goto on_error;
-		    if (res == NOTDONE)
-			goto theend;
+		    જો (res == FAIL)
+			જાઓ on_error;
+		    જો (res == NOTDONE)
+			જાઓ theend;
 		}
-		break;
+		તોડો;
 
 	    // store value in list or blob range
-	    case ISN_STORERANGE:
-		if (execute_storerange(iptr, ectx) == FAIL)
-		    goto on_error;
-		break;
+	    સ્થિતિ ISN_STORERANGE:
+		જો (execute_storerange(iptr, ectx) == FAIL)
+		    જાઓ on_error;
+		તોડો;
 
-	    case ISN_LOAD_CLASSMEMBER:
+	    સ્થિતિ ISN_LOAD_CLASSMEMBER:
 		{
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
 		    classmember_T *cm = &iptr->isn_arg.classmember;
 		    copy_tv(cm->cm_class->class_members_tv + cm->cm_idx,
-							      STACK_TV_BOT(0));
-		    ++ectx->ec_stack.ga_len;
+							      ઢગલો_TV_BOT(0));
+		    ++ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
-	    case ISN_STORE_CLASSMEMBER:
+	    સ્થિતિ ISN_STORE_CLASSMEMBER:
 		{
 		    classmember_T *cm = &iptr->isn_arg.classmember;
 		    tv = &cm->cm_class->class_members_tv[cm->cm_idx];
 		    clear_tv(tv);
-		    *tv = *STACK_TV_BOT(-1);
-		    --ectx->ec_stack.ga_len;
+		    *tv = *ઢગલો_TV_BOT(-1);
+		    --ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // Load or store variable or argument from outer scope.
-	    case ISN_LOADOUTER:
-	    case ISN_STOREOUTER:
+	    સ્થિતિ ISN_LOADOUTER:
+	    સ્થિતિ ISN_STOREOUTER:
 		{
-		    int		depth = iptr->isn_arg.outer.outer_depth;
-		    outer_T	*outer = ectx->ec_outer_ref == NULL ? NULL
+		    પૂર્ણાંક		depth = iptr->isn_arg.outer.outer_depth;
+		    outer_T	*outer = ectx->ec_outer_ref == ખાલી ? ખાલી
 						: ectx->ec_outer_ref->or_outer;
 
-		    while (depth > 1 && outer != NULL)
+		    જ્યારે (depth > 1 && outer != ખાલી)
 		    {
 			outer = outer->out_up;
 			--depth;
 		    }
-		    if (outer == NULL)
+		    જો (outer == ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			if (ectx->ec_frame_idx == ectx->ec_initial_frame_idx
-						 || ectx->ec_outer_ref == NULL)
+			જો (ectx->ec_frame_idx == ectx->ec_initial_frame_idx
+						 || ectx->ec_outer_ref == ખાલી)
 			    // Possibly :def function called from legacy
 			    // context.
 			    emsg(_(e_closure_called_from_invalid_context));
-			else
+			નહીંતર
 			    iemsg("LOADOUTER depth more than scope levels");
-			goto theend;
+			જાઓ theend;
 		    }
-		    if (depth < 0)
+		    જો (depth < 0)
 			// Variable declared in loop.  May be copied if the
 			// loop block has already ended.
 			tv = ((typval_T *)outer->out_loop[-depth - 1]
-							       .stack->ga_data)
+							       .ઢગલો->ga_data)
 					  + outer->out_loop[-depth - 1].var_idx
 					  + iptr->isn_arg.outer.outer_idx;
-		    else
+		    નહીંતર
 			// Variable declared in a function.  May be copied if
 			// the function has already returned.
-			tv = ((typval_T *)outer->out_stack->ga_data)
-				      + outer->out_frame_idx + STACK_FRAME_SIZE
+			tv = ((typval_T *)outer->out_ઢગલો->ga_data)
+				      + outer->out_frame_idx + ઢગલો_FRAME_SIZE
 				      + iptr->isn_arg.outer.outer_idx;
-		    if (iptr->isn_type == ISN_LOADOUTER)
+		    જો (iptr->isn_type == ISN_LOADOUTER)
 		    {
 			typval_T *copy;
-			if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			    goto theend;
+			જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			    જાઓ theend;
 			// careful: ga_grow_inner may re-alloc the stack
-			if (depth < 0)
+			જો (depth < 0)
 			    copy = ((typval_T *)outer->out_loop[-depth - 1]
-								   .stack->ga_data)
+								   .ઢગલો->ga_data)
 					      + outer->out_loop[-depth - 1].var_idx
 					      + iptr->isn_arg.outer.outer_idx;
-			else
-			    copy = ((typval_T *)outer->out_stack->ga_data)
-					  + outer->out_frame_idx + STACK_FRAME_SIZE
+			નહીંતર
+			    copy = ((typval_T *)outer->out_ઢગલો->ga_data)
+					  + outer->out_frame_idx + ઢગલો_FRAME_SIZE
 					  + iptr->isn_arg.outer.outer_idx;
 			// memory was freed, get tv again
-			if (copy != tv)
+			જો (copy != tv)
 			    tv = copy;
-			copy_tv(tv, STACK_TV_BOT(0));
-			++ectx->ec_stack.ga_len;
+			copy_tv(tv, ઢગલો_TV_BOT(0));
+			++ectx->ec_ઢગલો.ga_len;
 		    }
-		    else
+		    નહીંતર
 		    {
-			--ectx->ec_stack.ga_len;
+			--ectx->ec_ઢગલો.ga_len;
 			clear_tv(tv);
-			*tv = *STACK_TV_BOT(0);
+			*tv = *ઢગલો_TV_BOT(0);
 		    }
 		}
-		break;
+		તોડો;
 
 	    // unlet item in list or dict variable
-	    case ISN_UNLETINDEX:
-		if (execute_unletindex(iptr, ectx) == FAIL)
-		    goto on_error;
-		break;
+	    સ્થિતિ ISN_UNLETINDEX:
+		જો (execute_unletindex(iptr, ectx) == FAIL)
+		    જાઓ on_error;
+		તોડો;
 
 	    // unlet range of items in list variable
-	    case ISN_UNLETRANGE:
-		if (execute_unletrange(iptr, ectx) == FAIL)
-		    goto on_error;
-		break;
+	    સ્થિતિ ISN_UNLETRANGE:
+		જો (execute_unletrange(iptr, ectx) == FAIL)
+		    જાઓ on_error;
+		તોડો;
 
 	    // push constant
-	    case ISN_PUSHNR:
-	    case ISN_PUSHBOOL:
-	    case ISN_PUSHSPEC:
-	    case ISN_PUSHF:
-	    case ISN_PUSHS:
-	    case ISN_PUSHBLOB:
-	    case ISN_PUSHFUNC:
-	    case ISN_PUSHCHANNEL:
-	    case ISN_PUSHJOB:
-	    case ISN_PUSHOBJ:
-	    case ISN_PUSHCLASS:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_BOT(0);
+	    સ્થિતિ ISN_PUSHNR:
+	    સ્થિતિ ISN_PUSHBOOL:
+	    સ્થિતિ ISN_PUSHSPEC:
+	    સ્થિતિ ISN_PUSHF:
+	    સ્થિતિ ISN_PUSHS:
+	    સ્થિતિ ISN_PUSHBLOB:
+	    સ્થિતિ ISN_PUSHFUNC:
+	    સ્થિતિ ISN_PUSHCHANNEL:
+	    સ્થિતિ ISN_PUSHJOB:
+	    સ્થિતિ ISN_PUSHOBJ:
+	    સ્થિતિ ISN_PUSHCLASS:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_BOT(0);
 		tv->v_lock = 0;
-		++ectx->ec_stack.ga_len;
-		switch (iptr->isn_type)
+		++ectx->ec_ઢગલો.ga_len;
+		પસંદગી (iptr->isn_type)
 		{
-		    case ISN_PUSHNR:
-			tv->v_type = VAR_NUMBER;
-			tv->vval.v_number = iptr->isn_arg.number;
-			break;
-		    case ISN_PUSHBOOL:
+		    સ્થિતિ ISN_PUSHNR:
+			tv->v_type = VAR_સંખ્યા;
+			tv->vval.v_સંખ્યા = iptr->isn_arg.સંખ્યા;
+			તોડો;
+		    સ્થિતિ ISN_PUSHBOOL:
 			tv->v_type = VAR_BOOL;
-			tv->vval.v_number = iptr->isn_arg.number;
-			break;
-		    case ISN_PUSHSPEC:
+			tv->vval.v_સંખ્યા = iptr->isn_arg.સંખ્યા;
+			તોડો;
+		    સ્થિતિ ISN_PUSHSPEC:
 			tv->v_type = VAR_SPECIAL;
-			tv->vval.v_number = iptr->isn_arg.number;
-			break;
-		    case ISN_PUSHF:
+			tv->vval.v_સંખ્યા = iptr->isn_arg.સંખ્યા;
+			તોડો;
+		    સ્થિતિ ISN_PUSHF:
 			tv->v_type = VAR_FLOAT;
 			tv->vval.v_float = iptr->isn_arg.fnumber;
-			break;
-		    case ISN_PUSHBLOB:
+			તોડો;
+		    સ્થિતિ ISN_PUSHBLOB:
 			tv->v_type = VAR_BLOB;
 			tv->vval.v_blob = blob_copy(iptr->isn_arg.blob);
-			break;
-		    case ISN_PUSHFUNC:
+			તોડો;
+		    સ્થિતિ ISN_PUSHFUNC:
 			tv->v_type = VAR_FUNC;
-			if (iptr->isn_arg.string == NULL)
-			    tv->vval.v_string = NULL;
-			else
+			જો (iptr->isn_arg.string == ખાલી)
+			    tv->vval.v_string = ખાલી;
+			નહીંતર
 			    tv->vval.v_string =
 					     vim_strsave(iptr->isn_arg.string);
-			break;
-		    case ISN_PUSHCHANNEL:
+			તોડો;
+		    સ્થિતિ ISN_PUSHCHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 			tv->v_type = VAR_CHANNEL;
-			tv->vval.v_channel = NULL;
+			tv->vval.v_channel = ખાલી;
 #endif
-			break;
-		    case ISN_PUSHJOB:
+			તોડો;
+		    સ્થિતિ ISN_PUSHJOB:
 #ifdef FEAT_JOB_CHANNEL
 			tv->v_type = VAR_JOB;
-			tv->vval.v_job = NULL;
+			tv->vval.v_job = ખાલી;
 #endif
-			break;
-		    case ISN_PUSHOBJ:
+			તોડો;
+		    સ્થિતિ ISN_PUSHOBJ:
 			tv->v_type = VAR_OBJECT;
-			tv->vval.v_object = NULL;
-			break;
-		    case ISN_PUSHCLASS:
+			tv->vval.v_object = ખાલી;
+			તોડો;
+		    સ્થિતિ ISN_PUSHCLASS:
 			tv->v_type = VAR_CLASS;
 			tv->vval.v_class = iptr->isn_arg.classarg;
-			break;
-		    default:
+			તોડો;
+		    મૂળભૂત:
 			tv->v_type = VAR_STRING;
-			tv->vval.v_string = iptr->isn_arg.string == NULL
-				    ? NULL : vim_strsave(iptr->isn_arg.string);
+			tv->vval.v_string = iptr->isn_arg.string == ખાલી
+				    ? ખાલી : vim_strsave(iptr->isn_arg.string);
 		}
-		break;
+		તોડો;
 
-	    case ISN_AUTOLOAD:
+	    સ્થિતિ ISN_AUTOLOAD:
 		{
 		    char_u  *name = iptr->isn_arg.string;
 
-		    (void)script_autoload(name, FALSE);
-		    if (find_func(name, TRUE))
+		    (શૂન્ય)script_autoload(name, FALSE);
+		    જો (find_func(name, TRUE))
 		    {
-			if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			    goto theend;
-			tv = STACK_TV_BOT(0);
+			જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			    જાઓ theend;
+			tv = ઢગલો_TV_BOT(0);
 			tv->v_lock = 0;
-			++ectx->ec_stack.ga_len;
+			++ectx->ec_ઢગલો.ga_len;
 			tv->v_type = VAR_FUNC;
 			tv->vval.v_string = vim_strsave(name);
 		    }
-		    else
+		    નહીંતર
 		    {
-			int res = load_namespace_var(ectx, ISN_LOADG, iptr);
+			પૂર્ણાંક res = load_namespace_var(ectx, ISN_LOADG, iptr);
 
-			if (res == NOTDONE)
-			    goto theend;
-			if (res == FAIL)
-			    goto on_error;
+			જો (res == NOTDONE)
+			    જાઓ theend;
+			જો (res == FAIL)
+			    જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_UNLET:
-		if (do_unlet(iptr->isn_arg.unlet.ul_name,
+	    સ્થિતિ ISN_UNLET:
+		જો (do_unlet(iptr->isn_arg.unlet.ul_name,
 				       iptr->isn_arg.unlet.ul_forceit) == FAIL)
-		    goto on_error;
-		break;
-	    case ISN_UNLETENV:
+		    જાઓ on_error;
+		તોડો;
+	    સ્થિતિ ISN_UNLETENV:
 		vim_unsetenv_ext(iptr->isn_arg.unlet.ul_name);
-		break;
+		તોડો;
 
-	    case ISN_LOCKUNLOCK:
+	    સ્થિતિ ISN_LOCKUNLOCK:
 		{
 #ifdef LOG_LOCKVAR
-		    ch_log(NULL, "LKVAR: execute INS_LOCKUNLOCK isn_arg %s",
+		    ch_log(ખાલી, "LKVAR: execute INS_LOCKUNLOCK isn_arg %s",
 							iptr->isn_arg.string);
 #endif
-		    lval_root_T	*lval_root_save = lval_root;
+		    lval_મૂળ_T	*lval_મૂળ_save = lval_મૂળ;
 
 		    // Stack has the local variable, argument the whole :lock
 		    // or :unlock command, like ISN_EXEC.
-		    --ectx->ec_stack.ga_len;
-		    lval_root_T root;
-		    root.lr_tv      = STACK_TV_BOT(0);
-		    root.lr_cl_exec = iptr->isn_arg.lockunlock.lu_cl_exec;
-		    root.lr_is_arg  = iptr->isn_arg.lockunlock.lu_is_arg;
-		    lval_root = &root;
-		    int res = exec_command(iptr,
+		    --ectx->ec_ઢગલો.ga_len;
+		    lval_મૂળ_T મૂળ;
+		    મૂળ.lr_tv      = ઢગલો_TV_BOT(0);
+		    મૂળ.lr_cl_exec = iptr->isn_arg.lockunlock.lu_cl_exec;
+		    મૂળ.lr_is_arg  = iptr->isn_arg.lockunlock.lu_is_arg;
+		    lval_મૂળ = &મૂળ;
+		    પૂર્ણાંક res = exec_command(iptr,
 					iptr->isn_arg.lockunlock.lu_string);
-		    clear_tv(root.lr_tv);
-		    lval_root = lval_root_save;
-		    if (res == FAIL)
-			goto on_error;
+		    clear_tv(મૂળ.lr_tv);
+		    lval_મૂળ = lval_મૂળ_save;
+		    જો (res == FAIL)
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
-	    case ISN_LOCKCONST:
-		item_lock(STACK_TV_BOT(-1), 100, TRUE, TRUE);
-		break;
+	    સ્થિતિ ISN_LOCKCONST:
+		item_lock(ઢગલો_TV_BOT(-1), 100, TRUE, TRUE);
+		તોડો;
 
 	    // create a list from items on the stack; uses a single allocation
 	    // for the list header and the items
-	    case ISN_NEWLIST:
-		if (exe_newlist(iptr->isn_arg.number, ectx) == FAIL)
-		    goto theend;
-		break;
+	    સ્થિતિ ISN_NEWLIST:
+		જો (exe_newlist(iptr->isn_arg.સંખ્યા, ectx) == FAIL)
+		    જાઓ theend;
+		તોડો;
 
 	    // create a tuple from items on the stack
-	    case ISN_NEWTUPLE:
-		if (exe_newtuple(iptr->isn_arg.number, ectx) == FAIL)
-		    goto theend;
-		break;
+	    સ્થિતિ ISN_NEWTUPLE:
+		જો (exe_newtuple(iptr->isn_arg.સંખ્યા, ectx) == FAIL)
+		    જાઓ theend;
+		તોડો;
 
 	    // create a dict from items on the stack
-	    case ISN_NEWDICT:
+	    સ્થિતિ ISN_NEWDICT:
 		{
-		    int res;
+		    પૂર્ણાંક res;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    res = exe_newdict(iptr->isn_arg.number, ectx);
-		    if (res == FAIL)
-			goto theend;
-		    if (res == MAYBE)
-			goto on_error;
+		    res = exe_newdict(iptr->isn_arg.સંખ્યા, ectx);
+		    જો (res == FAIL)
+			જાઓ theend;
+		    જો (res == MAYBE)
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
-	    case ISN_CONCAT:
-		if (exe_concat(iptr->isn_arg.number, ectx) == FAIL)
-		    goto theend;
-		break;
+	    સ્થિતિ ISN_CONCAT:
+		જો (exe_concat(iptr->isn_arg.સંખ્યા, ectx) == FAIL)
+		    જાઓ theend;
+		તોડો;
 
 	    // create a partial with NULL value
-	    case ISN_NEWPARTIAL:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		++ectx->ec_stack.ga_len;
-		tv = STACK_TV_BOT(-1);
+	    સ્થિતિ ISN_NEWPARTIAL:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		++ectx->ec_ઢગલો.ga_len;
+		tv = ઢગલો_TV_BOT(-1);
 		tv->v_type = VAR_PARTIAL;
 		tv->v_lock = 0;
-		tv->vval.v_partial = NULL;
-		break;
+		tv->vval.v_partial = ખાલી;
+		તોડો;
 
 	    // call a :def function
-	    case ISN_DCALL:
+	    સ્થિતિ ISN_DCALL:
 		SOURCING_LNUM = iptr->isn_lnum;
-		if (call_dfunc(iptr->isn_arg.dfunc.cdf_idx,
-				NULL,
+		જો (call_dfunc(iptr->isn_arg.dfunc.cdf_idx,
+				ખાલી,
 				iptr->isn_arg.dfunc.cdf_argcount,
 				ectx) == FAIL)
-		    goto on_error;
-		break;
+		    જાઓ on_error;
+		તોડો;
 
 	    // call a method on an interface
-	    case ISN_METHODCALL:
+	    સ્થિતિ ISN_METHODCALL:
 		{
 		    cmfunc_T *mfunc = iptr->isn_arg.mfunc;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    tv = STACK_TV_BOT(-1 - mfunc->cmf_argcount);
-		    if (tv->v_type != VAR_OBJECT)
+		    tv = ઢગલો_TV_BOT(-1 - mfunc->cmf_argcount);
+		    જો (tv->v_type != VAR_OBJECT)
 		    {
 			object_required_error(tv);
-			goto on_error;
+			જાઓ on_error;
 		    }
 
 		    object_T *obj = tv->vval.v_object;
-		    if (obj == NULL)
+		    જો (obj == ખાલી)
 		    {
 			emsg(_(e_using_null_object));
-			goto on_error;
+			જાઓ on_error;
 		    }
 
 		    ufunc_T *ufunc;
 		    class_T *cl;
-		    if (mfunc->cmf_is_super)
+		    જો (mfunc->cmf_is_super)
 		    {
 			// Doing "super.Func", use the specific ufunc.
 			cl = mfunc->cmf_itf;
 			ufunc = cl->class_obj_methods[mfunc->cmf_idx];
 		    }
-		    else
+		    નહીંતર
 		    {
 			cl = obj->obj_class;
 
 			// convert the interface index to the object index
-			int idx = object_index_from_itf_index(mfunc->cmf_itf,
+			પૂર્ણાંક idx = object_index_from_itf_index(mfunc->cmf_itf,
 						     TRUE, mfunc->cmf_idx, cl);
 			ufunc = cl->class_obj_methods[idx];
 		    }
@@ -4959,19 +4959,19 @@ exec_instructions(ectx_T *ectx)
 		    // A generic method: use the method with the type arguments
 		    // used when compiling.  The last one is cached, since
 		    // looking it up is slow.
-		    if (mfunc->cmf_ufunc != NULL && IS_GENERIC_FUNC(ufunc))
+		    જો (mfunc->cmf_ufunc != ખાલી && IS_GENERIC_FUNC(ufunc))
 		    {
-			if (mfunc->cmf_cache_cl == cl
+			જો (mfunc->cmf_cache_cl == cl
 				&& mfunc->cmf_cache_generic == ufunc)
 			    ufunc = mfunc->cmf_cache_ufunc;
-			else
+			નહીંતર
 			{
 			    ufunc_T *generic_ufunc = ufunc;
 
 			    ufunc = generic_func_get_same_types(generic_ufunc,
 							    mfunc->cmf_ufunc);
-			    if (ufunc == NULL)
-				goto on_error;
+			    જો (ufunc == ખાલી)
+				જાઓ on_error;
 
 			    ++cl->class_refcount;
 			    class_unref(mfunc->cmf_cache_cl);
@@ -4981,94 +4981,94 @@ exec_instructions(ectx_T *ectx)
 			}
 		    }
 
-		    if (call_ufunc(ufunc, NULL, mfunc->cmf_argcount, ectx,
-							   NULL, NULL) == FAIL)
-			goto on_error;
+		    જો (call_ufunc(ufunc, ખાલી, mfunc->cmf_argcount, ectx,
+							   ખાલી, ખાલી) == FAIL)
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
 	    // call a builtin function
-	    case ISN_BCALL:
+	    સ્થિતિ ISN_BCALL:
 		SOURCING_LNUM = iptr->isn_lnum;
-		if (call_bfunc(iptr->isn_arg.bfunc.cbf_idx,
+		જો (call_bfunc(iptr->isn_arg.bfunc.cbf_idx,
 			      iptr->isn_arg.bfunc.cbf_argcount,
 			      ectx) == FAIL)
-		    goto on_error;
-		break;
+		    જાઓ on_error;
+		તોડો;
 
 	    // call a funcref or partial
-	    case ISN_PCALL:
+	    સ્થિતિ ISN_PCALL:
 		{
 		    cpfunc_T	*pfunc = &iptr->isn_arg.pfunc;
-		    int		r;
+		    પૂર્ણાંક		r;
 		    typval_T	partial_tv;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (pfunc->cpf_top)
+		    જો (pfunc->cpf_ટોચ)
 		    {
 			// funcref is above the arguments
-			tv = STACK_TV_BOT(-pfunc->cpf_argcount - 1);
+			tv = ઢગલો_TV_BOT(-pfunc->cpf_argcount - 1);
 		    }
-		    else
+		    નહીંતર
 		    {
 			// Get the funcref from the stack.
-			--ectx->ec_stack.ga_len;
-			partial_tv = *STACK_TV_BOT(0);
+			--ectx->ec_ઢગલો.ga_len;
+			partial_tv = *ઢગલો_TV_BOT(0);
 			tv = &partial_tv;
 		    }
 		    r = call_partial(tv, pfunc->cpf_argcount, ectx);
-		    if (tv == &partial_tv)
+		    જો (tv == &partial_tv)
 			clear_tv(&partial_tv);
-		    if (r == FAIL)
-			goto on_error;
+		    જો (r == FAIL)
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
-	    case ISN_PCALL_END:
+	    સ્થિતિ ISN_PCALL_END:
 		// PCALL finished, arguments have been consumed and replaced by
 		// the return value.  Now clear the funcref from the stack,
 		// and move the return value in its place.
-		--ectx->ec_stack.ga_len;
-		clear_tv(STACK_TV_BOT(-1));
-		*STACK_TV_BOT(-1) = *STACK_TV_BOT(0);
-		break;
+		--ectx->ec_ઢગલો.ga_len;
+		clear_tv(ઢગલો_TV_BOT(-1));
+		*ઢગલો_TV_BOT(-1) = *ઢગલો_TV_BOT(0);
+		તોડો;
 
 	    // call a user defined function or funcref/partial
-	    case ISN_UCALL:
+	    સ્થિતિ ISN_UCALL:
 		{
 		    cufunc_T	*cufunc = &iptr->isn_arg.ufunc;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (call_eval_func(cufunc->cuf_name, cufunc->cuf_argcount,
+		    જો (call_eval_func(cufunc->cuf_name, cufunc->cuf_argcount,
 							   ectx, iptr) == FAIL)
-			goto on_error;
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
 	    // :defer func(arg)
-	    case ISN_DEFER:
-		if (defer_command(iptr->isn_arg.defer.defer_var_idx,
+	    સ્થિતિ ISN_DEFER:
+		જો (defer_command(iptr->isn_arg.defer.defer_var_idx,
 			     iptr->isn_arg.defer.defer_argcount, ectx) == FAIL)
-		    goto on_error;
-		break;
+		    જાઓ on_error;
+		તોડો;
 
 	    // Return from a :def function call without a value.
 	    // Return from a constructor.
-	    case ISN_RETURN_VOID:
-	    case ISN_RETURN_OBJECT:
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_BOT(0);
-		++ectx->ec_stack.ga_len;
-		if (iptr->isn_type == ISN_RETURN_VOID)
+	    સ્થિતિ ISN_RETURN_VOID:
+	    સ્થિતિ ISN_RETURN_OBJECT:
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_BOT(0);
+		++ectx->ec_ઢગલો.ga_len;
+		જો (iptr->isn_type == ISN_RETURN_VOID)
 		{
 		    tv->v_type = VAR_VOID;
-		    tv->vval.v_number = 0;
+		    tv->vval.v_સંખ્યા = 0;
 		    tv->v_lock = 0;
 		}
-		else
+		નહીંતર
 		{
-		    *tv = *STACK_TV_VAR(0);
+		    *tv = *ઢગલો_TV_VAR(0);
 		    object_T *obj = tv->vval.v_object;
 		    ++obj->obj_refcount;
 
@@ -5078,135 +5078,135 @@ exec_instructions(ectx_T *ectx)
 		// FALLTHROUGH
 
 	    // return from a :def function call with what is on the stack
-	    case ISN_RETURN:
+	    સ્થિતિ ISN_RETURN:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
-		    trycmd_T    *trycmd = NULL;
+		    trycmd_T    *trycmd = ખાલી;
 
 		    ///////////////////////////////////////////////////
 		    // TODO: If FAIL, line number in output not correct
 		    ///////////////////////////////////////////////////
-		    if (check_typval_is_value(STACK_TV_BOT(-1)) == FAIL)
-			goto theend;
+		    જો (check_typval_is_કિંમત(ઢગલો_TV_BOT(-1)) == FAIL)
+			જાઓ theend;
 
-		    if (trystack->ga_len > 0)
+		    જો (trystack->ga_len > 0)
 			trycmd = ((trycmd_T *)trystack->ga_data)
 							+ trystack->ga_len - 1;
-		    if (trycmd != NULL
+		    જો (trycmd != ખાલી
 				 && trycmd->tcd_frame_idx == ectx->ec_frame_idx)
 		    {
 			// jump to ":finally" or ":endtry"
-			if (trycmd->tcd_finally_idx != 0)
+			જો (trycmd->tcd_finally_idx != 0)
 			    ectx->ec_iidx = trycmd->tcd_finally_idx;
-			else
+			નહીંતર
 			    ectx->ec_iidx = trycmd->tcd_endtry_idx;
 			trycmd->tcd_return = TRUE;
 		    }
-		    else
-			goto func_return;
+		    નહીંતર
+			જાઓ func_return;
 		}
-		break;
+		તોડો;
 
 	    // push a partial, a reference to a compiled function
-	    case ISN_FUNCREF:
+	    સ્થિતિ ISN_FUNCREF:
 		{
 		    partial_T	    *pt = ALLOC_CLEAR_ONE(partial_T);
 		    ufunc_T	    *ufunc;
 		    funcref_T	    *funcref = &iptr->isn_arg.funcref;
 		    funcref_extra_T *extra = funcref->fr_extra;
 
-		    if (pt == NULL)
-			goto theend;
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
+		    જો (pt == ખાલી)
+			જાઓ theend;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
 		    {
 			vim_free(pt);
-			goto theend;
+			જાઓ theend;
 		    }
-		    if (extra != NULL && extra->fre_class != NULL)
+		    જો (extra != ખાલી && extra->fre_class != ખાલી)
 		    {
 			class_T	*cl;
-			if (extra->fre_object_method)
+			જો (extra->fre_object_method)
 			{
-			    tv = STACK_TV_BOT(-1);
-			    if (tv->v_type != VAR_OBJECT)
+			    tv = ઢગલો_TV_BOT(-1);
+			    જો (tv->v_type != VAR_OBJECT)
 			    {
 				SOURCING_LNUM = iptr->isn_lnum;
 				object_required_error(tv);
 				vim_free(pt);
-				goto on_error;
+				જાઓ on_error;
 			    }
 
 			    object_T *obj = tv->vval.v_object;
-			    if (obj == NULL)
+			    જો (obj == ખાલી)
 			    {
 				SOURCING_LNUM = iptr->isn_lnum;
 				emsg(_(e_using_null_object));
 				vim_free(pt);
-				goto on_error;
+				જાઓ on_error;
 			    }
 
 			    cl = obj->obj_class;
 			    // drop the value from the stack
 			    clear_tv(tv);
-			    --ectx->ec_stack.ga_len;
+			    --ectx->ec_ઢગલો.ga_len;
 
 			    pt->pt_obj = obj;
 			    ++obj->obj_refcount;
 			}
-			else
+			નહીંતર
 			    cl = extra->fre_class;
 
-			if (extra->fre_object_method)
+			જો (extra->fre_object_method)
 			{
 			    // object method
 			    // convert the interface index to the object index
-			    int idx =
+			    પૂર્ણાંક idx =
 				object_index_from_itf_index(extra->fre_class,
 					TRUE, extra->fre_method_idx, cl);
 			    ufunc = cl->class_obj_methods[idx];
 			}
-			else
+			નહીંતર
 			{
 			    // class method
 			    ufunc =
 				cl->class_class_functions[extra->fre_method_idx];
 			}
 		    }
-		    else if (extra == NULL || extra->fre_func_name == NULL)
+		    નહીંતર જો (extra == ખાલી || extra->fre_func_name == ખાલી)
 		    {
 			dfunc_T	*pt_dfunc = ((dfunc_T *)def_functions.ga_data)
 						       + funcref->fr_dfunc_idx;
 
 			ufunc = pt_dfunc->df_ufunc;
 		    }
-		    else
+		    નહીંતર
 		    {
 			ufunc = find_func(extra->fre_func_name, FALSE);
 		    }
-		    if (ufunc == NULL)
+		    જો (ufunc == ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
 			iemsg("ufunc unexpectedly NULL for FUNCREF");
 			vim_free(pt);
-			goto theend;
+			જાઓ theend;
 		    }
-		    if (extra != NULL && extra->fre_outer_depth > 0
+		    જો (extra != ખાલી && extra->fre_outer_depth > 0
 					   && (ufunc->uf_flags & FC_CLOSURE))
 		    {
 			// Use the context of the function where the nested
 			// generic function is defined.
-			partial_T *outer_pt = ectx->ec_outer_ref == NULL
-				    ? NULL : ectx->ec_outer_ref->or_partial;
+			partial_T *outer_pt = ectx->ec_outer_ref == ખાલી
+				    ? ખાલી : ectx->ec_outer_ref->or_partial;
 
-			for (int depth = 1; outer_pt != NULL
+			માટે (પૂર્ણાંક depth = 1; outer_pt != ખાલી
 				    && depth < extra->fre_outer_depth; ++depth)
 			    outer_pt = get_pt_outer(outer_pt)->out_up_partial;
-			if (outer_pt == NULL)
+			જો (outer_pt == ખાલી)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    iemsg("outer partial unexpectedly NULL for FUNCREF");
 			    vim_free(pt);
-			    goto theend;
+			    જાઓ theend;
 			}
 			pt->pt_func = ufunc;
 			pt->pt_refcount = 1;
@@ -5214,121 +5214,121 @@ exec_instructions(ectx_T *ectx)
 			++outer_pt->pt_refcount;
 			++ufunc->uf_refcount;
 		    }
-		    else if (fill_partial_and_closure(pt, ufunc,
-			       extra == NULL ? NULL : &extra->fre_loopvar_info,
+		    નહીંતર જો (fill_partial_and_closure(pt, ufunc,
+			       extra == ખાલી ? ખાલી : &extra->fre_loopvar_info,
 								 ectx) == FAIL)
 		    {
 			vim_free(pt);
-			goto theend;
+			જાઓ theend;
 		    }
-		    tv = STACK_TV_BOT(0);
-		    ++ectx->ec_stack.ga_len;
+		    tv = ઢગલો_TV_BOT(0);
+		    ++ectx->ec_ઢગલો.ga_len;
 		    tv->vval.v_partial = pt;
 		    tv->v_type = VAR_PARTIAL;
 		    tv->v_lock = 0;
 		}
-		break;
+		તોડો;
 
 	    // Create a global function from a lambda.
-	    case ISN_NEWFUNC:
+	    સ્થિતિ ISN_NEWFUNC:
 		{
 		    newfuncarg_T    *arg = iptr->isn_arg.newfunc.nf_arg;
 
-		    if (copy_lambda_to_global_func(arg->nfa_lambda,
+		    જો (copy_lambda_to_global_func(arg->nfa_lambda,
 				       arg->nfa_global, &arg->nfa_loopvar_info,
 				       ectx) == FAIL)
-			goto theend;
+			જાઓ theend;
 		}
-		break;
+		તોડો;
 
 	    // List functions
-	    case ISN_DEF:
-		if (iptr->isn_arg.string == NULL)
-		    list_functions(NULL);
-		else
+	    સ્થિતિ ISN_DEF:
+		જો (iptr->isn_arg.string == ખાલી)
+		    list_functions(ખાલી);
+		નહીંતર
 		{
 		    exarg_T	ea;
-		    garray_T	lines_to_free;
+		    garray_T	લીટીઓ_to_free;
 
 		    CLEAR_FIELD(ea);
 		    ea.cmd = ea.arg = iptr->isn_arg.string;
-		    ga_init2(&lines_to_free, sizeof(char_u *), 50);
+		    ga_init2(&લીટીઓ_to_free, કદ(char_u *), 50);
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    define_function(&ea, NULL, &lines_to_free, 0, NULL, 0, NULL);
-		    ga_clear_strings(&lines_to_free);
+		    define_function(&ea, ખાલી, &લીટીઓ_to_free, 0, ખાલી, 0, ખાલી);
+		    ga_clear_strings(&લીટીઓ_to_free);
 		}
-		break;
+		તોડો;
 
 	    // jump if a condition is met
-	    case ISN_JUMP:
+	    સ્થિતિ ISN_JUMP:
 		{
 		    jumpwhen_T	when = iptr->isn_arg.jump.jump_when;
-		    int		error = FALSE;
-		    int		jump = TRUE;
+		    પૂર્ણાંક		error = FALSE;
+		    પૂર્ણાંક		jump = TRUE;
 
-		    if (when != JUMP_ALWAYS)
+		    જો (when != JUMP_ALWAYS)
 		    {
-			tv = STACK_TV_BOT(-1);
-			if (when == JUMP_IF_COND_FALSE
+			tv = ઢગલો_TV_BOT(-1);
+			જો (when == JUMP_IF_COND_FALSE
 				|| when == JUMP_IF_FALSE
 				|| when == JUMP_IF_COND_TRUE)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    jump = tv_get_bool_chk(tv, &error);
-			    if (error)
-				goto on_error;
+			    જો (error)
+				જાઓ on_error;
 			}
-			else
+			નહીંતર
 			    jump = tv2bool(tv);
-			if (when == JUMP_IF_FALSE || when == JUMP_IF_COND_FALSE)
+			જો (when == JUMP_IF_FALSE || when == JUMP_IF_COND_FALSE)
 			    jump = !jump;
-			if (when == JUMP_IF_FALSE || !jump)
+			જો (when == JUMP_IF_FALSE || !jump)
 			{
 			    // drop the value from the stack
 			    clear_tv(tv);
-			    --ectx->ec_stack.ga_len;
+			    --ectx->ec_ઢગલો.ga_len;
 			}
 		    }
-		    if (jump)
+		    જો (jump)
 			ectx->ec_iidx = iptr->isn_arg.jump.jump_where;
 		}
-		break;
+		તોડો;
 
 	    // "while": jump to end if a condition is false
-	    case ISN_WHILE:
+	    સ્થિતિ ISN_WHILE:
 		{
-		    int		error = FALSE;
-		    int		jump = TRUE;
+		    પૂર્ણાંક		error = FALSE;
+		    પૂર્ણાંક		jump = TRUE;
 
-		    tv = STACK_TV_BOT(-1);
+		    tv = ઢગલો_TV_BOT(-1);
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    jump = !tv_get_bool_chk(tv, &error);
-		    if (error)
-			goto on_error;
+		    જો (error)
+			જાઓ on_error;
 		    // drop the value from the stack
 		    clear_tv(tv);
-		    --ectx->ec_stack.ga_len;
-		    if (jump)
+		    --ectx->ec_ઢગલો.ga_len;
+		    જો (jump)
 			ectx->ec_iidx = iptr->isn_arg.whileloop.while_end;
 
 		    // Store the current funcref count, may be used by
 		    // ISN_ENDLOOP later
-		    tv = STACK_TV_VAR(
+		    tv = ઢગલો_TV_VAR(
 				    iptr->isn_arg.whileloop.while_funcref_idx);
-		    tv->vval.v_number = ectx->ec_funcrefs.ga_len;
+		    tv->vval.v_સંખ્યા = ectx->ec_funcrefs.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // Jump if an argument with a default value was already set and not
 	    // v:none.
-	    case ISN_JUMP_IF_ARG_SET:
-	    case ISN_JUMP_IF_ARG_NOT_SET:
-		tv = STACK_TV_VAR(iptr->isn_arg.jumparg.jump_arg_off);
-		int arg_set = tv->v_type != VAR_UNKNOWN
+	    સ્થિતિ ISN_JUMP_IF_ARG_SET:
+	    સ્થિતિ ISN_JUMP_IF_ARG_NOT_SET:
+		tv = ઢગલો_TV_VAR(iptr->isn_arg.jumparg.jump_arg_off);
+		પૂર્ણાંક arg_set = tv->v_type != VAR_UNKNOWN
 				&& !(tv->v_type == VAR_SPECIAL
-					    && tv->vval.v_number == VVAL_NONE);
+					    && tv->vval.v_સંખ્યા == VVAL_NONE);
 
-		if (iptr->isn_type == ISN_JUMP_IF_ARG_NOT_SET && !arg_set)
+		જો (iptr->isn_type == ISN_JUMP_IF_ARG_NOT_SET && !arg_set)
 		{
 		    dfunc_T *df = ((dfunc_T *)def_functions.ga_data)
 							+ ectx->ec_dfunc_idx;
@@ -5336,45 +5336,45 @@ exec_instructions(ectx_T *ectx)
 		    // jump_arg_off is negative for arguments
 		    size_t argidx = ufunc->uf_def_args.ga_len
 					+ iptr->isn_arg.jumparg.jump_arg_off
-					+ STACK_FRAME_SIZE;
+					+ ઢગલો_FRAME_SIZE;
 		    type_T *type = ufunc->uf_arg_types[argidx];
 		    CLEAR_POINTER(tv);
 		    // "any" is not a type a value can have, leave the
 		    // argument marked as not set.
-		    if (type->tt_type != VAR_ANY)
+		    જો (type->tt_type != VAR_ANY)
 			tv->v_type = type->tt_type;
 		}
 
-		if (iptr->isn_type == ISN_JUMP_IF_ARG_SET ? arg_set : !arg_set)
+		જો (iptr->isn_type == ISN_JUMP_IF_ARG_SET ? arg_set : !arg_set)
 		    ectx->ec_iidx = iptr->isn_arg.jumparg.jump_where;
-		break;
+		તોડો;
 
 	    // top of a for loop
-	    case ISN_FOR:
-		if (execute_for(iptr, ectx) == FAIL)
-		    goto theend;
-		break;
+	    સ્થિતિ ISN_FOR:
+		જો (execute_for(iptr, ectx) == FAIL)
+		    જાઓ theend;
+		તોડો;
 
 	    // end of a for or while loop
-	    case ISN_ENDLOOP:
-		if (execute_endloop(iptr, ectx) == FAIL)
-		    goto theend;
-		break;
+	    સ્થિતિ ISN_ENDLOOP:
+		જો (execute_endloop(iptr, ectx) == FAIL)
+		    જાઓ theend;
+		તોડો;
 
 	    // start of ":try" block
-	    case ISN_TRY:
+	    સ્થિતિ ISN_TRY:
 		{
-		    trycmd_T    *trycmd = NULL;
+		    trycmd_T    *trycmd = ખાલી;
 
-		    if (GA_GROW_FAILS(&ectx->ec_trystack, 1))
-			goto theend;
+		    જો (GA_GROW_FAILS(&ectx->ec_trystack, 1))
+			જાઓ theend;
 		    trycmd = ((trycmd_T *)ectx->ec_trystack.ga_data)
 						     + ectx->ec_trystack.ga_len;
 		    ++ectx->ec_trystack.ga_len;
 		    ++trylevel;
 		    CLEAR_POINTER(trycmd);
 		    trycmd->tcd_frame_idx = ectx->ec_frame_idx;
-		    trycmd->tcd_stack_len = ectx->ec_stack.ga_len;
+		    trycmd->tcd_ઢગલો_len = ectx->ec_ઢગલો.ga_len;
 		    trycmd->tcd_catch_idx =
 				       iptr->isn_arg.tryref.try_ref->try_catch;
 		    trycmd->tcd_finally_idx =
@@ -5382,26 +5382,26 @@ exec_instructions(ectx_T *ectx)
 		    trycmd->tcd_endtry_idx =
 				      iptr->isn_arg.tryref.try_ref->try_endtry;
 		}
-		break;
+		તોડો;
 
-	    case ISN_PUSHEXC:
-		if (current_exception == NULL)
+	    સ્થિતિ ISN_PUSHEXC:
+		જો (current_exception == ખાલી)
 		{
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    iemsg("Evaluating catch while current_exception is NULL");
-		    goto theend;
+		    જાઓ theend;
 		}
-		if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-		    goto theend;
-		tv = STACK_TV_BOT(0);
-		++ectx->ec_stack.ga_len;
+		જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+		    જાઓ theend;
+		tv = ઢગલો_TV_BOT(0);
+		++ectx->ec_ઢગલો.ga_len;
 		tv->v_type = VAR_STRING;
 		tv->v_lock = 0;
 		tv->vval.v_string = vim_strsave(
-					   (char_u *)current_exception->value);
-		break;
+					   (char_u *)current_exception->કિંમત);
+		તોડો;
 
-	    case ISN_CATCH:
+	    સ્થિતિ ISN_CATCH:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
 		    trycmd_T    *trycmd;
@@ -5416,25 +5416,25 @@ exec_instructions(ectx_T *ectx)
 		    force_abort = need_rethrow = FALSE;
 		    catch_exception(current_exception);
 		}
-		break;
+		તોડો;
 
-	    case ISN_TRYCONT:
+	    સ્થિતિ ISN_TRYCONT:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
 		    trycont_T	*trycont = &iptr->isn_arg.trycont;
-		    int		i;
+		    પૂર્ણાંક		i;
 		    trycmd_T    *trycmd;
-		    int		iidx = trycont->tct_where;
+		    પૂર્ણાંક		iidx = trycont->tct_where;
 
-		    if (trystack->ga_len < trycont->tct_levels)
+		    જો (trystack->ga_len < trycont->tct_levels)
 		    {
 			siemsg("TRYCONT: expected %d levels, found %d",
 					trycont->tct_levels, trystack->ga_len);
-			goto theend;
+			જાઓ theend;
 		    }
 		    // Make :endtry jump to any outer try block and the last
 		    // :endtry inside the loop to the loop start.
-		    for (i = trycont->tct_levels; i > 0; --i)
+		    માટે (i = trycont->tct_levels; i > 0; --i)
 		    {
 			trycmd = ((trycmd_T *)trystack->ga_data)
 							+ trystack->ga_len - i;
@@ -5447,9 +5447,9 @@ exec_instructions(ectx_T *ectx)
 		    // jump to :finally or :endtry of current try statement
 		    ectx->ec_iidx = iidx;
 		}
-		break;
+		તોડો;
 
-	    case ISN_FINALLY:
+	    સ્થિતિ ISN_FINALLY:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
 		    trycmd_T    *trycmd = ((trycmd_T *)trystack->ga_data)
@@ -5458,17 +5458,17 @@ exec_instructions(ectx_T *ectx)
 		    // Reset the index to avoid a return statement jumps here
 		    // again.
 		    trycmd->tcd_finally_idx = 0;
-		    if (trycmd->tcd_caught)
+		    જો (trycmd->tcd_caught)
 		    {
 			// discard the exception
-			finish_exception(caught_stack);
+			finish_exception(caught_ઢગલો);
 			trycmd->tcd_caught = FALSE;
 		    }
-		    break;
+		    તોડો;
 		}
 
 	    // end of ":try" block
-	    case ISN_ENDTRY:
+	    સ્થિતિ ISN_ENDTRY:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
 		    trycmd_T    *trycmd;
@@ -5476,511 +5476,511 @@ exec_instructions(ectx_T *ectx)
 		    --trystack->ga_len;
 		    --trylevel;
 		    trycmd = ((trycmd_T *)trystack->ga_data) + trystack->ga_len;
-		    if (trycmd->tcd_did_throw)
+		    જો (trycmd->tcd_did_throw)
 			did_throw = TRUE;
-		    if (trycmd->tcd_caught)
+		    જો (trycmd->tcd_caught)
 		    {
 			// discard the exception
-			finish_exception(caught_stack);
+			finish_exception(caught_ઢગલો);
 		    }
 
-		    if (trycmd->tcd_return)
-			goto func_return;
+		    જો (trycmd->tcd_return)
+			જાઓ func_return;
 
-		    while (ectx->ec_stack.ga_len > trycmd->tcd_stack_len)
+		    જ્યારે (ectx->ec_ઢગલો.ga_len > trycmd->tcd_ઢગલો_len)
 		    {
-			--ectx->ec_stack.ga_len;
-			clear_tv(STACK_TV_BOT(0));
+			--ectx->ec_ઢગલો.ga_len;
+			clear_tv(ઢગલો_TV_BOT(0));
 		    }
-		    if (trycmd->tcd_cont != 0)
+		    જો (trycmd->tcd_cont != 0)
 			// handling :continue: jump to outer try block or
 			// start of the loop
 			ectx->ec_iidx = trycmd->tcd_cont - 1;
 		}
-		break;
+		તોડો;
 
-	    case ISN_THROW:
+	    સ્થિતિ ISN_THROW:
 		{
 		    garray_T	*trystack = &ectx->ec_trystack;
 
-		    if (trystack->ga_len == 0 && trylevel == 0 && emsg_silent)
+		    જો (trystack->ga_len == 0 && trylevel == 0 && emsg_silent)
 		    {
 			// Throwing an exception while using "silent!" causes
 			// the function to abort but not display an error.
-			tv = STACK_TV_BOT(-1);
+			tv = ઢગલો_TV_BOT(-1);
 			clear_tv(tv);
-			tv->v_type = VAR_NUMBER;
-			tv->vval.v_number = 0;
-			goto done;
+			tv->v_type = VAR_સંખ્યા;
+			tv->vval.v_સંખ્યા = 0;
+			જાઓ done;
 		    }
-		    --ectx->ec_stack.ga_len;
-		    tv = STACK_TV_BOT(0);
-		    if (tv->vval.v_string == NULL
+		    --ectx->ec_ઢગલો.ga_len;
+		    tv = ઢગલો_TV_BOT(0);
+		    જો (tv->vval.v_string == ખાલી
 				       || *skipwhite(tv->vval.v_string) == NUL)
 		    {
 			vim_free(tv->vval.v_string);
 			SOURCING_LNUM = iptr->isn_lnum;
 			emsg(_(e_throw_with_empty_string));
-			goto theend;
+			જાઓ theend;
 		    }
 
 		    // Inside a "catch" we need to first discard the caught
 		    // exception.
-		    if (trystack->ga_len > 0)
+		    જો (trystack->ga_len > 0)
 		    {
 			trycmd_T    *trycmd = ((trycmd_T *)trystack->ga_data)
 							+ trystack->ga_len - 1;
-			if (trycmd->tcd_caught)
+			જો (trycmd->tcd_caught)
 			{
 			    // discard the exception
-			    finish_exception(caught_stack);
+			    finish_exception(caught_ઢગલો);
 			    trycmd->tcd_caught = FALSE;
 			}
 		    }
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (throw_exception(tv->vval.v_string, ET_USER, NULL)
+		    જો (throw_exception(tv->vval.v_string, ET_USER, ખાલી)
 								       == FAIL)
 		    {
 			vim_free(tv->vval.v_string);
-			goto theend;
+			જાઓ theend;
 		    }
 		    did_throw = TRUE;
 		}
-		break;
+		તોડો;
 
 	    // compare with special values
-	    case ISN_COMPAREBOOL:
-	    case ISN_COMPARESPECIAL:
+	    સ્થિતિ ISN_COMPAREBOOL:
+	    સ્થિતિ ISN_COMPARESPECIAL:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
-		    varnumber_T arg1 = tv1->vval.v_number;
-		    varnumber_T arg2 = tv2->vval.v_number;
-		    int		res;
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
+		    varnumber_T arg1 = tv1->vval.v_સંખ્યા;
+		    varnumber_T arg2 = tv2->vval.v_સંખ્યા;
+		    પૂર્ણાંક		res;
 
-		    if (iptr->isn_arg.op.op_type == EXPR_EQUAL)
+		    જો (iptr->isn_arg.op.op_type == પદાવલિ_EQUAL)
 			res = arg1 == arg2;
-		    else
+		    નહીંતર
 			res = arg1 != arg2;
 
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    tv1->v_type = VAR_BOOL;
-		    tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
+		    tv1->vval.v_સંખ્યા = res ? VVAL_TRUE : VVAL_FALSE;
 		}
-		break;
+		તોડો;
 
-	    case ISN_COMPARENULL:
+	    સ્થિતિ ISN_COMPARENULL:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
-		    int		res;
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
+		    પૂર્ણાંક		res;
 
 		    res = typval_compare_null(tv1, tv2);
-		    if (res == MAYBE)
-			goto on_error;
-		    if (iptr->isn_arg.op.op_type == EXPR_NEQUAL)
+		    જો (res == MAYBE)
+			જાઓ on_error;
+		    જો (iptr->isn_arg.op.op_type == પદાવલિ_NEQUAL)
 			res = !res;
 		    clear_tv(tv1);
 		    clear_tv(tv2);
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    tv1->v_type = VAR_BOOL;
-		    tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
+		    tv1->vval.v_સંખ્યા = res ? VVAL_TRUE : VVAL_FALSE;
 		}
-		break;
+		તોડો;
 
 	    // Operation with two number arguments
-	    case ISN_OPNR:
-	    case ISN_COMPARENR:
+	    સ્થિતિ ISN_OPNR:
+	    સ્થિતિ ISN_COMPARENR:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
-		    varnumber_T arg1 = tv1->vval.v_number;
-		    varnumber_T arg2 = tv2->vval.v_number;
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
+		    varnumber_T arg1 = tv1->vval.v_સંખ્યા;
+		    varnumber_T arg2 = tv2->vval.v_સંખ્યા;
 		    varnumber_T res = 0;
-		    int		div_zero = FALSE;
+		    પૂર્ણાંક		div_zero = FALSE;
 
-		    if (iptr->isn_arg.op.op_type == EXPR_LSHIFT
-			    || iptr->isn_arg.op.op_type == EXPR_RSHIFT)
+		    જો (iptr->isn_arg.op.op_type == પદાવલિ_LSHIFT
+			    || iptr->isn_arg.op.op_type == પદાવલિ_RSHIFT)
 		    {
-			if (arg2 < 0)
+			જો (arg2 < 0)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    emsg(_(e_bitshift_ops_must_be_positive));
-			    goto on_error;
+			    જાઓ on_error;
 			}
 		    }
 
-		    switch (iptr->isn_arg.op.op_type)
+		    પસંદગી (iptr->isn_arg.op.op_type)
 		    {
-			case EXPR_MULT: res = arg1 * arg2; break;
-			case EXPR_DIV:  if (arg2 == 0)
+			સ્થિતિ પદાવલિ_MULT: res = arg1 * arg2; તોડો;
+			સ્થિતિ પદાવલિ_DIV:  જો (arg2 == 0)
 					    div_zero = TRUE;
-					else
+					નહીંતર
 					    res = arg1 / arg2;
-					break;
-			case EXPR_REM:  if (arg2 == 0)
+					તોડો;
+			સ્થિતિ પદાવલિ_REM:  જો (arg2 == 0)
 					    div_zero = TRUE;
-					else
+					નહીંતર
 					    res = arg1 % arg2;
-					break;
-			case EXPR_SUB: res = arg1 - arg2; break;
-			case EXPR_ADD: res = arg1 + arg2; break;
+					તોડો;
+			સ્થિતિ પદાવલિ_SUB: res = arg1 - arg2; તોડો;
+			સ્થિતિ પદાવલિ_ADD: res = arg1 + arg2; તોડો;
 
-			case EXPR_EQUAL: res = arg1 == arg2; break;
-			case EXPR_NEQUAL: res = arg1 != arg2; break;
-			case EXPR_GREATER: res = arg1 > arg2; break;
-			case EXPR_GEQUAL: res = arg1 >= arg2; break;
-			case EXPR_SMALLER: res = arg1 < arg2; break;
-			case EXPR_SEQUAL: res = arg1 <= arg2; break;
-			case EXPR_LSHIFT: if (arg2 > MAX_LSHIFT_BITS)
+			સ્થિતિ પદાવલિ_EQUAL: res = arg1 == arg2; તોડો;
+			સ્થિતિ પદાવલિ_NEQUAL: res = arg1 != arg2; તોડો;
+			સ્થિતિ પદાવલિ_GREATER: res = arg1 > arg2; તોડો;
+			સ્થિતિ પદાવલિ_GEQUAL: res = arg1 >= arg2; તોડો;
+			સ્થિતિ પદાવલિ_SMALLER: res = arg1 < arg2; તોડો;
+			સ્થિતિ પદાવલિ_SEQUAL: res = arg1 <= arg2; તોડો;
+			સ્થિતિ પદાવલિ_LSHIFT: જો (arg2 > MAX_LSHIFT_BITS)
 					      res = 0;
-					  else
+					  નહીંતર
 					      res = (uvarnumber_T)arg1 << arg2;
-					  break;
-			case EXPR_RSHIFT: if (arg2 > MAX_LSHIFT_BITS)
+					  તોડો;
+			સ્થિતિ પદાવલિ_RSHIFT: જો (arg2 > MAX_LSHIFT_BITS)
 					      res = 0;
-					  else
+					  નહીંતર
 					      res = (uvarnumber_T)arg1 >> arg2;
-					  break;
-			default: break;
+					  તોડો;
+			મૂળભૂત: તોડો;
 		    }
 
-		    --ectx->ec_stack.ga_len;
-		    if (iptr->isn_type == ISN_COMPARENR)
+		    --ectx->ec_ઢગલો.ga_len;
+		    જો (iptr->isn_type == ISN_COMPARENR)
 		    {
 			tv1->v_type = VAR_BOOL;
-			tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
+			tv1->vval.v_સંખ્યા = res ? VVAL_TRUE : VVAL_FALSE;
 		    }
-		    else
-			tv1->vval.v_number = res;
-		    if (div_zero)
+		    નહીંતર
+			tv1->vval.v_સંખ્યા = res;
+		    જો (div_zero)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
 			emsg(_(e_divide_by_zero));
-			goto on_error;
+			જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
 	    // Computation with two float arguments
-	    case ISN_OPFLOAT:
-	    case ISN_COMPAREFLOAT:
+	    સ્થિતિ ISN_OPFLOAT:
+	    સ્થિતિ ISN_COMPAREFLOAT:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    float_T	arg1 = tv1->vval.v_float;
 		    float_T	arg2 = tv2->vval.v_float;
 		    float_T	res = 0;
-		    int		cmp = FALSE;
+		    પૂર્ણાંક		cmp = FALSE;
 
-		    switch (iptr->isn_arg.op.op_type)
+		    પસંદગી (iptr->isn_arg.op.op_type)
 		    {
-			case EXPR_MULT: res = arg1 * arg2; break;
-			case EXPR_DIV: res = arg1 / arg2; break;
-			case EXPR_SUB: res = arg1 - arg2; break;
-			case EXPR_ADD: res = arg1 + arg2; break;
+			સ્થિતિ પદાવલિ_MULT: res = arg1 * arg2; તોડો;
+			સ્થિતિ પદાવલિ_DIV: res = arg1 / arg2; તોડો;
+			સ્થિતિ પદાવલિ_SUB: res = arg1 - arg2; તોડો;
+			સ્થિતિ પદાવલિ_ADD: res = arg1 + arg2; તોડો;
 
-			case EXPR_EQUAL: cmp = arg1 == arg2; break;
-			case EXPR_NEQUAL: cmp = arg1 != arg2; break;
-			case EXPR_GREATER: cmp = arg1 > arg2; break;
-			case EXPR_GEQUAL: cmp = arg1 >= arg2; break;
-			case EXPR_SMALLER: cmp = arg1 < arg2; break;
-			case EXPR_SEQUAL: cmp = arg1 <= arg2; break;
-			default: cmp = 0; break;
+			સ્થિતિ પદાવલિ_EQUAL: cmp = arg1 == arg2; તોડો;
+			સ્થિતિ પદાવલિ_NEQUAL: cmp = arg1 != arg2; તોડો;
+			સ્થિતિ પદાવલિ_GREATER: cmp = arg1 > arg2; તોડો;
+			સ્થિતિ પદાવલિ_GEQUAL: cmp = arg1 >= arg2; તોડો;
+			સ્થિતિ પદાવલિ_SMALLER: cmp = arg1 < arg2; તોડો;
+			સ્થિતિ પદાવલિ_SEQUAL: cmp = arg1 <= arg2; તોડો;
+			મૂળભૂત: cmp = 0; તોડો;
 		    }
-		    --ectx->ec_stack.ga_len;
-		    if (iptr->isn_type == ISN_COMPAREFLOAT)
+		    --ectx->ec_ઢગલો.ga_len;
+		    જો (iptr->isn_type == ISN_COMPAREFLOAT)
 		    {
 			tv1->v_type = VAR_BOOL;
-			tv1->vval.v_number = cmp ? VVAL_TRUE : VVAL_FALSE;
+			tv1->vval.v_સંખ્યા = cmp ? VVAL_TRUE : VVAL_FALSE;
 		    }
-		    else
+		    નહીંતર
 			tv1->vval.v_float = res;
 		}
-		break;
+		તોડો;
 
-	    case ISN_COMPARELIST:
-	    case ISN_COMPARETUPLE:
-	    case ISN_COMPAREDICT:
-	    case ISN_COMPAREFUNC:
-	    case ISN_COMPARESTRING:
-	    case ISN_COMPAREBLOB:
-	    case ISN_COMPAREOBJECT:
+	    સ્થિતિ ISN_COMPARELIST:
+	    સ્થિતિ ISN_COMPARETUPLE:
+	    સ્થિતિ ISN_COMPAREDICT:
+	    સ્થિતિ ISN_COMPAREFUNC:
+	    સ્થિતિ ISN_COMPARESTRING:
+	    સ્થિતિ ISN_COMPAREBLOB:
+	    સ્થિતિ ISN_COMPAREOBJECT:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    exprtype_T	exprtype = iptr->isn_arg.op.op_type;
-		    int		ic = iptr->isn_arg.op.op_ic;
-		    int		res = FALSE;
-		    int		status = OK;
+		    પૂર્ણાંક		ic = iptr->isn_arg.op.op_ic;
+		    પૂર્ણાંક		res = FALSE;
+		    પૂર્ણાંક		status = OK;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (iptr->isn_type == ISN_COMPARELIST)
+		    જો (iptr->isn_type == ISN_COMPARELIST)
 		    {
 			status = typval_compare_list(tv1, tv2,
 							   exprtype, ic, &res);
 		    }
-		    else if (iptr->isn_type == ISN_COMPARETUPLE)
+		    નહીંતર જો (iptr->isn_type == ISN_COMPARETUPLE)
 		    {
 			status = typval_compare_tuple(tv1, tv2,
 							   exprtype, ic, &res);
 		    }
-		    else if (iptr->isn_type == ISN_COMPAREDICT)
+		    નહીંતર જો (iptr->isn_type == ISN_COMPAREDICT)
 		    {
 			status = typval_compare_dict(tv1, tv2,
 							   exprtype, ic, &res);
 		    }
-		    else if (iptr->isn_type == ISN_COMPAREFUNC)
+		    નહીંતર જો (iptr->isn_type == ISN_COMPAREFUNC)
 		    {
 			status = typval_compare_func(tv1, tv2,
 							   exprtype, ic, &res);
 		    }
-		    else if (iptr->isn_type == ISN_COMPARESTRING)
+		    નહીંતર જો (iptr->isn_type == ISN_COMPARESTRING)
 		    {
 			status = typval_compare_string(tv1, tv2,
 							   exprtype, ic, &res);
 		    }
-		    else if (iptr->isn_type == ISN_COMPAREBLOB)
+		    નહીંતર જો (iptr->isn_type == ISN_COMPAREBLOB)
 		    {
 			status = typval_compare_blob(tv1, tv2, exprtype, &res);
 		    }
-		    else // ISN_COMPAREOBJECT
+		    નહીંતર // ISN_COMPAREOBJECT
 		    {
 			status = typval_compare_object(tv1, tv2,
 							exprtype, FALSE, &res);
 		    }
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    clear_tv(tv1);
 		    clear_tv(tv2);
 		    tv1->v_type = VAR_BOOL;
-		    tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
-		    if (status == FAIL)
-			goto theend;
+		    tv1->vval.v_સંખ્યા = res ? VVAL_TRUE : VVAL_FALSE;
+		    જો (status == FAIL)
+			જાઓ theend;
 		}
-		break;
+		તોડો;
 
-	    case ISN_COMPAREANY:
+	    સ્થિતિ ISN_COMPAREANY:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    exprtype_T	exprtype = iptr->isn_arg.op.op_type;
-		    int		ic = iptr->isn_arg.op.op_ic;
-		    int		status;
+		    પૂર્ણાંક		ic = iptr->isn_arg.op.op_ic;
+		    પૂર્ણાંક		status;
 
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    status = typval_compare(tv1, tv2, exprtype, ic);
 		    clear_tv(tv2);
-		    --ectx->ec_stack.ga_len;
-		    if (status == FAIL)
-			goto theend;
+		    --ectx->ec_ઢગલો.ga_len;
+		    જો (status == FAIL)
+			જાઓ theend;
 		}
-		break;
+		તોડો;
 
-	    case ISN_ADDLIST:
-	    case ISN_ADDTUPLE:
-	    case ISN_ADDBLOB:
+	    સ્થિતિ ISN_ADDLIST:
+	    સ્થિતિ ISN_ADDTUPLE:
+	    સ્થિતિ ISN_ADDBLOB:
 		{
-		    typval_T *tv1 = STACK_TV_BOT(-2);
-		    typval_T *tv2 = STACK_TV_BOT(-1);
+		    typval_T *tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T *tv2 = ઢગલો_TV_BOT(-1);
 
 		    // add two lists or blobs
-		    if (iptr->isn_type == ISN_ADDLIST)
+		    જો (iptr->isn_type == ISN_ADDLIST)
 		    {
-			if (iptr->isn_arg.op.op_type == EXPR_APPEND
-						   && tv1->vval.v_list != NULL)
+			જો (iptr->isn_arg.op.op_type == પદાવલિ_APPEND
+						   && tv1->vval.v_list != ખાલી)
 			    list_extend(tv1->vval.v_list, tv2->vval.v_list,
-									 NULL);
-			else
+									 ખાલી);
+			નહીંતર
 			    eval_addlist(tv1, tv2);
 		    }
-		    else if (iptr->isn_type == ISN_ADDTUPLE)
+		    નહીંતર જો (iptr->isn_type == ISN_ADDTUPLE)
 			eval_addtuple(tv1, tv2);
-		    else
+		    નહીંતર
 			eval_addblob(tv1, tv2);
 		    clear_tv(tv2);
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
-	    case ISN_LISTAPPEND:
+	    સ્થિતિ ISN_LISTAPPEND:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    list_T	*l = tv1->vval.v_list;
 
 		    // add an item to a list
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (l == NULL)
+		    જો (l == ખાલી)
 		    {
 			emsg(_(e_cannot_add_to_null_list));
-			goto on_error;
+			જાઓ on_error;
 		    }
-		    if (value_check_lock(l->lv_lock, NULL, FALSE))
-			goto on_error;
-		    if (list_append_tv(l, tv2) == FAIL)
-			goto theend;
+		    જો (કિંમત_check_lock(l->lv_lock, ખાલી, FALSE))
+			જાઓ on_error;
+		    જો (list_append_tv(l, tv2) == FAIL)
+			જાઓ theend;
 		    clear_tv(tv2);
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
-	    case ISN_BLOBAPPEND:
+	    સ્થિતિ ISN_BLOBAPPEND:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    blob_T	*b = tv1->vval.v_blob;
-		    int		error = FALSE;
+		    પૂર્ણાંક		error = FALSE;
 		    varnumber_T n;
 
 		    // add a number to a blob
-		    if (b == NULL)
+		    જો (b == ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
 			emsg(_(e_cannot_add_to_null_blob));
-			goto on_error;
+			જાઓ on_error;
 		    }
-		    n = tv_get_number_chk(tv2, &error);
-		    if (error)
-			goto on_error;
-		    ga_append(&b->bv_ga, (int)n);
-		    --ectx->ec_stack.ga_len;
+		    n = tv_get_સંખ્યા_chk(tv2, &error);
+		    જો (error)
+			જાઓ on_error;
+		    ga_append(&b->bv_ga, (પૂર્ણાંક)n);
+		    --ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
 	    // Computation with two arguments of unknown type
-	    case ISN_OPANY:
+	    સ્થિતિ ISN_OPANY:
 		{
-		    typval_T	*tv1 = STACK_TV_BOT(-2);
-		    typval_T	*tv2 = STACK_TV_BOT(-1);
+		    typval_T	*tv1 = ઢગલો_TV_BOT(-2);
+		    typval_T	*tv2 = ઢગલો_TV_BOT(-1);
 		    varnumber_T	n1, n2;
 		    float_T	f1 = 0, f2 = 0;
-		    int		error = FALSE;
+		    પૂર્ણાંક		error = FALSE;
 
-		    if (iptr->isn_arg.op.op_type == EXPR_ADD)
+		    જો (iptr->isn_arg.op.op_type == પદાવલિ_ADD)
 		    {
-			if (tv1->v_type == VAR_LIST && tv2->v_type == VAR_LIST)
+			જો (tv1->v_type == VAR_LIST && tv2->v_type == VAR_LIST)
 			{
 			    eval_addlist(tv1, tv2);
 			    clear_tv(tv2);
-			    --ectx->ec_stack.ga_len;
-			    break;
+			    --ectx->ec_ઢગલો.ga_len;
+			    તોડો;
 			}
-			else if (tv1->v_type == VAR_TUPLE
+			નહીંતર જો (tv1->v_type == VAR_TUPLE
 						&& tv2->v_type == VAR_TUPLE)
 			{
 			    eval_addtuple(tv1, tv2);
 			    clear_tv(tv2);
-			    --ectx->ec_stack.ga_len;
-			    break;
+			    --ectx->ec_ઢગલો.ga_len;
+			    તોડો;
 			}
-			else if (tv1->v_type == VAR_BLOB
+			નહીંતર જો (tv1->v_type == VAR_BLOB
 						    && tv2->v_type == VAR_BLOB)
 			{
 			    eval_addblob(tv1, tv2);
 			    clear_tv(tv2);
-			    --ectx->ec_stack.ga_len;
-			    break;
+			    --ectx->ec_ઢગલો.ga_len;
+			    તોડો;
 			}
 		    }
-		    if (tv1->v_type == VAR_FLOAT)
+		    જો (tv1->v_type == VAR_FLOAT)
 		    {
 			f1 = tv1->vval.v_float;
 			n1 = 0;
 		    }
-		    else
+		    નહીંતર
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			n1 = tv_get_number_chk(tv1, &error);
-			if (error)
-			    goto on_error;
-			if (tv2->v_type == VAR_FLOAT)
+			n1 = tv_get_સંખ્યા_chk(tv1, &error);
+			જો (error)
+			    જાઓ on_error;
+			જો (tv2->v_type == VAR_FLOAT)
 			    f1 = n1;
 		    }
-		    if (tv2->v_type == VAR_FLOAT)
+		    જો (tv2->v_type == VAR_FLOAT)
 		    {
 			f2 = tv2->vval.v_float;
 			n2 = 0;
 		    }
-		    else
+		    નહીંતર
 		    {
-			n2 = tv_get_number_chk(tv2, &error);
-			if (error)
-			    goto on_error;
-			if (tv1->v_type == VAR_FLOAT)
+			n2 = tv_get_સંખ્યા_chk(tv2, &error);
+			જો (error)
+			    જાઓ on_error;
+			જો (tv1->v_type == VAR_FLOAT)
 			    f2 = n2;
 		    }
 		    // if there is a float on either side the result is a float
-		    if (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+		    જો (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
 		    {
-			switch (iptr->isn_arg.op.op_type)
+			પસંદગી (iptr->isn_arg.op.op_type)
 			{
-			    case EXPR_MULT: f1 = f1 * f2; break;
-			    case EXPR_DIV:  f1 = f1 / f2; break;
-			    case EXPR_SUB:  f1 = f1 - f2; break;
-			    case EXPR_ADD:  f1 = f1 + f2; break;
-			    default: SOURCING_LNUM = iptr->isn_lnum;
+			    સ્થિતિ પદાવલિ_MULT: f1 = f1 * f2; તોડો;
+			    સ્થિતિ પદાવલિ_DIV:  f1 = f1 / f2; તોડો;
+			    સ્થિતિ પદાવલિ_SUB:  f1 = f1 - f2; તોડો;
+			    સ્થિતિ પદાવલિ_ADD:  f1 = f1 + f2; તોડો;
+			    મૂળભૂત: SOURCING_LNUM = iptr->isn_lnum;
 				     emsg(_(e_cannot_use_percent_with_float));
-				     goto on_error;
+				     જાઓ on_error;
 			}
 			clear_tv(tv1);
 			clear_tv(tv2);
 			tv1->v_type = VAR_FLOAT;
 			tv1->vval.v_float = f1;
-			--ectx->ec_stack.ga_len;
+			--ectx->ec_ઢગલો.ga_len;
 		    }
-		    else
+		    નહીંતર
 		    {
-			int failed = FALSE;
+			પૂર્ણાંક failed = FALSE;
 
-			switch (iptr->isn_arg.op.op_type)
+			પસંદગી (iptr->isn_arg.op.op_type)
 			{
-			    case EXPR_MULT: n1 = n1 * n2; break;
-			    case EXPR_DIV:  n1 = num_divide(n1, n2, &failed);
-					    if (failed)
-						goto on_error;
-					    break;
-			    case EXPR_SUB:  n1 = n1 - n2; break;
-			    case EXPR_ADD:  n1 = n1 + n2; break;
-			    default:	    n1 = num_modulus(n1, n2, &failed);
-					    if (failed)
-						goto on_error;
-					    break;
+			    સ્થિતિ પદાવલિ_MULT: n1 = n1 * n2; તોડો;
+			    સ્થિતિ પદાવલિ_DIV:  n1 = અંક_divide(n1, n2, &failed);
+					    જો (failed)
+						જાઓ on_error;
+					    તોડો;
+			    સ્થિતિ પદાવલિ_SUB:  n1 = n1 - n2; તોડો;
+			    સ્થિતિ પદાવલિ_ADD:  n1 = n1 + n2; તોડો;
+			    મૂળભૂત:	    n1 = અંક_modulus(n1, n2, &failed);
+					    જો (failed)
+						જાઓ on_error;
+					    તોડો;
 			}
 			clear_tv(tv1);
 			clear_tv(tv2);
-			tv1->v_type = VAR_NUMBER;
-			tv1->vval.v_number = n1;
-			--ectx->ec_stack.ga_len;
+			tv1->v_type = VAR_સંખ્યા;
+			tv1->vval.v_સંખ્યા = n1;
+			--ectx->ec_ઢગલો.ga_len;
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_STRINDEX:
-	    case ISN_STRSLICE:
+	    સ્થિતિ ISN_STRINDEX:
+	    સ્થિતિ ISN_STRSLICE:
 		{
-		    int		is_slice = iptr->isn_type == ISN_STRSLICE;
+		    પૂર્ણાંક		is_slice = iptr->isn_type == ISN_STRSLICE;
 		    varnumber_T	n1 = 0, n2;
 		    char_u	*res;
 
 		    // string index: string is at stack-2, index at stack-1
 		    // string slice: string is at stack-3, first index at
 		    // stack-2, second index at stack-1
-		    if (is_slice)
+		    જો (is_slice)
 		    {
-			tv = STACK_TV_BOT(-2);
-			n1 = tv->vval.v_number;
+			tv = ઢગલો_TV_BOT(-2);
+			n1 = tv->vval.v_સંખ્યા;
 		    }
 
-		    tv = STACK_TV_BOT(-1);
-		    n2 = tv->vval.v_number;
+		    tv = ઢગલો_TV_BOT(-1);
+		    n2 = tv->vval.v_સંખ્યા;
 
-		    ectx->ec_stack.ga_len -= is_slice ? 2 : 1;
-		    tv = STACK_TV_BOT(-1);
-		    if (is_slice)
+		    ectx->ec_ઢગલો.ga_len -= is_slice ? 2 : 1;
+		    tv = ઢગલો_TV_BOT(-1);
+		    જો (is_slice)
 			// Slice: Select the characters from the string
 			res = string_slice(tv->vval.v_string, n1, n2, FALSE);
-		    else
+		    નહીંતર
 			// Index: The resulting variable is a string of a
 			// single character (including composing characters).
 			// If the index is too big or negative the result is
@@ -5989,21 +5989,21 @@ exec_instructions(ectx_T *ectx)
 		    vim_free(tv->vval.v_string);
 		    tv->vval.v_string = res;
 		}
-		break;
+		તોડો;
 
-	    case ISN_LISTINDEX:
-	    case ISN_LISTSLICE:
-	    case ISN_TUPLEINDEX:
-	    case ISN_TUPLESLICE:
-	    case ISN_BLOBINDEX:
-	    case ISN_BLOBSLICE:
+	    સ્થિતિ ISN_LISTINDEX:
+	    સ્થિતિ ISN_LISTSLICE:
+	    સ્થિતિ ISN_TUPLEINDEX:
+	    સ્થિતિ ISN_TUPLESLICE:
+	    સ્થિતિ ISN_BLOBINDEX:
+	    સ્થિતિ ISN_BLOBSLICE:
 		{
-		    int		is_slice = iptr->isn_type == ISN_LISTSLICE
+		    પૂર્ણાંક		is_slice = iptr->isn_type == ISN_LISTSLICE
 				    || iptr->isn_type == ISN_TUPLESLICE
 				    || iptr->isn_type == ISN_BLOBSLICE;
-		    int		is_blob = iptr->isn_type == ISN_BLOBINDEX
+		    પૂર્ણાંક		is_blob = iptr->isn_type == ISN_BLOBINDEX
 					    || iptr->isn_type == ISN_BLOBSLICE;
-		    int		is_tuple = iptr->isn_type == ISN_TUPLEINDEX
+		    પૂર્ણાંક		is_tuple = iptr->isn_type == ISN_TUPLEINDEX
 				    || iptr->isn_type == ISN_TUPLESLICE;
 		    varnumber_T	n1, n2;
 		    typval_T	*val_tv;
@@ -6012,88 +6012,88 @@ exec_instructions(ectx_T *ectx)
 		    // list slice: list is at stack-3, indexes at stack-2 and
 		    // stack-1
 		    // Same for tuple and blob.
-		    val_tv = is_slice ? STACK_TV_BOT(-3) : STACK_TV_BOT(-2);
+		    val_tv = is_slice ? ઢગલો_TV_BOT(-3) : ઢગલો_TV_BOT(-2);
 
-		    tv = STACK_TV_BOT(-1);
-		    n1 = n2 = tv->vval.v_number;
+		    tv = ઢગલો_TV_BOT(-1);
+		    n1 = n2 = tv->vval.v_સંખ્યા;
 		    clear_tv(tv);
 
-		    if (is_slice)
+		    જો (is_slice)
 		    {
-			tv = STACK_TV_BOT(-2);
-			n1 = tv->vval.v_number;
+			tv = ઢગલો_TV_BOT(-2);
+			n1 = tv->vval.v_સંખ્યા;
 			clear_tv(tv);
 		    }
 
-		    ectx->ec_stack.ga_len -= is_slice ? 2 : 1;
-		    tv = STACK_TV_BOT(-1);
+		    ectx->ec_ઢગલો.ga_len -= is_slice ? 2 : 1;
+		    tv = ઢગલો_TV_BOT(-1);
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (is_blob)
+		    જો (is_blob)
 		    {
-			if (blob_slice_or_index(val_tv->vval.v_blob, is_slice,
+			જો (blob_slice_or_index(val_tv->vval.v_blob, is_slice,
 						    n1, n2, FALSE, tv) == FAIL)
-			    goto on_error;
+			    જાઓ on_error;
 		    }
-		    else if (is_tuple)
+		    નહીંતર જો (is_tuple)
 		    {
-			if (tuple_slice_or_index(val_tv->vval.v_tuple,
+			જો (tuple_slice_or_index(val_tv->vval.v_tuple,
 				is_slice, n1, n2, FALSE, tv, TRUE) == FAIL)
-			    goto on_error;
+			    જાઓ on_error;
 		    }
-		    else
+		    નહીંતર
 		    {
-			if (list_slice_or_index(val_tv->vval.v_list, is_slice,
+			જો (list_slice_or_index(val_tv->vval.v_list, is_slice,
 					      n1, n2, FALSE, tv, TRUE) == FAIL)
-			    goto on_error;
+			    જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_ANYINDEX:
-	    case ISN_ANYSLICE:
+	    સ્થિતિ ISN_ANYINDEX:
+	    સ્થિતિ ISN_ANYSLICE:
 		{
-		    int		is_slice = iptr->isn_type == ISN_ANYSLICE;
+		    પૂર્ણાંક		is_slice = iptr->isn_type == ISN_ANYSLICE;
 		    typval_T	*var1, *var2;
-		    int		res;
+		    પૂર્ણાંક		res;
 
 		    // index: composite is at stack-2, index at stack-1
 		    // slice: composite is at stack-3, indexes at stack-2 and
 		    // stack-1
-		    tv = is_slice ? STACK_TV_BOT(-3) : STACK_TV_BOT(-2);
+		    tv = is_slice ? ઢગલો_TV_BOT(-3) : ઢગલો_TV_BOT(-2);
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (check_can_index(tv, TRUE, TRUE) == FAIL)
-			goto on_error;
-		    var1 = is_slice ? STACK_TV_BOT(-2) : STACK_TV_BOT(-1);
-		    var2 = is_slice ? STACK_TV_BOT(-1) : NULL;
+		    જો (check_can_index(tv, TRUE, TRUE) == FAIL)
+			જાઓ on_error;
+		    var1 = is_slice ? ઢગલો_TV_BOT(-2) : ઢગલો_TV_BOT(-1);
+		    var2 = is_slice ? ઢગલો_TV_BOT(-1) : ખાલી;
 		    res = eval_index_inner(tv, is_slice, var1, var2,
-							FALSE, NULL, -1, TRUE);
+							FALSE, ખાલી, -1, TRUE);
 		    clear_tv(var1);
-		    if (is_slice)
+		    જો (is_slice)
 			clear_tv(var2);
-		    ectx->ec_stack.ga_len -= is_slice ? 2 : 1;
-		    if (res == FAIL)
-			goto on_error;
+		    ectx->ec_ઢગલો.ga_len -= is_slice ? 2 : 1;
+		    જો (res == FAIL)
+			જાઓ on_error;
 		}
-		break;
+		તોડો;
 
-	    case ISN_SLICE:
+	    સ્થિતિ ISN_SLICE:
 		{
-		    int		count = iptr->isn_arg.number;
+		    પૂર્ણાંક		ગણતરી = iptr->isn_arg.સંખ્યા;
 
 		    // type will have been checked to be a list
-		    tv = STACK_TV_BOT(-1);
-		    if (tv->v_type == VAR_LIST)
+		    tv = ઢગલો_TV_BOT(-1);
+		    જો (tv->v_type == VAR_LIST)
 		    {
 			list_T *list = tv->vval.v_list;
 
 			// no error for short list, expect it to be checked
 			// earlier
-			if (list != NULL && list->lv_len >= count)
+			જો (list != ખાલી && list->lv_len >= ગણતરી)
 			{
 			    list_T	*newlist = list_slice(list,
-				    count, list->lv_len - 1);
+				    ગણતરી, list->lv_len - 1);
 
-			    if (newlist != NULL)
+			    જો (newlist != ખાલી)
 			    {
 				list_unref(list);
 				tv->vval.v_list = newlist;
@@ -6101,19 +6101,19 @@ exec_instructions(ectx_T *ectx)
 			    }
 			}
 		    }
-		    else
+		    નહીંતર
 		    {
 			tuple_T *tuple = tv->vval.v_tuple;
 
 			// no error for short tuple, expect it to be checked
 			// earlier
-			if (tuple != NULL && TUPLE_LEN(tuple) >= count)
+			જો (tuple != ખાલી && TUPLE_LEN(tuple) >= ગણતરી)
 			{
 			    tuple_T *newtuple;
 
-			    newtuple = tuple_slice(tuple, count,
+			    newtuple = tuple_slice(tuple, ગણતરી,
 							TUPLE_LEN(tuple) - 1);
-			    if (newtuple != NULL)
+			    જો (newtuple != ખાલી)
 			    {
 				tuple_unref(tuple);
 				tv->v_type = VAR_TUPLE;
@@ -6123,9 +6123,9 @@ exec_instructions(ectx_T *ectx)
 			}
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_GETITEM:
+	    સ્થિતિ ISN_GETITEM:
 		{
 		    listitem_T	*li;
 		    typval_T	*item_tv;
@@ -6133,146 +6133,146 @@ exec_instructions(ectx_T *ectx)
 
 		    // Get list item: list is at stack-1, push item.
 		    // List type and length is checked for when compiling.
-		    tv = STACK_TV_BOT(-1 - gi->gi_with_op);
-		    if (tv->v_type == VAR_LIST)
+		    tv = ઢગલો_TV_BOT(-1 - gi->gi_with_op);
+		    જો (tv->v_type == VAR_LIST)
 		    {
 			li = list_find(tv->vval.v_list, gi->gi_index);
-			if (li == NULL)
-			    goto on_error;
+			જો (li == ખાલી)
+			    જાઓ on_error;
 			item_tv = &li->li_tv;
 		    }
-		    else
+		    નહીંતર
 			item_tv = TUPLE_ITEM(tv->vval.v_tuple, gi->gi_index);
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    ++ectx->ec_stack.ga_len;
-		    copy_tv(item_tv, STACK_TV_BOT(-1));
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    ++ectx->ec_ઢગલો.ga_len;
+		    copy_tv(item_tv, ઢગલો_TV_BOT(-1));
 
 		    // Useful when used in unpack assignment.  Reset at
 		    // ISN_DROP.
 		    ectx->ec_where.wt_index = gi->gi_index + 1;
 		    ectx->ec_where.wt_kind = WT_VARIABLE;
 		}
-		break;
+		તોડો;
 
 	    // dict member with string key (dict['member'])
-	    case ISN_MEMBER:
+	    સ્થિતિ ISN_MEMBER:
 		{
 		    dict_T	*dict;
-		    char_u	*key;
+		    char_u	*ચાવી;
 		    dictitem_T	*di;
 
 		    // dict member: dict is at stack-2, key at stack-1
-		    tv = STACK_TV_BOT(-2);
+		    tv = ઢગલો_TV_BOT(-2);
 		    // no need to check for VAR_DICT, CHECKTYPE will check.
 		    dict = tv->vval.v_dict;
 
-		    tv = STACK_TV_BOT(-1);
+		    tv = ઢગલો_TV_BOT(-1);
 		    // no need to check for VAR_STRING, 2STRING will check.
-		    key = tv->vval.v_string;
-		    if (key == NULL)
-			key = (char_u *)"";
+		    ચાવી = tv->vval.v_string;
+		    જો (ચાવી == ખાલી)
+			ચાવી = (char_u *)"";
 
-		    if ((di = dict_find(dict, key, -1)) == NULL)
+		    જો ((di = dict_find(dict, ચાવી, -1)) == ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			semsg(_(e_key_not_present_in_dictionary_str), key);
+			semsg(_(e_ચાવી_not_present_in_dictionary_str), ચાવી);
 
 			// If :silent! is used we will continue, make sure the
 			// stack contents makes sense and the dict stack is
 			// updated.
 			clear_tv(tv);
-			--ectx->ec_stack.ga_len;
-			tv = STACK_TV_BOT(-1);
-			(void) dict_stack_save(tv);
-			tv->v_type = VAR_NUMBER;
-			tv->vval.v_number = 0;
-			goto on_fatal_error;
+			--ectx->ec_ઢગલો.ga_len;
+			tv = ઢગલો_TV_BOT(-1);
+			(શૂન્ય) dict_ઢગલો_save(tv);
+			tv->v_type = VAR_સંખ્યા;
+			tv->vval.v_સંખ્યા = 0;
+			જાઓ on_fatal_error;
 		    }
 		    clear_tv(tv);
-		    --ectx->ec_stack.ga_len;
+		    --ectx->ec_ઢગલો.ga_len;
 		    // Put the dict used on the dict stack, it might be used by
 		    // a dict function later.
-		    tv = STACK_TV_BOT(-1);
-		    if (dict_stack_save(tv) == FAIL)
-			goto on_fatal_error;
+		    tv = ઢગલો_TV_BOT(-1);
+		    જો (dict_ઢગલો_save(tv) == FAIL)
+			જાઓ on_fatal_error;
 		    copy_tv(&di->di_tv, tv);
 		}
-		break;
+		તોડો;
 
 	    // dict member with string key (dict.member)
 	    // or can be an object
-	    case ISN_STRINGMEMBER:
+	    સ્થિતિ ISN_STRINGMEMBER:
 		{
 		    dict_T	*dict;
 		    dictitem_T	*di;
 
-		    tv = STACK_TV_BOT(-1);
+		    tv = ઢગલો_TV_BOT(-1);
 
-		    if (tv->v_type == VAR_OBJECT
+		    જો (tv->v_type == VAR_OBJECT
 			    || tv->v_type == VAR_CLASS)
 		    {
-			if (dict_stack_save(tv) == FAIL)
-			    goto on_fatal_error;
+			જો (dict_ઢગલો_save(tv) == FAIL)
+			    જાઓ on_fatal_error;
 
 			ufunc_T *ufunc = (((dfunc_T *)def_functions.ga_data)
 					+ ectx->ec_dfunc_idx)->df_ufunc;
 			// Class or an object (not a Dict)
-			if (var_any_get_oc_member(ufunc->uf_class, iptr, tv) == FAIL)
-			    goto on_error;
+			જો (var_any_get_oc_member(ufunc->uf_class, iptr, tv) == FAIL)
+			    જાઓ on_error;
 		    }
-		    else
+		    નહીંતર
 		    {
-			if (tv->v_type != VAR_DICT || tv->vval.v_dict == NULL)
+			જો (tv->v_type != VAR_DICT || tv->vval.v_dict == ખાલી)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
 			    emsg(_(e_dictionary_required));
-			    goto on_error;
+			    જાઓ on_error;
 			}
 			dict = tv->vval.v_dict;
 
-			if ((di = dict_find(dict, iptr->isn_arg.string, -1))
-								   == NULL)
+			જો ((di = dict_find(dict, iptr->isn_arg.string, -1))
+								   == ખાલી)
 			{
 			    SOURCING_LNUM = iptr->isn_lnum;
-			    semsg(_(e_key_not_present_in_dictionary_str),
+			    semsg(_(e_ચાવી_not_present_in_dictionary_str),
 						     iptr->isn_arg.string);
-			    goto on_error;
+			    જાઓ on_error;
 			}
 			// Put the dict used on the dict stack, it might be
 			// used by a dict function later.
-			if (dict_stack_save(tv) == FAIL)
-			    goto on_fatal_error;
+			જો (dict_ઢગલો_save(tv) == FAIL)
+			    જાઓ on_fatal_error;
 
 			copy_tv(&di->di_tv, tv);
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_GET_OBJ_MEMBER:
-	    case ISN_GET_ITF_MEMBER:
+	    સ્થિતિ ISN_GET_OBJ_MEMBER:
+	    સ્થિતિ ISN_GET_ITF_MEMBER:
 		{
-		    tv = STACK_TV_BOT(-1);
-		    if (tv->v_type != VAR_OBJECT)
+		    tv = ઢગલો_TV_BOT(-1);
+		    જો (tv->v_type != VAR_OBJECT)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
 			object_required_error(tv);
-			goto on_error;
+			જાઓ on_error;
 		    }
 
 		    object_T *obj = tv->vval.v_object;
-		    if (obj == NULL)
+		    જો (obj == ખાલી)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
 			emsg(_(e_using_null_object));
-			goto on_error;
+			જાઓ on_error;
 		    }
 
-		    int idx;
-		    if (iptr->isn_type == ISN_GET_OBJ_MEMBER)
+		    પૂર્ણાંક idx;
+		    જો (iptr->isn_type == ISN_GET_OBJ_MEMBER)
 			idx = iptr->isn_arg.classmember.cm_idx;
-		    else
+		    નહીંતર
 		    {
 			idx = iptr->isn_arg.classmember.cm_idx;
 			// convert the interface index to the object index
@@ -6283,7 +6283,7 @@ exec_instructions(ectx_T *ectx)
 
 		    // The members are located right after the object struct.
 		    typval_T *mtv = ((typval_T *)(obj + 1)) + idx;
-		    if (mtv->v_type == VAR_UNKNOWN)
+		    જો (mtv->v_type == VAR_UNKNOWN)
 		    {
 			// Referencing an object variable (without a type)
 			// which is not yet initialized.  So the type is not
@@ -6292,7 +6292,7 @@ exec_instructions(ectx_T *ectx)
 			SOURCING_LNUM = iptr->isn_lnum;
 			semsg(_(e_uninitialized_object_var_reference),
 				m->ocm_name.string);
-			goto on_error;
+			જાઓ on_error;
 		    }
 		    copy_tv(mtv, tv);
 
@@ -6300,242 +6300,242 @@ exec_instructions(ectx_T *ectx)
 		    // be freed.
 		    object_unref(obj);
 		}
-		break;
+		તોડો;
 
-	    case ISN_STORE_THIS:
+	    સ્થિતિ ISN_STORE_THIS:
 		{
-		    int idx = iptr->isn_arg.number;
-		    object_T *obj = STACK_TV_VAR(0)->vval.v_object;
+		    પૂર્ણાંક idx = iptr->isn_arg.સંખ્યા;
+		    object_T *obj = ઢગલો_TV_VAR(0)->vval.v_object;
 		    // the members are located right after the object struct
 		    typval_T *mtv = ((typval_T *)(obj + 1)) + idx;
 		    clear_tv(mtv);
-		    *mtv = *STACK_TV_BOT(-1);
-		    --ectx->ec_stack.ga_len;
+		    *mtv = *ઢગલો_TV_BOT(-1);
+		    --ectx->ec_ઢગલો.ga_len;
 		}
-		break;
+		તોડો;
 
-	    case ISN_CLEARDICT:
-		dict_stack_drop();
-		break;
+	    સ્થિતિ ISN_CLEARDICT:
+		dict_ઢગલો_drop();
+		તોડો;
 
-	    case ISN_USEDICT:
+	    સ્થિતિ ISN_USEDICT:
 		{
-		    typval_T *dict_tv = dict_stack_get_tv();
+		    typval_T *dict_tv = dict_ઢગલો_get_tv();
 
 		    // Turn "dict.Func" into a partial for "Func" bound to
 		    // "dict".  Don't do this when "Func" is already a partial
 		    // that was bound explicitly (pt_auto is FALSE).
-		    tv = STACK_TV_BOT(-1);
-		    if (dict_tv != NULL
+		    tv = ઢગલો_TV_BOT(-1);
+		    જો (dict_tv != ખાલી
 			    && dict_tv->v_type == VAR_DICT
-			    && dict_tv->vval.v_dict != NULL
+			    && dict_tv->vval.v_dict != ખાલી
 			    && (tv->v_type == VAR_FUNC
 				|| (tv->v_type == VAR_PARTIAL
 				    && (tv->vval.v_partial->pt_auto
-				     || tv->vval.v_partial->pt_dict == NULL))))
+				     || tv->vval.v_partial->pt_dict == ખાલી))))
 		    dict_tv->vval.v_dict =
 					make_partial(dict_tv->vval.v_dict, tv);
-		    dict_stack_drop();
+		    dict_ઢગલો_drop();
 		}
-		break;
+		તોડો;
 
-	    case ISN_NEGATENR:
-		tv = STACK_TV_BOT(-1);
+	    સ્થિતિ ISN_NEGATENR:
+		tv = ઢગલો_TV_BOT(-1);
 		// CHECKTYPE should have checked the variable type
-		if (tv->v_type == VAR_FLOAT)
+		જો (tv->v_type == VAR_FLOAT)
 		    tv->vval.v_float = -tv->vval.v_float;
-		else
-		    tv->vval.v_number = -tv->vval.v_number;
-		break;
+		નહીંતર
+		    tv->vval.v_સંખ્યા = -tv->vval.v_સંખ્યા;
+		તોડો;
 
-	    case ISN_CHECKTYPE:
+	    સ્થિતિ ISN_CHECKTYPE:
 		{
 		    checktype_T *ct = &iptr->isn_arg.type;
-		    int		r;
+		    પૂર્ણાંક		r;
 		    where_T	where = WHERE_INIT;
 
-		    tv = STACK_TV_BOT((int)ct->ct_off);
+		    tv = ઢગલો_TV_BOT((પૂર્ણાંક)ct->ct_off);
 		    SOURCING_LNUM = iptr->isn_lnum;
-		    if (ct->ct_arg_idx > 0)
+		    જો (ct->ct_arg_idx > 0)
 		    {
 			where.wt_index = ct->ct_arg_idx;
 			where.wt_kind = ct->ct_is_var ? WT_VARIABLE : WT_ARGUMENT;
 		    }
 		    where.wt_func_name = ectx->ec_where.wt_func_name;
 		    r = check_typval_type(ct->ct_type, tv, where);
-		    if (r == FAIL)
-			goto on_error;
+		    જો (r == FAIL)
+			જાઓ on_error;
 
 		    // number 0 is FALSE, number 1 is TRUE
-		    if (tv->v_type == VAR_NUMBER
+		    જો (tv->v_type == VAR_સંખ્યા
 			    && ct->ct_type->tt_type == VAR_BOOL
-			    && (tv->vval.v_number == 0
-						|| tv->vval.v_number == 1))
+			    && (tv->vval.v_સંખ્યા == 0
+						|| tv->vval.v_સંખ્યા == 1))
 		    {
 			tv->v_type = VAR_BOOL;
-			tv->vval.v_number = tv->vval.v_number
+			tv->vval.v_સંખ્યા = tv->vval.v_સંખ્યા
 						      ? VVAL_TRUE : VVAL_FALSE;
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_CHECKLEN:
+	    સ્થિતિ ISN_CHECKLEN:
 		{
-		    int	    min_len = iptr->isn_arg.checklen.cl_min_len;
-		    list_T  *list = NULL;
-		    tuple_T *tuple = NULL;
-		    int	    len = 0;
+		    પૂર્ણાંક	    min_len = iptr->isn_arg.checklen.cl_min_len;
+		    list_T  *list = ખાલી;
+		    tuple_T *tuple = ખાલી;
+		    પૂર્ણાંક	    len = 0;
 
-		    tv = STACK_TV_BOT(-1);
+		    tv = ઢગલો_TV_BOT(-1);
 
-		    int		len_check_failed = FALSE;
-		    if (tv->v_type == VAR_LIST)
+		    પૂર્ણાંક		len_check_failed = FALSE;
+		    જો (tv->v_type == VAR_LIST)
 		    {
 			list = tv->vval.v_list;
-			if (list == NULL || list->lv_len < min_len
+			જો (list == ખાલી || list->lv_len < min_len
 			    || (list->lv_len > min_len
 					&& !iptr->isn_arg.checklen.cl_more_OK))
 			    len_check_failed = TRUE;
-			if (list != NULL)
+			જો (list != ખાલી)
 			    len = list->lv_len;
 		    }
-		    else if (tv->v_type == VAR_TUPLE)
+		    નહીંતર જો (tv->v_type == VAR_TUPLE)
 		    {
 			tuple = tv->vval.v_tuple;
-			if (tuple == NULL || TUPLE_LEN(tuple) < min_len
+			જો (tuple == ખાલી || TUPLE_LEN(tuple) < min_len
 			    || (TUPLE_LEN(tuple) > min_len
 					&& !iptr->isn_arg.checklen.cl_more_OK))
 			    len_check_failed = TRUE;
-			if (tuple != NULL)
+			જો (tuple != ખાલી)
 			    len = TUPLE_LEN(tuple);
 		    }
-		    else
+		    નહીંતર
 			len_check_failed = TRUE;
 
-		    if (len_check_failed)
+		    જો (len_check_failed)
 		    {
 			SOURCING_LNUM = iptr->isn_lnum;
-			semsg(_(e_expected_nr_items_but_got_nr),
+			semsg(_(e_expected_nr_વસ્તુઓ_but_got_nr),
 				     min_len, len);
-			goto on_error;
+			જાઓ on_error;
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_SETTYPE:
-		set_tv_type(STACK_TV_BOT(-1), iptr->isn_arg.type.ct_type);
-		break;
+	    સ્થિતિ ISN_SETTYPE:
+		set_tv_type(ઢગલો_TV_BOT(-1), iptr->isn_arg.type.ct_type);
+		તોડો;
 
-	    case ISN_2BOOL:
-	    case ISN_COND2BOOL:
+	    સ્થિતિ ISN_2BOOL:
+	    સ્થિતિ ISN_COND2BOOL:
 		{
-		    int n;
-		    int error = FALSE;
+		    પૂર્ણાંક n;
+		    પૂર્ણાંક error = FALSE;
 
-		    if (iptr->isn_type == ISN_2BOOL)
+		    જો (iptr->isn_type == ISN_2BOOL)
 		    {
-			tv = STACK_TV_BOT(iptr->isn_arg.tobool.offset);
+			tv = ઢગલો_TV_BOT(iptr->isn_arg.tobool.offset);
 			n = tv2bool(tv);
-			if (iptr->isn_arg.tobool.invert)
+			જો (iptr->isn_arg.tobool.invert)
 			    n = !n;
 		    }
-		    else
+		    નહીંતર
 		    {
-			tv = STACK_TV_BOT(-1);
+			tv = ઢગલો_TV_BOT(-1);
 			SOURCING_LNUM = iptr->isn_lnum;
 			n = tv_get_bool_chk(tv, &error);
-			if (error)
-			    goto on_error;
+			જો (error)
+			    જાઓ on_error;
 		    }
 		    clear_tv(tv);
 		    tv->v_type = VAR_BOOL;
-		    tv->vval.v_number = n ? VVAL_TRUE : VVAL_FALSE;
+		    tv->vval.v_સંખ્યા = n ? VVAL_TRUE : VVAL_FALSE;
 		}
-		break;
+		તોડો;
 
-	    case ISN_2STRING:
-	    case ISN_2STRING_ANY:
+	    સ્થિતિ ISN_2STRING:
+	    સ્થિતિ ISN_2STRING_ANY:
 		SOURCING_LNUM = iptr->isn_lnum;
-		if (do_2string(STACK_TV_BOT(iptr->isn_arg.tostring.offset),
+		જો (do_2string(ઢગલો_TV_BOT(iptr->isn_arg.tostring.offset),
 				iptr->isn_type == ISN_2STRING_ANY,
 				      iptr->isn_arg.tostring.flags) == FAIL)
-			    goto on_error;
-		break;
+			    જાઓ on_error;
+		તોડો;
 
-	    case ISN_RANGE:
+	    સ્થિતિ ISN_RANGE:
 		{
 		    exarg_T	ea;
-		    char	*errormsg;
+		    અક્ષર	*errormsg;
 
 		    ea.line2 = 0;
-		    ea.addr_count = 0;
-		    ea.addr_type = ADDR_LINES;
+		    ea.addr_ગણતરી = 0;
+		    ea.addr_type = ADDR_લીટીઓ;
 		    ea.cmd = iptr->isn_arg.string;
 		    ea.skip = FALSE;
-		    if (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
-			goto on_error;
+		    જો (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
+			જાઓ on_error;
 
-		    if (GA_GROW_FAILS(&ectx->ec_stack, 1))
-			goto theend;
-		    ++ectx->ec_stack.ga_len;
-		    tv = STACK_TV_BOT(-1);
-		    tv->v_type = VAR_NUMBER;
+		    જો (GA_GROW_FAILS(&ectx->ec_ઢગલો, 1))
+			જાઓ theend;
+		    ++ectx->ec_ઢગલો.ga_len;
+		    tv = ઢગલો_TV_BOT(-1);
+		    tv->v_type = VAR_સંખ્યા;
 		    tv->v_lock = 0;
-		    tv->vval.v_number = ea.line2;
+		    tv->vval.v_સંખ્યા = ea.line2;
 		}
-		break;
+		તોડો;
 
-	    case ISN_PUT:
-		tv = NULL; // initialize it so we don't get a warning
+	    સ્થિતિ ISN_PUT:
+		tv = ખાલી; // initialize it so we don't get a warning
 		isn_put_do(ectx, iptr, tv, FALSE);
-		break;
-	    case ISN_IPUT:
-		tv = NULL;
+		તોડો;
+	    સ્થિતિ ISN_IPUT:
+		tv = ખાલી;
 		isn_put_do(ectx, iptr, tv, TRUE);
-		break;
+		તોડો;
 
-	    case ISN_CMDMOD:
+	    સ્થિતિ ISN_CMDMOD:
 		ectx->ec_funclocal.floc_save_cmdmod = cmdmod;
 		ectx->ec_funclocal.floc_restore_cmdmod = TRUE;
 		ectx->ec_funclocal.floc_restore_cmdmod_stacklen =
-							 ectx->ec_stack.ga_len;
+							 ectx->ec_ઢગલો.ga_len;
 		cmdmod = *iptr->isn_arg.cmdmod.cf_cmdmod;
 		apply_cmdmod(&cmdmod);
-		break;
+		તોડો;
 
-	    case ISN_CMDMOD_REV:
+	    સ્થિતિ ISN_CMDMOD_REV:
 		// filter regprog is owned by the instruction, don't free it
-		cmdmod.cmod_filter_regmatch.regprog = NULL;
+		cmdmod.cmod_filter_regmatch.regprog = ખાલી;
 		undo_cmdmod(&cmdmod);
 		cmdmod = ectx->ec_funclocal.floc_save_cmdmod;
 		ectx->ec_funclocal.floc_restore_cmdmod = FALSE;
-		break;
+		તોડો;
 
-	    case ISN_UNPACK:
+	    સ્થિતિ ISN_UNPACK:
 		// Check there is a valid list to unpack.
-		tv = STACK_TV_BOT(-1);
-		if (tv->v_type != VAR_LIST && tv->v_type != VAR_TUPLE)
+		tv = ઢગલો_TV_BOT(-1);
+		જો (tv->v_type != VAR_LIST && tv->v_type != VAR_TUPLE)
 		{
 		    SOURCING_LNUM = iptr->isn_lnum;
 		    emsg(_(e_for_argument_must_be_sequence_of_lists_or_tuples));
-		    goto on_error;
+		    જાઓ on_error;
 		}
 
-		int rc;
-		if (tv->v_type == VAR_LIST)
+		પૂર્ણાંક rc;
+		જો (tv->v_type == VAR_LIST)
 		    rc = exec_unpack_list(ectx, iptr, tv);
-		else
+		નહીંતર
 		    rc = exec_unpack_tuple(ectx, iptr, tv);
-		if (rc != EXEC_OK)
+		જો (rc != EXEC_OK)
 		{
-		    if (rc == EXEC_FAIL)
-			goto on_error;
-		    goto theend;
+		    જો (rc == EXEC_FAIL)
+			જાઓ on_error;
+		    જાઓ theend;
 		}
-		break;
+		તોડો;
 
-	    case ISN_PROF_START:
-	    case ISN_PROF_END:
+	    સ્થિતિ ISN_PROF_START:
+	    સ્થિતિ ISN_PROF_END:
 		{
 #ifdef FEAT_PROFILE
 		    funccall_T	cookie;
@@ -6544,92 +6544,92 @@ exec_instructions(ectx_T *ectx)
 					       + ectx->ec_dfunc_idx)->df_ufunc;
 
 		    cookie.fc_func = cur_ufunc;
-		    if (iptr->isn_type == ISN_PROF_START)
+		    જો (iptr->isn_type == ISN_PROF_START)
 		    {
-			func_line_start(&cookie, iptr->isn_lnum);
+			func_લીટી_start(&cookie, iptr->isn_lnum);
 			// if we get here the instruction is executed
-			func_line_exec(&cookie);
+			func_લીટી_exec(&cookie);
 		    }
-		    else
-			func_line_end(&cookie);
+		    નહીંતર
+			func_લીટી_end(&cookie);
 #endif
 		}
-		break;
+		તોડો;
 
-	    case ISN_DEBUG:
+	    સ્થિતિ ISN_DEBUG:
 		handle_debug(iptr, ectx);
-		break;
+		તોડો;
 
-	    case ISN_SHUFFLE:
+	    સ્થિતિ ISN_SHUFFLE:
 		{
 		    typval_T	tmp_tv;
-		    int		item = iptr->isn_arg.shuffle.shfl_item;
-		    int		up = iptr->isn_arg.shuffle.shfl_up;
+		    પૂર્ણાંક		item = iptr->isn_arg.shuffle.shfl_item;
+		    પૂર્ણાંક		up = iptr->isn_arg.shuffle.shfl_up;
 
-		    tmp_tv = *STACK_TV_BOT(-item);
-		    for ( ; up > 0 && item > 1; --up)
+		    tmp_tv = *ઢગલો_TV_BOT(-item);
+		    માટે ( ; up > 0 && item > 1; --up)
 		    {
-			*STACK_TV_BOT(-item) = *STACK_TV_BOT(-item + 1);
+			*ઢગલો_TV_BOT(-item) = *ઢગલો_TV_BOT(-item + 1);
 			--item;
 		    }
-		    *STACK_TV_BOT(-item) = tmp_tv;
+		    *ઢગલો_TV_BOT(-item) = tmp_tv;
 		}
-		break;
+		તોડો;
 
-	    case ISN_DROP:
-		--ectx->ec_stack.ga_len;
-		clear_tv(STACK_TV_BOT(0));
+	    સ્થિતિ ISN_DROP:
+		--ectx->ec_ઢગલો.ga_len;
+		clear_tv(ઢગલો_TV_BOT(0));
 		ectx->ec_where = (where_T)WHERE_INIT;
-		break;
+		તોડો;
 
-	    case ISN_SCRIPTCTX_SET:
+	    સ્થિતિ ISN_SCRIPTCTX_SET:
 		// change the script context.  Used to evaluate an object
 		// member variable initialization expression in the context of
 		// the script where the class is defined.
 		current_sctx = iptr->isn_arg.setsctx;
-		break;
+		તોડો;
 	}
-	continue;
+	ચાલુ;
 
 func_return:
 	// Restore previous function. If the frame pointer is where we started
 	// then there is none and we are done.
-	if (ectx->ec_frame_idx == ectx->ec_initial_frame_idx)
-	    goto done;
+	જો (ectx->ec_frame_idx == ectx->ec_initial_frame_idx)
+	    જાઓ done;
 
-	if (func_return(ectx) == FAIL)
+	જો (func_return(ectx) == FAIL)
 	    // only fails when out of memory
-	    goto theend;
-	continue;
+	    જાઓ theend;
+	ચાલુ;
 
 on_error:
 	// Jump here for an error that does not require aborting execution.
 	// If "emsg_silent" is set then ignore the error, unless it was set
 	// when calling the function.
-	if (did_emsg_cumul + did_emsg == ectx->ec_did_emsg_before
+	જો (did_emsg_cumul + did_emsg == ectx->ec_did_emsg_before
 					   && emsg_silent && did_emsg_def == 0)
 	{
 	    // If a sequence of instructions causes an error while ":silent!"
 	    // was used, restore the stack length and jump ahead to restoring
 	    // the cmdmod.
-	    if (ectx->ec_funclocal.floc_restore_cmdmod)
+	    જો (ectx->ec_funclocal.floc_restore_cmdmod)
 	    {
-		while (ectx->ec_stack.ga_len
+		જ્યારે (ectx->ec_ઢગલો.ga_len
 			     > ectx->ec_funclocal.floc_restore_cmdmod_stacklen)
 		{
-		    --ectx->ec_stack.ga_len;
-		    clear_tv(STACK_TV_BOT(0));
+		    --ectx->ec_ઢગલો.ga_len;
+		    clear_tv(ઢગલો_TV_BOT(0));
 		}
-		while (ectx->ec_instr[ectx->ec_iidx].isn_type != ISN_CMDMOD_REV)
+		જ્યારે (ectx->ec_instr[ectx->ec_iidx].isn_type != ISN_CMDMOD_REV)
 		    ++ectx->ec_iidx;
 	    }
-	    continue;
+	    ચાલુ;
 	}
 on_fatal_error:
 	// Jump here for an error that messes up the stack.
 	// If we are not inside a try-catch started here, abort execution.
-	if (trylevel <= ectx->ec_trylevel_at_start)
-	    goto theend;
+	જો (trylevel <= ectx->ec_trylevel_at_start)
+	    જાઓ theend;
     }
 
 done:
@@ -6637,9 +6637,9 @@ done:
 theend:
     may_invoke_defer_funcs(ectx);
 
-    dict_stack_clear(dict_stack_len_at_start);
+    dict_ઢગલો_clear(dict_ઢગલો_len_at_start);
     ectx->ec_trylevel_at_start = save_trylevel_at_start;
-    return ret;
+    પાછા ret;
 }
 
 /*
@@ -6647,13 +6647,13 @@ theend:
  * "rettv".
  * Return OK or FAIL.
  */
-    int
+    પૂર્ણાંક
 exe_typval_instr(typval_T *tv, typval_T *rettv)
 {
     ectx_T	*ectx = tv->vval.v_instr->instr_ectx;
     isn_T	*save_instr = ectx->ec_instr;
-    int		save_iidx = ectx->ec_iidx;
-    int		res;
+    પૂર્ણાંક		save_iidx = ectx->ec_iidx;
+    પૂર્ણાંક		res;
 
     // Initialize rettv so that it is safe for caller to invoke clear_tv(rettv)
     // even when the compilation fails.
@@ -6661,16 +6661,16 @@ exe_typval_instr(typval_T *tv, typval_T *rettv)
 
     ectx->ec_instr = tv->vval.v_instr->instr_instr;
     res = exec_instructions(ectx);
-    if (res == OK)
+    જો (res == OK)
     {
-	*rettv = *STACK_TV_BOT(-1);
-	--ectx->ec_stack.ga_len;
+	*rettv = *ઢગલો_TV_BOT(-1);
+	--ectx->ec_ઢગલો.ga_len;
     }
 
     ectx->ec_instr = save_instr;
     ectx->ec_iidx = save_iidx;
 
-    return res;
+    પાછા res;
 }
 
 /*
@@ -6678,23 +6678,23 @@ exe_typval_instr(typval_T *tv, typval_T *rettv)
  * "substitute_instr".
  */
     char_u *
-exe_substitute_instr(void)
+exe_substitute_instr(શૂન્ય)
 {
     ectx_T	*ectx = substitute_instr->subs_ectx;
     isn_T	*save_instr = ectx->ec_instr;
-    int		save_iidx = ectx->ec_iidx;
+    પૂર્ણાંક		save_iidx = ectx->ec_iidx;
     char_u	*res;
 
     ectx->ec_instr = substitute_instr->subs_instr;
-    if (exec_instructions(ectx) == OK)
+    જો (exec_instructions(ectx) == OK)
     {
-	typval_T *tv = STACK_TV_BOT(-1);
+	typval_T *tv = ઢગલો_TV_BOT(-1);
 
 	res = typval2string(tv, TRUE);
-	--ectx->ec_stack.ga_len;
+	--ectx->ec_ઢગલો.ga_len;
 	clear_tv(tv);
     }
-    else
+    નહીંતર
     {
 	substitute_instr->subs_status = FAIL;
 	res = vim_strsave((char_u *)"");
@@ -6703,209 +6703,209 @@ exe_substitute_instr(void)
     ectx->ec_instr = save_instr;
     ectx->ec_iidx = save_iidx;
 
-    return res;
+    પાછા res;
 }
 
 /*
  * Call a "def" function from old Vim script.
  * Return OK or FAIL.
  */
-    int
+    પૂર્ણાંક
 call_def_function(
     ufunc_T	*ufunc,
-    int		argc_arg,	// nr of arguments
+    પૂર્ણાંક		argc_arg,	// nr of arguments
     typval_T	*argv,		// arguments
-    int		flags,		// DEF_ flags
+    પૂર્ણાંક		flags,		// DEF_ flags
     partial_T	*partial,	// optional partial for context
     object_T	*object,	// object, e.g. for this.Func()
     funccall_T	*funccal,
     typval_T	*rettv)		// return value
 {
     ectx_T	ectx;		// execution context
-    int		argc = argc_arg;
-    int		partial_argc = partial == NULL
+    પૂર્ણાંક		argc = argc_arg;
+    પૂર્ણાંક		partial_argc = partial == ખાલી
 				  || (flags & DEF_USE_PT_ARGV) == 0
 							? 0 : partial->pt_argc;
-    int		total_argc = argc + partial_argc;
+    પૂર્ણાંક		total_argc = argc + partial_argc;
     typval_T	*tv;
-    int		idx;
-    int		ret = FAIL;
-    int		defcount = ufunc->uf_args.ga_len - total_argc;
+    પૂર્ણાંક		idx;
+    પૂર્ણાંક		ret = FAIL;
+    પૂર્ણાંક		defcount = ufunc->uf_args.ga_len - total_argc;
     sctx_T	save_current_sctx = current_sctx;
-    int		did_emsg_before = did_emsg_cumul + did_emsg;
-    int		save_suppress_errthrow = suppress_errthrow;
-    msglist_T	**saved_msg_list = NULL;
-    msglist_T	*private_msg_list = NULL;
-    int		save_emsg_silent_def = emsg_silent_def;
-    int		save_did_emsg_def = did_emsg_def;
-    int		orig_funcdepth;
-    int		orig_nesting_level = ex_nesting_level;
+    પૂર્ણાંક		did_emsg_before = did_emsg_cumul + did_emsg;
+    પૂર્ણાંક		save_suppress_errthrow = suppress_errthrow;
+    msglist_T	**saved_સંદેશ_list = ખાલી;
+    msglist_T	*private_સંદેશ_list = ખાલી;
+    પૂર્ણાંક		save_emsg_silent_def = emsg_silent_def;
+    પૂર્ણાંક		save_did_emsg_def = did_emsg_def;
+    પૂર્ણાંક		orig_funcdepth;
+    પૂર્ણાંક		orig_nesting_level = ex_nesting_level;
 
 // Get pointer to item in the stack.
-#undef STACK_TV
-#define STACK_TV(idx) (((typval_T *)ectx.ec_stack.ga_data) + idx)
+#undef ઢગલો_TV
+#define ઢગલો_TV(idx) (((typval_T *)ectx.ec_ઢગલો.ga_data) + idx)
 
 // Get pointer to item at the bottom of the stack, -1 is the bottom.
-#undef STACK_TV_BOT
-#define STACK_TV_BOT(idx) (((typval_T *)ectx.ec_stack.ga_data) + ectx.ec_stack.ga_len + idx)
+#undef ઢગલો_TV_BOT
+#define ઢગલો_TV_BOT(idx) (((typval_T *)ectx.ec_ઢગલો.ga_data) + ectx.ec_ઢગલો.ga_len + idx)
 
 // Get pointer to a local variable on the stack.  Negative for arguments.
-#undef STACK_TV_VAR
-#define STACK_TV_VAR(idx) (((typval_T *)ectx.ec_stack.ga_data) + ectx.ec_frame_idx + STACK_FRAME_SIZE + idx)
+#undef ઢગલો_TV_VAR
+#define ઢગલો_TV_VAR(idx) (((typval_T *)ectx.ec_ઢગલો.ga_data) + ectx.ec_frame_idx + ઢગલો_FRAME_SIZE + idx)
 
-    if (ufunc->uf_def_status == UF_NOT_COMPILED
+    જો (ufunc->uf_def_status == UF_NOT_COMPILED
 	    || ufunc->uf_def_status == UF_COMPILE_ERROR
 	    || (func_needs_compiling(ufunc, get_compile_type(ufunc))
 		&& compile_def_function(ufunc, FALSE,
-				       get_compile_type(ufunc), NULL) == FAIL))
+				       get_compile_type(ufunc), ખાલી) == FAIL))
     {
-	if (did_emsg_cumul + did_emsg == did_emsg_before)
+	જો (did_emsg_cumul + did_emsg == did_emsg_before)
 	    semsg(_(e_function_is_not_compiled_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	પાછા FAIL;
     }
 
     {
 	// Check the function was really compiled.
 	dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 							 + ufunc->uf_dfunc_idx;
-	if (dfunc->df_ufunc == NULL)
+	જો (dfunc->df_ufunc == ખાલી)
 	{
 	    semsg(_(e_function_was_deleted_str), printable_func_name(ufunc));
-	    return FAIL;
+	    પાછા FAIL;
 	}
-	if (INSTRUCTIONS(dfunc) == NULL)
+	જો (INSTRUCTIONS(dfunc) == ખાલી)
 	{
 	    iemsg("using call_def_function() on not compiled function");
-	    return FAIL;
+	    પાછા FAIL;
 	}
     }
 
     // If depth of calling is getting too high, don't execute the function.
     orig_funcdepth = funcdepth_get();
-    if (funcdepth_increment() == FAIL)
-	return FAIL;
+    જો (funcdepth_increment() == FAIL)
+	પાછા FAIL;
 
     CLEAR_FIELD(ectx);
     ectx.ec_dfunc_idx = ufunc->uf_dfunc_idx;
-    ga_init2(&ectx.ec_stack, sizeof(typval_T), 500);
-    if (GA_GROW_FAILS(&ectx.ec_stack, 20))
+    ga_init2(&ectx.ec_ઢગલો, કદ(typval_T), 500);
+    જો (GA_GROW_FAILS(&ectx.ec_ઢગલો, 20))
     {
 	funcdepth_decrement();
-	return FAIL;
+	પાછા FAIL;
     }
-    ga_init2(&ectx.ec_trystack, sizeof(trycmd_T), 10);
-    ga_init2(&ectx.ec_funcrefs, sizeof(partial_T *), 10);
+    ga_init2(&ectx.ec_trystack, કદ(trycmd_T), 10);
+    ga_init2(&ectx.ec_funcrefs, કદ(partial_T *), 10);
     ectx.ec_did_emsg_before = did_emsg_before;
     ++ex_nesting_level;
 
     idx = total_argc - ufunc->uf_args.ga_len;
-    if (idx > 0 && ufunc->uf_va_name == NULL)
+    જો (idx > 0 && ufunc->uf_va_name == ખાલી)
     {
 	semsg(NGETTEXT(e_one_argument_too_many, e_nr_arguments_too_many,
 								    idx), idx);
-	goto failed_early;
+	જાઓ failed_early;
     }
     idx = total_argc - ufunc->uf_args.ga_len + ufunc->uf_def_args.ga_len;
-    if (idx < 0)
+    જો (idx < 0)
     {
 	semsg(NGETTEXT(e_one_argument_too_few, e_nr_arguments_too_few,
 								  -idx), -idx);
-	goto failed_early;
+	જાઓ failed_early;
     }
 
     // Put values from the partial and arguments on the stack, but no more than
     // what the function expects.  A lambda can be called with more arguments
     // than it uses.
-    for (idx = 0; idx < total_argc
-	    && (ufunc->uf_va_name != NULL || idx < ufunc->uf_args.ga_len);
+    માટે (idx = 0; idx < total_argc
+	    && (ufunc->uf_va_name != ખાલી || idx < ufunc->uf_args.ga_len);
 									 ++idx)
     {
-	int argv_idx = idx - partial_argc;
+	પૂર્ણાંક argv_idx = idx - partial_argc;
 
 	tv = idx < partial_argc ? partial->pt_argv + idx : argv + argv_idx;
-	if (idx >= ufunc->uf_args.ga_len - ufunc->uf_def_args.ga_len
+	જો (idx >= ufunc->uf_args.ga_len - ufunc->uf_def_args.ga_len
 		&& tv->v_type == VAR_SPECIAL
-		&& tv->vval.v_number == VVAL_NONE)
+		&& tv->vval.v_સંખ્યા == VVAL_NONE)
 	{
 	    // Use the default value.
-	    STACK_TV_BOT(0)->v_type = VAR_UNKNOWN;
+	    ઢગલો_TV_BOT(0)->v_type = VAR_UNKNOWN;
 	}
-	else
+	નહીંતર
 	{
-	    int done = FALSE;
-	    if (ufunc->uf_arg_types != NULL && idx < ufunc->uf_args.ga_len)
+	    પૂર્ણાંક done = FALSE;
+	    જો (ufunc->uf_arg_types != ખાલી && idx < ufunc->uf_args.ga_len)
 	    {
 		type_T *expected = ufunc->uf_arg_types[idx];
-		if (expected->tt_type == VAR_FLOAT && tv->v_type == VAR_NUMBER)
+		જો (expected->tt_type == VAR_FLOAT && tv->v_type == VAR_સંખ્યા)
 		{
 		    // When a float is expected and a number was given, convert
 		    // the value.
-		    STACK_TV_BOT(0)->v_type = VAR_FLOAT;
-		    STACK_TV_BOT(0)->v_lock = 0;
-		    STACK_TV_BOT(0)->vval.v_float = tv->vval.v_number;
+		    ઢગલો_TV_BOT(0)->v_type = VAR_FLOAT;
+		    ઢગલો_TV_BOT(0)->v_lock = 0;
+		    ઢગલો_TV_BOT(0)->vval.v_float = tv->vval.v_સંખ્યા;
 		    done = TRUE;
 		}
-		else if (check_typval_arg_type(expected, tv,
-						   NULL, argv_idx + 1) == FAIL)
-		    goto failed_early;
+		નહીંતર જો (check_typval_arg_type(expected, tv,
+						   ખાલી, argv_idx + 1) == FAIL)
+		    જાઓ failed_early;
 	    }
-	    if (!done)
-		copy_tv(tv, STACK_TV_BOT(0));
+	    જો (!done)
+		copy_tv(tv, ઢગલો_TV_BOT(0));
 	}
-	++ectx.ec_stack.ga_len;
+	++ectx.ec_ઢગલો.ga_len;
     }
 
     // Turn varargs into a list.  Empty list if no args.
-    if (ufunc->uf_va_name != NULL)
+    જો (ufunc->uf_va_name != ખાલી)
     {
-	int vararg_count = argc - ufunc->uf_args.ga_len;
+	પૂર્ણાંક vararg_ગણતરી = argc - ufunc->uf_args.ga_len;
 
-	if (vararg_count < 0)
-	    vararg_count = 0;
-	else
-	    argc -= vararg_count;
-	if (exe_newlist(vararg_count, &ectx) == FAIL)
-	    goto failed_early;
+	જો (vararg_ગણતરી < 0)
+	    vararg_ગણતરી = 0;
+	નહીંતર
+	    argc -= vararg_ગણતરી;
+	જો (exe_newlist(vararg_ગણતરી, &ectx) == FAIL)
+	    જાઓ failed_early;
 
 	// Check the type of the list items.
-	tv = STACK_TV_BOT(-1);
-	if (ufunc->uf_va_type != NULL
+	tv = ઢગલો_TV_BOT(-1);
+	જો (ufunc->uf_va_type != ખાલી
 		&& ufunc->uf_va_type != &t_list_any
 		&& ufunc->uf_va_type->tt_member != &t_any
-		&& tv->vval.v_list != NULL)
+		&& tv->vval.v_list != ખાલી)
 	{
 	    type_T	*expected = ufunc->uf_va_type->tt_member;
 	    listitem_T	*li = tv->vval.v_list->lv_first;
 
-	    for (idx = 0; idx < vararg_count; ++idx)
+	    માટે (idx = 0; idx < vararg_ગણતરી; ++idx)
 	    {
-		if (check_typval_arg_type(expected, &li->li_tv,
-						 NULL, argc + idx + 1) == FAIL)
-		    goto failed_early;
+		જો (check_typval_arg_type(expected, &li->li_tv,
+						 ખાલી, argc + idx + 1) == FAIL)
+		    જાઓ failed_early;
 		li = li->li_next;
 	    }
 	}
 
-	if (defcount > 0)
+	જો (defcount > 0)
 	    // Move varargs list to below missing default arguments.
-	    *STACK_TV_BOT(defcount - 1) = *STACK_TV_BOT(-1);
-	--ectx.ec_stack.ga_len;
+	    *ઢગલો_TV_BOT(defcount - 1) = *ઢગલો_TV_BOT(-1);
+	--ectx.ec_ઢગલો.ga_len;
     }
 
     // Make space for omitted arguments, will store default value below.
     // Any varargs list goes after them.
-    if (defcount > 0)
-	for (idx = 0; idx < defcount; ++idx)
+    જો (defcount > 0)
+	માટે (idx = 0; idx < defcount; ++idx)
 	{
-	    STACK_TV_BOT(0)->v_type = VAR_UNKNOWN;
-	    ++ectx.ec_stack.ga_len;
+	    ઢગલો_TV_BOT(0)->v_type = VAR_UNKNOWN;
+	    ++ectx.ec_ઢગલો.ga_len;
 	}
-    if (ufunc->uf_va_name != NULL)
-	++ectx.ec_stack.ga_len;
+    જો (ufunc->uf_va_name != ખાલી)
+	++ectx.ec_ઢગલો.ga_len;
 
     // Frame pointer points to just after arguments.
-    ectx.ec_frame_idx = ectx.ec_stack.ga_len;
+    ectx.ec_frame_idx = ectx.ec_ઢગલો.ga_len;
     ectx.ec_initial_frame_idx = ectx.ec_frame_idx;
 
     {
@@ -6915,35 +6915,35 @@ call_def_function(
 
 	// "uf_partial" is on the ufunc that "df_ufunc" points to, as is done
 	// by copy_lambda_to_global_func().
-	if (partial != NULL || base_ufunc->uf_partial != NULL)
+	જો (partial != ખાલી || base_ufunc->uf_partial != ખાલી)
 	{
 	    ectx.ec_outer_ref = ALLOC_CLEAR_ONE(outer_ref_T);
-	    if (ectx.ec_outer_ref == NULL)
-		goto failed_early;
-	    if (partial != NULL)
+	    જો (ectx.ec_outer_ref == ખાલી)
+		જાઓ failed_early;
+	    જો (partial != ખાલી)
 	    {
 		outer_T *outer = get_pt_outer(partial);
 
-		if (outer->out_stack == NULL && outer->out_loop_size == 0)
+		જો (outer->out_ઢગલો == ખાલી && outer->out_loop_size == 0)
 		{
 		    // no stack was set
-		    if (current_ectx != NULL)
+		    જો (current_ectx != ખાલી)
 		    {
-			if (current_ectx->ec_outer_ref != NULL
-			       && current_ectx->ec_outer_ref->or_outer != NULL)
+			જો (current_ectx->ec_outer_ref != ખાલી
+			       && current_ectx->ec_outer_ref->or_outer != ખાલી)
 			    ectx.ec_outer_ref->or_outer =
 					  current_ectx->ec_outer_ref->or_outer;
 		    }
 		    // else: should there be an error here?
 		}
-		else
+		નહીંતર
 		{
 		    ectx.ec_outer_ref->or_outer = outer;
 		    ++partial->pt_refcount;
 		    ectx.ec_outer_ref->or_partial = partial;
 		}
 	    }
-	    else
+	    નહીંતર
 	    {
 		ectx.ec_outer_ref->or_outer = &base_ufunc->uf_partial->pt_outer;
 		++base_ufunc->uf_partial->pt_refcount;
@@ -6953,10 +6953,10 @@ call_def_function(
     }
 
     // dummy frame entries
-    for (idx = 0; idx < STACK_FRAME_SIZE; ++idx)
+    માટે (idx = 0; idx < ઢગલો_FRAME_SIZE; ++idx)
     {
-	STACK_TV(ectx.ec_stack.ga_len)->v_type = VAR_UNKNOWN;
-	++ectx.ec_stack.ga_len;
+	ઢગલો_TV(ectx.ec_ઢગલો.ga_len)->v_type = VAR_UNKNOWN;
+	++ectx.ec_ઢગલો.ga_len;
     }
 
     {
@@ -6966,47 +6966,47 @@ call_def_function(
 
 	// Initialize variables to zero.  That avoids having to generate
 	// initializing instructions for "var nr: number", "var x: any", etc.
-	for (idx = 0; idx < dfunc->df_varcount; ++idx)
+	માટે (idx = 0; idx < dfunc->df_varcount; ++idx)
 	{
-	    STACK_TV_VAR(idx)->v_type = VAR_NUMBER;
-	    STACK_TV_VAR(idx)->vval.v_number = 0;
+	    ઢગલો_TV_VAR(idx)->v_type = VAR_સંખ્યા;
+	    ઢગલો_TV_VAR(idx)->vval.v_સંખ્યા = 0;
 	}
-	ectx.ec_stack.ga_len += dfunc->df_varcount;
+	ectx.ec_ઢગલો.ga_len += dfunc->df_varcount;
 
-	if (object != NULL)
+	જો (object != ખાલી)
 	{
 	    // the object is always the variable at index zero
-	    tv = STACK_TV_VAR(0);
+	    tv = ઢગલો_TV_VAR(0);
 	    tv->v_type = VAR_OBJECT;
 	    tv->vval.v_object = object;
 	}
 
-	if (dfunc->df_has_closure)
+	જો (dfunc->df_has_closure)
 	{
 	    // Initialize the variable that counts how many closures were
 	    // created.  This is used in handle_closure_in_use().
-	    STACK_TV_VAR(idx)->v_type = VAR_NUMBER;
-	    STACK_TV_VAR(idx)->vval.v_number = 0;
-	    ++ectx.ec_stack.ga_len;
+	    ઢગલો_TV_VAR(idx)->v_type = VAR_સંખ્યા;
+	    ઢગલો_TV_VAR(idx)->vval.v_સંખ્યા = 0;
+	    ++ectx.ec_ઢગલો.ga_len;
 	}
 
 	ectx.ec_instr = INSTRUCTIONS(dfunc);
     }
 
     // Store the execution context in funccal, used by invoke_all_defer().
-    if (funccal != NULL)
+    જો (funccal != ખાલી)
 	funccal->fc_ectx = &ectx;
 
     // Following errors are in the function, not the caller.
     // Commands behave like vim9script.
-    estack_push_ufunc(ufunc, 1);
+    estack_ધકેલો_ufunc(ufunc, 1);
     current_sctx = ufunc->uf_script_ctx;
     current_sctx.sc_version = SCRIPT_VERSION_VIM9;
 
     // Use a specific location for storing error messages to be converted to an
     // exception.
-    saved_msg_list = msg_list;
-    msg_list = &private_msg_list;
+    saved_સંદેશ_list = સંદેશ_list;
+    સંદેશ_list = &private_સંદેશ_list;
 
     // Do turn errors into exceptions.
     suppress_errthrow = FALSE;
@@ -7025,16 +7025,16 @@ call_def_function(
      * Execute the instructions until done.
      */
     ret = exec_instructions(&ectx);
-    if (ret == OK)
+    જો (ret == OK)
     {
 	// function finished, get result from the stack.
-	if (ufunc->uf_ret_type == &t_void)
+	જો (ufunc->uf_ret_type == &t_void)
 	{
 	    rettv->v_type = VAR_VOID;
 	}
-	else
+	નહીંતર
 	{
-	    tv = STACK_TV_BOT(-1);
+	    tv = ઢગલો_TV_BOT(-1);
 	    *rettv = *tv;
 	    tv->v_type = VAR_UNKNOWN;
 	}
@@ -7044,35 +7044,35 @@ call_def_function(
     unwind_def_callstack(&ectx);
 
     // Deal with any remaining closures, they may be in use somewhere.
-    if (ectx.ec_funcrefs.ga_len > 0)
+    જો (ectx.ec_funcrefs.ga_len > 0)
     {
 	handle_closure_in_use(&ectx, FALSE);
 	ga_clear(&ectx.ec_funcrefs);
     }
 
-    estack_pop();
+    estack_કાઢો();
     current_sctx = save_current_sctx;
 
-    if (--ufunc->uf_calls <= 0 && ufunc->uf_refcount <= 0)
+    જો (--ufunc->uf_calls <= 0 && ufunc->uf_refcount <= 0)
 	// Function was unreferenced while being used, free it now.
 	func_clear_free(ufunc, FALSE);
 
-    if (*msg_list != NULL && saved_msg_list != NULL)
+    જો (*સંદેશ_list != ખાલી && saved_સંદેશ_list != ખાલી)
     {
-	msglist_T **plist = saved_msg_list;
+	msglist_T **plist = saved_સંદેશ_list;
 
 	// Append entries from the current msg_list (uncaught exceptions) to
 	// the saved msg_list.
-	while (*plist != NULL)
+	જ્યારે (*plist != ખાલી)
 	    plist = &(*plist)->next;
 
-	*plist = *msg_list;
+	*plist = *સંદેશ_list;
     }
-    msg_list = saved_msg_list;
+    સંદેશ_list = saved_સંદેશ_list;
 
-    if (ectx.ec_funclocal.floc_restore_cmdmod)
+    જો (ectx.ec_funclocal.floc_restore_cmdmod)
     {
-	cmdmod.cmod_filter_regmatch.regprog = NULL;
+	cmdmod.cmod_filter_regmatch.regprog = ખાલી;
 	undo_cmdmod(&cmdmod);
 	cmdmod = ectx.ec_funclocal.floc_save_cmdmod;
     }
@@ -7081,19 +7081,19 @@ call_def_function(
 
 failed_early:
     // Free all arguments and local variables.
-    for (idx = 0; idx < ectx.ec_stack.ga_len; ++idx)
+    માટે (idx = 0; idx < ectx.ec_ઢગલો.ga_len; ++idx)
     {
-	tv = STACK_TV(idx);
-	if (tv->v_type != VAR_NUMBER && tv->v_type != VAR_UNKNOWN)
+	tv = ઢગલો_TV(idx);
+	જો (tv->v_type != VAR_સંખ્યા && tv->v_type != VAR_UNKNOWN)
 	    clear_tv(tv);
     }
     ex_nesting_level = orig_nesting_level;
 
-    vim_free(ectx.ec_stack.ga_data);
+    vim_free(ectx.ec_ઢગલો.ga_data);
     vim_free(ectx.ec_trystack.ga_data);
-    if (ectx.ec_outer_ref != NULL)
+    જો (ectx.ec_outer_ref != ખાલી)
     {
-	if (ectx.ec_outer_ref->or_outer_allocated)
+	જો (ectx.ec_outer_ref->or_outer_allocated)
 	    vim_free(ectx.ec_outer_ref->or_outer);
 	partial_unref(ectx.ec_outer_ref->or_partial);
 	vim_free(ectx.ec_outer_ref);
@@ -7102,12 +7102,12 @@ failed_early:
     // Not sure if this is necessary.
     suppress_errthrow = save_suppress_errthrow;
 
-    if (ret != OK && did_emsg_cumul + did_emsg == did_emsg_before
+    જો (ret != OK && did_emsg_cumul + did_emsg == did_emsg_before
 							      && !need_rethrow)
 	semsg(_(e_unknown_error_while_executing_str),
 						   printable_func_name(ufunc));
     funcdepth_restore(orig_funcdepth);
-    return ret;
+    પાછા ret;
 }
 
 /*
@@ -7115,49 +7115,49 @@ failed_early:
  * Invoke all the function returns to clean up and invoke deferred functions,
  * except the toplevel one.
  */
-    void
+    શૂન્ય
 unwind_def_callstack(ectx_T *ectx)
 {
-    while (ectx->ec_frame_idx != ectx->ec_initial_frame_idx)
+    જ્યારે (ectx->ec_frame_idx != ectx->ec_initial_frame_idx)
 	func_return(ectx);
 }
 
 /*
  * Invoke any deferred functions for the top function in "ectx".
  */
-    void
+    શૂન્ય
 may_invoke_defer_funcs(ectx_T *ectx)
 {
     dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data) + ectx->ec_dfunc_idx;
 
-    if (dfunc->df_defer_var_idx > 0)
+    જો (dfunc->df_defer_var_idx > 0)
 	invoke_defer_funcs(ectx);
 }
 
 /*
  * Return loopvarinfo in a printable form in allocated memory.
  */
-    static char_u *
+    સ્થિર char_u *
 printable_loopvarinfo(loopvarinfo_T *lvi)
 {
     garray_T	ga;
-    int		depth;
+    પૂર્ણાંક		depth;
 
     ga_init2(&ga, 1, 100);
-    for (depth = 0; depth < lvi->lvi_depth; ++depth)
+    માટે (depth = 0; depth < lvi->lvi_depth; ++depth)
     {
-	if (ga_grow(&ga, 50) == FAIL)
-	    break;
-	if (lvi->lvi_loop[depth].var_idx == 0)
-	    STRCPY((char *)ga.ga_data + ga.ga_len, " -");
-	else
-	    vim_snprintf((char *)ga.ga_data + ga.ga_len, 50, " $%d-$%d",
+	જો (ga_grow(&ga, 50) == FAIL)
+	    તોડો;
+	જો (lvi->lvi_loop[depth].var_idx == 0)
+	    STRCPY((અક્ષર *)ga.ga_data + ga.ga_len, " -");
+	નહીંતર
+	    vim_snprintf((અક્ષર *)ga.ga_data + ga.ga_len, 50, " $%d-$%d",
 			    lvi->lvi_loop[depth].var_idx,
 			    lvi->lvi_loop[depth].var_idx
-					 + lvi->lvi_loop[depth].var_count - 1);
-	ga.ga_len = (int)STRLEN(ga.ga_data);
+					 + lvi->lvi_loop[depth].var_ગણતરી - 1);
+	ga.ga_len = (પૂર્ણાંક)STRLEN(ga.ga_data);
     }
-    return ga.ga_data;
+    પાછા ga.ga_data;
 }
 
 /*
@@ -7165,86 +7165,86 @@ printable_loopvarinfo(loopvarinfo_T *lvi)
  * "ufunc" has the source lines, NULL for the instructions of ISN_SUBSTITUTE.
  * "pfx" is prefixed to every line.
  */
-    static void
-list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
+    સ્થિર શૂન્ય
+list_instructions(અક્ષર *pfx, isn_T *instr, પૂર્ણાંક instr_ગણતરી, ufunc_T *ufunc)
 {
-    int		line_idx = 0;
-    int		prev_current = 0;
-    int		current;
-    int		def_arg_idx = 0;
+    પૂર્ણાંક		લીટી_idx = 0;
+    પૂર્ણાંક		prev_current = 0;
+    પૂર્ણાંક		current;
+    પૂર્ણાંક		def_arg_idx = 0;
     sctx_T	script_ctx = current_sctx;
 
-    for (current = 0; current < instr_count; ++current)
+    માટે (current = 0; current < instr_ગણતરી; ++current)
     {
 	isn_T	    *iptr = &instr[current];
-	char	    *line;
+	અક્ષર	    *લીટી;
 
-	if (ufunc != NULL)
+	જો (ufunc != ખાલી)
 	{
-	    while (line_idx < iptr->isn_lnum
-					  && line_idx < ufunc->uf_lines.ga_len)
+	    જ્યારે (લીટી_idx < iptr->isn_lnum
+					  && લીટી_idx < ufunc->uf_લીટીઓ.ga_len)
 	    {
-		if (current > prev_current)
+		જો (current > prev_current)
 		{
-		    msg_puts("\n\n");
+		    સંદેશ_puts("\n\n");
 		    prev_current = current;
 		}
-		line = ((char **)ufunc->uf_lines.ga_data)[line_idx++];
-		if (line != NULL)
-		    msg(line);
+		લીટી = ((અક્ષર **)ufunc->uf_લીટીઓ.ga_data)[લીટી_idx++];
+		જો (લીટી != ખાલી)
+		    સંદેશ(લીટી);
 	    }
-	    if (iptr->isn_type == ISN_JUMP_IF_ARG_SET)
+	    જો (iptr->isn_type == ISN_JUMP_IF_ARG_SET)
 	    {
-		int	first_def_arg = ufunc->uf_args.ga_len
+		પૂર્ણાંક	first_def_arg = ufunc->uf_args.ga_len
 						   - ufunc->uf_def_args.ga_len;
 
-		if (def_arg_idx > 0)
-		    msg_puts("\n\n");
-		msg_start();
-		msg_puts("  ");
-		msg_puts(((char **)(ufunc->uf_args.ga_data))[
+		જો (def_arg_idx > 0)
+		    સંદેશ_puts("\n\n");
+		સંદેશ_start();
+		સંદેશ_puts("  ");
+		સંદેશ_puts(((અક્ષર **)(ufunc->uf_args.ga_data))[
 						 first_def_arg + def_arg_idx]);
-		msg_puts(" = ");
-		msg_puts(((char **)(ufunc->uf_def_args.ga_data))[def_arg_idx++]);
-		msg_clr_eos();
-		msg_end();
+		સંદેશ_puts(" = ");
+		સંદેશ_puts(((અક્ષર **)(ufunc->uf_def_args.ga_data))[def_arg_idx++]);
+		સંદેશ_clr_eos();
+		સંદેશ_end();
 	    }
 	}
 
-	switch (iptr->isn_type)
+	પસંદગી (iptr->isn_type)
 	{
-	    case ISN_CONSTRUCT:
+	    સ્થિતિ ISN_CONSTRUCT:
 		smsg("%s%4d NEW %s size %d", pfx, current,
 			iptr->isn_arg.construct.construct_class->class_name.string,
-				  (int)iptr->isn_arg.construct.construct_size);
-		break;
-	    case ISN_EXEC:
+				  (પૂર્ણાંક)iptr->isn_arg.construct.construct_size);
+		તોડો;
+	    સ્થિતિ ISN_EXEC:
 		smsg("%s%4d EXEC %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_EXEC_SPLIT:
+		તોડો;
+	    સ્થિતિ ISN_EXEC_SPLIT:
 		smsg("%s%4d EXEC_SPLIT %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_EXECRANGE:
+		તોડો;
+	    સ્થિતિ ISN_EXECRANGE:
 		smsg("%s%4d EXECRANGE %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LEGACY_EVAL:
+		તોડો;
+	    સ્થિતિ ISN_LEGACY_EVAL:
 		smsg("%s%4d EVAL legacy %s", pfx, current,
 							 iptr->isn_arg.string);
-		break;
-	    case ISN_REDIRSTART:
+		તોડો;
+	    સ્થિતિ ISN_REDIRSTART:
 		smsg("%s%4d REDIR", pfx, current);
-		break;
-	    case ISN_REDIREND:
+		તોડો;
+	    સ્થિતિ ISN_REDIREND:
 		smsg("%s%4d REDIR END%s", pfx, current,
-					iptr->isn_arg.number ? " append" : "");
-		break;
-	    case ISN_CEXPR_AUCMD:
+					iptr->isn_arg.સંખ્યા ? " append" : "");
+		તોડો;
+	    સ્થિતિ ISN_CEXPR_AUCMD:
 #ifdef FEAT_QUICKFIX
 		smsg("%s%4d CEXPR pre %s", pfx, current,
-				       cexpr_get_auname(iptr->isn_arg.number));
+				       cexpr_get_auname(iptr->isn_arg.સંખ્યા));
 #endif
-		break;
-	    case ISN_CEXPR_CORE:
+		તોડો;
+	    સ્થિતિ ISN_CEXPR_CORE:
 #ifdef FEAT_QUICKFIX
 		{
 		    cexprref_T	    *cer = iptr->isn_arg.cexpr.cexpr_ref;
@@ -7255,101 +7255,101 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 				       cer->cer_cmdline);
 		}
 #endif
-		break;
-	    case ISN_INSTR:
+		તોડો;
+	    સ્થિતિ ISN_INSTR:
 		smsg("%s%4d INSTR", pfx, current);
-		list_instructions("    ", iptr->isn_arg.instr, INT_MAX, NULL);
-		msg("     -------------");
-		break;
-	    case ISN_SOURCE:
+		list_instructions("    ", iptr->isn_arg.instr, INT_MAX, ખાલી);
+		સંદેશ("     -------------");
+		તોડો;
+	    સ્થિતિ ISN_SOURCE:
 		{
-		    scriptitem_T    *si = SCRIPT_ITEM(iptr->isn_arg.number);
+		    scriptitem_T    *si = SCRIPT_ITEM(iptr->isn_arg.સંખ્યા);
 
 		    smsg("%s%4d SOURCE %s", pfx, current, si->sn_name);
 		}
-		break;
-	    case ISN_SUBSTITUTE:
+		તોડો;
+	    સ્થિતિ ISN_SUBSTITUTE:
 		{
 		    subs_T *subs = &iptr->isn_arg.subs;
 
 		    smsg("%s%4d SUBSTITUTE %s", pfx, current, subs->subs_cmd);
-		    list_instructions("    ", subs->subs_instr, INT_MAX, NULL);
-		    msg("     -------------");
+		    list_instructions("    ", subs->subs_instr, INT_MAX, ખાલી);
+		    સંદેશ("     -------------");
 		}
-		break;
-	    case ISN_EXECCONCAT:
+		તોડો;
+	    સ્થિતિ ISN_EXECCONCAT:
 		smsg("%s%4d EXECCONCAT %lld", pfx, current,
-					      (varnumber_T)iptr->isn_arg.number);
-		break;
-	    case ISN_ECHO:
+					      (varnumber_T)iptr->isn_arg.સંખ્યા);
+		તોડો;
+	    સ્થિતિ ISN_ECHO:
 		{
 		    echo_T *echo = &iptr->isn_arg.echo;
 
 		    smsg("%s%4d %s %d", pfx, current,
 			    echo->echo_with_white ? "ECHO" : "ECHON",
-			    echo->echo_count);
+			    echo->echo_ગણતરી);
 		}
-		break;
-	    case ISN_EXECUTE:
+		તોડો;
+	    સ્થિતિ ISN_EXECUTE:
 		smsg("%s%4d EXECUTE %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_ECHOMSG:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_ECHOMSG:
 		smsg("%s%4d ECHOMSG %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_ECHOWINDOW:
-		if (iptr->isn_arg.echowin.ewin_time > 0)
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_ECHOWINDOW:
+		જો (iptr->isn_arg.echowin.ewin_time > 0)
 		    smsg("%s%4d ECHOWINDOW %d (%ld sec)", pfx, current,
-				      iptr->isn_arg.echowin.ewin_count,
+				      iptr->isn_arg.echowin.ewin_ગણતરી,
 				      iptr->isn_arg.echowin.ewin_time);
-		else
+		નહીંતર
 		    smsg("%s%4d ECHOWINDOW %d", pfx, current,
-					     iptr->isn_arg.echowin.ewin_count);
-		break;
-	    case ISN_ECHOCONSOLE:
+					     iptr->isn_arg.echowin.ewin_ગણતરી);
+		તોડો;
+	    સ્થિતિ ISN_ECHOCONSOLE:
 		smsg("%s%4d ECHOCONSOLE %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_ECHOERR:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_ECHOERR:
 		smsg("%s%4d ECHOERR %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_LOAD:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_LOAD:
 		{
-		    if (iptr->isn_arg.number < 0)
+		    જો (iptr->isn_arg.સંખ્યા < 0)
 			smsg("%s%4d LOAD arg[%lld]", pfx, current,
-				(varnumber_T)(iptr->isn_arg.number
-							  + STACK_FRAME_SIZE));
-		    else
+				(varnumber_T)(iptr->isn_arg.સંખ્યા
+							  + ઢગલો_FRAME_SIZE));
+		    નહીંતર
 			smsg("%s%4d LOAD $%lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
 		}
-		break;
-	    case ISN_LOADOUTER:
+		તોડો;
+	    સ્થિતિ ISN_LOADOUTER:
 		{
 		    isn_outer_T *outer = &iptr->isn_arg.outer;
 
-		    if (outer->outer_idx < 0)
+		    જો (outer->outer_idx < 0)
 			smsg("%s%4d LOADOUTER level %d arg[%d]", pfx, current,
 					outer->outer_depth,
-					outer->outer_idx + STACK_FRAME_SIZE);
-		    else if (outer->outer_depth < 0)
+					outer->outer_idx + ઢગલો_FRAME_SIZE);
+		    નહીંતર જો (outer->outer_depth < 0)
 			smsg("%s%4d LOADOUTER $%d in loop level %d",
 					       pfx, current,
 					       outer->outer_idx,
 					       -outer->outer_depth);
-		    else
+		    નહીંતર
 			smsg("%s%4d LOADOUTER level %d $%d", pfx, current,
 					      outer->outer_depth,
 					      outer->outer_idx);
 		}
-		break;
-	    case ISN_LOADV:
+		તોડો;
+	    સ્થિતિ ISN_LOADV:
 		smsg("%s%4d LOADV v:%s", pfx, current,
-				       get_vim_var_name(iptr->isn_arg.number));
-		break;
-	    case ISN_LOADSCRIPT:
+				       get_vim_var_name(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_LOADSCRIPT:
 		{
 		    scriptref_T	    *sref = iptr->isn_arg.script.scriptref;
 		    scriptitem_T    *si = SCRIPT_ITEM(sref->sref_sid);
@@ -7359,18 +7359,18 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 		    current_sctx = script_ctx;
 		    sv = get_script_svar(sref, -1);
 		    current_sctx = save_sctx;
-		    if (sv == NULL)
+		    જો (sv == ખાલી)
 			smsg("%s%4d LOADSCRIPT [deleted] from %s",
 						    pfx, current, si->sn_name);
-		    else
+		    નહીંતર
 			smsg("%s%4d LOADSCRIPT %s-%d from %s", pfx, current,
 					    sv->sv_name,
 					    sref->sref_idx,
 					    si->sn_name);
 		}
-		break;
-	    case ISN_LOADS:
-	    case ISN_LOADEXPORT:
+		તોડો;
+	    સ્થિતિ ISN_LOADS:
+	    સ્થિતિ ISN_LOADEXPORT:
 		{
 		    scriptitem_T *si = SCRIPT_ITEM(
 					       iptr->isn_arg.loadstore.ls_sid);
@@ -7380,87 +7380,87 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 								: "LOADEXPORT",
 			    iptr->isn_arg.loadstore.ls_name, si->sn_name);
 		}
-		break;
-	    case ISN_LOADAUTO:
+		તોડો;
+	    સ્થિતિ ISN_LOADAUTO:
 		smsg("%s%4d LOADAUTO %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADG:
+		તોડો;
+	    સ્થિતિ ISN_LOADG:
 		smsg("%s%4d LOADG g:%s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADB:
+		તોડો;
+	    સ્થિતિ ISN_LOADB:
 		smsg("%s%4d LOADB b:%s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADW:
+		તોડો;
+	    સ્થિતિ ISN_LOADW:
 		smsg("%s%4d LOADW w:%s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADT:
+		તોડો;
+	    સ્થિતિ ISN_LOADT:
 		smsg("%s%4d LOADT t:%s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADGDICT:
+		તોડો;
+	    સ્થિતિ ISN_LOADGDICT:
 		smsg("%s%4d LOAD g:", pfx, current);
-		break;
-	    case ISN_LOADBDICT:
+		તોડો;
+	    સ્થિતિ ISN_LOADBDICT:
 		smsg("%s%4d LOAD b:", pfx, current);
-		break;
-	    case ISN_LOADWDICT:
+		તોડો;
+	    સ્થિતિ ISN_LOADWDICT:
 		smsg("%s%4d LOAD w:", pfx, current);
-		break;
-	    case ISN_LOADTDICT:
+		તોડો;
+	    સ્થિતિ ISN_LOADTDICT:
 		smsg("%s%4d LOAD t:", pfx, current);
-		break;
-	    case ISN_LOADOPT:
+		તોડો;
+	    સ્થિતિ ISN_LOADOPT:
 		smsg("%s%4d LOADOPT %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADENV:
+		તોડો;
+	    સ્થિતિ ISN_LOADENV:
 		smsg("%s%4d LOADENV %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOADREG:
+		તોડો;
+	    સ્થિતિ ISN_LOADREG:
 		smsg("%s%4d LOADREG @%c", pfx, current,
-						  (int)(iptr->isn_arg.number));
-		break;
+						  (પૂર્ણાંક)(iptr->isn_arg.સંખ્યા));
+		તોડો;
 
-	    case ISN_STORE:
-		if (iptr->isn_arg.number < 0)
+	    સ્થિતિ ISN_STORE:
+		જો (iptr->isn_arg.સંખ્યા < 0)
 		    smsg("%s%4d STORE arg[%lld]", pfx, current,
-				      iptr->isn_arg.number + STACK_FRAME_SIZE);
-		else
+				      iptr->isn_arg.સંખ્યા + ઢગલો_FRAME_SIZE);
+		નહીંતર
 		    smsg("%s%4d STORE $%lld", pfx, current,
-							 iptr->isn_arg.number);
-		break;
-	    case ISN_STOREOUTER:
+							 iptr->isn_arg.સંખ્યા);
+		તોડો;
+	    સ્થિતિ ISN_STOREOUTER:
 		{
 		    isn_outer_T *outer = &iptr->isn_arg.outer;
 
-		    if (outer->outer_depth < 0)
+		    જો (outer->outer_depth < 0)
 			smsg("%s%4d STOREOUTER $%d in loop level %d",
 				pfx, current, outer->outer_idx,
 				-outer->outer_depth);
-		    else
+		    નહીંતર
 			smsg("%s%4d STOREOUTER level %d $%d", pfx, current,
 				outer->outer_depth, outer->outer_idx);
 		}
-		break;
-	    case ISN_STOREV:
+		તોડો;
+	    સ્થિતિ ISN_STOREV:
 		smsg("%s%4d STOREV v:%s", pfx, current,
-				       get_vim_var_name(iptr->isn_arg.number));
-		break;
-	    case ISN_STOREAUTO:
+				       get_vim_var_name(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_STOREAUTO:
 		smsg("%s%4d STOREAUTO %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STOREG:
+		તોડો;
+	    સ્થિતિ ISN_STOREG:
 		smsg("%s%4d STOREG %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STOREB:
+		તોડો;
+	    સ્થિતિ ISN_STOREB:
 		smsg("%s%4d STOREB %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STOREW:
+		તોડો;
+	    સ્થિતિ ISN_STOREW:
 		smsg("%s%4d STOREW %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STORET:
+		તોડો;
+	    સ્થિતિ ISN_STORET:
 		smsg("%s%4d STORET %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STORES:
-	    case ISN_STOREEXPORT:
+		તોડો;
+	    સ્થિતિ ISN_STORES:
+	    સ્થિતિ ISN_STOREEXPORT:
 		{
 		    scriptitem_T *si = SCRIPT_ITEM(
 					       iptr->isn_arg.loadstore.ls_sid);
@@ -7470,8 +7470,8 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 						    ? "STORES" : "STOREEXPORT",
 				 iptr->isn_arg.loadstore.ls_name, si->sn_name);
 		}
-		break;
-	    case ISN_STORESCRIPT:
+		તોડો;
+	    સ્થિતિ ISN_STORESCRIPT:
 		{
 		    scriptref_T	    *sref = iptr->isn_arg.script.scriptref;
 		    scriptitem_T    *si = SCRIPT_ITEM(sref->sref_sid);
@@ -7481,74 +7481,74 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 		    current_sctx = script_ctx;
 		    sv = get_script_svar(sref, -1);
 		    current_sctx = save_sctx;
-		    if (sv == NULL)
+		    જો (sv == ખાલી)
 			smsg("%s%4d STORESCRIPT [deleted] in %s",
 						    pfx, current, si->sn_name);
-		    else
+		    નહીંતર
 			smsg("%s%4d STORESCRIPT %s-%d in %s", pfx, current,
 					     sv->sv_name,
 					     sref->sref_idx,
 					     si->sn_name);
 		}
-		break;
-	    case ISN_STOREOPT:
-	    case ISN_STOREFUNCOPT:
+		તોડો;
+	    સ્થિતિ ISN_STOREOPT:
+	    સ્થિતિ ISN_STOREFUNCOPT:
 		smsg("%s%4d %s &%s", pfx, current,
 		  iptr->isn_type == ISN_STOREOPT ? "STOREOPT" : "STOREFUNCOPT",
 					       iptr->isn_arg.storeopt.so_name);
-		break;
-	    case ISN_STOREENV:
+		તોડો;
+	    સ્થિતિ ISN_STOREENV:
 		smsg("%s%4d STOREENV $%s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_STOREREG:
+		તોડો;
+	    સ્થિતિ ISN_STOREREG:
 		smsg("%s%4d STOREREG @%c", pfx, current,
-						    (int)iptr->isn_arg.number);
-		break;
-	    case ISN_STORENR:
+						    (પૂર્ણાંક)iptr->isn_arg.સંખ્યા);
+		તોડો;
+	    સ્થિતિ ISN_STORENR:
 		smsg("%s%4d STORE %lld in $%d", pfx, current,
 				iptr->isn_arg.storenr.stnr_val,
 				iptr->isn_arg.storenr.stnr_idx);
-		break;
+		તોડો;
 
-	    case ISN_STOREINDEX:
+	    સ્થિતિ ISN_STOREINDEX:
 		smsg("%s%4d STOREINDEX %s", pfx, current,
 			    vartype_name(iptr->isn_arg.storeindex.si_vartype));
-		break;
+		તોડો;
 
-	    case ISN_STORERANGE:
+	    સ્થિતિ ISN_STORERANGE:
 		smsg("%s%4d STORERANGE", pfx, current);
-		break;
+		તોડો;
 
-	    case ISN_LOAD_CLASSMEMBER:
-	    case ISN_STORE_CLASSMEMBER:
+	    સ્થિતિ ISN_LOAD_CLASSMEMBER:
+	    સ્થિતિ ISN_STORE_CLASSMEMBER:
 		{
 		    class_T *cl = iptr->isn_arg.classmember.cm_class;
-		    int	    idx = iptr->isn_arg.classmember.cm_idx;
+		    પૂર્ણાંક	    idx = iptr->isn_arg.classmember.cm_idx;
 		    ocmember_T *ocm = &cl->class_class_members[idx];
 		    smsg("%s%4d %s CLASSMEMBER %s.%s", pfx, current,
 			    iptr->isn_type == ISN_LOAD_CLASSMEMBER
 							    ? "LOAD" : "STORE",
 			    cl->class_name.string, ocm->ocm_name.string);
 		}
-		break;
+		તોડો;
 
 	    // constants
-	    case ISN_PUSHNR:
+	    સ્થિતિ ISN_PUSHNR:
 		smsg("%s%4d PUSHNR %lld", pfx, current,
-					    (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_PUSHBOOL:
-	    case ISN_PUSHSPEC:
+					    (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_PUSHBOOL:
+	    સ્થિતિ ISN_PUSHSPEC:
 		smsg("%s%4d PUSH %s", pfx, current,
-				   get_var_special_name(iptr->isn_arg.number));
-		break;
-	    case ISN_PUSHF:
+				   get_var_special_name(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_PUSHF:
 		smsg("%s%4d PUSHF %g", pfx, current, iptr->isn_arg.fnumber);
-		break;
-	    case ISN_PUSHS:
+		તોડો;
+	    સ્થિતિ ISN_PUSHS:
 		smsg("%s%4d PUSHS \"%s\"", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_PUSHBLOB:
+		તોડો;
+	    સ્થિતિ ISN_PUSHBLOB:
 		{
 		    char_u	*r;
 		    char_u	numbuf[NUMBUFLEN];
@@ -7558,79 +7558,79 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 		    smsg("%s%4d PUSHBLOB %s", pfx, current, r);
 		    vim_free(tofree);
 		}
-		break;
-	    case ISN_PUSHFUNC:
+		તોડો;
+	    સ્થિતિ ISN_PUSHFUNC:
 		{
-		    char *name = (char *)iptr->isn_arg.string;
+		    અક્ષર *name = (અક્ષર *)iptr->isn_arg.string;
 
 		    smsg("%s%4d PUSHFUNC \"%s\"", pfx, current,
-					       name == NULL ? "[none]" : name);
+					       name == ખાલી ? "[none]" : name);
 		}
-		break;
-	    case ISN_PUSHCHANNEL:
+		તોડો;
+	    સ્થિતિ ISN_PUSHCHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 		smsg("%s%4d PUSHCHANNEL 0", pfx, current);
 #endif
-		break;
-	    case ISN_PUSHJOB:
+		તોડો;
+	    સ્થિતિ ISN_PUSHJOB:
 #ifdef FEAT_JOB_CHANNEL
 		smsg("%s%4d PUSHJOB \"no process\"", pfx, current);
 #endif
-		break;
-	    case ISN_PUSHOBJ:
+		તોડો;
+	    સ્થિતિ ISN_PUSHOBJ:
 		smsg("%s%4d PUSHOBJ null", pfx, current);
-		break;
-	    case ISN_PUSHCLASS:
+		તોડો;
+	    સ્થિતિ ISN_PUSHCLASS:
 		smsg("%s%4d PUSHCLASS %s", pfx, current,
-			iptr->isn_arg.classarg == NULL ? "null"
-				 : (char *)iptr->isn_arg.classarg->class_name.string);
-		break;
-	    case ISN_PUSHEXC:
+			iptr->isn_arg.classarg == ખાલી ? "null"
+				 : (અક્ષર *)iptr->isn_arg.classarg->class_name.string);
+		તોડો;
+	    સ્થિતિ ISN_PUSHEXC:
 		smsg("%s%4d PUSH v:exception", pfx, current);
-		break;
-	    case ISN_AUTOLOAD:
+		તોડો;
+	    સ્થિતિ ISN_AUTOLOAD:
 		smsg("%s%4d AUTOLOAD %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_UNLET:
+		તોડો;
+	    સ્થિતિ ISN_UNLET:
 		smsg("%s%4d UNLET%s %s", pfx, current,
 			iptr->isn_arg.unlet.ul_forceit ? "!" : "",
 			iptr->isn_arg.unlet.ul_name);
-		break;
-	    case ISN_UNLETENV:
+		તોડો;
+	    સ્થિતિ ISN_UNLETENV:
 		smsg("%s%4d UNLETENV%s $%s", pfx, current,
 			iptr->isn_arg.unlet.ul_forceit ? "!" : "",
 			iptr->isn_arg.unlet.ul_name);
-		break;
-	    case ISN_UNLETINDEX:
+		તોડો;
+	    સ્થિતિ ISN_UNLETINDEX:
 		smsg("%s%4d UNLETINDEX", pfx, current);
-		break;
-	    case ISN_UNLETRANGE:
+		તોડો;
+	    સ્થિતિ ISN_UNLETRANGE:
 		smsg("%s%4d UNLETRANGE", pfx, current);
-		break;
-	    case ISN_LOCKUNLOCK:
+		તોડો;
+	    સ્થિતિ ISN_LOCKUNLOCK:
 		smsg("%s%4d LOCKUNLOCK %s", pfx, current, iptr->isn_arg.string);
-		break;
-	    case ISN_LOCKCONST:
+		તોડો;
+	    સ્થિતિ ISN_LOCKCONST:
 		smsg("%s%4d LOCKCONST", pfx, current);
-		break;
-	    case ISN_NEWLIST:
+		તોડો;
+	    સ્થિતિ ISN_NEWLIST:
 		smsg("%s%4d NEWLIST size %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_NEWTUPLE:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_NEWTUPLE:
 		smsg("%s%4d NEWTUPLE size %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_NEWDICT:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_NEWDICT:
 		smsg("%s%4d NEWDICT size %lld", pfx, current,
-					  (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_NEWPARTIAL:
+					  (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_NEWPARTIAL:
 		smsg("%s%4d NEWPARTIAL", pfx, current);
-		break;
+		તોડો;
 
 	    // function call
-	    case ISN_BCALL:
+	    સ્થિતિ ISN_BCALL:
 		{
 		    cbfunc_T	*cbfunc = &iptr->isn_arg.bfunc;
 
@@ -7638,8 +7638,8 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 			    internal_func_name(cbfunc->cbf_idx),
 			    cbfunc->cbf_argcount);
 		}
-		break;
-	    case ISN_DCALL:
+		તોડો;
+	    સ્થિતિ ISN_DCALL:
 		{
 		    cdfunc_T	*cdfunc = &iptr->isn_arg.dfunc;
 		    dfunc_T	*df = ((dfunc_T *)def_functions.ga_data)
@@ -7649,77 +7649,77 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 					    printable_func_name(df->df_ufunc),
 							 cdfunc->cdf_argcount);
 		}
-		break;
-	    case ISN_METHODCALL:
+		તોડો;
+	    સ્થિતિ ISN_METHODCALL:
 		{
 		    cmfunc_T	*mfunc = iptr->isn_arg.mfunc;
 
 		    smsg("%s%4d METHODCALL %s.%s(argc %d)", pfx, current,
 			    mfunc->cmf_itf->class_name.string,
-			    mfunc->cmf_ufunc != NULL
+			    mfunc->cmf_ufunc != ખાલી
 				? mfunc->cmf_ufunc->uf_name
 				: mfunc->cmf_itf->class_obj_methods[
 						      mfunc->cmf_idx]->uf_name,
 			    mfunc->cmf_argcount);
 		}
-		break;
-	    case ISN_UCALL:
+		તોડો;
+	    સ્થિતિ ISN_UCALL:
 		{
 		    cufunc_T	*cufunc = &iptr->isn_arg.ufunc;
 
 		    smsg("%s%4d UCALL %s(argc %d)", pfx, current,
 				       cufunc->cuf_name, cufunc->cuf_argcount);
 		}
-		break;
-	    case ISN_PCALL:
+		તોડો;
+	    સ્થિતિ ISN_PCALL:
 		{
 		    cpfunc_T	*cpfunc = &iptr->isn_arg.pfunc;
 
 		    smsg("%s%4d PCALL%s (argc %d)", pfx, current,
-			   cpfunc->cpf_top ? " top" : "", cpfunc->cpf_argcount);
+			   cpfunc->cpf_ટોચ ? " top" : "", cpfunc->cpf_argcount);
 		}
-		break;
-	    case ISN_PCALL_END:
+		તોડો;
+	    સ્થિતિ ISN_PCALL_END:
 		smsg("%s%4d PCALL end", pfx, current);
-		break;
-	    case ISN_DEFER:
+		તોડો;
+	    સ્થિતિ ISN_DEFER:
 		smsg("%s%4d DEFER %d args", pfx, current,
-				      (int)iptr->isn_arg.defer.defer_argcount);
-		break;
-	    case ISN_RETURN:
+				      (પૂર્ણાંક)iptr->isn_arg.defer.defer_argcount);
+		તોડો;
+	    સ્થિતિ ISN_RETURN:
 		smsg("%s%4d RETURN", pfx, current);
-		break;
-	    case ISN_RETURN_VOID:
+		તોડો;
+	    સ્થિતિ ISN_RETURN_VOID:
 		smsg("%s%4d RETURN void", pfx, current);
-		break;
-	    case ISN_RETURN_OBJECT:
+		તોડો;
+	    સ્થિતિ ISN_RETURN_OBJECT:
 		smsg("%s%4d RETURN object", pfx, current);
-		break;
-	    case ISN_FUNCREF:
+		તોડો;
+	    સ્થિતિ ISN_FUNCREF:
 		{
 		    funcref_T		*funcref = &iptr->isn_arg.funcref;
 		    funcref_extra_T	*extra = funcref->fr_extra;
 		    char_u		*name;
 
-		    if (extra == NULL || extra->fre_func_name == NULL)
+		    જો (extra == ખાલી || extra->fre_func_name == ખાલી)
 		    {
 			dfunc_T	*df = ((dfunc_T *)def_functions.ga_data)
 						       + funcref->fr_dfunc_idx;
 			name = df->df_ufunc->uf_name;
 		    }
-		    else
+		    નહીંતર
 			name = extra->fre_func_name;
-		    if (extra != NULL && extra->fre_class != NULL)
+		    જો (extra != ખાલી && extra->fre_class != ખાલી)
 		    {
 			smsg("%s%4d FUNCREF %s.%s", pfx, current,
 					   extra->fre_class->class_name.string, name);
 		    }
-		    else if (extra == NULL
+		    નહીંતર જો (extra == ખાલી
 				     || extra->fre_loopvar_info.lvi_depth == 0)
 		    {
 			smsg("%s%4d FUNCREF %s", pfx, current, name);
 		    }
-		    else
+		    નહીંતર
 		    {
 			char_u	*info = printable_loopvarinfo(
 						     &extra->fre_loopvar_info);
@@ -7729,16 +7729,16 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 			vim_free(info);
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_NEWFUNC:
+	    સ્થિતિ ISN_NEWFUNC:
 		{
 		    newfuncarg_T    *arg = iptr->isn_arg.newfunc.nf_arg;
 
-		    if (arg->nfa_loopvar_info.lvi_depth == 0)
+		    જો (arg->nfa_loopvar_info.lvi_depth == 0)
 			smsg("%s%4d NEWFUNC %s %s", pfx, current,
 					     arg->nfa_lambda, arg->nfa_global);
-		    else
+		    નહીંતર
 		    {
 			char_u	*info = printable_loopvarinfo(
 						       &arg->nfa_loopvar_info);
@@ -7748,72 +7748,72 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 			vim_free(info);
 		    }
 		}
-		break;
+		તોડો;
 
-	    case ISN_DEF:
+	    સ્થિતિ ISN_DEF:
 		{
 		    char_u *name = iptr->isn_arg.string;
 
 		    smsg("%s%4d DEF %s", pfx, current,
-					   name == NULL ? (char_u *)"" : name);
+					   name == ખાલી ? (char_u *)"" : name);
 		}
-		break;
+		તોડો;
 
-	    case ISN_JUMP:
+	    સ્થિતિ ISN_JUMP:
 		{
-		    char *when = "?";
+		    અક્ષર *when = "?";
 
-		    switch (iptr->isn_arg.jump.jump_when)
+		    પસંદગી (iptr->isn_arg.jump.jump_when)
 		    {
-			case JUMP_ALWAYS:
+			સ્થિતિ JUMP_ALWAYS:
 			    when = "JUMP";
-			    break;
-			case JUMP_NEVER:
+			    તોડો;
+			સ્થિતિ JUMP_NEVER:
 			    iemsg("JUMP_NEVER should not be used");
-			    break;
-			case JUMP_AND_KEEP_IF_TRUE:
+			    તોડો;
+			સ્થિતિ JUMP_AND_KEEP_IF_TRUE:
 			    when = "JUMP_AND_KEEP_IF_TRUE";
-			    break;
-			case JUMP_IF_FALSE:
+			    તોડો;
+			સ્થિતિ JUMP_IF_FALSE:
 			    when = "JUMP_IF_FALSE";
-			    break;
-			case JUMP_WHILE_FALSE:
+			    તોડો;
+			સ્થિતિ JUMP_WHILE_FALSE:
 			    when = "JUMP_WHILE_FALSE";  // unused
-			    break;
-			case JUMP_IF_COND_FALSE:
+			    તોડો;
+			સ્થિતિ JUMP_IF_COND_FALSE:
 			    when = "JUMP_IF_COND_FALSE";
-			    break;
-			case JUMP_IF_COND_TRUE:
+			    તોડો;
+			સ્થિતિ JUMP_IF_COND_TRUE:
 			    when = "JUMP_IF_COND_TRUE";
-			    break;
+			    તોડો;
 		    }
 		    smsg("%s%4d %s -> %d", pfx, current, when,
 						iptr->isn_arg.jump.jump_where);
 		}
-		break;
+		તોડો;
 
-	    case ISN_JUMP_IF_ARG_SET:
+	    સ્થિતિ ISN_JUMP_IF_ARG_SET:
 		smsg("%s%4d JUMP_IF_ARG_SET arg[%d] -> %d", pfx, current,
-			 iptr->isn_arg.jumparg.jump_arg_off + STACK_FRAME_SIZE,
+			 iptr->isn_arg.jumparg.jump_arg_off + ઢગલો_FRAME_SIZE,
 						iptr->isn_arg.jump.jump_where);
-		break;
+		તોડો;
 
-	    case ISN_JUMP_IF_ARG_NOT_SET:
+	    સ્થિતિ ISN_JUMP_IF_ARG_NOT_SET:
 		smsg("%s%4d JUMP_IF_ARG_NOT_SET arg[%d] -> %d", pfx, current,
-			 iptr->isn_arg.jumparg.jump_arg_off + STACK_FRAME_SIZE,
+			 iptr->isn_arg.jumparg.jump_arg_off + ઢગલો_FRAME_SIZE,
 						iptr->isn_arg.jump.jump_where);
-		break;
+		તોડો;
 
-	    case ISN_FOR:
+	    સ્થિતિ ISN_FOR:
 		{
 		    forloop_T *forloop = &iptr->isn_arg.forloop;
 
 		    smsg("%s%4d FOR $%d -> %d", pfx, current,
 				      forloop->for_loop_idx, forloop->for_end);
 		}
-		break;
+		તોડો;
 
-	    case ISN_ENDLOOP:
+	    સ્થિતિ ISN_ENDLOOP:
 		{
 		    endloop_T *endloop = &iptr->isn_arg.endloop;
 
@@ -7821,12 +7821,12 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 								  pfx, current,
 			    endloop->end_funcref_idx,
 			    endloop->end_var_idx,
-			    endloop->end_var_idx + endloop->end_var_count - 1,
+			    endloop->end_var_idx + endloop->end_var_ગણતરી - 1,
 			    endloop->end_depth);
 		}
-		break;
+		તોડો;
 
-	    case ISN_WHILE:
+	    સ્થિતિ ISN_WHILE:
 		{
 		    whileloop_T *whileloop = &iptr->isn_arg.whileloop;
 
@@ -7834,29 +7834,29 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 					       whileloop->while_funcref_idx,
 					       whileloop->while_end);
 		}
-		break;
+		તોડો;
 
-	    case ISN_TRY:
+	    સ્થિતિ ISN_TRY:
 		{
 		    try_T *try = &iptr->isn_arg.tryref;
 
-		    if (try->try_ref->try_finally == 0)
+		    જો (try->try_ref->try_finally == 0)
 			smsg("%s%4d TRY catch -> %d, endtry -> %d",
 				pfx, current,
 				try->try_ref->try_catch,
 				try->try_ref->try_endtry);
-		    else
+		    નહીંતર
 			smsg("%s%4d TRY catch -> %d, finally -> %d, endtry -> %d",
 				pfx, current,
 				try->try_ref->try_catch,
 				try->try_ref->try_finally,
 				try->try_ref->try_endtry);
 		}
-		break;
-	    case ISN_CATCH:
+		તોડો;
+	    સ્થિતિ ISN_CATCH:
 		smsg("%s%4d CATCH", pfx, current);
-		break;
-	    case ISN_TRYCONT:
+		તોડો;
+	    સ્થિતિ ISN_TRYCONT:
 		{
 		    trycont_T *trycont = &iptr->isn_arg.trycont;
 
@@ -7865,304 +7865,304 @@ list_instructions(char *pfx, isn_T *instr, int instr_count, ufunc_T *ufunc)
 				      trycont->tct_levels == 1 ? "" : "s",
 				      trycont->tct_where);
 		}
-		break;
-	    case ISN_FINALLY:
+		તોડો;
+	    સ્થિતિ ISN_FINALLY:
 		smsg("%s%4d FINALLY", pfx, current);
-		break;
-	    case ISN_ENDTRY:
+		તોડો;
+	    સ્થિતિ ISN_ENDTRY:
 		smsg("%s%4d ENDTRY", pfx, current);
-		break;
-	    case ISN_THROW:
+		તોડો;
+	    સ્થિતિ ISN_THROW:
 		smsg("%s%4d THROW", pfx, current);
-		break;
+		તોડો;
 
 	    // expression operations on number
-	    case ISN_OPNR:
-	    case ISN_OPFLOAT:
-	    case ISN_OPANY:
+	    સ્થિતિ ISN_OPNR:
+	    સ્થિતિ ISN_OPFLOAT:
+	    સ્થિતિ ISN_OPANY:
 		{
-		    char *what;
-		    char *ins;
+		    અક્ષર *what;
+		    અક્ષર *ins;
 
-		    switch (iptr->isn_arg.op.op_type)
+		    પસંદગી (iptr->isn_arg.op.op_type)
 		    {
-			case EXPR_MULT: what = "*"; break;
-			case EXPR_DIV: what = "/"; break;
-			case EXPR_REM: what = "%"; break;
-			case EXPR_SUB: what = "-"; break;
-			case EXPR_ADD: what = "+"; break;
-			case EXPR_LSHIFT: what = "<<"; break;
-			case EXPR_RSHIFT: what = ">>"; break;
-			default:       what = "???"; break;
+			સ્થિતિ પદાવલિ_MULT: what = "*"; તોડો;
+			સ્થિતિ પદાવલિ_DIV: what = "/"; તોડો;
+			સ્થિતિ પદાવલિ_REM: what = "%"; તોડો;
+			સ્થિતિ પદાવલિ_SUB: what = "-"; તોડો;
+			સ્થિતિ પદાવલિ_ADD: what = "+"; તોડો;
+			સ્થિતિ પદાવલિ_LSHIFT: what = "<<"; તોડો;
+			સ્થિતિ પદાવલિ_RSHIFT: what = ">>"; તોડો;
+			મૂળભૂત:       what = "???"; તોડો;
 		    }
-		    switch (iptr->isn_type)
+		    પસંદગી (iptr->isn_type)
 		    {
-			case ISN_OPNR: ins = "OPNR"; break;
-			case ISN_OPFLOAT: ins = "OPFLOAT"; break;
-			case ISN_OPANY: ins = "OPANY"; break;
-			default: ins = "???"; break;
+			સ્થિતિ ISN_OPNR: ins = "OPNR"; તોડો;
+			સ્થિતિ ISN_OPFLOAT: ins = "OPFLOAT"; તોડો;
+			સ્થિતિ ISN_OPANY: ins = "OPANY"; તોડો;
+			મૂળભૂત: ins = "???"; તોડો;
 		    }
 		    smsg("%s%4d %s %s", pfx, current, ins, what);
 		}
-		break;
+		તોડો;
 
-	    case ISN_COMPAREBOOL:
-	    case ISN_COMPARESPECIAL:
-	    case ISN_COMPARENULL:
-	    case ISN_COMPARENR:
-	    case ISN_COMPAREFLOAT:
-	    case ISN_COMPARESTRING:
-	    case ISN_COMPAREBLOB:
-	    case ISN_COMPARELIST:
-	    case ISN_COMPARETUPLE:
-	    case ISN_COMPAREDICT:
-	    case ISN_COMPAREFUNC:
-	    case ISN_COMPAREOBJECT:
-	    case ISN_COMPAREANY:
+	    સ્થિતિ ISN_COMPAREBOOL:
+	    સ્થિતિ ISN_COMPARESPECIAL:
+	    સ્થિતિ ISN_COMPARENULL:
+	    સ્થિતિ ISN_COMPARENR:
+	    સ્થિતિ ISN_COMPAREFLOAT:
+	    સ્થિતિ ISN_COMPARESTRING:
+	    સ્થિતિ ISN_COMPAREBLOB:
+	    સ્થિતિ ISN_COMPARELIST:
+	    સ્થિતિ ISN_COMPARETUPLE:
+	    સ્થિતિ ISN_COMPAREDICT:
+	    સ્થિતિ ISN_COMPAREFUNC:
+	    સ્થિતિ ISN_COMPAREOBJECT:
+	    સ્થિતિ ISN_COMPAREANY:
 		   {
-		       char *p;
-		       char buf[10];
-		       char *type;
+		       અક્ષર *p;
+		       અક્ષર buf[10];
+		       અક્ષર *type;
 
-		       switch (iptr->isn_arg.op.op_type)
+		       પસંદગી (iptr->isn_arg.op.op_type)
 		       {
-			   case EXPR_EQUAL:	 p = "=="; break;
-			   case EXPR_NEQUAL:    p = "!="; break;
-			   case EXPR_GREATER:   p = ">"; break;
-			   case EXPR_GEQUAL:    p = ">="; break;
-			   case EXPR_SMALLER:   p = "<"; break;
-			   case EXPR_SEQUAL:    p = "<="; break;
-			   case EXPR_MATCH:	 p = "=~"; break;
-			   case EXPR_IS:	 p = "is"; break;
-			   case EXPR_ISNOT:	 p = "isnot"; break;
-			   case EXPR_NOMATCH:	 p = "!~"; break;
-			   default:  p = "???"; break;
+			   સ્થિતિ પદાવલિ_EQUAL:	 p = "=="; તોડો;
+			   સ્થિતિ પદાવલિ_NEQUAL:    p = "!="; તોડો;
+			   સ્થિતિ પદાવલિ_GREATER:   p = ">"; તોડો;
+			   સ્થિતિ પદાવલિ_GEQUAL:    p = ">="; તોડો;
+			   સ્થિતિ પદાવલિ_SMALLER:   p = "<"; તોડો;
+			   સ્થિતિ પદાવલિ_SEQUAL:    p = "<="; તોડો;
+			   સ્થિતિ પદાવલિ_MATCH:	 p = "=~"; તોડો;
+			   સ્થિતિ પદાવલિ_IS:	 p = "is"; તોડો;
+			   સ્થિતિ પદાવલિ_ISNOT:	 p = "isnot"; તોડો;
+			   સ્થિતિ પદાવલિ_NOMATCH:	 p = "!~"; તોડો;
+			   મૂળભૂત:  p = "???"; તોડો;
 		       }
 		       STRCPY(buf, p);
-		       if (iptr->isn_arg.op.op_ic == TRUE)
+		       જો (iptr->isn_arg.op.op_ic == TRUE)
 			   strcat(buf, "?");
-		       switch(iptr->isn_type)
+		       પસંદગી(iptr->isn_type)
 		       {
-			   case ISN_COMPAREBOOL: type = "COMPAREBOOL"; break;
-			   case ISN_COMPARESPECIAL:
-						 type = "COMPARESPECIAL"; break;
-			   case ISN_COMPARENULL: type = "COMPARENULL"; break;
-			   case ISN_COMPARENR: type = "COMPARENR"; break;
-			   case ISN_COMPAREFLOAT: type = "COMPAREFLOAT"; break;
-			   case ISN_COMPARESTRING:
-						  type = "COMPARESTRING"; break;
-			   case ISN_COMPAREBLOB: type = "COMPAREBLOB"; break;
-			   case ISN_COMPARELIST: type = "COMPARELIST"; break;
-			   case ISN_COMPARETUPLE: type = "COMPARETUPLE"; break;
-			   case ISN_COMPAREDICT: type = "COMPAREDICT"; break;
-			   case ISN_COMPAREFUNC: type = "COMPAREFUNC"; break;
-			   case ISN_COMPAREOBJECT:
-						 type = "COMPAREOBJECT"; break;
-			   case ISN_COMPAREANY: type = "COMPAREANY"; break;
-			   default: type = "???"; break;
+			   સ્થિતિ ISN_COMPAREBOOL: type = "COMPAREBOOL"; તોડો;
+			   સ્થિતિ ISN_COMPARESPECIAL:
+						 type = "COMPARESPECIAL"; તોડો;
+			   સ્થિતિ ISN_COMPARENULL: type = "COMPARENULL"; તોડો;
+			   સ્થિતિ ISN_COMPARENR: type = "COMPARENR"; તોડો;
+			   સ્થિતિ ISN_COMPAREFLOAT: type = "COMPAREFLOAT"; તોડો;
+			   સ્થિતિ ISN_COMPARESTRING:
+						  type = "COMPARESTRING"; તોડો;
+			   સ્થિતિ ISN_COMPAREBLOB: type = "COMPAREBLOB"; તોડો;
+			   સ્થિતિ ISN_COMPARELIST: type = "COMPARELIST"; તોડો;
+			   સ્થિતિ ISN_COMPARETUPLE: type = "COMPARETUPLE"; તોડો;
+			   સ્થિતિ ISN_COMPAREDICT: type = "COMPAREDICT"; તોડો;
+			   સ્થિતિ ISN_COMPAREFUNC: type = "COMPAREFUNC"; તોડો;
+			   સ્થિતિ ISN_COMPAREOBJECT:
+						 type = "COMPAREOBJECT"; તોડો;
+			   સ્થિતિ ISN_COMPAREANY: type = "COMPAREANY"; તોડો;
+			   મૂળભૂત: type = "???"; તોડો;
 		       }
 
 		       smsg("%s%4d %s %s", pfx, current, type, buf);
 		   }
-		   break;
+		   તોડો;
 
-	    case ISN_ADDLIST: smsg("%s%4d ADDLIST", pfx, current); break;
-	    case ISN_ADDTUPLE: smsg("%s%4d ADDTUPLE", pfx, current); break;
-	    case ISN_ADDBLOB: smsg("%s%4d ADDBLOB", pfx, current); break;
+	    સ્થિતિ ISN_ADDLIST: smsg("%s%4d ADDLIST", pfx, current); તોડો;
+	    સ્થિતિ ISN_ADDTUPLE: smsg("%s%4d ADDTUPLE", pfx, current); તોડો;
+	    સ્થિતિ ISN_ADDBLOB: smsg("%s%4d ADDBLOB", pfx, current); તોડો;
 
 	    // expression operations
-	    case ISN_CONCAT:
+	    સ્થિતિ ISN_CONCAT:
 		smsg("%s%4d CONCAT size %lld", pfx, current,
-					    (varnumber_T)(iptr->isn_arg.number));
-		break;
-	    case ISN_STRINDEX: smsg("%s%4d STRINDEX", pfx, current); break;
-	    case ISN_STRSLICE: smsg("%s%4d STRSLICE", pfx, current); break;
-	    case ISN_BLOBINDEX: smsg("%s%4d BLOBINDEX", pfx, current); break;
-	    case ISN_BLOBSLICE: smsg("%s%4d BLOBSLICE", pfx, current); break;
-	    case ISN_LISTAPPEND: smsg("%s%4d LISTAPPEND", pfx, current); break;
-	    case ISN_BLOBAPPEND: smsg("%s%4d BLOBAPPEND", pfx, current); break;
-	    case ISN_LISTINDEX: smsg("%s%4d LISTINDEX", pfx, current); break;
-	    case ISN_LISTSLICE: smsg("%s%4d LISTSLICE", pfx, current); break;
-	    case ISN_TUPLEINDEX: smsg("%s%4d TUPLEINDEX", pfx, current); break;
-	    case ISN_TUPLESLICE: smsg("%s%4d TUPLESLICE", pfx, current); break;
-	    case ISN_ANYINDEX: smsg("%s%4d ANYINDEX", pfx, current); break;
-	    case ISN_ANYSLICE: smsg("%s%4d ANYSLICE", pfx, current); break;
-	    case ISN_SLICE: smsg("%s%4d SLICE %lld",
-				    pfx, current, iptr->isn_arg.number); break;
-	    case ISN_GETITEM: smsg("%s%4d ITEM %lld%s", pfx, current,
+					    (varnumber_T)(iptr->isn_arg.સંખ્યા));
+		તોડો;
+	    સ્થિતિ ISN_STRINDEX: smsg("%s%4d STRINDEX", pfx, current); તોડો;
+	    સ્થિતિ ISN_STRSLICE: smsg("%s%4d STRSLICE", pfx, current); તોડો;
+	    સ્થિતિ ISN_BLOBINDEX: smsg("%s%4d BLOBINDEX", pfx, current); તોડો;
+	    સ્થિતિ ISN_BLOBSLICE: smsg("%s%4d BLOBSLICE", pfx, current); તોડો;
+	    સ્થિતિ ISN_LISTAPPEND: smsg("%s%4d LISTAPPEND", pfx, current); તોડો;
+	    સ્થિતિ ISN_BLOBAPPEND: smsg("%s%4d BLOBAPPEND", pfx, current); તોડો;
+	    સ્થિતિ ISN_LISTINDEX: smsg("%s%4d LISTINDEX", pfx, current); તોડો;
+	    સ્થિતિ ISN_LISTSLICE: smsg("%s%4d LISTSLICE", pfx, current); તોડો;
+	    સ્થિતિ ISN_TUPLEINDEX: smsg("%s%4d TUPLEINDEX", pfx, current); તોડો;
+	    સ્થિતિ ISN_TUPLESLICE: smsg("%s%4d TUPLESLICE", pfx, current); તોડો;
+	    સ્થિતિ ISN_ANYINDEX: smsg("%s%4d ANYINDEX", pfx, current); તોડો;
+	    સ્થિતિ ISN_ANYSLICE: smsg("%s%4d ANYSLICE", pfx, current); તોડો;
+	    સ્થિતિ ISN_SLICE: smsg("%s%4d SLICE %lld",
+				    pfx, current, iptr->isn_arg.સંખ્યા); તોડો;
+	    સ્થિતિ ISN_GETITEM: smsg("%s%4d ITEM %lld%s", pfx, current,
 					 iptr->isn_arg.getitem.gi_index,
 					 iptr->isn_arg.getitem.gi_with_op ?
-						       " with op" : ""); break;
-	    case ISN_MEMBER: smsg("%s%4d MEMBER", pfx, current); break;
-	    case ISN_STRINGMEMBER: smsg("%s%4d MEMBER %s", pfx, current,
-						  iptr->isn_arg.string); break;
-	    case ISN_GET_OBJ_MEMBER: smsg("%s%4d OBJ_MEMBER %d", pfx, current,
-			     (int)iptr->isn_arg.classmember.cm_idx);
-				     break;
-	    case ISN_GET_ITF_MEMBER: smsg("%s%4d ITF_MEMBER %d on %s",
+						       " with op" : ""); તોડો;
+	    સ્થિતિ ISN_MEMBER: smsg("%s%4d MEMBER", pfx, current); તોડો;
+	    સ્થિતિ ISN_STRINGMEMBER: smsg("%s%4d MEMBER %s", pfx, current,
+						  iptr->isn_arg.string); તોડો;
+	    સ્થિતિ ISN_GET_OBJ_MEMBER: smsg("%s%4d OBJ_MEMBER %d", pfx, current,
+			     (પૂર્ણાંક)iptr->isn_arg.classmember.cm_idx);
+				     તોડો;
+	    સ્થિતિ ISN_GET_ITF_MEMBER: smsg("%s%4d ITF_MEMBER %d on %s",
 			     pfx, current,
-			     (int)iptr->isn_arg.classmember.cm_idx,
+			     (પૂર્ણાંક)iptr->isn_arg.classmember.cm_idx,
 			     iptr->isn_arg.classmember.cm_class->class_name.string);
-				     break;
-	    case ISN_STORE_THIS: smsg("%s%4d STORE_THIS %d", pfx, current,
-					     (int)iptr->isn_arg.number); break;
-	    case ISN_CLEARDICT: smsg("%s%4d CLEARDICT", pfx, current); break;
-	    case ISN_USEDICT: smsg("%s%4d USEDICT", pfx, current); break;
+				     તોડો;
+	    સ્થિતિ ISN_STORE_THIS: smsg("%s%4d STORE_THIS %d", pfx, current,
+					     (પૂર્ણાંક)iptr->isn_arg.સંખ્યા); તોડો;
+	    સ્થિતિ ISN_CLEARDICT: smsg("%s%4d CLEARDICT", pfx, current); તોડો;
+	    સ્થિતિ ISN_USEDICT: smsg("%s%4d USEDICT", pfx, current); તોડો;
 
-	    case ISN_NEGATENR: smsg("%s%4d NEGATENR", pfx, current); break;
+	    સ્થિતિ ISN_NEGATENR: smsg("%s%4d NEGATENR", pfx, current); તોડો;
 
-	    case ISN_CHECKTYPE:
+	    સ્થિતિ ISN_CHECKTYPE:
 		  {
 		      checktype_T   *ct = &iptr->isn_arg.type;
-		      char	    *tofree = NULL;
-		      char	    *typename;
+		      અક્ષર	    *tofree = ખાલી;
+		      અક્ષર	    *typename;
 
-		      if (ct->ct_type->tt_type == VAR_FLOAT
-			      && (ct->ct_type->tt_flags & TTFLAG_NUMBER_OK))
+		      જો (ct->ct_type->tt_type == VAR_FLOAT
+			      && (ct->ct_type->tt_flags & TTFLAG_સંખ્યા_OK))
 			  typename = "float|number";
-		      else if (ct->ct_type->tt_type == VAR_LIST
+		      નહીંતર જો (ct->ct_type->tt_type == VAR_LIST
 			      && (ct->ct_type->tt_flags & TTFLAG_TUPLE_OK))
 			  typename = "list<any>|tuple<any>";
-		      else
+		      નહીંતર
 			  typename = type_name(ct->ct_type, &tofree);
 
-		      if (ct->ct_arg_idx == 0)
+		      જો (ct->ct_arg_idx == 0)
 			  smsg("%s%4d CHECKTYPE %s stack[%d]", pfx, current,
 					  typename,
-					  (int)ct->ct_off);
-		      else
+					  (પૂર્ણાંક)ct->ct_off);
+		      નહીંતર
 			  smsg("%s%4d CHECKTYPE %s stack[%d] %s %d",
 					  pfx, current,
 					  typename,
-					  (int)ct->ct_off,
+					  (પૂર્ણાંક)ct->ct_off,
 					  ct->ct_is_var ? "var": "arg",
-					  (int)ct->ct_arg_idx);
+					  (પૂર્ણાંક)ct->ct_arg_idx);
 		      vim_free(tofree);
-		      break;
+		      તોડો;
 		  }
-	    case ISN_CHECKLEN: smsg("%s%4d CHECKLEN %s%d", pfx, current,
+	    સ્થિતિ ISN_CHECKLEN: smsg("%s%4d CHECKLEN %s%d", pfx, current,
 				iptr->isn_arg.checklen.cl_more_OK ? ">= " : "",
 				iptr->isn_arg.checklen.cl_min_len);
-			       break;
-	    case ISN_SETTYPE:
+			       તોડો;
+	    સ્થિતિ ISN_SETTYPE:
 		  {
-		      char *tofree;
+		      અક્ષર *tofree;
 
 		      smsg("%s%4d SETTYPE %s", pfx, current,
 			      type_name(iptr->isn_arg.type.ct_type, &tofree));
 		      vim_free(tofree);
-		      break;
+		      તોડો;
 		  }
-	    case ISN_COND2BOOL: smsg("%s%4d COND2BOOL", pfx, current); break;
-	    case ISN_2BOOL: if (iptr->isn_arg.tobool.invert)
+	    સ્થિતિ ISN_COND2BOOL: smsg("%s%4d COND2BOOL", pfx, current); તોડો;
+	    સ્થિતિ ISN_2BOOL: જો (iptr->isn_arg.tobool.invert)
 				smsg("%s%4d INVERT %d (!val)", pfx, current,
 					 iptr->isn_arg.tobool.offset);
-			    else
+			    નહીંતર
 				smsg("%s%4d 2BOOL %d (!!val)", pfx, current,
 					 iptr->isn_arg.tobool.offset);
-			    break;
-	    case ISN_2STRING: smsg("%s%4d 2STRING stack[%lld]", pfx, current,
+			    તોડો;
+	    સ્થિતિ ISN_2STRING: smsg("%s%4d 2STRING stack[%lld]", pfx, current,
 				 (varnumber_T)(iptr->isn_arg.tostring.offset));
-			      break;
-	    case ISN_2STRING_ANY: smsg("%s%4d 2STRING_ANY stack[%lld]",
+			      તોડો;
+	    સ્થિતિ ISN_2STRING_ANY: smsg("%s%4d 2STRING_ANY stack[%lld]",
 								  pfx, current,
 				 (varnumber_T)(iptr->isn_arg.tostring.offset));
-			      break;
-	    case ISN_RANGE: smsg("%s%4d RANGE %s", pfx, current,
+			      તોડો;
+	    સ્થિતિ ISN_RANGE: smsg("%s%4d RANGE %s", pfx, current,
 							 iptr->isn_arg.string);
-			    break;
-	    case ISN_PUT:
-		if (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE_ABOVE)
+			    તોડો;
+	    સ્થિતિ ISN_PUT:
+		જો (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE_ABOVE)
 		    smsg("%s%4d PUT %c above range",
 				  pfx, current, iptr->isn_arg.put.put_regname);
-		else if (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE)
+		નહીંતર જો (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE)
 		    smsg("%s%4d PUT %c range",
 				  pfx, current, iptr->isn_arg.put.put_regname);
-		else
+		નહીંતર
 		    smsg("%s%4d PUT %c %ld", pfx, current,
 						 iptr->isn_arg.put.put_regname,
 					     (long)iptr->isn_arg.put.put_lnum);
-		break;
-	    case ISN_IPUT:
-		if (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE_ABOVE)
+		તોડો;
+	    સ્થિતિ ISN_IPUT:
+		જો (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE_ABOVE)
 		    smsg("%s%4d IPUT %c above range",
 				  pfx, current, iptr->isn_arg.put.put_regname);
-		else if (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE)
+		નહીંતર જો (iptr->isn_arg.put.put_lnum == LNUM_VARIABLE_RANGE)
 		    smsg("%s%4d IPUT %c range",
 				  pfx, current, iptr->isn_arg.put.put_regname);
-		else
+		નહીંતર
 		    smsg("%s%4d IPUT %c %ld", pfx, current,
 						 iptr->isn_arg.put.put_regname,
 					     (long)iptr->isn_arg.put.put_lnum);
-		break;
-	    case ISN_CMDMOD:
+		તોડો;
+	    સ્થિતિ ISN_CMDMOD:
 		{
 		    char_u  *buf;
 		    size_t  len = produce_cmdmods(
-				  NULL, iptr->isn_arg.cmdmod.cf_cmdmod, FALSE);
+				  ખાલી, iptr->isn_arg.cmdmod.cf_cmdmod, FALSE);
 
 		    buf = alloc(len + 1);
-		    if (likely(buf != NULL))
+		    જો (likely(buf != ખાલી))
 		    {
-			(void)produce_cmdmods(
+			(શૂન્ય)produce_cmdmods(
 				   buf, iptr->isn_arg.cmdmod.cf_cmdmod, FALSE);
 			smsg("%s%4d CMDMOD %s", pfx, current, buf);
 			vim_free(buf);
 		    }
-		    break;
+		    તોડો;
 		}
-	    case ISN_CMDMOD_REV: smsg("%s%4d CMDMOD_REV", pfx, current); break;
+	    સ્થિતિ ISN_CMDMOD_REV: smsg("%s%4d CMDMOD_REV", pfx, current); તોડો;
 
-	    case ISN_PROF_START:
+	    સ્થિતિ ISN_PROF_START:
 		 smsg("%s%4d PROFILE START line %d", pfx, current,
 							       iptr->isn_lnum);
-		 break;
+		 તોડો;
 
-	    case ISN_PROF_END:
+	    સ્થિતિ ISN_PROF_END:
 		smsg("%s%4d PROFILE END", pfx, current);
-		break;
+		તોડો;
 
-	    case ISN_DEBUG:
+	    સ્થિતિ ISN_DEBUG:
 		smsg("%s%4d DEBUG line %d-%d varcount %lld", pfx, current,
 			iptr->isn_arg.debug.dbg_break_lnum + 1,
 			iptr->isn_lnum,
 			iptr->isn_arg.debug.dbg_var_names_len);
-		break;
+		તોડો;
 
-	    case ISN_UNPACK: smsg("%s%4d UNPACK %d%s", pfx, current,
-			iptr->isn_arg.unpack.unp_count,
+	    સ્થિતિ ISN_UNPACK: smsg("%s%4d UNPACK %d%s", pfx, current,
+			iptr->isn_arg.unpack.unp_ગણતરી,
 			iptr->isn_arg.unpack.unp_semicolon ? " semicolon" : "");
-			      break;
-	    case ISN_SHUFFLE: smsg("%s%4d SHUFFLE %d up %d", pfx, current,
+			      તોડો;
+	    સ્થિતિ ISN_SHUFFLE: smsg("%s%4d SHUFFLE %d up %d", pfx, current,
 					 iptr->isn_arg.shuffle.shfl_item,
 					 iptr->isn_arg.shuffle.shfl_up);
-			      break;
-	    case ISN_DROP: smsg("%s%4d DROP", pfx, current); break;
+			      તોડો;
+	    સ્થિતિ ISN_DROP: smsg("%s%4d DROP", pfx, current); તોડો;
 
-	    case ISN_SCRIPTCTX_SET:
+	    સ્થિતિ ISN_SCRIPTCTX_SET:
 		{
-		    int	sid = iptr->isn_arg.setsctx.sc_sid;
+		    પૂર્ણાંક	sid = iptr->isn_arg.setsctx.sc_sid;
 		    scriptitem_T *si = SCRIPT_ITEM(sid);
 		    smsg("%s%4d SCRIPTCTX_SET %s", pfx, current, si->sn_name);
 		    script_ctx = iptr->isn_arg.setsctx;
 		}
-		break;
+		તોડો;
 
-	    case ISN_FINISH: // End of list of instructions for ISN_SUBSTITUTE.
-			   return;
+	    સ્થિતિ ISN_FINISH: // End of list of instructions for ISN_SUBSTITUTE.
+			   પાછા;
 	}
 
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
-	if (got_int)
-	    break;
+	જો (got_int)
+	    તોડો;
     }
 }
 
 /*
  * Handle command line completion for the :disassemble command.
  */
-    void
+    શૂન્ય
 set_context_in_disassemble_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
@@ -8172,7 +8172,7 @@ set_context_in_disassemble_cmd(expand_T *xp, char_u *arg)
     xp->xp_pattern = arg;
 
     // first argument already typed: only user function names
-    if (*arg != NUL && *(p = skiptowhite(arg)) != NUL)
+    જો (*arg != NUL && *(p = skiptowhite(arg)) != NUL)
     {
 	xp->xp_context = EXPAND_USER_FUNC;
 	xp->xp_pattern = skipwhite(p);
@@ -8184,13 +8184,13 @@ set_context_in_disassemble_cmd(expand_T *xp, char_u *arg)
  * arguments.
  */
     char_u *
-get_disassemble_argument(expand_T *xp, int idx)
+get_disassemble_argument(expand_T *xp, પૂર્ણાંક idx)
 {
-    if (idx == 0)
-	return (char_u *)"debug";
-    if (idx == 1)
-	return (char_u *)"profile";
-    return get_user_func_name(xp, idx - 2);
+    જો (idx == 0)
+	પાછા (char_u *)"debug";
+    જો (idx == 1)
+	પાછા (char_u *)"profile";
+    પાછા get_user_func_name(xp, idx - 2);
 }
 
 /*
@@ -8198,50 +8198,50 @@ get_disassemble_argument(expand_T *xp, int idx)
  * We don't really need this at runtime, but we do have tests that require it,
  * so always include this.
  */
-    void
+    શૂન્ય
 ex_disassemble(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     ufunc_T	*ufunc;
     dfunc_T	*dfunc;
-    isn_T	*instr = NULL;  // init to shut up gcc warning
-    int		instr_count = 0;  // init to shut up gcc warning
+    isn_T	*instr = ખાલી;  // init to shut up gcc warning
+    પૂર્ણાંક		instr_ગણતરી = 0;  // init to shut up gcc warning
     compiletype_T compile_type = CT_NONE;
 
     ufunc = find_func_by_name(arg, &compile_type);
-    if (ufunc == NULL)
-	return;
-    if (func_needs_compiling(ufunc, compile_type)
-	    && compile_def_function(ufunc, FALSE, compile_type, NULL) == FAIL)
-	return;
-    if (ufunc->uf_def_status != UF_COMPILED)
+    જો (ufunc == ખાલી)
+	પાછા;
+    જો (func_needs_compiling(ufunc, compile_type)
+	    && compile_def_function(ufunc, FALSE, compile_type, ખાલી) == FAIL)
+	પાછા;
+    જો (ufunc->uf_def_status != UF_COMPILED)
     {
 	semsg(_(e_function_is_not_compiled_str), eap->arg);
-	return;
+	પાછા;
     }
-    msg((char *)printable_func_name(ufunc));
+    સંદેશ((અક્ષર *)printable_func_name(ufunc));
 
     dfunc = ((dfunc_T *)def_functions.ga_data) + ufunc->uf_dfunc_idx;
-    switch (compile_type)
+    પસંદગી (compile_type)
     {
-	case CT_PROFILE:
+	સ્થિતિ CT_PROFILE:
 #ifdef FEAT_PROFILE
 	    instr = dfunc->df_instr_prof;
-	    instr_count = dfunc->df_instr_prof_count;
-	    break;
+	    instr_ગણતરી = dfunc->df_instr_prof_ગણતરી;
+	    તોડો;
 #endif
 	    // FALLTHROUGH
-	case CT_NONE:
+	સ્થિતિ CT_NONE:
 	    instr = dfunc->df_instr;
-	    instr_count = dfunc->df_instr_count;
-	    break;
-	case CT_DEBUG:
+	    instr_ગણતરી = dfunc->df_instr_ગણતરી;
+	    તોડો;
+	સ્થિતિ CT_DEBUG:
 	    instr = dfunc->df_instr_debug;
-	    instr_count = dfunc->df_instr_debug_count;
-	    break;
+	    instr_ગણતરી = dfunc->df_instr_debug_ગણતરી;
+	    તોડો;
     }
 
-    list_instructions("", instr, instr_count, ufunc);
+    list_instructions("", instr, instr_ગણતરી, ufunc);
 }
 
 /*
@@ -8249,84 +8249,84 @@ ex_disassemble(exarg_T *eap)
  * list, etc.  Mostly like what JavaScript does, except that empty list and
  * empty dictionary are FALSE.
  */
-    int
+    પૂર્ણાંક
 tv2bool(typval_T *tv)
 {
-    switch (tv->v_type)
+    પસંદગી (tv->v_type)
     {
-	case VAR_NUMBER:
-	    return tv->vval.v_number != 0;
-	case VAR_FLOAT:
-	    return tv->vval.v_float != 0.0;
-	case VAR_PARTIAL:
-	    return tv->vval.v_partial != NULL;
-	case VAR_FUNC:
-	case VAR_STRING:
-	    return tv->vval.v_string != NULL && *tv->vval.v_string != NUL;
-	case VAR_LIST:
-	    return tv->vval.v_list != NULL && tv->vval.v_list->lv_len > 0;
-	case VAR_TUPLE:
-	    return tuple_len(tv->vval.v_tuple) > 0;
-	case VAR_DICT:
-	    return tv->vval.v_dict != NULL
+	સ્થિતિ VAR_સંખ્યા:
+	    પાછા tv->vval.v_સંખ્યા != 0;
+	સ્થિતિ VAR_FLOAT:
+	    પાછા tv->vval.v_float != 0.0;
+	સ્થિતિ VAR_PARTIAL:
+	    પાછા tv->vval.v_partial != ખાલી;
+	સ્થિતિ VAR_FUNC:
+	સ્થિતિ VAR_STRING:
+	    પાછા tv->vval.v_string != ખાલી && *tv->vval.v_string != NUL;
+	સ્થિતિ VAR_LIST:
+	    પાછા tv->vval.v_list != ખાલી && tv->vval.v_list->lv_len > 0;
+	સ્થિતિ VAR_TUPLE:
+	    પાછા tuple_len(tv->vval.v_tuple) > 0;
+	સ્થિતિ VAR_DICT:
+	    પાછા tv->vval.v_dict != ખાલી
 				    && tv->vval.v_dict->dv_hashtab.ht_used > 0;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    return tv->vval.v_number == VVAL_TRUE ? TRUE : FALSE;
-	case VAR_JOB:
+	સ્થિતિ VAR_BOOL:
+	સ્થિતિ VAR_SPECIAL:
+	    પાછા tv->vval.v_સંખ્યા == VVAL_TRUE ? TRUE : FALSE;
+	સ્થિતિ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv->vval.v_job != NULL;
-#else
-	    break;
+	    પાછા tv->vval.v_job != ખાલી;
+#નહીંતર
+	    તોડો;
 #endif
-	case VAR_CHANNEL:
+	સ્થિતિ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv->vval.v_channel != NULL;
-#else
-	    break;
+	    પાછા tv->vval.v_channel != ખાલી;
+#નહીંતર
+	    તોડો;
 #endif
-	case VAR_BLOB:
-	    return tv->vval.v_blob != NULL && tv->vval.v_blob->bv_ga.ga_len > 0;
+	સ્થિતિ VAR_BLOB:
+	    પાછા tv->vval.v_blob != ખાલી && tv->vval.v_blob->bv_ga.ga_len > 0;
 
-	case VAR_OBJECT:
-	    return tv->vval.v_object != NULL;
+	સ્થિતિ VAR_OBJECT:
+	    પાછા tv->vval.v_object != ખાલી;
 
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    check_typval_is_value(tv);
-	    break;
+	સ્થિતિ VAR_CLASS:
+	સ્થિતિ VAR_TYPEALIAS:
+	    check_typval_is_કિંમત(tv);
+	    તોડો;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_INSTR:
-	    break;
+	સ્થિતિ VAR_UNKNOWN:
+	સ્થિતિ VAR_ANY:
+	સ્થિતિ VAR_VOID:
+	સ્થિતિ VAR_INSTR:
+	    તોડો;
     }
-    return FALSE;
+    પાછા FALSE;
 }
 
-    void
-emsg_using_string_as(typval_T *tv, int as_number)
+    શૂન્ય
+emsg_using_string_as(typval_T *tv, પૂર્ણાંક as_સંખ્યા)
 {
-    semsg(_(as_number ? e_using_string_as_number_str
+    semsg(_(as_સંખ્યા ? e_using_string_as_સંખ્યા_str
 						 : e_using_string_as_bool_str),
-		       tv->vval.v_string == NULL
+		       tv->vval.v_string == ખાલી
 					   ? (char_u *)"" : tv->vval.v_string);
 }
 
 /*
  * If "tv" is a string give an error and return FAIL.
  */
-    int
+    પૂર્ણાંક
 check_not_string(typval_T *tv)
 {
-    if (tv->v_type == VAR_STRING)
+    જો (tv->v_type == VAR_STRING)
     {
 	emsg_using_string_as(tv, TRUE);
 	clear_tv(tv);
-	return FAIL;
+	પાછા FAIL;
     }
-    return OK;
+    પાછા OK;
 }
 
 #endif // FEAT_EVAL

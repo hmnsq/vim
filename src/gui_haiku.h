@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+સંરચના BMenu;
+સંરચના BMenuItem;
+સંરચના BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+સંરચના VimApp;
+સંરચના VimFormView;
+સંરચના VimTextAreaView;
+સંરચના VimWindow;
+સંરચના VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+બાહ્ય પૂર્ણાંક vim_lock_screen();
+બાહ્ય શૂન્ય vim_unlock_screen();
 
 #ifndef __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+પ્રકારવ્યાખ્યા સંરચના BMenu BMenu;
+પ્રકારવ્યાખ્યા સંરચના BMenuItem BMenuItem;
+પ્રકારવ્યાખ્યા સંરચના BPictureButton BPictureButton;
+પ્રકારવ્યાખ્યા સંરચના VimWindow VimWindow;
+પ્રકારવ્યાખ્યા સંરચના VimFormView VimFormView;
+પ્રકારવ્યાખ્યા સંરચના VimTextAreaView VimTextAreaView;
+પ્રકારવ્યાખ્યા સંરચના VimApp VimApp;
+પ્રકારવ્યાખ્યા સંરચના VimScrollBar VimScrollBar;
 
 #endif

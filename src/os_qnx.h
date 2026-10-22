@@ -14,6 +14,6 @@
 
 #define POSIX	    // Used by pty.c
 
-#if defined(FEAT_GUI_PHOTON)
-extern int is_photon_available;
+#જો defined(FEAT_GUI_PHOTON)
+બાહ્ય પૂર્ણાંક is_photon_available;
 #endif

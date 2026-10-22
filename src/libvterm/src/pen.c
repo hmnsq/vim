@@ -1,16 +1,16 @@
-#include "vterm_internal.h"
+#અન્તર્ભાવ "vterm_internal.h"
 
-#include <stdio.h>
+#અન્તર્ભાવ <stdio.h>
 
 /**
  * Structure used to store RGB triples without the additional metadata stored in
  * VTermColor.
  */
-typedef struct {
+પ્રકારવ્યાખ્યા સંરચના {
   uint8_t red, green, blue;
 } VTermRGB;
 
-static const VTermRGB ansi_colors[] = {
+સ્થિર અચલ VTermRGB ansi_colors[] = {
   /* R    G    B */
   {   0,   0,   0 }, // black
   { 224,   0,   0 }, // red
@@ -32,17 +32,17 @@ static const VTermRGB ansi_colors[] = {
   { 255, 255, 255 }, // white for real
 };
 
-static int ramp6[] = {
+સ્થિર પૂર્ણાંક ramp6[] = {
   0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF,
 };
 
 // Use 0x81 instead of 0x80 to be able to distinguish from ansi black
-static int ramp24[] = {
+સ્થિર પૂર્ણાંક ramp24[] = {
   0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
   0x81, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE,
 };
 
-static void lookup_default_colour_ansi(long idx, VTermColor *col)
+સ્થિર શૂન્ય lookup_default_colour_ansi(long idx, VTermColor *col)
 {
   // VIM: store both RGB color and index
   vterm_color_rgb(
@@ -52,23 +52,23 @@ static void lookup_default_colour_ansi(long idx, VTermColor *col)
   col->type = VTERM_COLOR_INDEXED;
 }
 
-static int lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
+સ્થિર પૂર્ણાંક lookup_colour_ansi(અચલ VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  જો(index >= 0 && index < 16) {
     *col = state->colors[index];
-    return TRUE;
+    પાછા TRUE;
   }
 
-  return FALSE;
+  પાછા FALSE;
 }
 
-static int lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
+સ્થિર પૂર્ણાંક lookup_colour_palette(અચલ VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  જો(index >= 0 && index < 16) {
     // Normal 8 colours or high intensity - parse as palette 0
-    return lookup_colour_ansi(state, index, col);
+    પાછા lookup_colour_ansi(state, index, col);
   }
-  else if(index >= 16 && index < 232) {
+  નહીંતર જો(index >= 16 && index < 232) {
     // 216-colour cube
     index -= 16;
 
@@ -76,82 +76,82 @@ static int lookup_colour_palette(const VTermState *state, long index, VTermColor
                          ramp6[index/6   % 6],
                          ramp6[index     % 6]);
 
-    return TRUE;
+    પાછા TRUE;
   }
-  else if(index >= 232 && index < 256) {
+  નહીંતર જો(index >= 232 && index < 256) {
     // 24 greyscales
     index -= 232;
 
     vterm_color_rgb(col, ramp24[index], ramp24[index], ramp24[index]);
 
-    return TRUE;
+    પાછા TRUE;
   }
 
-  return FALSE;
+  પાછા FALSE;
 }
 
-static int lookup_colour(const VTermState *state, int palette, const long args[], int argcount, VTermColor *col)
+સ્થિર પૂર્ણાંક lookup_colour(અચલ VTermState *state, પૂર્ણાંક palette, અચલ long args[], પૂર્ણાંક argcount, VTermColor *col)
 {
-  switch(palette) {
-  case 2: // RGB mode - 3 args contain colour values directly
-    if(argcount < 3)
-      return argcount;
+  પસંદગી(palette) {
+  સ્થિતિ 2: // RGB mode - 3 args contain colour values directly
+    જો(argcount < 3)
+      પાછા argcount;
 
     vterm_color_rgb(col, (uint8_t)CSI_ARG(args[0]), (uint8_t)CSI_ARG(args[1]), (uint8_t)CSI_ARG(args[2]));
 
-    return 3;
+    પાછા 3;
 
-  case 5: // XTerm 256-colour mode
-    if (!argcount || CSI_ARG_IS_MISSING(args[0])) {
-      return argcount ? 1 : 0;
+  સ્થિતિ 5: // XTerm 256-colour mode
+    જો (!argcount || CSI_ARG_IS_MISSING(args[0])) {
+      પાછા argcount ? 1 : 0;
     }
 
     lookup_colour_palette(state, args[0], col);
-    return 1;
+    પાછા 1;
 
-  default:
+  મૂળભૂત:
     DEBUG_LOG1("Unrecognised colour palette %d\n", palette);
-    return 0;
+    પાછા 0;
   }
 }
 
 // Some conveniences
 
-static void setpenattr(VTermState *state, VTermAttr attr, VTermValueType type UNUSED, VTermValue *val)
+સ્થિર શૂન્ય setpenattr(VTermState *state, VTermAttr attr, VTerm_કિંમત_Type type UNUSED, VTerm_કિંમત *val)
 {
 #ifdef DEBUG
-  if(type != vterm_get_attr_type(attr)) {
+  જો(type != vterm_get_attr_type(attr)) {
     DEBUG_LOG3("Cannot set attr %d as it has type %d, not type %d\n",
         attr, vterm_get_attr_type(attr), type);
-    return;
+    પાછા;
   }
 #endif
-  if(state->callbacks && state->callbacks->setpenattr)
+  જો(state->callbacks && state->callbacks->setpenattr)
     (*state->callbacks->setpenattr)(attr, val, state->cbdata);
 }
 
-static void setpenattr_bool(VTermState *state, VTermAttr attr, int boolean)
+સ્થિર શૂન્ય setpenattr_bool(VTermState *state, VTermAttr attr, પૂર્ણાંક boolean)
 {
-  VTermValue val;
+  VTerm_કિંમત val;
   val.boolean = boolean;
   setpenattr(state, attr, VTERM_VALUETYPE_BOOL, &val);
 }
 
-static void setpenattr_int(VTermState *state, VTermAttr attr, int number)
+સ્થિર શૂન્ય setpenattr_int(VTermState *state, VTermAttr attr, પૂર્ણાંક સંખ્યા)
 {
-  VTermValue val;
-  val.number = number;
+  VTerm_કિંમત val;
+  val.સંખ્યા = સંખ્યા;
   setpenattr(state, attr, VTERM_VALUETYPE_INT, &val);
 }
 
-static void setpenattr_col(VTermState *state, VTermAttr attr, VTermColor color)
+સ્થિર શૂન્ય setpenattr_col(VTermState *state, VTermAttr attr, VTermColor color)
 {
-  VTermValue val;
+  VTerm_કિંમત val;
   val.color = color;
   setpenattr(state, attr, VTERM_VALUETYPE_COLOR, &val);
 }
 
-static void set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
+સ્થિર શૂન્ય set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
 {
   VTermColor *colp = (attr == VTERM_ATTR_BACKGROUND) ? &state->pen.bg : &state->pen.fg;
 
@@ -160,18 +160,18 @@ static void set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
   setpenattr_col(state, attr, *colp);
 }
 
-INTERNAL void vterm_state_newpen(VTermState *state)
+INTERNAL શૂન્ય vterm_state_newpen(VTermState *state)
 {
   // 90% grey so that pure white is brighter
   vterm_color_rgb(&state->default_fg, 240, 240, 240);
   vterm_color_rgb(&state->default_bg, 0, 0, 0);
   vterm_state_set_default_colors(state, &state->default_fg, &state->default_bg);
 
-  for(int col = 0; col < 16; col++)
+  માટે(પૂર્ણાંક col = 0; col < 16; col++)
     lookup_default_colour_ansi(col, &state->colors[col]);
 }
 
-INTERNAL void vterm_state_resetpen(VTermState *state)
+INTERNAL શૂન્ય vterm_state_resetpen(VTermState *state)
 {
   state->pen.bold = 0;      setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
   state->pen.underline = 0; setpenattr_int (state, VTERM_ATTR_UNDERLINE, 0);
@@ -188,12 +188,12 @@ INTERNAL void vterm_state_resetpen(VTermState *state)
   state->pen.bg = state->default_bg;  setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->default_bg);
 }
 
-INTERNAL void vterm_state_savepen(VTermState *state, int save)
+INTERNAL શૂન્ય vterm_state_savepen(VTermState *state, પૂર્ણાંક save)
 {
-  if(save) {
+  જો(save) {
     state->saved.pen = state->pen;
   }
-  else {
+  નહીંતર {
     state->pen = state->saved.pen;
 
     setpenattr_bool(state, VTERM_ATTR_BOLD,      state->pen.bold);
@@ -212,7 +212,7 @@ INTERNAL void vterm_state_savepen(VTermState *state, int save)
   }
 }
 
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
+શૂન્ય vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
 {
   col->type = VTERM_COLOR_RGB;
   col->red   = red;
@@ -220,239 +220,239 @@ void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
   col->blue  = blue;
 }
 
-void vterm_color_indexed(VTermColor *col, uint8_t idx)
+શૂન્ય vterm_color_indexed(VTermColor *col, uint8_t idx)
 {
   col->type = VTERM_COLOR_INDEXED;
   col->index = idx;
 }
 
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
+પૂર્ણાંક vterm_color_is_equal(અચલ VTermColor *a, અચલ VTermColor *b)
 {
   /* First make sure that the two colours are of the same type (RGB/Indexed) */
-  if (a->type != b->type) {
-    return FALSE;
+  જો (a->type != b->type) {
+    પાછા FALSE;
   }
 
   /* Depending on the type inspect the corresponding members */
-  if (VTERM_COLOR_IS_INDEXED(a)) {
-    return a->index == b->index;
+  જો (VTERM_COLOR_IS_INDEXED(a)) {
+    પાછા a->index == b->index;
   }
-  else if (VTERM_COLOR_IS_RGB(a)) {
-    return    (a->red   == b->red)
+  નહીંતર જો (VTERM_COLOR_IS_RGB(a)) {
+    પાછા    (a->red   == b->red)
            && (a->green == b->green)
            && (a->blue  == b->blue);
   }
 
-  return 0;
+  પાછા 0;
 }
 
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
+શૂન્ય vterm_state_get_default_colors(અચલ VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
 {
   *default_fg = state->default_fg;
   *default_bg = state->default_bg;
 }
 
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col)
+શૂન્ય vterm_state_get_palette_color(અચલ VTermState *state, પૂર્ણાંક index, VTermColor *col)
 {
   lookup_colour_palette(state, index, col);
 }
 
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg)
+શૂન્ય vterm_state_set_default_colors(VTermState *state, અચલ VTermColor *default_fg, અચલ VTermColor *default_bg)
 {
-  if(default_fg) {
+  જો(default_fg) {
     state->default_fg = *default_fg;
     state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg) {
+  જો(default_bg) {
     state->default_bg = *default_bg;
     state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_BG;
   }
 }
 
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col)
+શૂન્ય vterm_state_set_palette_color(VTermState *state, પૂર્ણાંક index, અચલ VTermColor *col)
 {
-  if(index >= 0 && index < 16)
+  જો(index >= 0 && index < 16)
     state->colors[index] = *col;
 }
 
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col)
+શૂન્ય vterm_state_convert_color_to_rgb(અચલ VTermState *state, VTermColor *col)
 {
-  if (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
+  જો (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
     lookup_colour_palette(state, col->index, col);
   }
   col->type &= VTERM_COLOR_TYPE_MASK; /* Reset any metadata but the type */
 }
 
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright)
+શૂન્ય vterm_state_set_bold_highbright(VTermState *state, પૂર્ણાંક bold_is_highbright)
 {
   state->bold_is_highbright = bold_is_highbright;
 }
 
-INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argcount)
+INTERNAL શૂન્ય vterm_state_setpen(VTermState *state, અચલ long args[], પૂર્ણાંક argcount)
 {
   // SGR - ECMA-48 8.3.117
 
-  int argi = 0;
-  int value;
+  પૂર્ણાંક argi = 0;
+  પૂર્ણાંક કિંમત;
 
-  while(argi < argcount) {
+  જ્યારે(argi < argcount) {
     // This logic is easier to do 'done' backwards; set it true, and make it
     // false again in the 'default' case
-    int done = 1;
+    પૂર્ણાંક done = 1;
 
     long arg;
-    switch(arg = CSI_ARG(args[argi])) {
-    case CSI_ARG_MISSING:
-    case 0: // Reset
+    પસંદગી(arg = CSI_ARG(args[argi])) {
+    સ્થિતિ CSI_ARG_MISSING:
+    સ્થિતિ 0: // Reset
       vterm_state_resetpen(state);
-      break;
+      તોડો;
 
-    case 1: { // Bold on
-      const VTermColor *fg = &state->pen.fg;
+    સ્થિતિ 1: { // Bold on
+      અચલ VTermColor *fg = &state->pen.fg;
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
-      if(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
+      જો(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, fg->index + (state->pen.bold ? 8 : 0));
-      break;
+      તોડો;
     }
 
-    case 3: // Italic on
+    સ્થિતિ 3: // Italic on
       state->pen.italic = 1;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 1);
-      break;
+      તોડો;
 
-    case 4: // Underline
+    સ્થિતિ 4: // Underline
       state->pen.underline = VTERM_UNDERLINE_SINGLE;
-      if(CSI_ARG_HAS_MORE(args[argi])) {
+      જો(CSI_ARG_HAS_MORE(args[argi])) {
         argi++;
-        switch(CSI_ARG(args[argi])) {
-          case 0:
+        પસંદગી(CSI_ARG(args[argi])) {
+          સ્થિતિ 0:
             state->pen.underline = 0;
-            break;
-          case 1:
+            તોડો;
+          સ્થિતિ 1:
             state->pen.underline = VTERM_UNDERLINE_SINGLE;
-            break;
-          case 2:
+            તોડો;
+          સ્થિતિ 2:
             state->pen.underline = VTERM_UNDERLINE_DOUBLE;
-            break;
-          case 3:
+            તોડો;
+          સ્થિતિ 3:
             state->pen.underline = VTERM_UNDERLINE_CURLY;
-            break;
+            તોડો;
         }
       }
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      તોડો;
 
-    case 5: // Blink
+    સ્થિતિ 5: // Blink
       state->pen.blink = 1;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 1);
-      break;
+      તોડો;
 
-    case 7: // Reverse on
+    સ્થિતિ 7: // Reverse on
       state->pen.reverse = 1;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 1);
-      break;
+      તોડો;
 
-    case 8: // Conceal on
+    સ્થિતિ 8: // Conceal on
       state->pen.conceal = 1;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 1);
-      break;
+      તોડો;
 
-    case 9: // Strikethrough on
+    સ્થિતિ 9: // Strikethrough on
       state->pen.strike = 1;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 1);
-      break;
+      તોડો;
 
-    case 10: case 11: case 12: case 13: case 14:
-    case 15: case 16: case 17: case 18: case 19: // Select font
+    સ્થિતિ 10: સ્થિતિ 11: સ્થિતિ 12: સ્થિતિ 13: સ્થિતિ 14:
+    સ્થિતિ 15: સ્થિતિ 16: સ્થિતિ 17: સ્થિતિ 18: સ્થિતિ 19: // Select font
       state->pen.font = CSI_ARG(args[argi]) - 10;
       setpenattr_int(state, VTERM_ATTR_FONT, state->pen.font);
-      break;
+      તોડો;
 
-    case 21: // Underline double
+    સ્થિતિ 21: // Underline double
       state->pen.underline = VTERM_UNDERLINE_DOUBLE;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      તોડો;
 
-    case 22: // Bold off
+    સ્થિતિ 22: // Bold off
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
-      break;
+      તોડો;
 
-    case 23: // Italic and Gothic (currently unsupported) off
+    સ્થિતિ 23: // Italic and Gothic (currently unsupported) off
       state->pen.italic = 0;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 0);
-      break;
+      તોડો;
 
-    case 24: // Underline off
+    સ્થિતિ 24: // Underline off
       state->pen.underline = 0;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, 0);
-      break;
+      તોડો;
 
-    case 25: // Blink off
+    સ્થિતિ 25: // Blink off
       state->pen.blink = 0;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 0);
-      break;
+      તોડો;
 
-    case 27: // Reverse off
+    સ્થિતિ 27: // Reverse off
       state->pen.reverse = 0;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
-      break;
+      તોડો;
 
-    case 28: // Conceal off (Reveal)
+    સ્થિતિ 28: // Conceal off (Reveal)
       state->pen.conceal = 0;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 0);
-      break;
+      તોડો;
 
-    case 29: // Strikethrough off
+    સ્થિતિ 29: // Strikethrough off
       state->pen.strike = 0;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
-      break;
+      તોડો;
 
-    case 30: case 31: case 32: case 33:
-    case 34: case 35: case 36: case 37: // Foreground colour palette
-      value = CSI_ARG(args[argi]) - 30;
-      if(state->pen.bold && state->bold_is_highbright)
-        value += 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    સ્થિતિ 30: સ્થિતિ 31: સ્થિતિ 32: સ્થિતિ 33:
+    સ્થિતિ 34: સ્થિતિ 35: સ્થિતિ 36: સ્થિતિ 37: // Foreground colour palette
+      કિંમત = CSI_ARG(args[argi]) - 30;
+      જો(state->pen.bold && state->bold_is_highbright)
+        કિંમત += 8;
+      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, કિંમત);
+      તોડો;
 
-    case 38: // Foreground colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    સ્થિતિ 38: // Foreground colour alternative palette
+      જો(argcount - argi < 1)
+        પાછા;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.fg);
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      તોડો;
 
-    case 39: // Foreground colour default
+    સ્થિતિ 39: // Foreground colour default
       state->pen.fg = state->default_fg;
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      તોડો;
 
-    case 40: case 41: case 42: case 43:
-    case 44: case 45: case 46: case 47: // Background colour palette
-      value = CSI_ARG(args[argi]) - 40;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    સ્થિતિ 40: સ્થિતિ 41: સ્થિતિ 42: સ્થિતિ 43:
+    સ્થિતિ 44: સ્થિતિ 45: સ્થિતિ 46: સ્થિતિ 47: // Background colour palette
+      કિંમત = CSI_ARG(args[argi]) - 40;
+      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, કિંમત);
+      તોડો;
 
-    case 48: // Background colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    સ્થિતિ 48: // Background colour alternative palette
+      જો(argcount - argi < 1)
+        પાછા;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.bg);
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      તોડો;
 
-    case 49: // Default background
+    સ્થિતિ 49: // Default background
       state->pen.bg = state->default_bg;
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      તોડો;
 
-    case 73: // Superscript
-    case 74: // Subscript
-    case 75: // Superscript/subscript off
+    સ્થિતિ 73: // Superscript
+    સ્થિતિ 74: // Subscript
+    સ્થિતિ 75: // Superscript/subscript off
       state->pen.small = (arg != 75);
       state->pen.baseline =
         (arg == 73) ? VTERM_BASELINE_RAISE :
@@ -460,169 +460,169 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
                       VTERM_BASELINE_NORMAL;
       setpenattr_bool(state, VTERM_ATTR_SMALL,    state->pen.small);
       setpenattr_int (state, VTERM_ATTR_BASELINE, state->pen.baseline);
-      break;
+      તોડો;
 
-    case 90: case 91: case 92: case 93:
-    case 94: case 95: case 96: case 97: // Foreground colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 90 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    સ્થિતિ 90: સ્થિતિ 91: સ્થિતિ 92: સ્થિતિ 93:
+    સ્થિતિ 94: સ્થિતિ 95: સ્થિતિ 96: સ્થિતિ 97: // Foreground colour high-intensity palette
+      કિંમત = CSI_ARG(args[argi]) - 90 + 8;
+      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, કિંમત);
+      તોડો;
 
-    case 100: case 101: case 102: case 103:
-    case 104: case 105: case 106: case 107: // Background colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 100 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    સ્થિતિ 100: સ્થિતિ 101: સ્થિતિ 102: સ્થિતિ 103:
+    સ્થિતિ 104: સ્થિતિ 105: સ્થિતિ 106: સ્થિતિ 107: // Background colour high-intensity palette
+      કિંમત = CSI_ARG(args[argi]) - 100 + 8;
+      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, કિંમત);
+      તોડો;
 
-    default:
+    મૂળભૂત:
       done = 0;
-      break;
+      તોડો;
     }
 
-    if(!done)
+    જો(!done)
     {
       DEBUG_LOG1("libvterm: Unhandled CSI SGR %ld\n", arg);
     }
 
-    while(CSI_ARG_HAS_MORE(args[argi++]))
+    જ્યારે(CSI_ARG_HAS_MORE(args[argi++]))
       ;
   }
 }
 
-static int vterm_state_getpen_color(const VTermColor *col, int argi, long args[], int fg)
+સ્થિર પૂર્ણાંક vterm_state_getpen_color(અચલ VTermColor *col, પૂર્ણાંક argi, long args[], પૂર્ણાંક fg)
 {
     /* Do nothing if the given color is the default color */
-    if (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
+    જો (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
         (!fg && VTERM_COLOR_IS_DEFAULT_BG(col))) {
-        return argi;
+        પાછા argi;
     }
 
     /* Decide whether to send an indexed color or an RGB color */
-    if (VTERM_COLOR_IS_INDEXED(col)) {
-        const uint8_t idx = col->index;
-        if (idx < 8) {
+    જો (VTERM_COLOR_IS_INDEXED(col)) {
+        અચલ uint8_t idx = col->index;
+        જો (idx < 8) {
             args[argi++] = (idx + (fg ? 30 : 40));
         }
-        else if (idx < 16) {
+        નહીંતર જો (idx < 16) {
             args[argi++] = (idx - 8 + (fg ? 90 : 100));
         }
-        else {
+        નહીંતર {
             args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
             args[argi++] = CSI_ARG_FLAG_MORE | 5;
             args[argi++] = idx;
         }
     }
-    else if (VTERM_COLOR_IS_RGB(col)) {
+    નહીંતર જો (VTERM_COLOR_IS_RGB(col)) {
         args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
         args[argi++] = CSI_ARG_FLAG_MORE | 2;
         args[argi++] = CSI_ARG_FLAG_MORE | col->red;
         args[argi++] = CSI_ARG_FLAG_MORE | col->green;
         args[argi++] = col->blue;
     }
-    return argi;
+    પાછા argi;
 }
 
-INTERNAL int vterm_state_getpen(VTermState *state, long args[], int argcount UNUSED)
+INTERNAL પૂર્ણાંક vterm_state_getpen(VTermState *state, long args[], પૂર્ણાંક argcount UNUSED)
 {
-  int argi = 0;
+  પૂર્ણાંક argi = 0;
 
-  if(state->pen.bold)
+  જો(state->pen.bold)
     args[argi++] = 1;
 
-  if(state->pen.italic)
+  જો(state->pen.italic)
     args[argi++] = 3;
 
-  if(state->pen.underline == VTERM_UNDERLINE_SINGLE)
+  જો(state->pen.underline == VTERM_UNDERLINE_SINGLE)
     args[argi++] = 4;
-  if(state->pen.underline == VTERM_UNDERLINE_CURLY)
+  જો(state->pen.underline == VTERM_UNDERLINE_CURLY)
     args[argi++] = 4 | CSI_ARG_FLAG_MORE, args[argi++] = 3;
 
-  if(state->pen.blink)
+  જો(state->pen.blink)
     args[argi++] = 5;
 
-  if(state->pen.reverse)
+  જો(state->pen.reverse)
     args[argi++] = 7;
 
-  if(state->pen.conceal)
+  જો(state->pen.conceal)
     args[argi++] = 8;
 
-  if(state->pen.strike)
+  જો(state->pen.strike)
     args[argi++] = 9;
 
-  if(state->pen.font)
+  જો(state->pen.font)
     args[argi++] = 10 + state->pen.font;
 
-  if(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
+  જો(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
     args[argi++] = 21;
 
   argi = vterm_state_getpen_color(&state->pen.fg, argi, args, TRUE);
 
   argi = vterm_state_getpen_color(&state->pen.bg, argi, args, FALSE);
 
-  if(state->pen.small) {
-    if(state->pen.baseline == VTERM_BASELINE_RAISE)
+  જો(state->pen.small) {
+    જો(state->pen.baseline == VTERM_BASELINE_RAISE)
       args[argi++] = 73;
-    else if(state->pen.baseline == VTERM_BASELINE_LOWER)
+    નહીંતર જો(state->pen.baseline == VTERM_BASELINE_LOWER)
       args[argi++] = 74;
   }
 
-  return argi;
+  પાછા argi;
 }
 
-int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
+પૂર્ણાંક vterm_state_get_penattr(અચલ VTermState *state, VTermAttr attr, VTerm_કિંમત *val)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  પસંદગી(attr) {
+  સ્થિતિ VTERM_ATTR_BOLD:
     val->boolean = state->pen.bold;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_UNDERLINE:
-    val->number = state->pen.underline;
-    return 1;
+  સ્થિતિ VTERM_ATTR_UNDERLINE:
+    val->સંખ્યા = state->pen.underline;
+    પાછા 1;
 
-  case VTERM_ATTR_ITALIC:
+  સ્થિતિ VTERM_ATTR_ITALIC:
     val->boolean = state->pen.italic;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_BLINK:
+  સ્થિતિ VTERM_ATTR_BLINK:
     val->boolean = state->pen.blink;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_REVERSE:
+  સ્થિતિ VTERM_ATTR_REVERSE:
     val->boolean = state->pen.reverse;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_CONCEAL:
+  સ્થિતિ VTERM_ATTR_CONCEAL:
     val->boolean = state->pen.conceal;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_STRIKE:
+  સ્થિતિ VTERM_ATTR_STRIKE:
     val->boolean = state->pen.strike;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_FONT:
-    val->number = state->pen.font;
-    return 1;
+  સ્થિતિ VTERM_ATTR_FONT:
+    val->સંખ્યા = state->pen.font;
+    પાછા 1;
 
-  case VTERM_ATTR_FOREGROUND:
+  સ્થિતિ VTERM_ATTR_FOREGROUND:
     val->color = state->pen.fg;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_BACKGROUND:
+  સ્થિતિ VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_SMALL:
+  સ્થિતિ VTERM_ATTR_SMALL:
     val->boolean = state->pen.small;
-    return 1;
+    પાછા 1;
 
-  case VTERM_ATTR_BASELINE:
-    val->number = state->pen.baseline;
-    return 1;
+  સ્થિતિ VTERM_ATTR_BASELINE:
+    val->સંખ્યા = state->pen.baseline;
+    પાછા 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  સ્થિતિ VTERM_N_ATTRS:
+    પાછા 0;
   }
 
-  return 0;
+  પાછા 0;
 }

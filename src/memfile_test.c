@@ -13,121 +13,121 @@
  */
 
 #undef NDEBUG
-#include <assert.h>
+#અન્તર્ભાવ <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#અન્તર્ભાવ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#અન્તર્ભાવ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#define index_to_ચાવી(i) ((i) ^ 15167)
+#define TEST_ગણતરી 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    સ્થિર શૂન્ય
+test_mf_hash(શૂન્ય)
 {
     mf_hashtab_T   ht;
     mf_hashitem_T  *item;
-    blocknr_T      key;
+    blocknr_T      ચાવી;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   અંક_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    માટે (i = 0; i < TEST_ગણતરી; i++)
     {
-	assert(ht.mht_count == i);
+	પ્રતિજ્ઞા(ht.mht_ગણતરી == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	અંક_buckets = ht.mht_mask + 1;
+	પ્રતિજ્ઞા(અંક_buckets > 0 && (અંક_buckets & (અંક_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	પ્રતિજ્ઞા(ht.mht_ગણતરી <= (અંક_buckets << MHT_LOG_LOAD_FACTOR));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	જો (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    પ્રતિજ્ઞા(અંક_buckets == MHT_INIT_SIZE);
+	    પ્રતિજ્ઞા(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	નહીંતર
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    પ્રતિજ્ઞા(અંક_buckets > MHT_INIT_SIZE);
+	    પ્રતિજ્ઞા(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	ચાવી = index_to_ચાવી(i);
+	પ્રતિજ્ઞા(mf_hash_find(&ht, ચાવી) == ખાલી);
 
 	// allocate and add new item
 	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
+	પ્રતિજ્ઞા(item != ખાલી);
+	item->mhi_ચાવી = ચાવી;
 	mf_hash_add_item(&ht, item);
 
-	assert(mf_hash_find(&ht, key) == item);
+	પ્રતિજ્ઞા(mf_hash_find(&ht, ચાવી) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	જો (ht.mht_mask + 1 != અંક_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    પ્રતિજ્ઞા(ht.mht_mask + 1 == અંક_buckets * MHT_GROWTH_FACTOR);
+	    પ્રતિજ્ઞા(i + 1 == (અંક_buckets << MHT_LOG_LOAD_FACTOR));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    માટે (i = 0; i < TEST_ગણતરી; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	ચાવી = index_to_ચાવી(i);
+	item = mf_hash_find(&ht, ચાવી);
+	પ્રતિજ્ઞા(item != ખાલી);
+	પ્રતિજ્ઞા(item->mhi_ચાવી == ચાવી);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    માટે (i = 0; i < TEST_ગણતરી; i++)
     {
-	if (i % 100 < 70)
+	જો (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ચાવી = index_to_ચાવી(i);
+	    item = mf_hash_find(&ht, ચાવી);
+	    પ્રતિજ્ઞા(item != ખાલી);
+	    પ્રતિજ્ઞા(item->mhi_ચાવી == ચાવી);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    પ્રતિજ્ઞા(mf_hash_find(&ht, ચાવી) == ખાલી);
 
 	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    પ્રતિજ્ઞા(mf_hash_find(&ht, ચાવી) == item);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    પ્રતિજ્ઞા(mf_hash_find(&ht, ચાવી) == ખાલી);
 
 	    vim_free(item);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    માટે (i = 0; i < TEST_ગણતરી; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	ચાવી = index_to_ચાવી(i);
+	item = mf_hash_find(&ht, ચાવી);
 
-	if (i % 100 < 70)
+	જો (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    પ્રતિજ્ઞા(item == ખાલી);
 	}
-	else
+	નહીંતર
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    પ્રતિજ્ઞા(item != ખાલી);
+	    પ્રતિજ્ઞા(item->mhi_ચાવી == ચાવી);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    પૂર્ણાંક
+મુખ્ય(શૂન્ય)
 {
     test_mf_hash();
-    return 0;
+    પાછા 0;
 }

@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned પૂર્ણાંક utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#જો defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned પૂર્ણાંક utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  જો(codepoint < 0x0000080) પાછા 1;
+  જો(codepoint < 0x0000800) પાછા 2;
+  જો(codepoint < 0x0010000) પાછા 3;
+  જો(codepoint < 0x0200000) પાછા 4;
+  જો(codepoint < 0x4000000) પાછા 5;
+  પાછા 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+પૂર્ણાંક fill_utf8(long codepoint, અક્ષર *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#જો defined(DEFINE_INLINES) || USE_INLINE
+INLINE પૂર્ણાંક fill_utf8(long codepoint, અક્ષર *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  પૂર્ણાંક nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  પૂર્ણાંક b = nbytes;
+  જ્યારે(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  પસંદગી(nbytes) {
+    સ્થિતિ 1: str[0] =        (codepoint & 0x7f); તોડો;
+    સ્થિતિ 2: str[0] = 0xc0 | (codepoint & 0x1f); તોડો;
+    સ્થિતિ 3: str[0] = 0xe0 | (codepoint & 0x0f); તોડો;
+    સ્થિતિ 4: str[0] = 0xf0 | (codepoint & 0x07); તોડો;
+    સ્થિતિ 5: str[0] = 0xf8 | (codepoint & 0x03); તોડો;
+    સ્થિતિ 6: str[0] = 0xfc | (codepoint & 0x01); તોડો;
   }
 
-  return nbytes;
+  પાછા nbytes;
 }
 #endif
 /* end copy */

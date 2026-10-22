@@ -11,34 +11,34 @@
  * testing.c: Support for tests.
  */
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 
 /*
  * Prepare "gap" for an assert error and add the sourcing position.
  */
-    static void
+    સ્થિર શૂન્ય
 prepare_assert_error(garray_T *gap)
 {
     char_u  *sname = estack_sfile(ESTACK_NONE);
 
     ga_init2(gap, 1, 100);
-    if (sname != NULL)
+    જો (sname != ખાલી)
     {
 	ga_concat(gap, sname);
-	if (SOURCING_LNUM > 0)
+	જો (SOURCING_LNUM > 0)
 	    GA_CONCAT_LITERAL(gap, " ");
     }
-    if (SOURCING_LNUM > 0)
+    જો (SOURCING_LNUM > 0)
     {
-	char    buf[NUMBUFLEN];
+	અક્ષર    buf[NUMBUFLEN];
 	size_t	buflen;
 
-	buflen = vim_snprintf_safelen(buf, sizeof(buf), "line %ld", (long)SOURCING_LNUM);
+	buflen = vim_snprintf_safelen(buf, કદ(buf), "line %ld", (long)SOURCING_LNUM);
 	ga_concat_len(gap, (char_u *)buf, buflen);
     }
-    if (sname != NULL || SOURCING_LNUM > 0)
+    જો (sname != ખાલી || SOURCING_LNUM > 0)
 	GA_CONCAT_LITERAL(gap, ": ");
     vim_free(sname);
 }
@@ -47,40 +47,40 @@ prepare_assert_error(garray_T *gap)
  * Append "p[clen]" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
-ga_concat_esc(garray_T *gap, char_u *p, int clen)
+    સ્થિર શૂન્ય
+ga_concat_esc(garray_T *gap, char_u *p, પૂર્ણાંક clen)
 {
     char_u  buf[NUMBUFLEN];
 
-    if (clen > 1)
+    જો (clen > 1)
     {
 	mch_memmove(buf, p, clen);
 	buf[clen] = NUL;
 	ga_concat_len(gap, buf, clen);
-	return;
+	પાછા;
     }
 
-    switch (*p)
+    પસંદગી (*p)
     {
-	case BS: GA_CONCAT_LITERAL(gap, "\\b"); break;
-	case ESC: GA_CONCAT_LITERAL(gap, "\\e"); break;
-	case FF: GA_CONCAT_LITERAL(gap, "\\f"); break;
-	case NL: GA_CONCAT_LITERAL(gap, "\\n"); break;
-	case TAB: GA_CONCAT_LITERAL(gap, "\\t"); break;
-	case CAR: GA_CONCAT_LITERAL(gap, "\\r"); break;
-	case '\\': GA_CONCAT_LITERAL(gap, "\\\\"); break;
-	default:
-	   if (*p < ' ' || *p == 0x7f)
+	સ્થિતિ BS: GA_CONCAT_LITERAL(gap, "\\b"); તોડો;
+	સ્થિતિ ESC: GA_CONCAT_LITERAL(gap, "\\e"); તોડો;
+	સ્થિતિ FF: GA_CONCAT_LITERAL(gap, "\\f"); તોડો;
+	સ્થિતિ NL: GA_CONCAT_LITERAL(gap, "\\n"); તોડો;
+	સ્થિતિ TAB: GA_CONCAT_LITERAL(gap, "\\t"); તોડો;
+	સ્થિતિ CAR: GA_CONCAT_LITERAL(gap, "\\r"); તોડો;
+	સ્થિતિ '\\': GA_CONCAT_LITERAL(gap, "\\\\"); તોડો;
+	મૂળભૂત:
+	   જો (*p < ' ' || *p == 0x7f)
 	   {
 		size_t	buflen;
 
-		buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+		buflen = vim_snprintf_safelen((અક્ષર *)buf, કદ(buf),
 		    "\\x%02x", *p);
 		ga_concat_len(gap, buf, buflen);
 	   }
-	   else
+	   નહીંતર
 	       ga_append(gap, *p);
-	   break;
+	   તોડો;
     }
 }
 
@@ -88,46 +88,46 @@ ga_concat_esc(garray_T *gap, char_u *p, int clen)
  * Append "str" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
+    સ્થિર શૂન્ય
 ga_concat_shorten_esc(garray_T *gap, char_u *str)
 {
     char_u  *p;
     char_u  *s;
-    int	    c;
-    int	    clen;
+    પૂર્ણાંક	    c;
+    પૂર્ણાંક	    clen;
     char_u  buf[NUMBUFLEN];
     size_t  buflen;
-    int	    same_len;
+    પૂર્ણાંક	    same_len;
 
-    if (str == NULL)
+    જો (str == ખાલી)
     {
 	GA_CONCAT_LITERAL(gap, "NULL");
-	return;
+	પાછા;
     }
 
-    for (p = str; *p != NUL; )
+    માટે (p = str; *p != NUL; )
     {
 	same_len = 1;
 	s = p;
 	c = mb_cptr2char_adv(&s);
 	clen = s - p;
-	while (*s != NUL && c == mb_ptr2char(s))
+	જ્યારે (*s != NUL && c == mb_ptr2char(s))
 	{
 	    ++same_len;
 	    s += clen;
 	}
-	if (same_len > 20)
+	જો (same_len > 20)
 	{
 	    GA_CONCAT_LITERAL(gap, "\\[");
 	    ga_concat_esc(gap, p, clen);
 	    GA_CONCAT_LITERAL(gap, " occurs ");
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((અક્ષર *)buf, કદ(buf),
 		"%d", same_len);
 	    ga_concat_len(gap, buf, buflen);
 	    GA_CONCAT_LITERAL(gap, " times]");
 	    p = s;
 	}
-	else
+	નહીંતર
 	{
 	    ga_concat_esc(gap, p, clen);
 	    p += clen;
@@ -138,10 +138,10 @@ ga_concat_shorten_esc(garray_T *gap, char_u *str)
 /*
  * Fill "gap" with information about an assert error.
  */
-    static void
+    સ્થિર શૂન્ય
 fill_assert_error(
     garray_T	*gap,
-    typval_T	*opt_msg_tv,
+    typval_T	*opt_સંદેશ_tv,
     char_u      *exp_str,
     typval_T	*exp_tv_arg,
     typval_T	*got_tv_arg,
@@ -151,84 +151,84 @@ fill_assert_error(
     char_u	*tofree;
     typval_T	*exp_tv = exp_tv_arg;
     typval_T	*got_tv = got_tv_arg;
-    int		did_copy = FALSE;
-    int		omitted = 0;
+    પૂર્ણાંક		did_copy = FALSE;
+    પૂર્ણાંક		omitted = 0;
 
-    if (opt_msg_tv->v_type != VAR_UNKNOWN
-	    && !(opt_msg_tv->v_type == VAR_STRING
-		&& (opt_msg_tv->vval.v_string == NULL
-		    || *opt_msg_tv->vval.v_string == NUL)))
+    જો (opt_સંદેશ_tv->v_type != VAR_UNKNOWN
+	    && !(opt_સંદેશ_tv->v_type == VAR_STRING
+		&& (opt_સંદેશ_tv->vval.v_string == ખાલી
+		    || *opt_સંદેશ_tv->vval.v_string == NUL)))
     {
-	ga_concat(gap, echo_string(opt_msg_tv, &tofree, numbuf, 0));
+	ga_concat(gap, echo_string(opt_સંદેશ_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 	GA_CONCAT_LITERAL(gap, ": ");
     }
 
-    if (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
+    જો (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
 	GA_CONCAT_LITERAL(gap, "Pattern ");
-    else if (atype == ASSERT_NOTEQUAL)
+    નહીંતર જો (atype == ASSERT_NOTEQUAL)
 	GA_CONCAT_LITERAL(gap, "Expected not equal to ");
-    else
+    નહીંતર
 	GA_CONCAT_LITERAL(gap, "Expected ");
-    if (exp_str == NULL)
+    જો (exp_str == ખાલી)
     {
 	// When comparing dictionaries, drop the items that are equal, so that
 	// it's a lot easier to see what differs.
-	if (atype != ASSERT_NOTEQUAL
+	જો (atype != ASSERT_NOTEQUAL
 		&& exp_tv->v_type == VAR_DICT && got_tv->v_type == VAR_DICT
-		&& exp_tv->vval.v_dict != NULL && got_tv->vval.v_dict != NULL)
+		&& exp_tv->vval.v_dict != ખાલી && got_tv->vval.v_dict != ખાલી)
 	{
 	    dict_T	*exp_d = exp_tv->vval.v_dict;
 	    dict_T	*got_d = got_tv->vval.v_dict;
 	    hashitem_T	*hi;
 	    dictitem_T	*item2;
-	    int		todo;
+	    પૂર્ણાંક		todo;
 
 	    did_copy = TRUE;
 	    exp_tv->vval.v_dict = dict_alloc();
 	    got_tv->vval.v_dict = dict_alloc();
-	    if (exp_tv->vval.v_dict == NULL || got_tv->vval.v_dict == NULL)
+	    જો (exp_tv->vval.v_dict == ખાલી || got_tv->vval.v_dict == ખાલી)
 	    {
 		dict_unref(exp_tv->vval.v_dict);
-		exp_tv->vval.v_dict = NULL;
+		exp_tv->vval.v_dict = ખાલી;
 		dict_unref(got_tv->vval.v_dict);
-		got_tv->vval.v_dict = NULL;
-		return;
+		got_tv->vval.v_dict = ખાલી;
+		પાછા;
 	    }
 
-	    todo = (int)exp_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&exp_d->dv_hashtab, hi, todo)
+	    todo = (પૂર્ણાંક)exp_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_વસ્તુઓ(&exp_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		જો (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(got_d, hi->hi_key, -1);
-		    if (item2 == NULL || !tv_equal(&HI2DI(hi)->di_tv,
+		    item2 = dict_find(got_d, hi->hi_ચાવી, -1);
+		    જો (item2 == ખાલી || !tv_equal(&HI2DI(hi)->di_tv,
 						  &item2->di_tv, FALSE))
 		    {
 			// item of exp_d not present in got_d or values differ.
 			dict_add_tv(exp_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
-			if (item2 != NULL)
+					(અક્ષર *)hi->hi_ચાવી, &HI2DI(hi)->di_tv);
+			જો (item2 != ખાલી)
 			    dict_add_tv(got_tv->vval.v_dict,
-					    (char *)hi->hi_key, &item2->di_tv);
+					    (અક્ષર *)hi->hi_ચાવી, &item2->di_tv);
 		    }
-		    else
+		    નહીંતર
 			++omitted;
 		    --todo;
 		}
 	    }
 
 	    // Add items only present in got_d.
-	    todo = (int)got_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&got_d->dv_hashtab, hi, todo)
+	    todo = (પૂર્ણાંક)got_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_વસ્તુઓ(&got_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		જો (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(exp_d, hi->hi_key, -1);
-		    if (item2 == NULL)
+		    item2 = dict_find(exp_d, hi->hi_ચાવી, -1);
+		    જો (item2 == ખાલી)
 			// item of got_d not present in exp_d
 			dict_add_tv(got_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
+					(અક્ષર *)hi->hi_ચાવી, &HI2DI(hi)->di_tv);
 		    --todo;
 		}
 	    }
@@ -237,153 +237,153 @@ fill_assert_error(
 	ga_concat_shorten_esc(gap, tv2string(exp_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    નહીંતર
     {
-	if (atype == ASSERT_FAILS)
+	જો (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
 	ga_concat_shorten_esc(gap, exp_str);
-	if (atype == ASSERT_FAILS)
+	જો (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
     }
-    if (atype != ASSERT_NOTEQUAL)
+    જો (atype != ASSERT_NOTEQUAL)
     {
-	if (atype == ASSERT_MATCH)
+	જો (atype == ASSERT_MATCH)
 	    GA_CONCAT_LITERAL(gap, " does not match ");
-	else if (atype == ASSERT_NOTMATCH)
+	નહીંતર જો (atype == ASSERT_NOTMATCH)
 	    GA_CONCAT_LITERAL(gap, " does match ");
-	else
+	નહીંતર
 	    GA_CONCAT_LITERAL(gap, " but got ");
 	ga_concat_shorten_esc(gap, tv2string(got_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 
-	if (omitted != 0)
+	જો (omitted != 0)
 	{
-	    char    buf[100];
+	    અક્ષર    buf[100];
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen(buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen(buf, કદ(buf),
 		" - %d equal item%s omitted", omitted, omitted == 1 ? "" : "s");
 	    ga_concat_len(gap, (char_u *)buf, buflen);
 	}
     }
 
-    if (did_copy)
+    જો (did_copy)
     {
 	clear_tv(exp_tv);
 	clear_tv(got_tv);
     }
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 assert_equal_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
 
-    if (tv_equal(&argvars[0], &argvars[1], FALSE)
+    જો (tv_equal(&argvars[0], &argvars[1], FALSE)
 						   != (atype == ASSERT_EQUAL))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], ખાલી, &argvars[0], &argvars[1],
 								       atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	પાછા 1;
     }
-    return 0;
+    પાછા 0;
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 assert_match_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
 
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return 1;
+	પાછા 1;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[0], buf1);
     char_u *text = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (pat != NULL && text != NULL
+    જો (pat != ખાલી && text != ખાલી
 		 && pattern_match(pat, text, FALSE) != (atype == ASSERT_MATCH))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], ખાલી, &argvars[0], &argvars[1],
 									atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	પાછા 1;
     }
-    return 0;
+    પાછા 0;
 }
 
 /*
  * Common for assert_true() and assert_false().
  * Return non-zero for failure.
  */
-    static int
-assert_bool(typval_T *argvars, int isTrue)
+    સ્થિર પૂર્ણાંક
+assert_bool(typval_T *argvars, પૂર્ણાંક isTrue)
 {
-    int		error = FALSE;
+    પૂર્ણાંક		error = FALSE;
     garray_T	ga;
 
-    if (argvars[0].v_type == VAR_BOOL
-	    && argvars[0].vval.v_number == (isTrue ? VVAL_TRUE : VVAL_FALSE))
-	return 0;
-    if (argvars[0].v_type != VAR_NUMBER
-	    || (tv_get_number_chk(&argvars[0], &error) == 0) == isTrue
+    જો (argvars[0].v_type == VAR_BOOL
+	    && argvars[0].vval.v_સંખ્યા == (isTrue ? VVAL_TRUE : VVAL_FALSE))
+	પાછા 0;
+    જો (argvars[0].v_type != VAR_સંખ્યા
+	    || (tv_get_સંખ્યા_chk(&argvars[0], &error) == 0) == isTrue
 	    || error)
     {
 	prepare_assert_error(&ga);
 	fill_assert_error(&ga, &argvars[1],
 		(char_u *)(isTrue ? "True" : "False"),
-		NULL, &argvars[0], ASSERT_OTHER);
+		ખાલી, &argvars[0], ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	પાછા 1;
     }
-    return 0;
+    પાછા 0;
 }
 
-    static void
+    સ્થિર શૂન્ય
 assert_append_cmd_or_arg(garray_T *gap, typval_T *argvars, char_u *cmd)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    જો (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	ga_concat(gap, echo_string(&argvars[2], &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    નહીંતર
 	ga_concat(gap, cmd);
 }
 
-    static int
-assert_beeps(typval_T *argvars, int no_beep)
+    સ્થિર પૂર્ણાંક
+assert_beeps(typval_T *argvars, પૂર્ણાંક no_beep)
 {
     char_u	*cmd;
     garray_T	ga;
-    int		ret = 0;
+    પૂર્ણાંક		ret = 0;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return 0;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા 0;
 
     cmd = tv_get_string_chk(&argvars[0]);
     called_vim_beep = FALSE;
     suppress_errthrow = TRUE;
     emsg_silent = FALSE;
     do_cmdline_cmd(cmd);
-    if (no_beep ? called_vim_beep : !called_vim_beep)
+    જો (no_beep ? called_vim_beep : !called_vim_beep)
     {
 	prepare_assert_error(&ga);
-	if (no_beep)
+	જો (no_beep)
 	    GA_CONCAT_LITERAL(&ga, "command did beep: ");
-	else
+	નહીંતર
 	    GA_CONCAT_LITERAL(&ga, "command did not beep: ");
 	ga_concat(&ga, cmd);
 	assert_error(&ga);
@@ -393,43 +393,43 @@ assert_beeps(typval_T *argvars, int no_beep)
 
     suppress_errthrow = FALSE;
     emsg_on_display = FALSE;
-    return ret;
+    પાછા ret;
 }
 
 /*
  * "assert_beeps(cmd)" function
  */
-    void
+    શૂન્ય
 f_assert_beeps(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    rettv->vval.v_number = assert_beeps(argvars, FALSE);
+    rettv->vval.v_સંખ્યા = assert_beeps(argvars, FALSE);
 }
 
 /*
  * "assert_nobeep(cmd)" function
  */
-    void
+    શૂન્ય
 f_assert_nobeep(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    rettv->vval.v_number = assert_beeps(argvars, TRUE);
+    rettv->vval.v_સંખ્યા = assert_beeps(argvars, TRUE);
 }
 
 /*
  * "assert_equal(expected, actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_equal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_EQUAL);
+    rettv->vval.v_સંખ્યા = assert_equal_common(argvars, ASSERT_EQUAL);
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 assert_equalfile(typval_T *argvars)
 {
     char_u	buf1[NUMBUFLEN];
@@ -438,75 +438,75 @@ assert_equalfile(typval_T *argvars)
     char_u	*fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
     FILE	*fd1;
     FILE	*fd2;
-    char	line1[200];
-    char	line2[200];
-    int		lineidx = 0;
+    અક્ષર	line1[200];
+    અક્ષર	line2[200];
+    પૂર્ણાંક		lineidx = 0;
     size_t	IObufflen;
 
-    if (fname1 == NULL || fname2 == NULL)
-	return 0;
+    જો (fname1 == ખાલી || fname2 == ખાલી)
+	પાછા 0;
 
     IObuff[0] = NUL;
     IObufflen = 0;
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((અક્ષર *)fname1, READBIN);
+    જો (fd1 == ખાલી)
     {
-	IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-	    (char *)e_cant_read_file_str, fname1);
+	IObufflen = vim_snprintf_safelen((અક્ષર *)IObuff, IOSIZE,
+	    (અક્ષર *)e_cant_read_file_str, fname1);
     }
-    else
+    નહીંતર
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((અક્ષર *)fname2, READBIN);
+	જો (fd2 == ખાલી)
 	{
 	    fclose(fd1);
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-		(char *)e_cant_read_file_str, fname2);
+	    IObufflen = vim_snprintf_safelen((અક્ષર *)IObuff, IOSIZE,
+		(અક્ષર *)e_cant_read_file_str, fname2);
 	}
-	else
+	નહીંતર
 	{
-	    int	    c1, c2;
-	    long    count = 0;
+	    પૂર્ણાંક	    c1, c2;
+	    long    ગણતરી = 0;
 	    long    linecount = 1;
 
-	    for (;;)
+	    માટે (;;)
 	    {
 		c1 = fgetc(fd1);
 		c2 = fgetc(fd2);
-		if (c1 == EOF)
+		જો (c1 == EOF)
 		{
-		    if (c2 != EOF)
+		    જો (c2 != EOF)
 		    {
 			STRCPY(IObuff, "first file is shorter");
 			IObufflen = 21;
 		    }
-		    break;
+		    તોડો;
 		}
-		else if (c2 == EOF)
+		નહીંતર જો (c2 == EOF)
 		{
 		    STRCPY(IObuff, "second file is shorter");
 		    IObufflen = 22;
-		    break;
+		    તોડો;
 		}
-		else
+		નહીંતર
 		{
 		    line1[lineidx] = c1;
 		    line2[lineidx] = c2;
 		    ++lineidx;
-		    if (c1 != c2)
+		    જો (c1 != c2)
 		    {
-			IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-			    "difference at byte %ld, line %ld", count, linecount);
-			break;
+			IObufflen = vim_snprintf_safelen((અક્ષર *)IObuff, IOSIZE,
+			    "difference at byte %ld, line %ld", ગણતરી, linecount);
+			તોડો;
 		    }
 		}
-		++count;
-		if (c1 == NL)
+		++ગણતરી;
+		જો (c1 == NL)
 		{
 		    ++linecount;
 		    lineidx = 0;
 		}
-		else if (lineidx + 2 == (int)sizeof(line1))
+		નહીંતર જો (lineidx + 2 == (પૂર્ણાંક)કદ(line1))
 		{
 		    mch_memmove(line1, line1 + 100, lineidx - 100);
 		    mch_memmove(line2, line2 + 100, lineidx - 100);
@@ -518,11 +518,11 @@ assert_equalfile(typval_T *argvars)
 	}
     }
 
-    if (IObufflen > 0)
+    જો (IObufflen > 0)
     {
 	garray_T	ga;
 	prepare_assert_error(&ga);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	જો (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    char_u	numbuf[NUMBUFLEN];
 	    char_u	*tofree;
@@ -532,13 +532,13 @@ assert_equalfile(typval_T *argvars)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	}
 	ga_concat_len(&ga, IObuff, IObufflen);
-	if (lineidx > 0)
+	જો (lineidx > 0)
 	{
 	    line1[lineidx] = NUL;
 	    line2[lineidx] = NUL;
 	    GA_CONCAT_LITERAL(&ga, " after \"");
 	    ga_concat_len(&ga, (char_u *)line1, lineidx);
-	    if (STRCMP(line1, line2) != 0)
+	    જો (STRCMP(line1, line2) != 0)
 	    {
 		GA_CONCAT_LITERAL(&ga, "\" vs \"");
 		ga_concat_len(&ga, (char_u *)line2, lineidx);
@@ -547,91 +547,91 @@ assert_equalfile(typval_T *argvars)
 	}
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	પાછા 1;
     }
 
-    return 0;
+    પાછા 0;
 }
 
 /*
  * "assert_equalfile(fname-one, fname-two[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_equalfile(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	પાછા;
 
-    rettv->vval.v_number = assert_equalfile(argvars);
+    rettv->vval.v_સંખ્યા = assert_equalfile(argvars);
 }
 
 /*
  * "assert_notequal(expected, actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_notequal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_NOTEQUAL);
+    rettv->vval.v_સંખ્યા = assert_equal_common(argvars, ASSERT_NOTEQUAL);
 }
 
 /*
  * "assert_exception(string[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_exception(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
     char_u	*error;
 
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
     error = tv_get_string_chk(&argvars[0]);
-    if (*get_vim_var_str(VV_EXCEPTION) == NUL)
+    જો (*get_vim_var_str(VV_EXCEPTION) == NUL)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "v:exception is not set");
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_સંખ્યા = 1;
     }
-    else if (error != NULL
-	&& strstr((char *)get_vim_var_str(VV_EXCEPTION), (char *)error) == NULL)
+    નહીંતર જો (error != ખાલી
+	&& strstr((અક્ષર *)get_vim_var_str(VV_EXCEPTION), (અક્ષર *)error) == ખાલી)
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[1], NULL, &argvars[0],
+	fill_assert_error(&ga, &argvars[1], ખાલી, &argvars[0],
 				  get_vim_var_tv(VV_EXCEPTION), ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_સંખ્યા = 1;
     }
 }
 
 /*
  * "assert_fails(cmd [, error[, msg]])" function
  */
-    void
+    શૂન્ય
 f_assert_fails(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    int		save_trylevel = trylevel;
-    int		called_emsg_before = called_emsg;
-    char	*wrong_arg_msg = NULL;
-    char_u	*tofree = NULL;
+    પૂર્ણાંક		save_trylevel = trylevel;
+    પૂર્ણાંક		called_emsg_before = called_emsg;
+    અક્ષર	*wrong_arg_સંદેશ = ખાલી;
+    char_u	*tofree = ખાલી;
 
-    if (check_for_string_or_number_arg(argvars, 0) == FAIL
+    જો (check_for_string_or_સંખ્યા_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_or_list_arg(argvars, 1) == FAIL
 	    || (argvars[1].v_type != VAR_UNKNOWN
 		&& (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_સંખ્યા_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 4) == FAIL)))))
-	return;
+	પાછા;
 
     // trylevel must be zero for a ":throw" command to be considered failed
     trylevel = 0;
@@ -646,62 +646,62 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
     trylevel = save_trylevel;
     suppress_errthrow = FALSE;
 
-    if (called_emsg == called_emsg_before)
+    જો (called_emsg == called_emsg_before)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "command did not fail: ");
 	assert_append_cmd_or_arg(&ga, argvars, cmd);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_સંખ્યા = 1;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    નહીંતર જો (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u	*expected;
-	char_u	*expected_str = NULL;
-	int	error_found = FALSE;
-	int	error_found_index = 1;
-	char_u	*actual = emsg_assert_fails_msg == NULL ? (char_u *)"[unknown]"
-						       : emsg_assert_fails_msg;
+	char_u	*expected_str = ખાલી;
+	પૂર્ણાંક	error_found = FALSE;
+	પૂર્ણાંક	error_found_index = 1;
+	char_u	*actual = emsg_assert_fails_સંદેશ == ખાલી ? (char_u *)"[unknown]"
+						       : emsg_assert_fails_સંદેશ;
 
-	if (argvars[1].v_type == VAR_STRING)
+	જો (argvars[1].v_type == VAR_STRING)
 	{
 	    expected = tv_get_string_buf_chk(&argvars[1], buf);
-	    error_found = expected == NULL
-			   || strstr((char *)actual, (char *)expected) == NULL;
+	    error_found = expected == ખાલી
+			   || strstr((અક્ષર *)actual, (અક્ષર *)expected) == ખાલી;
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	નહીંતર જો (argvars[1].v_type == VAR_LIST)
 	{
 	    list_T	*list = argvars[1].vval.v_list;
 	    typval_T	*tv;
 
-	    if (list == NULL || list->lv_len < 1 || list->lv_len > 2)
+	    જો (list == ખાલી || list->lv_len < 1 || list->lv_len > 2)
 	    {
-		wrong_arg_msg = e_assert_fails_second_arg;
-		goto theend;
+		wrong_arg_સંદેશ = e_assert_fails_second_arg;
+		જાઓ theend;
 	    }
 	    CHECK_LIST_MATERIALIZE(list);
 	    tv = &list->lv_first->li_tv;
 	    expected = tv_get_string_buf_chk(tv, buf);
-	    if (expected == NULL)
-		goto theend;
-	    if (!pattern_match(expected, actual, FALSE))
+	    જો (expected == ખાલી)
+		જાઓ theend;
+	    જો (!pattern_match(expected, actual, FALSE))
 	    {
 		error_found = TRUE;
 		expected_str = expected;
 	    }
-	    else if (list->lv_len == 2)
+	    નહીંતર જો (list->lv_len == 2)
 	    {
 		// make a copy, an error in pattern_match() may free it
 		tofree = actual = vim_strsave(get_vim_var_str(VV_ERRMSG));
-		if (actual != NULL)
+		જો (actual != ખાલી)
 		{
 		    tv = &list->lv_u.mat.lv_last->li_tv;
 		    expected = tv_get_string_buf_chk(tv, buf);
-		    if (expected == NULL)
-			goto theend;
-		    if (!pattern_match(expected, actual, FALSE))
+		    જો (expected == ખાલી)
+			જાઓ theend;
+		    જો (!pattern_match(expected, actual, FALSE))
 		    {
 			error_found = TRUE;
 			expected_str = expected;
@@ -709,34 +709,34 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 		}
 	    }
 	}
-	else
+	નહીંતર
 	{
-	    wrong_arg_msg = e_assert_fails_second_arg;
-	    goto theend;
+	    wrong_arg_સંદેશ = e_assert_fails_second_arg;
+	    જાઓ theend;
 	}
 
-	if (!error_found && argvars[2].v_type != VAR_UNKNOWN
+	જો (!error_found && argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[3].v_type != VAR_NUMBER)
+	    જો (argvars[3].v_type != VAR_સંખ્યા)
 	    {
-		wrong_arg_msg = e_assert_fails_fourth_argument;
-		goto theend;
+		wrong_arg_સંદેશ = e_assert_fails_fourth_argument;
+		જાઓ theend;
 	    }
-	    else if (argvars[3].vval.v_number >= 0
-			 && argvars[3].vval.v_number != emsg_assert_fails_lnum)
+	    નહીંતર જો (argvars[3].vval.v_સંખ્યા >= 0
+			 && argvars[3].vval.v_સંખ્યા != emsg_assert_fails_lnum)
 	    {
 		error_found = TRUE;
 		error_found_index = 3;
 	    }
-	    if (!error_found && argvars[4].v_type != VAR_UNKNOWN)
+	    જો (!error_found && argvars[4].v_type != VAR_UNKNOWN)
 	    {
-		if (argvars[4].v_type != VAR_STRING)
+		જો (argvars[4].v_type != VAR_STRING)
 		{
-		    wrong_arg_msg = e_assert_fails_fifth_argument;
-		    goto theend;
+		    wrong_arg_સંદેશ = e_assert_fails_fifth_argument;
+		    જાઓ theend;
 		}
-		else if (argvars[4].vval.v_string != NULL
+		નહીંતર જો (argvars[4].vval.v_string != ખાલી
 		    && !pattern_match(argvars[4].vval.v_string,
 					     emsg_assert_fails_context, FALSE))
 		{
@@ -746,22 +746,22 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    }
 	}
 
-	if (error_found)
+	જો (error_found)
 	{
 	    typval_T actual_tv;
 
 	    prepare_assert_error(&ga);
-	    if (error_found_index == 3)
+	    જો (error_found_index == 3)
 	    {
-		actual_tv.v_type = VAR_NUMBER;
-		actual_tv.vval.v_number = emsg_assert_fails_lnum;
+		actual_tv.v_type = VAR_સંખ્યા;
+		actual_tv.vval.v_સંખ્યા = emsg_assert_fails_lnum;
 	    }
-	    else if (error_found_index == 4)
+	    નહીંતર જો (error_found_index == 4)
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = emsg_assert_fails_context;
 	    }
-	    else
+	    નહીંતર
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = actual;
@@ -772,7 +772,7 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    assert_append_cmd_or_arg(&ga, argvars, cmd);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    rettv->vval.v_number = 1;
+	    rettv->vval.v_સંખ્યા = 1;
 	}
     }
 
@@ -782,36 +782,36 @@ theend:
     in_assert_fails = FALSE;
     did_emsg = FALSE;
     got_int = FALSE;
-    msg_col = 0;
+    સંદેશ_col = 0;
     --no_wait_return;
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    msg_scrolled = 0;
-    lines_left = Rows;
-    VIM_CLEAR(emsg_assert_fails_msg);
+    સંદેશ_scrolled = 0;
+    લીટીઓ_ડાબું = Rows;
+    VIM_CLEAR(emsg_assert_fails_સંદેશ);
     vim_free(tofree);
-    set_vim_var_string(VV_ERRMSG, NULL, 0);
-    if (wrong_arg_msg != NULL)
-	emsg(_(wrong_arg_msg));
+    set_vim_var_string(VV_ERRMSG, ખાલી, 0);
+    જો (wrong_arg_સંદેશ != ખાલી)
+	emsg(_(wrong_arg_સંદેશ));
 }
 
 /*
  * "assert_false(actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_false(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, FALSE);
+    rettv->vval.v_સંખ્યા = assert_bool(argvars, FALSE);
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 assert_inrange(typval_T *argvars)
 {
     garray_T	ga;
-    int		error = FALSE;
+    પૂર્ણાંક		error = FALSE;
     char_u	expected_str[200];
 
-    if (argvars[0].v_type == VAR_FLOAT
+    જો (argvars[0].v_type == VAR_FLOAT
 	    || argvars[1].v_type == VAR_FLOAT
 	    || argvars[2].v_type == VAR_FLOAT)
     {
@@ -819,137 +819,137 @@ assert_inrange(typval_T *argvars)
 	float_T fupper = tv_get_float(&argvars[1]);
 	float_T factual = tv_get_float(&argvars[2]);
 
-	if (factual < flower || factual > fupper)
+	જો (factual < flower || factual > fupper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %g - %g,",
+	    vim_snprintf((અક્ષર *)expected_str, 200, "range %g - %g,",
 							       flower, fupper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, ખાલી,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    પાછા 1;
 	}
     }
-    else
+    નહીંતર
     {
-	varnumber_T	lower = tv_get_number_chk(&argvars[0], &error);
-	varnumber_T	upper = tv_get_number_chk(&argvars[1], &error);
-	varnumber_T	actual = tv_get_number_chk(&argvars[2], &error);
+	varnumber_T	lower = tv_get_સંખ્યા_chk(&argvars[0], &error);
+	varnumber_T	upper = tv_get_સંખ્યા_chk(&argvars[1], &error);
+	varnumber_T	actual = tv_get_સંખ્યા_chk(&argvars[2], &error);
 
-	if (error)
-	    return 0;
-	if (actual < lower || actual > upper)
+	જો (error)
+	    પાછા 0;
+	જો (actual < lower || actual > upper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %ld - %ld,",
+	    vim_snprintf((અક્ષર *)expected_str, 200, "range %ld - %ld,",
 						     (long)lower, (long)upper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, ખાલી,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    પાછા 1;
 	}
     }
-    return 0;
+    પાછા 0;
 }
 
 /*
  * "assert_inrange(lower, upper[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_inrange(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_float_or_nr_arg(argvars, 0) == FAIL
+    જો (check_for_float_or_nr_arg(argvars, 0) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 1) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 2) == FAIL
 	    || check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	પાછા;
 
-    rettv->vval.v_number = assert_inrange(argvars);
+    rettv->vval.v_સંખ્યા = assert_inrange(argvars);
 }
 
 /*
  * "assert_match(pattern, actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_match(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_MATCH);
+    rettv->vval.v_સંખ્યા = assert_match_common(argvars, ASSERT_MATCH);
 }
 
 /*
  * "assert_notmatch(pattern, actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_notmatch(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_NOTMATCH);
+    rettv->vval.v_સંખ્યા = assert_match_common(argvars, ASSERT_NOTMATCH);
 }
 
 /*
  * "assert_report(msg)" function
  */
-    void
+    શૂન્ય
 f_assert_report(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     prepare_assert_error(&ga);
     ga_concat(&ga, tv_get_string(&argvars[0]));
     assert_error(&ga);
     ga_clear(&ga);
-    rettv->vval.v_number = 1;
+    rettv->vval.v_સંખ્યા = 1;
 }
 
 /*
  * "assert_true(actual[, msg])" function
  */
-    void
+    શૂન્ય
 f_assert_true(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, TRUE);
+    rettv->vval.v_સંખ્યા = assert_bool(argvars, TRUE);
 }
 
 /*
  * "test_alloc_fail(id, countdown, repeat)" function
  */
-    void
+    શૂન્ય
 f_test_alloc_fail(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
+		|| check_for_સંખ્યા_arg(argvars, 1) == FAIL
+		|| check_for_સંખ્યા_arg(argvars, 2) == FAIL))
+	પાછા;
 
-    if (argvars[0].v_type != VAR_NUMBER
-	    || argvars[0].vval.v_number <= 0
-	    || argvars[1].v_type != VAR_NUMBER
-	    || argvars[1].vval.v_number < 0
-	    || argvars[2].v_type != VAR_NUMBER)
+    જો (argvars[0].v_type != VAR_સંખ્યા
+	    || argvars[0].vval.v_સંખ્યા <= 0
+	    || argvars[1].v_type != VAR_સંખ્યા
+	    || argvars[1].vval.v_સંખ્યા < 0
+	    || argvars[2].v_type != VAR_સંખ્યા)
 	emsg(_(e_invalid_argument));
-    else
+    નહીંતર
     {
-	alloc_fail_id = argvars[0].vval.v_number;
-	if (alloc_fail_id >= aid_last)
+	alloc_fail_id = argvars[0].vval.v_સંખ્યા;
+	જો (alloc_fail_id >= aid_last)
 	    emsg(_(e_invalid_argument));
-	alloc_fail_countdown = argvars[1].vval.v_number;
-	alloc_fail_repeat = argvars[2].vval.v_number;
-	did_outofmem_msg = FALSE;
+	alloc_fail_countdown = argvars[1].vval.v_સંખ્યા;
+	alloc_fail_repeat = argvars[2].vval.v_સંખ્યા;
+	did_outofmem_સંદેશ = FALSE;
     }
 }
 
 /*
  * "test_autochdir()"
  */
-    void
+    શૂન્ય
 f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_AUTOCHDIR)
+#જો defined(FEAT_AUTOCHDIR)
     test_autochdir = TRUE;
 #endif
 }
@@ -957,26 +957,26 @@ f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_feedinput()"
  */
-    void
+    શૂન્ય
 f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 {
-#ifdef USE_INPUT_BUF
+#ifdef USE_આગત_BUF
     char_u	*val;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     val = tv_get_string_chk(&argvars[0]);
 # ifdef VIMDLL
     // this doesn't work in the console
-    if (!gui.in_use)
-	return;
+    જો (!gui.in_use)
+	પાછા;
 # endif
 
-    if (val != NULL)
+    જો (val != ખાલી)
     {
-	trash_input_buf();
-	add_to_input_buf_csi(val, (int)STRLEN(val));
+	trash_આગત_buf();
+	add_to_આગત_buf_csi(val, (પૂર્ણાંક)STRLEN(val));
     }
 #endif
 }
@@ -984,100 +984,100 @@ f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "test_getvalue({name})" function
  */
-    void
+    શૂન્ય
 f_test_getvalue(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     name = tv_get_string(&argvars[0]);
 
-    if (STRCMP(name, (char_u *)"need_fileinfo") == 0)
-	rettv->vval.v_number = need_fileinfo;
-    else
+    જો (STRCMP(name, (char_u *)"need_fileinfo") == 0)
+	rettv->vval.v_સંખ્યા = need_fileinfo;
+    નહીંતર
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_option_not_set({name})" function
  */
-    void
+    શૂન્ય
 f_test_option_not_set(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     name = tv_get_string(&argvars[0]);
-    if (reset_option_was_set(name) == FAIL)
+    જો (reset_option_was_set(name) == FAIL)
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_override({name}, {val})" function
  */
-    void
+    શૂન્ય
 f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
-    int     val;
-    static int save_starting = -1;
+    પૂર્ણાંક     val;
+    સ્થિર પૂર્ણાંક save_starting = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL)
-	return;
+    જો (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_સંખ્યા_arg(argvars, 1) == FAIL)
+	પાછા;
 
     name = tv_get_string(&argvars[0]);
-    val = (int)tv_get_number(&argvars[1]);
+    val = (પૂર્ણાંક)tv_get_સંખ્યા(&argvars[1]);
 
-    if (STRCMP(name, (char_u *)"redraw") == 0)
+    જો (STRCMP(name, (char_u *)"redraw") == 0)
 	disable_redraw_for_testing = val;
-    else if (STRCMP(name, (char_u *)"redraw_flag") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"redraw_flag") == 0)
 	ignore_redraw_flag_for_testing = val;
-    else if (STRCMP(name, (char_u *)"char_avail") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"char_avail") == 0)
 	disable_char_avail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"starting") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"starting") == 0)
     {
-	if (val)
+	જો (val)
 	{
-	    if (save_starting < 0)
+	    જો (save_starting < 0)
 		save_starting = starting;
 	    starting = 0;
 	}
-	else
+	નહીંતર
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else if (STRCMP(name, (char_u *)"nfa_fail") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"nfa_fail") == 0)
 	nfa_fail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
 	disable_syn_idlist_cache_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_query_mouse") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"no_query_mouse") == 0)
 	no_query_mouse_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_wait_return") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"no_wait_return") == 0)
 	no_wait_return = val;
-    else if (STRCMP(name, (char_u *)"ui_delay") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"ui_delay") == 0)
 	ui_delay_for_testing = val;
-    else if (STRCMP(name, (char_u *)"unreachable") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"unreachable") == 0)
 	ignore_unreachable_code_for_testing = val;
-    else if (STRCMP(name, (char_u *)"term_props") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"term_props") == 0)
 	reset_term_props_on_termresponse = val;
-    else if (STRCMP(name, (char_u *)"vterm_title") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"vterm_title") == 0)
 	disable_vterm_title_for_testing = val;
-    else if (STRCMP(name, (char_u *)"uptime") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"uptime") == 0)
 	override_sysinfo_uptime = val;
-    else if (STRCMP(name, (char_u *)"alloc_lines") == 0)
-	ml_get_alloc_lines = val;
-    else if (STRCMP(name, (char_u *)"autoload") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"alloc_lines") == 0)
+	ml_get_alloc_લીટીઓ = val;
+    નહીંતર જો (STRCMP(name, (char_u *)"autoload") == 0)
 	override_autoload = val;
-    else if (STRCMP(name, (char_u *)"defcompile") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"defcompile") == 0)
 	override_defcompile = val;
-    else if (STRCMP(name, (char_u *)"ALL") == 0)
+    નહીંતર જો (STRCMP(name, (char_u *)"ALL") == 0)
     {
 	disable_char_avail_for_testing = FALSE;
 	disable_redraw_for_testing = FALSE;
@@ -1089,116 +1089,116 @@ f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 	reset_term_props_on_termresponse = FALSE;
 	override_sysinfo_uptime = -1;
 	// ml_get_alloc_lines is not reset by "ALL"
-	if (save_starting >= 0)
+	જો (save_starting >= 0)
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else
+    નહીંતર
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_refcount({expr})" function
  */
-    void
+    શૂન્ય
 f_test_refcount(typval_T *argvars, typval_T *rettv)
 {
-    int retval = -1;
+    પૂર્ણાંક retval = -1;
 
-    switch (argvars[0].v_type)
+    પસંદગી (argvars[0].v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_FLOAT:
-	case VAR_SPECIAL:
-	case VAR_STRING:
-	case VAR_INSTR:
-	    break;
+	સ્થિતિ VAR_UNKNOWN:
+	સ્થિતિ VAR_ANY:
+	સ્થિતિ VAR_VOID:
+	સ્થિતિ VAR_સંખ્યા:
+	સ્થિતિ VAR_BOOL:
+	સ્થિતિ VAR_FLOAT:
+	સ્થિતિ VAR_SPECIAL:
+	સ્થિતિ VAR_STRING:
+	સ્થિતિ VAR_INSTR:
+	    તોડો;
 
-	case VAR_JOB:
+	સ્થિતિ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_job != NULL)
+	    જો (argvars[0].vval.v_job != ખાલી)
 		retval = argvars[0].vval.v_job->jv_refcount - 1;
 #endif
-	    break;
-	case VAR_CHANNEL:
+	    તોડો;
+	સ્થિતિ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_channel != NULL)
+	    જો (argvars[0].vval.v_channel != ખાલી)
 		retval = argvars[0].vval.v_channel->ch_refcount - 1;
 #endif
-	    break;
-	case VAR_FUNC:
-	    if (argvars[0].vval.v_string != NULL)
+	    તોડો;
+	સ્થિતિ VAR_FUNC:
+	    જો (argvars[0].vval.v_string != ખાલી)
 	    {
 		ufunc_T *fp;
 
 		fp = find_func(argvars[0].vval.v_string, FALSE);
-		if (fp != NULL)
+		જો (fp != ખાલી)
 		    retval = fp->uf_refcount;
 	    }
-	    break;
-	case VAR_PARTIAL:
-	    if (argvars[0].vval.v_partial != NULL)
+	    તોડો;
+	સ્થિતિ VAR_PARTIAL:
+	    જો (argvars[0].vval.v_partial != ખાલી)
 		retval = argvars[0].vval.v_partial->pt_refcount - 1;
-	    break;
-	case VAR_BLOB:
-	    if (argvars[0].vval.v_blob != NULL)
+	    તોડો;
+	સ્થિતિ VAR_BLOB:
+	    જો (argvars[0].vval.v_blob != ખાલી)
 		retval = argvars[0].vval.v_blob->bv_refcount - 1;
-	    break;
-	case VAR_LIST:
-	    if (argvars[0].vval.v_list != NULL)
+	    તોડો;
+	સ્થિતિ VAR_LIST:
+	    જો (argvars[0].vval.v_list != ખાલી)
 		retval = argvars[0].vval.v_list->lv_refcount - 1;
-	    break;
-	case VAR_TUPLE:
-	    if (argvars[0].vval.v_tuple != NULL)
+	    તોડો;
+	સ્થિતિ VAR_TUPLE:
+	    જો (argvars[0].vval.v_tuple != ખાલી)
 		retval = argvars[0].vval.v_tuple->tv_refcount - 1;
-	    break;
-	case VAR_DICT:
-	    if (argvars[0].vval.v_dict != NULL)
+	    તોડો;
+	સ્થિતિ VAR_DICT:
+	    જો (argvars[0].vval.v_dict != ખાલી)
 		retval = argvars[0].vval.v_dict->dv_refcount - 1;
-	    break;
-	case VAR_CLASS:
-	    if (argvars[0].vval.v_class != NULL)
+	    તોડો;
+	સ્થિતિ VAR_CLASS:
+	    જો (argvars[0].vval.v_class != ખાલી)
 		retval = argvars[0].vval.v_class->class_refcount - 1;
-	    break;
-	case VAR_OBJECT:
-	    if (argvars[0].vval.v_object != NULL)
+	    તોડો;
+	સ્થિતિ VAR_OBJECT:
+	    જો (argvars[0].vval.v_object != ખાલી)
 		retval = argvars[0].vval.v_object->obj_refcount - 1;
-	    break;
-	case VAR_TYPEALIAS:
-	    if (argvars[0].vval.v_typealias != NULL)
+	    તોડો;
+	સ્થિતિ VAR_TYPEALIAS:
+	    જો (argvars[0].vval.v_typealias != ખાલી)
 		retval = argvars[0].vval.v_typealias->ta_refcount - 1;
-	    break;
+	    તોડો;
     }
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = retval;
+    rettv->v_type = VAR_સંખ્યા;
+    rettv->vval.v_સંખ્યા = retval;
 
 }
 
 /*
  * "test_garbagecollect_now()" function
  */
-    void
+    શૂન્ય
 f_test_garbagecollect_now(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     // This is dangerous, any Lists and Dicts used internally may be freed
     // while still in use.
-    if (!get_vim_var_nr(VV_TESTING))
+    જો (!get_vim_var_nr(VV_TESTING))
 	emsg(_(e_calling_test_garbagecollect_now_while_v_testing_is_not_set));
-    else
+    નહીંતર
 	garbage_collect(TRUE);
 }
 
 /*
  * "test_garbagecollect_soon()" function
  */
-    void
+    શૂન્ય
 f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     may_garbage_collect = TRUE;
@@ -1207,230 +1207,230 @@ f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_ignore_error()" function
  */
-    void
+    શૂન્ય
 f_test_ignore_error(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     ignore_error_for_testing(tv_get_string(&argvars[0]));
 }
 
-    void
+    શૂન્ય
 f_test_null_blob(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_BLOB;
-    rettv->vval.v_blob = NULL;
+    rettv->vval.v_blob = ખાલી;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#જો defined(FEAT_JOB_CHANNEL)
+    શૂન્ય
 f_test_null_channel(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    rettv->vval.v_channel = NULL;
+    rettv->vval.v_channel = ખાલી;
 }
 #endif
 
-    void
+    શૂન્ય
 f_test_null_dict(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_dict_set(rettv, NULL);
+    rettv_dict_set(rettv, ખાલી);
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#જો defined(FEAT_JOB_CHANNEL)
+    શૂન્ય
 f_test_null_job(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = NULL;
+    rettv->vval.v_job = ખાલી;
 }
 #endif
 
-    void
+    શૂન્ય
 f_test_null_list(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_list_set(rettv, NULL);
+    rettv_list_set(rettv, ખાલી);
 }
 
-    void
+    શૂન્ય
 f_test_null_function(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_FUNC;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ખાલી;
 }
 
-    void
+    શૂન્ય
 f_test_null_partial(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_PARTIAL;
-    rettv->vval.v_partial = NULL;
+    rettv->vval.v_partial = ખાલી;
 }
 
-    void
+    શૂન્ય
 f_test_null_string(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ખાલી;
 }
 
-    void
+    શૂન્ય
 f_test_null_tuple(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_tuple_set(rettv, NULL);
+    rettv_tuple_set(rettv, ખાલી);
 }
 
-    void
+    શૂન્ય
 f_test_unknown(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_UNKNOWN;
 }
 
-    void
+    શૂન્ય
 f_test_void(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_VOID;
 }
 
-    void
+    શૂન્ય
 f_test_setmouse(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    જો (in_vim9script()
+	    && (check_for_સંખ્યા_arg(argvars, 0) == FAIL
+		|| check_for_સંખ્યા_arg(argvars, 1) == FAIL))
+	પાછા;
 
-    if (argvars[0].v_type != VAR_NUMBER || argvars[1].v_type != VAR_NUMBER)
+    જો (argvars[0].v_type != VAR_સંખ્યા || argvars[1].v_type != VAR_સંખ્યા)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	પાછા;
     }
 
-    mouse_row = (time_t)tv_get_number(&argvars[0]) - 1;
-    mouse_col = (time_t)tv_get_number(&argvars[1]) - 1;
+    mouse_row = (time_t)tv_get_સંખ્યા(&argvars[0]) - 1;
+    mouse_col = (time_t)tv_get_સંખ્યા(&argvars[1]) - 1;
 }
 
 #ifdef FEAT_GUI
-    static int
+    સ્થિર પૂર્ણાંક
 test_gui_drop_files(dict_T *args UNUSED)
 {
-# if defined(HAVE_DROP_FILE)
-    int		row;
-    int		col;
+# જો defined(HAVE_DROP_FILE)
+    પૂર્ણાંક		row;
+    પૂર્ણાંક		col;
     int_u	mods;
     char_u	**fnames;
-    int		count = 0;
+    પૂર્ણાંક		ગણતરી = 0;
     typval_T	t;
     list_T	*l;
     listitem_T	*li;
 
-    if (!dict_has_key(args, "files")
-	    || !dict_has_key(args, "row")
-	    || !dict_has_key(args, "col")
-	    || !dict_has_key(args, "modifiers"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "files")
+	    || !dict_has_ચાવી(args, "row")
+	    || !dict_has_ચાવી(args, "col")
+	    || !dict_has_ચાવી(args, "modifiers"))
+	પાછા FALSE;
 
-    (void)dict_get_tv(args, "files", &t);
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
-    mods = (int)dict_get_number(args, "modifiers");
+    (શૂન્ય)dict_get_tv(args, "files", &t);
+    row = (પૂર્ણાંક)dict_get_સંખ્યા(args, "row");
+    col = (પૂર્ણાંક)dict_get_સંખ્યા(args, "col");
+    mods = (પૂર્ણાંક)dict_get_સંખ્યા(args, "modifiers");
 
-    if (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
-	return FALSE;
+    જો (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
+	પાછા FALSE;
 
     l = t.vval.v_list;
     fnames = ALLOC_MULT(char_u *, list_len(l));
-    if (fnames == NULL)
-	return FALSE;
+    જો (fnames == ખાલી)
+	પાછા FALSE;
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_વસ્તુઓ(l, li)
     {
 	// ignore non-string items
-	if (li->li_tv.v_type != VAR_STRING
-		|| li->li_tv.vval.v_string == NULL)
-	    continue;
+	જો (li->li_tv.v_type != VAR_STRING
+		|| li->li_tv.vval.v_string == ખાલી)
+	    ચાલુ;
 
-	fnames[count] = vim_strsave(li->li_tv.vval.v_string);
-	if (fnames[count] == NULL)
+	fnames[ગણતરી] = vim_strsave(li->li_tv.vval.v_string);
+	જો (fnames[ગણતરી] == ખાલી)
 	{
-	    while (--count >= 0)
-		vim_free(fnames[count]);
+	    જ્યારે (--ગણતરી >= 0)
+		vim_free(fnames[ગણતરી]);
 	    vim_free(fnames);
-	    return FALSE;
+	    પાછા FALSE;
 	}
-	count++;
+	ગણતરી++;
     }
 
-    if (count > 0)
-	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, count);
-    else
+    જો (ગણતરી > 0)
+	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, ગણતરી);
+    નહીંતર
 	vim_free(fnames);
 # endif
 
-    return TRUE;
+    પાછા TRUE;
 }
 
-# if defined(FIND_REPLACE_DIALOG)
-    static int
+# જો defined(FIND_REPLACE_DIALOG)
+    સ્થિર પૂર્ણાંક
 test_gui_find_repl(dict_T *args)
 {
-    int		flags;
+    પૂર્ણાંક		flags;
     char_u	*find_text;
     char_u	*repl_text;
-    int		forward;
-    int		retval;
+    પૂર્ણાંક		forward;
+    પૂર્ણાંક		retval;
 
-    if (!dict_has_key(args, "find_text")
-	    || !dict_has_key(args, "repl_text")
-	    || !dict_has_key(args, "flags")
-	    || !dict_has_key(args, "forward"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "find_text")
+	    || !dict_has_ચાવી(args, "repl_text")
+	    || !dict_has_ચાવી(args, "flags")
+	    || !dict_has_ચાવી(args, "forward"))
+	પાછા FALSE;
 
     find_text = dict_get_string(args, "find_text", TRUE);
     repl_text = dict_get_string(args, "repl_text", TRUE);
-    flags = (int)dict_get_number(args, "flags");
-    forward = (int)dict_get_number(args, "forward");
+    flags = (પૂર્ણાંક)dict_get_સંખ્યા(args, "flags");
+    forward = (પૂર્ણાંક)dict_get_સંખ્યા(args, "forward");
 
     retval = gui_do_findrepl(flags, find_text, repl_text, forward);
     vim_free(find_text);
     vim_free(repl_text);
 
-    return retval;
+    પાછા retval;
 }
 # endif
 
-    static int
+    સ્થિર પૂર્ણાંક
 test_gui_mouse_event(dict_T *args)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    પૂર્ણાંક		button;
+    પૂર્ણાંક		row;
+    પૂર્ણાંક		col;
+    પૂર્ણાંક		repeated_click;
     int_u	mods;
-    int		move;
+    પૂર્ણાંક		move;
 
-    if (!dict_has_key(args, "row")
-	    || !dict_has_key(args, "col"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "row")
+	    || !dict_has_ચાવી(args, "col"))
+	પાછા FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
+    move = (પૂર્ણાંક)dict_get_bool(args, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    જો (!move && (!dict_has_ચાવી(args, "button")
+	    || !dict_has_ચાવી(args, "multiclick")
+	    || !dict_has_ચાવી(args, "modifiers")))
+	પાછા FALSE;
 
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
+    row = (પૂર્ણાંક)dict_get_સંખ્યા(args, "row");
+    col = (પૂર્ણાંક)dict_get_સંખ્યા(args, "col");
 
-    if (move)
+    જો (move)
     {
-	int pY = row;
-	int pX = col;
+	પૂર્ણાંક pY = row;
+	પૂર્ણાંક pX = col;
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	જો (dict_get_bool(args, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
@@ -1439,11 +1439,11 @@ test_gui_mouse_event(dict_T *args)
 	}
 	gui_mouse_moved(pX, pY);
     }
-    else
+    નહીંતર
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (પૂર્ણાંક)dict_get_સંખ્યા(args, "button");
+	repeated_click = (પૂર્ણાંક)dict_get_સંખ્યા(args, "multiclick");
+	mods = (પૂર્ણાંક)dict_get_સંખ્યા(args, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
@@ -1454,161 +1454,161 @@ test_gui_mouse_event(dict_T *args)
 							repeated_click, mods);
     }
 
-    return TRUE;
+    પાછા TRUE;
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 test_gui_scrollbar(dict_T *args)
 {
     char_u	*which;
-    long	value;
-    int		dragging;
-    scrollbar_T *sb = NULL;
+    long	કિંમત;
+    પૂર્ણાંક		dragging;
+    scrollbar_T *sb = ખાલી;
 
-    if (!dict_has_key(args, "which")
-	    || !dict_has_key(args, "value")
-	    || !dict_has_key(args, "dragging"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "which")
+	    || !dict_has_ચાવી(args, "value")
+	    || !dict_has_ચાવી(args, "dragging"))
+	પાછા FALSE;
 
     which = dict_get_string(args, "which", FALSE);
-    value = (long)dict_get_number(args, "value");
-    dragging = (int)dict_get_number(args, "dragging");
+    કિંમત = (long)dict_get_સંખ્યા(args, "value");
+    dragging = (પૂર્ણાંક)dict_get_સંખ્યા(args, "dragging");
 
-    if (STRCMP(which, "left") == 0)
-	sb = &curwin->w_scrollbars[SBAR_LEFT];
-    else if (STRCMP(which, "right") == 0)
-	sb = &curwin->w_scrollbars[SBAR_RIGHT];
-    else if (STRCMP(which, "hor") == 0)
+    જો (STRCMP(which, "left") == 0)
+	sb = &curwin->w_scrollbars[SBAR_ડાબું];
+    નહીંતર જો (STRCMP(which, "right") == 0)
+	sb = &curwin->w_scrollbars[SBAR_જમણું];
+    નહીંતર જો (STRCMP(which, "hor") == 0)
 	sb = &gui.bottom_sbar;
-    if (sb == NULL)
+    જો (sb == ખાલી)
     {
 	semsg(_(e_invalid_argument_str), which);
-	return FALSE;
+	પાછા FALSE;
     }
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, કિંમત, dragging);
 # ifndef USE_ON_FLY_SCROLL
     // need to loop through normal_cmd() to handle the scroll events
     exec_normal(FALSE, TRUE, FALSE);
 # endif
 
-    return TRUE;
+    પાછા TRUE;
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 test_gui_tabline_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int		tabnr;
+    પૂર્ણાંક		tabnr;
 
-    if (!dict_has_key(args, "tabnr"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "tabnr"))
+	પાછા FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
+    tabnr = (પૂર્ણાંક)dict_get_સંખ્યા(args, "tabnr");
 
-    return send_tabline_event(tabnr);
-# else
-    return FALSE;
+    પાછા send_tabline_event(tabnr);
+# નહીંતર
+    પાછા FALSE;
 # endif
 }
 
-    static int
+    સ્થિર પૂર્ણાંક
 test_gui_tabmenu_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int	tabnr;
-    int	item;
+    પૂર્ણાંક	tabnr;
+    પૂર્ણાંક	item;
 
-    if (!dict_has_key(args, "tabnr")
-	    || !dict_has_key(args, "item"))
-	return FALSE;
+    જો (!dict_has_ચાવી(args, "tabnr")
+	    || !dict_has_ચાવી(args, "item"))
+	પાછા FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
-    item = (int)dict_get_number(args, "item");
+    tabnr = (પૂર્ણાંક)dict_get_સંખ્યા(args, "tabnr");
+    item = (પૂર્ણાંક)dict_get_સંખ્યા(args, "item");
 
     send_tabline_menu_event(tabnr, item);
 # endif
-    return TRUE;
+    પાછા TRUE;
 }
 #endif
 
-    void
+    શૂન્ય
 f_test_mswin_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef MSWIN
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_સંખ્યા = FALSE;
 
-    if (sandbox != 0)
+    જો (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	પાછા;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    જો (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == ખાલી)
+	પાછા;
 
     char_u *event = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    rettv->vval.v_સંખ્યા = test_mswin_event(event, argvars[1].vval.v_dict);
 
 #endif
 }
 
-    void
+    શૂન્ય
 f_test_gui_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
     char_u	*event;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_સંખ્યા = FALSE;
 
-    if (sandbox != 0)
+    જો (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	પાછા;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    જો (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == ખાલી)
+	પાછા;
 
     event = tv_get_string(&argvars[0]);
-    if (STRCMP(event, "dropfiles") == 0)
-	rettv->vval.v_number = test_gui_drop_files(argvars[1].vval.v_dict);
-# if defined(FIND_REPLACE_DIALOG)
-    else if (STRCMP(event, "findrepl") == 0)
-	rettv->vval.v_number = test_gui_find_repl(argvars[1].vval.v_dict);
+    જો (STRCMP(event, "dropfiles") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_drop_files(argvars[1].vval.v_dict);
+# જો defined(FIND_REPLACE_DIALOG)
+    નહીંતર જો (STRCMP(event, "findrepl") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_find_repl(argvars[1].vval.v_dict);
 # endif
 # ifdef MSWIN
-    else if (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
-	rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    નહીંતર જો (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
+	rettv->vval.v_સંખ્યા = test_mswin_event(event, argvars[1].vval.v_dict);
 # endif
-    else if (STRCMP(event, "mouse") == 0)
-	rettv->vval.v_number = test_gui_mouse_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "scrollbar") == 0)
-	rettv->vval.v_number = test_gui_scrollbar(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabline") == 0)
-	rettv->vval.v_number = test_gui_tabline_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabmenu") == 0)
-	rettv->vval.v_number = test_gui_tabmenu_event(argvars[1].vval.v_dict);
-    else
+    નહીંતર જો (STRCMP(event, "mouse") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_mouse_event(argvars[1].vval.v_dict);
+    નહીંતર જો (STRCMP(event, "scrollbar") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_scrollbar(argvars[1].vval.v_dict);
+    નહીંતર જો (STRCMP(event, "tabline") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_tabline_event(argvars[1].vval.v_dict);
+    નહીંતર જો (STRCMP(event, "tabmenu") == 0)
+	rettv->vval.v_સંખ્યા = test_gui_tabmenu_event(argvars[1].vval.v_dict);
+    નહીંતર
     {
 	semsg(_(e_invalid_argument_str), event);
-	return;
+	પાછા;
     }
 #endif
 }
 
-    void
+    શૂન્ય
 f_test_settime(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_સંખ્યા_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    time_for_testing = (time_t)tv_get_number(&argvars[0]);
+    time_for_testing = (time_t)tv_get_સંખ્યા(&argvars[0]);
 }
 
 #endif // defined(FEAT_EVAL)

@@ -15,20 +15,20 @@
 
 #define NO_X11_INCLUDES
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#include <CoreServices/CoreServices.h>
+#અન્તર્ભાવ <CoreServices/CoreServices.h>
 
 
-#if defined(MACOS_CONVERT)
+#જો defined(MACOS_CONVERT)
 
-static char_u	    *mac_utf16_to_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
-static UniChar	    *mac_utf8_to_utf16(char_u *from, size_t fromLen, size_t *actualLen);
+સ્થિર char_u	    *mac_utf16_to_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
+સ્થિર UniChar	    *mac_utf8_to_utf16(char_u *from, size_t fromLen, size_t *actualLen);
 
 // Converter for composing decomposed HFS+ file paths
-static TECObjectRef gPathConverter;
+સ્થિર TECObjectRef gPathConverter;
 // Converter used by mac_utf16_to_utf8
-static TECObjectRef gUTF16ToUTF8Converter;
+સ્થિર TECObjectRef gUTF16ToUTF8Converter;
 
 /*
  * A Mac version of string_convert_ext() for special cases.
@@ -36,111 +36,111 @@ static TECObjectRef gUTF16ToUTF8Converter;
     char_u *
 mac_string_convert(
     char_u		*ptr,
-    int			len,
-    int			*lenp,
-    int			fail_on_error,
-    int			from_enc,
-    int			to_enc,
-    int			*unconvlenp)
+    પૂર્ણાંક			len,
+    પૂર્ણાંક			*lenp,
+    પૂર્ણાંક			fail_on_error,
+    પૂર્ણાંક			from_enc,
+    પૂર્ણાંક			to_enc,
+    પૂર્ણાંક			*unconvlenp)
 {
     char_u		*retval, *d;
     CFStringRef		cfstr;
-    int			buflen, in, out, l, i;
+    પૂર્ણાંક			buflen, in, out, l, i;
     CFStringEncoding	from;
     CFStringEncoding	to;
 
-    switch (from_enc)
+    પસંદગી (from_enc)
     {
-	case 'l':   from = kCFStringEncodingISOLatin1; break;
-	case 'm':   from = kCFStringEncodingMacRoman; break;
-	case 'u':   from = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	સ્થિતિ 'l':   from = kCFStringEncodingISOLatin1; તોડો;
+	સ્થિતિ 'm':   from = kCFStringEncodingMacRoman; તોડો;
+	સ્થિતિ 'u':   from = kCFStringEncodingUTF8; તોડો;
+	મૂળભૂત:    પાછા ખાલી;
     }
-    switch (to_enc)
+    પસંદગી (to_enc)
     {
-	case 'l':   to = kCFStringEncodingISOLatin1; break;
-	case 'm':   to = kCFStringEncodingMacRoman; break;
-	case 'u':   to = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	સ્થિતિ 'l':   to = kCFStringEncodingISOLatin1; તોડો;
+	સ્થિતિ 'm':   to = kCFStringEncodingMacRoman; તોડો;
+	સ્થિતિ 'u':   to = kCFStringEncodingUTF8; તોડો;
+	મૂળભૂત:    પાછા ખાલી;
     }
 
-    if (unconvlenp != NULL)
+    જો (unconvlenp != ખાલી)
 	*unconvlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+    cfstr = CFStringCreateWithBytes(ખાલી, ptr, len, from, 0);
 
-    if (cfstr == NULL)
+    જો (cfstr == ખાલી)
 	fprintf(stderr, "Encoding failed\n");
     // When conversion failed, try excluding bytes from the end, helps when
     // there is an incomplete byte sequence.  Only do up to 6 bytes to avoid
     // looping a long time when there really is something unconvertible.
-    while (cfstr == NULL && unconvlenp != NULL && len > 1 && *unconvlenp < 6)
+    જ્યારે (cfstr == ખાલી && unconvlenp != ખાલી && len > 1 && *unconvlenp < 6)
     {
 	--len;
 	++*unconvlenp;
-	cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+	cfstr = CFStringCreateWithBytes(ખાલી, ptr, len, from, 0);
     }
-    if (cfstr == NULL)
-	return NULL;
+    જો (cfstr == ખાલી)
+	પાછા ખાલી;
 
-    if (to == kCFStringEncodingUTF8)
+    જો (to == kCFStringEncodingUTF8)
 	buflen = len * 6 + 1;
-    else
+    નહીંતર
 	buflen = len + 1;
     retval = alloc(buflen);
-    if (retval == NULL)
+    જો (retval == ખાલી)
     {
 	CFRelease(cfstr);
-	return NULL;
+	પાછા ખાલી;
     }
 
-#if 0
+#જો 0
     CFRange convertRange = CFRangeMake(0, CFStringGetLength(cfstr));
     //  Determine output buffer size
-    CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, NULL, 0, (CFIndex *)&buflen);
-    retval = (buflen > 0) ? alloc(buflen) : NULL;
-    if (retval == NULL)
+    CFStringGetBytes(cfstr, convertRange, to, ખાલી, FALSE, ખાલી, 0, (CFIndex *)&buflen);
+    retval = (buflen > 0) ? alloc(buflen) : ખાલી;
+    જો (retval == ખાલી)
     {
 	CFRelease(cfstr);
-	return NULL;
+	પાછા ખાલી;
     }
 
-    if (lenp)
-	*lenp = buflen / sizeof(char_u);
+    જો (lenp)
+	*lenp = buflen / કદ(char_u);
 
-    if (!CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, retval, buflen, NULL))
+    જો (!CFStringGetBytes(cfstr, convertRange, to, ખાલી, FALSE, retval, buflen, ખાલી))
 #endif
-    if (!CFStringGetCString(cfstr, (char *)retval, buflen, to))
+    જો (!CFStringGetCString(cfstr, (અક્ષર *)retval, buflen, to))
     {
 	CFRelease(cfstr);
-	if (fail_on_error)
+	જો (fail_on_error)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    પાછા ખાલી;
 	}
 
 	fprintf(stderr, "Trying char-by-char conversion...\n");
 	// conversion failed for the whole string, but maybe it will work
 	// for each character
-	for (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
+	માટે (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
 	{
-	    if (from == kCFStringEncodingUTF8)
+	    જો (from == kCFStringEncodingUTF8)
 		l = utf_ptr2len(ptr + in);
-	    else
+	    નહીંતર
 		l = 1;
-	    cfstr = CFStringCreateWithBytes(NULL, ptr + in, l, from, 0);
-	    if (cfstr == NULL)
+	    cfstr = CFStringCreateWithBytes(ખાલી, ptr + in, l, from, 0);
+	    જો (cfstr == ખાલી)
 	    {
 		*d++ = '?';
 		out++;
 	    }
-	    else
+	    નહીંતર
 	    {
-		if (!CFStringGetCString(cfstr, (char *)d, buflen - out, to))
+		જો (!CFStringGetCString(cfstr, (અક્ષર *)d, buflen - out, to))
 		{
 		    *d++ = '?';
 		    out++;
 		}
-		else
+		નહીંતર
 		{
 		    i = STRLEN(d);
 		    d += i;
@@ -151,15 +151,15 @@ mac_string_convert(
 	    in += l;
 	}
 	*d = NUL;
-	if (lenp != NULL)
+	જો (lenp != ખાલી)
 	    *lenp = out;
-	return retval;
+	પાછા retval;
     }
     CFRelease(cfstr);
-    if (lenp != NULL)
+    જો (lenp != ખાલી)
 	*lenp = STRLEN(retval);
 
-    return retval;
+    પાછા retval;
 }
 
 /*
@@ -170,7 +170,7 @@ mac_string_convert(
  * output is in-place, "sizep" is adjusted.
  * Returns OK or FAIL.
  */
-    int
+    પૂર્ણાંક
 macroman2enc(
     char_u	*ptr,
     long	*sizep,
@@ -182,31 +182,31 @@ macroman2enc(
 
     // MacRoman is an 8-bit encoding, no need to move bytes to
     // conv_rest[].
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len,
+    cfstr = CFStringCreateWithBytes(ખાલી, ptr, len,
 						kCFStringEncodingMacRoman, 0);
     /*
      * If there is a conversion error, try using another
      * conversion.
      */
-    if (cfstr == NULL)
-	return FAIL;
+    જો (cfstr == ખાલી)
+	પાછા FAIL;
 
     r.location = 0;
     r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    જો (r.length != CFStringGetBytes(cfstr, r,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0, // no lossy conversion
 	    0, // not external representation
 	    ptr + *sizep, real_size - *sizep, &len))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	પાછા FAIL;
     }
     CFRelease(cfstr);
     mch_memmove(ptr, ptr + *sizep, len);
     *sizep = len;
 
-    return OK;
+    પાછા OK;
 }
 
 /*
@@ -216,37 +216,37 @@ macroman2enc(
  * Unconverted rest in rest[*restlenp].
  * Returns OK or FAIL.
  */
-    int
+    પૂર્ણાંક
 enc2macroman(
     char_u	*from,
     size_t	fromlen,
     char_u	*to,
-    int		*tolenp,
-    int		maxtolen,
+    પૂર્ણાંક		*tolenp,
+    પૂર્ણાંક		maxtolen,
     char_u	*rest,
-    int		*restlenp)
+    પૂર્ણાંક		*restlenp)
 {
     CFStringRef	cfstr;
     CFRange	r;
     CFIndex	l;
 
     *restlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+    cfstr = CFStringCreateWithBytes(ખાલી, from, fromlen,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0);
-    while (cfstr == NULL && *restlenp < 3 && fromlen > 1)
+    જ્યારે (cfstr == ખાલી && *restlenp < 3 && fromlen > 1)
     {
 	rest[*restlenp++] = from[--fromlen];
-	cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+	cfstr = CFStringCreateWithBytes(ખાલી, from, fromlen,
 		(enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 		0);
     }
-    if (cfstr == NULL)
-	return FAIL;
+    જો (cfstr == ખાલી)
+	પાછા FAIL;
 
     r.location = 0;
     r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    જો (r.length != CFStringGetBytes(cfstr, r,
 		kCFStringEncodingMacRoman,
 		0, // no lossy conversion
 		0, // not external representation (since vim
@@ -254,18 +254,18 @@ enc2macroman(
 		to, maxtolen, &l))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	પાછા FAIL;
     }
     CFRelease(cfstr);
     *tolenp = l;
-    return OK;
+    પાછા OK;
 }
 
 /*
  * Initializes text converters
  */
-    void
-mac_conv_init(void)
+    શૂન્ય
+mac_conv_init(શૂન્ય)
 {
     TextEncoding    utf8_encoding;
     TextEncoding    utf8_hfsplus_encoding;
@@ -281,37 +281,37 @@ mac_conv_init(void)
     utf16_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
 	    kTextEncodingDefaultVariant, kUnicode16BitFormat);
 
-    if (TECCreateConverter(&gPathConverter, utf8_encoding,
+    જો (TECCreateConverter(&gPathConverter, utf8_encoding,
 		utf8_hfsplus_encoding) != noErr)
-	gPathConverter = NULL;
+	gPathConverter = ખાલી;
 
-    if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+    જો (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
 		utf8_canon_encoding) != noErr)
     {
 	// On pre-10.3, Unicode normalization is not available so
 	// fall back to non-normalizing converter
-	if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+	જો (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
 		    utf8_encoding) != noErr)
-	    gUTF16ToUTF8Converter = NULL;
+	    gUTF16ToUTF8Converter = ખાલી;
     }
 }
 
 /*
  * Destroys text converters
  */
-    void
-mac_conv_cleanup(void)
+    શૂન્ય
+mac_conv_cleanup(શૂન્ય)
 {
-    if (gUTF16ToUTF8Converter)
+    જો (gUTF16ToUTF8Converter)
     {
 	TECDisposeConverter(gUTF16ToUTF8Converter);
-	gUTF16ToUTF8Converter = NULL;
+	gUTF16ToUTF8Converter = ખાલી;
     }
 
-    if (gPathConverter)
+    જો (gPathConverter)
     {
 	TECDisposeConverter(gPathConverter);
-	gPathConverter = NULL;
+	gPathConverter = ખાલી;
     }
 }
 
@@ -330,13 +330,13 @@ mac_utf16_to_enc(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    char_u      *result = NULL;
+    char_u      *result = ખાલી;
 
     // Convert to utf-8 first, works better with iconv
     utf8_len = 0;
     utf8_str = mac_utf16_to_utf8(from, fromLen, &utf8_len);
 
-    if (utf8_str)
+    જો (utf8_str)
     {
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
@@ -344,31 +344,31 @@ mac_utf16_to_enc(
 	// If encoding (p_enc) is any unicode, it is actually in utf-8 (vim
 	// internal unicode is always utf-8) so don't convert in such cases
 
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
+	જો ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
 	    convert_setup(&conv, (char_u *)"utf-8",
 		    p_enc? p_enc: (char_u *)"macroman");
-	if (conv.vc_type == CONV_NONE)
+	જો (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    result = utf8_str;
 	}
-	else
+	નહીંતર
 	{
-	    int len = utf8_len;
+	    પૂર્ણાંક len = utf8_len;
 	    result = string_convert(&conv, utf8_str, &len);
 	    utf8_len = len;
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_setup(&conv, ખાલી, ખાલી);
 
-	if (actualLen)
+	જો (actualLen)
 	    *actualLen = utf8_len;
     }
-    else if (actualLen)
+    નહીંતર જો (actualLen)
 	*actualLen = 0;
 
-    return result;
+    પાછા result;
 }
 
 /*
@@ -386,72 +386,72 @@ mac_enc_to_utf16(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    UniChar     *result = NULL;
+    UniChar     *result = ખાલી;
     Boolean     should_free_utf8 = FALSE;
 
-    do
+    કરો
     {
 	// Use MacRoman by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
+	જો ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
 		convert_setup(&conv, p_enc ? p_enc : (char_u *)"macroman",
 		    (char_u *)"utf-8") == FAIL)
-	    break;
+	    તોડો;
 
-	if (conv.vc_type != CONV_NONE)
+	જો (conv.vc_type != CONV_NONE)
 	{
 	    utf8_len = fromLen;
-	    utf8_str = string_convert(&conv, from, (int *)&utf8_len);
+	    utf8_str = string_convert(&conv, from, (પૂર્ણાંક *)&utf8_len);
 	    should_free_utf8 = TRUE;
 	}
-	else
+	નહીંતર
 	{
 	    utf8_str = from;
 	    utf8_len = fromLen;
 	}
 
-	if (utf8_str == NULL)
-	    break;
+	જો (utf8_str == ખાલી)
+	    તોડો;
 
-	convert_setup(&conv, NULL, NULL);
+	convert_setup(&conv, ખાલી, ખાલી);
 
 	result = mac_utf8_to_utf16(utf8_str, utf8_len, actualLen);
 
-	if (should_free_utf8)
+	જો (should_free_utf8)
 	    vim_free(utf8_str);
-	return result;
+	પાછા result;
     }
-    while (0);
+    જ્યારે (0);
 
-    if (actualLen)
+    જો (actualLen)
 	*actualLen = 0;
 
-    return result;
+    પાછા result;
 }
 
 /*
  * Converts from UTF-16 UniChars to CFString
  * The void * return type is actually a CFStringRef
  */
-    void *
+    શૂન્ય *
 mac_enc_to_cfstring(
     char_u  *from,
     size_t  fromLen)
 {
     UniChar	*utf16_str;
     size_t	utf16_len;
-    CFStringRef	result = NULL;
+    CFStringRef	result = ખાલી;
 
     utf16_str = mac_enc_to_utf16(from, fromLen, &utf16_len);
-    if (utf16_str)
+    જો (utf16_str)
     {
-	result = CFStringCreateWithCharacters(NULL, utf16_str, utf16_len/sizeof(UniChar));
+	result = CFStringCreateWithCharacters(ખાલી, utf16_str, utf16_len/કદ(UniChar));
 	vim_free(utf16_str);
     }
 
-    return (void *)result;
+    પાછા (શૂન્ય *)result;
 }
 
 /*
@@ -463,68 +463,68 @@ mac_precompose_path(
     size_t  decompLen,
     size_t  *precompLen)
 {
-    char_u  *result = NULL;
+    char_u  *result = ખાલી;
     size_t  actualLen = 0;
 
-    if (gPathConverter)
+    જો (gPathConverter)
     {
 	result = alloc(decompLen);
-	if (result)
+	જો (result)
 	{
-	    if (TECConvertText(gPathConverter, decompPath,
+	    જો (TECConvertText(gPathConverter, decompPath,
 			decompLen, &decompLen, result,
 			decompLen, &actualLen) != noErr)
 		VIM_CLEAR(result);
 	}
     }
 
-    if (precompLen)
+    જો (precompLen)
 	*precompLen = actualLen;
 
-    return result;
+    પાછા result;
 }
 
 /*
  * Converts from UTF-16 UniChars to precomposed UTF-8
  */
-    static char_u *
+    સ્થિર char_u *
 mac_utf16_to_utf8(
     UniChar *from,
     size_t fromLen,
     size_t *actualLen)
 {
-    ByteCount		utf8_len;
-    ByteCount		inputRead;
+    Byte_ગણતરી		utf8_len;
+    Byte_ગણતરી		આગત_Read;
     char_u		*result;
 
-    if (gUTF16ToUTF8Converter)
+    જો (gUTF16ToUTF8Converter)
     {
 	result = alloc(fromLen * 6 + 1);
-	if (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
-		    fromLen, &inputRead, result,
-		    (fromLen*6+1)*sizeof(char_u), &utf8_len) == noErr)
+	જો (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
+		    fromLen, &આગત_Read, result,
+		    (fromLen*6+1)*કદ(char_u), &utf8_len) == noErr)
 	{
-	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &inputRead);
-	    utf8_len += inputRead;
+	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*કદ(char_u), &આગત_Read);
+	    utf8_len += આગત_Read;
 	}
-	else
+	નહીંતર
 	    VIM_CLEAR(result);
     }
-    else
+    નહીંતર
     {
-	result = NULL;
+	result = ખાલી;
     }
 
-    if (actualLen)
+    જો (actualLen)
 	*actualLen = result ? utf8_len : 0;
 
-    return result;
+    પાછા result;
 }
 
 /*
  * Converts from UTF-8 to UTF-16 UniChars
  */
-    static UniChar *
+    સ્થિર UniChar *
 mac_utf8_to_utf16(
     char_u *from,
     size_t fromLen,
@@ -532,16 +532,16 @@ mac_utf8_to_utf16(
 {
     CFStringRef  utf8_str;
     CFRange      convertRange;
-    UniChar      *result = NULL;
+    UniChar      *result = ખાલી;
 
-    utf8_str = CFStringCreateWithBytes(NULL, from, fromLen,
+    utf8_str = CFStringCreateWithBytes(ખાલી, from, fromLen,
 	    kCFStringEncodingUTF8, FALSE);
 
-    if (utf8_str == NULL)
+    જો (utf8_str == ખાલી)
     {
-	if (actualLen)
+	જો (actualLen)
 	    *actualLen = 0;
-	return NULL;
+	પાછા ખાલી;
     }
 
     convertRange = CFRangeMake(0, CFStringGetLength(utf8_str));
@@ -551,37 +551,37 @@ mac_utf8_to_utf16(
 
     CFRelease(utf8_str);
 
-    if (actualLen)
-	*actualLen = convertRange.length * sizeof(UniChar);
+    જો (actualLen)
+	*actualLen = convertRange.length * કદ(UniChar);
 
-    return result;
+    પાછા result;
 }
 
 /*
  * Sets LANG environment variable in Vim from Mac locale
  */
-    void
-mac_lang_init(void)
+    શૂન્ય
+mac_lang_init(શૂન્ય)
 {
-    if (mch_getenv((char_u *)"LANG") != NULL)
-	return;
+    જો (mch_getenv((char_u *)"LANG") != ખાલી)
+	પાછા;
 
-    char	buf[50];
+    અક્ષર	buf[50];
 
     // $LANG is not set, either because it was unset or Vim was started
     // from the Dock.  Query the system locale.
-    if (LocaleRefGetPartString(NULL,
+    જો (LocaleRefGetPartString(ખાલી,
 		kLocaleLanguageMask | kLocaleLanguageVariantMask |
 		kLocaleRegionMask | kLocaleRegionVariantMask,
-		sizeof(buf) - 10, buf) == noErr && *buf)
+		કદ(buf) - 10, buf) == noErr && *buf)
     {
-	if (strcasestr(buf, "utf-8") == NULL)
+	જો (strcasestr(buf, "utf-8") == ખાલી)
 	    strcat(buf, ".UTF-8");
 	vim_setenv((char_u *)"LANG", (char_u *)buf);
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_ALL, "");
 #endif
-#if defined(LC_NUMERIC)
+#જો defined(LC_NUMERIC)
 	// Make sure strtod() uses a decimal point, not a comma.
 	setlocale(LC_NUMERIC, "C");
 #endif

@@ -4,73 +4,73 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import os
-import sys
-import time
+તઃ __future__ આયાત print_function
+આયાત os
+આયાત sys
+આયાત time
 
-if __name__ == "__main__":
+જો __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
+    જો len(sys.argv) > 1:
+        જો sys.argv[1].startswith("err"):
             print(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
-        elif sys.argv[1].startswith("incomplete"):
+        અથવાજો sys.argv[1].startswith("incomplete"):
             print(sys.argv[1], end='')
             sys.stdout.flush()
             sys.exit(0)
-        elif sys.argv[1].startswith("busy"):
-            time.sleep(100)
+        અથવાજો sys.argv[1].startswith("busy"):
+            time.સુષુપ્તિ(100)
             sys.exit(0)
-        else:
+        નહીંતર:
             print(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            જો sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
-        try:
-            import thread_util
-            thread_util.set_high_priority()
-        except Exception:
+    જો os.getenv('CI'):
+        પ્રયાસ:
+            આયાત thread_util
+            thread_util.set_ઉપલું_priority()
+        અપવાદ Exception:
             pass
 
-    while True:
+    જ્યારે સાચું:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
-            break
-        if typed.startswith("quit"):
+        જો typed == "":  # EOF -- stop
+            તોડો
+        જો typed.startswith("quit"):
             print("Goodbye!")
             sys.stdout.flush()
-            break
-        if typed.startswith("echo "):
+            તોડો
+        જો typed.startswith("echo "):
             print(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
-                sys.stdout.write(part)
+        જો typed.startswith("echosplit "):
+            માટે part માં typed[10:-1].split('|'):
+                sys.stdout.લિખ(part)
                 sys.stdout.flush()
-                time.sleep(0.05)
-        if typed.startswith("double "):
+                time.સુષુપ્તિ(0.05)
+        જો typed.startswith("double "):
             print(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
+        જો typed.startswith("split "):
             print(typed[6:-1], end='')
             sys.stdout.flush()
-            time.sleep(0.05)
+            time.સુષુપ્તિ(0.05)
             print(typed[6:-1], end='')
             sys.stdout.flush()
-            time.sleep(0.05)
+            time.સુષુપ્તિ(0.05)
             print(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
+        જો typed.startswith("echoerr "):
             print(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
+        જો typed.startswith("doubleerr "):
             print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
+        જો typed.startswith("XXX"):
             print(typed, end='')
             sys.stderr.flush()
-            break
+            તોડો
 

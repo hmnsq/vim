@@ -1,4 +1,4 @@
 #!/usr/bin/python2
 
-import sys
+આયાત sys
 print(sys.version)

@@ -10,9 +10,9 @@
 #ifndef HARDCOPY_POSTSCRIPT_H
 #define HARDCOPY_POSTSCRIPT_H
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_POSTSCRIPT)
+#જો defined(FEAT_POSTSCRIPT)
 
 # define OPT_MBFONT_USECOURIER  0
 # define OPT_MBFONT_ASCII       1
@@ -20,9 +20,9 @@
 # define OPT_MBFONT_BOLD	3
 # define OPT_MBFONT_OBLIQUE     4
 # define OPT_MBFONT_BOLDOBLIQUE 5
-# define OPT_MBFONT_NUM_OPTIONS 6
+# define OPT_MBFONT_અંક_OPTIONS 6
 
-extern option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS];
+બાહ્ય option_table_T mbfont_opts[OPT_MBFONT_અંક_OPTIONS];
 
 #endif
 

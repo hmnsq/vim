@@ -12,9 +12,9 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#અન્તર્ભાવ "vim.h"
 
-#if defined(FEAT_EVAL)
+#જો defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -26,342 +26,342 @@
  * this always uses a decimal point.
  * Returns the length of the text that was consumed.
  */
-    int
+    પૂર્ણાંક
 string2float(
     char_u	*text,
-    float_T	*value,	    // result stored here
-    int		skip_quotes)
+    float_T	*કિંમત,	    // result stored here
+    પૂર્ણાંક		skip_quotes)
 {
-    char	*s = (char *)text;
+    અક્ષર	*s = (અક્ષર *)text;
     float_T	f;
 
     // MS-Windows does not deal with "inf" and "nan" properly.
-    if (STRNICMP(text, "inf", 3) == 0)
+    જો (STRNICMP(text, "inf", 3) == 0)
     {
-	*value = INFINITY;
-	return 3;
+	*કિંમત = INFINITY;
+	પાછા 3;
     }
-    if (STRNICMP(text, "-inf", 4) == 0)
+    જો (STRNICMP(text, "-inf", 4) == 0)
     {
-	*value = -INFINITY;
-	return 4;
+	*કિંમત = -INFINITY;
+	પાછા 4;
     }
-    if (STRNICMP(text, "nan", 3) == 0)
+    જો (STRNICMP(text, "nan", 3) == 0)
     {
-	*value = NAN;
-	return 3;
+	*કિંમત = NAN;
+	પાછા 3;
     }
-    if (skip_quotes && vim_strchr((char_u *)s, '\'') != NULL)
+    જો (skip_quotes && vim_strchr((char_u *)s, '\'') != ખાલી)
     {
 	char_u	    buf[100];
 	char_u	    *p;
-	int	    quotes = 0;
+	પૂર્ણાંક	    quotes = 0;
 
 	vim_strncpy(buf, (char_u *)s, 99);
-	for (p = buf; ; p = skipdigits(p))
+	માટે (p = buf; ; p = skipdigits(p))
 	{
 	    // remove single quotes between digits, not in the exponent
-	    if (*p == '\'')
+	    જો (*p == '\'')
 	    {
 		++quotes;
 		mch_memmove(p, p + 1, STRLEN(p));
 	    }
-	    if (!vim_isdigit(*p))
-		break;
+	    જો (!vim_isdigit(*p))
+		તોડો;
 	}
-	s = (char *)buf;
+	s = (અક્ષર *)buf;
 	f = strtod(s, &s);
-	*value = f;
-	return (int)((char_u *)s - buf) + quotes;
+	*કિંમત = f;
+	પાછા (પૂર્ણાંક)((char_u *)s - buf) + quotes;
     }
 
     f = strtod(s, &s);
-    *value = f;
-    return (int)((char_u *)s - text);
+    *કિંમત = f;
+    પાછા (પૂર્ણાંક)((char_u *)s - text);
 }
 
 /*
  * Get the float value of "argvars[0]" into "f".
  * Returns FAIL when the argument is not a Number or Float.
  */
-    static int
+    સ્થિર પૂર્ણાંક
 get_float_arg(typval_T *argvars, float_T *f)
 {
-    if (argvars[0].v_type == VAR_FLOAT)
+    જો (argvars[0].v_type == VAR_FLOAT)
     {
 	*f = argvars[0].vval.v_float;
-	return OK;
+	પાછા OK;
     }
-    if (argvars[0].v_type == VAR_NUMBER)
+    જો (argvars[0].v_type == VAR_સંખ્યા)
     {
-	*f = (float_T)argvars[0].vval.v_number;
-	return OK;
+	*f = (float_T)argvars[0].vval.v_સંખ્યા;
+	પાછા OK;
     }
-    emsg(_(e_number_or_float_required));
-    return FAIL;
+    emsg(_(e_સંખ્યા_or_float_required));
+    પાછા FAIL;
 }
 
 /*
  * "abs(expr)" function
  */
-    void
+    શૂન્ય
 f_abs(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    if (argvars[0].v_type == VAR_FLOAT)
+    જો (argvars[0].v_type == VAR_FLOAT)
     {
 	rettv->v_type = VAR_FLOAT;
 	rettv->vval.v_float = fabs(argvars[0].vval.v_float);
     }
-    else
+    નહીંતર
     {
 	varnumber_T	n;
-	int		error = FALSE;
+	પૂર્ણાંક		error = FALSE;
 
-	n = tv_get_number_chk(&argvars[0], &error);
-	if (error)
-	    rettv->vval.v_number = -1;
-	else if (n > 0)
-	    rettv->vval.v_number = n;
-	else
-	    rettv->vval.v_number = -n;
+	n = tv_get_સંખ્યા_chk(&argvars[0], &error);
+	જો (error)
+	    rettv->vval.v_સંખ્યા = -1;
+	નહીંતર જો (n > 0)
+	    rettv->vval.v_સંખ્યા = n;
+	નહીંતર
+	    rettv->vval.v_સંખ્યા = -n;
     }
 }
 
 /*
  * "acos()" function
  */
-    void
+    શૂન્ય
 f_acos(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = acos(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "asin()" function
  */
-    void
+    શૂન્ય
 f_asin(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = asin(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "atan()" function
  */
-    void
+    શૂન્ય
 f_atan(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = atan(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "atan2()" function
  */
-    void
+    શૂન્ય
 f_atan2(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    જો (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = atan2(fx, fy);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "ceil({float})" function
  */
-    void
+    શૂન્ય
 f_ceil(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = ceil(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "cos()" function
  */
-    void
+    શૂન્ય
 f_cos(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = cos(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "cosh()" function
  */
-    void
+    શૂન્ય
 f_cosh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = cosh(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "exp()" function
  */
-    void
+    શૂન્ય
 f_exp(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = exp(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "float2nr({float})" function
  */
-    void
+    શૂન્ય
 f_float2nr(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    if (get_float_arg(argvars, &f) != OK)
-	return;
+    જો (get_float_arg(argvars, &f) != OK)
+	પાછા;
 
-    if (f <= (float_T)-VARNUM_MAX + DBL_EPSILON)
-	rettv->vval.v_number = -VARNUM_MAX;
-    else if (f >= (float_T)VARNUM_MAX - DBL_EPSILON)
-	rettv->vval.v_number = VARNUM_MAX;
-    else
-	rettv->vval.v_number = (varnumber_T)f;
+    જો (f <= (float_T)-VARNUM_MAX + DBL_EPSILON)
+	rettv->vval.v_સંખ્યા = -VARNUM_MAX;
+    નહીંતર જો (f >= (float_T)VARNUM_MAX - DBL_EPSILON)
+	rettv->vval.v_સંખ્યા = VARNUM_MAX;
+    નહીંતર
+	rettv->vval.v_સંખ્યા = (varnumber_T)f;
 }
 
 /*
  * "floor({float})" function
  */
-    void
+    શૂન્ય
 f_floor(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = floor(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "fmod()" function
  */
-    void
+    શૂન્ય
 f_fmod(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    જો (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = fmod(fx, fy);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
-#if defined(HAVE_MATH_H)
+#જો defined(HAVE_MATH_H)
 /*
  * "isinf()" function
  */
-    void
+    શૂન્ય
 f_isinf(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    if (argvars[0].v_type == VAR_FLOAT && isinf(argvars[0].vval.v_float))
-	rettv->vval.v_number = argvars[0].vval.v_float > 0.0 ? 1 : -1;
+    જો (argvars[0].v_type == VAR_FLOAT && isinf(argvars[0].vval.v_float))
+	rettv->vval.v_સંખ્યા = argvars[0].vval.v_float > 0.0 ? 1 : -1;
 }
 
 /*
  * "isnan()" function
  */
-    void
+    શૂન્ય
 f_isnan(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
-    rettv->vval.v_number = argvars[0].v_type == VAR_FLOAT
+    rettv->vval.v_સંખ્યા = argvars[0].v_type == VAR_FLOAT
 					    && isnan(argvars[0].vval.v_float);
 }
 #endif
@@ -369,57 +369,57 @@ f_isnan(typval_T *argvars, typval_T *rettv)
 /*
  * "log()" function
  */
-    void
+    શૂન્ય
 f_log(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = log(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "log10()" function
  */
-    void
+    શૂન્ય
 f_log10(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = log10(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "pow()" function
  */
-    void
+    શૂન્ય
 f_pow(typval_T *argvars, typval_T *rettv)
 {
     float_T	fx = 0.0, fy = 0.0;
 
-    if (in_vim9script()
+    જો (in_vim9script()
 	    && (check_for_float_or_nr_arg(argvars, 0) == FAIL
 		|| check_for_float_or_nr_arg(argvars, 1) == FAIL))
-	return;
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &fx) == OK
+    જો (get_float_arg(argvars, &fx) == OK
 				     && get_float_arg(&argvars[1], &fy) == OK)
 	rettv->vval.v_float = pow(fx, fy);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
@@ -430,103 +430,103 @@ f_pow(typval_T *argvars, typval_T *rettv)
     float_T
 vim_round(float_T f)
 {
-    return f > 0 ? floor(f + 0.5) : ceil(f - 0.5);
+    પાછા f > 0 ? floor(f + 0.5) : ceil(f - 0.5);
 }
 
 /*
  * "round({float})" function
  */
-    void
+    શૂન્ય
 f_round(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = vim_round(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sin()" function
  */
-    void
+    શૂન્ય
 f_sin(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sin(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sinh()" function
  */
-    void
+    શૂન્ય
 f_sinh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sinh(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "sqrt()" function
  */
-    void
+    શૂન્ય
 f_sqrt(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = sqrt(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "str2float()" function
  */
-    void
+    શૂન્ય
 f_str2float(typval_T *argvars, typval_T *rettv)
 {
     char_u *p;
-    int     isneg;
-    int	    skip_quotes;
+    પૂર્ણાંક     isneg;
+    પૂર્ણાંક	    skip_quotes;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	પાછા;
 
     skip_quotes = argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]);
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
 
-    if (*p == '+' || *p == '-')
+    જો (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    (void)string2float(p, &rettv->vval.v_float, skip_quotes);
-    if (isneg)
+    (શૂન્ય)string2float(p, &rettv->vval.v_float, skip_quotes);
+    જો (isneg)
 	rettv->vval.v_float *= -1;
     rettv->v_type = VAR_FLOAT;
 }
@@ -534,55 +534,55 @@ f_str2float(typval_T *argvars, typval_T *rettv)
 /*
  * "tan()" function
  */
-    void
+    શૂન્ય
 f_tan(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = tan(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "tanh()" function
  */
-    void
+    શૂન્ય
 f_tanh(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	rettv->vval.v_float = tanh(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
 /*
  * "trunc({float})" function
  */
-    void
+    શૂન્ય
 f_trunc(typval_T *argvars, typval_T *rettv)
 {
     float_T	f = 0.0;
 
-    if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
-	return;
+    જો (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
+	પાછા;
 
     rettv->v_type = VAR_FLOAT;
-    if (get_float_arg(argvars, &f) == OK)
+    જો (get_float_arg(argvars, &f) == OK)
 	// trunc() is not in C90, use floor() or ceil() instead.
 	rettv->vval.v_float = f > 0 ? floor(f) : ceil(f);
-    else
+    નહીંતર
 	rettv->vval.v_float = 0.0;
 }
 
