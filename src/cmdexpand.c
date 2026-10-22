@@ -11,34 +11,34 @@
  * cmdexpand.c: functions for command-line completion
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-static int	cmd_showtail;	// Only show path tail in lists ?
-static int	may_expand_pattern = FALSE;
-static pos_T	pre_incsearch_pos; // Cursor position when incsearch started
+स्थिर पूर्णाङ्क	cmd_showtail;	// Only show path tail in lists ?
+स्थिर पूर्णाङ्क	may_expand_pattern = FALSE;
+स्थिर pos_T	pre_incsearch_pos; // Cursor position when incsearch started
 
-static void	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, int usefilter, expand_T *xp, int *complp);
-static int	ExpandFromContext(expand_T *xp, char_u *, char_u ***, int *, int);
-static char_u	*showmatches_gettail(char_u *s);
-static int	expand_showtail(expand_T *xp);
-static int	expand_shellcmd(char_u *filepat, char_u ***matches, int *numMatches, int flagsarg);
-#if defined(FEAT_EVAL)
-static int	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, int *numMatches);
-static int	ExpandUserList(expand_T *xp, char_u ***matches, int *numMatches);
-static char_u	*apply_user_completeopt_escape(expand_T *xp, char_u *str);
-static char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, int srclen, int *new_lenp);
+स्थिर शून्य	set_context_for_wildcard_arg(exarg_T *eap, char_u *arg, पूर्णाङ्क usefilter, expand_T *xp, पूर्णाङ्क *complp);
+स्थिर पूर्णाङ्क	ExpandFromContext(expand_T *xp, char_u *, char_u ***, पूर्णाङ्क *, पूर्णाङ्क);
+स्थिर char_u	*showmatches_gettail(char_u *s);
+स्थिर पूर्णाङ्क	expand_showtail(expand_T *xp);
+स्थिर पूर्णाङ्क	expand_shellcmd(char_u *filepat, char_u ***matches, पूर्णाङ्क *अंक_Matches, पूर्णाङ्क flagsarg);
+#यदि defined(FEAT_EVAL)
+स्थिर पूर्णाङ्क	ExpandUserDefined(char_u *pat, expand_T *xp, regmatch_T *regmatch, char_u ***matches, पूर्णाङ्क *अंक_Matches);
+स्थिर पूर्णाङ्क	ExpandUserList(expand_T *xp, char_u ***matches, पूर्णाङ्क *अंक_Matches);
+स्थिर char_u	*apply_user_completeopt_escape(expand_T *xp, char_u *str);
+स्थिर char_u	*unescape_user_completeopt_pat(expand_T *xp, char_u *src, पूर्णाङ्क srclen, पूर्णाङ्क *new_lenp);
 #endif
-static int	expand_pattern_in_buf(char_u *pat, int dir, char_u ***matches, int *numMatches);
+स्थिर पूर्णाङ्क	expand_pattern_in_buf(char_u *pat, पूर्णाङ्क dir, char_u ***matches, पूर्णाङ्क *अंक_Matches);
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
-static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+स्थिर pumitem_T *compl_match_array = रिक्त;
+स्थिर पूर्णाङ्क compl_match_arraysize;
 // First column in cmdline of the matched item for completion.
-static int compl_startcol;
-static int compl_selected;
+स्थिर पूर्णाङ्क compl_startcol;
+स्थिर पूर्णाङ्क compl_selected;
 // cmdline before expansion
-static string_T cmdline_orig = {NULL, 0};
+स्थिर string_T cmdline_orig = {रिक्त, 0};
 
 #define SHOW_MATCH(m) (showtail ? showmatches_gettail(matches[m]) : matches[m])
 
@@ -46,39 +46,39 @@ static string_T cmdline_orig = {NULL, 0};
  * Returns TRUE if fuzzy completion is supported for a given cmdline completion
  * context.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cmdline_fuzzy_completion_supported(expand_T *xp)
 {
-    switch (xp->xp_context)
+    विकल्प (xp->xp_context)
     {
-    case EXPAND_BOOL_SETTINGS:
-    case EXPAND_COLORS:
-    case EXPAND_COMPILER:
-    case EXPAND_DIRECTORIES:
-    case EXPAND_DIRS_IN_CDPATH:
-    case EXPAND_FILES:
-    case EXPAND_FILES_IN_PATH:
-    case EXPAND_FILETYPE:
-    case EXPAND_FILETYPECMD:
-    case EXPAND_HELP:
-    case EXPAND_KEYMAP:
-    case EXPAND_OLD_SETTING:
-    case EXPAND_STRING_SETTING:
-    case EXPAND_SETTING_SUBTRACT:
-    case EXPAND_OWNSYNTAX:
-    case EXPAND_PACKADD:
-    case EXPAND_RUNTIME:
-    case EXPAND_SHELLCMD:
-    case EXPAND_SHELLCMDLINE:
-    case EXPAND_TAGS:
-    case EXPAND_TAGS_LISTFILES:
-	return FALSE;
+    पक्ष EXPAND_BOOL_SETTINGS:
+    पक्ष EXPAND_COLORS:
+    पक्ष EXPAND_COMPILER:
+    पक्ष EXPAND_DIRECTORIES:
+    पक्ष EXPAND_DIRS_IN_CDPATH:
+    पक्ष EXPAND_FILES:
+    पक्ष EXPAND_FILES_IN_PATH:
+    पक्ष EXPAND_FILETYPE:
+    पक्ष EXPAND_FILETYPECMD:
+    पक्ष EXPAND_HELP:
+    पक्ष EXPAND_KEYMAP:
+    पक्ष EXPAND_OLD_SETTING:
+    पक्ष EXPAND_STRING_SETTING:
+    पक्ष EXPAND_SETTING_SUBTRACT:
+    पक्ष EXPAND_OWNSYNTAX:
+    पक्ष EXPAND_PACKADD:
+    पक्ष EXPAND_RUNTIME:
+    पक्ष EXPAND_SHELLCMD:
+    पक्ष EXPAND_SHELLCMDLINE:
+    पक्ष EXPAND_TAGS:
+    पक्ष EXPAND_TAGS_LISTFILES:
+	प्रत्यागम FALSE;
 
-    default:
-	break;
+    स्वभाव:
+	भङ्ग;
     }
 
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL;
+    प्रत्यागम vim_strchr(p_wop, WOP_FUZZY) != रिक्त;
 }
 
 /*
@@ -86,42 +86,42 @@ cmdline_fuzzy_completion_supported(expand_T *xp)
  * 'fuzzystr' is not empty.  If search pattern is empty, then don't use fuzzy
  * matching.
  */
-    int
+    पूर्णाङ्क
 cmdline_fuzzy_complete(char_u *fuzzystr)
 {
-    return vim_strchr(p_wop, WOP_FUZZY) != NULL && *fuzzystr != NUL;
+    प्रत्यागम vim_strchr(p_wop, WOP_FUZZY) != रिक्त && *fuzzystr != NUL;
 }
 
 /*
  * sort function for the completion matches.
  * <SNR> functions should be sorted to the end.
  */
-    static int
-sort_func_compare(const void *s1, const void *s2)
+    स्थिर पूर्णाङ्क
+sort_func_compare(ध्रुव शून्य *s1, ध्रुव शून्य *s2)
 {
     char_u *p1 = *(char_u **)s1;
     char_u *p2 = *(char_u **)s2;
 
-    if (*p1 != '<' && *p2 == '<') return -1;
-    if (*p1 == '<' && *p2 != '<') return 1;
-    return STRCMP(p1, p2);
+    यदि (*p1 != '<' && *p2 == '<') प्रत्यागम -1;
+    यदि (*p1 == '<' && *p2 != '<') प्रत्यागम 1;
+    प्रत्यागम STRCMP(p1, p2);
 }
 
 /*
  * Escape special characters in the cmdline completion matches.
  */
-    static void
+    स्थिर शून्य
 wildescape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    पूर्णाङ्क		numfiles,
     char_u	**files)
 {
     char_u	*p;
-    int		vse_what = xp->xp_context == EXPAND_BUFFERS
+    पूर्णाङ्क		vse_what = xp->xp_context == EXPAND_BUFFERS
 						       ? VSE_BUFFER : VSE_NONE;
 
-    if (xp->xp_context == EXPAND_FILES
+    यदि (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_SHELLCMD
 	    || xp->xp_context == EXPAND_BUFFERS
@@ -130,20 +130,20 @@ wildescape(
     {
 	// Insert a backslash into a file name before a space, \, %, #
 	// and wildmatch characters, except '~'.
-	for (int i = 0; i < numfiles; ++i)
+	प्रति (पूर्णाङ्क i = 0; i < numfiles; ++i)
 	{
 	    // for ":set path=" we need to escape spaces twice
-	    if (xp->xp_backslash & XP_BS_THREE)
+	    यदि (xp->xp_backslash & XP_BS_THREE)
 	    {
-		char *pat = (xp->xp_backslash & XP_BS_COMMA) ?  " ," : " ";
+		वर्ण *pat = (xp->xp_backslash & XP_BS_COMMA) ?  " ," : " ";
 		p = vim_strsave_escaped(files[i], (char_u *)pat);
-		if (p != NULL)
+		यदि (p != रिक्त)
 		{
 		    vim_free(files[i]);
 		    files[i] = p;
-#if defined(BACKSLASH_IN_FILENAME)
+#यदि defined(BACKSLASH_IN_FILENAME)
 		    p = vim_strsave_escaped(files[i], (char_u *)" ");
-		    if (p != NULL)
+		    यदि (p != रिक्त)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -151,12 +151,12 @@ wildescape(
 #endif
 		}
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    अन्यथा यदि (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (vim_strchr(files[i], ',') != NULL)
+		यदि (vim_strchr(files[i], ',') != रिक्त)
 		{
 		    p = vim_strsave_escaped(files[i], (char_u *)",");
-		    if (p != NULL)
+		    यदि (p != रिक्त)
 		    {
 			vim_free(files[i]);
 			files[i] = p;
@@ -165,11 +165,11 @@ wildescape(
 	    }
 #ifdef BACKSLASH_IN_FILENAME
 	    p = vim_strsave_fnameescape(files[i], vse_what);
-#else
+#अन्यथा
 	    p = vim_strsave_fnameescape(files[i],
 		    xp->xp_shell ? VSE_SHELL : vse_what);
 #endif
-	    if (p != NULL)
+	    यदि (p != रिक्त)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -177,24 +177,24 @@ wildescape(
 
 	    // If 'str' starts with "\~", replace "~" at start of
 	    // files[i] with "\~".
-	    if (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
+	    यदि (str[0] == '\\' && str[1] == '~' && files[i][0] == '~')
 		escape_fname(&files[i]);
 	}
 	xp->xp_backslash = XP_BS_NONE;
 
 	// If the first file starts with a '+' escape it.  Otherwise it
 	// could be seen as "+cmd".
-	if (*files[0] == '+')
+	यदि (*files[0] == '+')
 	    escape_fname(&files[0]);
     }
-    else if (xp->xp_context == EXPAND_TAGS)
+    अन्यथा यदि (xp->xp_context == EXPAND_TAGS)
     {
 	// Insert a backslash before characters in a tag name that
 	// would terminate the ":tag" command.
-	for (int i = 0; i < numfiles; ++i)
+	प्रति (पूर्णाङ्क i = 0; i < numfiles; ++i)
 	{
 	    p = vim_strsave_escaped(files[i], (char_u *)"\\|\"");
-	    if (p != NULL)
+	    यदि (p != रिक्त)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -206,19 +206,19 @@ wildescape(
 /*
  * Escape special characters in the cmdline completion matches.
  */
-    static void
+    स्थिर शून्य
 ExpandEscape(
     expand_T	*xp,
     char_u	*str,
-    int		numfiles,
+    पूर्णाङ्क		numfiles,
     char_u	**files,
-    int		options)
+    पूर्णाङ्क		options)
 {
     // May change home directory back to "~"
-    if (options & WILD_HOME_REPLACE)
+    यदि (options & WILD_HOME_REPLACE)
 	tilde_replace(str, numfiles, files);
 
-    if (options & WILD_ESCAPE)
+    यदि (options & WILD_ESCAPE)
 	wildescape(xp, str, numfiles, files);
 }
 
@@ -228,30 +228,30 @@ ExpandEscape(
  * For the caller, this means that the character is just passed through like a
  * normal character (instead of being expanded).  This allows :s/^I^D etc.
  */
-    int
+    पूर्णाङ्क
 nextwild(
     expand_T	*xp,
-    int		type,
-    int		options,	// extra options for ExpandOne()
-    int		escape)		// if TRUE, escape the returned matches
+    पूर्णाङ्क		type,
+    पूर्णाङ्क		options,	// extra options for ExpandOne()
+    पूर्णाङ्क		escape)		// if TRUE, escape the returned matches
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*p;
-    int		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
-    int		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
+    पूर्णाङ्क		from_wildtrigger_func = options & WILD_FUNC_TRIGGER;
+    पूर्णाङ्क		wild_navigate = (type == WILD_NEXT || type == WILD_PREV
 	    || type == WILD_PAGEUP || type == WILD_PAGEDOWN);
 
-    if (xp->xp_numfiles == -1)
+    यदि (xp->xp_numfiles == -1)
     {
 	pre_incsearch_pos = xp->xp_pre_incsearch_pos;
 #ifdef FEAT_EVAL
-	if (ccline->input_fn && ccline->xp_context == EXPAND_COMMANDS)
+	यदि (ccline->निवेश_fn && ccline->xp_context == EXPAND_COMMANDS)
 	{
 	    // Expand commands typed in input() function
 	    set_cmd_context(xp, ccline->cmdbuff, ccline->cmdlen, ccline->cmdpos, FALSE);
 	}
-	else
+	अन्यथा
 #endif
 	{
 	    may_expand_pattern = options & WILD_MAY_EXPAND_PATTERN;
@@ -261,70 +261,70 @@ nextwild(
 	cmd_showtail = expand_showtail(xp);
     }
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    यदि (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return OK;  // Something illegal on command line
+	प्रत्यागम OK;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    यदि (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    i = (int)(xp->xp_pattern - ccline->cmdbuff);
+    i = (पूर्णाङ्क)(xp->xp_pattern - ccline->cmdbuff);
     xp->xp_pattern_len = ccline->cmdpos - i;
 
     // Skip showing matches if prefix is invalid during wildtrigger()
-    if (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
+    यदि (from_wildtrigger_func && xp->xp_context == EXPAND_COMMANDS
 	    && xp->xp_pattern_len == 0)
-	return FAIL;
+	प्रत्यागम FAIL;
 
     // If cmd_silent is set then don't show the dots, because redrawcmd() below
     // won't remove them.
-    if (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
+    यदि (!cmd_silent && !from_wildtrigger_func && !wild_navigate)
     {
-	msg_puts("...");	    // show that we are busy
+	संदेश_puts("...");	    // show that we are busy
 	out_flush();
     }
 
-    if (wild_navigate)
+    यदि (wild_navigate)
     {
 	// Get next/previous match for a previous expanded pattern.
-	p = ExpandOne(xp, NULL, NULL, 0, type);
+	p = ExpandOne(xp, रिक्त, रिक्त, 0, type);
     }
-    else
+    अन्यथा
     {
 	char_u	*tmp;
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	पूर्णाङ्क	pat_len = xp->xp_pattern_len;
+#यदि defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	यदि (unesc != रिक्त)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp)
+	यदि (cmdline_fuzzy_completion_supported(xp)
 		|| xp->xp_context == EXPAND_PATTERN_IN_BUF)
 	    // Don't modify the search string
 	    tmp = vim_strnsave(pat_src, pat_len);
-	else
+	अन्यथा
 	    tmp = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
 
 	// Translate string into pattern and expand it.
-	if (tmp == NULL)
-	    p = NULL;
-	else
+	यदि (tmp == रिक्त)
+	    p = रिक्त;
+	अन्यथा
 	{
-	    int use_options = options |
+	    पूर्णाङ्क use_options = options |
 		    WILD_HOME_REPLACE|WILD_ADD_SLASH|WILD_SILENT;
-	    if (escape)
+	    यदि (escape)
 		use_options |= WILD_ESCAPE;
-	    if (p_wic)
+	    यदि (p_wic)
 		use_options += WILD_ICASE;
 
 	    p = ExpandOne(xp, tmp,
@@ -332,51 +332,51 @@ nextwild(
 							   use_options, type);
 	    vim_free(tmp);
 	    // longest match: make sure it is not shorter, happens with :help
-	    if (p != NULL && type == WILD_LONGEST)
+	    यदि (p != रिक्त && type == WILD_LONGEST)
 	    {
-		int	j;
+		पूर्णाङ्क	j;
 
-		for (j = 0; j < xp->xp_pattern_len; ++j)
+		प्रति (j = 0; j < xp->xp_pattern_len; ++j)
 		{
 		    char_u  c = ccline->cmdbuff[i + j];
-		    if (c == '*' || c == '?')
-			break;
+		    यदि (c == '*' || c == '?')
+			भङ्ग;
 		}
-		if ((int)STRLEN(p) < j)
+		यदि ((पूर्णाङ्क)STRLEN(p) < j)
 		    VIM_CLEAR(p);
 	    }
 	}
     }
 
     // Save cmdline before inserting selected item
-    if (!wild_navigate && ccline->cmdbuff != NULL)
+    यदि (!wild_navigate && ccline->cmdbuff != रिक्त)
     {
 	vim_free(cmdline_orig.string);
 	cmdline_orig.string = vim_strnsave(ccline->cmdbuff, ccline->cmdlen);
-	if (cmdline_orig.string == NULL)
+	यदि (cmdline_orig.string == रिक्त)
 	    cmdline_orig.length = 0;
-	else
+	अन्यथा
 	    cmdline_orig.length = ccline->cmdlen;
     }
 
-    if (p != NULL && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
+    यदि (p != रिक्त && !got_int && !(options & (WILD_NOSELECT | WILD_NOINSERT)))
     {
-	size_t	plen = STRLEN(p);
-	int	difflen;
-	int	v = OK;
+	माप_प्रकार	plen = STRLEN(p);
+	पूर्णाङ्क	difflen;
+	पूर्णाङ्क	v = OK;
 
-	difflen = (int)plen - xp->xp_pattern_len;
-	if (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
+	difflen = (पूर्णाङ्क)plen - xp->xp_pattern_len;
+	यदि (ccline->cmdlen + difflen + 4 > ccline->cmdbufflen)
 	{
 	    v = realloc_cmdbuff(ccline->cmdlen + difflen + 4);
 	    xp->xp_pattern = ccline->cmdbuff + i;
 	}
 
-	if (v == OK)
+	यदि (v == OK)
 	{
 	    mch_memmove(&ccline->cmdbuff[ccline->cmdpos + difflen],
 		    &ccline->cmdbuff[ccline->cmdpos],
-		    (size_t)(ccline->cmdlen - ccline->cmdpos + 1));
+		    (माप_प्रकार)(ccline->cmdlen - ccline->cmdpos + 1));
 	    mch_memmove(&ccline->cmdbuff[i], p, plen);
 	    ccline->cmdlen += difflen;
 	    ccline->cmdpos += difflen;
@@ -388,75 +388,75 @@ nextwild(
 
     // When expanding a ":map" command and no matches are found, assume that
     // the key is supposed to be inserted literally
-    if (xp->xp_context == EXPAND_MAPPINGS && p == NULL)
-	return FAIL;
+    यदि (xp->xp_context == EXPAND_MAPPINGS && p == रिक्त)
+	प्रत्यागम FAIL;
 
-    if (xp->xp_numfiles <= 0 && p == NULL)
+    यदि (xp->xp_numfiles <= 0 && p == रिक्त)
 	beep_flush();
-    else if (xp->xp_numfiles == 1
+    अन्यथा यदि (xp->xp_numfiles == 1
 	    && !(options & (WILD_NOSELECT | WILD_NOINSERT))
 	    && !wild_navigate)
 	// free expanded pattern
-	(void)ExpandOne(xp, NULL, NULL, 0, WILD_FREE);
+	(शून्य)ExpandOne(xp, रिक्त, रिक्त, 0, WILD_FREE);
 
     vim_free(p);
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Create completion popup menu with items from 'matches'.
  */
-    static int
+    स्थिर पूर्णाङ्क
 cmdline_pum_create(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail)
+	पूर्णाङ्क		अंक_Matches,
+	पूर्णाङ्क		showtail)
 {
-    int	prefix_len;
+    पूर्णाङ्क	prefix_len;
 
     // Add all the completion matches
-    compl_match_array = ALLOC_MULT(pumitem_T, numMatches);
-    if (compl_match_array == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    compl_match_array = ALLOC_MULT(pumitem_T, अंक_Matches);
+    यदि (compl_match_array == रिक्त)
+	प्रत्यागम EXPAND_UNSUCCESSFUL;
 
-    compl_match_arraysize = numMatches;
-    for (int i = 0; i < numMatches; i++)
+    compl_match_arraysize = अंक_Matches;
+    प्रति (पूर्णाङ्क i = 0; i < अंक_Matches; i++)
     {
-	compl_match_array[i].pum_text = (xp->xp_files_abbr != NULL
-				    && xp->xp_files_abbr[i] != NULL)
+	compl_match_array[i].pum_text = (xp->xp_files_abbr != रिक्त
+				    && xp->xp_files_abbr[i] != रिक्त)
 					? xp->xp_files_abbr[i]
 					: SHOW_MATCH(i);
-	compl_match_array[i].pum_info = xp->xp_files_info != NULL
-					    ? xp->xp_files_info[i] : NULL;
-	compl_match_array[i].pum_extra = xp->xp_files_menu != NULL
-					    ? xp->xp_files_menu[i] : NULL;
-	compl_match_array[i].pum_kind = xp->xp_files_kind != NULL
-					    ? xp->xp_files_kind[i] : NULL;
+	compl_match_array[i].pum_info = xp->xp_files_info != रिक्त
+					    ? xp->xp_files_info[i] : रिक्त;
+	compl_match_array[i].pum_extra = xp->xp_files_menu != रिक्त
+					    ? xp->xp_files_menu[i] : रिक्त;
+	compl_match_array[i].pum_kind = xp->xp_files_kind != रिक्त
+					    ? xp->xp_files_kind[i] : रिक्त;
 	compl_match_array[i].pum_user_abbr_hlattr = -1;
 	compl_match_array[i].pum_user_kind_hlattr = -1;
     }
 
     // Compute the popup menu starting column
-    compl_startcol = ccline == NULL ? 0 : vim_strsize(ccline->cmdbuff) + 1;
+    compl_startcol = ccline == रिक्त ? 0 : vim_strsize(ccline->cmdbuff) + 1;
     prefix_len = vim_strsize(xp->xp_pattern);
-    if (showtail)
+    यदि (showtail)
 	prefix_len += vim_strsize(showmatches_gettail(matches[0]))
 	    - vim_strsize(matches[0]);
     compl_startcol = cmdline_col_off + MAX(0, compl_startcol - prefix_len);
 
-    return EXPAND_OK;
+    प्रत्यागम EXPAND_OK;
 }
 
 /*
  * Display the cmdline completion matches in a popup menu
  */
-    void
-cmdline_pum_display(void)
+    शून्य
+cmdline_pum_display(शून्य)
 {
-    if (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
+    यदि (p_po > 0 && p_po < 100 && !pum_redraw_in_same_position())
 	pum_call_update_screen();
     pum_display(compl_match_array, compl_match_arraysize, compl_selected, -1);
 }
@@ -464,23 +464,23 @@ cmdline_pum_display(void)
 /*
  * Returns TRUE if the cmdline completion popup menu is being displayed.
  */
-    int
-cmdline_pum_active(void)
+    पूर्णाङ्क
+cmdline_pum_active(शून्य)
 {
-    return pum_visible() && compl_match_array != NULL;
+    प्रत्यागम pum_visible() && compl_match_array != रिक्त;
 }
 
 /*
  * Remove the cmdline completion popup menu (if present), free the list of
  * items and refresh the screen.
  */
-    void
-cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
+    शून्य
+cmdline_pum_remove(cmdline_info_T *cclp UNUSED, पूर्णाङ्क defer_redraw)
 {
-    int	save_KeyTyped = KeyTyped;
+    पूर्णाङ्क	save_कुंजी_Typed = कुंजी_Typed;
 #ifdef FEAT_EVAL
-    int	save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    पूर्णाङ्क	save_RedrawingDisabled = RedrawingDisabled;
+    यदि (cclp->निवेश_fn)
 	RedrawingDisabled = 0;
 #endif
 
@@ -488,28 +488,28 @@ cmdline_pum_remove(cmdline_info_T *cclp UNUSED, int defer_redraw)
     pum_undisplay();
     VIM_CLEAR(compl_match_array);
     compl_match_arraysize = 0;
-    if (!defer_redraw)
+    यदि (!defer_redraw)
     {
-	int save_p_lz = p_lz;
+	पूर्णाङ्क save_p_lz = p_lz;
 	p_lz = FALSE;  // avoid the popup menu hanging around
 	update_screen(0);
 	p_lz = save_p_lz;
     }
-    else
+    अन्यथा
 	pum_call_update_screen();
     redrawcmd();
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
 
     // When a function is called (e.g. for 'foldtext') KeyTyped might be reset
     // as a side effect.
-    KeyTyped = save_KeyTyped;
+    कुंजी_Typed = save_कुंजी_Typed;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    यदि (cclp->निवेश_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
 
-    void
+    शून्य
 cmdline_pum_cleanup(cmdline_info_T *cclp)
 {
     cmdline_pum_remove(cclp, FALSE);
@@ -520,32 +520,32 @@ cmdline_pum_cleanup(cmdline_info_T *cclp)
  * Returns the starting column number to use for the cmdline completion popup
  * menu.
  */
-    int
-cmdline_compl_startcol(void)
+    पूर्णाङ्क
+cmdline_compl_startcol(शून्य)
 {
-    return compl_startcol;
+    प्रत्यागम compl_startcol;
 }
 
 /*
  * Returns the current cmdline completion pattern.
  */
     char_u *
-cmdline_compl_pattern(void)
+cmdline_compl_pattern(शून्य)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp == NULL ? NULL : xp->xp_orig;
+    प्रत्यागम xp == रिक्त ? रिक्त : xp->xp_orig;
 }
 
 /*
  * Returns TRUE if fuzzy cmdline completion is active, FALSE otherwise.
  */
-    int
-cmdline_compl_is_fuzzy(void)
+    पूर्णाङ्क
+cmdline_compl_is_fuzzy(शून्य)
 {
     expand_T	*xp = get_cmdline_info()->xpc;
 
-    return xp != NULL && cmdline_fuzzy_completion_supported(xp);
+    प्रत्यागम xp != रिक्त && cmdline_fuzzy_completion_supported(xp);
 }
 
 /*
@@ -553,10 +553,10 @@ cmdline_compl_is_fuzzy(void)
  * These are backslashes used for escaping.  Do show backslashes in help tags
  * and in search pattern completion matches.
  */
-    static int
+    स्थिर पूर्णाङ्क
 skip_status_match_char(expand_T *xp, char_u *s)
 {
-    if ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
+    यदि ((rem_backslash(s) && xp->xp_context != EXPAND_HELP
 		&& xp->xp_context != EXPAND_PATTERN_IN_BUF)
 #ifdef FEAT_MENU
 	    || ((xp->xp_context == EXPAND_MENUS
@@ -566,39 +566,39 @@ skip_status_match_char(expand_T *xp, char_u *s)
 	   )
     {
 #ifndef BACKSLASH_IN_FILENAME
-	if (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
-	    return 2;
+	यदि (xp->xp_shell && csh_like_shell() && s[1] == '\\' && s[2] == '!')
+	    प्रत्यागम 2;
 #endif
-	return 1;
+	प्रत्यागम 1;
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
 /*
  * Get the length of an item as it will be shown in the status line.
  */
-    static int
+    स्थिर पूर्णाङ्क
 status_match_len(expand_T *xp, char_u *s)
 {
-    int	len = 0;
+    पूर्णाङ्क	len = 0;
 
 #ifdef FEAT_MENU
-    int emenu = xp->xp_context == EXPAND_MENUS
+    पूर्णाङ्क emenu = xp->xp_context == EXPAND_MENUS
 	     || xp->xp_context == EXPAND_MENUNAMES;
 
     // Check for menu separators - replace with '|'.
-    if (emenu && menu_is_separator(s))
-	return 1;
+    यदि (emenu && menu_is_separator(s))
+	प्रत्यागम 1;
 #endif
 
-    while (*s != NUL)
+    यावत् (*s != NUL)
     {
 	s += skip_status_match_char(xp, s);
 	len += ptr2cells(s);
 	MB_PTR_ADV(s);
     }
 
-    return len;
+    प्रत्यागम len;
 }
 
 /*
@@ -608,98 +608,98 @@ status_match_len(expand_T *xp, char_u *s)
  *
  * If inversion is possible we use it. Else '=' characters are used.
  */
-    static void
+    स्थिर शून्य
 win_redr_status_matches(
     expand_T	*xp,
-    int		num_matches,
+    पूर्णाङ्क		अंक_matches,
     char_u	**matches,	// list of matches
-    int		match,
-    int		showtail)
+    पूर्णाङ्क		match,
+    पूर्णाङ्क		showtail)
 {
-    int		row;
+    पूर्णाङ्क		row;
     char_u	*buf;
-    int		len;
-    int		clen;		// length in screen cells
-    int		fillchar;
-    int		attr;
-    int		i;
-    int		highlight = TRUE;
-    char_u	*selstart = NULL;
-    int		selstart_col = 0;
-    char_u	*selend = NULL;
-    static int	first_match = 0;
-    int		add_left = FALSE;
+    पूर्णाङ्क		len;
+    पूर्णाङ्क		clen;		// length in screen cells
+    पूर्णाङ्क		fillchar;
+    पूर्णाङ्क		attr;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		highlight = TRUE;
+    char_u	*selstart = रिक्त;
+    पूर्णाङ्क		selstart_col = 0;
+    char_u	*selend = रिक्त;
+    स्थिर पूर्णाङ्क	first_match = 0;
+    पूर्णाङ्क		add_बायाँ = FALSE;
     char_u	*s;
 #ifdef FEAT_MENU
-    int		emenu;
+    पूर्णाङ्क		emenu;
 #endif
-    int		l;
+    पूर्णाङ्क		l;
 
-    if (matches == NULL)	// interrupted completion?
-	return;
+    यदि (matches == रिक्त)	// interrupted completion?
+	प्रत्यागम;
 
-    if (has_mbyte)
+    यदि (has_mbyte)
 	buf = alloc(topframe->fr_width * MB_MAXBYTES + 1);
-    else
+    अन्यथा
 	buf = alloc(topframe->fr_width + 1);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
-    if (match == -1)	// don't show match but original text
+    यदि (match == -1)	// don't show match but original text
     {
 	match = 0;
 	highlight = FALSE;
     }
     // count 1 for the ending ">"
     clen = status_match_len(xp, SHOW_MATCH(match)) + 3;
-    if (match == 0)
+    यदि (match == 0)
 	first_match = 0;
-    else if (match < first_match)
+    अन्यथा यदि (match < first_match)
     {
 	// jumping left, as far as we can go
 	first_match = match;
-	add_left = TRUE;
+	add_बायाँ = TRUE;
     }
-    else
+    अन्यथा
     {
 	// check if match fits on the screen
-	for (i = first_match; i < match; ++i)
+	प्रति (i = first_match; i < match; ++i)
 	    clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-	if (first_match > 0)
+	यदि (first_match > 0)
 	    clen += 2;
 	// jumping right, put match at the left
-	if (clen > topframe->fr_width)
+	यदि (clen > topframe->fr_width)
 	{
 	    first_match = match;
 	    // if showing the last match, we can add some on the left
 	    clen = 2;
-	    for (i = match; i < num_matches; ++i)
+	    प्रति (i = match; i < अंक_matches; ++i)
 	    {
 		clen += status_match_len(xp, SHOW_MATCH(i)) + 2;
-		if (clen >= topframe->fr_width)
-		    break;
+		यदि (clen >= topframe->fr_width)
+		    भङ्ग;
 	    }
-	    if (i == num_matches)
-		add_left = TRUE;
+	    यदि (i == अंक_matches)
+		add_बायाँ = TRUE;
 	}
     }
-    if (add_left)
-	while (first_match > 0)
+    यदि (add_बायाँ)
+	यावत् (first_match > 0)
 	{
 	    clen += status_match_len(xp, SHOW_MATCH(first_match - 1)) + 2;
-	    if (clen >= topframe->fr_width)
-		break;
+	    यदि (clen >= topframe->fr_width)
+		भङ्ग;
 	    --first_match;
 	}
 
     fillchar = fillchar_status(&attr, curwin);
 
-    if (first_match == 0)
+    यदि (first_match == 0)
     {
 	*buf = NUL;
 	len = 0;
     }
-    else
+    अन्यथा
     {
 	STRCPY(buf, "< ");
 	len = 2;
@@ -707,9 +707,9 @@ win_redr_status_matches(
     clen = len;
 
     i = first_match;
-    while (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
+    यावत् (clen + status_match_len(xp, SHOW_MATCH(i)) + 2 < topframe->fr_width)
     {
-	if (i == match)
+	यदि (i == match)
 	{
 	    selstart = buf + len;
 	    selstart_col = clen;
@@ -720,42 +720,42 @@ win_redr_status_matches(
 #ifdef FEAT_MENU
 	emenu = (xp->xp_context == EXPAND_MENUS
 		|| xp->xp_context == EXPAND_MENUNAMES);
-	if (emenu && menu_is_separator(s))
+	यदि (emenu && menu_is_separator(s))
 	{
 	    STRCPY(buf + len, transchar('|'));
-	    l = (int)STRLEN(buf + len);
+	    l = (पूर्णाङ्क)STRLEN(buf + len);
 	    len += l;
 	    clen += l;
 	}
-	else
+	अन्यथा
 #endif
-	for ( ; *s != NUL; ++s)
+	प्रति ( ; *s != NUL; ++s)
 	{
 	    s += skip_status_match_char(xp, s);
 	    clen += ptr2cells(s);
-	    if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	    यदि (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	    {
 		STRNCPY(buf + len, s, l);
 		s += l - 1;
 		len += l;
 	    }
-	    else
+	    अन्यथा
 	    {
 		STRCPY(buf + len, transchar_byte(*s));
-		len += (int)STRLEN(buf + len);
+		len += (पूर्णाङ्क)STRLEN(buf + len);
 	    }
 	}
-	if (i == match)
+	यदि (i == match)
 	    selend = buf + len;
 
 	*(buf + len++) = ' ';
 	*(buf + len++) = ' ';
 	clen += 2;
-	if (++i == num_matches)
-		break;
+	यदि (++i == अंक_matches)
+		भङ्ग;
     }
 
-    if (i != num_matches)
+    यदि (i != अंक_matches)
     {
 	*(buf + len++) = '>';
 	++clen;
@@ -764,32 +764,32 @@ win_redr_status_matches(
     buf[len] = NUL;
 
     row = cmdline_row - 1;
-    if (row >= 0)
+    यदि (row >= 0)
     {
-	if (wild_menu_showing == 0)
+	यदि (wild_menu_showing == 0)
 	{
-	    if (msg_scrolled > 0)
+	    यदि (संदेश_scrolled > 0)
 	    {
 		// Put the wildmenu just above the command line.  If there is
 		// no room, scroll the screen one line up.
-		if (cmdline_row == Rows - 1)
+		यदि (cmdline_row == Rows - 1)
 		{
-		    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
-		    ++msg_scrolled;
+		    screen_del_पंक्तियाँ(0, 0, 1, (पूर्णाङ्क)Rows, TRUE, 0, रिक्त);
+		    ++संदेश_scrolled;
 		}
-		else
+		अन्यथा
 		{
 		    ++cmdline_row;
 		    ++row;
 		}
 		wild_menu_showing = WM_SCROLLED;
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Create status line if needed by setting 'laststatus' to 2.
 		// Set 'winminheight' to zero to avoid that the window is
 		// resized.
-		if (lastwin->w_status_height == 0)
+		यदि (lastwin->w_status_height == 0)
 		{
 		    save_p_ls = p_ls;
 		    save_p_wmh = p_wmh;
@@ -802,7 +802,7 @@ win_redr_status_matches(
 	}
 
 	screen_puts(buf, row, firstwin->w_wincol, attr);
-	if (selstart != NULL && highlight)
+	यदि (selstart != रिक्त && highlight)
 	{
 	    *selend = NUL;
 	    screen_puts(selstart, row, firstwin->w_wincol + selstart_col,
@@ -818,7 +818,7 @@ win_redr_status_matches(
     vim_free(buf);
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Apply -completeopt=escape to a string about to be inserted into the command
  * line as a completion result.  If "str" is non-NULL and the active expansion
@@ -826,22 +826,22 @@ win_redr_status_matches(
  * and return a newly-allocated copy with spaces, tabs and backslashes prefixed
  * by a backslash.  Otherwise return "str" unchanged.
  */
-    static char_u *
+    स्थिर char_u *
 apply_user_completeopt_escape(expand_T *xp, char_u *str)
 {
     char_u  *p;
 
-    if (str == NULL)
-	return NULL;
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    यदि (str == रिक्त)
+	प्रत्यागम रिक्त;
+    यदि ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return str;
+	प्रत्यागम str;
     p = vim_strsave_escaped(str, (char_u *)" \t\\");
-    if (p == NULL)
-	return str;
+    यदि (p == रिक्त)
+	प्रत्यागम str;
     vim_free(str);
-    return p;
+    प्रत्यागम p;
 }
 
 /*
@@ -851,36 +851,36 @@ apply_user_completeopt_escape(expand_T *xp, char_u *str)
  * Returns a newly-allocated string and stores its length in "*new_lenp", or
  * NULL when no unescape is applicable (caller should keep the original).
  */
-    static char_u *
+    स्थिर char_u *
 unescape_user_completeopt_pat(
     expand_T	*xp,
     char_u	*src,
-    int		srclen,
-    int		*new_lenp)
+    पूर्णाङ्क		srclen,
+    पूर्णाङ्क		*new_lenp)
 {
     char_u  *buf, *p, *d, *end;
 
-    if ((xp->xp_context != EXPAND_USER_DEFINED
+    यदि ((xp->xp_context != EXPAND_USER_DEFINED
 		&& xp->xp_context != EXPAND_USER_LIST)
 	    || !(xp->xp_complete_opt & UCC_ESCAPE))
-	return NULL;
+	प्रत्यागम रिक्त;
 
     buf = alloc(srclen + 1);
-    if (buf == NULL)
-	return NULL;
+    यदि (buf == रिक्त)
+	प्रत्यागम रिक्त;
 
     d = buf;
     end = src + srclen;
-    for (p = src; p < end; ++p)
+    प्रति (p = src; p < end; ++p)
     {
-	if (*p == '\\' && p + 1 < end
+	यदि (*p == '\\' && p + 1 < end
 			   && (p[1] == ' ' || p[1] == TAB || p[1] == '\\'))
 	    ++p;
 	*d++ = *p;
     }
     *d = NUL;
-    *new_lenp = (int)(d - buf);
-    return buf;
+    *new_lenp = (पूर्णाङ्क)(d - buf);
+    प्रत्यागम buf;
 }
 #endif
 
@@ -888,84 +888,84 @@ unescape_user_completeopt_pat(
  * Get the next or prev cmdline completion match. The index of the match is set
  * in "xp->xp_selected"
  */
-    static char_u *
-get_next_or_prev_match(int mode, expand_T *xp)
+    स्थिर char_u *
+get_next_or_prev_match(पूर्णाङ्क mode, expand_T *xp)
 {
-    int	    findex = xp->xp_selected;
-    int	    ht;
+    पूर्णाङ्क	    findex = xp->xp_selected;
+    पूर्णाङ्क	    ht;
 
     // When no matches found, return NULL
-    if (xp->xp_numfiles <= 0)
-	return NULL;
+    यदि (xp->xp_numfiles <= 0)
+	प्रत्यागम रिक्त;
 
-    if (mode == WILD_PREV)
+    यदि (mode == WILD_PREV)
     {
 	// Select the last entry if at original text
-	if (findex == -1)
+	यदि (findex == -1)
 	    findex = xp->xp_numfiles;
 	// Otherwise select the previous entry
 	--findex;
     }
-    else if (mode == WILD_NEXT)
+    अन्यथा यदि (mode == WILD_NEXT)
     {
 	// Select the next entry
 	++findex;
     }
-    else   // WILD_PAGEDOWN or WILD_PAGEUP
+    अन्यथा   // WILD_PAGEDOWN or WILD_PAGEUP
     {
 	// Get the height of popup menu (used for both PAGEUP and PAGEDOWN)
 	ht = pum_get_height();
-	if (ht > 3)
+	यदि (ht > 3)
 	    ht -= 2;
 
-	if (mode == WILD_PAGEUP)
+	यदि (mode == WILD_PAGEUP)
 	{
-	    if (findex == 0)
+	    यदि (findex == 0)
 		// at the first entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    अन्यथा यदि (findex < 0)
 		// no entry is selected. select the last entry
 		findex = xp->xp_numfiles - 1;
-	    else
+	    अन्यथा
 		// go up by the pum height
 		findex = MAX(findex - ht, 0);
 	}
-	else    // mode == WILD_PAGEDOWN
+	अन्यथा    // mode == WILD_PAGEDOWN
 	{
-	    if (findex >= xp->xp_numfiles - 1)
+	    यदि (findex >= xp->xp_numfiles - 1)
 		// at the last entry, don't select any entries
 		findex = -1;
-	    else if (findex < 0)
+	    अन्यथा यदि (findex < 0)
 		// no entry is selected, select the first entry
 		findex = 0;
-	    else
+	    अन्यथा
 		// go down by the pum height
 		findex = MIN(findex + ht, xp->xp_numfiles - 1);
 	}
     }
 
     // Handle wrapping around
-    if (findex < 0 || findex >= xp->xp_numfiles)
+    यदि (findex < 0 || findex >= xp->xp_numfiles)
     {
 	// If original text exists, return to it when wrapping around
-	if (xp->xp_orig != NULL)
+	यदि (xp->xp_orig != रिक्त)
 	    findex = -1;
-	else
+	अन्यथा
 	    // Wrap around to opposite end
 	    findex = (findex < 0) ? xp->xp_numfiles - 1 : 0;
     }
 
     // Display matches on screen
-    if (p_wmnu)
+    यदि (p_wmnu)
     {
-	if (compl_match_array)
+	यदि (compl_match_array)
 	{
 	    compl_selected = findex;
 	    cmdline_pum_display();
 	}
-	else if (vim_strchr(p_wop, WOP_PUM) != NULL)
+	अन्यथा यदि (vim_strchr(p_wop, WOP_PUM) != रिक्त)
 	{
-	    if (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
+	    यदि (cmdline_pum_create(get_cmdline_info(), xp, xp->xp_files,
 			xp->xp_numfiles, cmd_showtail) == EXPAND_OK)
 	    {
 		compl_selected = findex;
@@ -973,62 +973,62 @@ get_next_or_prev_match(int mode, expand_T *xp)
 		cmdline_pum_display();
 	    }
 	}
-	else
+	अन्यथा
 	    win_redr_status_matches(xp, xp->xp_numfiles, xp->xp_files, findex,
 		    cmd_showtail);
     }
 
     xp->xp_selected = findex;
     // Return the original text or the selected match
-    if (findex == -1)
-	return vim_strsave(xp->xp_orig);
-#if defined(FEAT_EVAL)
-    return apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
-#else
-    return vim_strsave(xp->xp_files[findex]);
+    यदि (findex == -1)
+	प्रत्यागम vim_strsave(xp->xp_orig);
+#यदि defined(FEAT_EVAL)
+    प्रत्यागम apply_user_completeopt_escape(xp, vim_strsave(xp->xp_files[findex]));
+#अन्यथा
+    प्रत्यागम vim_strsave(xp->xp_files[findex]);
 #endif
 }
 
 /*
  * Start the command-line expansion and get the matches.
  */
-    static char_u *
-ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
+    स्थिर char_u *
+ExpandOne_start(पूर्णाङ्क mode, expand_T *xp, char_u *str, पूर्णाङ्क options)
 {
-    int		non_suf_match;		// number without matching suffix
-    int		i;
-    char_u	*ss = NULL;
+    पूर्णाङ्क		non_suf_match;		// number without matching suffix
+    पूर्णाङ्क		i;
+    char_u	*ss = रिक्त;
 
     // Do the expansion.
-    if (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
+    यदि (ExpandFromContext(xp, str, &xp->xp_files, &xp->xp_numfiles,
 		options) == FAIL)
     {
 #ifdef FNAME_ILLEGAL
 	// Illegal file name has been silently skipped.  But when there
 	// are wildcards, the real problem is that there was no match,
 	// causing the pattern to be added, which has illegal characters.
-	if (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
+	यदि (!(options & WILD_SILENT) && (options & WILD_LIST_NOTFOUND))
 	    semsg(_(e_no_match_str_2), str);
 #endif
     }
-    else if (xp->xp_numfiles == 0)
+    अन्यथा यदि (xp->xp_numfiles == 0)
     {
-	if (!(options & WILD_SILENT))
+	यदि (!(options & WILD_SILENT))
 	    semsg(_(e_no_match_str_2), str);
     }
-    else
+    अन्यथा
     {
 	// Escape the matches for use on the command line.
 	ExpandEscape(xp, str, xp->xp_numfiles, xp->xp_files, options);
 
 	// Check for matching suffixes in file names.
-	if (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
+	यदि (mode != WILD_ALL && mode != WILD_ALL_KEEP && mode != WILD_LONGEST)
 	{
-	    if (xp->xp_numfiles)
+	    यदि (xp->xp_numfiles)
 		non_suf_match = xp->xp_numfiles;
-	    else
+	    अन्यथा
 		non_suf_match = 1;
-	    if ((xp->xp_context == EXPAND_FILES
+	    यदि ((xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_DIRECTORIES)
 		    && xp->xp_numfiles > 1)
 	    {
@@ -1036,104 +1036,104 @@ ExpandOne_start(int mode, expand_T *xp, char_u *str, int options)
 		// The files will have been sorted on matching suffix in
 		// expand_wildcards, only need to check the first two.
 		non_suf_match = 0;
-		for (i = 0; i < 2; ++i)
-		    if (match_suffix(xp->xp_files[i]))
+		प्रति (i = 0; i < 2; ++i)
+		    यदि (match_suffix(xp->xp_files[i]))
 			++non_suf_match;
 	    }
-	    if (non_suf_match != 1)
+	    यदि (non_suf_match != 1)
 	    {
 		// Can we ever get here unless it's while expanding
 		// interactively?  If not, we can get rid of this all
 		// together. Don't really want to wait for this message
 		// (and possibly have to hit return to continue!).
-		if (!(options & WILD_SILENT))
+		यदि (!(options & WILD_SILENT))
 		    emsg(_(e_too_many_file_names));
-		else if (!(options & WILD_NO_BEEP))
+		अन्यथा यदि (!(options & WILD_NO_BEEP))
 		    beep_flush();
 	    }
-	    if (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
+	    यदि (!(non_suf_match != 1 && mode == WILD_EXPAND_FREE))
 		ss = vim_strsave(xp->xp_files[0]);
 	}
     }
 
-    return ss;
+    प्रत्यागम ss;
 }
 
 /*
  * Return the longest common part in the list of cmdline completion matches.
  */
-    static char_u *
-find_longest_match(expand_T *xp, int options)
+    स्थिर char_u *
+find_longest_match(expand_T *xp, पूर्णाङ्क options)
 {
     long_u	len;
-    int		mb_len = 1;
-    int		c0, ci;
-    int		i;
+    पूर्णाङ्क		mb_len = 1;
+    पूर्णाङ्क		c0, ci;
+    पूर्णाङ्क		i;
     char_u	*ss;
 
-    for (len = 0; xp->xp_files[0][len]; len += mb_len)
+    प्रति (len = 0; xp->xp_files[0][len]; len += mb_len)
     {
-	if (has_mbyte)
+	यदि (has_mbyte)
 	{
 	    mb_len = (*mb_ptr2len)(&xp->xp_files[0][len]);
 	    c0 = (*mb_ptr2char)(&xp->xp_files[0][len]);
 	}
-	else
+	अन्यथा
 	    c0 = xp->xp_files[0][len];
-	for (i = 1; i < xp->xp_numfiles; ++i)
+	प्रति (i = 1; i < xp->xp_numfiles; ++i)
 	{
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 		ci = (*mb_ptr2char)(&xp->xp_files[i][len]);
-	    else
+	    अन्यथा
 		ci = xp->xp_files[i][len];
-	    if (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
+	    यदि (p_fic && (xp->xp_context == EXPAND_DIRECTORIES
 			|| xp->xp_context == EXPAND_FILES
 			|| xp->xp_context == EXPAND_SHELLCMD
 			|| xp->xp_context == EXPAND_BUFFERS))
 	    {
-		if (MB_TOLOWER(c0) != MB_TOLOWER(ci))
-		    break;
+		यदि (MB_TOLOWER(c0) != MB_TOLOWER(ci))
+		    भङ्ग;
 	    }
-	    else if (c0 != ci)
-		break;
+	    अन्यथा यदि (c0 != ci)
+		भङ्ग;
 	}
-	if (i < xp->xp_numfiles)
+	यदि (i < xp->xp_numfiles)
 	{
-	    if (!(options & WILD_NO_BEEP))
+	    यदि (!(options & WILD_NO_BEEP))
 		vim_beep(BO_WILD);
-	    break;
+	    भङ्ग;
 	}
     }
 
     ss = alloc(len + 1);
-    if (ss)
-	vim_strncpy(ss, xp->xp_files[0], (size_t)len);
+    यदि (ss)
+	vim_strncpy(ss, xp->xp_files[0], (माप_प्रकार)len);
 
-    return ss;
+    प्रत्यागम ss;
 }
 
-    void
-free_xp_files_extra(expand_T *xp, int numfiles)
+    शून्य
+free_xp_files_extra(expand_T *xp, पूर्णाङ्क numfiles)
 {
-    if (xp->xp_files_abbr != NULL)
+    यदि (xp->xp_files_abbr != रिक्त)
     {
 	FreeWild(numfiles, xp->xp_files_abbr);
-	xp->xp_files_abbr = NULL;
+	xp->xp_files_abbr = रिक्त;
     }
-    if (xp->xp_files_kind != NULL)
+    यदि (xp->xp_files_kind != रिक्त)
     {
 	FreeWild(numfiles, xp->xp_files_kind);
-	xp->xp_files_kind = NULL;
+	xp->xp_files_kind = रिक्त;
     }
-    if (xp->xp_files_menu != NULL)
+    यदि (xp->xp_files_menu != रिक्त)
     {
 	FreeWild(numfiles, xp->xp_files_menu);
-	xp->xp_files_menu = NULL;
+	xp->xp_files_menu = रिक्त;
     }
-    if (xp->xp_files_info != NULL)
+    यदि (xp->xp_files_info != रिक्त)
     {
 	FreeWild(numfiles, xp->xp_files_info);
-	xp->xp_files_info = NULL;
+	xp->xp_files_info = रिक्त;
     }
 }
 
@@ -1181,40 +1181,40 @@ ExpandOne(
     expand_T	*xp,
     char_u	*str,
     char_u	*orig,	    // allocated copy of original of expanded string
-    int		options,
-    int		mode)
+    पूर्णाङ्क		options,
+    पूर्णाङ्क		mode)
 {
-    char_u	*ss = NULL;
-    int		orig_saved = FALSE;
-#if defined(FEAT_EVAL)
+    char_u	*ss = रिक्त;
+    पूर्णाङ्क		orig_saved = FALSE;
+#यदि defined(FEAT_EVAL)
     // ss_is_match is TRUE when ss is derived from xp_files and should be
     // escaped per -completeopt=escape before being inserted.  WILD_CANCEL
     // and WILD_APPLY-without-selection return xp_orig unchanged.
-    int		ss_is_match = FALSE;
+    पूर्णाङ्क		ss_is_match = FALSE;
 #endif
 
     // first handle the case of using an old match
-    if (mode == WILD_NEXT || mode == WILD_PREV
+    यदि (mode == WILD_NEXT || mode == WILD_PREV
 	    || mode == WILD_PAGEUP || mode == WILD_PAGEDOWN)
-	return get_next_or_prev_match(mode, xp);
+	प्रत्यागम get_next_or_prev_match(mode, xp);
 
-    if (mode == WILD_CANCEL)
+    यदि (mode == WILD_CANCEL)
 	ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-    else if (mode == WILD_APPLY)
+    अन्यथा यदि (mode == WILD_APPLY)
     {
-	if (xp->xp_selected == -1)
+	यदि (xp->xp_selected == -1)
 	    ss = vim_strsave(xp->xp_orig ? xp->xp_orig : (char_u *)"");
-	else
+	अन्यथा
 	{
 	    ss = vim_strsave(xp->xp_files[xp->xp_selected]);
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 	    ss_is_match = TRUE;
 #endif
 	}
     }
 
     // free old names
-    if (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
+    यदि (xp->xp_numfiles != -1 && mode != WILD_ALL && mode != WILD_LONGEST)
     {
 	FreeWild(xp->xp_numfiles, xp->xp_files);
 	free_xp_files_extra(xp, xp->xp_numfiles);
@@ -1222,141 +1222,141 @@ ExpandOne(
 	VIM_CLEAR(xp->xp_orig);
 
 	// The entries from xp_files may be used in the PUM, remove it.
-	if (compl_match_array != NULL)
+	यदि (compl_match_array != रिक्त)
 	    cmdline_pum_remove(get_cmdline_info(), FALSE);
     }
     xp->xp_selected = (options & WILD_NOSELECT) ? -1 : 0;
 
-    if (mode == WILD_FREE)	// only release file name
-	return NULL;
+    यदि (mode == WILD_FREE)	// only release file name
+	प्रत्यागम रिक्त;
 
-    if (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
+    यदि (xp->xp_numfiles == -1 && mode != WILD_APPLY && mode != WILD_CANCEL)
     {
 	vim_free(xp->xp_orig);
 	xp->xp_orig = orig;
 	orig_saved = TRUE;
 
 	ss = ExpandOne_start(mode, xp, str, options);
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#यदि defined(FEAT_EVAL)
+	यदि (ss != रिक्त)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Find longest common part
-    if (mode == WILD_LONGEST && xp->xp_numfiles > 0)
+    यदि (mode == WILD_LONGEST && xp->xp_numfiles > 0)
     {
 	ss = find_longest_match(xp, options);
 	xp->xp_selected = -1;			// next p_wc gets first one
-#if defined(FEAT_EVAL)
-	if (ss != NULL)
+#यदि defined(FEAT_EVAL)
+	यदि (ss != रिक्त)
 	    ss_is_match = TRUE;
 #endif
     }
 
     // Concatenate all matching names.  Unless interrupted, this can be slow
     // and the result probably won't be used.
-    if (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
+    यदि (mode == WILD_ALL && xp->xp_numfiles > 0 && !got_int)
     {
-	size_t	ss_size = 0;
-	char	*prefix = "";
-	char	*suffix = (options & WILD_USE_NL) ? "\n" : " ";
-	int	n = xp->xp_numfiles - 1;
-	int	i;
-#if defined(FEAT_EVAL)
+	माप_प्रकार	ss_size = 0;
+	वर्ण	*prefix = "";
+	वर्ण	*suffix = (options & WILD_USE_NL) ? "\n" : " ";
+	पूर्णाङ्क	n = xp->xp_numfiles - 1;
+	पूर्णाङ्क	i;
+#यदि defined(FEAT_EVAL)
 	char_u	**files = xp->xp_files;
-	char_u	**escaped = NULL;
+	char_u	**escaped = रिक्त;
 
 	// When -completeopt=escape is set for a user command, escape each
 	// match before joining so the separator spaces stay unescaped.
-	if ((xp->xp_context == EXPAND_USER_DEFINED
+	यदि ((xp->xp_context == EXPAND_USER_DEFINED
 		    || xp->xp_context == EXPAND_USER_LIST)
 		&& (xp->xp_complete_opt & UCC_ESCAPE))
 	{
 	    escaped = ALLOC_MULT(char_u *, xp->xp_numfiles);
-	    if (escaped != NULL)
+	    यदि (escaped != रिक्त)
 	    {
-		for (i = 0; i < xp->xp_numfiles; ++i)
+		प्रति (i = 0; i < xp->xp_numfiles; ++i)
 		{
 		    escaped[i] = vim_strsave_escaped(xp->xp_files[i],
 						       (char_u *)" \t\\");
-		    if (escaped[i] == NULL)
+		    यदि (escaped[i] == रिक्त)
 		    {
-			while (--i >= 0)
+			यावत् (--i >= 0)
 			    vim_free(escaped[i]);
 			VIM_CLEAR(escaped);
-			break;
+			भङ्ग;
 		    }
 		}
-		if (escaped != NULL)
+		यदि (escaped != रिक्त)
 		    files = escaped;
 	    }
 	}
-#else
+#अन्यथा
 	char_u	**files = xp->xp_files;
 #endif
 
-	if (xp->xp_prefix == XP_PREFIX_NO)
+	यदि (xp->xp_prefix == XP_PREFIX_NO)
 	{
 	    prefix = "no";
 	    ss_size = STRLEN_LITERAL("no") * n;
 	}
-	else if (xp->xp_prefix == XP_PREFIX_INV)
+	अन्यथा यदि (xp->xp_prefix == XP_PREFIX_INV)
 	{
 	    prefix = "inv";
 	    ss_size = STRLEN_LITERAL("inv") * n;
 	}
 
-	for (i = 0; i < xp->xp_numfiles; ++i)
+	प्रति (i = 0; i < xp->xp_numfiles; ++i)
 	    ss_size += STRLEN(files[i]) + 1;		// +1 for the suffix
 	++ss_size;					// +1 for the NUL
 
 	ss = alloc(ss_size);
-	if (ss != NULL)
+	यदि (ss != रिक्त)
 	{
-	    size_t  ss_len = 0;
+	    माप_प्रकार  ss_len = 0;
 
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    प्रति (i = 0; i < xp->xp_numfiles; ++i)
 	    {
 		ss_len += vim_snprintf_safelen(
-		    (char *)ss + ss_len,
+		    (वर्ण *)ss + ss_len,
 		    ss_size - ss_len,
 		    "%s%s%s",
 		    (i > 0) ? prefix : "",
-		    (char *)files[i],
+		    (वर्ण *)files[i],
 		    (i < n) ? suffix : "");
 	    }
 	}
-#if defined(FEAT_EVAL)
-	if (escaped != NULL)
+#यदि defined(FEAT_EVAL)
+	यदि (escaped != रिक्त)
 	{
-	    for (i = 0; i < xp->xp_numfiles; ++i)
+	    प्रति (i = 0; i < xp->xp_numfiles; ++i)
 		vim_free(escaped[i]);
 	    vim_free(escaped);
 	}
 #endif
     }
 
-    if (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
+    यदि (mode == WILD_EXPAND_FREE || mode == WILD_ALL)
 	ExpandCleanup(xp);
 
     // Free "orig" if it wasn't stored in "xp->xp_orig".
-    if (!orig_saved)
+    यदि (!orig_saved)
 	vim_free(orig);
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
     // WILD_ALL already escaped its component matches in place, so don't
     // re-escape the joined string (its separator spaces would break).
-    if (ss_is_match && mode != WILD_ALL)
+    यदि (ss_is_match && mode != WILD_ALL)
 	ss = apply_user_completeopt_escape(xp, ss);
 #endif
-    return ss;
+    प्रत्यागम ss;
 }
 
 /*
  * Prepare an expand structure for use.
  */
-    void
+    शून्य
 ExpandInit(expand_T *xp)
 {
     CLEAR_POINTER(xp);
@@ -1368,10 +1368,10 @@ ExpandInit(expand_T *xp)
 /*
  * Cleanup an expand structure after use.
  */
-    void
+    शून्य
 ExpandCleanup(expand_T *xp)
 {
-    if (xp->xp_numfiles >= 0)
+    यदि (xp->xp_numfiles >= 0)
     {
 	free_xp_files_extra(xp, xp->xp_numfiles);
 	FreeWild(xp->xp_numfiles, xp->xp_files);
@@ -1380,8 +1380,8 @@ ExpandCleanup(expand_T *xp)
     VIM_CLEAR(xp->xp_orig);
 }
 
-    void
-clear_cmdline_orig(void)
+    शून्य
+clear_cmdline_orig(शून्य)
 {
     VIM_CLEAR_STRING(cmdline_orig);
 }
@@ -1397,43 +1397,43 @@ clear_cmdline_orig(void)
  *   showtail - display only the tail of the full path of a file name
  *   dir_attr - highlight attribute to use for directory names
  */
-    static void
+    स्थिर शून्य
 showmatches_oneline(
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		lines,
-	int		linenr,
-	int		maxlen,
-	int		showtail,
-	int		dir_attr)
+	पूर्णाङ्क		अंक_Matches,
+	पूर्णाङ्क		पंक्तियाँ,
+	पूर्णाङ्क		linenr,
+	पूर्णाङ्क		maxlen,
+	पूर्णाङ्क		showtail,
+	पूर्णाङ्क		dir_attr)
 {
-    int		i, j;
-    int		isdir;
-    int		lastlen;
+    पूर्णाङ्क		i, j;
+    पूर्णाङ्क		isdir;
+    पूर्णाङ्क		lastlen;
     char_u	*p;
 
     lastlen = 999;
-    for (j = linenr; j < numMatches; j += lines)
+    प्रति (j = linenr; j < अंक_Matches; j += पंक्तियाँ)
     {
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	यदि (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
-	    msg_outtrans_attr(matches[j], HL_ATTR(HLF_D));
+	    संदेश_outtrans_attr(matches[j], HL_ATTR(HLF_D));
 	    p = matches[j] + STRLEN(matches[j]) + 1;
-	    msg_advance(maxlen + 1);
-	    msg_puts((char *)p);
-	    msg_advance(maxlen + 3);
-	    msg_outtrans_long_attr(p + 2, HL_ATTR(HLF_D));
-	    break;
+	    संदेश_advance(maxlen + 1);
+	    संदेश_puts((वर्ण *)p);
+	    संदेश_advance(maxlen + 3);
+	    संदेश_outtrans_long_attr(p + 2, HL_ATTR(HLF_D));
+	    भङ्ग;
 	}
-	for (i = maxlen - lastlen; --i >= 0; )
-	    msg_putchar(' ');
-	if (xp->xp_context == EXPAND_FILES
+	प्रति (i = maxlen - lastlen; --i >= 0; )
+	    संदेश_putchar(' ');
+	यदि (xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_SHELLCMD
 		|| xp->xp_context == EXPAND_BUFFERS)
 	{
 	    // highlight directories
-	    if (xp->xp_numfiles != -1)
+	    यदि (xp->xp_numfiles != -1)
 	    {
 		char_u	*halved_slash;
 		char_u	*exp_path;
@@ -1442,38 +1442,38 @@ showmatches_oneline(
 		// Expansion was done before and special characters
 		// were escaped, need to halve backslashes.  Also
 		// $HOME has been replaced with ~/.
-		exp_path = expand_env_save_opt(matches[j], TRUE, NULL);
-		path = exp_path != NULL ? exp_path : matches[j];
+		exp_path = expand_env_save_opt(matches[j], TRUE, रिक्त);
+		path = exp_path != रिक्त ? exp_path : matches[j];
 		halved_slash = backslash_halve_save(path);
-		isdir = mch_isdir(halved_slash != NULL ? halved_slash
+		isdir = mch_isdir(halved_slash != रिक्त ? halved_slash
 			: matches[j]);
 		vim_free(exp_path);
-		if (halved_slash != path)
+		यदि (halved_slash != path)
 		    vim_free(halved_slash);
 	    }
-	    else
+	    अन्यथा
 		// Expansion was done here, file names are literal.
 		isdir = mch_isdir(matches[j]);
-	    if (showtail)
+	    यदि (showtail)
 		p = SHOW_MATCH(j);
-	    else
+	    अन्यथा
 	    {
-		home_replace(NULL, matches[j], NameBuff, MAXPATHL,
+		home_replace(रिक्त, matches[j], NameBuff, MAXPATHL,
 			TRUE);
 		p = NameBuff;
 	    }
 	}
-	else
+	अन्यथा
 	{
 	    isdir = FALSE;
 	    p = SHOW_MATCH(j);
 	}
-	lastlen = msg_outtrans_attr(p, isdir ? dir_attr : 0);
+	lastlen = संदेश_outtrans_attr(p, isdir ? dir_attr : 0);
     }
-    if (msg_col > 0)	// when not wrapped around
+    यदि (संदेश_col > 0)	// when not wrapped around
     {
-	msg_clr_eos();
-	msg_putchar('\n');
+	संदेश_clr_eos();
+	संदेश_putchar('\n');
     }
     out_flush();		    // show one line at a time
 }
@@ -1482,24 +1482,24 @@ showmatches_oneline(
  * Show the matches in a popup menu, with the first one selected unless
  * "noselect" is set.
  */
-    static int
+    स्थिर पूर्णाङ्क
 show_pum_matches(
 	cmdline_info_T	*ccline,
 	expand_T	*xp,
 	char_u		**matches,
-	int		numMatches,
-	int		showtail,
-	int		noselect)
+	पूर्णाङ्क		अंक_Matches,
+	पूर्णाङ्क		showtail,
+	पूर्णाङ्क		noselect)
 {
-    int	retval = cmdline_pum_create(ccline, xp, matches, numMatches, showtail);
+    पूर्णाङ्क	retval = cmdline_pum_create(ccline, xp, matches, अंक_Matches, showtail);
 
-    if (retval == EXPAND_OK)
+    यदि (retval == EXPAND_OK)
     {
 	compl_selected = noselect ? -1 : 0;
 	pum_clear();
 	cmdline_pum_display();
     }
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
@@ -1507,171 +1507,171 @@ show_pum_matches(
  * Returns EXPAND_NOTHING when the character that triggered expansion should be
  *   inserted as a normal character.
  */
-    int
+    पूर्णाङ्क
 showmatches(
     expand_T	*xp,
-    int		display_wildmenu,
-    int		display_list,
-    int		wim_flags_arg)
+    पूर्णाङ्क		display_wildmenu,
+    पूर्णाङ्क		display_list,
+    पूर्णाङ्क		wim_flags_arg)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		numMatches;
+    पूर्णाङ्क		अंक_Matches;
     char_u	**matches;
-    int		i;
-    int		maxlen;
-    int		lines;
-    int		columns;
-    int		attr;
-    int		showtail;
-    int		noselect = (wim_flags_arg & WIM_NOSELECT);
-    int		noinsert = (wim_flags_arg & WIM_NOINSERT);
-    int		cmdline_unchanged = noselect || noinsert;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		maxlen;
+    पूर्णाङ्क		पंक्तियाँ;
+    पूर्णाङ्क		columns;
+    पूर्णाङ्क		attr;
+    पूर्णाङ्क		showtail;
+    पूर्णाङ्क		noselect = (wim_flags_arg & WIM_NOSELECT);
+    पूर्णाङ्क		noinsert = (wim_flags_arg & WIM_NOINSERT);
+    पूर्णाङ्क		cmdline_unchanged = noselect || noinsert;
 
-    if (xp->xp_numfiles == -1)
+    यदि (xp->xp_numfiles == -1)
     {
-	int retval;
+	पूर्णाङ्क retval;
 	set_expand_context(xp);
 	retval = expand_cmdline(xp, ccline->cmdbuff, ccline->cmdpos,
-		&numMatches, &matches);
-	if (retval != EXPAND_OK)
-	    return retval;
+		&अंक_Matches, &matches);
+	यदि (retval != EXPAND_OK)
+	    प्रत्यागम retval;
 	showtail = expand_showtail(xp);
     }
-    else
+    अन्यथा
     {
-	numMatches = xp->xp_numfiles;
+	अंक_Matches = xp->xp_numfiles;
 	matches = xp->xp_files;
 	showtail = cmd_showtail;
     }
 
-    if (display_wildmenu && !display_list
-	    && vim_strchr(p_wop, WOP_PUM) != NULL)
-	return show_pum_matches(ccline, xp, matches, numMatches,
+    यदि (display_wildmenu && !display_list
+	    && vim_strchr(p_wop, WOP_PUM) != रिक्त)
+	प्रत्यागम show_pum_matches(ccline, xp, matches, अंक_Matches,
 		showtail && !cmdline_unchanged, noselect);
 
-    if (display_list)
+    यदि (display_list)
     {
-	msg_didany = FALSE;		// lines_left will be set
-	msg_start();			// prepare for paging
-	msg_putchar('\n');
+	संदेश_didany = FALSE;		// lines_left will be set
+	संदेश_start();			// prepare for paging
+	संदेश_putchar('\n');
 	out_flush();
-	cmdline_row = msg_row;
-	msg_didany = FALSE;		// lines_left will be set again
-	msg_start();			// prepare for paging
+	cmdline_row = संदेश_row;
+	संदेश_didany = FALSE;		// lines_left will be set again
+	संदेश_start();			// prepare for paging
     }
 
-    if (got_int)
+    यदि (got_int)
 	got_int = FALSE;  // only interrupt the completion, not the cmd line
-    else if (display_wildmenu && !display_list)
-	win_redr_status_matches(xp, numMatches, matches, noselect ? -1 : 0,
+    अन्यथा यदि (display_wildmenu && !display_list)
+	win_redr_status_matches(xp, अंक_Matches, matches, noselect ? -1 : 0,
 		showtail);  // display statusbar menu
-    else if (display_list)
+    अन्यथा यदि (display_list)
     {
 	// find the length of the longest file name
 	maxlen = 0;
-	for (i = 0; i < numMatches; ++i)
+	प्रति (i = 0; i < अंक_Matches; ++i)
 	{
-	    int	len;
-	    if (!showtail && (xp->xp_context == EXPAND_FILES
+	    पूर्णाङ्क	len;
+	    यदि (!showtail && (xp->xp_context == EXPAND_FILES
 			  || xp->xp_context == EXPAND_SHELLCMD
 			  || xp->xp_context == EXPAND_BUFFERS))
 	    {
-		home_replace(NULL, matches[i], NameBuff, MAXPATHL, TRUE);
+		home_replace(रिक्त, matches[i], NameBuff, MAXPATHL, TRUE);
 		len = vim_strsize(NameBuff);
 	    }
-	    else
+	    अन्यथा
 		len = vim_strsize(SHOW_MATCH(i));
-	    if (len > maxlen)
+	    यदि (len > maxlen)
 		maxlen = len;
 	}
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
-	    lines = numMatches;
-	else
+	यदि (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	    पंक्तियाँ = अंक_Matches;
+	अन्यथा
 	{
 	    // compute the number of columns and lines for the listing
 	    maxlen += 2;    // two spaces between file names
 	    columns = (cmdline_width + 2) / maxlen;
-	    if (columns < 1)
+	    यदि (columns < 1)
 		columns = 1;
-	    lines = (numMatches + columns - 1) / columns;
+	    पंक्तियाँ = (अंक_Matches + columns - 1) / columns;
 	}
 
 	attr = HL_ATTR(HLF_D);	// find out highlighting for directories
 
-	if (xp->xp_context == EXPAND_TAGS_LISTFILES)
+	यदि (xp->xp_context == EXPAND_TAGS_LISTFILES)
 	{
-	    msg_puts_attr(_("tagname"), HL_ATTR(HLF_T));
-	    msg_clr_eos();
-	    msg_advance(maxlen - 3);
-	    msg_puts_attr(_(" kind file\n"), HL_ATTR(HLF_T));
+	    संदेश_puts_attr(_("tagname"), HL_ATTR(HLF_T));
+	    संदेश_clr_eos();
+	    संदेश_advance(maxlen - 3);
+	    संदेश_puts_attr(_(" kind file\n"), HL_ATTR(HLF_T));
 	}
 
 	// list the files line by line
-	for (i = 0; i < lines; ++i)
+	प्रति (i = 0; i < पंक्तियाँ; ++i)
 	{
-	    showmatches_oneline(xp, matches, numMatches, lines, i,
+	    showmatches_oneline(xp, matches, अंक_Matches, पंक्तियाँ, i,
 						maxlen, showtail, attr);
-	    if (got_int)
+	    यदि (got_int)
 	    {
 		got_int = FALSE;
-		break;
+		भङ्ग;
 	    }
 	}
 
 	// we redraw the command below the lines that we have just listed
 	// This is a bit tricky, but it saves a lot of screen updating.
-	cmdline_row = msg_row;	// will put it back later
+	cmdline_row = संदेश_row;	// will put it back later
     }
 
     // "list" and "full" in the same 'wildmode' phase: the matches are listed
     // above and shown in the menu as well.
-    if (display_wildmenu && display_list)
+    यदि (display_wildmenu && display_list)
     {
-	if (vim_strchr(p_wop, WOP_PUM) != NULL)
-	    (void)show_pum_matches(ccline, xp, matches, numMatches,
+	यदि (vim_strchr(p_wop, WOP_PUM) != रिक्त)
+	    (शून्य)show_pum_matches(ccline, xp, matches, अंक_Matches,
 		    showtail && !cmdline_unchanged, noselect);
-	else
-	    win_redr_status_matches(xp, numMatches, matches,
+	अन्यथा
+	    win_redr_status_matches(xp, अंक_Matches, matches,
 		    noselect ? -1 : 0, showtail);
     }
 
-    if (xp->xp_numfiles == -1)
+    यदि (xp->xp_numfiles == -1)
     {
-	FreeWild(numMatches, matches);
-	free_xp_files_extra(xp, numMatches);
+	FreeWild(अंक_Matches, matches);
+	free_xp_files_extra(xp, अंक_Matches);
     }
 
-    return EXPAND_OK;
+    प्रत्यागम EXPAND_OK;
 }
 
 /*
  * gettail() version for showmatches() and win_redr_status_matches():
  * Return the tail of file name path "s", ignoring a trailing "/".
  */
-    static char_u *
+    स्थिर char_u *
 showmatches_gettail(char_u *s)
 {
     char_u	*p;
     char_u	*t = s;
-    int		had_sep = FALSE;
+    पूर्णाङ्क		had_sep = FALSE;
 
-    for (p = s; *p != NUL; )
+    प्रति (p = s; *p != NUL; )
     {
-	if (vim_ispathsep(*p)
+	यदि (vim_ispathsep(*p)
 #ifdef BACKSLASH_IN_FILENAME
 		&& !rem_backslash(p)
 #endif
 	   )
 	    had_sep = TRUE;
-	else if (had_sep)
+	अन्यथा यदि (had_sep)
 	{
 	    t = p;
 	    had_sep = FALSE;
 	}
 	MB_PTR_ADV(p);
     }
-    return t;
+    प्रत्यागम t;
 }
 
 /*
@@ -1679,32 +1679,32 @@ showmatches_gettail(char_u *s)
  * When not completing file names or there is a wildcard in the path FALSE is
  * returned.
  */
-    static int
+    स्थिर पूर्णाङ्क
 expand_showtail(expand_T *xp)
 {
     char_u	*s;
     char_u	*end;
 
     // When not completing file names a "/" may mean something different.
-    if (xp->xp_context != EXPAND_FILES
+    यदि (xp->xp_context != EXPAND_FILES
 	    && xp->xp_context != EXPAND_SHELLCMD
 	    && xp->xp_context != EXPAND_DIRECTORIES)
-	return FALSE;
+	प्रत्यागम FALSE;
 
     end = gettail(xp->xp_pattern);
-    if (end == xp->xp_pattern)		// there is no path separator
-	return FALSE;
+    यदि (end == xp->xp_pattern)		// there is no path separator
+	प्रत्यागम FALSE;
 
-    for (s = xp->xp_pattern; s < end; s++)
+    प्रति (s = xp->xp_pattern; s < end; s++)
     {
 	// Skip escaped wildcards.  Only when the backslash is not a path
 	// separator, on DOS the '*' "path\*\file" must not be skipped.
-	if (rem_backslash(s))
+	यदि (rem_backslash(s))
 	    ++s;
-	else if (vim_strchr((char_u *)"*?[", *s) != NULL)
-	    return FALSE;
+	अन्यथा यदि (vim_strchr((char_u *)"*?[", *s) != रिक्त)
+	    प्रत्यागम FALSE;
     }
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
@@ -1717,16 +1717,16 @@ expand_showtail(expand_T *xp)
     char_u *
 addstar(
     char_u	*fname,
-    int		len,
-    int		context)	// EXPAND_FILES etc.
+    पूर्णाङ्क		len,
+    पूर्णाङ्क		context)	// EXPAND_FILES etc.
 {
     char_u	*retval;
-    int		i, j;
-    int		new_len;
+    पूर्णाङ्क		i, j;
+    पूर्णाङ्क		new_len;
     char_u	*tail;
-    int		ends_in_star;
+    पूर्णाङ्क		ends_in_star;
 
-    if (context != EXPAND_FILES
+    यदि (context != EXPAND_FILES
 	    && context != EXPAND_FILES_IN_PATH
 	    && context != EXPAND_SHELLCMD
 	    && context != EXPAND_DIRECTORIES
@@ -1738,7 +1738,7 @@ addstar(
 
 	// For help tags the translation is done in find_help_tags().
 	// For a tag pattern starting with "/" no translation is needed.
-	if (context == EXPAND_FINDFUNC
+	यदि (context == EXPAND_FINDFUNC
 		|| context == EXPAND_HELP
 		|| context == EXPAND_COLORS
 		|| context == EXPAND_COMPILER
@@ -1751,55 +1751,55 @@ addstar(
 			|| context == EXPAND_TAGS)
 		    && fname[0] == '/'))
 	    retval = vim_strnsave(fname, len);
-	else
+	अन्यथा
 	{
 	    new_len = len + 2;		// +2 for '^' at start, NUL at end
-	    for (i = 0; i < len; i++)
+	    प्रति (i = 0; i < len; i++)
 	    {
-		if (fname[i] == '*' || fname[i] == '~')
+		यदि (fname[i] == '*' || fname[i] == '~')
 		    new_len++;		// '*' needs to be replaced by ".*"
 					// '~' needs to be replaced by "\~"
 
 		// Buffer names are like file names.  "." should be literal
-		if (context == EXPAND_BUFFERS && fname[i] == '.')
+		यदि (context == EXPAND_BUFFERS && fname[i] == '.')
 		    new_len++;		// "." becomes "\."
 
 		// Custom expansion takes care of special things, match
 		// backslashes literally (perhaps also for other types?)
-		if ((context == EXPAND_USER_DEFINED
+		यदि ((context == EXPAND_USER_DEFINED
 			  || context == EXPAND_USER_LIST) && fname[i] == '\\')
 		    new_len++;		// '\' becomes "\\"
 	    }
 	    retval = alloc(new_len);
-	    if (retval != NULL)
+	    यदि (retval != रिक्त)
 	    {
 		retval[0] = '^';
 		j = 1;
-		for (i = 0; i < len; i++, j++)
+		प्रति (i = 0; i < len; i++, j++)
 		{
 		    // Skip backslash.  But why?  At least keep it for custom
 		    // expansion.
-		    if (context != EXPAND_USER_DEFINED
+		    यदि (context != EXPAND_USER_DEFINED
 			    && context != EXPAND_USER_LIST
 			    && fname[i] == '\\'
 			    && ++i == len)
-			break;
+			भङ्ग;
 
-		    switch (fname[i])
+		    विकल्प (fname[i])
 		    {
-			case '*':   retval[j++] = '.';
-				    break;
-			case '~':   retval[j++] = '\\';
-				    break;
-			case '?':   retval[j] = '.';
-				    continue;
-			case '.':   if (context == EXPAND_BUFFERS)
+			पक्ष '*':   retval[j++] = '.';
+				    भङ्ग;
+			पक्ष '~':   retval[j++] = '\\';
+				    भङ्ग;
+			पक्ष '?':   retval[j] = '.';
+				    अनुवर्त;
+			पक्ष '.':   यदि (context == EXPAND_BUFFERS)
 					retval[j++] = '\\';
-				    break;
-			case '\\':  if (context == EXPAND_USER_DEFINED
+				    भङ्ग;
+			पक्ष '\\':  यदि (context == EXPAND_USER_DEFINED
 					    || context == EXPAND_USER_LIST)
 					retval[j++] = '\\';
-				    break;
+				    भङ्ग;
 		    }
 		    retval[j] = fname[i];
 		}
@@ -1807,10 +1807,10 @@ addstar(
 	    }
 	}
     }
-    else
+    अन्यथा
     {
 	retval = alloc(len + 4);
-	if (retval != NULL)
+	यदि (retval != रिक्त)
 	{
 	    vim_strncpy(retval, fname, len);
 
@@ -1823,24 +1823,24 @@ addstar(
 	    tail = gettail(retval);
 	    ends_in_star = (len > 0 && retval[len - 1] == '*');
 #ifndef BACKSLASH_IN_FILENAME
-	    for (i = len - 2; i >= 0; --i)
+	    प्रति (i = len - 2; i >= 0; --i)
 	    {
-		if (retval[i] != '\\')
-		    break;
+		यदि (retval[i] != '\\')
+		    भङ्ग;
 		ends_in_star = !ends_in_star;
 	    }
 #endif
-	    if ((*retval != '~' || tail != retval)
+	    यदि ((*retval != '~' || tail != retval)
 		    && !ends_in_star
-		    && vim_strchr(tail, '$') == NULL
-		    && vim_strchr(retval, '`') == NULL)
+		    && vim_strchr(tail, '$') == रिक्त
+		    && vim_strchr(retval, '`') == रिक्त)
 		retval[len++] = '*';
-	    else if (len > 0 && retval[len - 1] == '$')
+	    अन्यथा यदि (len > 0 && retval[len - 1] == '$')
 		--len;
 	    retval[len] = NUL;
 	}
     }
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
@@ -1887,35 +1887,35 @@ addstar(
  *  EXPAND_USER		    Complete user names
  *  EXPAND_PATTERN_IN_BUF   Complete pattern in '/', '?', ':s', ':g', etc.
  */
-    void
+    शून्य
 set_expand_context(expand_T *xp)
 {
     cmdline_info_T  *ccline = get_cmdline_info();
 
     // Handle search commands: '/' or '?'
-    if ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
+    यदि ((ccline->cmdfirstc == '/' || ccline->cmdfirstc == '?')
 	    && may_expand_pattern)
     {
 	xp->xp_context = EXPAND_PATTERN_IN_BUF;
-	xp->xp_search_dir = (ccline->cmdfirstc == '/') ? FORWARD : BACKWARD;
+	xp->xp_खोज_dir = (ccline->cmdfirstc == '/') ? FORWARD : BACKWARD;
 	xp->xp_pattern = ccline->cmdbuff;
 	xp->xp_pattern_len = ccline->cmdpos;
-#ifdef FEAT_SEARCH_EXTRA
-	search_first_line = 0; // Search entire buffer
+#ifdef FEAT_खोज_EXTRA
+	खोज_first_पंक्ति = 0; // Search entire buffer
 #endif
-	return;
+	प्रत्यागम;
     }
 
     // Only handle ':', '>', or '=' command-lines, or expression input
-    if (ccline->cmdfirstc != ':'
+    यदि (ccline->cmdfirstc != ':'
 #ifdef FEAT_EVAL
 	    && ccline->cmdfirstc != '>' && ccline->cmdfirstc != '='
-	    && !ccline->input_fn
+	    && !ccline->निवेश_fn
 #endif
        )
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return;
+	प्रत्यागम;
     }
 
     // Fallback to command-line expansion
@@ -1929,12 +1929,12 @@ set_expand_context(expand_T *xp)
  *
  * Returns a pointer to the text after the command or NULL for failure.
  */
-    static char_u *
-set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
+    स्थिर char_u *
+set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, पूर्णाङ्क *complp)
 {
-    char_u	*p = NULL;
-    int		len = 0;
-    int		fuzzy = cmdline_fuzzy_complete(cmd);
+    char_u	*p = रिक्त;
+    पूर्णाङ्क		len = 0;
+    पूर्णाङ्क		fuzzy = cmdline_fuzzy_complete(cmd);
 
     // Isolate the command and search for it in the command table.
     // Exceptions:
@@ -1944,37 +1944,37 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
     // command like :Kz (#20241), and for fuzzy matching as that can find
     // matches anywhere in the command name.
     // - the 's' command can be followed directly by 'c', 'g', 'i', 'I' or 'r'
-    if (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
+    यदि (!fuzzy && !p_ic && (*cmd == 'k' && cmd[1] != 'e'))
     {
 	eap->cmdidx = CMD_k;
 	p = cmd + 1;
     }
-    else
+    अन्यथा
     {
 	p = cmd;
-	while (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
+	यावत् (ASCII_ISALPHA(*p) || *p == '*')    // Allow * wild card
 	    ++p;
 	// A user command may contain digits.
 	// Include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
-	if (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
-	    while (ASCII_ISALNUM(*p) || *p == '*')
+	यदि (ASCII_ISUPPER(cmd[0]) || STRNCMP("vim9", cmd, 4) == 0)
+	    यावत् (ASCII_ISALNUM(*p) || *p == '*')
 		++p;
 	// for python 3.x: ":py3*" commands completion
-	if (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
+	यदि (cmd[0] == 'p' && cmd[1] == 'y' && p == cmd + 2 && *p == '3')
 	{
 	    ++p;
-	    while (ASCII_ISALPHA(*p) || *p == '*')
+	    यावत् (ASCII_ISALPHA(*p) || *p == '*')
 		++p;
 	}
 	// check for non-alpha command
-	if (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != NULL)
+	यदि (p == cmd && vim_strchr((char_u *)"@*!=><&~#", *p) != रिक्त)
 	    ++p;
-	len = (int)(p - cmd);
+	len = (पूर्णाङ्क)(p - cmd);
 
-	if (len == 0)
+	यदि (len == 0)
 	{
 	    xp->xp_context = EXPAND_UNSUCCESSFUL;
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
 
 	eap->cmdidx = excmd_get_cmdidx(cmd, len);
@@ -1982,74 +1982,74 @@ set_cmd_index(char_u *cmd, exarg_T *eap, expand_T *xp, int *complp)
 	// User defined commands support alphanumeric characters.
 	// Also when doing fuzzy expansion for non-shell commands, support
 	// alphanumeric characters.
-	if ((cmd[0] >= 'A' && cmd[0] <= 'Z')
+	यदि ((cmd[0] >= 'A' && cmd[0] <= 'Z')
 		|| (fuzzy && eap->cmdidx != CMD_bang && *p != NUL))
-	    while (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
+	    यावत् (ASCII_ISALNUM(*p) || *p == '*')	// Allow * wild card
 		++p;
     }
 
     // If the cursor is touching the command, and it ends in an alphanumeric
     // character, complete the command name.
-    if (*p == NUL && ASCII_ISALNUM(p[-1]))
-	return NULL;
+    यदि (*p == NUL && ASCII_ISALNUM(p[-1]))
+	प्रत्यागम रिक्त;
 
-    if (eap->cmdidx == CMD_SIZE)
+    यदि (eap->cmdidx == CMD_SIZE)
     {
-	if (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != NULL)
+	यदि (*cmd == 's' && vim_strchr((char_u *)"cgriI", cmd[1]) != रिक्त)
 	{
 	    eap->cmdidx = CMD_substitute;
 	    p = cmd + 1;
 	}
-	else if (cmd[0] >= 'A' && cmd[0] <= 'Z')
+	अन्यथा यदि (cmd[0] >= 'A' && cmd[0] <= 'Z')
 	{
 	    eap->cmd = cmd;
-	    p = find_ucmd(eap, p, NULL, xp, complp);
-	    if (p == NULL)
+	    p = find_ucmd(eap, p, रिक्त, xp, complp);
+	    यदि (p == रिक्त)
 		eap->cmdidx = CMD_SIZE;	// ambiguous user command
 	}
     }
-    if (eap->cmdidx == CMD_SIZE)
+    यदि (eap->cmdidx == CMD_SIZE)
     {
 	// Not still touching the command and it was an illegal one
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    return p;
+    प्रत्यागम p;
 }
 
 /*
  * Set the completion context for a command argument with wild card characters.
  */
-    static void
+    स्थिर शून्य
 set_context_for_wildcard_arg(
 	exarg_T		*eap,
 	char_u		*arg,
-	int		usefilter,
+	पूर्णाङ्क		usefilter,
 	expand_T	*xp,
-	int		*complp)
+	पूर्णाङ्क		*complp)
 {
     char_u	*p;
-    int		c;
-    int		in_quote = FALSE;
-    char_u	*bow = NULL;	// Beginning of word
-    int		len = 0;
+    पूर्णाङ्क		c;
+    पूर्णाङ्क		in_quote = FALSE;
+    char_u	*bow = रिक्त;	// Beginning of word
+    पूर्णाङ्क		len = 0;
 
     // Allow spaces within back-quotes to count as part of the argument
     // being expanded.
     xp->xp_pattern = skipwhite(arg);
     p = xp->xp_pattern;
-    while (*p != NUL)
+    यावत् (*p != NUL)
     {
-	if (has_mbyte)
+	यदि (has_mbyte)
 	    c = mb_ptr2char(p);
-	else
+	अन्यथा
 	    c = *p;
-	if (c == '\\' && p[1] != NUL)
+	यदि (c == '\\' && p[1] != NUL)
 	    ++p;
-	else if (c == '`')
+	अन्यथा यदि (c == '`')
 	{
-	    if (!in_quote)
+	    यदि (!in_quote)
 	    {
 		xp->xp_pattern = p;
 		bow = p + 1;
@@ -2058,28 +2058,28 @@ set_context_for_wildcard_arg(
 	}
 	// An argument can contain just about everything, except
 	// characters that end the command and white space.
-	else if (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
-		    && (!(eap != NULL && (eap->argt & EX_NOSPC)) || usefilter)
+	अन्यथा यदि (c == '|' || c == '\n' || c == '"' || (VIM_ISWHITE(c)
+		    && (!(eap != रिक्त && (eap->argt & EX_NOSPC)) || usefilter)
 		    ))
 	{
 	    len = 0;  // avoid getting stuck when space is in 'isfname'
-	    while (*p != NUL)
+	    यावत् (*p != NUL)
 	    {
-		if (has_mbyte)
+		यदि (has_mbyte)
 		    c = mb_ptr2char(p);
-		else
+		अन्यथा
 		    c = *p;
-		if (c == '`' || vim_isfilec_or_wc(c))
-		    break;
-		if (has_mbyte)
+		यदि (c == '`' || vim_isfilec_or_wc(c))
+		    भङ्ग;
+		यदि (has_mbyte)
 		    len = (*mb_ptr2len)(p);
-		else
+		अन्यथा
 		    len = 1;
 		MB_PTR_ADV(p);
 	    }
-	    if (in_quote)
+	    यदि (in_quote)
 		bow = p;
-	    else
+	    अन्यथा
 		xp->xp_pattern = p;
 	    p -= len;
 	}
@@ -2088,13 +2088,13 @@ set_context_for_wildcard_arg(
 
     // If we are still inside the quotes, and we passed a space, just
     // expand from there.
-    if (bow != NULL && in_quote)
+    यदि (bow != रिक्त && in_quote)
 	xp->xp_pattern = bow;
     xp->xp_context = EXPAND_FILES;
 
     // For a shell command more chars need to be escaped.
-    if (usefilter
-	    || (eap != NULL
+    यदि (usefilter
+	    || (eap != रिक्त
 		&& (eap->cmdidx == CMD_bang || eap->cmdidx == CMD_terminal))
 	    || *complp == EXPAND_SHELLCMDLINE)
     {
@@ -2102,34 +2102,34 @@ set_context_for_wildcard_arg(
 	xp->xp_shell = TRUE;
 #endif
 	// When still after the command name expand executables.
-	if (xp->xp_pattern == skipwhite(arg))
+	यदि (xp->xp_pattern == skipwhite(arg))
 	    xp->xp_context = EXPAND_SHELLCMD;
     }
 
     // Check for environment variable.
-    if (*xp->xp_pattern == '$')
+    यदि (*xp->xp_pattern == '$')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL; ++p)
-	    if (!vim_isIDc(*p))
-		break;
-	if (*p == NUL)
+	प्रति (p = xp->xp_pattern + 1; *p != NUL; ++p)
+	    यदि (!vim_isIDc(*p))
+		भङ्ग;
+	यदि (*p == NUL)
 	{
 	    xp->xp_context = EXPAND_ENV_VARS;
 	    ++xp->xp_pattern;
 	    // Avoid that the assignment uses EXPAND_FILES again.
-	    if (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
+	    यदि (*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST)
 		*complp = EXPAND_ENV_VARS;
 	}
     }
     // Check for user names.
-    if (*xp->xp_pattern == '~')
+    यदि (*xp->xp_pattern == '~')
     {
-	for (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
+	प्रति (p = xp->xp_pattern + 1; *p != NUL && *p != '/'; ++p)
 	    ;
 	// Complete ~user only if it partially matches a user name.
 	// A full match ~user<Tab> will be replaced by user's home
 	// directory i.e. something like ~user<Tab> -> /home/user/
-	if (*p == NUL && p > xp->xp_pattern + 1
+	यदि (*p == NUL && p > xp->xp_pattern + 1
 		&& match_user(xp->xp_pattern + 1) >= 1)
 	{
 	    xp->xp_context = EXPAND_USER;
@@ -2142,38 +2142,38 @@ set_context_for_wildcard_arg(
  * Set the completion context for the "++opt=arg" argument.  Always returns
  * NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_argopt(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    यदि (p == रिक्त)
 	xp->xp_pattern = arg;
-    else
+    अन्यथा
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_ARGOPT;
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 #ifdef FEAT_TERMINAL
 /*
  * Set the completion context for :terminal's [options].  Always returns NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_terminalopt(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = vim_strchr(arg, '=');
-    if (p == NULL)
+    यदि (p == रिक्त)
 	xp->xp_pattern = arg;
-    else
+    अन्यथा
 	xp->xp_pattern = p + 1;
 
     xp->xp_context = EXPAND_TERMINALOPT;
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 #endif
 
@@ -2181,39 +2181,39 @@ set_context_in_terminalopt(expand_T *xp, char_u *arg)
  * Set the completion context for the :filter command. Returns a pointer to the
  * next command after the :filter command.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_filter_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg != NUL)
-	arg = skip_vimgrep_pat(arg, NULL, NULL);
-    if (arg == NULL || *arg == NUL)
+    यदि (*arg != NUL)
+	arg = skip_vimgrep_pat(arg, रिक्त, रिक्त);
+    यदि (arg == रिक्त || *arg == NUL)
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	प्रत्यागम रिक्त;
     }
-    return skipwhite(arg);
+    प्रत्यागम skipwhite(arg);
 }
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_खोज_EXTRA
 /*
  * Set the completion context for the :match command. Returns a pointer to the
  * next command after the :match command.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_match_cmd(expand_T *xp, char_u *arg)
 {
-    if (*arg == NUL || !ends_excmd(*arg))
+    यदि (*arg == NUL || !ends_excmd(*arg))
     {
 	// also complete "None"
 	set_context_in_echohl_cmd(xp, arg);
 	arg = skipwhite(skiptowhite(arg));
-	if (*arg != NUL)
+	यदि (*arg != NUL)
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	    arg = skip_regexp(arg + 1, *arg, magic_isset());
 	}
     }
-    return find_nextcmd(arg);
+    प्रत्यागम find_nextcmd(arg);
 }
 #endif
 
@@ -2221,63 +2221,63 @@ set_context_in_match_cmd(expand_T *xp, char_u *arg)
  * Returns a pointer to the next command after a :global or a :v command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    स्थिर char_u *
 find_cmd_after_global_cmd(char_u *arg)
 {
-    int		delim;
+    पूर्णाङ्क		delim;
 
     delim = *arg;	    // get the delimiter
-    if (delim)
+    यदि (delim)
 	++arg;		    // skip delimiter if there is one
 
-    while (arg[0] != NUL && arg[0] != delim)
+    यावत् (arg[0] != NUL && arg[0] != delim)
     {
-	if (arg[0] == '\\' && arg[1] != NUL)
+	यदि (arg[0] == '\\' && arg[1] != NUL)
 	    ++arg;
 	++arg;
     }
-    if (arg[0] != NUL)
-	return arg + 1;
+    यदि (arg[0] != NUL)
+	प्रत्यागम arg + 1;
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Returns a pointer to the next command after a :substitute or a :& command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    स्थिर char_u *
 find_cmd_after_substitute_cmd(char_u *arg)
 {
-    int		delim;
+    पूर्णाङ्क		delim;
 
     delim = *arg;
-    if (delim)
+    यदि (delim)
     {
 	// skip "from" part
 	++arg;
 	arg = skip_regexp(arg, delim, magic_isset());
 
-	if (arg[0] != NUL && arg[0] == delim)
+	यदि (arg[0] != NUL && arg[0] == delim)
 	{
 	    // skip "to" part
 	    ++arg;
-	    while (arg[0] != NUL && arg[0] != delim)
+	    यावत् (arg[0] != NUL && arg[0] != delim)
 	    {
-		if (arg[0] == '\\' && arg[1] != NUL)
+		यदि (arg[0] == '\\' && arg[1] != NUL)
 		    ++arg;
 		++arg;
 	    }
-	    if (arg[0] != NUL)	// skip delimiter
+	    यदि (arg[0] != NUL)	// skip delimiter
 		++arg;
 	}
     }
-    while (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == NULL)
+    यावत् (arg[0] && vim_strchr((char_u *)"|\"#", arg[0]) == रिक्त)
 	++arg;
-    if (arg[0] != NUL)
-	return arg;
+    यदि (arg[0] != NUL)
+	प्रत्यागम arg;
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
@@ -2285,72 +2285,72 @@ find_cmd_after_substitute_cmd(char_u *arg)
  * :dlist/:ijump/:psearch/:djump/:isplit/:dsplit command.
  * Returns NULL if there is no next command.
  */
-    static char_u *
+    स्थिर char_u *
 find_cmd_after_isearch_cmd(expand_T *xp, char_u *arg)
 {
     arg = skipwhite(skipdigits(arg));	    // skip count
-    if (*arg != '/')
-	return NULL;
+    यदि (*arg != '/')
+	प्रत्यागम रिक्त;
 
     // Match regexp, not just whole words
-    for (++arg; *arg && *arg != '/'; arg++)
-	if (*arg == '\\' && arg[1] != NUL)
+    प्रति (++arg; *arg && *arg != '/'; arg++)
+	यदि (*arg == '\\' && arg[1] != NUL)
 	    arg++;
-    if (*arg)
+    यदि (*arg)
     {
 	arg = skipwhite(arg + 1);
 
 	// Check for trailing illegal characters
-	if (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == NULL)
+	यदि (*arg == NUL || vim_strchr((char_u *)"|\"\n", *arg) == रिक्त)
 	    xp->xp_context = EXPAND_NOTHING;
-	else
-	    return arg;
+	अन्यथा
+	    प्रत्यागम arg;
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 #ifdef FEAT_EVAL
 /*
  * Set the completion context for the :unlet command. Always returns NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_unlet_cmd(expand_T *xp, char_u *arg)
 {
-    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+    यावत् ((xp->xp_pattern = vim_strchr(arg, ' ')) != रिक्त)
 	arg = xp->xp_pattern + 1;
 
     xp->xp_context = EXPAND_USER_VARS;
     xp->xp_pattern = arg;
 
-    if (*xp->xp_pattern == '$')
+    यदि (*xp->xp_pattern == '$')
     {
 	xp->xp_context = EXPAND_ENV_VARS;
 	++xp->xp_pattern;
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Set the completion context for the :language command. Always returns NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_lang_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
 
     p = skiptowhite(arg);
-    if (*p == NUL)
+    यदि (*p == NUL)
     {
 	xp->xp_context = EXPAND_LANGUAGE;
 	xp->xp_pattern = arg;
     }
-    else
+    अन्यथा
     {
-	if ( STRNCMP(arg, "messages", p - arg) == 0
+	यदि ( STRNCMP(arg, "messages", p - arg) == 0
 		|| STRNCMP(arg, "ctype", p - arg) == 0
 		|| STRNCMP(arg, "time", p - arg) == 0
 		|| STRNCMP(arg, "collate", p - arg) == 0)
@@ -2358,15 +2358,15 @@ set_context_in_lang_cmd(expand_T *xp, char_u *arg)
 	    xp->xp_context = EXPAND_LOCALES;
 	    xp->xp_pattern = skipwhite(p);
 	}
-	else
+	अन्यथा
 	    xp->xp_context = EXPAND_NOTHING;
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 #endif
 
-static enum
+स्थिर गणना
 {
     EXP_FILETYPECMD_ALL,	// expand all :filetype values
     EXP_FILETYPECMD_PLUGIN,	// expand plugin on off
@@ -2379,7 +2379,7 @@ static enum
 #define EXPAND_FILETYPECMD_ONOFF  0x04
 
 #ifdef FEAT_EVAL
-static enum
+स्थिर गणना
 {
     EXP_BREAKPT_ADD,	// expand ":breakadd" sub-commands
     EXP_BREAKPT_DEL,	// expand ":breakdel" sub-commands
@@ -2389,7 +2389,7 @@ static enum
 /*
  * Set the completion context for the :breakadd command. Always returns NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
 {
     char_u *p;
@@ -2398,19 +2398,19 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
     xp->xp_context = EXPAND_BREAKPOINT;
     xp->xp_pattern = arg;
 
-    if (cmdidx == CMD_breakadd)
+    यदि (cmdidx == CMD_breakadd)
 	breakpt_expand_what = EXP_BREAKPT_ADD;
-    else if (cmdidx == CMD_breakdel)
+    अन्यथा यदि (cmdidx == CMD_breakdel)
 	breakpt_expand_what = EXP_BREAKPT_DEL;
-    else
+    अन्यथा
 	breakpt_expand_what = EXP_PROFDEL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    यदि (*p == NUL)
+	प्रत्यागम रिक्त;
     subcmd_start = p;
 
-    if (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
+    यदि (STRNCMP("file ", p, 5) == 0 || STRNCMP("func ", p, 5) == 0)
     {
 	// :breakadd file [lnum] <filename>
 	// :breakadd func [lnum] <funcname>
@@ -2418,108 +2418,108 @@ set_context_in_breakadd_cmd(expand_T *xp, char_u *arg, cmdidx_T cmdidx)
 	p = skipwhite(p);
 
 	// skip line number (if specified)
-	if (VIM_ISDIGIT(*p))
+	यदि (VIM_ISDIGIT(*p))
 	{
 	    p = skipdigits(p);
-	    if (*p != ' ')
+	    यदि (*p != ' ')
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 	    p = skipwhite(p);
 	}
-	if (STRNCMP("file", subcmd_start, 4) == 0)
+	यदि (STRNCMP("file", subcmd_start, 4) == 0)
 	    xp->xp_context = EXPAND_FILES;
-	else
+	अन्यथा
 	    xp->xp_context = EXPAND_USER_FUNC;
 	xp->xp_pattern = p;
     }
-    else if (STRNCMP("expr ", p, 5) == 0)
+    अन्यथा यदि (STRNCMP("expr ", p, 5) == 0)
     {
 	// :breakadd expr <expression>
 	xp->xp_context = EXPAND_EXPRESSION;
 	xp->xp_pattern = skipwhite(p + 5);
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
-    static char_u *
+    स्थिर char_u *
 set_context_in_scriptnames_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
 
     xp->xp_context = EXPAND_NOTHING;
-    xp->xp_pattern = NULL;
+    xp->xp_pattern = रिक्त;
 
     p = skipwhite(arg);
-    if (VIM_ISDIGIT(*p))
-	return NULL;
+    यदि (VIM_ISDIGIT(*p))
+	प्रत्यागम रिक्त;
 
     xp->xp_context = EXPAND_SCRIPTNAMES;
     xp->xp_pattern = p;
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 #endif
 
 /*
  * Set the completion context for the :filetype command. Always returns NULL.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_in_filetype_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
-    int    val = 0;
+    पूर्णाङ्क    val = 0;
 
     xp->xp_context = EXPAND_FILETYPECMD;
     xp->xp_pattern = arg;
     filetype_expand_what = EXP_FILETYPECMD_ALL;
 
     p = skipwhite(arg);
-    if (*p == NUL)
-	return NULL;
+    यदि (*p == NUL)
+	प्रत्यागम रिक्त;
 
-    for (;;)
+    प्रति (;;)
     {
-	if (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
+	यदि (STRNCMP(p, "plugin", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_PLUGIN;
 	    p = skipwhite(p + 6);
-	    continue;
+	    अनुवर्त;
 	}
-	if (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
+	यदि (STRNCMP(p, "indent", 6) == 0 && VIM_ISWHITE(p[6]))
 	{
 	    val |= EXPAND_FILETYPECMD_INDENT;
 	    p = skipwhite(p + 6);
-	    continue;
+	    अनुवर्त;
 	}
-	break;
+	भङ्ग;
     }
 
-    if ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
+    यदि ((val & EXPAND_FILETYPECMD_PLUGIN) && (val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_ONOFF;
-    else if ((val & EXPAND_FILETYPECMD_PLUGIN))
+    अन्यथा यदि ((val & EXPAND_FILETYPECMD_PLUGIN))
 	filetype_expand_what = EXP_FILETYPECMD_INDENT;
-    else if ((val & EXPAND_FILETYPECMD_INDENT))
+    अन्यथा यदि ((val & EXPAND_FILETYPECMD_INDENT))
 	filetype_expand_what = EXP_FILETYPECMD_PLUGIN;
 
     xp->xp_pattern = p;
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Sets the completion context for commands that involve a search pattern
  * and a line range (e.g., :s, :g, :v).
  */
-    static void
+    स्थिर शून्य
 set_context_with_pattern(expand_T *xp)
 {
-    int		    skiplen = 0;
+    पूर्णाङ्क		    skiplen = 0;
     cmdline_info_T  *ccline = get_cmdline_info();
-#ifdef FEAT_SEARCH_EXTRA
-    int		    dummy, patlen, retval;
+#ifdef FEAT_खोज_EXTRA
+    पूर्णाङ्क		    dummy, patlen, retval;
 
     ++emsg_off;
     retval = parse_pattern_and_range(&pre_incsearch_pos, &dummy, &skiplen,
@@ -2527,15 +2527,15 @@ set_context_with_pattern(expand_T *xp)
     --emsg_off;
 
     // Check if cursor is within search pattern
-    if (!retval || ccline->cmdpos <= skiplen
+    यदि (!retval || ccline->cmdpos <= skiplen
 	    || ccline->cmdpos > skiplen + patlen)
-	return;
+	प्रत्यागम;
 #endif
 
     xp->xp_pattern = ccline->cmdbuff + skiplen;
     xp->xp_pattern_len = ccline->cmdpos - skiplen;
     xp->xp_context = EXPAND_PATTERN_IN_BUF;
-    xp->xp_search_dir = FORWARD;
+    xp->xp_खोज_dir = FORWARD;
 }
 
 /*
@@ -2546,395 +2546,395 @@ set_context_with_pattern(expand_T *xp)
  * Returns a pointer to the next command. Returns NULL if there is no next
  * command.
  */
-    static char_u *
+    स्थिर char_u *
 set_context_by_cmdname(
 	char_u		*cmd,
 	cmdidx_T	cmdidx,
 	expand_T	*xp,
 	char_u		*arg,
-	long		argt,
-	int		compl,
-	int		forceit)
+	दीर्घ		argt,
+	पूर्णाङ्क		compl,
+	पूर्णाङ्क		forceit)
 {
     char_u  *nextcmd;
 
-    switch (cmdidx)
+    विकल्प (cmdidx)
     {
-	case CMD_find:
-	case CMD_sfind:
-	case CMD_tabfind:
-	    if (xp->xp_context == EXPAND_FILES)
+	पक्ष CMD_find:
+	पक्ष CMD_sfind:
+	पक्ष CMD_tabfind:
+	    यदि (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = *get_findfunc() != NUL ? EXPAND_FINDFUNC
 							: EXPAND_FILES_IN_PATH;
-	    break;
-	case CMD_cd:
-	case CMD_chdir:
-	case CMD_tcd:
-	case CMD_tchdir:
-	case CMD_lcd:
-	case CMD_lchdir:
-	    if (xp->xp_context == EXPAND_FILES)
+	    भङ्ग;
+	पक्ष CMD_cd:
+	पक्ष CMD_chdir:
+	पक्ष CMD_tcd:
+	पक्ष CMD_tchdir:
+	पक्ष CMD_lcd:
+	पक्ष CMD_lchdir:
+	    यदि (xp->xp_context == EXPAND_FILES)
 		xp->xp_context = EXPAND_DIRS_IN_CDPATH;
-	    break;
-	case CMD_help:
+	    भङ्ग;
+	पक्ष CMD_help:
 	    xp->xp_context = EXPAND_HELP;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
 	// Command modifiers: return the argument.
 	// Also for commands with an argument that is a command.
-	case CMD_aboveleft:
-	case CMD_argdo:
-	case CMD_belowright:
-	case CMD_botright:
-	case CMD_browse:
-	case CMD_bufdo:
-	case CMD_cdo:
-	case CMD_cfdo:
-	case CMD_confirm:
-	case CMD_debug:
-	case CMD_folddoclosed:
-	case CMD_folddoopen:
-	case CMD_hide:
-	case CMD_horizontal:
-	case CMD_keepalt:
-	case CMD_keepjumps:
-	case CMD_keepmarks:
-	case CMD_keeppatterns:
-	case CMD_ldo:
-	case CMD_leftabove:
-	case CMD_lfdo:
-	case CMD_lockmarks:
-	case CMD_noautocmd:
-	case CMD_noswapfile:
-	case CMD_rightbelow:
-	case CMD_sandbox:
-	case CMD_silent:
-	case CMD_tab:
-	case CMD_tabdo:
-	case CMD_topleft:
-	case CMD_unsilent:
-	case CMD_verbose:
-	case CMD_vertical:
-	case CMD_windo:
-	case CMD_vim9cmd:
-	case CMD_legacy:
-	    return arg;
+	पक्ष CMD_aboveleft:
+	पक्ष CMD_argdo:
+	पक्ष CMD_belowright:
+	पक्ष CMD_botright:
+	पक्ष CMD_browse:
+	पक्ष CMD_bufdo:
+	पक्ष CMD_cdo:
+	पक्ष CMD_cfdo:
+	पक्ष CMD_confirm:
+	पक्ष CMD_debug:
+	पक्ष CMD_folddoclosed:
+	पक्ष CMD_folddoopen:
+	पक्ष CMD_hide:
+	पक्ष CMD_horizontal:
+	पक्ष CMD_keepalt:
+	पक्ष CMD_keepjumps:
+	पक्ष CMD_keepmarks:
+	पक्ष CMD_keeppatterns:
+	पक्ष CMD_ldo:
+	पक्ष CMD_leftabove:
+	पक्ष CMD_lfdo:
+	पक्ष CMD_lockmarks:
+	पक्ष CMD_noautocmd:
+	पक्ष CMD_noswapfile:
+	पक्ष CMD_rightbelow:
+	पक्ष CMD_sandbox:
+	पक्ष CMD_silent:
+	पक्ष CMD_tab:
+	पक्ष CMD_tabdo:
+	पक्ष CMD_topleft:
+	पक्ष CMD_unsilent:
+	पक्ष CMD_verbose:
+	पक्ष CMD_vertical:
+	पक्ष CMD_windo:
+	पक्ष CMD_vim9cmd:
+	पक्ष CMD_legacy:
+	    प्रत्यागम arg;
 
-	case CMD_filter:
-	    return set_context_in_filter_cmd(xp, arg);
+	पक्ष CMD_filter:
+	    प्रत्यागम set_context_in_filter_cmd(xp, arg);
 
-#ifdef FEAT_SEARCH_EXTRA
-	case CMD_match:
-	    return set_context_in_match_cmd(xp, arg);
+#ifdef FEAT_खोज_EXTRA
+	पक्ष CMD_match:
+	    प्रत्यागम set_context_in_match_cmd(xp, arg);
 #endif
 
 	// All completion for the +cmdline_compl feature goes here.
 
-	case CMD_command:
-	    return set_context_in_user_cmd(xp, arg);
+	पक्ष CMD_command:
+	    प्रत्यागम set_context_in_user_cmd(xp, arg);
 
-	case CMD_delcommand:
+	पक्ष CMD_delcommand:
 	    xp->xp_context = EXPAND_USER_COMMANDS;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_global:
-	case CMD_vglobal:
+	पक्ष CMD_global:
+	पक्ष CMD_vglobal:
 	    nextcmd = find_cmd_after_global_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    यदि (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    प्रत्यागम nextcmd;
 
-	case CMD_and:
-	case CMD_substitute:
+	पक्ष CMD_and:
+	पक्ष CMD_substitute:
 	    nextcmd = find_cmd_after_substitute_cmd(arg);
-	    if (!nextcmd && may_expand_pattern)
+	    यदि (!nextcmd && may_expand_pattern)
 		set_context_with_pattern(xp);
-	    return nextcmd;
+	    प्रत्यागम nextcmd;
 
-	case CMD_isearch:
-	case CMD_dsearch:
-	case CMD_ilist:
-	case CMD_dlist:
-	case CMD_ijump:
-	case CMD_psearch:
-	case CMD_djump:
-	case CMD_isplit:
-	case CMD_dsplit:
-	    return find_cmd_after_isearch_cmd(xp, arg);
-	case CMD_autocmd:
-	    return set_context_in_autocmd(xp, arg, FALSE);
-	case CMD_doautocmd:
-	case CMD_doautoall:
-	    return set_context_in_autocmd(xp, arg, TRUE);
-	case CMD_set:
+	पक्ष CMD_isearch:
+	पक्ष CMD_dsearch:
+	पक्ष CMD_ilist:
+	पक्ष CMD_dlist:
+	पक्ष CMD_ijump:
+	पक्ष CMD_psearch:
+	पक्ष CMD_djump:
+	पक्ष CMD_isplit:
+	पक्ष CMD_dsplit:
+	    प्रत्यागम find_cmd_after_isearch_cmd(xp, arg);
+	पक्ष CMD_autocmd:
+	    प्रत्यागम set_context_in_autocmd(xp, arg, FALSE);
+	पक्ष CMD_doautocmd:
+	पक्ष CMD_doautoall:
+	    प्रत्यागम set_context_in_autocmd(xp, arg, TRUE);
+	पक्ष CMD_set:
 	    set_context_in_set_cmd(xp, arg, 0);
-	    break;
-	case CMD_setglobal:
+	    भङ्ग;
+	पक्ष CMD_setglobal:
 	    set_context_in_set_cmd(xp, arg, OPT_GLOBAL);
-	    break;
-	case CMD_setlocal:
+	    भङ्ग;
+	पक्ष CMD_setlocal:
 	    set_context_in_set_cmd(xp, arg, OPT_LOCAL);
-	    break;
-	case CMD_tag:
-	case CMD_stag:
-	case CMD_ptag:
-	case CMD_ltag:
-	case CMD_tselect:
-	case CMD_stselect:
-	case CMD_ptselect:
-	case CMD_tjump:
-	case CMD_stjump:
-	case CMD_ptjump:
-	    if (vim_strchr(p_wop, WOP_TAGFILE) != NULL)
+	    भङ्ग;
+	पक्ष CMD_tag:
+	पक्ष CMD_stag:
+	पक्ष CMD_ptag:
+	पक्ष CMD_ltag:
+	पक्ष CMD_tselect:
+	पक्ष CMD_stselect:
+	पक्ष CMD_ptselect:
+	पक्ष CMD_tjump:
+	पक्ष CMD_stjump:
+	पक्ष CMD_ptjump:
+	    यदि (vim_strchr(p_wop, WOP_TAGFILE) != रिक्त)
 		xp->xp_context = EXPAND_TAGS_LISTFILES;
-	    else
+	    अन्यथा
 		xp->xp_context = EXPAND_TAGS;
 	    xp->xp_pattern = arg;
-	    break;
-	case CMD_augroup:
+	    भङ्ग;
+	पक्ष CMD_augroup:
 	    xp->xp_context = EXPAND_AUGROUP;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 #ifdef FEAT_SYN_HL
-	case CMD_syntax:
+	पक्ष CMD_syntax:
 	    set_context_in_syntax_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 #endif
 #ifdef FEAT_EVAL
-	case CMD_final:
-	case CMD_const:
-	case CMD_let:
-	case CMD_var:
-	case CMD_if:
-	case CMD_elseif:
-	case CMD_while:
-	case CMD_for:
-	case CMD_echo:
-	case CMD_echon:
-	case CMD_execute:
-	case CMD_echomsg:
-	case CMD_echoerr:
-	case CMD_echoconsole:
-	case CMD_echowindow:
-	case CMD_call:
-	case CMD_return:
-	case CMD_cexpr:
-	case CMD_caddexpr:
-	case CMD_cgetexpr:
-	case CMD_lexpr:
-	case CMD_laddexpr:
-	case CMD_lgetexpr:
+	पक्ष CMD_final:
+	पक्ष CMD_const:
+	पक्ष CMD_let:
+	पक्ष CMD_var:
+	पक्ष CMD_if:
+	पक्ष CMD_elseif:
+	पक्ष CMD_while:
+	पक्ष CMD_for:
+	पक्ष CMD_echo:
+	पक्ष CMD_echon:
+	पक्ष CMD_execute:
+	पक्ष CMD_echomsg:
+	पक्ष CMD_echoerr:
+	पक्ष CMD_echoconsole:
+	पक्ष CMD_echowindow:
+	पक्ष CMD_call:
+	पक्ष CMD_return:
+	पक्ष CMD_cexpr:
+	पक्ष CMD_caddexpr:
+	पक्ष CMD_cgetexpr:
+	पक्ष CMD_lexpr:
+	पक्ष CMD_laddexpr:
+	पक्ष CMD_lgetexpr:
 	    set_context_for_expression(xp, arg, cmdidx);
-	    break;
+	    भङ्ग;
 
-	case CMD_unlet:
-	    return set_context_in_unlet_cmd(xp, arg);
-	case CMD_function:
-	case CMD_delfunction:
+	पक्ष CMD_unlet:
+	    प्रत्यागम set_context_in_unlet_cmd(xp, arg);
+	पक्ष CMD_function:
+	पक्ष CMD_delfunction:
 	    xp->xp_context = EXPAND_USER_FUNC;
 	    xp->xp_pattern = arg;
-	    break;
-	case CMD_disassemble:
+	    भङ्ग;
+	पक्ष CMD_disassemble:
 	    set_context_in_disassemble_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 
-	case CMD_echohl:
+	पक्ष CMD_echohl:
 	    set_context_in_echohl_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 #endif
-	case CMD_highlight:
+	पक्ष CMD_highlight:
 	    set_context_in_highlight_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 #ifdef FEAT_CSCOPE
-	case CMD_cscope:
-	case CMD_lcscope:
-	case CMD_scscope:
+	पक्ष CMD_cscope:
+	पक्ष CMD_lcscope:
+	पक्ष CMD_scscope:
 	    set_context_in_cscope_cmd(xp, arg, cmdidx);
-	    break;
+	    भङ्ग;
 #endif
 #ifdef FEAT_SIGNS
-	case CMD_sign:
+	पक्ष CMD_sign:
 	    set_context_in_sign_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 #endif
-	case CMD_bdelete:
-	case CMD_bwipeout:
-	case CMD_bunload:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	पक्ष CMD_bdelete:
+	पक्ष CMD_bwipeout:
+	पक्ष CMD_bunload:
+	    यावत् ((xp->xp_pattern = vim_strchr(arg, ' ')) != रिक्त)
 		arg = xp->xp_pattern + 1;
 	    // FALLTHROUGH
-	case CMD_buffer:
-	case CMD_sbuffer:
-	case CMD_pbuffer:
-	case CMD_checktime:
+	पक्ष CMD_buffer:
+	पक्ष CMD_sbuffer:
+	पक्ष CMD_pbuffer:
+	पक्ष CMD_checktime:
 	    xp->xp_context = EXPAND_BUFFERS;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 #ifdef FEAT_DIFF
-	case CMD_diffget:
-	case CMD_diffput:
+	पक्ष CMD_diffget:
+	पक्ष CMD_diffput:
 	    // If current buffer is in diff mode, complete buffer names
 	    // which are in diff mode, and different than current buffer.
 	    xp->xp_context = EXPAND_DIFF_BUFFERS;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 #endif
-	case CMD_USER:
-	case CMD_USER_BUF:
-	    return set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
+	पक्ष CMD_USER:
+	पक्ष CMD_USER_BUF:
+	    प्रत्यागम set_context_in_user_cmdarg(cmd, arg, argt, compl, xp,
 								forceit);
 
-	case CMD_map:	    case CMD_noremap:
-	case CMD_nmap:	    case CMD_nnoremap:
-	case CMD_vmap:	    case CMD_vnoremap:
-	case CMD_omap:	    case CMD_onoremap:
-	case CMD_imap:	    case CMD_inoremap:
-	case CMD_cmap:	    case CMD_cnoremap:
-	case CMD_lmap:	    case CMD_lnoremap:
-	case CMD_smap:	    case CMD_snoremap:
-	case CMD_tmap:	    case CMD_tnoremap:
-	case CMD_xmap:	    case CMD_xnoremap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	पक्ष CMD_map:	    पक्ष CMD_noremap:
+	पक्ष CMD_nmap:	    पक्ष CMD_nnoremap:
+	पक्ष CMD_vmap:	    पक्ष CMD_vnoremap:
+	पक्ष CMD_omap:	    पक्ष CMD_onoremap:
+	पक्ष CMD_imap:	    पक्ष CMD_inoremap:
+	पक्ष CMD_cmap:	    पक्ष CMD_cnoremap:
+	पक्ष CMD_lmap:	    पक्ष CMD_lnoremap:
+	पक्ष CMD_smap:	    पक्ष CMD_snoremap:
+	पक्ष CMD_tmap:	    पक्ष CMD_tnoremap:
+	पक्ष CMD_xmap:	    पक्ष CMD_xnoremap:
+	    प्रत्यागम set_context_in_map_cmd(xp, cmd, arg, forceit,
 						     FALSE, FALSE, cmdidx);
-	case CMD_unmap:
-	case CMD_nunmap:
-	case CMD_vunmap:
-	case CMD_ounmap:
-	case CMD_iunmap:
-	case CMD_cunmap:
-	case CMD_lunmap:
-	case CMD_sunmap:
-	case CMD_tunmap:
-	case CMD_xunmap:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	पक्ष CMD_unmap:
+	पक्ष CMD_nunmap:
+	पक्ष CMD_vunmap:
+	पक्ष CMD_ounmap:
+	पक्ष CMD_iunmap:
+	पक्ष CMD_cunmap:
+	पक्ष CMD_lunmap:
+	पक्ष CMD_sunmap:
+	पक्ष CMD_tunmap:
+	पक्ष CMD_xunmap:
+	    प्रत्यागम set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      FALSE, TRUE, cmdidx);
-	case CMD_mapclear:
-	case CMD_nmapclear:
-	case CMD_vmapclear:
-	case CMD_omapclear:
-	case CMD_imapclear:
-	case CMD_cmapclear:
-	case CMD_lmapclear:
-	case CMD_smapclear:
-	case CMD_tmapclear:
-	case CMD_xmapclear:
+	पक्ष CMD_mapclear:
+	पक्ष CMD_nmapclear:
+	पक्ष CMD_vmapclear:
+	पक्ष CMD_omapclear:
+	पक्ष CMD_imapclear:
+	पक्ष CMD_cmapclear:
+	पक्ष CMD_lmapclear:
+	पक्ष CMD_smapclear:
+	पक्ष CMD_tmapclear:
+	पक्ष CMD_xmapclear:
 	    xp->xp_context = EXPAND_MAPCLEAR;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_abbreviate:	case CMD_noreabbrev:
-	case CMD_cabbrev:	case CMD_cnoreabbrev:
-	case CMD_iabbrev:	case CMD_inoreabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	पक्ष CMD_abbreviate:	पक्ष CMD_noreabbrev:
+	पक्ष CMD_cabbrev:	पक्ष CMD_cnoreabbrev:
+	पक्ष CMD_iabbrev:	पक्ष CMD_inoreabbrev:
+	    प्रत्यागम set_context_in_map_cmd(xp, cmd, arg, forceit,
 						      TRUE, FALSE, cmdidx);
-	case CMD_unabbreviate:
-	case CMD_cunabbrev:
-	case CMD_iunabbrev:
-	    return set_context_in_map_cmd(xp, cmd, arg, forceit,
+	पक्ष CMD_unabbreviate:
+	पक्ष CMD_cunabbrev:
+	पक्ष CMD_iunabbrev:
+	    प्रत्यागम set_context_in_map_cmd(xp, cmd, arg, forceit,
 						       TRUE, TRUE, cmdidx);
 #ifdef FEAT_MENU
-	case CMD_menu:	    case CMD_noremenu:	    case CMD_unmenu:
-	case CMD_amenu:	    case CMD_anoremenu:	    case CMD_aunmenu:
-	case CMD_nmenu:	    case CMD_nnoremenu:	    case CMD_nunmenu:
-	case CMD_vmenu:	    case CMD_vnoremenu:	    case CMD_vunmenu:
-	case CMD_omenu:	    case CMD_onoremenu:	    case CMD_ounmenu:
-	case CMD_imenu:	    case CMD_inoremenu:	    case CMD_iunmenu:
-	case CMD_cmenu:	    case CMD_cnoremenu:	    case CMD_cunmenu:
-	case CMD_tlmenu:    case CMD_tlnoremenu:    case CMD_tlunmenu:
-	case CMD_tmenu:				    case CMD_tunmenu:
-	case CMD_popup:	    case CMD_tearoff:	    case CMD_emenu:
-	    return set_context_in_menu_cmd(xp, cmd, arg, forceit);
+	पक्ष CMD_menu:	    पक्ष CMD_noremenu:	    पक्ष CMD_unmenu:
+	पक्ष CMD_amenu:	    पक्ष CMD_anoremenu:	    पक्ष CMD_aunmenu:
+	पक्ष CMD_nmenu:	    पक्ष CMD_nnoremenu:	    पक्ष CMD_nunmenu:
+	पक्ष CMD_vmenu:	    पक्ष CMD_vnoremenu:	    पक्ष CMD_vunmenu:
+	पक्ष CMD_omenu:	    पक्ष CMD_onoremenu:	    पक्ष CMD_ounmenu:
+	पक्ष CMD_imenu:	    पक्ष CMD_inoremenu:	    पक्ष CMD_iunmenu:
+	पक्ष CMD_cmenu:	    पक्ष CMD_cnoremenu:	    पक्ष CMD_cunmenu:
+	पक्ष CMD_tlmenu:    पक्ष CMD_tlnoremenu:    पक्ष CMD_tlunmenu:
+	पक्ष CMD_tmenu:				    पक्ष CMD_tunmenu:
+	पक्ष CMD_popup:	    पक्ष CMD_tearoff:	    पक्ष CMD_emenu:
+	    प्रत्यागम set_context_in_menu_cmd(xp, cmd, arg, forceit);
 #endif
 
-	case CMD_colorscheme:
+	पक्ष CMD_colorscheme:
 	    xp->xp_context = EXPAND_COLORS;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_compiler:
+	पक्ष CMD_compiler:
 	    xp->xp_context = EXPAND_COMPILER;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_ownsyntax:
+	पक्ष CMD_ownsyntax:
 	    xp->xp_context = EXPAND_OWNSYNTAX;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_setfiletype:
+	पक्ष CMD_setfiletype:
 	    xp->xp_context = EXPAND_FILETYPE;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_packadd:
+	पक्ष CMD_packadd:
 	    xp->xp_context = EXPAND_PACKADD;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_runtime:
+	पक्ष CMD_runtime:
 	    set_context_in_runtime_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	case CMD_language:
-	    return set_context_in_lang_cmd(xp, arg);
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	पक्ष CMD_language:
+	    प्रत्यागम set_context_in_lang_cmd(xp, arg);
 #endif
-#if defined(FEAT_PROFILE)
-	case CMD_profile:
+#यदि defined(FEAT_PROFILE)
+	पक्ष CMD_profile:
 	    set_context_in_profile_cmd(xp, arg);
-	    break;
+	    भङ्ग;
 #endif
-	case CMD_behave:
+	पक्ष CMD_behave:
 	    xp->xp_context = EXPAND_BEHAVE;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_retab:
+	पक्ष CMD_retab:
 	    xp->xp_context = EXPAND_RETAB;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_messages:
+	पक्ष CMD_messages:
 	    xp->xp_context = EXPAND_MESSAGES;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
-	case CMD_history:
+	पक्ष CMD_history:
 	    xp->xp_context = EXPAND_HISTORY;
 	    xp->xp_pattern = arg;
-	    break;
-#if defined(FEAT_PROFILE)
-	case CMD_syntime:
+	    भङ्ग;
+#यदि defined(FEAT_PROFILE)
+	पक्ष CMD_syntime:
 	    xp->xp_context = EXPAND_SYNTIME;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 #endif
 
-	case CMD_argdelete:
-	    while ((xp->xp_pattern = vim_strchr(arg, ' ')) != NULL)
+	पक्ष CMD_argdelete:
+	    यावत् ((xp->xp_pattern = vim_strchr(arg, ' ')) != रिक्त)
 		arg = xp->xp_pattern + 1;
 	    xp->xp_context = EXPAND_ARGLIST;
 	    xp->xp_pattern = arg;
-	    break;
+	    भङ्ग;
 
 #ifdef FEAT_EVAL
-	case CMD_breakadd:
-	case CMD_profdel:
-	case CMD_breakdel:
-	    return set_context_in_breakadd_cmd(xp, arg, cmdidx);
+	पक्ष CMD_breakadd:
+	पक्ष CMD_profdel:
+	पक्ष CMD_breakdel:
+	    प्रत्यागम set_context_in_breakadd_cmd(xp, arg, cmdidx);
 
-	case CMD_scriptnames:
-	    return set_context_in_scriptnames_cmd(xp, arg);
+	पक्ष CMD_scriptnames:
+	    प्रत्यागम set_context_in_scriptnames_cmd(xp, arg);
 #endif
-	case CMD_filetype:
-	    return set_context_in_filetype_cmd(xp, arg);
+	पक्ष CMD_filetype:
+	    प्रत्यागम set_context_in_filetype_cmd(xp, arg);
 
-	default:
-	    break;
+	स्वभाव:
+	    भङ्ग;
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
@@ -2944,88 +2944,88 @@ set_context_by_cmdname(
  * perfectly compatible with each other, but then the command line syntax
  * probably won't change that much -- webb.
  */
-    static char_u *
+    स्थिर char_u *
 set_one_cmd_context(
     expand_T	*xp,
     char_u	*buff)	    // buffer for command string
 {
     char_u		*p;
     char_u		*cmd, *arg;
-    int			len = 0;
+    पूर्णाङ्क			len = 0;
     exarg_T		ea;
-    int			compl = EXPAND_NOTHING;
-    int			forceit = FALSE;
-    int			usefilter = FALSE;  // filter instead of file name
+    पूर्णाङ्क			compl = EXPAND_NOTHING;
+    पूर्णाङ्क			forceit = FALSE;
+    पूर्णाङ्क			usefilter = FALSE;  // filter instead of file name
 
     ExpandInit(xp);
     xp->xp_pattern = buff;
-    xp->xp_line = buff;
+    xp->xp_पंक्ति = buff;
     xp->xp_context = EXPAND_COMMANDS;	// Default until we get past command
     ea.argt = 0;
 
     // 1. skip comment lines and leading space, colons or bars
-    for (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != NULL; cmd++)
+    प्रति (cmd = buff; vim_strchr((char_u *)" \t:|", *cmd) != रिक्त; cmd++)
 	;
     xp->xp_pattern = cmd;
 
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')	    // ignore comment lines
+    यदि (*cmd == NUL)
+	प्रत्यागम रिक्त;
+    यदि (*cmd == '"')	    // ignore comment lines
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     // 3. Skip over the range to find the command.
     cmd = skip_range(cmd, TRUE, &xp->xp_context);
     xp->xp_pattern = cmd;
-    if (*cmd == NUL)
-	return NULL;
-    if (*cmd == '"')
+    यदि (*cmd == NUL)
+	प्रत्यागम रिक्त;
+    यदि (*cmd == '"')
     {
 	xp->xp_context = EXPAND_NOTHING;
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    if (*cmd == '|' || *cmd == '\n')
-	return cmd + 1;			// There's another command
+    यदि (*cmd == '|' || *cmd == '\n')
+	प्रत्यागम cmd + 1;			// There's another command
 
     // Get the command index.
     p = set_cmd_index(cmd, &ea, xp, &compl);
-    if (p == NULL)
-	return NULL;
+    यदि (p == रिक्त)
+	प्रत्यागम रिक्त;
 
     xp->xp_context = EXPAND_NOTHING; // Default now that we're past command
 
-    if (*p == '!')		    // forced commands
+    यदि (*p == '!')		    // forced commands
     {
 	forceit = TRUE;
 	++p;
     }
 
     // 6. parse arguments
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    यदि (!IS_USER_CMDIDX(ea.cmdidx))
 	ea.argt = excmd_get_argt(ea.cmdidx);
 
     arg = skipwhite(p);
 
     // Does command allow "++argopt" argument?
-    if ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
+    यदि ((ea.argt & EX_ARGOPT) || ea.cmdidx == CMD_terminal)
     {
-	while (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
+	यावत् (*arg != NUL && STRNCMP(arg, "++", 2) == 0)
 	{
 	    p = arg + 2;
-	    while (*p && !vim_isspace(*p))
+	    यावत् (*p && !vim_isspace(*p))
 		MB_PTR_ADV(p);
 
 	    // Still touching the command after "++"?
-	    if (*p == NUL)
+	    यदि (*p == NUL)
 	    {
-		if (ea.argt & EX_ARGOPT)
-		    return set_context_in_argopt(xp, arg + 2);
+		यदि (ea.argt & EX_ARGOPT)
+		    प्रत्यागम set_context_in_argopt(xp, arg + 2);
 #ifdef FEAT_TERMINAL
-		if (ea.cmdidx == CMD_terminal)
-		    return set_context_in_terminalopt(xp, arg + 2);
+		यदि (ea.cmdidx == CMD_terminal)
+		    प्रत्यागम set_context_in_terminalopt(xp, arg + 2);
 #endif
 	    }
 
@@ -3033,48 +3033,48 @@ set_one_cmd_context(
 	}
     }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    यदि (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*arg == '>')			// append
+	यदि (*arg == '>')			// append
 	{
-	    if (*++arg == '>')
+	    यदि (*++arg == '>')
 		++arg;
 	    arg = skipwhite(arg);
 	}
-	else if (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
+	अन्यथा यदि (*arg == '!' && ea.cmdidx == CMD_write)	// :w !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    यदि (ea.cmdidx == CMD_read)
     {
 	usefilter = forceit;			// :r! filter if forced
-	if (*arg == '!')			// :r !filter
+	यदि (*arg == '!')			// :r !filter
 	{
 	    ++arg;
 	    usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    यदि (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
-	while (*arg == *cmd)	    // allow any number of '>' or '<'
+	यावत् (*arg == *cmd)	    // allow any number of '>' or '<'
 	    ++arg;
 	arg = skipwhite(arg);
     }
 
     // Does command allow "+command"?
-    if ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
+    यदि ((ea.argt & EX_CMDARG) && !usefilter && *arg == '+')
     {
 	// Check if we're in the +command
 	p = arg + 1;
 	arg = skip_cmd_arg(arg, FALSE);
 
 	// Still touching the command after '+'?
-	if (*arg == NUL)
-	    return p;
+	यदि (*arg == NUL)
+	    प्रत्यागम p;
 
 	// Skip space(s) after +command to get to the real argument
 	arg = skipwhite(arg);
@@ -3083,81 +3083,81 @@ set_one_cmd_context(
 
     // Check for '|' to separate commands and '"' to start comments.
     // Don't do this for ":read !cmd" and ":write !cmd".
-    if ((ea.argt & EX_TRLBAR) && !usefilter)
+    यदि ((ea.argt & EX_TRLBAR) && !usefilter)
     {
 	p = arg;
 	// ":redir @" is not the start of a comment
-	if (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
+	यदि (ea.cmdidx == CMD_redir && p[0] == '@' && p[1] == '"')
 	    p += 2;
-	while (*p)
+	यावत् (*p)
 	{
-	    if (*p == Ctrl_V)
+	    यदि (*p == Ctrl_V)
 	    {
-		if (p[1] != NUL)
+		यदि (p[1] != NUL)
 		    ++p;
 	    }
-	    else if ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
+	    अन्यथा यदि ( (*p == '"' && !(ea.argt & EX_NOTRLCOM))
 		    || *p == '|' || *p == '\n')
 	    {
-		if (*(p - 1) != '\\')
+		यदि (*(p - 1) != '\\')
 		{
-		    if (*p == '|' || *p == '\n')
-			return p + 1;
-		    return NULL;    // It's a comment
+		    यदि (*p == '|' || *p == '\n')
+			प्रत्यागम p + 1;
+		    प्रत्यागम रिक्त;    // It's a comment
 		}
 	    }
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (!(ea.argt & EX_EXTRA) && *arg != NUL
-				  && vim_strchr((char_u *)"|\"", *arg) == NULL)
+    यदि (!(ea.argt & EX_EXTRA) && *arg != NUL
+				  && vim_strchr((char_u *)"|\"", *arg) == रिक्त)
 	// no arguments allowed but there is something
-	return NULL;
+	प्रत्यागम रिक्त;
 
     // Find start of last argument (argument just before cursor):
     p = buff;
     xp->xp_pattern = p;
-    len = (int)STRLEN(buff);
-    while (*p && p < buff + len)
+    len = (पूर्णाङ्क)STRLEN(buff);
+    यावत् (*p && p < buff + len)
     {
-	if (*p == ' ' || *p == TAB)
+	यदि (*p == ' ' || *p == TAB)
 	{
 	    // argument starts after a space
 	    xp->xp_pattern = ++p;
 	}
-	else
+	अन्यथा
 	{
-	    if (*p == '\\' && *(p + 1) != NUL)
+	    यदि (*p == '\\' && *(p + 1) != NUL)
 		++p; // skip over escaped character
 	    MB_PTR_ADV(p);
 	}
     }
 
-    if (ea.argt & EX_XFILE)
+    यदि (ea.argt & EX_XFILE)
 	set_context_for_wildcard_arg(&ea, arg, usefilter, xp, &compl);
 
     // 6. Switch on command name.
-    return set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
+    प्रत्यागम set_context_by_cmdname(cmd, ea.cmdidx, xp, arg, ea.argt, compl,
 								forceit);
 }
 
 /*
  * Set the completion context in 'xp' for command 'str'
  */
-    void
+    शून्य
 set_cmd_context(
     expand_T	*xp,
     char_u	*str,	    // start of command line
-    int		len,	    // length of command line (excl. NUL)
-    int		col,	    // position of cursor
-    int		use_ccline UNUSED) // use ccline for info
+    पूर्णाङ्क		len,	    // length of command line (excl. NUL)
+    पूर्णाङ्क		col,	    // position of cursor
+    पूर्णाङ्क		use_ccline UNUSED) // use ccline for info
 {
 #ifdef FEAT_EVAL
     cmdline_info_T	*ccline = get_cmdline_info();
-    int			context;
+    पूर्णाङ्क			context;
 #endif
-    int		old_char = NUL;
+    पूर्णाङ्क		old_char = NUL;
     char_u	*nextcomm;
 
     // Only save and overwrite the character when it is not the NUL terminator
@@ -3165,7 +3165,7 @@ set_cmd_context(
     // back to a "" literal for a NULL string or on a type error, and writing
     // at "col" would then crash.
     // This also avoids a UMR warning from Purify.
-    if (col < len)
+    यदि (col < len)
     {
 	old_char = str[col];
 	str[col] = NUL;
@@ -3178,34 +3178,34 @@ set_cmd_context(
 #endif
 
 #ifdef FEAT_EVAL
-    if (use_ccline && ccline->cmdfirstc == '=')
+    यदि (use_ccline && ccline->cmdfirstc == '=')
     {
 	// pass CMD_SIZE because there is no real command
 	set_context_for_expression(xp, str, CMD_SIZE);
     }
-    else if (use_ccline && ccline->input_fn)
+    अन्यथा यदि (use_ccline && ccline->निवेश_fn)
     {
 	xp->xp_context = ccline->xp_context;
 	xp->xp_pattern = ccline->cmdbuff;
 	xp->xp_arg = ccline->xp_arg;
-	if (xp->xp_context == EXPAND_SHELLCMDLINE)
+	यदि (xp->xp_context == EXPAND_SHELLCMDLINE)
 	{
 	    context = xp->xp_context;
-	    set_context_for_wildcard_arg(NULL, xp->xp_pattern, FALSE, xp,
+	    set_context_for_wildcard_arg(रिक्त, xp->xp_pattern, FALSE, xp,
 								     &context);
 	}
     }
-    else
+    अन्यथा
 #endif
-	while (nextcomm != NULL)
+	यावत् (nextcomm != रिक्त)
 	    nextcomm = set_one_cmd_context(xp, nextcomm);
 
     // Store the string here so that call_user_expand_func() can get to them
     // easily.
-    xp->xp_line = str;
+    xp->xp_पंक्ति = str;
     xp->xp_col = col;
 
-    if (col < len)
+    यदि (col < len)
 	str[col] = old_char;
 }
 
@@ -3220,87 +3220,87 @@ set_cmd_context(
  * key that triggered expansion literally.
  * Returns EXPAND_OK otherwise.
  */
-    int
+    पूर्णाङ्क
 expand_cmdline(
     expand_T	*xp,
     char_u	*str,		// start of command line
-    int		col,		// position of cursor
-    int		*matchcount,	// return: nr of matches
+    पूर्णाङ्क		col,		// position of cursor
+    पूर्णाङ्क		*matchcount,	// return: nr of matches
     char_u	***matches)	// return: array of pointers to matches
 {
-    char_u	*file_str = NULL;
-    int		options = WILD_ADD_SLASH|WILD_SILENT;
+    char_u	*file_str = रिक्त;
+    पूर्णाङ्क		options = WILD_ADD_SLASH|WILD_SILENT;
 
-    if (xp->xp_context == EXPAND_UNSUCCESSFUL)
+    यदि (xp->xp_context == EXPAND_UNSUCCESSFUL)
     {
 	beep_flush();
-	return EXPAND_UNSUCCESSFUL;  // Something illegal on command line
+	प्रत्यागम EXPAND_UNSUCCESSFUL;  // Something illegal on command line
     }
-    if (xp->xp_context == EXPAND_NOTHING)
+    यदि (xp->xp_context == EXPAND_NOTHING)
     {
 	// Caller can use the character as a normal char instead
-	return EXPAND_NOTHING;
+	प्रत्यागम EXPAND_NOTHING;
     }
 
     // add star to file name, or convert to regexp if not exp. files.
-    xp->xp_pattern_len = (int)(str + col - xp->xp_pattern);
+    xp->xp_pattern_len = (पूर्णाङ्क)(str + col - xp->xp_pattern);
     {
 	char_u	*pat_src = xp->xp_pattern;
-	int	pat_len = xp->xp_pattern_len;
-#if defined(FEAT_EVAL)
+	पूर्णाङ्क	pat_len = xp->xp_pattern_len;
+#यदि defined(FEAT_EVAL)
 	char_u	*unesc = unescape_user_completeopt_pat(xp, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	यदि (unesc != रिक्त)
 	    pat_src = unesc;
 #endif
 
-	if (cmdline_fuzzy_completion_supported(xp))
+	यदि (cmdline_fuzzy_completion_supported(xp))
 	    // If fuzzy matching, don't modify the search string
 	    file_str = vim_strnsave(pat_src, pat_len);
-	else
+	अन्यथा
 	    file_str = addstar(pat_src, pat_len, xp->xp_context);
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 	vim_free(unesc);
 #endif
     }
-    if (file_str == NULL)
-	return EXPAND_UNSUCCESSFUL;
+    यदि (file_str == रिक्त)
+	प्रत्यागम EXPAND_UNSUCCESSFUL;
 
-    if (p_wic)
+    यदि (p_wic)
 	options += WILD_ICASE;
 
     // find all files that match the description
-    if (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
+    यदि (ExpandFromContext(xp, file_str, matches, matchcount, options) == FAIL)
     {
 	*matchcount = 0;
-	*matches = NULL;
+	*matches = रिक्त;
     }
     vim_free(file_str);
 
-    return EXPAND_OK;
+    प्रत्यागम EXPAND_OK;
 }
 
 /*
  * Expand file or directory names.
  * Returns OK or FAIL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 expand_files_and_dirs(
 	expand_T	*xp,
 	char_u		*pat,
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
-	int		options)
+	पूर्णाङ्क		*अंक_Matches,
+	पूर्णाङ्क		flags,
+	पूर्णाङ्क		options)
 {
-    int		free_pat = FALSE;
-    int		ret = FAIL;
+    पूर्णाङ्क		free_pat = FALSE;
+    पूर्णाङ्क		ret = FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped
     // space
-    if (xp->xp_backslash != XP_BS_NONE)
+    यदि (xp->xp_backslash != XP_BS_NONE)
     {
-	size_t	pat_len;
+	माप_प्रकार	pat_len;
 	char_u	*pat_end;
 	char_u	*p;
 
@@ -3308,50 +3308,50 @@ expand_files_and_dirs(
 
 	pat_len = STRLEN(pat);
 	pat = vim_strnsave(pat, pat_len);
-	if (pat == NULL)
-	    return ret;
+	यदि (pat == रिक्त)
+	    प्रत्यागम ret;
 
 	pat_end = pat + pat_len;
-	for (p = pat; *p != NUL; ++p)
+	प्रति (p = pat; *p != NUL; ++p)
 	{
 	    char_u  *from;
 
-	    if (*p != '\\')
-		continue;
+	    यदि (*p != '\\')
+		अनुवर्त;
 
-	    if (xp->xp_backslash & XP_BS_THREE
+	    यदि (xp->xp_backslash & XP_BS_THREE
 		&& *(p + 1) == '\\'
 		&& *(p + 2) == '\\'
 		&& *(p + 3) == ' ')
 	    {
 		from = p + 3;
 		mch_memmove(p, from,
-		    (size_t)(pat_end - from) + 1);   // +1 for NUL
+		    (माप_प्रकार)(pat_end - from) + 1);   // +1 for NUL
 		pat_end -= 3;
 	    }
-	    else if (xp->xp_backslash & XP_BS_ONE
+	    अन्यथा यदि (xp->xp_backslash & XP_BS_ONE
 		&& *(p + 1) == ' ')
 	    {
 		from = p + 1;
 		mch_memmove(p, from,
-		    (size_t)(pat_end - from) + 1);   // +1 for NUL
+		    (माप_प्रकार)(pat_end - from) + 1);   // +1 for NUL
 		--pat_end;
 	    }
-	    else if (xp->xp_backslash & XP_BS_COMMA)
+	    अन्यथा यदि (xp->xp_backslash & XP_BS_COMMA)
 	    {
-		if (*(p + 1) == '\\' && *(p + 2) == ',')
+		यदि (*(p + 1) == '\\' && *(p + 2) == ',')
 		{
 		    from = p + 2;
 		    mch_memmove(p, from,
-			(size_t)(pat_end - from) + 1);   // +1 for NUL
+			(माप_प्रकार)(pat_end - from) + 1);   // +1 for NUL
 		    pat_end -= 2;
 		}
 #ifdef BACKSLASH_IN_FILENAME
-		else if (*(p + 1) == ',')
+		अन्यथा यदि (*(p + 1) == ',')
 		{
 		    from = p + 1;
 		    mch_memmove(p, from,
-			(size_t)(pat_end - from) + 1);   // +1 for NUL
+			(माप_प्रकार)(pat_end - from) + 1);   // +1 for NUL
 		    --pat_end;
 		}
 #endif
@@ -3359,100 +3359,100 @@ expand_files_and_dirs(
 	}
     }
 
-    if (xp->xp_context == EXPAND_FINDFUNC)
+    यदि (xp->xp_context == EXPAND_FINDFUNC)
     {
 #ifdef FEAT_EVAL
-	ret = expand_findfunc(xp, pat, matches, numMatches);
+	ret = expand_findfunc(xp, pat, matches, अंक_Matches);
 #endif
     }
-    else
+    अन्यथा
     {
-	if (xp->xp_context == EXPAND_FILES)
+	यदि (xp->xp_context == EXPAND_FILES)
 	    flags |= EW_FILE;
-	else if (xp->xp_context == EXPAND_FILES_IN_PATH)
+	अन्यथा यदि (xp->xp_context == EXPAND_FILES_IN_PATH)
 	    flags |= (EW_FILE | EW_PATH);
-	else if (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
+	अन्यथा यदि (xp->xp_context == EXPAND_DIRS_IN_CDPATH)
 	    flags = (flags | EW_DIR | EW_CDPATH) & ~EW_FILE;
-	else
+	अन्यथा
 	    flags = (flags | EW_DIR) & ~EW_FILE;
-	if (options & WILD_ICASE)
+	यदि (options & WILD_ICASE)
 	    flags |= EW_ICASE;
 
 	// Expand wildcards, supporting %:h and the like.
-	ret = expand_wildcards_eval(&pat, numMatches, matches, flags);
+	ret = expand_wildcards_eval(&pat, अंक_Matches, matches, flags);
     }
-    if (free_pat)
+    यदि (free_pat)
 	vim_free(pat);
 #ifdef BACKSLASH_IN_FILENAME
-    if (p_csl[0] != NUL
+    यदि (p_csl[0] != NUL
 	    && (options & WILD_IGNORE_COMPLETESLASH) == 0
 	    && xp->xp_context != EXPAND_FINDFUNC)
     {
-	int j;
+	पूर्णाङ्क j;
 
-	for (j = 0; j < *numMatches; ++j)
+	प्रति (j = 0; j < *अंक_Matches; ++j)
 	{
 	    char_u	*ptr = (*matches)[j];
 
-	    while (*ptr != NUL)
+	    यावत् (*ptr != NUL)
 	    {
-		if (p_csl[0] == 's' && *ptr == '\\')
+		यदि (p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (p_csl[0] == 'b' && *ptr == '/')
+		अन्यथा यदि (p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
 	}
     }
 #endif
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":behave {mswin,xterm}" command.
  */
-    static char_u *
-get_behave_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_behave_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
-	return (char_u *)"mswin";
-    if (idx == 1)
-	return (char_u *)"xterm";
-    return NULL;
+    यदि (idx == 0)
+	प्रत्यागम (char_u *)"mswin";
+    यदि (idx == 1)
+	प्रत्यागम (char_u *)"xterm";
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":filetype {plugin,indent}" command.
  */
-    static char_u *
-get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_filetypecmd_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx < 0)
-	return NULL;
+    यदि (idx < 0)
+	प्रत्यागम रिक्त;
 
-    if (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
+    यदि (filetype_expand_what == EXP_FILETYPECMD_ALL && idx < 5)
     {
-	char	*opts_all[] = {"detect", "indent", "plugin", "on", "off"};
-	return (char_u *)opts_all[idx];
+	वर्ण	*opts_all[] = {"detect", "indent", "plugin", "on", "off"};
+	प्रत्यागम (char_u *)opts_all[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
+    यदि (filetype_expand_what == EXP_FILETYPECMD_PLUGIN && idx < 3)
     {
-	char	*opts_plugin[] = {"plugin", "on", "off"};
-	return (char_u *)opts_plugin[idx];
+	वर्ण	*opts_plugin[] = {"plugin", "on", "off"};
+	प्रत्यागम (char_u *)opts_plugin[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
+    यदि (filetype_expand_what == EXP_FILETYPECMD_INDENT && idx < 3)
     {
-	char	*opts_indent[] = {"indent", "on", "off"};
-	return (char_u *)opts_indent[idx];
+	वर्ण	*opts_indent[] = {"indent", "on", "off"};
+	प्रत्यागम (char_u *)opts_indent[idx];
     }
-    if (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
+    यदि (filetype_expand_what == EXP_FILETYPECMD_ONOFF && idx < 2)
     {
-	char	*opts_onoff[] = {"on", "off"};
-	return (char_u *)opts_onoff[idx];
+	वर्ण	*opts_onoff[] = {"on", "off"};
+	प्रत्यागम (char_u *)opts_onoff[idx];
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 #ifdef FEAT_EVAL
@@ -3461,47 +3461,47 @@ get_filetypecmd_arg(expand_T *xp UNUSED, int idx)
  * ":breakadd {expr, file, func, here}" command.
  * ":breakdel {func, file, here}" command.
  */
-    static char_u *
-get_breakadd_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_breakadd_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx >= 0 && idx <= 3)
+    यदि (idx >= 0 && idx <= 3)
     {
-	char	*opts[] = {"expr", "file", "func", "here"};
+	वर्ण	*opts[] = {"expr", "file", "func", "here"};
 
 	// breakadd {expr, file, func, here}
-	if (breakpt_expand_what == EXP_BREAKPT_ADD)
-	    return (char_u *)opts[idx];
-	else if (breakpt_expand_what == EXP_BREAKPT_DEL)
+	यदि (breakpt_expand_what == EXP_BREAKPT_ADD)
+	    प्रत्यागम (char_u *)opts[idx];
+	अन्यथा यदि (breakpt_expand_what == EXP_BREAKPT_DEL)
 	{
 	    // breakdel {func, file, here}
-	    if (idx <= 2)
-		return (char_u *)opts[idx + 1];
+	    यदि (idx <= 2)
+		प्रत्यागम (char_u *)opts[idx + 1];
 	}
-	else
+	अन्यथा
 	{
 	    // profdel {func, file}
-	    if (idx <= 1)
-		return (char_u *)opts[idx + 1];
+	    यदि (idx <= 1)
+		प्रत्यागम (char_u *)opts[idx + 1];
 	}
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments for the
  * ":scriptnames" command.
  */
-    static char_u *
-get_scriptnames_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_scriptnames_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
     scriptitem_T *si;
 
-    if (!SCRIPT_ID_VALID(idx + 1))
-	return NULL;
+    यदि (!SCRIPT_ID_VALID(idx + 1))
+	प्रत्यागम रिक्त;
 
     si = SCRIPT_ITEM(idx + 1);
-    home_replace(NULL, si->sn_name, NameBuff, MAXPATHL, TRUE);
-    return NameBuff;
+    home_replace(रिक्त, si->sn_name, NameBuff, MAXPATHL, TRUE);
+    प्रत्यागम NameBuff;
 }
 #endif
 
@@ -3509,51 +3509,51 @@ get_scriptnames_arg(expand_T *xp UNUSED, int idx)
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":retab {-indentonly}" option.
  */
-    static char_u *
-get_retab_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_retab_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
-	return (char_u *)"-indentonly";
-    return NULL;
+    यदि (idx == 0)
+	प्रत्यागम (char_u *)"-indentonly";
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the possible arguments of the
  * ":messages {clear}" command.
  */
-    static char_u *
-get_messages_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_messages_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
-	return (char_u *)"clear";
-    return NULL;
+    यदि (idx == 0)
+	प्रत्यागम (char_u *)"clear";
+    प्रत्यागम रिक्त;
 }
 
-    static char_u *
-get_mapclear_arg(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_mapclear_arg(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
-	return (char_u *)"<buffer>";
-    return NULL;
+    यदि (idx == 0)
+	प्रत्यागम (char_u *)"<buffer>";
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Do the expansion based on xp->xp_context and 'rmp'.
  */
-    static int
+    स्थिर पूर्णाङ्क
 ExpandOther(
 	char_u		*pat,
 	expand_T	*xp,
 	regmatch_T	*rmp,
 	char_u		***matches,
-	int		*numMatches)
+	पूर्णाङ्क		*अंक_Matches)
 {
-    static struct expgen
+    स्थिर संरचना expgen
     {
-	int		context;
-	char_u	*((*func)(expand_T *, int));
-	int		ic;
-	int		escaped;
+	पूर्णाङ्क		context;
+	char_u	*((*func)(expand_T *, पूर्णाङ्क));
+	पूर्णाङ्क		ic;
+	पूर्णाङ्क		escaped;
     } tab[] =
     {
 	{EXPAND_COMMANDS, get_command_name, FALSE, TRUE},
@@ -3573,7 +3573,7 @@ ExpandOther(
 	{EXPAND_FUNCTIONS, get_function_name, FALSE, TRUE},
 	{EXPAND_USER_FUNC, get_user_func_name, FALSE, TRUE},
 	{EXPAND_DISASSEMBLE, get_disassemble_argument, FALSE, TRUE},
-	{EXPAND_EXPRESSION, get_expr_name, FALSE, TRUE},
+	{EXPAND_EXPRESSION, get_व्यंजक_name, FALSE, TRUE},
 #endif
 #ifdef FEAT_MENU
 	{EXPAND_MENUS, get_menu_name, FALSE, TRUE},
@@ -3597,7 +3597,7 @@ ExpandOther(
 #ifdef FEAT_PROFILE
 	{EXPAND_PROFILE, get_profile_name, TRUE, TRUE},
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#यदि defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 	{EXPAND_LANGUAGE, get_lang_arg, TRUE, FALSE},
 	{EXPAND_LOCALES, get_locales, TRUE, FALSE},
 #endif
@@ -3610,222 +3610,222 @@ ExpandOther(
 #endif
 	{EXPAND_RETAB, get_retab_arg, TRUE, TRUE},
     };
-    int	i;
-    int ret = FAIL;
+    पूर्णाङ्क	i;
+    पूर्णाङ्क ret = FAIL;
 
     // Find a context in the table and call the ExpandGeneric() with the
     // right function to do the expansion.
-    for (i = 0; i < (int)ARRAY_LENGTH(tab); ++i)
+    प्रति (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(tab); ++i)
     {
-	if (xp->xp_context == tab[i].context)
+	यदि (xp->xp_context == tab[i].context)
 	{
-	    if (tab[i].ic)
+	    यदि (tab[i].ic)
 		rmp->rm_ic = TRUE;
-	    ret = ExpandGeneric(pat, xp, rmp, matches, numMatches,
+	    ret = ExpandGeneric(pat, xp, rmp, matches, अंक_Matches,
 						tab[i].func, tab[i].escaped);
-	    break;
+	    भङ्ग;
 	}
     }
 
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * Map wild expand options to flags for expand_wildcards()
  */
-    static int
-map_wildopts_to_ewflags(int options)
+    स्थिर पूर्णाङ्क
+map_wildopts_to_ewflags(पूर्णाङ्क options)
 {
-    int		flags;
+    पूर्णाङ्क		flags;
 
     flags = EW_DIR;	// include directories
-    if (options & WILD_LIST_NOTFOUND)
+    यदि (options & WILD_LIST_NOTFOUND)
 	flags |= EW_NOTFOUND;
-    if (options & WILD_ADD_SLASH)
+    यदि (options & WILD_ADD_SLASH)
 	flags |= EW_ADDSLASH;
-    if (options & WILD_KEEP_ALL)
+    यदि (options & WILD_KEEP_ALL)
 	flags |= EW_KEEPALL;
-    if (options & WILD_SILENT)
+    यदि (options & WILD_SILENT)
 	flags |= EW_SILENT;
-    if (options & WILD_NOERROR)
+    यदि (options & WILD_NOERROR)
 	flags |= EW_NOERROR;
-    if (options & WILD_ALLLINKS)
+    यदि (options & WILD_ALLLINKS)
 	flags |= EW_ALLLINKS;
 
-    return flags;
+    प्रत्यागम flags;
 }
 
 /*
  * Do the expansion based on xp->xp_context and "pat".
  */
-    static int
+    स्थिर पूर्णाङ्क
 ExpandFromContext(
     expand_T	*xp,
     char_u	*pat,
     char_u	***matches,
-    int		*numMatches,
-    int		options)  // WILD_ flags
+    पूर्णाङ्क		*अंक_Matches,
+    पूर्णाङ्क		options)  // WILD_ flags
 {
     regmatch_T	regmatch;
-    int		ret;
-    int		flags;
-    char_u	*tofree = NULL;
-    int		fuzzy = cmdline_fuzzy_complete(pat)
+    पूर्णाङ्क		ret;
+    पूर्णाङ्क		flags;
+    char_u	*tofree = रिक्त;
+    पूर्णाङ्क		fuzzy = cmdline_fuzzy_complete(pat)
 				     && cmdline_fuzzy_completion_supported(xp);
 
     flags = map_wildopts_to_ewflags(options);
 
-    if (xp->xp_context == EXPAND_FILES
+    यदि (xp->xp_context == EXPAND_FILES
 	    || xp->xp_context == EXPAND_DIRECTORIES
 	    || xp->xp_context == EXPAND_FILES_IN_PATH
 	    || xp->xp_context == EXPAND_FINDFUNC
 	    || xp->xp_context == EXPAND_DIRS_IN_CDPATH)
-	return expand_files_and_dirs(xp, pat, matches, numMatches, flags,
+	प्रत्यागम expand_files_and_dirs(xp, pat, matches, अंक_Matches, flags,
 								options);
 
     *matches = (char_u **)"";
-    *numMatches = 0;
-    if (xp->xp_context == EXPAND_HELP)
+    *अंक_Matches = 0;
+    यदि (xp->xp_context == EXPAND_HELP)
     {
 	// With an empty argument we would get all the help tags, which is
 	// very slow.  Get matches for "help" instead.
-	if (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
-					numMatches, matches, FALSE) == OK)
+	यदि (find_help_tags(*pat == NUL ? (char_u *)"help" : pat,
+					अंक_Matches, matches, FALSE) == OK)
 	{
 #ifdef FEAT_MULTI_LANG
-	    cleanup_help_tags(*numMatches, *matches);
+	    cleanup_help_tags(*अंक_Matches, *matches);
 #endif
-	    return OK;
+	    प्रत्यागम OK;
 	}
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    if (xp->xp_context == EXPAND_SHELLCMD)
-	return expand_shellcmd(pat, matches, numMatches, flags);
-    if (xp->xp_context == EXPAND_OLD_SETTING)
-	return ExpandOldSetting(numMatches, matches);
-    if (xp->xp_context == EXPAND_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches, options);
+    यदि (xp->xp_context == EXPAND_SHELLCMD)
+	प्रत्यागम expand_shellcmd(pat, matches, अंक_Matches, flags);
+    यदि (xp->xp_context == EXPAND_OLD_SETTING)
+	प्रत्यागम ExpandOldSetting(अंक_Matches, matches);
+    यदि (xp->xp_context == EXPAND_BUFFERS)
+	प्रत्यागम ExpandBufnames(pat, अंक_Matches, matches, options);
 #ifdef FEAT_DIFF
-    if (xp->xp_context == EXPAND_DIFF_BUFFERS)
-	return ExpandBufnames(pat, numMatches, matches,
+    यदि (xp->xp_context == EXPAND_DIFF_BUFFERS)
+	प्रत्यागम ExpandBufnames(pat, अंक_Matches, matches,
 						options | BUF_DIFF_FILTER);
 #endif
-    if (xp->xp_context == EXPAND_TAGS
+    यदि (xp->xp_context == EXPAND_TAGS
 	    || xp->xp_context == EXPAND_TAGS_LISTFILES)
-	return expand_tags(xp->xp_context == EXPAND_TAGS, pat, numMatches,
+	प्रत्यागम expand_tags(xp->xp_context == EXPAND_TAGS, pat, अंक_Matches,
 								matches);
-    if (xp->xp_context == EXPAND_COLORS)
+    यदि (xp->xp_context == EXPAND_COLORS)
     {
-	char *directories[] = {"colors", NULL};
-	return ExpandRTDir(pat, DIP_START + DIP_OPT, numMatches, matches,
+	वर्ण *directories[] = {"colors", रिक्त};
+	प्रत्यागम ExpandRTDir(pat, DIP_START + DIP_OPT, अंक_Matches, matches,
 								directories);
     }
-    if (xp->xp_context == EXPAND_COMPILER)
+    यदि (xp->xp_context == EXPAND_COMPILER)
     {
-	char *directories[] = {"compiler", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	वर्ण *directories[] = {"compiler", रिक्त};
+	प्रत्यागम ExpandRTDir(pat, 0, अंक_Matches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_OWNSYNTAX)
+    यदि (xp->xp_context == EXPAND_OWNSYNTAX)
     {
-	char *directories[] = {"syntax", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	वर्ण *directories[] = {"syntax", रिक्त};
+	प्रत्यागम ExpandRTDir(pat, 0, अंक_Matches, matches, directories);
     }
-    if (xp->xp_context == EXPAND_FILETYPE)
+    यदि (xp->xp_context == EXPAND_FILETYPE)
     {
-	char *directories[] = {"syntax", "indent", "ftplugin", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	वर्ण *directories[] = {"syntax", "indent", "ftplugin", रिक्त};
+	प्रत्यागम ExpandRTDir(pat, 0, अंक_Matches, matches, directories);
     }
 #ifdef FEAT_KEYMAP
-    if (xp->xp_context == EXPAND_KEYMAP)
+    यदि (xp->xp_context == EXPAND_KEYMAP)
     {
-	char *directories[] = {"keymap", NULL};
-	return ExpandRTDir(pat, 0, numMatches, matches, directories);
+	वर्ण *directories[] = {"keymap", रिक्त};
+	प्रत्यागम ExpandRTDir(pat, 0, अंक_Matches, matches, directories);
     }
 #endif
-#if defined(FEAT_EVAL)
-    if (xp->xp_context == EXPAND_USER_LIST)
-	return ExpandUserList(xp, matches, numMatches);
+#यदि defined(FEAT_EVAL)
+    यदि (xp->xp_context == EXPAND_USER_LIST)
+	प्रत्यागम ExpandUserList(xp, matches, अंक_Matches);
 #endif
-    if (xp->xp_context == EXPAND_PACKADD)
-	return ExpandPackAddDir(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_RUNTIME)
-	return expand_runtime_cmd(pat, numMatches, matches);
-    if (xp->xp_context == EXPAND_PATTERN_IN_BUF)
-	return expand_pattern_in_buf(pat, xp->xp_search_dir,
-		matches, numMatches);
+    यदि (xp->xp_context == EXPAND_PACKADD)
+	प्रत्यागम ExpandPackAddDir(pat, अंक_Matches, matches);
+    यदि (xp->xp_context == EXPAND_RUNTIME)
+	प्रत्यागम expand_runtime_cmd(pat, अंक_Matches, matches);
+    यदि (xp->xp_context == EXPAND_PATTERN_IN_BUF)
+	प्रत्यागम expand_pattern_in_buf(pat, xp->xp_खोज_dir,
+		matches, अंक_Matches);
 
     // When expanding a function name starting with s:, match the <SNR>nr_
     // prefix.
-    if ((xp->xp_context == EXPAND_USER_FUNC
+    यदि ((xp->xp_context == EXPAND_USER_FUNC
 				       || xp->xp_context == EXPAND_DISASSEMBLE)
 	    && STRNCMP(pat, "^s:", 3) == 0)
     {
-	int len = (int)STRLEN(pat) + 20;
+	पूर्णाङ्क len = (पूर्णाङ्क)STRLEN(pat) + 20;
 
 	tofree = alloc(len);
-	if (tofree == NULL)
-	    return FAIL;
-	vim_snprintf((char *)tofree, len, "^<SNR>\\d\\+_%s", pat + 3);
+	यदि (tofree == रिक्त)
+	    प्रत्यागम FAIL;
+	vim_snprintf((वर्ण *)tofree, len, "^<SNR>\\d\\+_%s", pat + 3);
 	pat = tofree;
     }
 
-    if (!fuzzy)
+    यदि (!fuzzy)
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
+	यदि (regmatch.regprog == रिक्त)
 	{
 	    vim_free(tofree);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
 	// set ignore-case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
     }
 
-    if (xp->xp_context == EXPAND_SETTINGS
+    यदि (xp->xp_context == EXPAND_SETTINGS
 	    || xp->xp_context == EXPAND_BOOL_SETTINGS)
-	ret = ExpandSettings(xp, &regmatch, pat, numMatches, matches, fuzzy);
-    else if (xp->xp_context == EXPAND_STRING_SETTING)
-	ret = ExpandStringSetting(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_SETTING_SUBTRACT)
-	ret = ExpandSettingSubtract(xp, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_MAPPINGS)
-	ret = ExpandMappings(pat, &regmatch, numMatches, matches);
-    else if (xp->xp_context == EXPAND_ARGOPT)
-	ret = expand_argopt(pat, xp, &regmatch, matches, numMatches);
-    else if (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
-	ret = expand_highlight_group(pat, xp, &regmatch, matches, numMatches);
-#if defined(FEAT_TERMINAL)
-    else if (xp->xp_context == EXPAND_TERMINALOPT)
-	ret = expand_terminal_opt(pat, xp, &regmatch, matches, numMatches);
+	ret = ExpandSettings(xp, &regmatch, pat, अंक_Matches, matches, fuzzy);
+    अन्यथा यदि (xp->xp_context == EXPAND_STRING_SETTING)
+	ret = ExpandStringSetting(xp, &regmatch, अंक_Matches, matches);
+    अन्यथा यदि (xp->xp_context == EXPAND_SETTING_SUBTRACT)
+	ret = ExpandSettingSubtract(xp, &regmatch, अंक_Matches, matches);
+    अन्यथा यदि (xp->xp_context == EXPAND_MAPPINGS)
+	ret = ExpandMappings(pat, &regmatch, अंक_Matches, matches);
+    अन्यथा यदि (xp->xp_context == EXPAND_ARGOPT)
+	ret = expand_argopt(pat, xp, &regmatch, matches, अंक_Matches);
+    अन्यथा यदि (xp->xp_context == EXPAND_HIGHLIGHT_GROUP)
+	ret = expand_highlight_group(pat, xp, &regmatch, matches, अंक_Matches);
+#यदि defined(FEAT_TERMINAL)
+    अन्यथा यदि (xp->xp_context == EXPAND_TERMINALOPT)
+	ret = expand_terminal_opt(pat, xp, &regmatch, matches, अंक_Matches);
 #endif
-#if defined(FEAT_EVAL)
-    else if (xp->xp_context == EXPAND_USER_DEFINED)
-	ret = ExpandUserDefined(pat, xp, &regmatch, matches, numMatches);
+#यदि defined(FEAT_EVAL)
+    अन्यथा यदि (xp->xp_context == EXPAND_USER_DEFINED)
+	ret = ExpandUserDefined(pat, xp, &regmatch, matches, अंक_Matches);
 #endif
-    else
-	ret = ExpandOther(pat, xp, &regmatch, matches, numMatches);
+    अन्यथा
+	ret = ExpandOther(pat, xp, &regmatch, matches, अंक_Matches);
 
-    if (!fuzzy)
+    यदि (!fuzzy)
 	vim_regfree(regmatch.regprog);
     vim_free(tofree);
 
-    return ret;
+    प्रत्यागम ret;
 }
 
-    int
+    पूर्णाङ्क
 ExpandGeneric(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    पूर्णाङ्क		*अंक_Matches,
+    char_u	*(*func)(expand_T *, पूर्णाङ्क),
 					  // returns a string from the list
-    int		escaped)
+    पूर्णाङ्क		escaped)
 {
-    return ExpandGenericExt(
-	pat, xp, regmatch, matches, numMatches, func, escaped, 0);
+    प्रत्यागम ExpandGenericExt(
+	pat, xp, regmatch, matches, अंक_Matches, func, escaped, 0);
 }
 
 /*
@@ -3844,104 +3844,104 @@ ExpandGeneric(
  *
  * Returns OK when no problems encountered, FAIL for error (out of memory).
  */
-    int
+    पूर्णाङ्क
 ExpandGenericExt(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches,
-    char_u	*(*func)(expand_T *, int),
+    पूर्णाङ्क		*अंक_Matches,
+    char_u	*(*func)(expand_T *, पूर्णाङ्क),
 					  // returns a string from the list
-    int		escaped,
-    int		sortStartIdx)
+    पूर्णाङ्क		escaped,
+    पूर्णाङ्क		sortStartIdx)
 {
-    int		i;
+    पूर्णाङ्क		i;
     garray_T	ga;
     char_u	*str;
-    fuzmatch_str_T	*fuzmatch = NULL;
-    int		score = 0;
-    int		fuzzy;
-    int		match;
-    int		sort_matches = FALSE;
-    int		funcsort = FALSE;
-    int		sortStartMatchIdx = -1;
+    fuzmatch_str_T	*fuzmatch = रिक्त;
+    पूर्णाङ्क		score = 0;
+    पूर्णाङ्क		fuzzy;
+    पूर्णाङ्क		match;
+    पूर्णाङ्क		sort_matches = FALSE;
+    पूर्णाङ्क		funcsort = FALSE;
+    पूर्णाङ्क		sortStartMatchIdx = -1;
 
     fuzzy = cmdline_fuzzy_complete(pat);
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = रिक्त;
+    *अंक_Matches = 0;
 
-    if (!fuzzy)
-	ga_init2(&ga, sizeof(char *), 30);
-    else
-	ga_init2(&ga, sizeof(fuzmatch_str_T), 30);
+    यदि (!fuzzy)
+	ga_init2(&ga, परिमाण(वर्ण *), 30);
+    अन्यथा
+	ga_init2(&ga, परिमाण(fuzmatch_str_T), 30);
 
-    for (i = 0; ; ++i)
+    प्रति (i = 0; ; ++i)
     {
 	str = (*func)(xp, i);
-	if (str == NULL)	    // end of list
-	    break;
-	if (*str == NUL)	    // skip empty strings
-	    continue;
+	यदि (str == रिक्त)	    // end of list
+	    भङ्ग;
+	यदि (*str == NUL)	    // skip empty strings
+	    अनुवर्त;
 
-	if (xp->xp_pattern[0] != NUL)
+	यदि (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    यदि (!fuzzy)
 		match = vim_regexec(regmatch, str, (colnr_T)0);
-	    else
+	    अन्यथा
 	    {
 		score = fuzzy_match_str(str, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	अन्यथा
 	    match = TRUE;
 
-	if (!match)
-	    continue;
+	यदि (!match)
+	    अनुवर्त;
 
-	if (escaped)
+	यदि (escaped)
 	    str = vim_strsave_escaped(str, (char_u *)" \t\\.");
-	else
+	अन्यथा
 	    str = vim_strsave(str);
-	if (str == NULL)
+	यदि (str == रिक्त)
 	{
-	    if (!fuzzy)
+	    यदि (!fuzzy)
 	    {
 		ga_clear_strings(&ga);
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    fuzmatch_str_free(ga.ga_data, ga.ga_len);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
 
-	if (ga_grow(&ga, 1) == FAIL)
+	यदि (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(str);
-	    break;
+	    भङ्ग;
 	}
 
-	if (fuzzy)
+	यदि (fuzzy)
 	{
 	    fuzmatch = &((fuzmatch_str_T *)ga.ga_data)[ga.ga_len];
 	    fuzmatch->idx = ga.ga_len;
 	    fuzmatch->str = str;
 	    fuzmatch->score = score;
 	}
-	else
+	अन्यथा
 	    ((char_u **)ga.ga_data)[ga.ga_len] = str;
 
 #ifdef FEAT_MENU
-	if (func == get_menu_names)
+	यदि (func == get_menu_names)
 	{
 	    // test for separator added by get_menu_names()
 	    str += STRLEN(str) - 1;
-	    if (*str == '\001')
+	    यदि (*str == '\001')
 		*str = '.';
 	}
 #endif
 
-	if (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
+	यदि (sortStartIdx >= 0 && i >= sortStartIdx && sortStartMatchIdx == -1)
 	{
 	    // Found first item to start sorting from. This is usually 0.
 	    sortStartMatchIdx = ga.ga_len;
@@ -3950,13 +3950,13 @@ ExpandGenericExt(
 	++ga.ga_len;
     }
 
-    if (ga.ga_len == 0)
-	return OK;
+    यदि (ga.ga_len == 0)
+	प्रत्यागम OK;
 
     // sort the matches when using regular expression matching and sorting
     // applies to the completion context. Menus and scriptnames should be kept
     // in the specified order.
-    if (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
+    यदि (!fuzzy && xp->xp_context != EXPAND_MENUNAMES
 					&& xp->xp_context != EXPAND_STRING_SETTING
 					&& xp->xp_context != EXPAND_MENUS
 					&& xp->xp_context != EXPAND_SCRIPTNAMES
@@ -3965,75 +3965,75 @@ ExpandGenericExt(
 	sort_matches = TRUE;
 
     // <SNR> functions should be sorted to the end.
-    if (xp->xp_context == EXPAND_EXPRESSION
+    यदि (xp->xp_context == EXPAND_EXPRESSION
 	    || xp->xp_context == EXPAND_FUNCTIONS
 	    || xp->xp_context == EXPAND_USER_FUNC
 	    || xp->xp_context == EXPAND_DISASSEMBLE)
 	funcsort = TRUE;
 
     // Sort the matches.
-    if (sort_matches && sortStartMatchIdx != -1)
+    यदि (sort_matches && sortStartMatchIdx != -1)
     {
-	if (funcsort)
+	यदि (funcsort)
 	    // <SNR> functions should be sorted to the end.
-	    qsort((void *)ga.ga_data, (size_t)ga.ga_len, sizeof(char_u *),
+	    क्विक((शून्य *)ga.ga_data, (माप_प्रकार)ga.ga_len, परिमाण(char_u *),
 							   sort_func_compare);
-	else
+	अन्यथा
 	    sort_strings((char_u **)ga.ga_data + sortStartMatchIdx, ga.ga_len - sortStartMatchIdx);
     }
 
-    if (!fuzzy)
+    यदि (!fuzzy)
     {
 	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
+	*अंक_Matches = ga.ga_len;
     }
-    else
+    अन्यथा
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	यदि (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 							funcsort) == FAIL)
-	    return FAIL;
-	*numMatches = ga.ga_len;
+	    प्रत्यागम FAIL;
+	*अंक_Matches = ga.ga_len;
     }
 
-#if defined(FEAT_SYN_HL)
+#यदि defined(FEAT_SYN_HL)
     // Reset the variables used for special highlight names expansion, so that
     // they don't show up when getting normal highlight names by ID.
     reset_expand_highlight();
 #endif
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Expand shell command matches in one directory of $PATH.
  */
-    static void
+    स्थिर शून्य
 expand_shellcmd_onedir(
 	char_u		*pathed_pattern,    // fully pathed pattern
-	size_t		pathlen,	    // length of the path portion of pathed_pattern
+	माप_प्रकार		pathlen,	    // length of the path portion of pathed_pattern
 					    // (0 if no path).
 	char_u		***matches,
-	int		*numMatches,
-	int		flags,
+	पूर्णाङ्क		*अंक_Matches,
+	पूर्णाङ्क		flags,
 	hashtab_T	*ht,
 	garray_T	*gap)
 {
     // Expand matches in one directory of $PATH.
-    if (expand_wildcards(1, &pathed_pattern, numMatches, matches, flags) != OK)
-	return;
+    यदि (expand_wildcards(1, &pathed_pattern, अंक_Matches, matches, flags) != OK)
+	प्रत्यागम;
 
-    if (ga_grow(gap, *numMatches) == FAIL)
+    यदि (ga_grow(gap, *अंक_Matches) == FAIL)
     {
-	FreeWild(*numMatches, *matches);
-	return;
+	FreeWild(*अंक_Matches, *matches);
+	प्रत्यागम;
     }
 
-    for (int i = 0; i < *numMatches; ++i)
+    प्रति (पूर्णाङ्क i = 0; i < *अंक_Matches; ++i)
     {
 	char_u	*name = (*matches)[i];
-	size_t	namelen = STRLEN(name);
+	माप_प्रकार	namelen = STRLEN(name);
 
-	if (namelen > pathlen)
+	यदि (namelen > pathlen)
 	{
 	    hash_T	hash;
 	    hashitem_T	*hi;
@@ -4041,14 +4041,14 @@ expand_shellcmd_onedir(
 	    // Check if this name was already found.
 	    hash = hash_hash(name + pathlen);
 	    hi = hash_lookup(ht, name + pathlen, hash);
-	    if (HASHITEM_EMPTY(hi))
+	    यदि (HASHITEM_EMPTY(hi))
 	    {
 		// Remove the path that was prepended.
 		mch_memmove(name, name + pathlen,
-		    (size_t)(namelen - pathlen) + 1);   // +1 for NUL
+		    (माप_प्रकार)(namelen - pathlen) + 1);   // +1 for NUL
 		((char_u **)gap->ga_data)[gap->ga_len++] = name;
 		hash_add_item(ht, hi, name, hash);
-		name = NULL;
+		name = रिक्त;
 	    }
 	}
 	vim_free(name);
@@ -4060,84 +4060,84 @@ expand_shellcmd_onedir(
  * Complete a shell command.
  * Returns FAIL or OK;
  */
-    static int
+    स्थिर पूर्णाङ्क
 expand_shellcmd(
     char_u	*filepat,	// pattern to match with command names
     char_u	***matches,	// return: array with matches
-    int		*numMatches,	// return: number of matches
-    int		flagsarg)	// EW_ flags
+    पूर्णाङ्क		*अंक_Matches,	// return: number of matches
+    पूर्णाङ्क		flagsarg)	// EW_ flags
 {
     char_u	*pat;
-    size_t	patlen;
-    char_u	*path = NULL;
-    int		mustfree = FALSE;
+    माप_प्रकार	patlen;
+    char_u	*path = रिक्त;
+    पूर्णाङ्क		mustfree = FALSE;
     garray_T    ga;
     char_u	*buf;
     char_u	*s, *e;
-    int		flags = flagsarg;
-    int		did_curdir = FALSE;
+    पूर्णाङ्क		flags = flagsarg;
+    पूर्णाङ्क		did_curdir = FALSE;
     hashtab_T	found_ht;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return FAIL;
+    यदि (buf == रिक्त)
+	प्रत्यागम FAIL;
 
     // for ":set path=" and ":set tags=" halve backslashes for escaped space
     patlen = STRLEN(filepat);
     pat = vim_strnsave(filepat, patlen);
-    if (pat == NULL)
+    यदि (pat == रिक्त)
     {
 	vim_free(buf);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
     // Replace "\ " with " ".
     e = pat + patlen;
-    for (s = pat; *s != NUL; ++s)
+    प्रति (s = pat; *s != NUL; ++s)
     {
 	char_u  *p;
 
-	if (*s != '\\')
-	    continue;
+	यदि (*s != '\\')
+	    अनुवर्त;
 
 	p = s + 1;
-	if (*p == ' ')
+	यदि (*p == ' ')
 	{
-	    mch_memmove(s, p, (size_t)(e - p) + 1);     // +1 for NUL
+	    mch_memmove(s, p, (माप_प्रकार)(e - p) + 1);     // +1 for NUL
 	    --e;
 	}
     }
-    patlen = (size_t)(e - pat);
+    patlen = (माप_प्रकार)(e - pat);
 
     flags |= EW_FILE | EW_EXEC | EW_SHELLCMD;
 
-    if (pat[0] == '.' && (vim_ispathsep(pat[1])
+    यदि (pat[0] == '.' && (vim_ispathsep(pat[1])
 			       || (pat[1] == '.' && vim_ispathsep(pat[2]))))
 	path = (char_u *)".";
-    else
+    अन्यथा
     {
 	// For an absolute name we don't use $PATH.
-	if (!mch_isFullName(pat))
+	यदि (!mch_isFullName(pat))
 	    path = vim_getenv((char_u *)"PATH", &mustfree);
-	if (path == NULL)
+	यदि (path == रिक्त)
 	    path = (char_u *)"";
     }
 
     // Go over all directories in $PATH.  Expand matches in that directory and
     // collect them in "ga".  When "." is not in $PATH also expand for the
     // current directory, to find "subdir/cmd".
-    ga_init2(&ga, sizeof(char *), 10);
+    ga_init2(&ga, परिमाण(वर्ण *), 10);
     hash_init(&found_ht);
-    for (s = path; ; s = e)
+    प्रति (s = path; ; s = e)
     {
-	size_t	pathlen;	// length of the path portion of buf
+	माप_प्रकार	pathlen;	// length of the path portion of buf
 				// (including trailing slash).
-	size_t	seplen;
+	माप_प्रकार	seplen;
 
-	if (*s == NUL)
+	यदि (*s == NUL)
 	{
-	    if (did_curdir)
-		break;
+	    यदि (did_curdir)
+		भङ्ग;
 
 	    // Find directories in the current directory, path is empty.
 	    did_curdir = TRUE;
@@ -4147,38 +4147,38 @@ expand_shellcmd(
 	    pathlen = 0;
 	    seplen = 0;
 	}
-	else
+	अन्यथा
 	{
-#if defined(MSWIN)
+#यदि defined(MSWIN)
 	    e = vim_strchr(s, ';');
-#else
+#अन्यथा
 	    e = vim_strchr(s, ':');
 #endif
-	    if (e == NULL)
+	    यदि (e == रिक्त)
 		e = s + STRLEN(s);
 
-	    pathlen = (size_t)(e - s);
-	    if (STRNCMP(s, ".", pathlen) == 0)
+	    pathlen = (माप_प्रकार)(e - s);
+	    यदि (STRNCMP(s, ".", pathlen) == 0)
 	    {
 		did_curdir = TRUE;
 		flags |= EW_DIR;
 	    }
-	    else
+	    अन्यथा
 		// Do not match directories inside a $PATH item.
 		flags &= ~EW_DIR;
 
-	    seplen = !after_pathsep(s, e) ? sizeof(PATHSEP) : 0;
+	    seplen = !after_pathsep(s, e) ? परिमाण(PATHSEP) : 0;
 	}
 
 	// Make sure that the pathed pattern (ie the path and pattern concatenated
 	// together) will fit inside the buffer. If not skip it and move on to the
 	// next path.
-	if (pathlen + seplen + patlen + 1 <= MAXPATHL)
+	यदि (pathlen + seplen + patlen + 1 <= MAXPATHL)
 	{
-	    if (pathlen > 0)
+	    यदि (pathlen > 0)
 	    {
 		vim_strncpy(buf, s, pathlen);
-		if (seplen > 0)
+		यदि (seplen > 0)
 		{
 		    STRCPY(buf + pathlen, PATHSEPSTR);
 		    pathlen += seplen;
@@ -4186,64 +4186,64 @@ expand_shellcmd(
 	    }
 	    STRCPY(buf + pathlen, pat);
 
-	    expand_shellcmd_onedir(buf, pathlen, matches, numMatches, flags,
+	    expand_shellcmd_onedir(buf, pathlen, matches, अंक_Matches, flags,
 				    &found_ht, &ga);
 	}
 
-	if (*e != NUL)
+	यदि (*e != NUL)
 	    ++e;
     }
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
+    *अंक_Matches = ga.ga_len;
 
     vim_free(buf);
     vim_free(pat);
-    if (mustfree)
+    यदि (mustfree)
 	vim_free(path);
     hash_clear(&found_ht);
-    return OK;
+    प्रत्यागम OK;
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Call "user_expand_func()" to invoke a user defined Vim script function and
  * return the result (either a string, a List or NULL).
  */
-    static void *
+    स्थिर शून्य *
 call_user_expand_func(
-    void	*(*user_expand_func)(char_u *, int, typval_T *),
+    शून्य	*(*user_expand_func)(char_u *, पूर्णाङ्क, typval_T *),
     expand_T	*xp)
 {
     cmdline_info_T	*ccline = get_cmdline_info();
-    int		keep = 0;
+    पूर्णाङ्क		keep = 0;
     typval_T	args[4];
     sctx_T	save_current_sctx = current_sctx;
-    char_u	*pat = NULL;
-    void	*ret;
+    char_u	*pat = रिक्त;
+    शून्य	*ret;
 
-    if (xp->xp_arg == NULL || xp->xp_arg[0] == '\0' || xp->xp_line == NULL)
-	return NULL;
+    यदि (xp->xp_arg == रिक्त || xp->xp_arg[0] == '\0' || xp->xp_पंक्ति == रिक्त)
+	प्रत्यागम रिक्त;
 
-    if (ccline->cmdbuff != NULL)
+    यदि (ccline->cmdbuff != रिक्त)
     {
 	keep = ccline->cmdbuff[ccline->cmdlen];
 	ccline->cmdbuff[ccline->cmdlen] = 0;
     }
 
     {
-	int unesc_len;
+	पूर्णाङ्क unesc_len;
 	pat = unescape_user_completeopt_pat(xp, xp->xp_pattern,
 						  xp->xp_pattern_len, &unesc_len);
-	if (pat == NULL)
+	यदि (pat == रिक्त)
 	    pat = vim_strnsave(xp->xp_pattern, xp->xp_pattern_len);
     }
 
     args[0].v_type = VAR_STRING;
     args[0].vval.v_string = pat;
     args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = xp->xp_line;
-    args[2].v_type = VAR_NUMBER;
-    args[2].vval.v_number = xp->xp_col;
+    args[1].vval.v_string = xp->xp_पंक्ति;
+    args[2].v_type = VAR_संख्या;
+    args[2].vval.v_संख्या = xp->xp_col;
     args[3].v_type = VAR_UNKNOWN;
 
     current_sctx = xp->xp_script_ctx;
@@ -4251,85 +4251,85 @@ call_user_expand_func(
     ret = user_expand_func(xp->xp_arg, 3, args);
 
     current_sctx = save_current_sctx;
-    if (ccline->cmdbuff != NULL)
+    यदि (ccline->cmdbuff != रिक्त)
 	ccline->cmdbuff[ccline->cmdlen] = keep;
 
     vim_free(pat);
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * Expand names with a function defined by the user (EXPAND_USER_DEFINED and
  * EXPAND_USER_LIST).
  */
-    static int
+    स्थिर पूर्णाङ्क
 ExpandUserDefined(
     char_u	*pat,
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	***matches,
-    int		*numMatches)
+    पूर्णाङ्क		*अंक_Matches)
 {
     char_u	*retstr;
     char_u	*s;
     char_u	*e;
-    int		keep;
+    पूर्णाङ्क		keep;
     garray_T	ga;
-    int		fuzzy;
-    int		match;
-    int		score = 0;
+    पूर्णाङ्क		fuzzy;
+    पूर्णाङ्क		match;
+    पूर्णाङ्क		score = 0;
 
     fuzzy = cmdline_fuzzy_complete(pat);
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = रिक्त;
+    *अंक_Matches = 0;
 
     retstr = call_user_expand_func(call_func_retstr, xp);
-    if (retstr == NULL)
-	return FAIL;
+    यदि (retstr == रिक्त)
+	प्रत्यागम FAIL;
 
-    if (!fuzzy)
-	ga_init2(&ga, sizeof(char *), 3);
-    else
-	ga_init2(&ga, sizeof(fuzmatch_str_T), 3);
+    यदि (!fuzzy)
+	ga_init2(&ga, परिमाण(वर्ण *), 3);
+    अन्यथा
+	ga_init2(&ga, परिमाण(fuzmatch_str_T), 3);
 
-    for (s = retstr; *s != NUL; s = e)
+    प्रति (s = retstr; *s != NUL; s = e)
     {
 	e = vim_strchr(s, '\n');
-	if (e == NULL)
+	यदि (e == रिक्त)
 	    e = s + STRLEN(s);
 	keep = *e;
 	*e = NUL;
 
-	if (xp->xp_pattern[0] != NUL)
+	यदि (xp->xp_pattern[0] != NUL)
 	{
-	    if (!fuzzy)
+	    यदि (!fuzzy)
 		match = vim_regexec(regmatch, s, (colnr_T)0);
-	    else
+	    अन्यथा
 	    {
 		score = fuzzy_match_str(s, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 	}
-	else
+	अन्यथा
 	    match = TRUE;		// match everything
 
 	*e = keep;
 
-	if (match)
+	यदि (match)
 	{
-	    char_u  *p = vim_strnsave(s, (size_t)(e - s));
-	    if (p == NULL)
-		break;
+	    char_u  *p = vim_strnsave(s, (माप_प्रकार)(e - s));
+	    यदि (p == रिक्त)
+		भङ्ग;
 
-	    if (ga_grow(&ga, 1) == FAIL)
+	    यदि (ga_grow(&ga, 1) == FAIL)
 	    {
 		vim_free(p);
-		break;
+		भङ्ग;
 	    }
 
-	    if (!fuzzy)
+	    यदि (!fuzzy)
 		((char_u **)ga.ga_data)[ga.ga_len] = p;
-	    else
+	    अन्यथा
 	    {
 		fuzmatch_str_T  *fuzmatch =
 				&((fuzmatch_str_T  *)ga.ga_data)[ga.ga_len];
@@ -4340,34 +4340,34 @@ ExpandUserDefined(
 	    ++ga.ga_len;
 	}
 
-	if (*e != NUL)
+	यदि (*e != NUL)
 	    ++e;
     }
     vim_free(retstr);
 
-    if (ga.ga_len == 0)
-	return OK;
+    यदि (ga.ga_len == 0)
+	प्रत्यागम OK;
 
-    if (!fuzzy)
+    यदि (!fuzzy)
     {
 	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
+	*अंक_Matches = ga.ga_len;
     }
-    else
+    अन्यथा
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	यदि (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 								FALSE) == FAIL)
-	    return FAIL;
-	*numMatches = ga.ga_len;
+	    प्रत्यागम FAIL;
+	*अंक_Matches = ga.ga_len;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
-    void
+    शून्य
 expand_process_user_list(
     list_T	*retlist,
     char_u	***matches,
-    int		*numMatches,
+    पूर्णाङ्क		*अंक_Matches,
     expand_T	*xp)
 {
     listitem_T	*li;
@@ -4376,49 +4376,49 @@ expand_process_user_list(
     garray_T	ga_kind;
     garray_T	ga_menu;
     garray_T	ga_info;
-    int		have_extra = FALSE;
-    int		i;
+    पूर्णाङ्क		have_extra = FALSE;
+    पूर्णाङ्क		i;
 
-    ga_init2(&ga, sizeof(char *), 3);
-    ga_init2(&ga_abbr, sizeof(char *), 3);
-    ga_init2(&ga_kind, sizeof(char *), 3);
-    ga_init2(&ga_menu, sizeof(char *), 3);
-    ga_init2(&ga_info, sizeof(char *), 3);
+    ga_init2(&ga, परिमाण(वर्ण *), 3);
+    ga_init2(&ga_abbr, परिमाण(वर्ण *), 3);
+    ga_init2(&ga_kind, परिमाण(वर्ण *), 3);
+    ga_init2(&ga_menu, परिमाण(वर्ण *), 3);
+    ga_init2(&ga_info, परिमाण(वर्ण *), 3);
     // Loop over the items in the list.
-    FOR_ALL_LIST_ITEMS(retlist, li)
+    FOR_ALL_LIST_वस्तुएँ(retlist, li)
     {
 	typval_T *tv = &li->li_tv;
-	char_u	*p = NULL;
-	char_u	*abbr = NULL;
-	char_u	*kind = NULL;
-	char_u	*menu = NULL;
-	char_u	*info = NULL;
+	char_u	*p = रिक्त;
+	char_u	*abbr = रिक्त;
+	char_u	*kind = रिक्त;
+	char_u	*menu = रिक्त;
+	char_u	*info = रिक्त;
 
-	if (tv->v_type == VAR_STRING)
+	यदि (tv->v_type == VAR_STRING)
 	{
-	    if (tv->vval.v_string == NULL)
-		continue;  // Skip NULL strings
+	    यदि (tv->vval.v_string == रिक्त)
+		अनुवर्त;  // Skip NULL strings
 	    p = vim_strsave(tv->vval.v_string);
 	}
-	else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+	अन्यथा यदि (tv->v_type == VAR_DICT && tv->vval.v_dict != रिक्त)
 	{
 	    dict_T	*d = tv->vval.v_dict;
 	    char_u	*word = dict_get_string(d, "word", FALSE);
 
-	    if (word == NULL)
-		continue;  // "word" is required
+	    यदि (word == रिक्त)
+		अनुवर्त;  // "word" is required
 	    p = vim_strsave(word);
 	    abbr = dict_get_string(d, "abbr", TRUE);
 	    kind = dict_get_string(d, "kind", TRUE);
 	    menu = dict_get_string(d, "menu", TRUE);
 	    info = dict_get_string(d, "info", TRUE);
-	    if (abbr != NULL || kind != NULL || menu != NULL || info != NULL)
+	    यदि (abbr != रिक्त || kind != रिक्त || menu != रिक्त || info != रिक्त)
 		have_extra = TRUE;
 	}
-	else
-	    continue;  // Skip other types
+	अन्यथा
+	    अनुवर्त;  // Skip other types
 
-	if (p == NULL
+	यदि (p == रिक्त
 		|| ga_grow(&ga, 1) == FAIL
 		|| ga_grow(&ga_abbr, 1) == FAIL
 		|| ga_grow(&ga_kind, 1) == FAIL
@@ -4430,7 +4430,7 @@ expand_process_user_list(
 	    vim_free(kind);
 	    vim_free(menu);
 	    vim_free(info);
-	    break;
+	    भङ्ग;
 	}
 
 	((char_u **)ga.ga_data)[ga.ga_len++] = p;
@@ -4441,27 +4441,27 @@ expand_process_user_list(
     }
 
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
-    if (have_extra && ga.ga_len > 0)
+    *अंक_Matches = ga.ga_len;
+    यदि (have_extra && ga.ga_len > 0)
     {
 	xp->xp_files_abbr = (char_u **)ga_abbr.ga_data;
 	xp->xp_files_kind = (char_u **)ga_kind.ga_data;
 	xp->xp_files_menu = (char_u **)ga_menu.ga_data;
 	xp->xp_files_info = (char_u **)ga_info.ga_data;
     }
-    else
+    अन्यथा
     {
 	// No extra info collected; free the placeholder NULL entries.
-	for (i = 0; i < ga_abbr.ga_len; i++)
+	प्रति (i = 0; i < ga_abbr.ga_len; i++)
 	    vim_free(((char_u **)ga_abbr.ga_data)[i]);
 	vim_free(ga_abbr.ga_data);
-	for (i = 0; i < ga_kind.ga_len; i++)
+	प्रति (i = 0; i < ga_kind.ga_len; i++)
 	    vim_free(((char_u **)ga_kind.ga_data)[i]);
 	vim_free(ga_kind.ga_data);
-	for (i = 0; i < ga_menu.ga_len; i++)
+	प्रति (i = 0; i < ga_menu.ga_len; i++)
 	    vim_free(((char_u **)ga_menu.ga_data)[i]);
 	vim_free(ga_menu.ga_data);
-	for (i = 0; i < ga_info.ga_len; i++)
+	प्रति (i = 0; i < ga_info.ga_len; i++)
 	    vim_free(((char_u **)ga_info.ga_data)[i]);
 	vim_free(ga_info.ga_data);
     }
@@ -4470,23 +4470,23 @@ expand_process_user_list(
 /*
  * Expand names with a list returned by a function defined by the user.
  */
-    static int
+    स्थिर पूर्णाङ्क
 ExpandUserList(
     expand_T	*xp,
     char_u	***matches,
-    int		*numMatches)
+    पूर्णाङ्क		*अंक_Matches)
 {
     list_T      *retlist;
 
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = रिक्त;
+    *अंक_Matches = 0;
     retlist = call_user_expand_func(call_func_retlist, xp);
-    if (retlist == NULL)
-	return FAIL;
+    यदि (retlist == रिक्त)
+	प्रत्यागम FAIL;
 
-    expand_process_user_list(retlist, matches, numMatches, xp);
+    expand_process_user_list(retlist, matches, अंक_Matches, xp);
     list_unref(retlist);
-    return OK;
+    प्रत्यागम OK;
 }
 #endif
 
@@ -4495,77 +4495,77 @@ ExpandUserList(
  * Adds the matches to "ga".  Caller must init "ga".
  * If "dirs" is TRUE only expand directory names.
  */
-    void
+    शून्य
 globpath(
     char_u	*path,
     char_u	*file,
     garray_T	*ga,
-    int		expand_options,
-    int		dirs)
+    पूर्णाङ्क		expand_options,
+    पूर्णाङ्क		dirs)
 {
     expand_T	xpc;
     char_u	*buf;
-    size_t	pathlen;	    // length of the path portion of buf
+    माप_प्रकार	pathlen;	    // length of the path portion of buf
 				    // (including trailing slash)
-    size_t	seplen;
-    size_t	filelen;
+    माप_प्रकार	seplen;
+    माप_प्रकार	filelen;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
     ExpandInit(&xpc);
     xpc.xp_context = dirs ? EXPAND_DIRECTORIES : EXPAND_FILES;
 
     filelen = STRLEN(file);
 
-#if defined(MSWIN)
+#यदि defined(MSWIN)
     // Using the platform's path separator (\) makes vim incorrectly
     // treat it as an escape character, use '/' instead.
 # define TMP_PATHSEPSTR "/"
-#else
+#अन्यथा
 # define TMP_PATHSEPSTR PATHSEPSTR
 #endif
 
     // Loop over all entries in {path}.
-    while (*path != NUL)
+    यावत् (*path != NUL)
     {
 	// Copy one item of the path to buf[] and concatenate the file name.
-	pathlen = (size_t)copy_option_part(&path, buf, MAXPATHL, ",");
+	pathlen = (माप_प्रकार)copy_option_part(&path, buf, MAXPATHL, ",");
 	seplen = (*buf != NUL && !after_pathsep(buf, buf + pathlen))
 	    ? STRLEN_LITERAL(TMP_PATHSEPSTR)
 	    : 0;
 
-	if (pathlen + seplen + filelen + 1 <= MAXPATHL)
+	यदि (pathlen + seplen + filelen + 1 <= MAXPATHL)
 	{
-	    int	    num_p;
+	    पूर्णाङ्क	    अंक_p;
 	    char_u  **p;
 
-	    if (seplen > 0)
+	    यदि (seplen > 0)
 	    {
 		STRCPY(buf + pathlen, TMP_PATHSEPSTR);
 		pathlen += seplen;
 	    }
 	    STRCPY(buf + pathlen, file);
 
-	    if (ExpandFromContext(&xpc, buf, &p, &num_p,
-			     WILD_SILENT|expand_options) != FAIL && num_p > 0)
+	    यदि (ExpandFromContext(&xpc, buf, &p, &अंक_p,
+			     WILD_SILENT|expand_options) != FAIL && अंक_p > 0)
 	    {
-		ExpandEscape(&xpc, buf, num_p, p, WILD_SILENT|expand_options);
+		ExpandEscape(&xpc, buf, अंक_p, p, WILD_SILENT|expand_options);
 
-		if (ga_grow(ga, num_p) == OK)
+		यदि (ga_grow(ga, अंक_p) == OK)
 		{
 		    // take over the pointers and put them in "ga"
-		    for (int i = 0; i < num_p; ++i)
+		    प्रति (पूर्णाङ्क i = 0; i < अंक_p; ++i)
 		    {
 			((char_u **)ga->ga_data)[ga->ga_len] = p[i];
 			++ga->ga_len;
 		    }
 		}
-		else
+		अन्यथा
 		{
-		    FreeWild(num_p, p);
-		    p = NULL;
+		    FreeWild(अंक_p, p);
+		    p = रिक्त;
 		}
 		vim_free(p);
 	    }
@@ -4579,60 +4579,60 @@ globpath(
 /*
  * Translate some keys pressed when 'wildmenu' is used.
  */
-    int
-wildmenu_translate_key(
+    पूर्णाङ्क
+wildmenu_translate_कुंजी(
 	cmdline_info_T	*cclp,
-	int		key,
+	पूर्णाङ्क		कुंजी,
 	expand_T	*xp,
-	int		did_wild_list)
+	पूर्णाङ्क		did_wild_list)
 {
-    int c = key;
+    पूर्णाङ्क c = कुंजी;
 
-    if (cmdline_pum_active())
+    यदि (cmdline_pum_active())
     {
 	// When the popup menu is used for cmdline completion:
 	//   Up	  : go to the previous item in the menu
 	//   Down : go to the next item in the menu
 	//   Left : go to the parent directory
 	//   Right: list the files in the selected directory
-	switch (c)
+	विकल्प (c)
 	{
-	    case K_UP:	  c = K_LEFT; break;
-	    case K_DOWN:  c = K_RIGHT; break;
-	    case K_LEFT:  c = K_UP; break;
-	    case K_RIGHT: c = K_DOWN; break;
-	    default:	  break;
+	    पक्ष K_UP:	  c = K_बायाँ; भङ्ग;
+	    पक्ष K_DOWN:  c = K_दायाँ; भङ्ग;
+	    पक्ष K_बायाँ:  c = K_UP; भङ्ग;
+	    पक्ष K_दायाँ: c = K_DOWN; भङ्ग;
+	    स्वभाव:	  भङ्ग;
 	}
     }
 
-    if (cmdline_pum_active() || did_wild_list || wild_menu_showing)
+    यदि (cmdline_pum_active() || did_wild_list || wild_menu_showing)
     {
-	if (c == K_LEFT)
+	यदि (c == K_बायाँ)
 	    c = Ctrl_P;
-	else if (c == K_RIGHT)
+	अन्यथा यदि (c == K_दायाँ)
 	    c = Ctrl_N;
     }
 
     // Hitting CR after "emenu Name.": complete submenu
-    if (xp->xp_context == EXPAND_MENUNAMES
+    यदि (xp->xp_context == EXPAND_MENUNAMES
 	    && cclp->cmdpos > 1
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.'
 	    && cclp->cmdbuff[cclp->cmdpos - 2] != '\\'
 	    && (c == '\n' || c == '\r' || c == K_KENTER))
 	c = K_DOWN;
 
-    return c;
+    प्रत्यागम c;
 }
 
 /*
  * Delete characters on the command line, from "from" to the current
  * position.
  */
-    static void
-cmdline_del(cmdline_info_T *cclp, int from)
+    स्थिर शून्य
+cmdline_del(cmdline_info_T *cclp, पूर्णाङ्क from)
 {
     mch_memmove(cclp->cmdbuff + from, cclp->cmdbuff + cclp->cmdpos,
-	    (size_t)(cclp->cmdlen - cclp->cmdpos + 1));
+	    (माप_प्रकार)(cclp->cmdlen - cclp->cmdpos + 1));
     cclp->cmdlen -= cclp->cmdpos - from;
     cclp->cmdpos = from;
 }
@@ -4641,57 +4641,57 @@ cmdline_del(cmdline_info_T *cclp, int from)
  * Handle a key pressed when the wild menu for the menu names
  * (EXPAND_MENUNAMES) is displayed.
  */
-    static int
-wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
+    स्थिर पूर्णाङ्क
+wildmenu_process_कुंजी_menunames(cmdline_info_T *cclp, पूर्णाङ्क कुंजी, expand_T *xp)
 {
-    int		i;
-    int		j;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		j;
 
     // Hitting <Down> after "emenu Name.": complete submenu
-    if (key == K_DOWN && cclp->cmdpos > 0
+    यदि (कुंजी == K_DOWN && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == '.')
     {
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	कुंजी = p_wc;
+	कुंजी_Typed = TRUE;  // in case the key was mapped
     }
-    else if (key == K_UP)
+    अन्यथा यदि (कुंजी == K_UP)
     {
 	// Hitting <Up>: Remove one submenu name in front of the
 	// cursor
-	int found = FALSE;
+	पूर्णाङ्क found = FALSE;
 
-	j = (int)(xp->xp_pattern - cclp->cmdbuff);
+	j = (पूर्णाङ्क)(xp->xp_pattern - cclp->cmdbuff);
 	i = 0;
-	while (--j > 0)
+	यावत् (--j > 0)
 	{
 	    // check for start of menu name
-	    if (cclp->cmdbuff[j] == ' '
+	    यदि (cclp->cmdbuff[j] == ' '
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
 		i = j + 1;
-		break;
+		भङ्ग;
 	    }
 	    // check for start of submenu name
-	    if (cclp->cmdbuff[j] == '.'
+	    यदि (cclp->cmdbuff[j] == '.'
 		    && cclp->cmdbuff[j - 1] != '\\')
 	    {
-		if (found)
+		यदि (found)
 		{
 		    i = j + 1;
-		    break;
+		    भङ्ग;
 		}
-		else
+		अन्यथा
 		    found = TRUE;
 	    }
 	}
-	if (i > 0)
+	यदि (i > 0)
 	    cmdline_del(cclp, i);
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	कुंजी = p_wc;
+	कुंजी_Typed = TRUE;  // in case the key was mapped
 	xp->xp_context = EXPAND_NOTHING;
     }
 
-    return key;
+    प्रत्यागम कुंजी;
 }
 
 /*
@@ -4699,11 +4699,11 @@ wildmenu_process_key_menunames(cmdline_info_T *cclp, int key, expand_T *xp)
  * directory names (EXPAND_DIRECTORIES) or shell command names
  * (EXPAND_SHELLCMD) is displayed.
  */
-    static int
-wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
+    स्थिर पूर्णाङ्क
+wildmenu_process_कुंजी_filenames(cmdline_info_T *cclp, पूर्णाङ्क कुंजी, expand_T *xp)
 {
-    int		i;
-    int		j;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		j;
     char_u	upseg[5];
 
     upseg[0] = PATHSEP;
@@ -4712,7 +4712,7 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
     upseg[3] = PATHSEP;
     upseg[4] = NUL;
 
-    if (key == K_DOWN
+    यदि (कुंजी == K_DOWN
 	    && cclp->cmdpos > 0
 	    && cclp->cmdbuff[cclp->cmdpos - 1] == PATHSEP
 	    && (cclp->cmdpos < 3
@@ -4720,137 +4720,137 @@ wildmenu_process_key_filenames(cmdline_info_T *cclp, int key, expand_T *xp)
 		|| cclp->cmdbuff[cclp->cmdpos - 3] != '.'))
     {
 	// go down a directory
-	key = p_wc;
-	KeyTyped = TRUE;  // in case the key was mapped
+	कुंजी = p_wc;
+	कुंजी_Typed = TRUE;  // in case the key was mapped
     }
-    else if (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && key == K_DOWN)
+    अन्यथा यदि (STRNCMP(xp->xp_pattern, upseg + 1, 3) == 0 && कुंजी == K_DOWN)
     {
 	// If in a direct ancestor, strip off one ../ to go down
-	int found = FALSE;
+	पूर्णाङ्क found = FALSE;
 
 	j = cclp->cmdpos;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (पूर्णाङ्क)(xp->xp_pattern - cclp->cmdbuff);
+	यावत् (--j > i)
 	{
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j]))
+	    यदि (vim_ispathsep(cclp->cmdbuff[j]))
 	    {
 		found = TRUE;
-		break;
+		भङ्ग;
 	    }
 	}
-	if (found
+	यदि (found
 		&& cclp->cmdbuff[j - 1] == '.'
 		&& cclp->cmdbuff[j - 2] == '.'
 		&& (vim_ispathsep(cclp->cmdbuff[j - 3]) || j == i + 2))
 	{
 	    cmdline_del(cclp, j - 2);
-	    key = p_wc;
-	    KeyTyped = TRUE;  // in case the key was mapped
+	    कुंजी = p_wc;
+	    कुंजी_Typed = TRUE;  // in case the key was mapped
 	}
     }
-    else if (key == K_UP)
+    अन्यथा यदि (कुंजी == K_UP)
     {
 	// go up a directory
-	int found = FALSE;
+	पूर्णाङ्क found = FALSE;
 
 	j = cclp->cmdpos - 1;
-	i = (int)(xp->xp_pattern - cclp->cmdbuff);
-	while (--j > i)
+	i = (पूर्णाङ्क)(xp->xp_pattern - cclp->cmdbuff);
+	यावत् (--j > i)
 	{
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 		j -= (*mb_head_off)(cclp->cmdbuff, cclp->cmdbuff + j);
-	    if (vim_ispathsep(cclp->cmdbuff[j])
+	    यदि (vim_ispathsep(cclp->cmdbuff[j])
 #ifdef BACKSLASH_IN_FILENAME
 		    && vim_strchr((char_u *)" *?[{`$%#",
-			cclp->cmdbuff[j + 1]) == NULL
+			cclp->cmdbuff[j + 1]) == रिक्त
 #endif
 	       )
 	    {
-		if (found)
+		यदि (found)
 		{
 		    i = j + 1;
-		    break;
+		    भङ्ग;
 		}
-		else
+		अन्यथा
 		    found = TRUE;
 	    }
 	}
 
-	if (!found)
+	यदि (!found)
 	    j = i;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
+	अन्यथा यदि (STRNCMP(cclp->cmdbuff + j, upseg, 4) == 0)
 	    j += 4;
-	else if (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
+	अन्यथा यदि (STRNCMP(cclp->cmdbuff + j, upseg + 1, 3) == 0
 		&& j == i)
 	    j += 3;
-	else
+	अन्यथा
 	    j = 0;
-	if (j > 0)
+	यदि (j > 0)
 	{
 	    // TODO this is only for DOS/UNIX systems - need to put in
 	    // machine-specific stuff here and in upseg init
 	    cmdline_del(cclp, j);
 	    put_on_cmdline(upseg + 1, 3, FALSE);
 	}
-	else if (cclp->cmdpos > i)
+	अन्यथा यदि (cclp->cmdpos > i)
 	    cmdline_del(cclp, i);
 
 	// Now complete in the new directory. Set KeyTyped in case the
 	// Up key came from a mapping.
-	key = p_wc;
-	KeyTyped = TRUE;
+	कुंजी = p_wc;
+	कुंजी_Typed = TRUE;
     }
 
-    return key;
+    प्रत्यागम कुंजी;
 }
 
 /*
  * Handle a key pressed when the wild menu is displayed
  */
-    int
-wildmenu_process_key(cmdline_info_T *cclp, int key, expand_T *xp)
+    पूर्णाङ्क
+wildmenu_process_कुंजी(cmdline_info_T *cclp, पूर्णाङ्क कुंजी, expand_T *xp)
 {
-    if (xp->xp_context == EXPAND_MENUNAMES)
-	return wildmenu_process_key_menunames(cclp, key, xp);
-    else if ((xp->xp_context == EXPAND_FILES
+    यदि (xp->xp_context == EXPAND_MENUNAMES)
+	प्रत्यागम wildmenu_process_कुंजी_menunames(cclp, कुंजी, xp);
+    अन्यथा यदि ((xp->xp_context == EXPAND_FILES
 		|| xp->xp_context == EXPAND_DIRECTORIES
 		|| xp->xp_context == EXPAND_SHELLCMD))
-	return wildmenu_process_key_filenames(cclp, key, xp);
+	प्रत्यागम wildmenu_process_कुंजी_filenames(cclp, कुंजी, xp);
 
-    return key;
+    प्रत्यागम कुंजी;
 }
 
 /*
  * Free expanded names when finished walking through the matches
  */
-    void
+    शून्य
 wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 {
-    int skt = KeyTyped;
+    पूर्णाङ्क skt = कुंजी_Typed;
 
-    if (!p_wmnu || wild_menu_showing == 0)
-	return;
+    यदि (!p_wmnu || wild_menu_showing == 0)
+	प्रत्यागम;
 
 #ifdef FEAT_EVAL
-    int save_RedrawingDisabled = RedrawingDisabled;
-    if (cclp->input_fn)
+    पूर्णाङ्क save_RedrawingDisabled = RedrawingDisabled;
+    यदि (cclp->निवेश_fn)
 	RedrawingDisabled = 0;
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#यदि defined(FEAT_खोज_EXTRA)
     // Clear highlighting applied during wildmenu activity
     set_no_hlsearch(TRUE);
 #endif
 
-    if (wild_menu_showing == WM_SCROLLED)
+    यदि (wild_menu_showing == WM_SCROLLED)
     {
 	// Entered command line, move it up
 	cmdline_row--;
 	redrawcmd();
     }
-    else if (save_p_ls != -1)
+    अन्यथा यदि (save_p_ls != -1)
     {
 	// restore 'laststatus' and 'winminheight'
 	p_ls = save_p_ls;
@@ -4860,170 +4860,170 @@ wildmenu_cleanup(cmdline_info_T *cclp UNUSED)
 	redrawcmd();
 	save_p_ls = -1;
     }
-    else
+    अन्यथा
     {
 	win_redraw_last_status(topframe);
 	redraw_statuslines();
     }
-    KeyTyped = skt;
+    कुंजी_Typed = skt;
     wild_menu_showing = 0;
 #ifdef FEAT_EVAL
-    if (cclp->input_fn)
+    यदि (cclp->निवेश_fn)
 	RedrawingDisabled = save_RedrawingDisabled;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * "getcompletion()" function
  */
-    void
+    शून्य
 f_getcompletion(typval_T *argvars, typval_T *rettv)
 {
     char_u	*pat;
     char_u	*type;
     expand_T	xpc;
-    int		filtered = FALSE;
-    int		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
+    पूर्णाङ्क		filtered = FALSE;
+    पूर्णाङ्क		options = WILD_SILENT | WILD_USE_NL | WILD_ADD_SLASH
 					| WILD_NO_BEEP | WILD_HOME_REPLACE;
 
-    if (in_vim9script()
+    यदि (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	प्रत्यागम;
 
     pat = tv_get_string(&argvars[0]);
-    if (check_for_string_arg(argvars, 1) == FAIL)
-	return;
+    यदि (check_for_string_arg(argvars, 1) == FAIL)
+	प्रत्यागम;
     type = tv_get_string(&argvars[1]);
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	filtered = tv_get_bool_chk(&argvars[2], NULL);
+    यदि (argvars[2].v_type != VAR_UNKNOWN)
+	filtered = tv_get_bool_chk(&argvars[2], रिक्त);
 
-    if (p_wic)
+    यदि (p_wic)
 	options |= WILD_ICASE;
 
     // For filtered results, 'wildignore' is used
-    if (!filtered)
+    यदि (!filtered)
 	options |= WILD_KEEP_ALL;
 
     ExpandInit(&xpc);
-    if (STRCMP(type, "cmdline") == 0)
+    यदि (STRCMP(type, "cmdline") == 0)
     {
-	int cmdline_len = (int)STRLEN(pat);
+	पूर्णाङ्क cmdline_len = (पूर्णाङ्क)STRLEN(pat);
 	set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
+	xpc.xp_pattern_len = (पूर्णाङ्क)STRLEN(xpc.xp_pattern);
 	xpc.xp_col = cmdline_len;
     }
-    else
+    अन्यथा
     {
 	char_u	*pattern_start;
 
 	xpc.xp_pattern = pattern_start = pat;
-	xpc.xp_pattern_len = (int)STRLEN(xpc.xp_pattern);
-	xpc.xp_line = pat;
+	xpc.xp_pattern_len = (पूर्णाङ्क)STRLEN(xpc.xp_pattern);
+	xpc.xp_पंक्ति = pat;
 
 	xpc.xp_context = cmdcomplete_str_to_type(type);
-	switch (xpc.xp_context)
+	विकल्प (xpc.xp_context)
 	{
-	case EXPAND_NOTHING:
+	पक्ष EXPAND_NOTHING:
 	    semsg(_(e_invalid_argument_str), type);
-	    return;
+	    प्रत्यागम;
 
-	case EXPAND_USER_DEFINED:
+	पक्ष EXPAND_USER_DEFINED:
 	    // Must be "custom,funcname" pattern
-	    if (STRNCMP(type, "custom,", 7) != 0)
+	    यदि (STRNCMP(type, "custom,", 7) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		प्रत्यागम;
 	    }
 
 	    xpc.xp_arg = type + 7;
-	    break;
+	    भङ्ग;
 
-	case EXPAND_USER_LIST:
+	पक्ष EXPAND_USER_LIST:
 	    // Must be "customlist,funcname" pattern
-	    if (STRNCMP(type, "customlist,", 11) != 0)
+	    यदि (STRNCMP(type, "customlist,", 11) != 0)
 	    {
 		semsg(_(e_invalid_argument_str), type);
-		return;
+		प्रत्यागम;
 	    }
 
 	    xpc.xp_arg = type + 11;
-	    break;
+	    भङ्ग;
 
-# if defined(FEAT_MENU)
-	case EXPAND_MENUS:
+# यदि defined(FEAT_MENU)
+	पक्ष EXPAND_MENUS:
 	    set_context_in_menu_cmd(&xpc, (char_u *)"menu", xpc.xp_pattern, FALSE);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (पूर्णाङ्क)(xpc.xp_pattern - pattern_start);
+	    भङ्ग;
 # endif
 
 # ifdef FEAT_CSCOPE
-	case EXPAND_CSCOPE:
+	पक्ष EXPAND_CSCOPE:
 	    set_context_in_cscope_cmd(&xpc, xpc.xp_pattern, CMD_cscope);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (पूर्णाङ्क)(xpc.xp_pattern - pattern_start);
+	    भङ्ग;
 # endif
 
 # ifdef FEAT_SIGNS
-	case EXPAND_SIGN:
+	पक्ष EXPAND_SIGN:
 	    set_context_in_sign_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (पूर्णाङ्क)(xpc.xp_pattern - pattern_start);
+	    भङ्ग;
 # endif
 
-	case EXPAND_RUNTIME:
+	पक्ष EXPAND_RUNTIME:
 	    set_context_in_runtime_cmd(&xpc, xpc.xp_pattern);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (पूर्णाङ्क)(xpc.xp_pattern - pattern_start);
+	    भङ्ग;
 
-	case EXPAND_SHELLCMDLINE:
+	पक्ष EXPAND_SHELLCMDLINE:
 	{
-	    int context = EXPAND_SHELLCMDLINE;
-	    set_context_for_wildcard_arg(NULL, xpc.xp_pattern, FALSE, &xpc,
+	    पूर्णाङ्क context = EXPAND_SHELLCMDLINE;
+	    set_context_for_wildcard_arg(रिक्त, xpc.xp_pattern, FALSE, &xpc,
 					 &context);
-	    xpc.xp_pattern_len -= (int)(xpc.xp_pattern - pattern_start);
-	    break;
+	    xpc.xp_pattern_len -= (पूर्णाङ्क)(xpc.xp_pattern - pattern_start);
+	    भङ्ग;
 	}
 
-	case EXPAND_FILETYPECMD:
+	पक्ष EXPAND_FILETYPECMD:
 	    filetype_expand_what = EXP_FILETYPECMD_ALL;
-	    break;
+	    भङ्ग;
 
-	case EXPAND_BREAKPOINT:
+	पक्ष EXPAND_BREAKPOINT:
 	    breakpt_expand_what = EXP_BREAKPT_ADD;
-	    break;
+	    भङ्ग;
 
-	default:
-	    break;
+	स्वभाव:
+	    भङ्ग;
 	}
     }
 
     {
 	char_u	*pat_src = xpc.xp_pattern;
-	int	pat_len = xpc.xp_pattern_len;
+	पूर्णाङ्क	pat_len = xpc.xp_pattern_len;
 	char_u	*unesc = unescape_user_completeopt_pat(&xpc, pat_src, pat_len,
 								  &pat_len);
-	if (unesc != NULL)
+	यदि (unesc != रिक्त)
 	    pat_src = unesc;
 
-	if (cmdline_fuzzy_completion_supported(&xpc))
+	यदि (cmdline_fuzzy_completion_supported(&xpc))
 	    // when fuzzy matching, don't modify the search string
 	    pat = vim_strnsave(pat_src, pat_len);
-	else
+	अन्यथा
 	    pat = addstar(pat_src, pat_len, xpc.xp_context);
 	vim_free(unesc);
     }
 
-    if (rettv_list_alloc(rettv) == OK && pat != NULL)
+    यदि (rettv_list_alloc(rettv) == OK && pat != रिक्त)
     {
-	int	i;
+	पूर्णाङ्क	i;
 
-	ExpandOne(&xpc, pat, NULL, options, WILD_ALL_KEEP);
+	ExpandOne(&xpc, pat, रिक्त, options, WILD_ALL_KEEP);
 
-	for (i = 0; i < xpc.xp_numfiles; i++)
+	प्रति (i = 0; i < xpc.xp_numfiles; i++)
 	    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
     }
     vim_free(pat);
@@ -5033,23 +5033,23 @@ f_getcompletion(typval_T *argvars, typval_T *rettv)
 /*
  * "getcompletiontype()" function
  */
-    void
+    शून्य
 f_getcompletiontype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*pat;
     expand_T	xpc;
-    int		cmdline_len;
+    पूर्णाङ्क		cmdline_len;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = रिक्त;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    यदि (check_for_string_arg(argvars, 0) == FAIL)
+	प्रत्यागम;
 
     pat = tv_get_string(&argvars[0]);
     ExpandInit(&xpc);
 
-    cmdline_len = (int)STRLEN(pat);
+    cmdline_len = (पूर्णाङ्क)STRLEN(pat);
     set_cmd_context(&xpc, pat, cmdline_len, cmdline_len, FALSE);
     rettv->vval.v_string = cmdcomplete_type_to_str(xpc.xp_context, xpc.xp_arg);
 
@@ -5059,34 +5059,34 @@ f_getcompletiontype(typval_T *argvars, typval_T *rettv)
 /*
  * "cmdcomplete_info()" function
  */
-    void
+    शून्य
 f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
 {
     cmdline_info_T  *ccline = get_cmdline_info();
     dict_T	    *retdict;
     list_T	    *li;
-    int		    idx;
-    int		    ret = OK;
+    पूर्णाङ्क		    idx;
+    पूर्णाङ्क		    ret = OK;
 
-    if (rettv_dict_alloc(rettv) == FAIL || ccline == NULL
-	    || ccline->xpc == NULL || ccline->xpc->xp_files == NULL)
-	return;
+    यदि (rettv_dict_alloc(rettv) == FAIL || ccline == रिक्त
+	    || ccline->xpc == रिक्त || ccline->xpc->xp_files == रिक्त)
+	प्रत्यागम;
     retdict = rettv->vval.v_dict;
     ret = dict_add_string_len(retdict, "cmdline_orig",
-	cmdline_orig.string, (int)cmdline_orig.length);
-    if (ret == OK)
-	ret = dict_add_number(retdict, "pum_visible", pum_visible());
-    if (ret == OK)
-	ret = dict_add_number(retdict, "selected", ccline->xpc->xp_selected);
-    if (ret == OK)
+	cmdline_orig.string, (पूर्णाङ्क)cmdline_orig.length);
+    यदि (ret == OK)
+	ret = dict_add_संख्या(retdict, "pum_visible", pum_visible());
+    यदि (ret == OK)
+	ret = dict_add_संख्या(retdict, "selected", ccline->xpc->xp_selected);
+    यदि (ret == OK)
     {
 	li = list_alloc();
-	if (li == NULL)
-	    return;
+	यदि (li == रिक्त)
+	    प्रत्यागम;
 	ret = dict_add_list(retdict, "matches", li);
-	if (ret == FAIL)
+	यदि (ret == FAIL)
 	    list_unref(li);
-	for (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
+	प्रति (idx = 0; ret == OK && idx < ccline->xpc->xp_numfiles; idx++)
 	    list_append_string(li, ccline->xpc->xp_files[idx], -1);
     }
 }
@@ -5098,85 +5098,85 @@ f_cmdcomplete_info(typval_T *argvars UNUSED, typval_T *rettv)
  * The copied string is stored in '*match', and the actual end position of the
  * matched text is returned in '*match_end'.
  */
-    static int
+    स्थिर पूर्णाङ्क
 copy_substring_from_pos(pos_T *start, pos_T *end, char_u **match,
 	pos_T *match_end)
 {
     char_u	*word_end;
-    char_u	*line, *start_line, *end_line;
-    int		segment_len;
+    char_u	*पंक्ति, *start_पंक्ति, *end_पंक्ति;
+    पूर्णाङ्क		segment_len;
     linenr_T	lnum;
     garray_T	ga;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    पूर्णाङ्क		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != रिक्त;
 
-    if (start->lnum > end->lnum
+    यदि (start->lnum > end->lnum
 	    || (start->lnum == end->lnum && start->col >= end->col))
-	return FAIL; // invalid range
+	प्रत्यागम FAIL; // invalid range
 
     // Use a growable string (ga)
     ga_init2(&ga, 1, 128);
 
     // Append start line from start->col to end
-    start_line = ml_get(start->lnum);
-    char_u  *start_ptr = start_line + start->col;
-    int	    is_single_line = start->lnum == end->lnum;
+    start_पंक्ति = ml_get(start->lnum);
+    char_u  *start_ptr = start_पंक्ति + start->col;
+    पूर्णाङ्क	    is_single_पंक्ति = start->lnum == end->lnum;
 
-    segment_len = is_single_line ? (end->col - start->col)
-			: (int)(ml_get_len(start->lnum) - start->col);
-    if (ga_grow(&ga, segment_len + 2) != OK)
-	goto fail;
+    segment_len = is_single_पंक्ति ? (end->col - start->col)
+			: (पूर्णाङ्क)(ml_get_len(start->lnum) - start->col);
+    यदि (ga_grow(&ga, segment_len + 2) != OK)
+	गच्छ fail;
 
     ga_concat_len(&ga, start_ptr, segment_len);
-    if (!is_single_line)
+    यदि (!is_single_पंक्ति)
     {
-	if (exacttext)
+	यदि (exacttext)
 	    GA_CONCAT_LITERAL(&ga, "\\n");
-	else
+	अन्यथा
 	    ga_append(&ga, '\n');
     }
 
     // Append full lines between start and end
-    if (!is_single_line)
+    यदि (!is_single_पंक्ति)
     {
-	for (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
+	प्रति (lnum = start->lnum + 1; lnum < end->lnum; lnum++)
 	{
-	    int  linelen;
+	    पूर्णाङ्क  linelen;
 
-	    line = ml_get(lnum);
-	    linelen = (int)ml_get_len(lnum);
-	    if (ga_grow(&ga, linelen + 2) != OK)
-		goto fail;
-	    ga_concat_len(&ga, line, linelen);
-	    if (exacttext)
+	    पंक्ति = ml_get(lnum);
+	    linelen = (पूर्णाङ्क)ml_get_len(lnum);
+	    यदि (ga_grow(&ga, linelen + 2) != OK)
+		गच्छ fail;
+	    ga_concat_len(&ga, पंक्ति, linelen);
+	    यदि (exacttext)
 		GA_CONCAT_LITERAL(&ga, "\\n");
-	    else
+	    अन्यथा
 		ga_append(&ga, '\n');
 	}
     }
 
     // Append partial end line (up to word end)
-    end_line = ml_get(end->lnum);
-    word_end = find_word_end(end_line + end->col);
-    segment_len = (int)(word_end - end_line);
-    if (ga_grow(&ga, segment_len) != OK)
-	goto fail;
-    ga_concat_len(&ga, end_line + (is_single_line ? end->col : 0),
-	    segment_len - (is_single_line ? end->col : 0));
+    end_पंक्ति = ml_get(end->lnum);
+    word_end = find_word_end(end_पंक्ति + end->col);
+    segment_len = (पूर्णाङ्क)(word_end - end_पंक्ति);
+    यदि (ga_grow(&ga, segment_len) != OK)
+	गच्छ fail;
+    ga_concat_len(&ga, end_पंक्ति + (is_single_पंक्ति ? end->col : 0),
+	    segment_len - (is_single_पंक्ति ? end->col : 0));
 
     // Null-terminate
-    if (ga_grow(&ga, 1) != OK)
-	goto fail;
+    यदि (ga_grow(&ga, 1) != OK)
+	गच्छ fail;
     ga_append(&ga, NUL);
 
     *match = (char_u *)ga.ga_data;
     match_end->lnum = end->lnum;
     match_end->col = segment_len;
 
-    return OK;
+    प्रत्यागम OK;
 
 fail:
     ga_clear(&ga);
-    return FAIL;
+    प्रत्यागम FAIL;
 }
 
 /*
@@ -5184,35 +5184,35 @@ fail:
  * Honors the 'ignorecase' (p_ic) and 'smartcase' (p_scs) settings to determine
  * case sensitivity.
  */
-    static int
+    स्थिर पूर्णाङ्क
 is_regex_match(char_u *pat, char_u *str)
 {
-    if (STRCMP(pat, str) == 0)
-	return TRUE;
+    यदि (STRCMP(pat, str) == 0)
+	प्रत्यागम TRUE;
 
     regmatch_T	regmatch;
-    int		result;
+    पूर्णाङ्क		result;
 
     ++emsg_off;
-    ++msg_silent;
+    ++संदेश_silent;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
     --emsg_off;
-    --msg_silent;
+    --संदेश_silent;
 
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    यदि (regmatch.regprog == रिक्त)
+	प्रत्यागम FALSE;
     regmatch.rm_ic = p_ic;
-    if (p_ic && p_scs)
+    यदि (p_ic && p_scs)
 	regmatch.rm_ic = !pat_has_uppercase(pat);
 
     ++emsg_off;
-    ++msg_silent;
+    ++संदेश_silent;
     result = vim_regexec_nl(&regmatch, str, (colnr_T)0);
     --emsg_off;
-    --msg_silent;
+    --संदेश_silent;
 
     vim_regfree(regmatch.regprog);
-    return result;
+    प्रत्यागम result;
 }
 
 /*
@@ -5222,48 +5222,48 @@ is_regex_match(char_u *pat, char_u *str)
  * If 'lowercase' is TRUE, the appended text is converted to lowercase before
  * being combined. Returns the newly allocated match string, or NULL on failure.
  */
-    static char_u *
+    स्थिर char_u *
 concat_pattern_with_buffer_match(
 	char_u *pat,
-	int pat_len,
+	पूर्णाङ्क pat_len,
 	pos_T *end_match_pos,
-	int lowercase UNUSED)
+	पूर्णाङ्क lowercase UNUSED)
 {
-    char_u  *line = ml_get(end_match_pos->lnum);
-    char_u  *word_end = find_word_end(line + end_match_pos->col);
-    int	    match_len = (int)(word_end - (line + end_match_pos->col));
+    char_u  *पंक्ति = ml_get(end_match_pos->lnum);
+    char_u  *word_end = find_word_end(पंक्ति + end_match_pos->col);
+    पूर्णाङ्क	    match_len = (पूर्णाङ्क)(word_end - (पंक्ति + end_match_pos->col));
     char_u  *match = alloc(match_len + pat_len + 1);  // +1 for NUL
 
-    if (match == NULL)
-	return NULL;
+    यदि (match == रिक्त)
+	प्रत्यागम रिक्त;
     mch_memmove(match, pat, pat_len);
-    if (match_len > 0)
+    यदि (match_len > 0)
     {
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
-	if (lowercase)
+#यदि defined(FEAT_EVAL) || defined(FEAT_SPELL)
+	यदि (lowercase)
 	{
-	    char_u  *mword = vim_strnsave(line + end_match_pos->col,
+	    char_u  *mword = vim_strnsave(पंक्ति + end_match_pos->col,
 		    match_len);
-	    if (mword == NULL)
-		goto cleanup;
+	    यदि (mword == रिक्त)
+		गच्छ cleanup;
 	    char_u  *lower = strlow_save(mword);
 	    vim_free(mword);
-	    if (lower == NULL)
-		goto cleanup;
+	    यदि (lower == रिक्त)
+		गच्छ cleanup;
 	    mch_memmove(match + pat_len, lower, match_len);
 	    vim_free(lower);
 	}
-	else
+	अन्यथा
 #endif
-	    mch_memmove(match + pat_len, line + end_match_pos->col, match_len);
+	    mch_memmove(match + pat_len, पंक्ति + end_match_pos->col, match_len);
     }
     match[pat_len + match_len] = NUL;
-    return match;
+    प्रत्यागम match;
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#यदि defined(FEAT_EVAL) || defined(FEAT_SPELL)
 cleanup:
     vim_free(match);
-    return NULL;
+    प्रत्यागम रिक्त;
 #endif
 }
 
@@ -5271,78 +5271,78 @@ cleanup:
  * Search for strings matching "pat" in the specified range and return them.
  * Returns OK on success, FAIL otherwise.
  */
-    static int
+    स्थिर पूर्णाङ्क
 expand_pattern_in_buf(
     char_u	*pat,		    // pattern to match
-    int		dir,		    // direction: FORWARD or BACKWARD
+    पूर्णाङ्क		dir,		    // direction: FORWARD or BACKWARD
     char_u	***matches,	    // return: array with matched strings
-    int		*numMatches)	    // return: number of matches
+    पूर्णाङ्क		*अंक_Matches)	    // return: number of matches
 {
     pos_T	cur_match_pos, prev_match_pos, end_match_pos, word_end_pos;
     garray_T	ga;
-    int		found_new_match;
-    int		looped_around = FALSE;
-    int		pat_len;
-    int		has_range = FALSE;
-    int		compl_started = FALSE;
-    int		search_flags;
+    पूर्णाङ्क		found_new_match;
+    पूर्णाङ्क		looped_around = FALSE;
+    पूर्णाङ्क		pat_len;
+    पूर्णाङ्क		has_range = FALSE;
+    पूर्णाङ्क		compl_started = FALSE;
+    पूर्णाङ्क		खोज_flags;
     char_u	*match, *full_match;
-    int		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != NULL;
+    पूर्णाङ्क		exacttext = vim_strchr(p_wop, WOP_EXACTTEXT) != रिक्त;
 
-#ifdef FEAT_SEARCH_EXTRA
-    has_range = search_first_line != 0;
+#ifdef FEAT_खोज_EXTRA
+    has_range = खोज_first_पंक्ति != 0;
 #endif
 
-    *matches = NULL;
-    *numMatches = 0;
+    *matches = रिक्त;
+    *अंक_Matches = 0;
 
-    if (pat == NULL || *pat == NUL)
-	return FAIL;
+    यदि (pat == रिक्त || *pat == NUL)
+	प्रत्यागम FAIL;
 
-    pat_len = (int)STRLEN(pat);
+    pat_len = (पूर्णाङ्क)STRLEN(pat);
     CLEAR_FIELD(cur_match_pos);
     CLEAR_FIELD(prev_match_pos);
-#ifdef FEAT_SEARCH_EXTRA
-    if (has_range)
-	cur_match_pos.lnum = search_first_line;
-    else
+#ifdef FEAT_खोज_EXTRA
+    यदि (has_range)
+	cur_match_pos.lnum = खोज_first_पंक्ति;
+    अन्यथा
 #endif
 	cur_match_pos = pre_incsearch_pos;
 
-    search_flags = SEARCH_OPT | SEARCH_NOOF | SEARCH_PEEK | SEARCH_NFMSG
-	| (has_range ? SEARCH_START : 0);
+    खोज_flags = खोज_OPT | खोज_NOOF | खोज_PEEK | खोज_NFMSG
+	| (has_range ? खोज_START : 0);
 
-    ga_init2(&ga, sizeof(char_u *), 10); // Use growable array of char_u*
+    ga_init2(&ga, परिमाण(char_u *), 10); // Use growable array of char_u*
 
-    for (;;)
+    प्रति (;;)
     {
 	++emsg_off;
-	++msg_silent;
-	found_new_match = searchit(NULL, curbuf, &cur_match_pos,
+	++संदेश_silent;
+	found_new_match = searchit(रिक्त, curbuf, &cur_match_pos,
 		&end_match_pos, dir, pat, pat_len, 1L,
-		search_flags, RE_LAST, NULL);
-	--msg_silent;
+		खोज_flags, RE_LAST, रिक्त);
+	--संदेश_silent;
 	--emsg_off;
 
-	if (found_new_match == FAIL)
-	    break;
+	यदि (found_new_match == FAIL)
+	    भङ्ग;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_खोज_EXTRA
 	// If in range mode, check if match is within the range
-	if (has_range && (cur_match_pos.lnum < search_first_line
-		    || cur_match_pos.lnum > search_last_line))
-		break;
+	यदि (has_range && (cur_match_pos.lnum < खोज_first_पंक्ति
+		    || cur_match_pos.lnum > खोज_last_पंक्ति))
+		भङ्ग;
 #endif
 
-	if (compl_started)
+	यदि (compl_started)
 	{
 	    // If we've looped back to an earlier match, stop
-	    if ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
+	    यदि ((dir == FORWARD && LTOREQ_POS(cur_match_pos, prev_match_pos)) ||
 		(dir == BACKWARD && LTOREQ_POS(prev_match_pos, cur_match_pos)))
 	    {
-		if (looped_around)
-		    break;
-		else
+		यदि (looped_around)
+		    भङ्ग;
+		अन्यथा
 		    looped_around = TRUE;
 	    }
 	}
@@ -5351,34 +5351,34 @@ expand_pattern_in_buf(
 	prev_match_pos = cur_match_pos;
 
 	// Abort if user typed a character or interrupted
-	if (char_avail() || got_int)
+	यदि (char_avail() || got_int)
 	{
-	    if (got_int)
+	    यदि (got_int)
 	    {
-		(void)vpeekc();  // Remove <C-C> from input stream
+		(शून्य)vpeekc();  // Remove <C-C> from input stream
 		got_int = FALSE; // Don't abandon the command line
 	    }
-	    goto cleanup;
+	    गच्छ cleanup;
 	}
 
 	// searchit() can return line number +1 past the last line when
 	// searching for "foo\n" if "foo" is at end of buffer.
-	if (end_match_pos.lnum > curbuf->b_ml.ml_line_count)
+	यदि (end_match_pos.lnum > curbuf->b_ml.ml_पंक्ति_गिनती)
 	{
 	    cur_match_pos.lnum = 1;
 	    cur_match_pos.col = 0;
 	    cur_match_pos.coladd = 0;
-	    continue;
+	    अनुवर्त;
 	}
 
 	// Extract the matching text prepended to completed word
-	if (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
+	यदि (copy_substring_from_pos(&cur_match_pos, &end_match_pos, &full_match,
 		    &word_end_pos) == FAIL)
-	    break;
+	    भङ्ग;
 
-	if (exacttext)
+	यदि (exacttext)
 	    match = full_match;
-	else
+	अन्यथा
 	{
 	    // Construct a new match from completed word appended to pattern itself
 	    match = concat_pattern_with_buffer_match(pat, pat_len, &end_match_pos,
@@ -5387,50 +5387,50 @@ expand_pattern_in_buf(
 	    // The regex pattern may include '\C' or '\c'. First, try matching the
 	    // buffer word as-is. If it doesn't match, try again with the lowercase
 	    // version of the word to handle smartcase behavior.
-	    if (match == NULL || !is_regex_match(match, full_match))
+	    यदि (match == रिक्त || !is_regex_match(match, full_match))
 	    {
 		vim_free(match);
 		match = concat_pattern_with_buffer_match(pat, pat_len,
 			&end_match_pos, TRUE);
-		if (match == NULL || !is_regex_match(match, full_match))
+		यदि (match == रिक्त || !is_regex_match(match, full_match))
 		{
 		    vim_free(match);
 		    vim_free(full_match);
-		    continue;
+		    अनुवर्त;
 		}
 	    }
 	    vim_free(full_match);
 	}
 
 	// Include this match if it is not a duplicate
-	for (int i = 0; i < ga.ga_len; ++i)
+	प्रति (पूर्णाङ्क i = 0; i < ga.ga_len; ++i)
 	{
-	    if (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
+	    यदि (STRCMP(match, ((char_u **)ga.ga_data)[i]) == 0)
 	    {
 		VIM_CLEAR(match);
-		break;
+		भङ्ग;
 	    }
 	}
-	if (match != NULL)
+	यदि (match != रिक्त)
 	{
-	    if (ga_grow(&ga, 1) == FAIL)
+	    यदि (ga_grow(&ga, 1) == FAIL)
 	    {
 		VIM_CLEAR(match);
-		goto cleanup;
+		गच्छ cleanup;
 	    }
 	    ((char_u **)ga.ga_data)[ga.ga_len++] = match;
-	    if (ga.ga_len > TAG_MANY)
-		break;
+	    यदि (ga.ga_len > TAG_MANY)
+		भङ्ग;
 	}
-	if (has_range)
+	यदि (has_range)
 	    cur_match_pos = word_end_pos;
     }
 
     *matches = (char_u **)ga.ga_data;
-    *numMatches = ga.ga_len;
-    return OK;
+    *अंक_Matches = ga.ga_len;
+    प्रत्यागम OK;
 
 cleanup:
     ga_clear_strings(&ga);
-    return FAIL;
+    प्रत्यागम FAIL;
 }

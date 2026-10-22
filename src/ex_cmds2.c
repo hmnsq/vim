@@ -11,8 +11,8 @@
  * ex_cmds2.c: some more functions for command line commands
  */
 
-#include "vim.h"
-#include "version.h"
+#अन्तर्भाव "vim.h"
+#अन्तर्भाव "version.h"
 
 /*
  * If 'autowrite' option set, try to write the file.
@@ -20,48 +20,48 @@
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-autowrite(buf_T *buf, int forceit)
+    पूर्णाङ्क
+autowrite(buf_T *buf, पूर्णाङ्क forceit)
 {
-    int		r;
+    पूर्णाङ्क		r;
     bufref_T	bufref;
 
-    if (!(p_aw || p_awa) || !p_write
+    यदि (!(p_aw || p_awa) || !p_write
 	    // never autowrite a "nofile" or "nowrite" buffer
 	    || bt_dontwrite(buf)
-	    || (!forceit && buf->b_p_ro) || buf->b_ffname == NULL)
-	return FAIL;
+	    || (!forceit && buf->b_p_ro) || buf->b_ffname == रिक्त)
+	प्रत्यागम FAIL;
     set_bufref(&bufref, buf);
     r = buf_write_all(buf, forceit);
 
     // Writing may succeed but the buffer still changed, e.g., when there is a
     // conversion error.  We do want to return FAIL then.
-    if (bufref_valid(&bufref) && bufIsChanged(buf))
+    यदि (bufref_valid(&bufref) && bufIsChanged(buf))
 	r = FAIL;
-    return r;
+    प्रत्यागम r;
 }
 
 /*
  * Flush all buffers, except the ones that are readonly or are never written.
  */
-    void
-autowrite_all(void)
+    शून्य
+autowrite_all(शून्य)
 {
     buf_T	*buf;
 
-    if (!(p_aw || p_awa) || !p_write)
-	return;
+    यदि (!(p_aw || p_awa) || !p_write)
+	प्रत्यागम;
     FOR_ALL_BUFFERS(buf)
-	if (bufIsChanged(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
+	यदि (bufIsChanged(buf) && !buf->b_p_ro && !bt_dontwrite(buf))
 	{
 	    bufref_T	bufref;
 
 	    set_bufref(&bufref, buf);
 
-	    (void)buf_write_all(buf, FALSE);
+	    (शून्य)buf_write_all(buf, FALSE);
 
 	    // an autocommand may have deleted the buffer
-	    if (!bufref_valid(&bufref))
+	    यदि (!bufref_valid(&bufref))
 		buf = firstbuf;
 	}
 }
@@ -70,82 +70,82 @@ autowrite_all(void)
  * Return TRUE if buffer was changed and cannot be abandoned.
  * For flags use the CCGD_ values.
  */
-    int
-check_changed(buf_T *buf, int flags)
+    पूर्णाङ्क
+check_changed(buf_T *buf, पूर्णाङ्क flags)
 {
-    int		forceit = (flags & CCGD_FORCEIT);
+    पूर्णाङ्क		forceit = (flags & CCGD_FORCEIT);
     bufref_T	bufref;
 
     set_bufref(&bufref, buf);
 
-    if (       !forceit
+    यदि (       !forceit
 	    && bufIsChanged(buf)
 	    && ((flags & CCGD_MULTWIN) || buf->b_nwindows <= 1)
 	    && (!(flags & CCGD_AW) || autowrite(buf, forceit) == FAIL))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#यदि defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	यदि ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    यदि (term_job_running(buf->b_term))
 	    {
-		return term_confirm_stop(buf) == FAIL;
+		प्रत्यागम term_confirm_stop(buf) == FAIL;
 	    }
 # endif
 
 	    buf_T	*buf2;
-	    int		count = 0;
+	    पूर्णाङ्क		गिनती = 0;
 
-	    if (flags & CCGD_ALLBUF)
+	    यदि (flags & CCGD_ALLBUF)
 		FOR_ALL_BUFFERS(buf2)
-		    if (bufIsChanged(buf2)
-				     && (buf2->b_ffname != NULL
+		    यदि (bufIsChanged(buf2)
+				     && (buf2->b_ffname != रिक्त
 # ifdef FEAT_BROWSE
 					 || (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
 					))
-			++count;
-	    if (!bufref_valid(&bufref))
+			++गिनती;
+	    यदि (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
+		प्रत्यागम FALSE;
 
-	    dialog_changed(buf, count > 1);
+	    dialog_changed(buf, गिनती > 1);
 
-	    if (!bufref_valid(&bufref))
+	    यदि (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
-		return FALSE;
-	    return bufIsChanged(buf);
+		प्रत्यागम FALSE;
+	    प्रत्यागम bufIsChanged(buf);
 	}
 #endif
-	if (flags & CCGD_EXCMD)
+	यदि (flags & CCGD_EXCMD)
 	    no_write_message();
-	else
+	अन्यथा
 	    no_write_message_nobang(curbuf);
-	return TRUE;
+	प्रत्यागम TRUE;
     }
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#यदि defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 
-# if defined(FEAT_BROWSE)
+# यदि defined(FEAT_BROWSE)
 /*
  * When wanting to write a file without a file name, ask the user for a name.
  */
-    void
+    शून्य
 browse_save_fname(buf_T *buf)
 {
-    if (buf->b_fname != NULL)
-	return;
+    यदि (buf->b_fname != रिक्त)
+	प्रत्यागम;
 
     char_u *fname;
 
     fname = do_browse(BROWSE_SAVE, (char_u *)_("Save As"),
-	    (char_u *)"Untitled", NULL, NULL, NULL, buf);
-    if (fname == NULL)
-	return;
+	    (char_u *)"Untitled", रिक्त, रिक्त, रिक्त, buf);
+    यदि (fname == रिक्त)
+	प्रत्यागम;
 
-    if (setfname(buf, fname, NULL, TRUE) == OK)
+    यदि (setfname(buf, fname, रिक्त, TRUE) == OK)
 	buf->b_flags |= BF_NOTEDITED;
     vim_free(fname);
 }
@@ -155,62 +155,62 @@ browse_save_fname(buf_T *buf)
  * Ask the user what to do when abandoning a changed buffer.
  * Must check 'write' option first!
  */
-    void
+    शून्य
 dialog_changed(
     buf_T	*buf,
-    int		checkall)	// may abandon all changed buffers
+    पूर्णाङ्क		checkall)	// may abandon all changed buffers
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int		ret;
+    char_u	buff[DIALOG_संदेश_SIZE];
+    पूर्णाङ्क		ret;
     buf_T	*buf2;
     exarg_T	ea;
 
-    dialog_msg(buff, _("Save changes to \"%s\"?"), buf->b_fname);
-    if (checkall)
-	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, NULL, buff, 1);
-    else
-	ret = vim_dialog_yesnocancel(VIM_QUESTION, NULL, buff, 1);
+    dialog_संदेश(buff, _("Save changes to \"%s\"?"), buf->b_fname);
+    यदि (checkall)
+	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, रिक्त, buff, 1);
+    अन्यथा
+	ret = vim_dialog_yesnocancel(VIM_QUESTION, रिक्त, buff, 1);
 
     // Init ea pseudo-structure, this is needed for the check_overwrite()
     // function.
     CLEAR_FIELD(ea);
 
-    if (ret == VIM_YES)
+    यदि (ret == VIM_YES)
     {
-	int	empty_bufname;
+	पूर्णाङ्क	empty_bufname;
 
 # ifdef FEAT_BROWSE
 	// May get file name, when there is none
 	browse_save_fname(buf);
 
 	// User cancelled the file dialog; keep the buffer modified.
-	if (buf->b_fname == NULL)
-	    return;
+	यदि (buf->b_fname == रिक्त)
+	    प्रत्यागम;
 # endif
-	empty_bufname = buf->b_fname == NULL ? TRUE : FALSE;
-	if (empty_bufname)
+	empty_bufname = buf->b_fname == रिक्त ? TRUE : FALSE;
+	यदि (empty_bufname)
 	    buf_set_name(buf->b_fnum, (char_u *)"Untitled");
 
-	if (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
+	यदि (check_overwrite(&ea, buf, buf->b_fname, buf->b_ffname, FALSE) == OK)
 	{
 	    // didn't hit Cancel
-	    if (buf_write_all(buf, FALSE) == OK)
-		return;
+	    यदि (buf_write_all(buf, FALSE) == OK)
+		प्रत्यागम;
 	}
 
 	// restore to empty when write failed or was cancelled
-	if (empty_bufname)
+	यदि (empty_bufname)
 	{
-	    buf->b_fname = NULL;
+	    buf->b_fname = रिक्त;
 	    VIM_CLEAR(buf->b_ffname);
 	    VIM_CLEAR(buf->b_sfname);
 	}
     }
-    else if (ret == VIM_NO)
+    अन्यथा यदि (ret == VIM_NO)
     {
 	unchanged(buf, TRUE, FALSE);
     }
-    else if (ret == VIM_ALL)
+    अन्यथा यदि (ret == VIM_ALL)
     {
 	/*
 	 * Write all modified files that can be written.
@@ -219,8 +219,8 @@ dialog_changed(
 	 */
 	FOR_ALL_BUFFERS(buf2)
 	{
-	    if (bufIsChanged(buf2)
-		    && (buf2->b_ffname != NULL
+	    यदि (bufIsChanged(buf2)
+		    && (buf2->b_ffname != रिक्त
 # ifdef FEAT_BROWSE
 			|| (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
@@ -235,18 +235,18 @@ dialog_changed(
 		// May get file name, when there is none
 		browse_save_fname(buf2);
 # endif
-		if (buf2->b_fname != NULL && check_overwrite(&ea, buf2,
+		यदि (buf2->b_fname != रिक्त && check_overwrite(&ea, buf2,
 				  buf2->b_fname, buf2->b_ffname, FALSE) == OK)
 		    // didn't hit Cancel
-		    (void)buf_write_all(buf2, FALSE);
+		    (शून्य)buf_write_all(buf2, FALSE);
 
 		// an autocommand may have deleted the buffer
-		if (!bufref_valid(&bufref))
+		यदि (!bufref_valid(&bufref))
 		    buf2 = firstbuf;
 	    }
 	}
     }
-    else if (ret == VIM_DISCARDALL)
+    अन्यथा यदि (ret == VIM_DISCARDALL)
     {
 	/*
 	 * mark all buffers as unchanged
@@ -261,10 +261,10 @@ dialog_changed(
  * Return TRUE if the buffer "buf" can be abandoned, either by making it
  * hidden, autowriting it or unloading it.
  */
-    int
-can_abandon(buf_T *buf, int forceit)
+    पूर्णाङ्क
+can_abandon(buf_T *buf, पूर्णाङ्क forceit)
 {
-    return (	   buf_hide(buf)
+    प्रत्यागम (	   buf_hide(buf)
 		|| !bufIsChanged(buf)
 		|| buf->b_nwindows > 1
 		|| autowrite(buf, forceit) == OK
@@ -274,14 +274,14 @@ can_abandon(buf_T *buf, int forceit)
 /*
  * Add a buffer number to "bufnrs", unless it's already there.
  */
-    static void
-add_bufnum(int *bufnrs, int *bufnump, int nr)
+    स्थिर शून्य
+add_bufnum(पूर्णाङ्क *bufnrs, पूर्णाङ्क *bufnump, पूर्णाङ्क nr)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    for (i = 0; i < *bufnump; ++i)
-	if (bufnrs[i] == nr)
-	    return;
+    प्रति (i = 0; i < *bufnump; ++i)
+	यदि (bufnrs[i] == nr)
+	    प्रत्यागम;
     bufnrs[*bufnump] = nr;
     *bufnump = *bufnump + 1;
 }
@@ -292,18 +292,18 @@ add_bufnum(int *bufnrs, int *bufnump, int nr)
  * When "unload" is TRUE the current buffer is unloaded instead of making it
  * hidden.  This is used for ":q!".
  */
-    int
+    पूर्णाङ्क
 check_changed_any(
-    int		hidden,		// Only check hidden buffers
-    int		unload)
+    पूर्णाङ्क		hidden,		// Only check hidden buffers
+    पूर्णाङ्क		unload)
 {
-    int		ret = FALSE;
+    पूर्णाङ्क		ret = FALSE;
     buf_T	*buf;
-    int		save;
-    int		i;
-    int		bufnum = 0;
-    int		bufcount = 0;
-    int		*bufnrs;
+    पूर्णाङ्क		save;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		bufnum = 0;
+    पूर्णाङ्क		bufcount = 0;
+    पूर्णाङ्क		*bufnrs;
     tabpage_T   *tp;
     win_T	*wp;
 
@@ -311,24 +311,24 @@ check_changed_any(
     FOR_ALL_BUFFERS(buf)
 	++bufcount;
 
-    if (bufcount == 0)
-	return FALSE;
+    यदि (bufcount == 0)
+	प्रत्यागम FALSE;
 
-    bufnrs = ALLOC_MULT(int, bufcount);
-    if (bufnrs == NULL)
-	return FALSE;
+    bufnrs = ALLOC_MULT(पूर्णाङ्क, bufcount);
+    यदि (bufnrs == रिक्त)
+	प्रत्यागम FALSE;
 
     // curbuf
     bufnrs[bufnum++] = curbuf->b_fnum;
 
     // buffers in current tab
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer != curbuf)
+	यदि (wp->w_buffer != curbuf)
 	    add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
 
     // buffers in other tabs
     FOR_ALL_TABPAGES(tp)
-	if (tp != curtab)
+	यदि (tp != curtab)
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 		add_bufnum(bufnrs, &bufnum, wp->w_buffer->b_fnum);
 
@@ -336,64 +336,64 @@ check_changed_any(
     FOR_ALL_BUFFERS(buf)
 	add_bufnum(bufnrs, &bufnum, buf->b_fnum);
 
-    for (i = 0; i < bufnum; ++i)
+    प्रति (i = 0; i < bufnum; ++i)
     {
 	buf = buflist_findnr(bufnrs[i]);
-	if (buf == NULL)
-	    continue;
-	if ((!hidden || buf->b_nwindows == 0) && bufIsChanged(buf))
+	यदि (buf == रिक्त)
+	    अनुवर्त;
+	यदि ((!hidden || buf->b_nwindows == 0) && bufIsChanged(buf))
 	{
 	    bufref_T bufref;
 
 	    set_bufref(&bufref, buf);
 #ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    यदि (term_job_running(buf->b_term))
 	    {
-		if (term_try_stop_job(buf) == FAIL)
-		    break;
+		यदि (term_try_stop_job(buf) == FAIL)
+		    भङ्ग;
 	    }
-	    else
+	    अन्यथा
 #endif
 	    // Try auto-writing the buffer.  If this fails but the buffer no
 	    // longer exists it's not changed, that's OK.
-	    if (check_changed(buf, (p_awa ? CCGD_AW : 0)
+	    यदि (check_changed(buf, (p_awa ? CCGD_AW : 0)
 				 | CCGD_MULTWIN
 				 | CCGD_ALLBUF) && bufref_valid(&bufref))
-		break;	    // didn't save - still changes
+		भङ्ग;	    // didn't save - still changes
 	}
     }
 
-    if (i >= bufnum)
-	goto theend;
+    यदि (i >= bufnum)
+	गच्छ theend;
 
     // Get here if "buf" cannot be abandoned.
     ret = TRUE;
     exiting = FALSE;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#यदि defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     /*
      * When ":confirm" used, don't give an error message.
      */
-    if (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
+    यदि (!(p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
 #endif
     {
 	// There must be a wait_return() for this message, do_buffer()
 	// may cause a redraw.  But wait_return() is a no-op when vgetc()
 	// is busy (Quit used from window menu), then make sure we don't
 	// cause a scroll up.
-	if (vgetc_busy > 0)
+	यदि (vgetc_busy > 0)
 	{
-	    msg_row = cmdline_row;
-	    msg_col = 0;
-	    msg_didout = FALSE;
+	    संदेश_row = cmdline_row;
+	    संदेश_col = 0;
+	    संदेश_didout = FALSE;
 	}
-	if (
+	यदि (
 #ifdef FEAT_TERMINAL
 		term_job_running(buf->b_term)
 		    ? semsg(_(e_job_still_running_in_buffer_str), buf->b_fname)
 		    :
 #endif
 		semsg(_(e_no_write_since_last_change_for_buffer_str),
-		    buf_spname(buf) != NULL ? buf_spname(buf) : buf->b_fname))
+		    buf_spname(buf) != रिक्त ? buf_spname(buf) : buf->b_fname))
 	{
 	    save = no_wait_return;
 	    no_wait_return = FALSE;
@@ -403,9 +403,9 @@ check_changed_any(
     }
 
     // Try to find a window that contains the buffer.
-    if (buf != curbuf)
+    यदि (buf != curbuf)
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf)
+	    यदि (wp->w_buffer == buf)
 	    {
 		bufref_T bufref;
 
@@ -414,34 +414,34 @@ check_changed_any(
 		goto_tabpage_win(tp, wp);
 
 		// Paranoia: did autocmd wipe out the buffer with changes?
-		if (!bufref_valid(&bufref))
-		    goto theend;
-		goto buf_found;
+		यदि (!bufref_valid(&bufref))
+		    गच्छ theend;
+		गच्छ buf_found;
 	    }
 buf_found:
 
     // Open the changed buffer in the current window.
-    if (buf != curbuf)
+    यदि (buf != curbuf)
 	set_curbuf(buf, unload ? DOBUF_UNLOAD : DOBUF_GOTO);
 
 theend:
     vim_free(bufnrs);
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * return FAIL if there is no file name, OK if there is one
  * give error message for FAIL
  */
-    int
-check_fname(void)
+    पूर्णाङ्क
+check_fname(शून्य)
 {
-    if (curbuf->b_ffname == NULL)
+    यदि (curbuf->b_ffname == रिक्त)
     {
 	emsg(_(e_no_file_name));
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
@@ -449,87 +449,87 @@ check_fname(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-buf_write_all(buf_T *buf, int forceit)
+    पूर्णाङ्क
+buf_write_all(buf_T *buf, पूर्णाङ्क forceit)
 {
-    int	    retval;
+    पूर्णाङ्क	    retval;
     buf_T	*old_curbuf = curbuf;
 
     retval = (buf_write(buf, buf->b_ffname, buf->b_fname,
-				   (linenr_T)1, buf->b_ml.ml_line_count, NULL,
+				   (linenr_T)1, buf->b_ml.ml_पंक्ति_गिनती, रिक्त,
 						  FALSE, forceit, TRUE, FALSE));
-    if (curbuf != old_curbuf)
+    यदि (curbuf != old_curbuf)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
+	संदेश_source(HL_ATTR(HLF_W));
+	संदेश(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
     }
-    return retval;
+    प्रत्यागम retval;
 }
 
 /*
  * ":argdo", ":windo", ":bufdo", ":tabdo", ":cdo", ":ldo", ":cfdo" and ":lfdo"
  */
-    void
+    शून्य
 ex_listdo(exarg_T *eap)
 {
-    int		i;
+    पूर्णाङ्क		i;
     win_T	*wp;
     tabpage_T	*tp;
     buf_T	*buf = curbuf;
-    int		next_fnum = 0;
+    पूर्णाङ्क		next_fnum = 0;
 
     // ":windo" and ":tabdo" only visit existing windows/tabpages, they don't
     // change the current window's buffer, so they can't escape a 'winfixbuf'
     // window (which would create a split).
-    if (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
+    यदि (curwin->w_p_wfb && eap->cmdidx != CMD_windo &&
 	    eap->cmdidx != CMD_tabdo)
     {
-	if ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
+	यदि ((eap->cmdidx == CMD_ldo || eap->cmdidx == CMD_lfdo) &&
 		!eap->forceit)
 	{
 	    // Disallow :ldo if 'winfixbuf' is applied
 	    emsg(_(e_winfixbuf_cannot_go_to_buffer));
-	    return;
+	    प्रत्यागम;
 	}
 
-	if (win_valid(prevwin) && !prevwin->w_p_wfb)
+	यदि (win_valid(prevwin) && !prevwin->w_p_wfb)
 	    // 'winfixbuf' is set; attempt to change to a window without it.
 	    win_goto(prevwin);
-	if (curwin->w_p_wfb)
+	यदि (curwin->w_p_wfb)
 	{
 	    // Split the window, which will be 'nowinfixbuf', and set curwin to
 	    // that
-	    (void)win_split(0, 0);
+	    (शून्य)win_split(0, 0);
 
-	    if (curwin->w_p_wfb)
+	    यदि (curwin->w_p_wfb)
 	    {
 		// Autocommands set 'winfixbuf' or sent us to another window
 		// with it set, or we failed to split the window.  Give up.
 		emsg(_(e_winfixbuf_cannot_go_to_buffer));
-		return;
+		प्रत्यागम;
 	    }
 	}
     }
 
-#if defined(FEAT_SYN_HL)
-    char_u	*save_ei = NULL;
+#यदि defined(FEAT_SYN_HL)
+    char_u	*save_ei = रिक्त;
 #endif
 #ifdef FEAT_QUICKFIX
-    int		qf_size = 0;
-    int		qf_idx;
+    पूर्णाङ्क		qf_size = 0;
+    पूर्णाङ्क		qf_idx;
 #endif
 
 #ifndef FEAT_QUICKFIX
-    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
+    यदि (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo ||
 	    eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
     {
 	ex_ni(eap);
-	return;
+	प्रत्यागम;
     }
 #endif
 
-#if defined(FEAT_SYN_HL)
-    if (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
+#यदि defined(FEAT_SYN_HL)
+    यदि (eap->cmdidx != CMD_windo && eap->cmdidx != CMD_tabdo)
     {
 	// Don't do syntax HL autocommands.  Skipping the syntax file is a
 	// great speed improvement.
@@ -547,7 +547,7 @@ ex_listdo(exarg_T *eap)
     inc_clip_provider();
 #endif
 
-    if (eap->cmdidx == CMD_windo
+    यदि (eap->cmdidx == CMD_windo
 	    || eap->cmdidx == CMD_tabdo
 	    || buf_hide(curbuf)
 	    || !check_changed(curbuf, CCGD_AW
@@ -558,109 +558,109 @@ ex_listdo(exarg_T *eap)
 	// start at the eap->line1 argument/window/buffer
 	wp = firstwin;
 	tp = first_tabpage;
-	switch (eap->cmdidx)
+	विकल्प (eap->cmdidx)
 	{
-	    case CMD_windo:
-		for ( ; wp != NULL && i + 1 < eap->line1; wp = wp->w_next)
+	    पक्ष CMD_windo:
+		प्रति ( ; wp != रिक्त && i + 1 < eap->line1; wp = wp->w_next)
 		    i++;
-		break;
-	    case CMD_tabdo:
-		for ( ; tp != NULL && i + 1 < eap->line1; tp = tp->tp_next)
+		भङ्ग;
+	    पक्ष CMD_tabdo:
+		प्रति ( ; tp != रिक्त && i + 1 < eap->line1; tp = tp->tp_next)
 		    i++;
-		break;
-	    case CMD_argdo:
+		भङ्ग;
+	    पक्ष CMD_argdo:
 		i = eap->line1 - 1;
-		break;
-	    default:
-		break;
+		भङ्ग;
+	    स्वभाव:
+		भङ्ग;
 	}
 	// set pcmark now
-	if (eap->cmdidx == CMD_bufdo)
+	यदि (eap->cmdidx == CMD_bufdo)
 	{
 	    // Advance to the first listed buffer after "eap->line1".
-	    for (buf = firstbuf; buf != NULL && (buf->b_fnum < eap->line1
+	    प्रति (buf = firstbuf; buf != रिक्त && (buf->b_fnum < eap->line1
 					  || !buf->b_p_bl); buf = buf->b_next)
-		if (buf->b_fnum > eap->line2)
+		यदि (buf->b_fnum > eap->line2)
 		{
-		    buf = NULL;
-		    break;
+		    buf = रिक्त;
+		    भङ्ग;
 		}
-	    if (buf != NULL)
+	    यदि (buf != रिक्त)
 		goto_buffer(eap, DOBUF_FIRST, FORWARD, buf->b_fnum);
 	}
 #ifdef FEAT_QUICKFIX
-	else if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+	अन्यथा यदि (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		|| eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	{
 	    qf_size = qf_get_valid_size(eap);
-	    if (qf_size <= 0 || eap->line1 > qf_size)
-		buf = NULL;
-	    else
+	    यदि (qf_size <= 0 || eap->line1 > qf_size)
+		buf = रिक्त;
+	    अन्यथा
 	    {
-		save_clear_shm_value();
+		save_clear_shm_मूल्य();
 		ex_cc(eap);
-		restore_shm_value();
+		restore_shm_मूल्य();
 
 		buf = curbuf;
 		i = eap->line1 - 1;
-		if (eap->addr_count <= 0)
+		यदि (eap->addr_गिनती <= 0)
 		    // default is all the quickfix/location list entries
 		    eap->line2 = qf_size;
 	    }
 	}
 #endif
-	else
+	अन्यथा
 	    setpcmark();
 	listcmd_busy = TRUE;	    // avoids setting pcmark below
 
-	while (!got_int && buf != NULL)
+	यावत् (!got_int && buf != रिक्त)
 	{
-	    if (eap->cmdidx == CMD_argdo)
+	    यदि (eap->cmdidx == CMD_argdo)
 	    {
 		// go to argument "i"
-		if (i == ARGCOUNT)
-		    break;
+		यदि (i == ARGCOUNT)
+		    भङ्ग;
 		// Don't call do_argfile() when already there, it will try
 		// reloading the file.
-		if (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
+		यदि (curwin->w_arg_idx != i || !editing_arg_idx(curwin))
 		{
 		    // Clear 'shm' to avoid that the file message overwrites
 		    // any output from the command.
-		    save_clear_shm_value();
+		    save_clear_shm_मूल्य();
 		    do_argfile(eap, i);
-		    restore_shm_value();
+		    restore_shm_मूल्य();
 		}
-		if (curwin->w_arg_idx != i)
-		    break;
+		यदि (curwin->w_arg_idx != i)
+		    भङ्ग;
 	    }
-	    else if (eap->cmdidx == CMD_windo)
+	    अन्यथा यदि (eap->cmdidx == CMD_windo)
 	    {
 		// go to window "wp"
-		if (!win_valid(wp))
-		    break;
+		यदि (!win_valid(wp))
+		    भङ्ग;
 		win_goto(wp);
-		if (curwin != wp)
-		    break;  // something must be wrong
+		यदि (curwin != wp)
+		    भङ्ग;  // something must be wrong
 		wp = curwin->w_next;
 	    }
-	    else if (eap->cmdidx == CMD_tabdo)
+	    अन्यथा यदि (eap->cmdidx == CMD_tabdo)
 	    {
 		// go to window "tp"
-		if (!valid_tabpage(tp))
-		    break;
+		यदि (!valid_tabpage(tp))
+		    भङ्ग;
 		goto_tabpage_tp(tp, TRUE, TRUE);
 		tp = tp->tp_next;
 	    }
-	    else if (eap->cmdidx == CMD_bufdo)
+	    अन्यथा यदि (eap->cmdidx == CMD_bufdo)
 	    {
 		// Remember the number of the next listed buffer, in case
 		// ":bwipe" is used or autocommands do something strange.
 		next_fnum = -1;
-		for (buf = curbuf->b_next; buf != NULL; buf = buf->b_next)
-		    if (buf->b_p_bl)
+		प्रति (buf = curbuf->b_next; buf != रिक्त; buf = buf->b_next)
+		    यदि (buf->b_p_bl)
 		    {
 			next_fnum = buf->b_fnum;
-			break;
+			भङ्ग;
 		    }
 	    }
 
@@ -670,90 +670,90 @@ ex_listdo(exarg_T *eap)
 	    do_cmdline(eap->arg, eap->ea_getline, eap->cookie,
 						DOCMD_VERBOSE + DOCMD_NOWAIT);
 
-	    if (eap->cmdidx == CMD_bufdo)
+	    यदि (eap->cmdidx == CMD_bufdo)
 	    {
 		// Done?
-		if (next_fnum < 0 || next_fnum > eap->line2)
-		    break;
+		यदि (next_fnum < 0 || next_fnum > eap->line2)
+		    भङ्ग;
 		// Check if the buffer still exists.
 		FOR_ALL_BUFFERS(buf)
-		    if (buf->b_fnum == next_fnum)
-			break;
-		if (buf == NULL)
-		    break;
+		    यदि (buf->b_fnum == next_fnum)
+			भङ्ग;
+		यदि (buf == रिक्त)
+		    भङ्ग;
 
 		// Go to the next buffer.  Clear 'shm' to avoid that the file
 		// message overwrites any output from the command.
-		save_clear_shm_value();
+		save_clear_shm_मूल्य();
 		goto_buffer(eap, DOBUF_FIRST, FORWARD, next_fnum);
-		restore_shm_value();
+		restore_shm_मूल्य();
 
 		// If autocommands took us elsewhere, quit here.
-		if (curbuf->b_fnum != next_fnum)
-		    break;
+		यदि (curbuf->b_fnum != next_fnum)
+		    भङ्ग;
 	    }
 
 #ifdef FEAT_QUICKFIX
-	    if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
+	    यदि (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 		    || eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	    {
-		if (i >= qf_size || i >= eap->line2)
-		    break;
+		यदि (i >= qf_size || i >= eap->line2)
+		    भङ्ग;
 
 		qf_idx = qf_get_cur_idx(eap);
 
-		save_clear_shm_value();
+		save_clear_shm_मूल्य();
 		ex_cnext(eap);
-		restore_shm_value();
+		restore_shm_मूल्य();
 
 		// If jumping to the next quickfix entry fails, quit here
-		if (qf_get_cur_idx(eap) == qf_idx)
-		    break;
+		यदि (qf_get_cur_idx(eap) == qf_idx)
+		    भङ्ग;
 	    }
 #endif
 
-	    if (eap->cmdidx == CMD_windo)
+	    यदि (eap->cmdidx == CMD_windo)
 	    {
 		validate_cursor();	// cursor may have moved
 
 		// required when 'scrollbind' has been set
-		if (curwin->w_p_scb)
+		यदि (curwin->w_p_scb)
 		    do_check_scrollbind(TRUE);
 	    }
 
-	    if (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
-		if (i+1 > eap->line2)
-		    break;
-	    if (eap->cmdidx == CMD_argdo && i >= eap->line2)
-		break;
+	    यदि (eap->cmdidx == CMD_windo || eap->cmdidx == CMD_tabdo)
+		यदि (i+1 > eap->line2)
+		    भङ्ग;
+	    यदि (eap->cmdidx == CMD_argdo && i >= eap->line2)
+		भङ्ग;
 	}
 	listcmd_busy = FALSE;
     }
 
-#if defined(FEAT_SYN_HL)
-    if (save_ei != NULL)
+#यदि defined(FEAT_SYN_HL)
+    यदि (save_ei != रिक्त)
     {
 	buf_T		*bnext;
 	aco_save_T	aco;
 
 	au_event_restore(save_ei);
 
-	for (buf = firstbuf; buf != NULL; buf = bnext)
+	प्रति (buf = firstbuf; buf != रिक्त; buf = bnext)
 	{
 	    bnext = buf->b_next;
-	    if (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_SET))
+	    यदि (buf->b_nwindows > 0 && (buf->b_flags & BF_SYN_SET))
 	    {
 		buf->b_flags &= ~BF_SYN_SET;
 
 		// buffer was opened while Syntax autocommands were disabled,
 		// need to trigger them now.
-		if (buf == curbuf)
+		यदि (buf == curbuf)
 		    apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn,
 					       curbuf->b_fname, TRUE, curbuf);
-		else
+		अन्यथा
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    यदि (curbuf == buf)
 		    {
 			apply_autocmds(EVENT_SYNTAX, buf->b_p_syn,
 						      buf->b_fname, TRUE, buf);
@@ -779,32 +779,32 @@ ex_listdo(exarg_T *eap)
 /*
  * ":compiler[!] {name}"
  */
-    void
+    शून्य
 ex_compiler(exarg_T *eap)
 {
     char_u	*buf;
-    char_u	*old_cur_comp = NULL;
+    char_u	*old_cur_comp = रिक्त;
     char_u	*p;
 
-    if (*eap->arg == NUL)
+    यदि (*eap->arg == NUL)
     {
 	// List all compiler scripts.
 	do_cmdline_cmd((char_u *)"echo globpath(&rtp, 'compiler/*.vim')");
 					// ) keep the indenter happy...
-	return;
+	प्रत्यागम;
     }
 
     buf = alloc(STRLEN(eap->arg) + 14);
-    if (buf == NULL)
-	return;
+    यदि (buf == रिक्त)
+	प्रत्यागम;
 
-    if (eap->forceit)
+    यदि (eap->forceit)
     {
 	// ":compiler! {name}" sets global options
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet set <args>");
     }
-    else
+    अन्यथा
     {
 	// ":compiler! {name}" sets local options.
 	// To remain backwards compatible "current_compiler" is always
@@ -812,8 +812,8 @@ ex_compiler(exarg_T *eap)
 	// plugin will then skip the settings.  Afterwards set
 	// "b:current_compiler" and restore "current_compiler".
 	// Explicitly prepend "g:" to make it work in a function.
-	old_cur_comp = get_var_value((char_u *)"g:current_compiler");
-	if (old_cur_comp != NULL)
+	old_cur_comp = get_var_मूल्य((char_u *)"g:current_compiler");
+	यदि (old_cur_comp != रिक्त)
 	    old_cur_comp = vim_strsave(old_cur_comp);
 	do_cmdline_cmd((char_u *)
 		"command -nargs=* -keepscript CompilerSet setlocal <args>");
@@ -821,47 +821,47 @@ ex_compiler(exarg_T *eap)
     do_unlet((char_u *)"g:current_compiler", TRUE);
     do_unlet((char_u *)"b:current_compiler", TRUE);
 
-    sprintf((char *)buf, "compiler/%s.vim", eap->arg);
-    if (source_runtime(buf, DIP_ALL) == FAIL)
+    प्र_लिखो((वर्ण *)buf, "compiler/%s.vim", eap->arg);
+    यदि (source_runtime(buf, DIP_ALL) == FAIL)
 	semsg(_(e_compiler_not_supported_str), eap->arg);
     vim_free(buf);
 
     do_cmdline_cmd((char_u *)":delcommand CompilerSet");
 
     // Set "b:current_compiler" from "current_compiler".
-    p = get_var_value((char_u *)"g:current_compiler");
-    if (p != NULL)
+    p = get_var_मूल्य((char_u *)"g:current_compiler");
+    यदि (p != रिक्त)
 	set_internal_string_var((char_u *)"b:current_compiler", p);
 
     // Restore "current_compiler" for ":compiler {name}".
-    if (!eap->forceit)
+    यदि (!eap->forceit)
     {
-	if (old_cur_comp != NULL)
+	यदि (old_cur_comp != रिक्त)
 	{
 	    set_internal_string_var((char_u *)"g:current_compiler",
 		    old_cur_comp);
 	    vim_free(old_cur_comp);
 	}
-	else
+	अन्यथा
 	    do_unlet((char_u *)"g:current_compiler", TRUE);
     }
 }
 #endif
 
-#if defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
+#यदि defined(FEAT_PYTHON3) || defined(FEAT_PYTHON)
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# यदि defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 /*
  * Detect Python 3 or 2, and initialize 'pyxversion'.
  */
-    void
-init_pyxversion(void)
+    शून्य
+init_pyxversion(शून्य)
 {
-    if (p_pyx == 0)
+    यदि (p_pyx == 0)
     {
-	if (python3_enabled(FALSE))
+	यदि (python3_enabled(FALSE))
 	    p_pyx = 3;
-	else if (python_enabled(FALSE))
+	अन्यथा यदि (python_enabled(FALSE))
 	    p_pyx = 2;
     }
 }
@@ -876,71 +876,71 @@ init_pyxversion(void)
  * "# requires python 3.x"  => returns 3
  * otherwise return 0.
  */
-    static int
+    स्थिर पूर्णाङ्क
 requires_py_version(char_u *filename)
 {
-    FILE    *file;
-    int	    requires_py_version = 0;
-    int	    i, lines;
+    खाता    *file;
+    पूर्णाङ्क	    requires_py_version = 0;
+    पूर्णाङ्क	    i, पंक्तियाँ;
 
-    lines = (int)p_mls;
-    if (lines < 0)
-	lines = 5;
+    पंक्तियाँ = (पूर्णाङ्क)p_mls;
+    यदि (पंक्तियाँ < 0)
+	पंक्तियाँ = 5;
 
-    file = mch_fopen((char *)filename, "r");
-    if (file == NULL)
-	return 0;
+    file = mch_fopen((वर्ण *)filename, "r");
+    यदि (file == रिक्त)
+	प्रत्यागम 0;
 
-    for (i = 0; i < lines; i++)
+    प्रति (i = 0; i < पंक्तियाँ; i++)
     {
-	if (vim_fgets(IObuff, IOSIZE, file))
-	    break;
-	if (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
+	यदि (vim_fgets(IObuff, IOSIZE, file))
+	    भङ्ग;
+	यदि (i == 0 && IObuff[0] == '#' && IObuff[1] == '!')
 	{
 	    // Check shebang.
-	    if (strstr((char *)IObuff + 2, "python2") != NULL)
+	    यदि (म_माला((वर्ण *)IObuff + 2, "python2") != रिक्त)
 	    {
 		requires_py_version = 2;
-		break;
+		भङ्ग;
 	    }
-	    if (strstr((char *)IObuff + 2, "python3") != NULL)
+	    यदि (म_माला((वर्ण *)IObuff + 2, "python3") != रिक्त)
 	    {
 		requires_py_version = 3;
-		break;
+		भङ्ग;
 	    }
 	}
 	IObuff[21] = '\0';
-	if (STRCMP("# requires python 2.x", IObuff) == 0)
+	यदि (STRCMP("# requires python 2.x", IObuff) == 0)
 	{
 	    requires_py_version = 2;
-	    break;
+	    भङ्ग;
 	}
-	if (STRCMP("# requires python 3.x", IObuff) == 0)
+	यदि (STRCMP("# requires python 3.x", IObuff) == 0)
 	{
 	    requires_py_version = 3;
-	    break;
+	    भङ्ग;
 	}
     }
-    fclose(file);
-    return requires_py_version;
+    ख_बंद(file);
+    प्रत्यागम requires_py_version;
 }
 
 
 /*
  * Source a python file using the requested python version.
  */
-    static void
+    स्थिर शून्य
 source_pyx_file(exarg_T *eap, char_u *fname)
 {
     exarg_T ex;
-    int	    v = requires_py_version(fname);
+    पूर्णाङ्क	    v = requires_py_version(fname);
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# यदि defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
 # endif
-    if (v == 0)
+    यदि (v == 0)
     {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# यदि defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
 	// user didn't choose a preference, 'pyx' is used
 	v = p_pyx;
 # elif defined(FEAT_PYTHON)
@@ -954,43 +954,43 @@ source_pyx_file(exarg_T *eap, char_u *fname)
      * now source, if required python version is not supported show
      * unobtrusive message.
      */
-    if (eap == NULL)
+    यदि (eap == रिक्त)
 	CLEAR_FIELD(ex);
-    else
+    अन्यथा
 	ex = *eap;
     ex.arg = fname;
     ex.cmd = (char_u *)(v == 2 ? "pyfile" : "pyfile3");
 
-    if (v == 2)
+    यदि (v == 2)
     {
 # ifdef FEAT_PYTHON
 	ex_pyfile(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# अन्यथा
+	vim_snprintf((वर्ण *)IObuff, IOSIZE,
 		_("W20: Required python version 2.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	संदेश((वर्ण *)IObuff);
 # endif
-	return;
+	प्रत्यागम;
     }
-    else
+    अन्यथा
     {
 # ifdef FEAT_PYTHON3
 	ex_py3file(&ex);
-# else
-	vim_snprintf((char *)IObuff, IOSIZE,
+# अन्यथा
+	vim_snprintf((वर्ण *)IObuff, IOSIZE,
 		_("W21: Required python version 3.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	संदेश((वर्ण *)IObuff);
 # endif
-	return;
+	प्रत्यागम;
     }
 }
 
 /*
  * ":pyxfile {fname}"
  */
-    void
+    शून्य
 ex_pyxfile(exarg_T *eap)
 {
     source_pyx_file(eap, eap->arg);
@@ -999,14 +999,14 @@ ex_pyxfile(exarg_T *eap)
 /*
  * ":pyx"
  */
-    void
+    शून्य
 ex_pyx(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# यदि defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    यदि (p_pyx == 2)
 	ex_python(eap);
-    else
+    अन्यथा
 	ex_py3(eap);
 # elif defined(FEAT_PYTHON)
     ex_python(eap);
@@ -1018,14 +1018,14 @@ ex_pyx(exarg_T *eap)
 /*
  * ":pyxdo"
  */
-    void
+    शून्य
 ex_pyxdo(exarg_T *eap)
 {
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# यदि defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    यदि (p_pyx == 2)
 	ex_pydo(eap);
-    else
+    अन्यथा
 	ex_py3do(eap);
 # elif defined(FEAT_PYTHON)
     ex_pydo(eap);
@@ -1039,20 +1039,20 @@ ex_pyxdo(exarg_T *eap)
 /*
  * ":checktime [buffer]"
  */
-    void
+    शून्य
 ex_checktime(exarg_T *eap)
 {
     buf_T	*buf;
-    int		save_no_check_timestamps = no_check_timestamps;
+    पूर्णाङ्क		save_no_check_timestamps = no_check_timestamps;
 
     no_check_timestamps = 0;
-    if (eap->addr_count == 0)	// default is all buffers
+    यदि (eap->addr_गिनती == 0)	// default is all buffers
 	check_timestamps(FALSE);
-    else
+    अन्यथा
     {
-	buf = buflist_findnr((int)eap->line2);
-	if (buf != NULL)	// cannot happen?
-	    (void)buf_check_timestamp(buf, FALSE);
+	buf = buflist_findnr((पूर्णाङ्क)eap->line2);
+	यदि (buf != रिक्त)	// cannot happen?
+	    (शून्य)buf_check_timestamp(buf, FALSE);
     }
     no_check_timestamps = save_no_check_timestamps;
 }

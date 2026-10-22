@@ -7,7 +7,7 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 /*
  * Vim originated from Stevie version 3.6 (Fish disk 217) by GRWalter (Fred)
@@ -23,142 +23,142 @@
  * interesting.
  */
 
-#include "version.h"
+#अन्तर्भाव "version.h"
 
-char		*Version = VIM_VERSION_SHORT;
-static char	*mediumVersion = VIM_VERSION_MEDIUM;
+वर्ण		*Version = VIM_VERSION_SHORT;
+स्थिर वर्ण	*mediumVersion = VIM_VERSION_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
-char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
-						      + sizeof(__TIME__) + 3];
+#यदि defined(HAVE_DATE_TIME)
+# यदि defined(VMS) && defined(VAXC)
+वर्ण	longVersion[परिमाण(VIM_VERSION_LONG_DATE) + परिमाण(__DATE__)
+						      + परिमाण(__TIME__) + 3];
 
-    void
-init_longVersion(void)
+    शून्य
+init_longVersion(शून्य)
 {
     /*
      * Construct the long version string.  Necessary because
      * VAX C can't concatenate strings in the preprocessor.
      */
-    strcpy(longVersion, VIM_VERSION_LONG_DATE);
+    म_नकल(longVersion, VIM_VERSION_LONG_DATE);
 #  ifdef BUILD_DATE
-    strcat(longVersion, BUILD_DATE);
-#  else
-    strcat(longVersion, __DATE__);
-    strcat(longVersion, " ");
-    strcat(longVersion, __TIME__);
+    म_जोड़ो(longVersion, BUILD_DATE);
+#  अन्यथा
+    म_जोड़ो(longVersion, __DATE__);
+    म_जोड़ो(longVersion, " ");
+    म_जोड़ो(longVersion, __TIME__);
 #  endif
-    strcat(longVersion, ")");
+    म_जोड़ो(longVersion, ")");
 }
 
-# else
-char	*longVersion = NULL;
+# अन्यथा
+वर्ण	*longVersion = रिक्त;
 
-    void
-init_longVersion(void)
+    शून्य
+init_longVersion(शून्य)
 {
-    if (longVersion != NULL)
-	return;
+    यदि (longVersion != रिक्त)
+	प्रत्यागम;
 
 #  ifdef BUILD_DATE
-    char *date_time = BUILD_DATE;
-#  else
-    char *date_time = __DATE__ " " __TIME__;
+    वर्ण *date_time = BUILD_DATE;
+#  अन्यथा
+    वर्ण *date_time = __DATE__ " " __TIME__;
 #  endif
-    char *msg = _("%s (%s, compiled %s)");
-    size_t len = strlen(msg)
+    वर्ण *संदेश = _("%s (%s, compiled %s)");
+    माप_प्रकार len = म_माप(संदेश)
 	+ STRLEN_LITERAL(VIM_VERSION_LONG_ONLY)
 	+ STRLEN_LITERAL(VIM_VERSION_DATE_ONLY)
-	+ strlen(date_time);
+	+ म_माप(date_time);
 
     longVersion = alloc(len);
-    if (longVersion == NULL)
+    यदि (longVersion == रिक्त)
 	longVersion = VIM_VERSION_LONG;
-    else
-	vim_snprintf(longVersion, len, msg,
+    अन्यथा
+	vim_snprintf(longVersion, len, संदेश,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
-#else
-char	*longVersion = VIM_VERSION_LONG;
+#अन्यथा
+वर्ण	*longVersion = VIM_VERSION_LONG;
 
-    void
-init_longVersion(void)
+    शून्य
+init_longVersion(शून्य)
 {
     // nothing to do
 }
 #endif
 
-static char *(features[]) =
+स्थिर वर्ण *(features[]) =
 {
 #ifdef HAVE_ACL
 	"+acl",
-#else
+#अन्यथा
 	"-acl",
 #endif
 #ifdef FEAT_ARABIC
 	"+arabic",
-#else
+#अन्यथा
 	"-arabic",
 #endif
 #ifdef AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# अन्यथा
 	"-ARP",
 # endif
 #endif
 #ifdef FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#अन्यथा
 	"-autochdir",
 #endif
 	"+autocmd",
 #ifdef FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#अन्यथा
 	"-autoservername",
 #endif
 #ifdef FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#अन्यथा
 	"-balloon_eval",
 #endif
 #ifdef FEAT_BEVAL_TERM
 	"+balloon_eval_term",
-#else
+#अन्यथा
 	"-balloon_eval_term",
 #endif
 #ifdef FEAT_BROWSE
 	"+browse",
-#else
+#अन्यथा
 	"-browse",
 #endif
 	"++builtin_terms",
 #ifdef FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#अन्यथा
 	"-byte_offset",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+channel",
-#else
+#अन्यथा
 	"-channel",
 #endif
 	"+cindent",
 #ifdef FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#अन्यथा
 	"-clientserver",
 #endif
 #ifdef FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#अन्यथा
 	"-clipboard",
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#अन्यथा
 	"-clipboard_provider",
 #endif
 	"+cmdline_compl",
@@ -167,159 +167,159 @@ static char *(features[]) =
 	"+comments",
 #ifdef FEAT_CONCEAL
 	"+conceal",
-#else
+#अन्यथा
 	"-conceal",
 #endif
 #ifdef FEAT_CRYPT
 	"+cryptv",
-#else
+#अन्यथा
 	"-cryptv",
 #endif
 #ifdef FEAT_CSCOPE
 	"+cscope",
-#else
+#अन्यथा
 	"-cscope",
 #endif
 	"+cursorbind",
 #ifdef CURSOR_SHAPE
 	"+cursorshape",
-#else
+#अन्यथा
 	"-cursorshape",
 #endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#यदि defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#अन्यथा
+# यदि defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# अन्यथा
+#  यदि defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  अन्यथा
 	"-dialog",
 #  endif
 # endif
 #endif
 #ifdef FEAT_DIFF
 	"+diff",
-#else
+#अन्यथा
 	"-diff",
 #endif
 #ifdef FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#अन्यथा
 	"-digraphs",
 #endif
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# अन्यथा
 	"-directx",
 # endif
 #endif
 #ifdef FEAT_DND
 	"+dnd",
-#else
+#अन्यथा
 	"-dnd",
 #endif
 	"-ebcdic",
 #ifdef FEAT_EMACS_TAGS
 	"+emacs_tags",
-#else
+#अन्यथा
 	"-emacs_tags",
 #endif
 #ifdef FEAT_EVAL
 	"+eval",
-#else
+#अन्यथा
 	"-eval",
 #endif
 	"+ex_extra",
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_खोज_EXTRA
 	"+extra_search",
-#else
+#अन्यथा
 	"-extra_search",
 #endif
 	"-farsi",
 	"+file_in_path",
 #ifdef FEAT_FIND_ID
 	"+find_in_path",
-#else
+#अन्यथा
 	"-find_in_path",
 #endif
 	"+float",
 #ifdef FEAT_FOLDING
 	"+folding",
-#else
+#अन्यथा
 	"-folding",
 #endif
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#यदि !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
 #endif
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# अन्यथा
 	"+gettext",
 # endif
-#else
+#अन्यथा
 	"-gettext",
 #endif
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#यदि (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# अन्यथा
 	"+iconv",
 # endif
-#else
+#अन्यथा
 	"-iconv",
 #endif
 #ifdef FEAT_IMAGE
 	"+image",
-#else
+#अन्यथा
 	"-image",
 #endif
 #ifdef FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#अन्यथा
 	"-image_popup",
 #endif
 	"+insert_expand",
 #ifdef FEAT_IPV6
 	"+ipv6",
-#else
+#अन्यथा
 	"-ipv6",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+job",
-#else
+#अन्यथा
 	"-job",
 #endif
 	"+jumplist",
 #ifdef FEAT_KEYMAP
 	"+keymap",
-#else
+#अन्यथा
 	"-keymap",
 #endif
 #ifdef FEAT_EVAL
 	"+lambda",
-#else
+#अन्यथा
 	"-lambda",
 #endif
 #ifdef FEAT_LANGMAP
 	"+langmap",
-#else
+#अन्यथा
 	"-langmap",
 #endif
 #ifdef FEAT_LIBCALL
 	"+libcall",
-#else
+#अन्यथा
 	"-libcall",
 #endif
 #ifdef FEAT_LINEBREAK
 	"+linebreak",
-#else
+#अन्यथा
 	"-linebreak",
 #endif
 	"+lispindent",
@@ -328,47 +328,47 @@ static char *(features[]) =
 #ifdef FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# अन्यथा
 	"+lua",
 # endif
-#else
+#अन्यथा
 	"-lua",
 #endif
 #ifdef FEAT_MENU
 	"+menu",
-#else
+#अन्यथा
 	"-menu",
 #endif
 #ifdef FEAT_SESSION
 	"+mksession",
-#else
+#अन्यथा
 	"-mksession",
 #endif
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#यदि defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# अन्यथा
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  अन्यथा
 	"+mouse_gpm",
 #  endif
-# else
+# अन्यथा
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# अन्यथा
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# अन्यथा
 	"-mouse_netterm",
 # endif
 #endif
@@ -376,212 +376,212 @@ static char *(features[]) =
 #ifdef __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# अन्यथा
 	"-mouse_pterm",
 # endif
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#यदि defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# अन्यथा
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# अन्यथा
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
 #endif
 #ifdef FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#अन्यथा
 	"-mouseshape",
 #endif
 
 #ifdef FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# अन्यथा
 	"+multi_byte_ime",
 # endif
-#else
+#अन्यथा
 	"+multi_byte",
 #endif
 #ifdef FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#अन्यथा
 	"-multi_lang",
 #endif
 #ifdef FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# अन्यथा
 	"+mzscheme",
 # endif
-#else
+#अन्यथा
 	"-mzscheme",
 #endif
 #ifdef FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#अन्यथा
 	"-netbeans_intg",
 #endif
 	"+num64",
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# अन्यथा
 	"-ole",
 # endif
 #endif
 #ifdef FEAT_EVAL
 	"+packages",
-#else
+#अन्यथा
 	"-packages",
 #endif
 #ifdef FEAT_PRINT_PANGO
 	"+pango",
-#else
+#अन्यथा
 	"-pango",
 #endif
 	"+path_extra",
 #ifdef FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# अन्यथा
 	"+perl",
 # endif
-#else
+#अन्यथा
 	"-perl",
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#अन्यथा
 	"-persistent_undo",
 #endif
 #ifdef FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#अन्यथा
 	"-popupwin",
 #endif
 #ifdef FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# अन्यथा
 	"-postscript",
 # endif
 	"+printer",
-#else
+#अन्यथा
 	"-printer",
 #endif
 #ifdef FEAT_PROFILE
 	"+profile",
-#else
+#अन्यथा
 	"-profile",
 #endif
 #ifdef FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# अन्यथा
 	"+python",
 # endif
-#else
+#अन्यथा
 	"-python",
 #endif
 #ifdef FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  अन्यथा
 	"+python3/dyn",
 #  endif
-# else
+# अन्यथा
 	"+python3",
 # endif
-#else
+#अन्यथा
 	"-python3",
 #endif
 #ifdef FEAT_QUICKFIX
 	"+quickfix",
-#else
+#अन्यथा
 	"-quickfix",
 #endif
 #ifdef FEAT_RELTIME
 	"+reltime",
-#else
+#अन्यथा
 	"-reltime",
 #endif
 #ifdef FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#अन्यथा
 	"-rightleft",
 #endif
 #ifdef FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# अन्यथा
 	"+ruby",
 # endif
-#else
+#अन्यथा
 	"-ruby",
 #endif
 	"+scrollbind",
 #ifdef FEAT_SIGNS
 	"+signs",
-#else
+#अन्यथा
 	"-signs",
 #endif
 	"+smartindent",
 #ifdef FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#अन्यथा
 	"-socketserver",
 #endif
 #ifdef FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# अन्यथा
 	"+sodium",
 # endif
-#else
+#अन्यथा
 	"-sodium",
 #endif
 #ifdef FEAT_SOUND
 	"+sound",
-#else
+#अन्यथा
 	"-sound",
 #endif
 #ifdef FEAT_SPELL
 	"+spell",
-#else
+#अन्यथा
 	"-spell",
 #endif
 #ifdef STARTUPTIME
 	"+startuptime",
-#else
+#अन्यथा
 	"-startuptime",
 #endif
 #ifdef FEAT_STL_OPT
 	"+statusline",
-#else
+#अन्यथा
 	"-statusline",
 #endif
 	"-sun_workshop",
 #ifdef FEAT_SYN_HL
 	"+syntax",
-#else
+#अन्यथा
 	"-syntax",
 #endif
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#यदि defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
 #endif
-#if defined(FEAT_TABPANEL)
+#यदि defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#अन्यथा
 	"-tabpanel",
 #endif
 	"-tag_any_white",
@@ -590,71 +590,71 @@ static char *(features[]) =
 #ifdef FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# अन्यथा
 	"+tcl",
 # endif
-#else
+#अन्यथा
 	"-tcl",
 #endif
 #ifdef FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#अन्यथा
 	"-termguicolors",
 #endif
 #ifdef FEAT_TERMINAL
 	"+terminal",
-#else
+#अन्यथा
 	"-terminal",
 #endif
-#if defined(UNIX)
+#यदि defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# अन्यथा
 	"-terminfo",
 # endif
 #endif
 #ifdef FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#अन्यथा
 	"-termresponse",
 #endif
 	"+textobjects",
 #ifdef FEAT_PROP_POPUP
 	"+textprop",
-#else
+#अन्यथा
 	"-textprop",
 #endif
-#if !defined(UNIX)
+#यदि !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# अन्यथा
 	"-tgetent",
 # endif
 #endif
 #ifdef FEAT_TIMERS
 	"+timers",
-#else
+#अन्यथा
 	"-timers",
 #endif
 	"+title",
 #ifdef FEAT_TOOLBAR
 	"+toolbar",
-#else
+#अन्यथा
 	"-toolbar",
 #endif
 	"+user_commands",
 #ifdef FEAT_VARTABS
 	"+vartabs",
-#else
+#अन्यथा
 	"-vartabs",
 #endif
 	"+vertsplit",
 	"+vim9script",
 #ifdef FEAT_VIMINFO
 	"+viminfo",
-#else
+#अन्यथा
 	"-viminfo",
 #endif
 	"+virtualedit",
@@ -664,18 +664,18 @@ static char *(features[]) =
 #ifdef MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# अन्यथा
 	"-vtp",
 # endif
 #endif
 #ifdef FEAT_WAYLAND
 	"+wayland",
-#else
+#अन्यथा
 	"-wayland",
 #endif
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#अन्यथा
 	"-wayland_clipboard",
 #endif
 	"+wildignore",
@@ -683,65 +683,65 @@ static char *(features[]) =
 	"+windows",
 #ifdef FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#अन्यथा
 	"-writebackup",
 #endif
-#if defined(UNIX) || defined(VMS)
+#यदि defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# अन्यथा
 	"-X11",
 # endif
 #endif
 #ifdef FEAT_XATTR
 	"+xattr",
-#else
+#अन्यथा
 	"-xattr",
 #endif
 #ifdef FEAT_XFONTSET
 	"+xfontset",
-#else
+#अन्यथा
 	"-xfontset",
 #endif
 #ifdef FEAT_XIM
 	"+xim",
-#else
+#अन्यथा
 	"-xim",
 #endif
-#if defined(MSWIN)
+#यदि defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# अन्यथा
 	"-xpm_w32",
 # endif
-#elif defined(HAVE_XPM)
+#नोचेद्यदि defined(HAVE_XPM)
 	"+xpm",
-#else
+#अन्यथा
 	"-xpm",
 #endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#यदि defined(UNIX) || defined(VMS)
+# यदि defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# अन्यथा
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# अन्यथा
 	"-xterm_clipboard",
 # endif
 #endif
 #ifdef FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#अन्यथा
 	"-xterm_save",
 #endif
-	NULL
+	रिक्त
 };
 
-static int included_patches[] =
+स्थिर पूर्णाङ्क included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3204,56 +3204,56 @@ static int included_patches[] =
  * See the official Vim patches for the diff format: It must use a context of
  * one line only.  Create it by hand or use "diff -C2" and edit the patch.
  */
-static char *(extra_patches[]) =
+स्थिर वर्ण *(extra_patches[]) =
 {   /* Add your patch description below this line */
 /**/
-    NULL
+    रिक्त
 };
 
-    int
-highest_patch(void)
+    पूर्णाङ्क
+highest_patch(शून्य)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    प्रत्यागम included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#यदि defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    पूर्णाङ्क
+has_patch(पूर्णाङ्क n)
 {
-    int		h, m, l;
+    पूर्णाङ्क		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (पूर्णाङ्क)ARRAY_LENGTH(included_patches) - 1;
+    प्रति (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
-	    break;
-	if (included_patches[m] < n)
+	यदि (included_patches[m] == n)
+	    प्रत्यागम TRUE;
+	यदि (l == h)
+	    भङ्ग;
+	यदि (included_patches[m] < n)
 	    h = m;
-	else
+	अन्यथा
 	    l = m + 1;
     }
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 #endif
 
-    void
+    शून्य
 ex_version(exarg_T *eap)
 {
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    यदि (*eap->arg == NUL)
     {
-	msg_putchar('\n');
+	संदेश_putchar('\n');
 	list_version();
     }
 }
@@ -3263,35 +3263,35 @@ ex_version(exarg_T *eap)
  * newline, unless the message is too long to fit on the screen anyway.
  * When "wrap" is TRUE wrap the string in [].
  */
-    static void
-version_msg_wrap(char_u *s, int wrap)
+    स्थिर शून्य
+version_संदेश_wrap(char_u *s, पूर्णाङ्क wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    पूर्णाङ्क		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    यदि (!got_int && len < cmdline_width && संदेश_col + len >= cmdline_width
 								&& *s != '\n')
-	msg_putchar('\n');
-    if (!got_int)
+	संदेश_putchar('\n');
+    यदि (!got_int)
     {
-	if (wrap)
-	    msg_puts("[");
-	msg_puts((char *)s);
-	if (wrap)
-	    msg_puts("]");
+	यदि (wrap)
+	    संदेश_puts("[");
+	संदेश_puts((वर्ण *)s);
+	यदि (wrap)
+	    संदेश_puts("]");
     }
 }
 
-    static void
-version_msg(char *s)
+    स्थिर शून्य
+version_संदेश(वर्ण *s)
 {
-    version_msg_wrap((char_u *)s, FALSE);
+    version_संदेश_wrap((char_u *)s, FALSE);
 }
 
 /*
  * List all features aligned in columns, dictionary style.
  */
-    static void
-list_features(void)
+    स्थिर शून्य
+list_features(शून्य)
 {
     list_in_columns((char_u **)features, -1, -1);
 }
@@ -3301,167 +3301,167 @@ list_features(void)
  * When "size" is < 0 then the last entry is marked with NULL.
  * The entry with index "current" is inclosed in [].
  */
-    void
-list_in_columns(char_u **items, int size, int current)
+    शून्य
+list_in_columns(char_u **वस्तुएँ, पूर्णाङ्क size, पूर्णाङ्क current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		ncol;
+    पूर्णाङ्क		nrow;
+    पूर्णाङ्क		cur_row = 1;
+    पूर्णाङ्क		item_गिनती = 0;
+    पूर्णाङ्क		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    पूर्णाङ्क		use_highlight = (वस्तुएँ == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    प्रति (i = 0; size < 0 ? वस्तुएँ[i] != रिक्त : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	पूर्णाङ्क l = vim_strsize(वस्तुएँ[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
+	यदि (l > width)
 	    width = l;
-	++item_count;
+	++item_गिनती;
     }
     width += 1;
 
-    if (cmdline_width < width)
+    यदि (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	प्रति (i = 0; i < item_गिनती; ++i)
 	{
-	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
-		msg_putchar('\n');
+	    version_संदेश_wrap(वस्तुएँ[i], i == current);
+	    यदि (संदेश_col > 0 && i < item_गिनती - 1)
+		संदेश_putchar('\n');
 	}
-	return;
+	प्रत्यागम;
     }
 
     // The rightmost column doesn't need a separator.
     // Sacrifice it to fit in one more column if possible.
     ncol = (cmdline_width + 1) / width;
-    nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
+    nrow = item_गिनती / ncol + ((item_गिनती % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    प्रति (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	पूर्णाङ्क idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	यदि (idx < item_गिनती)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    पूर्णाङ्क last_col = (i + 1) % ncol == 0;
 
-	    if (idx == current)
-		msg_putchar('[');
+	    यदि (idx == current)
+		संदेश_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
-		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
+	    यदि (use_highlight && वस्तुएँ[idx][0] == '-')
+		संदेश_puts_attr((वर्ण *)वस्तुएँ[idx], HL_ATTR(HLF_W));
+	    अन्यथा
 #endif
-		msg_puts((char *)items[idx]);
-	    if (idx == current)
-		msg_putchar(']');
-	    if (last_col)
+		संदेश_puts((वर्ण *)वस्तुएँ[idx]);
+	    यदि (idx == current)
+		संदेश_putchar(']');
+	    यदि (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
-		    msg_putchar('\n');
+		यदि (संदेश_col > 0 && cur_row < nrow)
+		    संदेश_putchar('\n');
 		++cur_row;
 	    }
-	    else
+	    अन्यथा
 	    {
-		while (msg_col % width)
-		    msg_putchar(' ');
+		यावत् (संदेश_col % width)
+		    संदेश_putchar(' ');
 	    }
 	}
-	else
+	अन्यथा
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    यदि (संदेश_col > 0)
 	    {
-		if (cur_row < nrow)
-		    msg_putchar('\n');
+		यदि (cur_row < nrow)
+		    संदेश_putchar('\n');
 		++cur_row;
 	    }
 	}
     }
 }
 
-    void
-list_version(void)
+    शून्य
+list_version(शून्य)
 {
-    int		i;
-    int		first;
-    char	*s = "";
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		first;
+    वर्ण	*s = "";
 
     /*
      * When adding features here, don't forget to update the list of
      * internal variables in eval.c!
      */
     init_longVersion();
-    msg(longVersion);
+    संदेश(longVersion);
 #ifdef MSWIN
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
+#    यदि defined(_M_ARM64) || defined(_M_ARM64EC)
+     संदेश_puts(_("\nMS-Windows ARM64 GUI/console version"));
+#    अन्यथा
+     संदेश_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
+#   अन्यथा
+    संदेश_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  अन्यथा
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
-     msg_puts(_("\nMS-Windows 64-bit GUI version"));
+#    यदि defined(_M_ARM64) || defined(_M_ARM64EC)
+     संदेश_puts(_("\nMS-Windows ARM64 GUI version"));
+#    अन्यथा
+     संदेश_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
-    msg_puts(_("\nMS-Windows 32-bit GUI version"));
+#   अन्यथा
+    संदेश_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
-    msg_puts(_(" with OLE support"));
+    संदेश_puts(_(" with OLE support"));
 #  endif
-# else
+# अन्यथा
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
-    msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
-    msg_puts(_("\nMS-Windows 64-bit console version"));
+#   यदि defined(_M_ARM64) || defined(_M_ARM64EC)
+    संदेश_puts(_("\nMS-Windows ARM64 console version"));
+#   अन्यथा
+    संदेश_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
-    msg_puts(_("\nMS-Windows 32-bit console version"));
+#  अन्यथा
+    संदेश_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
-    msg_puts(_("\nmacOS version"));
-# else
-    msg_puts(_("\nmacOS version w/o darwin feat."));
+#यदि defined(MACOS_X)
+# यदि defined(MACOS_X_DARWIN)
+    संदेश_puts(_("\nmacOS version"));
+# अन्यथा
+    संदेश_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
-    msg_puts(" - arm64");
+# यदि defined(__arm64__)
+    संदेश_puts(" - arm64");
 # elif defined(__x86_64__)
-    msg_puts(" - x86_64");
+    संदेश_puts(" - x86_64");
 # endif
 #endif
 
 #ifdef VMS
-    msg_puts(_("\nOpenVMS (build) arch, version"));
+    संदेश_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    यदि (*compiled_arch != NUL)
     {
-	msg_puts(": ");
-	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	संदेश_puts(": ");
+	संदेश_puts((वर्ण *)compiled_arch);
+	यदि (*compiled_vers != NUL)
 	{
-	    msg_puts(", ");
-	    msg_puts((char *)compiled_vers);
+	    संदेश_puts(", ");
+	    संदेश_puts((वर्ण *)compiled_vers);
 	}
     }
 
@@ -3471,24 +3471,24 @@ list_version(void)
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    यदि (included_patches[0] != 0)
     {
-	msg_puts(_("\nIncluded patches: "));
+	संदेश_puts(_("\nIncluded patches: "));
 	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	i = (पूर्णाङ्क)ARRAY_LENGTH(included_patches) - 1;
+	यावत् (--i >= 0)
 	{
-	    if (first < 0)
+	    यदि (first < 0)
 		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    यदि (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
-		msg_puts(s);
+		संदेश_puts(s);
 		s = ", ";
-		msg_outnum((long)first);
-		if (first != included_patches[i])
+		संदेश_outnum((दीर्घ)first);
+		यदि (first != included_patches[i])
 		{
-		    msg_puts("-");
-		    msg_outnum((long)included_patches[i]);
+		    संदेश_puts("-");
+		    संदेश_outnum((दीर्घ)included_patches[i]);
 		}
 		first = -1;
 	    }
@@ -3496,192 +3496,192 @@ list_version(void)
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    यदि (extra_patches[0] != रिक्त)
     {
-	msg_puts(_("\nExtra patches: "));
+	संदेश_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	प्रति (i = 0; extra_patches[i] != रिक्त; ++i)
 	{
-	    msg_puts(s);
+	    संदेश_puts(s);
 	    s = ", ";
-	    msg_puts(extra_patches[i]);
+	    संदेश_puts(extra_patches[i]);
 	}
     }
 
 #ifdef MODIFIED_BY
-    msg_puts("\n");
-    msg_puts(_("Modified by "));
-    msg_puts(MODIFIED_BY);
+    संदेश_puts("\n");
+    संदेश_puts(_("Modified by "));
+    संदेश_puts(MODIFIED_BY);
 #endif
 
 #ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+    यदि (*compiled_user != NUL || *compiled_sys != NUL)
     {
-	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	संदेश_puts(_("\nCompiled "));
+	यदि (*compiled_user != NUL)
 	{
-	    msg_puts(_("by "));
-	    msg_puts((char *)compiled_user);
+	    संदेश_puts(_("by "));
+	    संदेश_puts((वर्ण *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	यदि (*compiled_sys != NUL)
 	{
-	    msg_puts("@");
-	    msg_puts((char *)compiled_sys);
+	    संदेश_puts("@");
+	    संदेश_puts((वर्ण *)compiled_sys);
 	}
     }
 #endif
 
-#if defined(FEAT_HUGE)
-    msg_puts(_("\nHuge version "));
-#elif defined(FEAT_NORMAL)
-    msg_puts(_("\nNormal version "));
-#else
-    msg_puts(_("\nTiny version "));
+#यदि defined(FEAT_HUGE)
+    संदेश_puts(_("\nHuge version "));
+#नोचेद्यदि defined(FEAT_NORMAL)
+    संदेश_puts(_("\nNormal version "));
+#अन्यथा
+    संदेश_puts(_("\nTiny version "));
 #endif
-#if !defined(FEAT_GUI)
-    msg_puts(_("without GUI."));
-#elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
-    msg_puts(_("with GTK4 GUI."));
+#यदि !defined(FEAT_GUI)
+    संदेश_puts(_("without GUI."));
+#नोचेद्यदि defined(FEAT_GUI_GTK)
+# यदि defined(USE_GTK4)
+    संदेश_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
-    msg_puts(_("with GTK3 GUI."));
+    संदेश_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
-    msg_puts(_("with GTK2-GNOME GUI."));
-# else
-    msg_puts(_("with GTK2 GUI."));
+    संदेश_puts(_("with GTK2-GNOME GUI."));
+# अन्यथा
+    संदेश_puts(_("with GTK2 GUI."));
 # endif
-#elif defined(FEAT_GUI_MOTIF)
-    msg_puts(_("with X11-Motif GUI."));
-#elif defined(FEAT_GUI_HAIKU)
-    msg_puts(_("with Haiku GUI."));
-#elif defined(FEAT_GUI_PHOTON)
-    msg_puts(_("with Photon GUI."));
-#elif defined(MSWIN)
-    msg_puts(_("with GUI."));
+#नोचेद्यदि defined(FEAT_GUI_MOTIF)
+    संदेश_puts(_("with X11-Motif GUI."));
+#नोचेद्यदि defined(FEAT_GUI_HAIKU)
+    संदेश_puts(_("with Haiku GUI."));
+#नोचेद्यदि defined(FEAT_GUI_PHOTON)
+    संदेश_puts(_("with Photon GUI."));
+#नोचेद्यदि defined(MSWIN)
+    संदेश_puts(_("with GUI."));
 #endif
-    version_msg(_("  Features included (+) or not (-):\n"));
+    version_संदेश(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
-	msg_putchar('\n');
+    यदि (संदेश_col > 0)
+	संदेश_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
-    version_msg(_("   system vimrc file: \""));
-    version_msg(SYS_VIMRC_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("   system vimrc file: \""));
+    version_संदेश(SYS_VIMRC_FILE);
+    version_संदेश("\"\n");
 #endif
 #ifdef USR_VIMRC_FILE
-    version_msg(_("     user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("     user vimrc file: \""));
+    version_संदेश(USR_VIMRC_FILE);
+    version_संदेश("\"\n");
 #endif
 #ifdef USR_VIMRC_FILE2
-    version_msg(_(" 2nd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE2);
-    version_msg("\"\n");
+    version_संदेश(_(" 2nd user vimrc file: \""));
+    version_संदेश(USR_VIMRC_FILE2);
+    version_संदेश("\"\n");
 #endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-    version_msg(_(" 4th user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
-#elif defined(USR_VIMRC_FILE3)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-#elif defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
+#यदि defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+    version_संदेश(_(" 3rd user vimrc file: \""));
+    version_संदेश(USR_VIMRC_FILE3);
+    version_संदेश("\"\n");
+    version_संदेश(_(" 4th user vimrc file: \""));
+    version_संदेश((वर्ण *)(XDG_VIMRC_FILE));
+    version_संदेश("\"\n");
+#नोचेद्यदि defined(USR_VIMRC_FILE3)
+    version_संदेश(_(" 3rd user vimrc file: \""));
+    version_संदेश(USR_VIMRC_FILE3);
+    version_संदेश("\"\n");
+#नोचेद्यदि defined(XDG_VIMRC_FILE)
+    version_संदेश(_(" 3rd user vimrc file: \""));
+    version_संदेश((वर्ण *)(XDG_VIMRC_FILE));
+    version_संदेश("\"\n");
 #endif
 #ifdef USR_EXRC_FILE
-    version_msg(_("      user exrc file: \""));
-    version_msg(USR_EXRC_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("      user exrc file: \""));
+    version_संदेश(USR_EXRC_FILE);
+    version_संदेश("\"\n");
 #endif
 #ifdef USR_EXRC_FILE2
-    version_msg(_("  2nd user exrc file: \""));
-    version_msg(USR_EXRC_FILE2);
-    version_msg("\"\n");
+    version_संदेश(_("  2nd user exrc file: \""));
+    version_संदेश(USR_EXRC_FILE2);
+    version_संदेश("\"\n");
 #endif
 #ifdef FEAT_GUI
 # ifdef SYS_GVIMRC_FILE
-    version_msg(_("  system gvimrc file: \""));
-    version_msg(SYS_GVIMRC_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("  system gvimrc file: \""));
+    version_संदेश(SYS_GVIMRC_FILE);
+    version_संदेश("\"\n");
 # endif
-    version_msg(_("    user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("    user gvimrc file: \""));
+    version_संदेश(USR_GVIMRC_FILE);
+    version_संदेश("\"\n");
 # ifdef USR_GVIMRC_FILE2
-    version_msg(_("2nd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE2);
-    version_msg("\"\n");
+    version_संदेश(_("2nd user gvimrc file: \""));
+    version_संदेश(USR_GVIMRC_FILE2);
+    version_संदेश("\"\n");
 # endif
 # ifdef USR_GVIMRC_FILE3
-    version_msg(_("3rd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE3);
-    version_msg("\"\n");
+    version_संदेश(_("3rd user gvimrc file: \""));
+    version_संदेश(USR_GVIMRC_FILE3);
+    version_संदेश("\"\n");
 # endif
 #endif
-    version_msg(_("       defaults file: \""));
-    version_msg(VIM_DEFAULTS_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("       defaults file: \""));
+    version_संदेश(VIM_DEFAULTS_FILE);
+    version_संदेश("\"\n");
 #ifdef FEAT_GUI
 # ifdef SYS_MENU_FILE
-    version_msg(_("    system menu file: \""));
-    version_msg(SYS_MENU_FILE);
-    version_msg("\"\n");
+    version_संदेश(_("    system menu file: \""));
+    version_संदेश(SYS_MENU_FILE);
+    version_संदेश("\"\n");
 # endif
 #endif
 #ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+    यदि (*default_vim_dir != NUL)
     {
-	version_msg(_("  fall-back for $VIM: \""));
-	version_msg((char *)default_vim_dir);
-	version_msg("\"\n");
+	version_संदेश(_("  fall-back for $VIM: \""));
+	version_संदेश((वर्ण *)default_vim_dir);
+	version_संदेश("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    यदि (*default_vimruntime_dir != NUL)
     {
-	version_msg(_(" f-b for $VIMRUNTIME: \""));
-	version_msg((char *)default_vimruntime_dir);
-	version_msg("\"\n");
+	version_संदेश(_(" f-b for $VIMRUNTIME: \""));
+	version_संदेश((वर्ण *)default_vimruntime_dir);
+	version_संदेश("\"\n");
     }
-    version_msg(_("Compilation: "));
-    version_msg((char *)all_cflags);
-    version_msg("\n");
+    version_संदेश(_("Compilation: "));
+    version_संदेश((वर्ण *)all_cflags);
+    version_संदेश("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    यदि (*compiler_version != NUL)
     {
-	version_msg(_("Compiler: "));
-	version_msg((char *)compiler_version);
-	version_msg("\n");
+	version_संदेश(_("Compiler: "));
+	version_संदेश((वर्ण *)compiler_version);
+	version_संदेश("\n");
     }
 # endif
-    version_msg(_("Linking: "));
-    version_msg((char *)all_lflags);
+    version_संदेश(_("Linking: "));
+    version_संदेश((वर्ण *)all_lflags);
 #endif
 #ifdef DEBUG
-    version_msg("\n");
-    version_msg(_("  DEBUG BUILD"));
+    version_संदेश("\n");
+    version_संदेश(_("  DEBUG BUILD"));
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+स्थिर शून्य do_intro_पंक्ति(पूर्णाङ्क row, char_u *mesg, पूर्णाङ्क add_version, पूर्णाङ्क attr);
+स्थिर शून्य intro_message(पूर्णाङ्क colon);
 
 /*
  * Show the intro message when not editing a file.
  */
-    void
-maybe_intro_message(void)
+    शून्य
+maybe_intro_message(शून्य)
 {
-    if (BUFEMPTY()
-	    && curbuf->b_fname == NULL
-	    && firstwin->w_next == NULL
-	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
+    यदि (BUFEMPTY()
+	    && curbuf->b_fname == रिक्त
+	    && firstwin->w_next == रिक्त
+	    && vim_strchr(p_shm, SHM_INTRO) == रिक्त)
 	intro_message(FALSE);
 }
 
@@ -3690,16 +3690,16 @@ maybe_intro_message(void)
  * Only used when starting Vim on an empty file, without a file name.
  * Or with the ":intro" command (for Sven :-).
  */
-    static void
+    स्थिर शून्य
 intro_message(
-    int		colon)		// TRUE for ":intro"
+    पूर्णाङ्क		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
-    char	*p;
-    static char	*(lines[]) =
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		row;
+    पूर्णाङ्क		blanklines;
+    पूर्णाङ्क		sponsor;
+    वर्ण	*p;
+    स्थिर वर्ण	*(पंक्तियाँ[]) =
     {
 	N_("VIM - Vi IMproved"),
 	"",
@@ -3716,110 +3716,110 @@ intro_message(
 	N_("type  :q<Enter>               to exit         "),
 	N_("type  :help<Enter>  or  <F1>  for on-line help"),
 	N_("type  :help version9<Enter>   for version info"),
-	NULL,
+	रिक्त,
 	"",
 	N_("Running in Vi compatible mode"),
 	N_("type  :set nocp<Enter>        for Vim defaults"),
 	N_("type  :help cp-default<Enter> for info on this"),
     };
 #ifdef FEAT_GUI
-    static char	*(gui_lines[]) =
+    स्थिर वर्ण	*(gui_पंक्तियाँ[]) =
     {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	रिक्त,
+	रिक्त,
+	रिक्त,
+	रिक्त,
 # ifdef MODIFIED_BY
-	NULL,
+	रिक्त,
 # endif
-	NULL,
-	NULL,
-	NULL,
+	रिक्त,
+	रिक्त,
+	रिक्त,
 	N_("menu  Help->Orphans           for information    "),
-	NULL,
+	रिक्त,
 	N_("Running modeless, typed text is inserted"),
 	N_("menu  Edit->Global Settings->Toggle Insert Mode  "),
 	N_("                              for two modes      "),
-	NULL,
-	NULL,
-	NULL,
+	रिक्त,
+	रिक्त,
+	रिक्त,
 	N_("menu  Edit->Global Settings->Toggle Vi Compatible"),
 	N_("                              for Vim defaults   "),
     };
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (पूर्णाङ्क)Rows - (ARRAY_LENGTH(पंक्तियाँ) - 1);
+    यदि (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
+    यदि (p_ls > 1)
 	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    यदि (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (पूर्णाङ्क)समय(रिक्त);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
     row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    यदि ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	प्रति (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(पंक्तियाँ); ++i)
 	{
-	    p = lines[i];
+	    p = पंक्तियाँ[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
-		p = gui_lines[i];
+	    यदि (p_im && gui.in_use && gui_पंक्तियाँ[i] != रिक्त)
+		p = gui_पंक्तियाँ[i];
 #endif
-	    if (p == NULL)
+	    यदि (p == रिक्त)
 	    {
-		if (!p_cp)
-		    break;
-		continue;
+		यदि (!p_cp)
+		    भङ्ग;
+		अनुवर्त;
 	    }
-	    if (sponsor != 0)
+	    यदि (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		यदि (म_माला(p, "children") != रिक्त)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		अन्यथा यदि (म_माला(p, "Kuwasha") != रिक्त)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		अन्यथा यदि (म_माला(p, "Orphans") != रिक्त)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
-		do_intro_line(row, (char_u *)_(p), i == 2, 0);
+	    यदि (*p != NUL)
+		do_intro_पंक्ति(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
-	msg_row = row;
+    यदि (colon)
+	संदेश_row = row;
 }
 
-    static void
-do_intro_line(
-    int		row,
+    स्थिर शून्य
+do_intro_पंक्ति(
+    पूर्णाङ्क		row,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    पूर्णाङ्क		add_version,
+    पूर्णाङ्क		attr)
 {
     char_u	vers[20];
-    int		col;
+    पूर्णाङ्क		col;
     char_u	*p;
-    int		l;
-    int		clen;
+    पूर्णाङ्क		l;
+    पूर्णाङ्क		clen;
 #ifdef MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    यदि (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (पूर्णाङ्क)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
@@ -3827,40 +3827,40 @@ do_intro_line(
 
     // Center the message horizontally.
     col = vim_strsize(mesg);
-    if (add_version)
+    यदि (add_version)
     {
 	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	यदि (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    यदि (SAFE_isalpha((पूर्णाङ्क)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
-		sprintf((char *)vers + len, ".%d%s", highest_patch(),
+		पूर्णाङ्क len = (SAFE_isalpha((पूर्णाङ्क)vers[4])) ? 5 : 4;
+		प्र_लिखो((वर्ण *)vers + len, ".%d%s", highest_patch(),
 							 mediumVersion + len);
 	    }
-	    else
-		sprintf((char *)vers + 3, ".%d", highest_patch());
+	    अन्यथा
+		प्र_लिखो((वर्ण *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	col += (पूर्णाङ्क)STRLEN(vers);
     }
     col = (topframe->fr_width - col) / 2;
-    if (col < 0)
+    यदि (col < 0)
 	col = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    प्रति (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	प्रति (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    यदि (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    अन्यथा
 		clen += byte2cells(p[l]);
 	}
 	screen_puts_len(p, l, row, col + firstwin->w_wincol,
@@ -3869,18 +3869,18 @@ do_intro_line(
     }
 
     // Add the version number to the version line.
-    if (add_version)
+    यदि (add_version)
 	screen_puts(vers, row, col + firstwin->w_wincol, 0);
 }
 
 /*
  * ":intro": clear screen, display intro screen and wait for return.
  */
-    void
+    शून्य
 ex_intro(exarg_T *eap UNUSED)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#यदि defined(FEAT_TABPANEL)
     draw_tabpanel();
 #endif
     intro_message(TRUE);

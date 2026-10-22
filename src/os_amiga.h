@@ -16,7 +16,7 @@
 #define HAVE_AVAIL_MEM
 
 #ifndef HAVE_CONFIG_H
-# if defined(AZTEC_C) || defined(__amigaos4__)
+# यदि defined(AZTEC_C) || defined(__amigaos4__)
 #  define HAVE_STAT_H
 # endif
 # define HAVE_LOCALE_H
@@ -29,7 +29,7 @@
 # define HAVE_SETENV
 # define HAVE_MEMSET
 # define HAVE_QSORT
-# if defined(__DATE__) && defined(__TIME__)
+# यदि defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 
@@ -55,9 +55,9 @@
 # define TEMPNAMELEN	12
 #endif
 
-#include <exec/types.h>
-#include <libraries/dos.h>
-#include <libraries/dosextens.h>
+#अन्तर्भाव <exec/types.h>
+#अन्तर्भाव <libraries/dos.h>
+#अन्तर्भाव <libraries/dosextens.h>
 
 // Currently, all Amiga compilers except AZTEC C have these...
 #ifndef AZTEC_C
@@ -72,7 +72,7 @@
  * Manx doesn't have off_t, define it here.
  */
 #ifdef AZTEC_C
-typedef long off_t;
+प्रकारनिर्देश दीर्घ off_t;
 #endif
 
 #ifdef LATTICE
@@ -92,14 +92,14 @@ typedef long off_t;
 // Classic AmigaOS 3.x with GCC/libnix does not provide fchown, fchmod, or
 // ftruncate.  Stub them as no-ops.  (OS4 has these via clib2; MorphOS and
 // AROS provide them in their respective C libraries.)
-#if defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
+#यदि defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
 	&& !defined(__AROS__) && !defined(__MORPHOS__)
 # define fchown(fd, uid, gid) (0)
 # define fchmod(fd, mode) (0)
 # define ftruncate(fd, len) (0)
 #endif
 
-#include <time.h>	// for strftime() and others
+#अन्तर्भाव <time.h>	// for strftime() and others
 
 /*
  * arpbase.h must be included before functions.h
@@ -112,7 +112,7 @@ typedef long off_t;
  * This won't be needed if you have a version of Lattice 4.01 without broken
  * break signal handling.
  */
-#include <signal.h>
+#अन्तर्भाव <signal.h>
 
 /*
  * Names for the EXRC, HELP and temporary files.
@@ -210,11 +210,11 @@ typedef long off_t;
 # define DFLT_MAXMEMTOT	0		// decide in set_init
 #endif
 
-#if defined(SASC)
-int setenv(const char *, const char *);
+#यदि defined(SASC)
+पूर्णाङ्क setenv(ध्रुव वर्ण *, ध्रुव वर्ण *);
 #endif
 
-#define mch_remove(x) remove((char *)(x))
-#define mch_rename(src, dst) rename(src, dst)
-#define mch_chdir(s) chdir(s)
+#define mch_remove(x) हटाओ((वर्ण *)(x))
+#define mch_rename(src, dst) नाम(src, dst)
+#define mch_chdir(s) स_बदलो(s)
 #define vim_mkdir(x, y) mch_mkdir(x)
