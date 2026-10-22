@@ -11,13 +11,13 @@
 // error checks: none
 //@@MIDL_FILE_HEADING(  )
 #ifdef __cplusplus
-extern "C"{
+ବାହ୍ୟ "C"{
 #endif
 
 #ifdef __MINGW32__
 # include <w32api.h>
 
-# if __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
+# ଯଦି __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
    // This define is missing from older MingW versions of w32api, even though
    // IID is defined.
 #  define __IID_DEFINED__
@@ -27,28 +27,28 @@ extern "C"{
 #ifndef __IID_DEFINED__
 # define __IID_DEFINED__
 
-typedef struct _IID
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା _IID
 {
     unsigned long x;
     unsigned short s1;
     unsigned short s2;
-    unsigned char  c[8];
+    unsigned ଅକ୍ଷର  c[8];
 } IID;
 
 #endif
 
 #ifndef CLSID_DEFINED
 # define CLSID_DEFINED
-typedef IID CLSID;
+ପ୍ରକାରବ୍ୟାଖ୍ୟା IID CLSID;
 #endif
 
-const IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+ଅଚଳ IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-const IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+ଅଚଳ IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-const CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+ଅଚଳ CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
 #ifdef __cplusplus

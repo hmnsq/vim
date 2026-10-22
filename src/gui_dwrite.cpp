@@ -13,20 +13,20 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef DYNAMIC_DIRECTX
-# if WINVER < 0x0600
+# ଯଦି WINVER < 0x0600
 #  error WINVER must be 0x0600 or above to use DirectWrite(DirectX)
 # endif
 #endif
 
-#include <windows.h>
-#include <crtdbg.h>
-#include <assert.h>
-#include <math.h>
-#include <d2d1.h>
-#include <d2d1helper.h>
+#ଅନ୍ତର୍ଭାଵ <windows.h>
+#ଅନ୍ତର୍ଭାଵ <crtdbg.h>
+#ଅନ୍ତର୍ଭାଵ <assert.h>
+#ଅନ୍ତର୍ଭାଵ <math.h>
+#ଅନ୍ତର୍ଭାଵ <d2d1.h>
+#ଅନ୍ତର୍ଭାଵ <d2d1helper.h>
 
 // Disable these macros to compile with old VC and newer SDK (V8.1 or later).
-#if defined(_MSC_VER) && (_MSC_VER < 1700)
+#ଯଦି defined(_MSC_VER) && (_MSC_VER < 1700)
 # define _COM_Outptr_ __out
 # define _In_reads_(s)
 # define _In_reads_opt_(s)
@@ -40,11 +40,11 @@
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
 # include <dwrite_2.h>
-#else
+#ଅନ୍ୟଥା
 # include <dwrite.h>
 #endif
 
-#include "gui_dwrite.h"
+#ଅନ୍ତର୍ଭାଵ "gui_dwrite.h"
 
 #ifdef __MINGW32__
 # define __maybenull	SAL__maybenull
@@ -54,240 +54,240 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#ଅନ୍ୟଥା
 # define UNUSED
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#ଯଦି (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#ଅନ୍ୟଥା
 # define FINAL
 #endif
 
 #ifdef DYNAMIC_DIRECTX
-extern "C" HINSTANCE vimLoadLib(const char *name);
+ବାହ୍ୟ "C" HINSTANCE vimLoadLib(ଅଚଳ ଅକ୍ଷର *name);
 
-typedef int (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, int);
-typedef HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
-	REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ପୂର୍ଣ୍ଣସଂଖ୍ୟା (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+ପ୍ରକାରବ୍ୟାଖ୍ୟା HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
+	REFIID, ଅଚଳ D2D1_FACTORY_OPTIONS *, ଶୂନ୍ୟ **);
+ପ୍ରକାରବ୍ୟାଖ୍ୟା HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
 	REFIID, IUnknown **);
 
-static HINSTANCE hD2D1DLL = NULL;
-static HINSTANCE hDWriteDLL = NULL;
+ସ୍ଥିର HINSTANCE hD2D1DLL = ଖାଲି;
+ସ୍ଥିର HINSTANCE hDWriteDLL = ଖାଲି;
 
-static PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = NULL;
-static PD2D1CREATEFACTORY pD2D1CreateFactory = NULL;
-static PDWRITECREATEFACTORY pDWriteCreateFactory = NULL;
+ସ୍ଥିର PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = ଖାଲି;
+ସ୍ଥିର PD2D1CREATEFACTORY pD2D1CreateFactory = ଖାଲି;
+ସ୍ଥିର PDWRITECREATEFACTORY pDWriteCreateFactory = ଖାଲି;
 
 #define GetUserDefaultLocaleName	(*pGetUserDefaultLocaleName)
 #define D2D1CreateFactory		(*pD2D1CreateFactory)
 #define DWriteCreateFactory		(*pDWriteCreateFactory)
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 unload(HINSTANCE &hinst)
 {
-    if (hinst != NULL)
+    ଯଦି (hinst != ଖାଲି)
     {
 	FreeLibrary(hinst);
-	hinst = NULL;
+	hinst = ଖାଲି;
     }
 }
 #endif // DYNAMIC_DIRECTX
 
-template <class T> inline void SafeRelease(T **ppT)
+template <ଶ୍ରେଣୀ T> ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ SafeRelease(T **ppT)
 {
-    if (*ppT)
+    ଯଦି (*ppT)
     {
 	(*ppT)->Release();
-	*ppT = NULL;
+	*ppT = ଖାଲି;
     }
 }
 
-    static DWRITE_PIXEL_GEOMETRY
-ToPixelGeometry(int value)
+    ସ୍ଥିର DWRITE_PIXEL_GEOMETRY
+ToPixelGeometry(ପୂର୍ଣ୍ଣସଂଖ୍ୟା ମୂଲ୍ୟ)
 {
-    switch (value)
+    ବାଛ (ମୂଲ୍ୟ)
     {
-	default:
-	case 0:
-	    return DWRITE_PIXEL_GEOMETRY_FLAT;
-	case 1:
-	    return DWRITE_PIXEL_GEOMETRY_RGB;
-	case 2:
-	    return DWRITE_PIXEL_GEOMETRY_BGR;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	ସ୍ଥିତି 0:
+	    ଫେରନ୍ତୁ DWRITE_PIXEL_GEOMETRY_FLAT;
+	ସ୍ଥିତି 1:
+	    ଫେରନ୍ତୁ DWRITE_PIXEL_GEOMETRY_RGB;
+	ସ୍ଥିତି 2:
+	    ଫେରନ୍ତୁ DWRITE_PIXEL_GEOMETRY_BGR;
     }
 }
 
-    static int
-ToInt(DWRITE_PIXEL_GEOMETRY value)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ToInt(DWRITE_PIXEL_GEOMETRY ମୂଲ୍ୟ)
 {
-    switch (value)
+    ବାଛ (ମୂଲ୍ୟ)
     {
-	case DWRITE_PIXEL_GEOMETRY_FLAT:
-	    return 0;
-	case DWRITE_PIXEL_GEOMETRY_RGB:
-	    return 1;
-	case DWRITE_PIXEL_GEOMETRY_BGR:
-	    return 2;
-	default:
-	    return -1;
+	ସ୍ଥିତି DWRITE_PIXEL_GEOMETRY_FLAT:
+	    ଫେରନ୍ତୁ 0;
+	ସ୍ଥିତି DWRITE_PIXEL_GEOMETRY_RGB:
+	    ଫେରନ୍ତୁ 1;
+	ସ୍ଥିତି DWRITE_PIXEL_GEOMETRY_BGR:
+	    ଫେରନ୍ତୁ 2;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	    ଫେରନ୍ତୁ -1;
     }
 }
 
-    static DWRITE_RENDERING_MODE
-ToRenderingMode(int value)
+    ସ୍ଥିର DWRITE_RENDERING_MODE
+ToRenderingMode(ପୂର୍ଣ୍ଣସଂଖ୍ୟା ମୂଲ୍ୟ)
 {
-    switch (value)
+    ବାଛ (ମୂଲ୍ୟ)
     {
-	default:
-	case 0:
-	    return DWRITE_RENDERING_MODE_DEFAULT;
-	case 1:
-	    return DWRITE_RENDERING_MODE_ALIASED;
-	case 2:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
-	case 3:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
-	case 4:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
-	case 5:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
-	case 6:
-	    return DWRITE_RENDERING_MODE_OUTLINE;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	ସ୍ଥିତି 0:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_DEFAULT;
+	ସ୍ଥିତି 1:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_ALIASED;
+	ସ୍ଥିତି 2:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
+	ସ୍ଥିତି 3:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
+	ସ୍ଥିତି 4:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
+	ସ୍ଥିତି 5:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
+	ସ୍ଥିତି 6:
+	    ଫେରନ୍ତୁ DWRITE_RENDERING_MODE_OUTLINE;
     }
 }
 
-    static D2D1_TEXT_ANTIALIAS_MODE
-ToTextAntialiasMode(int value)
+    ସ୍ଥିର D2D1_TEXT_ANTIALIAS_MODE
+ToTextAntialiasMode(ପୂର୍ଣ୍ଣସଂଖ୍ୟା ମୂଲ୍ୟ)
 {
-    switch (value)
+    ବାଛ (ମୂଲ୍ୟ)
     {
-	default:
-	case 0:
-	    return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
-	case 1:
-	    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-	case 2:
-	    return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
-	case 3:
-	    return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	ସ୍ଥିତି 0:
+	    ଫେରନ୍ତୁ D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
+	ସ୍ଥିତି 1:
+	    ଫେରନ୍ତୁ D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
+	ସ୍ଥିତି 2:
+	    ଫେରନ୍ତୁ D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
+	ସ୍ଥିତି 3:
+	    ଫେରନ୍ତୁ D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
     }
 }
 
-    static int
-ToInt(DWRITE_RENDERING_MODE value)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ToInt(DWRITE_RENDERING_MODE ମୂଲ୍ୟ)
 {
-    switch (value)
+    ବାଛ (ମୂଲ୍ୟ)
     {
-	case DWRITE_RENDERING_MODE_DEFAULT:
-	    return 0;
-	case DWRITE_RENDERING_MODE_ALIASED:
-	    return 1;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
-	    return 2;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
-	    return 3;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
-	    return 4;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
-	    return 5;
-	case DWRITE_RENDERING_MODE_OUTLINE:
-	    return 6;
-	default:
-	    return -1;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_DEFAULT:
+	    ଫେରନ୍ତୁ 0;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_ALIASED:
+	    ଫେରନ୍ତୁ 1;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
+	    ଫେରନ୍ତୁ 2;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
+	    ଫେରନ୍ତୁ 3;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
+	    ଫେରନ୍ତୁ 4;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
+	    ଫେରନ୍ତୁ 5;
+	ସ୍ଥିତି DWRITE_RENDERING_MODE_OUTLINE:
+	    ଫେରନ୍ତୁ 6;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	    ଫେରନ୍ତୁ -1;
     }
 }
 
-class FontCache {
-public:
-    struct Item {
+ଶ୍ରେଣୀ FontCache {
+ସର୍ବସାଧାରଣ:
+    ସଂରଚନା Item {
 	HFONT              hFont;
 	IDWriteTextFormat* pTextFormat;
 	DWRITE_FONT_WEIGHT fontWeight;
 	DWRITE_FONT_STYLE  fontStyle;
 	FLOAT              fontAscent;
-	Item() : hFont(NULL), pTextFormat(NULL), fontAscent(0.0f) {}
+	Item() : hFont(ଖାଲି), pTextFormat(ଖାଲି), fontAscent(0.0f) {}
     };
 
-private:
-    int mSize;
-    Item *mItems;
+ବ୍ୟକ୍ତିଗତ:
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା mSize;
+    Item *m_ବସ୍ତୁଗୁଡ଼ିକ;
 
-public:
-    FontCache(int size = 2) :
+ସର୍ବସାଧାରଣ:
+    FontCache(ପୂର୍ଣ୍ଣସଂଖ୍ୟା size = 2) :
 	mSize(size),
-	mItems(new Item[size])
+	m_ବସ୍ତୁଗୁଡ଼ିକ(ନୂତନ Item[size])
     {
     }
 
     ~FontCache()
     {
-	for (int i = 0; i < mSize; ++i)
-	    SafeRelease(&mItems[i].pTextFormat);
-	delete[] mItems;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < mSize; ++i)
+	    SafeRelease(&m_ବସ୍ତୁଗୁଡ଼ିକ[i].pTextFormat);
+	delete[] m_ବସ୍ତୁଗୁଡ଼ିକ;
     }
 
-    bool get(HFONT hFont, Item &item)
+    ତାର୍କିକ get(HFONT hFont, Item &item)
     {
-	int n = find(hFont);
-	if (n < 0)
-	    return false;
-	item = mItems[n];
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = find(hFont);
+	ଯଦି (n < 0)
+	    ଫେରନ୍ତୁ ମିଥ୍ୟା;
+	item = m_ବସ୍ତୁଗୁଡ଼ିକ[n];
 	slide(n);
-	return true;
+	ଫେରନ୍ତୁ ସତ୍ୟ;
     }
 
-    void put(const Item& item)
+    ଶୂନ୍ୟ put(ଅଚଳ Item& item)
     {
-	int n = find(item.hFont);
-	if (n < 0)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = find(item.hFont);
+	ଯଦି (n < 0)
 	    n = mSize - 1;
-	if (mItems[n].pTextFormat != item.pTextFormat)
+	ଯଦି (m_ବସ୍ତୁଗୁଡ଼ିକ[n].pTextFormat != item.pTextFormat)
 	{
-	    SafeRelease(&mItems[n].pTextFormat);
-	    if (item.pTextFormat != NULL)
+	    SafeRelease(&m_ବସ୍ତୁଗୁଡ଼ିକ[n].pTextFormat);
+	    ଯଦି (item.pTextFormat != ଖାଲି)
 		item.pTextFormat->AddRef();
 	}
-	mItems[n] = item;
+	m_ବସ୍ତୁଗୁଡ଼ିକ[n] = item;
 	slide(n);
     }
 
-private:
-    int find(HFONT hFont)
+ବ୍ୟକ୍ତିଗତ:
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା find(HFONT hFont)
     {
-	for (int i = 0; i < mSize; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < mSize; ++i)
 	{
-	    if (mItems[i].hFont == hFont)
-		return i;
+	    ଯଦି (m_ବସ୍ତୁଗୁଡ଼ିକ[i].hFont == hFont)
+		ଫେରନ୍ତୁ i;
 	}
-	return -1;
+	ଫେରନ୍ତୁ -1;
     }
 
-    void slide(int nextTop)
+    ଶୂନ୍ୟ slide(ପୂର୍ଣ୍ଣସଂଖ୍ୟା next_ଶୀର୍ଷ)
     {
-	if (nextTop == 0)
-	    return;
-	Item tmp = mItems[nextTop];
-	for (int i = nextTop - 1; i >= 0; --i)
-	    mItems[i + 1] = mItems[i];
-	mItems[0] = tmp;
+	ଯଦି (next_ଶୀର୍ଷ == 0)
+	    ଫେରନ୍ତୁ;
+	Item tmp = m_ବସ୍ତୁଗୁଡ଼ିକ[next_ଶୀର୍ଷ];
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = next_ଶୀର୍ଷ - 1; i >= 0; --i)
+	    m_ବସ୍ତୁଗୁଡ଼ିକ[i + 1] = m_ବସ୍ତୁଗୁଡ଼ିକ[i];
+	m_ବସ୍ତୁଗୁଡ଼ିକ[0] = tmp;
     }
 };
 
-enum DrawingMode {
+ଗଣନା DrawingMode {
     DM_GDI = 0,
     DM_DIRECTX = 1,
     DM_INTEROP = 2,
 };
 
-struct DWriteContext {
+ସଂରଚନା DWriteContext {
     HDC mHDC;
     RECT mBindRect;
     DrawingMode mDMode;
     HDC mInteropHDC;
-    bool mDrawing;
-    bool mFallbackDC;
+    ତାର୍କିକ mDrawing;
+    ତାର୍କିକ mFallbackDC;
 
     ID2D1Factory *mD2D1Factory;
 
@@ -314,88 +314,88 @@ struct DWriteContext {
     D2D1_TEXT_ANTIALIAS_MODE mTextAntialiasMode;
 
     DWriteFontFeature mFontFeatures[DWRITE_MAX_FONT_FEATURES];
-    int mFontFeatureCount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା m_Font_Feature_ଗଣନା;
 
     // METHODS
 
     DWriteContext();
 
-    virtual ~DWriteContext();
+    ଆଭାସୀ ~DWriteContext();
 
     HRESULT CreateDeviceResources();
 
-    void DiscardDeviceResources();
+    ଶୂନ୍ୟ DiscardDeviceResources();
 
-    HRESULT CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+    HRESULT CreateTextFormatFromLOGFONT(ଅଚଳ LOGFONTW &logFont,
 	    IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent);
 
-    HRESULT SetFontByLOGFONT(const LOGFONTW &logFont);
+    HRESULT SetFontByLOGFONT(ଅଚଳ LOGFONTW &logFont);
 
-    void SetFont(HFONT hFont);
+    ଶୂନ୍ୟ SetFont(HFONT hFont);
 
-    void Rebind();
+    ଶୂନ୍ୟ Rebind();
 
-    void BindDC(HDC hdc, const RECT *rect);
+    ଶୂନ୍ୟ BindDC(HDC hdc, ଅଚଳ RECT *rect);
 
     HRESULT SetDrawingMode(DrawingMode mode);
 
     ID2D1Brush* SolidBrush(COLORREF color);
 
-    void DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx);
+    ଶୂନ୍ୟ DrawText(ଅଚଳ WCHAR *text, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cellWidth, COLORREF color,
+	UINT fuOptions, ଅଚଳ RECT *lprc, ଅଚଳ INT *lpDx);
 
-    void FillRect(const RECT *rc, COLORREF color);
+    ଶୂନ୍ୟ FillRect(ଅଚଳ RECT *rc, COLORREF color);
 
-    void DrawLine(int x1, int y1, int x2, int y2, COLORREF color);
+    ଶୂନ୍ୟ Draw_ଧାଡ଼ି(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x2, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y2, COLORREF color);
 
-    void SetPixel(int x, int y, COLORREF color);
+    ଶୂନ୍ୟ SetPixel(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, COLORREF color);
 
-    void Scroll(int x, int y, const RECT *rc);
+    ଶୂନ୍ୟ Scroll(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ଅଚଳ RECT *rc);
 
-    void Flush();
+    ଶୂନ୍ୟ Flush();
 
-    void SetRenderingParams(
-	    const DWriteRenderingParams *params);
+    ଶୂନ୍ୟ SetRenderingParams(
+	    ଅଚଳ DWriteRenderingParams *params);
 
     DWriteRenderingParams *GetRenderingParams(
 	    DWriteRenderingParams *params);
 
-    void SetFontFeatures(const DWriteFontFeature *features, int count);
+    ଶୂନ୍ୟ SetFontFeatures(ଅଚଳ DWriteFontFeature *features, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଗଣନା_2);
 };
 
-class AdjustedGlyphRun : public DWRITE_GLYPH_RUN
+ଶ୍ରେଣୀ AdjustedGlyphRun : ସର୍ବସାଧାରଣ DWRITE_GLYPH_RUN
 {
-private:
+ବ୍ୟକ୍ତିଗତ:
     FLOAT &mAccum;
     FLOAT mDelta;
     FLOAT *mAdjustedAdvances;
 
-public:
+ସର୍ବସାଧାରଣ:
     AdjustedGlyphRun(
-	    const DWRITE_GLYPH_RUN *glyphRun,
+	    ଅଚଳ DWRITE_GLYPH_RUN *glyphRun,
 	    FLOAT cellWidth,
 	    FLOAT &accum,
-	    const INT *lpDx,
-	    int *glyphIndex,
-	    int cchText) :
+	    ଅଚଳ INT *lpDx,
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *glyphIndex,
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cchText) :
 	DWRITE_GLYPH_RUN(*glyphRun),
 	mAccum(accum),
 	mDelta(0.0f),
-	mAdjustedAdvances(new FLOAT[glyphRun->glyphCount])
+	mAdjustedAdvances(ନୂତନ FLOAT[glyphRun->glyph_ଗଣନା])
     {
-	assert(cellWidth != 0.0f);
-	for (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
+	ପ୍ରତିଜ୍ଞା(cellWidth != 0.0f);
+	ପାଇଁ (UINT32 i = 0; i < glyphRun->glyph_ଗଣନା; ++i)
 	{
 	    FLOAT orig = glyphRun->glyphAdvances[i];
 	    FLOAT adjusted;
 
-	    if (*glyphIndex < cchText)
+	    ଯଦି (*glyphIndex < cchText)
 	    {
 		adjusted = FLOAT(lpDx[*glyphIndex]);
 		(*glyphIndex)++;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		adjusted = adjustToCell(orig, cellWidth);
 	    }
@@ -412,111 +412,111 @@ public:
 	delete[] mAdjustedAdvances;
     }
 
-    static FLOAT adjustToCell(FLOAT value, FLOAT cellWidth)
+    ସ୍ଥିର FLOAT adjustToCell(FLOAT ମୂଲ୍ୟ, FLOAT cellWidth)
     {
-	int cellCount = int(floor(value / cellWidth + 0.5f));
-	if (cellCount < 1)
-	    cellCount = 1;
-	return cellCount * cellWidth;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା cell_ଗଣନା = ପୂର୍ଣ୍ଣସଂଖ୍ୟା(floor(ମୂଲ୍ୟ / cellWidth + 0.5f));
+	ଯଦି (cell_ଗଣନା < 1)
+	    cell_ଗଣନା = 1;
+	ଫେରନ୍ତୁ cell_ଗଣନା * cellWidth;
     }
 };
 
-struct TextRendererContext {
+ସଂରଚନା TextRendererContext {
     // const fields.
     COLORREF color;
     FLOAT cellWidth;
-    const INT *lpDx;
-    int cchText;
+    ଅଚଳ INT *lpDx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cchText;
     FLOAT baselineY;  // Fixed baseline Y coordinate
 
     // working fields.
     FLOAT offsetX;
-    int glyphIndex;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା glyphIndex;
 };
 
-class TextRenderer FINAL : public IDWriteTextRenderer
+ଶ୍ରେଣୀ TextRenderer FINAL : ସର୍ବସାଧାରଣ IDWriteTextRenderer
 {
-public:
+ସର୍ବସାଧାରଣ:
     TextRenderer(
 	    DWriteContext* pDWC) :
-	cRefCount_(0),
+	c_Ref_ଗଣନା(0),
 	pDWC_(pDWC)
     {
 	AddRef();
     }
 
     // add "virtual" to avoid a compiler warning
-    virtual ~TextRenderer()
+    ଆଭାସୀ ~TextRenderer()
     {
     }
 
     IFACEMETHOD(IsPixelSnappingDisabled)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	__out BOOL* isDisabled)
     {
 	*isDisabled = FALSE;
-	return S_OK;
+	ଫେରନ୍ତୁ S_OK;
     }
 
     IFACEMETHOD(GetCurrentTransform)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	__out DWRITE_MATRIX* transform)
     {
 	// forward the render target's transform
 	pDWC_->mRT->GetTransform(
 		reinterpret_cast<D2D1_MATRIX_3X2_F*>(transform));
-	return S_OK;
+	ଫେରନ୍ତୁ S_OK;
     }
 
     IFACEMETHOD(GetPixelsPerDip)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	__out FLOAT* pixelsPerDip)
     {
-	float dpiX, unused;
+	ଦଶମିକ dpiX, unused;
 	pDWC_->mRT->GetDpi(&dpiX, &unused);
 	*pixelsPerDip = dpiX / 96.0f;
-	return S_OK;
+	ଫେରନ୍ତୁ S_OK;
     }
 
     IFACEMETHOD(DrawUnderline)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_UNDERLINE const* underline UNUSED,
+	__in DWRITE_UNDERLINE ଅଚଳ* underline UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ଫେରନ୍ତୁ E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawStrikethrough)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_STRIKETHROUGH const* strikethrough UNUSED,
+	__in DWRITE_STRIKETHROUGH ଅଚଳ* strikethrough UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ଫେରନ୍ତୁ E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawInlineObject)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext UNUSED,
 	FLOAT originX UNUSED,
 	FLOAT originY UNUSED,
 	IDWriteInlineObject* inlineObject UNUSED,
 	BOOL isSideways UNUSED,
-	BOOL isRightToLeft UNUSED,
+	BOOL is_ଡାହାଣ_To_ବାମ UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ଫେରନ୍ତୁ E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawGlyphRun)(
-	__maybenull void* clientDrawingContext,
+	__maybenull ଶୂନ୍ୟ* clientDrawingContext,
 	FLOAT baselineOriginX,
 	FLOAT baselineOriginY,
 	DWRITE_MEASURING_MODE measuringMode UNUSED,
-	__in DWRITE_GLYPH_RUN const* glyphRun,
-	__in DWRITE_GLYPH_RUN_DESCRIPTION const* glyphRunDescription UNUSED,
+	__in DWRITE_GLYPH_RUN ଅଚଳ* glyphRun,
+	__in DWRITE_GLYPH_RUN_DESCRIPTION ଅଚଳ* glyphRunDescription UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
 	TextRendererContext *context =
@@ -532,26 +532,26 @@ public:
 		context->cchText);
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-	if (pDWC_->mDWriteFactory2 != NULL)
+	ଯଦି (pDWC_->mDWriteFactory2 != ଖାଲି)
 	{
-	    IDWriteColorGlyphRunEnumerator *enumerator = NULL;
+	    IDWriteColorGlyphRunEnumerator *enumerator = ଖାଲି;
 	    HRESULT hr = pDWC_->mDWriteFactory2->TranslateColorGlyphRun(
 		baselineOriginX + context->offsetX,
 		baselineOriginY,
 		&adjustedGlyphRun,
-		NULL,
+		ଖାଲି,
 		DWRITE_MEASURING_MODE_GDI_NATURAL,
-		NULL,
+		ଖାଲି,
 		0,
 		&enumerator);
-	    if (SUCCEEDED(hr))
+	    ଯଦି (SUCCEEDED(hr))
 	    {
 		// Draw by IDWriteFactory2 for color emoji
 		BOOL hasRun = TRUE;
 		enumerator->MoveNext(&hasRun);
-		while (hasRun)
+		ଯେତେବେଳେ (hasRun)
 		{
-		    const DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
+		    ଅଚଳ DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
 		    enumerator->GetCurrentRun(&colorGlyphRun);
 
 		    pDWC_->mBrush->SetColor(colorGlyphRun->runColor);
@@ -565,7 +565,7 @@ public:
 		    enumerator->MoveNext(&hasRun);
 		}
 		SafeRelease(&enumerator);
-		return S_OK;
+		ଫେରନ୍ତୁ S_OK;
 	    }
 	}
 #endif
@@ -578,93 +578,93 @@ public:
 		&adjustedGlyphRun,
 		pDWC_->SolidBrush(context->color),
 		DWRITE_MEASURING_MODE_NATURAL);
-	return S_OK;
+	ଫେରନ୍ତୁ S_OK;
     }
 
-public:
+ସର୍ବସାଧାରଣ:
     IFACEMETHOD_(unsigned long, AddRef) ()
     {
-	return InterlockedIncrement(&cRefCount_);
+	ଫେରନ୍ତୁ InterlockedIncrement(&c_Ref_ଗଣନା);
     }
 
     IFACEMETHOD_(unsigned long, Release) ()
     {
-	long newCount = InterlockedDecrement(&cRefCount_);
+	long new_ଗଣନା_2 = InterlockedDecrement(&c_Ref_ଗଣନା);
 
-	if (newCount == 0)
+	ଯଦି (new_ଗଣନା_2 == 0)
 	{
-	    delete this;
-	    return 0;
+	    delete ଏହି;
+	    ଫେରନ୍ତୁ 0;
 	}
-	return newCount;
+	ଫେରନ୍ତୁ new_ଗଣନା_2;
     }
 
     IFACEMETHOD(QueryInterface)(
-	IID const& riid,
-	void** ppvObject)
+	IID ଅଚଳ& riid,
+	ଶୂନ୍ୟ** ppvObject)
     {
-	if (__uuidof(IDWriteTextRenderer) == riid)
+	ଯଦି (__uuidof(IDWriteTextRenderer) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ଏହି;
 	}
-	else if (__uuidof(IDWritePixelSnapping) == riid)
+	ଅନ୍ୟଥା ଯଦି (__uuidof(IDWritePixelSnapping) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ଏହି;
 	}
-	else if (__uuidof(IUnknown) == riid)
+	ଅନ୍ୟଥା ଯଦି (__uuidof(IUnknown) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = ଏହି;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    *ppvObject = NULL;
-	    return E_FAIL;
+	    *ppvObject = ଖାଲି;
+	    ଫେରନ୍ତୁ E_FAIL;
 	}
 
-	return S_OK;
+	ଫେରନ୍ତୁ S_OK;
     }
 
-private:
-    long cRefCount_;
+ବ୍ୟକ୍ତିଗତ:
+    long c_Ref_ଗଣନା;
     DWriteContext* pDWC_;
 };
 
 DWriteContext::DWriteContext() :
-    mHDC(NULL),
+    mHDC(ଖାଲି),
     mBindRect(),
     mDMode(DM_GDI),
-    mInteropHDC(NULL),
-    mDrawing(false),
-    mFallbackDC(false),
-    mD2D1Factory(NULL),
-    mRT(NULL),
-    mGDIRT(NULL),
-    mBrush(NULL),
-    mBitmap(NULL),
-    mDWriteFactory(NULL),
+    mInteropHDC(ଖାଲି),
+    mDrawing(ମିଥ୍ୟା),
+    mFallbackDC(ମିଥ୍ୟା),
+    mD2D1Factory(ଖାଲି),
+    mRT(ଖାଲି),
+    mGDIRT(ଖାଲି),
+    mBrush(ଖାଲି),
+    mBitmap(ଖାଲି),
+    mDWriteFactory(ଖାଲି),
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    mDWriteFactory2(NULL),
+    mDWriteFactory2(ଖାଲି),
 #endif
-    mGdiInterop(NULL),
-    mRenderingParams(NULL),
+    mGdiInterop(ଖାଲି),
+    mRenderingParams(ଖାଲି),
     mFontCache(8),
-    mTextFormat(NULL),
+    mTextFormat(ଖାଲି),
     mFontWeight(DWRITE_FONT_WEIGHT_NORMAL),
     mFontStyle(DWRITE_FONT_STYLE_NORMAL),
     mFontSize(0.0f),
     mFontAscent(0.0f),
     mTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_DEFAULT),
-    mFontFeatureCount(0)
+    m_Font_Feature_ଗଣନା(0)
 {
-    ZeroMemory(mFontFeatures, sizeof(mFontFeatures));
+    ZeroMemory(mFontFeatures, ଆକାର(mFontFeatures));
     HRESULT hr;
 
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
-	    __uuidof(ID2D1Factory), NULL,
-	    reinterpret_cast<void**>(&mD2D1Factory));
+	    __uuidof(ID2D1Factory), ଖାଲି,
+	    reinterpret_cast<ଶୂନ୍ୟ**>(&mD2D1Factory));
     _RPT2(_CRT_WARN, "D2D1CreateFactory: hr=%p p=%p\n", hr, mD2D1Factory);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -675,7 +675,7 @@ DWriteContext::DWriteContext() :
     }
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -685,13 +685,13 @@ DWriteContext::DWriteContext() :
     }
 #endif
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->GetGdiInterop(&mGdiInterop);
 	_RPT2(_CRT_WARN, "GetGdiInterop: hr=%p p=%p\n", hr, mGdiInterop);
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->CreateRenderingParams(&mRenderingParams);
 	_RPT2(_CRT_WARN, "CreateRenderingParams: hr=%p p=%p\n", hr,
@@ -720,8 +720,8 @@ DWriteContext::CreateDeviceResources()
 {
     HRESULT hr;
 
-    if (mRT != NULL)
-	return S_OK;
+    ଯଦି (mRT != ଖାଲି)
+	ଫେରନ୍ତୁ S_OK;
 
     D2D1_RENDER_TARGET_PROPERTIES props = {
 	D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -733,16 +733,16 @@ DWriteContext::CreateDeviceResources()
     hr = mD2D1Factory->CreateDCRenderTarget(&props, &mRT);
     _RPT2(_CRT_WARN, "CreateDCRenderTarget: hr=%p p=%p\n", hr, mRT);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	// This always succeeds.
 	mRT->QueryInterface(
 		__uuidof(ID2D1GdiInteropRenderTarget),
-		reinterpret_cast<void**>(&mGDIRT));
+		reinterpret_cast<ଶୂନ୍ୟ**>(&mGDIRT));
 	_RPT1(_CRT_WARN, "GdiInteropRenderTarget: p=%p\n", mGDIRT);
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = mRT->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Black),
@@ -750,13 +750,13 @@ DWriteContext::CreateDeviceResources()
 	_RPT2(_CRT_WARN, "CreateSolidColorBrush: hr=%p p=%p\n", hr, mBrush);
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
 	Rebind();
 
-    return hr;
+    ଫେରନ୍ତୁ hr;
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::DiscardDeviceResources()
 {
     SafeRelease(&mBitmap);
@@ -766,33 +766,33 @@ DWriteContext::DiscardDeviceResources()
 }
 
     HRESULT
-DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+DWriteContext::CreateTextFormatFromLOGFONT(ଅଚଳ LOGFONTW &logFont,
 	IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent)
 {
     // Most of this function is copied from: https://github.com/Microsoft/Windows-classic-samples/blob/master/Samples/Win7Samples/multimedia/DirectWrite/RenderTest/TextHelpers.cpp
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = ଖାଲି;
 
-    IDWriteFont *font = NULL;
-    IDWriteFontFamily *fontFamily = NULL;
-    IDWriteLocalizedStrings *localizedFamilyNames = NULL;
-    float fontSize = 0;
+    IDWriteFont *font = ଖାଲି;
+    IDWriteFontFamily *fontFamily = ଖାଲି;
+    IDWriteLocalizedStrings *localizedFamilyNames = ଖାଲି;
+    ଦଶମିକ fontSize = 0;
     DWRITE_FONT_METRICS fontMetrics = {};
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = mGdiInterop->CreateFontFromLOGFONT(&logFont, &font);
     }
 
     // Get the font family to which this font belongs.
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = font->GetFontFamily(&fontFamily);
     }
 
     // Get the family names. This returns an object that encapsulates one or
     // more names with the same meaning but in different languages.
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = fontFamily->GetFamilyNames(&localizedFamilyNames);
     }
@@ -802,31 +802,31 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // purposes of creating a text format object any language will do.
 
     wchar_t familyName[100];
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	hr = localizedFamilyNames->GetString(0, familyName,
 		ARRAYSIZE(familyName));
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	// Use lfHeight of the LOGFONT as font size.
-	fontSize = float(logFont.lfHeight);
+	fontSize = ଦଶମିକ(logFont.lfHeight);
 
 	font->GetMetrics(&fontMetrics);
 
 	// Convert lfHeight to DirectWrite font size
-	if (fontSize < 0)
+	ଯଦି (fontSize < 0)
 	{
 	    // Negative lfHeight represents the font's em height in pixels
 	    fontSize = -fontSize;
 	}
-	else if (fontSize > 0)
+	ଅନ୍ୟଥା ଯଦି (fontSize > 0)
 	{
 	    // Positive lfHeight represents the font's cell height (ascent + descent)
 	    // Convert to em height
-	    fontSize = fontSize * float(fontMetrics.designUnitsPerEm)
-		/ float(fontMetrics.ascent + fontMetrics.descent + fontMetrics.lineGap);
+	    fontSize = fontSize * ଦଶମିକ(fontMetrics.designUnitsPerEm)
+		/ ଦଶମିକ(fontMetrics.ascent + fontMetrics.descent + fontMetrics.ଧାଡ଼ି_Gap);
 	}
     }
 
@@ -834,18 +834,18 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // language of the text, which may or may not be the same as the primary
     // language of the user. However, for our purposes the user locale will do.
     wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
-	if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
+	ଯଦି (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
 	    hr = HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	// Create the text format object.
 	hr = mDWriteFactory->CreateTextFormat(
 		familyName,
-		NULL, // no custom font collection
+		ଖାଲି, // no custom font collection
 		font->GetWeight(),
 		font->GetStyle(),
 		font->GetStretch(),
@@ -854,49 +854,49 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
 		&pTextFormat);
     }
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
 	hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
 	hr = pTextFormat->SetParagraphAlignment(
 		DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
 	hr = pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
     SafeRelease(&localizedFamilyNames);
     SafeRelease(&fontFamily);
     SafeRelease(&font);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	*ppTextFormat = pTextFormat;
-	if (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
+	ଯଦି (pFontAscent != ଖାଲି && fontMetrics.designUnitsPerEm != 0)
 	{
 	    // Calculate ascent ratio (0.0 to 1.0) relative to total font height
-	    FLOAT totalHeight = float(fontMetrics.ascent + fontMetrics.descent);
-	    if (totalHeight != 0.0f)
-		*pFontAscent = float(fontMetrics.ascent) / totalHeight;
-	    else
+	    FLOAT totalHeight = ଦଶମିକ(fontMetrics.ascent + fontMetrics.descent);
+	    ଯଦି (totalHeight != 0.0f)
+		*pFontAscent = ଦଶମିକ(fontMetrics.ascent) / totalHeight;
+	    ଅନ୍ୟଥା
 		*pFontAscent = 0.83f; // fallback
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	SafeRelease(&pTextFormat);
 
-    return hr;
+    ଫେରନ୍ତୁ hr;
 }
 
     HRESULT
-DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
+DWriteContext::SetFontByLOGFONT(ଅଚଳ LOGFONTW &logFont)
 {
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = ଖାଲି;
     FLOAT fontAscent = 0.0f;
 
     hr = CreateTextFormatFromLOGFONT(logFont, &pTextFormat, &fontAscent);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	SafeRelease(&mTextFormat);
 	mTextFormat = pTextFormat;
@@ -906,16 +906,16 @@ DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
 	mFontAscent = fontAscent;
     }
 
-    return hr;
+    ଫେରନ୍ତୁ hr;
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::SetFont(HFONT hFont)
 {
     FontCache::Item item;
-    if (mFontCache.get(hFont, item))
+    ଯଦି (mFontCache.get(hFont, item))
     {
-	if (item.pTextFormat != NULL)
+	ଯଦି (item.pTextFormat != ଖାଲି)
 	{
 	    item.pTextFormat->AddRef();
 	    SafeRelease(&mTextFormat);
@@ -923,33 +923,33 @@ DWriteContext::SetFont(HFONT hFont)
 	    mFontWeight = item.fontWeight;
 	    mFontStyle = item.fontStyle;
 	    mFontAscent = item.fontAscent;
-	    mFallbackDC = false;
+	    mFallbackDC = ମିଥ୍ୟା;
 	}
-	else
-	    mFallbackDC = true;
-	return;
+	ଅନ୍ୟଥା
+	    mFallbackDC = ସତ୍ୟ;
+	ଫେରନ୍ତୁ;
     }
 
     HRESULT hr = E_FAIL;
     LOGFONTW lf;
-    if (GetObjectW(hFont, sizeof(lf), &lf))
+    ଯଦି (GetObjectW(hFont, ଆକାର(lf), &lf))
 	hr = SetFontByLOGFONT(lf);
 
     item.hFont = hFont;
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	item.pTextFormat = mTextFormat;
 	item.fontWeight = mFontWeight;
 	item.fontStyle = mFontStyle;
 	item.fontAscent = mFontAscent;
-	mFallbackDC = false;
+	mFallbackDC = ମିଥ୍ୟା;
     }
-    else
-	mFallbackDC = true;
+    ଅନ୍ୟଥା
+	mFallbackDC = ସତ୍ୟ;
     mFontCache.put(item);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::Rebind()
 {
     SafeRelease(&mBitmap);
@@ -962,83 +962,83 @@ DWriteContext::Rebind()
 	96.0f, 96.0f
     };
     mRT->CreateBitmap(
-	    D2D1::SizeU(mBindRect.right - mBindRect.left,
-		mBindRect.bottom - mBindRect.top),
+	    D2D1::SizeU(mBindRect.ଡାହାଣ - mBindRect.ବାମ,
+		mBindRect.bottom - mBindRect.ଶୀର୍ଷ),
 	    props, &mBitmap);
 }
 
-    void
-DWriteContext::BindDC(HDC hdc, const RECT *rect)
+    ଶୂନ୍ୟ
+DWriteContext::BindDC(HDC hdc, ଅଚଳ RECT *rect)
 {
     mHDC = hdc;
     mBindRect = *rect;
 
-    if (mRT == NULL)
+    ଯଦି (mRT == ଖାଲି)
 	CreateDeviceResources();
-    else
+    ଅନ୍ୟଥା
     {
 	Flush();
 	Rebind();
     }
 }
 
-extern "C" void redraw_later_clear(void);
+ବାହ୍ୟ "C" ଶୂନ୍ୟ redraw_later_clear(ଶୂନ୍ୟ);
 
     HRESULT
 DWriteContext::SetDrawingMode(DrawingMode mode)
 {
     HRESULT hr = S_OK;
 
-    switch (mode)
+    ବାଛ (mode)
     {
-	default:
-	case DM_GDI:
-	    if (mInteropHDC != NULL)
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	ସ୍ଥିତି DM_GDI:
+	    ଯଦି (mInteropHDC != ଖାଲି)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(ଖାଲି);
+		mInteropHDC = ଖାଲି;
 	    }
-	    if (mDrawing)
+	    ଯଦି (mDrawing)
 	    {
 		hr = mRT->EndDraw();
-		if (hr == (HRESULT)D2DERR_RECREATE_TARGET)
+		ଯଦି (hr == (HRESULT)D2DERR_RECREATE_TARGET)
 		{
 		    hr = S_OK;
 		    DiscardDeviceResources();
 		    CreateDeviceResources();
 		    redraw_later_clear();
 		}
-		mDrawing = false;
+		mDrawing = ମିଥ୍ୟା;
 	    }
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case DM_DIRECTX:
-	    if (mInteropHDC != NULL)
+	ସ୍ଥିତି DM_DIRECTX:
+	    ଯଦି (mInteropHDC != ଖାଲି)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(ଖାଲି);
+		mInteropHDC = ଖାଲି;
 	    }
-	    else if (mDrawing == false)
+	    ଅନ୍ୟଥା ଯଦି (mDrawing == ମିଥ୍ୟା)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = ସତ୍ୟ;
 	    }
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case DM_INTEROP:
-	    if (mDrawing == false)
+	ସ୍ଥିତି DM_INTEROP:
+	    ଯଦି (mDrawing == ମିଥ୍ୟା)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = ସତ୍ୟ;
 	    }
-	    if (mInteropHDC == NULL)
+	    ଯଦି (mInteropHDC == ଖାଲି)
 		hr = mGDIRT->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &mInteropHDC);
-	    break;
+	    ଭାଙ୍ଗ;
     }
     mDMode = mode;
-    return hr;
+    ଫେରନ୍ତୁ hr;
 }
 
     ID2D1Brush*
@@ -1046,19 +1046,19 @@ DWriteContext::SolidBrush(COLORREF color)
 {
     mBrush->SetColor(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
 		UINT32(GetGValue(color)) << 8 | UINT32(GetBValue(color))));
-    return mBrush;
+    ଫେରନ୍ତୁ mBrush;
 }
 
-    void
-DWriteContext::DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx)
+    ଶୂନ୍ୟ
+DWriteContext::DrawText(ଅଚଳ WCHAR *text, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cellWidth, COLORREF color,
+	UINT fuOptions, ଅଚଳ RECT *lprc, ଅଚଳ INT *lpDx)
 {
-    if (mFallbackDC)
+    ଯଦି (mFallbackDC)
     {
 	// Fall back to GDI rendering.
 	HRESULT hr = SetDrawingMode(DM_INTEROP);
-	if (SUCCEEDED(hr))
+	ଯଦି (SUCCEEDED(hr))
 	{
 	    HGDIOBJ hFont = ::GetCurrentObject(mHDC, OBJ_FONT);
 	    HGDIOBJ hOldFont = ::SelectObject(mInteropHDC, hFont);
@@ -1067,70 +1067,70 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	    ::ExtTextOutW(mInteropHDC, x, y, fuOptions, lprc, text, len, lpDx);
 	    ::SelectObject(mInteropHDC, hOldFont);
 	}
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     HRESULT hr;
-    IDWriteTextLayout *textLayout = NULL;
+    IDWriteTextLayout *textLayout = ଖାଲି;
 
     SetDrawingMode(DM_DIRECTX);
 
     // Apply clipping if ETO_CLIPPED is specified
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    ଯଦି ((fuOptions & ETO_CLIPPED) && lprc != ଖାଲି)
     {
-	mRT->PushAxisAlignedClip(
-	    D2D1::RectF(FLOAT(lprc->left), FLOAT(lprc->top),
-			FLOAT(lprc->right), FLOAT(lprc->bottom)),
+	mRT->ଠେଲ_Axis_Aligned_Clip(
+	    D2D1::RectF(FLOAT(lprc->ବାମ), FLOAT(lprc->ଶୀର୍ଷ),
+			FLOAT(lprc->ଡାହାଣ), FLOAT(lprc->bottom)),
 	    D2D1_ANTIALIAS_MODE_ALIASED);
     }
 
     hr = mDWriteFactory->CreateTextLayout(text, len, mTextFormat,
 	    FLOAT(w), FLOAT(h), &textLayout);
 
-    if (SUCCEEDED(hr))
+    ଯଦି (SUCCEEDED(hr))
     {
 	DWRITE_TEXT_RANGE textRange = { 0, UINT32(len) };
 	textLayout->SetFontWeight(mFontWeight, textRange);
 	textLayout->SetFontStyle(mFontStyle, textRange);
 
-	if (mFontFeatureCount > 0)
+	ଯଦି (m_Font_Feature_ଗଣନା > 0)
 	{
 	    // Default OpenType features that DirectWrite normally enables.
 	    // SetTypography() overrides all defaults, so we must
 	    // re-add them here explicitly.
-	    static const DWRITE_FONT_FEATURE defaultFeatures[] = {
+	    ସ୍ଥିର ଅଚଳ DWRITE_FONT_FEATURE defaultFeatures[] = {
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_ALTERNATES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_STANDARD_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_KERNING, 1 },
 	    };
-	    static const int numDefaults = sizeof(defaultFeatures)
-		/ sizeof(defaultFeatures[0]);
+	    ସ୍ଥିର ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଅଙ୍କ_Defaults = ଆକାର(defaultFeatures)
+		/ ଆକାର(defaultFeatures[0]);
 
-	    IDWriteTypography *typography = NULL;
+	    IDWriteTypography *typography = ଖାଲି;
 	    hr = mDWriteFactory->CreateTypography(&typography);
-	    if (SUCCEEDED(hr))
+	    ଯଦି (SUCCEEDED(hr))
 	    {
 		// Add default features, skipping any that the user
 		// has explicitly specified (either + or -).
-		for (int d = 0; d < numDefaults; ++d)
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା d = 0; d < ଅଙ୍କ_Defaults; ++d)
 		{
-		    int overridden = 0;
-		    for (int u = 0; u < mFontFeatureCount; ++u)
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା overridden = 0;
+		    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା u = 0; u < m_Font_Feature_ଗଣନା; ++u)
 		    {
-			if ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
+			ଯଦି ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
 				== defaultFeatures[d].nameTag)
 			{
 			    overridden = 1;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
-		    if (!overridden)
+		    ଯଦି (!overridden)
 			typography->AddFontFeature(defaultFeatures[d]);
 		}
 		// Add user-specified features.
-		for (int i = 0; i < mFontFeatureCount; ++i)
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < m_Font_Feature_ଗଣନା; ++i)
 		{
 		    DWRITE_FONT_FEATURE ff = {
 			(DWRITE_FONT_FEATURE_TAG)mFontFeatures[i].tag,
@@ -1151,7 +1151,7 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	// vertical shifts during redraw.
 	FLOAT baselineY = roundf(FLOAT(y) + FLOAT(h) * mFontAscent + 0.5);
 
-	TextRenderer renderer(this);
+	TextRenderer renderer(ଏହି);
 	TextRendererContext context = { color, FLOAT(cellWidth), lpDx, len,
 		baselineY, 0.0f, 0 };
 
@@ -1160,14 +1160,14 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 
     SafeRelease(&textLayout);
 
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
-	mRT->PopAxisAlignedClip();
+    ଯଦି ((fuOptions & ETO_CLIPPED) && lprc != ଖାଲି)
+	mRT->କାଢ଼_Axis_Aligned_Clip();
 }
 
-    void
-DWriteContext::FillRect(const RECT *rc, COLORREF color)
+    ଶୂନ୍ୟ
+DWriteContext::FillRect(ଅଚଳ RECT *rc, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ଯଦି (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1175,121 +1175,121 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 	::FillRect(mInteropHDC, rc, hbr);
 	::DeleteObject(HGDIOBJ(hbr));
     }
-    else
+    ଅନ୍ୟଥା
     {
 	SetDrawingMode(DM_DIRECTX);
 	mRT->FillRectangle(
-		D2D1::RectF(FLOAT(rc->left), FLOAT(rc->top),
-		    FLOAT(rc->right), FLOAT(rc->bottom)),
+		D2D1::RectF(FLOAT(rc->ବାମ), FLOAT(rc->ଶୀର୍ଷ),
+		    FLOAT(rc->ଡାହାଣ), FLOAT(rc->bottom)),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
+    ଶୂନ୍ୟ
+DWriteContext::Draw_ଧାଡ଼ି(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x2, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y2, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ଯଦି (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	HPEN hpen = ::CreatePen(PS_SOLID, 1, color);
 	HGDIOBJ old_pen = ::SelectObject(mInteropHDC, HGDIOBJ(hpen));
-	::MoveToEx(mInteropHDC, x1, y1, NULL);
-	::LineTo(mInteropHDC, x2, y2);
+	::MoveToEx(mInteropHDC, x1, y1, ଖାଲି);
+	::ଧାଡ଼ି_To(mInteropHDC, x2, y2);
 	::SelectObject(mInteropHDC, old_pen);
 	::DeleteObject(HGDIOBJ(hpen));
     }
-    else
+    ଅନ୍ୟଥା
     {
 	SetDrawingMode(DM_DIRECTX);
-	mRT->DrawLine(
+	mRT->Draw_ଧାଡ଼ି(
 		D2D1::Point2F(FLOAT(x1), FLOAT(y1) + 0.5f),
 		D2D1::Point2F(FLOAT(x2), FLOAT(y2) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::SetPixel(int x, int y, COLORREF color)
+    ଶୂନ୍ୟ
+DWriteContext::SetPixel(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    ଯଦି (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	::SetPixel(mInteropHDC, x, y, color);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	SetDrawingMode(DM_DIRECTX);
 	// Direct2D doesn't have SetPixel API.  Use DrawLine instead.
-	mRT->DrawLine(
+	mRT->Draw_ଧାଡ଼ି(
 		D2D1::Point2F(FLOAT(x), FLOAT(y) + 0.5f),
 		D2D1::Point2F(FLOAT(x+1), FLOAT(y) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::Scroll(int x, int y, const RECT *rc)
+    ଶୂନ୍ୟ
+DWriteContext::Scroll(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ଅଚଳ RECT *rc)
 {
     SetDrawingMode(DM_DIRECTX);
     mRT->Flush();
 
     D2D1_RECT_U srcRect;
     D2D1_POINT_2U destPoint;
-    if (x >= 0)
+    ଯଦି (x >= 0)
     {
-	srcRect.left = rc->left;
-	srcRect.right = rc->right - x;
-	destPoint.x = rc->left + x;
+	srcRect.ବାମ = rc->ବାମ;
+	srcRect.ଡାହାଣ = rc->ଡାହାଣ - x;
+	destPoint.x = rc->ବାମ + x;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	srcRect.left = rc->left - x;
-	srcRect.right = rc->right;
-	destPoint.x = rc->left;
+	srcRect.ବାମ = rc->ବାମ - x;
+	srcRect.ଡାହାଣ = rc->ଡାହାଣ;
+	destPoint.x = rc->ବାମ;
     }
-    if (y >= 0)
+    ଯଦି (y >= 0)
     {
-	srcRect.top = rc->top;
+	srcRect.ଶୀର୍ଷ = rc->ଶୀର୍ଷ;
 	srcRect.bottom = rc->bottom - y;
-	destPoint.y = rc->top + y;
+	destPoint.y = rc->ଶୀର୍ଷ + y;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	srcRect.top = rc->top - y;
+	srcRect.ଶୀର୍ଷ = rc->ଶୀର୍ଷ - y;
 	srcRect.bottom = rc->bottom;
-	destPoint.y = rc->top;
+	destPoint.y = rc->ଶୀର୍ଷ;
     }
     mBitmap->CopyFromRenderTarget(&destPoint, mRT, &srcRect);
 
     D2D1_RECT_F destRect = {
 	    FLOAT(destPoint.x), FLOAT(destPoint.y),
-	    FLOAT(destPoint.x + srcRect.right - srcRect.left),
-	    FLOAT(destPoint.y + srcRect.bottom - srcRect.top)
+	    FLOAT(destPoint.x + srcRect.ଡାହାଣ - srcRect.ବାମ),
+	    FLOAT(destPoint.y + srcRect.bottom - srcRect.ଶୀର୍ଷ)
     };
     mRT->DrawBitmap(mBitmap, destRect, 1.0F,
 	    D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, destRect);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::Flush()
 {
     SetDrawingMode(DM_GDI);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::SetRenderingParams(
-	const DWriteRenderingParams *params)
+	ଅଚଳ DWriteRenderingParams *params)
 {
-    if (mDWriteFactory == NULL)
-	return;
+    ଯଦି (mDWriteFactory == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    IDWriteRenderingParams *renderingParams = NULL;
+    IDWriteRenderingParams *renderingParams = ଖାଲି;
     D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode =
 	D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
     HRESULT hr;
-    if (params != NULL)
+    ଯଦି (params != ଖାଲି)
     {
 	hr = mDWriteFactory->CreateCustomRenderingParams(params->gamma,
 		params->enhancedContrast, params->clearTypeLevel,
@@ -1297,9 +1297,9 @@ DWriteContext::SetRenderingParams(
 		ToRenderingMode(params->renderingMode), &renderingParams);
 	textAntialiasMode = ToTextAntialiasMode(params->textAntialiasMode);
     }
-    else
+    ଅନ୍ୟଥା
 	hr = mDWriteFactory->CreateRenderingParams(&renderingParams);
-    if (SUCCEEDED(hr) && renderingParams != NULL)
+    ଯଦି (SUCCEEDED(hr) && renderingParams != ଖାଲି)
     {
 	SafeRelease(&mRenderingParams);
 	mRenderingParams = renderingParams;
@@ -1315,7 +1315,7 @@ DWriteContext::SetRenderingParams(
 DWriteContext::GetRenderingParams(
 	DWriteRenderingParams *params)
 {
-    if (params != NULL && mRenderingParams != NULL)
+    ଯଦି (params != ଖାଲି && mRenderingParams != ଖାଲି)
     {
 	params->gamma = mRenderingParams->GetGamma();
 	params->enhancedContrast = mRenderingParams->GetEnhancedContrast();
@@ -1324,23 +1324,23 @@ DWriteContext::GetRenderingParams(
 	params->renderingMode = ToInt(mRenderingParams->GetRenderingMode());
 	params->textAntialiasMode = mTextAntialiasMode;
     }
-    return params;
+    ଫେରନ୍ତୁ params;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // PUBLIC C INTERFACES
 
-    void
-DWrite_Init(void)
+    ଶୂନ୍ୟ
+DWrite_Init(ଶୂନ୍ୟ)
 {
 #ifdef DYNAMIC_DIRECTX
     // Load libraries.
     hD2D1DLL = vimLoadLib("d2d1.dll");
     hDWriteDLL = vimLoadLib("dwrite.dll");
-    if (hD2D1DLL == NULL || hDWriteDLL == NULL)
+    ଯଦି (hD2D1DLL == ଖାଲି || hDWriteDLL == ଖାଲି)
     {
 	DWrite_Final();
-	return;
+	ଫେରନ୍ତୁ;
     }
     // Get address of procedures.
     pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)GetProcAddress(
@@ -1352,111 +1352,111 @@ DWrite_Init(void)
 #endif
 }
 
-    void
-DWrite_Final(void)
+    ଶୂନ୍ୟ
+DWrite_Final(ଶୂନ୍ୟ)
 {
 #ifdef DYNAMIC_DIRECTX
-    pGetUserDefaultLocaleName = NULL;
-    pD2D1CreateFactory = NULL;
-    pDWriteCreateFactory = NULL;
+    pGetUserDefaultLocaleName = ଖାଲି;
+    pD2D1CreateFactory = ଖାଲି;
+    pDWriteCreateFactory = ଖାଲି;
     unload(hDWriteDLL);
     unload(hD2D1DLL);
 #endif
 }
 
     DWriteContext *
-DWriteContext_Open(void)
+DWriteContext_Open(ଶୂନ୍ୟ)
 {
 #ifdef DYNAMIC_DIRECTX
-    if (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
-	    || pDWriteCreateFactory == NULL)
-	return NULL;
+    ଯଦି (pGetUserDefaultLocaleName == ଖାଲି || pD2D1CreateFactory == ଖାଲି
+	    || pDWriteCreateFactory == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 #endif
-    return new DWriteContext();
+    ଫେରନ୍ତୁ ନୂତନ DWriteContext();
 }
 
-    void
-DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect)
+    ଶୂନ୍ୟ
+DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, ଅଚଳ RECT *rect)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->BindDC(hdc, rect);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->SetFont(hFont);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_DrawText(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	ଅଚଳ WCHAR *text,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା x,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା y,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା w,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା h,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା cellWidth,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx)
+	ଅଚଳ RECT *lprc,
+	ଅଚଳ INT *lpDx)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->DrawText(text, len, x, y, w, h, cellWidth, color,
 		fuOptions, lprc, lpDx);
 }
 
-    void
-DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color)
+    ଶୂନ୍ୟ
+DWriteContext_FillRect(DWriteContext *ctx, ଅଚଳ RECT *rc, COLORREF color)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->FillRect(rc, color);
 }
 
-    void
-DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+    ଶୂନ୍ୟ
+DWrite_Context_Draw_ଧାଡ଼ି(DWriteContext *ctx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x2, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y2,
 	COLORREF color)
 {
-    if (ctx != NULL)
-	ctx->DrawLine(x1, y1, x2, y2, color);
+    ଯଦି (ctx != ଖାଲି)
+	ctx->Draw_ଧାଡ଼ି(x1, y1, x2, y2, color);
 }
 
-    void
-DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color)
+    ଶୂନ୍ୟ
+DWriteContext_SetPixel(DWriteContext *ctx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, COLORREF color)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->SetPixel(x, y, color);
 }
 
-    void
-DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc)
+    ଶୂନ୍ୟ
+DWriteContext_Scroll(DWriteContext *ctx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ଅଚଳ RECT *rc)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->Scroll(x, y, rc);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_Flush(DWriteContext *ctx)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->Flush();
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_Close(DWriteContext *ctx)
 {
     delete ctx;
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_SetRenderingParams(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params)
+	ଅଚଳ DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
+    ଯଦି (ctx != ଖାଲି)
 	ctx->SetRenderingParams(params);
 }
 
@@ -1465,29 +1465,29 @@ DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	return ctx->GetRenderingParams(params);
-    else
-	return NULL;
+    ଯଦି (ctx != ଖାଲି)
+	ଫେରନ୍ତୁ ctx->GetRenderingParams(params);
+    ଅନ୍ୟଥା
+	ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext::SetFontFeatures(
-	const DWriteFontFeature *features, int count)
+	ଅଚଳ DWriteFontFeature *features, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଗଣନା_2)
 {
-    if (count > DWRITE_MAX_FONT_FEATURES)
-	count = DWRITE_MAX_FONT_FEATURES;
-    mFontFeatureCount = count;
-    if (count > 0 && features != NULL)
-	memcpy(mFontFeatures, features, sizeof(DWriteFontFeature) * count);
+    ଯଦି (ଗଣନା_2 > DWRITE_MAX_FONT_FEATURES)
+	ଗଣନା_2 = DWRITE_MAX_FONT_FEATURES;
+    m_Font_Feature_ଗଣନା = ଗଣନା_2;
+    ଯଦି (ଗଣନା_2 > 0 && features != ଖାଲି)
+	memcpy(mFontFeatures, features, ଆକାର(DWriteFontFeature) * ଗଣନା_2);
 }
 
-    void
+    ଶୂନ୍ୟ
 DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count)
+	ଅଚଳ DWriteFontFeature *features,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଗଣନା_2)
 {
-    if (ctx != NULL)
-	ctx->SetFontFeatures(features, count);
+    ଯଦି (ctx != ଖାଲି)
+	ctx->SetFontFeatures(features, ଗଣନା_2);
 }

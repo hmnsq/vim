@@ -56,11 +56,11 @@
  */
 
 #define IN_SPELL_C
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_SPELL)
+#ଯଦି defined(FEAT_SPELL)
 
-#include <time.h>
+#ଅନ୍ତର୍ଭାଵ <time.h>
 
 #define REGION_ALL 0xff		// word valid in all regions
 
@@ -74,7 +74,7 @@
 /*
  * Structure to store info for word matching.
  */
-typedef struct matchinf_S
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା matchinf_S
 {
     langp_T	*mi_lp;			// info for language and region
 
@@ -87,34 +87,34 @@ typedef struct matchinf_S
 
     // case-folded text
     char_u	mi_fword[MAXWLEN + 1];	// mi_word case-folded
-    int		mi_fwordlen;		// nr of valid bytes in mi_fword
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_fwordlen;		// nr of valid bytes in mi_fword
 
     // for when checking word after a prefix
-    int		mi_prefarridx;		// index in sl_pidxs with list of
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_prefarridx;		// index in sl_pidxs with list of
 					// affixID/condition
-    int		mi_prefcnt;		// number of entries at mi_prefarridx
-    int		mi_prefixlen;		// byte length of prefix
-    int		mi_cprefixlen;		// byte length of prefix in original
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_prefcnt;		// number of entries at mi_prefarridx
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_prefixlen;		// byte length of prefix
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_cprefixlen;		// byte length of prefix in original
 					// case
 
     // for when checking a compound word
-    int		mi_compoff;		// start of following word offset
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_compoff;		// start of following word offset
     char_u	mi_compflags[MAXWLEN];	// flags for compound words used
-    int		mi_complen;		// nr of compound words used
-    int		mi_compextra;		// nr of COMPOUNDROOT words
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_complen;		// nr of compound words used
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_compextra;		// nr of COMPOUNDROOT words
 
     // others
-    int		mi_result;		// result so far: SP_BAD, SP_OK, etc.
-    int		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_result;		// result so far: SP_BAD, SP_OK, etc.
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_capflags;		// WF_ONECAP WF_ALLCAP WF_KEEPCAP
     win_T	*mi_win;		// buffer being checked
 
     // for NOBREAK
-    int		mi_result2;		// "mi_result" without following word
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mi_result2;		// "mi_result" without following word
     char_u	*mi_end2;		// "mi_end" without following word
 } matchinf_T;
 
 
-static int spell_mb_isword_class(int cl, win_T *wp);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା spell_mb_isword_class(ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl, win_T *wp);
 
 // mode values for find_word
 #define FIND_FOLDWORD	    0	// find word case-folded
@@ -128,20 +128,20 @@ static int spell_mb_isword_class(int cl, win_T *wp);
 #define CHAR_UPPER	1
 #define CHAR_DIGIT	2
 
-static void find_word(matchinf_T *mip, int mode);
-static void find_prefix(matchinf_T *mip, int mode);
-static int fold_more(matchinf_T *mip);
-static void spell_load_cb(char_u *fname, void *cookie);
-static int count_syllables(slang_T *slang, char_u *word);
-static void clear_midword(win_T *buf);
-static void use_midword(slang_T *lp, win_T *buf);
-static int find_region(char_u *rp, char_u *region);
-static void spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
-static void spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
-static void dump_word(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T lnum);
-static linenr_T dump_prefixes(slang_T *slang, char_u *word, char_u *pat, int *dir, int round, int flags, linenr_T startlnum);
-static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
+ସ୍ଥିର ଶୂନ୍ୟ find_word(matchinf_T *mip, ପୂର୍ଣ୍ଣସଂଖ୍ୟା mode);
+ସ୍ଥିର ଶୂନ୍ୟ find_prefix(matchinf_T *mip, ପୂର୍ଣ୍ଣସଂଖ୍ୟା mode);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା fold_more(matchinf_T *mip);
+ସ୍ଥିର ଶୂନ୍ୟ spell_load_cb(char_u *fname, ଶୂନ୍ୟ *cookie);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଗଣନା_syllables(slang_T *slang, char_u *word);
+ସ୍ଥିର ଶୂନ୍ୟ clear_midword(win_T *buf);
+ସ୍ଥିର ଶୂନ୍ୟ use_midword(slang_T *lp, win_T *buf);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା find_region(char_u *rp, char_u *region);
+ସ୍ଥିର ଶୂନ୍ୟ spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res);
+ସ୍ଥିର ଶୂନ୍ୟ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res);
+ସ୍ଥିର ଶୂନ୍ୟ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res);
+ସ୍ଥିର ଶୂନ୍ୟ dump_word(slang_T *slang, char_u *word, char_u *pat, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *dir, ପୂର୍ଣ୍ଣସଂଖ୍ୟା round, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags, linenr_T lnum);
+ସ୍ଥିର linenr_T dump_prefixes(slang_T *slang, char_u *word, char_u *pat, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *dir, ପୂର୍ଣ୍ଣସଂଖ୍ୟା round, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags, linenr_T startlnum);
+ସ୍ଥିର char_u *advance_camelcase_word(char_u *p, win_T *wp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *is_camel_case);
 
 /*
  * Main spell-checking function.
@@ -158,73 +158,73 @@ static char_u *advance_camelcase_word(char_u *p, win_T *wp, int *is_camel_case);
  * Returns the length of the word in bytes, also when it's OK, so that the
  * caller can skip over the word.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_check(
     win_T	*wp,		// current window
     char_u	*ptr,
     hlf_T	*attrp,
-    int		*capcol,	// column to check for Capital
-    int		docount)	// count good words
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*capcol,	// column to check for Capital
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		docount)	// count good words
 {
     matchinf_T	mi;		// Most things are put in "mi" so that it can
 				// be passed to functions quickly.
-    int		nrlen = 0;	// found a number first
-    int		c;
-    int		wrongcaplen = 0;
-    int		lpi;
-    int		count_word = docount;
-    int		use_camel_case = *wp->w_s->b_p_spo != NUL;
-    int		is_camel_case = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nrlen = 0;	// found a number first
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wrongcaplen = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lpi;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_word = docount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		use_camel_case = *wp->w_s->b_p_spo != NUL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_camel_case = FALSE;
 
     // A word never starts at a space or a control character.  Return quickly
     // then, skipping over the character.
-    if (*ptr <= ' ')
-	return 1;
+    ଯଦି (*ptr <= ' ')
+	ଫେରନ୍ତୁ 1;
 
     // Return here when loading language files failed.
-    if (wp->w_s->b_langp.ga_len == 0)
-	return 1;
+    ଯଦି (wp->w_s->b_langp.ga_len == 0)
+	ଫେରନ୍ତୁ 1;
 
     CLEAR_FIELD(mi);
 
     // A number is always OK.  Also skip hexadecimal numbers 0xFF99 and
     // 0X99FF.  But always do check spelling to find "3GPP" and "11
     // julifeest".
-    if (*ptr >= '0' && *ptr <= '9')
+    ଯଦି (*ptr >= '0' && *ptr <= '9')
     {
-	if (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
+	ଯଦି (*ptr == '0' && (ptr[1] == 'b' || ptr[1] == 'B'))
 	    mi.mi_end = skipbin(ptr + 2);
-	else if (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
+	ଅନ୍ୟଥା ଯଦି (*ptr == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
 	    mi.mi_end = skiphex(ptr + 2);
-	else
+	ଅନ୍ୟଥା
 	    mi.mi_end = skipdigits(ptr);
-	nrlen = (int)(mi.mi_end - ptr);
+	nrlen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mi.mi_end - ptr);
     }
 
     // Find the normal end of the word (until the next non-word character).
     mi.mi_word = ptr;
     mi.mi_fend = ptr;
-    if (spell_iswordp(mi.mi_fend, wp))
+    ଯଦି (spell_iswordp(mi.mi_fend, wp))
     {
-	if (use_camel_case)
+	ଯଦି (use_camel_case)
 	    mi.mi_fend = advance_camelcase_word(ptr, wp, &is_camel_case);
-	else
+	ଅନ୍ୟଥା
 	{
-	    do
+	    କର
 	    {
 		MB_PTR_ADV(mi.mi_fend);
-	    } while (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
+	    } ଯେତେବେଳେ (*mi.mi_fend != NUL && spell_iswordp(mi.mi_fend, wp));
 	}
 
-	if (capcol != NULL && *capcol == 0 && wp->w_s->b_cap_prog != NULL)
+	ଯଦି (capcol != ଖାଲି && *capcol == 0 && wp->w_s->b_cap_prog != ଖାଲି)
 	{
 	    // Check word starting with capital letter.
 	    c = PTR2CHAR(ptr);
-	    if (!SPELL_ISUPPER(c))
-		wrongcaplen = (int)(mi.mi_fend - ptr);
+	    ଯଦି (!SPELL_ISUPPER(c))
+		wrongcaplen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mi.mi_fend - ptr);
 	}
     }
-    if (capcol != NULL)
+    ଯଦି (capcol != ଖାଲି)
 	*capcol = -1;
 
     // We always use the characters up to the next non-word character,
@@ -233,19 +233,19 @@ spell_check(
 
     // Check caps type later.
     mi.mi_capflags = 0;
-    mi.mi_cend = NULL;
+    mi.mi_cend = ଖାଲି;
     mi.mi_win = wp;
 
     // case-fold the word with one non-word character, so that we can check
     // for the word end.
-    if (*mi.mi_fend != NUL)
+    ଯଦି (*mi.mi_fend != NUL)
 	MB_PTR_ADV(mi.mi_fend);
 
-    (void)spell_casefold(wp, ptr, (int)(mi.mi_fend - ptr), mi.mi_fword,
+    (ଶୂନ୍ୟ)spell_casefold(wp, ptr, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mi.mi_fend - ptr), mi.mi_fword,
 							     MAXWLEN + 1);
-    mi.mi_fwordlen = (int)STRLEN(mi.mi_fword);
+    mi.mi_fwordlen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(mi.mi_fword);
 
-    if (is_camel_case && mi.mi_fwordlen > 0)
+    ଯଦି (is_camel_case && mi.mi_fwordlen > 0)
 	// Introduce a fake word end space into the folded word.
 	mi.mi_fword[mi.mi_fwordlen - 1] = ' ';
 
@@ -258,14 +258,14 @@ spell_check(
      * We check them all, because a word may be matched longer in another
      * language.
      */
-    for (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
+    ପାଇଁ (lpi = 0; lpi < wp->w_s->b_langp.ga_len; ++lpi)
     {
 	mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, lpi);
 
 	// If reloading fails the language is still in the list but everything
 	// has been cleared.
-	if (mi.mi_lp->lp_slang->sl_fidxs == NULL)
-	    continue;
+	ଯଦି (mi.mi_lp->lp_slang->sl_fidxs == ଖାଲି)
+	    ଜାରି;
 
 	// Check for a matching word in case-folded words.
 	find_word(&mi, FIND_FOLDWORD);
@@ -278,7 +278,7 @@ spell_check(
 
 	// For a NOBREAK language, may want to use a word without a following
 	// word as a backup.
-	if (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
+	ଯଦି (mi.mi_lp->lp_slang->sl_nobreak && mi.mi_result == SP_BAD
 						   && mi.mi_result2 != SP_BAD)
 	{
 	    mi.mi_result = mi.mi_result2;
@@ -286,127 +286,127 @@ spell_check(
 	}
 
 	// Count the word in the first language where it's found to be OK.
-	if (count_word && mi.mi_result == SP_OK)
+	ଯଦି (ଗଣନା_word && mi.mi_result == SP_OK)
 	{
-	    count_common_word(mi.mi_lp->lp_slang, ptr,
-						   (int)(mi.mi_end - ptr), 1);
-	    count_word = FALSE;
+	    ଗଣନା_common_word(mi.mi_lp->lp_slang, ptr,
+						   (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mi.mi_end - ptr), 1);
+	    ଗଣନା_word = FALSE;
 	}
     }
 
-    if (mi.mi_result != SP_OK)
+    ଯଦି (mi.mi_result != SP_OK)
     {
 	// If we found a number skip over it.  Allows for "42nd".  Do flag
 	// rare and local words, e.g., "3GPP".
-	if (nrlen > 0)
+	ଯଦି (nrlen > 0)
 	{
-	    if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
-		return nrlen;
+	    ଯଦି (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
+		ଫେରନ୍ତୁ nrlen;
 	}
 
 	// When we are at a non-word character there is no error, just
 	// skip over the character (try looking for a word after it).
-	else if (!spell_iswordp_nmw(ptr, wp))
+	ଅନ୍ୟଥା ଯଦି (!spell_iswordp_nmw(ptr, wp))
 	{
-	    if (capcol != NULL && wp->w_s->b_cap_prog != NULL)
+	    ଯଦି (capcol != ଖାଲି && wp->w_s->b_cap_prog != ଖାଲି)
 	    {
 		regmatch_T	regmatch;
-		int		r;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
 
 		// Check for end of sentence.
 		regmatch.regprog = wp->w_s->b_cap_prog;
 		regmatch.rm_ic = FALSE;
 		r = vim_regexec(&regmatch, ptr, 0);
 		wp->w_s->b_cap_prog = regmatch.regprog;
-		if (r)
-		    *capcol = (int)(regmatch.endp[0] - ptr);
+		ଯଦି (r)
+		    *capcol = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(regmatch.endp[0] - ptr);
 	    }
 
-	    if (has_mbyte)
-		return (*mb_ptr2len)(ptr);
-	    return 1;
+	    ଯଦି (has_mbyte)
+		ଫେରନ୍ତୁ (*mb_ptr2len)(ptr);
+	    ଫେରନ୍ତୁ 1;
 	}
-	else if (mi.mi_end == ptr)
+	ଅନ୍ୟଥା ଯଦି (mi.mi_end == ptr)
 	    // Always include at least one character.  Required for when there
 	    // is a mixup in "midword".
 	    MB_PTR_ADV(mi.mi_end);
-	else if (mi.mi_result == SP_BAD
+	ଅନ୍ୟଥା ଯଦି (mi.mi_result == SP_BAD
 		&& LANGP_ENTRY(wp->w_s->b_langp, 0)->lp_slang->sl_nobreak)
 	{
 	    char_u	*p, *fp;
-	    int		save_result = mi.mi_result;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_result = mi.mi_result;
 
 	    // First language in 'spelllang' is NOBREAK.  Find first position
 	    // at which any word would be valid.
 	    mi.mi_lp = LANGP_ENTRY(wp->w_s->b_langp, 0);
-	    if (mi.mi_lp->lp_slang->sl_fidxs != NULL)
+	    ଯଦି (mi.mi_lp->lp_slang->sl_fidxs != ଖାଲି)
 	    {
 		p = mi.mi_word;
 		fp = mi.mi_fword;
-		for (;;)
+		ପାଇଁ (;;)
 		{
 		    MB_PTR_ADV(p);
 		    MB_PTR_ADV(fp);
-		    if (p >= mi.mi_end)
-			break;
-		    mi.mi_compoff = (int)(fp - mi.mi_fword);
+		    ଯଦି (p >= mi.mi_end)
+			ଭାଙ୍ଗ;
+		    mi.mi_compoff = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(fp - mi.mi_fword);
 		    find_word(&mi, FIND_COMPOUND);
-		    if (mi.mi_result != SP_BAD)
+		    ଯଦି (mi.mi_result != SP_BAD)
 		    {
 			mi.mi_end = p;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 		}
 		mi.mi_result = save_result;
 	    }
 	}
 
-	if (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
+	ଯଦି (mi.mi_result == SP_BAD || mi.mi_result == SP_BANNED)
 	    *attrp = HLF_SPB;
-	else if (mi.mi_result == SP_RARE)
+	ଅନ୍ୟଥା ଯଦି (mi.mi_result == SP_RARE)
 	    *attrp = HLF_SPR;
-	else
+	ଅନ୍ୟଥା
 	    *attrp = HLF_SPL;
     }
 
-    if (wrongcaplen > 0 && (mi.mi_result == SP_OK || mi.mi_result == SP_RARE))
+    ଯଦି (wrongcaplen > 0 && (mi.mi_result == SP_OK || mi.mi_result == SP_RARE))
     {
 	// Report SpellCap only when the word isn't badly spelled.
 	*attrp = HLF_SPC;
-	return wrongcaplen;
+	ଫେରନ୍ତୁ wrongcaplen;
     }
 
-    return (int)(mi.mi_end - ptr);
+    ଫେରନ୍ତୁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mi.mi_end - ptr);
 }
 
 /*
  * Determine the type of character 'c'.
  */
-    static int
-get_char_type(int c)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_char_type(ପୂର୍ଣ୍ଣସଂଖ୍ୟା c)
 {
-    if (VIM_ISDIGIT(c))
-	return CHAR_DIGIT;
-    if (SPELL_ISUPPER(c))
-	return CHAR_UPPER;
-    return CHAR_OTHER;
+    ଯଦି (VIM_ISDIGIT(c))
+	ଫେରନ୍ତୁ CHAR_DIGIT;
+    ଯଦି (SPELL_ISUPPER(c))
+	ଫେରନ୍ତୁ CHAR_UPPER;
+    ଫେରନ୍ତୁ CHAR_OTHER;
 }
 
 /*
  * Returns a pointer to the end of the word starting at "str".
  * Supports camelCase words.
  */
-    static char_u *
-advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
+    ସ୍ଥିର char_u *
+advance_camelcase_word(char_u *str, win_T *wp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *is_camel_case)
 {
-    int last_type, last_last_type, this_type;
-    int c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_type, last_last_type, this_type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା c;
     char_u *end = str;
 
     *is_camel_case = FALSE;
 
-    if (*str == NUL)
-	return str;
+    ଯଦି (*str == NUL)
+	ଫେରନ୍ତୁ str;
 
     c = PTR2CHAR(end);
     MB_PTR_ADV(end);
@@ -414,12 +414,12 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
     last_last_type = -1;
     last_type = get_char_type(c);
 
-    while (*end != NUL && spell_iswordp(end, wp))
+    ଯେତେବେଳେ (*end != NUL && spell_iswordp(end, wp))
     {
 	c = PTR2CHAR(end);
 	this_type = get_char_type(c);
 
-	if (last_last_type == CHAR_UPPER && last_type == CHAR_UPPER
+	ଯଦି (last_last_type == CHAR_UPPER && last_type == CHAR_UPPER
 		&& this_type == CHAR_OTHER)
 	{
 	    // Handle the following cases:
@@ -427,16 +427,16 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
 	    *is_camel_case = TRUE;
 	    // Back up by one char.
 	    MB_PTR_BACK(str, end);
-	    break;
+	    ଭାଙ୍ଗ;
 	}
-	else if ((this_type == CHAR_UPPER && last_type == CHAR_OTHER)
+	ଅନ୍ୟଥା ଯଦି ((this_type == CHAR_UPPER && last_type == CHAR_OTHER)
 		|| (this_type != last_type
 		    && (this_type == CHAR_DIGIT || last_type == CHAR_DIGIT)))
 	{
 	    // Handle the following cases:
 	    // LowerUpper LowerDigit UpperDigit DigitUpper DigitLower
 	    *is_camel_case = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
 	last_last_type = last_type;
@@ -445,7 +445,7 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
 	MB_PTR_ADV(end);
     }
 
-    return end;
+    ଫେରନ୍ତୁ end;
 }
 
 /*
@@ -457,31 +457,31 @@ advance_camelcase_word(char_u *str, win_T *wp, int *is_camel_case)
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_word(matchinf_T *mip, int mode)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_word(matchinf_T *mip, ପୂର୍ଣ୍ଣସଂଖ୍ୟା mode)
 {
     idx_T	arridx = 0;
-    int		endlen[MAXWLEN];    // length at possible word endings
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		endlen[MAXWLEN];    // length at possible word endings
     idx_T	endidx[MAXWLEN];    // possible word endings
-    int		endidxcnt = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		endidxcnt = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wlen = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     char_u	*s;
     char_u	*p;
-    int		res = SP_BAD;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		res = SP_BAD;
     slang_T	*slang = mip->mi_lp->lp_slang;
     unsigned	flags;
     char_u	*byts;
     idx_T	*idxs;
-    int		word_ends;
-    int		prefix_found;
-    int		nobreak_result;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		word_ends;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		prefix_found;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nobreak_result;
 
-    if (mode == FIND_KEEPWORD || mode == FIND_KEEPCOMPOUND)
+    ଯଦି (mode == FIND_KEEPWORD || mode == FIND_KEEPCOMPOUND)
     {
 	// Check for word with matching case in keep-case tree.
 	ptr = mip->mi_word;
@@ -489,11 +489,11 @@ find_word(matchinf_T *mip, int mode)
 	byts = slang->sl_kbyts;
 	idxs = slang->sl_kidxs;
 
-	if (mode == FIND_KEEPCOMPOUND)
+	ଯଦି (mode == FIND_KEEPCOMPOUND)
 	    // Skip over the previously found word(s).
 	    wlen += mip->mi_compoff;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Check for case-folded in case-folded tree.
 	ptr = mip->mi_fword;
@@ -501,13 +501,13 @@ find_word(matchinf_T *mip, int mode)
 	byts = slang->sl_fbyts;
 	idxs = slang->sl_fidxs;
 
-	if (mode == FIND_PREFIX)
+	ଯଦି (mode == FIND_PREFIX)
 	{
 	    // Skip over the prefix.
 	    wlen = mip->mi_prefixlen;
 	    flen -= mip->mi_prefixlen;
 	}
-	else if (mode == FIND_COMPOUND)
+	ଅନ୍ୟଥା ଯଦି (mode == FIND_COMPOUND)
 	{
 	    // Skip over the previously found word(s).
 	    wlen = mip->mi_compoff;
@@ -516,8 +516,8 @@ find_word(matchinf_T *mip, int mode)
 
     }
 
-    if (byts == NULL)
-	return;			// array is empty
+    ଯଦି (byts == ଖାଲି)
+	ଫେରନ୍ତୁ;			// array is empty
 
     /*
      * Repeat advancing in the tree until:
@@ -525,22 +525,22 @@ find_word(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    ପାଇଁ (;;)
     {
-	if (flen <= 0 && *mip->mi_fend != NUL)
+	ଯଦି (flen <= 0 && *mip->mi_fend != NUL)
 	    flen = fold_more(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the word could end here.
 	// Remember this index, we first check for the longest word.
-	if (byts[arridx] == 0)
+	ଯଦି (byts[arridx] == 0)
 	{
-	    if (endidxcnt == MAXWLEN)
+	    ଯଦି (endidxcnt == MAXWLEN)
 	    {
 		// Must be a corrupted spell file.
 		emsg(_(e_format_error_in_spell_file));
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    endlen[endidxcnt] = wlen;
 	    endidx[endidxcnt++] = arridx++;
@@ -548,42 +548,42 @@ find_word(matchinf_T *mip, int mode)
 
 	    // Skip over the zeros, there can be several flag/region
 	    // combinations.
-	    while (len > 0 && byts[arridx] == 0)
+	    ଯେତେବେଳେ (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
 	    }
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    ଯଦି (len == 0)
+		ଭାଙ୍ଗ;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	ଯଦି (ptr[wlen] == NUL)
+	    ଭାଙ୍ଗ;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
-	if (c == TAB)	    // <Tab> is handled like <Space>
+	ଯଦି (c == TAB)	    // <Tab> is handled like <Space>
 	    c = ' ';
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	ଯେତେବେଳେ (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    ଯଦି (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    ଅନ୍ୟଥା ଯଦି (byts[m] < c)
 		lo = m + 1;
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		lo = hi = m;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	ଯଦି (hi < lo || byts[lo] != c)
+	    ଭାଙ୍ଗ;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -592,14 +592,14 @@ find_word(matchinf_T *mip, int mode)
 
 	// One space in the good word may stand for several spaces in the
 	// checked word.
-	if (c == ' ')
+	ଯଦି (c == ' ')
 	{
-	    for (;;)
+	    ପାଇଁ (;;)
 	    {
-		if (flen <= 0 && *mip->mi_fend != NUL)
+		ଯଦି (flen <= 0 && *mip->mi_fend != NUL)
 		    flen = fold_more(mip);
-		if (ptr[wlen] != ' ' && ptr[wlen] != TAB)
-		    break;
+		ଯଦି (ptr[wlen] != ' ' && ptr[wlen] != TAB)
+		    ଭାଙ୍ଗ;
 		++wlen;
 		--flen;
 	    }
@@ -610,37 +610,37 @@ find_word(matchinf_T *mip, int mode)
      * Verify that one of the possible endings is valid.  Try the longest
      * first.
      */
-    while (endidxcnt > 0)
+    ଯେତେବେଳେ (endidxcnt > 0)
     {
 	--endidxcnt;
 	arridx = endidx[endidxcnt];
 	wlen = endlen[endidxcnt];
 
-	if ((*mb_head_off)(ptr, ptr + wlen) > 0)
-	    continue;	    // not at first byte of character
-	if (spell_iswordp(ptr + wlen, mip->mi_win))
+	ଯଦି ((*mb_head_off)(ptr, ptr + wlen) > 0)
+	    ଜାରି;	    // not at first byte of character
+	ଯଦି (spell_iswordp(ptr + wlen, mip->mi_win))
 	{
-	    if (slang->sl_compprog == NULL && !slang->sl_nobreak)
-		continue;	    // next char is a word character
+	    ଯଦି (slang->sl_compprog == ଖାଲି && !slang->sl_nobreak)
+		ଜାରି;	    // next char is a word character
 	    word_ends = FALSE;
 	}
-	else
+	ଅନ୍ୟଥା
 	    word_ends = TRUE;
 	// The prefix flag is before compound flags.  Once a valid prefix flag
 	// has been found we try compound flags.
 	prefix_found = FALSE;
 
-	if (mode != FIND_KEEPWORD && has_mbyte)
+	ଯଦି (mode != FIND_KEEPWORD && has_mbyte)
 	{
 	    // Compute byte length in original word, length may change
 	    // when folding case.  This can be slow, take a shortcut when the
 	    // case-folded word is equal to the keep-case word.
 	    p = mip->mi_word;
-	    if (STRNCMP(ptr, p, wlen) != 0)
+	    ଯଦି (STRNCMP(ptr, p, wlen) != 0)
 	    {
-		for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+		ପାଇଁ (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 		    MB_PTR_ADV(p);
-		wlen = (int)(p - mip->mi_word);
+		wlen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - mip->mi_word);
 	    }
 	}
 
@@ -649,7 +649,7 @@ find_word(matchinf_T *mip, int mode)
 	// Repeat this if there are more flags/region alternatives until there
 	// is a match.
 	res = SP_BAD;
-	for (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
+	ପାଇଁ (len = byts[arridx - 1]; len > 0 && byts[arridx] == 0;
 							      --len, ++arridx)
 	{
 	    flags = idxs[arridx];
@@ -658,9 +658,9 @@ find_word(matchinf_T *mip, int mode)
 	    // matches with what the word in the tree requires.
 	    // For keep-case tree the case is always right.  For prefixes we
 	    // don't bother to check.
-	    if (mode == FIND_FOLDWORD)
+	    ଯଦି (mode == FIND_FOLDWORD)
 	    {
-		if (mip->mi_cend != mip->mi_word + wlen)
+		ଯଦି (mip->mi_cend != mip->mi_word + wlen)
 		{
 		    // mi_capflags was set for a different word length, need
 		    // to do it again.
@@ -668,42 +668,42 @@ find_word(matchinf_T *mip, int mode)
 		    mip->mi_capflags = captype(mip->mi_word, mip->mi_cend);
 		}
 
-		if (mip->mi_capflags == WF_KEEPCAP
+		ଯଦି (mip->mi_capflags == WF_KEEPCAP
 				|| !spell_valid_case(mip->mi_capflags, flags))
-		    continue;
+		    ଜାରି;
 	    }
 
 	    // When mode is FIND_PREFIX the word must support the prefix:
 	    // check the prefix ID and the condition.  Do that for the list at
 	    // mip->mi_prefarridx that find_prefix() filled.
-	    else if (mode == FIND_PREFIX && !prefix_found)
+	    ଅନ୍ୟଥା ଯଦି (mode == FIND_PREFIX && !prefix_found)
 	    {
 		c = valid_word_prefix(mip->mi_prefcnt, mip->mi_prefarridx,
 				    flags,
 				    mip->mi_word + mip->mi_cprefixlen, slang,
 				    FALSE);
-		if (c == 0)
-		    continue;
+		ଯଦି (c == 0)
+		    ଜାରି;
 
 		// Use the WF_RARE flag for a rare prefix.
-		if (c & WF_RAREPFX)
+		ଯଦି (c & WF_RAREPFX)
 		    flags |= WF_RARE;
 		prefix_found = TRUE;
 	    }
 
-	    if (slang->sl_nobreak)
+	    ଯଦି (slang->sl_nobreak)
 	    {
-		if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND)
+		ଯଦି ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND)
 			&& (flags & WF_BANNED) == 0)
 		{
 		    // NOBREAK: found a valid following word.  That's all we
 		    // need to know, so return.
 		    mip->mi_result = SP_OK;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 
-	    else if ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND
+	    ଅନ୍ୟଥା ଯଦି ((mode == FIND_COMPOUND || mode == FIND_KEEPCOMPOUND
 								|| !word_ends))
 	    {
 		// If there is no compound flag or the word is shorter than
@@ -711,76 +711,76 @@ find_word(matchinf_T *mip, int mode)
 		// Makes you wonder why someone puts a compound flag on a word
 		// that's too short...  Myspell compatibility requires this
 		// anyway.
-		if (((unsigned)flags >> 24) == 0
+		ଯଦି (((unsigned)flags >> 24) == 0
 			     || wlen - mip->mi_compoff < slang->sl_compminlen)
-		    continue;
+		    ଜାରି;
 		// For multi-byte chars check character length against
 		// COMPOUNDMIN.
-		if (has_mbyte
+		ଯଦି (has_mbyte
 			&& slang->sl_compminlen > 0
 			&& mb_charlen_len(mip->mi_word + mip->mi_compoff,
 				wlen - mip->mi_compoff) < slang->sl_compminlen)
-			continue;
+			ଜାରି;
 
 		// Limit the number of compound words to COMPOUNDWORDMAX if no
 		// maximum for syllables is specified.
-		if (!word_ends && mip->mi_complen + mip->mi_compextra + 2
+		ଯଦି (!word_ends && mip->mi_complen + mip->mi_compextra + 2
 							   > slang->sl_compmax
 					   && slang->sl_compsylmax == MAXWLEN)
-		    continue;
+		    ଜାରି;
 
 		// Don't allow compounding on a side where an affix was added,
 		// unless COMPOUNDPERMITFLAG was used.
-		if (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
-		    continue;
-		if (!word_ends && (flags & WF_NOCOMPAFT))
-		    continue;
+		ଯଦି (mip->mi_complen > 0 && (flags & WF_NOCOMPBEF))
+		    ଜାରି;
+		ଯଦି (!word_ends && (flags & WF_NOCOMPAFT))
+		    ଜାରି;
 
 		// Quickly check if compounding is possible with this flag.
-		if (!byte_in_str(mip->mi_complen == 0
+		ଯଦି (!byte_in_str(mip->mi_complen == 0
 					? slang->sl_compstartflags
 					: slang->sl_compallflags,
 					    ((unsigned)flags >> 24)))
-		    continue;
+		    ଜାରି;
 
 		// If there is a match with a CHECKCOMPOUNDPATTERN rule
 		// discard the compound word.
-		if (match_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
-		    continue;
+		ଯଦି (match_checkcompoundpattern(ptr, wlen, &slang->sl_comppat))
+		    ଜାରି;
 
-		if (mode == FIND_COMPOUND)
+		ଯଦି (mode == FIND_COMPOUND)
 		{
-		    int	    capflags;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    capflags;
 
 		    // Need to check the caps type of the appended compound
 		    // word.
-		    if (has_mbyte && STRNCMP(ptr, mip->mi_word,
+		    ଯଦି (has_mbyte && STRNCMP(ptr, mip->mi_word,
 							mip->mi_compoff) != 0)
 		    {
 			// case folding may have changed the length
 			p = mip->mi_word;
-			for (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
+			ପାଇଁ (s = ptr; s < ptr + mip->mi_compoff; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			p = mip->mi_word + mip->mi_compoff;
 		    capflags = captype(p, mip->mi_word + wlen);
-		    if (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
+		    ଯଦି (capflags == WF_KEEPCAP || (capflags == WF_ALLCAP
 						 && (flags & WF_FIXCAP) != 0))
-			continue;
+			ଜାରି;
 
-		    if (capflags != WF_ALLCAP)
+		    ଯଦି (capflags != WF_ALLCAP)
 		    {
 			// When the character before the word is a word
 			// character we do not accept a Onecap word.  We do
 			// accept a no-caps word, even when the dictionary
 			// word specifies ONECAP.
 			MB_PTR_BACK(mip->mi_word, p);
-			if (spell_iswordp_nmw(p, mip->mi_win)
+			ଯଦି (spell_iswordp_nmw(p, mip->mi_win)
 				? capflags == WF_ONECAP
 				: (flags & WF_ONECAP) != 0
 						     && capflags != WF_ONECAP)
-			    continue;
+			    ଜାରି;
 		    }
 		}
 
@@ -789,83 +789,83 @@ find_word(matchinf_T *mip, int mode)
 		// the number of syllables must not be too large.
 		mip->mi_compflags[mip->mi_complen] = ((unsigned)flags >> 24);
 		mip->mi_compflags[mip->mi_complen + 1] = NUL;
-		if (word_ends)
+		ଯଦି (word_ends)
 		{
 		    char_u	fword[MAXWLEN];
 
-		    if (slang->sl_compsylmax < MAXWLEN)
+		    ଯଦି (slang->sl_compsylmax < MAXWLEN)
 		    {
 			// "fword" is only needed for checking syllables.
-			if (ptr == mip->mi_word)
-			    (void)spell_casefold(mip->mi_win,
+			ଯଦି (ptr == mip->mi_word)
+			    (ଶୂନ୍ୟ)spell_casefold(mip->mi_win,
 						    ptr, wlen, fword, MAXWLEN);
-			else
+			ଅନ୍ୟଥା
 			    vim_strncpy(fword, ptr, endlen[endidxcnt]);
 		    }
-		    if (!can_compound(slang, fword, mip->mi_compflags))
-			continue;
+		    ଯଦି (!can_compound(slang, fword, mip->mi_compflags))
+			ଜାରି;
 		}
-		else if (slang->sl_comprules != NULL
+		ଅନ୍ୟଥା ଯଦି (slang->sl_comprules != ଖାଲି
 			     && !match_compoundrule(slang, mip->mi_compflags))
 		    // The compound flags collected so far do not match any
 		    // COMPOUNDRULE, discard the compounded word.
-		    continue;
+		    ଜାରି;
 	    }
 
 	    // Check NEEDCOMPOUND: can't use word without compounding.
-	    else if (flags & WF_NEEDCOMP)
-		continue;
+	    ଅନ୍ୟଥା ଯଦି (flags & WF_NEEDCOMP)
+		ଜାରି;
 
 	    nobreak_result = SP_OK;
 
-	    if (!word_ends)
+	    ଯଦି (!word_ends)
 	    {
-		int	save_result = mip->mi_result;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	save_result = mip->mi_result;
 		char_u	*save_end = mip->mi_end;
 		langp_T	*save_lp = mip->mi_lp;
-		int	lpi;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	lpi;
 
 		// Check that a valid word follows.  If there is one and we
 		// are compounding, it will set "mi_result", thus we are
 		// always finished here.  For NOBREAK we only check that a
 		// valid word follows.
 		// Recursive!
-		if (slang->sl_nobreak)
+		ଯଦି (slang->sl_nobreak)
 		    mip->mi_result = SP_BAD;
 
 		// Find following word in case-folded tree.
 		mip->mi_compoff = endlen[endidxcnt];
-		if (has_mbyte && mode == FIND_KEEPWORD)
+		ଯଦି (has_mbyte && mode == FIND_KEEPWORD)
 		{
 		    // Compute byte length in case-folded word from "wlen":
 		    // byte length in keep-case word.  Length may change when
 		    // folding case.  This can be slow, take a shortcut when
 		    // the case-folded word is equal to the keep-case word.
 		    p = mip->mi_fword;
-		    if (STRNCMP(ptr, p, wlen) != 0)
+		    ଯଦି (STRNCMP(ptr, p, wlen) != 0)
 		    {
-			for (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
+			ପାଇଁ (s = ptr; s < ptr + wlen; MB_PTR_ADV(s))
 			    MB_PTR_ADV(p);
-			mip->mi_compoff = (int)(p - mip->mi_fword);
+			mip->mi_compoff = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - mip->mi_fword);
 		    }
 		}
-#if 0 // Disabled, see below
+#ଯଦି 0 // Disabled, see below
 		c = mip->mi_compoff;
 #endif
 		++mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		ଯଦି (flags & WF_COMPROOT)
 		    ++mip->mi_compextra;
 
 		// For NOBREAK we need to try all NOBREAK languages, at least
 		// to find the ".add" file(s).
-		for (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
+		ପାଇଁ (lpi = 0; lpi < mip->mi_win->w_s->b_langp.ga_len; ++lpi)
 		{
-		    if (slang->sl_nobreak)
+		    ଯଦି (slang->sl_nobreak)
 		    {
 			mip->mi_lp = LANGP_ENTRY(mip->mi_win->w_s->b_langp, lpi);
-			if (mip->mi_lp->lp_slang->sl_fidxs == NULL
+			ଯଦି (mip->mi_lp->lp_slang->sl_fidxs == ଖାଲି
 					 || !mip->mi_lp->lp_slang->sl_nobreak)
-			    continue;
+			    ଜାରି;
 		    }
 
 		    find_word(mip, FIND_COMPOUND);
@@ -873,16 +873,16 @@ find_word(matchinf_T *mip, int mode)
 		    // When NOBREAK any word that matches is OK.  Otherwise we
 		    // need to find the longest match, thus try with keep-case
 		    // and prefix too.
-		    if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+		    ଯଦି (!slang->sl_nobreak || mip->mi_result == SP_BAD)
 		    {
 			// Find following word in keep-case tree.
 			mip->mi_compoff = wlen;
 			find_word(mip, FIND_KEEPCOMPOUND);
 
-#if 0	    // Disabled, a prefix must not appear halfway a compound word,
+#ଯଦି 0	    // Disabled, a prefix must not appear halfway a compound word,
 	    // unless the COMPOUNDPERMITFLAG is used and then it can't be a
 	    // postponed prefix.
-			if (!slang->sl_nobreak || mip->mi_result == SP_BAD)
+			ଯଦି (!slang->sl_nobreak || mip->mi_result == SP_BAD)
 			{
 			    // Check for following word with prefix.
 			    mip->mi_compoff = c;
@@ -891,71 +891,71 @@ find_word(matchinf_T *mip, int mode)
 #endif
 		    }
 
-		    if (!slang->sl_nobreak)
-			break;
+		    ଯଦି (!slang->sl_nobreak)
+			ଭାଙ୍ଗ;
 		}
 		--mip->mi_complen;
-		if (flags & WF_COMPROOT)
+		ଯଦି (flags & WF_COMPROOT)
 		    --mip->mi_compextra;
 		mip->mi_lp = save_lp;
 
-		if (slang->sl_nobreak)
+		ଯଦି (slang->sl_nobreak)
 		{
 		    nobreak_result = mip->mi_result;
 		    mip->mi_result = save_result;
 		    mip->mi_end = save_end;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
-		    if (mip->mi_result == SP_OK)
-			break;
-		    continue;
+		    ଯଦି (mip->mi_result == SP_OK)
+			ଭାଙ୍ଗ;
+		    ଜାରି;
 		}
 	    }
 
-	    if (flags & WF_BANNED)
+	    ଯଦି (flags & WF_BANNED)
 		res = SP_BANNED;
-	    else if (flags & WF_REGION)
+	    ଅନ୍ୟଥା ଯଦି (flags & WF_REGION)
 	    {
 		// Check region.
-		if ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
+		ଯଦି ((mip->mi_lp->lp_region & (flags >> 16)) != 0)
 		    res = SP_OK;
-		else
+		ଅନ୍ୟଥା
 		    res = SP_LOCAL;
 	    }
-	    else if (flags & WF_RARE)
+	    ଅନ୍ୟଥା ଯଦି (flags & WF_RARE)
 		res = SP_RARE;
-	    else
+	    ଅନ୍ୟଥା
 		res = SP_OK;
 
 	    // Always use the longest match and the best result.  For NOBREAK
 	    // we separately keep the longest match without a following good
 	    // word as a fall-back.
-	    if (nobreak_result == SP_BAD)
+	    ଯଦି (nobreak_result == SP_BAD)
 	    {
-		if (mip->mi_result2 > res)
+		ଯଦି (mip->mi_result2 > res)
 		{
 		    mip->mi_result2 = res;
 		    mip->mi_end2 = mip->mi_word + wlen;
 		}
-		else if (mip->mi_result2 == res
+		ଅନ୍ୟଥା ଯଦି (mip->mi_result2 == res
 					&& mip->mi_end2 < mip->mi_word + wlen)
 		    mip->mi_end2 = mip->mi_word + wlen;
 	    }
-	    else if (mip->mi_result > res)
+	    ଅନ୍ୟଥା ଯଦି (mip->mi_result > res)
 	    {
 		mip->mi_result = res;
 		mip->mi_end = mip->mi_word + wlen;
 	    }
-	    else if (mip->mi_result == res && mip->mi_end < mip->mi_word + wlen)
+	    ଅନ୍ୟଥା ଯଦି (mip->mi_result == res && mip->mi_end < mip->mi_word + wlen)
 		mip->mi_end = mip->mi_word + wlen;
 
-	    if (mip->mi_result == SP_OK)
-		break;
+	    ଯଦି (mip->mi_result == SP_OK)
+		ଭାଙ୍ଗ;
 	}
 
-	if (mip->mi_result == SP_OK)
-	    break;
+	ଯଦି (mip->mi_result == SP_OK)
+	    ଭାଙ୍ଗ;
     }
 }
 
@@ -966,66 +966,66 @@ find_word(matchinf_T *mip, int mode)
  * A match means that the first part of CHECKCOMPOUNDPATTERN matches at the
  * end of ptr[wlen] and the second part matches after it.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 match_checkcompoundpattern(
     char_u	*ptr,
-    int		wlen,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wlen,
     garray_T	*gap)  // &sl_comppat
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     char_u	*p;
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
-    for (i = 0; i + 1 < gap->ga_len; i += 2)
+    ପାଇଁ (i = 0; i + 1 < gap->ga_len; i += 2)
     {
 	p = ((char_u **)gap->ga_data)[i + 1];
-	if (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
+	ଯଦି (STRNCMP(ptr + wlen, p, STRLEN(p)) == 0)
 	{
 	    // Second part matches at start of following compound word, now
 	    // check if first part matches at end of previous word.
 	    p = ((char_u **)gap->ga_data)[i];
-	    len = (int)STRLEN(p);
-	    if (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
-		return TRUE;
+	    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p);
+	    ଯଦି (len <= wlen && STRNCMP(ptr + wlen - len, p, len) == 0)
+		ଫେରନ୍ତୁ TRUE;
 	}
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Return TRUE if "flags" is a valid sequence of compound flags and "word"
  * does not have too many syllables.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 can_compound(slang_T *slang, char_u *word, char_u *flags)
 {
     char_u	uflags[MAXWLEN * 2];
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     char_u	*p;
 
-    if (slang->sl_compprog == NULL)
-	return FALSE;
-    if (enc_utf8)
+    ଯଦି (slang->sl_compprog == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
+    ଯଦି (enc_utf8)
     {
 	// Need to convert the single byte flags to utf8 characters.
 	p = uflags;
-	for (i = 0; flags[i] != NUL; ++i)
+	ପାଇଁ (i = 0; flags[i] != NUL; ++i)
 	    p += utf_char2bytes(flags[i], p);
 	*p = NUL;
 	p = uflags;
     }
-    else
+    ଅନ୍ୟଥା
 	p = flags;
-    if (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
-	return FALSE;
+    ଯଦି (!vim_regexec_prog(&slang->sl_compprog, FALSE, p, 0))
+	ଫେରନ୍ତୁ FALSE;
 
     // Count the number of syllables.  This may be slow, do it last.  If there
     // are too many syllables AND the number of compound words is above
     // COMPOUNDWORDMAX then compounding is not allowed.
-    if (slang->sl_compsylmax < MAXWLEN
-		       && count_syllables(slang, word) > slang->sl_compsylmax)
-	return (int)STRLEN(flags) < slang->sl_compmax;
-    return TRUE;
+    ଯଦି (slang->sl_compsylmax < MAXWLEN
+		       && ଗଣନା_syllables(slang, word) > slang->sl_compsylmax)
+	ଫେରନ୍ତୁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(flags) < slang->sl_compmax;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -1034,52 +1034,52 @@ can_compound(slang_T *slang, char_u *word, char_u *flags)
  * collected so far can't possibly match any compound rule.
  * Caller must check that slang->sl_comprules is not NULL.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 match_compoundrule(slang_T *slang, char_u *compflags)
 {
     char_u	*p;
-    int		i;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
     // loop over all the COMPOUNDRULE entries
-    for (p = slang->sl_comprules; *p != NUL; ++p)
+    ପାଇଁ (p = slang->sl_comprules; *p != NUL; ++p)
     {
 	// loop over the flags in the compound word we have made, match
 	// them against the current rule entry
-	for (i = 0; ; ++i)
+	ପାଇଁ (i = 0; ; ++i)
 	{
 	    c = compflags[i];
-	    if (c == NUL)
+	    ଯଦି (c == NUL)
 		// found a rule that matches for the flags we have so far
-		return TRUE;
-	    if (*p == '/' || *p == NUL)
-		break;  // end of rule, it's too short
-	    if (*p == '[')
+		ଫେରନ୍ତୁ TRUE;
+	    ଯଦି (*p == '/' || *p == NUL)
+		ଭାଙ୍ଗ;  // end of rule, it's too short
+	    ଯଦି (*p == '[')
 	    {
-		int match = FALSE;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା match = FALSE;
 
 		// compare against all the flags in []
 		++p;
-		while (*p != ']' && *p != NUL)
-		    if (*p++ == c)
+		ଯେତେବେଳେ (*p != ']' && *p != NUL)
+		    ଯଦି (*p++ == c)
 			match = TRUE;
-		if (!match)
-		    break;  // none matches
+		ଯଦି (!match)
+		    ଭାଙ୍ଗ;  // none matches
 	    }
-	    else if (*p != c)
-		break;  // flag of word doesn't match flag in pattern
+	    ଅନ୍ୟଥା ଯଦି (*p != c)
+		ଭାଙ୍ଗ;  // flag of word doesn't match flag in pattern
 	    ++p;
 	}
 
 	// Skip to the next "/", where the next pattern starts.
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    break;
+	ଯଦି (p == ଖାଲି)
+	    ଭାଙ୍ଗ;
     }
 
     // Checked all the rules and none of them match the flags, so there
     // can't possibly be a compound starting with these flags.
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
@@ -1087,49 +1087,49 @@ match_compoundrule(slang_T *slang, char_u *compflags)
  * ID in "flags" for the word "word".
  * The WF_RAREPFX flag is included in the return value for a rare prefix.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 valid_word_prefix(
-    int		totprefcnt,	// nr of prefix IDs
-    int		arridx,		// idx in sl_pidxs[]
-    int		flags,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		totprefcnt,	// nr of prefix IDs
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arridx,		// idx in sl_pidxs[]
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags,
     char_u	*word,
     slang_T	*slang,
-    int		cond_req)	// only use prefixes with a condition
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cond_req)	// only use prefixes with a condition
 {
-    int		prefcnt;
-    int		pidx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		prefcnt;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pidx;
     regprog_T	**rp;
-    int		prefid;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		prefid;
 
     prefid = (unsigned)flags >> 24;
-    for (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
+    ପାଇଁ (prefcnt = totprefcnt - 1; prefcnt >= 0; --prefcnt)
     {
 	pidx = slang->sl_pidxs[arridx + prefcnt];
 
 	// Check the prefix ID.
-	if (prefid != (pidx & 0xff))
-	    continue;
+	ଯଦି (prefid != (pidx & 0xff))
+	    ଜାରି;
 
 	// Check if the prefix doesn't combine and the word already has a
 	// suffix.
-	if ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
-	    continue;
+	ଯଦି ((flags & WF_HAS_AFF) && (pidx & WF_PFX_NC))
+	    ଜାରି;
 
 	// Check the condition, if there is one.  The condition index is
 	// stored in the two bytes above the prefix ID byte.
 	rp = &slang->sl_prefprog[((unsigned)pidx >> 8) & 0xffff];
-	if (*rp != NULL)
+	ଯଦି (*rp != ଖାଲି)
 	{
-	    if (!vim_regexec_prog(rp, FALSE, word, 0))
-		continue;
+	    ଯଦି (!vim_regexec_prog(rp, FALSE, word, 0))
+		ଜାରି;
 	}
-	else if (cond_req)
-	    continue;
+	ଅନ୍ୟଥା ଯଦି (cond_req)
+	    ଜାରି;
 
 	// It's a match!  Return the WF_ flags.
-	return pidx;
+	ଫେରନ୍ତୁ pidx;
     }
-    return 0;
+    ଫେରନ୍ତୁ 0;
 }
 
 /*
@@ -1141,14 +1141,14 @@ valid_word_prefix(
  *
  * For a match mip->mi_result is updated.
  */
-    static void
-find_prefix(matchinf_T *mip, int mode)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_prefix(matchinf_T *mip, ପୂର୍ଣ୍ଣସଂଖ୍ୟା mode)
 {
     idx_T	arridx = 0;
-    int		len;
-    int		wlen = 0;
-    int		flen;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wlen = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	*ptr;
     idx_T	lo, hi, m;
     slang_T	*slang = mip->mi_lp->lp_slang;
@@ -1156,14 +1156,14 @@ find_prefix(matchinf_T *mip, int mode)
     idx_T	*idxs;
 
     byts = slang->sl_pbyts;
-    if (byts == NULL)
-	return;			// array is empty
+    ଯଦି (byts == ଖାଲି)
+	ଫେରନ୍ତୁ;			// array is empty
 
     // We use the case-folded word here, since prefixes are always
     // case-folded.
     ptr = mip->mi_fword;
     flen = mip->mi_fwordlen;    // available case-folded bytes
-    if (mode == FIND_COMPOUND)
+    ଯଦି (mode == FIND_COMPOUND)
     {
 	// Skip over the previously found word(s).
 	ptr += mip->mi_compoff;
@@ -1177,16 +1177,16 @@ find_prefix(matchinf_T *mip, int mode)
      * - we reach the end of the tree,
      * - or we reach the end of the line.
      */
-    for (;;)
+    ପାଇଁ (;;)
     {
-	if (flen == 0 && *mip->mi_fend != NUL)
+	ଯଦି (flen == 0 && *mip->mi_fend != NUL)
 	    flen = fold_more(mip);
 
 	len = byts[arridx++];
 
 	// If the first possible byte is a zero the prefix could end here.
 	// Check if the following word matches and supports the prefix.
-	if (byts[arridx] == 0)
+	ଯଦି (byts[arridx] == 0)
 	{
 	    // There can be several prefixes with different conditions.  We
 	    // try them all, since we don't know which one will give the
@@ -1194,7 +1194,7 @@ find_prefix(matchinf_T *mip, int mode)
 	    // of possible prefixes to find_word().
 	    mip->mi_prefarridx = arridx;
 	    mip->mi_prefcnt = len;
-	    while (len > 0 && byts[arridx] == 0)
+	    ଯେତେବେଳେ (len > 0 && byts[arridx] == 0)
 	    {
 		++arridx;
 		--len;
@@ -1203,50 +1203,50 @@ find_prefix(matchinf_T *mip, int mode)
 
 	    // Find the word that comes after the prefix.
 	    mip->mi_prefixlen = wlen;
-	    if (mode == FIND_COMPOUND)
+	    ଯଦି (mode == FIND_COMPOUND)
 		// Skip over the previously found word(s).
 		mip->mi_prefixlen += mip->mi_compoff;
 
-	    if (has_mbyte)
+	    ଯଦି (has_mbyte)
 	    {
 		// Case-folded length may differ from original length.
 		mip->mi_cprefixlen = nofold_len(mip->mi_fword,
 					     mip->mi_prefixlen, mip->mi_word);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		mip->mi_cprefixlen = mip->mi_prefixlen;
 	    find_word(mip, FIND_PREFIX);
 
 
-	    if (len == 0)
-		break;	    // no children, word must end here
+	    ଯଦି (len == 0)
+		ଭାଙ୍ଗ;	    // no children, word must end here
 	}
 
 	// Stop looking at end of the line.
-	if (ptr[wlen] == NUL)
-	    break;
+	ଯଦି (ptr[wlen] == NUL)
+	    ଭାଙ୍ଗ;
 
 	// Perform a binary search in the list of accepted bytes.
 	c = ptr[wlen];
 	lo = arridx;
 	hi = arridx + len - 1;
-	while (lo < hi)
+	ଯେତେବେଳେ (lo < hi)
 	{
 	    m = (lo + hi) / 2;
-	    if (byts[m] > c)
+	    ଯଦି (byts[m] > c)
 		hi = m - 1;
-	    else if (byts[m] < c)
+	    ଅନ୍ୟଥା ଯଦି (byts[m] < c)
 		lo = m + 1;
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		lo = hi = m;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
 	// Stop if there is no matching byte.
-	if (hi < lo || byts[lo] != c)
-	    break;
+	ଯଦି (hi < lo || byts[lo] != c)
+	    ଭାଙ୍ଗ;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[lo];
@@ -1260,39 +1260,39 @@ find_prefix(matchinf_T *mip, int mode)
  * for efficiency.  Include the non-word character too.
  * Return the length of the folded chars in bytes.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 fold_more(matchinf_T *mip)
 {
-    int		flen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flen;
     char_u	*p;
 
     p = mip->mi_fend;
-    do
+    କର
 	MB_PTR_ADV(mip->mi_fend);
-    while (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
+    ଯେତେବେଳେ (*mip->mi_fend != NUL && spell_iswordp(mip->mi_fend, mip->mi_win));
 
     // Include the non-word character so that we can check for the word end.
-    if (*mip->mi_fend != NUL)
+    ଯଦି (*mip->mi_fend != NUL)
 	MB_PTR_ADV(mip->mi_fend);
 
-    (void)spell_casefold(mip->mi_win, p, (int)(mip->mi_fend - p),
+    (ଶୂନ୍ୟ)spell_casefold(mip->mi_win, p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(mip->mi_fend - p),
 			     mip->mi_fword + mip->mi_fwordlen,
 			     MAXWLEN - mip->mi_fwordlen);
-    flen = (int)STRLEN(mip->mi_fword + mip->mi_fwordlen);
+    flen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(mip->mi_fword + mip->mi_fwordlen);
     mip->mi_fwordlen += flen;
-    return flen;
+    ଫେରନ୍ତୁ flen;
 }
 
 /*
  * Check case flags for a word.  Return TRUE if the word has the requested
  * case.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_valid_case(
-    int	    wordflags,	    // flags for the checked word.
-    int	    treeflags)	    // flags for the word in the spell tree
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    wordflags,	    // flags for the checked word.
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    treeflags)	    // flags for the word in the spell tree
 {
-    return ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
+    ଫେରନ୍ତୁ ((wordflags == WF_ALLCAP && (treeflags & WF_FIXCAP) == 0)
 	    || ((treeflags & (WF_ALLCAP | WF_KEEPCAP)) == 0
 		&& ((treeflags & WF_ONECAP) == 0
 					   || (wordflags & WF_ONECAP) != 0)));
@@ -1301,25 +1301,25 @@ spell_valid_case(
 /*
  * Return TRUE if spell checking is enabled for "wp".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_check_window(win_T *wp)
 {
-    return wp->w_p_spell
+    ଫେରନ୍ତୁ wp->w_p_spell
 		&& *wp->w_s->b_p_spl != NUL
 		&& wp->w_s->b_langp.ga_len > 0
-		&& *(char **)(wp->w_s->b_langp.ga_data) != NULL;
+		&& *(ଅକ୍ଷର **)(wp->w_s->b_langp.ga_data) != ଖାଲି;
 }
 
 /*
  * Return TRUE and give an error if spell checking is not enabled.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 no_spell_checking(win_T *wp)
 {
-    if (spell_check_window(wp))
-	return FALSE;
+    ଯଦି (spell_check_window(wp))
+	ଫେରନ୍ତୁ FALSE;
     emsg(_(e_spell_checking_is_not_possible));
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -1330,37 +1330,37 @@ no_spell_checking(win_T *wp)
  * to after badly spelled word before the cursor.
  * Return 0 if not found, length of the badly spelled word otherwise.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_move_to(
     win_T	*wp,
-    int		dir,		// FORWARD or BACKWARD
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir,		// FORWARD or BACKWARD
     smt_T	behaviour,	// Behaviour of the function
-    int		curline,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curline,
     hlf_T	*attrp)		// return: attributes of bad word or NULL
 				// (only when "dir" is FORWARD)
 {
     linenr_T	lnum;
     pos_T	found_pos;
-    int		found_len = 0;
-    char_u	*line;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found_len = 0;
+    char_u	*ଧାଡ଼ି;
     char_u	*p;
     char_u	*endp;
     hlf_T	attr = 0;
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 #ifdef FEAT_SYN_HL
-    int		has_syntax = syntax_present(wp);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_syntax = syntax_present(wp);
 #endif
-    int		col;
-    int		can_spell;
-    char_u	*buf = NULL;
-    int		buflen = 0;
-    int		skip = 0;
-    int		capcol = -1;
-    int		found_one = FALSE;
-    int		wrapped = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		can_spell;
+    char_u	*buf = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		buflen = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skip = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		capcol = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found_one = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wrapped = FALSE;
 
-    if (no_spell_checking(wp))
-	return 0;
+    ଯଦି (no_spell_checking(wp))
+	ଫେରନ୍ତୁ 0;
 
     /*
      * Start looking for bad word at the start of the line, because we can't
@@ -1376,76 +1376,76 @@ spell_move_to(
     lnum = wp->w_cursor.lnum;
     CLEAR_POS(&found_pos);
 
-    while (!got_int)
+    ଯେତେବେଳେ (!got_int)
     {
-	int empty_line;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା empty_ଧାଡ଼ି;
 
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	ଧାଡ଼ି = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 	len = ml_get_buf_len(wp->w_buffer, lnum);
-	if (buflen < len + MAXWLEN + 2)
+	ଯଦି (buflen < len + MAXWLEN + 2)
 	{
 	    vim_free(buf);
 	    buflen = len + MAXWLEN + 2;
 	    buf = alloc(buflen);
-	    if (buf == NULL)
-		break;
+	    ଯଦି (buf == ଖାଲି)
+		ଭାଙ୍ଗ;
 	}
 
 	// In first line check first word for Capital.
-	if (lnum == 1)
+	ଯଦି (lnum == 1)
 	    capcol = 0;
 
 	// For checking first word with a capital skip white space.
-	if (capcol == 0)
-	    capcol = getwhitecols(line);
-	else if (curline && wp == curwin)
+	ଯଦି (capcol == 0)
+	    capcol = getwhitecols(ଧାଡ଼ି);
+	ଅନ୍ୟଥା ଯଦି (curline && wp == curwin)
 	{
 	    // For spellbadword(): check if first word needs a capital.
-	    col = getwhitecols(line);
-	    if (check_need_cap(curwin, lnum, col))
+	    col = getwhitecols(ଧାଡ଼ି);
+	    ଯଦି (check_need_cap(curwin, lnum, col))
 		capcol = col;
 
 	    // Need to get the line again, may have looked at the previous
 	    // one.
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	    ଧାଡ଼ି = ml_get_buf(wp->w_buffer, lnum, FALSE);
 	}
 
 	// Copy the line into "buf" and append the start of the next line if
 	// possible.  Note: this ml_get_buf() may make "line" invalid, check
 	// for empty line first.
-	empty_line = *skipwhite(line) == NUL;
-	STRCPY(buf, line);
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
-	    spell_cat_line(buf + STRLEN(buf),
+	empty_ଧାଡ଼ି = *skipwhite(ଧାଡ଼ି) == NUL;
+	STRCPY(buf, ଧାଡ଼ି);
+	ଯଦି (lnum < wp->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+	    spell_cat_ଧାଡ଼ି(buf + STRLEN(buf),
 			  ml_get_buf(wp->w_buffer, lnum + 1, FALSE), MAXWLEN);
 
 	p = buf + skip;
 	endp = buf + len;
-	while (p < endp)
+	ଯେତେବେଳେ (p < endp)
 	{
 	    // When searching backward don't search after the cursor.  Unless
 	    // we wrapped around the end of the buffer.
-	    if (dir == BACKWARD
+	    ଯଦି (dir == BACKWARD
 		    && lnum == wp->w_cursor.lnum
 		    && !wrapped
 		    && (colnr_T)(p - buf) >= wp->w_cursor.col)
-		break;
+		ଭାଙ୍ଗ;
 
 	    // start of word
-	    attr = HLF_COUNT;
+	    attr = HLF_ଗଣନା;
 	    len = spell_check(wp, p, &attr, &capcol, FALSE);
 
-	    if (attr != HLF_COUNT)
+	    ଯଦି (attr != HLF_ଗଣନା)
 	    {
 		// We found a bad word.  Check the attribute.
-		if (behaviour == SMT_ALL
+		ଯଦି (behaviour == SMT_ALL
 				|| (behaviour == SMT_BAD && attr == HLF_SPB)
 				|| (behaviour == SMT_RARE && attr == HLF_SPR))
 		{
 		    // When searching forward only accept a bad word after
 		    // the cursor.
-		    if (dir == BACKWARD
+		    ଯଦି (dir == BACKWARD
 			    || lnum != wp->w_cursor.lnum
 			    || (wrapped
 				|| (colnr_T)(curline ? p - buf + len
@@ -1453,41 +1453,41 @@ spell_move_to(
 						  > wp->w_cursor.col))
 		    {
 #ifdef FEAT_SYN_HL
-			if (has_syntax)
+			ଯଦି (has_syntax)
 			{
-			    col = (int)(p - buf);
-			    (void)syn_get_id(wp, lnum, (colnr_T)col,
+			    col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - buf);
+			    (ଶୂନ୍ୟ)syn_get_id(wp, lnum, (colnr_T)col,
 						    FALSE, &can_spell, FALSE);
-			    if (!can_spell)
-				attr = HLF_COUNT;
+			    ଯଦି (!can_spell)
+				attr = HLF_ଗଣନା;
 			}
-			else
+			ଅନ୍ୟଥା
 #endif
 			    can_spell = TRUE;
 
-			if (can_spell)
+			ଯଦି (can_spell)
 			{
 			    found_one = TRUE;
 			    found_pos.lnum = lnum;
-			    found_pos.col = (int)(p - buf);
+			    found_pos.col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - buf);
 			    found_pos.coladd = 0;
-			    if (dir == FORWARD)
+			    ଯଦି (dir == FORWARD)
 			    {
 				// No need to search further.
 				wp->w_cursor = found_pos;
 				vim_free(buf);
-				if (attrp != NULL)
+				ଯଦି (attrp != ଖାଲି)
 				    *attrp = attr;
-				return len;
+				ଫେରନ୍ତୁ len;
 			    }
-			    else if (curline)
+			    ଅନ୍ୟଥା ଯଦି (curline)
 				// Insert mode completion: put cursor after
 				// the bad word.
 				found_pos.col += len;
 			    found_len = len;
 			}
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			found_one = TRUE;
 		}
 	    }
@@ -1497,81 +1497,81 @@ spell_move_to(
 	    capcol -= len;
 	}
 
-	if (dir == BACKWARD && found_pos.lnum != 0)
+	ଯଦି (dir == BACKWARD && found_pos.lnum != 0)
 	{
 	    // Use the last match in the line (before the cursor).
 	    wp->w_cursor = found_pos;
 	    vim_free(buf);
-	    return found_len;
+	    ଫେରନ୍ତୁ found_len;
 	}
 
-	if (curline)
-	    break;	// only check cursor line
+	ଯଦି (curline)
+	    ଭାଙ୍ଗ;	// only check cursor line
 
 	// If we are back at the starting line and searched it again there
 	// is no match, give up.
-	if (lnum == wp->w_cursor.lnum && wrapped)
-	    break;
+	ଯଦି (lnum == wp->w_cursor.lnum && wrapped)
+	    ଭାଙ୍ଗ;
 
 	// Advance to next line.
-	if (dir == BACKWARD)
+	ଯଦି (dir == BACKWARD)
 	{
-	    if (lnum > 1)
+	    ଯଦି (lnum > 1)
 		--lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    ଅନ୍ୟଥା ଯଦି (!p_ws)
+		ଭାଙ୍ଗ;	    // at first line and 'nowrapscan'
+	    ଅନ୍ୟଥା
 	    {
 		// Wrap around to the end of the buffer.  May search the
 		// starting line again and accept the last match.
-		lnum = wp->w_buffer->b_ml.ml_line_count;
+		lnum = wp->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		ଯଦି (!shortmess(SHM_ସନ୍ଧାନ))
+		    give_warning((char_u *)_(ଶୀର୍ଷ_bot_ସନ୍ଦେଶ), TRUE);
 	    }
 	    capcol = -1;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	    ଯଦି (lnum < wp->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 		++lnum;
-	    else if (!p_ws)
-		break;	    // at first line and 'nowrapscan'
-	    else
+	    ଅନ୍ୟଥା ଯଦି (!p_ws)
+		ଭାଙ୍ଗ;	    // at first line and 'nowrapscan'
+	    ଅନ୍ୟଥା
 	    {
 		// Wrap around to the start of the buffer.  May search the
 		// starting line again and accept the first match.
 		lnum = 1;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		ଯଦି (!shortmess(SHM_ସନ୍ଧାନ))
+		    give_warning((char_u *)_(bot_ଶୀର୍ଷ_ସନ୍ଦେଶ), TRUE);
 	    }
 
 	    // If we are back at the starting line and there is no match then
 	    // give up.
-	    if (lnum == wp->w_cursor.lnum && !found_one)
-		break;
+	    ଯଦି (lnum == wp->w_cursor.lnum && !found_one)
+		ଭାଙ୍ଗ;
 
 	    // Skip the characters at the start of the next line that were
 	    // included in a match crossing line boundaries.
-	    if (attr == HLF_COUNT)
-		skip = (int)(p - endp);
-	    else
+	    ଯଦି (attr == HLF_ଗଣନା)
+		skip = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - endp);
+	    ଅନ୍ୟଥା
 		skip = 0;
 
 	    // Capcol skips over the inserted space.
 	    --capcol;
 
 	    // But after empty line check first word in next line
-	    if (empty_line)
+	    ଯଦି (empty_ଧାଡ଼ି)
 		capcol = 0;
 	}
 
-	line_breakcheck();
+	ଧାଡ଼ି_breakcheck();
     }
 
     vim_free(buf);
-    return 0;
+    ଫେରନ୍ତୁ 0;
 }
 
 /*
@@ -1580,23 +1580,23 @@ spell_move_to(
  * Keep the blanks at the start of the next line, this is used in win_line()
  * to skip those bytes if the word was OK.
  */
-    void
-spell_cat_line(char_u *buf, char_u *line, int maxlen)
+    ଶୂନ୍ୟ
+spell_cat_ଧାଡ଼ି(char_u *buf, char_u *ଧାଡ଼ି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା maxlen)
 {
     char_u	*p;
-    int		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
 
-    p = skipwhite(line);
-    while (vim_strchr((char_u *)"*#/\"\t", *p) != NULL)
+    p = skipwhite(ଧାଡ଼ି);
+    ଯେତେବେଳେ (vim_strchr((char_u *)"*#/\"\t", *p) != ଖାଲି)
 	p = skipwhite(p + 1);
 
-    if (*p == NUL)
-	return;
+    ଯଦି (*p == NUL)
+	ଫେରନ୍ତୁ;
 
     // Only worth concatenating if there is something else than spaces to
     // concatenate.
-    n = (int)(p - line) + 1;
-    if (n < maxlen - 1)
+    n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - ଧାଡ଼ି) + 1;
+    ଯଦି (n < maxlen - 1)
     {
 	vim_memset(buf, ' ', n);
 	vim_strncpy(buf +  n, p, maxlen - 1 - n);
@@ -1606,29 +1606,29 @@ spell_cat_line(char_u *buf, char_u *line, int maxlen)
 /*
  * Structure used for the cookie argument of do_in_runtimepath().
  */
-typedef struct spelload_S
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା spelload_S
 {
     char_u  sl_lang[MAXWLEN + 1];	// language name
     slang_T *sl_slang;			// resulting slang_T struct
-    int	    sl_nobreak;			// NOBREAK language found
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    sl_nobreak;			// NOBREAK language found
 } spelload_T;
 
 /*
  * Load word list(s) for "lang" from Vim spell file(s).
  * "lang" must be the language without the region: e.g., "en".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 spell_load_lang(char_u *lang)
 {
     char_u	fname_enc[85];
-    int		r;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
     spelload_T	sl;
-    int		round;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		round;
 
     // Copy the language name to pass it to spell_load_cb() as a cookie.
     // It's truncated when an error is detected.
     STRCPY(sl.sl_lang, lang);
-    sl.sl_slang = NULL;
+    sl.sl_slang = ଖାଲି;
     sl.sl_nobreak = FALSE;
 
     // Disallow deleting the current buffer.  Autocommands can do weird things
@@ -1637,52 +1637,52 @@ spell_load_lang(char_u *lang)
 
     // We may retry when no spell file is found for the language, an
     // autocommand may load it then.
-    for (round = 1; round <= 2; ++round)
+    ପାଇଁ (round = 1; round <= 2; ++round)
     {
 	/*
 	 * Find the first spell file for "lang" in 'runtimepath' and load it.
 	 */
-	vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
+	vim_snprintf((ଅକ୍ଷର *)fname_enc, ଆକାର(fname_enc) - 5,
 #ifdef VMS
 					"spell/%s_%s.spl",
-#else
+#ଅନ୍ୟଥା
 					"spell/%s.%s.spl",
 #endif
 							   lang, spell_enc());
 	r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
 
-	if (r == FAIL && *sl.sl_lang != NUL)
+	ଯଦି (r == FAIL && *sl.sl_lang != NUL)
 	{
 	    // Try loading the ASCII version.
-	    vim_snprintf((char *)fname_enc, sizeof(fname_enc) - 5,
+	    vim_snprintf((ଅକ୍ଷର *)fname_enc, ଆକାର(fname_enc) - 5,
 #ifdef VMS
 						  "spell/%s_ascii.spl",
-#else
+#ଅନ୍ୟଥା
 						  "spell/%s.ascii.spl",
 #endif
 									lang);
 	    r = do_in_runtimepath(fname_enc, 0, spell_load_cb, &sl);
 
-	    if (r == FAIL && *sl.sl_lang != NUL && round == 1
+	    ଯଦି (r == FAIL && *sl.sl_lang != NUL && round == 1
 		    && apply_autocmds(EVENT_SPELLFILEMISSING, lang,
 					      curbuf->b_fname, FALSE, curbuf))
-		continue;
-	    break;
+		ଜାରି;
+	    ଭାଙ୍ଗ;
 	}
-	break;
+	ଭାଙ୍ଗ;
     }
 
-    if (r == FAIL)
+    ଯଦି (r == FAIL)
     {
 	smsg(
 #ifdef VMS
 	_("Warning: Cannot find word list \"%s_%s.spl\" or \"%s_ascii.spl\""),
-#else
+#ଅନ୍ୟଥା
 	_("Warning: Cannot find word list \"%s.%s.spl\" or \"%s.ascii.spl\""),
 #endif
 						     lang, spell_enc(), lang);
     }
-    else if (sl.sl_slang != NULL)
+    ଅନ୍ୟଥା ଯଦି (sl.sl_slang != ଖାଲି)
     {
 	// At least one file was loaded, now load ALL the additions.
 	STRCPY(fname_enc + STRLEN(fname_enc) - 3, "add.spl");
@@ -1697,22 +1697,22 @@ spell_load_lang(char_u *lang)
  * use "latin1" for "latin9".  And limit to 60 characters (just in case).
  */
     char_u *
-spell_enc(void)
+spell_enc(ଶୂନ୍ୟ)
 {
 
-    if (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
-	return p_enc;
-    return (char_u *)"latin1";
+    ଯଦି (STRLEN(p_enc) < 60 && STRCMP(p_enc, "iso-8859-15") != 0)
+	ଫେରନ୍ତୁ p_enc;
+    ଫେରନ୍ତୁ (char_u *)"latin1";
 }
 
 /*
  * Get the name of the .spl file for the internal wordlist into
  * "fname[MAXPATHL]".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 int_wordlist_spl(char_u *fname)
 {
-    vim_snprintf((char *)fname, MAXPATHL, SPL_FNAME_TMPL,
+    vim_snprintf((ଅକ୍ଷର *)fname, MAXPATHL, SPL_FNAME_TMPL,
 						  int_wordlist, spell_enc());
 }
 
@@ -1726,24 +1726,24 @@ slang_alloc(char_u *lang)
     slang_T *lp;
 
     lp = ALLOC_CLEAR_ONE(slang_T);
-    if (lp != NULL)
+    ଯଦି (lp != ଖାଲି)
     {
-	if (lang != NULL)
+	ଯଦି (lang != ଖାଲି)
 	    lp->sl_name = vim_strsave(lang);
-	ga_init2(&lp->sl_rep, sizeof(fromto_T), 10);
-	ga_init2(&lp->sl_repsal, sizeof(fromto_T), 10);
+	ga_init2(&lp->sl_rep, ଆକାର(fromto_T), 10);
+	ga_init2(&lp->sl_repsal, ଆକାର(fromto_T), 10);
 	lp->sl_compmax = MAXWLEN;
 	lp->sl_compsylmax = MAXWLEN;
 	hash_init(&lp->sl_wordcount);
     }
 
-    return lp;
+    ଫେରନ୍ତୁ lp;
 }
 
 /*
  * Free the contents of an slang_T and the structure itself.
  */
-    void
+    ଶୂନ୍ୟ
 slang_free(slang_T *lp)
 {
     vim_free(lp->sl_name);
@@ -1758,12 +1758,12 @@ slang_free(slang_T *lp)
  * clear the garray.  Used by slang_clear() and when set_sofo() reuses
  * sl_sal for the SN_SOFO form.
  */
-    void
-free_sal_items(garray_T *gap)
+    ଶୂନ୍ୟ
+free_sal_ବସ୍ତୁଗୁଡ଼ିକ(garray_T *gap)
 {
     salitem_T	*smp;
 
-    while (gap->ga_len > 0)
+    ଯେତେବେଳେ (gap->ga_len > 0)
     {
 	smp = &((salitem_T *)gap->ga_data)[--gap->ga_len];
 	vim_free(smp->sm_lead);
@@ -1779,13 +1779,13 @@ free_sal_items(garray_T *gap)
 /*
  * Clear an slang_T so that the file can be reloaded.
  */
-    void
+    ଶୂନ୍ୟ
 slang_clear(slang_T *lp)
 {
     garray_T	*gap;
     fromto_T	*ftp;
-    int		i;
-    int		round;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		round;
 
     VIM_CLEAR(lp->sl_fbyts);
     VIM_CLEAR(lp->sl_kbyts);
@@ -1795,10 +1795,10 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_kidxs);
     VIM_CLEAR(lp->sl_pidxs);
 
-    for (round = 1; round <= 2; ++round)
+    ପାଇଁ (round = 1; round <= 2; ++round)
     {
 	gap = round == 1 ? &lp->sl_rep : &lp->sl_repsal;
-	while (gap->ga_len > 0)
+	ଯେତେବେଳେ (gap->ga_len > 0)
 	{
 	    ftp = &((fromto_T *)gap->ga_data)[--gap->ga_len];
 	    vim_free(ftp->ft_from);
@@ -1808,19 +1808,19 @@ slang_clear(slang_T *lp)
     }
 
     gap = &lp->sl_sal;
-    if (lp->sl_sofo)
+    ଯଦି (lp->sl_sofo)
     {
 	// "ga_len" is set to 1 without adding an item for latin1
-	if (gap->ga_data != NULL)
+	ଯଦି (gap->ga_data != ଖାଲି)
 	    // SOFOFROM and SOFOTO items: free lists of wide characters.
-	    for (i = 0; i < gap->ga_len; ++i)
-		vim_free(((int **)gap->ga_data)[i]);
+	    ପାଇଁ (i = 0; i < gap->ga_len; ++i)
+		vim_free(((ପୂର୍ଣ୍ଣସଂଖ୍ୟା **)gap->ga_data)[i]);
 	ga_clear(gap);
     }
-    else
-	free_sal_items(gap);
+    ଅନ୍ୟଥା
+	free_sal_ବସ୍ତୁଗୁଡ଼ିକ(gap);
 
-    for (i = 0; i < lp->sl_prefixcnt; ++i)
+    ପାଇଁ (i = 0; i < lp->sl_prefixcnt; ++i)
 	vim_regfree(lp->sl_prefprog[i]);
     lp->sl_prefixcnt = 0;
     VIM_CLEAR(lp->sl_prefprog);
@@ -1830,17 +1830,17 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_midword);
 
     vim_regfree(lp->sl_compprog);
-    lp->sl_compprog = NULL;
+    lp->sl_compprog = ଖାଲି;
     VIM_CLEAR(lp->sl_comprules);
     VIM_CLEAR(lp->sl_compstartflags);
     VIM_CLEAR(lp->sl_compallflags);
 
     VIM_CLEAR(lp->sl_syllable);
-    ga_clear(&lp->sl_syl_items);
+    ga_clear(&lp->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ);
 
     ga_clear_strings(&lp->sl_comppat);
 
-    hash_clear_all(&lp->sl_wordcount, WC_KEY_OFF);
+    hash_clear_all(&lp->sl_wordcount, WC_ଚାବି_OFF);
     hash_init(&lp->sl_wordcount);
 
     hash_clear_all(&lp->sl_map_hash, 0);
@@ -1857,13 +1857,13 @@ slang_clear(slang_T *lp)
 /*
  * Clear the info from the .sug file in "lp".
  */
-    void
+    ଶୂନ୍ୟ
 slang_clear_sug(slang_T *lp)
 {
     VIM_CLEAR(lp->sl_sbyts);
     VIM_CLEAR(lp->sl_sidxs);
     close_spellbuf(lp->sl_sugbuf);
-    lp->sl_sugbuf = NULL;
+    lp->sl_sugbuf = ଖାଲି;
     lp->sl_sugloaded = FALSE;
     lp->sl_sugtime = 0;
 }
@@ -1872,21 +1872,21 @@ slang_clear_sug(slang_T *lp)
  * Load one spell file and store the info into a slang_T.
  * Invoked through do_in_runtimepath().
  */
-    static void
-spell_load_cb(char_u *fname, void *cookie)
+    ସ୍ଥିର ଶୂନ୍ୟ
+spell_load_cb(char_u *fname, ଶୂନ୍ୟ *cookie)
 {
     spelload_T	*slp = (spelload_T *)cookie;
     slang_T	*slang;
 
-    slang = spell_load_file(fname, slp->sl_lang, NULL, FALSE);
-    if (slang == NULL)
-	return;
+    slang = spell_load_file(fname, slp->sl_lang, ଖାଲି, FALSE);
+    ଯଦି (slang == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // When a previously loaded file has NOBREAK also use it for the
     // ".add" files.
-    if (slp->sl_nobreak && slang->sl_add)
+    ଯଦି (slp->sl_nobreak && slang->sl_add)
 	slang->sl_nobreak = TRUE;
-    else if (slang->sl_nobreak)
+    ଅନ୍ୟଥା ଯଦି (slang->sl_nobreak)
 	slp->sl_nobreak = TRUE;
 
     slp->sl_slang = slang;
@@ -1897,12 +1897,12 @@ spell_load_cb(char_u *fname, void *cookie)
  * Add a word to the hashtable of common words.
  * If it's already there then the counter is increased.
  */
-    void
-count_common_word(
+    ଶୂନ୍ୟ
+ଗଣନା_common_word(
     slang_T	*lp,
     char_u	*word,
-    int		len,	    // word length, -1 for up to NUL
-    int		count)	    // 1 to count once, 10 to init
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len,	    // word length, -1 for up to NUL
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_2)	    // 1 to count once, 10 to init
 {
     hash_T	hash;
     hashitem_T	*hi;
@@ -1910,11 +1910,11 @@ count_common_word(
     char_u	buf[MAXWLEN];
     char_u	*p;
 
-    if (len == -1)
+    ଯଦି (len == -1)
 	p = word;
-    else if (len >= MAXWLEN)
-	return;
-    else
+    ଅନ୍ୟଥା ଯଦି (len >= MAXWLEN)
+	ଫେରନ୍ତୁ;
+    ଅନ୍ୟଥା
     {
 	vim_strncpy(buf, word, len);
 	p = buf;
@@ -1922,20 +1922,20 @@ count_common_word(
 
     hash = hash_hash(p);
     hi = hash_lookup(&lp->sl_wordcount, p, hash);
-    if (HASHITEM_EMPTY(hi))
+    ଯଦି (HASHITEM_EMPTY(hi))
     {
 	wc = alloc(offsetof(wordcount_T, wc_word) + STRLEN(p) + 1);
-	if (wc == NULL)
-	    return;
+	ଯଦି (wc == ଖାଲି)
+	    ଫେରନ୍ତୁ;
 	STRCPY(wc->wc_word, p);
-	wc->wc_count = count;
+	wc->wc_ଗଣନା = ଗଣନା_2;
 	hash_add_item(&lp->sl_wordcount, hi, wc->wc_word, hash);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	wc = HI2WC(hi);
-	if ((wc->wc_count += count) < (unsigned)count)	// check for overflow
-	    wc->wc_count = MAXWORDCOUNT;
+	ଯଦି ((wc->wc_ଗଣନା += ଗଣନା_2) < (unsigned)ଗଣନା_2)	// check for overflow
+	    wc->wc_ଗଣନା = MAXWORDCOUNT;
     }
 }
 
@@ -1943,59 +1943,59 @@ count_common_word(
  * Return TRUE if byte "n" appears in "str".
  * Like strchr() but independent of locale.
  */
-    int
-byte_in_str(char_u *str, int n)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+byte_in_str(char_u *str, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     char_u	*p;
 
-    for (p = str; *p != NUL; ++p)
-	if (*p == n)
-	    return TRUE;
-    return FALSE;
+    ପାଇଁ (p = str; *p != NUL; ++p)
+	ଯଦି (*p == n)
+	    ଫେରନ୍ତୁ TRUE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 #define SY_MAXLEN   30
-typedef struct syl_item_S
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା syl_item_S
 {
     char_u	sy_chars[SY_MAXLEN];	    // the sequence of chars
-    int		sy_len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sy_len;
 } syl_item_T;
 
 /*
  * Truncate "slang->sl_syllable" at the first slash and put the following items
  * in "slang->sl_syl_items".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 init_syl_tab(slang_T *slang)
 {
     char_u	*p;
     char_u	*s;
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
     syl_item_T	*syl;
 
-    ga_init2(&slang->sl_syl_items, sizeof(syl_item_T), 4);
+    ga_init2(&slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ, ଆକାର(syl_item_T), 4);
     p = vim_strchr(slang->sl_syllable, '/');
-    while (p != NULL)
+    ଯେତେବେଳେ (p != ଖାଲି)
     {
 	*p++ = NUL;
-	if (*p == NUL)	    // trailing slash
-	    break;
+	ଯଦି (*p == NUL)	    // trailing slash
+	    ଭାଙ୍ଗ;
 	s = p;
 	p = vim_strchr(p, '/');
-	if (p == NULL)
-	    l = (int)STRLEN(s);
-	else
-	    l = (int)(p - s);
-	if (l >= SY_MAXLEN)
-	    return SP_FORMERROR;
-	if (ga_grow(&slang->sl_syl_items, 1) == FAIL)
-	    return SP_OTHERERROR;
-	syl = ((syl_item_T *)slang->sl_syl_items.ga_data)
-					       + slang->sl_syl_items.ga_len++;
+	ଯଦି (p == ଖାଲି)
+	    l = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(s);
+	ଅନ୍ୟଥା
+	    l = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - s);
+	ଯଦି (l >= SY_MAXLEN)
+	    ଫେରନ୍ତୁ SP_FORMERROR;
+	ଯଦି (ga_grow(&slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ, 1) == FAIL)
+	    ଫେରନ୍ତୁ SP_OTHERERROR;
+	syl = ((syl_item_T *)slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ.ga_data)
+					       + slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ.ga_len++;
 	vim_strncpy(syl->sy_chars, s, l);
 	syl->sy_len = l;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -2003,89 +2003,89 @@ init_syl_tab(slang_T *slang)
  * When "word" contains spaces the syllables after the last space are counted.
  * Returns zero if syllables are not defines.
  */
-    static int
-count_syllables(slang_T *slang, char_u *word)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ଗଣନା_syllables(slang_T *slang, char_u *word)
 {
-    int		cnt = 0;
-    int		skip = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cnt = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skip = FALSE;
     char_u	*p;
-    int		len;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     syl_item_T	*syl;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (slang->sl_syllable == NULL)
-	return 0;
+    ଯଦି (slang->sl_syllable == ଖାଲି)
+	ଫେରନ୍ତୁ 0;
 
-    for (p = word; *p != NUL; p += len)
+    ପାଇଁ (p = word; *p != NUL; p += len)
     {
 	// When running into a space reset counter.
-	if (*p == ' ')
+	ଯଦି (*p == ' ')
 	{
 	    len = 1;
 	    cnt = 0;
-	    continue;
+	    ଜାରି;
 	}
 
 	// Find longest match of syllable items.
 	len = 0;
-	for (i = 0; i < slang->sl_syl_items.ga_len; ++i)
+	ପାଇଁ (i = 0; i < slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ.ga_len; ++i)
 	{
-	    syl = ((syl_item_T *)slang->sl_syl_items.ga_data) + i;
-	    if (syl->sy_len > len
+	    syl = ((syl_item_T *)slang->sl_syl_ବସ୍ତୁଗୁଡ଼ିକ.ga_data) + i;
+	    ଯଦି (syl->sy_len > len
 			       && STRNCMP(p, syl->sy_chars, syl->sy_len) == 0)
 		len = syl->sy_len;
 	}
-	if (len != 0)	// found a match, count syllable
+	ଯଦି (len != 0)	// found a match, count syllable
 	{
 	    ++cnt;
 	    skip = FALSE;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // No recognized syllable item, at least a syllable char then?
 	    c = mb_ptr2char(p);
 	    len = (*mb_ptr2len)(p);
-	    if (vim_strchr(slang->sl_syllable, c) == NULL)
+	    ଯଦି (vim_strchr(slang->sl_syllable, c) == ଖାଲି)
 		skip = FALSE;	    // No, search for next syllable
-	    else if (!skip)
+	    ଅନ୍ୟଥା ଯଦି (!skip)
 	    {
 		++cnt;		    // Yes, count it
 		skip = TRUE;	    // don't count following syllable chars
 	    }
 	}
     }
-    return cnt;
+    ଫେରନ୍ତୁ cnt;
 }
 
 /*
  * Parse 'spelllang' and set w_s->b_langp accordingly.
  * Returns NULL if it's OK, an untranslated error message otherwise.
  */
-    char *
+    ଅକ୍ଷର *
 parse_spelllang(win_T *wp)
 {
     garray_T	ga;
     char_u	*splp;
     char_u	*region;
     char_u	region_cp[3];
-    int		filename;
-    int		region_mask;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		filename;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		region_mask;
     slang_T	*slang;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	lang[MAXWLEN + 1];
     char_u	spf_name[MAXPATHL];
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
     char_u	*p;
-    int		round;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		round;
     char_u	*spf;
-    char_u	*use_region = NULL;
-    int		dont_use_region = FALSE;
-    int		nobreak = FALSE;
-    int		i, j;
+    char_u	*use_region = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dont_use_region = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nobreak = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i, j;
     langp_T	*lp, *lp2;
-    static int	recursive = FALSE;
-    char	*ret_msg = NULL;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	recursive = FALSE;
+    ଅକ୍ଷର	*ret_ସନ୍ଦେଶ = ଖାଲି;
     char_u	*spl_copy;
     bufref_T	bufref;
 
@@ -2094,102 +2094,102 @@ parse_spelllang(win_T *wp)
     // We don't want to do this recursively.  May happen when a language is
     // not available and the SpellFileMissing autocommand opens a new buffer
     // in which 'spell' is set.
-    if (recursive)
-	return NULL;
+    ଯଦି (recursive)
+	ଫେରନ୍ତୁ ଖାଲି;
     recursive = TRUE;
 
-    ga_init2(&ga, sizeof(langp_T), 2);
+    ga_init2(&ga, ଆକାର(langp_T), 2);
     clear_midword(wp);
 
     // Make a copy of 'spelllang', the SpellFileMissing autocommands may change
     // it under our fingers.
     spl_copy = vim_strsave(wp->w_s->b_p_spl);
-    if (spl_copy == NULL)
-	goto theend;
+    ଯଦି (spl_copy == ଖାଲି)
+	ଯାଅ theend;
 
     wp->w_s->b_cjk = 0;
 
     // Loop over comma separated language names.
-    for (splp = spl_copy; *splp != NUL; )
+    ପାଇଁ (splp = spl_copy; *splp != NUL; )
     {
 	// Get one language name.
 	len = copy_option_part(&splp, lang, MAXWLEN, ",");
-	region = NULL;
+	region = ଖାଲି;
 
-	if (!valid_spelllang(lang))
-	    continue;
+	ଯଦି (!valid_spelllang(lang))
+	    ଜାରି;
 
-	if (STRCMP(lang, "cjk") == 0)
+	ଯଦି (STRCMP(lang, "cjk") == 0)
 	{
 	    wp->w_s->b_cjk = 1;
-	    continue;
+	    ଜାରି;
 	}
 
 	// If the name ends in ".spl" use it as the name of the spell file.
 	// If there is a region name let "region" point to it and remove it
 	// from the name.
-	if (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
+	ଯଦି (len > 4 && fnamecmp(lang + len - 4, ".spl") == 0)
 	{
 	    filename = TRUE;
 
 	    // Locate a region and remove it from the file name.
 	    p = vim_strchr(gettail(lang), '_');
-	    if (p != NULL && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
+	    ଯଦି (p != ଖାଲି && ASCII_ISALPHA(p[1]) && ASCII_ISALPHA(p[2])
 						      && !ASCII_ISALPHA(p[3]))
 	    {
 		vim_strncpy(region_cp, p + 1, 2);
 		mch_memmove(p, p + 3, len - (p - lang) - 2);
 		region = region_cp;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-		    break;
+		ଯଦି (fullpathcmp(lang, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+		    ଭାଙ୍ଗ;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    filename = FALSE;
-	    if (len > 3 && lang[len - 3] == '_')
+	    ଯଦି (len > 3 && lang[len - 3] == '_')
 	    {
 		region = lang + len - 2;
 		len -= 3;
 		lang[len] = NUL;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		dont_use_region = TRUE;
 
 	    // Check if we loaded this language before.
 	    FOR_ALL_SPELL_LANGS(slang)
-		if (STRICMP(lang, slang->sl_name) == 0)
-		    break;
+		ଯଦି (STRICMP(lang, slang->sl_name) == 0)
+		    ଭାଙ୍ଗ;
 	}
 
-	if (region != NULL)
+	ଯଦି (region != ଖାଲି)
 	{
 	    // If the region differs from what was used before then don't
 	    // use it for 'spellfile'.
-	    if (use_region != NULL && STRCMP(region, use_region) != 0)
+	    ଯଦି (use_region != ଖାଲି && STRCMP(region, use_region) != 0)
 		dont_use_region = TRUE;
 	    use_region = region;
 	}
 
 	// If not found try loading the language now.
-	if (slang == NULL)
+	ଯଦି (slang == ଖାଲି)
 	{
-	    if (filename)
-		(void)spell_load_file(lang, lang, NULL, FALSE);
-	    else
+	    ଯଦି (filename)
+		(ଶୂନ୍ୟ)spell_load_file(lang, lang, ଖାଲି, FALSE);
+	    ଅନ୍ୟଥା
 	    {
 		spell_load_lang(lang);
 		// SpellFileMissing autocommands may do anything, including
 		// destroying the buffer we are using or closing the window.
-		if (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
+		ଯଦି (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
 		{
-		    ret_msg = N_(e_spellfilemising_autocommand_deleted_buffer);
-		    goto theend;
+		    ret_ସନ୍ଦେଶ = N_(e_spellfilemising_autocommand_deleted_buffer);
+		    ଯାଅ theend;
 		}
 	    }
 	}
@@ -2198,46 +2198,46 @@ parse_spelllang(win_T *wp)
 	 * Loop over the languages, there can be several files for "lang".
 	 */
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
+	    ଯଦି (filename ? fullpathcmp(lang, slang->sl_fname, FALSE, TRUE)
 								    == FPC_SAME
 			 : STRICMP(lang, slang->sl_name) == 0)
 	    {
 		region_mask = REGION_ALL;
-		if (!filename && region != NULL)
+		ଯଦି (!filename && region != ଖାଲି)
 		{
 		    // find region in sl_regions
 		    c = find_region(slang->sl_regions, region);
-		    if (c == REGION_ALL)
+		    ଯଦି (c == REGION_ALL)
 		    {
-			if (slang->sl_add)
+			ଯଦି (slang->sl_add)
 			{
-			    if (*slang->sl_regions != NUL)
+			    ଯଦି (*slang->sl_regions != NUL)
 				// This addition file is for other regions.
 				region_mask = 0;
 			}
-			else
+			ଅନ୍ୟଥା
 			    // This is probably an error.  Give a warning and
 			    // accept the words anyway.
 			    smsg(_("Warning: region %s not supported"),
 								      region);
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			region_mask = 1 << c;
 		}
 
-		if (region_mask != 0)
+		ଯଦି (region_mask != 0)
 		{
-		    if (ga_grow(&ga, 1) == FAIL)
+		    ଯଦି (ga_grow(&ga, 1) == FAIL)
 		    {
 			ga_clear(&ga);
-			ret_msg = e_out_of_memory;
-			goto theend;
+			ret_ସନ୍ଦେଶ = e_out_of_memory;
+			ଯାଅ theend;
 		    }
 		    LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
 		    LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
 		    ++ga.ga_len;
 		    use_midword(slang, wp);
-		    if (slang->sl_nobreak)
+		    ଯଦି (slang->sl_nobreak)
 			nobreak = TRUE;
 		}
 	    }
@@ -2248,78 +2248,78 @@ parse_spelllang(win_T *wp)
     // round 2: load second name in 'spellfile.
     // etc.
     spf = curwin->w_s->b_p_spf;
-    for (round = 0; round == 0 || *spf != NUL; ++round)
+    ପାଇଁ (round = 0; round == 0 || *spf != NUL; ++round)
     {
-	if (round == 0)
+	ଯଦି (round == 0)
 	{
 	    // Internal wordlist, if there is one.
-	    if (int_wordlist == NULL)
-		continue;
+	    ଯଦି (int_wordlist == ଖାଲି)
+		ଜାରି;
 	    int_wordlist_spl(spf_name);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // One entry in 'spellfile'.
 	    len = copy_option_part(&spf, spf_name, MAXPATHL - 4, ",");
 	    STRCPY(spf_name + len, ".spl");
 
 	    // If it was already found above then skip it.
-	    for (c = 0; c < ga.ga_len; ++c)
+	    ପାଇଁ (c = 0; c < ga.ga_len; ++c)
 	    {
 		p = LANGP_ENTRY(ga, c)->lp_slang->sl_fname;
-		if (p != NULL && fullpathcmp(spf_name, p, FALSE, TRUE)
+		ଯଦି (p != ଖାଲି && fullpathcmp(spf_name, p, FALSE, TRUE)
 								== FPC_SAME)
-		    break;
+		    ଭାଙ୍ଗ;
 	    }
-	    if (c < ga.ga_len)
-		continue;
+	    ଯଦି (c < ga.ga_len)
+		ଜାରି;
 	}
 
 	// Check if it was loaded already.
 	FOR_ALL_SPELL_LANGS(slang)
-	    if (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
+	    ଯଦି (fullpathcmp(spf_name, slang->sl_fname, FALSE, TRUE)
 								== FPC_SAME)
-		break;
-	if (slang == NULL)
+		ଭାଙ୍ଗ;
+	ଯଦି (slang == ଖାଲି)
 	{
 	    // Not loaded, try loading it now.  The language name includes the
 	    // region name, the region is ignored otherwise.  for int_wordlist
 	    // use an arbitrary name.
-	    if (round == 0)
+	    ଯଦି (round == 0)
 		STRCPY(lang, "internal wordlist");
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		vim_strncpy(lang, gettail(spf_name), MAXWLEN);
 		p = vim_strchr(lang, '.');
-		if (p != NULL)
+		ଯଦି (p != ଖାଲି)
 		    *p = NUL;	// truncate at ".encoding.add"
 	    }
-	    slang = spell_load_file(spf_name, lang, NULL, TRUE);
+	    slang = spell_load_file(spf_name, lang, ଖାଲି, TRUE);
 
 	    // If one of the languages has NOBREAK we assume the addition
 	    // files also have this.
-	    if (slang != NULL && nobreak)
+	    ଯଦି (slang != ଖାଲି && nobreak)
 		slang->sl_nobreak = TRUE;
 	}
-	if (slang != NULL && ga_grow(&ga, 1) == OK)
+	ଯଦି (slang != ଖାଲି && ga_grow(&ga, 1) == OK)
 	{
 	    region_mask = REGION_ALL;
-	    if (use_region != NULL && !dont_use_region)
+	    ଯଦି (use_region != ଖାଲି && !dont_use_region)
 	    {
 		// find region in sl_regions
 		c = find_region(slang->sl_regions, use_region);
-		if (c != REGION_ALL)
+		ଯଦି (c != REGION_ALL)
 		    region_mask = 1 << c;
-		else if (*slang->sl_regions != NUL)
+		ଅନ୍ୟଥା ଯଦି (*slang->sl_regions != NUL)
 		    // This spell file is for other regions.
 		    region_mask = 0;
 	    }
 
-	    if (region_mask != 0)
+	    ଯଦି (region_mask != 0)
 	    {
 		LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_sallang = NULL;
-		LANGP_ENTRY(ga, ga.ga_len)->lp_replang = NULL;
+		LANGP_ENTRY(ga, ga.ga_len)->lp_sallang = ଖାଲି;
+		LANGP_ENTRY(ga, ga.ga_len)->lp_replang = ଖାଲି;
 		LANGP_ENTRY(ga, ga.ga_len)->lp_region = region_mask;
 		++ga.ga_len;
 		use_midword(slang, wp);
@@ -2334,43 +2334,43 @@ parse_spelllang(win_T *wp)
     // For each language figure out what language to use for sound folding and
     // REP items.  If the language doesn't support it itself use another one
     // with the same name.  E.g. for "en-math" use "en".
-    for (i = 0; i < ga.ga_len; ++i)
+    ପାଇଁ (i = 0; i < ga.ga_len; ++i)
     {
 	lp = LANGP_ENTRY(ga, i);
 
 	// sound folding
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	ଯଦି (lp->lp_slang->sl_sal.ga_len > 0)
 	    // language does sound folding itself
 	    lp->lp_sallang = lp->lp_slang;
-	else
+	ଅନ୍ୟଥା
 	    // find first similar language that does sound folding
-	    for (j = 0; j < ga.ga_len; ++j)
+	    ପାଇଁ (j = 0; j < ga.ga_len; ++j)
 	    {
 		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_sal.ga_len > 0
+		ଯଦି (lp2->lp_slang->sl_sal.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_sallang = lp2->lp_slang;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 
 	// REP items
-	if (lp->lp_slang->sl_rep.ga_len > 0)
+	ଯଦି (lp->lp_slang->sl_rep.ga_len > 0)
 	    // language has REP items itself
 	    lp->lp_replang = lp->lp_slang;
-	else
+	ଅନ୍ୟଥା
 	    // find first similar language that has REP items
-	    for (j = 0; j < ga.ga_len; ++j)
+	    ପାଇଁ (j = 0; j < ga.ga_len; ++j)
 	    {
 		lp2 = LANGP_ENTRY(ga, j);
-		if (lp2->lp_slang->sl_rep.ga_len > 0
+		ଯଦି (lp2->lp_slang->sl_rep.ga_len > 0
 			&& STRNCMP(lp->lp_slang->sl_name,
 					      lp2->lp_slang->sl_name, 2) == 0)
 		{
 		    lp->lp_replang = lp2->lp_slang;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
     }
@@ -2379,13 +2379,13 @@ parse_spelllang(win_T *wp)
 theend:
     vim_free(spl_copy);
     recursive = FALSE;
-    return ret_msg;
+    ଫେରନ୍ତୁ ret_ସନ୍ଦେଶ;
 }
 
 /*
  * Clear the midword characters for buffer "buf".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 clear_midword(win_T *wp)
 {
     CLEAR_FIELD(wp->w_s->b_spell_ismw);
@@ -2396,33 +2396,33 @@ clear_midword(win_T *wp)
  * Use the "sl_midword" field of language "lp" for buffer "buf".
  * They add up to any currently used midword characters.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 use_midword(slang_T *lp, win_T *wp)
 {
     char_u	*p;
 
-    if (lp->sl_midword == NULL)	    // there aren't any
-	return;
+    ଯଦି (lp->sl_midword == ଖାଲି)	    // there aren't any
+	ଫେରନ୍ତୁ;
 
-    for (p = lp->sl_midword; *p != NUL; )
-	if (has_mbyte)
+    ପାଇଁ (p = lp->sl_midword; *p != NUL; )
+	ଯଦି (has_mbyte)
 	{
-	    int	    c, l, n;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    c, l, n;
 	    char_u  *bp;
 
 	    c = mb_ptr2char(p);
 	    l = (*mb_ptr2len)(p);
-	    if (c < 256 && l <= 2)
+	    ଯଦି (c < 256 && l <= 2)
 		wp->w_s->b_spell_ismw[c] = TRUE;
-	    else if (wp->w_s->b_spell_ismw_mb == NULL)
+	    ଅନ୍ୟଥା ଯଦି (wp->w_s->b_spell_ismw_mb == ଖାଲି)
 		// First multi-byte char in "b_spell_ismw_mb".
 		wp->w_s->b_spell_ismw_mb = vim_strnsave(p, l);
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Append multi-byte chars to "b_spell_ismw_mb".
-		n = (int)STRLEN(wp->w_s->b_spell_ismw_mb);
+		n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(wp->w_s->b_spell_ismw_mb);
 		bp = vim_strnsave(wp->w_s->b_spell_ismw_mb, n + l);
-		if (bp != NULL)
+		ଯଦି (bp != ଖାଲି)
 		{
 		    vim_free(wp->w_s->b_spell_ismw_mb);
 		    wp->w_s->b_spell_ismw_mb = bp;
@@ -2431,7 +2431,7 @@ use_midword(slang_T *lp, win_T *wp)
 	    }
 	    p += l;
 	}
-	else
+	ଅନ୍ୟଥା
 	    wp->w_s->b_spell_ismw[*p++] = TRUE;
 }
 
@@ -2440,19 +2440,19 @@ use_midword(slang_T *lp, win_T *wp)
  * Each region is simply stored as the two characters of its name.
  * Returns the index if found (first is 0), REGION_ALL if not found.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 find_region(char_u *rp, char_u *region)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    for (i = 0; ; i += 2)
+    ପାଇଁ (i = 0; ; i += 2)
     {
-	if (rp[i] == NUL)
-	    return REGION_ALL;
-	if (rp[i] == region[0] && rp[i + 1] == region[1])
-	    break;
+	ଯଦି (rp[i] == NUL)
+	    ଫେରନ୍ତୁ REGION_ALL;
+	ଯଦି (rp[i] == region[0] && rp[i + 1] == region[1])
+	    ଭାଙ୍ଗ;
     }
-    return i / 2;
+    ଫେରନ୍ତୁ i / 2;
 }
 
 /*
@@ -2462,24 +2462,24 @@ find_region(char_u *rp, char_u *region)
  * W WORD	WF_ALLCAP
  * WoRd	wOrd	WF_KEEPCAP
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 captype(
     char_u	*word,
     char_u	*end)	    // When NULL use up to NUL byte.
 {
     char_u	*p;
-    int		c;
-    int		firstcap;
-    int		allcap;
-    int		past_second = FALSE;	// past second word char
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		firstcap;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		allcap;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		past_second = FALSE;	// past second word char
 
     // find first letter
-    for (p = word; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
-	if (end == NULL ? *p == NUL : p >= end)
-	    return 0;	    // only non-word characters, illegal word
-    if (has_mbyte)
+    ପାଇଁ (p = word; !spell_iswordp_nmw(p, curwin); MB_PTR_ADV(p))
+	ଯଦି (end == ଖାଲି ? *p == NUL : p >= end)
+	    ଫେରନ୍ତୁ 0;	    // only non-word characters, illegal word
+    ଯଦି (has_mbyte)
 	c = mb_ptr2char_adv(&p);
-    else
+    ଅନ୍ୟଥା
 	c = *p++;
     firstcap = allcap = SPELL_ISUPPER(c);
 
@@ -2487,40 +2487,40 @@ captype(
      * Need to check all letters to find a word with mixed upper/lower.
      * But a word with an upper char only at start is a ONECAP.
      */
-    for ( ; end == NULL ? *p != NUL : p < end; MB_PTR_ADV(p))
-	if (spell_iswordp_nmw(p, curwin))
+    ପାଇଁ ( ; end == ଖାଲି ? *p != NUL : p < end; MB_PTR_ADV(p))
+	ଯଦି (spell_iswordp_nmw(p, curwin))
 	{
 	    c = PTR2CHAR(p);
-	    if (!SPELL_ISUPPER(c))
+	    ଯଦି (!SPELL_ISUPPER(c))
 	    {
 		// UUl -> KEEPCAP
-		if (past_second && allcap)
-		    return WF_KEEPCAP;
+		ଯଦି (past_second && allcap)
+		    ଫେରନ୍ତୁ WF_KEEPCAP;
 		allcap = FALSE;
 	    }
-	    else if (!allcap)
+	    ଅନ୍ୟଥା ଯଦି (!allcap)
 		// UlU -> KEEPCAP
-		return WF_KEEPCAP;
+		ଫେରନ୍ତୁ WF_KEEPCAP;
 	    past_second = TRUE;
 	}
 
-    if (allcap)
-	return WF_ALLCAP;
-    if (firstcap)
-	return WF_ONECAP;
-    return 0;
+    ଯଦି (allcap)
+	ଫେରନ୍ତୁ WF_ALLCAP;
+    ଯଦି (firstcap)
+	ଫେରନ୍ତୁ WF_ONECAP;
+    ଫେରନ୍ତୁ 0;
 }
 
 /*
  * Delete the internal wordlist and its .spl file.
  */
-    void
-spell_delete_wordlist(void)
+    ଶୂନ୍ୟ
+spell_delete_wordlist(ଶୂନ୍ୟ)
 {
     char_u	fname[MAXPATHL];
 
-    if (int_wordlist == NULL)
-	return;
+    ଯଦି (int_wordlist == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     mch_remove(int_wordlist);
     int_wordlist_spl(fname);
@@ -2531,8 +2531,8 @@ spell_delete_wordlist(void)
 /*
  * Free all languages.
  */
-    void
-spell_free_all(void)
+    ଶୂନ୍ୟ
+spell_free_all(ଶୂନ୍ୟ)
 {
     slang_T	*slang;
     buf_T	*buf;
@@ -2541,7 +2541,7 @@ spell_free_all(void)
     FOR_ALL_BUFFERS(buf)
 	ga_clear(&buf->b_s.b_langp);
 
-    while (first_lang != NULL)
+    ଯେତେବେଳେ (first_lang != ଖାଲି)
     {
 	slang = first_lang;
 	first_lang = slang->sl_next;
@@ -2558,8 +2558,8 @@ spell_free_all(void)
  * Clear all spelling tables and reload them.
  * Used after 'encoding' is set and when ":mkspell" was used.
  */
-    void
-spell_reload(void)
+    ଶୂନ୍ୟ
+spell_reload(ଶୂନ୍ୟ)
 {
     win_T	*wp;
 
@@ -2574,12 +2574,12 @@ spell_reload(void)
     {
 	// Only load the wordlists when 'spelllang' is set and there is a
 	// window for this buffer in which 'spell' is set.
-	if (*wp->w_s->b_p_spl != NUL)
+	ଯଦି (*wp->w_s->b_p_spl != NUL)
 	{
-		if (wp->w_p_spell)
+		ଯଦି (wp->w_p_spell)
 		{
-		    (void)parse_spelllang(wp);
-		    break;
+		    (ଶୂନ୍ୟ)parse_spelllang(wp);
+		    ଭାଙ୍ଗ;
 		}
 	}
     }
@@ -2594,32 +2594,32 @@ spell_reload(void)
  * Returns NULL when out of memory.
  */
     buf_T *
-open_spellbuf(void)
+open_spellbuf(ଶୂନ୍ୟ)
 {
     buf_T	*buf;
 
     buf = ALLOC_CLEAR_ONE(buf_T);
-    if (buf == NULL)
-	return NULL;
+    ଯଦି (buf == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     buf->b_spell = true;
     buf->b_p_swf = TRUE;	// may create a swap file
 #ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
+    buf->b_p_ଚାବି = empty_option;
 #endif
     ml_open(buf);
     ml_open_file(buf);	// create swap file now
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
  * Close the buffer used for spell info.
  */
-    void
+    ଶୂନ୍ୟ
 close_spellbuf(buf_T *buf)
 {
-    if (buf == NULL)
-	return;
+    ଯଦି (buf == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     ml_close(buf, TRUE);
     vim_free(buf);
@@ -2628,15 +2628,15 @@ close_spellbuf(buf_T *buf)
 /*
  * Init the chartab used for spelling for ASCII.
  */
-    void
+    ଶୂନ୍ୟ
 clear_spell_chartab(spelltab_T *sp)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
     // Init everything to FALSE (zero).
     CLEAR_FIELD(sp->st_isw);
     CLEAR_FIELD(sp->st_isu);
-    for (i = 0; i < 256; ++i)
+    ପାଇଁ (i = 0; i < 256; ++i)
     {
 	sp->st_fold[i] = i;
 	sp->st_upper[i] = i;
@@ -2644,15 +2644,15 @@ clear_spell_chartab(spelltab_T *sp)
 
     // We include digits.  A word shouldn't start with a digit, but handling
     // that is done separately.
-    for (i = '0'; i <= '9'; ++i)
+    ପାଇଁ (i = '0'; i <= '9'; ++i)
 	sp->st_isw[i] = TRUE;
-    for (i = 'A'; i <= 'Z'; ++i)
+    ପାଇଁ (i = 'A'; i <= 'Z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
 	sp->st_isu[i] = TRUE;
 	sp->st_fold[i] = i + 0x20;
     }
-    for (i = 'a'; i <= 'z'; ++i)
+    ପାଇଁ (i = 'a'; i <= 'z'; ++i)
     {
 	sp->st_isw[i] = TRUE;
 	sp->st_upper[i] = i - 0x20;
@@ -2666,26 +2666,26 @@ clear_spell_chartab(spelltab_T *sp)
  * characters to make it possible that 'encoding' differs from the current
  * locale.  For utf-8 we don't use isalpha() but our own functions.
  */
-    void
-init_spell_chartab(void)
+    ଶୂନ୍ୟ
+init_spell_chartab(ଶୂନ୍ୟ)
 {
-    int	    i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    i;
 
     did_set_spelltab = FALSE;
     clear_spell_chartab(&spelltab);
-    if (enc_dbcs)
+    ଯଦି (enc_dbcs)
     {
 	// DBCS: assume double-wide characters are word characters.
-	for (i = 128; i <= 255; ++i)
-	    if (MB_BYTE2LEN(i) == 2)
+	ପାଇଁ (i = 128; i <= 255; ++i)
+	    ଯଦି (MB_BYTE2LEN(i) == 2)
 		spelltab.st_isw[i] = TRUE;
     }
-    else if (enc_utf8)
+    ଅନ୍ୟଥା ଯଦି (enc_utf8)
     {
-	for (i = 128; i < 256; ++i)
+	ପାଇଁ (i = 128; i < 256; ++i)
 	{
-	    int f = utf_fold(i);
-	    int u = utf_toupper(i);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା f = utf_fold(i);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା u = utf_toupper(i);
 
 	    spelltab.st_isu[i] = utf_isupper(i);
 	    spelltab.st_isw[i] = spelltab.st_isu[i] || utf_islower(i);
@@ -2696,18 +2696,18 @@ init_spell_chartab(void)
 	    spelltab.st_upper[i] = (u < 256) ? u : i;
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Rough guess: use locale-dependent library functions.
-	for (i = 128; i < 256; ++i)
+	ପାଇଁ (i = 128; i < 256; ++i)
 	{
-	    if (MB_ISUPPER(i))
+	    ଯଦି (MB_ISUPPER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
 		spelltab.st_isu[i] = TRUE;
 		spelltab.st_fold[i] = MB_TOLOWER(i);
 	    }
-	    else if (MB_ISLOWER(i))
+	    ଅନ୍ୟଥା ଯଦି (MB_ISLOWER(i))
 	    {
 		spelltab.st_isw[i] = TRUE;
 		spelltab.st_upper[i] = MB_TOUPPER(i);
@@ -2723,60 +2723,60 @@ init_spell_chartab(void)
  * followed by a word character.  This finds they'there but not 'they there'.
  * Thus this only works properly when past the first character of the word.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_iswordp(
     char_u	*p,
     win_T	*wp)	    // buffer used
 {
     char_u	*s;
-    int		l;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
 	l = mb_ptr2len(p);
 	s = p;
-	if (l == 1)
+	ଯଦି (l == 1)
 	{
 	    // be quick for ASCII
-	    if (wp->w_s->b_spell_ismw[*p])
+	    ଯଦି (wp->w_s->b_spell_ismw[*p])
 		s = p + 1;		// skip a mid-word character
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    c = mb_ptr2char(p);
-	    if (c < 256 ? wp->w_s->b_spell_ismw[c]
-		    : (wp->w_s->b_spell_ismw_mb != NULL
-			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != NULL))
+	    ଯଦି (c < 256 ? wp->w_s->b_spell_ismw[c]
+		    : (wp->w_s->b_spell_ismw_mb != ଖାଲି
+			   && vim_strchr(wp->w_s->b_spell_ismw_mb, c) != ଖାଲି))
 		s = p + l;
 	}
 
 	c = mb_ptr2char(s);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(s), wp);
-	return spelltab.st_isw[c];
+	ଯଦି (c > 255)
+	    ଫେରନ୍ତୁ spell_mb_isword_class(mb_get_class(s), wp);
+	ଫେରନ୍ତୁ spelltab.st_isw[c];
     }
 
-    return spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
+    ଫେରନ୍ତୁ spelltab.st_isw[wp->w_s->b_spell_ismw[*p] ? p[1] : p[0]];
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Unlike spell_iswordp() this doesn't check for "midword" characters.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_iswordp_nmw(char_u *p, win_T *wp)
 {
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
 	c = mb_ptr2char(p);
-	if (c > 255)
-	    return spell_mb_isword_class(mb_get_class(p), wp);
-	return spelltab.st_isw[c];
+	ଯଦି (c > 255)
+	    ଫେରନ୍ତୁ spell_mb_isword_class(mb_get_class(p), wp);
+	ଫେରନ୍ତୁ spelltab.st_isw[c];
     }
-    return spelltab.st_isw[*p];
+    ଫେରନ୍ତୁ spelltab.st_isw[*p];
 }
 
 /*
@@ -2785,41 +2785,41 @@ spell_iswordp_nmw(char_u *p, win_T *wp)
  * Unicode subscript and superscript are not considered word characters.
  * See also dbcs_class() and utf_class() in mbyte.c.
  */
-    static int
-spell_mb_isword_class(int cl, win_T *wp)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+spell_mb_isword_class(ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl, win_T *wp)
 {
-    if (wp->w_s->b_cjk)
+    ଯଦି (wp->w_s->b_cjk)
 	// East Asian characters are not considered word characters.
-	return cl == 2 || cl == 0x2800;
-    return cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
+	ଫେରନ୍ତୁ cl == 2 || cl == 0x2800;
+    ଫେରନ୍ତୁ cl >= 2 && cl != 0x2070 && cl != 0x2080 && cl != 3;
 }
 
 /*
  * Return TRUE if "p" points to a word character.
  * Wide version of spell_iswordp().
  */
-    static int
-spell_iswordp_w(int *p, win_T *wp)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+spell_iswordp_w(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *p, win_T *wp)
 {
-    int		*s;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*s;
 
-    if (*p < 256 ? wp->w_s->b_spell_ismw[*p]
-		 : (wp->w_s->b_spell_ismw_mb != NULL
-			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != NULL))
+    ଯଦି (*p < 256 ? wp->w_s->b_spell_ismw[*p]
+		 : (wp->w_s->b_spell_ismw_mb != ଖାଲି
+			     && vim_strchr(wp->w_s->b_spell_ismw_mb, *p) != ଖାଲି))
 	s = p + 1;
-    else
+    ଅନ୍ୟଥା
 	s = p;
 
-    if (*s > 255)
+    ଯଦି (*s > 255)
     {
-	if (enc_utf8)
-	    return spell_mb_isword_class(utf_class(*s), wp);
-	if (enc_dbcs)
-	    return spell_mb_isword_class(
+	ଯଦି (enc_utf8)
+	    ଫେରନ୍ତୁ spell_mb_isword_class(utf_class(*s), wp);
+	ଯଦି (enc_dbcs)
+	    ଫେରନ୍ତୁ spell_mb_isword_class(
 				dbcs_class((unsigned)*s >> 8, *s & 0xff), wp);
-	return 0;
+	ଫେରନ୍ତୁ 0;
     }
-    return spelltab.st_isw[*s];
+    ଫେରନ୍ତୁ spelltab.st_isw[*s];
 }
 
 /*
@@ -2828,194 +2828,194 @@ spell_iswordp_w(int *p, win_T *wp)
  * When using a multi-byte 'encoding' the length may change!
  * Returns FAIL when something wrong.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 spell_casefold(
     win_T	*wp,
     char_u	*str,
-    int		len,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len,
     char_u	*buf,
-    int		buflen)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		buflen)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    if (len >= buflen)
+    ଯଦି (len >= buflen)
     {
 	buf[0] = NUL;
-	return FAIL;		// result will not fit
+	ଫେରନ୍ତୁ FAIL;		// result will not fit
     }
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
-	int	outi = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	outi = 0;
 	char_u	*p;
-	int	c;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	c;
 
 	// Fold one character at a time.
-	for (p = str; p < str + len; )
+	ପାଇଁ (p = str; p < str + len; )
 	{
-	    if (outi + MB_MAXBYTES > buflen)
+	    ଯଦି (outi + MB_MAXBYTES > buflen)
 	    {
 		buf[outi] = NUL;
-		return FAIL;
+		ଫେରନ୍ତୁ FAIL;
 	    }
 	    c = mb_cptr2char_adv(&p);
 
 	    // Exception: greek capital sigma 0x03A3 folds to 0x03C3, except
 	    // when it is the last character in a word, then it folds to
 	    // 0x03C2.
-	    if (c == 0x03a3 || c == 0x03c2)
+	    ଯଦି (c == 0x03a3 || c == 0x03c2)
 	    {
-		if (p == str + len || !spell_iswordp(p, wp))
+		ଯଦି (p == str + len || !spell_iswordp(p, wp))
 		    c = 0x03c2;
-		else
+		ଅନ୍ୟଥା
 		    c = 0x03c3;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		c = SPELL_TOFOLD(c);
 
 	    outi += mb_char2bytes(c, buf + outi);
 	}
 	buf[outi] = NUL;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Be quick for non-multibyte encodings.
-	for (i = 0; i < len; ++i)
+	ପାଇଁ (i = 0; i < len; ++i)
 	    buf[i] = spelltab.st_fold[str[i]];
 	buf[i] = NUL;
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check if the word at line "lnum" column "col" is required to start with a
  * capital.  This uses 'spellcapcheck' of the buffer in window "wp".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 {
-    if (wp->w_s->b_cap_prog == NULL)
-	return FALSE;
+    ଯଦି (wp->w_s->b_cap_prog == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
-    int		need_cap = FALSE;
-    char_u	*line = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : NULL;
-    char_u	*line_copy = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		need_cap = FALSE;
+    char_u	*ଧାଡ଼ି = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : ଖାଲି;
+    char_u	*ଧାଡ଼ି_copy = ଖାଲି;
     colnr_T	endcol = 0;
 
-    if (col == 0 || getwhitecols(line) >= col)
+    ଯଦି (col == 0 || getwhitecols(ଧାଡ଼ି) >= col)
     {
 	// At start of line, check if previous line is empty or sentence
 	// ends there.
-	if (lnum == 1)
+	ଯଦି (lnum == 1)
 	    need_cap = TRUE;
-	else
+	ଅନ୍ୟଥା
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
-	    if (*skipwhite(line) == NUL)
+	    ଧାଡ଼ି = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
+	    ଯଦି (*skipwhite(ଧାଡ଼ି) == NUL)
 		need_cap = TRUE;
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Append a space in place of the line break.
-		line_copy = concat_str(line, (char_u *)" ");
-		if (line_copy == NULL)
-		    return FALSE;
+		ଧାଡ଼ି_copy = concat_str(ଧାଡ଼ି, (char_u *)" ");
+		ଯଦି (ଧାଡ଼ି_copy == ଖାଲି)
+		    ଫେରନ୍ତୁ FALSE;
 
-		line = line_copy;
-		endcol = (colnr_T)STRLEN(line);
+		ଧାଡ଼ି = ଧାଡ଼ି_copy;
+		endcol = (colnr_T)STRLEN(ଧାଡ଼ି);
 	    }
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	endcol = col;
 
-    if (endcol > 0)
+    ଯଦି (endcol > 0)
     {
 	// Check if sentence ends before the bad word.
 	regmatch_T	regmatch;
 	regmatch.regprog = wp->w_s->b_cap_prog;
 	regmatch.rm_ic = FALSE;
-	char_u *p = line + endcol;
-	for (;;)
+	char_u *p = ଧାଡ଼ି + endcol;
+	ପାଇଁ (;;)
 	{
-	    MB_PTR_BACK(line, p);
-	    if (p == line || spell_iswordp_nmw(p, wp))
-		break;
-	    if (vim_regexec(&regmatch, p, 0)
-					 && regmatch.endp[0] == line + endcol)
+	    MB_PTR_BACK(ଧାଡ଼ି, p);
+	    ଯଦି (p == ଧାଡ଼ି || spell_iswordp_nmw(p, wp))
+		ଭାଙ୍ଗ;
+	    ଯଦି (vim_regexec(&regmatch, p, 0)
+					 && regmatch.endp[0] == ଧାଡ଼ି + endcol)
 	    {
 		need_cap = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 	wp->w_s->b_cap_prog = regmatch.regprog;
     }
 
-    vim_free(line_copy);
+    vim_free(ଧାଡ଼ି_copy);
 
-    return need_cap;
+    ଫେରନ୍ତୁ need_cap;
 }
 
 
 /*
  * ":spellrepall"
  */
-    void
+    ଶୂନ୍ୟ
 ex_spellrepall(exarg_T *eap UNUSED)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*frompat;
     size_t	frompatlen;
-    char_u	*line;
+    char_u	*ଧାଡ଼ି;
     char_u	*p;
-    int		save_ws = p_ws;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_ws = p_ws;
     linenr_T	prev_lnum = 0;
 
-    if (repl_from == NULL || repl_to == NULL)
+    ଯଦି (repl_from == ଖାଲି || repl_to == ଖାଲି)
     {
 	emsg(_(e_no_previous_spell_replacement));
-	return;
+	ଫେରନ୍ତୁ;
     }
     size_t	repl_from_len = STRLEN(repl_from);
     size_t	repl_to_len = STRLEN(repl_to);
     long	addlen = (long)repl_to_len - (long)repl_from_len;
 
     frompat = alloc(repl_from_len + 7);
-    if (frompat == NULL)
-	return;
-    frompatlen = vim_snprintf((char *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
+    ଯଦି (frompat == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    frompatlen = vim_snprintf((ଅକ୍ଷର *)frompat, repl_from_len + 7, "\\V\\<%s\\>", repl_from);
     p_ws = FALSE;
 
     sub_nsubs = 0;
     sub_nlines = 0;
     curwin->w_cursor.lnum = 0;
-    while (!got_int)
+    ଯେତେବେଳେ (!got_int)
     {
-	if (do_search(NULL, '/', '/', frompat, frompatlen, 1L, SEARCH_KEEP, NULL) == 0
+	ଯଦି (do_ସନ୍ଧାନ(ଖାଲି, '/', '/', frompat, frompatlen, 1L, ସନ୍ଧାନ_KEEP, ଖାଲି) == 0
 						   || u_save_cursor() == FAIL)
-	    break;
+	    ଭାଙ୍ଗ;
 
 	// Only replace when the right word isn't there yet.  This happens
 	// when changing "etc" to "etc.".
-	line = ml_get_curline();
-	if (addlen <= 0 || STRNCMP(line + curwin->w_cursor.col,
+	ଧାଡ଼ି = ml_get_curline();
+	ଯଦି (addlen <= 0 || STRNCMP(ଧାଡ଼ି + curwin->w_cursor.col,
 						   repl_to, repl_to_len) != 0)
 	{
 	    p = alloc(ml_get_curline_len() + addlen + 1);
-	    if (p == NULL)
-		break;
-	    mch_memmove(p, line, curwin->w_cursor.col);
+	    ଯଦି (p == ଖାଲି)
+		ଭାଙ୍ଗ;
+	    mch_memmove(p, ଧାଡ଼ି, curwin->w_cursor.col);
 	    STRCPY(p + curwin->w_cursor.col, repl_to);
-	    STRCAT(p, line + curwin->w_cursor.col + repl_from_len);
+	    STRCAT(p, ଧାଡ଼ି + curwin->w_cursor.col + repl_from_len);
 	    ml_replace(curwin->w_cursor.lnum, p, FALSE);
 	    changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
-#if defined(FEAT_PROP_POPUP)
-	    if (curbuf->b_has_textprop && addlen != 0)
+#ଯଦି defined(FEAT_PROP_POPUP)
+	    ଯଦି (curbuf->b_has_textprop && addlen != 0)
 		adjust_prop_columns(curwin->w_cursor.lnum,
-				 curwin->w_cursor.col, (int)addlen, APC_SUBSTITUTE);
+				 curwin->w_cursor.col, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)addlen, APC_SUBSTITUTE);
 #endif
 
-	    if (curwin->w_cursor.lnum != prev_lnum)
+	    ଯଦି (curwin->w_cursor.lnum != prev_lnum)
 	    {
 		++sub_nlines;
 		prev_lnum = curwin->w_cursor.lnum;
@@ -3029,10 +3029,10 @@ ex_spellrepall(exarg_T *eap UNUSED)
     curwin->w_cursor = pos;
     vim_free(frompat);
 
-    if (sub_nsubs == 0)
+    ଯଦି (sub_nsubs == 0)
 	semsg(_(e_not_found_str), repl_from);
-    else
-	do_sub_msg(FALSE);
+    ଅନ୍ୟଥା
+	do_sub_ସନ୍ଦେଶ(FALSE);
 }
 
 /*
@@ -3040,28 +3040,28 @@ ex_spellrepall(exarg_T *eap UNUSED)
  * "wcopy[MAXWLEN]".  "word" must not be empty.
  * The result is NUL terminated.
  */
-    void
+    ଶୂନ୍ୟ
 onecap_copy(
     char_u	*word,
     char_u	*wcopy,
-    int		upper)	    // TRUE: first letter made upper case
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		upper)	    // TRUE: first letter made upper case
 {
     char_u	*p;
-    int		c;
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
     p = word;
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
 	c = mb_cptr2char_adv(&p);
-    else
+    ଅନ୍ୟଥା
 	c = *p++;
-    if (upper)
+    ଯଦି (upper)
 	c = SPELL_TOUPPER(c);
-    else
+    ଅନ୍ୟଥା
 	c = SPELL_TOFOLD(c);
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
 	l = mb_char2bytes(c, wcopy);
-    else
+    ଅନ୍ୟଥା
     {
 	l = 1;
 	wcopy[0] = c;
@@ -3073,43 +3073,43 @@ onecap_copy(
  * Make a copy of "word" with all the letters upper cased into
  * "wcopy[MAXWLEN]".  The result is NUL terminated.
  */
-    void
+    ଶୂନ୍ୟ
 allcap_copy(char_u *word, char_u *wcopy)
 {
     char_u	*s;
     char_u	*d;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
     d = wcopy;
-    for (s = word; *s != NUL; )
+    ପାଇଁ (s = word; *s != NUL; )
     {
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	    c = mb_cptr2char_adv(&s);
-	else
+	ଅନ୍ୟଥା
 	    c = *s++;
 
 	// We only change 0xdf to SS when we are certain latin1 is used.  It
 	// would cause weird errors in other 8-bit encodings.
-	if (enc_latin1like && c == 0xdf)
+	ଯଦି (enc_latin1like && c == 0xdf)
 	{
 	    c = 'S';
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    ଯଦି (d - wcopy >= MAXWLEN - 1)
+		ଭାଙ୍ଗ;
 	    *d++ = c;
 	}
-	else
+	ଅନ୍ୟଥା
 	    c = SPELL_TOUPPER(c);
 
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
-	    if (d - wcopy >= MAXWLEN - MB_MAXBYTES)
-		break;
+	    ଯଦି (d - wcopy >= MAXWLEN - MB_MAXBYTES)
+		ଭାଙ୍ଗ;
 	    d += mb_char2bytes(c, d);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (d - wcopy >= MAXWLEN - 1)
-		break;
+	    ଯଦି (d - wcopy >= MAXWLEN - 1)
+		ଭାଙ୍ଗ;
 	    *d++ = c;
 	}
     }
@@ -3120,37 +3120,37 @@ allcap_copy(char_u *word, char_u *wcopy)
  * Case-folding may change the number of bytes: Count nr of chars in
  * fword[flen] and return the byte length of that many chars in "word".
  */
-    int
-nofold_len(char_u *fword, int flen, char_u *word)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+nofold_len(char_u *fword, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flen, char_u *word)
 {
     char_u	*p;
-    int		i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i = 0;
 
-    for (p = fword; p < fword + flen; MB_PTR_ADV(p))
+    ପାଇଁ (p = fword; p < fword + flen; MB_PTR_ADV(p))
 	++i;
-    for (p = word; i > 0; MB_PTR_ADV(p))
+    ପାଇଁ (p = word; i > 0; MB_PTR_ADV(p))
 	--i;
-    return (int)(p - word);
+    ଫେରନ୍ତୁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - word);
 }
 
 /*
  * Copy "fword" to "cword", fixing case according to "flags".
  */
-    void
-make_case_word(char_u *fword, char_u *cword, int flags)
+    ଶୂନ୍ୟ
+make_case_word(char_u *fword, char_u *cword, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags)
 {
-    if (flags & WF_ALLCAP)
+    ଯଦି (flags & WF_ALLCAP)
 	// Make it all upper-case
 	allcap_copy(fword, cword);
-    else if (flags & WF_ONECAP)
+    ଅନ୍ୟଥା ଯଦି (flags & WF_ONECAP)
 	// Make the first letter upper-case
 	onecap_copy(fword, cword, TRUE);
-    else
+    ଅନ୍ୟଥା
 	// Use goodword as-is.
 	STRCPY(cword, fword);
 }
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 /*
  * Soundfold a string, for soundfold().
  * Result is in allocated memory, NULL for an error.
@@ -3160,23 +3160,23 @@ eval_soundfold(char_u *word)
 {
     langp_T	*lp;
     char_u	sound[MAXWLEN];
-    int		lpi;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lpi;
 
-    if (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+    ଯଦି (curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
 	// Use the sound-folding of the first language that supports it.
-	for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+	ପାଇଁ (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
 	{
 	    lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	    if (lp->lp_slang->sl_sal.ga_len > 0)
+	    ଯଦି (lp->lp_slang->sl_sal.ga_len > 0)
 	    {
 		// soundfold the word
 		spell_soundfold(lp->lp_slang, word, FALSE, sound);
-		return vim_strsave(sound);
+		ଫେରନ୍ତୁ vim_strsave(sound);
 	    }
 	}
 
     // No language with sound folding, return word as-is.
-    return vim_strsave(word);
+    ଫେରନ୍ତୁ vim_strsave(word);
 }
 #endif
 
@@ -3192,34 +3192,34 @@ eval_soundfold(char_u *word)
  * 1. SOFOFROM/SOFOTO do a simple character mapping.
  * 2. SAL items define a more advanced sound-folding (and much slower).
  */
-    void
+    ଶୂନ୍ୟ
 spell_soundfold(
     slang_T	*slang,
     char_u	*inword,
-    int		folded,	    // "inword" is already case-folded
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		folded,	    // "inword" is already case-folded
     char_u	*res)
 {
     char_u	fword[MAXWLEN];
     char_u	*word;
 
-    if (slang->sl_sofo)
+    ଯଦି (slang->sl_sofo)
 	// SOFOFROM and SOFOTO used
 	spell_soundfold_sofo(slang, inword, res);
-    else
+    ଅନ୍ୟଥା
     {
 	// SAL items used.  Requires the word to be case-folded.
-	if (folded)
+	ଯଦି (folded)
 	    word = inword;
-	else
+	ଅନ୍ୟଥା
 	{
-	    (void)spell_casefold(curwin,
-				  inword, (int)STRLEN(inword), fword, MAXWLEN);
+	    (ଶୂନ୍ୟ)spell_casefold(curwin,
+				  inword, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(inword), fword, MAXWLEN);
 	    word = fword;
 	}
 
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	    spell_soundfold_wsal(slang, word, res);
-	else
+	ଅନ୍ୟଥା
 	    spell_soundfold_sal(slang, word, res);
     }
 }
@@ -3228,68 +3228,68 @@ spell_soundfold(
  * Perform sound folding of "inword" into "res" according to SOFOFROM and
  * SOFOTO lines.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
 {
     char_u	*s;
-    int		ri = 0;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ri = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
-	int	prevc = 0;
-	int	*ip;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	prevc = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	*ip;
 
 	// The sl_sal_first[] table contains the translation for chars up to
 	// 255, sl_sal the rest.
-	for (s = inword; *s != NUL; )
+	ପାଇଁ (s = inword; *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&s);
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    ଯଦି (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 		c = ' ';
-	    else if (c < 256)
+	    ଅନ୍ୟଥା ଯଦି (c < 256)
 		c = slang->sl_sal_first[c];
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		ip = ((int **)slang->sl_sal.ga_data)[c & 0xff];
-		if (ip == NULL)		// empty list, can't match
+		ip = ((ପୂର୍ଣ୍ଣସଂଖ୍ୟା **)slang->sl_sal.ga_data)[c & 0xff];
+		ଯଦି (ip == ଖାଲି)		// empty list, can't match
 		    c = NUL;
-		else
-		    for (;;)		// find "c" in the list
+		ଅନ୍ୟଥା
+		    ପାଇଁ (;;)		// find "c" in the list
 		    {
-			if (*ip == 0)	// not found
+			ଯଦି (*ip == 0)	// not found
 			{
 			    c = NUL;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
-			if (*ip == c)	// match!
+			ଯଦି (*ip == c)	// match!
 			{
 			    c = ip[1];
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 			ip += 2;
 		    }
 	    }
 
-	    if (c != NUL && c != prevc)
+	    ଯଦି (c != NUL && c != prevc)
 	    {
 		ri += mb_char2bytes(c, res + ri);
-		if (ri + MB_MAXBYTES > MAXWLEN)
-		    break;
+		ଯଦି (ri + MB_MAXBYTES > MAXWLEN)
+		    ଭାଙ୍ଗ;
 		prevc = c;
 	    }
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// The sl_sal_first[] table contains the translation.
-	for (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
+	ପାଇଁ (s = inword; (c = *s) != NUL && ri < MAXWLEN - 1; ++s)
 	{
-	    if (VIM_ISWHITE(c))
+	    ଯଦି (VIM_ISWHITE(c))
 		c = ' ';
-	    else
+	    ଅନ୍ୟଥା
 		c = slang->sl_sal_first[c];
-	    if (c != NUL && (ri == 0 || res[ri - 1] != c))
+	    ଯଦି (c != NUL && (ri == 0 || res[ri - 1] != c))
 		res[ri++] = c;
 	}
     }
@@ -3297,7 +3297,7 @@ spell_soundfold_sofo(slang_T *slang, char_u *inword, char_u *res)
     res[ri] = NUL;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 {
     salitem_T	*smp;
@@ -3305,39 +3305,39 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
     char_u	*s = inword;
     char_u	*t;
     char_u	*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i, j, z;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		reslen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n, k = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		z0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		k0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pri;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		p0 = -333;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c0;
 
     // Remove accents, if wanted.  We actually remove all non-word characters.
     // But keep white space.  We need a copy, the word may be changed here.
-    if (slang->sl_rem_accents)
+    ଯଦି (slang->sl_rem_accents)
     {
 	t = word;
-	while (*s != NUL)
+	ଯେତେବେଳେ (*s != NUL)
 	{
-	    if (VIM_ISWHITE(*s))
+	    ଯଦି (VIM_ISWHITE(*s))
 	    {
 		*t++ = ' ';
 		s = skipwhite(s);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		if (spell_iswordp_nmw(s, curwin))
+		ଯଦି (spell_iswordp_nmw(s, curwin))
 		    *t++ = *s;
 		++s;
 	    }
 	}
 	*t = NUL;
     }
-    else
+    ଅନ୍ୟଥା
 	vim_strncpy(word, s, MAXWLEN - 1);
 
     smp = (salitem_T *)slang->sl_sal.ga_data;
@@ -3347,41 +3347,41 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    ଯେତେବେଳେ ((c = word[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
 	n = slang->sl_sal_first[c];
 	z0 = 0;
 
-	if (n >= 0)
+	ଯଦି (n >= 0)
 	{
 	    // check all rules for the same letter
-	    for (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
+	    ପାଇଁ (; n < slang->sl_sal.ga_len && (s = smp[n].sm_lead)[0] == c; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		ଯଦି (k > 1)
 		{
-		    if (word[i + 1] != s[1])
-			continue;
-		    if (k > 2)
+		    ଯଦି (word[i + 1] != s[1])
+			ଜାରି;
+		    ଯଦି (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != s[j])
-				break;
-			if (j < k)
-			    continue;
+			ପାଇଁ (j = 2; j < k; ++j)
+			    ଯଦି (word[i + j] != s[j])
+				ଭାଙ୍ଗ;
+			ଯଦି (j < k)
+			    ଜାରି;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof) != NULL)
+		ଯଦି ((pf = smp[n].sm_oneof) != ଖାଲି)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    ଯେତେବେଳେ (*pf != NUL && *pf != word[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    ଯଦି (*pf == NUL)
+			ଜାରି;
 		    ++k;
 		}
 		s = smp[n].sm_rules;
@@ -3389,23 +3389,23 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		ଯେତେବେଳେ (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		ଯଦି (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		ଯଦି (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		ଯଦି (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		ଯଦି (*s == NUL
 			|| (*s == '^'
 			    && (i == 0 || !(word[i - 1] == ' '
 				      || spell_iswordp(word + i - 1, curwin)))
@@ -3420,142 +3420,142 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
 		    c0 = word[i + k - 1];
 		    n0 = slang->sl_sal_first[c0];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
+		    ଯଦି (slang->sl_followup && k > 1 && n0 >= 0
 					   && p0 != '-' && word[i + k] != NUL)
 		    {
 			// test follow-up rule for "word[i + k]"
-			for ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
+			ପାଇଁ ( ; (s = smp[n0].sm_lead)[0] == c0; ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
 			    //
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    ଯଦି (k0 > 1)
 			    {
-				if (word[i + k] != s[1])
-				    continue;
-				if (k0 > 2)
+				ଯଦି (word[i + k] != s[1])
+				    ଜାରି;
+				ଯଦି (k0 > 2)
 				{
 				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != s[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    ପାଇଁ (j = 2; j < k0; ++j)
+					ଯଦି (*pf++ != s[j])
+					    ଭାଙ୍ଗ;
+				    ଯଦି (j < k0)
+					ଜାରି;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof) != NULL)
+			    ଯଦି ((pf = smp[n0].sm_oneof) != ଖାଲି)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				ଯେତେବେଳେ (*pf != NUL && *pf != word[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				ଯଦି (*pf == NUL)
+				    ଜାରି;
 				++k0;
 			    }
 
 			    p0 = 5;
 			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    ଯେତେବେଳେ (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    ଯଦି (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    ଯଦି (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    ଯଦି (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
 					    && !spell_iswordp(word + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				ଯଦି (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    ଜାରି;
 
-				if (p0 < pri)
+				ଯଦି (p0 < pri)
 				    // priority too low
-				    continue;
+				    ଜାରି;
 				// rule fits; stop search
-				break;
+				ଭାଙ୍ଗ;
 			    }
 			}
 
-			if (p0 >= pri && smp[n0].sm_lead[0] == c0)
-			    continue;
+			ଯଦି (p0 >= pri && smp[n0].sm_lead[0] == c0)
+			    ଜାରି;
 		    }
 
 		    // replace string
 		    s = smp[n].sm_to;
-		    if (s == NULL)
+		    ଯଦି (s == ଖାଲି)
 			s = (char_u *)"";
 		    pf = smp[n].sm_rules;
-		    p0 = (vim_strchr(pf, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    p0 = (vim_strchr(pf, '<') != ଖାଲି) ? 1 : 0;
+		    ଯଦି (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && *s != NUL && (res[reslen - 1] == c
+			ଯଦି (reslen > 0 && *s != NUL && (res[reslen - 1] == c
 						    || res[reslen - 1] == *s))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			while (*s != NUL && word[i + k0] != NUL)
+			ଯେତେବେଳେ (*s != NUL && word[i + k0] != NUL)
 			{
 			    word[i + k0] = *s;
 			    k0++;
 			    s++;
 			}
-			if (k > k0)
+			ଯଦି (k > k0)
 			    STRMOVE(word + i + k0, word + i + k);
 
 			// new "actual letter"
 			c = word[i];
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			while (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
+			ଯେତେବେଳେ (*s != NUL && s[1] != NUL && reslen < MAXWLEN - 1)
 			{
-			    if (reslen == 0 || res[reslen - 1] != *s)
+			    ଯଦି (reslen == 0 || res[reslen - 1] != *s)
 				res[reslen++] = *s;
 			    s++;
 			}
 			// new "actual letter"
 			c = *s;
-			if (strstr((char *)pf, "^^") != NULL)
+			ଯଦି (strstr((ଅକ୍ଷର *)pf, "^^") != ଖାଲି)
 			{
-			    if (c != NUL && reslen < MAXWLEN - 1)
+			    ଯଦି (c != NUL && reslen < MAXWLEN - 1)
 				res[reslen++] = c;
 			    STRMOVE(word, word + i + 1);
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	ଅନ୍ୟଥା ଯଦି (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	ଯଦି (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
+	    ଯଦି (k && !p0 && reslen < MAXWLEN - 1 && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || res[reslen - 1] != c))
 		// condense only double letters
@@ -3574,29 +3574,29 @@ spell_soundfold_sal(slang_T *slang, char_u *inword, char_u *res)
  * Turn "inword" into its sound-a-like equivalent in "res[MAXWLEN]".
  * Multi-byte version of spell_soundfold().
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 {
     salitem_T	*smp = (salitem_T *)slang->sl_sal.ga_data;
-    int		word[MAXWLEN];
-    int		wres[MAXWLEN];
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		word[MAXWLEN];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wres[MAXWLEN];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
     char_u	*s;
-    int		*ws;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*ws;
     char_u	*t;
-    int		*pf;
-    int		i, j, z;
-    int		reslen;
-    int		n, k = 0;
-    int		z0;
-    int		k0;
-    int		n0;
-    int		c;
-    int		pri;
-    int		p0 = -333;
-    int		c0;
-    int		did_white = FALSE;
-    int		wordlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*pf;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i, j, z;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		reslen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n, k = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		z0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		k0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pri;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		p0 = -333;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_white = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wordlen;
 
 
     /*
@@ -3605,24 +3605,24 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * But keep white space.
      */
     wordlen = 0;
-    for (s = inword; *s != NUL; )
+    ପାଇଁ (s = inword; *s != NUL; )
     {
 	t = s;
 	c = mb_cptr2char_adv(&s);
-	if (slang->sl_rem_accents)
+	ଯଦି (slang->sl_rem_accents)
 	{
-	    if (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
+	    ଯଦି (enc_utf8 ? utf_class(c) == 0 : VIM_ISWHITE(c))
 	    {
-		if (did_white)
-		    continue;
+		ଯଦି (did_white)
+		    ଜାରି;
 		c = ' ';
 		did_white = TRUE;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		did_white = FALSE;
-		if (!spell_iswordp_nmw(t, curwin))
-		    continue;
+		ଯଦି (!spell_iswordp_nmw(t, curwin))
+		    ଜାରି;
 	    }
 	}
 	word[wordlen++] = c;
@@ -3635,47 +3635,47 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
      * Changed to keep spaces.
      */
     i = reslen = z = 0;
-    while ((c = word[i]) != NUL)
+    ଯେତେବେଳେ ((c = word[i]) != NUL)
     {
 	// Start with the first rule that has the character in the word.
 	n = slang->sl_sal_first[c & 0xff];
 	z0 = 0;
 
-	if (n >= 0)
+	ଯଦି (n >= 0)
 	{
 	    // Check all rules for the same index byte.
 	    // If c is 0x300 need extra check for the end of the array, as
 	    // (c & 0xff) is NUL.
-	    for (; n < slang->sl_sal.ga_len
+	    ପାଇଁ (; n < slang->sl_sal.ga_len
 			&& ((ws = smp[n].sm_lead_w)[0] & 0xff) == (c & 0xff)
 							 && ws[0] != NUL; ++n)
 	    {
 		// Quickly skip entries that don't match the word.  Most
 		// entries are less than three chars, optimize for that.
-		if (c != ws[0])
-		    continue;
+		ଯଦି (c != ws[0])
+		    ଜାରି;
 		k = smp[n].sm_leadlen;
-		if (k > 1)
+		ଯଦି (k > 1)
 		{
-		    if (word[i + 1] != ws[1])
-			continue;
-		    if (k > 2)
+		    ଯଦି (word[i + 1] != ws[1])
+			ଜାରି;
+		    ଯଦି (k > 2)
 		    {
-			for (j = 2; j < k; ++j)
-			    if (word[i + j] != ws[j])
-				break;
-			if (j < k)
-			    continue;
+			ପାଇଁ (j = 2; j < k; ++j)
+			    ଯଦି (word[i + j] != ws[j])
+				ଭାଙ୍ଗ;
+			ଯଦି (j < k)
+			    ଜାରି;
 		    }
 		}
 
-		if ((pf = smp[n].sm_oneof_w) != NULL)
+		ଯଦି ((pf = smp[n].sm_oneof_w) != ଖାଲି)
 		{
 		    // Check for match with one of the chars in "sm_oneof".
-		    while (*pf != NUL && *pf != word[i + k])
+		    ଯେତେବେଳେ (*pf != NUL && *pf != word[i + k])
 			++pf;
-		    if (*pf == NUL)
-			continue;
+		    ଯଦି (*pf == NUL)
+			ଜାରି;
 		    ++k;
 		}
 		s = smp[n].sm_rules;
@@ -3683,23 +3683,23 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 
 		p0 = *s;
 		k0 = k;
-		while (*s == '-' && k > 1)
+		ଯେତେବେଳେ (*s == '-' && k > 1)
 		{
 		    k--;
 		    s++;
 		}
-		if (*s == '<')
+		ଯଦି (*s == '<')
 		    s++;
-		if (VIM_ISDIGIT(*s))
+		ଯଦି (VIM_ISDIGIT(*s))
 		{
 		    // determine priority
 		    pri = *s - '0';
 		    s++;
 		}
-		if (*s == '^' && *(s + 1) == '^')
+		ଯଦି (*s == '^' && *(s + 1) == '^')
 		    s++;
 
-		if (*s == NUL
+		ଯଦି (*s == NUL
 			|| (*s == '^'
 			    && (i == 0 || !(word[i - 1] == ' '
 				    || spell_iswordp_w(word + i - 1, curwin)))
@@ -3714,153 +3714,153 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 		    c0 = word[i + k - 1];
 		    n0 = slang->sl_sal_first[c0 & 0xff];
 
-		    if (slang->sl_followup && k > 1 && n0 >= 0
+		    ଯଦି (slang->sl_followup && k > 1 && n0 >= 0
 					   && p0 != '-' && word[i + k] != NUL)
 		    {
 			// Test follow-up rule for "word[i + k]"; loop over
 			// all entries with the same index byte.
-			for ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
+			ପାଇଁ ( ; ((ws = smp[n0].sm_lead_w)[0] & 0xff)
 							 == (c0 & 0xff); ++n0)
 			{
 			    // Quickly skip entries that don't match the word.
-			    if (c0 != ws[0])
-				continue;
+			    ଯଦି (c0 != ws[0])
+				ଜାରି;
 			    k0 = smp[n0].sm_leadlen;
-			    if (k0 > 1)
+			    ଯଦି (k0 > 1)
 			    {
-				if (word[i + k] != ws[1])
-				    continue;
-				if (k0 > 2)
+				ଯଦି (word[i + k] != ws[1])
+				    ଜାରି;
+				ଯଦି (k0 > 2)
 				{
 				    pf = word + i + k + 1;
-				    for (j = 2; j < k0; ++j)
-					if (*pf++ != ws[j])
-					    break;
-				    if (j < k0)
-					continue;
+				    ପାଇଁ (j = 2; j < k0; ++j)
+					ଯଦି (*pf++ != ws[j])
+					    ଭାଙ୍ଗ;
+				    ଯଦି (j < k0)
+					ଜାରି;
 				}
 			    }
 			    k0 += k - 1;
 
-			    if ((pf = smp[n0].sm_oneof_w) != NULL)
+			    ଯଦି ((pf = smp[n0].sm_oneof_w) != ଖାଲି)
 			    {
 				// Check for match with one of the chars in
 				// "sm_oneof".
-				while (*pf != NUL && *pf != word[i + k0])
+				ଯେତେବେଳେ (*pf != NUL && *pf != word[i + k0])
 				    ++pf;
-				if (*pf == NUL)
-				    continue;
+				ଯଦି (*pf == NUL)
+				    ଜାରି;
 				++k0;
 			    }
 
 			    p0 = 5;
 			    s = smp[n0].sm_rules;
-			    while (*s == '-')
+			    ଯେତେବେଳେ (*s == '-')
 			    {
 				// "k0" gets NOT reduced because
 				// "if (k0 == k)"
 				s++;
 			    }
-			    if (*s == '<')
+			    ଯଦି (*s == '<')
 				s++;
-			    if (VIM_ISDIGIT(*s))
+			    ଯଦି (VIM_ISDIGIT(*s))
 			    {
 				p0 = *s - '0';
 				s++;
 			    }
 
-			    if (*s == NUL
+			    ଯଦି (*s == NUL
 				    // *s == '^' cuts
 				    || (*s == '$'
 					 && !spell_iswordp_w(word + i + k0,
 								     curwin)))
 			    {
-				if (k0 == k)
+				ଯଦି (k0 == k)
 				    // this is just a piece of the string
-				    continue;
+				    ଜାରି;
 
-				if (p0 < pri)
+				ଯଦି (p0 < pri)
 				    // priority too low
-				    continue;
+				    ଜାରି;
 				// rule fits; stop search
-				break;
+				ଭାଙ୍ଗ;
 			    }
 			}
 
-			if (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
+			ଯଦି (p0 >= pri && (smp[n0].sm_lead_w[0] & 0xff)
 							       == (c0 & 0xff))
-			    continue;
+			    ଜାରି;
 		    }
 
 		    // replace string
 		    ws = smp[n].sm_to_w;
 		    s = smp[n].sm_rules;
-		    p0 = (vim_strchr(s, '<') != NULL) ? 1 : 0;
-		    if (p0 == 1 && z == 0)
+		    p0 = (vim_strchr(s, '<') != ଖାଲି) ? 1 : 0;
+		    ଯଦି (p0 == 1 && z == 0)
 		    {
 			// rule with '<' is used
-			if (reslen > 0 && ws != NULL && *ws != NUL
+			ଯଦି (reslen > 0 && ws != ଖାଲି && *ws != NUL
 				&& (wres[reslen - 1] == c
 						    || wres[reslen - 1] == *ws))
 			    reslen--;
 			z0 = 1;
 			z = 1;
 			k0 = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && word[i + k0] != NUL)
+			ଯଦି (ws != ଖାଲି)
+			    ଯେତେବେଳେ (*ws != NUL && word[i + k0] != NUL)
 			    {
 				word[i + k0] = *ws;
 				k0++;
 				ws++;
 			    }
-			if (k > k0)
+			ଯଦି (k > k0)
 			    mch_memmove(word + i + k0, word + i + k,
-				    sizeof(int) * (wordlen - (i + k) + 1));
+				    ଆକାର(ପୂର୍ଣ୍ଣସଂଖ୍ୟା) * (wordlen - (i + k) + 1));
 
 			// new "actual letter"
 			c = word[i];
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// no '<' rule used
 			i += k - 1;
 			z = 0;
-			if (ws != NULL)
-			    while (*ws != NUL && ws[1] != NUL
+			ଯଦି (ws != ଖାଲି)
+			    ଯେତେବେଳେ (*ws != NUL && ws[1] != NUL
 							  && reslen < MAXWLEN)
 			    {
-				if (reslen == 0 || wres[reslen - 1] != *ws)
+				ଯଦି (reslen == 0 || wres[reslen - 1] != *ws)
 				    wres[reslen++] = *ws;
 				ws++;
 			    }
 			// new "actual letter"
-			if (ws == NULL)
+			ଯଦି (ws == ଖାଲି)
 			    c = NUL;
-			else
+			ଅନ୍ୟଥା
 			    c = *ws;
-			if (strstr((char *)s, "^^") != NULL)
+			ଯଦି (strstr((ଅକ୍ଷର *)s, "^^") != ଖାଲି)
 			{
-			    if (c != NUL && reslen < MAXWLEN)
+			    ଯଦି (c != NUL && reslen < MAXWLEN)
 				wres[reslen++] = c;
 			    mch_memmove(word, word + i + 1,
-				       sizeof(int) * (wordlen - (i + 1) + 1));
+				       ଆକାର(ପୂର୍ଣ୍ଣସଂଖ୍ୟା) * (wordlen - (i + 1) + 1));
 			    i = 0;
 			    z0 = 1;
 			}
 		    }
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 	}
-	else if (VIM_ISWHITE(c))
+	ଅନ୍ୟଥା ଯଦି (VIM_ISWHITE(c))
 	{
 	    c = ' ';
 	    k = 1;
 	}
 
-	if (z0 == 0)
+	ଯଦି (z0 == 0)
 	{
-	    if (k && !p0 && reslen < MAXWLEN && c != NUL
+	    ଯଦି (k && !p0 && reslen < MAXWLEN && c != NUL
 		    && (!slang->sl_collapse || reslen == 0
 						     || wres[reslen - 1] != c))
 		// condense only double letters
@@ -3874,11 +3874,11 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 
     // Convert wide characters in "wres" to a multi-byte string in "res".
     l = 0;
-    for (n = 0; n < reslen; ++n)
+    ପାଇଁ (n = 0; n < reslen; ++n)
     {
 	l += mb_char2bytes(wres[n], res + l);
-	if (l + MB_MAXBYTES > MAXWLEN)
-	    break;
+	ଯଦି (l + MB_MAXBYTES > MAXWLEN)
+	    ଭାଙ୍ଗ;
     }
     res[l] = NUL;
 }
@@ -3886,35 +3886,35 @@ spell_soundfold_wsal(slang_T *slang, char_u *inword, char_u *res)
 /*
  * ":spellinfo"
  */
-    void
+    ଶୂନ୍ୟ
 ex_spellinfo(exarg_T *eap UNUSED)
 {
-    int		lpi;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lpi;
     langp_T	*lp;
     char_u	*p;
 
-    if (no_spell_checking(curwin))
-	return;
+    ଯଦି (no_spell_checking(curwin))
+	ଫେରନ୍ତୁ;
 
-    msg_start();
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
+    ସନ୍ଦେଶ_start();
+    ପାଇଁ (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	msg_puts("file: ");
-	msg_puts((char *)lp->lp_slang->sl_fname);
-	msg_putchar('\n');
+	ସନ୍ଦେଶ_puts("file: ");
+	ସନ୍ଦେଶ_puts((ଅକ୍ଷର *)lp->lp_slang->sl_fname);
+	ସନ୍ଦେଶ_putchar('\n');
 	p = lp->lp_slang->sl_info;
-	if (p != NULL)
+	ଯଦି (p != ଖାଲି)
 	{
-	    msg_puts((char *)p);
-	    msg_putchar('\n');
+	    ସନ୍ଦେଶ_puts((ଅକ୍ଷର *)p);
+	    ସନ୍ଦେଶ_putchar('\n');
 	}
     }
-    msg_end();
+    ସନ୍ଦେଶ_end();
 }
 
 #define DUMPFLAG_KEEPCASE   1	// round 2: keep-case tree
-#define DUMPFLAG_COUNT	    2	// include word count
+#define DUMPFLAG_ଗଣନା	    2	// include word count
 #define DUMPFLAG_ICASE	    4	// ignore case when finding matches
 #define DUMPFLAG_ONECAP	    8	// pattern starts with capital
 #define DUMPFLAG_ALLCAP	    16	// pattern is all capitals
@@ -3922,32 +3922,32 @@ ex_spellinfo(exarg_T *eap UNUSED)
 /*
  * ":spelldump"
  */
-    void
+    ଶୂନ୍ୟ
 ex_spelldump(exarg_T *eap)
 {
     char_u  *spl;
     long    dummy;
 
-    if (no_spell_checking(curwin))
-	return;
-    (void)get_option_value((char_u*)"spl", &dummy, &spl, NULL, OPT_LOCAL);
+    ଯଦି (no_spell_checking(curwin))
+	ଫେରନ୍ତୁ;
+    (ଶୂନ୍ୟ)get_option_ମୂଲ୍ୟ((char_u*)"spl", &dummy, &spl, ଖାଲି, OPT_LOCAL);
 
     // Create a new empty buffer in a new window.
     do_cmdline_cmd((char_u *)"new");
 
     // enable spelling locally in the new window
-    set_option_value_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
-    set_option_value_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
+    set_option_ମୂଲ୍ୟ_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
+    set_option_ମୂଲ୍ୟ_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
     vim_free(spl);
 
-    if (!BUFEMPTY())
-	return;
+    ଯଦି (!BUFEMPTY())
+	ଫେରନ୍ତୁ;
 
-    spell_dump_compl(NULL, 0, NULL, eap->forceit ? DUMPFLAG_COUNT : 0);
+    spell_dump_compl(ଖାଲି, 0, ଖାଲି, eap->forceit ? DUMPFLAG_ଗଣନା : 0);
 
     // Delete the empty line that we started with.
-    if (curbuf->b_ml.ml_line_count > 1)
-	ml_delete(curbuf->b_ml.ml_line_count);
+    ଯଦି (curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା > 1)
+	ml_delete(curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା);
 
     redraw_later(UPD_NOT_VALID);
 }
@@ -3958,145 +3958,145 @@ ex_spelldump(exarg_T *eap)
  *	"ic" and "dir" are not used.
  * 2. When "pat" is not NULL: add matching words to insert mode completion.
  */
-    void
+    ଶୂନ୍ୟ
 spell_dump_compl(
     char_u	*pat,	    // leading part of the word
-    int		ic,	    // ignore case
-    int		*dir,	    // direction for adding matches
-    int		dumpflags_arg)	// DUMPFLAG_*
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic,	    // ignore case
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*dir,	    // direction for adding matches
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dumpflags_arg)	// DUMPFLAG_*
 {
     langp_T	*lp;
     slang_T	*slang;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curi[MAXWLEN];
     char_u	word[MAXWLEN];
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = 0;
-    int		round;
-    int		depth;
-    int		n;
-    int		flags;
-    char_u	*region_names = NULL;	    // region names being used
-    int		do_region = TRUE;	    // dump region names and numbers
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		round;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		depth;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags;
+    char_u	*region_names = ଖାଲି;	    // region names being used
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		do_region = TRUE;	    // dump region names and numbers
     char_u	*p;
-    int		lpi;
-    int		dumpflags = dumpflags_arg;
-    int		patlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lpi;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dumpflags = dumpflags_arg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		patlen;
 
     // When ignoring case or when the pattern starts with capital pass this on
     // to dump_word().
-    if (pat != NULL)
+    ଯଦି (pat != ଖାଲି)
     {
-	if (ic)
+	ଯଦି (ic)
 	    dumpflags |= DUMPFLAG_ICASE;
-	else
+	ଅନ୍ୟଥା
 	{
-	    n = captype(pat, NULL);
-	    if (n == WF_ONECAP)
+	    n = captype(pat, ଖାଲି);
+	    ଯଦି (n == WF_ONECAP)
 		dumpflags |= DUMPFLAG_ONECAP;
-	    else if (n == WF_ALLCAP && (int)STRLEN(pat) > mb_ptr2len(pat))
+	    ଅନ୍ୟଥା ଯଦି (n == WF_ALLCAP && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(pat) > mb_ptr2len(pat))
 		dumpflags |= DUMPFLAG_ALLCAP;
 	}
     }
 
     // Find out if we can support regions: All languages must support the same
     // regions or none at all.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    ପାଇଁ (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	p = lp->lp_slang->sl_regions;
-	if (p[0] != 0)
+	ଯଦି (p[0] != 0)
 	{
-	    if (region_names == NULL)	    // first language with regions
+	    ଯଦି (region_names == ଖାଲି)	    // first language with regions
 		region_names = p;
-	    else if (STRCMP(region_names, p) != 0)
+	    ଅନ୍ୟଥା ଯଦି (STRCMP(region_names, p) != 0)
 	    {
 		do_region = FALSE;	    // region names are different
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
 
-    if (do_region && region_names != NULL && pat == NULL)
+    ଯଦି (do_region && region_names != ଖାଲି && pat == ଖାଲି)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "/regions=%s", region_names);
+	vim_snprintf((ଅକ୍ଷର *)IObuff, IOSIZE, "/regions=%s", region_names);
 	ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
     }
-    else
+    ଅନ୍ୟଥା
 	do_region = FALSE;
 
     /*
      * Loop over all files loaded for the entries in 'spelllang'.
      */
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    ପାଇଁ (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_fbyts == NULL)	    // reloading failed
-	    continue;
+	ଯଦି (slang->sl_fbyts == ଖାଲି)	    // reloading failed
+	    ଜାରି;
 
-	if (pat == NULL)
+	ଯଦି (pat == ଖାଲି)
 	{
-	    vim_snprintf((char *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
+	    vim_snprintf((ଅକ୍ଷର *)IObuff, IOSIZE, "# file: %s", slang->sl_fname);
 	    ml_append(lnum++, IObuff, (colnr_T)0, FALSE);
 	}
 
 	// When matching with a pattern and there are no prefixes only use
 	// parts of the tree that match "pat".
-	if (pat != NULL && slang->sl_pbyts == NULL)
-	    patlen = (int)STRLEN(pat);
-	else
+	ଯଦି (pat != ଖାଲି && slang->sl_pbyts == ଖାଲି)
+	    patlen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(pat);
+	ଅନ୍ୟଥା
 	    patlen = -1;
 
 	// round 1: case-folded tree
 	// round 2: keep-case tree
-	for (round = 1; round <= 2; ++round)
+	ପାଇଁ (round = 1; round <= 2; ++round)
 	{
-	    if (round == 1)
+	    ଯଦି (round == 1)
 	    {
 		dumpflags &= ~DUMPFLAG_KEEPCASE;
 		byts = slang->sl_fbyts;
 		idxs = slang->sl_fidxs;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		dumpflags |= DUMPFLAG_KEEPCASE;
 		byts = slang->sl_kbyts;
 		idxs = slang->sl_kidxs;
 	    }
-	    if (byts == NULL)
-		continue;		// array is empty
+	    ଯଦି (byts == ଖାଲି)
+		ଜାରି;		// array is empty
 
 	    depth = 0;
 	    arridx[0] = 0;
 	    curi[0] = 1;
-	    while (depth >= 0 && !got_int
-				  && (pat == NULL || !ins_compl_interrupted()))
+	    ଯେତେବେଳେ (depth >= 0 && !got_int
+				  && (pat == ଖାଲି || !ins_compl_interrupted()))
 	    {
-		if (curi[depth] > byts[arridx[depth]])
+		ଯଦି (curi[depth] > byts[arridx[depth]])
 		{
 		    // Done all bytes at this node, go up one level.
 		    --depth;
-		    line_breakcheck();
-		    ins_compl_check_keys(50, FALSE);
+		    ଧାଡ଼ି_breakcheck();
+		    ins_compl_check_ଚାବିଗୁଡ଼ିକ(50, FALSE);
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    // Do one more byte at this node.
 		    n = arridx[depth] + curi[depth];
 		    ++curi[depth];
 		    c = byts[n];
-		    if (c == 0 || depth >= MAXWLEN - 1)
+		    ଯଦି (c == 0 || depth >= MAXWLEN - 1)
 		    {
 			// End of word or reached maximum length, deal with the
 			// word.
 			// Don't use keep-case words in the fold-case tree,
 			// they will appear in the keep-case tree.
 			// Only use the word when the region matches.
-			flags = (int)idxs[n];
-			if ((round == 2 || (flags & WF_KEEPCAP) == 0)
+			flags = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)idxs[n];
+			ଯଦି ((round == 2 || (flags & WF_KEEPCAP) == 0)
 				&& (flags & WF_NEEDCOMP) == 0
 				&& (do_region
 				    || (flags & WF_REGION) == 0
@@ -4104,27 +4104,27 @@ spell_dump_compl(
 						       & lp->lp_region) != 0))
 			{
 			    word[depth] = NUL;
-			    if (!do_region)
+			    ଯଦି (!do_region)
 				flags &= ~WF_REGION;
 
 			    // Dump the basic word if there is no prefix or
 			    // when it's the first one.
 			    c = (unsigned)flags >> 24;
-			    if (c == 0 || curi[depth] == 2)
+			    ଯଦି (c == 0 || curi[depth] == 2)
 			    {
 				dump_word(slang, word, pat, dir,
 						      dumpflags, flags, lnum);
-				if (pat == NULL)
+				ଯଦି (pat == ଖାଲି)
 				    ++lnum;
 			    }
 
 			    // Apply the prefix, if there is one.
-			    if (c != 0)
+			    ଯଦି (c != 0)
 				lnum = dump_prefixes(slang, word, pat, dir,
 						      dumpflags, flags, lnum);
 			}
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// Normal char, go one level deeper.
 			word[depth++] = c;
@@ -4137,7 +4137,7 @@ spell_dump_compl(
 			// proper case later.  This isn't exactly right when
 			// length changes for multi-byte characters with
 			// ignore case...
-			if (depth <= patlen
+			ଯଦି (depth <= patlen
 					&& MB_STRNICMP(word, pat, depth) != 0)
 			    --depth;
 		    }
@@ -4151,86 +4151,86 @@ spell_dump_compl(
  * Dump one word: apply case modifications and append a line to the buffer.
  * When "lnum" is zero add insert mode completion.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dump_word(
     slang_T	*slang,
     char_u	*word,
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		wordflags,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*dir,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dumpflags,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wordflags,
     linenr_T	lnum)
 {
-    int		keepcap = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		keepcap = FALSE;
     char_u	*p;
     char_u	*tw;
     char_u	cword[MAXWLEN];
     char_u	badword[MAXWLEN + 10];
-    int		i;
-    int		flags = wordflags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags = wordflags;
 
-    if (dumpflags & DUMPFLAG_ONECAP)
+    ଯଦି (dumpflags & DUMPFLAG_ONECAP)
 	flags |= WF_ONECAP;
-    if (dumpflags & DUMPFLAG_ALLCAP)
+    ଯଦି (dumpflags & DUMPFLAG_ALLCAP)
 	flags |= WF_ALLCAP;
 
-    if ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
+    ଯଦି ((dumpflags & DUMPFLAG_KEEPCASE) == 0 && (flags & WF_CAPMASK) != 0)
     {
 	// Need to fix case according to "flags".
 	make_case_word(word, cword, flags);
 	p = cword;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	p = word;
-	if ((dumpflags & DUMPFLAG_KEEPCASE)
-		&& ((captype(word, NULL) & WF_KEEPCAP) == 0
+	ଯଦି ((dumpflags & DUMPFLAG_KEEPCASE)
+		&& ((captype(word, ଖାଲି) & WF_KEEPCAP) == 0
 						 || (flags & WF_FIXCAP) != 0))
 	    keepcap = TRUE;
     }
     tw = p;
 
-    if (pat == NULL)
+    ଯଦି (pat == ଖାଲି)
     {
 	// Add flags and regions after a slash.
-	if ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
+	ଯଦି ((flags & (WF_BANNED | WF_RARE | WF_REGION)) || keepcap)
 	{
 	    STRCPY(badword, p);
 	    STRCAT(badword, "/");
-	    if (keepcap)
+	    ଯଦି (keepcap)
 		STRCAT(badword, "=");
-	    if (flags & WF_BANNED)
+	    ଯଦି (flags & WF_BANNED)
 		STRCAT(badword, "!");
-	    else if (flags & WF_RARE)
+	    ଅନ୍ୟଥା ଯଦି (flags & WF_RARE)
 		STRCAT(badword, "?");
-	    if (flags & WF_REGION)
-		for (i = 0; i < 7; ++i)
-		    if (flags & (0x10000 << i))
-			sprintf((char *)badword + STRLEN(badword), "%d", i + 1);
+	    ଯଦି (flags & WF_REGION)
+		ପାଇଁ (i = 0; i < 7; ++i)
+		    ଯଦି (flags & (0x10000 << i))
+			sprintf((ଅକ୍ଷର *)badword + STRLEN(badword), "%d", i + 1);
 	    p = badword;
 	}
 
-	if (dumpflags & DUMPFLAG_COUNT)
+	ଯଦି (dumpflags & DUMPFLAG_ଗଣନା)
 	{
 	    hashitem_T  *hi;
 
 	    // Include the word count for ":spelldump!".
 	    hi = hash_find(&slang->sl_wordcount, tw);
-	    if (!HASHITEM_EMPTY(hi))
+	    ଯଦି (!HASHITEM_EMPTY(hi))
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "%s\t%d",
-						     tw, HI2WC(hi)->wc_count);
+		vim_snprintf((ଅକ୍ଷର *)IObuff, IOSIZE, "%s\t%d",
+						     tw, HI2WC(hi)->wc_ଗଣନା);
 		p = IObuff;
 	    }
 	}
 
 	ml_append(lnum, p, (colnr_T)0, FALSE);
     }
-    else if (((dumpflags & DUMPFLAG_ICASE)
+    ଅନ୍ୟଥା ଯଦି (((dumpflags & DUMPFLAG_ICASE)
 		    ? MB_STRNICMP(p, pat, STRLEN(pat)) == 0
 		    : STRNCMP(p, pat, STRLEN(pat)) == 0)
-		&& ins_compl_add_infercase(p, (int)STRLEN(p),
-					  p_ic, NULL, *dir, FALSE, 0) == OK)
+		&& ins_compl_add_infercase(p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p),
+					  p_ic, ଖାଲି, *dir, FALSE, 0) == OK)
 	// if dir was BACKWARD then honor it just once
 	*dir = FORWARD;
 }
@@ -4241,34 +4241,34 @@ dump_word(
  * When "lnum" is zero add insert mode completion.
  * Return the updated line number.
  */
-    static linenr_T
+    ସ୍ଥିର linenr_T
 dump_prefixes(
     slang_T	*slang,
     char_u	*word,	    // case-folded word
     char_u	*pat,
-    int		*dir,
-    int		dumpflags,
-    int		flags,	    // flags with prefix ID
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*dir,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dumpflags,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags,	    // flags with prefix ID
     linenr_T	startlnum)
 {
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curi[MAXWLEN];
     char_u	prefix[MAXWLEN];
     char_u	word_up[MAXWLEN];
-    int		has_word_up = FALSE;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_word_up = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	*byts;
     idx_T	*idxs;
     linenr_T	lnum = startlnum;
-    int		depth;
-    int		n;
-    int		len;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		depth;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
     // If the word starts with a lower-case letter make the word with an
     // upper-case letter in word_up[].
     c = PTR2CHAR(word);
-    if (SPELL_TOUPPER(c) != c)
+    ଯଦି (SPELL_TOUPPER(c) != c)
     {
 	onecap_copy(word, word_up, TRUE);
 	has_word_up = TRUE;
@@ -4276,7 +4276,7 @@ dump_prefixes(
 
     byts = slang->sl_pbyts;
     idxs = slang->sl_pidxs;
-    if (byts != NULL)		// array not is empty
+    ଯଦି (byts != ଖାଲି)		// array not is empty
     {
 	/*
 	 * Loop over all prefixes, building them byte-by-byte in prefix[].
@@ -4285,61 +4285,61 @@ dump_prefixes(
 	depth = 0;
 	arridx[0] = 0;
 	curi[0] = 1;
-	while (depth >= 0 && !got_int)
+	ଯେତେବେଳେ (depth >= 0 && !got_int)
 	{
 	    n = arridx[depth];
 	    len = byts[n];
-	    if (curi[depth] > len)
+	    ଯଦି (curi[depth] > len)
 	    {
 		// Done all bytes at this node, go up one level.
 		--depth;
-		line_breakcheck();
+		ଧାଡ଼ି_breakcheck();
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Do one more byte at this node.
 		n += curi[depth];
 		++curi[depth];
 		c = byts[n];
-		if (c == 0)
+		ଯଦି (c == 0)
 		{
 		    // End of prefix, find out how many IDs there are.
-		    for (i = 1; i < len; ++i)
-			if (byts[n + i] != 0)
-			    break;
+		    ପାଇଁ (i = 1; i < len; ++i)
+			ଯଦି (byts[n + i] != 0)
+			    ଭାଙ୍ଗ;
 		    curi[depth] += i - 1;
 
 		    c = valid_word_prefix(i, n, flags, word, slang, FALSE);
-		    if (c != 0)
+		    ଯଦି (c != 0)
 		    {
 			vim_strncpy(prefix + depth, word, MAXWLEN - depth - 1);
 			dump_word(slang, prefix, pat, dir, dumpflags,
 				(c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			if (lnum != 0)
+			ଯଦି (lnum != 0)
 			    ++lnum;
 		    }
 
 		    // Check for prefix that matches the word when the
 		    // first letter is upper-case, but only if the prefix has
 		    // a condition.
-		    if (has_word_up)
+		    ଯଦି (has_word_up)
 		    {
 			c = valid_word_prefix(i, n, flags, word_up, slang,
 									TRUE);
-			if (c != 0)
+			ଯଦି (c != 0)
 			{
 			    vim_strncpy(prefix + depth, word_up,
 							 MAXWLEN - depth - 1);
 			    dump_word(slang, prefix, pat, dir, dumpflags,
 				    (c & WF_RAREPFX) ? (flags | WF_RARE)
 							       : flags, lnum);
-			    if (lnum != 0)
+			    ଯଦି (lnum != 0)
 				++lnum;
 			}
 		    }
 		}
-		else if (depth < MAXWLEN - 1)
+		ଅନ୍ୟଥା ଯଦି (depth < MAXWLEN - 1)
 		{
 		    // Normal char, go one level deeper.
 		    prefix[depth++] = c;
@@ -4350,7 +4350,7 @@ dump_prefixes(
 	}
     }
 
-    return lnum;
+    ଫେରନ୍ତୁ lnum;
 }
 
 /*
@@ -4362,9 +4362,9 @@ spell_to_word_end(char_u *start, win_T *win)
 {
     char_u  *p = start;
 
-    while (*p != NUL && spell_iswordp(p, win))
+    ଯେତେବେଳେ (*p != NUL && spell_iswordp(p, win))
 	MB_PTR_ADV(p);
-    return p;
+    ଫେରନ୍ତୁ p;
 }
 
 /*
@@ -4374,45 +4374,45 @@ spell_to_word_end(char_u *start, win_T *win)
  * the word in front of the cursor.
  * Returns the column number of the word.
  */
-    int
-spell_word_start(int startcol)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+spell_word_start(ପୂର୍ଣ୍ଣସଂଖ୍ୟା startcol)
 {
-    char_u	*line;
+    char_u	*ଧାଡ଼ି;
     char_u	*p;
-    int		col = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col = 0;
 
-    if (no_spell_checking(curwin))
-	return startcol;
+    ଯଦି (no_spell_checking(curwin))
+	ଫେରନ୍ତୁ startcol;
 
     // Find a word character before "startcol".
-    line = ml_get_curline();
-    for (p = line + startcol; p > line; )
+    ଧାଡ଼ି = ml_get_curline();
+    ପାଇଁ (p = ଧାଡ଼ି + startcol; p > ଧାଡ଼ି; )
     {
-	MB_PTR_BACK(line, p);
-	if (spell_iswordp_nmw(p, curwin))
-	    break;
+	MB_PTR_BACK(ଧାଡ଼ି, p);
+	ଯଦି (spell_iswordp_nmw(p, curwin))
+	    ଭାଙ୍ଗ;
     }
 
     // Go back to start of the word.
-    while (p > line)
+    ଯେତେବେଳେ (p > ଧାଡ଼ି)
     {
-	col = (int)(p - line);
-	MB_PTR_BACK(line, p);
-	if (!spell_iswordp(p, curwin))
-	    break;
+	col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - ଧାଡ଼ି);
+	MB_PTR_BACK(ଧାଡ଼ି, p);
+	ଯଦି (!spell_iswordp(p, curwin))
+	    ଭାଙ୍ଗ;
 	col = 0;
     }
 
-    return col;
+    ଫେରନ୍ତୁ col;
 }
 
 /*
  * Need to check for 'spellcapcheck' now, the word is removed before
  * expand_spelling() is called.  Therefore the ugly global variable.
  */
-static int spell_expand_need_cap;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା spell_expand_need_cap;
 
-    void
+    ଶୂନ୍ୟ
 spell_expand_check_cap(colnr_T col)
 {
     spell_expand_need_cap = check_need_cap(curwin, curwin->w_cursor.lnum, col);
@@ -4424,7 +4424,7 @@ spell_expand_check_cap(colnr_T col)
  * Returns the number of matches.  The matches are in "matchp[]", array of
  * allocated strings.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 expand_spelling(
     linenr_T	lnum UNUSED,
     char_u	*pat,
@@ -4434,92 +4434,92 @@ expand_spelling(
 
     spell_suggest_list(&ga, pat, 100, spell_expand_need_cap, TRUE);
     *matchp = ga.ga_data;
-    return ga.ga_len;
+    ଫେରନ୍ତୁ ga.ga_len;
 }
 
 /*
  * Return TRUE if "val" is a valid 'spelllang' value.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 valid_spelllang(char_u *val)
 {
-    return valid_name(val, ".-_,@");
+    ଫେରନ୍ତୁ valid_name(val, ".-_,@");
 }
 
 /*
  * Return TRUE if "val" is a valid 'spellfile' value.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 valid_spellfile(char_u *val)
 {
     char_u	spf_name[MAXPATHL];
     char_u	*spf;
     char_u	*s;
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
     spf = val;
-    while (*spf != NUL)
+    ଯେତେବେଳେ (*spf != NUL)
     {
 	l = copy_option_part(&spf, spf_name, MAXPATHL, ",");
-	if (l >= MAXPATHL - 4 || l < 4
+	ଯଦି (l >= MAXPATHL - 4 || l < 4
 				  || STRCMP(spf_name + l - 4, ".add") != 0)
-	    return FALSE;
-	for (s = spf_name; *s != NUL; ++s)
-	    if (!vim_is_fname_char(*s))
-		return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
+	ପାଇଁ (s = spf_name; *s != NUL; ++s)
+	    ଯଦି (!vim_is_fname_char(*s))
+		ଫେରନ୍ତୁ FALSE;
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
  * Handle side effects of setting 'spell' or 'spellfile'
  * Return an error message or NULL for success.
  */
-    char *
-did_set_spell_option(void)
+    ଅକ୍ଷର *
+did_set_spell_option(ଶୂନ୍ୟ)
 {
-    char    *errmsg = NULL;
+    ଅକ୍ଷର    *errmsg = ଖାଲି;
     win_T   *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == curbuf && wp->w_p_spell)
+	ଯଦି (wp->w_buffer == curbuf && wp->w_p_spell)
 	{
 	    errmsg = parse_spelllang(wp);
-	    break;
+	    ଭାଙ୍ଗ;
 	}
-    return errmsg;
+    ଫେରନ୍ତୁ errmsg;
 }
 
 /*
  * Set curbuf->b_cap_prog to the regexp program for 'spellcapcheck'.
  * Return error message when failed, NULL when OK.
  */
-    char *
+    ଅକ୍ଷର *
 compile_cap_prog(synblock_T *synblock)
 {
     regprog_T   *rp = synblock->b_cap_prog;
     char_u	*re;
 
-    if (synblock->b_p_spc == NULL || *synblock->b_p_spc == NUL)
-	synblock->b_cap_prog = NULL;
-    else
+    ଯଦି (synblock->b_p_spc == ଖାଲି || *synblock->b_p_spc == NUL)
+	synblock->b_cap_prog = ଖାଲି;
+    ଅନ୍ୟଥା
     {
 	// Prepend a ^ so that we only match at one column
 	re = concat_str((char_u *)"^", synblock->b_p_spc);
-	if (re != NULL)
+	ଯଦି (re != ଖାଲି)
 	{
 	    synblock->b_cap_prog = vim_regcomp(re, RE_MAGIC);
 	    vim_free(re);
-	    if (synblock->b_cap_prog == NULL)
+	    ଯଦି (synblock->b_cap_prog == ଖାଲି)
 	    {
 		synblock->b_cap_prog = rp; // restore the previous program
-		return e_invalid_argument;
+		ଫେରନ୍ତୁ e_invalid_argument;
 	    }
 	}
     }
 
     vim_regfree(rp);
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 #endif  // FEAT_SPELL

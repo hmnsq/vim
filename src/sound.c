@@ -11,15 +11,15 @@
  * sound.c: functions related making noise
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_SOUND)
+#ଯଦି defined(FEAT_SOUND)
 
-static long sound_id = 0;
+ସ୍ଥିର long sound_id = 0;
 
 // soundcb_T is typedef'ed in vim.h
 
-struct soundcb_S
+ସଂରଚନା soundcb_S
 {
     callback_T snd_callback;
 # ifdef MSWIN
@@ -29,56 +29,56 @@ struct soundcb_S
     soundcb_T *snd_next;
 };
 
-static soundcb_T *first_callback = NULL;
+ସ୍ଥିର soundcb_T *first_callback = ଖାଲି;
 
 /*
  * Return TRUE when a sound callback has been created, it may be invoked when
  * the sound finishes playing.  Also see has_sound_callback_in_queue().
  */
-int
-has_any_sound_callback(void)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+has_any_sound_callback(ଶୂନ୍ୟ)
 {
-    return first_callback != NULL;
+    ଫେରନ୍ତୁ first_callback != ଖାଲି;
 }
 
-static soundcb_T *
+ସ୍ଥିର soundcb_T *
 get_sound_callback(typval_T *arg)
 {
     callback_T callback;
     soundcb_T *soundcb;
 
-    if (arg->v_type == VAR_UNKNOWN)
-        return NULL;
+    ଯଦି (arg->v_type == VAR_UNKNOWN)
+        ଫେରନ୍ତୁ ଖାଲି;
     callback = get_callback(arg);
-    if (callback.cb_name == NULL)
-        return NULL;
+    ଯଦି (callback.cb_name == ଖାଲି)
+        ଫେରନ୍ତୁ ଖାଲି;
 
     soundcb = ALLOC_ONE(soundcb_T);
-    if (soundcb == NULL)
+    ଯଦି (soundcb == ଖାଲି)
     {
         free_callback(&callback);
-        return NULL;
+        ଫେରନ୍ତୁ ଖାଲି;
     }
 
     soundcb->snd_next = first_callback;
     first_callback = soundcb;
     set_callback(&soundcb->snd_callback, &callback);
-    return soundcb;
+    ଫେରନ୍ତୁ soundcb;
 }
 
 /*
  * Call "soundcb" with proper parameters.
  */
-void
-call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
+ଶୂନ୍ୟ
+call_sound_callback(soundcb_T *soundcb, long snd_id, ପୂର୍ଣ୍ଣସଂଖ୍ୟା result)
 {
     typval_T argv[3];
     typval_T rettv;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = snd_id;
-    argv[1].v_type = VAR_NUMBER;
-    argv[1].vval.v_number = result;
+    argv[0].v_type = VAR_ସଂଖ୍ୟା;
+    argv[0].vval.v_ସଂଖ୍ୟା = snd_id;
+    argv[1].v_type = VAR_ସଂଖ୍ୟା;
+    argv[1].vval.v_ସଂଖ୍ୟା = result;
     argv[2].v_type = VAR_UNKNOWN;
 
     call_callback(&soundcb->snd_callback, -1, &rettv, 2, argv);
@@ -88,65 +88,65 @@ call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
 /*
  * Delete "soundcb" from the list of pending callbacks.
  */
-void
+ଶୂନ୍ୟ
 delete_sound_callback(soundcb_T *soundcb)
 {
     soundcb_T *p;
-    soundcb_T *prev = NULL;
+    soundcb_T *prev = ଖାଲି;
 
-    for (p = first_callback; p != NULL; prev = p, p = p->snd_next)
-        if (p == soundcb)
+    ପାଇଁ (p = first_callback; p != ଖାଲି; prev = p, p = p->snd_next)
+        ଯଦି (p == soundcb)
         {
-            if (prev == NULL)
+            ଯଦି (prev == ଖାଲି)
                 first_callback = p->snd_next;
-            else
+            ଅନ୍ୟଥା
                 prev->snd_next = p->snd_next;
             free_callback(&p->snd_callback);
             vim_free(p);
-            break;
+            ଭାଙ୍ଗ;
         }
 }
 
-# if defined(HAVE_CANBERRA)
+# ଯଦି defined(HAVE_CANBERRA)
 
 /*
  * Sound implementation for Linux/Unix using libcanberra.
  */
 #  include <canberra.h>
 
-static ca_context *context = NULL;
+ସ୍ଥିର ca_context *context = ଖାଲି;
 
 // Structure to store info about a sound callback to be invoked soon.
-typedef struct soundcb_queue_S soundcb_queue_T;
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା soundcb_queue_S soundcb_queue_T;
 
-struct soundcb_queue_S
+ସଂରଚନା soundcb_queue_S
 {
     soundcb_queue_T *scb_next;
     uint32_t scb_id; // ID of the sound
-    int scb_result; // CA_ value
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା scb_result; // CA_ value
     soundcb_T *scb_callback; // function to call
 };
 
 // Queue of callbacks to invoke from the main loop.
-static soundcb_queue_T *callback_queue = NULL;
+ସ୍ଥିର soundcb_queue_T *callback_queue = ଖାଲି;
 
 /*
  * Add a callback to the queue of callbacks to invoke later from the main loop.
  * That is because the callback may be called from another thread and invoking
  * another sound function may cause trouble.
  */
-static void
+ସ୍ଥିର ଶୂନ୍ୟ
 sound_callback(ca_context *c UNUSED,
                uint32_t id,
-               int error_code,
-               void *userdata)
+               ପୂର୍ଣ୍ଣସଂଖ୍ୟା error_code,
+               ଶୂନ୍ୟ *userdata)
 {
     soundcb_T *soundcb = (soundcb_T *)userdata;
     soundcb_queue_T *scb;
 
     scb = ALLOC_ONE(soundcb_queue_T);
-    if (scb == NULL)
-        return;
+    ଯଦି (scb == ଖାଲି)
+        ଫେରନ୍ତୁ;
     scb->scb_next = callback_queue;
     callback_queue = scb;
     scb->scb_id = id;
@@ -161,21 +161,21 @@ sound_callback(ca_context *c UNUSED,
 /*
  * Return TRUE if there is a sound callback to be called.
  */
-int
-has_sound_callback_in_queue(void)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+has_sound_callback_in_queue(ଶୂନ୍ୟ)
 {
-    return callback_queue != NULL;
+    ଫେରନ୍ତୁ callback_queue != ଖାଲି;
 }
 
 /*
  * Invoke queued sound callbacks.
  */
-void
-invoke_sound_callback(void)
+ଶୂନ୍ୟ
+invoke_sound_callback(ଶୂନ୍ୟ)
 {
     soundcb_queue_T *scb;
 
-    while (callback_queue != NULL)
+    ଯେତେବେଳେ (callback_queue != ଖାଲି)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -188,56 +188,56 @@ invoke_sound_callback(void)
     redraw_after_callback(TRUE, FALSE);
 }
 
-static void
-sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
+ସ୍ଥିର ଶୂନ୍ୟ
+sound_play_common(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
-    if (context == NULL)
+    ଯଦି (context == ଖାଲି)
         ca_context_create(&context);
-    if (context == NULL)
-        return;
+    ଯଦି (context == ଖାଲି)
+        ଫେରନ୍ତୁ;
 
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
-    int res = CA_ERROR_INVALID;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା res = CA_ERROR_INVALID;
 
     ++sound_id;
-    if (soundcb == NULL)
+    ଯଦି (soundcb == ଖାଲି)
     {
         res = ca_context_play(context, sound_id,
                               playfile ? CA_PROP_MEDIA_FILENAME
                                        : CA_PROP_EVENT_ID,
                               tv_get_string(&argvars[0]),
-                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", NULL);
+                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", ଖାଲି);
     }
-    else
+    ଅନ୍ୟଥା
     {
-        static ca_proplist *proplist = NULL;
+        ସ୍ଥିର ca_proplist *proplist = ଖାଲି;
 
         ca_proplist_create(&proplist);
-        if (proplist != NULL)
+        ଯଦି (proplist != ଖାଲି)
         {
-            if (playfile)
+            ଯଦି (playfile)
                 ca_proplist_sets(proplist, CA_PROP_MEDIA_FILENAME,
-                                 (char *)tv_get_string(&argvars[0]));
-            else
+                                 (ଅକ୍ଷର *)tv_get_string(&argvars[0]));
+            ଅନ୍ୟଥା
                 ca_proplist_sets(proplist, CA_PROP_EVENT_ID,
-                                 (char *)tv_get_string(&argvars[0]));
+                                 (ଅକ୍ଷର *)tv_get_string(&argvars[0]));
             ca_proplist_sets(proplist, CA_PROP_CANBERRA_CACHE_CONTROL,
                              "volatile");
             res = ca_context_play_full(context, sound_id, proplist,
                                        sound_callback, soundcb);
-            if (res != CA_SUCCESS)
+            ଯଦି (res != CA_SUCCESS)
                 delete_sound_callback(soundcb);
 
             ca_proplist_destroy(proplist);
         }
     }
-    rettv->vval.v_number = res == CA_SUCCESS ? sound_id : 0;
+    rettv->vval.v_ସଂଖ୍ୟା = res == CA_SUCCESS ? sound_id : 0;
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, FALSE);
@@ -246,7 +246,7 @@ f_sound_playevent(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_playfile({path} [, {callback}])
  */
-void
+ଶୂନ୍ୟ
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, TRUE);
@@ -255,41 +255,41 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_stop({id})
  */
-void
+ଶୂନ୍ୟ
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
-    if (context != NULL)
-        ca_context_cancel(context, tv_get_number(&argvars[0]));
+    ଯଦି (context != ଖାଲି)
+        ca_context_cancel(context, tv_get_ସଂଖ୍ୟା(&argvars[0]));
 }
 
 /*
  * implementation of sound_clear()
  */
-void
+ଶୂନ୍ୟ
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (context == NULL)
-        return;
+    ଯଦି (context == ଖାଲି)
+        ଫେରନ୍ତୁ;
     ca_context_destroy(context);
-    context = NULL;
+    context = ଖାଲି;
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  ଯଦି defined(EXITFREE)
+ଶୂନ୍ୟ
+sound_free(ଶୂନ୍ୟ)
 {
     soundcb_queue_T *scb;
 
-    if (context != NULL)
+    ଯଦି (context != ଖାଲି)
         ca_context_destroy(context);
 
-    while (first_callback != NULL)
+    ଯେତେବେଳେ (first_callback != ଖାଲି)
         delete_sound_callback(first_callback);
 
-    while (callback_queue != NULL)
+    ଯେତେବେଳେ (callback_queue != ଖାଲି)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -305,24 +305,24 @@ sound_free(void)
  * Sound implementation for MS-Windows.
  */
 
-static HWND g_hWndSound = NULL;
+ସ୍ଥିର HWND g_hWndSound = ଖାଲି;
 
-static LRESULT CALLBACK
+ସ୍ଥିର LRESULT CALLBACK
 sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     soundcb_T *p;
 
-    switch (message)
+    ବାଛ (message)
     {
-        case MM_MCINOTIFY:
-            for (p = first_callback; p != NULL; p = p->snd_next)
-                if (p->snd_device_id == (MCIDEVICEID)lParam)
+        ସ୍ଥିତି MM_MCINOTIFY:
+            ପାଇଁ (p = first_callback; p != ଖାଲି; p = p->snd_next)
+                ଯଦି (p->snd_device_id == (MCIDEVICEID)lParam)
                 {
-                    char buf[32];
+                    ଅକ୍ଷର buf[32];
 
-                    vim_snprintf(buf, sizeof(buf), "close sound%06ld",
+                    vim_snprintf(buf, ଆକାର(buf), "close sound%06ld",
                                  p->snd_id);
-                    mciSendStringA(buf, NULL, 0, 0);
+                    mciSendStringA(buf, ଖାଲି, 0, 0);
 
                     long result = wParam == MCI_NOTIFY_SUCCESSFUL ? 0
                                   : wParam == MCI_NOTIFY_ABORTED  ? 1
@@ -332,46 +332,46 @@ sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     delete_sound_callback(p);
                     redraw_after_callback(TRUE, FALSE);
                 }
-            break;
+            ଭାଙ୍ଗ;
     }
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    ଫେରନ୍ତୁ DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static HWND
-sound_window(void)
+ସ୍ଥିର HWND
+sound_window(ଶୂନ୍ୟ)
 {
-    if (g_hWndSound == NULL)
+    ଯଦି (g_hWndSound == ଖାଲି)
     {
         LPCSTR clazz = "VimSound";
-        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, NULL, 0,
-                              0, NULL,          clazz };
+        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, ଖାଲି, 0,
+                              0, ଖାଲି,          clazz };
         RegisterClass(&wndclass);
-        g_hWndSound = CreateWindow(clazz, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE,
-                                   NULL, g_hinst, NULL);
+        g_hWndSound = CreateWindow(clazz, ଖାଲି, 0, 0, 0, 0, 0, HWND_MESSAGE,
+                                   ଖାଲି, g_hinst, ଖାଲି);
     }
 
-    return g_hWndSound;
+    ଫେରନ୍ତୁ g_hWndSound;
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     WCHAR *wp;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
-    wp = enc_to_utf16(tv_get_string(&argvars[0]), NULL);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16(tv_get_string(&argvars[0]), ଖାଲି);
+    ଯଦି (wp == ଖାଲି)
+        ଫେରନ୍ତୁ;
 
-    if (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
-        rettv->vval.v_number = ++sound_id;
-    free(wp);
+    ଯଦି (PlaySoundW(wp, ଖାଲି, SND_ASYNC | SND_ALIAS))
+        rettv->vval.v_ସଂଖ୍ୟା = ++sound_id;
+    ମୁକ୍ତ(wp);
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     long newid = sound_id + 1;
@@ -379,83 +379,83 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
     char_u *p, *filename;
     WCHAR *wp;
     soundcb_T *soundcb;
-    char buf[32];
+    ଅକ୍ଷର buf[32];
     MCIERROR err;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
     filename = tv_get_string(&argvars[0]);
 
     len = STRLEN(filename) + 5 + 18 + 2 + 1;
     p = alloc(len);
-    if (p == NULL)
+    ଯଦି (p == ଖାଲି)
     {
-        return;
+        ଫେରନ୍ତୁ;
     }
-    vim_snprintf((char *)p, len, "open \"%s\" alias sound%06ld", filename,
+    vim_snprintf((ଅକ୍ଷର *)p, len, "open \"%s\" alias sound%06ld", filename,
                  newid);
 
-    wp = enc_to_utf16((char_u *)p, NULL);
-    free(p);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16((char_u *)p, ଖାଲି);
+    ମୁକ୍ତ(p);
+    ଯଦି (wp == ଖାଲି)
+        ଫେରନ୍ତୁ;
 
-    err = mciSendStringW(wp, NULL, 0, sound_window());
-    free(wp);
-    if (err != 0)
-        return;
+    err = mciSendStringW(wp, ଖାଲି, 0, sound_window());
+    ମୁକ୍ତ(wp);
+    ଯଦି (err != 0)
+        ଫେରନ୍ତୁ;
 
-    vim_snprintf(buf, sizeof(buf), "play sound%06ld notify", newid);
-    err = mciSendStringA(buf, NULL, 0, sound_window());
-    if (err != 0)
-        goto failure;
+    vim_snprintf(buf, ଆକାର(buf), "play sound%06ld notify", newid);
+    err = mciSendStringA(buf, ଖାଲି, 0, sound_window());
+    ଯଦି (err != 0)
+        ଯାଅ failure;
 
     sound_id = newid;
-    rettv->vval.v_number = sound_id;
+    rettv->vval.v_ସଂଖ୍ୟା = sound_id;
 
     soundcb = get_sound_callback(&argvars[1]);
-    if (soundcb != NULL)
+    ଯଦି (soundcb != ଖାଲି)
     {
-        vim_snprintf(buf, sizeof(buf), "sound%06ld", newid);
+        vim_snprintf(buf, ଆକାର(buf), "sound%06ld", newid);
         soundcb->snd_id = newid;
         soundcb->snd_device_id = mciGetDeviceID(buf);
     }
-    return;
+    ଫେରନ୍ତୁ;
 
 failure:
-    vim_snprintf(buf, sizeof(buf), "close sound%06ld", newid);
-    mciSendStringA(buf, NULL, 0, NULL);
+    vim_snprintf(buf, ଆକାର(buf), "close sound%06ld", newid);
+    mciSendStringA(buf, ଖାଲି, 0, ଖାଲି);
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     long id;
-    char buf[32];
+    ଅକ୍ଷର buf[32];
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
-    id = tv_get_number(&argvars[0]);
-    vim_snprintf(buf, sizeof(buf), "stop sound%06ld", id);
-    mciSendStringA(buf, NULL, 0, NULL);
+    id = tv_get_ସଂଖ୍ୟା(&argvars[0]);
+    vim_snprintf(buf, ଆକାର(buf), "stop sound%06ld", id);
+    mciSendStringA(buf, ଖାଲି, 0, ଖାଲି);
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    PlaySoundW(NULL, NULL, 0);
-    mciSendStringA("close all", NULL, 0, NULL);
+    PlaySoundW(ଖାଲି, ଖାଲି, 0);
+    mciSendStringA("close all", ଖାଲି, 0, ଖାଲି);
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  ଯଦି defined(EXITFREE)
+ଶୂନ୍ୟ
+sound_free(ଶୂନ୍ୟ)
 {
     CloseWindow(g_hWndSound);
 
-    while (first_callback != NULL)
+    ଯେତେବେଳେ (first_callback != ଖାଲି)
         delete_sound_callback(first_callback);
 }
 #  endif
@@ -463,11 +463,11 @@ sound_free(void)
 # elif defined(MACOS_X_DARWIN)
 
 // Sound implementation for macOS.
-static void
+ସ୍ଥିର ଶୂନ୍ୟ
 sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
 
     char_u *sound_name = tv_get_string(&argvars[0]);
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
@@ -475,45 +475,45 @@ sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
     ++sound_id;
 
     bool play_success = sound_mch_play(sound_name, sound_id, soundcb, playfile);
-    if (!play_success && soundcb)
+    ଯଦି (!play_success && soundcb)
     {
         delete_sound_callback(soundcb);
     }
-    rettv->vval.v_number = play_success ? sound_id : 0;
+    rettv->vval.v_ସଂଖ୍ୟା = play_success ? sound_id : 0;
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, false);
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, true);
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
-    sound_mch_stop(tv_get_number(&argvars[0]));
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+        ଫେରନ୍ତୁ;
+    sound_mch_stop(tv_get_ସଂଖ୍ୟା(&argvars[0]));
 }
 
-void
+ଶୂନ୍ୟ
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     sound_mch_clear();
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  ଯଦି defined(EXITFREE)
+ଶୂନ୍ୟ
+sound_free(ଶୂନ୍ୟ)
 {
     sound_mch_free();
-    while (first_callback != NULL)
+    ଯେତେବେଳେ (first_callback != ଖାଲି)
         delete_sound_callback(first_callback);
 }
 #  endif

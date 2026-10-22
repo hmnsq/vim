@@ -12,21 +12,21 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 
-static class_T *first_class = NULL;
-static class_T *next_nonref_class = NULL;
+ସ୍ଥିର class_T *first_class = ଖାଲି;
+ସ୍ଥିର class_T *next_nonref_class = ଖାଲି;
 
 /*
  * Call this function when a class has been created.  It will be added to the
  * list headed by "first_class".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 class_created(class_T *cl)
 {
-    if (first_class != NULL)
+    ଯଦି (first_class != ଖାଲି)
     {
 	cl->class_next_used = first_class;
 	first_class->class_prev_used = cl;
@@ -38,18 +38,18 @@ class_created(class_T *cl)
  * Call this function when a class has been cleared and is about to be freed.
  * It is removed from the list headed by "first_class".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 class_cleared(class_T *cl)
 {
-    if (cl->class_next_used != NULL)
+    ଯଦି (cl->class_next_used != ଖାଲି)
 	cl->class_next_used->class_prev_used = cl->class_prev_used;
-    if (cl->class_prev_used != NULL)
+    ଯଦି (cl->class_prev_used != ଖାଲି)
 	cl->class_prev_used->class_next_used = cl->class_next_used;
-    else if (first_class == cl)
+    ଅନ୍ୟଥା ଯଦି (first_class == cl)
 	first_class = cl->class_next_used;
 
     // update the next class to check if needed
-    if (cl == next_nonref_class)
+    ଯଦି (cl == next_nonref_class)
 	next_nonref_class = cl->class_next_used;
 }
 
@@ -60,99 +60,99 @@ class_cleared(class_T *cl)
  * "init_expr" is set to the initialisation expression (allocated), if there is
  * one.  For an interface "init_expr" is NULL.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 parse_member(
     exarg_T	*eap,
-    char_u	*line,
+    char_u	*ଧାଡ଼ି,
     char_u	*varname,
-    int		has_public,	    // TRUE if "public" seen before "varname"
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_public,	    // TRUE if "public" seen before "varname"
     char_u	**varname_end,
-    int		*has_type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*has_type,
     garray_T	*type_list,
     type_T	**type_ret,
-    char_u	**init_expr)
+    char_u	**init_ପଦସମଷ୍ଟି)
 {
     *varname_end = to_name_end(varname, FALSE);
-    if (*varname == '_' && has_public)
+    ଯଦି (*varname == '_' && has_public)
     {
-	semsg(_(e_public_variable_name_cannot_start_with_underscore_str), line);
-	return FAIL;
+	semsg(_(e_public_variable_name_cannot_start_with_underscore_str), ଧାଡ଼ି);
+	ଫେରନ୍ତୁ FAIL;
     }
 
     char_u *colon = skipwhite(*varname_end);
     char_u *type_arg = colon;
-    type_T *type = NULL;
+    type_T *type = ଖାଲି;
     *has_type = FALSE;
-    if (*colon == ':')
+    ଯଦି (*colon == ':')
     {
-	if (VIM_ISWHITE(**varname_end))
+	ଯଦି (VIM_ISWHITE(**varname_end))
 	{
 	    semsg(_(e_no_white_space_allowed_before_colon_str), varname);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
-	if (!VIM_ISWHITE(colon[1]))
+	ଯଦି (!VIM_ISWHITE(colon[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", varname);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 	type_arg = skipwhite(colon + 1);
-	type = parse_type(&type_arg, type_list, NULL, NULL, TRUE);
-	if (type == NULL || !valid_declaration_type(type))
-	    return FAIL;
+	type = parse_type(&type_arg, type_list, ଖାଲି, ଖାଲି, TRUE);
+	ଯଦି (type == ଖାଲି || !valid_declaration_type(type))
+	    ଫେରନ୍ତୁ FAIL;
 	*has_type = TRUE;
     }
 
     char_u *init_arg = skipwhite(type_arg);
-    if (type == NULL && *init_arg != '=')
+    ଯଦି (type == ଖାଲି && *init_arg != '=')
     {
 	emsg(_(e_type_or_initialization_required));
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (init_expr == NULL && *init_arg == '=')
+    ଯଦି (init_ପଦସମଷ୍ଟି == ଖାଲି && *init_arg == '=')
     {
 	emsg(_(e_cannot_initialize_variable_in_interface));
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (*init_arg == '=')
+    ଯଦି (*init_arg == '=')
     {
 	evalarg_T evalarg;
-	char_u *expr_start, *expr_end;
+	char_u *ପଦସମଷ୍ଟି_start, *ପଦସମଷ୍ଟି_end;
 
-	if (!VIM_ISWHITE(init_arg[-1]) || !VIM_ISWHITE(init_arg[1]))
+	ଯଦି (!VIM_ISWHITE(init_arg[-1]) || !VIM_ISWHITE(init_arg[1]))
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 							"=", type_arg);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 	init_arg = skipwhite(init_arg + 1);
 
 	fill_evalarg_from_eap(&evalarg, eap, FALSE);
-	(void)skip_expr_concatenate(&init_arg, &expr_start, &expr_end, &evalarg);
+	(ଶୂନ୍ୟ)skip_ପଦସମଷ୍ଟି_concatenate(&init_arg, &ପଦସମଷ୍ଟି_start, &ପଦସମଷ୍ଟି_end, &evalarg);
 
 	init_arg = skipwhite(init_arg);
-	if (*init_arg != NUL && !vim9_comment_start(init_arg))
+	ଯଦି (*init_arg != NUL && !vim9_comment_start(init_arg))
 	{
 	    semsg(_(e_trailing_characters_str), init_arg);
-	    clear_evalarg(&evalarg, NULL);
-	    return FAIL;
+	    clear_evalarg(&evalarg, ଖାଲି);
+	    ଫେରନ୍ତୁ FAIL;
 	}
 
 	// No type specified for the member.  Set it to "any" and the correct
 	// type will be set when the object is instantiated.
-	if (type == NULL)
+	ଯଦି (type == ଖାଲି)
 	    type = &t_any;
 
-	*init_expr = vim_strnsave(expr_start, expr_end - expr_start);
+	*init_ପଦସମଷ୍ଟି = vim_strnsave(ପଦସମଷ୍ଟି_start, ପଦସମଷ୍ଟି_end - ପଦସମଷ୍ଟି_start);
 	// Free the memory pointed by expr_start.
-	clear_evalarg(&evalarg, NULL);
+	clear_evalarg(&evalarg, ଖାଲି);
     }
-    else if (!valid_declaration_type(type))
-	return FAIL;
+    ଅନ୍ୟଥା ଯଦି (!valid_declaration_type(type))
+	ଫେରନ୍ତୁ FAIL;
 
     *type_ret = type;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -161,47 +161,47 @@ parse_member(
  * Returns OK on success and FAIL on memory allocation failure (caller might
  * need to free "init_expr").
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_member(
     garray_T	*gap,
     char_u	*varname,
     char_u	*varname_end,
-    int		has_public,
-    int		has_final,
-    int		has_const,
-    int		has_type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_public,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_final,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_const,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		has_type,
     type_T	*type,
-    char_u	*init_expr)
+    char_u	*init_ପଦସମଷ୍ଟି)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    ଯଦି (ga_grow(gap, 1) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
     ocmember_T *m = ((ocmember_T *)gap->ga_data) + gap->ga_len;
     m->ocm_name.length = (size_t)(varname_end - varname);
     m->ocm_name.string = vim_strnsave(varname, m->ocm_name.length);
-    if (m->ocm_name.string == NULL)
+    ଯଦି (m->ocm_name.string == ଖାଲି)
     {
 	m->ocm_name.length = 0;
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
     m->ocm_access = has_public ? VIM_ACCESS_ALL
 		      : *varname == '_' ? VIM_ACCESS_PRIVATE : VIM_ACCESS_READ;
-    if (has_final)
+    ଯଦି (has_final)
 	m->ocm_flags |= OCMFLAG_FINAL;
-    if (has_const)
+    ଯଦି (has_const)
 	m->ocm_flags |= OCMFLAG_CONST;
-    if (has_type)
+    ଯଦି (has_type)
 	m->ocm_flags |= OCMFLAG_HAS_TYPE;
     m->ocm_type = type;
-    if (init_expr != NULL)
+    ଯଦି (init_ପଦସମଷ୍ଟି != ଖାଲି)
     {
-	m->ocm_init = init_expr;
+	m->ocm_init = init_ପଦସମଷ୍ଟି;
 	// Save the script context, we need it when evaluating or compiling the
 	// initializer expression.
 	m->ocm_init_sctx = current_sctx;
 	m->ocm_init_sctx.sc_lnum += SOURCING_LNUM;
     }
     ++gap->ga_len;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -213,93 +213,93 @@ add_member(
  * "member_count" set to the number of members.
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_members_to_class(
     garray_T	*gap,
     ocmember_T	*parent_members,
-    int		parent_count,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		parent_ଗଣନା,
     ocmember_T	**members,
-    int		*member_count)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*member_ଗଣନା)
 {
-    *member_count = parent_count + gap->ga_len;
-    *members = *member_count == 0 ? NULL
-				       : ALLOC_MULT(ocmember_T, *member_count);
-    if (*member_count > 0 && *members == NULL)
-	return FAIL;
-    for (int i = 0; i < parent_count; ++i)
+    *member_ଗଣନା = parent_ଗଣନା + gap->ga_len;
+    *members = *member_ଗଣନା == 0 ? ଖାଲି
+				       : ALLOC_MULT(ocmember_T, *member_ଗଣନା);
+    ଯଦି (*member_ଗଣନା > 0 && *members == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < parent_ଗଣନା; ++i)
     {
 	// parent members need to be copied
 	ocmember_T	*m = *members + i;
 	*m = parent_members[i];
 	m->ocm_name.string = vim_strnsave(m->ocm_name.string, m->ocm_name.length);
-	if (m->ocm_name.string == NULL)
+	ଯଦି (m->ocm_name.string == ଖାଲି)
 	{
 	    m->ocm_name.length = 0;
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
-	if (m->ocm_init != NULL)
+	ଯଦି (m->ocm_init != ଖାଲି)
 	    m->ocm_init = vim_strsave(m->ocm_init);
     }
-    if (gap->ga_len > 0)
+    ଯଦି (gap->ga_len > 0)
 	// new members are moved
-	mch_memmove(*members + parent_count,
-			       gap->ga_data, sizeof(ocmember_T) * gap->ga_len);
+	mch_memmove(*members + parent_ଗଣନା,
+			       gap->ga_data, ଆକାର(ocmember_T) * gap->ga_len);
     VIM_CLEAR(gap->ga_data);
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Convert a member index "idx" of interface "itf" to the member index of class
  * "cl" implementing that interface.
  */
-    int
-object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+object_index_from_itf_index(class_T *itf, ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_method, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx, class_T *cl)
 {
-    if (idx >= (is_method ? itf->class_obj_method_count
-				   : itf->class_obj_member_count))
+    ଯଦି (idx >= (is_method ? itf->class_obj_method_ଗଣନା
+				   : itf->class_obj_member_ଗଣନା))
     {
 	siemsg("index %d out of range for interface %s", idx, itf->class_name.string);
-	return 0;
+	ଫେରନ୍ତୁ 0;
     }
 
     // If "cl" is the interface or the class that is extended, then the method
     // index can be used directly and there is no need to search for the method
     // index in one of the child classes.
-    if (cl == itf)
-	return idx;
+    ଯଦି (cl == itf)
+	ଫେରନ୍ତୁ idx;
 
-    itf2class_T		*i2c = NULL;
-    int			searching = TRUE;
-    int			method_offset = 0;
+    itf2class_T		*i2c = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			searching = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			method_offset = 0;
 
-    for (class_T *super = cl; super != NULL && searching;
+    ପାଇଁ (class_T *super = cl; super != ଖାଲି && searching;
 						super = super->class_extends)
     {
-	for (i2c = itf->class_itf2class; i2c != NULL; i2c = i2c->i2c_next)
+	ପାଇଁ (i2c = itf->class_itf2class; i2c != ଖାଲି; i2c = i2c->i2c_next)
 	{
-	    if (i2c->i2c_class == super && i2c->i2c_is_method == is_method)
+	    ଯଦି (i2c->i2c_class == super && i2c->i2c_is_method == is_method)
 	    {
 		searching = FALSE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	if (searching && is_method)
+	ଯଦି (searching && is_method)
 	    // The parent class methods are stored after the current class
 	    // methods.
-	    method_offset += super->class_obj_method_count_child;
+	    method_offset += super->class_obj_method_ଗଣନା_child;
     }
-    if (i2c == NULL)
+    ଯଦି (i2c == ଖାଲି)
     {
 	siemsg("class %s not found on interface %s",
 					      cl->class_name.string, itf->class_name.string);
-	return 0;
+	ଫେରନ୍ତୁ 0;
     }
 
     // A table follows the i2c for the class
-    int *table = (int *)(i2c + 1);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *table = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)(i2c + 1);
     // "method_offset" is 0, if method is in the current class.  If method
     // is in a parent class, then it is non-zero.
-    return table[idx] + method_offset;
+    ଫେରନ୍ତୁ table[idx] + method_offset;
 }
 
 /*
@@ -307,30 +307,30 @@ object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
  * valid, then "extends_clp" is set with the class pointer.
  * Returns TRUE if the class name "extends_names" is a valid class.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_extends_class(
     class_T *cl,
     char_u  *extends_name,
     class_T **extends_clp,
-    int	    is_class)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    is_class)
 {
     typval_T	tv;
-    int		success = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		success = FALSE;
 
-    if (STRCMP(cl->class_name.string, extends_name) == 0)
+    ଯଦି (STRCMP(cl->class_name.string, extends_name) == 0)
     {
 	semsg(_(e_cannot_extend_str), extends_name);
-	return success;
+	ଫେରନ୍ତୁ success;
     }
 
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(extends_name, &tv) == FAIL)
+    ଯଦି (eval_variable_import(extends_name, &tv) == FAIL)
     {
 	semsg(_(e_class_name_not_found_str), extends_name);
-	return success;
+	ଫେରନ୍ତୁ success;
     }
 
-    if (tv.v_type != VAR_CLASS || tv.vval.v_class == NULL
+    ଯଦି (tv.v_type != VAR_CLASS || tv.vval.v_class == ଖାଲି
 	    || (is_class && IS_INTERFACE(tv.vval.v_class))
 	    || (!is_class && !IS_INTERFACE(tv.vval.v_class))
 	    || (is_class && IS_ENUM(tv.vval.v_class)))
@@ -340,7 +340,7 @@ validate_extends_class(
 	// a class cannot extend an enum.
 	semsg(_(e_cannot_extend_str), extends_name);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	class_T *extends_cl = tv.vval.v_class;
 	++extends_cl->class_refcount;
@@ -349,95 +349,95 @@ validate_extends_class(
     }
     clear_tv(&tv);
 
-    return success;
+    ଫେରନ୍ତୁ success;
 }
 
 /*
  * Check a generic method is extended by a generic method and the number of
  * type variables match.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_extends_generic_method(
     class_T *super_cl,
     ufunc_T *super_fp,
     ufunc_T *cl_fp)
 {
-    char	*msg = NULL;
+    ଅକ୍ଷର	*ସନ୍ଦେଶ = ଖାଲି;
 
-    if (cl_fp->uf_generic_argcount == super_fp->uf_generic_argcount)
-	return TRUE;
+    ଯଦି (cl_fp->uf_generic_argcount == super_fp->uf_generic_argcount)
+	ଫେରନ୍ତୁ TRUE;
 
-    if (super_fp->uf_generic_argcount == 0)
-	msg = e_concrete_method_str_override_with_generic_method_in_class_str;
-    else if (cl_fp->uf_generic_argcount == 0)
-	msg = e_generic_method_str_override_with_concrete_method_in_class_str;
-    else
-	msg = e_generic_method_str_type_arguments_mismatch_in_class_str;
+    ଯଦି (super_fp->uf_generic_argcount == 0)
+	ସନ୍ଦେଶ = e_concrete_method_str_override_with_generic_method_in_class_str;
+    ଅନ୍ୟଥା ଯଦି (cl_fp->uf_generic_argcount == 0)
+	ସନ୍ଦେଶ = e_generic_method_str_override_with_concrete_method_in_class_str;
+    ଅନ୍ୟଥା
+	ସନ୍ଦେଶ = e_generic_method_str_type_arguments_mismatch_in_class_str;
 
-    semsg(_(msg), cl_fp->uf_name, super_cl->class_name.string);
-    return FALSE;
+    semsg(_(ସନ୍ଦେଶ), cl_fp->uf_name, super_cl->class_name.string);
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Check method names in the parent class lineage to make sure the access is
  * the same for overridden methods.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_extends_methods(
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
     class_T	*super = extends_cl;
-    int		method_count = objmethods_gap->ga_len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		method_ଗଣନା = objmethods_gap->ga_len;
     ufunc_T	**cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
 
-    while (super != NULL)
+    ଯେତେବେଳେ (super != ଖାଲି)
     {
-	int extends_method_count = super->class_obj_method_count_child;
-	if (extends_method_count == 0)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା extends_method_ଗଣନା = super->class_obj_method_ଗଣନା_child;
+	ଯଦି (extends_method_ଗଣନା == 0)
 	{
 	    super = super->class_extends;
-	    continue;
+	    ଜାରି;
 	}
 
 	ufunc_T **extends_methods = super->class_obj_methods;
 
-	for (int i = 0; i < extends_method_count; i++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < extends_method_ଗଣନା; i++)
 	{
 	    char_u  *pstr = extends_methods[i]->uf_name;
-	    int	    extends_private = (*pstr == '_');
-	    if (extends_private)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    extends_private = (*pstr == '_');
+	    ଯଦି (extends_private)
 		pstr++;
 
 	    // When comparing the method names, ignore the access type (public
 	    // and private methods are considered the same).
-	    for (int j = 0; j < method_count; j++)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < method_ଗଣନା; j++)
 	    {
 		char_u  *qstr = cl_fp[j]->uf_name;
-		int	priv_method = (*qstr == '_');
-		if (priv_method)
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	priv_method = (*qstr == '_');
+		ଯଦି (priv_method)
 		    qstr++;
-		if (STRCMP(pstr, qstr) == 0)
+		ଯଦି (STRCMP(pstr, qstr) == 0)
 		{
-		    if (priv_method != extends_private)
+		    ଯଦି (priv_method != extends_private)
 		    {
 			// Method access is different between the super class
 			// and the subclass
 			semsg(_(e_method_str_of_class_str_has_different_access),
 				cl_fp[j]->uf_name, super->class_name.string);
-			return FALSE;
+			ଫେରନ୍ତୁ FALSE;
 		    }
 
-		    if (!validate_extends_generic_method(super,
+		    ଯଦି (!validate_extends_generic_method(super,
 						extends_methods[i], cl_fp[j]))
-			    return FALSE;
+			    ଫେରନ୍ତୁ FALSE;
 		}
 	    }
 	}
 	super = super->class_extends;
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -445,19 +445,19 @@ validate_extends_methods(
  * a member in any of the extended parent class lineage.  Returns TRUE if there
  * are no duplicates.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 extends_check_dup_members(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
-	return TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା member_ଗଣନା = objmembers_gap->ga_len;
+    ଯଦି (member_ଗଣନା == 0)
+	ଫେରନ୍ତୁ TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା c_i = 0; c_i < member_ଗଣନା; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
@@ -465,32 +465,32 @@ extends_check_dup_members(
 	char_u	    *pstr = c_m->ocm_name.string + c_protected;
 
 	// Check in all the parent classes in the lineage
-	while (p_cl != NULL)
+	ଯେତେବେଳେ (p_cl != ଖାଲି)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା p_member_ଗଣନା = p_cl->class_obj_member_ଗଣନା;
 
-	    if (p_member_count == 0)
+	    ଯଦି (p_member_ଗଣନା == 0)
 	    {
 		p_cl = p_cl->class_extends;
-		continue;
+		ଜାରି;
 	    }
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା p_i = 0; p_i < p_member_ଗଣନା; p_i++)
 	    {
 		ocmember_T  *p_m = p_members + p_i;
 		bool	    p_protected = (*p_m->ocm_name.string == '_');
 		char_u	    *qstr = p_m->ocm_name.string + p_protected;
-		if (STRCMP(pstr, qstr) == 0)
+		ଯଦି (STRCMP(pstr, qstr) == 0)
 		{
-		    if (c_protected != p_protected)
+		    ଯଦି (c_protected != p_protected)
 			semsg(_(e_public_and_protected_member_have_same_name_str_str),
 				pstr, pstr);
-		    else
+		    ଅନ୍ୟଥା
 			semsg(_(e_duplicate_variable_str),
 				c_m->ocm_name.string);
-		    return FALSE;
+		    ଫେରନ୍ତୁ FALSE;
 		}
 	    }
 
@@ -498,7 +498,7 @@ extends_check_dup_members(
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -507,51 +507,51 @@ extends_check_dup_members(
  * compare the variable types when extending interfaces.  Returns TRUE if the
  * variable types are the same.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 extends_check_intf_var_type(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
-	return TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା member_ଗଣନା = objmembers_gap->ga_len;
+    ଯଦି (member_ଗଣନା == 0)
+	ଫେରନ୍ତୁ TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା c_i = 0; c_i < member_ଗଣନା; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
-	int	    var_found = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    var_found = FALSE;
 
 	// Check in all the parent classes in the lineage
-	while (p_cl != NULL && !var_found)
+	ଯେତେବେଳେ (p_cl != ଖାଲି && !var_found)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
-	    if (p_member_count == 0)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା p_member_ଗଣନା = p_cl->class_obj_member_ଗଣନା;
+	    ଯଦି (p_member_ଗଣନା == 0)
 	    {
 		p_cl = p_cl->class_extends;
-		continue;
+		ଜାରି;
 	    }
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା p_i = 0; p_i < p_member_ଗଣନା; p_i++)
 	    {
 		where_T		where = WHERE_INIT;
 		ocmember_T	*p_m = p_members + p_i;
 
-		if (STRCMP(p_m->ocm_name.string, c_m->ocm_name.string) != 0)
-		    continue;
+		ଯଦି (STRCMP(p_m->ocm_name.string, c_m->ocm_name.string) != 0)
+		    ଜାରି;
 
 		// Ensure the type is matching.
-		where.wt_func_name = (char *)c_m->ocm_name.string;
+		where.wt_func_name = (ଅକ୍ଷର *)c_m->ocm_name.string;
 		where.wt_kind = WT_MEMBER;
 
-		if (check_type(p_m->ocm_type, c_m->ocm_type, TRUE,
+		ଯଦି (check_type(p_m->ocm_type, c_m->ocm_type, TRUE,
 								where) == FAIL)
-		    return FALSE;
+		    ଫେରନ୍ତୁ FALSE;
 
 		var_found = TRUE;
 	    }
@@ -560,7 +560,7 @@ extends_check_intf_var_type(
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -568,72 +568,72 @@ extends_check_intf_var_type(
  * the parent class are implemented.  Returns TRUE if all the methods are
  * implemented.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_abstract_class_methods(
     garray_T	*classmethods_gap,
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
-    for (int loop = 1; loop <= 2; ++loop)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; ++loop)
     {
 	// loop == 1: check class methods
 	// loop == 2: check object methods
-	int extends_method_count = loop == 1
-				? extends_cl->class_class_function_count
-				: extends_cl->class_obj_method_count;
-	if (extends_method_count == 0)
-	    continue;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା extends_method_ଗଣନା = loop == 1
+				? extends_cl->class_class_function_ଗଣନା
+				: extends_cl->class_obj_method_ଗଣନା;
+	ଯଦି (extends_method_ଗଣନା == 0)
+	    ଜାରି;
 
 	ufunc_T **extends_methods = loop == 1
 				? extends_cl->class_class_functions
 				: extends_cl->class_obj_methods;
 
-	int method_count = loop == 1 ? classmethods_gap->ga_len
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା method_ଗଣନା = loop == 1 ? classmethods_gap->ga_len
 						: objmethods_gap->ga_len;
 	ufunc_T **cl_fp = (ufunc_T **)(loop == 1
 						? classmethods_gap->ga_data
 						: objmethods_gap->ga_data);
 
-	for (int i = 0; i < extends_method_count; i++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < extends_method_ଗଣନା; i++)
 	{
 	    ufunc_T *uf = extends_methods[i];
-	    if (!IS_ABSTRACT_METHOD(uf))
-		continue;
+	    ଯଦି (!IS_ABSTRACT_METHOD(uf))
+		ଜାରି;
 
-	    int	concrete_method_found = FALSE;
-	    int	j = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	concrete_method_found = FALSE;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	j = 0;
 
 	    // Check if the abstract method is already implemented in one of
 	    // the parent classes.
-	    for (j = 0; !concrete_method_found && j < i; j++)
+	    ପାଇଁ (j = 0; !concrete_method_found && j < i; j++)
 	    {
 		ufunc_T *uf2 = extends_methods[j];
-		if (!IS_ABSTRACT_METHOD(uf2) &&
+		ଯଦି (!IS_ABSTRACT_METHOD(uf2) &&
 			STRCMP(uf->uf_name, uf2->uf_name) == 0)
 		    concrete_method_found = TRUE;
 	    }
 
-	    if (concrete_method_found)
-		continue;
+	    ଯଦି (concrete_method_found)
+		ଜାରି;
 
-	    for (j = 0; j < method_count; j++)
+	    ପାଇଁ (j = 0; j < method_ଗଣନା; j++)
 	    {
-		if (STRCMP(uf->uf_name, cl_fp[j]->uf_name) == 0)
+		ଯଦି (STRCMP(uf->uf_name, cl_fp[j]->uf_name) == 0)
 		{
 		    concrete_method_found = TRUE;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 
-	    if (!concrete_method_found)
+	    ଯଦି (!concrete_method_found)
 	    {
 		semsg(_(e_abstract_method_str_not_implemented), uf->uf_name);
-		return FALSE;
+		ଫେରନ୍ତୁ FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -641,62 +641,62 @@ validate_abstract_class_methods(
  * variables in "cl_mt" or in the parent lineage of one of the extended classes
  * in "extends_cl".  For a class variable, 'is_class_var' is TRUE.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 intf_variable_present(
     char_u	*intf_class_name,
     ocmember_T *if_var,
     ocmember_T *cl_mt,
-    int		cl_member_count,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cl_member_ଗଣନା,
     class_T	*extends_cl)
 {
-    int		variable_present  = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		variable_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_member_count; ++cl_i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_i = 0; cl_i < cl_member_ଗଣନା; ++cl_i)
     {
 	ocmember_T	*m = &cl_mt[cl_i];
 	where_T		where = WHERE_INIT;
 
-	if (STRCMP(if_var->ocm_name.string, m->ocm_name.string) != 0)
-	    continue;
+	ଯଦି (STRCMP(if_var->ocm_name.string, m->ocm_name.string) != 0)
+	    ଜାରି;
 
 	// Ensure the access type is same
-	if (if_var->ocm_access != m->ocm_access)
+	ଯଦି (if_var->ocm_access != m->ocm_access)
 	{
 	    semsg(_(e_variable_str_of_interface_str_has_different_access),
 		    if_var->ocm_name.string, intf_class_name);
-	    return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
 	}
 
 	// Ensure the type is matching.
-	if (m->ocm_type == &t_any)
+	ଯଦି (m->ocm_type == &t_any)
 	{
 	    // variable type is not specified.  Use the variable type in the
 	    // interface.
 	    m->ocm_type = if_var->ocm_type;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    where.wt_func_name = (char *)m->ocm_name.string;
+	    where.wt_func_name = (ଅକ୍ଷର *)m->ocm_name.string;
 	    where.wt_kind = WT_MEMBER;
-	    if (check_type(if_var->ocm_type, m->ocm_type, TRUE,
+	    ଯଦି (check_type(if_var->ocm_type, m->ocm_type, TRUE,
 							    where) == FAIL)
-		return FALSE;
+		ଫେରନ୍ତୁ FALSE;
 	}
 
 	variable_present = TRUE;
-	break;
+	ଭାଙ୍ଗ;
     }
 
-    if (!variable_present && extends_cl != NULL)
+    ଯଦି (!variable_present && extends_cl != ଖାଲି)
     {
-	int ext_cl_count = extends_cl->class_obj_member_count;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା ext_cl_ଗଣନା = extends_cl->class_obj_member_ଗଣନା;
 	ocmember_T *ext_cl_mt = extends_cl->class_obj_members;
-	return intf_variable_present(intf_class_name, if_var,
-					ext_cl_mt, ext_cl_count,
+	ଫେରନ୍ତୁ intf_variable_present(intf_class_name, if_var,
+					ext_cl_mt, ext_cl_ଗଣନା,
 					extends_cl->class_extends);
     }
 
-    return variable_present;
+    ଫେରନ୍ତୁ variable_present;
 }
 
 /*
@@ -704,39 +704,39 @@ intf_variable_present(
  * ("objmembers_gap") of a class.
  * Returns TRUE if the object variables names are valid.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_interface_variables(
     char_u	*intf_class_name,
     class_T	*ifcl,
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_member_count;
-    if (if_count == 0)
-	return TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_ଗଣନା = ifcl->class_obj_member_ଗଣନା;
+    ଯଦି (if_ଗଣନା == 0)
+	ଫେରନ୍ତୁ TRUE;
 
     ocmember_T *if_ms = ifcl->class_obj_members;
     ocmember_T *cl_ms = (ocmember_T *)(objmembers_gap->ga_data);
-    int cl_count = objmembers_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_ଗଣନା = objmembers_gap->ga_len;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_i = 0; if_i < if_ଗଣନା; ++if_i)
     {
-	if (!intf_variable_present(intf_class_name, &if_ms[if_i], cl_ms,
-							cl_count, extends_cl))
+	ଯଦି (!intf_variable_present(intf_class_name, &if_ms[if_i], cl_ms,
+							cl_ଗଣନା, extends_cl))
 	{
 	    semsg(_(e_variable_str_of_interface_str_not_implemented),
 		    if_ms[if_i].ocm_name.string, intf_class_name);
-	    return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
  * Returns TRUE if the method signature of "if_method" of interface
  * "intf_name" and "cl_method" matches.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 intf_method_type_matches(
     ufunc_T	*if_method,
     ufunc_T	*cl_method,
@@ -746,21 +746,21 @@ intf_method_type_matches(
 
     // A generic method must have the same number of type variables, like
     // when overriding a method, see validate_extends_generic_method().
-    if (cl_method->uf_generic_argcount != if_method->uf_generic_argcount)
+    ଯଦି (cl_method->uf_generic_argcount != if_method->uf_generic_argcount)
     {
-	semsg(_(e_type_var_count_of_method_str_differs_from_interface_str),
+	semsg(_(e_type_var_ଗଣନା_of_method_str_differs_from_interface_str),
 						cl_method->uf_name, intf_name);
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
     }
 
     // Ensure the type is matching.
-    where.wt_func_name = (char *)if_method->uf_name;
+    where.wt_func_name = (ଅକ୍ଷର *)if_method->uf_name;
     where.wt_kind = WT_METHOD;
-    if (check_type(if_method->uf_func_type, cl_method->uf_func_type, TRUE,
+    ଯଦି (check_type(if_method->uf_func_type, cl_method->uf_func_type, TRUE,
 								where) == FAIL)
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -768,37 +768,37 @@ intf_method_type_matches(
  * the list of methods in "cl_fp" or in the parent lineage of one of the
  * extended classes in "extends_cl".
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 intf_method_present(
     ufunc_T *if_ufunc,
     ufunc_T **cl_fp,
-    int	    cl_count,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cl_ଗଣନା,
     class_T *extends_cl,
     char_u  *intf_name)
 {
-    int		method_present  = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		method_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_count; ++cl_i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_i = 0; cl_i < cl_ଗଣନା; ++cl_i)
     {
-	if (STRCMP(if_ufunc->uf_name, cl_fp[cl_i]->uf_name) == 0)
+	ଯଦି (STRCMP(if_ufunc->uf_name, cl_fp[cl_i]->uf_name) == 0)
 	{
 	    // Ensure the type is matching.
-	    if (!intf_method_type_matches(if_ufunc, cl_fp[cl_i], intf_name))
-		return FALSE;
+	    ଯଦି (!intf_method_type_matches(if_ufunc, cl_fp[cl_i], intf_name))
+		ଫେରନ୍ତୁ FALSE;
 	    method_present = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
 
-    if (!method_present && extends_cl != NULL)
+    ଯଦି (!method_present && extends_cl != ଖାଲି)
     {
 	ufunc_T **ext_cl_fp = (ufunc_T **)(extends_cl->class_obj_methods);
-	int	ext_cl_count = extends_cl->class_obj_method_count;
-	return intf_method_present(if_ufunc, ext_cl_fp, ext_cl_count,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	ext_cl_ଗଣନା = extends_cl->class_obj_method_ଗଣନା;
+	ଫେରନ୍ତୁ intf_method_present(if_ufunc, ext_cl_fp, ext_cl_ଗଣନା,
 					extends_cl->class_extends, intf_name);
     }
 
-    return method_present;
+    ଫେରନ୍ତୁ method_present;
 }
 
 /*
@@ -809,34 +809,34 @@ intf_method_present(
  * Returns TRUE if all the interface class/object methods are implemented in
  * the new class.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_interface_methods(
     char_u	*intf_class_name,
     class_T	*ifcl,
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_method_count;
-    if (if_count == 0)
-	return TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_ଗଣନା = ifcl->class_obj_method_ଗଣନା;
+    ଯଦି (if_ଗଣନା == 0)
+	ଫେରନ୍ତୁ TRUE;
 
     ufunc_T **if_fp = ifcl->class_obj_methods;
     ufunc_T **cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
-    int cl_count = objmethods_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_ଗଣନା = objmethods_gap->ga_len;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_i = 0; if_i < if_ଗଣନା; ++if_i)
     {
 	char_u	*if_name = if_fp[if_i]->uf_name;
 
-	if (!intf_method_present(if_fp[if_i], cl_fp, cl_count, extends_cl,
+	ଯଦି (!intf_method_present(if_fp[if_i], cl_fp, cl_ଗଣନା, extends_cl,
 							    intf_class_name))
 	{
 	    semsg(_(e_method_str_of_interface_str_not_implemented),
 		    if_name, intf_class_name);
-	    return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -846,7 +846,7 @@ validate_interface_methods(
  * "classfunctions_gap", "classmembers_gap", "objmethods_gap", and
  * "objmembers_gap" respectively.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 validate_implements_classes(
     class_T	*cl,
     garray_T	*impl_gap,
@@ -855,36 +855,36 @@ validate_implements_classes(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int		success = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		success = TRUE;
 
-    for (int i = 0; i < impl_gap->ga_len && success; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < impl_gap->ga_len && success; ++i)
     {
 	char_u *impl = ((char_u **)impl_gap->ga_data)[i];
 	typval_T tv;
 	tv.v_type = VAR_UNKNOWN;
-	if (eval_variable_import(impl, &tv) == FAIL)
+	ଯଦି (eval_variable_import(impl, &tv) == FAIL)
 	{
 	    semsg(_(e_interface_name_not_found_str), impl);
 	    success = FALSE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
-	if (tv.v_type != VAR_CLASS
-		|| tv.vval.v_class == NULL
+	ଯଦି (tv.v_type != VAR_CLASS
+		|| tv.vval.v_class == ଖାଲି
 		|| !IS_INTERFACE(tv.vval.v_class))
 	{
 	    semsg(_(e_not_valid_interface_str), impl);
 	    success = FALSE;
 	    clear_tv(&tv);
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
 	class_T *ifcl = tv.vval.v_class;
-	if (ga_grow(intf_classes_gap, 1) == FAIL)
+	ଯଦି (ga_grow(intf_classes_gap, 1) == FAIL)
 	{
 	    success = FALSE;
 	    clear_tv(&tv);
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 	((class_T **)intf_classes_gap->ga_data)[intf_classes_gap->ga_len]
 								= ifcl;
@@ -897,49 +897,49 @@ validate_implements_classes(
 	clear_tv(&tv);
     }
 
-    if (!success)
-	return FALSE;
+    ଯଦି (!success)
+	ଫେରନ୍ତୁ FALSE;
 
     // check if the functions/methods of the interface match the
     // functions/methods of the class.  A method may return the new class
     // where an interface or the parent class is expected, temporarily set
     // them in "cl" to make the type check work.
     cl->class_interfaces_cl = (class_T **)intf_classes_gap->ga_data;
-    cl->class_interface_count = intf_classes_gap->ga_len;
+    cl->class_interface_ଗଣନା = intf_classes_gap->ga_len;
     cl->class_extends = extends_cl;
-    for (int i = 0; i < impl_gap->ga_len && success; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < impl_gap->ga_len && success; ++i)
 	success = validate_interface_methods(
 		((char_u **)impl_gap->ga_data)[i],
 		((class_T **)intf_classes_gap->ga_data)[i], objmethods_gap,
 		extends_cl);
-    cl->class_interfaces_cl = NULL;
-    cl->class_interface_count = 0;
-    cl->class_extends = NULL;
+    cl->class_interfaces_cl = ଖାଲି;
+    cl->class_interface_ଗଣନା = 0;
+    cl->class_extends = ଖାଲି;
 
-    return success;
+    ଫେରନ୍ତୁ success;
 }
 
 /*
  * Returns TRUE if the interface class "ifcl" is already present in the
  * "intf_classes_gap" grow array.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_interface_class_present(garray_T *intf_classes_gap, class_T *ifcl)
 {
-    for (int j = 0; j < intf_classes_gap->ga_len; j++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < intf_classes_gap->ga_len; j++)
     {
-	if (((class_T **)intf_classes_gap->ga_data)[j] == ifcl)
-	    return TRUE;
+	ଯଦି (((class_T **)intf_classes_gap->ga_data)[j] == ifcl)
+	    ଫେରନ୍ତୁ TRUE;
     }
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Add interface "ifcl" from a super class to "intf_classes_gap" and the class
  * name to "impl_gap".
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_interface_from_super_class(
     class_T	*ifcl,
     garray_T	*impl_gap,
@@ -949,21 +949,21 @@ add_interface_from_super_class(
 
     // Add the interface name to "impl_gap"
     intf_name = vim_strnsave(ifcl->class_name.string, ifcl->class_name.length);
-    if (intf_name == NULL)
-	return FALSE;
+    ଯଦି (intf_name == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
-    if (ga_grow(impl_gap, 1) == FAIL)
-	goto fail;
+    ଯଦି (ga_grow(impl_gap, 1) == FAIL)
+	ଯାଅ fail;
 
     char_u **intf_names = (char_u **)impl_gap->ga_data;
     intf_names[impl_gap->ga_len] = intf_name;
     impl_gap->ga_len++;
 
     // Add the interface class to "intf_classes_gap"
-    if (ga_grow(intf_classes_gap, 1) == FAIL)
+    ଯଦି (ga_grow(intf_classes_gap, 1) == FAIL)
     {
 	--impl_gap->ga_len;
-	goto fail;
+	ଯାଅ fail;
     }
 
     class_T **intf_classes = (class_T **)intf_classes_gap->ga_data;
@@ -971,32 +971,32 @@ add_interface_from_super_class(
     intf_classes_gap->ga_len++;
     ++ifcl->class_refcount;
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 fail:
     vim_free(intf_name);
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Add "super" class interfaces to "intf_classes_gap" (if not present already)
  * Add the interface class names to "impl_gap".
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_super_class_interfaces(
     class_T	*super,
     garray_T	*impl_gap,
     garray_T	*intf_classes_gap)
 {
     // Iterate through all the interfaces implemented by "super"
-    for (int i = 0; i < super->class_interface_count; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < super->class_interface_ଗଣନା; i++)
     {
 	class_T	*ifcl = super->class_interfaces_cl[i];
 
-	if (!is_interface_class_present(intf_classes_gap, ifcl))
+	ଯଦି (!is_interface_class_present(intf_classes_gap, ifcl))
 	    add_interface_from_super_class(ifcl, impl_gap, intf_classes_gap);
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -1004,56 +1004,56 @@ add_super_class_interfaces(
  * (Object members are always accessed with "this." prefix, so no need
  * to check them.)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_func_arg_names(
     garray_T	*classfunctions_gap,
     garray_T	*objmethods_gap,
     garray_T	*classmembers_gap)
 {
     // loop 1: class functions, loop 2: object methods
-    for (int loop = 1; loop <= 2; ++loop)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; ++loop)
     {
 	garray_T *gap = loop == 1 ? classfunctions_gap : objmethods_gap;
 
-	for (int fi = 0; fi < gap->ga_len; ++fi)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା fi = 0; fi < gap->ga_len; ++fi)
 	{
 	    ufunc_T *uf = ((ufunc_T **)gap->ga_data)[fi];
 
-	    for (int i = 0; i < uf->uf_args.ga_len; ++i)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < uf->uf_args.ga_len; ++i)
 	    {
 		char_u *aname = ((char_u **)uf->uf_args.ga_data)[i];
 		garray_T *mgap = classmembers_gap;
 
 		// Check all the class member names
-		for (int mi = 0; mi < mgap->ga_len; ++mi)
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା mi = 0; mi < mgap->ga_len; ++mi)
 		{
 		    char_u *mname =
 				((ocmember_T *)mgap->ga_data + mi)->ocm_name.string;
-		    if (STRCMP(aname, mname) == 0)
+		    ଯଦି (STRCMP(aname, mname) == 0)
 		    {
-			if (uf->uf_script_ctx.sc_sid > 0)
+			ଯଦି (uf->uf_script_ctx.sc_sid > 0)
 			    SOURCING_LNUM = uf->uf_script_ctx.sc_lnum;
 
 			semsg(_(e_argument_already_declared_in_class_str),
 				aname);
 
-			return FALSE;
+			ଫେରନ୍ତୁ FALSE;
 		    }
 		}
 	    }
 	}
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
  * Returns TRUE if 'varname' is a reserved keyword name
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_reserved_varname(char_u *varname, char_u *varname_end)
 {
-    int reserved = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା reserved = FALSE;
     char_u save_varname_end = *varname_end;
     *varname_end = NUL;
 
@@ -1061,14 +1061,14 @@ is_reserved_varname(char_u *varname, char_u *varname_end)
 
     *varname_end = save_varname_end;
 
-    return reserved;
+    ଫେରନ୍ତୁ reserved;
 }
 
 /*
  * Returns TRUE if the variable "varname" is already defined either as a class
  * variable or as an object variable.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_duplicate_variable(
     garray_T	*class_members,
     garray_T	*obj_members,
@@ -1078,11 +1078,11 @@ is_duplicate_variable(
     // Note: the .string field may point to a string longer than the .length
     // field.  So we need to use STRNCMP() to compare it.
     string_T	pstr = {varname, (size_t)(varname_end - varname)};
-    int		dup = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dup = FALSE;
     bool	p_protected = false;
 
     // Step over a leading '_'.
-    if (*pstr.string == '_')
+    ଯଦି (*pstr.string == '_')
     {
 	pstr.string++;
 	pstr.length--;
@@ -1090,48 +1090,48 @@ is_duplicate_variable(
     }
 
     // loop == 1: class variables, loop == 2: object variables
-    for (int loop = 1; loop <= 2; loop++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; loop++)
     {
 	garray_T    *vgap = (loop == 1) ? class_members : obj_members;
-	for (int i = 0; i < vgap->ga_len; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < vgap->ga_len; ++i)
 	{
 	    ocmember_T *m = ((ocmember_T *)vgap->ga_data) + i;
 	    string_T	qstr = {m->ocm_name.string, m->ocm_name.length};
 	    bool	q_protected = false;
 
 	    // Step over a leading '_'.
-	    if (*qstr.string == '_')
+	    ଯଦି (*qstr.string == '_')
 	    {
 		qstr.string++;
 		qstr.length--;
 		q_protected = true;
 	    }
 
-	    if (pstr.length == qstr.length
+	    ଯଦି (pstr.length == qstr.length
 		&& STRNCMP(pstr.string, qstr.string, pstr.length) == 0)
 	    {
 		char_u	save_c = *varname_end;
 
 		*varname_end = NUL;
-		if (p_protected != q_protected)
+		ଯଦି (p_protected != q_protected)
 		    semsg(_(e_public_and_protected_member_have_same_name_str_str),
 					       pstr.string, pstr.string);
-		else
+		ଅନ୍ୟଥା
 		    semsg(_(e_duplicate_variable_str), varname);
 		*varname_end = save_c;
 		dup = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
 
-    return dup;
+    ଫେରନ୍ତୁ dup;
 }
 
 /*
  * Returns TRUE if the method "name" is already defined.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_duplicate_method(
     garray_T	*classmethods_gap,
     garray_T	*objmethods_gap,
@@ -1140,61 +1140,61 @@ is_duplicate_method(
     char_u *pstr = (*name == '_') ? name + 1 : name;
 
     // loop 1: class methods, loop 2: object methods
-    for (int loop = 1; loop <= 2; loop++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; loop++)
     {
 	garray_T *fgap = (loop == 1) ? classmethods_gap : objmethods_gap;
-	for (int i = 0; i < fgap->ga_len; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < fgap->ga_len; ++i)
 	{
 	    char_u	*n = ((ufunc_T **)fgap->ga_data)[i]->uf_name;
 	    char_u	*qstr = *n == '_' ? n + 1 : n;
-	    if (STRCMP(pstr, qstr) == 0)
+	    ଯଦି (STRCMP(pstr, qstr) == 0)
 	    {
 		semsg(_(e_duplicate_function_str), name);
-		return TRUE;
+		ଫେରନ୍ତୁ TRUE;
 	    }
 	}
     }
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Returns TRUE if the constructor is valid.
  */
-    static int
-is_valid_constructor(ufunc_T *uf, int is_abstract, int has_static)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+is_valid_constructor(ufunc_T *uf, ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_abstract, ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_static)
 {
     // Constructors are not allowed in abstract classes.
-    if (is_abstract)
+    ଯଦି (is_abstract)
     {
 	emsg(_(e_cannot_define_new_method_in_abstract_class));
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
     }
     // A constructor is always static, no need to define it so.
-    if (has_static)
+    ଯଦି (has_static)
     {
 	emsg(_(e_cannot_define_new_method_as_static));
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
     }
     // A return type should not be specified for the new()
     // constructor method.
-    if (uf->uf_ret_type->tt_type != VAR_VOID)
+    ଯଦି (uf->uf_ret_type->tt_type != VAR_VOID)
     {
 	emsg(_(e_cannot_use_a_return_type_with_new_method));
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
  * Returns TRUE if 'uf' is a supported builtin method and has the correct
  * method signature.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_check_builtin_method_sig(ufunc_T *uf)
 {
     char_u  *name = uf->uf_name;
-    int	    valid = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    valid = FALSE;
     type_T  method_sig;
     type_T  method_rt;
     where_T where = WHERE_INIT;
@@ -1204,60 +1204,60 @@ object_check_builtin_method_sig(ufunc_T *uf)
     CLEAR_FIELD(method_rt);
     method_sig.tt_type = VAR_FUNC;
 
-    if (STRCMP(name, "len") == 0)
+    ଯଦି (STRCMP(name, "len") == 0)
     {
 	// def __len(): number
-	method_rt.tt_type = VAR_NUMBER;
+	method_rt.tt_type = VAR_ସଂଖ୍ୟା;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else if (STRCMP(name, "empty") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRCMP(name, "empty") == 0)
     {
 	// def __empty(): bool
 	method_rt.tt_type = VAR_BOOL;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else if (STRCMP(name, "string") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRCMP(name, "string") == 0)
     {
 	// def __string(): string
 	method_rt.tt_type = VAR_STRING;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_builtin_object_method_str_not_supported), uf->uf_name);
 
-    where.wt_func_name = (char *)uf->uf_name;
+    where.wt_func_name = (ଅକ୍ଷର *)uf->uf_name;
     where.wt_kind = WT_METHOD;
-    if (valid && !check_type(&method_sig, uf->uf_func_type, TRUE, where))
+    ଯଦି (valid && !check_type(&method_sig, uf->uf_func_type, TRUE, where))
 	valid = FALSE;
 
-    return valid;
+    ଫେରନ୍ତୁ valid;
 }
 
 /*
  * Returns TRUE if "funcname" is a supported builtin object method name
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_valid_builtin_obj_methodname(char_u *funcname)
 {
-    switch (funcname[0])
+    ବାଛ (funcname[0])
     {
-	case 'e':
-	    return STRNCMP(funcname, "empty", 5) == 0;
+	ସ୍ଥିତି 'e':
+	    ଫେରନ୍ତୁ STRNCMP(funcname, "empty", 5) == 0;
 
-	case 'l':
-	    return STRNCMP(funcname, "len", 3) == 0;
+	ସ୍ଥିତି 'l':
+	    ଫେରନ୍ତୁ STRNCMP(funcname, "len", 3) == 0;
 
-	case 'n':
-	    return STRNCMP(funcname, "new", 3) == 0;
+	ସ୍ଥିତି 'n':
+	    ଫେରନ୍ତୁ STRNCMP(funcname, "new", 3) == 0;
 
-	case 's':
-	    return STRNCMP(funcname, "string", 6) == 0;
+	ସ୍ଥିତି 's':
+	    ଫେରନ୍ତୁ STRNCMP(funcname, "string", 6) == 0;
     }
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 
@@ -1269,15 +1269,15 @@ is_valid_builtin_obj_methodname(char_u *funcname)
 class_get_builtin_method(
     class_T		*cl,
     class_builtin_T	builtin_method,
-    int			*method_idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			*method_idx)
 {
     *method_idx = -1;
 
-    if (cl == NULL)
-	return NULL;
+    ଯଦି (cl == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     *method_idx = cl->class_builtin_methods[builtin_method];
-    return *method_idx != -1 ? cl->class_obj_methods[*method_idx] : NULL;
+    ଫେରନ୍ତୁ *method_idx != -1 ? cl->class_obj_methods[*method_idx] : ଖାଲି;
 }
 
 /*
@@ -1288,109 +1288,109 @@ class_get_builtin_method(
  * This is also used for updating the lookup table for the extended class
  * hierarchy.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 update_member_method_lookup_table(
     class_T	*ifcl,
     class_T	*cl,
     garray_T	*objmethods,
-    int		pobj_method_offset)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pobj_method_offset)
 {
-    if (ifcl == NULL)
-	return OK;
+    ଯଦି (ifcl == ଖାଲି)
+	ଫେରନ୍ତୁ OK;
 
     // Table for members.
-    itf2class_T *if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_member_count * sizeof(int));
-    if (if2cl == NULL)
-	return FAIL;
+    itf2class_T *if2cl = alloc_clear(ଆକାର(itf2class_T)
+				+ ifcl->class_obj_member_ଗଣନା * ଆକାର(ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
+    ଯଦି (if2cl == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
     ifcl->class_itf2class = if2cl;
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = FALSE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_member_count; ++if_i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_i = 0; if_i < ifcl->class_obj_member_ଗଣନା; ++if_i)
     {
 	char_u  *ocm_name = ifcl->class_obj_members[if_i].ocm_name.string;
 
-	for (int cl_i = 0; cl_i < cl->class_obj_member_count; ++cl_i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_i = 0; cl_i < cl->class_obj_member_ଗଣନା; ++cl_i)
 	{
-	    if (STRCMP(ocm_name, cl->class_obj_members[cl_i].ocm_name.string) == 0)
+	    ଯଦି (STRCMP(ocm_name, cl->class_obj_members[cl_i].ocm_name.string) == 0)
 	    {
-		int *table = (int *)(if2cl + 1);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା *table = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)(if2cl + 1);
 		table[if_i] = cl_i;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
 
     // Table for methods.
-    if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_method_count * sizeof(int));
-    if (if2cl == NULL)
-	return FAIL;
+    if2cl = alloc_clear(ଆକାର(itf2class_T)
+				+ ifcl->class_obj_method_ଗଣନା * ଆକାର(ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
+    ଯଦି (if2cl == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
     ifcl->class_itf2class = if2cl;
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = TRUE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_method_count; ++if_i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା if_i = 0; if_i < ifcl->class_obj_method_ଗଣନା; ++if_i)
     {
-	int	done = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	done = FALSE;
 	char_u	*if_name = ifcl->class_obj_methods[if_i]->uf_name;
 
-	for (int cl_i = 0; cl_i < objmethods->ga_len; ++cl_i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_i = 0; cl_i < objmethods->ga_len; ++cl_i)
 	{
-	    if (STRCMP(if_name,
+	    ଯଦି (STRCMP(if_name,
 			((ufunc_T **)objmethods->ga_data)[cl_i]->uf_name) == 0)
 	    {
-		int *table = (int *)(if2cl + 1);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା *table = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)(if2cl + 1);
 		table[if_i] = cl_i;
 		done = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
 	// extended class object method is not overridden by the child class.
 	// Keep the method declared in one of the parent classes in the
 	// lineage.
-	if (!done)
+	ଯଦି (!done)
 	{
 	    // If "ifcl" is not the immediate parent of "cl", then search in
 	    // the intermediate parent classes.
-	    if (cl->class_extends != ifcl)
+	    ଯଦି (cl->class_extends != ifcl)
 	    {
 		class_T		*parent = cl->class_extends;
-		int		method_offset = objmethods->ga_len;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା		method_offset = objmethods->ga_len;
 
-		while (!done && parent != NULL && parent != ifcl)
+		ଯେତେବେଳେ (!done && parent != ଖାଲି && parent != ifcl)
 		{
-		    for (int cl_i = 0;
-			    cl_i < parent->class_obj_method_count_child; ++cl_i)
+		    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା cl_i = 0;
+			    cl_i < parent->class_obj_method_ଗଣନା_child; ++cl_i)
 		    {
-			if (STRCMP(if_name,
+			ଯଦି (STRCMP(if_name,
 				    parent->class_obj_methods[cl_i]->uf_name)
 				== 0)
 			{
-			    int *table = (int *)(if2cl + 1);
+			    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *table = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)(if2cl + 1);
 			    table[if_i] = method_offset + cl_i;
 			    done = TRUE;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
-		    method_offset += parent->class_obj_method_count_child;
+		    method_offset += parent->class_obj_method_ଗଣନା_child;
 		    parent = parent->class_extends;
 		}
 	    }
 
-	    if (!done)
+	    ଯଦି (!done)
 	    {
-		int *table = (int *)(if2cl + 1);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା *table = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)(if2cl + 1);
 		table[if_i] = pobj_method_offset + if_i;
 	    }
 	}
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -1400,74 +1400,74 @@ update_member_method_lookup_table(
  * to the member index in the new class.  And a lookup table for the object
  * method index on the interface to the object method index in the new class.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_lookup_tables(class_T *cl, class_T *extends_cl, garray_T *objmethods_gap)
 {
     // update the lookup table for all the implemented interfaces
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_interface_ଗଣନା; ++i)
     {
 	class_T *ifcl = cl->class_interfaces_cl[i];
 
 	// update the lookup table for this interface and all its super
 	// interfaces.
-	while (ifcl != NULL)
+	ଯେତେବେଳେ (ifcl != ଖାଲି)
 	{
-	    if (update_member_method_lookup_table(ifcl, cl, objmethods_gap,
+	    ଯଦି (update_member_method_lookup_table(ifcl, cl, objmethods_gap,
 								0) == FAIL)
-		return FAIL;
+		ଫେରନ୍ତୁ FAIL;
 	    ifcl = ifcl->class_extends;
 	}
     }
 
     // Update the lookup table for the extended class, if any
-    if (extends_cl != NULL)
+    ଯଦି (extends_cl != ଖାଲି)
     {
 	class_T		*pclass = extends_cl;
-	int		pobj_method_offset = objmethods_gap->ga_len;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pobj_method_offset = objmethods_gap->ga_len;
 
 	// Update the entire lineage of extended classes.
-	while (pclass != NULL)
+	ଯେତେବେଳେ (pclass != ଖାଲି)
 	{
-	    if (update_member_method_lookup_table(pclass, cl,
+	    ଯଦି (update_member_method_lookup_table(pclass, cl,
 			objmethods_gap, pobj_method_offset) == FAIL)
-		return FAIL;
+		ଫେରନ୍ତୁ FAIL;
 
-	    pobj_method_offset += pclass->class_obj_method_count_child;
+	    pobj_method_offset += pclass->class_obj_method_ଗଣନା_child;
 	    pclass = pclass->class_extends;
 	}
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add class members to a new class.  Allocate a typval for each class member
  * and initialize it.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 {
     // Allocate a typval for each class member and initialize it.
     cl->class_members_tv = ALLOC_CLEAR_MULT(typval_T,
-					    cl->class_class_member_count);
-    if (cl->class_members_tv == NULL)
-	return FAIL;
+					    cl->class_class_member_ଗଣନା);
+    ଯଦି (cl->class_members_tv == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_member_ଗଣନା; ++i)
     {
 	ocmember_T	*m = &cl->class_class_members[i];
 	typval_T	*tv = &cl->class_members_tv[i];
-	if (m->ocm_init != NULL)
+	ଯଦି (m->ocm_init != ଖାଲି)
 	{
 	    sctx_T	save_current_sctx = current_sctx;
 
 	    current_sctx = m->ocm_init_sctx;
-	    typval_T *etv = eval_expr(m->ocm_init, eap);
+	    typval_T *etv = eval_ପଦସମଷ୍ଟି(m->ocm_init, eap);
 	    current_sctx = save_current_sctx;
-	    if (etv == NULL)
-		return FAIL;
+	    ଯଦି (etv == ଖାଲି)
+		ଫେରନ୍ତୁ FAIL;
 
-	    if (m->ocm_type->tt_type == VAR_ANY
+	    ଯଦି (m->ocm_type->tt_type == VAR_ANY
 		    && !(m->ocm_flags & OCMFLAG_HAS_TYPE)
 		    && etv->v_type != VAR_SPECIAL)
 		// If the member variable type is not yet set, then use
@@ -1478,44 +1478,44 @@ add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 	    *tv = *etv;
 	    vim_free(etv);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // TODO: proper default value
 	    tv->v_type = m->ocm_type->tt_type;
-	    tv->vval.v_string = NULL;
+	    tv->vval.v_string = ଖାଲି;
 	}
 	set_tv_type(tv, m->ocm_type);
-	if (m->ocm_flags & OCMFLAG_CONST)
+	ଯଦି (m->ocm_flags & OCMFLAG_CONST)
 	    item_lock(tv, DICT_MAXNEST, TRUE, TRUE);
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a default constructor method (new()) to the class "cl".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 add_default_constructor(
     class_T	*cl,
     garray_T	*classfunctions_gap,
     garray_T	*type_list_gap)
 {
     garray_T	fga;
-    int		is_enum = IS_ENUM(cl);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_enum = IS_ENUM(cl);
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "new(");
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_member_ଗଣନା; ++i)
     {
-	if (i < 2 && is_enum)
+	ଯଦି (i < 2 && is_enum)
 	    // The first two object variables in an enum are the enum value
 	    // name and ordinal.  Don't initialize these object variables in
 	    // the default constructor as they are already initialized right
 	    // after creating the object.
-	    continue;
+	    ଜାରି;
 
-	if (i > (is_enum ? 2 : 0))
+	ଯଦି (i > (is_enum ? 2 : 0))
 	    GA_CONCAT_LITERAL(&fga, ", ");
 	GA_CONCAT_LITERAL(&fga, "this.");
 	ocmember_T *m = cl->class_obj_members + i;
@@ -1530,17 +1530,17 @@ add_default_constructor(
     fea.cmdidx = CMD_def;
     fea.cmd = fea.arg = fga.ga_data;
 
-    garray_T lines_to_free;
-    ga_init2(&lines_to_free, sizeof(char_u *), 50);
+    garray_T ଧାଡ଼ିଗୁଡ଼ିକ_to_free;
+    ga_init2(&ଧାଡ଼ିଗୁଡ଼ିକ_to_free, ଆକାର(char_u *), 50);
 
-    ufunc_T *nf = define_function(&fea, NULL, &lines_to_free, CF_CLASS,
-			    cl->class_obj_members, cl->class_obj_member_count,
-			    NULL);
+    ufunc_T *nf = define_function(&fea, ଖାଲି, &ଧାଡ଼ିଗୁଡ଼ିକ_to_free, CF_CLASS,
+			    cl->class_obj_members, cl->class_obj_member_ଗଣନା,
+			    ଖାଲି);
 
-    ga_clear_strings(&lines_to_free);
+    ga_clear_strings(&ଧାଡ଼ିଗୁଡ଼ିକ_to_free);
     vim_free(fga.ga_data);
 
-    if (nf != NULL && ga_grow(classfunctions_gap, 1) == OK)
+    ଯଦି (nf != ଖାଲି && ga_grow(classfunctions_gap, 1) == OK)
     {
 	((ufunc_T **)classfunctions_gap->ga_data)[classfunctions_gap->ga_len]
 									= nf;
@@ -1548,12 +1548,12 @@ add_default_constructor(
 
 	nf->uf_flags |= FC_NEW;
 	nf->uf_ret_type = get_type_ptr(type_list_gap);
-	if (nf->uf_ret_type != NULL)
+	ଯଦି (nf->uf_ret_type != ଖାଲି)
 	{
 	    nf->uf_ret_type->tt_type = VAR_OBJECT;
 	    nf->uf_ret_type->tt_class = cl;
 	    nf->uf_ret_type->tt_argcount = 0;
-	    nf->uf_ret_type->tt_args = NULL;
+	    nf->uf_ret_type->tt_args = ଖାଲି;
 	}
     }
 }
@@ -1564,7 +1564,7 @@ add_default_constructor(
  * parent class also.
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 add_classfuncs_objmethods(
     class_T	*cl,
     class_T	*extends_cl,
@@ -1572,45 +1572,45 @@ add_classfuncs_objmethods(
     garray_T	*objmethods_gap)
 {
     // loop 1: class functions, loop 2: object methods
-    for (int loop = 1; loop <= 2; ++loop)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; ++loop)
     {
 	garray_T	*gap = loop == 1 ? classfunctions_gap : objmethods_gap;
-	int		*fcount = loop == 1 ? &cl->class_class_function_count
-						: &cl->class_obj_method_count;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*fcount = loop == 1 ? &cl->class_class_function_ଗଣନା
+						: &cl->class_obj_method_ଗଣନା;
 	ufunc_T		***fup = loop == 1 ? &cl->class_class_functions
 						: &cl->class_obj_methods;
 
-	int parent_count = 0;
-	if (extends_cl != NULL)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା parent_ଗଣନା = 0;
+	ଯଦି (extends_cl != ଖାଲି)
 	    // Include object methods from the parent.
 	    // Don't include the parent class methods.
-	    parent_count = loop == 1
+	    parent_ଗଣନା = loop == 1
 				? 0
-				: extends_cl->class_obj_method_count;
+				: extends_cl->class_obj_method_ଗଣନା;
 
-	*fcount = parent_count + gap->ga_len;
-	if (*fcount == 0)
+	*fcount = parent_ଗଣନା + gap->ga_len;
+	ଯଦି (*fcount == 0)
 	{
-	    *fup = NULL;
-	    continue;
+	    *fup = ଖାଲି;
+	    ଜାରି;
 	}
 	*fup = ALLOC_MULT(ufunc_T *, *fcount);
-	if (*fup == NULL)
-	    return FAIL;
+	ଯଦି (*fup == ଖାଲି)
+	    ଫେରନ୍ତୁ FAIL;
 
-	if (gap->ga_len != 0)
-	    mch_memmove(*fup, gap->ga_data, sizeof(ufunc_T *) * gap->ga_len);
+	ଯଦି (gap->ga_len != 0)
+	    mch_memmove(*fup, gap->ga_data, ଆକାର(ufunc_T *) * gap->ga_len);
 	VIM_CLEAR(gap->ga_data);
-	if (loop == 1)
-	    cl->class_class_function_count_child = gap->ga_len;
-	else
-	    cl->class_obj_method_count_child = gap->ga_len;
+	ଯଦି (loop == 1)
+	    cl->class_class_function_ଗଣନା_child = gap->ga_len;
+	ଅନ୍ୟଥା
+	    cl->class_obj_method_ଗଣନା_child = gap->ga_len;
 
-	if (loop == 2)
+	ଯଦି (loop == 2)
 	{
 	    // Copy instance methods from the parent.
 
-	    for (int i = 0; i < parent_count; ++i)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < parent_ଗଣନା; ++i)
 	    {
 		// Can't use the same parent function, because "uf_class" is
 		// different and compilation will have a different result.
@@ -1623,23 +1623,23 @@ add_classfuncs_objmethods(
 
 		// The types of a generic method use the type variables of the
 		// parent method, make them use the type variables of the copy.
-		if (nf != NULL && IS_GENERIC_FUNC(nf)
-					      && nf->uf_generic_args != NULL)
+		ଯଦି (nf != ଖାଲି && IS_GENERIC_FUNC(nf)
+					      && nf->uf_generic_args != ଖାଲି)
 		    generic_func_copy_types(pf, nf);
 
 		// If the child class overrides a function from the parent
 		// the signature must be equal.
 		char_u *pname = pf->uf_name;
-		for (int ci = 0; ci < gap->ga_len; ++ci)
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା ci = 0; ci < gap->ga_len; ++ci)
 		{
 		    ufunc_T *cf = (*fup)[ci];
 		    char_u *cname = cf->uf_name;
-		    if (STRCMP(pname, cname) == 0)
+		    ଯଦି (STRCMP(pname, cname) == 0)
 		    {
 			where_T where = WHERE_INIT;
-			where.wt_func_name = (char *)pname;
+			where.wt_func_name = (ଅକ୍ଷର *)pname;
 			where.wt_kind = WT_METHOD;
-			(void)check_type(pf->uf_func_type, cf->uf_func_type,
+			(ଶୂନ୍ୟ)check_type(pf->uf_func_type, cf->uf_func_type,
 								TRUE, where);
 		    }
 		}
@@ -1647,44 +1647,44 @@ add_classfuncs_objmethods(
 	}
 
 	// Set the class pointer on all the functions and object methods.
-	for (int i = 0; i < *fcount; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < *fcount; ++i)
 	{
 	    ufunc_T *fp = (*fup)[i];
 	    fp->uf_class = cl;
-	    if (i < gap->ga_len)
+	    ଯଦି (i < gap->ga_len)
 		fp->uf_defclass = cl;
-	    if (loop == 2)
+	    ଯଦି (loop == 2)
 		fp->uf_flags |= FC_OBJECT;
 	}
 
 	ga_clear(gap);
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Update the index of object methods called by builtin functions.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 update_builtin_method_index(class_T *cl)
 {
-    int	i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	i;
 
-    for (i = 0; i < CLASS_BUILTIN_MAX; i++)
+    ପାଇଁ (i = 0; i < CLASS_BUILTIN_MAX; i++)
 	cl->class_builtin_methods[i] = -1;
 
-    for (i = 0; i < cl->class_obj_method_count; i++)
+    ପାଇଁ (i = 0; i < cl->class_obj_method_ଗଣନା; i++)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 
-	if (cl->class_builtin_methods[CLASS_BUILTIN_STRING] == -1
+	ଯଦି (cl->class_builtin_methods[CLASS_BUILTIN_STRING] == -1
 		&& STRCMP(uf->uf_name, "string") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_STRING] = i;
-	else if (cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] == -1 &&
+	ଅନ୍ୟଥା ଯଦି (cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] == -1 &&
 		STRCMP(uf->uf_name, "empty") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_EMPTY] = i;
-	else if (cl->class_builtin_methods[CLASS_BUILTIN_LEN] == -1 &&
+	ଅନ୍ୟଥା ଯଦି (cl->class_builtin_methods[CLASS_BUILTIN_LEN] == -1 &&
 		STRCMP(uf->uf_name, "len") == 0)
 	    cl->class_builtin_methods[CLASS_BUILTIN_LEN] = i;
     }
@@ -1695,22 +1695,22 @@ update_builtin_method_index(class_T *cl)
  * class name are alphanumeric characters and "_".  Also handles imported class
  * names.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 find_class_name_end(char_u *arg)
 {
     char_u *end = arg;
 
-    while (ASCII_ISALNUM(*end) || *end == '_'
+    ଯେତେବେଳେ (ASCII_ISALNUM(*end) || *end == '_'
 	    || (*end == '.' && (ASCII_ISALNUM(end[1]) || end[1] == '_')))
 	++end;
 
-    return end;
+    ଫେରନ୍ତୁ end;
 }
 
 /*
  * Returns TRUE if the enum value "varname" is already defined.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_duplicate_enum(
     garray_T	*enum_gap,
     char_u	*varname,
@@ -1721,13 +1721,13 @@ is_duplicate_enum(
 								    // than the .length field.
 								    // So we need to use STRNCMP()
 								    // to compare it.
-    int		dup = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dup = FALSE;
 
-    for (int i = 0; i < enum_gap->ga_len; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < enum_gap->ga_len; ++i)
     {
 	ocmember_T *m = ((ocmember_T *)enum_gap->ga_data) + i;
 
-	if (name.length == m->ocm_name.length
+	ଯଦି (name.length == m->ocm_name.length
 	    && STRNCMP(name.string, m->ocm_name.string, name.length) == 0)
 	{
 	    char_u  save_c = *varname_end;
@@ -1736,111 +1736,111 @@ is_duplicate_enum(
 	    semsg(_(e_duplicate_enum_str), varname);
 	    *varname_end = save_c;
 	    dup = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
 
-    return dup;
+    ଫେରନ୍ତୁ dup;
 }
 
 /*
  * Parse the enum values in "line" separated by comma and add them to "gap".
  * If the last enum value is found, then "enum_end" is set to TRUE.
  */
-    static int
-enum_parse_values(
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+enum_parse_ମୂଲ୍ୟଗୁଡ଼ିକ(
     exarg_T	*eap,
     class_T	*en,
-    char_u	*line,
+    char_u	*ଧାଡ଼ି,
     garray_T	*gap,
-    int		*num_enum_values,
-    int		*enum_end)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*enum_end)
 {
     evalarg_T	evalarg;
-    char_u	*p = line;
-    char	initexpr_buf[1024];
+    char_u	*p = ଧାଡ଼ି;
+    ଅକ୍ଷର	initexpr_buf[1024];
     size_t	initexpr_buflen;
     char_u	last_char = NUL;
-    int		rc = OK;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		rc = OK;
 
     fill_evalarg_from_eap(&evalarg, eap, FALSE);
 
-    int		did_emsg_before = did_emsg;
-    while (*p != NUL)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
+    ଯେତେବେଳେ (*p != NUL)
     {
 	// ignore comment
-	if (*p == '#')
-	    break;
+	ଯଦି (*p == '#')
+	    ଭାଙ୍ଗ;
 
-	if (!eval_isnamec1(*p))
+	ଯଦି (!eval_isnamec1(*p))
 	{
-	    semsg(_(e_invalid_enum_value_declaration_str), p);
-	    break;
+	    semsg(_(e_invalid_enum_ମୂଲ୍ୟ_declaration_str), p);
+	    ଭାଙ୍ଗ;
 	}
 
 	char_u *eni_name_start = p;
 	char_u *eni_name_end = to_name_end(p, FALSE);
 
-	if (is_duplicate_enum(gap, eni_name_start, eni_name_end))
-	    break;
+	ଯଦି (is_duplicate_enum(gap, eni_name_start, eni_name_end))
+	    ଭାଙ୍ଗ;
 
 	p = skipwhite(eni_name_end);
 
-	char_u	*init_expr = NULL;
-	if (*p == '(' || *p == '<')
+	char_u	*init_ପଦସମଷ୍ଟି = ଖାଲି;
+	ଯଦି (*p == '(' || *p == '<')
 	{
-	    if (VIM_ISWHITE(p[-1]))
+	    ଯଦି (VIM_ISWHITE(p[-1]))
 	    {
-		semsg(_(e_no_white_space_allowed_before_str_str), "(", line);
-		break;
+		semsg(_(e_no_white_space_allowed_before_str_str), "(", ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
 
-	    char_u *expr_start, *expr_end;
+	    char_u *ପଦସମଷ୍ଟି_start, *ପଦସମଷ୍ଟି_end;
 
 	    p = eni_name_start;
-	    (void)skip_expr_concatenate(&p, &expr_start, &expr_end, &evalarg);
+	    (ଶୂନ୍ୟ)skip_ପଦସମଷ୍ଟି_concatenate(&p, &ପଦସମଷ୍ଟି_start, &ପଦସମଷ୍ଟି_end, &evalarg);
 
-	    while (*expr_start && *expr_start != '(' && *expr_start != '<')
-		expr_start++;
+	    ଯେତେବେଳେ (*ପଦସମଷ୍ଟି_start && *ପଦସମଷ୍ଟି_start != '(' && *ପଦସମଷ୍ଟି_start != '<')
+		ପଦସମଷ୍ଟି_start++;
 
-	    if (expr_end > expr_start)
-		init_expr = vim_strnsave(expr_start, expr_end - expr_start);
+	    ଯଦି (ପଦସମଷ୍ଟି_end > ପଦସମଷ୍ଟି_start)
+		init_ପଦସମଷ୍ଟି = vim_strnsave(ପଦସମଷ୍ଟି_start, ପଦସମଷ୍ଟି_end - ପଦସମଷ୍ଟି_start);
 	}
 
-	if (init_expr == NULL)
+	ଯଦି (init_ପଦସମଷ୍ଟି == ଖାଲି)
 	    initexpr_buflen = vim_snprintf_safelen(
-		initexpr_buf, sizeof(initexpr_buf), "%s.new()", en->class_name.string);
-	else
+		initexpr_buf, ଆକାର(initexpr_buf), "%s.new()", en->class_name.string);
+	ଅନ୍ୟଥା
 	{
 	    initexpr_buflen = vim_snprintf_safelen(
-		initexpr_buf, sizeof(initexpr_buf), "%s.new%s", en->class_name.string,
-		init_expr);
-	    vim_free(init_expr);
+		initexpr_buf, ଆକାର(initexpr_buf), "%s.new%s", en->class_name.string,
+		init_ପଦସମଷ୍ଟି);
+	    vim_free(init_ପଦସମଷ୍ଟି);
 	}
-	if (add_member(gap, eni_name_start, eni_name_end, FALSE,
+	ଯଦି (add_member(gap, eni_name_start, eni_name_end, FALSE,
 				TRUE, TRUE, TRUE, &en->class_object_type,
 				vim_strnsave((char_u *)initexpr_buf, initexpr_buflen)) == FAIL)
-	    break;
+	    ଭାଙ୍ଗ;
 
-	++*num_enum_values;
+	++*ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ;
 
-	if (*p != '#')
+	ଯଦି (*p != '#')
 	    last_char = *p;
 
-	if (*p != NUL && *p != ',')
-	    break;
+	ଯଦି (*p != NUL && *p != ',')
+	    ଭାଙ୍ଗ;
 
-	if (*p == ',')
+	ଯଦି (*p == ',')
 	{
-	    if (!IS_WHITE_OR_NUL(p[1]))
+	    ଯଦି (!IS_WHITE_OR_NUL(p[1]))
 	    {
-		semsg(_(e_white_space_required_after_str_str), ",", line);
-		break;
+		semsg(_(e_white_space_required_after_str_str), ",", ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
-	    if (VIM_ISWHITE(p[-1]))
+	    ଯଦି (VIM_ISWHITE(p[-1]))
 	    {
-		semsg(_(e_no_white_space_allowed_before_str_str), ",", line);
-		break;
+		semsg(_(e_no_white_space_allowed_before_str_str), ",", ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
 	    p = skipwhite(p + 1);
 	}
@@ -1848,44 +1848,44 @@ enum_parse_values(
 
     p = skipwhite(p);
 
-    if (*p != NUL && *p != '#')
+    ଯଦି (*p != NUL && *p != '#')
     {
-	if (did_emsg == did_emsg_before)
+	ଯଦି (did_emsg == did_emsg_before)
 	    semsg(_(e_missing_comma_before_argument_str), p);
 	rc = FAIL;
     }
 
-    if (last_char != ',')
+    ଯଦି (last_char != ',')
 	// last enum value should not be terminated by ","
 	*enum_end = TRUE;
 
     // Free the memory pointed by expr_start.
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ଖାଲି);
 
-    return rc;
+    ଫେରନ୍ତୁ rc;
 }
 
 /*
  * Add the "values" class variable (List of enum value objects) to the enum
  * class "en"
  */
-    static int
-enum_add_values_member(
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+enum_add_ମୂଲ୍ୟଗୁଡ଼ିକ_member(
     class_T	*en,
     garray_T	*gap,
-    int		num_enum_values,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ,
     garray_T	*type_list_gap)
 {
     garray_T	fga;
-    int		rc = FAIL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		rc = FAIL;
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "[");
-    for (int i = 0; i < num_enum_values; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ; ++i)
     {
 	ocmember_T *m = ((ocmember_T *)gap->ga_data) + i;
 
-	if (i > 0)
+	ଯଦି (i > 0)
 	    GA_CONCAT_LITERAL(&fga, ", ");
 	ga_concat_len(&fga, en->class_name.string, en->class_name.length);
 	GA_CONCAT_LITERAL(&fga, ".");
@@ -1897,12 +1897,12 @@ enum_add_values_member(
     char_u *varname = (char_u *)"values";
 
     type_T *type = get_type_ptr(type_list_gap);
-    if (type == NULL)
-	goto done;
+    ଯଦି (type == ଖାଲି)
+	ଯାଅ done;
 
     type->tt_type = VAR_LIST;
     type->tt_member = get_type_ptr(type_list_gap);
-    if (type->tt_member != NULL)
+    ଯଦି (type->tt_member != ଖାଲି)
     {
 	type->tt_member->tt_type = VAR_OBJECT;
 	type->tt_member->tt_class = en;
@@ -1914,21 +1914,21 @@ enum_add_values_member(
 done:
     vim_free(fga.ga_data);
 
-    return rc;
+    ଫେରନ୍ତୁ rc;
 }
 
 /*
  * Clear the constructor method names in a enum class, so that an enum class
  * cannot be instantiated.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 enum_clear_constructors(class_T *en)
 {
-    for (int i = 0; i < en->class_class_function_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < en->class_class_function_ଗଣନା; ++i)
     {
 	ufunc_T *fp = en->class_class_functions[i];
 
-	if (fp->uf_flags & FC_NEW)
+	ଯଦି (fp->uf_flags & FC_NEW)
 	    *fp->uf_name = NUL;
     }
 }
@@ -1937,64 +1937,64 @@ enum_clear_constructors(class_T *en)
  * Initialize the name and ordinal object variable in the enum value "enval" in
  * the enum "en".  These values are set during the enum value object creation.
  */
-    void
+    ଶୂନ୍ୟ
 enum_set_internal_obj_vars(class_T *en, object_T *enval)
 {
-    int	i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	i;
 
-    for (i = 0; i < en->class_class_member_count; ++i)
+    ପାଇଁ (i = 0; i < en->class_class_member_ଗଣନା; ++i)
     {
 	typval_T *en_tv = en->class_members_tv + i;
-	if (en_tv != NULL && en_tv->v_type == VAR_UNKNOWN)
-	    break;
+	ଯଦି (en_tv != ଖାଲି && en_tv->v_type == VAR_UNKNOWN)
+	    ଭାଙ୍ଗ;
     }
 
-    if (i >= en->class_class_member_count)
+    ଯଦି (i >= en->class_class_member_ଗଣନା)
 	// When adding enum values to an enum, the index value should be less
 	// than the member count.  It will be greater only when appending a
 	// new item to a list of enums.  In this case, skip setting the enum
 	// name and ordinal (as this is a dummy enum object)
-	return;
+	ଫେରନ୍ତୁ;
 
     // First object variable is the name
-    ocmember_T *value_ocm = en->class_class_members + i;
+    ocmember_T *ମୂଲ୍ୟ_ocm = en->class_class_members + i;
     typval_T *name_tv = (typval_T *)(enval + 1);
     name_tv->v_type = VAR_STRING;
     name_tv->vval.v_string =
-	vim_strnsave(value_ocm->ocm_name.string, value_ocm->ocm_name.length);
+	vim_strnsave(ମୂଲ୍ୟ_ocm->ocm_name.string, ମୂଲ୍ୟ_ocm->ocm_name.length);
 
     // Second object variable is the ordinal
     typval_T *ord_tv = (typval_T *)(name_tv + 1);
-    ord_tv->v_type = VAR_NUMBER;
-    ord_tv->vval.v_number = i;
+    ord_tv->v_type = VAR_ସଂଖ୍ୟା;
+    ord_tv->vval.v_ସଂଖ୍ୟା = i;
 }
 
 /*
  * Read the body up to ":endclass", ":endenum" or ":endinterface" and throw it
  * away.  Used while skipping.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 skip_class_body(exarg_T *eap)
 {
-    for (;;)
+    ପାଇଁ (;;)
     {
 	char_u	*theline = eap->ea_getline(':', eap->cookie, 0,
 							  GETLINE_CONCAT_ALL);
-	if (theline == NULL)
-	    break;
+	ଯଦି (theline == ଖାଲି)
+	    ଭାଙ୍ଗ;
 
 	char_u	*p = theline;
-	int	found;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	found;
 
 	// skip ':' and blanks
-	for (; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	ପାଇଁ (; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    ;
 	found = checkforcmd(&p, "endclass", 4)
 			|| checkforcmd(&p, "endenum", 4)
 			|| checkforcmd(&p, "endinterface", 5);
 	vim_free(theline);
-	if (found)
-	    break;
+	ଯଦି (found)
+	    ଭାଙ୍ଗ;
     }
 }
 
@@ -2003,29 +2003,29 @@ skip_class_body(exarg_T *eap)
  * Handle ":enum" up to ":endenum".
  * Handle ":interface" up to ":endinterface".
  */
-    void
+    ଶୂନ୍ୟ
 ex_class(exarg_T *eap)
 {
-    int		is_class = eap->cmdidx == CMD_class;
-    int		is_abstract = eap->cmdidx == CMD_abstract;
-    int		is_enum = eap->cmdidx == CMD_enum;
-    int		added_enum_values = FALSE;
-    int		is_interface;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_class = eap->cmdidx == CMD_class;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_abstract = eap->cmdidx == CMD_abstract;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_enum = eap->cmdidx == CMD_enum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		added_enum_ମୂଲ୍ୟଗୁଡ଼ିକ = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_interface;
     long	start_lnum = SOURCING_LNUM;
     char_u	*arg = eap->arg;
 
-    if (eap->skip)
+    ଯଦି (eap->skip)
     {
 	skip_class_body(eap);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (is_abstract)
+    ଯଦି (is_abstract)
     {
-	if (STRNCMP(arg, "class", 5) != 0 || !VIM_ISWHITE(arg[5]))
+	ଯଦି (STRNCMP(arg, "class", 5) != 0 || !VIM_ISWHITE(arg[5]))
 	{
 	    semsg(_(e_invalid_argument_str), arg);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 	arg = skipwhite(arg + 5);
 	is_class = TRUE;
@@ -2033,35 +2033,35 @@ ex_class(exarg_T *eap)
 
     is_interface = !is_class && !is_enum;
 
-    if (!current_script_is_vim9()
+    ଯଦି (!current_script_is_vim9()
 		|| (cmdmod.cmod_flags & CMOD_LEGACY)
 		|| !getline_equal(eap->ea_getline, eap->cookie, getsourceline))
     {
-	if (is_class)
+	ଯଦି (is_class)
 	    emsg(_(e_class_can_only_be_defined_in_vim9_script));
-	else if (is_enum)
+	ଅନ୍ୟଥା ଯଦି (is_enum)
 	    emsg(_(e_enum_can_only_be_defined_in_vim9_script));
-	else
+	ଅନ୍ୟଥା
 	    emsg(_(e_interface_can_only_be_defined_in_vim9_script));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (!ASCII_ISUPPER(*arg))
+    ଯଦି (!ASCII_ISUPPER(*arg))
     {
-	if (is_class)
+	ଯଦି (is_class)
 	    semsg(_(e_class_name_must_start_with_uppercase_letter_str), arg);
-	else if (is_enum)
+	ଅନ୍ୟଥା ଯଦି (is_enum)
 	    semsg(_(e_enum_name_must_start_with_uppercase_letter_str), arg);
-	else
+	ଅନ୍ୟଥା
 	    semsg(_(e_interface_name_must_start_with_uppercase_letter_str),
 									  arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
-    char_u *name_end = find_name_end(arg, NULL, NULL, FNE_CHECK_START);
-    if (!IS_WHITE_OR_NUL(*name_end))
+    char_u *name_end = find_name_end(arg, ଖାଲି, ଖାଲି, FNE_CHECK_START);
+    ଯଦି (!IS_WHITE_OR_NUL(*name_end))
     {
 	semsg(_(e_white_space_required_after_name_str), arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
     char_u *name_start = arg;
 
@@ -2069,150 +2069,150 @@ ex_class(exarg_T *eap)
     //    generics: <Tkey, Tentry>
 
     // Name for "extends BaseClass"
-    char_u *extends = NULL;
+    char_u *extends = ଖାଲି;
 
     // Names for "implements SomeInterface"
     garray_T	ga_impl;
-    ga_init2(&ga_impl, sizeof(char_u *), 5);
+    ga_init2(&ga_impl, ଆକାର(char_u *), 5);
 
     arg = skipwhite(name_end);
-    while (*arg != NUL && *arg != '#' && *arg != '\n')
+    ଯେତେବେଳେ (*arg != NUL && *arg != '#' && *arg != '\n')
     {
 	// TODO:
 	//    specifies SomeInterface
-	if (STRNCMP(arg, "extends", 7) == 0 && IS_WHITE_OR_NUL(arg[7]))
+	ଯଦି (STRNCMP(arg, "extends", 7) == 0 && IS_WHITE_OR_NUL(arg[7]))
 	{
-	    if (is_enum)
+	    ଯଦି (is_enum)
 	    {
 		emsg(_(e_enum_cannot_extend_class));
-		goto early_ret;
+		ଯାଅ early_ret;
 	    }
-	    if (extends != NULL)
+	    ଯଦି (extends != ଖାଲି)
 	    {
 		emsg(_(e_duplicate_extends));
-		goto early_ret;
+		ଯାଅ early_ret;
 	    }
 	    arg = skipwhite(arg + 7);
 
 	    char_u *end = find_class_name_end(arg);
-	    if (!IS_WHITE_OR_NUL(*end))
+	    ଯଦି (!IS_WHITE_OR_NUL(*end))
 	    {
 		semsg(_(e_white_space_required_after_name_str), arg);
-		goto early_ret;
+		ଯାଅ early_ret;
 	    }
 	    extends = vim_strnsave(arg, end - arg);
-	    if (extends == NULL)
-		goto early_ret;
+	    ଯଦି (extends == ଖାଲି)
+		ଯାଅ early_ret;
 
 	    arg = skipwhite(end + 1);
 	}
-	else if (STRNCMP(arg, "implements", 10) == 0
+	ଅନ୍ୟଥା ଯଦି (STRNCMP(arg, "implements", 10) == 0
 						   && IS_WHITE_OR_NUL(arg[10]))
 	{
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		emsg(_(e_interface_cannot_use_implements));
-		goto early_ret;
+		ଯାଅ early_ret;
 	    }
 
-	    if (ga_impl.ga_len > 0)
+	    ଯଦି (ga_impl.ga_len > 0)
 	    {
 		emsg(_(e_duplicate_implements));
-		goto early_ret;
+		ଯାଅ early_ret;
 	    }
 	    arg = skipwhite(arg + 10);
 
-	    for (;;)
+	    ପାଇଁ (;;)
 	    {
 		char_u *impl_end = find_class_name_end(arg);
-		if ((!IS_WHITE_OR_NUL(*impl_end) && *impl_end != ',')
+		ଯଦି ((!IS_WHITE_OR_NUL(*impl_end) && *impl_end != ',')
 			|| (*impl_end == ','
 			    && !IS_WHITE_OR_NUL(*(impl_end + 1))))
 		{
 		    semsg(_(e_white_space_required_after_name_str), arg);
-		    goto early_ret;
+		    ଯାଅ early_ret;
 		}
-		if (impl_end - arg == 0)
+		ଯଦି (impl_end - arg == 0)
 		{
 		    emsg(_(e_missing_name_after_implements));
-		    goto early_ret;
+		    ଯାଅ early_ret;
 		}
 
 		char_u *iname = vim_strnsave(arg, impl_end - arg);
-		if (iname == NULL)
-		    goto early_ret;
-		for (int i = 0; i < ga_impl.ga_len; ++i)
-		    if (STRCMP(((char_u **)ga_impl.ga_data)[i], iname) == 0)
+		ଯଦି (iname == ଖାଲି)
+		    ଯାଅ early_ret;
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < ga_impl.ga_len; ++i)
+		    ଯଦି (STRCMP(((char_u **)ga_impl.ga_data)[i], iname) == 0)
 		    {
 			semsg(_(e_duplicate_interface_after_implements_str),
 									iname);
 			vim_free(iname);
-			goto early_ret;
+			ଯାଅ early_ret;
 		    }
-		if (ga_add_string(&ga_impl, iname) == FAIL)
+		ଯଦି (ga_add_string(&ga_impl, iname) == FAIL)
 		{
 		    vim_free(iname);
-		    goto early_ret;
+		    ଯାଅ early_ret;
 		}
-		if (*impl_end != ',')
+		ଯଦି (*impl_end != ',')
 		{
 		    arg = skipwhite(impl_end);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		arg = skipwhite(impl_end + 1);
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    semsg(_(e_trailing_characters_str), arg);
 early_ret:
 	    vim_free(extends);
 	    ga_clear_strings(&ga_impl);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
 
     garray_T	type_list;	    // list of pointers to allocated types
-    ga_init2(&type_list, sizeof(type_T *), 10);
+    ga_init2(&type_list, ଆକାର(type_T *), 10);
 
     // Growarray with class members declared in the class.
     garray_T classmembers;
-    ga_init2(&classmembers, sizeof(ocmember_T), 10);
+    ga_init2(&classmembers, ଆକାର(ocmember_T), 10);
 
     // Growarray with functions declared in the class.
     garray_T classfunctions;
-    ga_init2(&classfunctions, sizeof(ufunc_T *), 10);
+    ga_init2(&classfunctions, ଆକାର(ufunc_T *), 10);
 
     // Growarray with object members declared in the class.
     garray_T objmembers;
-    ga_init2(&objmembers, sizeof(ocmember_T), 10);
+    ga_init2(&objmembers, ଆକାର(ocmember_T), 10);
 
     // Growarray with object methods declared in the class.
     garray_T objmethods;
-    ga_init2(&objmethods, sizeof(ufunc_T *), 10);
+    ga_init2(&objmethods, ଆକାର(ufunc_T *), 10);
 
-    class_T *cl = NULL;
-    class_T *extends_cl = NULL;  // class from "extends" argument
-    class_T **intf_classes = NULL;
-    int	    intf_count = 0;	// number of items in "intf_classes"
-    int	    num_enum_values = 0;
+    class_T *cl = ଖାଲି;
+    class_T *extends_cl = ଖାଲି;  // class from "extends" argument
+    class_T **intf_classes = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    intf_ଗଣନା = 0;	// number of items in "intf_classes"
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ = 0;
 
     cl = ALLOC_CLEAR_ONE(class_T);
-    if (cl == NULL)
-	goto cleanup;
+    ଯଦି (cl == ଖାଲି)
+	ଯାଅ cleanup;
 
-    if (is_enum)
+    ଯଦି (is_enum)
 	cl->class_flags = CLASS_ENUM;
-    else if (is_interface)
+    ଅନ୍ୟଥା ଯଦି (is_interface)
 	cl->class_flags = CLASS_INTERFACE;
-    else if (is_abstract)
+    ଅନ୍ୟଥା ଯଦି (is_abstract)
 	cl->class_flags = CLASS_ABSTRACT;
 
     cl->class_refcount = 1;
     cl->class_name.length = (size_t)(name_end - name_start);
     cl->class_name.string = vim_strnsave(name_start, cl->class_name.length);
-    if (cl->class_name.string == NULL)
-	goto cleanup;
+    ଯଦି (cl->class_name.string == ଖାଲି)
+	ଯାଅ cleanup;
 
     cl->class_type.tt_type = VAR_CLASS;
     cl->class_type.tt_class = cl;
@@ -2228,22 +2228,22 @@ early_ret:
     tv.v_type = VAR_CLASS;
     tv.vval.v_class = cl;
     SOURCING_LNUM = start_lnum;
-    int rc = set_var_const(cl->class_name.string, 0, NULL, &tv, FALSE, 0, 0);
-    if (rc == FAIL)
-	goto cleanup;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା rc = set_var_const(cl->class_name.string, 0, ଖାଲି, &tv, FALSE, 0, 0);
+    ଯଦି (rc == FAIL)
+	ଯାଅ cleanup;
 
-    if (is_enum)
+    ଯଦି (is_enum)
     {
 	// All the enum classes have the name and ordinal object variables.
 	char_u *varname = (char_u *)"name";
-	if (add_member(&objmembers, varname, varname + 4, FALSE, FALSE, TRUE,
-		    TRUE, &t_string, NULL) == FAIL)
-	    goto cleanup;
+	ଯଦି (add_member(&objmembers, varname, varname + 4, FALSE, FALSE, TRUE,
+		    TRUE, &t_string, ଖାଲି) == FAIL)
+	    ଯାଅ cleanup;
 
 	varname = (char_u *)"ordinal";
-	if (add_member(&objmembers, varname, varname + 7, FALSE, FALSE, TRUE,
-		    TRUE, &t_number, NULL) == FAIL)
-	    goto cleanup;
+	ଯଦି (add_member(&objmembers, varname, varname + 7, FALSE, FALSE, TRUE,
+		    TRUE, &t_ସଂଖ୍ୟା, ଖାଲି) == FAIL)
+	    ଯାଅ cleanup;
     }
 
     // "export class" gets used when creating the class, don't use "is_export"
@@ -2252,50 +2252,50 @@ early_ret:
 
     // When parsing an enum definition, this denotes whether all the enumerated
     // values are parsed or not.
-    int		enum_end = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		enum_end = FALSE;
 
     /*
      * Go over the body of the class/interface until "endclass" or
      * "endinterface" or "endenum" is found.
      */
-    char_u *theline = NULL;
-    int success = FALSE;
-    for (;;)
+    char_u *theline = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା success = FALSE;
+    ପାଇଁ (;;)
     {
 	vim_free(theline);
 	theline = eap->ea_getline(':', eap->cookie, 0, GETLINE_CONCAT_ALL);
-	if (theline == NULL)
-	    break;
-	char_u *line = skipwhite(theline);
+	ଯଦି (theline == ଖାଲି)
+	    ଭାଙ୍ଗ;
+	char_u *ଧାଡ଼ି = skipwhite(theline);
 
 	// Skip empty and comment lines.
-	if (*line == NUL)
-	    continue;
-	if (*line == '#')
+	ଯଦି (*ଧାଡ଼ି == NUL)
+	    ଜାରି;
+	ଯଦି (*ଧାଡ଼ି == '#')
 	{
-	    if (vim9_bad_comment(line))
-		break;
-	    continue;
+	    ଯଦି (vim9_bad_comment(ଧାଡ଼ି))
+		ଭାଙ୍ଗ;
+	    ଜାରି;
 	}
 
-	char_u *p = line;
+	char_u *p = ଧାଡ଼ି;
 
-	char	*end_name;
-	int	shortlen;
-	int	fullen;
-	if (is_class)
+	ଅକ୍ଷର	*end_name;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	shortlen;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	fullen;
+	ଯଦି (is_class)
 	{
 	    end_name = "endclass";
 	    shortlen = 4;
 	    fullen = 8;
 	}
-	else if (is_enum)
+	ଅନ୍ୟଥା ଯଦି (is_enum)
 	{
 	    end_name = "endenum";
 	    shortlen = 4;
 	    fullen = 7;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    end_name = "endinterface";
 	    shortlen = 5;
@@ -2303,171 +2303,171 @@ early_ret:
 	}
 
 	// skip ':' and blanks
-	for (; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	ପାଇଁ (; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    ;
 	char_u *cmd_start = p;
-	if (checkforcmd(&p, end_name, shortlen))
+	ଯଦି (checkforcmd(&p, end_name, shortlen))
 	{
-	    if (STRNCMP(cmd_start, end_name, fullen) != 0)
+	    ଯଦି (STRNCMP(cmd_start, end_name, fullen) != 0)
 		semsg(_(e_command_cannot_be_shortened_str), cmd_start);
-	    else if (*p == '|' || !ends_excmd2(line, p))
+	    ଅନ୍ୟଥା ଯଦି (*p == '|' || !ends_excmd2(ଧାଡ଼ି, p))
 		semsg(_(e_trailing_characters_str), p);
-	    else
+	    ଅନ୍ୟଥା
 		success = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
-	int	wrong_endname = FALSE;
-	if (is_class)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	wrong_endname = FALSE;
+	ଯଦି (is_class)
 	    wrong_endname = checkforcmd(&p, "endinterface", 5)
 					|| checkforcmd(&p, "endenum", 4);
-	else if (is_enum)
+	ଅନ୍ୟଥା ଯଦି (is_enum)
 	    wrong_endname = checkforcmd(&p, "endclass", 4)
 					|| checkforcmd(&p, "endinterface", 5);
-	else
+	ଅନ୍ୟଥା
 	    wrong_endname = checkforcmd(&p, "endclass", 4)
 					|| checkforcmd(&p, "endenum", 4);
-	if (wrong_endname)
+	ଯଦି (wrong_endname)
 	{
-	    semsg(_(e_invalid_command_str_expected_str), line, end_name);
-	    break;
+	    semsg(_(e_invalid_command_str_expected_str), ଧାଡ଼ି, end_name);
+	    ଭାଙ୍ଗ;
 	}
 
-	if (is_enum && !enum_end)
+	ଯଦି (is_enum && !enum_end)
 	{
 	    // In an enum, all the enumerated values are at the beginning
 	    // separated by comma.  The class and object variables/methods
 	    // follow the values.
-	    if (enum_parse_values(eap, cl, line, &classmembers,
-					&num_enum_values, &enum_end) == FAIL)
-		break;
+	    ଯଦି (enum_parse_ମୂଲ୍ୟଗୁଡ଼ିକ(eap, cl, ଧାଡ଼ି, &classmembers,
+					&ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ, &enum_end) == FAIL)
+		ଭାଙ୍ଗ;
 
-	    if (enum_end)
+	    ଯଦି (enum_end)
 	    {
 		// Add the enum "values" class variable.
-		enum_add_values_member(cl, &classmembers, num_enum_values,
+		enum_add_ମୂଲ୍ୟଗୁଡ଼ିକ_member(cl, &classmembers, ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ,
 							&type_list);
-		added_enum_values = TRUE;
+		added_enum_ମୂଲ୍ୟଗୁଡ଼ିକ = TRUE;
 	    }
-	    continue;
+	    ଜାରି;
 	}
 
-	int has_public = FALSE;
-	if (checkforcmd(&p, "public", 3))
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_public = FALSE;
+	ଯଦି (checkforcmd(&p, "public", 3))
 	{
-	    if (STRNCMP(line, "public", 6) != 0)
+	    ଯଦି (STRNCMP(ଧାଡ଼ି, "public", 6) != 0)
 	    {
-		semsg(_(e_command_cannot_be_shortened_str), line);
-		break;
+		semsg(_(e_command_cannot_be_shortened_str), ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		emsg(_(e_public_variable_not_supported_in_interface));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	    has_public = TRUE;
-	    p = skipwhite(line + 6);
+	    p = skipwhite(ଧାଡ଼ି + 6);
 
-	    if (STRNCMP(p, "def", 3) == 0)
+	    ଯଦି (STRNCMP(p, "def", 3) == 0)
 	    {
 		emsg(_(e_public_keyword_not_supported_for_method));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "static", 6) != 0
+	    ଯଦି (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "static", 6) != 0
 		&& STRNCMP(p, "final", 5) != 0 && STRNCMP(p, "const", 5) != 0)
 	    {
 		emsg(_(e_public_must_be_followed_by_var_static_final_or_const));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
-	int abstract_method = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା abstract_method = FALSE;
 	char_u *pa = p;
-	if (checkforcmd(&p, "abstract", 3))
+	ଯଦି (checkforcmd(&p, "abstract", 3))
 	{
-	    if (STRNCMP(pa, "abstract", 8) != 0)
+	    ଯଦି (STRNCMP(pa, "abstract", 8) != 0)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), pa);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (is_enum)
+	    ଯଦି (is_enum)
 	    {
 		// "abstract" not supported in an enum
 		emsg(_(e_abstract_cannot_be_used_in_enum));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		// "abstract" not supported in an interface
 		emsg(_(e_abstract_cannot_be_used_in_interface));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (!is_abstract)
+	    ଯଦି (!is_abstract)
 	    {
 		semsg(_(e_abstract_method_in_concrete_class), pa);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
 	    p = skipwhite(pa + 8);
-	    if (STRNCMP(p, "def", 3) != 0)
+	    ଯଦି (STRNCMP(p, "def", 3) != 0)
 	    {
 		emsg(_(e_abstract_must_be_followed_by_def));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
 	    abstract_method = TRUE;
 	}
 
-	int has_static = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_static = FALSE;
 	char_u *ps = p;
-	if (checkforcmd(&p, "static", 4))
+	ଯଦି (checkforcmd(&p, "static", 4))
 	{
-	    if (STRNCMP(ps, "static", 6) != 0)
+	    ଯଦି (STRNCMP(ps, "static", 6) != 0)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), ps);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		emsg(_(e_static_member_not_supported_in_interface));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	    has_static = TRUE;
 	    p = skipwhite(ps + 6);
 
-	    if (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "def", 3) != 0
+	    ଯଦି (STRNCMP(p, "var", 3) != 0 && STRNCMP(p, "def", 3) != 0
 		&& STRNCMP(p, "final", 5) != 0 && STRNCMP(p, "const", 5) != 0)
 	    {
 		emsg(_(e_static_must_be_followed_by_var_def_final_or_const));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
-	int has_final = FALSE;
-	int has_var = FALSE;
-	int has_const = FALSE;
-	if (checkforcmd(&p, "var", 3))
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_final = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_var = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା has_const = FALSE;
+	ଯଦି (checkforcmd(&p, "var", 3))
 	    has_var = TRUE;
-	else if (checkforcmd(&p, "final", 5))
+	ଅନ୍ୟଥା ଯଦି (checkforcmd(&p, "final", 5))
 	{
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		emsg(_(e_final_variable_not_supported_in_interface));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	    has_final = TRUE;
 	}
-	else if (checkforcmd(&p, "const", 5))
+	ଅନ୍ୟଥା ଯଦି (checkforcmd(&p, "const", 5))
 	{
-	    if (is_interface)
+	    ଯଦି (is_interface)
 	    {
 		emsg(_(e_const_variable_not_supported_in_interface));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	    has_const = TRUE;
 	}
@@ -2493,49 +2493,49 @@ early_ret:
 	//	"static const _varname"
 	//	"static const varname"
 	//	"public static const varname"
-	if (has_var || has_final || has_const)
+	ଯଦି (has_var || has_final || has_const)
 	{
 	    char_u *varname = p;
-	    char_u *varname_end = NULL;
-	    type_T *type = NULL;
-	    char_u *init_expr = NULL;
-	    int	    has_type = FALSE;
+	    char_u *varname_end = ଖାଲି;
+	    type_T *type = ଖାଲି;
+	    char_u *init_ପଦସମଷ୍ଟି = ଖାଲି;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    has_type = FALSE;
 
-	    if (!eval_isnamec1(*p))
+	    ଯଦି (!eval_isnamec1(*p))
 	    {
-		if (has_static)
-		    semsg(_(e_invalid_class_variable_declaration_str), line);
-		else
-		    semsg(_(e_invalid_object_variable_declaration_str), line);
-		break;
+		ଯଦି (has_static)
+		    semsg(_(e_invalid_class_variable_declaration_str), ଧାଡ଼ି);
+		ଅନ୍ୟଥା
+		    semsg(_(e_invalid_object_variable_declaration_str), ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (is_interface && *varname == '_')
+	    ଯଦି (is_interface && *varname == '_')
 	    {
 		// private variables are not supported in an interface
 		semsg(_(e_protected_variable_not_supported_in_interface),
 			varname);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (parse_member(eap, line, varname, has_public,
+	    ଯଦି (parse_member(eap, ଧାଡ଼ି, varname, has_public,
 			  &varname_end, &has_type, &type_list, &type,
-			  !is_interface ? &init_expr: NULL) == FAIL)
-		break;
+			  !is_interface ? &init_ପଦସମଷ୍ଟି: ଖାଲି) == FAIL)
+		ଭାଙ୍ଗ;
 
-	    if (is_reserved_varname(varname, varname_end)
+	    ଯଦି (is_reserved_varname(varname, varname_end)
 		    || is_duplicate_variable(&classmembers, &objmembers,
 							varname, varname_end))
 	    {
-		vim_free(init_expr);
-		break;
+		vim_free(init_ପଦସମଷ୍ଟି);
+		ଭାଙ୍ଗ;
 	    }
-	    if (add_member(has_static ? &classmembers : &objmembers, varname,
+	    ଯଦି (add_member(has_static ? &classmembers : &objmembers, varname,
 				varname_end, has_public, has_final, has_const,
-				has_type, type, init_expr) == FAIL)
+				has_type, type, init_ପଦସମଷ୍ଟି) == FAIL)
 	    {
-		vim_free(init_expr);
-		break;
+		vim_free(init_ପଦସମଷ୍ଟି);
+		ଭାଙ୍ଗ;
 	    }
 	}
 
@@ -2551,96 +2551,96 @@ early_ret:
 	//	  enddef
 	//	  def someMethod<typeA, typeB>()
 	//	  enddef
-	else if (checkforcmd(&p, "def", 3))
+	ଅନ୍ୟଥା ଯଦି (checkforcmd(&p, "def", 3))
 	{
 	    exarg_T	ea;
-	    garray_T	lines_to_free;
-	    int		is_new = STRNCMP(p, "new", 3) == 0
+	    garray_T	ଧାଡ଼ିଗୁଡ଼ିକ_to_free;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_new = STRNCMP(p, "new", 3) == 0
 						|| STRNCMP(p, "_new", 4) == 0;
 
-	    if (has_public)
+	    ଯଦି (has_public)
 	    {
 		// "public" keyword is not supported when defining an object or
 		// class method
 		emsg(_(e_public_keyword_not_supported_for_method));
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (*p == NUL)
+	    ଯଦି (*p == NUL)
 	    {
 		// No method name following def
-		semsg(_(e_not_valid_command_in_class_str), line);
-		break;
+		semsg(_(e_not_valid_command_in_class_str), ଧାଡ଼ି);
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (is_interface && *p == '_')
+	    ଯଦି (is_interface && *p == '_')
 	    {
 		// private methods are not supported in an interface
 		semsg(_(e_protected_method_not_supported_in_interface), p);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (has_static && !is_new && SAFE_islower(*p) &&
+	    ଯଦି (has_static && !is_new && SAFE_islower(*p) &&
 					is_valid_builtin_obj_methodname(p))
 	    {
 		semsg(_(e_builtin_class_method_not_supported), p);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
 	    CLEAR_FIELD(ea);
-	    ea.cmd = line;
+	    ea.cmd = ଧାଡ଼ି;
 	    ea.arg = p;
 	    ea.cmdidx = CMD_def;
 	    ea.ea_getline = eap->ea_getline;
 	    ea.cookie = eap->cookie;
 
-	    ga_init2(&lines_to_free, sizeof(char_u *), 50);
-	    int class_flags;
-	    if (is_interface)
+	    ga_init2(&ଧାଡ଼ିଗୁଡ଼ିକ_to_free, ଆକାର(char_u *), 50);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା class_flags;
+	    ଯଦି (is_interface)
 		class_flags = CF_INTERFACE;
-	    else
+	    ଅନ୍ୟଥା
 		class_flags = abstract_method ? CF_ABSTRACT_METHOD : CF_CLASS;
-	    ufunc_T *uf = define_function(&ea, NULL, &lines_to_free,
+	    ufunc_T *uf = define_function(&ea, ଖାଲି, &ଧାଡ଼ିଗୁଡ଼ିକ_to_free,
 			class_flags, objmembers.ga_data, objmembers.ga_len,
-			NULL);
-	    ga_clear_strings(&lines_to_free);
+			ଖାଲି);
+	    ga_clear_strings(&ଧାଡ଼ିଗୁଡ଼ିକ_to_free);
 
-	    if (uf != NULL)
+	    ଯଦି (uf != ଖାଲି)
 	    {
-		if (is_new && !is_valid_constructor(uf, is_abstract,
+		ଯଦି (is_new && !is_valid_constructor(uf, is_abstract,
 								has_static))
 		{
 		    // private variables are not supported in an interface
 		    semsg(_(e_protected_method_not_supported_in_interface),
 			    uf->uf_name);
 		    func_clear_free(uf, FALSE);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 
 		// check for builtin method
-		if (!is_new && SAFE_islower(*uf->uf_name) &&
+		ଯଦି (!is_new && SAFE_islower(*uf->uf_name) &&
 					!object_check_builtin_method_sig(uf))
 		{
 		    func_clear_free(uf, FALSE);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 
 		// Check the uf_name isn't used already.
-		if (is_duplicate_method(&classfunctions, &objmethods, uf->uf_name))
+		ଯଦି (is_duplicate_method(&classfunctions, &objmethods, uf->uf_name))
 		{
 		    success = FALSE;
 		    func_clear_free(uf, FALSE);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 
 		garray_T *fgap = has_static || is_new
 					       ? &classfunctions : &objmethods;
-		if (ga_grow(fgap, 1) == OK)
+		ଯଦି (ga_grow(fgap, 1) == OK)
 		{
-		    if (is_new)
+		    ଯଦି (is_new)
 			uf->uf_flags |= FC_NEW;
 
-		    if (abstract_method)
+		    ଯଦି (abstract_method)
 			uf->uf_flags |= FC_ABSTRACT;
 
 		    ((ufunc_T **)fgap->ga_data)[fgap->ga_len] = uf;
@@ -2649,26 +2649,26 @@ early_ret:
 	    }
 	}
 
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (is_class)
-		semsg(_(e_not_valid_command_in_class_str), line);
-	    else if (is_enum)
-		semsg(_(e_not_valid_command_in_enum_str), line);
-	    else
-		semsg(_(e_not_valid_command_in_interface_str), line);
-	    break;
+	    ଯଦି (is_class)
+		semsg(_(e_not_valid_command_in_class_str), ଧାଡ଼ି);
+	    ଅନ୍ୟଥା ଯଦି (is_enum)
+		semsg(_(e_not_valid_command_in_enum_str), ଧାଡ଼ି);
+	    ଅନ୍ୟଥା
+		semsg(_(e_not_valid_command_in_interface_str), ଧାଡ଼ି);
+	    ଭାଙ୍ଗ;
 	}
     }
 
-    if (theline == NULL && !success && is_enum)
+    ଯଦି (theline == ଖାଲି && !success && is_enum)
 	emsg(_(e_missing_endenum));
 
     vim_free(theline);
 
-    if (success && is_enum && (num_enum_values == 0 || !added_enum_values))
+    ଯଦି (success && is_enum && (ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ == 0 || !added_enum_ମୂଲ୍ୟଗୁଡ଼ିକ))
 	// Empty enum statement. Add an empty "values" class variable
-	success = enum_add_values_member(cl, &classmembers, num_enum_values,
+	success = enum_add_ମୂଲ୍ୟଗୁଡ଼ିକ_member(cl, &classmembers, ଅଙ୍କ_enum_ମୂଲ୍ୟଗୁଡ଼ିକ,
 								&type_list);
 
     /*
@@ -2676,30 +2676,30 @@ early_ret:
      */
 
     // Check the "extends" class is valid.
-    if (success && extends != NULL)
+    ଯଦି (success && extends != ଖାଲି)
 	success = validate_extends_class(cl, extends, &extends_cl, is_class);
     VIM_CLEAR(extends);
 
     // Check the new object methods to make sure their access (public or
     // private) is the same as that in the extended class lineage.
-    if (success && extends_cl != NULL)
+    ଯଦି (success && extends_cl != ଖାଲି)
 	success = validate_extends_methods(&objmethods, extends_cl);
 
     // Check the new class and object variables are not duplicates of the
     // variables in the extended class lineage.  If an interface is extending
     // another interface, then it can duplicate the member variables.
-    if (success && extends_cl != NULL)
+    ଯଦି (success && extends_cl != ଖାଲି)
     {
-	if (is_class)
+	ଯଦି (is_class)
 	    success = extends_check_dup_members(&objmembers, extends_cl);
-	else
+	ଅନ୍ୟଥା
 	    success = extends_check_intf_var_type(&objmembers, extends_cl);
     }
 
     // When extending an abstract class, make sure all the abstract methods in
     // the parent class are implemented.  If the current class is an abstract
     // class, then there is no need for this check.
-    if (success && !is_abstract && extends_cl != NULL
+    ଯଦି (success && !is_abstract && extends_cl != ଖାଲି
 				&& (extends_cl->class_flags & CLASS_ABSTRACT))
 	success = validate_abstract_class_methods(&classfunctions,
 						&objmethods, extends_cl);
@@ -2708,118 +2708,118 @@ early_ret:
     // Check all "implements" entries are valid.
     garray_T  intf_classes_ga;
 
-    ga_init2(&intf_classes_ga, sizeof(class_T *), 5);
+    ga_init2(&intf_classes_ga, ଆକାର(class_T *), 5);
 
-    if (success && ga_impl.ga_len > 0)
+    ଯଦି (success && ga_impl.ga_len > 0)
 	success = validate_implements_classes(cl, &ga_impl, &intf_classes_ga,
 					&objmethods, &objmembers, extends_cl);
 
     // inherit the super class interfaces
-    if (success && extends_cl != NULL)
+    ଯଦି (success && extends_cl != ଖାଲି)
 	success = add_super_class_interfaces(extends_cl, &ga_impl,
 							&intf_classes_ga);
 
     // When validating failed "intf_classes" may have fewer items than
     // "ga_impl".
     intf_classes = intf_classes_ga.ga_data;
-    intf_count = intf_classes_ga.ga_len;
+    intf_ଗଣନା = intf_classes_ga.ga_len;
     intf_classes_ga.ga_len = 0;
 
     // Check no function argument name is used as a class member.
-    if (success)
+    ଯଦି (success)
 	success = check_func_arg_names(&classfunctions, &objmethods,
 							&classmembers);
 
-    if (success)
+    ଯଦି (success)
     {
 	// "endclass" or "endinterface" or "endenum" encountered without any
 	// failures
 
-	if (extends_cl != NULL)
+	ଯଦି (extends_cl != ଖାଲି)
 	{
 	    cl->class_extends = extends_cl;
 	    extends_cl->class_flags |= CLASS_EXTENDED;
 	}
 
 	// Add class and object variables to "cl".
-	if (add_members_to_class(&classmembers,
-				 NULL,
+	ଯଦି (add_members_to_class(&classmembers,
+				 ଖାଲି,
 				 0,
 				 &cl->class_class_members,
-				 &cl->class_class_member_count) == FAIL
+				 &cl->class_class_member_ଗଣନା) == FAIL
 		|| add_members_to_class(&objmembers,
-				 extends_cl == NULL ? NULL
+				 extends_cl == ଖାଲି ? ଖାଲି
 					       : extends_cl->class_obj_members,
-				 extends_cl == NULL ? 0
-					  : extends_cl->class_obj_member_count,
+				 extends_cl == ଖାଲି ? 0
+					  : extends_cl->class_obj_member_ଗଣନା,
 				 &cl->class_obj_members,
-				 &cl->class_obj_member_count) == FAIL)
-	    goto cleanup;
+				 &cl->class_obj_member_ଗଣନା) == FAIL)
+	    ଯାଅ cleanup;
 
-	if (ga_impl.ga_len > 0)
+	ଯଦି (ga_impl.ga_len > 0)
 	{
 	    // Move the "implements" names into the class.
-	    cl->class_interface_count = ga_impl.ga_len;
+	    cl->class_interface_ଗଣନା = ga_impl.ga_len;
 	    cl->class_interfaces = ALLOC_MULT(char_u *, ga_impl.ga_len);
-	    if (cl->class_interfaces == NULL)
-		goto cleanup;
-	    for (int i = 0; i < ga_impl.ga_len; ++i)
+	    ଯଦି (cl->class_interfaces == ଖାଲି)
+		ଯାଅ cleanup;
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < ga_impl.ga_len; ++i)
 		cl->class_interfaces[i] = ((char_u **)ga_impl.ga_data)[i];
 	    VIM_CLEAR(ga_impl.ga_data);
 	    ga_impl.ga_len = 0;
 
 	    cl->class_interfaces_cl = intf_classes;
-	    intf_classes = NULL;
+	    intf_classes = ଖାଲି;
 	}
 
-	if (cl->class_interface_count > 0 || extends_cl != NULL)
+	ଯଦି (cl->class_interface_ଗଣନା > 0 || extends_cl != ଖାଲି)
 	{
 	    // Add a method and member lookup table to each of the interface
 	    // classes.
-	    if (add_lookup_tables(cl, extends_cl, &objmethods) == FAIL)
-		goto cleanup;
+	    ଯଦି (add_lookup_tables(cl, extends_cl, &objmethods) == FAIL)
+		ଯାଅ cleanup;
 	}
 
-	int	have_new = FALSE;
-	ufunc_T	*class_func = NULL;
-	for (int i = 0; i < classfunctions.ga_len; ++i)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	have_new = FALSE;
+	ufunc_T	*class_func = ଖାଲି;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < classfunctions.ga_len; ++i)
 	{
 	    class_func = ((ufunc_T **)classfunctions.ga_data)[i];
-	    if (STRCMP(class_func->uf_name, "new") == 0
+	    ଯଦି (STRCMP(class_func->uf_name, "new") == 0
 				|| STRCMP(class_func->uf_name, "_new") == 0)
 	    {
 		have_new = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
-	if (have_new)
+	ଯଦି (have_new)
 	    // The return type of new() is an object of class "cl"
 	    class_func->uf_ret_type->tt_class = cl;
-	else if ((is_class || is_enum) && !is_abstract && !have_new)
+	ଅନ୍ୟଥା ଯଦି ((is_class || is_enum) && !is_abstract && !have_new)
 	    // No new() method was defined, add the default constructor.
 	    add_default_constructor(cl, &classfunctions, &type_list);
 
 	// Move all the functions into the created class.
-	if (add_classfuncs_objmethods(cl, extends_cl, &classfunctions,
+	ଯଦି (add_classfuncs_objmethods(cl, extends_cl, &classfunctions,
 							&objmethods) == FAIL)
-	    goto cleanup;
+	    ଯାଅ cleanup;
 
 	update_builtin_method_index(cl);
 
 	class_created(cl);
 
 	// Allocate a typval for each class member and initialize it.
-	if ((is_class || is_enum) && cl->class_class_member_count > 0)
-	    if (add_class_members(cl, eap, &type_list) == FAIL)
+	ଯଦି ((is_class || is_enum) && cl->class_class_member_ଗଣନା > 0)
+	    ଯଦି (add_class_members(cl, eap, &type_list) == FAIL)
 	    {
 		cl->class_type_list = type_list;
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 
 	cl->class_type_list = type_list;
 
-	if (is_enum)
+	ଯଦି (is_enum)
 	{
 	    // clear the constructor method names, so that an enum class cannot
 	    // be instantiated
@@ -2829,28 +2829,28 @@ early_ret:
 	// TODO:
 	// - Fill hashtab with object members and methods ?
 
-	return;
+	ଫେରନ୍ତୁ;
     }
 
 cleanup:
     vim_free(extends);
     class_unref(extends_cl);
 
-    if (intf_classes != NULL)
+    ଯଦି (intf_classes != ଖାଲି)
     {
-	for (int i = 0; i < intf_count; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < intf_ଗଣନା; ++i)
 	    class_unref(intf_classes[i]);
 	vim_free(intf_classes);
     }
     ga_clear_strings(&ga_impl);
 
-    for (int round = 1; round <= 2; ++round)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା round = 1; round <= 2; ++round)
     {
 	garray_T *gap = round == 1 ? &classmembers : &objmembers;
-	if (gap->ga_len == 0 || gap->ga_data == NULL)
-	    continue;
+	ଯଦି (gap->ga_len == 0 || gap->ga_data == ଖାଲି)
+	    ଜାରି;
 
-	for (int i = 0; i < gap->ga_len; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < gap->ga_len; ++i)
 	{
 	    ocmember_T *m = ((ocmember_T *)gap->ga_data) + i;
 	    VIM_CLEAR_STRING(m->ocm_name);
@@ -2859,14 +2859,14 @@ cleanup:
 	ga_clear(gap);
     }
 
-    for (int i = 0; i < objmethods.ga_len; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < objmethods.ga_len; ++i)
     {
 	ufunc_T *uf = ((ufunc_T **)objmethods.ga_data)[i];
 	func_clear_free(uf, FALSE);
     }
     ga_clear(&objmethods);
 
-    for (int i = 0; i < classfunctions.ga_len; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < classfunctions.ga_len; ++i)
     {
 	ufunc_T *uf = ((ufunc_T **)classfunctions.ga_data)[i];
 	func_clear_free(uf, FALSE);
@@ -2887,10 +2887,10 @@ cleanup:
     type_T *
 oc_member_type(
     class_T	*cl,
-    int		is_object,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_object,
     char_u	*name,
     char_u	*name_end,
-    int		*member_idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*member_idx)
 {
     size_t	len = name_end - name;
     ocmember_T	*m;
@@ -2899,14 +2899,14 @@ oc_member_type(
 
     m = member_lookup(cl, is_object ? VAR_OBJECT : VAR_CLASS, name, len,
 								member_idx);
-    if (m == NULL)
+    ଯଦି (m == ଖାଲି)
     {
-	member_not_found_msg(cl, is_object ? VAR_OBJECT : VAR_CLASS, name,
+	member_not_found_ସନ୍ଦେଶ(cl, is_object ? VAR_OBJECT : VAR_CLASS, name,
 									len);
-	return &t_any;
+	ଫେରନ୍ତୁ &t_any;
     }
 
-    return m->ocm_type;
+    ଫେରନ୍ତୁ m->ocm_type;
 }
 
 /*
@@ -2915,34 +2915,34 @@ oc_member_type(
     type_T *
 oc_member_type_by_idx(
     class_T	*cl,
-    int		is_object,
-    int		member_idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_object,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		member_idx)
 {
     ocmember_T	*m;
-    int		member_count;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		member_ଗଣନା;
 
-    if (is_object)
+    ଯଦି (is_object)
     {
 	m = cl->class_obj_members;
-	member_count = cl->class_obj_member_count;
+	member_ଗଣନା = cl->class_obj_member_ଗଣନା;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	m = cl->class_class_members;
-	member_count = cl->class_class_member_count;
+	member_ଗଣନା = cl->class_class_member_ଗଣନା;
     }
 
-    if (member_idx >= member_count)
-	return NULL;
+    ଯଦି (member_idx >= member_ଗଣନା)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    return m[member_idx].ocm_type;
+    ଫେରନ୍ତୁ m[member_idx].ocm_type;
 }
 
 /*
  * Type aliases (:type)
  */
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 typealias_free(typealias_T *ta)
 {
     // ta->ta_type is freed in clear_type_list()
@@ -2950,98 +2950,98 @@ typealias_free(typealias_T *ta)
     vim_free(ta);
 }
 
-    void
+    ଶୂନ୍ୟ
 typealias_unref(typealias_T *ta)
 {
-    if (ta != NULL && --ta->ta_refcount <= 0)
+    ଯଦି (ta != ଖାଲି && --ta->ta_refcount <= 0)
 	typealias_free(ta);
 }
 
 /*
  * Handle ":type".  Create an alias for a type specification.
  */
-    void
+    ଶୂନ୍ୟ
 ex_type(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
 
-    if (!current_script_is_vim9()
+    ଯଦି (!current_script_is_vim9()
 		|| (cmdmod.cmod_flags & CMOD_LEGACY)
 		|| !getline_equal(eap->ea_getline, eap->cookie, getsourceline))
     {
 	emsg(_(e_type_can_only_be_defined_in_vim9_script));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (*arg == NUL)
+    ଯଦି (*arg == NUL)
     {
 	emsg(_(e_missing_typealias_name));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (!ASCII_ISUPPER(*arg))
+    ଯଦି (!ASCII_ISUPPER(*arg))
     {
 	semsg(_(e_type_name_must_start_with_uppercase_letter_str), arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    char_u *name_end = find_name_end(arg, NULL, NULL, FNE_CHECK_START);
-    if (!IS_WHITE_OR_NUL(*name_end))
+    char_u *name_end = find_name_end(arg, ଖାଲି, ଖାଲି, FNE_CHECK_START);
+    ଯଦି (!IS_WHITE_OR_NUL(*name_end))
     {
 	semsg(_(e_white_space_required_after_name_str), arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
     char_u *name_start = arg;
 
     arg = skipwhite(name_end);
-    if (*arg != '=')
+    ଯଦି (*arg != '=')
     {
 	semsg(_(e_missing_equal_str), arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
-    if (!IS_WHITE_OR_NUL(*(arg + 1)))
+    ଯଦି (!IS_WHITE_OR_NUL(*(arg + 1)))
     {
 	semsg(_(e_white_space_required_after_str_str), "=", arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
     arg++;
     arg = skipwhite(arg);
 
-    if (*arg == NUL)
+    ଯଦି (*arg == NUL)
     {
 	emsg(_(e_missing_typealias_type));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     scriptitem_T    *si = SCRIPT_ITEM(current_sctx.sc_sid);
-    type_T *type = parse_type(&arg, &si->sn_type_list, NULL, NULL, TRUE);
-    if (type == NULL)
-	return;
+    type_T *type = parse_type(&arg, &si->sn_type_list, ଖାଲି, ଖାଲି, TRUE);
+    ଯଦି (type == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (*arg != NUL)
+    ଯଦି (*arg != NUL)
     {
 	// some text after the type
 	semsg(_(e_trailing_characters_str), arg);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    int cc = *name_end;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cc = *name_end;
     *name_end = NUL;
 
     typval_T tv;
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(name_start, &tv) == OK)
+    ଯଦି (eval_variable_import(name_start, &tv) == OK)
     {
-	if (tv.v_type == VAR_TYPEALIAS)
+	ଯଦି (tv.v_type == VAR_TYPEALIAS)
 	    semsg(_(e_typealias_already_exists_for_str), name_start);
-	else
+	ଅନ୍ୟଥା
 	    semsg(_(e_redefining_script_item_str), name_start);
 	clear_tv(&tv);
-	goto done;
+	ଯାଅ done;
     }
 
     // Create a script-local variable for the type alias.
-    if (type->tt_type != VAR_OBJECT)
+    ଯଦି (type->tt_type != VAR_OBJECT)
     {
 	tv.v_type = VAR_TYPEALIAS;
 	tv.v_lock = 0;
@@ -3051,7 +3051,7 @@ ex_type(exarg_T *eap)
 	tv.vval.v_typealias->ta_type = type;
 	tv.vval.v_typealias->ta_depth = parse_type_depth();
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// When creating a type alias for a class, use the class type itself to
 	// create the type alias variable.  This is needed to use the type
@@ -3061,7 +3061,7 @@ ex_type(exarg_T *eap)
 	tv.vval.v_class = type->tt_class;
 	++tv.vval.v_class->class_refcount;
     }
-    set_var_const(name_start, current_sctx.sc_sid, NULL, &tv, FALSE,
+    set_var_const(name_start, current_sctx.sc_sid, ଖାଲି, &tv, FALSE,
 						ASSIGN_CONST | ASSIGN_FINAL, 0);
 
 done:
@@ -3074,32 +3074,32 @@ done:
  * "rettv".  If "is_object" is TRUE, then the object member variable table is
  * searched.  Otherwise the class member variable table is searched.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 get_member_tv(
     class_T	*cl,
-    int		is_object,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_object,
     char_u	*name,
     size_t	namelen,
     class_T	*current_class,
     typval_T	*rettv)
 {
     ocmember_T *m;
-    int		m_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		m_idx;
 
     m = member_lookup(cl, is_object ? VAR_OBJECT : VAR_CLASS, name, namelen,
 								&m_idx);
-    if (m == NULL)
-	return FAIL;
+    ଯଦି (m == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
-    if (*name == '_' && (current_class == NULL ||
+    ଯଦି (*name == '_' && (current_class == ଖାଲି ||
 				!class_instance_of(current_class, cl)))
     {
 	emsg_var_cl_define(e_cannot_access_protected_variable_str,
 							m->ocm_name.string, 0, cl);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (is_object)
+    ଯଦି (is_object)
     {
 	// The object only contains a pointer to the class, the member values
 	// array follows right after that.
@@ -3109,21 +3109,21 @@ get_member_tv(
 	set_tv_type(rettv, m->ocm_type);
 	object_unref(obj);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	copy_tv(&cl->class_members_tv[m_idx], rettv);
 	set_tv_type(rettv, m->ocm_type);
 	class_unref(cl);
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Call an object or class method "name" in class "cl".  The method return
  * value is returned in "rettv".
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 call_oc_method(
     class_T	*cl,
     char_u	*name,
@@ -3136,76 +3136,76 @@ call_oc_method(
 {
     ufunc_T	*fp;
     typval_T	argvars[MAX_FUNC_ARGS + 1];
-    int		argcount = 0;
-    ocmember_T	*ocm = NULL;
-    int		m_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		argcount = 0;
+    ocmember_T	*ocm = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		m_idx;
 
-    fp = method_lookup(cl, rettv->v_type, name, len, NULL);
-    if (fp == NULL)
+    fp = method_lookup(cl, rettv->v_type, name, len, ଖାଲି);
+    ଯଦି (fp == ଖାଲି)
     {
 	// could be an object or class funcref variable
 	ocm = member_lookup(cl, rettv->v_type, name, len, &m_idx);
-	if (ocm == NULL || ocm->ocm_type->tt_type != VAR_FUNC)
+	ଯଦି (ocm == ଖାଲି || ocm->ocm_type->tt_type != VAR_FUNC)
 	{
-	    method_not_found_msg(cl, rettv->v_type, name, len);
-	    return FAIL;
+	    method_not_found_ସନ୍ଦେଶ(cl, rettv->v_type, name, len);
+	    ଫେରନ୍ତୁ FAIL;
 	}
 
-	if (*name == '_')
+	ଯଦି (*name == '_')
 	{
 	    // Protected object or class funcref variable
 	    semsg(_(e_cannot_access_protected_variable_str), ocm->ocm_name.string,
 		    cl->class_name.string);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 
-	if (rettv->v_type == VAR_OBJECT)
+	ଯଦି (rettv->v_type == VAR_OBJECT)
 	{
 	    // funcref object variable
 	    object_T	*obj = rettv->vval.v_object;
 	    typval_T	*tv = (typval_T *)(obj + 1) + m_idx;
 	    copy_tv(tv, rettv);
 	}
-	else
+	ଅନ୍ୟଥା
 	    // funcref class variable
 	    copy_tv(&cl->class_members_tv[m_idx], rettv);
 	*arg = name_end;
-	return OK;
+	ଫେରନ୍ତୁ OK;
     }
 
-    if (ocm == NULL && *fp->uf_name == '_')
+    ଯଦି (ocm == ଖାଲି && *fp->uf_name == '_')
     {
 	// Cannot access a protected method outside of a class
 	semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     // process generic function call
-    if (fp != NULL)
+    ଯଦି (fp != ଖାଲି)
     {
 	fp = generic_func_get(fp, gfatab);
-	if (fp == NULL)
-	    return FAIL;
+	ଯଦି (fp == ଖାଲି)
+	    ଫେରନ୍ତୁ FAIL;
     }
 
     char_u *argp = name_end;
-    int ret = get_func_arguments(&argp, evalarg, 0, argvars, &argcount, FALSE);
-    if (ret == FAIL)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ret = get_func_arguments(&argp, evalarg, 0, argvars, &argcount, FALSE);
+    ଯଦି (ret == FAIL)
     {
-	while (--argcount >= 0)
+	ଯେତେବେଳେ (--argcount >= 0)
 	    clear_tv(&argvars[argcount]);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     funcexe_T funcexe;
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
-    if (rettv->v_type == VAR_OBJECT)
+    ଯଦି (rettv->v_type == VAR_OBJECT)
     {
 	funcexe.fe_object = rettv->vval.v_object;
 	++funcexe.fe_object->obj_refcount;
     }
-    if (evalarg != NULL)
+    ଯଦି (evalarg != ଖାଲି)
 	funcexe.fe_cctx = evalarg->eval_cctx;
 
     // Clear the class or object after calling the function, in
@@ -3214,37 +3214,37 @@ call_oc_method(
     rettv->v_type = VAR_UNKNOWN;
 
     // Call the user function.  Result goes into rettv;
-    int error = call_user_func_check(fp, argcount, argvars, rettv, &funcexe,
-								NULL);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା error = call_user_func_check(fp, argcount, argvars, rettv, &funcexe,
+								ଖାଲି);
 
     // Clear the previous rettv and the arguments.
     clear_tv(&tv_tofree);
-    for (int idx = 0; idx < argcount; ++idx)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = 0; idx < argcount; ++idx)
 	clear_tv(&argvars[idx]);
 
-    if (error != FCERR_NONE)
+    ଯଦି (error != FCERR_NONE)
     {
 	user_func_error(error, printable_func_name(fp), funcexe.fe_found_var);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
     *arg = argp;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Create a partial typval for "obj.obj_method" and store it in "rettv".
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
 {
     partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
-    if (pt == NULL)
-	return FAIL;
+    ଯଦି (pt == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     pt->pt_refcount = 1;
-    if (obj != NULL)
+    ଯଦି (obj != ଖାଲି)
     {
 	pt->pt_obj = obj;
 	++pt->pt_obj->obj_refcount;
@@ -3256,7 +3256,7 @@ obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
     rettv->v_type = VAR_PARTIAL;
     rettv->vval.v_partial = pt;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -3272,112 +3272,112 @@ obj_method_to_partial_tv(object_T *obj, ufunc_T *obj_method, typval_T *rettv)
  *
  * Returns FAIL or OK.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 class_object_index(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose UNUSED)	// give error messages
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		verbose UNUSED)	// give error messages
 {
-    int	ret = FAIL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	ret = FAIL;
 
-    if (VIM_ISWHITE((*arg)[1]))
+    ଯଦି (VIM_ISWHITE((*arg)[1]))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str), ".", *arg);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     ++*arg;
     char_u *name = *arg;
-    char_u *name_end = find_name_end(name, NULL, NULL, FNE_CHECK_START);
-    if (name_end == name)
-	return FAIL;
+    char_u *name_end = find_name_end(name, ଖାଲି, ଖାଲି, FNE_CHECK_START);
+    ଯଦି (name_end == name)
+	ଫେରନ୍ତୁ FAIL;
     size_t len = name_end - name;
 
-    int did_emsg_save = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା did_emsg_save = did_emsg;
     class_T *cl;
-    if (rettv->v_type == VAR_CLASS)
+    ଯଦି (rettv->v_type == VAR_CLASS)
 	cl = rettv->vval.v_class;
-    else // VAR_OBJECT
+    ଅନ୍ୟଥା // VAR_OBJECT
     {
-	if (rettv->vval.v_object == NULL)
+	ଯଦି (rettv->vval.v_object == ଖାଲି)
 	{
 	    emsg(_(e_using_null_object));
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 	cl = rettv->vval.v_object->obj_class;
     }
 
-    if (cl == NULL)
+    ଯଦି (cl == ଖାଲି)
     {
 	emsg(_(e_incomplete_type));
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     gfargs_tab_T    gfatab;
 
     generic_func_args_table_init(&gfatab);
 
-    if (*name_end == '<')
+    ଯଦି (*name_end == '<')
     {
-	cctx_T	    *cctx = NULL;
+	cctx_T	    *cctx = ଖାଲି;
 
-	if (evalarg != NULL)
+	ଯଦି (evalarg != ଖାଲି)
 	    cctx = evalarg->eval_cctx;
 
 	// calling a generic method
 	name_end = parse_generic_func_type_args(name, len, name + len,
 						&gfatab, cctx);
-	if (name_end == NULL)
-	    goto done;
+	ଯଦି (name_end == ଖାଲି)
+	    ଯାଅ done;
     }
 
-    if (*name_end == '(')
+    ଯଦି (*name_end == '(')
 	// Invoke the class or object method
 	ret = call_oc_method(cl, name, len, name_end, evalarg, arg,
 							&gfatab, rettv);
-    else if (rettv->v_type == VAR_OBJECT || rettv->v_type == VAR_CLASS)
+    ଅନ୍ୟଥା ଯଦି (rettv->v_type == VAR_OBJECT || rettv->v_type == VAR_CLASS)
     {
 	// Search in the object member variable table and the class member
 	// variable table.
-	int is_object = rettv->v_type == VAR_OBJECT;
-	if (get_member_tv(cl, is_object, name, len, NULL, rettv) == OK)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_object = rettv->v_type == VAR_OBJECT;
+	ଯଦି (get_member_tv(cl, is_object, name, len, ଖାଲି, rettv) == OK)
 	{
 	    *arg = name_end;
 	    ret = OK;
-	    goto done;
+	    ଯାଅ done;
 	}
 
 	// could be a class method or an object method
-	int	fidx;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	fidx;
 	ufunc_T	*fp = method_lookup(cl, rettv->v_type, name, len, &fidx);
-	if (fp != NULL)
+	ଯଦି (fp != ଖାଲି)
 	{
 	    // Protected methods are not accessible outside the class
-	    if (fp->uf_defclass != evalarg->eval_class
+	    ଯଦି (fp->uf_defclass != evalarg->eval_class
 		    && *name == '_')
 	    {
 		semsg(_(e_cannot_access_protected_method_str), fp->uf_name);
-		goto done;
+		ଯାଅ done;
 	    }
 
-	    if (obj_method_to_partial_tv(is_object ? rettv->vval.v_object :
-						NULL, fp, rettv) == FAIL)
-		goto done;
+	    ଯଦି (obj_method_to_partial_tv(is_object ? rettv->vval.v_object :
+						ଖାଲି, fp, rettv) == FAIL)
+		ଯାଅ done;
 
 	    *arg = name_end;
 	    ret = OK;
-	    goto done;
+	    ଯାଅ done;
 	}
 
-	if (did_emsg == did_emsg_save)
-	    member_not_found_msg(cl, rettv->v_type, name, len);
+	ଯଦି (did_emsg == did_emsg_save)
+	    member_not_found_ସନ୍ଦେଶ(cl, rettv->v_type, name, len);
     }
 
 done:
     generic_func_args_table_clear(&gfatab);
 
-    return ret;
+    ଫେରନ୍ତୁ ret;
 }
 
 /*
@@ -3388,42 +3388,42 @@ done:
 find_class_func(char_u **arg)
 {
     char_u *name = *arg;
-    char_u *name_end = find_name_end(name, NULL, NULL, FNE_CHECK_START);
-    if (name_end == name || *name_end != '.')
-	return NULL;
+    char_u *name_end = find_name_end(name, ଖାଲି, ଖାଲି, FNE_CHECK_START);
+    ଯଦି (name_end == name || *name_end != '.')
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    ufunc_T	*fp = NULL;
+    ufunc_T	*fp = ଖାଲି;
     size_t	len = name_end - name;
     typval_T	tv;
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable(name, (int)len,
-				    0, &tv, NULL, EVAL_VAR_NOAUTOLOAD) == FAIL)
-	return NULL;
-    if (tv.v_type != VAR_CLASS && tv.v_type != VAR_OBJECT)
-	goto fail_after_eval;
+    ଯଦି (eval_variable(name, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)len,
+				    0, &tv, ଖାଲି, EVAL_VAR_NOAUTOLOAD) == FAIL)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଯଦି (tv.v_type != VAR_CLASS && tv.v_type != VAR_OBJECT)
+	ଯାଅ fail_after_eval;
 
     class_T *cl = tv.v_type == VAR_CLASS ? tv.vval.v_class
 						 : tv.vval.v_object->obj_class;
-    if (cl == NULL)
-	goto fail_after_eval;
+    ଯଦି (cl == ଖାଲି)
+	ଯାଅ fail_after_eval;
     char_u *fname = name_end + 1;
-    char_u *fname_end = find_name_end(fname, NULL, NULL, FNE_CHECK_START);
-    if (fname_end == fname)
-	goto fail_after_eval;
+    char_u *fname_end = find_name_end(fname, ଖାଲି, ଖାଲି, FNE_CHECK_START);
+    ଯଦି (fname_end == fname)
+	ଯାଅ fail_after_eval;
     len = fname_end - fname;
 
-    fp = method_lookup(cl, tv.v_type, fname, len, NULL);
+    fp = method_lookup(cl, tv.v_type, fname, len, ଖାଲି);
 
-    if (fp != NULL)
+    ଯଦି (fp != ଖାଲି)
     {
 	fp = eval_generic_func(fp, fname, &fname_end);
-	if (fp != NULL)
+	ଯଦି (fp != ଖାଲି)
 	    *arg = fname_end;
     }
 
 fail_after_eval:
     clear_tv(&tv);
-    return fp;
+    ଫେରନ୍ତୁ fp;
 }
 
 /*
@@ -3431,12 +3431,12 @@ fail_after_eval:
  * Returns -1, if the variable is not found.
  * If "namelen" is zero, then it is assumed that "name" is NUL terminated.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 class_member_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
     class_member_lookup(cl, name, namelen, &idx);
-    return idx;
+    ଫେରନ୍ତୁ idx;
 }
 
 /*
@@ -3445,33 +3445,33 @@ class_member_idx(class_T *cl, char_u *name, size_t namelen)
  * The member variable index is set in "idx".
  */
     ocmember_T *
-class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+class_member_lookup(class_T *cl, char_u *name, size_t namelen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idx)
 {
-    ocmember_T	*ret_m = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    ocmember_T	*ret_m = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ret_idx = -1;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_member_ଗଣନା; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
-	if (namelen)
+	ଯଦି (namelen)
 	{
-	    if (namelen == m->ocm_name.length
+	    ଯଦି (namelen == m->ocm_name.length
 		&& STRNCMP(name, m->ocm_name.string, namelen) == 0)
 	    {
 		ret_m = m;
 		ret_idx = i;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	else if (STRCMP(name, m->ocm_name.string) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRCMP(name, m->ocm_name.string) == 0)
 	{
 	    ret_m = m;
 	    ret_idx = i;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
-    if (idx != NULL)
+    ଯଦି (idx != ଖାଲି)
 	*idx = ret_idx;
-    return ret_m;
+    ଫେରନ୍ତୁ ret_m;
 }
 
 /*
@@ -3479,37 +3479,37 @@ class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
  * Returns NULL if the method is not found.
  * The method index is set in "idx".
  */
-    static ufunc_T *
-class_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+    ସ୍ଥିର ufunc_T *
+class_method_lookup(class_T *cl, char_u *name, size_t namelen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idx)
 {
-    ufunc_T	*ret_fp = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    ufunc_T	*ret_fp = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ret_idx = -1;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_function_ଗଣନା; ++i)
     {
 	ufunc_T *fp = cl->class_class_functions[i];
 	char_u *ufname = (char_u *)fp->uf_name;
-	if (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
+	ଯଦି (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
 	{
 	    ret_fp = fp;
 	    ret_idx = i;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
-    if (idx != NULL)
+    ଯଦି (idx != ଖାଲି)
 	*idx = ret_idx;
-    return ret_fp;
+    ଫେରନ୍ତୁ ret_fp;
 }
 
 /*
  * Returns the index of class method "name" in the class "cl".
  * Returns -1, if the method is not found.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 class_method_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
     class_method_lookup(cl, name, namelen, &idx);
-    return idx;
+    ଫେରନ୍ତୁ idx;
 }
 
 /*
@@ -3517,12 +3517,12 @@ class_method_idx(class_T *cl, char_u *name, size_t namelen)
  * Returns -1, if the variable is not found.
  * If "namelen" is zero, then it is assumed that "name" is NUL terminated.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_member_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
     object_member_lookup(cl, name, namelen, &idx);
-    return idx;
+    ଫେରନ୍ତୁ idx;
 }
 
 /*
@@ -3531,33 +3531,33 @@ object_member_idx(class_T *cl, char_u *name, size_t namelen)
  * The object member variable index is set in "idx".
  */
     ocmember_T *
-object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+object_member_lookup(class_T *cl, char_u *name, size_t namelen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idx)
 {
-    ocmember_T	*ret_m = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    ocmember_T	*ret_m = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ret_idx = -1;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_member_ଗଣନା; ++i)
     {
 	ocmember_T  *m = &cl->class_obj_members[i];
-	if (namelen)
+	ଯଦି (namelen)
 	{
-	    if (namelen == m->ocm_name.length
+	    ଯଦି (namelen == m->ocm_name.length
 		&& STRNCMP(name, m->ocm_name.string, namelen) == 0)
 	    {
 		ret_m = m;
 		ret_idx = i;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	else if (STRCMP(name, m->ocm_name.string) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRCMP(name, m->ocm_name.string) == 0)
 	{
 	    ret_m = m;
 	    ret_idx = i;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
-    if (idx != NULL)
+    ଯଦି (idx != ଖାଲି)
 	*idx = ret_idx;
-    return ret_m;
+    ଫେରନ୍ତୁ ret_m;
 }
 
 /*
@@ -3565,39 +3565,39 @@ object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
  * Returns NULL if the method is not found.
  * The object method index is set in "idx".
  */
-    static ufunc_T *
-object_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
+    ସ୍ଥିର ufunc_T *
+object_method_lookup(class_T *cl, char_u *name, size_t namelen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idx)
 {
-    ufunc_T	*ret_fp = NULL;
-    int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    ufunc_T	*ret_fp = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ret_idx = -1;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_method_ଗଣନା; ++i)
     {
 	ufunc_T *fp = cl->class_obj_methods[i];
 	// Use a separate pointer to avoid that ASAN complains about
 	// uf_name[] only being 4 characters.
 	char_u *ufname = (char_u *)fp->uf_name;
-	if (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
+	ଯଦି (STRNCMP(name, ufname, namelen) == 0 && ufname[namelen] == NUL)
 	{
 	    ret_fp = fp;
 	    ret_idx = i;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
-    if (idx != NULL)
+    ଯଦି (idx != ଖାଲି)
 	*idx = ret_idx;
-    return ret_fp;
+    ଫେରନ୍ତୁ ret_fp;
 }
 
 /*
  * Returns the index of object method "name" in the class "cl".
  * Returns -1, if the method is not found.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_method_idx(class_T *cl, char_u *name, size_t namelen)
 {
-    int idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
     object_method_lookup(cl, name, namelen, &idx);
-    return idx;
+    ଫେରନ୍ତୁ idx;
 }
 
 /*
@@ -3614,12 +3614,12 @@ member_lookup(
     vartype_T	v_type,
     char_u	*name,
     size_t	namelen,
-    int		*idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*idx)
 {
-    if (v_type == VAR_CLASS)
-	return class_member_lookup(cl, name, namelen, idx);
+    ଯଦି (v_type == VAR_CLASS)
+	ଫେରନ୍ତୁ class_member_lookup(cl, name, namelen, idx);
 
-    return object_member_lookup(cl, name, namelen, idx);
+    ଫେରନ୍ତୁ object_member_lookup(cl, name, namelen, idx);
 }
 
 /*
@@ -3630,12 +3630,12 @@ member_lookup(
  * Fill in "p_m", if specified, for ocmember_T in found class.
  */
 // NOTE: if useful for something could also indirectly return vartype and idx.
-    static class_T *
+    ସ୍ଥିର class_T *
 class_defining_member(class_T *cl, char_u *name, size_t len, ocmember_T **p_m)
 {
-    class_T	*cl_found = NULL;
+    class_T	*cl_found = ଖାଲି;
     vartype_T	vartype = VAR_UNKNOWN;
-    ocmember_T	*m_found = NULL;
+    ocmember_T	*m_found = ଖାଲି;
 
     len = len != 0 ? len : STRLEN(name);
 
@@ -3643,34 +3643,34 @@ class_defining_member(class_T *cl, char_u *name, size_t len, ocmember_T **p_m)
     // defined in any super class; the last class where it's found is the
     // class where it is defined. Once the vartype is found, the other
     // type is no longer checked.
-    for (class_T *super = cl; super != NULL; super = super->class_extends)
+    ପାଇଁ (class_T *super = cl; super != ଖାଲି; super = super->class_extends)
     {
-	class_T		*cl_tmp = NULL;
-	ocmember_T	*m = NULL;
-	if (vartype == VAR_UNKNOWN || vartype == VAR_OBJECT)
+	class_T		*cl_tmp = ଖାଲି;
+	ocmember_T	*m = ଖାଲି;
+	ଯଦି (vartype == VAR_UNKNOWN || vartype == VAR_OBJECT)
 	{
-	    if ((m = object_member_lookup(super, name, len, NULL)) != NULL)
+	    ଯଦି ((m = object_member_lookup(super, name, len, ଖାଲି)) != ଖାଲି)
 	    {
 		cl_tmp = super;
 		vartype = VAR_OBJECT;
 	    }
 	}
-	if (vartype == VAR_UNKNOWN || vartype == VAR_CLASS)
+	ଯଦି (vartype == VAR_UNKNOWN || vartype == VAR_CLASS)
 	{
-	    if (( m = class_member_lookup(super, name, len, NULL)) != NULL)
+	    ଯଦି (( m = class_member_lookup(super, name, len, ଖାଲି)) != ଖାଲି)
 	    {
 		cl_tmp = super;
 		vartype = VAR_CLASS;
 	    }
 	}
-	if (cl_tmp == NULL)
-	    break;  // member is not in this or any super class.
+	ଯଦି (cl_tmp == ଖାଲି)
+	    ଭାଙ୍ଗ;  // member is not in this or any super class.
 	cl_found = cl_tmp;
 	m_found = m;
     }
-    if (p_m != NULL)
+    ଯଦି (p_m != ଖାଲି)
 	*p_m = m_found;
-    return cl_found;
+    ଫେରନ୍ତୁ cl_found;
 }
 
 /*
@@ -3686,55 +3686,55 @@ method_lookup(
     vartype_T	v_type,
     char_u	*name,
     size_t	namelen,
-    int		*idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*idx)
 {
-    if (v_type == VAR_CLASS)
-	return class_method_lookup(cl, name, namelen, idx);
-    else
-	return object_method_lookup(cl, name, namelen, idx);
+    ଯଦି (v_type == VAR_CLASS)
+	ଫେରନ୍ତୁ class_method_lookup(cl, name, namelen, idx);
+    ଅନ୍ୟଥା
+	ଫେରନ୍ତୁ object_method_lookup(cl, name, namelen, idx);
 }
 
 /*
  * Return TRUE if current context "cctx_arg" is inside class "cl".
  * Return FALSE if not.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 inside_class(cctx_T *cctx_arg, class_T *cl)
 {
-    for (cctx_T *cctx = cctx_arg; cctx != NULL; cctx = cctx->ctx_outer)
-	if (cctx->ctx_ufunc != NULL
+    ପାଇଁ (cctx_T *cctx = cctx_arg; cctx != ଖାଲି; cctx = cctx->ctx_outer)
+	ଯଦି (cctx->ctx_ufunc != ଖାଲି
 			&& class_instance_of(cctx->ctx_ufunc->uf_class, cl))
-	    return TRUE;
-    return FALSE;
+	    ଫେରନ୍ତୁ TRUE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Return TRUE if object/class variable "m" is read-only.
  * Also give an error message.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 oc_var_check_ro(class_T *cl, ocmember_T *m)
 {
-    if (m->ocm_flags & (OCMFLAG_FINAL | OCMFLAG_CONST))
+    ଯଦି (m->ocm_flags & (OCMFLAG_FINAL | OCMFLAG_CONST))
     {
 	semsg(_(e_cannot_change_readonly_variable_str_in_class_str),
 		m->ocm_name.string, cl->class_name.string);
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Lock all the constant object variables.  Called after creating and
  * initializing a new object.
  */
-    void
+    ଶୂନ୍ୟ
 obj_lock_const_vars(object_T *obj)
 {
-    for (int i = 0; i < obj->obj_class->class_obj_member_count; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < obj->obj_class->class_obj_member_ଗଣନା; i++)
     {
 	ocmember_T *ocm = &obj->obj_class->class_obj_members[i];
-	if (ocm->ocm_flags & OCMFLAG_CONST)
+	ଯଦି (ocm->ocm_flags & OCMFLAG_CONST)
 	{
 	    typval_T *mtv = ((typval_T *)(obj + 1)) + i;
 	    item_lock(mtv, DICT_MAXNEST, TRUE, TRUE);
@@ -3749,15 +3749,15 @@ obj_lock_const_vars(object_T *obj)
 alloc_object(class_T *cl)
 {
     object_T	*obj;
-    int		sz;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sz;
 
-    if (cl == NULL)
-	return NULL;
+    ଯଦି (cl == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    sz = sizeof(object_T) + cl->class_obj_member_count * sizeof(typval_T);
+    sz = ଆକାର(object_T) + cl->class_obj_member_ଗଣନା * ଆକାର(typval_T);
     obj = alloc_clear(sz);
-    if (obj == NULL)
-	return NULL;
+    ଯଦି (obj == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     obj->obj_class = cl;
     ++cl->class_refcount;
@@ -3766,21 +3766,21 @@ alloc_object(class_T *cl)
 
     // When creating an enum value object, initialize the name and ordinal
     // object variables.
-    if (IS_ENUM(cl))
+    ଯଦି (IS_ENUM(cl))
 	enum_set_internal_obj_vars(cl, obj);
 
-    return obj;
+    ଫେରନ୍ତୁ obj;
 }
 
 /*
  * Make a copy of an object.
  */
-    void
+    ଶୂନ୍ୟ
 copy_object(typval_T *from, typval_T *to)
 {
-    if (from->vval.v_object == NULL)
-	to->vval.v_object = NULL;
-    else
+    ଯଦି (from->vval.v_object == ଖାଲି)
+	to->vval.v_object = ଖାଲି;
+    ଅନ୍ୟଥା
     {
 	to->vval.v_object = from->vval.v_object;
 	++to->vval.v_object->obj_refcount;
@@ -3790,12 +3790,12 @@ copy_object(typval_T *from, typval_T *to)
 /*
  * Make a copy of a class.
  */
-    void
+    ଶୂନ୍ୟ
 copy_class(typval_T *from, typval_T *to)
 {
-    if (from->vval.v_class == NULL)
-	to->vval.v_class = NULL;
-    else
+    ଯଦି (from->vval.v_class == ଖାଲି)
+	to->vval.v_class = ଖାଲି;
+    ଅନ୍ୟଥା
     {
 	to->vval.v_class = from->vval.v_class;
 	++to->vval.v_class->class_refcount;
@@ -3805,7 +3805,7 @@ copy_class(typval_T *from, typval_T *to)
 /*
  * Free the class "cl" and its contents.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 class_free(class_T *cl)
 {
     // Freeing what the class contains may recursively come back here.
@@ -3815,34 +3815,34 @@ class_free(class_T *cl)
 
     class_unref(cl->class_extends);
 
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_interface_ଗଣନା; ++i)
     {
 	vim_free(((char_u **)cl->class_interfaces)[i]);
-	if (cl->class_interfaces_cl[i] != NULL)
+	ଯଦି (cl->class_interfaces_cl[i] != ଖାଲି)
 	    class_unref(cl->class_interfaces_cl[i]);
     }
     vim_free(cl->class_interfaces);
     vim_free(cl->class_interfaces_cl);
 
     itf2class_T *next;
-    for (itf2class_T *i2c = cl->class_itf2class; i2c != NULL; i2c = next)
+    ପାଇଁ (itf2class_T *i2c = cl->class_itf2class; i2c != ଖାଲି; i2c = next)
     {
 	next = i2c->i2c_next;
 	vim_free(i2c);
     }
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_member_ଗଣନା; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
 	vim_free(m->ocm_init);
-	if (cl->class_members_tv != NULL)
+	ଯଦି (cl->class_members_tv != ଖାଲି)
 	    clear_tv(&cl->class_members_tv[i]);
     }
     vim_free(cl->class_class_members);
     vim_free(cl->class_members_tv);
 
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_member_ଗଣନା; ++i)
     {
 	ocmember_T *m = &cl->class_obj_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
@@ -3850,18 +3850,18 @@ class_free(class_T *cl)
     }
     vim_free(cl->class_obj_members);
 
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_function_ଗଣନା; ++i)
     {
 	ufunc_T *uf = cl->class_class_functions[i];
 	// For an enum class, the constructor function names are cleared.  Set
 	// the name back, so that clearing the function will work properly.
-	if (IS_ENUM(cl) && IS_CONSTRUCTOR_METHOD(uf) && *uf->uf_name == NUL)
+	ଯଦି (IS_ENUM(cl) && IS_CONSTRUCTOR_METHOD(uf) && *uf->uf_name == NUL)
 	    STRCPY(uf->uf_name, "new");
 	func_clear_free(uf, FALSE);
     }
     vim_free(cl->class_class_functions);
 
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_method_ଗଣନା; ++i)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 	func_clear_free(uf, FALSE);
@@ -3879,23 +3879,23 @@ class_free(class_T *cl)
  * Returns the number of references from the class members of class "cl" to cl"
  * itself.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 class_get_selfrefs(class_T *cl)
 {
-    int		self_refs = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		self_refs = 0;
     typval_T	*tv;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_member_ଗଣନା; ++i)
     {
 	tv = &cl->class_members_tv[i];
-	if (tv->v_type == VAR_OBJECT && tv->vval.v_object != NULL
+	ଯଦି (tv->v_type == VAR_OBJECT && tv->vval.v_object != ଖାଲି
 		&& tv->vval.v_object->obj_class == cl
 		&& (tv->vval.v_object->obj_refcount == 1
 		    || (IS_ENUM(cl) && tv->vval.v_object->obj_refcount == 2)))
 	    self_refs++;
     }
 
-    return self_refs;
+    ଫେରନ୍ତୁ self_refs;
 }
 
 /*
@@ -3903,38 +3903,38 @@ class_get_selfrefs(class_T *cl)
  * values are no longer referenced and the "values" class member is also not
  * referenced.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 can_free_enum(class_T *cl)
 {
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_class_member_ଗଣନା; ++i)
     {
 	typval_T	*tv = &cl->class_members_tv[i];
 	ocmember_T	*ocm = &cl->class_class_members[i];
 
-	if (tv->v_type != VAR_OBJECT && tv->v_type != VAR_LIST)
+	ଯଦି (tv->v_type != VAR_OBJECT && tv->v_type != VAR_LIST)
 	    // In an enum, the first set of class members are the enum values.
 	    // Followed by the "values" member which is a List of enum values.
 	    // If all of those members are no longer referenced, then the enum
 	    // may be freed.
-	    return TRUE;
+	    ଫେରନ୍ତୁ TRUE;
 
-	if (tv->v_type == VAR_LIST
+	ଯଦି (tv->v_type == VAR_LIST
 		&& tv->vval.v_list->lv_type->tt_member->tt_type == VAR_OBJECT
 		&& tv->vval.v_list->lv_type->tt_member->tt_class == cl
 		&& STRCMP(ocm->ocm_name.string, "values") == 0)
 	{
 	    // "values" class member is referenced outside
-	    if (tv->vval.v_list->lv_refcount > 1)
-		return FALSE;
-	    break;
+	    ଯଦି (tv->vval.v_list->lv_refcount > 1)
+		ଫେରନ୍ତୁ FALSE;
+	    ଭାଙ୍ଗ;
 	}
 
-	if (tv->vval.v_object->obj_refcount > 2)
+	ଯଦି (tv->vval.v_object->obj_refcount > 2)
 	    // enum value is referenced outside
-	    return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
     }
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -3942,56 +3942,56 @@ can_free_enum(class_T *cl)
  * it's own class members and can be freed.  If it is an enum, then checks
  * whether the enum values and the "values" members are referenced elsewhere.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 can_free_class(class_T *cl)
 {
-    int		can_free = FALSE;
-    int		self_refs = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		can_free = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		self_refs = 0;
 
-    if (IS_ENUM(cl) && !can_free_enum(cl))
-	return FALSE;
+    ଯଦି (IS_ENUM(cl) && !can_free_enum(cl))
+	ଫେରନ୍ତୁ FALSE;
 
-    if (cl->class_refcount > 0)
+    ଯଦି (cl->class_refcount > 0)
 	self_refs = class_get_selfrefs(cl);
 
     // If the class is no longer referenced or only referenced from it's own
     // class member, then it can be freed.
-    if (cl->class_refcount <= 0 || cl->class_refcount == self_refs)
+    ଯଦି (cl->class_refcount <= 0 || cl->class_refcount == self_refs)
 	can_free = TRUE;
 
-    return can_free;
+    ଫେରନ୍ତୁ can_free;
 }
 
 /*
  * Unreference a class.  Free it when the reference count goes down to zero.
  */
-    void
+    ଶୂନ୍ୟ
 class_unref(class_T *cl)
 {
-    if (cl == NULL)
-	return;
+    ଯଦି (cl == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     --cl->class_refcount;
 
-    if (cl->class_name.string == NULL)
-	return;
+    ଯଦି (cl->class_name.string == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (can_free_class(cl))
+    ଯଦି (can_free_class(cl))
 	class_free(cl);
 }
 
 /*
  * Go through the list of all classes and free items without "copyID".
  */
-    int
-class_free_nonref(int copyID)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+class_free_nonref(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
-    int		did_free = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_free = FALSE;
 
-    for (class_T *cl = first_class; cl != NULL; cl = next_nonref_class)
+    ପାଇଁ (class_T *cl = first_class; cl != ଖାଲି; cl = next_nonref_class)
     {
 	next_nonref_class = cl->class_next_used;
-	if ((cl->class_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ଯଦି ((cl->class_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the class and items it contains.
 	    class_free(cl);
@@ -3999,29 +3999,29 @@ class_free_nonref(int copyID)
 	}
     }
 
-    next_nonref_class = NULL;
-    return did_free;
+    next_nonref_class = ଖାଲି;
+    ଫେରନ୍ତୁ did_free;
 }
 
-    int
-set_ref_in_classes(int copyID)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+set_ref_in_classes(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
-    for (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
-	set_ref_in_item_class(cl, copyID, NULL, NULL, NULL);
+    ପାଇଁ (class_T *cl = first_class; cl != ଖାଲି; cl = cl->class_next_used)
+	set_ref_in_item_class(cl, copyID, ଖାଲି, ଖାଲି, ଖାଲି);
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-static object_T *first_object = NULL;
+ସ୍ଥିର object_T *first_object = ଖାଲି;
 
 /*
  * Call this function when an object has been created.  It will be added to the
  * list headed by "first_object".
  */
-    void
+    ଶୂନ୍ୟ
 object_created(object_T *obj)
 {
-    if (first_object != NULL)
+    ଯଦି (first_object != ଖାଲି)
     {
 	obj->obj_next_used = first_object;
 	first_object->obj_prev_used = obj;
@@ -4033,44 +4033,44 @@ object_created(object_T *obj)
  * Call this function when an object has been cleared and is about to be freed.
  * It is removed from the list headed by "first_object".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 object_cleared(object_T *obj)
 {
-    if (obj->obj_next_used != NULL)
+    ଯଦି (obj->obj_next_used != ଖାଲି)
 	obj->obj_next_used->obj_prev_used = obj->obj_prev_used;
-    if (obj->obj_prev_used != NULL)
+    ଯଦି (obj->obj_prev_used != ଖାଲି)
 	obj->obj_prev_used->obj_next_used = obj->obj_next_used;
-    else if (first_object == obj)
+    ଅନ୍ୟଥା ଯଦି (first_object == obj)
 	first_object = obj->obj_next_used;
 }
 
 /*
  * Free the contents of an object ignoring the reference count.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 object_free_contents(object_T *obj)
 {
     class_T *cl = obj->obj_class;
 
-    if (!cl)
-	return;
+    ଯଦି (!cl)
+	ଫେରନ୍ତୁ;
 
     // Avoid a recursive call, it can happen if "obj" has a circular reference.
     obj->obj_refcount = INT_MAX;
 
     // the member values are just after the object structure
     typval_T *tv = (typval_T *)(obj + 1);
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_member_ଗଣନା; ++i)
 	clear_tv(tv + i);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 object_free_object(object_T *obj)
 {
     class_T *cl = obj->obj_class;
 
-    if (!cl)
-	return;
+    ଯଦି (!cl)
+	ଫେରନ୍ତୁ;
 
     // Remove from the list headed by "first_object".
     object_cleared(obj);
@@ -4079,11 +4079,11 @@ object_free_object(object_T *obj)
     class_unref(cl);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 object_free(object_T *obj)
 {
-    if (in_free_unref_items)
-	return;
+    ଯଦି (in_free_unref_ବସ୍ତୁଗୁଡ଼ିକ)
+	ଫେରନ୍ତୁ;
 
     object_free_contents(obj);
     object_free_object(obj);
@@ -4092,24 +4092,24 @@ object_free(object_T *obj)
 /*
  * Unreference an object.
  */
-    void
+    ଶୂନ୍ୟ
 object_unref(object_T *obj)
 {
-    if (obj != NULL && --obj->obj_refcount <= 0)
+    ଯଦି (obj != ଖାଲି && --obj->obj_refcount <= 0)
 	object_free(obj);
 }
 
 /*
  * Go through the list of all objects and free items without "copyID".
  */
-    int
-object_free_nonref(int copyID)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+object_free_nonref(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
-    int		did_free = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_free = FALSE;
 
-    for (object_T *obj = first_object; obj != NULL; obj = obj->obj_next_used)
+    ପାଇଁ (object_T *obj = first_object; obj != ଖାଲି; obj = obj->obj_next_used)
     {
-	if ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ଯଦି ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the object contents.  Object itself will be freed later.
 	    object_free_contents(obj);
@@ -4117,18 +4117,18 @@ object_free_nonref(int copyID)
 	}
     }
 
-    return did_free;
+    ଫେରନ୍ତୁ did_free;
 }
 
-    void
-object_free_items(int copyID)
+    ଶୂନ୍ୟ
+object_free_ବସ୍ତୁଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
     object_T	*obj_next;
 
-    for (object_T *obj = first_object; obj != NULL; obj = obj_next)
+    ପାଇଁ (object_T *obj = first_object; obj != ଖାଲି; obj = obj_next)
     {
 	obj_next = obj->obj_next_used;
-	if ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ଯଦି ((obj->obj_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	    object_free_object(obj);
     }
 }
@@ -4138,45 +4138,45 @@ object_free_items(int copyID)
  * "cl" is that class where the name was found. Search "cl"'s hierarchy to
  * find the defining class.
  */
-    void
-emsg_var_cl_define(char *msg, char_u *name, size_t len, class_T *cl)
+    ଶୂନ୍ୟ
+emsg_var_cl_define(ଅକ୍ଷର *ସନ୍ଦେଶ, char_u *name, size_t len, class_T *cl)
 {
     ocmember_T	*m;
     class_T	*cl_def = class_defining_member(cl, name, len, &m);
-    if (cl_def != NULL)
-	semsg(_(msg), m->ocm_name.string, cl_def->class_name.string);
-    else
+    ଯଦି (cl_def != ଖାଲି)
+	semsg(_(ସନ୍ଦେଶ), m->ocm_name.string, cl_def->class_name.string);
+    ଅନ୍ୟଥା
 	emsg(_(e_internal_error_please_report_a_bug));
 }
 
 /*
  * Echo a class or object method not found message.
  */
-    void
-method_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
+    ଶୂନ୍ୟ
+method_not_found_ସନ୍ଦେଶ(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *method_name = vim_strnsave(name, len);
-    if ((v_type == VAR_OBJECT)
+    ଯଦି ((v_type == VAR_OBJECT)
 	    && (class_method_idx(cl, name, len) >= 0))
     {
 	// If this is a class method, then give a different error
-	if (*name == '_')
+	ଯଦି (*name == '_')
 	    semsg(_(e_cannot_access_protected_method_str), method_name);
-	else
+	ଅନ୍ୟଥା
 	    semsg(_(e_class_method_str_accessible_only_using_class_str),
 		    method_name, cl->class_name.string);
     }
-    else if ((v_type == VAR_CLASS)
+    ଅନ୍ୟଥା ଯଦି ((v_type == VAR_CLASS)
 	    && (object_method_idx(cl, name, len) >= 0))
     {
 	// If this is an object method, then give a different error
-	if (*name == '_')
+	ଯଦି (*name == '_')
 	    semsg(_(e_cannot_access_protected_method_str), method_name);
-	else
+	ଅନ୍ୟଥା
 	    semsg(_(e_object_method_str_accessible_only_using_object_str),
 		    method_name, cl->class_name.string);
     }
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_method_not_found_on_class_str_str), method_name,
 		cl->class_name.string);
     vim_free(method_name);
@@ -4185,31 +4185,31 @@ method_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 /*
  * Echo a class or object member not found message.
  */
-    void
-member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
+    ଶୂନ୍ୟ
+member_not_found_ସନ୍ଦେଶ(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *varname = len ? vim_strnsave(name, len) : vim_strsave(name);
 
-    if (v_type == VAR_OBJECT)
+    ଯଦି (v_type == VAR_OBJECT)
     {
-	if (class_member_idx(cl, name, len) >= 0)
+	ଯଦି (class_member_idx(cl, name, len) >= 0)
 	    semsg(_(e_class_variable_str_accessible_only_using_class_str),
 		    varname, cl->class_name.string);
-	else
+	ଅନ୍ୟଥା
 	    semsg(_(e_variable_not_found_on_object_str_str), varname,
 		    cl->class_name.string);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (object_member_idx(cl, name, len) >= 0)
+	ଯଦି (object_member_idx(cl, name, len) >= 0)
 	    semsg(_(e_object_variable_str_accessible_only_using_object_str),
 		    varname, cl->class_name.string);
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (IS_ENUM(cl))
-		semsg(_(e_enum_value_str_not_found_in_enum_str),
+	    ଯଦି (IS_ENUM(cl))
+		semsg(_(e_enum_ମୂଲ୍ୟ_str_not_found_in_enum_str),
 			varname, cl->class_name.string);
-	    else
+	    ଅନ୍ୟଥା
 		semsg(_(e_class_variable_str_not_found_in_class_str),
 			varname, cl->class_name.string);
 	}
@@ -4220,19 +4220,19 @@ member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 /*
  * Compile all the class and object methods in "cl".
  */
-    void
+    ଶୂନ୍ୟ
 defcompile_class(class_T *cl)
 {
-    for (int loop = 1; loop <= 2; ++loop)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା loop = 1; loop <= 2; ++loop)
     {
-	int func_count = loop == 1 ? cl->class_class_function_count
-						: cl->class_obj_method_count;
-	for (int i = 0; i < func_count; i++)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା func_ଗଣନା = loop == 1 ? cl->class_class_function_ଗଣନା
+						: cl->class_obj_method_ଗଣନା;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < func_ଗଣନା; i++)
 	{
 	    ufunc_T *ufunc = loop == 1 ? cl->class_class_functions[i]
 						: cl->class_obj_methods[i];
 	    // Don't compile abstract methods
-	    if (!IS_ABSTRACT_METHOD(ufunc))
+	    ଯଦି (!IS_ABSTRACT_METHOD(ufunc))
 		defcompile_function(ufunc, cl);
 	}
     }
@@ -4241,12 +4241,12 @@ defcompile_class(class_T *cl)
 /*
  * Compile all the classes defined in the current script
  */
-    void
-defcompile_classes_in_script(void)
+    ଶୂନ୍ୟ
+defcompile_classes_in_script(ଶୂନ୍ୟ)
 {
-    for (class_T *cl = first_class; cl != NULL; cl = cl->class_next_used)
+    ପାଇଁ (class_T *cl = first_class; cl != ଖାଲି; cl = cl->class_next_used)
     {
-	if (eval_variable(cl->class_name.string, 0, 0, NULL, NULL,
+	ଯଦି (eval_variable(cl->class_name.string, 0, 0, ଖାଲି, ଖାଲି,
 			EVAL_VAR_NOAUTOLOAD | EVAL_VAR_NO_FUNC) != FAIL)
 	    defcompile_class(cl);
     }
@@ -4256,113 +4256,113 @@ defcompile_classes_in_script(void)
  * Returns TRUE if "name" is the name of a class.  The typval for the class is
  * returned in "rettv".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_class_name(char_u *name, typval_T *rettv)
 {
     rettv->v_type = VAR_UNKNOWN;
 
-    if (eval_variable(name, 0, 0, rettv, NULL, EVAL_VAR_NOAUTOLOAD |
+    ଯଦି (eval_variable(name, 0, 0, rettv, ଖାଲି, EVAL_VAR_NOAUTOLOAD |
 						EVAL_VAR_NO_FUNC) != FAIL)
-	return rettv->v_type == VAR_CLASS;
-    return FALSE;
+	ଫେରନ୍ତୁ rettv->v_type == VAR_CLASS;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * Calls the object builtin method "name" with arguments "argv".  The value
  * returned by the builtin method is in "rettv".  Returns OK or FAIL.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_call_builtin_method(
     object_T		*obj,
     class_builtin_T	builtin_method,
-    int			argc,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			argc,
     typval_T		*argv,
     typval_T		*rettv)
 {
     ufunc_T *uf;
-    int	    midx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    midx;
 
-    if (obj == NULL)
-	return FAIL;
+    ଯଦି (obj == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     uf = class_get_builtin_method(obj->obj_class, builtin_method, &midx);
-    if (uf == NULL)
-	return FAIL;
+    ଯଦି (uf == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     funccall_T  *fc = create_funccal(uf, rettv);
-    int		r;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
 
-    if (fc == NULL)
-	return FAIL;
+    ଯଦି (fc == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     ++obj->obj_refcount;
 
-    r = call_def_function(uf, argc, argv, 0, NULL, obj, fc, rettv);
+    r = call_def_function(uf, argc, argv, 0, ଖାଲି, obj, fc, rettv);
 
     remove_funccal();
 
-    return r;
+    ଫେରନ୍ତୁ r;
 }
 
 /*
  * Calls the object "empty()" method and returns the method return value.  In
  * case of an error, returns TRUE.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_empty(object_T *obj)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_EMPTY, 0, NULL, &rettv)
+    ଯଦି (object_call_builtin_method(obj, CLASS_BUILTIN_EMPTY, 0, ଖାଲି, &rettv)
 								== FAIL)
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
 
-    return tv_get_bool(&rettv);
+    ଫେରନ୍ତୁ tv_get_bool(&rettv);
 }
 
 /*
  * Use the object "len()" method to get an object length.  Returns 0 if the
  * method is not found or there is an error.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_len(object_T *obj)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_LEN, 0, NULL, &rettv)
+    ଯଦି (object_call_builtin_method(obj, CLASS_BUILTIN_LEN, 0, ଖାଲି, &rettv)
 								== FAIL)
-	return 0;
+	ଫେରନ୍ତୁ 0;
 
-    return tv_to_number(&rettv);
+    ଫେରନ୍ତୁ tv_to_ସଂଖ୍ୟା(&rettv);
 }
 
 /*
  * Return TRUE when two objects have exactly the same values.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 object_equal(
 	object_T *o1,
 	object_T *o2,
-	int	ic)	// ignore case for strings
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	ic)	// ignore case for strings
 {
     class_T *cl1, *cl2;
 
-    if (o1 == o2)
-	return TRUE;
-    if (o1 == NULL || o2 == NULL)
-	return FALSE;
+    ଯଦି (o1 == o2)
+	ଫେରନ୍ତୁ TRUE;
+    ଯଦି (o1 == ଖାଲି || o2 == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
     cl1 = o1->obj_class;
     cl2 = o2->obj_class;
 
-    if (cl1 != cl2 || cl1 == NULL || cl2 == NULL)
-	return FALSE;
+    ଯଦି (cl1 != cl2 || cl1 == ଖାଲି || cl2 == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
-    for (int i = 0; i < cl1->class_obj_member_count; ++i)
-	if (!tv_equal((typval_T *)(o1 + 1) + i, (typval_T *)(o2 + 1) + i, ic))
-	    return FALSE;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl1->class_obj_member_ଗଣନା; ++i)
+	ଯଦି (!tv_equal((typval_T *)(o1 + 1) + i, (typval_T *)(o2 + 1) + i, ic))
+	    ଫେରନ୍ତୁ FALSE;
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -4374,24 +4374,24 @@ object_equal(
 object2string(
     object_T	*obj,
     char_u	*numbuf,
-    int		copyID,
-    int		echo_style,
-    int		restore_copyID,
-    int		composite_val)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		copyID,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		echo_style,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		restore_copyID,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		composite_val)
 {
     typval_T	rettv;
 
-    if (object_call_builtin_method(obj, CLASS_BUILTIN_STRING, 0, NULL, &rettv)
+    ଯଦି (object_call_builtin_method(obj, CLASS_BUILTIN_STRING, 0, ଖାଲି, &rettv)
 								== OK
-					&& rettv.vval.v_string != NULL)
-	return rettv.vval.v_string;
+					&& rettv.vval.v_string != ଖାଲି)
+	ଫେରନ୍ତୁ rettv.vval.v_string;
 
-    int		ok = OK;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ok = OK;
     class_T	*cl = obj->obj_class;
     garray_T	ga;
     ga_init2(&ga, 1, 50);
 
-    if (cl != NULL && IS_ENUM(cl))
+    ଯଦି (cl != ଖାଲି && IS_ENUM(cl))
     {
 	GA_CONCAT_LITERAL(&ga, "enum ");
 	ga_concat_len(&ga, cl->class_name.string, cl->class_name.length);
@@ -4399,116 +4399,116 @@ object2string(
 	GA_CONCAT_LITERAL(&ga, ".");
 	ga_concat(&ga, enum_name);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	GA_CONCAT_LITERAL(&ga, "object of ");
-	if (cl == NULL)
+	ଯଦି (cl == ଖାଲି)
 	    GA_CONCAT_LITERAL(&ga, "[unknown]");
-	else
+	ଅନ୍ୟଥା
 	    ga_concat_len(&ga, cl->class_name.string, cl->class_name.length);
     }
-    if (cl != NULL)
+    ଯଦି (cl != ଖାଲି)
     {
 	GA_CONCAT_LITERAL(&ga, " {");
-	for (int i = 0; i < cl->class_obj_member_count; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < cl->class_obj_member_ଗଣନା; ++i)
 	{
-	    if (i > 0)
+	    ଯଦି (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
 	    ocmember_T *m = &cl->class_obj_members[i];
 	    ga_concat_len(&ga, m->ocm_name.string, m->ocm_name.length);
 	    GA_CONCAT_LITERAL(&ga, ": ");
-	    char_u *tf = NULL;
+	    char_u *tf = ଖାଲି;
 	    char_u *s = echo_string_core((typval_T *)(obj + 1) + i,
 					 &tf, numbuf, copyID, echo_style,
 					 restore_copyID, composite_val);
-	    if (s != NULL)
+	    ଯଦି (s != ଖାଲି)
 		ga_concat(&ga, s);
 	    vim_free(tf);
-	    if (s == NULL || did_echo_string_emsg)
+	    ଯଦି (s == ଖାଲି || did_echo_string_emsg)
 	    {
 		ok = FAIL;
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	    line_breakcheck();
+	    ଧାଡ଼ି_breakcheck();
 	}
 	GA_CONCAT_LITERAL(&ga, "}");
     }
-    if (ok == FAIL)
+    ଯଦି (ok == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ଫେରନ୍ତୁ (char_u *)ga.ga_data;
 }
 
 /*
  * Return TRUE when the class "cl", its base class or one of the implemented
  * interfaces matches the class "other_cl".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 class_instance_of(class_T *cl, class_T *other_cl)
 {
-    if (cl == other_cl)
-	return TRUE;
+    ଯଦି (cl == other_cl)
+	ଫେରନ୍ତୁ TRUE;
 
     // Recursively check the base classes.
-    for (; cl != NULL; cl = cl->class_extends)
+    ପାଇଁ (; cl != ଖାଲି; cl = cl->class_extends)
     {
-	if (cl == other_cl)
-	    return TRUE;
+	ଯଦି (cl == other_cl)
+	    ଫେରନ୍ତୁ TRUE;
 	// Check the implemented interfaces and the super interfaces
-	for (int i = cl->class_interface_count - 1; i >= 0; --i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = cl->class_interface_ଗଣନା - 1; i >= 0; --i)
 	{
 	    class_T	*intf = cl->class_interfaces_cl[i];
-	    while (intf != NULL)
+	    ଯେତେବେଳେ (intf != ଖାଲି)
 	    {
-		if (intf == other_cl)
-		    return TRUE;
+		ଯଦି (intf == other_cl)
+		    ଫେରନ୍ତୁ TRUE;
 		// check the super interfaces
 		intf = intf->class_extends;
 	    }
 	}
     }
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
  * "instanceof(object, classinfo, ...)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_instanceof(typval_T *argvars, typval_T *rettv)
 {
     typval_T	*object_tv = &argvars[0];
     typval_T	*classinfo_tv = &argvars[1];
     class_T	*c;
 
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_ସଂଖ୍ୟା = VVAL_FALSE;
 
-    if (check_for_object_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_object_arg(argvars, 0) == FAIL
 	    || check_for_class_or_typealias_args(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (object_tv->vval.v_object == NULL)
+    ଯଦି (object_tv->vval.v_object == ଖାଲି)
     {
-	if (classinfo_tv->vval.v_class == NULL)
+	ଯଦି (classinfo_tv->vval.v_class == ଖାଲି)
 	    // consider null_object as an instance of null_class
-	    rettv->vval.v_number = VVAL_TRUE;
-	return;
+	    rettv->vval.v_ସଂଖ୍ୟା = VVAL_TRUE;
+	ଫେରନ୍ତୁ;
     }
 
-    for (; classinfo_tv->v_type != VAR_UNKNOWN; ++classinfo_tv)
+    ପାଇଁ (; classinfo_tv->v_type != VAR_UNKNOWN; ++classinfo_tv)
     {
-	if (classinfo_tv->v_type == VAR_TYPEALIAS)
+	ଯଦି (classinfo_tv->v_type == VAR_TYPEALIAS)
 	    c = classinfo_tv->vval.v_typealias->ta_type->tt_class;
-	else
+	ଅନ୍ୟଥା
 	    c = classinfo_tv->vval.v_class;
 
-	if (class_instance_of(object_tv->vval.v_object->obj_class, c))
+	ଯଦି (class_instance_of(object_tv->vval.v_object->obj_class, c))
 	{
-	    rettv->vval.v_number = VVAL_TRUE;
-	    return;
+	    rettv->vval.v_ସଂଖ୍ୟା = VVAL_TRUE;
+	    ଫେରନ୍ତୁ;
 	}
     }
 }

@@ -10,43 +10,43 @@
  * search.c: code for normal mode searching commands
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
 #ifdef FEAT_EVAL
-static void set_vv_searchforward(void);
-static int first_submatch(regmmatch_T *rp);
+ସ୍ଥିର ଶୂନ୍ୟ set_vv_searchforward(ଶୂନ୍ୟ);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା first_submatch(regmmatch_T *rp);
 #endif
 #ifdef FEAT_FIND_ID
-static char_u *get_line_and_copy(linenr_T lnum, char_u *buf);
-static void show_pat_in_path(char_u *, int, int, int, FILE *, linenr_T *, long);
+ସ୍ଥିର char_u *get_ଧାଡ଼ି_and_copy(linenr_T lnum, char_u *buf);
+ସ୍ଥିର ଶୂନ୍ୟ show_pat_in_path(char_u *, ପୂର୍ଣ୍ଣସଂଖ୍ୟା, ପୂର୍ଣ୍ଣସଂଖ୍ୟା, ପୂର୍ଣ୍ଣସଂଖ୍ୟା, FILE *, linenr_T *, long);
 #endif
 
-typedef struct searchstat
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା searchstat
 {
-    int	    cur;	    // current position of found words
-    int	    cnt;	    // total count of found words
-    int	    exact_match;    // TRUE if matched exactly on specified position
-    int	    incomplete;	    // 0: search was fully completed
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cur;	    // current position of found words
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cnt;	    // total count of found words
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    exact_match;    // TRUE if matched exactly on specified position
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    incomplete;	    // 0: search was fully completed
 			    // 1: recomputing was timed out
 			    // 2: max count exceeded
-    int	    last_maxcount;  // the max count of the last search
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    last_maxcount;  // the max count of the last search
 } searchstat_T;
 
-#ifdef FEAT_SEARCH_EXTRA
-static void save_incsearch_state(void);
-static void restore_incsearch_state(void);
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+ସ୍ଥିର ଶୂନ୍ୟ save_incsearch_state(ଶୂନ୍ୟ);
+ସ୍ଥିର ଶୂନ୍ୟ restore_incsearch_state(ଶୂନ୍ୟ);
 #endif
-static int check_prevcol(char_u *linep, int col, int ch, int *prevcol);
-static int find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
-static void find_mps_values(int *initc, int *findc, int *backwards, int switchit);
-static int is_zero_width(char_u *pattern, size_t patternlen, int move, pos_T *cur, int direction);
-static void cmdline_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
-static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା check_prevcol(char_u *linep, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ch, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *prevcol);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
+ସ୍ଥିର ଶୂନ୍ୟ find_mps_ମୂଲ୍ୟଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *initc, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *findc, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *backwards, ପୂର୍ଣ୍ଣସଂଖ୍ୟା switchit);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_zero_width(char_u *pattern, size_t patternlen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା move, pos_T *cur, ପୂର୍ଣ୍ଣସଂଖ୍ୟା direction);
+ସ୍ଥିର ଶୂନ୍ୟ cmdline_ସନ୍ଧାନ_stat(ପୂର୍ଣ୍ଣସଂଖ୍ୟା dirc, pos_T *pos, pos_T *cursor_pos, ପୂର୍ଣ୍ଣସଂଖ୍ୟା show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ, char_u *msgbuf, size_t msgbuflen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା recompute, ପୂର୍ଣ୍ଣସଂଖ୍ୟା maxcount, long timeout);
+ସ୍ଥିର ଶୂନ୍ୟ update_ସନ୍ଧାନ_stat(ପୂର୍ଣ୍ଣସଂଖ୍ୟା dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, ପୂର୍ଣ୍ଣସଂଖ୍ୟା recompute, ପୂର୍ଣ୍ଣସଂଖ୍ୟା maxcount, long timeout);
 
-#define SEARCH_STAT_DEF_TIMEOUT 40L
+#define ସନ୍ଧାନ_STAT_DEF_TIMEOUT 40L
 // 'W ':  2 +
 // '[>9999/>9999]': 13 + 1 (NUL)
-#define SEARCH_STAT_BUF_LEN 16
+#define ସନ୍ଧାନ_STAT_BUF_LEN 16
 
 /*
  * This file contains various searching-related routines. These fall into
@@ -76,44 +76,44 @@ static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchst
  * one for other searches.  last_idx points to the one that was used the last
  * time.
  */
-static spat_T spats[2] =
+ସ୍ଥିର spat_T spats[2] =
 {
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
+    {ଖାଲି, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
+    {ଖାଲି, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
 };
 
-static int last_idx = 0;	// index in spats[] for RE_LAST
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_idx = 0;	// index in spats[] for RE_LAST
 
-static char_u lastc[2] = {NUL, NUL};	// last character searched for
-static int lastcdir = FORWARD;		// last direction of character search
-static int last_t_cmd = TRUE;		// last search t_cmd
-static char_u	lastc_bytes[MB_MAXBYTES + 1];
-static int	lastc_bytelen = 1;	// >1 for multi-byte char
+ସ୍ଥିର char_u lastc[2] = {NUL, NUL};	// last character searched for
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା lastcdir = FORWARD;		// last direction of character search
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_t_cmd = TRUE;		// last search t_cmd
+ସ୍ଥିର char_u	lastc_bytes[MB_MAXBYTES + 1];
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	lastc_bytelen = 1;	// >1 for multi-byte char
 
 // copy of spats[], for keeping the search patterns while executing autocmds
-static spat_T	    saved_spats[ARRAY_LENGTH(spats)];
-static char_u	    *saved_mr_pattern = NULL;
-static size_t	    saved_mr_patternlen = 0;
-#ifdef FEAT_SEARCH_EXTRA
-static int	    saved_spats_last_idx = 0;
-static int	    saved_spats_no_hlsearch = 0;
+ସ୍ଥିର spat_T	    saved_spats[ARRAY_LENGTH(spats)];
+ସ୍ଥିର char_u	    *saved_mr_pattern = ଖାଲି;
+ସ୍ଥିର size_t	    saved_mr_patternlen = 0;
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_spats_last_idx = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_spats_no_hlsearch = 0;
 #endif
 
 // allocated copy of pattern used by search_regcomp()
-static char_u	    *mr_pattern = NULL;
-static size_t	    mr_patternlen = 0;
+ସ୍ଥିର char_u	    *mr_pattern = ଖାଲି;
+ସ୍ଥିର size_t	    mr_patternlen = 0;
 
 #ifdef FEAT_FIND_ID
 /*
  * Type used by find_pattern_in_path() to remember which included files have
  * been searched already.
  */
-typedef struct SearchedFile
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା SearchedFile
 {
     FILE	*fp;		// File pointer
     char_u	*name;		// Full name of file
     linenr_T	lnum;		// Line we were up to in file
-    int		matched;	// Found a match in this file
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		matched;	// Found a match in this file
 } SearchedFile;
 #endif
 
@@ -131,17 +131,17 @@ typedef struct SearchedFile
  *
  * returns FAIL if failed, OK otherwise.
  */
-    int
-search_regcomp(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ସନ୍ଧାନ_regcomp(
     char_u	*pat,
     size_t	patlen,
     char_u	**used_pat,
-    int		pat_save,
-    int		pat_use,
-    int		options,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pat_save,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pat_use,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options,
     regmmatch_T	*regmatch)	// return: pattern and ignore-case flag
 {
-    int		magic;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		magic;
 
     rc_did_emsg = FALSE;
     magic = magic_isset();
@@ -149,96 +149,96 @@ search_regcomp(
     /*
      * If no pattern given, use a previously defined pattern.
      */
-    if (pat == NULL || *pat == NUL)
+    ଯଦି (pat == ଖାଲି || *pat == NUL)
     {
-	int i;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-	if (pat_use == RE_LAST)
+	ଯଦି (pat_use == RE_LAST)
 	    i = last_idx;
-	else
+	ଅନ୍ୟଥା
 	    i = pat_use;
-	if (spats[i].pat == NULL)	// pattern was never defined
+	ଯଦି (spats[i].pat == ଖାଲି)	// pattern was never defined
 	{
-	    if (pat_use == RE_SUBST)
+	    ଯଦି (pat_use == RE_SUBST)
 		emsg(_(e_no_previous_substitute_regular_expression));
-	    else
+	    ଅନ୍ୟଥା
 		emsg(_(e_no_previous_regular_expression));
 	    rc_did_emsg = TRUE;
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 	pat = spats[i].pat;
 	patlen = spats[i].patlen;
 	magic = spats[i].magic;
 	no_smartcase = spats[i].no_scs;
     }
-    else if (options & SEARCH_HIS)	// put new pattern in history
-	add_to_history(HIST_SEARCH, pat, patlen, TRUE, NUL);
+    ଅନ୍ୟଥା ଯଦି (options & ସନ୍ଧାନ_HIS)	// put new pattern in history
+	add_to_history(HIST_ସନ୍ଧାନ, pat, patlen, TRUE, NUL);
 
-    if (used_pat)
+    ଯଦି (used_pat)
 	*used_pat = pat;
 
     vim_free(mr_pattern);
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+    ଯଦି (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 	mr_pattern = reverse_text(pat);
-    else
+    ଅନ୍ୟଥା
 #endif
 	mr_pattern = vim_strnsave(pat, patlen);
-    if (mr_pattern == NULL)
+    ଯଦି (mr_pattern == ଖାଲି)
 	mr_patternlen = 0;
-    else
+    ଅନ୍ୟଥା
 	mr_patternlen = patlen;
 
     /*
      * Save the currently used pattern in the appropriate place,
      * unless the pattern should not be remembered.
      */
-    if (!(options & SEARCH_KEEP)
+    ଯଦି (!(options & ସନ୍ଧାନ_KEEP)
 			       && (cmdmod.cmod_flags & CMOD_KEEPPATTERNS) == 0)
     {
 	// search or global command
-	if (pat_save == RE_SEARCH || pat_save == RE_BOTH)
-	    save_re_pat(RE_SEARCH, pat, patlen, magic);
+	ଯଦି (pat_save == RE_ସନ୍ଧାନ || pat_save == RE_BOTH)
+	    save_re_pat(RE_ସନ୍ଧାନ, pat, patlen, magic);
 	// substitute or global command
-	if (pat_save == RE_SUBST || pat_save == RE_BOTH)
+	ଯଦି (pat_save == RE_SUBST || pat_save == RE_BOTH)
 	    save_re_pat(RE_SUBST, pat, patlen, magic);
     }
 
     regmatch->rmm_ic = ignorecase(pat);
     regmatch->rmm_maxcol = 0;
     regmatch->regprog = vim_regcomp(pat, magic ? RE_MAGIC : 0);
-    if (regmatch->regprog == NULL)
-	return FAIL;
-    return OK;
+    ଯଦି (regmatch->regprog == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Get search pattern used by search_regcomp().
  */
     char_u *
-get_search_pat(void)
+get_ସନ୍ଧାନ_pat(ଶୂନ୍ୟ)
 {
-    return mr_pattern;
+    ଫେରନ୍ତୁ mr_pattern;
 }
 
-    void
-save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
+    ଶୂନ୍ୟ
+save_re_pat(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx, char_u *pat, size_t patlen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା magic)
 {
-    if (spats[idx].pat == pat)
-	return;
+    ଯଦି (spats[idx].pat == pat)
+	ଫେରନ୍ତୁ;
 
     vim_free(spats[idx].pat);
     spats[idx].pat = vim_strnsave(pat, patlen);
-    if (spats[idx].pat == NULL)
+    ଯଦି (spats[idx].pat == ଖାଲି)
 	spats[idx].patlen = 0;
-    else
+    ଅନ୍ୟଥା
 	spats[idx].patlen = patlen;
     spats[idx].magic = magic;
     spats[idx].no_scs = no_smartcase;
     last_idx = idx;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls)
+    ଯଦି (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
     set_no_hlsearch(FALSE);
 #endif
@@ -248,74 +248,74 @@ save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
  * Save the search patterns, so they can be restored later.
  * Used before/after executing autocommands and user functions.
  */
-static int save_level = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା save_level = 0;
 
-    void
-save_search_patterns(void)
+    ଶୂନ୍ୟ
+save_ସନ୍ଧାନ_patterns(ଶୂନ୍ୟ)
 {
-    int i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-    if (save_level++ != 0)
-	return;
+    ଯଦି (save_level++ != 0)
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    ପାଇଁ (i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(spats); ++i)
     {
 	saved_spats[i] = spats[i];
-	if (spats[i].pat != NULL)
+	ଯଦି (spats[i].pat != ଖାଲି)
 	{
 	    saved_spats[i].pat = vim_strnsave(spats[i].pat, spats[i].patlen);
-	    if (saved_spats[i].pat == NULL)
+	    ଯଦି (saved_spats[i].pat == ଖାଲି)
 		saved_spats[i].patlen = 0;
-	    else
+	    ଅନ୍ୟଥା
 		saved_spats[i].patlen = spats[i].patlen;
 	}
     }
-    if (mr_pattern == NULL)
-	saved_mr_pattern = NULL;
-    else
+    ଯଦି (mr_pattern == ଖାଲି)
+	saved_mr_pattern = ଖାଲି;
+    ଅନ୍ୟଥା
 	saved_mr_pattern = vim_strnsave(mr_pattern, mr_patternlen);
-    if (saved_mr_pattern == NULL)
+    ଯଦି (saved_mr_pattern == ଖାଲି)
 	saved_mr_patternlen = 0;
-    else
+    ଅନ୍ୟଥା
 	saved_mr_patternlen = mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
     saved_spats_last_idx = last_idx;
     saved_spats_no_hlsearch = no_hlsearch;
 #endif
 }
 
-    void
-restore_search_patterns(void)
+    ଶୂନ୍ୟ
+restore_ସନ୍ଧାନ_patterns(ଶୂନ୍ୟ)
 {
-    int i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-    if (--save_level != 0)
-	return;
+    ଯଦି (--save_level != 0)
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    ପାଇଁ (i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(spats); ++i)
     {
 	vim_free(spats[i].pat);
 	spats[i] = saved_spats[i];
     }
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
     set_vv_searchforward();
 #endif
     vim_free(mr_pattern);
     mr_pattern = saved_mr_pattern;
     mr_patternlen = saved_mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
     last_idx = saved_spats_last_idx;
     set_no_hlsearch(saved_spats_no_hlsearch);
 #endif
 }
 
-#if defined(EXITFREE)
-    void
-free_search_patterns(void)
+#ଯଦି defined(EXITFREE)
+    ଶୂନ୍ୟ
+free_ସନ୍ଧାନ_patterns(ଶୂନ୍ୟ)
 {
-    int i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    ପାଇଁ (i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(spats); ++i)
     {
 	VIM_CLEAR(spats[i].pat);
 	spats[i].patlen = 0;
@@ -325,15 +325,15 @@ free_search_patterns(void)
 }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 // copy of spats[RE_SEARCH], for keeping the search patterns while incremental
 // searching
-static spat_T	    saved_last_search_spat;
-static int	    did_save_last_search_spat = 0;
-static int	    saved_last_idx = 0;
-static int	    saved_no_hlsearch = 0;
-static int	    saved_search_match_endcol;
-static int	    saved_search_match_lines;
+ସ୍ଥିର spat_T	    saved_last_ସନ୍ଧାନ_spat;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    did_save_last_ସନ୍ଧାନ_spat = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_last_idx = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_no_hlsearch = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_ସନ୍ଧାନ_match_endcol;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    saved_ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ;
 
 /*
  * Save and restore the search pattern for incremental highlight search
@@ -343,43 +343,43 @@ static int	    saved_search_match_lines;
  * restore_search_patterns(), because the search pattern must be restored when
  * canceling incremental searching even if it's called inside user functions.
  */
-    void
-save_last_search_pattern(void)
+    ଶୂନ୍ୟ
+save_last_ସନ୍ଧାନ_pattern(ଶୂନ୍ୟ)
 {
-    if (++did_save_last_search_spat != 1)
+    ଯଦି (++did_save_last_ସନ୍ଧାନ_spat != 1)
 	// nested call, nothing to do
-	return;
+	ଫେରନ୍ତୁ;
 
-    saved_last_search_spat = spats[RE_SEARCH];
-    if (spats[RE_SEARCH].pat != NULL)
+    saved_last_ସନ୍ଧାନ_spat = spats[RE_ସନ୍ଧାନ];
+    ଯଦି (spats[RE_ସନ୍ଧାନ].pat != ଖାଲି)
     {
-	saved_last_search_spat.pat = vim_strnsave(spats[RE_SEARCH].pat, spats[RE_SEARCH].patlen);
-	if (saved_last_search_spat.pat == NULL)
-	    saved_last_search_spat.patlen = 0;
-	else
-	    saved_last_search_spat.patlen = spats[RE_SEARCH].patlen;
+	saved_last_ସନ୍ଧାନ_spat.pat = vim_strnsave(spats[RE_ସନ୍ଧାନ].pat, spats[RE_ସନ୍ଧାନ].patlen);
+	ଯଦି (saved_last_ସନ୍ଧାନ_spat.pat == ଖାଲି)
+	    saved_last_ସନ୍ଧାନ_spat.patlen = 0;
+	ଅନ୍ୟଥା
+	    saved_last_ସନ୍ଧାନ_spat.patlen = spats[RE_ସନ୍ଧାନ].patlen;
     }
     saved_last_idx = last_idx;
     saved_no_hlsearch = no_hlsearch;
 }
 
-    void
-restore_last_search_pattern(void)
+    ଶୂନ୍ୟ
+restore_last_ସନ୍ଧାନ_pattern(ଶୂନ୍ୟ)
 {
-    if (--did_save_last_search_spat > 0)
+    ଯଦି (--did_save_last_ସନ୍ଧାନ_spat > 0)
 	// nested call, nothing to do
-	return;
-    if (did_save_last_search_spat != 0)
+	ଫେରନ୍ତୁ;
+    ଯଦି (did_save_last_ସନ୍ଧାନ_spat != 0)
     {
 	iemsg("restore_last_search_pattern() called more often than save_last_search_pattern()");
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    vim_free(spats[RE_SEARCH].pat);
-    spats[RE_SEARCH] = saved_last_search_spat;
-    saved_last_search_spat.pat = NULL;
-    saved_last_search_spat.patlen = 0;
-# if defined(FEAT_EVAL)
+    vim_free(spats[RE_ସନ୍ଧାନ].pat);
+    spats[RE_ସନ୍ଧାନ] = saved_last_ସନ୍ଧାନ_spat;
+    saved_last_ସନ୍ଧାନ_spat.pat = ଖାଲି;
+    saved_last_ସନ୍ଧାନ_spat.patlen = 0;
+# ଯଦି defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
     last_idx = saved_last_idx;
@@ -391,30 +391,30 @@ restore_last_search_pattern(void)
  * This is required so that calling searchcount() at does not invalidate the
  * incsearch highlighting.
  */
-    static void
-save_incsearch_state(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+save_incsearch_state(ଶୂନ୍ୟ)
 {
-    saved_search_match_endcol = search_match_endcol;
-    saved_search_match_lines  = search_match_lines;
+    saved_ସନ୍ଧାନ_match_endcol = ସନ୍ଧାନ_match_endcol;
+    saved_ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ  = ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ;
 }
 
-    static void
-restore_incsearch_state(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+restore_incsearch_state(ଶୂନ୍ୟ)
 {
-    search_match_endcol = saved_search_match_endcol;
-    search_match_lines  = saved_search_match_lines;
+    ସନ୍ଧାନ_match_endcol = saved_ସନ୍ଧାନ_match_endcol;
+    ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ  = saved_ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ;
 }
 
     char_u *
-last_search_pattern(void)
+last_ସନ୍ଧାନ_pattern(ଶୂନ୍ୟ)
 {
-    return spats[RE_SEARCH].pat;
+    ଫେରନ୍ତୁ spats[RE_ସନ୍ଧାନ].pat;
 }
 
     size_t
-last_search_pattern_len(void)
+last_ସନ୍ଧାନ_pattern_len(ଶୂନ୍ୟ)
 {
-    return spats[RE_SEARCH].patlen;
+    ଫେରନ୍ତୁ spats[RE_ସନ୍ଧାନ].patlen;
 }
 #endif
 
@@ -422,211 +422,211 @@ last_search_pattern_len(void)
  * Return TRUE when case should be ignored for search pattern "pat".
  * Uses the 'ignorecase' and 'smartcase' options.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 ignorecase(char_u *pat)
 {
-    return ignorecase_opt(pat, p_ic, p_scs);
+    ଫେରନ୍ତୁ ignorecase_opt(pat, p_ic, p_scs);
 }
 
 /*
  * As ignorecase() but pass the "ic" and "scs" flags.
  */
-    int
-ignorecase_opt(char_u *pat, int ic_in, int scs)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ignorecase_opt(char_u *pat, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ic_in, ପୂର୍ଣ୍ଣସଂଖ୍ୟା scs)
 {
-    int		ic = ic_in;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic = ic_in;
 
-    if (ic && !no_smartcase && scs
+    ଯଦି (ic && !no_smartcase && scs
 			    && !(ctrl_x_mode_not_default() && curbuf->b_p_inf))
 	ic = !pat_has_uppercase(pat);
     no_smartcase = FALSE;
 
-    return ic;
+    ଫେରନ୍ତୁ ic;
 }
 
 /*
  * Return TRUE if pattern "pat" has an uppercase character.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 pat_has_uppercase(char_u *pat)
 {
     char_u *p = pat;
     magic_T magic_val = MAGIC_ON;
 
     // get the magicness of the pattern
-    (void)skip_regexp_ex(pat, NUL, magic_isset(), NULL, NULL, &magic_val);
+    (ଶୂନ୍ୟ)skip_regexp_ex(pat, NUL, magic_isset(), ଖାଲି, ଖାଲି, &magic_val);
 
-    while (*p != NUL)
+    ଯେତେବେଳେ (*p != NUL)
     {
-	int		l;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ଯଦି (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    if (enc_utf8 && utf_isupper(utf_ptr2char(p)))
-		return TRUE;
+	    ଯଦି (enc_utf8 && utf_isupper(utf_ptr2char(p)))
+		ଫେରନ୍ତୁ TRUE;
 	    p += l;
 	}
-	else if (*p == '\\' && magic_val <= MAGIC_ON)
+	ଅନ୍ୟଥା ଯଦି (*p == '\\' && magic_val <= MAGIC_ON)
 	{
-	    if (p[1] == '_' && p[2] != NUL)  // skip "\_X"
+	    ଯଦି (p[1] == '_' && p[2] != NUL)  // skip "\_X"
 		p += 3;
-	    else if (p[1] == '%' && p[2] != NUL)  // skip "\%X"
+	    ଅନ୍ୟଥା ଯଦି (p[1] == '%' && p[2] != NUL)  // skip "\%X"
 		p += 3;
-	    else if (p[1] != NUL)  // skip "\X"
+	    ଅନ୍ୟଥା ଯଦି (p[1] != NUL)  // skip "\X"
 		p += 2;
-	    else
+	    ଅନ୍ୟଥା
 		p += 1;
 	}
-	else if ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
+	ଅନ୍ୟଥା ଯଦି ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
 	{
-	    if (p[1] != NUL)  // skip "_X" and %X
+	    ଯଦି (p[1] != NUL)  // skip "_X" and %X
 		p += 2;
-	    else
+	    ଅନ୍ୟଥା
 		p++;
 	}
-	else if (MB_ISUPPER(*p))
-	    return TRUE;
-	else
+	ଅନ୍ୟଥା ଯଦି (MB_ISUPPER(*p))
+	    ଫେରନ୍ତୁ TRUE;
+	ଅନ୍ୟଥା
 	    ++p;
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
     char_u *
-last_csearch(void)
+last_csearch(ଶୂନ୍ୟ)
 {
-    return lastc_bytes;
+    ଫେରନ୍ତୁ lastc_bytes;
 }
 
-    int
-last_csearch_forward(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+last_csearch_forward(ଶୂନ୍ୟ)
 {
-    return lastcdir == FORWARD;
+    ଫେରନ୍ତୁ lastcdir == FORWARD;
 }
 
-    int
-last_csearch_until(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+last_csearch_until(ଶୂନ୍ୟ)
 {
-    return last_t_cmd == TRUE;
+    ଫେରନ୍ତୁ last_t_cmd == TRUE;
 }
 
-    void
-set_last_csearch(int c, char_u *s, int len)
+    ଶୂନ୍ୟ
+set_last_csearch(ପୂର୍ଣ୍ଣସଂଖ୍ୟା c, char_u *s, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     *lastc = c;
     lastc_bytelen = len;
-    if (len)
+    ଯଦି (len)
 	memcpy(lastc_bytes, s, len);
-    else
+    ଅନ୍ୟଥା
 	CLEAR_FIELD(lastc_bytes);
 }
 #endif
 
-    void
-set_csearch_direction(int cdir)
+    ଶୂନ୍ୟ
+set_csearch_direction(ପୂର୍ଣ୍ଣସଂଖ୍ୟା cdir)
 {
     lastcdir = cdir;
 }
 
-    void
-set_csearch_until(int t_cmd)
+    ଶୂନ୍ୟ
+set_csearch_until(ପୂର୍ଣ୍ଣସଂଖ୍ୟା t_cmd)
 {
     last_t_cmd = t_cmd;
 }
 
     char_u *
-last_search_pat(void)
+last_ସନ୍ଧାନ_pat(ଶୂନ୍ୟ)
 {
-    return spats[last_idx].pat;
+    ଫେରନ୍ତୁ spats[last_idx].pat;
 }
 
 /*
  * Reset search direction to forward.  For "gd" and "gD" commands.
  */
-    void
-reset_search_dir(void)
+    ଶୂନ୍ୟ
+reset_ସନ୍ଧାନ_dir(ଶୂନ୍ୟ)
 {
     spats[0].off.dir = '/';
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
     set_vv_searchforward();
 #endif
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
+#ଯଦି defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
 /*
  * Set the last search pattern.  For ":let @/ =" and viminfo.
  * Also set the saved search pattern, so that this works in an autocommand.
  */
-    void
-set_last_search_pat(
+    ଶୂନ୍ୟ
+set_last_ସନ୍ଧାନ_pat(
     char_u	*s,
-    int		idx,
-    int		magic,
-    int		setlast)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		magic,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		setlast)
 {
     vim_free(spats[idx].pat);
     // An empty string means that nothing should be matched.
-    if (*s == NUL)
-	spats[idx].pat = NULL;
-    else
+    ଯଦି (*s == NUL)
+	spats[idx].pat = ଖାଲି;
+    ଅନ୍ୟଥା
     {
 	spats[idx].patlen = STRLEN(s);
 	spats[idx].pat = vim_strnsave(s, spats[idx].patlen);
     }
-    if (spats[idx].pat == NULL)
+    ଯଦି (spats[idx].pat == ଖାଲି)
 	spats[idx].patlen = 0;
     spats[idx].magic = magic;
     spats[idx].no_scs = FALSE;
     spats[idx].off.dir = '/';
-# if defined(FEAT_EVAL)
+# ଯଦି defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
-    spats[idx].off.line = FALSE;
+    spats[idx].off.ଧାଡ଼ି = FALSE;
     spats[idx].off.end = FALSE;
     spats[idx].off.off = 0;
-    if (setlast)
+    ଯଦି (setlast)
 	last_idx = idx;
-    if (save_level)
+    ଯଦି (save_level)
     {
 	vim_free(saved_spats[idx].pat);
 	saved_spats[idx] = spats[0];
-	if (spats[idx].pat == NULL)
-	    saved_spats[idx].pat = NULL;
-	else
+	ଯଦି (spats[idx].pat == ଖାଲି)
+	    saved_spats[idx].pat = ଖାଲି;
+	ଅନ୍ୟଥା
 	    saved_spats[idx].pat = vim_strnsave(spats[idx].pat, spats[idx].patlen);
-	if (saved_spats[idx].pat == NULL)
+	ଯଦି (saved_spats[idx].pat == ଖାଲି)
 	    saved_spats[idx].patlen = 0;
-	else
+	ଅନ୍ୟଥା
 	    saved_spats[idx].patlen = spats[idx].patlen;
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_ସନ୍ଧାନ_EXTRA
 	saved_spats_last_idx = last_idx;
 # endif
     }
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_ସନ୍ଧାନ_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls && idx == last_idx && !no_hlsearch)
+    ଯଦି (p_hls && idx == last_idx && !no_hlsearch)
 	redraw_all_later(UPD_SOME_VALID);
 # endif
 }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 /*
  * Get a regexp program for the last used search pattern.
  * This is used for highlighting all matches in a window.
  * Values returned in regmatch->regprog and regmatch->rmm_ic.
  */
-    void
+    ଶୂନ୍ୟ
 last_pat_prog(regmmatch_T *regmatch)
 {
-    if (spats[last_idx].pat == NULL)
+    ଯଦି (spats[last_idx].pat == ଖାଲି)
     {
-	regmatch->regprog = NULL;
-	return;
+	regmatch->regprog = ଖାଲି;
+	ଫେରନ୍ତୁ;
     }
     ++emsg_off;		// So it doesn't beep if bad expr
-    (void)search_regcomp((char_u *)"", 0, NULL, 0, last_idx, SEARCH_KEEP, regmatch);
+    (ଶୂନ୍ୟ)ସନ୍ଧାନ_regcomp((char_u *)"", 0, ଖାଲି, 0, last_idx, ସନ୍ଧାନ_KEEP, regmatch);
     --emsg_off;
 }
 #endif
@@ -651,22 +651,22 @@ last_pat_prog(regmmatch_T *regmatch)
  * When FEAT_EVAL is defined, returns the index of the first matching
  * subpattern plus one; one if there was none.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 searchit(
     win_T	*win,		// window to search in; can be NULL for a
 				// buffer without a window!
     buf_T	*buf,
     pos_T	*pos,
     pos_T	*end_pos,	// set to end of the match, unless NULL
-    int		dir,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir,
     char_u	*pat,
     size_t	patlen,
-    long	count,
-    int		options,
-    int		pat_use,	// which pattern to use when "pat" is empty
+    long	ଗଣନା_2,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pat_use,	// which pattern to use when "pat" is empty
     searchit_arg_T *extra_arg)	// optional extra arguments, can be NULL
 {
-    int		found;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found;
     linenr_T	lnum;		// no init to shut up Apollo cc
     colnr_T	col;
     regmmatch_T	regmatch;
@@ -674,39 +674,39 @@ searchit(
     colnr_T	matchcol;
     lpos_T	endpos;
     lpos_T	matchpos;
-    int		loop;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		loop;
     pos_T	start_pos;
-    int		at_first_line;
-    int		extra_col;
-    int		start_char_len;
-    int		match_ok;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		at_first_ଧାଡ଼ି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		extra_col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		start_char_len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		match_ok;
     long	nmatched;
-    int		submatch = 0;
-    int		first_match = TRUE;
-    int		called_emsg_before = called_emsg;
-#ifdef FEAT_SEARCH_EXTRA
-    int		break_loop = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		submatch = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		first_match = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		called_emsg_before = called_emsg;
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		break_loop = FALSE;
 #endif
     linenr_T	stop_lnum = 0;	// stop after this line number when != 0
-    int		unused_timeout_flag = FALSE;
-    int		*timed_out = &unused_timeout_flag;  // set when timed out.
-    int		search_from_match_end;		    // vi-compatible search?
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		unused_timeout_flag = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*timed_out = &unused_timeout_flag;  // set when timed out.
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ସନ୍ଧାନ_from_match_end;		    // vi-compatible search?
 
-    if (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
-		   (options & (SEARCH_HIS + SEARCH_KEEP)), &regmatch) == FAIL)
+    ଯଦି (ସନ୍ଧାନ_regcomp(pat, patlen, ଖାଲି, RE_ସନ୍ଧାନ, pat_use,
+		   (options & (ସନ୍ଧାନ_HIS + ସନ୍ଧାନ_KEEP)), &regmatch) == FAIL)
     {
-	if ((options & SEARCH_MSG) && !rc_did_emsg)
-	    semsg(_(e_invalid_search_string_str), mr_pattern);
-	return FAIL;
+	ଯଦି ((options & ସନ୍ଧାନ_ସନ୍ଦେଶ) && !rc_did_emsg)
+	    semsg(_(e_invalid_ସନ୍ଧାନ_string_str), mr_pattern);
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    search_from_match_end = vim_strchr(p_cpo, CPO_SEARCH) != NULL;
+    ସନ୍ଧାନ_from_match_end = vim_strchr(p_cpo, CPO_ସନ୍ଧାନ) != ଖାଲି;
 
-    if (extra_arg != NULL)
+    ଯଦି (extra_arg != ଖାଲି)
     {
 	stop_lnum = extra_arg->sa_stop_lnum;
 #ifdef FEAT_RELTIME
-	if (extra_arg->sa_tm > 0)
+	ଯଦି (extra_arg->sa_tm > 0)
 	    init_regexp_timeout(extra_arg->sa_tm);
 	// Also set the pointer when sa_tm is zero, the caller may have set the
 	// timeout.
@@ -717,49 +717,49 @@ searchit(
     /*
      * find the string
      */
-    do	// loop for count
+    କର	// loop for count
     {
 	// When not accepting a match at the start position set "extra_col" to
 	// a non-zero value.  Don't do that when starting at MAXCOL, since
 	// MAXCOL + 1 is zero.
-	if (pos->col == MAXCOL)
+	ଯଦି (pos->col == MAXCOL)
 	    start_char_len = 0;
 	// Watch out for the "col" being MAXCOL - 2, used in a closed fold.
-	else if (has_mbyte
-		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_line_count
+	ଅନ୍ୟଥା ଯଦି (has_mbyte
+		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା
 						    && pos->col < MAXCOL - 2)
 	{
 	    ptr = ml_get_buf(buf, pos->lnum, FALSE);
-	    if (ml_get_buf_len(buf, pos->lnum) <= pos->col)
+	    ଯଦି (ml_get_buf_len(buf, pos->lnum) <= pos->col)
 		start_char_len = 1;
-	    else
+	    ଅନ୍ୟଥା
 		start_char_len = (*mb_ptr2len)(ptr + pos->col);
 	}
-	else
+	ଅନ୍ୟଥା
 	    start_char_len = 1;
-	if (dir == FORWARD)
+	ଯଦି (dir == FORWARD)
 	{
-	    if (options & SEARCH_START)
+	    ଯଦି (options & ସନ୍ଧାନ_START)
 		extra_col = 0;
-	    else
+	    ଅନ୍ୟଥା
 		extra_col = start_char_len;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (options & SEARCH_START)
+	    ଯଦି (options & ସନ୍ଧାନ_START)
 		extra_col = start_char_len;
-	    else
+	    ଅନ୍ୟଥା
 		extra_col = 0;
 	}
 
 	start_pos = *pos;	// remember start pos for detecting no match
 	found = 0;		// default: not found
-	at_first_line = TRUE;	// default: start in first line
-	if (pos->lnum == 0)	// correct lnum for when starting in line 0
+	at_first_ଧାଡ଼ି = TRUE;	// default: start in first line
+	ଯଦି (pos->lnum == 0)	// correct lnum for when starting in line 0
 	{
 	    pos->lnum = 1;
 	    pos->col = 0;
-	    at_first_line = FALSE;  // not in first line now
+	    at_first_ଧାଡ଼ି = FALSE;  // not in first line now
 	}
 
 	/*
@@ -769,42 +769,42 @@ searchit(
 	 * current position, gain some efficiency by skipping back a line.
 	 * Otherwise begin the search in the current line.
 	 */
-	if (dir == BACKWARD && start_pos.col == 0
-					     && (options & SEARCH_START) == 0)
+	ଯଦି (dir == BACKWARD && start_pos.col == 0
+					     && (options & ସନ୍ଧାନ_START) == 0)
 	{
 	    lnum = pos->lnum - 1;
-	    at_first_line = FALSE;
+	    at_first_ଧାଡ଼ି = FALSE;
 	}
-	else
+	ଅନ୍ୟଥା
 	    lnum = pos->lnum;
 
-	for (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
+	ପାଇଁ (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
 	{
-	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
-					   lnum += dir, at_first_line = FALSE)
+	    ପାଇଁ ( ; lnum > 0 && lnum <= buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+					   lnum += dir, at_first_ଧାଡ଼ି = FALSE)
 	    {
 		// Stop after checking "stop_lnum", if it's set.
-		if (stop_lnum != 0 && (dir == FORWARD
+		ଯଦି (stop_lnum != 0 && (dir == FORWARD
 				       ? lnum > stop_lnum : lnum < stop_lnum))
-		    break;
+		    ଭାଙ୍ଗ;
 		// Stop after passing the time limit.
-		if (*timed_out)
-		    break;
+		ଯଦି (*timed_out)
+		    ଭାଙ୍ଗ;
 
 		/*
 		 * Look for a match somewhere in line "lnum".
 		 */
-		col = at_first_line && (options & SEARCH_COL) ? pos->col
+		col = at_first_ଧାଡ଼ି && (options & ସନ୍ଧାନ_COL) ? pos->col
 								 : (colnr_T)0;
 		nmatched = vim_regexec_multi(&regmatch, win, buf,
 							 lnum, col, timed_out);
 		// vim_regexec_multi() may clear "regprog"
-		if (regmatch.regprog == NULL)
-		    break;
+		ଯଦି (regmatch.regprog == ଖାଲି)
+		    ଭାଙ୍ଗ;
 		// Abort searching on an error (e.g., out of stack).
-		if (called_emsg > called_emsg_before || *timed_out)
-		    break;
-		if (nmatched > 0)
+		ଯଦି (called_emsg > called_emsg_before || *timed_out)
+		    ଭାଙ୍ଗ;
+		ଯଦି (nmatched > 0)
 		{
 		    // match may actually be in another line when using \zs
 		    matchpos = regmatch.startpos[0];
@@ -813,9 +813,9 @@ searchit(
 		    submatch = first_submatch(&regmatch);
 #endif
 		    // "lnum" may be past end of buffer for "\n\zs".
-		    if (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
+		    ଯଦି (lnum + matchpos.lnum > buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 			ptr = (char_u *)"";
-		    else
+		    ଅନ୍ୟଥା
 			ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 
 		    /*
@@ -823,7 +823,7 @@ searchit(
 		     * the start position. If not, continue at the end of the
 		     * match (this is vi compatible) or on the next char.
 		     */
-		    if (dir == FORWARD && at_first_line)
+		    ଯଦି (dir == FORWARD && at_first_ଧାଡ଼ି)
 		    {
 			match_ok = TRUE;
 
@@ -834,69 +834,69 @@ searchit(
 			 * one back afterwards, compare with that position,
 			 * otherwise "/$" will get stuck on end of line.
 			 */
-			while (matchpos.lnum == 0
-				&& ((options & SEARCH_END) && first_match
+			ଯେତେବେଳେ (matchpos.lnum == 0
+				&& ((options & ସନ୍ଧାନ_END) && first_match
 				    ?  (nmatched == 1
-					&& (int)endpos.col - 1
-					     < (int)start_pos.col + extra_col)
-				    : ((int)matchpos.col
+					&& (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)endpos.col - 1
+					     < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)start_pos.col + extra_col)
+				    : ((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)matchpos.col
 						  - (ptr[matchpos.col] == NUL)
-					    < (int)start_pos.col + extra_col)))
+					    < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)start_pos.col + extra_col)))
 			{
 			    /*
 			     * If vi-compatible searching, continue at the end
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ଯଦି (ସନ୍ଧାନ_from_match_end)
 			    {
-				if (nmatched > 1)
+				ଯଦି (nmatched > 1)
 				{
 				    // end is in next line, thus no match in
 				    // this line
 				    match_ok = FALSE;
-				    break;
+				    ଭାଙ୍ଗ;
 				}
 				matchcol = endpos.col;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ଯଦି (matchcol == matchpos.col
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ଯଦି (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    ଅନ୍ୟଥା
 					++matchcol;
 				}
 			    }
-			    else
+			    ଅନ୍ୟଥା
 			    {
 				// Advance "matchcol" to the next character.
 				// This uses rmm_matchcol, the actual start of
 				// the match, ignoring "\zs".
 				matchcol = regmatch.rmm_matchcol;
-				if (ptr[matchcol] != NUL)
+				ଯଦି (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ଯଦି (has_mbyte)
 					matchcol += (*mb_ptr2len)(ptr
 								  + matchcol);
-				    else
+				    ଅନ୍ୟଥା
 					++matchcol;
 				}
 			    }
-			    if (matchcol == 0 && (options & SEARCH_START))
-				break;
-			    if (ptr[matchcol] == NUL
+			    ଯଦି (matchcol == 0 && (options & ସନ୍ଧାନ_START))
+				ଭାଙ୍ଗ;
+			    ଯଦି (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
 					      matchcol, timed_out)) == 0)
 			    {
 				match_ok = FALSE;
-				break;
+				ଭାଙ୍ଗ;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ଯଦି (regmatch.regprog == ଖାଲି)
+				ଭାଙ୍ଗ;
 			    matchpos = regmatch.startpos[0];
 			    endpos = regmatch.endpos[0];
 #ifdef FEAT_EVAL
@@ -907,10 +907,10 @@ searchit(
 			    // multi-line search may have made it invalid.
 			    ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 			}
-			if (!match_ok)
-			    continue;
+			ଯଦି (!match_ok)
+			    ଜାରି;
 		    }
-		    if (dir == BACKWARD)
+		    ଯଦି (dir == BACKWARD)
 		    {
 			/*
 			 * Now, if there are multiple matches on this line,
@@ -920,27 +920,27 @@ searchit(
 			 * relative to the end of the match.
 			 */
 			match_ok = FALSE;
-			for (;;)
+			ପାଇଁ (;;)
 			{
 			    // Remember a position that is before the start
 			    // position, we use it if it's the last match in
 			    // the line.  Always accept a position after
 			    // wrapping around.
-			    if (loop
-				|| ((options & SEARCH_END)
+			    ଯଦି (loop
+				|| ((options & ସନ୍ଧାନ_END)
 				    ? (lnum + regmatch.endpos[0].lnum
 							      < start_pos.lnum
 					|| (lnum + regmatch.endpos[0].lnum
 							     == start_pos.lnum
-					     && (int)regmatch.endpos[0].col - 1
-							< (int)start_pos.col
+					     && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)regmatch.endpos[0].col - 1
+							< (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)start_pos.col
 								+ extra_col))
 				    : (lnum + regmatch.startpos[0].lnum
 							      < start_pos.lnum
 					|| (lnum + regmatch.startpos[0].lnum
 							     == start_pos.lnum
-					     && (int)regmatch.startpos[0].col
-						      < (int)start_pos.col
+					     && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)regmatch.startpos[0].col
+						      < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)start_pos.col
 							      + extra_col))))
 			    {
 				match_ok = TRUE;
@@ -950,8 +950,8 @@ searchit(
 				submatch = first_submatch(&regmatch);
 #endif
 			    }
-			    else
-				break;
+			    ଅନ୍ୟଥା
+				ଭାଙ୍ଗ;
 
 			    /*
 			     * We found a valid match, now check if there is
@@ -960,38 +960,38 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ଯଦି (ସନ୍ଧାନ_from_match_end)
 			    {
-				if (nmatched > 1)
-				    break;
+				ଯଦି (nmatched > 1)
+				    ଭାଙ୍ଗ;
 				matchcol = endpos.col;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ଯଦି (matchcol == matchpos.col
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ଯଦି (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    ଅନ୍ୟଥା
 					++matchcol;
 				}
 			    }
-			    else
+			    ଅନ୍ୟଥା
 			    {
 				// Stop when the match is in a next line.
-				if (matchpos.lnum > 0)
-				    break;
+				ଯଦି (matchpos.lnum > 0)
+				    ଭାଙ୍ଗ;
 				matchcol = matchpos.col;
-				if (ptr[matchcol] != NUL)
+				ଯଦି (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ଯଦି (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    ଅନ୍ୟଥା
 					++matchcol;
 				}
 			    }
-			    if (ptr[matchcol] == NUL
+			    ଯଦି (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
 					      matchcol, timed_out)) == 0)
@@ -999,13 +999,13 @@ searchit(
 				// If the search timed out, we did find a match
 				// but it might be the wrong one, so that's not
 				// OK.
-				if (*timed_out)
+				ଯଦି (*timed_out)
 				    match_ok = FALSE;
-				break;
+				ଭାଙ୍ଗ;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ଯଦି (regmatch.regprog == ଖାଲି)
+				ଭାଙ୍ଗ;
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
@@ -1016,14 +1016,14 @@ searchit(
 			 * If there is only a match after the cursor, skip
 			 * this match.
 			 */
-			if (!match_ok)
-			    continue;
+			ଯଦି (!match_ok)
+			    ଜାରି;
 		    }
 
 		    // With the SEARCH_END option move to the last character
 		    // of the match.  Don't do it for an empty match, end
 		    // should be same as start then.
-		    if ((options & SEARCH_END) && !(options & SEARCH_NOOF)
+		    ଯଦି ((options & ସନ୍ଧାନ_END) && !(options & ସନ୍ଧାନ_NOOF)
 			    && !(matchpos.lnum == endpos.lnum
 				&& matchpos.col == endpos.col))
 		    {
@@ -1031,89 +1031,89 @@ searchit(
 			// on the NUL in the previous line.
 			pos->lnum = lnum + endpos.lnum;
 			pos->col = endpos.col;
-			if (endpos.col == 0)
+			ଯଦି (endpos.col == 0)
 			{
-			    if (pos->lnum > 1)  // just in case
+			    ଯଦି (pos->lnum > 1)  // just in case
 			    {
 				--pos->lnum;
 				pos->col = ml_get_buf_len(buf, pos->lnum);
 			    }
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    --pos->col;
-			    if (has_mbyte
-				    && pos->lnum <= buf->b_ml.ml_line_count)
+			    ଯଦି (has_mbyte
+				    && pos->lnum <= buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 			    {
 				ptr = ml_get_buf(buf, pos->lnum, FALSE);
 				pos->col -= (*mb_head_off)(ptr, ptr + pos->col);
 			    }
 			}
-			if (end_pos != NULL)
+			ଯଦି (end_pos != ଖାଲି)
 			{
 			    end_pos->lnum = lnum + matchpos.lnum;
 			    end_pos->col = matchpos.col;
 			}
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			pos->lnum = lnum + matchpos.lnum;
 			pos->col = matchpos.col;
-			if (end_pos != NULL)
+			ଯଦି (end_pos != ଖାଲି)
 			{
 			    end_pos->lnum = lnum + endpos.lnum;
 			    end_pos->col = endpos.col;
 			}
 		    }
 		    pos->coladd = 0;
-		    if (end_pos != NULL)
+		    ଯଦି (end_pos != ଖାଲି)
 			end_pos->coladd = 0;
 		    found = 1;
 		    first_match = FALSE;
 
 		    // Set variables used for 'incsearch' highlighting.
-		    search_match_lines = endpos.lnum - matchpos.lnum;
-		    search_match_endcol = endpos.col;
-		    break;
+		    ସନ୍ଧାନ_match_ଧାଡ଼ିଗୁଡ଼ିକ = endpos.lnum - matchpos.lnum;
+		    ସନ୍ଧାନ_match_endcol = endpos.col;
+		    ଭାଙ୍ଗ;
 		}
-		line_breakcheck();	// stop if ctrl-C typed
-		if (got_int)
-		    break;
+		ଧାଡ଼ି_breakcheck();	// stop if ctrl-C typed
+		ଯଦି (got_int)
+		    ଭାଙ୍ଗ;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 		// Cancel searching if a character was typed.  Used for
 		// 'incsearch'.  Don't check too often, that would slowdown
 		// searching too much.
-		if ((options & SEARCH_PEEK)
+		ଯଦି ((options & ସନ୍ଧାନ_PEEK)
 			&& ((lnum - pos->lnum) & 0x3f) == 0
 			&& char_avail())
 		{
 		    break_loop = TRUE;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 #endif
 
-		if (loop && lnum == start_pos.lnum)
-		    break;	    // if second loop, stop where started
+		ଯଦି (loop && lnum == start_pos.lnum)
+		    ଭାଙ୍ଗ;	    // if second loop, stop where started
 	    }
-	    at_first_line = FALSE;
+	    at_first_ଧାଡ଼ି = FALSE;
 
 	    // vim_regexec_multi() may clear "regprog"
-	    if (regmatch.regprog == NULL)
-		break;
+	    ଯଦି (regmatch.regprog == ଖାଲି)
+		ଭାଙ୍ଗ;
 
 	    /*
 	     * Stop the search if wrapscan isn't set, "stop_lnum" is
 	     * specified, after an interrupt, after a match and after looping
 	     * twice.
 	     */
-	    if (!p_ws || stop_lnum != 0 || got_int
+	    ଯଦି (!p_ws || stop_lnum != 0 || got_int
 			      || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 			      || break_loop
 #endif
 			      || found || loop)
-		break;
+		ଭାଙ୍ଗ;
 
 	    /*
 	     * If 'wrapscan' is set we continue at the other end of the file.
@@ -1124,70 +1124,70 @@ searchit(
 	     * is redrawn. The keep_msg is cleared whenever another message is
 	     * written.
 	     */
-	    if (dir == BACKWARD)    // start second loop at the other end
-		lnum = buf->b_ml.ml_line_count;
-	    else
+	    ଯଦି (dir == BACKWARD)    // start second loop at the other end
+		lnum = buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+	    ଅନ୍ୟଥା
 		lnum = 1;
-	    if (!shortmess(SHM_SEARCH)
+	    ଯଦି (!shortmess(SHM_ସନ୍ଧାନ)
 		    && shortmess(SHM_SEARCHCOUNT)
-		    && (options & SEARCH_MSG))
+		    && (options & ସନ୍ଧାନ_ସନ୍ଦେଶ))
 		give_warning((char_u *)_(dir == BACKWARD
-					  ? top_bot_msg : bot_top_msg), TRUE);
-	    if (extra_arg != NULL)
+					  ? ଶୀର୍ଷ_bot_ସନ୍ଦେଶ : bot_ଶୀର୍ଷ_ସନ୍ଦେଶ), TRUE);
+	    ଯଦି (extra_arg != ଖାଲି)
 		extra_arg->sa_wrapped = TRUE;
 	}
-	if (got_int || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+	ଯଦି (got_int || called_emsg > called_emsg_before || *timed_out
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 		|| break_loop
 #endif
 		)
-	    break;
+	    ଭାଙ୍ଗ;
     }
-    while (--count > 0 && found);   // stop after count matches or no match
+    ଯେତେବେଳେ (--ଗଣନା_2 > 0 && found);   // stop after count matches or no match
 
 #ifdef FEAT_RELTIME
-    if (extra_arg != NULL && extra_arg->sa_tm > 0)
+    ଯଦି (extra_arg != ଖାଲି && extra_arg->sa_tm > 0)
 	disable_regexp_timeout();
 #endif
     vim_regfree(regmatch.regprog);
 
-    if (!found)		    // did not find it
+    ଯଦି (!found)		    // did not find it
     {
-	if (got_int)
+	ଯଦି (got_int)
 	    emsg(_(e_interrupted));
-	else if ((options & SEARCH_MSG) == SEARCH_MSG)
+	ଅନ୍ୟଥା ଯଦି ((options & ସନ୍ଧାନ_ସନ୍ଦେଶ) == ସନ୍ଧାନ_ସନ୍ଦେଶ)
 	{
-	    if (p_ws)
+	    ଯଦି (p_ws)
 		semsg(_(e_pattern_not_found_str), mr_pattern);
-	    else if (lnum == 0)
-		semsg(_(e_search_hit_top_without_match_for_str), mr_pattern);
-	    else
-		semsg(_(e_search_hit_bottom_without_match_for_str), mr_pattern);
+	    ଅନ୍ୟଥା ଯଦି (lnum == 0)
+		semsg(_(e_ସନ୍ଧାନ_hit_ଶୀର୍ଷ_without_match_for_str), mr_pattern);
+	    ଅନ୍ୟଥା
+		semsg(_(e_ସନ୍ଧାନ_hit_bottom_without_match_for_str), mr_pattern);
 	}
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     // A pattern like "\n\zs" may go past the last line.
-    if (pos->lnum > buf->b_ml.ml_line_count)
+    ଯଦି (pos->lnum > buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
     {
-	pos->lnum = buf->b_ml.ml_line_count;
+	pos->lnum = buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
 	pos->col = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > 0)
+	ଯଦି (pos->col > 0)
 	    --pos->col;
     }
 
-    return submatch + 1;
+    ଫେରନ୍ତୁ submatch + 1;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
-    void
-set_search_direction(int cdir)
+#ଯଦି defined(FEAT_EVAL) || defined(FEAT_PROTO)
+    ଶୂନ୍ୟ
+set_ସନ୍ଧାନ_direction(ପୂର୍ଣ୍ଣସଂଖ୍ୟା cdir)
 {
     spats[0].off.dir = cdir;
 }
 
-    static void
-set_vv_searchforward(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_vv_searchforward(ଶୂନ୍ୟ)
 {
     set_vim_var_nr(VV_SEARCHFORWARD, (long)(spats[0].off.dir == '/'));
 }
@@ -1196,22 +1196,22 @@ set_vv_searchforward(void)
  * Return the number of the first subpat that matched.
  * Return zero if none of them matched.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 first_submatch(regmmatch_T *rp)
 {
-    int		submatch;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		submatch;
 
-    for (submatch = 1; ; ++submatch)
+    ପାଇଁ (submatch = 1; ; ++submatch)
     {
-	if (rp->startpos[submatch].lnum >= 0)
-	    break;
-	if (submatch == 9)
+	ଯଦି (rp->startpos[submatch].lnum >= 0)
+	    ଭାଙ୍ଗ;
+	ଯଦି (submatch == 9)
 	{
 	    submatch = 0;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
-    return submatch;
+    ଫେରନ୍ତୁ submatch;
 }
 #endif
 
@@ -1231,54 +1231,54 @@ first_submatch(regmmatch_T *rp)
  * Returns the length of the parsed pattern + offset (used by get_address()
  * to know how much of the command line was consumed).
  */
-    int
-parse_search_pattern_offset(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+parse_ସନ୍ଧାନ_pattern_offset(
     char_u	**pat,
     size_t	*patlen,
-    int		search_delim,
-    int		options,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ସନ୍ଧାନ_delim,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options,
     char_u	**strcopy,
     char_u	**searchstr,
     size_t	*searchstrlen,
     char_u	**dircp,
     soffset_T	*offset)
 {
-    int		cmdlen = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cmdlen = 0;
     char_u	*p;
     char_u	*ps;
 
-    if (*pat == NULL || **pat == NUL)
-	return 0;
+    ଯଦି (*pat == ଖାଲି || **pat == NUL)
+	ଫେରନ୍ତୁ 0;
 
     ps = *strcopy;
     *searchstr = *pat;
     *searchstrlen = *patlen;
-    *dircp = NULL;
+    *dircp = ଖାଲି;
 
     /*
      * Find end of regular expression.
      * If there is a matching '/' or '?', toss it.
      */
-    p = skip_regexp_ex(*pat, search_delim, magic_isset(),
-						    strcopy, NULL, NULL);
-    if (*strcopy != ps)
+    p = skip_regexp_ex(*pat, ସନ୍ଧାନ_delim, magic_isset(),
+						    strcopy, ଖାଲି, ଖାଲି);
+    ଯଦି (*strcopy != ps)
     {
 	size_t len = STRLEN(*strcopy);
 	// made a copy of "pat" to change "\?" to "?"
-	cmdlen += (int)(*patlen - len);
+	cmdlen += (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*patlen - len);
 	*pat = *strcopy;
 	*patlen = len;
 	*searchstr = *strcopy;
 	*searchstrlen = len;
     }
-    if (*p == search_delim)
+    ଯଦି (*p == ସନ୍ଧାନ_delim)
     {
 	*searchstrlen = p - *pat;
 	*dircp = p;	// remember where we put the NUL
 	*p++ = NUL;
     }
 
-    offset->line = FALSE;
+    offset->ଧାଡ଼ି = FALSE;
     offset->end = FALSE;
     offset->off = 0;
     /*
@@ -1287,35 +1287,35 @@ parse_search_pattern_offset(
      * offset, because it is meaningless and the 's' could be a
      * substitute command.
      */
-    if (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
-	offset->line = TRUE;
-    else if ((options & SEARCH_OPT)
+    ଯଦି (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
+	offset->ଧାଡ଼ି = TRUE;
+    ଅନ୍ୟଥା ଯଦି ((options & ସନ୍ଧାନ_OPT)
 				  && (*p == 'e' || *p == 's' || *p == 'b'))
     {
-	if (*p == 'e')		// end
-	    offset->end = SEARCH_END;
+	ଯଦି (*p == 'e')		// end
+	    offset->end = ସନ୍ଧାନ_END;
 	++p;
     }
-    if (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
+    ଯଦି (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
     {
 				    // 'nr' or '+nr' or '-nr'
-	if (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
-	    offset->off = atol((char *)p);
-	else if (*p == '-')	    // single '-'
+	ଯଦି (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
+	    offset->off = atol((ଅକ୍ଷର *)p);
+	ଅନ୍ୟଥା ଯଦି (*p == '-')	    // single '-'
 	    offset->off = -1;
-	else			    // single '+'
+	ଅନ୍ୟଥା			    // single '+'
 	    offset->off = 1;
 	++p;
-	while (VIM_ISDIGIT(*p))	    // skip number
+	ଯେତେବେଳେ (VIM_ISDIGIT(*p))	    // skip number
 	    ++p;
     }
 
     // compute length of search command for get_address()
-    cmdlen += (int)(p - *pat);
+    cmdlen += (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - *pat);
     *patlen -= p - *pat;
     *pat = p;			    // put pat after search command
 
-    return cmdlen;
+    ଫେରନ୍ତୁ cmdlen;
 }
 
 /*
@@ -1339,40 +1339,40 @@ parse_search_pattern_offset(
  *
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    int
-do_search(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+do_ସନ୍ଧାନ(
     oparg_T	    *oap,	// can be NULL
-    int		    dirc,	// '/' or '?'
-    int		    search_delim, // the delimiter for the search, e.g. '%' in
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    dirc,	// '/' or '?'
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    ସନ୍ଧାନ_delim, // the delimiter for the search, e.g. '%' in
 				  // s%regex%replacement%
     char_u	    *pat,
     size_t	    patlen,
-    long	    count,
-    int		    options,
+    long	    ଗଣନା_2,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    options,
     searchit_arg_T  *sia)	// optional arguments or NULL
 {
     pos_T	    pos;	// position of the last match
     char_u	    *searchstr;
     size_t	    searchstrlen;
     soffset_T	    old_off;
-    int		    retval;	// Return value
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    retval;	// Return value
     char_u	    *p;
     long	    c;
     char_u	    *dircp;
-    char_u	    *strcopy = NULL;
-    int		    show_search_stats;
-    char_u	    *msgbuf = NULL;
+    char_u	    *strcopy = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    show_ସନ୍ଧାନ_stats;
+    char_u	    *msgbuf = ଖାଲି;
     size_t	    msgbuflen = 0;
-    int		    has_offset = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    has_offset = FALSE;
 
     searchcmdlen = 0;
 
     /*
      * A line offset is not remembered, this is vi compatible.
      */
-    if (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
+    ଯଦି (spats[0].off.ଧାଡ଼ି && vim_strchr(p_cpo, CPO_LINEOFF) != ଖାଲି)
     {
-	spats[0].off.line = FALSE;
+	spats[0].off.ଧାଡ଼ି = FALSE;
 	spats[0].off.off = 0;
     }
 
@@ -1387,25 +1387,25 @@ do_search(
     /*
      * Find out the direction of the search.
      */
-    if (dirc == 0)
+    ଯଦି (dirc == 0)
 	dirc = spats[0].off.dir;
-    else
+    ଅନ୍ୟଥା
     {
 	spats[0].off.dir = dirc;
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 	set_vv_searchforward();
 #endif
     }
-    if (options & SEARCH_REV)
+    ଯଦି (options & ସନ୍ଧାନ_REV)
     {
 #ifdef MSWIN
 	// There is a bug in the Visual C++ 2.2 compiler which means that
 	// dirc always ends up being '/'
 	dirc = (dirc == '/')  ?  '?'  :  '/';
-#else
-	if (dirc == '/')
+#ଅନ୍ୟଥା
+	ଯଦି (dirc == '/')
 	    dirc = '?';
-	else
+	ଅନ୍ୟଥା
 	    dirc = '/';
 #endif
     }
@@ -1413,23 +1413,23 @@ do_search(
 #ifdef FEAT_FOLDING
     // If the cursor is in a closed fold, don't find another match in the same
     // fold.
-    if (dirc == '/')
+    ଯଦି (dirc == '/')
     {
-	if (hasFolding(pos.lnum, NULL, &pos.lnum))
+	ଯଦି (hasFolding(pos.lnum, ଖାଲି, &pos.lnum))
 	    pos.col = MAXCOL - 2;	// avoid overflow when adding 1
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (hasFolding(pos.lnum, &pos.lnum, NULL))
+	ଯଦି (hasFolding(pos.lnum, &pos.lnum, ଖାଲି))
 	    pos.col = 0;
     }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
     /*
      * Turn 'hlsearch' highlighting back on.
      */
-    if (no_hlsearch && !(options & SEARCH_KEEP))
+    ଯଦି (no_hlsearch && !(options & ସନ୍ଧାନ_KEEP))
     {
 	redraw_all_later(UPD_SOME_VALID);
 	set_no_hlsearch(FALSE);
@@ -1439,29 +1439,29 @@ do_search(
     /*
      * Repeat the search when pattern followed by ';', e.g. "/foo/;?bar".
      */
-    for (;;)
+    ପାଇଁ (;;)
     {
-	int		show_top_bot_msg = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ = FALSE;
 
 	searchstr = pat;
 	searchstrlen = patlen;
 
-	dircp = NULL;
+	dircp = ଖାଲି;
 					    // use previous pattern
-	if (pat == NULL || *pat == NUL || *pat == search_delim)
+	ଯଦି (pat == ଖାଲି || *pat == NUL || *pat == ସନ୍ଧାନ_delim)
 	{
-	    if (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
+	    ଯଦି (spats[RE_ସନ୍ଧାନ].pat == ଖାଲି)	    // no previous pattern
 	    {
-		if (spats[RE_SUBST].pat == NULL)
+		ଯଦି (spats[RE_SUBST].pat == ଖାଲି)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    retval = 0;
-		    goto end_do_search;
+		    ଯାଅ end_do_ସନ୍ଧାନ;
 		}
 		searchstr = spats[RE_SUBST].pat;
 		searchstrlen = spats[RE_SUBST].patlen;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// make search_regcomp() use spats[RE_SEARCH].pat
 		searchstr = (char_u *)"";
@@ -1469,26 +1469,26 @@ do_search(
 	    }
 	}
 
-	if (pat != NULL && *pat != NUL)	// look for (new) offset
+	ଯଦି (pat != ଖାଲି && *pat != NUL)	// look for (new) offset
 	{
 	    char_u	*prev_searchstr = searchstr;
 	    size_t	prev_searchstrlen = searchstrlen;
 
-	    searchcmdlen += parse_search_pattern_offset(&pat, &patlen,
-				search_delim, options, &strcopy, &searchstr,
+	    searchcmdlen += parse_ସନ୍ଧାନ_pattern_offset(&pat, &patlen,
+				ସନ୍ଧାନ_delim, options, &strcopy, &searchstr,
 				&searchstrlen, &dircp, &spats[0].off);
 	    // An empty pattern (e.g. "//e") uses the previous pattern selected
 	    // above.
-	    if (*searchstr == NUL)
+	    ଯଦି (*searchstr == NUL)
 	    {
 		searchstr = prev_searchstr;
 		searchstrlen = prev_searchstrlen;
 	    }
 	}
 
-	show_search_stats = FALSE;
-	if ((options & SEARCH_ECHO) && messaging()
-		&& !msg_silent
+	show_ସନ୍ଧାନ_stats = FALSE;
+	ଯଦି ((options & ସନ୍ଧାନ_ECHO) && messaging()
+		&& !ସନ୍ଦେଶ_silent
 		&& (!cmd_silent || !shortmess(SHM_SEARCHCOUNT)))
 	{
 	    char_u	off_buf[40];
@@ -1497,86 +1497,86 @@ do_search(
 	    size_t	msgbufsize;
 
 	    // Compute msg_row early.
-	    msg_start();
+	    ସନ୍ଦେଶ_start();
 
 	    // Get the offset, so we know how long it is.
-	    if (!cmd_silent &&
-		    (spats[0].off.line || spats[0].off.end || spats[0].off.off))
+	    ଯଦି (!cmd_silent &&
+		    (spats[0].off.ଧାଡ଼ି || spats[0].off.end || spats[0].off.off))
 	    {
 		off_buf[off_len++] = dirc;
-		if (spats[0].off.end)
+		ଯଦି (spats[0].off.end)
 		    off_buf[off_len++] = 'e';
-		else if (!spats[0].off.line)
+		ଅନ୍ୟଥା ଯଦି (!spats[0].off.ଧାଡ଼ି)
 		    off_buf[off_len++] = 's';
 		off_buf[off_len] = NUL;
-		if (spats[0].off.off != 0 || spats[0].off.line)
-		    off_len += vim_snprintf((char *)off_buf + off_len,
-			   sizeof(off_buf) - off_len, "%+ld", spats[0].off.off);
+		ଯଦି (spats[0].off.off != 0 || spats[0].off.ଧାଡ଼ି)
+		    off_len += vim_snprintf((ଅକ୍ଷର *)off_buf + off_len,
+			   ଆକାର(off_buf) - off_len, "%+ld", spats[0].off.off);
 	    }
 
-	    if (*searchstr == NUL)
+	    ଯଦି (*searchstr == NUL)
 	    {
 		p = spats[0].pat;
 		plen = spats[0].patlen;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		p = searchstr;
 		plen = searchstrlen;
 	    }
 
-	    if (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
+	    ଯଦି (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
 	    {
 		// Reserve enough space for the search pattern + offset +
 		// search stat.  Use all the space available, so that the
 		// search state is right aligned.  If there is not enough space
 		// msg_strtrunc() will shorten in the middle.
-		if (msg_scrolled != 0 && !cmd_silent)
+		ଯଦି (ସନ୍ଦେଶ_scrolled != 0 && !cmd_silent)
 		    // Use all the columns.
-		    msgbufsize = (int)(Rows - msg_row) * cmdline_width - 1;
-		else
+		    msgbufsize = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(Rows - ସନ୍ଦେଶ_row) * cmdline_width - 1;
+		ଅନ୍ୟଥା
 		    // Use up to 'showcmd' column.
-		    msgbufsize = (int)(Rows - msg_row - 1) * cmdline_width
+		    msgbufsize = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(Rows - ସନ୍ଦେଶ_row - 1) * cmdline_width
 			+ sc_col - 1;
-		if (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
-		    msgbufsize = plen + off_len + SEARCH_STAT_BUF_LEN + 3;
+		ଯଦି (msgbufsize < plen + off_len + ସନ୍ଧାନ_STAT_BUF_LEN + 3)
+		    msgbufsize = plen + off_len + ସନ୍ଧାନ_STAT_BUF_LEN + 3;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		// Reserve enough space for the search pattern + offset.
 		msgbufsize = plen + off_len + 3;
 
 	    vim_free(msgbuf);
 	    msgbuf = alloc(msgbufsize);
-	    if (msgbuf == NULL)
+	    ଯଦି (msgbuf == ଖାଲି)
 	    {
 		msgbuflen = 0;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		vim_memset(msgbuf, ' ', msgbufsize);
 		msgbuflen = msgbufsize - 1;
 		msgbuf[msgbuflen] = NUL;
 		// do not fill the msgbuf buffer, if cmd_silent is set, leave it
 		// empty for the search_stat feature.
-		if (!cmd_silent)
+		ଯଦି (!cmd_silent)
 		{
 		    char_u	*trunc;
 
 		    msgbuf[0] = dirc;
 
-		    if (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
+		    ଯଦି (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
 		    {
 			// Use a space to draw the composing char on.
 			msgbuf[1] = ' ';
 			mch_memmove(msgbuf + 2, p, plen);
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			mch_memmove(msgbuf + 1, p, plen);
-		    if (off_len > 0)
+		    ଯଦି (off_len > 0)
 			mch_memmove(msgbuf + plen + 1, off_buf, off_len);
 
-		    trunc = msg_strtrunc(msgbuf, TRUE);
-		    if (trunc != NULL)
+		    trunc = ସନ୍ଦେଶ_strtrunc(msgbuf, TRUE);
+		    ଯଦି (trunc != ଖାଲି)
 		    {
 			vim_free(msgbuf);
 			msgbuf = trunc;
@@ -1588,41 +1588,41 @@ do_search(
 		    // rightleft mode, but the 'ruler' and 'showcmd' area use
 		    // it too, thus it would be blanked out again very soon.
 		    // Show it on the left, but do reverse the text.
-		    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+		    ଯଦି (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 		    {
 			char_u *r;
 			size_t pat_len;
 
 			r = reverse_text(msgbuf);
-			if (r != NULL)
+			ଯଦି (r != ଖାଲି)
 			{
 			    vim_free(msgbuf);
 			    msgbuf = r;
 			    msgbuflen = STRLEN(msgbuf);
 			    // move reversed text to beginning of buffer
-			    while (*r != NUL && *r == ' ')
+			    ଯେତେବେଳେ (*r != NUL && *r == ' ')
 				r++;
 			    pat_len = msgbuf + msgbuflen - r;
 			    mch_memmove(msgbuf, r, pat_len);
 			    // overwrite old text
-			    if ((size_t)(r - msgbuf) >= pat_len)
+			    ଯଦି ((size_t)(r - msgbuf) >= pat_len)
 				vim_memset(r, ' ', pat_len);
-			    else
+			    ଅନ୍ୟଥା
 				vim_memset(msgbuf + pat_len, ' ', r - msgbuf);
 			}
 		    }
 #endif
-		    msg_outtrans(msgbuf);
-		    msg_clr_eos();
-		    msg_check();
+		    ସନ୍ଦେଶ_outtrans(msgbuf);
+		    ସନ୍ଦେଶ_clr_eos();
+		    ସନ୍ଦେଶ_check();
 
 		    gotocmdline(FALSE);
 		    out_flush();
-		    msg_nowait = TRUE;	    // don't wait for this message
+		    ସନ୍ଦେଶ_nowait = TRUE;	    // don't wait for this message
 		}
 
-		if (!shortmess(SHM_SEARCHCOUNT))
-		    show_search_stats = TRUE;
+		ଯଦି (!shortmess(SHM_SEARCHCOUNT))
+		    show_ସନ୍ଧାନ_stats = TRUE;
 	    }	// msgbuf != NULL
 	}
 
@@ -1633,27 +1633,27 @@ do_search(
 	 * This is not done for a line offset, because then we would not be vi
 	 * compatible.
 	 */
-	if (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
+	ଯଦି (!spats[0].off.ଧାଡ଼ି && spats[0].off.off && pos.col < MAXCOL - 2)
 	{
-	    if (spats[0].off.off > 0)
+	    ଯଦି (spats[0].off.off > 0)
 	    {
-		for (c = spats[0].off.off; c; --c)
-		    if (decl(&pos) == -1)
-			break;
-		if (c)			// at start of buffer
+		ପାଇଁ (c = spats[0].off.off; c; --c)
+		    ଯଦି (decl(&pos) == -1)
+			ଭାଙ୍ଗ;
+		ଯଦି (c)			// at start of buffer
 		{
 		    pos.lnum = 0;	// allow lnum == 0 here
 		    pos.col = MAXCOL;
 		}
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		for (c = spats[0].off.off; c; ++c)
-		    if (incl(&pos) == -1)
-			break;
-		if (c)			// at end of buffer
+		ପାଇଁ (c = spats[0].off.off; c; ++c)
+		    ଯଦି (incl(&pos) == -1)
+			ଭାଙ୍ଗ;
+		ଯଦି (c)			// at end of buffer
 		{
-		    pos.lnum = curbuf->b_ml.ml_line_count + 1;
+		    pos.lnum = curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା + 1;
 		    pos.col = 0;
 		}
 	    }
@@ -1662,26 +1662,26 @@ do_search(
 	/*
 	 * The actual search.
 	 */
-	c = searchit(curwin, curbuf, &pos, NULL,
+	c = searchit(curwin, curbuf, &pos, ଖାଲି,
 					      dirc == '/' ? FORWARD : BACKWARD,
-		searchstr, searchstrlen, count, spats[0].off.end + (options &
-		       (SEARCH_KEEP + SEARCH_PEEK + SEARCH_HIS
-			+ SEARCH_MSG + SEARCH_START
-			+ ((pat != NULL && *pat == ';') ? 0 : SEARCH_NOOF))),
+		searchstr, searchstrlen, ଗଣନା_2, spats[0].off.end + (options &
+		       (ସନ୍ଧାନ_KEEP + ସନ୍ଧାନ_PEEK + ସନ୍ଧାନ_HIS
+			+ ସନ୍ଧାନ_ସନ୍ଦେଶ + ସନ୍ଧାନ_START
+			+ ((pat != ଖାଲି && *pat == ';') ? 0 : ସନ୍ଧାନ_NOOF))),
 		RE_LAST, sia);
 
-	if (dircp != NULL)
-	    *dircp = search_delim; // restore second '/' or '?' for normal_cmd()
+	ଯଦି (dircp != ଖାଲି)
+	    *dircp = ସନ୍ଧାନ_delim; // restore second '/' or '?' for normal_cmd()
 
-	if (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
-	    show_top_bot_msg = TRUE;
+	ଯଦି (!shortmess(SHM_ସନ୍ଧାନ) && sia && sia->sa_wrapped)
+	    show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ = TRUE;
 
-	if (c == FAIL)
+	ଯଦି (c == FAIL)
 	{
 	    retval = 0;
-	    goto end_do_search;
+	    ଯାଅ end_do_ସନ୍ଧାନ;
 	}
-	if (spats[0].off.end && oap != NULL)
+	ଯଦି (spats[0].off.end && oap != ଖାଲି)
 	    oap->inclusive = TRUE;  // 'e' includes last character
 
 	retval = 1;		    // pattern found
@@ -1689,58 +1689,58 @@ do_search(
 	/*
 	 * Add character and/or line offset
 	 */
-	if (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
+	ଯଦି (!(options & ସନ୍ଧାନ_NOOF) || (pat != ଖାଲି && *pat == ';'))
 	{
 	    pos_T org_pos = pos;
 
-	    if (spats[0].off.line)	// Add the offset to the line number.
+	    ଯଦି (spats[0].off.ଧାଡ଼ି)	// Add the offset to the line number.
 	    {
 		c = pos.lnum + spats[0].off.off;
-		if (c < 1)
+		ଯଦି (c < 1)
 		    pos.lnum = 1;
-		else if (c > curbuf->b_ml.ml_line_count)
-		    pos.lnum = curbuf->b_ml.ml_line_count;
-		else
+		ଅନ୍ୟଥା ଯଦି (c > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+		    pos.lnum = curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+		ଅନ୍ୟଥା
 		    pos.lnum = c;
 		pos.col = 0;
 
 		retval = 2;	    // pattern found, line offset added
 	    }
-	    else if (pos.col < MAXCOL - 2)	// just in case
+	    ଅନ୍ୟଥା ଯଦି (pos.col < MAXCOL - 2)	// just in case
 	    {
 		// to the right, check for end of file
 		c = spats[0].off.off;
-		if (c > 0)
+		ଯଦି (c > 0)
 		{
-		    while (c-- > 0)
-			if (incl(&pos) == -1)
-			    break;
+		    ଯେତେବେଳେ (c-- > 0)
+			ଯଦି (incl(&pos) == -1)
+			    ଭାଙ୍ଗ;
 		}
 		// to the left, check for start of file
-		else
+		ଅନ୍ୟଥା
 		{
-		    while (c++ < 0)
-			if (decl(&pos) == -1)
-			    break;
+		    ଯେତେବେଳେ (c++ < 0)
+			ଯଦି (decl(&pos) == -1)
+			    ଭାଙ୍ଗ;
 		}
 	    }
-	    if (!EQUAL_POS(pos, org_pos))
+	    ଯଦି (!EQUAL_POS(pos, org_pos))
 		has_offset = TRUE;
 	}
 
 	// Show [1/15] if 'S' is not in 'shortmess'.
-	if (show_search_stats)
-	     cmdline_search_stat(dirc, &pos, &curwin->w_cursor,
-				show_top_bot_msg, msgbuf, msgbuflen,
-				(count != 1 || has_offset
+	ଯଦି (show_ସନ୍ଧାନ_stats)
+	     cmdline_ସନ୍ଧାନ_stat(dirc, &pos, &curwin->w_cursor,
+				show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ, msgbuf, msgbuflen,
+				(ଗଣନା_2 != 1 || has_offset
 #ifdef FEAT_FOLDING
-				 || (!(fdo_flags & FDO_SEARCH)
+				 || (!(fdo_flags & FDO_ସନ୍ଧାନ)
 				     && hasFolding(curwin->w_cursor.lnum,
-								   NULL, NULL))
+								   ଖାଲି, ଖାଲି))
 #endif
 				),
 				p_msc,
-				SEARCH_STAT_DEF_TIMEOUT);
+				ସନ୍ଧାନ_STAT_DEF_TIMEOUT);
 
 	/*
 	 * The search command can be followed by a ';' to do another search.
@@ -1750,34 +1750,34 @@ do_search(
 	 * - When an error happens the cursor isn't moved at all.
 	 * Don't do this when called by get_address() (it handles ';' itself).
 	 */
-	if (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
-	    break;
+	ଯଦି (!(options & ସନ୍ଧାନ_OPT) || pat == ଖାଲି || *pat != ';')
+	    ଭାଙ୍ଗ;
 
 	dirc = *++pat;
 	--patlen;
-	search_delim = dirc;
-	if (dirc != '?' && dirc != '/')
+	ସନ୍ଧାନ_delim = dirc;
+	ଯଦି (dirc != '?' && dirc != '/')
 	{
 	    retval = 0;
 	    emsg(_(e_expected_question_or_slash_after_semicolon));
-	    goto end_do_search;
+	    ଯାଅ end_do_ସନ୍ଧାନ;
 	}
 	++pat;
 	--patlen;
     }
 
-    if (options & SEARCH_MARK)
+    ଯଦି (options & ସନ୍ଧାନ_MARK)
 	setpcmark();
     curwin->w_cursor = pos;
     curwin->w_set_curswant = true;
 
-end_do_search:
-    if ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
+end_do_ସନ୍ଧାନ:
+    ଯଦି ((options & ସନ୍ଧାନ_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
 	spats[0].off = old_off;
     vim_free(strcopy);
     vim_free(msgbuf);
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 /*
@@ -1789,54 +1789,54 @@ end_do_search:
  * ADDING is set.  If p_ic is set then the pattern must be in lowercase.
  * Return OK for success, or FAIL if no line found.
  */
-    int
-search_for_exact_line(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ସନ୍ଧାନ_for_exact_ଧାଡ଼ି(
     buf_T	*buf,
     pos_T	*pos,
-    int		dir,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir,
     char_u	*pat)
 {
     linenr_T	start = 0;
     char_u	*ptr;
     char_u	*p;
-    int		compl_len = ins_compl_len();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		compl_len = ins_compl_len();
 
-    if (buf->b_ml.ml_line_count == 0)
-	return FAIL;
-    for (;;)
+    ଯଦି (buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା == 0)
+	ଫେରନ୍ତୁ FAIL;
+    ପାଇଁ (;;)
     {
 	pos->lnum += dir;
-	if (pos->lnum < 1)
+	ଯଦି (pos->lnum < 1)
 	{
-	    if (p_ws)
+	    ଯଦି (p_ws)
 	    {
-		pos->lnum = buf->b_ml.ml_line_count;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		pos->lnum = buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+		ଯଦି (!shortmess(SHM_ସନ୍ଧାନ))
+		    give_warning((char_u *)_(ଶୀର୍ଷ_bot_ସନ୍ଦେଶ), TRUE);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		pos->lnum = 1;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	else if (pos->lnum > buf->b_ml.ml_line_count)
+	ଅନ୍ୟଥା ଯଦି (pos->lnum > buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 	{
-	    if (p_ws)
+	    ଯଦି (p_ws)
 	    {
 		pos->lnum = 1;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		ଯଦି (!shortmess(SHM_ସନ୍ଧାନ))
+		    give_warning((char_u *)_(bot_ଶୀର୍ଷ_ସନ୍ଦେଶ), TRUE);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		pos->lnum = 1;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	if (pos->lnum == start)
-	    break;
-	if (start == 0)
+	ଯଦି (pos->lnum == start)
+	    ଭାଙ୍ଗ;
+	ଯଦି (start == 0)
 	    start = pos->lnum;
 	ptr = ml_get_buf(buf, pos->lnum, FALSE);
 	p = skipwhite(ptr);
@@ -1844,19 +1844,19 @@ search_for_exact_line(
 
 	// when adding lines the matching line may be empty but it is not
 	// ignored because we are interested in the next line -- Acevedo
-	if (compl_status_adding() && !compl_status_sol())
+	ଯଦି (compl_status_adding() && !compl_status_sol())
 	{
-	    if ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
-		return OK;
+	    ଯଦି ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
+		ଫେରନ୍ତୁ OK;
 	}
-	else if (*p != NUL)	// ignore empty lines
+	ଅନ୍ୟଥା ଯଦି (*p != NUL)	// ignore empty lines
 	{	// expanding lines or words
-	    if ((p_ic ? MB_STRNICMP(p, pat, compl_len)
+	    ଯଦି ((p_ic ? MB_STRNICMP(p, pat, compl_len)
 				   : STRNCMP(p, pat, compl_len)) == 0)
-		return OK;
+		ଫେରନ୍ତୁ OK;
 	}
     }
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
@@ -1869,42 +1869,42 @@ search_for_exact_line(
  * Do this "cap->count1" times.
  * Return FAIL or OK.
  */
-    int
-searchc(cmdarg_T *cap, int t_cmd)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+searchc(cmdarg_T *cap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା t_cmd)
 {
-    int			c = cap->nchar;	// char to search for
-    int			dir = cap->arg;	// TRUE for searching forward
-    long		count = cap->count1;	// repeat count
-    int			col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			c = cap->nchar;	// char to search for
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			dir = cap->arg;	// TRUE for searching forward
+    long		ଗଣନା_2 = cap->count1;	// repeat count
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			col;
     char_u		*p;
-    int			len;
-    int			stop = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			stop = TRUE;
 
-    if (c != NUL)	// normal search: remember args for repeat
+    ଯଦି (c != NUL)	// normal search: remember args for repeat
     {
-	if (!KeyStuffed)    // don't remember when redoing
+	ଯଦି (!ଚାବି_Stuffed)    // don't remember when redoing
 	{
 	    *lastc = c;
 	    set_csearch_direction(dir);
 	    set_csearch_until(t_cmd);
 	    lastc_bytelen = (*mb_char2bytes)(c, lastc_bytes);
-	    if (cap->ncharC1 != 0)
+	    ଯଦି (cap->ncharC1 != 0)
 	    {
 		lastc_bytelen += (*mb_char2bytes)(cap->ncharC1,
 			lastc_bytes + lastc_bytelen);
-		if (cap->ncharC2 != 0)
+		ଯଦି (cap->ncharC2 != 0)
 		    lastc_bytelen += (*mb_char2bytes)(cap->ncharC2,
 			    lastc_bytes + lastc_bytelen);
 	    }
 	}
     }
-    else		// repeat previous search
+    ଅନ୍ୟଥା		// repeat previous search
     {
-	if (*lastc == NUL && lastc_bytelen <= 1)
-	    return FAIL;
-	if (dir)	// repeat in opposite direction
+	ଯଦି (*lastc == NUL && lastc_bytelen <= 1)
+	    ଫେରନ୍ତୁ FAIL;
+	ଯଦି (dir)	// repeat in opposite direction
 	    dir = -lastcdir;
-	else
+	ଅନ୍ୟଥା
 	    dir = lastcdir;
 	t_cmd = last_t_cmd;
 	c = *lastc;
@@ -1913,78 +1913,78 @@ searchc(cmdarg_T *cap, int t_cmd)
 	// Force a move of at least one char, so ";" and "," will move the
 	// cursor, even if the cursor is right in front of char we are looking
 	// at.
-	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
+	ଯଦି (vim_strchr(p_cpo, CPO_SCOLON) == ଖାଲି && ଗଣନା_2 == 1 && t_cmd)
 	    stop = FALSE;
     }
 
-    if (dir == BACKWARD)
+    ଯଦି (dir == BACKWARD)
 	cap->oap->inclusive = FALSE;
-    else
+    ଅନ୍ୟଥା
 	cap->oap->inclusive = TRUE;
 
     p = ml_get_curline();
     col = curwin->w_cursor.col;
     len = ml_get_curline_len();
 
-    while (count--)
+    ଯେତେବେଳେ (ଗଣନା_2--)
     {
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
-	    for (;;)
+	    ପାଇଁ (;;)
 	    {
-		if (dir > 0)
+		ଯଦି (dir > 0)
 		{
 		    col += (*mb_ptr2len)(p + col);
-		    if (col >= len)
-			return FAIL;
+		    ଯଦି (col >= len)
+			ଫେରନ୍ତୁ FAIL;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
-		    if (col == 0)
-			return FAIL;
+		    ଯଦି (col == 0)
+			ଫେରନ୍ତୁ FAIL;
 		    col -= (*mb_head_off)(p, p + col - 1) + 1;
 		}
-		if (lastc_bytelen <= 1)
+		ଯଦି (lastc_bytelen <= 1)
 		{
-		    if (p[col] == c && stop)
-			break;
+		    ଯଦି (p[col] == c && stop)
+			ଭାଙ୍ଗ;
 		}
-		else if (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
+		ଅନ୍ୟଥା ଯଦି (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
 								       && stop)
-		    break;
+		    ଭାଙ୍ଗ;
 		stop = TRUE;
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    for (;;)
+	    ପାଇଁ (;;)
 	    {
-		if ((col += dir) < 0 || col >= len)
-		    return FAIL;
-		if (p[col] == c && stop)
-		    break;
+		ଯଦି ((col += dir) < 0 || col >= len)
+		    ଫେରନ୍ତୁ FAIL;
+		ଯଦି (p[col] == c && stop)
+		    ଭାଙ୍ଗ;
 		stop = TRUE;
 	    }
 	}
     }
 
-    if (t_cmd)
+    ଯଦି (t_cmd)
     {
 	// backup to before the character (possibly double-byte)
 	col -= dir;
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
-	    if (dir < 0)
+	    ଯଦି (dir < 0)
 		// Landed on the search char which is lastc_bytelen long
 		col += lastc_bytelen - 1;
-	    else
+	    ଅନ୍ୟଥା
 		// To previous char, which may be multi-byte.
 		col -= (*mb_head_off)(p, p + col);
 	}
     }
     curwin->w_cursor.col = col;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -1997,9 +1997,9 @@ searchc(cmdarg_T *cap, int t_cmd)
  * Improvement over vi: Braces inside quotes are ignored.
  */
     pos_T *
-findmatch(oparg_T *oap, int initc)
+findmatch(oparg_T *oap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା initc)
 {
-    return findmatchlimit(oap, initc, 0, 0);
+    ଫେରନ୍ତୁ findmatchlimit(oap, initc, 0, 0);
 }
 
 /*
@@ -2009,61 +2009,61 @@ findmatch(oparg_T *oap, int initc)
  * is NULL.
  * Handles multibyte string correctly.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_prevcol(
     char_u	*linep,
-    int		col,
-    int		ch,
-    int		*prevcol)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ch,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*prevcol)
 {
     --col;
-    if (col > 0 && has_mbyte)
+    ଯଦି (col > 0 && has_mbyte)
 	col -= (*mb_head_off)(linep, linep + col);
-    if (prevcol)
+    ଯଦି (prevcol)
 	*prevcol = col;
-    return (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
+    ଫେରନ୍ତୁ (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
 }
 
 /*
  * Raw string start is found at linep[startpos.col - 1].
  * Return TRUE if the matching end can be found between startpos and endpos.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
 {
     char_u	*p;
     char_u	*delim_copy;
     size_t	delim_len;
     linenr_T	lnum;
-    int		found = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found = FALSE;
 
-    for (p = linep + startpos->col + 1; *p && *p != '('; ++p)
+    ପାଇଁ (p = linep + startpos->col + 1; *p && *p != '('; ++p)
 	;
     delim_len = (p - linep) - startpos->col - 1;
     delim_copy = vim_strnsave(linep + startpos->col + 1, delim_len);
-    if (delim_copy == NULL)
-	return FALSE;
-    for (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
+    ଯଦି (delim_copy == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
+    ପାଇଁ (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
     {
-	char_u *line = ml_get(lnum);
+	char_u *ଧାଡ଼ି = ml_get(lnum);
 
-	for (p = line + (lnum == startpos->lnum
+	ପାଇଁ (p = ଧାଡ଼ି + (lnum == startpos->lnum
 					    ? startpos->col + 1 : 0); *p; ++p)
 	{
-	    if (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
-		break;
-	    if (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
+	    ଯଦି (lnum == endpos->lnum && (colnr_T)(p - ଧାଡ଼ି) >= endpos->col)
+		ଭାଙ୍ଗ;
+	    ଯଦି (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
 			  && p[delim_len + 1] == '"')
 	    {
 		found = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	if (found)
-	    break;
+	ଯଦି (found)
+	    ଭାଙ୍ଗ;
     }
     vim_free(delim_copy);
-    return found;
+    ଫେରନ୍ତୁ found;
 }
 
 /*
@@ -2072,92 +2072,92 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
  * the opposite character.  Set "*backwards" to the direction.
  * When "switchit" is TRUE swap the direction.
  */
-    static void
-find_mps_values(
-    int	    *initc,
-    int	    *findc,
-    int	    *backwards,
-    int	    switchit)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_mps_ମୂଲ୍ୟଗୁଡ଼ିକ(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    *initc,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    *findc,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    *backwards,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    switchit)
 {
     char_u	*ptr;
 
     ptr = curbuf->b_p_mps;
-    while (*ptr != NUL)
+    ଯେତେବେଳେ (*ptr != NUL)
     {
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
 	    char_u *prev;
 
-	    if (mb_ptr2char(ptr) == *initc)
+	    ଯଦି (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ଯଦି (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = TRUE;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    *findc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = FALSE;
 		}
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    prev = ptr;
 	    ptr += mb_ptr2len(ptr) + 1;
-	    if (mb_ptr2char(ptr) == *initc)
+	    ଯଦି (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ଯଦି (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(prev);
 		    *backwards = FALSE;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    *findc = mb_ptr2char(prev);
 		    *backwards = TRUE;
 		}
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    ptr += mb_ptr2len(ptr);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (*ptr == *initc)
+	    ଯଦି (*ptr == *initc)
 	    {
-		if (switchit)
+		ଯଦି (switchit)
 		{
 		    *backwards = TRUE;
 		    *findc = *initc;
 		    *initc = ptr[2];
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    *backwards = FALSE;
 		    *findc = ptr[2];
 		}
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    ptr += 2;
-	    if (*ptr == *initc)
+	    ଯଦି (*ptr == *initc)
 	    {
-		if (switchit)
+		ଯଦି (switchit)
 		{
 		    *backwards = FALSE;
 		    *findc = *initc;
 		    *initc = ptr[-2];
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    *backwards = TRUE;
 		    *findc =  ptr[-2];
 		}
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    ++ptr;
 	}
-	if (*ptr == ',')
+	ଯଦି (*ptr == ',')
 	    ++ptr;
     }
 }
@@ -2185,50 +2185,50 @@ find_mps_values(
     pos_T *
 findmatchlimit(
     oparg_T	*oap,
-    int		initc,
-    int		flags,
-    int		maxtravel)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		initc,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		maxtravel)
 {
-    static pos_T pos;			// current search position
-    int		findc = 0;		// matching brace
-    int		c;
-    int		count = 0;		// cumulative number of braces
-    int		backwards = FALSE;	// init for gcc
-    int		raw_string = FALSE;	// search for raw string
-    int		inquote = FALSE;	// TRUE when inside quotes
+    ସ୍ଥିର pos_T pos;			// current search position
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		findc = 0;		// matching brace
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_2 = 0;		// cumulative number of braces
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		backwards = FALSE;	// init for gcc
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		raw_string = FALSE;	// search for raw string
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		inquote = FALSE;	// TRUE when inside quotes
     char_u	*linep;			// pointer to current line
     char_u	*ptr;
-    int		do_quotes;		// check for quotes in current line
-    int		at_start;		// do_quotes value at start position
-    int		hash_dir = 0;		// Direction searched for # things
-    int		comment_dir = 0;	// Direction searched for comments
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		do_quotes;		// check for quotes in current line
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		at_start;		// do_quotes value at start position
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		hash_dir = 0;		// Direction searched for # things
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		comment_dir = 0;	// Direction searched for comments
     pos_T	match_pos;		// Where last slash-star was found
-    int		start_in_quotes;	// start position is in quotes
-    int		traveled = 0;		// how far we've searched so far
-    int		ignore_cend = FALSE;    // ignore comment end
-    int		cpo_match;		// vi compatible matching
-    int		cpo_bsl;		// don't recognize backslashes
-    int		match_escaped = 0;	// search for escaped match
-    int		dir;			// Direction to search
-    int		comment_col = MAXCOL;   // start of / / comment
-    int		lispcomm = FALSE;	// inside of Lisp-style comment
-    int		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
-    int		skip_comments = (flags & FM_SKIPCOMM) != 0;
-    int		in_block_comment = FALSE; // inside /* */ block comment
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		start_in_quotes;	// start position is in quotes
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		traveled = 0;		// how far we've searched so far
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ignore_cend = FALSE;    // ignore comment end
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cpo_match;		// vi compatible matching
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cpo_bsl;		// don't recognize backslashes
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		match_escaped = 0;	// search for escaped match
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir;			// Direction to search
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		comment_col = MAXCOL;   // start of / / comment
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lispcomm = FALSE;	// inside of Lisp-style comment
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skip_comments = (flags & FM_SKIPCOMM) != 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		in_block_comment = FALSE; // inside /* */ block comment
 
     pos = curwin->w_cursor;
     pos.coladd = 0;
     linep = ml_get(pos.lnum);
 
-    cpo_match = (vim_strchr(p_cpo, CPO_MATCH) != NULL);
-    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != NULL);
+    cpo_match = (vim_strchr(p_cpo, CPO_MATCH) != ଖାଲି);
+    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != ଖାଲି);
 
     // Direction to search when initc is '/', '*' or '#'
-    if (flags & FM_BACKWARD)
+    ଯଦି (flags & FM_BACKWARD)
 	dir = BACKWARD;
-    else if (flags & FM_FORWARD)
+    ଅନ୍ୟଥା ଯଦି (flags & FM_FORWARD)
 	dir = FORWARD;
-    else
+    ଅନ୍ୟଥା
 	dir = 0;
 
     /*
@@ -2237,77 +2237,77 @@ findmatchlimit(
      * When '/' is used, we ignore running backwards into an star-slash, for
      * "[*" command, we just want to find any comment.
      */
-    if (initc == '/' || initc == '*' || initc == 'R')
+    ଯଦି (initc == '/' || initc == '*' || initc == 'R')
     {
 	comment_dir = dir;
-	if (initc == '/')
+	ଯଦି (initc == '/')
 	    ignore_cend = TRUE;
 	backwards = (dir == FORWARD) ? FALSE : TRUE;
 	raw_string = (initc == 'R');
 	initc = NUL;
     }
-    else if (initc != '#' && initc != NUL)
+    ଅନ୍ୟଥା ଯଦି (initc != '#' && initc != NUL)
     {
-	find_mps_values(&initc, &findc, &backwards, TRUE);
-	if (dir)
+	find_mps_ମୂଲ୍ୟଗୁଡ଼ିକ(&initc, &findc, &backwards, TRUE);
+	ଯଦି (dir)
 	    backwards = (dir == FORWARD) ? FALSE : TRUE;
-	if (findc == NUL)
-	    return NULL;
+	ଯଦି (findc == NUL)
+	    ଫେରନ୍ତୁ ଖାଲି;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	/*
 	 * Either initc is '#', or no initc was given and we need to look
 	 * under the cursor.
 	 */
-	if (initc == '#')
+	ଯଦି (initc == '#')
 	{
 	    hash_dir = dir;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    /*
 	     * initc was not given, must look for something to match under
 	     * or near the cursor.
 	     * Only check for special things when 'cpo' doesn't have '%'.
 	     */
-	    if (!cpo_match)
+	    ଯଦି (!cpo_match)
 	    {
 		// Are we before or at #if, #else etc.?
 		ptr = skipwhite(linep);
-		if (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
+		ଯଦି (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
 		{
 		    ptr = skipwhite(ptr + 1);
-		    if (   STRNCMP(ptr, "if", 2) == 0
+		    ଯଦି (   STRNCMP(ptr, "if", 2) == 0
 			|| STRNCMP(ptr, "endif", 5) == 0
 			|| STRNCMP(ptr, "el", 2) == 0)
 			hash_dir = 1;
 		}
 
 		// Are we on a comment?
-		else if (linep[pos.col] == '/')
+		ଅନ୍ୟଥା ଯଦି (linep[pos.col] == '/')
 		{
-		    if (linep[pos.col + 1] == '*')
+		    ଯଦି (linep[pos.col + 1] == '*')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
 			pos.col++;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '*')
+		    ଅନ୍ୟଥା ଯଦି (pos.col > 0 && linep[pos.col - 1] == '*')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 			pos.col--;
 		    }
 		}
-		else if (linep[pos.col] == '*')
+		ଅନ୍ୟଥା ଯଦି (linep[pos.col] == '*')
 		{
-		    if (linep[pos.col + 1] == '/')
+		    ଯଦି (linep[pos.col + 1] == '/')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '/')
+		    ଅନ୍ୟଥା ଯଦି (pos.col > 0 && linep[pos.col - 1] == '/')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
@@ -2319,122 +2319,122 @@ findmatchlimit(
 	     * If we are not on a comment or the # at the start of a line, then
 	     * look for brace anywhere on this line after the cursor.
 	     */
-	    if (!hash_dir && !comment_dir)
+	    ଯଦି (!hash_dir && !comment_dir)
 	    {
 		/*
 		 * Find the brace under or after the cursor.
 		 * If beyond the end of the line, use the last character in
 		 * the line.
 		 */
-		if (linep[pos.col] == NUL && pos.col)
+		ଯଦି (linep[pos.col] == NUL && pos.col)
 		    --pos.col;
-		for (;;)
+		ପାଇଁ (;;)
 		{
 		    initc = PTR2CHAR(linep + pos.col);
-		    if (initc == NUL)
-			break;
+		    ଯଦି (initc == NUL)
+			ଭାଙ୍ଗ;
 
-		    find_mps_values(&initc, &findc, &backwards, FALSE);
-		    if (findc)
-			break;
+		    find_mps_ମୂଲ୍ୟଗୁଡ଼ିକ(&initc, &findc, &backwards, FALSE);
+		    ଯଦି (findc)
+			ଭାଙ୍ଗ;
 		    pos.col += mb_ptr2len(linep + pos.col);
 		}
-		if (!findc)
+		ଯଦି (!findc)
 		{
 		    // no brace in the line, maybe use "  #if" then
-		    if (!cpo_match && *skipwhite(linep) == '#')
+		    ଯଦି (!cpo_match && *skipwhite(linep) == '#')
 			hash_dir = 1;
-		    else
-			return NULL;
+		    ଅନ୍ୟଥା
+			ଫେରନ୍ତୁ ଖାଲି;
 		}
-		else if (!cpo_bsl)
+		ଅନ୍ୟଥା ଯଦି (!cpo_bsl)
 		{
-		    int col, bslcnt = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, bslcnt = 0;
 
 		    // Set "match_escaped" if there are an odd number of
 		    // backslashes.
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    ପାଇଁ (col = pos.col; check_prevcol(linep, col, '\\', &col);)
 			bslcnt++;
 		    match_escaped = (bslcnt & 1);
 		}
 	    }
 	}
-	if (hash_dir)
+	ଯଦି (hash_dir)
 	{
 	    /*
 	     * Look for matching #if, #else, #elif, or #endif
 	     */
-	    if (oap != NULL)
+	    ଯଦି (oap != ଖାଲି)
 		oap->motion_type = MLINE;   // Linewise for this case only
-	    if (initc != '#')
+	    ଯଦି (initc != '#')
 	    {
 		ptr = skipwhite(skipwhite(linep) + 1);
-		if (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
+		ଯଦି (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
 		    hash_dir = 1;
-		else if (STRNCMP(ptr, "endif", 5) == 0)
+		ଅନ୍ୟଥା ଯଦି (STRNCMP(ptr, "endif", 5) == 0)
 		    hash_dir = -1;
-		else
-		    return NULL;
+		ଅନ୍ୟଥା
+		    ଫେରନ୍ତୁ ଖାଲି;
 	    }
 	    pos.col = 0;
-	    while (!got_int)
+	    ଯେତେବେଳେ (!got_int)
 	    {
-		if (hash_dir > 0)
+		ଯଦି (hash_dir > 0)
 		{
-		    if (pos.lnum == curbuf->b_ml.ml_line_count)
-			break;
+		    ଯଦି (pos.lnum == curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+			ଭାଙ୍ଗ;
 		}
-		else if (pos.lnum == 1)
-		    break;
+		ଅନ୍ୟଥା ଯଦି (pos.lnum == 1)
+		    ଭାଙ୍ଗ;
 		pos.lnum += hash_dir;
 		linep = ml_get(pos.lnum);
-		line_breakcheck();	// check for CTRL-C typed
+		ଧାଡ଼ି_breakcheck();	// check for CTRL-C typed
 		ptr = skipwhite(linep);
-		if (*ptr != '#')
-		    continue;
+		ଯଦି (*ptr != '#')
+		    ଜାରି;
 		pos.col = (colnr_T) (ptr - linep);
 		ptr = skipwhite(ptr + 1);
-		if (hash_dir > 0)
+		ଯଦି (hash_dir > 0)
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
-			count++;
-		    else if (STRNCMP(ptr, "el", 2) == 0)
+		    ଯଦି (STRNCMP(ptr, "if", 2) == 0)
+			ଗଣନା_2++;
+		    ଅନ୍ୟଥା ଯଦି (STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ଯଦି (ଗଣନା_2 == 0)
+			    ଫେରନ୍ତୁ &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
+		    ଅନ୍ୟଥା ଯଦି (STRNCMP(ptr, "endif", 5) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ଯଦି (ଗଣନା_2 == 0)
+			    ଫେରନ୍ତୁ &pos;
+			ଗଣନା_2--;
 		    }
 		}
-		else
+		ଅନ୍ୟଥା
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
+		    ଯଦି (STRNCMP(ptr, "if", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ଯଦି (ଗଣନା_2 == 0)
+			    ଫେରନ୍ତୁ &pos;
+			ଗଣନା_2--;
 		    }
-		    else if (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
+		    ଅନ୍ୟଥା ଯଦି (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ଯଦି (ଗଣନା_2 == 0)
+			    ଫେରନ୍ତୁ &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
-			count++;
+		    ଅନ୍ୟଥା ଯଦି (STRNCMP(ptr, "endif", 5) == 0)
+			ଗଣନା_2++;
 		}
 	    }
-	    return NULL;
+	    ଫେରନ୍ତୁ ଖାଲି;
 	}
     }
 
 #ifdef FEAT_RIGHTLEFT
     // This is just guessing: when 'rightleft' is set, search for a matching
     // paren/brace in the other direction.
-    if (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != NULL)
+    ଯଦି (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != ଖାଲି)
 	backwards = !backwards;
 #endif
 
@@ -2443,88 +2443,88 @@ findmatchlimit(
     CLEAR_POS(&match_pos);
 
     // backward search: Check if this line contains a single-line comment
-    if ((backwards && comment_dir) || lisp || skip_comments)
+    ଯଦି ((backwards && comment_dir) || lisp || skip_comments)
 	comment_col = check_linecomment(linep);
-    if (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
+    ଯଦି (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
 	lispcomm = TRUE;    // find match inside this comment
     // skip // comment portion at starting position
-    if (skip_comments && !in_block_comment && comment_col != MAXCOL
+    ଯଦି (skip_comments && !in_block_comment && comment_col != MAXCOL
 	    && backwards && pos.col > (colnr_T)comment_col)
 	pos.col = comment_col;
 
-    while (!got_int)
+    ଯେତେବେଳେ (!got_int)
     {
 	/*
 	 * Go to the next position, forward or backward. We could use
 	 * inc() and dec() here, but that is much slower
 	 */
-	if (backwards)
+	ଯଦି (backwards)
 	{
 	    // char to match is inside of comment, don't search outside
-	    if (lispcomm && pos.col < (colnr_T)comment_col)
-		break;
-	    if (pos.col == 0)		// at start of line, go to prev. one
+	    ଯଦି (lispcomm && pos.col < (colnr_T)comment_col)
+		ଭାଙ୍ଗ;
+	    ଯଦି (pos.col == 0)		// at start of line, go to prev. one
 	    {
-		if (pos.lnum == 1)	// start of file
-		    break;
+		ଯଦି (pos.lnum == 1)	// start of file
+		    ଭାଙ୍ଗ;
 		--pos.lnum;
 
-		if (maxtravel > 0 && ++traveled > maxtravel)
-		    break;
+		ଯଦି (maxtravel > 0 && ++traveled > maxtravel)
+		    ଭାଙ୍ଗ;
 
 		linep = ml_get(pos.lnum);
 		pos.col = ml_get_len(pos.lnum); // pos.col on trailing NUL
 		do_quotes = -1;
-		line_breakcheck();
+		ଧାଡ଼ି_breakcheck();
 
 		// Check if this line contains a single-line comment
-		if (comment_dir || lisp || skip_comments)
+		ଯଦି (comment_dir || lisp || skip_comments)
 		    comment_col = check_linecomment(linep);
 		// skip comment
-		if (lisp && comment_col != MAXCOL)
+		ଯଦି (lisp && comment_col != MAXCOL)
 		    pos.col = comment_col;
-		else if (skip_comments && !in_block_comment
+		ଅନ୍ୟଥା ଯଦି (skip_comments && !in_block_comment
 			&& comment_col != MAXCOL
 			&& pos.col > (colnr_T)comment_col)
 		    pos.col = comment_col;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		--pos.col;
-		if (has_mbyte)
+		ଯଦି (has_mbyte)
 		    pos.col -= (*mb_head_off)(linep, linep + pos.col);
 	    }
 	}
-	else				// forward search
+	ଅନ୍ୟଥା				// forward search
 	{
-	    if (linep[pos.col] == NUL
+	    ଯଦି (linep[pos.col] == NUL
 		    // at end of line, go to next one
 		    // For lisp don't search for match in comment
 		    || (lisp && comment_col != MAXCOL
 					   && pos.col == (colnr_T)comment_col))
 	    {
-		if (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
+		ଯଦି (pos.lnum == curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା  // end of file
 			// line is exhausted and comment with it,
 			// don't search for match in code
 			 || lispcomm)
-		    break;
+		    ଭାଙ୍ଗ;
 		++pos.lnum;
 
-		if (maxtravel && traveled++ > maxtravel)
-		    break;
+		ଯଦି (maxtravel && traveled++ > maxtravel)
+		    ଭାଙ୍ଗ;
 
 		linep = ml_get(pos.lnum);
 		pos.col = 0;
 		do_quotes = -1;
-		line_breakcheck();
-		if (lisp || skip_comments)   // find comment pos in new line
+		ଧାଡ଼ି_breakcheck();
+		ଯଦି (lisp || skip_comments)   // find comment pos in new line
 		    comment_col = check_linecomment(linep);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		if (has_mbyte)
+		ଯଦି (has_mbyte)
 		    pos.col += (*mb_ptr2len)(linep + pos.col);
-		else
+		ଅନ୍ୟଥା
 		    ++pos.col;
 	    }
 	}
@@ -2533,29 +2533,29 @@ findmatchlimit(
 	// string are not comments, so skip them while "inquote" is set.
 	// Backward: '/' of end-marker enters comment; '*' of start-marker exits.
 	// Forward:  '/' of start-marker enters comment; '/' of end-marker exits.
-	if (skip_comments && !comment_dir && !inquote)
+	ଯଦି (skip_comments && !comment_dir && !inquote)
 	{
-	    if (backwards)
+	    ଯଦି (backwards)
 	    {
 		// Guard pos.col < comment_col: don't misread '*/' at the '//'
 		// position as a block-comment end-marker.
-		if (!in_block_comment && pos.col > 0
+		ଯଦି (!in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
+			&& (comment_col == MAXCOL || (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col < comment_col))
 		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
+		ଅନ୍ୟଥା ଯଦି (in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '/' && linep[pos.col] == '*')
 		    in_block_comment = FALSE;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Guard pos.col < comment_col: don't treat '/*' inside a '//'
 		// comment as a block-comment start-marker.
-		if (!in_block_comment && linep[pos.col] == '/'
+		ଯଦି (!in_block_comment && linep[pos.col] == '/'
 			&& linep[pos.col + 1] == '*'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
+			&& (comment_col == MAXCOL || (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col < comment_col))
 		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
+		ଅନ୍ୟଥା ଯଦି (in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/')
 		    in_block_comment = FALSE;
 	    }
@@ -2564,78 +2564,78 @@ findmatchlimit(
 	/*
 	 * If FM_BLOCKSTOP given, stop at a '{' or '}' in column 0.
 	 */
-	if (pos.col == 0 && (flags & FM_BLOCKSTOP)
+	ଯଦି (pos.col == 0 && (flags & FM_BLOCKSTOP)
 				       && (linep[0] == '{' || linep[0] == '}'))
 	{
-	    if (linep[0] == findc && count == 0)	// match!
-		return &pos;
-	    break;					// out of scope
+	    ଯଦି (linep[0] == findc && ଗଣନା_2 == 0)	// match!
+		ଫେରନ୍ତୁ &pos;
+	    ଭାଙ୍ଗ;					// out of scope
 	}
 
-	if (comment_dir)
+	ଯଦି (comment_dir)
 	{
 	    // Note: comments do not nest, and we ignore quotes in them
 	    // TODO: ignore comment brackets inside strings
-	    if (comment_dir == FORWARD)
+	    ଯଦି (comment_dir == FORWARD)
 	    {
-		if (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
+		ଯଦି (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
 		{
 		    pos.col++;
-		    return &pos;
+		    ଫେରନ୍ତୁ &pos;
 		}
 	    }
-	    else    // Searching backwards
+	    ଅନ୍ୟଥା    // Searching backwards
 	    {
 		/*
 		 * A comment may contain / * or / /, it may also start or end
 		 * with / * /.	Ignore a / * after / / and after *.
 		 */
-		if (pos.col == 0)
-		    continue;
-		else if (raw_string)
+		ଯଦି (pos.col == 0)
+		    ଜାରି;
+		ଅନ୍ୟଥା ଯଦି (raw_string)
 		{
-		    if (linep[pos.col - 1] == 'R'
+		    ଯଦି (linep[pos.col - 1] == 'R'
 			&& linep[pos.col] == '"'
-			&& vim_strchr(linep + pos.col + 1, '(') != NULL)
+			&& vim_strchr(linep + pos.col + 1, '(') != ଖାଲି)
 		    {
 			// Possible start of raw string. Now that we have the
 			// delimiter we can check if it ends before where we
 			// started searching, or before the previously found
 			// raw string start.
-			if (!find_rawstring_end(linep, &pos,
-				  count > 0 ? &match_pos : &curwin->w_cursor))
+			ଯଦି (!find_rawstring_end(linep, &pos,
+				  ଗଣନା_2 > 0 ? &match_pos : &curwin->w_cursor))
 			{
-			    count++;
+			    ଗଣନା_2++;
 			    match_pos = pos;
 			    match_pos.col--;
 			}
 			linep = ml_get(pos.lnum); // may have been released
 		    }
 		}
-		else if (  linep[pos.col - 1] == '/'
+		ଅନ୍ୟଥା ଯଦି (  linep[pos.col - 1] == '/'
 			&& linep[pos.col] == '*'
 			&& (pos.col == 1 || linep[pos.col - 2] != '*')
-			&& (int)pos.col < comment_col)
+			&& (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col < comment_col)
 		{
-		    count++;
+		    ଗଣନା_2++;
 		    match_pos = pos;
 		    match_pos.col--;
 		}
-		else if (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
+		ଅନ୍ୟଥା ଯଦି (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
 		{
-		    if (count > 0)
+		    ଯଦି (ଗଣନା_2 > 0)
 			pos = match_pos;
-		    else if (pos.col > 1 && linep[pos.col - 2] == '/'
-					       && (int)pos.col <= comment_col)
+		    ଅନ୍ୟଥା ଯଦି (pos.col > 1 && linep[pos.col - 2] == '/'
+					       && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col <= comment_col)
 			pos.col -= 2;
-		    else if (ignore_cend)
-			continue;
-		    else
-			return NULL;
-		    return &pos;
+		    ଅନ୍ୟଥା ଯଦି (ignore_cend)
+			ଜାରି;
+		    ଅନ୍ୟଥା
+			ଫେରନ୍ତୁ ଖାଲି;
+		    ଫେରନ୍ତୁ &pos;
 		}
 	    }
-	    continue;
+	    ଜାରି;
 	}
 
 	/*
@@ -2643,23 +2643,23 @@ findmatchlimit(
 	 * of quotes are ignored, but only if there is an even number of
 	 * quotes in the line.
 	 */
-	if (cpo_match)
+	ଯଦି (cpo_match)
 	    do_quotes = 0;
-	else if (do_quotes == -1)
+	ଅନ୍ୟଥା ଯଦି (do_quotes == -1)
 	{
 	    /*
 	     * Count the number of quotes in the line, skipping \" and '"'.
 	     * Watch out for "\\".
 	     */
 	    at_start = do_quotes;
-	    for (ptr = linep; *ptr; ++ptr)
+	    ପାଇଁ (ptr = linep; *ptr; ++ptr)
 	    {
-		if (ptr == linep + pos.col + backwards)
+		ଯଦି (ptr == linep + pos.col + backwards)
 		    at_start = (do_quotes & 1);
-		if (*ptr == '"'
+		ଯଦି (*ptr == '"'
 			&& (ptr == linep || ptr[-1] != '\'' || ptr[1] != '\''))
 		    ++do_quotes;
-		if (*ptr == '\\' && ptr[1] != NUL)
+		ଯଦି (*ptr == '\\' && ptr[1] != NUL)
 		    ++ptr;
 	    }
 	    do_quotes &= 1;	    // result is 1 with even number of quotes
@@ -2668,34 +2668,34 @@ findmatchlimit(
 	     * If we find an uneven count, check current line and previous
 	     * one for a '\' at the end.
 	     */
-	    if (!do_quotes)
+	    ଯଦି (!do_quotes)
 	    {
 		inquote = FALSE;
-		if (ptr[-1] == '\\')
+		ଯଦି (ptr[-1] == '\\')
 		{
 		    do_quotes = 1;
-		    if (start_in_quotes == MAYBE)
+		    ଯଦି (start_in_quotes == MAYBE)
 		    {
 			inquote = at_start;
-			if (inquote)
+			ଯଦି (inquote)
 			    start_in_quotes = TRUE;
 		    }
-		    else if (backwards)
+		    ଅନ୍ୟଥା ଯଦି (backwards)
 			inquote = TRUE;
 		}
-		if (pos.lnum > 1)
+		ଯଦି (pos.lnum > 1)
 		{
 		    ptr = ml_get(pos.lnum - 1);
-		    if (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
+		    ଯଦି (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
 		    {
 			do_quotes = 1;
-			if (start_in_quotes == MAYBE)
+			ଯଦି (start_in_quotes == MAYBE)
 			{
 			    inquote = at_start;
-			    if (inquote)
+			    ଯଦି (inquote)
 				start_in_quotes = TRUE;
 			}
-			else if (!backwards)
+			ଅନ୍ୟଥା ଯଦି (!backwards)
 			    inquote = TRUE;
 		    }
 
@@ -2704,7 +2704,7 @@ findmatchlimit(
 		}
 	    }
 	}
-	if (start_in_quotes == MAYBE)
+	ଯଦି (start_in_quotes == MAYBE)
 	    start_in_quotes = FALSE;
 
 	/*
@@ -2719,34 +2719,34 @@ findmatchlimit(
 	 *   line or the previous one ends in a '\'.  Complicated, isn't it?
 	 */
 	c = PTR2CHAR(linep + pos.col);
-	switch (c)
+	ବାଛ (c)
 	{
-	case NUL:
+	ସ୍ଥିତି NUL:
 	    // at end of line without trailing backslash, reset inquote
-	    if (pos.col == 0 || linep[pos.col - 1] != '\\')
+	    ଯଦି (pos.col == 0 || linep[pos.col - 1] != '\\')
 	    {
 		inquote = FALSE;
 		start_in_quotes = FALSE;
 	    }
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case '"':
+	ସ୍ଥିତି '"':
 	    // a quote that is preceded with an odd number of backslashes is
 	    // ignored
-	    if (do_quotes)
+	    ଯଦି (do_quotes)
 	    {
-		int col;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା col;
 
-		for (col = pos.col - 1; col >= 0; --col)
-		    if (linep[col] != '\\')
-			break;
-		if ((((int)pos.col - 1 - col) & 1) == 0)
+		ପାଇଁ (col = pos.col - 1; col >= 0; --col)
+		    ଯଦି (linep[col] != '\\')
+			ଭାଙ୍ଗ;
+		ଯଦି ((((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col - 1 - col) & 1) == 0)
 		{
 		    inquote = !inquote;
 		    start_in_quotes = FALSE;
 		}
 	    }
-	    break;
+	    ଭାଙ୍ଗ;
 
 	/*
 	 * If smart matching ('cpoptions' does not contain '%'):
@@ -2755,95 +2755,95 @@ findmatchlimit(
 	 *   skipped, there is never a brace in them.
 	 *   Ignore this when finding matches for `'.
 	 */
-	case '\'':
-	    if (!cpo_match && initc != '\'' && findc != '\'')
+	ସ୍ଥିତି '\'':
+	    ଯଦି (!cpo_match && initc != '\'' && findc != '\'')
 	    {
-		if (backwards)
+		ଯଦି (backwards)
 		{
-		    if (pos.col > 1)
+		    ଯଦି (pos.col > 1)
 		    {
-			if (linep[pos.col - 2] == '\'')
+			ଯଦି (linep[pos.col - 2] == '\'')
 			{
 			    pos.col -= 2;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
-			else if (linep[pos.col - 2] == '\\'
+			ଅନ୍ୟଥା ଯଦି (linep[pos.col - 2] == '\\'
 				  && pos.col > 2 && linep[pos.col - 3] == '\'')
 			{
 			    pos.col -= 3;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
 		}
-		else if (linep[pos.col + 1])	// forward search
+		ଅନ୍ୟଥା ଯଦି (linep[pos.col + 1])	// forward search
 		{
-		    if (linep[pos.col + 1] == '\\'
+		    ଯଦି (linep[pos.col + 1] == '\\'
 			   && linep[pos.col + 2] && linep[pos.col + 3] == '\'')
 		    {
 			pos.col += 3;
-			break;
+			ଭାଙ୍ଗ;
 		    }
-		    else if (linep[pos.col + 2] == '\'')
+		    ଅନ୍ୟଥା ଯଦି (linep[pos.col + 2] == '\'')
 		    {
 			pos.col += 2;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 		}
 	    }
 	    // FALLTHROUGH
 
-	default:
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 	    /*
 	     * For Lisp skip over backslashed (), {} and [].
 	     * (actually, we skip #\( et al)
 	     */
-	    if (curbuf->b_p_lisp
-		    && vim_strchr((char_u *)"{}()[]", c) != NULL
+	    ଯଦି (curbuf->b_p_lisp
+		    && vim_strchr((char_u *)"{}()[]", c) != ଖାଲି
 		    && pos.col > 1
-		    && check_prevcol(linep, pos.col, '\\', NULL)
-		    && check_prevcol(linep, pos.col - 1, '#', NULL))
-		break;
+		    && check_prevcol(linep, pos.col, '\\', ଖାଲି)
+		    && check_prevcol(linep, pos.col - 1, '#', ଖାଲି))
+		ଭାଙ୍ଗ;
 
 	    // Skip matches inside comments when FM_SKIPCOMM is set.
-	    if (skip_comments && (in_block_comment
-		    || (comment_col != MAXCOL && (int)pos.col >= comment_col)))
-		break;
+	    ଯଦି (skip_comments && (in_block_comment
+		    || (comment_col != MAXCOL && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos.col >= comment_col)))
+		ଭାଙ୍ଗ;
 
 	    // Check for match outside of quotes, and inside of
 	    // quotes when the start is also inside of quotes.
-	    if ((!inquote || start_in_quotes == TRUE)
+	    ଯଦି ((!inquote || start_in_quotes == TRUE)
 		    && (c == initc || c == findc))
 	    {
-		int	col, bslcnt = 0;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col, bslcnt = 0;
 
-		if (!cpo_bsl)
+		ଯଦି (!cpo_bsl)
 		{
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    ପାଇଁ (col = pos.col; check_prevcol(linep, col, '\\', &col);)
 			bslcnt++;
 		}
 		// Only accept a match when 'M' is in 'cpo' or when escaping
 		// is what we expect.
-		if (cpo_bsl || (bslcnt & 1) == match_escaped)
+		ଯଦି (cpo_bsl || (bslcnt & 1) == match_escaped)
 		{
-		    if (c == initc)
-			count++;
-		    else
+		    ଯଦି (c == initc)
+			ଗଣନା_2++;
+		    ଅନ୍ୟଥା
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			ଯଦି (ଗଣନା_2 == 0)
+			    ଫେରନ୍ତୁ &pos;
+			ଗଣନା_2--;
 		    }
 		}
 	    }
 	}
     }
 
-    if (comment_dir == BACKWARD && count > 0)
+    ଯଦି (comment_dir == BACKWARD && ଗଣନା_2 > 0)
     {
 	pos = match_pos;
-	return &pos;
+	ଫେରନ୍ତୁ &pos;
     }
-    return (pos_T *)NULL;	// never found it
+    ଫେରନ୍ତୁ (pos_T *)ଖାଲି;	// never found it
 }
 
 /*
@@ -2852,9 +2852,9 @@ findmatchlimit(
  * Show the match only if it is visible on the screen.
  * If there isn't a match, then beep.
  */
-    void
+    ଶୂନ୍ୟ
 showmatch(
-    int		c)	    // char to show match for
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c)	    // char to show match for
 {
     pos_T	*lpos, save_cursor;
     pos_T	mpos;
@@ -2862,7 +2862,7 @@ showmatch(
     long	save_so;
     long	save_siso;
 #ifdef CURSOR_SHAPE
-    int		save_state;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_state;
 #endif
     colnr_T	save_dollar_vcol;
     char_u	*p;
@@ -2873,43 +2873,43 @@ showmatch(
      * Only show match for chars in the 'matchpairs' option.
      */
     // 'matchpairs' is "x:y,x:y"
-    for (p = curbuf->b_p_mps; *p != NUL; ++p)
+    ପାଇଁ (p = curbuf->b_p_mps; *p != NUL; ++p)
     {
 #ifdef FEAT_RIGHTLEFT
-	if (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
-	    break;
+	ଯଦି (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
+	    ଭାଙ୍ଗ;
 #endif
 	p += mb_ptr2len(p) + 1;
-	if (PTR2CHAR(p) == c
+	ଯଦି (PTR2CHAR(p) == c
 #ifdef FEAT_RIGHTLEFT
 		&& !(curwin->w_p_rl ^ p_ri)
 #endif
 	   )
-	    break;
+	    ଭାଙ୍ଗ;
 	p += mb_ptr2len(p);
-	if (*p == NUL)
-	    return;
+	ଯଦି (*p == NUL)
+	    ଫେରନ୍ତୁ;
     }
-    if (*p == NUL)
-	return;
+    ଯଦି (*p == NUL)
+	ଫେରନ୍ତୁ;
 
-    if ((lpos = findmatch(NULL, NUL)) == NULL)	    // no match, so beep
+    ଯଦି ((lpos = findmatch(ଖାଲି, NUL)) == ଖାଲି)	    // no match, so beep
     {
 	vim_beep(BO_MATCH);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
-	return;
+    ଯଦି (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
+	ଫେରନ୍ତୁ;
 
-    if (!curwin->w_p_wrap)
-	getvcol(curwin, lpos, NULL, &vcol, NULL, 0);
+    ଯଦି (!curwin->w_p_wrap)
+	getvcol(curwin, lpos, ଖାଲି, &vcol, ଖାଲି, 0);
 
-    int col_visible = (curwin->w_p_wrap
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା col_visible = (curwin->w_p_wrap
 	    || (vcol >= curwin->w_leftcol
 		&& vcol < curwin->w_leftcol + curwin->w_width));
-    if (!col_visible)
-	return;
+    ଯଦି (!col_visible)
+	ଫେରନ୍ତୁ;
 
     mpos = *lpos;    // save the pos, update_screen() may change it
     save_cursor = curwin->w_cursor;
@@ -2917,7 +2917,7 @@ showmatch(
     save_siso = *siso;
     // Handle "$" in 'cpo': If the ')' is typed on top of the "$",
     // stop displaying the "$".
-    if (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
+    ଯଦି (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
 	dollar_vcol = -1;
     ++curwin->w_virtcol;	// do display ')' just before "$"
     update_screen(UPD_VALID);	// show the new char first
@@ -2945,9 +2945,9 @@ showmatch(
      * brief pause, unless 'm' is present in 'cpo' and a character is
      * available.
      */
-    if (vim_strchr(p_cpo, CPO_SHOWMATCH) != NULL)
+    ଯଦି (vim_strchr(p_cpo, CPO_SHOWMATCH) != ଖାଲି)
 	ui_delay(p_mat * 100L + 8, TRUE);
-    else if (!char_avail())
+    ଅନ୍ୟଥା ଯଦି (!char_avail())
 	ui_delay(p_mat * 100L + 9, FALSE);
     curwin->w_cursor = save_cursor;	// restore cursor position
     *so = save_so;
@@ -2965,62 +2965,62 @@ showmatch(
  * "direction" is FORWARD or BACKWARD.
  * Returns TRUE, FALSE or -1 for failure.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_zero_width(
     char_u	*pattern,
     size_t	patternlen,
-    int		move,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		move,
     pos_T	*cur,
-    int		direction)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		direction)
 {
     regmmatch_T	regmatch;
-    int		nmatched = 0;
-    int		result = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nmatched = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		result = -1;
     pos_T	pos;
-    int		called_emsg_before = called_emsg;
-    int		flag = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		called_emsg_before = called_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flag = 0;
 
-    if (pattern == NULL)
+    ଯଦି (pattern == ଖାଲି)
     {
 	pattern = spats[last_idx].pat;
 	patternlen = spats[last_idx].patlen;
     }
 
-    if (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
-					      SEARCH_KEEP, &regmatch) == FAIL)
-	return -1;
+    ଯଦି (ସନ୍ଧାନ_regcomp(pattern, patternlen, ଖାଲି, RE_ସନ୍ଧାନ, RE_ସନ୍ଧାନ,
+					      ସନ୍ଧାନ_KEEP, &regmatch) == FAIL)
+	ଫେରନ୍ତୁ -1;
 
     // init startcol correctly
     regmatch.startpos[0].col = -1;
     // move to match
-    if (move)
+    ଯଦି (move)
     {
 	CLEAR_POS(&pos);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	pos = *cur;
 	// accept a match at the cursor position
-	flag = SEARCH_START;
+	flag = ସନ୍ଧାନ_START;
     }
 
-    if (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
-				  SEARCH_KEEP + flag, RE_SEARCH, NULL) != FAIL)
+    ଯଦି (searchit(curwin, curbuf, &pos, ଖାଲି, direction, pattern, patternlen, 1,
+				  ସନ୍ଧାନ_KEEP + flag, RE_ସନ୍ଧାନ, ଖାଲି) != FAIL)
     {
 	// Zero-width pattern should match somewhere, then we can check if
 	// start and end are in the same position.
-	do
+	କର
 	{
 	    regmatch.startpos[0].col++;
 	    nmatched = vim_regexec_multi(&regmatch, curwin, curbuf,
-			       pos.lnum, regmatch.startpos[0].col, NULL);
-	    if (nmatched != 0)
-		break;
-	} while (regmatch.regprog != NULL
+			       pos.lnum, regmatch.startpos[0].col, ଖାଲି);
+	    ଯଦି (nmatched != 0)
+		ଭାଙ୍ଗ;
+	} ଯେତେବେଳେ (regmatch.regprog != ଖାଲି
 		&& (direction == FORWARD ? regmatch.startpos[0].col < pos.col
 				      : regmatch.startpos[0].col > pos.col));
 
-	if (called_emsg == called_emsg_before)
+	ଯଦି (called_emsg == called_emsg_before)
 	{
 	    result = (nmatched != 0
 		&& regmatch.startpos[0].lnum == regmatch.endpos[0].lnum
@@ -3029,7 +3029,7 @@ is_zero_width(
     }
 
     vim_regfree(regmatch.regprog);
-    return result;
+    ଫେରନ୍ତୁ result;
 }
 
 
@@ -3037,26 +3037,26 @@ is_zero_width(
  * Find next search match under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
-current_search(
-    long	count,
-    int		forward)	// TRUE for forward, FALSE for backward
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+current_ସନ୍ଧାନ(
+    long	ଗଣନା_2,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		forward)	// TRUE for forward, FALSE for backward
 {
     pos_T	start_pos;	// start position of the pattern match
     pos_T	end_pos;	// end position of the pattern match
     pos_T	orig_pos;	// position of the cursor at beginning
     pos_T	pos;		// position after the pattern
-    int		i;
-    int		dir;
-    int		result;		// result of various function calls
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		result;		// result of various function calls
     char_u	old_p_ws = p_ws;
-    int		flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags = 0;
     pos_T	save_VIsual = VIsual;
-    int		zero_width;
-    int		skip_first_backward;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		zero_width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skip_first_backward;
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    ଯଦି (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     // When searching forward and the cursor is at the start of the Visual
@@ -3065,49 +3065,49 @@ current_search(
 					   && LT_POS(curwin->w_cursor, VIsual);
 
     orig_pos = pos = curwin->w_cursor;
-    if (VIsual_active)
+    ଯଦି (VIsual_active)
     {
-	if (forward)
+	ଯଦି (forward)
 	    incl(&pos);
-	else
+	ଅନ୍ୟଥା
 	    decl(&pos);
     }
 
     // Is the pattern is zero-width?, this time, don't care about the direction
     zero_width = is_zero_width(spats[last_idx].pat, spats[last_idx].patlen,
 						TRUE, &curwin->w_cursor, FORWARD);
-    if (zero_width == -1)
-	return FAIL;  // pattern not found
+    ଯଦି (zero_width == -1)
+	ଫେରନ୍ତୁ FAIL;  // pattern not found
 
     /*
      * The trick is to first search backwards and then search forward again,
      * so that a match at the current cursor position will be correctly
      * captured.  When "forward" is false do it the other way around.
      */
-    for (i = 0; i < 2; i++)
+    ପାଇଁ (i = 0; i < 2; i++)
     {
-	if (forward)
+	ଯଦି (forward)
 	{
-	    if (i == 0 && skip_first_backward)
-		continue;
+	    ଯଦି (i == 0 && skip_first_backward)
+		ଜାରି;
 	    dir = i;
 	}
-	else
+	ଅନ୍ୟଥା
 	    dir = !i;
 
 	flags = 0;
-	if (!dir && !zero_width)
-	    flags = SEARCH_END;
+	ଯଦି (!dir && !zero_width)
+	    flags = ସନ୍ଧାନ_END;
 	end_pos = pos;
 
 	// wrapping should not occur in the first round
-	if (i == 0)
+	ଯଦି (i == 0)
 	    p_ws = FALSE;
 
 	result = searchit(curwin, curbuf, &pos, &end_pos,
 		(dir ? FORWARD : BACKWARD),
-		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? count : 1),
-		SEARCH_KEEP | flags, RE_SEARCH, NULL);
+		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? ଗଣନା_2 : 1),
+		ସନ୍ଧାନ_KEEP | flags, RE_ସନ୍ଧାନ, ଖାଲି);
 
 	p_ws = old_p_ws;
 
@@ -3115,62 +3115,62 @@ current_search(
 	// beginning of the file (cursor might be on the search match)
 	// except when Visual mode is active, so that extending the visual
 	// selection works.
-	if (i == 1 && !result) // not found, abort
+	ଯଦି (i == 1 && !result) // not found, abort
 	{
 	    curwin->w_cursor = orig_pos;
-	    if (VIsual_active)
+	    ଯଦି (VIsual_active)
 		VIsual = save_VIsual;
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
-	else if (i == 0 && !result)
+	ଅନ୍ୟଥା ଯଦି (i == 0 && !result)
 	{
-	    if (forward)
+	    ଯଦି (forward)
 	    {
 		// try again from start of buffer
 		CLEAR_POS(&pos);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// try again from end of buffer
 		// searching backwards, so set pos to last line and col
-		pos.lnum = curwin->w_buffer->b_ml.ml_line_count;
-		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_line_count);
+		pos.lnum = curwin->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା);
 	    }
 	}
     }
 
     start_pos = pos;
 
-    if (!VIsual_active)
+    ଯଦି (!VIsual_active)
 	VIsual = start_pos;
 
     // put the cursor after the match
     curwin->w_cursor = end_pos;
-    if (LT_POS(VIsual, end_pos) && forward)
+    ଯଦି (LT_POS(VIsual, end_pos) && forward)
     {
-	if (skip_first_backward)
+	ଯଦି (skip_first_backward)
 	    // put the cursor on the start of the match
 	    curwin->w_cursor = pos;
-	else
+	ଅନ୍ୟଥା
 	    // put the cursor on last character of match
 	    dec_cursor();
     }
-    else if (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
+    ଅନ୍ୟଥା ଯଦି (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
 	curwin->w_cursor = pos;   // put the cursor on the start of the match
     VIsual_active = TRUE;
     VIsual_mode = 'v';
 
-    if (*p_sel == 'e')
+    ଯଦି (*p_sel == 'e')
     {
 	// Correction for exclusive selection depends on the direction.
-	if (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
+	ଯଦି (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	else if (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
+	ଅନ୍ୟଥା ଯଦି (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
 	    inc(&VIsual);
     }
 
 #ifdef FEAT_FOLDING
-    if (fdo_flags & FDO_SEARCH && KeyTyped)
+    ଯଦି (fdo_flags & FDO_ସନ୍ଧାନ && ଚାବି_Typed)
 	foldOpenCursor();
 #endif
 
@@ -3184,79 +3184,79 @@ current_search(
     redraw_curbuf_later(UPD_INVERTED);
     showmode();
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * return TRUE if line 'lnum' is empty or has white chars only.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 linewhite(linenr_T lnum)
 {
     char_u  *p;
 
     p = skipwhite(ml_get(lnum));
-    return (*p == NUL);
+    ଫେରନ୍ତୁ (*p == NUL);
 }
 
 /*
  * Add the search count "[3/19]" to "msgbuf".
  * See update_search_stat() for other arguments.
  */
-    static void
-cmdline_search_stat(
-    int		dirc,
+    ସ୍ଥିର ଶୂନ୍ୟ
+cmdline_ସନ୍ଧାନ_stat(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dirc,
     pos_T	*pos,
     pos_T	*cursor_pos,
-    int		show_top_bot_msg,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ,
     char_u	*msgbuf,
     size_t	msgbuflen,
-    int		recompute,
-    int		maxcount,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		recompute,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		maxcount,
     long	timeout)
 {
     searchstat_T stat;
 
-    update_search_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
+    update_ସନ୍ଧାନ_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
 								      timeout);
-    if (stat.cur <= 0)
-	return;
+    ଯଦି (stat.cur <= 0)
+	ଫେରନ୍ତୁ;
 
-    char	t[SEARCH_STAT_BUF_LEN];
+    ଅକ୍ଷର	t[ସନ୍ଧାନ_STAT_BUF_LEN];
     size_t	len;
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+    ଯଦି (curwin->w_p_rl && *curwin->w_p_rlc == 's')
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	ଯଦି (stat.incomplete == 1)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[?/??]");
+	ଅନ୍ୟଥା ଯଦି (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/%d]",
+	ଅନ୍ୟଥା ଯଦି (stat.cnt > maxcount)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[>%d/%d]",
 		    maxcount, stat.cur);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	ଅନ୍ୟଥା
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cnt, stat.cur);
     }
-    else
+    ଅନ୍ୟଥା
 #endif
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	ଯଦି (stat.incomplete == 1)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[?/??]");
+	ଅନ୍ୟଥା ଯଦି (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/>%d]",
+	ଅନ୍ୟଥା ଯଦି (stat.cnt > maxcount)
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[%d/>%d]",
 		    stat.cur, maxcount);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	ଅନ୍ୟଥା
+	    len = vim_snprintf(t, ସନ୍ଧାନ_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cur, stat.cnt);
     }
 
-    if (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
+    ଯଦି (show_ଶୀର୍ଷ_bot_ସନ୍ଦେଶ && len + 2 < ସନ୍ଧାନ_STAT_BUF_LEN)
     {
 	mch_memmove(t + 2, t, len);
 	t[0] = 'W';
@@ -3264,17 +3264,17 @@ cmdline_search_stat(
 	len += 2;
     }
 
-    if (len > msgbuflen)
+    ଯଦି (len > msgbuflen)
 	len = msgbuflen;
     mch_memmove(msgbuf + msgbuflen - len, t, len);
 
-    if (dirc == '?' && stat.cur == maxcount + 1)
+    ଯଦି (dirc == '?' && stat.cur == maxcount + 1)
 	stat.cur = -1;
 
     // keep the message even after redraw, but don't put in history
-    msg_hist_off = TRUE;
+    ସନ୍ଦେଶ_hist_off = TRUE;
     give_warning(msgbuf, FALSE);
-    msg_hist_off = FALSE;
+    ସନ୍ଦେଶ_hist_off = FALSE;
 }
 
 /*
@@ -3285,43 +3285,43 @@ cmdline_search_stat(
  * dirc == '/': find the next match
  * dirc == '?': find the previous match
  */
-    static void
-update_search_stat(
-    int			dirc,
+    ସ୍ଥିର ଶୂନ୍ୟ
+update_ସନ୍ଧାନ_stat(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			dirc,
     pos_T		*pos,
     pos_T		*cursor_pos,
     searchstat_T	*stat,
-    int			recompute,
-    int			maxcount,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			recompute,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			maxcount,
     long		timeout UNUSED)
 {
-    int		    save_ws = p_ws;
-    int		    wraparound = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    save_ws = p_ws;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    wraparound = FALSE;
     pos_T	    p = (*pos);
-    static pos_T    lastpos = {0, 0, 0};
-    static int	    cur = 0;
-    static int	    cnt = 0;
-    static int	    exact_match = FALSE;
-    static int	    incomplete = 0;
-    static int	    last_maxcount = 0;
-    static int	    chgtick = 0;
-    static char_u   *lastpat = NULL;
-    static size_t   lastpatlen = 0;
-    static buf_T    *lbuf = NULL;
+    ସ୍ଥିର pos_T    lastpos = {0, 0, 0};
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cur = 0;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cnt = 0;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    exact_match = FALSE;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    incomplete = 0;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    last_maxcount = 0;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    chgtick = 0;
+    ସ୍ଥିର char_u   *lastpat = ଖାଲି;
+    ସ୍ଥିର size_t   lastpatlen = 0;
+    ସ୍ଥିର buf_T    *lbuf = ଖାଲି;
 #ifdef FEAT_RELTIME
     proftime_T  start;
 #endif
 
     CLEAR_POINTER(stat);
 
-    if (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
+    ଯଦି (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
     {
 	stat->cur = cur;
 	stat->cnt = cnt;
 	stat->exact_match = exact_match;
 	stat->incomplete = incomplete;
 	stat->last_maxcount = last_maxcount;
-	return;
+	ଫେରନ୍ତୁ;
     }
     last_maxcount = maxcount;
 
@@ -3329,8 +3329,8 @@ update_search_stat(
 	       || (dirc == '/' && LT_POS(p, lastpos)));
 
     // If anything relevant changed the count has to be recomputed.
-    if (!(chgtick == CHANGEDTICK(curbuf)
-	&& (lastpat != NULL
+    ଯଦି (!(chgtick == CHANGEDTICK(curbuf)
+	&& (lastpat != ଖାଲି
 	    && STRNCMP(lastpat, spats[last_idx].pat, lastpatlen) == 0
 	    && lastpatlen == spats[last_idx].patlen
 	)
@@ -3348,54 +3348,54 @@ update_search_stat(
 
     // when searching backwards and having jumped to the first occurrence,
     // cur must remain greater than 1
-    if (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
+    ଯଦି (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
 		&& (dirc == 0 || dirc == '/' ? cur < cnt : cur > 1))
 	cur += dirc == 0 ? 0 : dirc == '/' ? 1 : -1;
-    else
+    ଅନ୍ୟଥା
     {
-	int	done_search = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	done_ସନ୍ଧାନ = FALSE;
 	pos_T	endpos = {0, 0, 0};
 
 	p_ws = FALSE;
 #ifdef FEAT_RELTIME
-	if (timeout > 0)
+	ଯଦି (timeout > 0)
 	    profile_setlimit(timeout, &start);
 #endif
-	while (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
-			 FORWARD, NULL, 0, 1, SEARCH_KEEP, RE_LAST, NULL) != FAIL)
+	ଯେତେବେଳେ (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
+			 FORWARD, ଖାଲି, 0, 1, ସନ୍ଧାନ_KEEP, RE_LAST, ଖାଲି) != FAIL)
 	{
-	    done_search = TRUE;
+	    done_ସନ୍ଧାନ = TRUE;
 #ifdef FEAT_RELTIME
 	    // Stop after passing the time limit.
-	    if (timeout > 0 && profile_passed_limit(&start))
+	    ଯଦି (timeout > 0 && profile_passed_limit(&start))
 	    {
 		incomplete = 1;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 #endif
 	    cnt++;
-	    if (LTOREQ_POS(lastpos, p))
+	    ଯଦି (LTOREQ_POS(lastpos, p))
 	    {
 		cur = cnt;
-		if (LT_POS(p, endpos))
+		ଯଦି (LT_POS(p, endpos))
 		    exact_match = TRUE;
 	    }
 	    fast_breakcheck();
-	    if (maxcount > 0 && cnt > maxcount)
+	    ଯଦି (maxcount > 0 && cnt > maxcount)
 	    {
 		incomplete = 2;    // max count exceeded
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	if (got_int)
+	ଯଦି (got_int)
 	    cur = -1; // abort
-	if (done_search)
+	ଯଦି (done_ସନ୍ଧାନ)
 	{
 	    vim_free(lastpat);
 	    lastpat = vim_strnsave(spats[last_idx].pat, spats[last_idx].patlen);
-	    if (lastpat == NULL)
+	    ଯଦି (lastpat == ଖାଲି)
 		lastpatlen = 0;
-	    else
+	    ଅନ୍ୟଥା
 		lastpatlen = spats[last_idx].patlen;
 	    chgtick = CHANGEDTICK(curbuf);
 	    lbuf = curbuf;
@@ -3410,289 +3410,289 @@ update_search_stat(
     p_ws = save_ws;
 }
 
-#if defined(FEAT_FIND_ID)
+#ଯଦି defined(FEAT_FIND_ID)
 
 /*
  * Get line "lnum" and copy it into "buf[LSIZE]".
  * The copy is made because the regexp may make the line invalid when using a
  * mark.
  */
-    static char_u *
-get_line_and_copy(linenr_T lnum, char_u *buf)
+    ସ୍ଥିର char_u *
+get_ଧାଡ଼ି_and_copy(linenr_T lnum, char_u *buf)
 {
-    char_u *line = ml_get(lnum);
+    char_u *ଧାଡ଼ି = ml_get(lnum);
 
-    vim_strncpy(buf, line, LSIZE - 1);
-    return buf;
+    vim_strncpy(buf, ଧାଡ଼ି, LSIZE - 1);
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
  * Find identifiers or defines in included files.
  * If p_ic && compl_status_sol() then ptr must be in lowercase.
  */
-    void
+    ଶୂନ୍ୟ
 find_pattern_in_path(
     char_u	*ptr,		// pointer to search pattern
-    int		dir UNUSED,	// direction of expansion
-    int		len,		// length of search pattern
-    int		whole,		// match whole words only
-    int		skip_comments,	// don't match inside comments
-    int		type,		// Type of search; are we looking for a type?
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir UNUSED,	// direction of expansion
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len,		// length of search pattern
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		whole,		// match whole words only
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skip_comments,	// don't match inside comments
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type,		// Type of search; are we looking for a type?
 				// a macro?
-    long	count,
-    int		action,		// What to do when we find it
+    long	ଗଣନା_2,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		action,		// What to do when we find it
     linenr_T	start_lnum,	// first line to start searching
     linenr_T	end_lnum,	// last line for searching
-    int		forceit,	// If true, always switch to the found path
-    int		silent)		// Do not print messages when ACTION_EXPAND
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		forceit,	// If true, always switch to the found path
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		silent)		// Do not print messages when ACTION_EXPAND
 {
     SearchedFile *files;		// Stack of included files
     SearchedFile *bigger;		// When we need more space
-    int		max_path_depth = 50;
-    long	match_count = 1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_path_depth = 50;
+    long	match_ଗଣନା = 1;
 
     char_u	*pat;
     char_u	*new_fname;
     char_u	*curr_fname = curbuf->b_fname;
-    char_u	*prev_fname = NULL;
+    char_u	*prev_fname = ଖାଲି;
     linenr_T	lnum;
-    int		depth;
-    int		depth_displayed;	// For type==CHECK_PATH
-    int		old_files;
-    int		already_searched;
-    char_u	*file_line;
-    char_u	*line;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		depth;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		depth_displayed;	// For type==CHECK_PATH
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		old_files;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		already_searched;
+    char_u	*file_ଧାଡ଼ି;
+    char_u	*ଧାଡ଼ି;
     char_u	*p;
     char_u	save_char;
-    int		define_matched;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		define_matched;
     regmatch_T	regmatch;
     regmatch_T	incl_regmatch;
     regmatch_T	def_regmatch;
-    int		matched = FALSE;
-    int		did_show = FALSE;
-    int		found = FALSE;
-    int		i;
-    char_u	*already = NULL;
-    char_u	*startp = NULL;
-    char_u	*inc_opt = NULL;
-# if defined(FEAT_QUICKFIX)
-    win_T	*curwin_save = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		matched = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_show = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    char_u	*already = ଖାଲି;
+    char_u	*startp = ଖାଲି;
+    char_u	*inc_opt = ଖାଲି;
+# ଯଦି defined(FEAT_QUICKFIX)
+    win_T	*curwin_save = ଖାଲି;
 # endif
 
-    regmatch.regprog = NULL;
-    incl_regmatch.regprog = NULL;
-    def_regmatch.regprog = NULL;
+    regmatch.regprog = ଖାଲି;
+    incl_regmatch.regprog = ଖାଲି;
+    def_regmatch.regprog = ଖାଲି;
 
-    file_line = alloc(LSIZE);
-    if (file_line == NULL)
-	return;
+    file_ଧାଡ଼ି = alloc(LSIZE);
+    ଯଦି (file_ଧାଡ଼ି == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (type != CHECK_PATH && type != FIND_DEFINE
+    ଯଦି (type != CHECK_PATH && type != FIND_DEFINE
 	    // when CONT_SOL is set compare "ptr" with the beginning of the
 	    // line is faster than quote_meta/regcomp/regexec "ptr" -- Acevedo
 	    && !compl_status_sol())
     {
 	pat = alloc(len + 5);
-	if (pat == NULL)
-	    goto fpip_end;
-	vim_snprintf((char *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
+	ଯଦି (pat == ଖାଲି)
+	    ଯାଅ fpip_end;
+	vim_snprintf((ଅକ୍ଷର *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
 	// ignore case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
 	vim_free(pat);
-	if (regmatch.regprog == NULL)
-	    goto fpip_end;
+	ଯଦି (regmatch.regprog == ଖାଲି)
+	    ଯାଅ fpip_end;
     }
     inc_opt = (*curbuf->b_p_inc == NUL) ? p_inc : curbuf->b_p_inc;
-    if (*inc_opt != NUL)
+    ଯଦି (*inc_opt != NUL)
     {
 	incl_regmatch.regprog = vim_regcomp(inc_opt,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (incl_regmatch.regprog == NULL)
-	    goto fpip_end;
+	ଯଦି (incl_regmatch.regprog == ଖାଲି)
+	    ଯାଅ fpip_end;
 	incl_regmatch.rm_ic = FALSE;	// don't ignore case in incl. pat.
     }
-    if (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
+    ଯଦି (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
     {
 	def_regmatch.regprog = vim_regcomp(*curbuf->b_p_def == NUL ? p_def : curbuf->b_p_def,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (def_regmatch.regprog == NULL)
-	    goto fpip_end;
+	ଯଦି (def_regmatch.regprog == ଖାଲି)
+	    ଯାଅ fpip_end;
 	def_regmatch.rm_ic = FALSE;	// don't ignore case in define pat.
     }
-    files = lalloc_clear(max_path_depth * sizeof(SearchedFile), TRUE);
-    if (files == NULL)
-	goto fpip_end;
+    files = lalloc_clear(max_path_depth * ଆକାର(SearchedFile), TRUE);
+    ଯଦି (files == ଖାଲି)
+	ଯାଅ fpip_end;
     old_files = max_path_depth;
     depth = depth_displayed = -1;
 
     lnum = start_lnum;
-    if (end_lnum > curbuf->b_ml.ml_line_count)
-	end_lnum = curbuf->b_ml.ml_line_count;
-    if (lnum > end_lnum)		// do at least one line
+    ଯଦି (end_lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+	end_lnum = curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+    ଯଦି (lnum > end_lnum)		// do at least one line
 	lnum = end_lnum;
-    line = get_line_and_copy(lnum, file_line);
+    ଧାଡ଼ି = get_ଧାଡ଼ି_and_copy(lnum, file_ଧାଡ଼ି);
 
-    for (;;)
+    ପାଇଁ (;;)
     {
-	if (incl_regmatch.regprog != NULL
-		&& vim_regexec(&incl_regmatch, line, (colnr_T)0))
+	ଯଦି (incl_regmatch.regprog != ଖାଲି
+		&& vim_regexec(&incl_regmatch, ଧାଡ଼ି, (colnr_T)0))
 	{
 	    char_u *p_fname = (curr_fname == curbuf->b_fname)
 					      ? curbuf->b_ffname : curr_fname;
 
-	    if (strstr((char *)inc_opt, "\\zs") != NULL)
+	    ଯଦି (strstr((ଅକ୍ଷର *)inc_opt, "\\zs") != ଖାଲି)
 		// Use text from '\zs' to '\ze' (or end) of 'include'.
 		new_fname = find_file_name_in_path(incl_regmatch.startp[0],
-		       (int)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
+		       (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
 				 FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname);
-	    else
+	    ଅନ୍ୟଥା
 		// Use text after match with 'include'.
-		new_fname = file_name_in_line(incl_regmatch.endp[0], 0,
-			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, NULL);
+		new_fname = file_name_in_ଧାଡ଼ି(incl_regmatch.endp[0], 0,
+			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, ଖାଲି);
 	    already_searched = FALSE;
-	    if (new_fname != NULL)
+	    ଯଦି (new_fname != ଖାଲି)
 	    {
 		// Check whether we have already searched in this file
-		for (i = 0;; i++)
+		ପାଇଁ (i = 0;; i++)
 		{
-		    if (i == depth + 1)
+		    ଯଦି (i == depth + 1)
 			i = old_files;
-		    if (i == max_path_depth)
-			break;
-		    if (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
+		    ଯଦି (i == max_path_depth)
+			ଭାଙ୍ଗ;
+		    ଯଦି (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
 								    & FPC_SAME)
 		    {
-			if (type != CHECK_PATH
+			ଯଦି (type != CHECK_PATH
 				&& action == ACTION_SHOW_ALL
 				&& files[i].matched)
 			{
-			    msg_putchar('\n');	    // cursor below last one
-			    if (!got_int)	    // don't display if 'q'
+			    ସନ୍ଦେଶ_putchar('\n');	    // cursor below last one
+			    ଯଦି (!got_int)	    // don't display if 'q'
 						    // typed at "--more--"
 						    // message
 			    {
-				msg_home_replace_hl(new_fname);
-				msg_puts(_(" (includes previously listed match)"));
-				prev_fname = NULL;
+				ସନ୍ଦେଶ_home_replace_hl(new_fname);
+				ସନ୍ଦେଶ_puts(_(" (includes previously listed match)"));
+				prev_fname = ଖାଲି;
 			    }
 			}
 			VIM_CLEAR(new_fname);
 			already_searched = TRUE;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 		}
 	    }
 
-	    if (type == CHECK_PATH && (action == ACTION_SHOW_ALL
-				 || (new_fname == NULL && !already_searched)))
+	    ଯଦି (type == CHECK_PATH && (action == ACTION_SHOW_ALL
+				 || (new_fname == ଖାଲି && !already_searched)))
 	    {
-		if (did_show)
-		    msg_putchar('\n');	    // cursor below last one
-		else
+		ଯଦି (did_show)
+		    ସନ୍ଦେଶ_putchar('\n');	    // cursor below last one
+		ଅନ୍ୟଥା
 		{
 		    gotocmdline(TRUE);	    // cursor at status line
-		    msg_puts_title(_("--- Included files "));
-		    if (action != ACTION_SHOW_ALL)
-			msg_puts_title(_("not found "));
-		    msg_puts_title(_("in path ---\n"));
+		    ସନ୍ଦେଶ_puts_title(_("--- Included files "));
+		    ଯଦି (action != ACTION_SHOW_ALL)
+			ସନ୍ଦେଶ_puts_title(_("not found "));
+		    ସନ୍ଦେଶ_puts_title(_("in path ---\n"));
 		}
 		did_show = TRUE;
-		while (depth_displayed < depth && !got_int)
+		ଯେତେବେଳେ (depth_displayed < depth && !got_int)
 		{
 		    ++depth_displayed;
-		    for (i = 0; i < depth_displayed; i++)
-			msg_puts("  ");
-		    msg_home_replace(files[depth_displayed].name);
-		    msg_puts(" -->\n");
+		    ପାଇଁ (i = 0; i < depth_displayed; i++)
+			ସନ୍ଦେଶ_puts("  ");
+		    ସନ୍ଦେଶ_home_replace(files[depth_displayed].name);
+		    ସନ୍ଦେଶ_puts(" -->\n");
 		}
-		if (!got_int)		    // don't display if 'q' typed
+		ଯଦି (!got_int)		    // don't display if 'q' typed
 					    // for "--more--" message
 		{
-		    for (i = 0; i <= depth_displayed; i++)
-			msg_puts("  ");
-		    if (new_fname != NULL)
+		    ପାଇଁ (i = 0; i <= depth_displayed; i++)
+			ସନ୍ଦେଶ_puts("  ");
+		    ଯଦି (new_fname != ଖାଲି)
 		    {
 			// using "new_fname" is more reliable, e.g., when
 			// 'includeexpr' is set.
-			msg_outtrans_attr(new_fname, HL_ATTR(HLF_D));
+			ସନ୍ଦେଶ_outtrans_attr(new_fname, HL_ATTR(HLF_D));
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			/*
 			 * Isolate the file name.
 			 * Include the surrounding "" or <> if present.
 			 */
-			if (strstr((char *)inc_opt, "\\zs") != NULL)
+			ଯଦି (strstr((ଅକ୍ଷର *)inc_opt, "\\zs") != ଖାଲି)
 			{
 			    // pattern contains \zs, use the match
 			    p = incl_regmatch.startp[0];
-			    i = (int)(incl_regmatch.endp[0]
+			    i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(incl_regmatch.endp[0]
 						   - incl_regmatch.startp[0]);
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    // find the file name after the end of the match
-			    for (p = incl_regmatch.endp[0];
+			    ପାଇଁ (p = incl_regmatch.endp[0];
 						  *p && !vim_isfilec(*p); p++)
 				;
-			    for (i = 0; vim_isfilec(p[i]); i++)
+			    ପାଇଁ (i = 0; vim_isfilec(p[i]); i++)
 				;
 			}
 
-			if (i == 0)
+			ଯଦି (i == 0)
 			{
 			    // Nothing found, use the rest of the line.
 			    p = incl_regmatch.endp[0];
-			    i = (int)STRLEN(p);
+			    i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p);
 			}
 			// Avoid checking before the start of the line, can
 			// happen if \zs appears in the regexp.
-			else if (p > line)
+			ଅନ୍ୟଥା ଯଦି (p > ଧାଡ଼ି)
 			{
-			    if (p[-1] == '"' || p[-1] == '<')
+			    ଯଦି (p[-1] == '"' || p[-1] == '<')
 			    {
 				--p;
 				++i;
 			    }
-			    if (p[i] == '"' || p[i] == '>')
+			    ଯଦି (p[i] == '"' || p[i] == '>')
 				++i;
 			}
 			save_char = p[i];
 			p[i] = NUL;
-			msg_outtrans_attr(p, HL_ATTR(HLF_D));
+			ସନ୍ଦେଶ_outtrans_attr(p, HL_ATTR(HLF_D));
 			p[i] = save_char;
 		    }
 
-		    if (new_fname == NULL && action == ACTION_SHOW_ALL)
+		    ଯଦି (new_fname == ଖାଲି && action == ACTION_SHOW_ALL)
 		    {
-			if (already_searched)
-			    msg_puts(_("  (Already listed)"));
-			else
-			    msg_puts(_("  NOT FOUND"));
+			ଯଦି (already_searched)
+			    ସନ୍ଦେଶ_puts(_("  (Already listed)"));
+			ଅନ୍ୟଥା
+			    ସନ୍ଦେଶ_puts(_("  NOT FOUND"));
 		    }
 		}
 		out_flush();	    // output each line directly
 	    }
 
-	    if (new_fname != NULL)
+	    ଯଦି (new_fname != ଖାଲି)
 	    {
 		// Push the new file onto the file stack
-		if (depth + 1 == old_files)
+		ଯଦି (depth + 1 == old_files)
 		{
 		    bigger = ALLOC_MULT(SearchedFile, max_path_depth * 2);
-		    if (bigger != NULL)
+		    ଯଦି (bigger != ଖାଲି)
 		    {
-			for (i = 0; i <= depth; i++)
+			ପାଇଁ (i = 0; i <= depth; i++)
 			    bigger[i] = files[i];
-			for (i = depth + 1; i < old_files + max_path_depth; i++)
+			ପାଇଁ (i = depth + 1; i < old_files + max_path_depth; i++)
 			{
-			    bigger[i].fp = NULL;
-			    bigger[i].name = NULL;
+			    bigger[i].fp = ଖାଲି;
+			    bigger[i].name = ଖାଲି;
 			    bigger[i].lnum = 0;
 			    bigger[i].matched = FALSE;
 			}
-			for (i = old_files; i < max_path_depth; i++)
+			ପାଇଁ (i = old_files; i < max_path_depth; i++)
 			    bigger[i + max_path_depth] = files[i];
 			old_files += max_path_depth;
 			max_path_depth *= 2;
@@ -3700,12 +3700,12 @@ find_pattern_in_path(
 			files = bigger;
 		    }
 		}
-		if ((files[depth + 1].fp = mch_fopen((char *)new_fname, "r"))
-								    == NULL)
+		ଯଦି ((files[depth + 1].fp = mch_fopen((ଅକ୍ଷର *)new_fname, "r"))
+								    == ଖାଲି)
 		    vim_free(new_fname);
-		else
+		ଅନ୍ୟଥା
 		{
-		    if (++depth == old_files)
+		    ଯଦି (++depth == old_files)
 		    {
 			/*
 			 * lalloc() for 'bigger' must have failed above.  We
@@ -3717,36 +3717,36 @@ find_pattern_in_path(
 		    files[depth].name = curr_fname = new_fname;
 		    files[depth].lnum = 0;
 		    files[depth].matched = FALSE;
-		    if (action == ACTION_EXPAND
+		    ଯଦି (action == ACTION_EXPAND
 			    && !shortmess(SHM_COMPLETIONSCAN) && !silent)
 		    {
-			msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-			vim_snprintf((char*)IObuff, IOSIZE,
+			ସନ୍ଦେଶ_hist_off = TRUE;	// reset in msg_trunc_attr()
+			vim_snprintf((ଅକ୍ଷର*)IObuff, IOSIZE,
 				_("Scanning included file: %s"),
-				(char *)new_fname);
-			msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+				(ଅକ୍ଷର *)new_fname);
+			ସନ୍ଦେଶ_trunc_attr((ଅକ୍ଷର *)IObuff, TRUE, HL_ATTR(HLF_R));
 		    }
-		    else if (p_verbose >= 5)
+		    ଅନ୍ୟଥା ଯଦି (p_verbose >= 5)
 		    {
 			verbose_enter();
 			smsg(_("Searching included file %s"),
-							   (char *)new_fname);
+							   (ଅକ୍ଷର *)new_fname);
 			verbose_leave();
 		    }
 
 		}
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    /*
 	     * Check if the line is a define (type == FIND_DEFINE)
 	     */
-	    p = line;
-search_line:
+	    p = ଧାଡ଼ି;
+ସନ୍ଧାନ_ଧାଡ଼ି:
 	    define_matched = FALSE;
-	    if (def_regmatch.regprog != NULL
-			      && vim_regexec(&def_regmatch, line, (colnr_T)0))
+	    ଯଦି (def_regmatch.regprog != ଖାଲି
+			      && vim_regexec(&def_regmatch, ଧାଡ଼ି, (colnr_T)0))
 	    {
 		/*
 		 * Pattern must be first identifier after 'define', so skip
@@ -3754,7 +3754,7 @@ search_line:
 		 * don't let it match beyond the end of this identifier.
 		 */
 		p = def_regmatch.endp[0];
-		while (*p && !vim_iswordc(*p))
+		ଯେତେବେଳେ (*p && !vim_iswordc(*p))
 		    p++;
 		define_matched = TRUE;
 	    }
@@ -3763,22 +3763,22 @@ search_line:
 	     * Look for a match.  Don't do this if we are looking for a
 	     * define and this line didn't match define_prog above.
 	     */
-	    if (def_regmatch.regprog == NULL || define_matched)
+	    ଯଦି (def_regmatch.regprog == ଖାଲି || define_matched)
 	    {
-		if (define_matched || compl_status_sol())
+		ଯଦି (define_matched || compl_status_sol())
 		{
 		    // compare the first "len" chars from "ptr"
 		    startp = skipwhite(p);
-		    if (p_ic)
+		    ଯଦି (p_ic)
 			matched = MB_STRNICMP(startp, ptr, len) == 0;
-		    else
+		    ଅନ୍ୟଥା
 			matched = STRNCMP(startp, ptr, len) == 0;
-		    if (matched && define_matched && whole
+		    ଯଦି (matched && define_matched && whole
 						  && vim_iswordc(startp[len]))
 			matched = FALSE;
 		}
-		else if (regmatch.regprog != NULL
-			 && vim_regexec(&regmatch, line, (colnr_T)(p - line)))
+		ଅନ୍ୟଥା ଯଦି (regmatch.regprog != ଖାଲି
+			 && vim_regexec(&regmatch, ଧାଡ଼ି, (colnr_T)(p - ଧାଡ଼ି)))
 		{
 		    matched = TRUE;
 		    startp = regmatch.startp[0];
@@ -3787,11 +3787,11 @@ search_line:
 		     * looking for a define).  A line starting with "# define"
 		     * is not considered to be a comment line.
 		     */
-		    if (!define_matched && skip_comments)
+		    ଯଦି (!define_matched && skip_comments)
 		    {
-			if ((*line != '#' ||
-				STRNCMP(skipwhite(line + 1), "define", 6) != 0)
-				&& get_leader_len(line, NULL, FALSE, TRUE))
+			ଯଦି ((*ଧାଡ଼ି != '#' ||
+				STRNCMP(skipwhite(ଧାଡ଼ି + 1), "define", 6) != 0)
+				&& get_leader_len(ଧାଡ଼ି, ଖାଲି, FALSE, TRUE))
 			    matched = FALSE;
 
 			/*
@@ -3800,22 +3800,22 @@ search_line:
 			 * * /" when looking for "normal".
 			 * Note: Doesn't skip "/ *" in comments.
 			 */
-			p = skipwhite(line);
-			if (matched
+			p = skipwhite(ଧାଡ଼ି);
+			ଯଦି (matched
 				|| (p[0] == '/' && p[1] == '*') || p[0] == '*')
-			    for (p = line; *p && p < startp; ++p)
+			    ପାଇଁ (p = ଧାଡ଼ି; *p && p < startp; ++p)
 			    {
-				if (matched
+				ଯଦି (matched
 					&& p[0] == '/'
 					&& (p[1] == '*' || p[1] == '/'))
 				{
 				    matched = FALSE;
 				    // After "//" all text is comment
-				    if (p[1] == '/')
-					break;
+				    ଯଦି (p[1] == '/')
+					ଭାଙ୍ଗ;
 				    ++p;
 				}
-				else if (!matched && p[0] == '*' && p[1] == '/')
+				ଅନ୍ୟଥା ଯଦି (!matched && p[0] == '*' && p[1] == '/')
 				{
 				    // Can find match after "* /".
 				    matched = TRUE;
@@ -3826,29 +3826,29 @@ search_line:
 		}
 	    }
 	}
-	if (matched)
+	ଯଦି (matched)
 	{
-	    if (action == ACTION_EXPAND)
+	    ଯଦି (action == ACTION_EXPAND)
 	    {
-		int	cont_s_ipos = FALSE;
-		int	add_r;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	cont_s_ipos = FALSE;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	add_r;
 		char_u	*aux;
 
-		if (depth == -1 && lnum == curwin->w_cursor.lnum)
-		    break;
+		ଯଦି (depth == -1 && lnum == curwin->w_cursor.lnum)
+		    ଭାଙ୍ଗ;
 		found = TRUE;
 		aux = p = startp;
-		if (compl_status_adding() && (int)STRLEN(p) >= ins_compl_len())
+		ଯଦି (compl_status_adding() && (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p) >= ins_compl_len())
 		{
 		    p += ins_compl_len();
-		    if (vim_iswordp(p))
-			goto exit_matched;
+		    ଯଦି (vim_iswordp(p))
+			ଯାଅ exit_matched;
 		    p = find_word_start(p);
 		}
 		p = find_word_end(p);
-		i = (int)(p - aux);
+		i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - aux);
 
-		if (compl_status_adding() && i == ins_compl_len())
+		ଯଦି (compl_status_adding() && i == ins_compl_len())
 		{
 		    // IOSIZE > compl_length, so the STRNCPY works
 		    STRNCPY(IObuff, aux, i);
@@ -3856,159 +3856,159 @@ search_line:
 		    // Get the next line: when "depth" < 0  from the current
 		    // buffer, otherwise from the included file.  Jump to
 		    // exit_matched when past the last line.
-		    if (depth < 0)
+		    ଯଦି (depth < 0)
 		    {
-			if (lnum >= end_lnum)
-			    goto exit_matched;
-			line = get_line_and_copy(++lnum, file_line);
+			ଯଦି (lnum >= end_lnum)
+			    ଯାଅ exit_matched;
+			ଧାଡ଼ି = get_ଧାଡ଼ି_and_copy(++lnum, file_ଧାଡ଼ି);
 		    }
-		    else if (vim_fgets(line = file_line,
+		    ଅନ୍ୟଥା ଯଦି (vim_fgets(ଧାଡ଼ି = file_ଧାଡ଼ି,
 						      LSIZE, files[depth].fp))
-			goto exit_matched;
+			ଯାଅ exit_matched;
 
 		    // we read a line, set "already" to check this "line" later
 		    // if depth >= 0 we'll increase files[depth].lnum far
 		    // below  -- Acevedo
-		    already = aux = p = skipwhite(line);
+		    already = aux = p = skipwhite(ଧାଡ଼ି);
 		    p = find_word_start(p);
 		    p = find_word_end(p);
-		    if (p > aux)
+		    ଯଦି (p > aux)
 		    {
-			if (*aux != ')' && IObuff[i-1] != TAB)
+			ଯଦି (*aux != ')' && IObuff[i-1] != TAB)
 			{
-			    if (IObuff[i-1] != ' ')
+			    ଯଦି (IObuff[i-1] != ' ')
 				IObuff[i++] = ' ';
 			    // IObuf =~ "\(\k\|\i\).* ", thus i >= 2
-			    if (p_js
+			    ଯଦି (p_js
 				&& (IObuff[i-2] == '.'
-				    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
+				    || (vim_strchr(p_cpo, CPO_JOINSP) == ଖାଲି
 					&& (IObuff[i-2] == '?'
 					    || IObuff[i-2] == '!'))))
 				IObuff[i++] = ' ';
 			}
 			// copy as much as possible of the new word
-			if (p - aux >= IOSIZE - i)
+			ଯଦି (p - aux >= IOSIZE - i)
 			    p = aux + IOSIZE - i - 1;
 			STRNCPY(IObuff + i, aux, p - aux);
-			i += (int)(p - aux);
+			i += (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(p - aux);
 			cont_s_ipos = TRUE;
 		    }
 		    IObuff[i] = NUL;
 		    aux = IObuff;
 
-		    if (i == ins_compl_len())
-			goto exit_matched;
+		    ଯଦି (i == ins_compl_len())
+			ଯାଅ exit_matched;
 		}
 
 		add_r = ins_compl_add_infercase(aux, i, p_ic,
-			curr_fname == curbuf->b_fname ? NULL
+			curr_fname == curbuf->b_fname ? ଖାଲି
 						  : shorten_fname1(curr_fname),
 			dir, cont_s_ipos, 0);
-		if (add_r == OK)
+		ଯଦି (add_r == OK)
 		    // if dir was BACKWARD then honor it just once
 		    dir = FORWARD;
-		else if (add_r == FAIL)
-		    break;
+		ଅନ୍ୟଥା ଯଦି (add_r == FAIL)
+		    ଭାଙ୍ଗ;
 	    }
-	    else if (action == ACTION_SHOW_ALL)
+	    ଅନ୍ୟଥା ଯଦି (action == ACTION_SHOW_ALL)
 	    {
 		found = TRUE;
-		if (!did_show)
+		ଯଦି (!did_show)
 		    gotocmdline(TRUE);		// cursor at status line
-		if (curr_fname != prev_fname)
+		ଯଦି (curr_fname != prev_fname)
 		{
-		    if (did_show)
-			msg_putchar('\n');	// cursor below last one
-		    if (!got_int)		// don't display if 'q' typed
+		    ଯଦି (did_show)
+			ସନ୍ଦେଶ_putchar('\n');	// cursor below last one
+		    ଯଦି (!got_int)		// don't display if 'q' typed
 						// at "--more--" message
-			msg_home_replace_hl(curr_fname);
+			ସନ୍ଦେଶ_home_replace_hl(curr_fname);
 		    prev_fname = curr_fname;
 		}
 		did_show = TRUE;
-		if (!got_int)
-		    show_pat_in_path(line, type, TRUE, action,
-			    (depth == -1) ? NULL : files[depth].fp,
+		ଯଦି (!got_int)
+		    show_pat_in_path(ଧାଡ଼ି, type, TRUE, action,
+			    (depth == -1) ? ଖାଲି : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum,
-			    match_count++);
+			    match_ଗଣନା++);
 
 		// Set matched flag for this file and all the ones that
 		// include it
-		for (i = 0; i <= depth; ++i)
+		ପାଇଁ (i = 0; i <= depth; ++i)
 		    files[i].matched = TRUE;
 	    }
-	    else if (--count <= 0)
+	    ଅନ୍ୟଥା ଯଦି (--ଗଣନା_2 <= 0)
 	    {
 		found = TRUE;
-		if (depth == -1 && lnum == curwin->w_cursor.lnum
-# if defined(FEAT_QUICKFIX)
+		ଯଦି (depth == -1 && lnum == curwin->w_cursor.lnum
+# ଯଦି defined(FEAT_QUICKFIX)
 						      && g_do_tagpreview == 0
 # endif
 						      )
-		    emsg(_(e_match_is_on_current_line));
-		else if (action == ACTION_SHOW)
+		    emsg(_(e_match_is_on_current_ଧାଡ଼ି));
+		ଅନ୍ୟଥା ଯଦି (action == ACTION_SHOW)
 		{
-		    show_pat_in_path(line, type, did_show, action,
-			    (depth == -1) ? NULL : files[depth].fp,
+		    show_pat_in_path(ଧାଡ଼ି, type, did_show, action,
+			    (depth == -1) ? ଖାଲି : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum, 1L);
 		    did_show = TRUE;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 # ifdef FEAT_GUI
 		    need_mouse_correct = TRUE;
 # endif
-# if defined(FEAT_QUICKFIX)
+# ଯଦି defined(FEAT_QUICKFIX)
 		    // ":psearch" uses the preview window
-		    if (g_do_tagpreview != 0)
+		    ଯଦି (g_do_tagpreview != 0)
 		    {
 			curwin_save = curwin;
 			prepare_tagpreview(TRUE, TRUE, FALSE);
 		    }
 # endif
-		    if (action == ACTION_SPLIT)
+		    ଯଦି (action == ACTION_SPLIT)
 		    {
-			if (win_split(0, 0) == FAIL)
-			    break;
+			ଯଦି (win_split(0, 0) == FAIL)
+			    ଭାଙ୍ଗ;
 			RESET_BINDING(curwin);
 		    }
-		    if (depth == -1)
+		    ଯଦି (depth == -1)
 		    {
 			// match in current file
-# if defined(FEAT_QUICKFIX)
-			if (g_do_tagpreview != 0)
+# ଯଦି defined(FEAT_QUICKFIX)
+			ଯଦି (g_do_tagpreview != 0)
 			{
-			    if (!win_valid(curwin_save))
-				break;
-			    if (!GETFILE_SUCCESS(getfile(
-					   curwin_save->w_buffer->b_fnum, NULL,
-						     NULL, TRUE, lnum, forceit)))
-				break;	// failed to jump to file
+			    ଯଦି (!win_valid(curwin_save))
+				ଭାଙ୍ଗ;
+			    ଯଦି (!GETFILE_SUCCESS(getfile(
+					   curwin_save->w_buffer->b_fnum, ଖାଲି,
+						     ଖାଲି, TRUE, lnum, forceit)))
+				ଭାଙ୍ଗ;	// failed to jump to file
 			}
-			else
+			ଅନ୍ୟଥା
 # endif
 			    setpcmark();
 			curwin->w_cursor.lnum = lnum;
 			check_cursor();
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			if (!GETFILE_SUCCESS(getfile(
-					0, files[depth].name, NULL, TRUE,
+			ଯଦି (!GETFILE_SUCCESS(getfile(
+					0, files[depth].name, ଖାଲି, TRUE,
 						    files[depth].lnum, forceit)))
-			    break;	// failed to jump to file
+			    ଭାଙ୍ଗ;	// failed to jump to file
 			// autocommands may have changed the lnum, we don't
 			// want that here
 			curwin->w_cursor.lnum = files[depth].lnum;
 		    }
 		}
-		if (action != ACTION_SHOW)
+		ଯଦି (action != ACTION_SHOW)
 		{
-		    curwin->w_cursor.col = (colnr_T)(startp - line);
+		    curwin->w_cursor.col = (colnr_T)(startp - ଧାଡ଼ି);
 		    curwin->w_set_curswant = true;
 		}
 
-# if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0
+# ଯଦି defined(FEAT_QUICKFIX)
+		ଯଦି (g_do_tagpreview != 0
 			   && curwin != curwin_save && win_valid(curwin_save))
 		{
 		    // Return cursor to where we were
@@ -4017,37 +4017,37 @@ search_line:
 		    win_enter(curwin_save, TRUE);
 		}
 #  ifdef FEAT_PROP_POPUP
-		else if (WIN_IS_POPUP(curwin))
+		ଅନ୍ୟଥା ଯଦି (WIN_IS_POPUP(curwin))
 		    // can't keep focus in popup window
 		    win_enter(firstwin, TRUE);
 #  endif
 # endif
-		break;
+		ଭାଙ୍ଗ;
 	    }
 exit_matched:
 	    matched = FALSE;
 	    // look for other matches in the rest of the line if we
 	    // are not at the end of it already
-	    if (def_regmatch.regprog == NULL
+	    ଯଦି (def_regmatch.regprog == ଖାଲି
 		    && action == ACTION_EXPAND
 		    && !compl_status_sol()
 		    && *startp != NUL
 		    && *(startp + mb_ptr2len(startp)) != NUL)
-		goto search_line;
+		ଯାଅ ସନ୍ଧାନ_ଧାଡ଼ି;
 	}
-	line_breakcheck();
-	if (action == ACTION_EXPAND)
-	    ins_compl_check_keys(30, FALSE);
-	if (got_int || ins_compl_interrupted())
-	    break;
+	ଧାଡ଼ି_breakcheck();
+	ଯଦି (action == ACTION_EXPAND)
+	    ins_compl_check_ଚାବିଗୁଡ଼ିକ(30, FALSE);
+	ଯଦି (got_int || ins_compl_interrupted())
+	    ଭାଙ୍ଗ;
 
 	/*
 	 * Read the next line.  When reading an included file and encountering
 	 * end-of-file, close the file and continue in the file that included
 	 * it.
 	 */
-	while (depth >= 0 && !already
-		&& vim_fgets(line = file_line, LSIZE, files[depth].fp))
+	ଯେତେବେଳେ (depth >= 0 && !already
+		&& vim_fgets(ଧାଡ଼ି = file_ଧାଡ଼ି, LSIZE, files[depth].fp))
 	{
 	    fclose(files[depth].fp);
 	    --old_files;
@@ -4056,131 +4056,131 @@ exit_matched:
 	    --depth;
 	    curr_fname = (depth == -1) ? curbuf->b_fname
 				       : files[depth].name;
-	    if (depth < depth_displayed)
+	    ଯଦି (depth < depth_displayed)
 		depth_displayed = depth;
 	}
-	if (depth >= 0)		// we could read the line
+	ଯଦି (depth >= 0)		// we could read the line
 	{
 	    files[depth].lnum++;
 	    // Remove any CR and LF from the line.
-	    i = (int)STRLEN(line);
-	    if (i > 0 && line[i - 1] == '\n')
-		line[--i] = NUL;
-	    if (i > 0 && line[i - 1] == '\r')
-		line[--i] = NUL;
+	    i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(ଧାଡ଼ି);
+	    ଯଦି (i > 0 && ଧାଡ଼ି[i - 1] == '\n')
+		ଧାଡ଼ି[--i] = NUL;
+	    ଯଦି (i > 0 && ଧାଡ଼ି[i - 1] == '\r')
+		ଧାଡ଼ି[--i] = NUL;
 	}
-	else if (!already)
+	ଅନ୍ୟଥା ଯଦି (!already)
 	{
-	    if (++lnum > end_lnum)
-		break;
-	    line = get_line_and_copy(lnum, file_line);
+	    ଯଦି (++lnum > end_lnum)
+		ଭାଙ୍ଗ;
+	    ଧାଡ଼ି = get_ଧାଡ଼ି_and_copy(lnum, file_ଧାଡ଼ି);
 	}
-	already = NULL;
+	already = ଖାଲି;
     }
     // End of big for (;;) loop.
 
     // Close any files that are still open.
-    for (i = 0; i <= depth; i++)
+    ପାଇଁ (i = 0; i <= depth; i++)
     {
 	fclose(files[i].fp);
 	vim_free(files[i].name);
     }
-    for (i = old_files; i < max_path_depth; i++)
+    ପାଇଁ (i = old_files; i < max_path_depth; i++)
 	vim_free(files[i].name);
     vim_free(files);
 
-    if (type == CHECK_PATH)
+    ଯଦି (type == CHECK_PATH)
     {
-	if (!did_show)
+	ଯଦି (!did_show)
 	{
-	    if (action != ACTION_SHOW_ALL)
-		msg(_("All included files were found"));
-	    else
-		msg(_("No included files"));
+	    ଯଦି (action != ACTION_SHOW_ALL)
+		ସନ୍ଦେଶ(_("All included files were found"));
+	    ଅନ୍ୟଥା
+		ସନ୍ଦେଶ(_("No included files"));
 	}
     }
-    else if (!found && action != ACTION_EXPAND && !silent)
+    ଅନ୍ୟଥା ଯଦି (!found && action != ACTION_EXPAND && !silent)
     {
-	if (got_int || ins_compl_interrupted())
+	ଯଦି (got_int || ins_compl_interrupted())
 	    emsg(_(e_interrupted));
-	else if (type == FIND_DEFINE)
+	ଅନ୍ୟଥା ଯଦି (type == FIND_DEFINE)
 	    emsg(_(e_couldnt_find_definition));
-	else
+	ଅନ୍ୟଥା
 	    emsg(_(e_couldnt_find_pattern));
     }
-    if (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
-	msg_end();
+    ଯଦି (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
+	ସନ୍ଦେଶ_end();
 
 fpip_end:
-    vim_free(file_line);
+    vim_free(file_ଧାଡ଼ି);
     vim_regfree(regmatch.regprog);
     vim_regfree(incl_regmatch.regprog);
     vim_regfree(def_regmatch.regprog);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 show_pat_in_path(
-    char_u  *line,
-    int	    type,
-    int	    did_show,
-    int	    action,
+    char_u  *ଧାଡ଼ି,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    did_show,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    action,
     FILE    *fp,
     linenr_T *lnum,
-    long    count)
+    long    ଗଣନା_2)
 {
     char_u  *p;
     size_t  linelen;
 
-    if (did_show)
-	msg_putchar('\n');	// cursor below last one
-    else if (!msg_silent)
+    ଯଦି (did_show)
+	ସନ୍ଦେଶ_putchar('\n');	// cursor below last one
+    ଅନ୍ୟଥା ଯଦି (!ସନ୍ଦେଶ_silent)
 	gotocmdline(TRUE);	// cursor at status line
-    if (got_int)		// 'q' typed at "--more--" message
-	return;
-    linelen = STRLEN(line);
-    for (;;)
+    ଯଦି (got_int)		// 'q' typed at "--more--" message
+	ଫେରନ୍ତୁ;
+    linelen = STRLEN(ଧାଡ଼ି);
+    ପାଇଁ (;;)
     {
-	p = line + linelen - 1;
-	if (fp != NULL)
+	p = ଧାଡ଼ି + linelen - 1;
+	ଯଦି (fp != ଖାଲି)
 	{
 	    // We used fgets(), so get rid of newline at end
-	    if (p >= line && *p == '\n')
+	    ଯଦି (p >= ଧାଡ଼ି && *p == '\n')
 		--p;
-	    if (p >= line && *p == '\r')
+	    ଯଦି (p >= ଧାଡ଼ି && *p == '\r')
 		--p;
 	    *(p + 1) = NUL;
 	}
-	if (action == ACTION_SHOW_ALL)
+	ଯଦି (action == ACTION_SHOW_ALL)
 	{
-	    sprintf((char *)IObuff, "%3ld: ", count);	// show match nr
-	    msg_puts((char *)IObuff);
-	    sprintf((char *)IObuff, "%4ld", *lnum);	// show line nr
+	    sprintf((ଅକ୍ଷର *)IObuff, "%3ld: ", ଗଣନା_2);	// show match nr
+	    ସନ୍ଦେଶ_puts((ଅକ୍ଷର *)IObuff);
+	    sprintf((ଅକ୍ଷର *)IObuff, "%4ld", *lnum);	// show line nr
 						// Highlight line numbers
-	    msg_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
-	    msg_puts(" ");
+	    ସନ୍ଦେଶ_puts_attr((ଅକ୍ଷର *)IObuff, HL_ATTR(HLF_N));
+	    ସନ୍ଦେଶ_puts(" ");
 	}
-	msg_prt_line(line, FALSE);
+	ସନ୍ଦେଶ_prt_ଧାଡ଼ି(ଧାଡ଼ି, FALSE);
 	out_flush();			// show one line at a time
 
 	// Definition continues until line that doesn't end with '\'
-	if (got_int || type != FIND_DEFINE || p < line || *p != '\\')
-	    break;
+	ଯଦି (got_int || type != FIND_DEFINE || p < ଧାଡ଼ି || *p != '\\')
+	    ଭାଙ୍ଗ;
 
-	if (fp != NULL)
+	ଯଦି (fp != ଖାଲି)
 	{
-	    if (vim_fgets(line, LSIZE, fp)) // end of file
-		break;
-	    linelen = STRLEN(line);
+	    ଯଦି (vim_fgets(ଧାଡ଼ି, LSIZE, fp)) // end of file
+		ଭାଙ୍ଗ;
+	    linelen = STRLEN(ଧାଡ଼ି);
 	    ++*lnum;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (++*lnum > curbuf->b_ml.ml_line_count)
-		break;
-	    line = ml_get(*lnum);
+	    ଯଦି (++*lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+		ଭାଙ୍ଗ;
+	    ଧାଡ଼ି = ml_get(*lnum);
 	    linelen = ml_get_len(*lnum);
 	}
-	msg_putchar('\n');
+	ସନ୍ଦେଶ_putchar('\n');
     }
 }
 #endif
@@ -4190,141 +4190,141 @@ show_pat_in_path(
  * Return the last used search pattern at "idx".
  */
     spat_T *
-get_spat(int idx)
+get_spat(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    return &spats[idx];
+    ଫେରନ୍ତୁ &spats[idx];
 }
 
 /*
  * Return the last used search pattern index.
  */
-    int
-get_spat_last_idx(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_spat_last_idx(ଶୂନ୍ୟ)
 {
-    return last_idx;
+    ଫେରନ୍ତୁ last_idx;
 }
 #endif
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#ଯଦି defined(FEAT_EVAL) || defined(FEAT_PROTO)
 /*
  * "searchcount()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_searchcount(typval_T *argvars, typval_T *rettv)
 {
     pos_T		pos = curwin->w_cursor;
-    char_u		*pattern = NULL;
-    int			maxcount = p_msc;
-    long		timeout = SEARCH_STAT_DEF_TIMEOUT;
-    int			recompute = TRUE;
+    char_u		*pattern = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			maxcount = p_msc;
+    long		timeout = ସନ୍ଧାନ_STAT_DEF_TIMEOUT;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			recompute = TRUE;
     searchstat_T	stat;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
+    ଯଦି (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
 	recompute = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
 	dict_T		*dict;
 	dictitem_T	*di;
 	listitem_T	*li;
-	int		error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-	if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	    return;
+	ଯଦି (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	    ଫେରନ୍ତୁ;
 	dict = argvars[0].vval.v_dict;
 	di = dict_find(dict, (char_u *)"timeout", -1);
-	if (di != NULL)
+	ଯଦି (di != ଖାଲି)
 	{
-	    timeout = (long)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    timeout = (long)tv_get_ସଂଖ୍ୟା_chk(&di->di_tv, &error);
+	    ଯଦି (error)
+		ଫେରନ୍ତୁ;
 	}
 	di = dict_find(dict, (char_u *)"maxcount", -1);
-	if (di != NULL)
+	ଯଦି (di != ଖାଲି)
 	{
-	    maxcount = (int)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    maxcount = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&di->di_tv, &error);
+	    ଯଦି (error)
+		ଫେରନ୍ତୁ;
 	}
 	recompute = dict_get_bool(dict, "recompute", recompute);
 	di = dict_find(dict, (char_u *)"pattern", -1);
-	if (di != NULL)
+	ଯଦି (di != ଖାଲି)
 	{
 	    pattern = tv_get_string_chk(&di->di_tv);
-	    if (pattern == NULL)
-		return;
+	    ଯଦି (pattern == ଖାଲି)
+		ଫେରନ୍ତୁ;
 	}
 	di = dict_find(dict, (char_u *)"pos", -1);
-	if (di != NULL)
+	ଯଦି (di != ଖାଲି)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    ଯଦି (di->di_tv.v_type != VAR_LIST)
 	    {
 		semsg(_(e_invalid_argument_str), "pos");
-		return;
+		ଫେରନ୍ତୁ;
 	    }
-	    if (list_len(di->di_tv.vval.v_list) != 3)
+	    ଯଦି (list_len(di->di_tv.vval.v_list) != 3)
 	    {
 		semsg(_(e_invalid_argument_str), "List format should be [lnum, col, off]");
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 0L);
-	    if (li != NULL)
+	    ଯଦି (li != ଖାଲି)
 	    {
-		pos.lnum = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.lnum = tv_get_ସଂଖ୍ୟା_chk(&li->li_tv, &error);
+		ଯଦି (error)
+		    ଫେରନ୍ତୁ;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 1L);
-	    if (li != NULL)
+	    ଯଦି (li != ଖାଲି)
 	    {
-		pos.col = tv_get_number_chk(&li->li_tv, &error) - 1;
-		if (error)
-		    return;
+		pos.col = tv_get_ସଂଖ୍ୟା_chk(&li->li_tv, &error) - 1;
+		ଯଦି (error)
+		    ଫେରନ୍ତୁ;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 2L);
-	    if (li != NULL)
+	    ଯଦି (li != ଖାଲି)
 	    {
-		pos.coladd = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.coladd = tv_get_ସଂଖ୍ୟା_chk(&li->li_tv, &error);
+		ଯଦି (error)
+		    ଫେରନ୍ତୁ;
 	    }
 	}
     }
 
-    save_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    save_last_ସନ୍ଧାନ_pattern();
+# ifdef FEAT_ସନ୍ଧାନ_EXTRA
     save_incsearch_state();
 # endif
-    if (pattern != NULL)
+    ଯଦି (pattern != ଖାଲି)
     {
-	if (*pattern == NUL)
-	    goto the_end;
+	ଯଦି (*pattern == NUL)
+	    ଯାଅ the_end;
 	vim_free(spats[last_idx].pat);
 	spats[last_idx].patlen = STRLEN(pattern);
 	spats[last_idx].pat = vim_strnsave(pattern, spats[last_idx].patlen);
-	if (spats[last_idx].pat == NULL)
+	ଯଦି (spats[last_idx].pat == ଖାଲି)
 	    spats[last_idx].patlen = 0;
     }
-    if (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
-	goto the_end;	// the previous pattern was never defined
+    ଯଦି (spats[last_idx].pat == ଖାଲି || *spats[last_idx].pat == NUL)
+	ଯାଅ the_end;	// the previous pattern was never defined
 
-    update_search_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
+    update_ସନ୍ଧାନ_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
 
-    dict_add_number(rettv->vval.v_dict, "current", stat.cur);
-    dict_add_number(rettv->vval.v_dict, "total", stat.cnt);
-    dict_add_number(rettv->vval.v_dict, "exact_match", stat.exact_match);
-    dict_add_number(rettv->vval.v_dict, "incomplete", stat.incomplete);
-    dict_add_number(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
+    dict_add_ସଂଖ୍ୟା(rettv->vval.v_dict, "current", stat.cur);
+    dict_add_ସଂଖ୍ୟା(rettv->vval.v_dict, "total", stat.cnt);
+    dict_add_ସଂଖ୍ୟା(rettv->vval.v_dict, "exact_match", stat.exact_match);
+    dict_add_ସଂଖ୍ୟା(rettv->vval.v_dict, "incomplete", stat.incomplete);
+    dict_add_ସଂଖ୍ୟା(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
 
 the_end:
-    restore_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    restore_last_ସନ୍ଧାନ_pattern();
+# ifdef FEAT_ସନ୍ଧାନ_EXTRA
     restore_incsearch_state();
 # endif
 }

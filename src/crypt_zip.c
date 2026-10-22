@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#ଯଦି defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,106 +24,106 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+ପ୍ରକାରବ୍ୟାଖ୍ୟା unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
+    u32_T ଚାବିଗୁଡ଼ିକ[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+ସ୍ଥିର u32_T crc_32_table[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+make_crc_tab(ଶୂନ୍ୟ)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	done = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    ଯଦି (done)
+	ଫେରନ୍ତୁ;
+    ପାଇଁ (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	ପାଇଁ (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
 	crc_32_table[t] = v;
     }
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(ଚାବିଗୁଡ଼ିକ, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u temp = (short_u)ଚାବିଗୁଡ଼ିକ[2] | 2; \
+    t = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#define UPDATE_ଚାବିଗୁଡ଼ିକ_ZIP(ଚାବିଗୁଡ଼ିକ, c) କର { \
+    ଚାବିଗୁଡ଼ିକ[0] = CRC32(ଚାବିଗୁଡ଼ିକ[0], (c)); \
+    ଚାବିଗୁଡ଼ିକ[1] += ଚାବିଗୁଡ଼ିକ[0] & 0xff; \
+    ଚାବିଗୁଡ଼ିକ[1] = ଚାବିଗୁଡ଼ିକ[1] * 134775813L + 1; \
+    ଚାବିଗୁଡ଼ିକ[2] = CRC32(ଚାବିଗୁଡ଼ିକ[2], (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(ଚାବିଗୁଡ଼ିକ[1] >> 24)); \
+} ଯେତେବେଳେ (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *ଚାବି,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    ଯଦି (zs == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->ଚାବିଗୁଡ଼ିକ[0] = 305419896L;
+    zs->ଚାବିଗୁଡ଼ିକ[1] = 591751049L;
+    zs->ଚାବିଗୁଡ଼ିକ[2] = 878082192L;
+    ପାଇଁ (p = ଚାବି; *p != NUL; ++p)
+	UPDATE_ଚାବିଗୁଡ଼ିକ_ZIP(zs->ଚାବିଗୁଡ଼ିକ, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)*p);
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    ଶୂନ୍ୟ
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    ପାଇଁ (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->ଚାବିଗୁଡ଼ିକ, t);
+	UPDATE_ଚାବିଗୁଡ଼ିକ_ZIP(zs->ଚାବିଗୁଡ଼ିକ, ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -131,23 +131,23 @@ crypt_zip_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    ଶୂନ୍ୟ
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
     short_u	temp;
 
-    for (i = 0; i < len; ++i)
+    ପାଇଁ (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	temp = (short_u)zs->ଚାବିଗୁଡ଼ିକ[2] | 2;
+	temp = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
+	UPDATE_ଚାବିଗୁଡ଼ିକ_ZIP(zs->ଚାବିଗୁଡ଼ିକ, to[i] = from[i] ^ temp);
     }
 }
 

@@ -12,7 +12,7 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
 /*
  * Copy "string" into newly allocated memory.
@@ -25,9 +25,9 @@ vim_strsave(char_u *string)
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    ଯଦି (p != ଖାଲି)
 	mch_memmove(p, string, len);
-    return p;
+    ଫେରନ୍ତୁ p;
 }
 
 /*
@@ -42,12 +42,12 @@ vim_strnsave(char_u *string, size_t len)
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    ଯଦି (p == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    ଫେରନ୍ତୁ p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    ଫେରନ୍ତୁ vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cc,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
     unsigned	length;
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
     length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    ପାଇଁ (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ଯଦି (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    length += l;		// count a multibyte char
 	    p += l - 1;
-	    continue;
+	    ଜାରି;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	ଯଦି (vim_strchr(esc_chars, *p) != ଖାଲି || (bsl && rem_backslash(p)))
 	    ++length;			// count a backslash
 	++length;			// count an ordinary char
     }
     escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    ଯଦି (escaped_string == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    ପାଇଁ (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ଯଦି (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    mch_memmove(p2, p, (size_t)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
-	    continue;
+	    ଜାରି;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	ଯଦି (vim_strchr(esc_chars, *p) != ଖାଲି || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    ଫେରନ୍ତୁ escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
-csh_like_shell(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+csh_like_shell(ଶୂନ୍ୟ)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    ଫେରନ୍ତୁ (strstr((ଅକ୍ଷର *)gettail(p_sh), "csh") != ଖାଲି);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
-fish_like_shell(void)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+fish_like_shell(ଶୂନ୍ୟ)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    ଫେରନ୍ତୁ (strstr((ଅକ୍ଷର *)gettail(p_sh), "fish") != ଖାଲି);
 }
 
 /*
@@ -145,19 +145,19 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_special, ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_newline)
 {
     unsigned	length;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
     size_t	l;
-    int		csh_like;
-    int		fish_like;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		csh_like;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fish_like;
     char_u	*shname;
-    int		powershell;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		powershell;
 #ifdef MSWIN
-    int		double_quotes;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		double_quotes;
 #endif
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
@@ -172,85 +172,85 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
+    powershell = strstr((ଅକ୍ଷର *)shname, "pwsh") != ଖାଲି;
 #ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = powershell || strstr((ଅକ୍ଷର *)shname, "powershell") != ଖାଲି;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
 #endif
 
     // First count the number of extra bytes required.
     length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    ପାଇଁ (p = string; *p != NUL; MB_PTR_ADV(p))
     {
 #ifdef MSWIN
-	if (double_quotes)
+	ଯଦି (double_quotes)
 	{
-	    if (*p == '"')
+	    ଯଦି (*p == '"')
 		++length;		// " -> ""
 	}
-	else
+	ଅନ୍ୟଥା
 #endif
-	if (*p == '\'')
+	ଯଦି (*p == '\'')
 	{
-	    if (powershell)
+	    ଯଦି (powershell)
 		length += 2;		// ' => ''
-	    else
+	    ଅନ୍ୟଥା
 		length += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	ଯଦି ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
 	    ++length;			// insert backslash
-	    if (csh_like && do_special)
+	    ଯଦି (csh_like && do_special)
 		++length;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	ଯଦି (do_special && find_cmdline_var(p, &l) >= 0)
 	{
 	    ++length;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
+	ଯଦି (*p == '\\' && fish_like)
 	    ++length;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
     escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    ଯଦି (escaped_string != ଖାଲି)
     {
 	d = escaped_string;
 
 	// add opening quote
 #ifdef MSWIN
-	if (double_quotes)
+	ଯଦି (double_quotes)
 	    *d++ = '"';
-	else
+	ଅନ୍ୟଥା
 #endif
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	ପାଇଁ (p = string; *p != NUL; )
 	{
 #ifdef MSWIN
-	    if (double_quotes)
+	    ଯଦି (double_quotes)
 	    {
-		if (*p == '"')
+		ଯଦି (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
 		    ++p;
-		    continue;
+		    ଜାରି;
 		}
 	    }
-	    else
+	    ଅନ୍ୟଥା
 #endif
-	    if (*p == '\'')
+	    ଯଦି (*p == '\'')
 	    {
-		if (powershell)
+		ଯଦି (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -258,30 +258,30 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    *d++ = '\'';
 		}
 		++p;
-		continue;
+		ଜାରି;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    ଯଦି ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		ଯଦି (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
-		continue;
+		ଜାରି;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    ଯଦି (do_special && find_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
 		memcpy(d, p, l);	// copy the var
 		d += l;
 		p += l;
-		continue;
+		ଜାରି;
 	    }
-	    if (*p == '\\' && fish_like)
+	    ଯଦି (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
-		continue;
+		ଜାରି;
 	    }
 
 	    MB_COPY_CHAR(p, d);
@@ -289,15 +289,15 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
 	// add terminating quote and finish with a NUL
 #ifdef MSWIN
-	if (double_quotes)
+	ଯଦି (double_quotes)
 	    *d++ = '"';
-	else
+	ଅନ୍ୟଥା
 #endif
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    ଫେରନ୍ତୁ escaped_string;
 }
 
 /*
@@ -311,7 +311,7 @@ vim_strsave_up(char_u *string)
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    ଫେରନ୍ତୁ p1;
 }
 
 /*
@@ -325,34 +325,34 @@ vim_strnsave_up(char_u *string, size_t len)
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    ଫେରନ୍ତୁ p1;
 }
 
 /*
  * ASCII lower-to-upper case translation, language independent.
  */
-    void
+    ଶୂନ୍ୟ
 vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    c;
 
-    if (p == NULL)
-	return;
+    ଯଦି (p == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    ଯେତେବେଳେ ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#ଯଦି defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
  * Returns NULL when out of memory.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 strup_save(char_u *orig)
 {
     char_u	*p;
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    ଯଦି (res != ଖାଲି)
+	ଯେତେବେଳେ (*p != NUL)
 	{
-	    int		l;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
-	    if (enc_utf8)
+	    ଯଦି (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	c, uc;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		ଯଦି (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		ଯଦି (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    ଯଦି (s == ଖାଲି)
 		    {
 			vim_free(res);
-			return NULL;
+			ଫେରନ୍ତୁ ଖାଲି;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    ଅନ୍ୟଥା ଯଦି (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ଫେରନ୍ତୁ res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    ଯଦି (res != ଖାଲି)
+	ଯେତେବେଳେ (*p != NUL)
 	{
-	    int		l;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
-	    if (enc_utf8)
+	    ଯଦି (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	c, lc;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		ଯଦି (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		ଯଦି (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    ଯଦି (s == ଖାଲି)
 		    {
 			vim_free(res);
-			return NULL;
+			ଫେରନ୍ତୁ ଖାଲି;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,29 +469,29 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    ଅନ୍ୟଥା ଯଦି (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ଫେରନ୍ତୁ res;
 }
 #endif
 
 /*
  * delete spaces at the end of a string
  */
-    void
+    ଶୂନ୍ୟ
 del_trailing_spaces(char_u *ptr)
 {
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    ଯେତେବେଳେ (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -499,7 +499,7 @@ del_trailing_spaces(char_u *ptr)
  * Like strncpy(), but always terminate the result with one NUL.
  * "to" must be "len + 1" long!
  */
-    void
+    ଶୂନ୍ୟ
 vim_strncpy(char_u *to, char_u *from, size_t len)
 {
     STRNCPY(to, from, len);
@@ -510,18 +510,18 @@ vim_strncpy(char_u *to, char_u *from, size_t len)
  * Like strcat(), but make sure the result fits in "tosize" bytes and is
  * always NUL terminated. "from" and "to" may overlap.
  */
-    void
+    ଶୂନ୍ୟ
 vim_strcat(char_u *to, char_u *from, size_t tosize)
 {
     size_t tolen = STRLEN(to);
     size_t fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    ଯଦି (tolen + fromlen + 1 > tosize)
     {
 	mch_memmove(to + tolen, from, tosize - tolen - 1);
 	to[tosize - 1] = NUL;
     }
-    else
+    ଅନ୍ୟଥା
 	mch_memmove(to + tolen, from, fromlen + 1);
 }
 
@@ -529,63 +529,63 @@ vim_strcat(char_u *to, char_u *from, size_t tosize)
  * A version of strlen() that has a maximum length.
  */
     size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+vim_strlen_maxlen(ଅକ୍ଷର *s, size_t maxlen)
 {
     size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    ପାଇଁ (i = 0; i < maxlen; ++i)
+	ଯଦି (s[i] == NUL)
+	    ଭାଙ୍ଗ;
+    ଫେରନ୍ତୁ i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#ଯଦି !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_stricmp(ଅକ୍ଷର *s1, ଅକ୍ଷର *s2)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    for (;;)
+    ପାଇଁ (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)TOLOWER_LOC(*s1) - (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)TOLOWER_LOC(*s2);
+	ଯଦି (i != 0)
+	    ଫେରନ୍ତୁ i;			    // this character different
+	ଯଦି (*s1 == NUL)
+	    ଭାଙ୍ଗ;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    ଫେରନ୍ତୁ 0;				    // strings match
 }
 #endif
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#ଯଦି !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_strnicmp(ଅକ୍ଷର *s1, ଅକ୍ଷର *s2, size_t len)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    while (len > 0)
+    ଯେତେବେଳେ (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)TOLOWER_LOC(*s1) - (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)TOLOWER_LOC(*s2);
+	ଯଦି (i != 0)
+	    ଫେରନ୍ତୁ i;			    // this character different
+	ଯଦି (*s1 == NUL)
+	    ଭାଙ୍ଗ;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    ଫେରନ୍ତୁ 0;				    // strings match
 }
 #endif
 
@@ -594,23 +594,23 @@ vim_strnicmp(char *s1, char *s2, size_t len)
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_strnicmp_asc(ଅକ୍ଷର *s1, ଅକ୍ଷର *s2, size_t len)
 {
-    int                i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା                i = 0;
 
-    while (len > 0)
+    ଯେତେବେଳେ (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	ଯଦି (i != 0)
+	    ଭାଙ୍ଗ;			// this character is different
+	ଯଦି (*s1 == NUL)
+	    ଭାଙ୍ଗ;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    ଫେରନ୍ତୁ i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, ପୂର୍ଣ୍ଣସଂଖ୍ୟା c)
 {
     char_u	*p;
-    int		b;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    ଯଦି (enc_utf8 && c > 0 && c < 0x80)
+	ଫେରନ୍ତୁ vim_strbyte(string, c);
+    ଯଦି (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	ଯେତେବେଳେ (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    ଯଦି (utf_ptr2char(p) == c && l > 1)
+		ଫେରନ୍ତୁ p;
 	    p += l;
 	}
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    if (enc_dbcs != 0 && c > 255)
+    ଯଦି (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	n2 = c & 0xff;
 
 	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	ଯେତେବେଳେ ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    ଯଦି (b == c && p[1] == n2)
+		ଫେରନ୍ତୁ p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	ଯେତେବେଳେ ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    ଯଦି (b == c)
+		ଫେରନ୍ତୁ p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    while ((b = *p) != NUL)
+    ଯେତେବେଳେ ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	ଯଦି (b == c)
+	    ଫେରନ୍ତୁ p;
 	++p;
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, ପୂର୍ଣ୍ଣସଂଖ୍ୟା c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    ଯଦି (c <= 0 || c > 255)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଫେରନ୍ତୁ (char_u *)strchr((ଅକ୍ଷର *)string, c);
 }
 
 /*
@@ -697,18 +697,18 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, ପୂର୍ଣ୍ଣସଂଖ୍ୟା c)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ଖାଲି;
     char_u	*p = string;
 
-    while (*p)
+    ଯେତେବେଳେ (*p)
     {
-	if (*p == c)
+	ଯଦି (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 /*
@@ -723,13 +723,13 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    ଯେତେବେଳେ (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	ଯଦି (vim_strchr(charset, *s) != ଖାଲି)
+	    ଫେରନ୍ତୁ s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 # endif
 #endif
@@ -737,37 +737,37 @@ vim_strpbrk(char_u *s, char_u *charset)
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା sort_compare(ଅଚଳ ଶୂନ୍ୟ *s1, ଅଚଳ ଶୂନ୍ୟ *s2);
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+sort_compare(ଅଚଳ ଶୂନ୍ୟ *s1, ଅଚଳ ଶୂନ୍ୟ *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    ଫେରନ୍ତୁ STRCMP(*(ଅକ୍ଷର **)s1, *(ଅକ୍ଷର **)s2);
 }
 
-    void
+    ଶୂନ୍ୟ
 sort_strings(
     char_u	**files,
-    int		count)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_2)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((ଶୂନ୍ୟ *)files, (size_t)ଗଣନା_2, ଆକାର(char_u *), sort_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#ଯଦି defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    ଯଦି (s != ଖାଲି)
+	ପାଇଁ (p = s; *p != NUL; ++p)
+	    ଯଦି (*p >= 128)
+		ଫେରନ୍ତୁ TRUE;
+    ଫେରନ୍ତୁ FALSE;
 }
 #endif
 
@@ -779,21 +779,21 @@ has_non_ascii(char_u *s)
 concat_str(char_u *str1, char_u *str2)
 {
     char_u  *dest;
-    size_t  l = str1 == NULL ? 0 : STRLEN(str1);
+    size_t  l = str1 == ଖାଲି ? 0 : STRLEN(str1);
 
-    dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    dest = alloc(l + (str2 == ଖାଲି ? 0 : STRLEN(str2)) + 1L);
+    ଯଦି (dest == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଯଦି (str1 == ଖାଲି)
 	*dest = NUL;
-    else
+    ଅନ୍ୟଥା
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    ଯଦି (str2 != ଖାଲି)
 	STRCPY(dest + l, str2);
-    return dest;
+    ଫେରନ୍ତୁ dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#ଯଦି defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
@@ -803,69 +803,69 @@ reverse_text(char_u *s)
 {
     size_t len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    ଯଦି (rev == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    ପାଇଁ (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	ଅନ୍ୟଥା
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    ଫେରନ୍ତୁ rev;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, ପୂର୍ଣ୍ଣସଂଖ୍ୟା function)
 {
     unsigned	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    ଯଦି (str != ଖାଲି)
     {
 	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	ପାଇଁ (p = str; *p != NUL; MB_PTR_ADV(p))
+	    ଯଦି (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    ଯଦି (r == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    if (function)
+    ଯଦି (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    ଅନ୍ୟଥା
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    ଯଦି (str != ଖାଲି)
+	ପାଇଁ (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    ଯଦି (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    ଯଦି (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    ଫେରନ୍ତୁ s;
 }
 
 /*
@@ -873,118 +873,118 @@ string_quote(char_u *str, int function)
  * ignored if "ic" is TRUE.
  */
     long
-string_count(char_u *haystack, char_u *needle, int ic)
+string_ଗଣନା(char_u *haystack, char_u *needle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ic)
 {
     long	n = 0;
     char_u	*p = haystack;
     char_u	*next;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    ଯଦି (p == ଖାଲି || needle == ଖାଲି || *needle == NUL)
+	ଫେରନ୍ତୁ 0;
 
     size_t  needlelen = STRLEN(needle);
-    if (ic)
+    ଯଦି (ic)
     {
-	while (*p != NUL)
+	ଯେତେବେଳେ (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    ଯଦି (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    ଅନ୍ୟଥା
+	ଯେତେବେଳେ ((next = (char_u *)strstr((ଅକ୍ଷର *)p, (ଅକ୍ଷର *)needle)) != ଖାଲି)
 	{
 	    ++n;
 	    p = next + needlelen;
 	}
 
-    return n;
+    ଫେରନ୍ତୁ n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+copy_first_char_to_tv(char_u *ନିବେଶ, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    ଯଦି (ନିବେଶ == ଖାଲି || output == ଖାଲି)
+	ଫେରନ୍ତୁ -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(ନିବେଶ) : 1;
+    STRNCPY(buf, ନିବେଶ, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    ଫେରନ୍ତୁ output->vval.v_string == ଖାଲି ? -1 : len;
 }
 
 /*
  * Implementation of map() and filter() for a String. Apply "expr" to every
  * character in string "str" and return the result in "rettv".
  */
-    void
+    ଶୂନ୍ୟ
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*ପଦସମଷ୍ଟି,
 	typval_T	*rettv)
 {
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_ଚାବି, VAR_ସଂଖ୍ୟା);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ପଦସମଷ୍ଟି_get_funccal(ପଦସମଷ୍ଟି, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, ଆକାର(ଅକ୍ଷର), 80);
+    ପାଇଁ (p = str; *p != NUL; p += len)
     {
 	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	ଯଦି (len < 0)
+	    ଭାଙ୍ଗ;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	set_vim_var_nr(VV_ଚାବି, idx);
+	ଯଦି (filter_map_one(&tv, ପଦସମଷ୍ଟି, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    ଭାଙ୍ଗ;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	ଯଦି (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    ଯଦି (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	ଅନ୍ୟଥା ଯଦି (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -994,7 +994,7 @@ string_filter_map(
     }
     ga_append(&ga, NUL);
     rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    ଯଦି (fc != ଖାଲି)
 	remove_funccal();
 }
 
@@ -1003,126 +1003,126 @@ string_filter_map(
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    ଶୂନ୍ୟ
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*ପଦସମଷ୍ଟି,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		called_emsg_start = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	ଯଦି (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_ମୂଲ୍ୟ), "String");
+	    ଫେରନ୍ତୁ;
 	}
 	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	ଯଦି (len < 0)
+	    ଫେରନ୍ତୁ;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    ଅନ୍ୟଥା ଯଦି (check_for_string_arg(argvars, 2) == FAIL)
+	ଫେରନ୍ତୁ;
+    ଅନ୍ୟଥା
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_ପଦସମଷ୍ଟି_get_funccal(ପଦସମଷ୍ଟି, rettv);
 
-    for ( ; *p != NUL; p += len)
+    ପାଇଁ ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	ଯଦି (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_ପଦସମଷ୍ଟି_typval(ପଦସମଷ୍ଟି, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	ଯଦି (r == FAIL || called_emsg != called_emsg_start)
+	    ଭାଙ୍ଗ;
     }
 
-    if (fc != NULL)
+    ଯଦି (fc != ଖାଲି)
 	remove_funccal();
 }
 
 /*
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
-    static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+    ସ୍ଥିର ଶୂନ୍ୟ
+byteidx_common(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
+    ଯଦି (str == ଖାଲି || idx < 0)
+	ଫେରନ୍ତୁ;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    semsg(_(e_using_ସଂଖ୍ୟା_as_bool_nr), utf16idx);
+	    ଫେରନ୍ତୁ;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*ptr2len)(char_u *);
+    ଯଦି (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    ଅନ୍ୟଥା
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    ପାଇଁ ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	ଯଦି (*t == NUL)		// EOL reached
+	    ଫେରନ୍ତୁ;
+	ଯଦି (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା clen = ptr2len(t);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    ଯଦି (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    ଯଦି (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	ଅନ୍ୟଥା ଯଦି (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(t - str);
 }
 
 /*
  * "byteidx()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_byteidx(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, FALSE);
@@ -1131,7 +1131,7 @@ f_byteidx(typval_T *argvars, typval_T *rettv)
 /*
  * "byteidxcomp()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, TRUE);
@@ -1140,114 +1140,114 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 /*
  * "charidx()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
+    ଯଦି (str == ଖାଲି || idx < 0)
+	ଫେରନ୍ତୁ;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*ptr2len)(char_u *);
+    ଯଦି (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    ଅନ୍ୟଥା
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପାଇଁ (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	ଯଦି (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    ଯଦି (utf16idx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_ସଂଖ୍ୟା = len;
+	    ଫେରନ୍ତୁ;
 	}
-	if (utf16idx)
+	ଯଦି (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା clen = ptr2len(p);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    ଯଦି (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_ସଂଖ୍ୟା = len > 0 ? len - 1 : 0;
 }
 
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    ଯଦି (convert_setup(&vimconv, from, to) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    ଯଦି (vimconv.vc_type == CONV_NONE)
     {
 	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
+	ଯଦି (ret->string == ଖାଲି)
 	    ret->length = 0;
-	else
+	ଅନ୍ୟଥା
 	    ret->length = str->length;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	int len = (int)str->length;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)str->length;
 	ret->string = string_convert(&vimconv, str->string, &len);
 	ret->length = len;
     }
-    convert_setup(&vimconv, NULL, NULL);
+    convert_setup(&vimconv, ଖାଲି, ଖାଲି);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    ଫେରନ୍ତୁ (ret->string == ଖାଲି) ? FAIL : OK;
 }
 
 /*
  * Add the bytes from "str" to "blob".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
+    ଯଦି (len == 0)
+	ଫେରନ୍ତୁ;
+    ଯଦି (ga_grow(&blob->bv_ga, len) == FAIL)
+	ଫେରନ୍ତୁ;
     dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
     mch_memmove(dest, str, (size_t)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < len; ++i)
+	ଯଦି (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,45 +1260,45 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
 {
     long	blen = blob_len(blob);
     long	start = *start_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    long	ଧାଡ଼ି_len;
 
-    if (start >= blen)
+    ଯଦି (start >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
 	ret->length = 0;
 	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	ଫେରନ୍ତୁ (ret->string == ଖାଲି) ? FAIL : OK;
     }
 
     src = (char_u *)blob->bv_ga.ga_data + start;
     nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    ଧାଡ଼ି_len = (nl == ଖାଲି) ? (blen - start) : (long)(nl - src);
 
-    ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(ଧାଡ଼ି_len + 1);
+    ଯଦି (ret->string == ଖାଲି)
     {
 	ret->length = 0;
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    ଯଦି (ଧାଡ଼ି_len > 0)
+	mch_memmove(ret->string, src, (size_t)ଧାଡ଼ି_len);
+    ret->string[ଧାଡ଼ି_len] = NUL;
+    ret->length = (size_t)ଧାଡ଼ି_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    ପାଇଁ (long i = 0; i < ଧାଡ଼ି_len; i++)
+	ଯଦି (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    *start_idx = start + ଧାଡ଼ି_len + (nl != ଖାଲି ? 1 : 0);
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -1306,22 +1306,22 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
  * For example: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
  * Returns allocated string or NULL on allocation failure.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    ଯଦି (from_encoding_raw == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    ଯେତେବେଳେ (*s != NUL)
     {
-	if (*s == '_')
+	ଯଦି (*s == '_')
 	    *pe++ = '-';
-	else
+	ଅନ୍ୟଥା
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    ଯଦି ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,117 +1337,117 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    ଫେରନ୍ତୁ from_encoding_raw;
 }
 
 /*
  * "blob2str()" function
  * Converts a blob to a string, ensuring valid UTF-8 encoding.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 append_converted_string_to_list(
 	string_T *converted,
-	int validate_utf8,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    ଯଦି (converted->string != ଖାଲି)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
 	char_u *end = converted->string + converted->length;
-	while (p < end)
+	ଯେତେବେଳେ (p < end)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	ଧାଡ଼ି;
+	    char_u	*ଧାଡ଼ି_start = p;
 
-	    while (p < end && *p != NL)
+	    ଯେତେବେଳେ (p < end && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    ଧାଡ଼ି.length = (size_t)(p - ଧାଡ଼ି_start);
+	    ଧାଡ଼ି.string = vim_strnsave(ଧାଡ଼ି_start, ଧାଡ଼ି.length);
+	    ଯଦି (ଧାଡ଼ି.string != ଖାଲି)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		ଯଦି (validate_utf8 && !utf_valid_string(ଧାଡ଼ି.string, ଖାଲି))
 		{
-		    vim_free(line.string);
+		    vim_free(ଧାଡ଼ି.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    ଫେରନ୍ତୁ; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		ଯଦି (list_append_string(list, ଧାଡ଼ି.string, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ଧାଡ଼ି.length) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(ଧାଡ଼ି.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    ଫେରନ୍ତୁ; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(ଧାଡ଼ି.string);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Allocation failure: report error and stop processing
 		emsg(_(e_out_of_memory));
 		vim_free(converted->string);
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 
-	    if (*p == NL)
+	    ଯଦି (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+append_validated_ଧାଡ଼ି_to_list(string_T *ଧାଡ଼ି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    ଯଦି (validate_utf8 && !utf_valid_string(ଧାଡ଼ି->string, ଖାଲି))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
-	return FAIL;
+	vim_free(ଧାଡ଼ି->string);
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
-    return ret;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ret = list_append_string(list, ଧାଡ଼ି->string, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ଧାଡ଼ି->length);
+    vim_free(ଧାଡ଼ି->string);
+    ଫେରନ୍ତୁ ret;
 }
 
-    void
+    ଶୂନ୍ୟ
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		blen;
     long	idx;
-    int		validate_utf8 = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    ଯଦି (blob == ଖାଲି)
+	ଫେରନ୍ତୁ;
     blen = blob_len(blob);
 
-    char_u	*from_encoding = NULL;
-    char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*from_encoding = ଖାଲି;
+    char_u	*from_encoding_raw = ଖାଲି;  // Encoding name with endianness preserved for iconv
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    ଯଦି (enc != ଖାଲି)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		ଯଦି (from_encoding_raw == ଖାଲି)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    ଫେରନ୍ତୁ;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    ଯଦି (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    ଯଦି (from_encoding != ଖାଲି && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,19 +1476,19 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା from_prop = 0;
+    ଯଦି (from_encoding != ଖାଲି)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    ଯଦି (from_encoding != ଖାଲି && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
 	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	ଯଦି (ga_grow(&blob_ga, blen + nul_size) == OK)
 	{
-	    if (blen > 0)
+	    ଯଦି (blen > 0)
 		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
 	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
@@ -1500,60 +1500,60 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	ଯଦି (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
-	    goto done;
+	    ଯାଅ done;
 	}
 	vimconv.vc_fail = TRUE;
 
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = blen;
 	converted.string =
-	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
+	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, ଖାଲି);
 	converted.length = len;
-	convert_setup(&vimconv, NULL, NULL);
+	convert_setup(&vimconv, ଖାଲି, ଖାଲି);
 	ga_clear(&blob_ga);
 	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	ଯେତେବେଳେ (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    ଯଦି (string_from_blob(blob, &idx, &str) != OK)
+		ଭାଙ୍ଗ;
 
-	    if (from_encoding != NULL)
+	    ଯଦି (from_encoding != ଖାଲି)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		ଯଦି (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
-		    goto done;
+		    ଯାଅ done;
 		}
 		str.string = converted.string;
 		str.length = converted.length;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
-		goto done;
+	    ଯଦି (append_validated_ଧାଡ଼ି_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+		ଯାଅ done;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    ଯଦି (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
 done:
@@ -1564,35 +1564,35 @@ done:
 /*
  * "str2blob()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_str2blob(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_blob_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    ଯଦି (list == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    char_u	*to_encoding = NULL;
-    char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*to_encoding = ଖାଲି;
+    char_u	*to_encoding_raw = ଖାଲି;  // Encoding name with endianness preserved for iconv
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    ଯଦି (enc != ଖାଲି)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		to_encoding = enc_canonize(enc_skipped);
@@ -1600,11 +1600,11 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
 		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		ଯଦି (to_encoding_raw == ଖାଲି)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(to_encoding);
-		    return;
+		    ଫେରନ୍ତୁ;
 		}
 	    }
 	}
@@ -1615,34 +1615,34 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା to_prop = 0;
+    ଯଦି (to_encoding != ଖାଲି)
 	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    ଯଦି (to_encoding != ଖାଲି && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(list, li)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    ଯଦି (li->li_tv.v_type != VAR_STRING)
+		ଜାରି;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    ଯଦି (li != list->lv_first)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    ଯଦି (s != ଖାଲି && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା slen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		ଯଦି (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
-		    goto done;
+		    ଯାଅ done;
 		}
 		mch_memmove((char_u *)str_ga.ga_data + str_ga.ga_len, s,
 								(size_t)slen);
@@ -1650,32 +1650,32 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	ଯଦି (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    ଯଦି (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		ଯାଅ done;
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
-				    (char_u *)str_ga.ga_data, &len, NULL);
-	    convert_setup(&vimconv, NULL, NULL);
+				    (char_u *)str_ga.ga_data, &len, ଖାଲି);
+	    convert_setup(&vimconv, ଖାଲି, ଖାଲି);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    ଯଦି (converted == ଖାଲି)
 	    {
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		ଯାଅ done;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    ଯଦି (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
 		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
 						    converted, (size_t)len);
@@ -1683,185 +1683,185 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	    }
 	    vim_free(converted);
 	}
-	else
+	ଅନ୍ୟଥା
 	    ga_clear(&str_ga);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    ଯଦି (li->li_tv.v_type != VAR_STRING)
+		ଜାରି;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
+	    ଯଦି (str.string == ଖାଲି)
 		STR_LITERAL_SET(str, "");
-	    else
+	    ଅନ୍ୟଥା
 		str.length = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    ଯଦି (to_encoding != ଖାଲି)
 	    {
-		int	    res;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    res;
 		string_T    converted;
 
 		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		ଯଦି (res != OK)
 		{
 		    semsg(_(e_str_encoding_to_failed), to_encoding);
-		    goto done;
+		    ଯାଅ done;
 		}
 		str.string = converted.string;
 		str.length = converted.length;
 	    }
 
-	    if (li != list->lv_first)
+	    ଯଦି (li != list->lv_first)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    ଯଦି (to_encoding != ଖାଲି)
 		vim_free(str.string);
 	}
     }
 
 done:
-    if (to_encoding != NULL)
+    ଯଦି (to_encoding != ଖାଲି)
 	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
+    ଯଦି (to_encoding_raw != ଖାଲି)
 	vim_free(to_encoding_raw);
 }
 
 /*
  * "str2list()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], ଖାଲି);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    ଯଦି (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*ptr2len)(char_u *);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	ଯଦି (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	ପାଇଁ ( ; *p != NUL; p += (*ptr2len)(p))
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+    ଅନ୍ୟଥା
+	ପାଇଁ ( ; *p != NUL; ++p)
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, *p);
 }
 
 /*
  * "str2nr()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		base = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		what = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		isneg;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	base = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[1]);
+	ଯଦି (base != 2 && base != 8 && base != 10 && base != 16)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    ଯଦି (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    switch (base)
+    ବାଛ (base)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	ସ୍ଥିତି 2: what |= STR2NR_BIN + STR2NR_FORCE; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 16: what |= STR2NR_HEX + STR2NR_FORCE; ଭାଙ୍ଗ;
     }
-    vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
+    vim_str2nr(p, ଖାଲି, ଖାଲି, what, &n, ଖାଲି, 0, FALSE, ଖାଲି);
     // Text after the number is silently ignored.
-    if (isneg)
-	rettv->vval.v_number = -n;
-    else
-	rettv->vval.v_number = n;
+    ଯଦି (isneg)
+	rettv->vval.v_ସଂଖ୍ୟା = -n;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = n;
 
 }
 
 /*
  * "strgetchar()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		charidx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    ଯଦି (str == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(str);
+    charidx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
+    ଯଦି (error)
+	ଫେରନ୍ତୁ;
 
-    while (charidx >= 0 && byteidx < len)
+    ଯେତେବେଳେ (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	ଯଦି (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    rettv->vval.v_ସଂଖ୍ୟା = mb_ptr2char(str + byteidx);
+	    ଭାଙ୍ଗ;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1871,7 +1871,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
 /*
  * "stridx()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_stridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
@@ -1879,40 +1879,40 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		start_idx;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL))
+	ଫେରନ୍ତୁ;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (needle == ଖାଲି || haystack == ଖାଲି)
+	ଫେରନ୍ତୁ;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
+	start_idx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	ଯଦି (error || start_idx >= (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(haystack))
+	    ଫେରନ୍ତୁ;
+	ଯଦି (start_idx >= 0)
 	    haystack += start_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+    pos	= (char_u *)strstr((ଅକ୍ଷର *)haystack, (ଅକ୍ଷର *)needle);
+    ଯଦି (pos != ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(pos - save_haystack);
 }
 
 /*
  * "string()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_string(typval_T *argvars, typval_T *rettv)
 {
     char_u	*tofree;
@@ -1922,49 +1922,49 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    ଯଦି (rettv->vval.v_string != ଖାଲି && tofree == ଖାଲି)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
 /*
  * "strlen()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script()
+	    && check_for_string_or_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
-    static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+    ସ୍ଥିର ଶୂନ୍ୟ
+strchar_common(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    ଯେତେବେଳେ (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_ସଂଖ୍ୟା = len;
 }
 
 /*
  * "strcharlen()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script()
+	    && check_for_string_or_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1972,26 +1972,26 @@ f_strcharlen(typval_T *argvars, typval_T *rettv)
 /*
  * "strchars()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    semsg(_(e_using_ସଂଖ୍ୟା_as_bool_nr), skipcc);
+	    ଫେରନ୍ତୁ;
 	}
     }
 
@@ -2001,161 +2001,161 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 /*
  * "strutf16len()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			(*func_mb_ptr2char_adv)(char_u **pp);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    ଯେତେବେଳେ (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	ଯଦି (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_ସଂଖ୍ୟା = len;
 }
 
 /*
  * "strdisplaywidth()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(linetabsize_col(col, s) - col);
 }
 
 /*
  * "strwidth()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
  * "strcharpart()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nchar;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nbyte = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		charlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		skipcc = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		slen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
+    ଯଦି (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    ଯଦି (error)
+		ଫେରନ୍ତୁ;
+	    ଯଦି (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		semsg(_(e_using_ସଂଖ୍ୟା_as_bool_nr), skipcc);
+		ଫେରନ୍ତୁ;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	ଯଦି (nchar > 0)
+	    ଯେତେବେଳେ (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		ଯଦି (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		ଅନ୍ୟଥା
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	ଅନ୍ୟଥା
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[2]);
+	    ଯେତେବେଳେ (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା off = nbyte + len;
 
-		if (off < 0)
+		ଯଦି (off < 0)
 		    len += 1;
-		else
+		ଅନ୍ୟଥା
 		{
-		    if (skipcc)
+		    ଯଦି (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    ଅନ୍ୟଥା
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    ଯଦି (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    ଅନ୍ୟଥା ଯଦି (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    ଯଦି (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    ଅନ୍ୟଥା ଯଦି (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2165,54 +2165,54 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strpart()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		slen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
+    ଯଦି (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    ଅନ୍ୟଥା ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
+	len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[2]);
+    ଅନ୍ୟଥା
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    ଯଦି (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    ଅନ୍ୟଥା ଯଦି (n > slen)
 	n = slen;
-    if (len < 0)
+    ଯଦି (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    ଅନ୍ୟଥା ଯଦି (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	ପାଇଁ (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2224,70 +2224,70 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strridx()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*needle;
     char_u	*haystack;
     char_u	*rest;
-    char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    char_u	*lastmatch = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		haystack_len, end_idx;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL))
+	ଫେରନ୍ତୁ;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (needle == ଖାଲି || haystack == ଖାଲି)
+	ଫେରନ୍ତୁ;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(haystack);
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	end_idx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], ଖାଲି);
+	ଯଦି (end_idx < 0)
+	    ଫେରନ୍ତୁ;	// can never find a match
     }
-    else
+    ଅନ୍ୟଥା
 	end_idx = haystack_len;
 
-    if (*needle == NUL)
+    ଯଦି (*needle == NUL)
     {
 	// Empty string matches past the end.
 	lastmatch = haystack + end_idx;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	ପାଇଁ (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)strstr((ଅକ୍ଷର *)rest, (ଅକ୍ଷର *)needle);
+	    ଯଦି (rest == ଖାଲି || rest > haystack + end_idx)
+		ଭାଙ୍ଗ;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+    ଯଦି (lastmatch == ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
  * "strtrans()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2300,73 +2300,73 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
  * Converts a byte or character offset in a string to the corresponding UTF-16
  * code unit offset.
  */
-    void
+    ଶୂନ୍ୟ
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    ଫେରନ୍ତୁ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
+    ଯଦି (str == ଖାଲି || idx < 0)
+	ଫେରନ୍ତୁ;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*ptr2len)(char_u *);
+    ଯଦି (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    ଅନ୍ୟଥା
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		utf16idx = 0;
+    ପାଇଁ (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	ଯଦି (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    ଯଦି (charidx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_ସଂଖ୍ୟା = len;
+	    ଫେରନ୍ତୁ;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା clen = ptr2len(p);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = (clen > 1) ? utf_ptr2char(p) : *p;
+	ଯଦି (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	ଯଦି (charidx)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_ସଂଖ୍ୟା = utf16idx;
 }
 
 /*
  * "tolower(string)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2375,11 +2375,11 @@ f_tolower(typval_T *argvars, typval_T *rettv)
 /*
  * "toupper(string)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2388,29 +2388,29 @@ f_toupper(typval_T *argvars, typval_T *rettv)
 /*
  * "tr(string, fromstr, tostr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_tr(typval_T *argvars, typval_T *rettv)
 {
     char_u	*in_str;
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		inlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fromlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		tolen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cplen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		first = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     in_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
@@ -2418,87 +2418,87 @@ f_tr(typval_T *argvars, typval_T *rettv)
 
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    rettv->vval.v_string = ଖାଲି;
+    ଯଦି (fromstr == ଖାଲି || tostr == ଖାଲି)
+	    ଫେରନ୍ତୁ;		// type error; errmsg already given
+    ga_init2(&ga, ଆକାର(ଅକ୍ଷର), 80);
 
-    if (!has_mbyte)
+    ଯଦି (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	ଯଦି (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
 	    semsg(_(e_invalid_argument_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    ଯେତେବେଳେ (*in_str != NUL)
     {
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	{
 	    inlen = (*mb_ptr2len)(in_str);
 	    cpstr = in_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    ପାଇଁ (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		ଯଦି (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    ପାଇଁ (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			ଯଦି (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
-			goto error;
-		    break;
+		    ଯଦି (*p == NUL)	// tostr is shorter than fromstr
+			ଯାଅ error;
+		    ଭାଙ୍ଗ;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    ଯଦି (first && cpstr == in_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
 		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		ପାଇଁ (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
-		    goto error;
+		ଯଦି (idx != 0)
+		    ଯାଅ error;
 	    }
 
-	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    (ଶୂନ୍ୟ)ga_grow(&ga, cplen);
+	    mch_memmove((ଅକ୍ଷର *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
 	    ga.ga_len += cplen;
 
 	    in_str += inlen;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // When not using multi-byte chars we can do it faster.
 	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    ଯଦି (p != ଖାଲି)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
+	    ଅନ୍ୟଥା
 		ga_append(&ga, *in_str);
 	    ++in_str;
 	}
     }
 
     // add a terminating NUL
-    (void)ga_grow(&ga, 1);
+    (ଶୂନ୍ୟ)ga_grow(&ga, 1);
     ga_append(&ga, NUL);
 
     rettv->vval.v_string = ga.ga_data;
@@ -2507,102 +2507,102 @@ error:
 /*
  * "trim({expr})" function
  */
-    void
+    ଶୂନ୍ୟ
 f_trim(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*head;
-    char_u	*mask = NULL;
+    char_u	*mask = ଖାଲି;
     char_u	*tail;
     char_u	*prev;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL)))
+	ଫେରନ୍ତୁ;
 
     head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    ଯଦି (head == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    ଯଦି (check_for_opt_string_arg(argvars, 1) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type == VAR_STRING)
+    ଯଦି (argvars[1].v_type == VAR_STRING)
     {
 	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
-	    mask = NULL;
+	ଯଦି (*mask == NUL)
+	    mask = ଖାଲି;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	    ଯଦି (error)
+		ଫେରନ୍ତୁ;
+	    ଯଦି (dir < 0 || dir > 2)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		ଫେରନ୍ତୁ;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    ଯଦି (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	ଯେତେବେଳେ (*head != NUL)
 	{
 	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    ଯଦି (mask == ଖାଲି)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		ଯଦି (c1 > ' ' && c1 != 0xa0)
+		    ଭାଙ୍ଗ;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		ପାଇଁ (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    ଯଦି (c1 == PTR2CHAR(p))
+			ଭାଙ୍ଗ;
+		ଯଦି (*p == NUL)
+		    ଭାଙ୍ଗ;
 	    }
 	    MB_PTR_ADV(head);
 	}
     }
 
     tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    ଯଦି (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	ପାଇଁ (; tail > head; tail = prev)
 	{
 	    prev = tail;
 	    MB_PTR_BACK(head, prev);
 	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    ଯଦି (mask == ଖାଲି)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		ଯଦି (c1 > ' ' && c1 != 0xa0)
+		    ଭାଙ୍ଗ;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		ପାଇଁ (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    ଯଦି (c1 == PTR2CHAR(p))
+			ଭାଙ୍ଗ;
+		ଯଦି (*p == NUL)
+		    ଭାଙ୍ଗ;
 	    }
 	}
     }
@@ -2625,69 +2625,69 @@ f_trim(typval_T *argvars, typval_T *rettv)
  *
  * Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    ଯଦି (str == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     size_t len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    ଯଦି (!decoded)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     char_u	*p = decoded;
     size_t	i = 0;
 
-    while (i < len)
+    ଯେତେବେଳେ (i < len)
     {
-	if (str[i] == '%')
+	ଯଦି (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    ଯଦି (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		ଯଦି (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା val = hexhex2nr(&str[i + 1]);
+		ଯଦି (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	ଅନ୍ୟଥା
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    ଫେରନ୍ତୁ decoded;
 }
 
 /*
  * "uri_decode({str})" function
  */
-    void
+    ଶୂନ୍ୟ
 f_uridecode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2706,76 +2706,76 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
  *
  *   Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    ଯଦି (str == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     size_t len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    ଯଦି (encoded == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    ପାଇଁ (size_t i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	ଯଦି (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	ଅନ୍ୟଥା
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    sprintf((ଅକ୍ଷର *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    ଫେରନ୍ତୁ encoded;
 }
 
 /*
  * "uri_encode({str})" function
  */
-    void
+    ଶୂନ୍ୟ
 f_uriencode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+ସ୍ଥିର ଅକ୍ଷର *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+    ସ୍ଥିର varnumber_T
+tv_nr(typval_T *tvs, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idxp)
 {
-    int		idx = *idxp - 1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ଯଦି (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ଅନ୍ୟଥା
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	n = tv_get_ସଂଖ୍ୟା_chk(&tvs[idx], &err);
+	ଯଦି (err)
 	    n = 0;
     }
-    return n;
+    ଫେରନ୍ତୁ n;
 }
 
 /*
@@ -2786,48 +2786,48 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    ସ୍ଥିର ଅକ୍ଷର *
+tv_str(typval_T *tvs, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
-    static char_u   numbuf[NUMBUFLEN];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    idx = *idxp - 1;
+    ଅକ୍ଷର	    *s = ଖାଲି;
+    ସ୍ଥିର char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ଯଦି (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ଅନ୍ୟଥା
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	ଯଦି (tofree != ଖାଲି)
+	    s = (ଅକ୍ଷର *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	ଅନ୍ୟଥା
+	    s = (ଅକ୍ଷର *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    ଫେରନ୍ତୁ s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    ସ୍ଥିର ଦ୍ୱିଗୁଣ
+tv_float(typval_T *tvs, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx = *idxp - 1;
+    ଦ୍ୱିଗୁଣ	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    ଯଦି (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    ଅନ୍ୟଥା
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	ଯଦି (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
+	ଅନ୍ୟଥା ଯଦି (tvs[idx].v_type == VAR_ସଂଖ୍ୟା)
+	    f = (ଦ୍ୱିଗୁଣ)tvs[idx].vval.v_ସଂଖ୍ୟା;
+	ଅନ୍ୟଥା
 	    emsg(_(e_expected_float_argument_for_printf));
     }
-    return f;
+    ଫେରନ୍ତୁ f;
 }
 
 #endif
@@ -2836,22 +2836,22 @@ tv_float(typval_T *tvs, int *idxp)
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *
+infinity_str(ପୂର୍ଣ୍ଣସଂଖ୍ୟା positive,
+	     ଅକ୍ଷର fmt_spec,
+	     ପୂର୍ଣ୍ଣସଂଖ୍ୟା force_sign,
+	     ପୂର୍ଣ୍ଣସଂଖ୍ୟା space_for_positive)
 {
-    static const char *table[] =
+    ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *table[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = positive * (1 + force_sign + force_sign * space_for_positive);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    ଯଦି (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    ଫେରନ୍ତୁ table[idx];
 }
 
 /*
@@ -2901,34 +2901,34 @@ infinity_str(int positive,
 #ifndef PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_snprintf_add(ଅକ୍ଷର *str, size_t str_m, ଅଚଳ ଅକ୍ଷର *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		str_l;
     size_t	len = STRLEN(str);
     size_t	space;
 
-    if (str_m <= len)
+    ଯଦି (str_m <= len)
 	space = 0;
-    else
+    ଅନ୍ୟଥା
 	space = str_m - len;
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
     va_end(ap);
-    return str_l;
+    ଫେରନ୍ତୁ str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_snprintf(ଅକ୍ଷର *str, size_t str_m, ଅଚଳ ଅକ୍ଷର *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		str_l;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
     va_end(ap);
-    return str_l;
+    ଫେରନ୍ତୁ str_l;
 }
 
 /*
@@ -2941,37 +2941,37 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * guarantees the returned length will never be greater than the destination length.
  */
     size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+vim_snprintf_safelen(ଅକ୍ଷର *str, size_t str_m, ଅଚଳ ଅକ୍ଷର *fmt, ...)
 {
     va_list ap;
-    int	    str_l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    ଯଦି (str_m == 0)
+	ଫେରନ୍ତୁ 0;
 
     va_start(ap, fmt);
-    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, ଖାଲି);
     va_end(ap);
 
-    if (str_l < 0)
+    ଯଦି (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	ଫେରନ୍ତୁ 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    ଫେରନ୍ତୁ ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 vim_vsnprintf(
-    char	*str,
+    ଅକ୍ଷର	*str,
     size_t	str_m,
-    const char	*fmt,
+    ଅଚଳ ଅକ୍ଷର	*fmt,
     va_list	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    ଫେରନ୍ତୁ vim_vsnprintf_typval(str, str_m, fmt, ap, ଖାଲି);
 }
 
-enum
+ଗଣନା
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2989,22 +2989,22 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 format_typeof(
-    const char	*type)
+    ଅଚଳ ଅକ୍ଷର	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    ଅକ୍ଷର    length_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    ଅକ୍ଷର    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    ଯଦି (*type == 'h' || *type == 'l')
     {
 	length_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	ଯଦି (length_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
 	    length_modifier = 'L';
@@ -3014,305 +3014,305 @@ format_typeof(
     fmt_spec = *type;
 
     // common synonyms:
-    switch (fmt_spec)
+    ବାଛ (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	ସ୍ଥିତି 'i': fmt_spec = 'd'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି '*': fmt_spec = 'd'; length_modifier = 'h'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 'D': fmt_spec = 'd'; length_modifier = 'l'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 'U': fmt_spec = 'u'; length_modifier = 'l'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 'O': fmt_spec = 'o'; length_modifier = 'l'; ଭାଙ୍ଗ;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ: ଭାଙ୍ଗ;
     }
 
     // get parameter value, do initial processing
-    switch (fmt_spec)
+    ବାଛ (fmt_spec)
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    ସ୍ଥିତି '%':
+	ଫେରନ୍ତୁ TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    ସ୍ଥିତି 'c':
+	ଫେରନ୍ତୁ TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    ସ୍ଥିତି 's':
+    ସ୍ଥିତି 'S':
+	ଫେରନ୍ତୁ TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    ସ୍ଥିତି 'd': ସ୍ଥିତି 'u':
+    ସ୍ଥିତି 'b': ସ୍ଥିତି 'B':
+    ସ୍ଥିତି 'o':
+    ସ୍ଥିତି 'x': ସ୍ଥିତି 'X':
+    ସ୍ଥିତି 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //ମୂଲ୍ୟ
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    ଯଦି (fmt_spec == 'p')
+		ଫେରନ୍ତୁ TYPE_POINTER;
+	    ଅନ୍ୟଥା ଯଦି (fmt_spec == 'b' || fmt_spec == 'B')
+		ଫେରନ୍ତୁ TYPE_UNSIGNEDLONGLONGINT;
+	    ଅନ୍ୟଥା ଯଦି (fmt_spec == 'd')
 	    {
 		// signed
-		switch (length_modifier)
+		ବାଛ (length_modifier)
 		{
-		case '\0':
-		case 'h':
+		ସ୍ଥିତି '\0':
+		ସ୍ଥିତି 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    ଫେରନ୍ତୁ TYPE_INT;
+		ସ୍ଥିତି 'l':
+		    ଫେରନ୍ତୁ TYPE_LONGINT;
+		ସ୍ଥିତି 'L':
+		    ଫେରନ୍ତୁ TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// unsigned
-		switch (length_modifier)
+		ବାଛ (length_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    ସ୍ଥିତି '\0':
+		    ସ୍ଥିତି 'h':
+			ଫେରନ୍ତୁ TYPE_UNSIGNEDINT;
+		    ସ୍ଥିତି 'l':
+			ଫେରନ୍ତୁ TYPE_UNSIGNEDLONGINT;
+		    ସ୍ଥିତି 'L':
+			ଫେରନ୍ତୁ TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	ଭାଙ୍ଗ;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    ସ୍ଥିତି 'f':
+    ସ୍ଥିତି 'F':
+    ସ୍ଥିତି 'e':
+    ସ୍ଥିତି 'E':
+    ସ୍ଥିତି 'g':
+    ସ୍ଥିତି 'G':
+	ଫେରନ୍ତୁ TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    ଫେରନ୍ତୁ TYPE_UNKNOWN;
 }
 
-    static char *
+    ସ୍ଥିର ଅକ୍ଷର *
 format_typename(
-    const char  *type)
+    ଅଚଳ ଅକ୍ଷର  *type)
 {
-    switch (format_typeof(type))
+    ବାଛ (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	ସ୍ଥିତି TYPE_INT:
+	    ଫେରନ୍ତୁ typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	ସ୍ଥିତି TYPE_LONGINT:
+	    ଫେରନ୍ତୁ typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	ସ୍ଥିତି TYPE_LONGLONGINT:
+	    ଫେରନ୍ତୁ typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	ସ୍ଥିତି TYPE_UNSIGNEDINT:
+	    ଫେରନ୍ତୁ typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	ସ୍ଥିତି TYPE_UNSIGNEDLONGINT:
+	    ଫେରନ୍ତୁ typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	ସ୍ଥିତି TYPE_UNSIGNEDLONGLONGINT:
+	    ଫେରନ୍ତୁ typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	ସ୍ଥିତି TYPE_POINTER:
+	    ଫେରନ୍ତୁ _(typename_pointer);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	ସ୍ଥିତି TYPE_PERCENT:
+	    ଫେରନ୍ତୁ _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	ସ୍ଥିତି TYPE_CHAR:
+	    ଫେରନ୍ତୁ typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	ସ୍ଥିତି TYPE_STRING:
+	    ଫେରନ୍ତୁ _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	ସ୍ଥିତି TYPE_FLOAT:
+	    ଫେରନ୍ତୁ typename_float;
     }
 
-    return _(typename_unknown);
+    ଫେରନ୍ତୁ _(typename_unknown);
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    ଅଚଳ ଅକ୍ଷର ***ap_types,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା arg,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *ଅଙ୍କ_posarg,
+    ଅଚଳ ଅକ୍ଷର *type)
 {
-    if (arg <= 0)
+    ଯଦି (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    ଯଦି (*ap_types == ଖାଲି || *ଅଙ୍କ_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    idx;
+	ଅଚଳ ଅକ୍ଷର  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	ଯଦି (*ap_types == ଖାଲି)
+	    new_types = ALLOC_CLEAR_MULT(ଅଚଳ ଅକ୍ଷର *, arg);
+	ଅନ୍ୟଥା
+	    new_types = vim_realloc((ଅକ୍ଷର **)*ap_types,
+						arg * ଆକାର(ଅଚଳ ଅକ୍ଷର *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	ଯଦି (new_types == ଖାଲି)
+	    ଫେରନ୍ତୁ FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
-	    new_types[idx] = NULL;
+	ପାଇଁ (idx = *ଅଙ୍କ_posarg; idx < arg; ++idx)
+	    new_types[idx] = ଖାଲି;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*ଅଙ୍କ_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    ଯଦି ((*ap_types)[arg - 1] != ଖାଲି)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	ଯଦି ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    ଅଚଳ ଅକ୍ଷର *pt = type;
+	    ଯଦି (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    ଯଦି (pt[0] != '*')
 	    {
-		switch (pt[0])
+		ବାଛ (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
-		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+		    ସ୍ଥିତି 'd':
+		    ସ୍ଥିତି 'i': ଭାଙ୍ଗ;
+		    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+			semsg(_(e_positional_ଅଙ୍କ_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			ଫେରନ୍ତୁ FAIL;
 		}
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    ଯଦି (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		semsg(_( e_positional_arg_ଅଙ୍କ_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		ଫେରନ୍ତୁ FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    static void
-format_overflow_error(const char *pstart)
+    ସ୍ଥିର ଶୂନ୍ୟ
+format_overflow_error(ଅଚଳ ଅକ୍ଷର *pstart)
 {
     size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    ଅକ୍ଷର	*argcopy = ଖାଲି;
+    ଅଚଳ ଅକ୍ଷର	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    ଯେତେବେଳେ (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(ଅକ୍ଷର, arglen + 1);
+    ଯଦି (argcopy != ଖାଲି)
     {
 	strncpy(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
-	free(argcopy);
+	ମୁକ୍ତ(argcopy);
     }
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
 }
 
 # define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    ଅଚଳ ଅକ୍ଷର *pstart,
+    ଅଚଳ ଅକ୍ଷର **p,
+    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା *uj,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା overflow_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    ଯେତେବେଳେ (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    ଯଦି (*uj > MAX_ALLOWED_STRING_WIDTH)
     {
-	if (overflow_err)
+	ଯଦି (overflow_err)
 	{
 	    format_overflow_error(pstart);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
-	else
+	ଅନ୍ୟଥା
 	    *uj = MAX_ALLOWED_STRING_WIDTH;
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
+    ଅଚଳ ଅକ୍ଷର  ***ap_types,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*ଅଙ୍କ_posarg,
+    ଅଚଳ ଅକ୍ଷର  *fmt,
     typval_T	*tvs UNUSED
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    ଅଚଳ ଅକ୍ଷର	*p = fmt;
+    ଅଚଳ ଅକ୍ଷର	*arg = ଖାଲି;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		any_pos = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		any_arg = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_idx;
 
-# define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+# define CHECK_POS_ARG କର { \
+    ଯଦି (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
-	goto error; \
+	ଯାଅ error; \
     } \
-} while (0);
+} ଯେତେବେଳେ (0);
 
-    if (p == NULL)
-	return OK;
+    ଯଦି (p == ଖାଲି)
+	ଫେରନ୍ତୁ OK;
 
-    while (*p != NUL)
+    ଯେତେବେଳେ (*p != NUL)
     {
-	if (*p != '%')
+	ଯଦି (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ଅଚଳ ଅକ୍ଷର    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ଖାଲି) ? STRLEN(p) : (size_t)(q - p);
 
 	    p += n;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    ଅକ୍ଷର	length_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pos_arg = -1;
+	    ଅଚଳ ଅକ୍ଷର	*ptype = ଖାଲି;
+	    ଅଚଳ ଅକ୍ଷର	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,23 +3320,23 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    ଯେତେବେଳେ (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    ଯଦି (*ptype == '$')
 	    {
-		if (*p == '0')
+		ଯଦି (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    ଯାଅ error;
 		}
 
 		// Positional argument
-		unsigned int uj;
+		unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ଯଦି (get_unsigned_int(pstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+		    ଯାଅ error;
 
 		pos_arg = uj;
 
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    ଯେତେବେଳେ (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		ବାଛ (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    ସ୍ଥିତି '0': ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '-': ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '+': ଭାଙ୍ଗ;
+		    ସ୍ଥିତି ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '#': ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '\'': ଭାଙ୍ଗ;
 		}
 		p++;
 	    }
@@ -3367,114 +3367,114 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    ଯଦି (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ଯଦି (get_unsigned_int(arg + 1, &p, &uj, tvs != ଖାଲି) == FAIL)
+			ଯାଅ error;
 
-		    if (*p != '$')
+		    ଯଦି (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			ଯାଅ error;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-			    goto error;
+			ଯଦି (adjust_types(ap_types, uj, ଅଙ୍କ_posarg, arg) == FAIL)
+			    ଯାଅ error;
 		    }
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    ଅନ୍ୟଥା ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ଅଚଳ ଅକ୍ଷର *digstart = p;
+		unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+		    ଯାଅ error;
 
-		if (*p == '$')
+		ଯଦି (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    ଯାଅ error;
 		}
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    ଯଦି (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		ଯଦି (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			ଯଦି (get_unsigned_int(arg + 1, &p, &uj, tvs != ଖାଲି) == FAIL)
+			    ଯାଅ error;
 
-			if (*p == '$')
+			ଯଦି (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-				goto error;
+			    ଯଦି (adjust_types(ap_types, uj, ଅଙ୍କ_posarg, arg) == FAIL)
+				ଯାଅ error;
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
-			    goto error;
+			    ଯାଅ error;
 			}
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		ଅନ୍ୟଥା ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ଅଚଳ ଅକ୍ଷର *digstart = p;
+		    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+			ଯାଅ error;
 
-		    if (*p == '$')
+		    ଯଦି (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			ଯାଅ error;
 		    }
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    ଯଦି (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    ଯଦି (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		ଯଦି (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3495,172 +3495,172 @@ parse_fmt_types(
 		}
 	    }
 
-	    switch (*p)
+	    ବାଛ (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		ସ୍ଥିତି 'i':
+		ସ୍ଥିତି '*':
+		ସ୍ଥିତି 'd':
+		ସ୍ଥିତି 'u':
+		ସ୍ଥିତି 'o':
+		ସ୍ଥିତି 'D':
+		ସ୍ଥିତି 'U':
+		ସ୍ଥିତି 'O':
+		ସ୍ଥିତି 'x':
+		ସ୍ଥିତି 'X':
+		ସ୍ଥିତି 'b':
+		ସ୍ଥିତି 'B':
+		ସ୍ଥିତି 'c':
+		ସ୍ଥିତି 's':
+		ସ୍ଥିତି 'S':
+		ସ୍ଥିତି 'p':
+		ସ୍ଥିତି 'f':
+		ସ୍ଥିତି 'F':
+		ସ୍ଥିତି 'e':
+		ସ୍ଥିତି 'E':
+		ସ୍ଥିତି 'g':
+		ସ୍ଥିତି 'G':
+		    ଯଦି (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
-			    goto error;
+			ଯଦି (adjust_types(ap_types, pos_arg, ଅଙ୍କ_posarg, ptype) == FAIL)
+			    ଯାଅ error;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    ଭାଙ୍ଗ;
 
-		default:
-		    if (pos_arg != -1)
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+		    ଯଦି (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
-			goto error;
+			ଯାଅ error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    ଯଦି (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    ପାଇଁ (arg_idx = 0; arg_idx < *ଅଙ୍କ_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	ଯଦି ((*ap_types)[arg_idx] == ଖାଲି)
 	{
 	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
-	    goto error;
+	    ଯାଅ error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# ଯଦି defined(FEAT_EVAL)
+	ଯଦି (tvs != ଖାଲି && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
 	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
-	    goto error;
+	    ଯାଅ error;
 	}
 # endif
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 
 error:
-    vim_free((char**)*ap_types);
-    *ap_types = NULL;
-    *num_posarg = 0;
-    return FAIL;
+    vim_free((ଅକ୍ଷର**)*ap_types);
+    *ap_types = ଖାଲି;
+    *ଅଙ୍କ_posarg = 0;
+    ଫେରନ୍ତୁ FAIL;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 skip_to_arg(
-    const char	**ap_types,
+    ଅଚଳ ଅକ୍ଷର	**ap_types,
     va_list	ap_start,
     va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*arg_idx,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*arg_cur,
+    ଅଚଳ ଅକ୍ଷର	*fmt)
 {
-    int		arg_min = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    ଯଦି (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (*arg_cur >= *arg_idx)
+    ଯଦି (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
 	va_end(*ap);
 	va_copy(*ap, ap_start);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    ପାଇଁ (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	ଅଚଳ ଅକ୍ଷର *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	ଯଦି (ap_types == ଖାଲି || ap_types[*arg_cur] == ଖାଲି)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
-	switch (fmt_type)
+	ବାଛ (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	ସ୍ଥିତି TYPE_PERCENT:
+	ସ୍ଥିତି TYPE_UNKNOWN:
+	    ଭାଙ୍ଗ;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	ସ୍ଥିତି TYPE_CHAR:
+	    va_arg(*ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	ସ୍ଥିତି TYPE_STRING:
+	    va_arg(*ap, ଅକ୍ଷର *);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_POINTER:
-	    va_arg(*ap, void *);
-	    break;
+	ସ୍ଥିତି TYPE_POINTER:
+	    va_arg(*ap, ଶୂନ୍ୟ *);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	ସ୍ଥିତି TYPE_INT:
+	    va_arg(*ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	ସ୍ଥିତି TYPE_LONGINT:
+	    va_arg(*ap, long ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_LONGLONGINT:
+	ସ୍ଥିତି TYPE_LONGLONGINT:
 	    va_arg(*ap, varnumber_T);
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	ସ୍ଥିତି TYPE_UNSIGNEDINT:
+	    va_arg(*ap, unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	ସ୍ଥିତି TYPE_UNSIGNEDLONGINT:
+	    va_arg(*ap, unsigned long ପୂର୍ଣ୍ଣସଂଖ୍ୟା);
+	    ଭାଙ୍ଗ;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
+	ସ୍ଥିତି TYPE_UNSIGNEDLONGLONGINT:
 	    va_arg(*ap, uvarnumber_T);
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	ସ୍ଥିତି TYPE_FLOAT:
+	    va_arg(*ap, ଦ୍ୱିଗୁଣ);
+	    ଭାଙ୍ଗ;
 	}
     }
 
@@ -3670,41 +3670,41 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    ଫେରନ୍ତୁ;
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 vim_vsnprintf_typval(
-    char	*str,
+    ଅକ୍ଷର	*str,
     size_t	str_m,
-    const char	*fmt,
+    ଅଚଳ ଅକ୍ଷର	*fmt,
     va_list	ap_start,
     typval_T	*tvs)
 {
     size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
+    ଅଚଳ ଅକ୍ଷର	*p = fmt;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_cur = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଅଙ୍କ_posarg = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_idx = 1;
     va_list	ap;
-    const char	**ap_types = NULL;
+    ଅଚଳ ଅକ୍ଷର	**ap_types = ଖାଲି;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    ଯଦି (parse_fmt_types(&ap_types, &ଅଙ୍କ_posarg, fmt, tvs) == FAIL)
+	ଫେରନ୍ତୁ 0;
 
     va_copy(ap, ap_start);
 
-    if (p == NULL)
+    ଯଦି (p == ଖାଲି)
 	p = "";
-    while (*p != NUL)
+    ଯେତେବେଳେ (*p != NUL)
     {
-	if (*p != '%')
+	ଯଦି (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ଅଚଳ ଅକ୍ଷର    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ଖାଲି) ? STRLEN(p) : (size_t)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    ଯଦି (str_l < str_m)
 	    {
 		size_t avail = str_m - str_l;
 
@@ -3713,27 +3713,27 @@ vim_vsnprintf_typval(
 	    p += n;
 	    str_l += n;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    zero_padding = 0, precision_specified = 0, justify_ବାମ = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    space_for_positive = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    ଅକ୍ଷର    length_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    ଅକ୍ଷର    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    ଅଚଳ ଅକ୍ଷର  *str_arg = ଖାଲି;
 
 	    // natural field width of arg without padding and sign
 	    size_t  str_arg_l;
@@ -3741,24 +3741,24 @@ vim_vsnprintf_typval(
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    unsigned ଅକ୍ଷର uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    size_t  ସଂଖ୍ୟା_of_zeros_to_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
 	    size_t  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    ଅକ୍ଷର    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
-	    char_u  *tofree = NULL;
+	    char_u  *tofree = ଖାଲି;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    pos_arg = -1;
+	    ଅଚଳ ଅକ୍ଷର	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,17 +3767,17 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    ଯେତେବେଳେ (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    ଯଦି (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		ଅଚଳ ଅକ୍ଷର *digstart = p;
+		unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+		    ଯାଅ error;
 
 		pos_arg = uj;
 
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    ଯେତେବେଳେ (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		ବାଛ (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    ସ୍ଥିତି '0': zero_padding = 1; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '-': justify_ବାମ = 1; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '+': force_sign = 1; space_for_positive = 0; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '#': alternate_form = 1; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି '\'': ଭାଙ୍ଗ;
 		}
 		p++;
 	    }
@@ -3806,20 +3806,20 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    ଯଦି (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା j;
+		ଅଚଳ ଅକ୍ଷର *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+			ଯାଅ error;
 
 		    arg_idx = uj;
 
@@ -3827,77 +3827,77 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
-		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+		    tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			va_arg(ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		ଯଦି (j > MAX_ALLOWED_STRING_WIDTH)
 		{
-		    if (tvs != NULL)
+		    ଯଦି (tvs != ଖାଲି)
 		    {
 			format_overflow_error(digstart);
-			goto error;
+			ଯାଅ error;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			j = MAX_ALLOWED_STRING_WIDTH;
 		}
 
-		if (j >= 0)
+		ଯଦି (j >= 0)
 		    min_field_width = j;
-		else
+		ଅନ୍ୟଥା
 		{
 		    min_field_width = -j;
-		    justify_left = 1;
+		    justify_ବାମ = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    ଅନ୍ୟଥା ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ଅଚଳ ଅକ୍ଷର *digstart = p;
+		unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+		    ଯାଅ error;
 
 		min_field_width = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    ଯଦି (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ଅଚଳ ଅକ୍ଷର *digstart = p;
+		    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+			ଯାଅ error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		ଅନ୍ୟଥା ଯଦି (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା j;
+		    ଅଚଳ ଅକ୍ଷର *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    ଯଦି (VIM_ISDIGIT((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			ଯଦି (get_unsigned_int(digstart, &p, &uj, tvs != ଖାଲି) == FAIL)
+			    ଯାଅ error;
 
 			arg_idx = uj;
 
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+			tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    va_arg(ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    ଯଦି (j > MAX_ALLOWED_STRING_WIDTH)
 		    {
-			if (tvs != NULL)
+			ଯଦି (tvs != ଖାଲି)
 			{
 			    format_overflow_error(digstart);
-			    goto error;
+			    ଯାଅ error;
 			}
-			else
+			ଅନ୍ୟଥା
 			    j = MAX_ALLOWED_STRING_WIDTH;
 		    }
 
-		    if (j >= 0)
+		    ଯଦି (j >= 0)
 			precision = j;
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,11 +3934,11 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    ଯଦି (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		ଯଦି (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    length_modifier = 'L';
@@ -3948,143 +3948,143 @@ vim_vsnprintf_typval(
 	    fmt_spec = *p;
 
 	    // common synonyms:
-	    switch (fmt_spec)
+	    ବାଛ (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		ସ୍ଥିତି 'i': fmt_spec = 'd'; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'D': fmt_spec = 'd'; length_modifier = 'l'; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'U': fmt_spec = 'u'; length_modifier = 'l'; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'O': fmt_spec = 'o'; length_modifier = 'l'; ଭାଙ୍ଗ;
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ: ଭାଙ୍ଗ;
 	    }
 
-# if defined(FEAT_EVAL)
-	    switch (fmt_spec)
+# ଯଦି defined(FEAT_EVAL)
+	    ବାଛ (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
+		ସ୍ଥିତି 'd': ସ୍ଥିତି 'u': ସ୍ଥିତି 'o': ସ୍ଥିତି 'x': ସ୍ଥିତି 'X':
+		    ଯଦି (tvs != ଖାଲି && length_modifier == '\0')
 			length_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    ଯଦି (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
-	    switch (fmt_spec)
+	    ବାଛ (fmt_spec)
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    ସ୍ଥିତି '%':
+	    ସ୍ଥିତି 'c':
+	    ସ୍ଥିତି 's':
+	    ସ୍ଥିତି 'S':
 		str_arg_l = 1;
-		switch (fmt_spec)
+		ବାଛ (fmt_spec)
 		{
-		case '%':
+		ସ୍ଥିତି '%':
 		    str_arg = p;
-		    break;
+		    ଭାଙ୍ଗ;
 
-		case 'c':
+		ସ୍ଥିତି 'c':
 		    {
-			int j;
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା j;
 
 			j =
-# if defined(FEAT_EVAL)
-			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+			    tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				va_arg(ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (unsigned ଅକ୍ଷର)j;
+			str_arg = (ଅକ୍ଷର *)&uchar_arg;
+			ଭାଙ୍ଗ;
 		    }
 
-		case 's':
-		case 'S':
+		ସ୍ଥିତି 's':
+		ସ୍ଥିତି 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
-				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
+# ଯଦି defined(FEAT_EVAL)
+				tvs != ଖାଲି ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
 				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    va_arg(ap, ଅକ୍ଷର *));
 
-		    if (str_arg == NULL)
+		    ଯଦି (str_arg == ଖାଲି)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
+		    ଅନ୍ୟଥା ଯଦି (!precision_specified)
 			str_arg_l = strlen(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    ଅନ୍ୟଥା ଯଦି (precision == 0)
 			str_arg_l = 0;
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
+			ଅଚଳ ଅକ୍ଷର *q = memchr(str_arg, '\0',
 				  precision <= (size_t)0x7fffffffL ? precision
 						       : (size_t)0x7fffffffL);
 
-			str_arg_l = (q == NULL) ? precision
+			str_arg_l = (q == ଖାଲି) ? precision
 						      : (size_t)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    ଯଦି (fmt_spec == 'S')
 		    {
 			char_u	*p1;
 			size_t	i;
-			int	cell;
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			ପାଇଁ (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    ଯଦି (precision_specified && i + cell > precision)
+				ଭାଙ୍ଗ;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
+			ଯଦି (min_field_width != 0)
 			    min_field_width += str_arg_l - i;
 		    }
-		    break;
+		    ଭାଙ୍ଗ;
 
-		default:
-		    break;
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+		    ଭାଙ୍ଗ;
 		}
-		break;
+		ଭାଙ୍ଗ;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    ସ୍ଥିତି 'd': ସ୍ଥିତି 'u':
+	    ସ୍ଥିତି 'b': ସ୍ଥିତି 'B':
+	    ସ୍ଥିତି 'o':
+	    ସ୍ଥିତି 'x': ସ୍ଥିତି 'X':
+	    ସ୍ଥିତି 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //ମୂଲ୍ୟ
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା int_arg = 0;
+		    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    long ପୂର୍ଣ୍ଣସଂଖ୍ୟା long_arg = 0;
+		    unsigned long ପୂର୍ଣ୍ଣସଂଖ୍ୟା ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4095,133 +4095,133 @@ vim_vsnprintf_typval(
 
 		    // pointer argument value -only defined for p
 		    // conversion
-		    void *ptr_arg = NULL;
+		    ଶୂନ୍ୟ *ptr_arg = ଖାଲି;
 
-		    if (fmt_spec == 'p')
+		    ଯଦି (fmt_spec == 'p')
 		    {
 			length_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
-				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
-									NULL) :
+# ଯଦି defined(FEAT_EVAL)
+				 tvs != ଖାଲି ? (ଶୂନ୍ୟ *)tv_str(tvs, &arg_idx,
+									ଖାଲି) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, void *));
+					va_arg(ap, ଶୂନ୍ୟ *));
 
-			if (ptr_arg != NULL)
+			ଯଦି (ptr_arg != ଖାଲି)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    ଅନ୍ୟଥା ଯଦି (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
-				    tvs != NULL ?
+# ଯଦି defined(FEAT_EVAL)
+				    tvs != ଖାଲି ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
 					va_arg(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			ଯଦି (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    ଅନ୍ୟଥା ଯଦି (fmt_spec == 'd')
 		    {
 			// signed
-			switch (length_modifier)
+			ବାଛ (length_modifier)
 			{
-			case '\0':
-			case 'h':
+			ସ୍ଥିତି '\0':
+			ସ୍ଥିତି 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+					tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    va_arg(ap, ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-			    if (int_arg > 0)
+			    ଯଦି (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    ଅନ୍ୟଥା ଯଦି (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+					tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    va_arg(ap, long ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-			    if (long_arg > 0)
+			    ଯଦି (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    ଅନ୍ୟଥା ଯଦି (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+					tvs != ଖାଲି ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
 					    va_arg(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    ଯଦି (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    ଅନ୍ୟଥା ଯଦି (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// unsigned
-			switch (length_modifier)
+			ବାଛ (length_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    ସ୍ଥିତି '\0':
+			    ସ୍ଥିତି 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned)
+# ଯଦି defined(FEAT_EVAL)
+					    tvs != ଖାଲି ? (unsigned)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						va_arg(ap, unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-				if (uint_arg != 0)
+				ଯଦି (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned long)
+# ଯଦି defined(FEAT_EVAL)
+					    tvs != ଖାଲି ? (unsigned long)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						va_arg(ap, unsigned long ପୂର୍ଣ୍ଣସଂଖ୍ୟା));
 
-				if (ulong_arg != 0)
+				ଯଦି (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (uvarnumber_T)
+# ଯଦି defined(FEAT_EVAL)
+					    tvs != ଖାଲି ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
 						va_arg(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				ଯଦି (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				ଭାଙ୍ଗ;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    ଯଦି (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    ଯଦି (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
+			ଯଦି (force_sign && arg_sign >= 0)
 			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    ଅନ୍ୟଥା ଯଦି (alternate_form)
 		    {
-			if (arg_sign != 0
+			ଯଦି (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    ଯଦି (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    ଯଦି (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			char	f[6];
-			int	f_l = 0;
+			ଅକ୍ଷର	f[6];
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			ଯଦି (!length_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			ଅନ୍ୟଥା ଯଦି (length_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# ଅନ୍ୟଥା
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
+			ଅନ୍ୟଥା
 			    f[f_l++] = length_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
+			ଯଦି (fmt_spec == 'p')
 			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			ଅନ୍ୟଥା ଯଦି (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
+			    ଅକ୍ଷର	    b[8 * ଆକାର(uvarnumber_T)];
 			    size_t	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
-			    do
+			    କର
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[ଆକାର(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    ଯେତେବେଳେ (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    memcpy(tmp + str_arg_l, b + ଆକାର(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			ଅନ୍ୟଥା ଯଦି (fmt_spec == 'd')
 			{
 			    // signed
-			    switch (length_modifier)
+			    ବାଛ (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    ସ୍ଥିତି '\0': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'h': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'l': str_arg_l += sprintf(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'L': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      ଭାଙ୍ଗ;
 			    }
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    // unsigned
-			    switch (length_modifier)
+			    ବାଛ (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    ସ୍ଥିତି '\0': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'h': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'l': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      ଭାଙ୍ଗ;
+			    ସ୍ଥିତି 'L': str_arg_l += sprintf(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      ଭାଙ୍ଗ;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			ଯଦି (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			ଯଦି (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4364,10 +4364,10 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			size_t ଅଙ୍କ_of_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			ଯଦି (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,71 +4375,71 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+			    ଯଦି (!precision_specified
+					     || precision < ଅଙ୍କ_of_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = ଅଙ୍କ_of_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			ଯଦି (ଅଙ୍କ_of_digits < precision)
+			    ସଂଖ୍ୟା_of_zeros_to_pad = precision - ଅଙ୍କ_of_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    ଯଦି (!justify_ବାମ && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
-			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(min_field_width - (str_arg_l
+						    + ସଂଖ୍ୟା_of_zeros_to_pad));
+			ଯଦି (n > 0)
+			    ସଂଖ୍ୟା_of_zeros_to_pad += n;
 		    }
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    ସ୍ଥିତି 'f':
+	    ସ୍ଥିତି 'F':
+	    ସ୍ଥିତି 'e':
+	    ସ୍ଥିତି 'E':
+	    ସ୍ଥିତି 'g':
+	    ସ୍ଥିତି 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    ଦ୍ୱିଗୁଣ	f;
+		    ଦ୍ୱିଗୁଣ	abs_f;
+		    ଅକ୍ଷର	format[40];
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_float(tvs, &arg_idx) :
+# ଯଦି defined(FEAT_EVAL)
+			tvs != ଖାଲି ? tv_float(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    va_arg(ap, ଦ୍ୱିଗୁଣ));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    ଯଦି (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			ଯଦି ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			ଅନ୍ୟଥା
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    ଯଦି ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# ଅନ୍ୟଥା
 			    abs_f > 1.0e307
 # endif
 			    )
@@ -4450,9 +4450,9 @@ vim_vsnprintf_typval(
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			if (isnan(f))
+			ଯଦି (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,32 +4460,32 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			ଅନ୍ୟଥା ଯଦି (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
 					      force_sign, space_for_positive));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
+			    ଯଦି (force_sign)
 				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    ଯଦି (precision_specified)
 			    {
 				size_t max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				ଯଦି ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
 				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				ଯଦି (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += sprintf(format + l, ".%d", (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
@@ -4493,30 +4493,30 @@ vim_vsnprintf_typval(
 			    str_arg_l = sprintf(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			ଯଦି (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
+			    ଅକ୍ଷର *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    ଯଦି (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    ଅନ୍ୟଥା
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (ଅକ୍ଷର *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				ଯଦି (tp != ଖାଲି)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    ଯଦି (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    ଯେତେବେଳେ (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    ଯଦି (tp != ଖାଲି && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				ଯେତେବେଳେ (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			ଅନ୍ୟଥା
 			{
-			    char *tp;
+			    ଅକ୍ଷର *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (ଅକ୍ଷର *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    ଯଦି (tp != ଖାଲି && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,49 +4556,49 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    ଯଦି (zero_padding && min_field_width > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			ସଂଖ୍ୟା_of_zeros_to_pad = min_field_width - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 
-	    default:
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		// unrecognized conversion specifier, keep format string
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
+		justify_ବାମ = 1;
 		min_field_width = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		ଯଦି (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
-	    if (*p != NUL)
+	    ଯଦି (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    ଯଦି (!justify_ବାମ)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା pn = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(min_field_width - (str_arg_l + ସଂଖ୍ୟା_of_zeros_to_pad));
 
-		if (pn > 0)
+		ଯଦି (pn > 0)
 		{
-		    if (str_l < str_m)
+		    ଯଦି (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4612,21 +4612,21 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    ଯଦି (ସଂଖ୍ୟା_of_zeros_to_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା zn = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		ଯଦି (zn > 0)
 		{
-		    if (str_l < str_m)
+		    ଯଦି (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4639,10 +4639,10 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ସଂଖ୍ୟା_of_zeros_to_pad;
+		ଯଦି (zn > 0)
 		{
-		    if (str_l < str_m)
+		    ଯଦି (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4657,11 +4657,11 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା sn = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		ଯଦି (sn > 0)
 		{
-		    if (str_l < str_m)
+		    ଯଦି (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4674,15 +4674,15 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    ଯଦି (justify_ବାମ)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା pn = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(min_field_width
+				      - (str_arg_l + ସଂଖ୍ୟା_of_zeros_to_pad));
 
-		if (pn > 0)
+		ଯଦି (pn > 0)
 		{
-		    if (str_l < str_m)
+		    ଯଦି (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    ଯଦି (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+    ଯଦି (tvs != ଖାଲି && tvs[ଅଙ୍କ_posarg != 0 ? ଅଙ୍କ_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
 	emsg(_(e_too_many_arguments_to_printf));
 
 error:
-    vim_free((char*)ap_types);
+    vim_free((ଅକ୍ଷର*)ap_types);
     va_end(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    ଫେରନ୍ତୁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)str_l;
 }
 
 #endif // PROTO

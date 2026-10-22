@@ -20,7 +20,7 @@
  *
  */
 
-#include "xinclude.h"
+#ଅନ୍ତର୍ଭାଵ "xinclude.h"
 
 
 long xdl_bogosqrt(long n) {
@@ -29,155 +29,155 @@ long xdl_bogosqrt(long n) {
 	/*
 	 * Classical integer square root approximation using shifts.
 	 */
-	for (i = 1; n > 0; n >>= 2)
+	ପାଇଁ (i = 1; n > 0; n >>= 2)
 		i <<= 1;
 
-	return i;
+	ଫେରନ୍ତୁ i;
 }
 
 
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_emit_diffrec(ଅକ୍ଷର ଅଚଳ *rec, long size, ଅକ୍ଷର ଅଚଳ *pre, long psize,
 		     xdemitcb_t *ecb) {
-	int i = 2;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 2;
 	mmbuffer_t mb[3];
 
-	mb[0].ptr = (char *) pre;
+	mb[0].ptr = (ଅକ୍ଷର *) pre;
 	mb[0].size = psize;
-	mb[1].ptr = (char *) rec;
+	mb[1].ptr = (ଅକ୍ଷର *) rec;
 	mb[1].size = size;
-	if (size > 0 && rec[size - 1] != '\n') {
-		mb[2].ptr = (char *) "\n\\ No newline at end of file\n";
+	ଯଦି (size > 0 && rec[size - 1] != '\n') {
+		mb[2].ptr = (ଅକ୍ଷର *) "\n\\ No newline at end of file\n";
 		mb[2].size = (long)strlen(mb[2].ptr);
 		i++;
 	}
-	if (ecb->out_line(ecb->priv, mb, i) < 0) {
+	ଯଦି (ecb->out_ଧାଡ଼ି(ecb->priv, mb, i) < 0) {
 
-		return -1;
+		ଫେରନ୍ତୁ -1;
 	}
 
-	return 0;
+	ଫେରନ୍ତୁ 0;
 }
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size)
+ଶୂନ୍ୟ *xdl_mmfile_first(mmfile_t *mmf, long *size)
 {
 	*size = mmf->size;
-	return mmf->ptr;
+	ଫେରନ୍ତୁ mmf->ptr;
 }
 
 
 long xdl_mmfile_size(mmfile_t *mmf)
 {
-	return mmf->size;
+	ଫେରନ୍ତୁ mmf->size;
 }
 
 
-int xdl_cha_init(chastore_t *cha, long isize, long icount) {
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_cha_init(chastore_t *cha, long isize, long icount) {
 
-	cha->head = cha->tail = NULL;
+	cha->head = cha->tail = ଖାଲି;
 	cha->isize = isize;
 	cha->nsize = icount * isize;
-	cha->ancur = cha->sncur = NULL;
+	cha->ancur = cha->sncur = ଖାଲି;
 	cha->scurr = 0;
 
-	return 0;
+	ଫେରନ୍ତୁ 0;
 }
 
 
-void xdl_cha_free(chastore_t *cha) {
+ଶୂନ୍ୟ xdl_cha_free(chastore_t *cha) {
 	chanode_t *cur, *tmp;
 
-	for (cur = cha->head; (tmp = cur) != NULL;) {
+	ପାଇଁ (cur = cha->head; (tmp = cur) != ଖାଲି;) {
 		cur = cur->next;
 		xdl_free(tmp);
 	}
 }
 
 
-void *xdl_cha_alloc(chastore_t *cha) {
+ଶୂନ୍ୟ *xdl_cha_alloc(chastore_t *cha) {
 	chanode_t *ancur;
-	void *data;
+	ଶୂନ୍ୟ *data;
 
-	if (!(ancur = cha->ancur) || ancur->icurr == cha->nsize) {
-		if (!(ancur = (chanode_t *) xdl_malloc(sizeof(chanode_t) + cha->nsize))) {
+	ଯଦି (!(ancur = cha->ancur) || ancur->icurr == cha->nsize) {
+		ଯଦି (!(ancur = (chanode_t *) xdl_malloc(ଆକାର(chanode_t) + cha->nsize))) {
 
-			return NULL;
+			ଫେରନ୍ତୁ ଖାଲି;
 		}
 		ancur->icurr = 0;
-		ancur->next = NULL;
-		if (cha->tail)
+		ancur->next = ଖାଲି;
+		ଯଦି (cha->tail)
 			cha->tail->next = ancur;
-		if (!cha->head)
+		ଯଦି (!cha->head)
 			cha->head = ancur;
 		cha->tail = ancur;
 		cha->ancur = ancur;
 	}
 
-	data = (char *) ancur + sizeof(chanode_t) + ancur->icurr;
+	data = (ଅକ୍ଷର *) ancur + ଆକାର(chanode_t) + ancur->icurr;
 	ancur->icurr += cha->isize;
 
-	return data;
+	ଫେରନ୍ତୁ data;
 }
 
-long xdl_guess_lines(mmfile_t *mf, long sample) {
+long xdl_guess_ଧାଡ଼ିଗୁଡ଼ିକ(mmfile_t *mf, long sample) {
 	long nl = 0, size, tsize = 0;
-	char const *data, *cur, *top;
+	ଅକ୍ଷର ଅଚଳ *data, *cur, *ଶୀର୍ଷ;
 
-	if ((cur = data = xdl_mmfile_first(mf, &size))) {
-		for (top = data + size; nl < sample && cur < top; ) {
+	ଯଦି ((cur = data = xdl_mmfile_first(mf, &size))) {
+		ପାଇଁ (ଶୀର୍ଷ = data + size; nl < sample && cur < ଶୀର୍ଷ; ) {
 			nl++;
-			if (!(cur = memchr(cur, '\n', top - cur)))
-				cur = top;
-			else
+			ଯଦି (!(cur = memchr(cur, '\n', ଶୀର୍ଷ - cur)))
+				cur = ଶୀର୍ଷ;
+			ଅନ୍ୟଥା
 				cur++;
 		}
 		tsize += (long) (cur - data);
 	}
 
-	if (nl && tsize)
+	ଯଦି (nl && tsize)
 		nl = xdl_mmfile_size(mf) / (tsize / nl);
 
-	return nl + 1;
+	ଫେରନ୍ତୁ nl + 1;
 }
 
-int xdl_blankline(const char *line, long size, long flags)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_blankline(ଅଚଳ ଅକ୍ଷର *ଧାଡ଼ି, long size, long flags)
 {
 	long i;
 
-	if (!(flags & XDF_WHITESPACE_FLAGS))
-		return (size <= 1);
+	ଯଦି (!(flags & XDF_WHITESPACE_FLAGS))
+		ଫେରନ୍ତୁ (size <= 1);
 
-	for (i = 0; i < size && XDL_ISSPACE(line[i]); i++)
+	ପାଇଁ (i = 0; i < size && XDL_ISSPACE(ଧାଡ଼ି[i]); i++)
 		;
 
-	return (i == size);
+	ଫେରନ୍ତୁ (i == size);
 }
 
 /*
  * Have we eaten everything on the line, except for an optional
  * CR at the very end?
  */
-static int ends_with_optional_cr(const char *l, long s, long i)
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା ends_with_optional_cr(ଅଚଳ ଅକ୍ଷର *l, long s, long i)
 {
-	int complete = s && l[s-1] == '\n';
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା complete = s && l[s-1] == '\n';
 
-	if (complete)
+	ଯଦି (complete)
 		s--;
-	if (s == i)
-		return 1;
+	ଯଦି (s == i)
+		ଫେରନ୍ତୁ 1;
 	/* do not ignore CR at the end of an incomplete line */
-	if (complete && s == i + 1 && l[i] == '\r')
-		return 1;
-	return 0;
+	ଯଦି (complete && s == i + 1 && l[i] == '\r')
+		ଫେରନ୍ତୁ 1;
+	ଫେରନ୍ତୁ 0;
 }
 
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_recmatch(ଅଚଳ ଅକ୍ଷର *l1, long s1, ଅଚଳ ଅକ୍ଷର *l2, long s2, long flags)
 {
-	int i1, i2;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା i1, i2;
 
-	if (s1 == s2 && !memcmp(l1, l2, s1))
-		return 1;
-	if (!(flags & XDF_WHITESPACE_FLAGS))
-		return 0;
+	ଯଦି (s1 == s2 && !memcmp(l1, l2, s1))
+		ଫେରନ୍ତୁ 1;
+	ଯଦି (!(flags & XDF_WHITESPACE_FLAGS))
+		ଫେରନ୍ତୁ 0;
 
 	i1 = 0;
 	i2 = 0;
@@ -190,42 +190,42 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 	 * Each flavor of ignoring needs different logic to skip whitespaces
 	 * while we have both sides to compare.
 	 */
-	if (flags & XDF_IGNORE_WHITESPACE) {
-		goto skip_ws;
-		while (i1 < s1 && i2 < s2) {
-			if (l1[i1++] != l2[i2++])
-				return 0;
+	ଯଦି (flags & XDF_IGNORE_WHITESPACE) {
+		ଯାଅ skip_ws;
+		ଯେତେବେଳେ (i1 < s1 && i2 < s2) {
+			ଯଦି (l1[i1++] != l2[i2++])
+				ଫେରନ୍ତୁ 0;
 		skip_ws:
-			while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+			ଯେତେବେଳେ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 				i1++;
-			while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+			ଯେତେବେଳେ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 				i2++;
 		}
-	} else if (flags & XDF_IGNORE_WHITESPACE_CHANGE) {
-		while (i1 < s1 && i2 < s2) {
-			if (XDL_ISSPACE(l1[i1]) && XDL_ISSPACE(l2[i2])) {
+	} ଅନ୍ୟଥା ଯଦି (flags & XDF_IGNORE_WHITESPACE_CHANGE) {
+		ଯେତେବେଳେ (i1 < s1 && i2 < s2) {
+			ଯଦି (XDL_ISSPACE(l1[i1]) && XDL_ISSPACE(l2[i2])) {
 				/* Skip matching spaces and try again */
-				while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+				ଯେତେବେଳେ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 					i1++;
-				while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+				ଯେତେବେଳେ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 					i2++;
-				continue;
+				ଜାରି;
 			}
-			if (l1[i1++] != l2[i2++])
-				return 0;
+			ଯଦି (l1[i1++] != l2[i2++])
+				ଫେରନ୍ତୁ 0;
 		}
-	} else if (flags & XDF_IGNORE_WHITESPACE_AT_EOL) {
-		while (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
+	} ଅନ୍ୟଥା ଯଦି (flags & XDF_IGNORE_WHITESPACE_AT_EOL) {
+		ଯେତେବେଳେ (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
 			i1++;
 			i2++;
 		}
-	} else if (flags & XDF_IGNORE_CR_AT_EOL) {
+	} ଅନ୍ୟଥା ଯଦି (flags & XDF_IGNORE_CR_AT_EOL) {
 		/* Find the first difference and see how the line ends */
-		while (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
+		ଯେତେବେଳେ (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
 			i1++;
 			i2++;
 		}
-		return (ends_with_optional_cr(l1, s1, i1) &&
+		ଫେରନ୍ତୁ (ends_with_optional_cr(l1, s1, i1) &&
 			ends_with_optional_cr(l2, s2, i2));
 	}
 
@@ -235,63 +235,63 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 	 * ignore-whitespace-at-eol case may break out of the loop
 	 * while there still are characters remaining on both lines.
 	 */
-	if (i1 < s1) {
-		while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+	ଯଦି (i1 < s1) {
+		ଯେତେବେଳେ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 			i1++;
-		if (s1 != i1)
-			return 0;
+		ଯଦି (s1 != i1)
+			ଫେରନ୍ତୁ 0;
 	}
-	if (i2 < s2) {
-		while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+	ଯଦି (i2 < s2) {
+		ଯେତେବେଳେ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 			i2++;
-		return (s2 == i2);
+		ଫେରନ୍ତୁ (s2 == i2);
 	}
-	return 1;
+	ଫେରନ୍ତୁ 1;
 }
 
-unsigned long xdl_hash_record_with_whitespace(char const **data,
-		char const *top, long flags) {
+unsigned long xdl_hash_record_with_whitespace(ଅକ୍ଷର ଅଚଳ **data,
+		ଅକ୍ଷର ଅଚଳ *ଶୀର୍ଷ, long flags) {
 	unsigned long ha = 5381;
-	char const *ptr = *data;
-	int cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
+	ଅକ୍ଷର ଅଚଳ *ptr = *data;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
 
-	for (; ptr < top && *ptr != '\n'; ptr++) {
-		if (cr_at_eol_only) {
+	ପାଇଁ (; ptr < ଶୀର୍ଷ && *ptr != '\n'; ptr++) {
+		ଯଦି (cr_at_eol_only) {
 			/* do not ignore CR at the end of an incomplete line */
-			if (*ptr == '\r' &&
-			    (ptr + 1 < top && ptr[1] == '\n'))
-				continue;
+			ଯଦି (*ptr == '\r' &&
+			    (ptr + 1 < ଶୀର୍ଷ && ptr[1] == '\n'))
+				ଜାରି;
 		}
-		else if (XDL_ISSPACE(*ptr)) {
-			const char *ptr2 = ptr;
-			int at_eol;
-			while (ptr + 1 < top && XDL_ISSPACE(ptr[1])
+		ଅନ୍ୟଥା ଯଦି (XDL_ISSPACE(*ptr)) {
+			ଅଚଳ ଅକ୍ଷର *ptr2 = ptr;
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା at_eol;
+			ଯେତେବେଳେ (ptr + 1 < ଶୀର୍ଷ && XDL_ISSPACE(ptr[1])
 					&& ptr[1] != '\n')
 				ptr++;
-			at_eol = (top <= ptr + 1 || ptr[1] == '\n');
-			if (flags & XDF_IGNORE_WHITESPACE)
+			at_eol = (ଶୀର୍ଷ <= ptr + 1 || ptr[1] == '\n');
+			ଯଦି (flags & XDF_IGNORE_WHITESPACE)
 				; /* already handled */
-			else if (flags & XDF_IGNORE_WHITESPACE_CHANGE
+			ଅନ୍ୟଥା ଯଦି (flags & XDF_IGNORE_WHITESPACE_CHANGE
 				 && !at_eol) {
 				ha += (ha << 5);
 				ha ^= (unsigned long) ' ';
 			}
-			else if (flags & XDF_IGNORE_WHITESPACE_AT_EOL
+			ଅନ୍ୟଥା ଯଦି (flags & XDF_IGNORE_WHITESPACE_AT_EOL
 				 && !at_eol) {
-				while (ptr2 != ptr + 1) {
+				ଯେତେବେଳେ (ptr2 != ptr + 1) {
 					ha += (ha << 5);
 					ha ^= (unsigned long) *ptr2;
 					ptr2++;
 				}
 			}
-			continue;
+			ଜାରି;
 		}
 		ha += (ha << 5);
 		ha ^= (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
+	*data = ptr < ଶୀର୍ଷ ? ptr + 1: ptr;
 
-	return ha;
+	ଫେରନ୍ତୁ ha;
 }
 
 /*
@@ -300,36 +300,36 @@ unsigned long xdl_hash_record_with_whitespace(char const **data,
  */
 #ifdef __GNUC__
 #define REASSOC_FENCE(x, y) __asm__("" : "+r"(x), "+r"(y))
-#else
+#ଅନ୍ୟଥା
 #define REASSOC_FENCE(x, y)
 #endif
 
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
+unsigned long xdl_hash_record_verbatim(ଅକ୍ଷର ଅଚଳ **data, ଅକ୍ଷର ଅଚଳ *ଶୀର୍ଷ) {
 	unsigned long ha = 5381, c0, c1;
-	char const *ptr = *data;
-#if 0
+	ଅକ୍ଷର ଅଚଳ *ptr = *data;
+#ଯଦି 0
 	/*
 	 * The baseline form of the optimized loop below. This is the djb2
 	 * hash (the above function uses a variant with XOR instead of ADD).
 	 */
-	for (; ptr < top && *ptr != '\n'; ptr++) {
+	ପାଇଁ (; ptr < ଶୀର୍ଷ && *ptr != '\n'; ptr++) {
 		ha += (ha << 5);
 		ha += (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
-#else
+	*data = ptr < ଶୀର୍ଷ ? ptr + 1: ptr;
+#ଅନ୍ୟଥା
 	/* Process two characters per iteration. */
-	if (top - ptr >= 2) do {
-		if ((c0 = ptr[0]) == '\n') {
+	ଯଦି (ଶୀର୍ଷ - ptr >= 2) କର {
+		ଯଦି ((c0 = ptr[0]) == '\n') {
 			*data = ptr + 1;
-			return ha;
+			ଫେରନ୍ତୁ ha;
 		}
-		if ((c1 = ptr[1]) == '\n') {
+		ଯଦି ((c1 = ptr[1]) == '\n') {
 			*data = ptr + 2;
 			c0 += ha;
 			REASSOC_FENCE(c0, ha);
 			ha = ha * 32 + c0;
-			return ha;
+			ଫେରନ୍ତୁ ha;
 		}
 		/*
 		 * Combine characters C0 and C1 into the hash HA. We have
@@ -347,84 +347,84 @@ unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
 		ha += c1;
 
 		ptr += 2;
-	} while (ptr < top - 1);
-	*data = top;
-	if (ptr < top && (c0 = ptr[0]) != '\n') {
+	} ଯେତେବେଳେ (ptr < ଶୀର୍ଷ - 1);
+	*data = ଶୀର୍ଷ;
+	ଯଦି (ptr < ଶୀର୍ଷ && (c0 = ptr[0]) != '\n') {
 		c0 += ha;
 		REASSOC_FENCE(c0, ha);
 		ha = ha * 32 + c0;
 	}
 #endif
-	return ha;
+	ଫେରନ୍ତୁ ha;
 }
 
-unsigned int xdl_hashbits(unsigned int size) {
-	unsigned int val = 1, bits = 0;
+unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_hashbits(unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା size) {
+	unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା val = 1, bits = 0;
 
-	for (; val < size && bits < CHAR_BIT * sizeof(unsigned int); val <<= 1, bits++);
-	return bits ? bits: 1;
+	ପାଇଁ (; val < size && bits < CHAR_BIT * ଆକାର(unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା); val <<= 1, bits++);
+	ଫେରନ୍ତୁ bits ? bits: 1;
 }
 
 
-int xdl_num_out(char *out, long val) {
-	char *ptr, *str = out;
-	char buf[32];
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_ଅଙ୍କ_out(ଅକ୍ଷର *out, long val) {
+	ଅକ୍ଷର *ptr, *str = out;
+	ଅକ୍ଷର buf[32];
 
-	ptr = buf + sizeof(buf) - 1;
+	ptr = buf + ଆକାର(buf) - 1;
 	*ptr = '\0';
-	if (val < 0) {
+	ଯଦି (val < 0) {
 		*--ptr = '-';
 		val = -val;
 	}
-	for (; val && ptr > buf; val /= 10)
+	ପାଇଁ (; val && ptr > buf; val /= 10)
 		*--ptr = "0123456789"[val % 10];
-	if (*ptr)
-		for (; *ptr; ptr++, str++)
+	ଯଦି (*ptr)
+		ପାଇଁ (; *ptr; ptr++, str++)
 			*str = *ptr;
-	else
+	ଅନ୍ୟଥା
 		*str++ = '0';
 	*str = '\0';
 
-	return str - out;
+	ଫେରନ୍ତୁ str - out;
 }
 
-static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
-			       const char *func, long funclen,
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
+			       ଅଚଳ ଅକ୍ଷର *func, long funclen,
 			       xdemitcb_t *ecb) {
-	int nb = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା nb = 0;
 	mmbuffer_t mb;
-	char buf[128];
+	ଅକ୍ଷର buf[128];
 
 	memcpy(buf, "@@ -", 4);
 	nb += 4;
 
-	nb += xdl_num_out(buf + nb, c1 ? s1: s1 - 1);
+	nb += xdl_ଅଙ୍କ_out(buf + nb, c1 ? s1: s1 - 1);
 
-	if (c1 != 1) {
+	ଯଦି (c1 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c1);
+		nb += xdl_ଅଙ୍କ_out(buf + nb, c1);
 	}
 
 	memcpy(buf + nb, " +", 2);
 	nb += 2;
 
-	nb += xdl_num_out(buf + nb, c2 ? s2: s2 - 1);
+	nb += xdl_ଅଙ୍କ_out(buf + nb, c2 ? s2: s2 - 1);
 
-	if (c2 != 1) {
+	ଯଦି (c2 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c2);
+		nb += xdl_ଅଙ୍କ_out(buf + nb, c2);
 	}
 
 	memcpy(buf + nb, " @@", 3);
 	nb += 3;
-	if (func && funclen) {
+	ଯଦି (func && funclen) {
 		buf[nb++] = ' ';
-		if ((size_t)funclen > sizeof(buf) - nb - 1)
-			funclen = sizeof(buf) - nb - 1;
+		ଯଦି ((size_t)funclen > ଆକାର(buf) - nb - 1)
+			funclen = ଆକାର(buf) - nb - 1;
 		memcpy(buf + nb, func, funclen);
 		nb += funclen;
 	}
@@ -432,26 +432,26 @@ static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
 
 	mb.ptr = buf;
 	mb.size = nb;
-	if (ecb->out_line(ecb->priv, &mb, 1) < 0)
-		return -1;
-	return 0;
+	ଯଦି (ecb->out_ଧାଡ଼ି(ecb->priv, &mb, 1) < 0)
+		ଫେରନ୍ତୁ -1;
+	ଫେରନ୍ତୁ 0;
 }
 
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen,
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
+		      ଅଚଳ ଅକ୍ଷର *func, long funclen,
 		      xdemitcb_t *ecb) {
-	if (!ecb->out_hunk)
-		return xdl_format_hunk_hdr(s1, c1, s2, c2, func, funclen, ecb);
-	if (ecb->out_hunk(ecb->priv,
+	ଯଦି (!ecb->out_hunk)
+		ଫେରନ୍ତୁ xdl_format_hunk_hdr(s1, c1, s2, c2, func, funclen, ecb);
+	ଯଦି (ecb->out_hunk(ecb->priv,
 			  c1 ? s1 : s1 - 1, c1,
 			  c2 ? s2 : s2 - 1, c2,
 			  func, funclen) < 0)
-		return -1;
-	return 0;
+		ଫେରନ୍ତୁ -1;
+	ଫେରନ୍ତୁ 0;
 }
 
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		int line1, int count1, int line2, int count2)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t ଅଚଳ *xpp,
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା line1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା count1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା line2, ପୂର୍ଣ୍ଣସଂଖ୍ୟା count2)
 {
 	/*
 	 * This probably does not work outside Git, since
@@ -464,36 +464,36 @@ int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
 	mmfile_t subfile1, subfile2;
 	xdfenv_t env;
 
-	subfile1.ptr = (char *)diff_env->xdf1.recs[line1 - 1].ptr;
+	subfile1.ptr = (ଅକ୍ଷର *)diff_env->xdf1.recs[line1 - 1].ptr;
 	subfile1.size = diff_env->xdf1.recs[line1 + count1 - 2].ptr +
 		diff_env->xdf1.recs[line1 + count1 - 2].size - subfile1.ptr;
-	subfile2.ptr = (char *)diff_env->xdf2.recs[line2 - 1].ptr;
+	subfile2.ptr = (ଅକ୍ଷର *)diff_env->xdf2.recs[line2 - 1].ptr;
 	subfile2.size = diff_env->xdf2.recs[line2 + count2 - 2].ptr +
 		diff_env->xdf2.recs[line2 + count2 - 2].size - subfile2.ptr;
-	if (xdl_do_diff(&subfile1, &subfile2, xpp, &env) < 0)
-		return -1;
+	ଯଦି (xdl_do_diff(&subfile1, &subfile2, xpp, &env) < 0)
+		ଫେରନ୍ତୁ -1;
 
 	memcpy(diff_env->xdf1.changed + line1 - 1, env.xdf1.changed, count1);
 	memcpy(diff_env->xdf2.changed + line2 - 1, env.xdf2.changed, count2);
 
 	xdl_free_env(&env);
 
-	return 0;
+	ଫେରନ୍ତୁ 0;
 }
 
-void* xdl_alloc_grow_helper(void *p, long nr, long *alloc, size_t size)
+ଶୂନ୍ୟ* xdl_alloc_grow_helper(ଶୂନ୍ୟ *p, long nr, long *alloc, size_t size)
 {
-	void *tmp = NULL;
+	ଶୂନ୍ୟ *tmp = ଖାଲି;
 	size_t n = ((LONG_MAX - 16) / 2 >= *alloc) ? 2 * *alloc + 16 : LONG_MAX;
-	if ((size_t)nr > n)
+	ଯଦି ((size_t)nr > n)
 		n = nr;
-	if (SIZE_MAX / size >= n)
+	ଯଦି (SIZE_MAX / size >= n)
 		tmp = xdl_realloc(p, n * size);
-	if (tmp) {
+	ଯଦି (tmp) {
 		*alloc = (long)n;
-	} else {
+	} ଅନ୍ୟଥା {
 		xdl_free(p);
 		*alloc = 0;
 	}
-	return tmp;
+	ଫେରନ୍ତୁ tmp;
 }

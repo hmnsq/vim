@@ -11,36 +11,36 @@
  * locale.c: functions for language/locale configuration
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#ଯଦି (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	&& (defined(FEAT_EVAL) || defined(FEAT_MULTI_LANG))
 # define HAVE_GET_LOCALE_VAL
-    static char_u *
-get_locale_val(int what)
+    ସ୍ଥିର char_u *
+get_locale_val(ପୂର୍ଣ୍ଣସଂଖ୍ୟା what)
 {
     char_u	*loc;
 
     // Obtain the locale value from the libraries.
-    loc = (char_u *)setlocale(what, NULL);
+    loc = (char_u *)setlocale(what, ଖାଲି);
 
 # ifdef MSWIN
-    if (loc != NULL)
+    ଯଦି (loc != ଖାଲି)
     {
 	char_u	*p;
 
 	// setocale() returns something like "LC_COLLATE=<name>;LC_..." when
 	// one of the values (e.g., LC_CTYPE) differs.
 	p = vim_strchr(loc, '=');
-	if (p != NULL)
+	ଯଦି (p != ଖାଲି)
 	{
 	    loc = ++p;
-	    while (*p != NUL)	// remove trailing newline
+	    ଯେତେବେଳେ (*p != NUL)	// remove trailing newline
 	    {
-		if (*p < ' ' || *p == ';')
+		ଯଦି (*p < ' ' || *p == ';')
 		{
 		    *p = NUL;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		++p;
 	    }
@@ -48,7 +48,7 @@ get_locale_val(int what)
     }
 # endif
 
-    return loc;
+    ଫେରନ୍ତୁ loc;
 }
 #endif
 
@@ -59,11 +59,11 @@ get_locale_val(int what)
  * gettext expects "de".  Try to translate one into another here for a few
  * supported languages.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 gettext_lang(char_u *name)
 {
-    int		i;
-    static char *(mtable[]) = {
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ସ୍ଥିର ଅକ୍ଷର *(mtable[]) = {
 			"afrikaans",	"af",
 			"czech",	"cs",
 			"dutch",	"nl",
@@ -82,24 +82,24 @@ gettext_lang(char_u *name)
 			"ukrainian",	"uk",
 			"chinese_china", "zh_CN",
 			"chinese_taiwan", "zh_TW",
-			NULL};
+			ଖାଲି};
 
-    for (i = 0; mtable[i] != NULL; i += 2)
-	if (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
-	    return (char_u *)mtable[i + 1];
-    return name;
+    ପାଇଁ (i = 0; mtable[i] != ଖାଲି; i += 2)
+	ଯଦି (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
+	    ଫେରନ୍ତୁ (char_u *)mtable[i + 1];
+    ଫେରନ୍ତୁ name;
 }
 #endif
 
-#if defined(FEAT_MULTI_LANG)
+#ଯଦି defined(FEAT_MULTI_LANG)
 /*
  * Return TRUE when "lang" starts with a valid language name.
  * Rejects NULL, empty string, "C", "C.UTF-8" and others.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 is_valid_mess_lang(char_u *lang)
 {
-    return lang != NULL && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
+    ଫେରନ୍ତୁ lang != ଖାଲି && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
 }
 
 /*
@@ -107,84 +107,84 @@ is_valid_mess_lang(char_u *lang)
  * 'helplang'.  May return NULL or an empty string.
  */
     char_u *
-get_mess_lang(void)
+get_mess_lang(ଶୂନ୍ୟ)
 {
     char_u *p;
 
 # ifdef HAVE_GET_LOCALE_VAL
-#  if defined(LC_MESSAGES)
+#  ଯଦି defined(LC_MESSAGES)
     p = get_locale_val(LC_MESSAGES);
-#  else
+#  ଅନ୍ୟଥା
     // This is necessary for Win32, where LC_MESSAGES is not defined and $LANG
     // may be set to the LCID number.  $LANG holds the display language, see
     // set_init_lang_env().  Otherwise LC_COLLATE is the best guess, LC_TIME
     // and LC_MONETARY may be set differently for a Japanese working in the US.
     p = mch_getenv((char_u *)"LANG");
-    if (!is_valid_mess_lang(p))
+    ଯଦି (!is_valid_mess_lang(p))
 	p = get_locale_val(LC_COLLATE);
 #  endif
-# else
+# ଅନ୍ୟଥା
     p = mch_getenv((char_u *)"LC_ALL");
-    if (!is_valid_mess_lang(p))
+    ଯଦି (!is_valid_mess_lang(p))
     {
 	p = mch_getenv((char_u *)"LC_MESSAGES");
-	if (!is_valid_mess_lang(p))
+	ଯଦି (!is_valid_mess_lang(p))
 	    p = mch_getenv((char_u *)"LANG");
     }
 # endif
 # ifdef MSWIN
     p = gettext_lang(p);
 # endif
-    return is_valid_mess_lang(p) ? p : NULL;
+    ଫେରନ୍ତୁ is_valid_mess_lang(p) ? p : ଖାଲି;
 }
 #endif
 
 // Complicated #if; matches with where get_mess_env() is used below.
-#if (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#ଯଦି (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	    && defined(LC_MESSAGES))) \
 	|| ((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 		&& !defined(LC_MESSAGES))
 /*
  * Get the language used for messages from the environment.
  */
-    static char_u *
-get_mess_env(void)
+    ସ୍ଥିର char_u *
+get_mess_env(ଶୂନ୍ୟ)
 {
     char_u	*p;
 
     p = mch_getenv((char_u *)"LC_ALL");
-    if (p != NULL && *p != NUL)
-	return p;
+    ଯଦି (p != ଖାଲି && *p != NUL)
+	ଫେରନ୍ତୁ p;
 
     p = mch_getenv((char_u *)"LC_MESSAGES");
-    if (p != NULL && *p != NUL)
-	return p;
+    ଯଦି (p != ଖାଲି && *p != NUL)
+	ଫେରନ୍ତୁ p;
 
     p = mch_getenv((char_u *)"LANG");
-    if (p != NULL && VIM_ISDIGIT(*p))
-	p = NULL;		// ignore something like "1043"
+    ଯଦି (p != ଖାଲି && VIM_ISDIGIT(*p))
+	p = ଖାଲି;		// ignore something like "1043"
 # ifdef HAVE_GET_LOCALE_VAL
-    if (p == NULL || *p == NUL)
+    ଯଦି (p == ଖାଲି || *p == NUL)
 	p = get_locale_val(LC_CTYPE);
 # endif
-    return p;
+    ଫେରନ୍ତୁ p;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 
 /*
  * Set the "v:lang" variable according to the current locale setting.
  * Also do "v:lc_time"and "v:ctype".
  */
-    void
-set_lang_var(void)
+    ଶୂନ୍ୟ
+set_lang_var(ଶୂନ୍ୟ)
 {
     char_u	*loc;
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_CTYPE);
-# else
+# ଅନ୍ୟଥା
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -192,9 +192,9 @@ set_lang_var(void)
 
     // When LC_MESSAGES isn't defined use the value from $LC_MESSAGES, fall
     // back to LC_CTYPE if it's empty.
-# if defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
+# ଯଦି defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
     loc = get_locale_val(LC_MESSAGES);
-# else
+# ଅନ୍ୟଥା
     loc = get_mess_env();
 # endif
     set_vim_var_string(VV_LANG, loc, -1);
@@ -206,7 +206,7 @@ set_lang_var(void)
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_COLLATE);
-# else
+# ଅନ୍ୟଥା
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -214,12 +214,12 @@ set_lang_var(void)
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#ଯଦି defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Setup to use the current locale (for ctype() and many other things).
  */
-    void
-init_locale(void)
+    ଶୂନ୍ୟ
+init_locale(ଶୂନ୍ୟ)
 {
     setlocale(LC_ALL, "");
 
@@ -227,7 +227,7 @@ init_locale(void)
     // Tell Gtk not to change our locale settings.
     gtk_disable_setlocale();
 # endif
-# if defined(LC_NUMERIC)
+# ଯଦି defined(LC_NUMERIC)
     // Make sure strtod() uses a decimal point, not a comma.
     setlocale(LC_NUMERIC, "C");
 # endif
@@ -241,7 +241,7 @@ init_locale(void)
 
 # ifdef FEAT_GETTEXT
     {
-	int	mustfree = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	mustfree = FALSE;
 	char_u	*p;
 
 #  ifdef DYNAMIC_GETTEXT
@@ -251,12 +251,12 @@ init_locale(void)
 	// expand_env() doesn't work yet, because g_chartab[] is not
 	// initialized yet, call vim_getenv() directly
 	p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-	if (p != NULL && *p != NUL)
+	ଯଦି (p != ଖାଲି && *p != NUL)
 	{
-	    vim_snprintf((char *)NameBuff, MAXPATHL, "%s/lang", p);
-	    bindtextdomain(VIMPACKAGE, (char *)NameBuff);
+	    vim_snprintf((ଅକ୍ଷର *)NameBuff, MAXPATHL, "%s/lang", p);
+	    bindtextdomain(VIMPACKAGE, (ଅକ୍ଷର *)NameBuff);
 	}
-	if (mustfree)
+	ଯଦି (mustfree)
 	    vim_free(p);
 	textdomain(VIMPACKAGE);
     }
@@ -266,17 +266,17 @@ init_locale(void)
 /*
  * ":language":  Set the language (locale).
  */
-    void
+    ଶୂନ୍ୟ
 ex_language(exarg_T *eap)
 {
-    char	*loc;
+    ଅକ୍ଷର	*loc;
     char_u	*p;
     char_u	*name;
-    int		what = LC_ALL;
-    char	*whatstr = "";
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		what = LC_ALL;
+    ଅକ୍ଷର	*whatstr = "";
 # ifdef LC_MESSAGES
 #  define VIM_LC_MESSAGES LC_MESSAGES
-# else
+# ଅନ୍ୟଥା
 #  define VIM_LC_MESSAGES 6789
 # endif
 
@@ -286,27 +286,27 @@ ex_language(exarg_T *eap)
     // Allow abbreviation, but require at least 3 characters to avoid
     // confusion with a two letter language name "me" or "ct".
     p = skiptowhite(eap->arg);
-    if ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
+    ଯଦି ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
     {
-	if (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
+	ଯଦି (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
 	{
 	    what = VIM_LC_MESSAGES;
 	    name = skipwhite(p);
 	    whatstr = "messages ";
 	}
-	else if (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
 	{
 	    what = LC_CTYPE;
 	    name = skipwhite(p);
 	    whatstr = "ctype ";
 	}
-	else if (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
 	{
 	    what = LC_TIME;
 	    name = skipwhite(p);
 	    whatstr = "time ";
 	}
-	else if (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
 	{
 	    what = LC_COLLATE;
 	    name = skipwhite(p);
@@ -314,57 +314,57 @@ ex_language(exarg_T *eap)
 	}
     }
 
-    if (*name == NUL)
+    ଯଦି (*name == NUL)
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	ଯଦି (what == VIM_LC_MESSAGES)
 	    p = get_mess_env();
-	else
+	ଅନ୍ୟଥା
 # endif
-	    p = (char_u *)setlocale(what, NULL);
-	if (p == NULL || *p == NUL)
+	    p = (char_u *)setlocale(what, ଖାଲି);
+	ଯଦି (p == ଖାଲି || *p == NUL)
 	    p = (char_u *)"Unknown";
 	smsg(_("Current %slanguage: \"%s\""), whatstr, p);
     }
-    else
+    ଅନ୍ୟଥା
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	ଯଦି (what == VIM_LC_MESSAGES)
 	    loc = "";
-	else
+	ଅନ୍ୟଥା
 # endif
 	{
-	    loc = setlocale(what, (char *)name);
-# if defined(LC_NUMERIC)
+	    loc = setlocale(what, (ଅକ୍ଷର *)name);
+# ଯଦି defined(LC_NUMERIC)
 	    // Make sure strtod() uses a decimal point, not a comma.
 	    setlocale(LC_NUMERIC, "C");
 # endif
 	}
-	if (loc == NULL)
+	ଯଦି (loc == ଖାଲି)
 	    semsg(_(e_cannot_set_language_to_str), name);
-	else
+	ଅନ୍ୟଥା
 	{
-# ifdef HAVE_NL_MSG_CAT_CNTR
+# ifdef HAVE_NL_ସନ୍ଦେଶ_CAT_CNTR
 	    // Need to do this for GNU gettext, otherwise cached translations
 	    // will be used again.
-	    extern int _nl_msg_cat_cntr;
+	    ବାହ୍ୟ ପୂର୍ଣ୍ଣସଂଖ୍ୟା nl_ସନ୍ଦେଶ_cat_cntr;
 
-	    ++_nl_msg_cat_cntr;
+	    ++nl_ସନ୍ଦେଶ_cat_cntr;
 # elif defined(DYNAMIC_GETTEXT)
 	    // Same thing when gettext is loaded at runtime.
-	    if (dyn_libintl_nl_msg_cat_cntr != NULL)
-		++*dyn_libintl_nl_msg_cat_cntr;
+	    ଯଦି (dyn_libintl_nl_ସନ୍ଦେଶ_cat_cntr != ଖାଲି)
+		++*dyn_libintl_nl_ସନ୍ଦେଶ_cat_cntr;
 # endif
 	    // Reset $LC_ALL, otherwise it would overrule everything.
 	    vim_setenv((char_u *)"LC_ALL", (char_u *)"");
 
-	    if (what != LC_TIME && what != LC_COLLATE)
+	    ଯଦି (what != LC_TIME && what != LC_COLLATE)
 	    {
 		// Tell gettext() what to translate to.  It apparently doesn't
 		// use the currently effective locale.  Also do this when
 		// FEAT_GETTEXT isn't defined, so that shell commands use this
 		// value.
-		if (what == LC_ALL)
+		ଯଦି (what == LC_ALL)
 		{
 		    vim_setenv((char_u *)"LANG", name);
 # ifdef MSWIN
@@ -374,12 +374,12 @@ ex_language(exarg_T *eap)
 		    setlocale(LC_CTYPE, "C");
 # endif
 		}
-		if (what != LC_CTYPE)
+		ଯଦି (what != LC_CTYPE)
 		{
 		    char_u	*mname;
 # ifdef MSWIN
 		    mname = gettext_lang(name);
-# else
+# ଅନ୍ୟଥା
 		    mname = name;
 # endif
 		    // Clear $LANGUAGE because GNU gettext uses it.
@@ -400,16 +400,16 @@ ex_language(exarg_T *eap)
     }
 }
 
-static char_u	**locales = NULL;	// Array of all available locales
+ସ୍ଥିର char_u	**locales = ଖାଲି;	// Array of all available locales
 
-static int	did_init_locales = FALSE;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	did_init_locales = FALSE;
 
 /*
  * Return an array of strings for all available locales + NULL for the
  * last element.  Return NULL in case of error.
  */
-    static char_u **
-find_locales(void)
+    ସ୍ଥିର char_u **
+find_locales(ଶୂନ୍ୟ)
 {
     garray_T	locales_ga;
     char_u	*loc;
@@ -422,110 +422,110 @@ find_locales(void)
     // doesn't work we won't have completion.
 # ifndef MSWIN
     locale_list = get_cmd_output((char_u *)"locale -a",
-						    NULL, SHELL_SILENT, NULL);
-# else
+						    ଖାଲି, SHELL_SILENT, ଖାଲି);
+# ଅନ୍ୟଥା
     // Find all available locales by examining the directories in
     // $VIMRUNTIME/lang/
     {
-	int		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
 	expand_T	xpc;
 	char_u		*p;
 
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
 	locale_list = ExpandOne(&xpc, (char_u *)"$VIMRUNTIME/lang/*",
-						      NULL, options, WILD_ALL);
+						      ଖାଲି, options, WILD_ALL);
 	ExpandCleanup(&xpc);
-	if (locale_list == NULL)
+	ଯଦି (locale_list == ଖାଲି)
 	    // Add a dummy input, that will be skipped lated but we need to
 	    // have something in locale_list so that the C locale is added at
 	    // the end.
 	    locale_list = vim_strsave((char_u *)".\n");
 	p = locale_list;
 	// find the last directory delimiter
-	while (p != NULL && *p != NUL)
+	ଯେତେବେଳେ (p != ଖାଲି && *p != NUL)
 	{
-	    if (*p == '\n')
-		break;
-	    if (*p == '\\')
+	    ଯଦି (*p == '\n')
+		ଭାଙ୍ଗ;
+	    ଯଦି (*p == '\\')
 		len = p - locale_list;
 	    p++;
 	}
     }
 # endif
-    if (locale_list == NULL)
-	return NULL;
-    ga_init2(&locales_ga, sizeof(char_u *), 20);
+    ଯଦି (locale_list == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ga_init2(&locales_ga, ଆକାର(char_u *), 20);
 
     // Transform locale_list string where each locale is separated by "\n"
     // into an array of locale strings.
-    loc = (char_u *)strtok((char *)locale_list, "\n");
+    loc = (char_u *)strtok((ଅକ୍ଷର *)locale_list, "\n");
 
-    while (loc != NULL)
+    ଯେତେବେଳେ (loc != ଖାଲି)
     {
-	int ignore = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା ignore = FALSE;
 
 # ifdef MSWIN
-	if (len > 0)
+	ଯଦି (len > 0)
 	    loc += len + 1;
 	// skip locales with a dot (which indicates the charset)
-	if (vim_strchr(loc, '.') != NULL)
+	ଯଦି (vim_strchr(loc, '.') != ଖାଲି)
 	    ignore = TRUE;
 # endif
-	if (!ignore)
+	ଯଦି (!ignore)
 	{
-	    if (ga_grow(&locales_ga, 1) == FAIL)
-		break;
+	    ଯଦି (ga_grow(&locales_ga, 1) == FAIL)
+		ଭାଙ୍ଗ;
 
 	    loc = vim_strsave(loc);
-	    if (loc == NULL)
-		break;
+	    ଯଦି (loc == ଖାଲି)
+		ଭାଙ୍ଗ;
 
 	    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] = loc;
 	}
-	loc = (char_u *)strtok(NULL, "\n");
+	loc = (char_u *)strtok(ଖାଲି, "\n");
     }
 
 # ifdef MSWIN
     // Add the C locale
-    if (ga_grow(&locales_ga, 1) == OK)
+    ଯଦି (ga_grow(&locales_ga, 1) == OK)
 	((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] =
 						    vim_strsave((char_u *)"C");
 # endif
 
     vim_free(locale_list);
-    if (ga_grow(&locales_ga, 1) == FAIL)
+    ଯଦି (ga_grow(&locales_ga, 1) == FAIL)
     {
 	ga_clear(&locales_ga);
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = NULL;
-    return (char_u **)locales_ga.ga_data;
+    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = ଖାଲି;
+    ଫେରନ୍ତୁ (char_u **)locales_ga.ga_data;
 }
 
 /*
  * Lazy initialization of all available locales.
  */
-    static void
-init_locales(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+init_locales(ଶୂନ୍ୟ)
 {
-    if (did_init_locales)
-	return;
+    ଯଦି (did_init_locales)
+	ଫେରନ୍ତୁ;
 
     did_init_locales = TRUE;
     locales = find_locales();
 }
 
-# if defined(EXITFREE)
-    void
-free_locales(void)
+# ଯଦି defined(EXITFREE)
+    ଶୂନ୍ୟ
+free_locales(ଶୂନ୍ୟ)
 {
-    int			i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			i;
 
-    if (locales == NULL)
-	return;
+    ଯଦି (locales == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; locales[i] != NULL; i++)
+    ପାଇଁ (i = 0; locales[i] != ଖାଲି; i++)
 	vim_free(locales[i]);
     VIM_CLEAR(locales);
 }
@@ -536,33 +536,33 @@ free_locales(void)
  * ":language" command.
  */
     char_u *
-get_lang_arg(expand_T *xp UNUSED, int idx)
+get_lang_arg(expand_T *xp UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    if (idx == 0)
-	return (char_u *)"messages";
-    if (idx == 1)
-	return (char_u *)"ctype";
-    if (idx == 2)
-	return (char_u *)"time";
-    if (idx == 3)
-	return (char_u *)"collate";
+    ଯଦି (idx == 0)
+	ଫେରନ୍ତୁ (char_u *)"messages";
+    ଯଦି (idx == 1)
+	ଫେରନ୍ତୁ (char_u *)"ctype";
+    ଯଦି (idx == 2)
+	ଫେରନ୍ତୁ (char_u *)"time";
+    ଯଦି (idx == 3)
+	ଫେରନ୍ତୁ (char_u *)"collate";
 
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx - 4];
+    ଯଦି (locales == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଫେରନ୍ତୁ locales[idx - 4];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the available locales.
  */
     char_u *
-get_locales(expand_T *xp UNUSED, int idx)
+get_locales(expand_T *xp UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx];
+    ଯଦି (locales == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଫେରନ୍ତୁ locales[idx];
 }
 
 #endif

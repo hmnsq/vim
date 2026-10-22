@@ -12,194 +12,194 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
 #endif
 
-static void f_and(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_and(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_BEVAL
-static void f_balloon_gettext(typval_T *argvars, typval_T *rettv);
-static void f_balloon_show(typval_T *argvars, typval_T *rettv);
-# if defined(FEAT_BEVAL_TERM)
-static void f_balloon_split(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_balloon_gettext(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_balloon_show(typval_T *argvars, typval_T *rettv);
+# ଯଦି defined(FEAT_BEVAL_TERM)
+ସ୍ଥିର ଶୂନ୍ୟ f_balloon_split(typval_T *argvars, typval_T *rettv);
 # endif
 #endif
-static void f_base64_encode(typval_T *argvars, typval_T *rettv);
-static void f_base64_decode(typval_T *argvars, typval_T *rettv);
-static void f_bindtextdomain(typval_T *argvars, typval_T *rettv);
-static void f_byte2line(typval_T *argvars, typval_T *rettv);
-static void f_call(typval_T *argvars, typval_T *rettv);
-static void f_changenr(typval_T *argvars, typval_T *rettv);
-static void f_char2nr(typval_T *argvars, typval_T *rettv);
-static void f_charcol(typval_T *argvars, typval_T *rettv);
-static void f_col(typval_T *argvars, typval_T *rettv);
-static void f_confirm(typval_T *argvars, typval_T *rettv);
-static void f_copy(typval_T *argvars, typval_T *rettv);
-static void f_cursor(typval_T *argsvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_base64_encode(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_base64_decode(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_bindtextdomain(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_byte2line(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_call(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_changenr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_char2nr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_charcol(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_col(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_confirm(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_copy(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_cursor(typval_T *argsvars, typval_T *rettv);
 #ifdef MSWIN
-static void f_debugbreak(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_debugbreak(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_deepcopy(typval_T *argvars, typval_T *rettv);
-static void f_did_filetype(typval_T *argvars, typval_T *rettv);
-static void f_echoraw(typval_T *argvars, typval_T *rettv);
-static void f_empty(typval_T *argvars, typval_T *rettv);
-static void f_environ(typval_T *argvars, typval_T *rettv);
-static void f_err_teapot(typval_T *argvars, typval_T *rettv);
-static void f_escape(typval_T *argvars, typval_T *rettv);
-static void f_eval(typval_T *argvars, typval_T *rettv);
-static void f_eventhandler(typval_T *argvars, typval_T *rettv);
-static void f_execute(typval_T *argvars, typval_T *rettv);
-static void f_exists_compiled(typval_T *argvars, typval_T *rettv);
-static void f_expand(typval_T *argvars, typval_T *rettv);
-static void f_expandcmd(typval_T *argvars, typval_T *rettv);
-static void f_feedkeys(typval_T *argvars, typval_T *rettv);
-static void f_fnameescape(typval_T *argvars, typval_T *rettv);
-static void f_foreground(typval_T *argvars, typval_T *rettv);
-static void f_funcref(typval_T *argvars, typval_T *rettv);
-static void f_function(typval_T *argvars, typval_T *rettv);
-static void f_garbagecollect(typval_T *argvars, typval_T *rettv);
-static void f_get(typval_T *argvars, typval_T *rettv);
-static void f_getbgcolor(typval_T *argvars, typval_T *rettv);
-static void f_getcellpixels(typval_T *argvars, typval_T *rettv);
-static void f_getchangelist(typval_T *argvars, typval_T *rettv);
-static void f_getcharpos(typval_T *argvars, typval_T *rettv);
-static void f_getcharsearch(typval_T *argvars, typval_T *rettv);
-static void f_getcurpos(typval_T *argvars, typval_T *rettv);
-static void f_getcursorcharpos(typval_T *argvars, typval_T *rettv);
-static void f_getenv(typval_T *argvars, typval_T *rettv);
-static void f_getfontname(typval_T *argvars, typval_T *rettv);
-static void f_getinfo(typval_T *argvars, typval_T *rettv);
-static void f_getjumplist(typval_T *argvars, typval_T *rettv);
-static void f_getpid(typval_T *argvars, typval_T *rettv);
-static void f_getpos(typval_T *argvars, typval_T *rettv);
-static void f_getreg(typval_T *argvars, typval_T *rettv);
-static void f_getreginfo(typval_T *argvars, typval_T *rettv);
-static void f_getregion(typval_T *argvars, typval_T *rettv);
-static void f_getregionpos(typval_T *argvars, typval_T *rettv);
-static void f_getregtype(typval_T *argvars, typval_T *rettv);
-static void f_gettagstack(typval_T *argvars, typval_T *rettv);
-static void f_gettext(typval_T *argvars, typval_T *rettv);
-static void f_haslocaldir(typval_T *argvars, typval_T *rettv);
-static void f_hlID(typval_T *argvars, typval_T *rettv);
-static void f_hlexists(typval_T *argvars, typval_T *rettv);
-static void f_hostname(typval_T *argvars, typval_T *rettv);
-static void f_id(typval_T *argvars, typval_T *rettv);
-static void f_index(typval_T *argvars, typval_T *rettv);
-static void f_indexof(typval_T *argvars, typval_T *rettv);
-static void f_input(typval_T *argvars, typval_T *rettv);
-static void f_inputdialog(typval_T *argvars, typval_T *rettv);
-static void f_inputlist(typval_T *argvars, typval_T *rettv);
-static void f_inputrestore(typval_T *argvars, typval_T *rettv);
-static void f_inputsave(typval_T *argvars, typval_T *rettv);
-static void f_inputsecret(typval_T *argvars, typval_T *rettv);
-static void f_interrupt(typval_T *argvars, typval_T *rettv);
-static void f_invert(typval_T *argvars, typval_T *rettv);
-static void f_islocked(typval_T *argvars, typval_T *rettv);
-static void f_items(typval_T *argvars, typval_T *rettv);
-static void f_keytrans(typval_T *argvars, typval_T *rettv);
-static void f_last_buffer_nr(typval_T *argvars, typval_T *rettv);
-static void f_libcall(typval_T *argvars, typval_T *rettv);
-static void f_libcallnr(typval_T *argvars, typval_T *rettv);
-static void f_line(typval_T *argvars, typval_T *rettv);
-static void f_line2byte(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_deepcopy(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_did_filetype(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_echoraw(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_empty(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_environ(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_err_teapot(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_escape(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_eval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_eventhandler(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_execute(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_exists_compiled(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_expand(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_expandcmd(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_feedkeys(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_fnameescape(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_foreground(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_funcref(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_function(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_garbagecollect(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_get(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getbgcolor(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getcellpixels(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getchangelist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getcharpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getcharsearch(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getcurpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getcursorcharpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getenv(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getfontname(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getinfo(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getjumplist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getpid(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getreg(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getreginfo(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getregion(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getregionpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_getregtype(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_gettagstack(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_gettext(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_haslocaldir(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_hlID(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_hlexists(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_hostname(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_id(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_index(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_indexof(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_ନିବେଶ(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_inputdialog(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_inputlist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_inputrestore(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_inputsave(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_inputsecret(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_interrupt(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_invert(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_islocked(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_ବସ୍ତୁଗୁଡ଼ିକ(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_keytrans(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_last_buffer_nr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_libcall(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_libcallnr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_ଧାଡ଼ି(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_line2byte(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_LUA
-static void f_luaeval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_luaeval(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_match(typval_T *argvars, typval_T *rettv);
-static void f_matchbufline(typval_T *argvars, typval_T *rettv);
-static void f_matchend(typval_T *argvars, typval_T *rettv);
-static void f_matchlist(typval_T *argvars, typval_T *rettv);
-static void f_matchstr(typval_T *argvars, typval_T *rettv);
-static void f_matchstrlist(typval_T *argvars, typval_T *rettv);
-static void f_matchstrpos(typval_T *argvars, typval_T *rettv);
-static void f_max(typval_T *argvars, typval_T *rettv);
-static void f_min(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_match(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchbufline(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchend(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchlist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchstr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchstrlist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_matchstrpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_max(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_min(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_MZSCHEME
-static void f_mzeval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_mzeval(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_nextnonblank(typval_T *argvars, typval_T *rettv);
-static void f_ngettext(typval_T *argvars, typval_T *rettv);
-static void f_nr2char(typval_T *argvars, typval_T *rettv);
-static void f_or(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_nextnonblank(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_ngettext(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_nr2char(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_or(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_PERL
-static void f_perleval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_perleval(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_prevnonblank(typval_T *argvars, typval_T *rettv);
-static void f_printf(typval_T *argvars, typval_T *rettv);
-static void f_pum_getpos(typval_T *argvars, typval_T *rettv);
-static void f_pumvisible(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_prevnonblank(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_printf(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_pum_getpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_pumvisible(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_PYTHON3
-static void f_py3eval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_py3eval(typval_T *argvars, typval_T *rettv);
 #endif
 #ifdef FEAT_PYTHON
-static void f_pyeval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_pyeval(typval_T *argvars, typval_T *rettv);
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
-static void f_pyxeval(typval_T *argvars, typval_T *rettv);
+#ଯଦି defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+ସ୍ଥିର ଶୂନ୍ୟ f_pyxeval(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_test_srand_seed(typval_T *argvars, typval_T *rettv);
-static void f_rand(typval_T *argvars, typval_T *rettv);
-static void f_range(typval_T *argvars, typval_T *rettv);
-static void f_reg_executing(typval_T *argvars, typval_T *rettv);
-static void f_reg_recording(typval_T *argvars, typval_T *rettv);
-static void f_rename(typval_T *argvars, typval_T *rettv);
-static void f_repeat(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_test_srand_seed(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_rand(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_range(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_reg_executing(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_reg_recording(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_rename(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_repeat(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_RUBY
-static void f_rubyeval(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_rubyeval(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_screenattr(typval_T *argvars, typval_T *rettv);
-static void f_screenchar(typval_T *argvars, typval_T *rettv);
-static void f_screenchars(typval_T *argvars, typval_T *rettv);
-static void f_screencol(typval_T *argvars, typval_T *rettv);
-static void f_screenrow(typval_T *argvars, typval_T *rettv);
-static void f_screenstring(typval_T *argvars, typval_T *rettv);
-static void f_search(typval_T *argvars, typval_T *rettv);
-static void f_searchdecl(typval_T *argvars, typval_T *rettv);
-static void f_searchpair(typval_T *argvars, typval_T *rettv);
-static void f_searchpairpos(typval_T *argvars, typval_T *rettv);
-static void f_searchpos(typval_T *argvars, typval_T *rettv);
-static void f_setcharpos(typval_T *argvars, typval_T *rettv);
-static void f_setcharsearch(typval_T *argvars, typval_T *rettv);
-static void f_setcursorcharpos(typval_T *argvars, typval_T *rettv);
-static void f_setenv(typval_T *argvars, typval_T *rettv);
-static void f_setfperm(typval_T *argvars, typval_T *rettv);
-static void f_setpos(typval_T *argvars, typval_T *rettv);
-static void f_setreg(typval_T *argvars, typval_T *rettv);
-static void f_settagstack(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screenattr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screenchar(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screenchars(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screencol(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screenrow(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_screenstring(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_ସନ୍ଧାନ(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_searchdecl(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_searchpair(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_searchpairpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_searchpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setcharpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setcharsearch(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setcursorcharpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setenv(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setfperm(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setpos(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_setreg(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_settagstack(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_CRYPT
-static void f_sha256(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_sha256(typval_T *argvars, typval_T *rettv);
 #endif
-static void f_shellescape(typval_T *argvars, typval_T *rettv);
-static void f_shiftwidth(typval_T *argvars, typval_T *rettv);
-static void f_soundfold(typval_T *argvars, typval_T *rettv);
-static void f_spellbadword(typval_T *argvars, typval_T *rettv);
-static void f_spellsuggest(typval_T *argvars, typval_T *rettv);
-static void f_split(typval_T *argvars, typval_T *rettv);
-static void f_srand(typval_T *argvars, typval_T *rettv);
-static void f_submatch(typval_T *argvars, typval_T *rettv);
-static void f_substitute(typval_T *argvars, typval_T *rettv);
-static void f_swapfilelist(typval_T *argvars, typval_T *rettv);
-static void f_swapinfo(typval_T *argvars, typval_T *rettv);
-static void f_swapname(typval_T *argvars, typval_T *rettv);
-static void f_synID(typval_T *argvars, typval_T *rettv);
-static void f_synIDattr(typval_T *argvars, typval_T *rettv);
-static void f_synIDtrans(typval_T *argvars, typval_T *rettv);
-static void f_synstack(typval_T *argvars, typval_T *rettv);
-static void f_synconcealed(typval_T *argvars, typval_T *rettv);
-static void f_tabpagebuflist(typval_T *argvars, typval_T *rettv);
-static void f_taglist(typval_T *argvars, typval_T *rettv);
-static void f_tagfiles(typval_T *argvars, typval_T *rettv);
-static void f_type(typval_T *argvars, typval_T *rettv);
-static void f_virtcol(typval_T *argvars, typval_T *rettv);
-static void f_visualmode(typval_T *argvars, typval_T *rettv);
-static void f_wildmenumode(typval_T *argvars, typval_T *rettv);
-static void f_windowsversion(typval_T *argvars, typval_T *rettv);
-static void f_wordcount(typval_T *argvars, typval_T *rettv);
-static void f_xor(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_shellescape(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_shiftwidth(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_soundfold(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_spellbadword(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_spellsuggest(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_split(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_srand(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_submatch(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_substitute(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_swapfilelist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_swapinfo(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_swapname(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_synID(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_synIDattr(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_synIDtrans(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_synstack(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_synconcealed(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_tabpagebuflist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_taglist(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_tagfiles(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_type(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_virtcol(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_visualmode(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_wildmenumode(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_windowsversion(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_wordcount(typval_T *argvars, typval_T *rettv);
+ସ୍ଥିର ଶୂନ୍ୟ f_xor(typval_T *argvars, typval_T *rettv);
 
 
 /*
@@ -208,10 +208,10 @@ static void f_xor(typval_T *argvars, typval_T *rettv);
  */
 
 // Context passed to an arg_ function.
-typedef struct {
-    int		arg_count;	// actual argument count
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_ଗଣନା;	// actual argument count
     type2_T	*arg_types;	// list of argument types
-    int		arg_idx;	// current argument index (first arg is zero)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_idx;	// current argument index (first arg is zero)
     cctx_T	*arg_cctx;
 } argcontext_T;
 
@@ -220,688 +220,688 @@ typedef struct {
 // E.g. if "arg_idx" is 1, then (type - 1) is the first argument type.
 // NOTE:    Use "arg_any", not NULL, in funcentry_T.f_argcheck array
 //	    to accept an argument of any type.
-typedef int (*argcheck_T)(type_T *, type_T *, argcontext_T *);
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ପୂର୍ଣ୍ଣସଂଖ୍ୟା (*argcheck_T)(type_T *, type_T *, argcontext_T *);
 
 /*
  * Call need_type() to check an argument type.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_arg_type(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    return need_type(actual, expected, 0,
-	    context->arg_idx - context->arg_count, context->arg_idx + 1,
+    ଫେରନ୍ତୁ need_type(actual, expected, 0,
+	    context->arg_idx - context->arg_ଗଣନା, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE);
 }
 
 /*
  * Call need_type() to check an argument type and that it is modifiable
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_arg_type_mod(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    if (need_type(actual, expected, 0,
-	    context->arg_idx - context->arg_count, context->arg_idx + 1,
+    ଯଦି (need_type(actual, expected, 0,
+	    context->arg_idx - context->arg_ଗଣନା, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(actual, context->arg_idx + 1);
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ arg_type_modifiable(actual, context->arg_idx + 1);
 }
 
 /*
  * Give an error if "type" is a constant.
  */
-    int
-arg_type_modifiable(type_T *type, int arg_idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+arg_type_modifiable(type_T *type, ପୂର୍ଣ୍ଣସଂଖ୍ୟା arg_idx)
 {
-    char *tofree;
+    ଅକ୍ଷର *tofree;
 
-    if ((type->tt_flags & TTFLAG_CONST) == 0)
-	return OK;
+    ଯଦି ((type->tt_flags & TTFLAG_CONST) == 0)
+	ଫେରନ୍ତୁ OK;
     semsg(_(e_argument_nr_trying_to_modify_const_str),
 	    arg_idx, type_name(type, &tofree));
     vim_free(tofree);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  *  Return OK for any type unconditionally.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_any(type_T *type UNUSED,
 	type_T *decl_type UNUSED,
 	argcontext_T *context UNUSED)
 {
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check "type" is a float or a number.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_float_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_FLOAT
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_FLOAT
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
-    arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+	ଫେରନ୍ତୁ OK;
+    arg_type_mismatch(&t_ସଂଖ୍ୟା, type, context->arg_idx + 1);
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a number.
  */
-    static int
-arg_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+arg_ସଂଖ୍ୟା(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_number, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_ସଂଖ୍ୟା, type, context);
 }
 
 /*
  * Check "type" is an object.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_object(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_OBJECT
+    ଯଦି (type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_object_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any'.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_dict_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_dict_any, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_dict_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any'.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_any, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' and modifiable
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_any_mod(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    return check_arg_type_mod(&t_list_any, type, context);
+    ଫେରନ୍ତୁ check_arg_type_mod(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of numbers.
  */
-    static int
-arg_list_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+arg_list_ସଂଖ୍ୟା(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_number, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_list_ସଂଖ୍ୟା, type, context);
 }
 
 /*
  * Check "type" is a list of strings.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_string, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_list_string, type, context);
 }
 
 /*
  * Check "type" is a tuple of 'any'.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_tuple_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_tuple_any, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_tuple_any, type, context);
 }
 
 /*
  * Check "type" is a string.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_string, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_string, type, context);
 }
 
 /*
  * Check "type" is a blob
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_blob, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_blob, type, context);
 }
 
 /*
  * Check "type" is a bool or number 0 or 1.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_bool(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_bool, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a bool or a number.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_bool_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BOOL
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_BOOL
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
-    arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+	ଫେରନ୍ତୁ OK;
+    arg_type_mismatch(&t_ସଂଖ୍ୟା, type, context->arg_idx + 1);
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a bool or a dict of 'any'.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_bool_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT || type_any_or_unknown(type))
-	return OK;
-    return check_arg_type(&t_bool, type, context);
+    ଯଦି (type->tt_type == VAR_DICT || type_any_or_unknown(type))
+	ଫେରନ୍ତୁ OK;
+    ଫେରନ୍ତୁ check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' or a blob.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a modifiable list of 'any' or a blob.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    ଯଦି (arg_list_or_blob(type, decl_type, context) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a tuple.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_tuple(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 
 /*
  * Check "type" is a list of 'any', a tuple or a blob.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a string or a number
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a buffer (string or a number)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_buffer(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a buffer or a dict of any
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_buffer_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a line (string or a number)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_lnum(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a string or a list of strings.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_list_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
-    if (type->tt_type != VAR_LIST)
+	ଫେରନ୍ତୁ OK;
+    ଯଦି (type->tt_type != VAR_LIST)
     {
 	arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    if (type->tt_member->tt_type == VAR_ANY
+    ଯଦି (type->tt_member->tt_type == VAR_ANY
 		    || type->tt_member->tt_type == VAR_STRING)
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     arg_type_mismatch(&t_list_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a string or a list of 'any'
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_list_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a string or a dict of 'any'
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a string or a blob
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any' or dict of 'any'.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_dict_or_blob(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  * Also check if "type" is modifiable.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_dict_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    ଯଦି (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_dict_or_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  * Also check the value is modifiable.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_or_dict_or_blob_or_string_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    ଯଦି (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any', a dict of 'any', a blob
  * or a string.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_list_tuple_dict_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr),
 						 context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check second argument of map(), filter(), foreach().
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_map_filter_arg2(
     type_T		*type,
     argcontext_T	*context,
     filtermap_T		filtermap)
 {
-    type_T *expected_member = NULL;
+    type_T *expected_member = ଖାଲି;
     type_T *(args[2]);
-    type_T t_func_exp = {VAR_FUNC, 2, 0, 0, NULL, NULL, args};
+    type_T t_func_exp = {VAR_FUNC, 2, 0, 0, ଖାଲି, ଖାଲି, args};
 
-    if (context->arg_types[0].type_curr->tt_type == VAR_LIST
+    ଯଦି (context->arg_types[0].type_curr->tt_type == VAR_LIST
 	    || context->arg_types[0].type_curr->tt_type == VAR_DICT)
     {
 	// Use the declared type if possible, so that an error is given if
 	// a declared list changes type, but not if a constant list changes
 	// type.
-	if (context->arg_types[0].type_decl->tt_type == VAR_LIST
+	ଯଦି (context->arg_types[0].type_decl->tt_type == VAR_LIST
 		|| context->arg_types[0].type_decl->tt_type == VAR_DICT)
 	    expected_member = context->arg_types[0].type_decl->tt_member;
-	else
+	ଅନ୍ୟଥା
 	    expected_member = context->arg_types[0].type_curr->tt_member;
     }
-    else if (context->arg_types[0].type_curr->tt_type == VAR_STRING)
+    ଅନ୍ୟଥା ଯଦି (context->arg_types[0].type_curr->tt_type == VAR_STRING)
 	expected_member = &t_string;
-    else if (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
-	expected_member = &t_number;
+    ଅନ୍ୟଥା ଯଦି (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
+	expected_member = &t_ସଂଖ୍ୟା;
 
-    args[0] = NULL;
+    args[0] = ଖାଲି;
     args[1] = &t_unknown;
-    if (type->tt_argcount != -1)
+    ଯଦି (type->tt_argcount != -1)
     {
-	if (!(type->tt_argcount == 2 || (type->tt_argcount == 1
+	ଯଦି (!(type->tt_argcount == 2 || (type->tt_argcount == 1
 				    && (type->tt_flags & TTFLAG_VARARGS))))
 	{
-	    emsg(_(e_invalid_number_of_arguments));
-	    return FAIL;
+	    emsg(_(e_invalid_ସଂଖ୍ୟା_of_arguments));
+	    ଫେରନ୍ତୁ FAIL;
 	}
-	if (type->tt_flags & TTFLAG_VARARGS)
+	ଯଦି (type->tt_flags & TTFLAG_VARARGS)
 	    // check the argument types at runtime
 	    t_func_exp.tt_argcount = -1;
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (context->arg_types[0].type_curr->tt_type == VAR_STRING
+	    ଯଦି (context->arg_types[0].type_curr->tt_type == VAR_STRING
 		    || context->arg_types[0].type_curr->tt_type == VAR_BLOB
 		    || context->arg_types[0].type_curr->tt_type == VAR_LIST)
-		args[0] = &t_number;
-	    else if (context->arg_types[0].type_decl->tt_type == VAR_DICT)
+		args[0] = &t_ସଂଖ୍ୟା;
+	    ଅନ୍ୟଥା ଯଦି (context->arg_types[0].type_decl->tt_type == VAR_DICT)
 		args[0] = &t_string;
-	    if (args[0] != NULL)
+	    ଯଦି (args[0] != ଖାଲି)
 		args[1] = expected_member;
 	}
     }
 
-    if (!type_any_or_unknown(type->tt_member) || args[0] != NULL)
+    ଯଦି (!type_any_or_unknown(type->tt_member) || args[0] != ଖାଲି)
     {
 	where_T where = WHERE_INIT;
 
-	if (filtermap == FILTERMAP_MAP)
-	    t_func_exp.tt_member = expected_member == NULL
+	ଯଦି (filtermap == FILTERMAP_MAP)
+	    t_func_exp.tt_member = expected_member == ଖାଲି
 					|| type_any_or_unknown(type->tt_member)
 				? &t_any : expected_member;
-	else if (filtermap == FILTERMAP_FILTER)
+	ଅନ୍ୟଥା ଯଦି (filtermap == FILTERMAP_FILTER)
 	    t_func_exp.tt_member = &t_bool;
-	else // filtermap == FILTERMAP_FOREACH
+	ଅନ୍ୟଥା // filtermap == FILTERMAP_FOREACH
 	    t_func_exp.tt_member = &t_unknown;
-	if (args[0] == NULL)
+	ଯଦି (args[0] == ଖାଲି)
 	    args[0] = &t_unknown;
-	if (type->tt_argcount == -1)
+	ଯଦି (type->tt_argcount == -1)
 	    t_func_exp.tt_argcount = -1;
 
 	where.wt_index = 2;
 	where.wt_kind = WT_ARGUMENT;
-	return check_type(&t_func_exp, type, TRUE, where);
+	ଫେରନ୍ତୁ check_type(&t_func_exp, type, TRUE, where);
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check second argument of filter(): func must return a bool.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_filter_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FILTER);
+    ଯଦି (type->tt_type == VAR_FUNC)
+	ଫେରନ୍ତୁ check_map_filter_arg2(type, context, FILTERMAP_FILTER);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check second argument of map(), the function.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_map_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_MAP);
+    ଯଦି (type->tt_type == VAR_FUNC)
+	ଫେରନ୍ତୁ check_map_filter_arg2(type, context, FILTERMAP_MAP);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check second argument of foreach(), the function.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_foreach_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
+    ଯଦି (type->tt_type == VAR_FUNC)
+	ଫେରନ୍ତୁ check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check second argument of sort() and uniq(), the "how" argument.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    if (type->tt_type == VAR_FUNC)
+    ଯଦି (type->tt_type == VAR_FUNC)
     {
 	type_T *(args[2]);
-	type_T t_func_exp = {VAR_FUNC, 2, 0, 0, &t_number, NULL, args};
+	type_T t_func_exp = {VAR_FUNC, 2, 0, 0, &t_ସଂଖ୍ୟା, ଖାଲି, args};
 
-	if (context->arg_types[0].type_curr->tt_type == VAR_LIST)
+	ଯଦି (context->arg_types[0].type_curr->tt_type == VAR_LIST)
 	    args[0] = context->arg_types[0].type_curr->tt_member;
-	else
+	ଅନ୍ୟଥା
 	    args[0] = &t_unknown;
-	if (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
+	ଯଦି (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
 	{
 	    where_T where = WHERE_INIT;
 
 	    args[1] = args[0];
-	    if (type->tt_argcount == -1)
+	    ଯଦି (type->tt_argcount == -1)
 		t_func_exp.tt_argcount = -1;
 	    where.wt_index = 2;
 	    where.wt_kind = WT_ARGUMENT;
-	    return check_type(&t_func_exp, type, TRUE, where);
+	    ଫେରନ୍ତୁ check_type(&t_func_exp, type, TRUE, where);
 	}
 
-	return OK;
+	ଫେରନ୍ତୁ OK;
     }
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
@@ -909,106 +909,106 @@ arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * Also accept a bool, a constant resulting from compiling a string argument.
  * Also accept a number, one and zero are accepted.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_or_func(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_BOOL
-	    || type->tt_type == VAR_NUMBER
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_func_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check varargs' "type" are class.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 varargs_class(type_T *type UNUSED,
 	      type_T *decl_type UNUSED,
 	      argcontext_T *context)
 {
-    for (int i = context->arg_idx; i < context->arg_count; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = context->arg_idx; i < context->arg_ଗଣନା; ++i)
     {
 	type2_T *types = &context->arg_types[i];
-	if (types->type_curr->tt_type != VAR_CLASS)
+	ଯଦି (types->type_curr->tt_type != VAR_CLASS)
 	{
 	    semsg(_(e_class_or_typealias_required_for_argument_nr), i + 1);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple, a blob or a string.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_list_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a tuple or a modifiable list of 'any' or a blob or a string.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_reverse(type_T *type, type_T *decl_type, argcontext_T *context)
 {
-    if (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    ଯଦି (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a job.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_job, type, context);
+    ଫେରନ୍ତୁ check_arg_type(&t_job, type, context);
 }
 
 /*
  * Check "type" is a channel or a job.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_chan_or_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_CHANNEL
+    ଯଦି (type->tt_type == VAR_CHANNEL
 	    || type->tt_type == VAR_JOB
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_channel, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" can be used as the type_decl of the previous argument.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_decl;
 
-    return check_arg_type(prev_type, type, context);
+    ଫେରନ୍ତୁ check_arg_type(prev_type, type, context);
 }
 
 /*
@@ -1016,7 +1016,7 @@ arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * dict vs other type, but not member type.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_same_struct_as_prev(
     type_T		*type,
     type_T		*decl_type UNUSED,
@@ -1024,931 +1024,931 @@ arg_same_struct_as_prev(
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
-	return check_arg_type(prev_type, type, context);
-    return OK;
+    ଯଦି (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
+	ଫେରନ୍ତୁ check_arg_type(prev_type, type, context);
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check "type" is an item of the list or blob of the previous arg.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_item_of_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
     type_T *expected;
 
-    if (prev_type->tt_type == VAR_LIST)
+    ଯଦି (prev_type->tt_type == VAR_LIST)
 	expected = prev_type->tt_member;
-    else if (prev_type->tt_type == VAR_BLOB)
-	expected = &t_number;
-    else
+    ଅନ୍ୟଥା ଯଦି (prev_type->tt_type == VAR_BLOB)
+	expected = &t_ସଂଖ୍ୟା;
+    ଅନ୍ୟଥା
 	// probably VAR_ANY, can't check
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    return check_arg_type(expected, type, context);
+    ଫେରନ୍ତୁ check_arg_type(expected, type, context);
 }
 
 /*
  * Check "type" is a string or a number or a list
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_str_or_nr_or_list(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any' or a string
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_dict_any_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT
+    ଯଦି (type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the third argument of extend() (number or string or
  * any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_extend3(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 2].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string(type, decl_type, context);
-    return OK;
+    ଯଦି (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	ଫେରନ୍ତୁ arg_ସଂଖ୍ୟା(type, decl_type, context);
+    ଯଦି (first_type->tt_type == VAR_DICT)
+	ଫେରନ୍ତୁ arg_string(type, decl_type, context);
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check "type" which is the first argument of get() (a blob, a list, a tuple,
  * a dict or a funcref)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_get1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BLOB
+    ଯଦି (type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the first argument of len() (a string, a number, a
  * blob, a list, a tuple, a dict or an object)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_len1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the second argument of remove() (number or string or
  * any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_remove2(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string_or_nr(type, decl_type, context);
-    return OK;
+    ଯଦି (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	ଫେରନ୍ତୁ arg_ସଂଖ୍ୟା(type, decl_type, context);
+    ଯଦି (first_type->tt_type == VAR_DICT)
+	ଫେରନ୍ତୁ arg_string_or_nr(type, decl_type, context);
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Check "type" which is the first argument of repeat() (a string, a number, a
  * blob, a list, a tuple or any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_repeat1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
-	    || type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_STRING
+	    || type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the first argument of slice() (a list, a tuple, a
  * blob, a string or any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_slice1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    ଯଦି (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the first argument of count() (a string, a list, a
  * tuple, a dict or any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_string_list_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    ଯଦି (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
     semsg(_(e_string_list_tuple_or_dict_required_for_argument_nr),
 							 context->arg_idx + 1);
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Check "type" which is the first argument of cursor() (number or string or
  * list or any)
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 arg_cursor1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_NUMBER
+    ଯଦି (type->tt_type == VAR_ସଂଖ୍ୟା
 	    || type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	ଫେରନ୍ତୁ OK;
 
-    arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    arg_type_mismatch(&t_ସଂଖ୍ୟା, type, context->arg_idx + 1);
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
  * Lists of functions that check the argument types of a builtin function.
  */
-static argcheck_T arg1_blob[] = {arg_blob};
-static argcheck_T arg1_bool[] = {arg_bool};
-static argcheck_T arg1_buffer[] = {arg_buffer};
-static argcheck_T arg1_buffer_or_dict_any[] = {arg_buffer_or_dict_any};
-static argcheck_T arg1_chan_or_job[] = {arg_chan_or_job};
-static argcheck_T arg1_dict_any[] = {arg_dict_any};
-static argcheck_T arg1_dict_or_string[] = {arg_dict_any_or_string};
-static argcheck_T arg1_float_or_nr[] = {arg_float_or_nr};
-static argcheck_T arg1_job[] = {arg_job};
-static argcheck_T arg1_list_any[] = {arg_list_any};
-static argcheck_T arg1_tuple_any[] = {arg_tuple_any};
-static argcheck_T arg1_list_number[] = {arg_list_number};
-static argcheck_T arg1_reverse[] = {arg_reverse};
-static argcheck_T arg1_list_or_tuple_or_dict[] = {arg_list_or_tuple_or_dict};
-static argcheck_T arg1_list_string[] = {arg_list_string};
-static argcheck_T arg1_list_tuple_dict_blob_or_string[] = {arg_list_tuple_dict_blob_or_string};
-static argcheck_T arg1_lnum[] = {arg_lnum};
-static argcheck_T arg1_number[] = {arg_number};
-static argcheck_T arg1_string[] = {arg_string};
-static argcheck_T arg1_string_or_list_any[] = {arg_string_or_list_any};
-static argcheck_T arg1_string_or_list_string[] = {arg_string_or_list_string};
-static argcheck_T arg1_string_or_nr[] = {arg_string_or_nr};
-static argcheck_T arg1_string_or_blob[] = {arg_string_or_blob};
-static argcheck_T arg2_buffer_any[] = {arg_buffer, arg_any};
-static argcheck_T arg2_buffer_bool[] = {arg_buffer, arg_bool};
-static argcheck_T arg2_buffer_list_any[] = {arg_buffer, arg_list_any};
-static argcheck_T arg2_buffer_lnum[] = {arg_buffer, arg_lnum};
-static argcheck_T arg2_buffer_number[] = {arg_buffer, arg_number};
-static argcheck_T arg2_buffer_string[] = {arg_buffer, arg_string};
-static argcheck_T arg2_chan_or_job_dict[] = {arg_chan_or_job, arg_dict_any};
-static argcheck_T arg2_chan_or_job_string[] = {arg_chan_or_job, arg_string};
-static argcheck_T arg2_dict_any_list_any[] = {arg_dict_any, arg_list_any};
-static argcheck_T arg2_dict_any_string_or_nr[] = {arg_dict_any, arg_string_or_nr};
-static argcheck_T arg2_dict_string[] = {arg_dict_any, arg_string};
-static argcheck_T arg2_float_or_nr[] = {arg_float_or_nr, arg_float_or_nr};
-static argcheck_T arg2_job_dict[] = {arg_job, arg_dict_any};
-static argcheck_T arg2_job_string_or_number[] = {arg_job, arg_string_or_nr};
-static argcheck_T arg2_list_any_number[] = {arg_list_any, arg_number};
-static argcheck_T arg2_list_number[] = {arg_list_number, arg_list_number};
-static argcheck_T arg2_list_number_bool[] = {arg_list_number, arg_bool};
-static argcheck_T arg2_list_string_dict[] = {arg_list_string, arg_dict_any};
-static argcheck_T arg2_listblobmod_item[] = {arg_list_or_blob_mod, arg_item_of_prev};
-static argcheck_T arg2_lnum[] = {arg_lnum, arg_lnum};
-static argcheck_T arg2_lnum_number[] = {arg_lnum, arg_number};
-static argcheck_T arg2_number[] = {arg_number, arg_number};
-static argcheck_T arg2_number_any[] = {arg_number, arg_any};
-static argcheck_T arg2_number_bool[] = {arg_number, arg_bool};
-static argcheck_T arg2_number_dict_any[] = {arg_number, arg_dict_any};
-static argcheck_T arg2_number_list[] = {arg_number, arg_list_any};
-static argcheck_T arg2_number_string[] = {arg_number, arg_string};
-static argcheck_T arg2_number_buffer[] = {arg_number, arg_buffer};
-static argcheck_T arg2_number_string_or_list[] = {arg_number, arg_string_or_list_any};
-static argcheck_T arg2_str_or_nr_or_list_dict[] = {arg_str_or_nr_or_list, arg_dict_any};
-static argcheck_T arg2_string[] = {arg_string, arg_string};
-static argcheck_T arg2_string_any[] = {arg_string, arg_any};
-static argcheck_T arg2_string_bool[] = {arg_string, arg_bool};
-static argcheck_T arg2_string_chan_or_job[] = {arg_string, arg_chan_or_job};
-static argcheck_T arg2_string_dict[] = {arg_string, arg_dict_any};
-static argcheck_T arg2_string_list_number[] = {arg_string, arg_list_number};
-static argcheck_T arg2_string_number[] = {arg_string, arg_number};
-static argcheck_T arg2_string_or_list_dict[] = {arg_string_or_list_any, arg_dict_any};
-static argcheck_T arg2_string_or_list_number[] = {arg_string_or_list_any, arg_number};
-static argcheck_T arg2_string_string_or_number[] = {arg_string, arg_string_or_nr};
-static argcheck_T arg2_blob_dict[] = {arg_blob, arg_dict_any};
-static argcheck_T arg2_list_or_tuple_string[] = {arg_list_or_tuple, arg_string};
-static argcheck_T arg3_any_buffer_bool_or_dict[] = {
+ସ୍ଥିର argcheck_T arg1_blob[] = {arg_blob};
+ସ୍ଥିର argcheck_T arg1_bool[] = {arg_bool};
+ସ୍ଥିର argcheck_T arg1_buffer[] = {arg_buffer};
+ସ୍ଥିର argcheck_T arg1_buffer_or_dict_any[] = {arg_buffer_or_dict_any};
+ସ୍ଥିର argcheck_T arg1_chan_or_job[] = {arg_chan_or_job};
+ସ୍ଥିର argcheck_T arg1_dict_any[] = {arg_dict_any};
+ସ୍ଥିର argcheck_T arg1_dict_or_string[] = {arg_dict_any_or_string};
+ସ୍ଥିର argcheck_T arg1_float_or_nr[] = {arg_float_or_nr};
+ସ୍ଥିର argcheck_T arg1_job[] = {arg_job};
+ସ୍ଥିର argcheck_T arg1_list_any[] = {arg_list_any};
+ସ୍ଥିର argcheck_T arg1_tuple_any[] = {arg_tuple_any};
+ସ୍ଥିର argcheck_T arg1_list_ସଂଖ୍ୟା[] = {arg_list_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg1_reverse[] = {arg_reverse};
+ସ୍ଥିର argcheck_T arg1_list_or_tuple_or_dict[] = {arg_list_or_tuple_or_dict};
+ସ୍ଥିର argcheck_T arg1_list_string[] = {arg_list_string};
+ସ୍ଥିର argcheck_T arg1_list_tuple_dict_blob_or_string[] = {arg_list_tuple_dict_blob_or_string};
+ସ୍ଥିର argcheck_T arg1_lnum[] = {arg_lnum};
+ସ୍ଥିର argcheck_T arg1_ସଂଖ୍ୟା[] = {arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg1_string[] = {arg_string};
+ସ୍ଥିର argcheck_T arg1_string_or_list_any[] = {arg_string_or_list_any};
+ସ୍ଥିର argcheck_T arg1_string_or_list_string[] = {arg_string_or_list_string};
+ସ୍ଥିର argcheck_T arg1_string_or_nr[] = {arg_string_or_nr};
+ସ୍ଥିର argcheck_T arg1_string_or_blob[] = {arg_string_or_blob};
+ସ୍ଥିର argcheck_T arg2_buffer_any[] = {arg_buffer, arg_any};
+ସ୍ଥିର argcheck_T arg2_buffer_bool[] = {arg_buffer, arg_bool};
+ସ୍ଥିର argcheck_T arg2_buffer_list_any[] = {arg_buffer, arg_list_any};
+ସ୍ଥିର argcheck_T arg2_buffer_lnum[] = {arg_buffer, arg_lnum};
+ସ୍ଥିର argcheck_T arg2_buffer_ସଂଖ୍ୟା[] = {arg_buffer, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_buffer_string[] = {arg_buffer, arg_string};
+ସ୍ଥିର argcheck_T arg2_chan_or_job_dict[] = {arg_chan_or_job, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_chan_or_job_string[] = {arg_chan_or_job, arg_string};
+ସ୍ଥିର argcheck_T arg2_dict_any_list_any[] = {arg_dict_any, arg_list_any};
+ସ୍ଥିର argcheck_T arg2_dict_any_string_or_nr[] = {arg_dict_any, arg_string_or_nr};
+ସ୍ଥିର argcheck_T arg2_dict_string[] = {arg_dict_any, arg_string};
+ସ୍ଥିର argcheck_T arg2_float_or_nr[] = {arg_float_or_nr, arg_float_or_nr};
+ସ୍ଥିର argcheck_T arg2_job_dict[] = {arg_job, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_job_string_or_ସଂଖ୍ୟା[] = {arg_job, arg_string_or_nr};
+ସ୍ଥିର argcheck_T arg2_list_any_ସଂଖ୍ୟା[] = {arg_list_any, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_list_ସଂଖ୍ୟା[] = {arg_list_ସଂଖ୍ୟା, arg_list_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_list_ସଂଖ୍ୟା_bool[] = {arg_list_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg2_list_string_dict[] = {arg_list_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_listblobmod_item[] = {arg_list_or_blob_mod, arg_item_of_prev};
+ସ୍ଥିର argcheck_T arg2_lnum[] = {arg_lnum, arg_lnum};
+ସ୍ଥିର argcheck_T arg2_lnum_ସଂଖ୍ୟା[] = {arg_lnum, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା[] = {arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_any[] = {arg_ସଂଖ୍ୟା, arg_any};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_bool[] = {arg_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_dict_any[] = {arg_ସଂଖ୍ୟା, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_list[] = {arg_ସଂଖ୍ୟା, arg_list_any};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_string[] = {arg_ସଂଖ୍ୟା, arg_string};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_buffer[] = {arg_ସଂଖ୍ୟା, arg_buffer};
+ସ୍ଥିର argcheck_T arg2_ସଂଖ୍ୟା_string_or_list[] = {arg_ସଂଖ୍ୟା, arg_string_or_list_any};
+ସ୍ଥିର argcheck_T arg2_str_or_nr_or_list_dict[] = {arg_str_or_nr_or_list, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_string[] = {arg_string, arg_string};
+ସ୍ଥିର argcheck_T arg2_string_any[] = {arg_string, arg_any};
+ସ୍ଥିର argcheck_T arg2_string_bool[] = {arg_string, arg_bool};
+ସ୍ଥିର argcheck_T arg2_string_chan_or_job[] = {arg_string, arg_chan_or_job};
+ସ୍ଥିର argcheck_T arg2_string_dict[] = {arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_string_list_ସଂଖ୍ୟା[] = {arg_string, arg_list_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_string_ସଂଖ୍ୟା[] = {arg_string, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_string_or_list_dict[] = {arg_string_or_list_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_string_or_list_ସଂଖ୍ୟା[] = {arg_string_or_list_any, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_string_string_or_ସଂଖ୍ୟା[] = {arg_string, arg_string_or_nr};
+ସ୍ଥିର argcheck_T arg2_blob_dict[] = {arg_blob, arg_dict_any};
+ସ୍ଥିର argcheck_T arg2_list_or_tuple_string[] = {arg_list_or_tuple, arg_string};
+ସ୍ଥିର argcheck_T arg3_any_buffer_bool_or_dict[] = {
 			      arg_any, arg_buffer, arg_bool_or_dict_any};
-static argcheck_T arg3_any_list_dict[] = {arg_any, arg_list_any, arg_dict_any};
-static argcheck_T arg3_buffer_lnum_lnum[] = {arg_buffer, arg_lnum, arg_lnum};
-static argcheck_T arg3_buffer_number_number[] = {arg_buffer, arg_number, arg_number};
-static argcheck_T arg3_buffer_string_any[] = {arg_buffer, arg_string, arg_any};
-static argcheck_T arg3_buffer_string_dict[] = {arg_buffer, arg_string, arg_dict_any};
-static argcheck_T arg3_dict_number_number[] = {arg_dict_any, arg_number, arg_number};
-static argcheck_T arg3_diff[] = {arg_list_string, arg_list_string, arg_dict_any};
-static argcheck_T arg3_list_string_dict[] = {arg_list_any, arg_string, arg_dict_any};
-static argcheck_T arg3_list_list_dict[] = {arg_list_any, arg_list_any, arg_dict_any};
-static argcheck_T arg3_lnum_number_bool[] = {arg_lnum, arg_number, arg_bool};
-static argcheck_T arg3_number[] = {arg_number, arg_number, arg_number};
-static argcheck_T arg3_number_any_dict[] = {arg_number, arg_any, arg_dict_any};
-static argcheck_T arg3_number_number_dict[] = {arg_number, arg_number, arg_dict_any};
-static argcheck_T arg3_number_string_any[] = {arg_number, arg_string, arg_any};
-static argcheck_T arg3_number_string_buffer[] = {arg_number, arg_string, arg_buffer};
-static argcheck_T arg3_number_string_string[] = {arg_number, arg_string, arg_string};
-static argcheck_T arg3_string[] = {arg_string, arg_string, arg_string};
-static argcheck_T arg3_string_any_dict[] = {arg_string, arg_any, arg_dict_any};
-static argcheck_T arg3_string_any_string[] = {arg_string, arg_any, arg_string};
-static argcheck_T arg3_string_bool_bool[] = {arg_string, arg_bool, arg_bool};
-static argcheck_T arg3_string_number_bool[] = {arg_string, arg_number, arg_bool};
-static argcheck_T arg3_string_number_number[] = {arg_string, arg_number, arg_number};
-static argcheck_T arg3_string_or_dict_bool_dict[] = {arg_string_or_dict_any, arg_bool, arg_dict_any};
-static argcheck_T arg3_string_or_list_bool_number[] = {arg_string_or_list_any, arg_bool, arg_number};
-static argcheck_T arg3_string_string_bool[] = {arg_string, arg_string, arg_bool};
-static argcheck_T arg3_string_string_dict[] = {arg_string, arg_string, arg_dict_any};
-static argcheck_T arg3_string_string_number[] = {arg_string, arg_string, arg_number};
-static argcheck_T arg4_number_number_string_any[] = {arg_number, arg_number, arg_string, arg_any};
-static argcheck_T arg4_string_string_any_string[] = {arg_string, arg_string, arg_any, arg_string};
-static argcheck_T arg4_string_string_number_string[] = {arg_string, arg_string, arg_number, arg_string};
-static argcheck_T arg4_string_number_bool_bool[] = {arg_string, arg_number, arg_bool, arg_bool};
+ସ୍ଥିର argcheck_T arg3_any_list_dict[] = {arg_any, arg_list_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_buffer_lnum_lnum[] = {arg_buffer, arg_lnum, arg_lnum};
+ସ୍ଥିର argcheck_T arg3_buffer_ସଂଖ୍ୟା_ସଂଖ୍ୟା[] = {arg_buffer, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_buffer_string_any[] = {arg_buffer, arg_string, arg_any};
+ସ୍ଥିର argcheck_T arg3_buffer_string_dict[] = {arg_buffer, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_dict_ସଂଖ୍ୟା_ସଂଖ୍ୟା[] = {arg_dict_any, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_diff[] = {arg_list_string, arg_list_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_list_string_dict[] = {arg_list_any, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_list_list_dict[] = {arg_list_any, arg_list_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_lnum_ସଂଖ୍ୟା_bool[] = {arg_lnum, arg_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା[] = {arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା_any_dict[] = {arg_ସଂଖ୍ୟା, arg_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା_ସଂଖ୍ୟା_dict[] = {arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା_string_any[] = {arg_ସଂଖ୍ୟା, arg_string, arg_any};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା_string_buffer[] = {arg_ସଂଖ୍ୟା, arg_string, arg_buffer};
+ସ୍ଥିର argcheck_T arg3_ସଂଖ୍ୟା_string_string[] = {arg_ସଂଖ୍ୟା, arg_string, arg_string};
+ସ୍ଥିର argcheck_T arg3_string[] = {arg_string, arg_string, arg_string};
+ସ୍ଥିର argcheck_T arg3_string_any_dict[] = {arg_string, arg_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_string_any_string[] = {arg_string, arg_any, arg_string};
+ସ୍ଥିର argcheck_T arg3_string_bool_bool[] = {arg_string, arg_bool, arg_bool};
+ସ୍ଥିର argcheck_T arg3_string_ସଂଖ୍ୟା_bool[] = {arg_string, arg_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg3_string_ସଂଖ୍ୟା_ସଂଖ୍ୟା[] = {arg_string, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_string_or_dict_bool_dict[] = {arg_string_or_dict_any, arg_bool, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_string_or_list_bool_ସଂଖ୍ୟା[] = {arg_string_or_list_any, arg_bool, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_string_string_bool[] = {arg_string, arg_string, arg_bool};
+ସ୍ଥିର argcheck_T arg3_string_string_dict[] = {arg_string, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg3_string_string_ସଂଖ୍ୟା[] = {arg_string, arg_string, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg4_ସଂଖ୍ୟା_ସଂଖ୍ୟା_string_any[] = {arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_string, arg_any};
+ସ୍ଥିର argcheck_T arg4_string_string_any_string[] = {arg_string, arg_string, arg_any, arg_string};
+ସ୍ଥିର argcheck_T arg4_string_string_ସଂଖ୍ୟା_string[] = {arg_string, arg_string, arg_ସଂଖ୍ୟା, arg_string};
+ସ୍ଥିର argcheck_T arg4_string_ସଂଖ୍ୟା_bool_bool[] = {arg_string, arg_ସଂଖ୍ୟା, arg_bool, arg_bool};
 /* Function specific argument types (not covered by the above) */
-static argcheck_T arg15_assert_fails[] = {arg_string_or_nr, arg_string_or_list_any, arg_any, arg_number, arg_string};
-static argcheck_T arg34_assert_inrange[] = {arg_float_or_nr, arg_float_or_nr, arg_float_or_nr, arg_string};
-static argcheck_T arg4_browse[] = {arg_bool, arg_string, arg_string, arg_string};
-static argcheck_T arg23_chanexpr[] = {arg_chan_or_job, arg_any, arg_dict_any};
-static argcheck_T arg23_chanraw[] = {arg_chan_or_job, arg_string_or_blob, arg_dict_any};
-static argcheck_T arg24_count[] = {arg_string_list_tuple_or_dict, arg_any, arg_bool, arg_number};
-static argcheck_T arg13_cursor[] = {arg_cursor1, arg_number, arg_number};
-static argcheck_T arg12_deepcopy[] = {arg_any, arg_bool};
-static argcheck_T arg12_execute[] = {arg_string_or_list_string, arg_string};
-static argcheck_T arg12_getchar[] = {arg_bool_or_nr, arg_dict_any};
-static argcheck_T arg23_extend[] = {arg_list_or_dict_or_blob_mod, arg_same_as_prev, arg_extend3};
-static argcheck_T arg23_extendnew[] = {arg_list_or_dict_or_blob, arg_same_struct_as_prev, arg_extend3};
-static argcheck_T arg23_get[] = {arg_get1, arg_string_or_nr, arg_any};
-static argcheck_T arg14_glob[] = {arg_string, arg_bool, arg_bool, arg_bool};
-static argcheck_T arg25_globpath[] = {arg_string, arg_string, arg_bool, arg_bool, arg_bool};
-static argcheck_T arg24_index[] = {arg_list_or_tuple_or_blob, arg_item_of_prev, arg_number, arg_bool};
-static argcheck_T arg23_index[] = {arg_list_or_tuple_or_blob, arg_filter_func, arg_dict_any};
-static argcheck_T arg23_insert[] = {arg_list_or_blob, arg_item_of_prev, arg_number};
-static argcheck_T arg1_len[] = {arg_len1};
-static argcheck_T arg3_libcall[] = {arg_string, arg_string, arg_string_or_nr};
-static argcheck_T arg14_maparg[] = {arg_string, arg_string, arg_bool, arg_bool};
-static argcheck_T arg2_filter[] = {arg_list_or_dict_or_blob_or_string_mod, arg_filter_func};
-static argcheck_T arg2_foreach[] = {arg_list_tuple_dict_blob_or_string, arg_foreach_func};
-static argcheck_T arg2_instanceof[] = {arg_object, varargs_class, NULL };
-static argcheck_T arg2_map[] = {arg_list_or_dict_or_blob_or_string_mod, arg_map_func};
-static argcheck_T arg2_mapnew[] = {arg_list_or_dict_or_blob_or_string, arg_any};
-static argcheck_T arg25_matchadd[] = {arg_string, arg_string, arg_number, arg_number, arg_dict_any};
-static argcheck_T arg25_matchaddpos[] = {arg_string, arg_list_any, arg_number, arg_number, arg_dict_any};
-static argcheck_T arg23_matchstrlist[] = {arg_list_string, arg_string, arg_dict_any};
-static argcheck_T arg45_matchbufline[] = {arg_buffer, arg_string, arg_lnum, arg_lnum, arg_dict_any};
-static argcheck_T arg119_printf[] = {arg_string_or_nr, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any};
-static argcheck_T arg23_reduce[] = {arg_string_list_tuple_or_blob, arg_any, arg_any};
-static argcheck_T arg24_remote_expr[] = {arg_string, arg_string, arg_string, arg_number};
-static argcheck_T arg23_remove[] = {arg_list_or_dict_or_blob_mod, arg_remove2, arg_number};
-static argcheck_T arg2_repeat[] = {arg_repeat1, arg_number};
-static argcheck_T arg15_search[] = {arg_string, arg_string, arg_number, arg_number, arg_string_or_func};
-static argcheck_T arg37_searchpair[] = {arg_string, arg_string, arg_string, arg_string, arg_string_or_func, arg_number, arg_number};
-static argcheck_T arg3_setbufline[] = {arg_buffer, arg_lnum, arg_str_or_nr_or_list};
-static argcheck_T arg2_setline[] = {arg_lnum, arg_any};
-static argcheck_T arg24_setloclist[] = {arg_number, arg_list_any, arg_string, arg_dict_any};
-static argcheck_T arg13_setqflist[] = {arg_list_any, arg_string, arg_dict_any};
-static argcheck_T arg23_settagstack[] = {arg_number, arg_dict_any, arg_string};
-static argcheck_T arg02_sign_getplaced[] = {arg_buffer, arg_dict_any};
-static argcheck_T arg45_sign_place[] = {arg_number, arg_string, arg_string, arg_buffer, arg_dict_any};
-static argcheck_T arg23_slice[] = {arg_slice1, arg_number, arg_number};
-static argcheck_T arg13_sortuniq[] = {arg_list_any_mod, arg_sort_how, arg_dict_any};
-static argcheck_T arg24_strpart[] = {arg_string, arg_number, arg_number, arg_bool};
-static argcheck_T arg12_system[] = {arg_string_or_list_any, arg_str_or_nr_or_list};
-static argcheck_T arg23_win_execute[] = {arg_number, arg_string_or_list_string, arg_string};
-static argcheck_T arg23_writefile[] = {arg_list_or_blob, arg_string, arg_string};
-static argcheck_T arg24_match_func[] = {arg_string_or_list_any, arg_string, arg_number, arg_number};
+ସ୍ଥିର argcheck_T arg15_assert_fails[] = {arg_string_or_nr, arg_string_or_list_any, arg_any, arg_ସଂଖ୍ୟା, arg_string};
+ସ୍ଥିର argcheck_T arg34_assert_inrange[] = {arg_float_or_nr, arg_float_or_nr, arg_float_or_nr, arg_string};
+ସ୍ଥିର argcheck_T arg4_browse[] = {arg_bool, arg_string, arg_string, arg_string};
+ସ୍ଥିର argcheck_T arg23_chanexpr[] = {arg_chan_or_job, arg_any, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_chanraw[] = {arg_chan_or_job, arg_string_or_blob, arg_dict_any};
+ସ୍ଥିର argcheck_T arg24_ଗଣନା[] = {arg_string_list_tuple_or_dict, arg_any, arg_bool, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg13_cursor[] = {arg_cursor1, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg12_deepcopy[] = {arg_any, arg_bool};
+ସ୍ଥିର argcheck_T arg12_execute[] = {arg_string_or_list_string, arg_string};
+ସ୍ଥିର argcheck_T arg12_getchar[] = {arg_bool_or_nr, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_extend[] = {arg_list_or_dict_or_blob_mod, arg_same_as_prev, arg_extend3};
+ସ୍ଥିର argcheck_T arg23_extendnew[] = {arg_list_or_dict_or_blob, arg_same_struct_as_prev, arg_extend3};
+ସ୍ଥିର argcheck_T arg23_get[] = {arg_get1, arg_string_or_nr, arg_any};
+ସ୍ଥିର argcheck_T arg14_glob[] = {arg_string, arg_bool, arg_bool, arg_bool};
+ସ୍ଥିର argcheck_T arg25_globpath[] = {arg_string, arg_string, arg_bool, arg_bool, arg_bool};
+ସ୍ଥିର argcheck_T arg24_index[] = {arg_list_or_tuple_or_blob, arg_item_of_prev, arg_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg23_index[] = {arg_list_or_tuple_or_blob, arg_filter_func, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_ଭର୍ତ୍ତି[] = {arg_list_or_blob, arg_item_of_prev, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg1_len[] = {arg_len1};
+ସ୍ଥିର argcheck_T arg3_libcall[] = {arg_string, arg_string, arg_string_or_nr};
+ସ୍ଥିର argcheck_T arg14_maparg[] = {arg_string, arg_string, arg_bool, arg_bool};
+ସ୍ଥିର argcheck_T arg2_filter[] = {arg_list_or_dict_or_blob_or_string_mod, arg_filter_func};
+ସ୍ଥିର argcheck_T arg2_foreach[] = {arg_list_tuple_dict_blob_or_string, arg_foreach_func};
+ସ୍ଥିର argcheck_T arg2_instanceof[] = {arg_object, varargs_class, ଖାଲି };
+ସ୍ଥିର argcheck_T arg2_map[] = {arg_list_or_dict_or_blob_or_string_mod, arg_map_func};
+ସ୍ଥିର argcheck_T arg2_mapnew[] = {arg_list_or_dict_or_blob_or_string, arg_any};
+ସ୍ଥିର argcheck_T arg25_matchadd[] = {arg_string, arg_string, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_dict_any};
+ସ୍ଥିର argcheck_T arg25_matchaddpos[] = {arg_string, arg_list_any, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_matchstrlist[] = {arg_list_string, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg45_matchbufline[] = {arg_buffer, arg_string, arg_lnum, arg_lnum, arg_dict_any};
+ସ୍ଥିର argcheck_T arg119_printf[] = {arg_string_or_nr, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any, arg_any};
+ସ୍ଥିର argcheck_T arg23_reduce[] = {arg_string_list_tuple_or_blob, arg_any, arg_any};
+ସ୍ଥିର argcheck_T arg24_remote_ପଦସମଷ୍ଟି[] = {arg_string, arg_string, arg_string, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg23_remove[] = {arg_list_or_dict_or_blob_mod, arg_remove2, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg2_repeat[] = {arg_repeat1, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg15_ସନ୍ଧାନ[] = {arg_string, arg_string, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_string_or_func};
+ସ୍ଥିର argcheck_T arg37_searchpair[] = {arg_string, arg_string, arg_string, arg_string, arg_string_or_func, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg3_setbufline[] = {arg_buffer, arg_lnum, arg_str_or_nr_or_list};
+ସ୍ଥିର argcheck_T arg2_setline[] = {arg_lnum, arg_any};
+ସ୍ଥିର argcheck_T arg24_setloclist[] = {arg_ସଂଖ୍ୟା, arg_list_any, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg13_setqflist[] = {arg_list_any, arg_string, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_settagstack[] = {arg_ସଂଖ୍ୟା, arg_dict_any, arg_string};
+ସ୍ଥିର argcheck_T arg02_sign_getplaced[] = {arg_buffer, arg_dict_any};
+ସ୍ଥିର argcheck_T arg45_sign_place[] = {arg_ସଂଖ୍ୟା, arg_string, arg_string, arg_buffer, arg_dict_any};
+ସ୍ଥିର argcheck_T arg23_slice[] = {arg_slice1, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
+ସ୍ଥିର argcheck_T arg13_sortuniq[] = {arg_list_any_mod, arg_sort_how, arg_dict_any};
+ସ୍ଥିର argcheck_T arg24_strpart[] = {arg_string, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା, arg_bool};
+ସ୍ଥିର argcheck_T arg12_system[] = {arg_string_or_list_any, arg_str_or_nr_or_list};
+ସ୍ଥିର argcheck_T arg23_win_execute[] = {arg_ସଂଖ୍ୟା, arg_string_or_list_string, arg_string};
+ସ୍ଥିର argcheck_T arg23_writefile[] = {arg_list_or_blob, arg_string, arg_string};
+ସ୍ଥିର argcheck_T arg24_match_func[] = {arg_string_or_list_any, arg_string, arg_ସଂଖ୍ୟା, arg_ସଂଖ୍ୟା};
 
 // Can be used by functions called through "f_retfunc" to create new types.
-static garray_T *current_type_gap = NULL;
+ସ୍ଥିର garray_T *current_type_gap = ଖାଲି;
 
 /*
  * Functions that return the return type of a builtin function.
  * Note that "argtypes" is NULL if "argcount" is zero.
  */
-    static type_T *
-ret_void(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_void(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_void;
+    ଫେରନ୍ତୁ &t_void;
 }
-    static type_T *
-ret_any(int	argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା	argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
-    static type_T *
-ret_bool(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_bool(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_bool;
+    ଫେରନ୍ତୁ &t_bool;
 }
-    static type_T *
-ret_number_bool(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_ସଂଖ୍ୟା_bool(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number_bool;
+    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା_bool;
 }
-    static type_T *
-ret_number(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_ସଂଖ୍ୟା(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number;
+    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା;
 }
-    static type_T *
-ret_float(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_float(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_float;
+    ଫେରନ୍ତୁ &t_float;
 }
-    static type_T *
-ret_string(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_string(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_string;
+    ଫେରନ୍ତୁ &t_string;
 }
-    static type_T *
-ret_list_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_list_any;
+    ଫେରନ୍ତୁ &t_list_any;
 }
-    static type_T *
-ret_list_number(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_ସଂଖ୍ୟା(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_number;
+    ଫେରନ୍ତୁ &t_list_ସଂଖ୍ୟା;
 }
-    static type_T *
-ret_list_string(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_string(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_string;
+    ଫେରନ୍ତୁ &t_list_string;
 }
-    static type_T *
-ret_list_dict_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_dict_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    ଫେରନ୍ତୁ &t_list_dict_any;
 }
-    static type_T *
-ret_list_items(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_ବସ୍ତୁଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    ଫେରନ୍ତୁ &t_list_list_any;
 }
-    static type_T *
-ret_list_list_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_list_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    ଫେରନ୍ତୁ &t_list_list_any;
 }
-    static type_T *
-ret_list_string_items(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_string_ବସ୍ତୁଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_string;
+    ଫେରନ୍ତୁ &t_list_list_string;
 }
-    static type_T *
-ret_list_regionpos(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_list_regionpos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_list_number;
+    ଫେରନ୍ତୁ &t_list_list_list_ସଂଖ୍ୟା;
 }
-    static type_T *
-ret_tuple_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_tuple_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_tuple_any;
+    ଫେରନ୍ତୁ &t_tuple_any;
 }
-    static type_T *
-ret_dict_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_dict_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_any;
+    ଫେରନ୍ତୁ &t_dict_any;
 }
-    static type_T *
-ret_job_info(int argcount,
+    ସ୍ଥିର type_T *
+ret_job_info(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount == 0)
+    ଯଦି (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_job;
+	ଫେରନ୍ତୁ &t_list_job;
     }
-    return &t_dict_any;
+    ଫେରନ୍ତୁ &t_dict_any;
 }
-    static type_T *
-ret_dict_number(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_dict_ସଂଖ୍ୟା(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_number;
+    ଫେରନ୍ତୁ &t_dict_ସଂଖ୍ୟା;
 }
-    static type_T *
-ret_dict_string(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_dict_string(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_string;
+    ଫେରନ୍ତୁ &t_dict_string;
 }
-    static type_T *
-ret_blob(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_blob(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_blob;
+    ଫେରନ୍ତୁ &t_blob;
 }
-    static type_T *
-ret_func_any(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_func_any(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_any;
+    ଫେରନ୍ତୁ &t_func_any;
 }
-    static type_T *
-ret_func_unknown(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_func_unknown(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_unknown;
+    ଫେରନ୍ତୁ &t_func_unknown;
 }
-    static type_T *
-ret_channel(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_channel(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_channel;
+    ଫେରନ୍ତୁ &t_channel;
 }
-    static type_T *
-ret_job(int argcount UNUSED,
+    ସ୍ଥିର type_T *
+ret_job(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_job;
+    ଫେରନ୍ତୁ &t_job;
 }
-    static type_T *
-ret_first_arg(int argcount,
+    ସ୍ଥିର type_T *
+ret_first_arg(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
-	return argtypes[0].type_curr;
+	ଫେରନ୍ତୁ argtypes[0].type_curr;
     }
-    return &t_void;
+    ଫେରନ୍ତୁ &t_void;
 }
-    static type_T *
-ret_slice(int argcount,
+    ସ୍ଥିର type_T *
+ret_slice(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	ଯଦି (argtypes[0].type_decl != ଖାଲି)
 	{
-	    switch (argtypes[0].type_decl->tt_type)
+	    ବାଛ (argtypes[0].type_decl->tt_type)
 	    {
-		case VAR_STRING: *decl_type = &t_string; break;
-		case VAR_BLOB: *decl_type = &t_blob; break;
-		case VAR_LIST: *decl_type = &t_list_any; break;
-		case VAR_TUPLE: *decl_type = &t_tuple_any; break;
-		default: break;
+		ସ୍ଥିତି VAR_STRING: *decl_type = &t_string; ଭାଙ୍ଗ;
+		ସ୍ଥିତି VAR_BLOB: *decl_type = &t_blob; ଭାଙ୍ଗ;
+		ସ୍ଥିତି VAR_LIST: *decl_type = &t_list_any; ଭାଙ୍ଗ;
+		ସ୍ଥିତି VAR_TUPLE: *decl_type = &t_tuple_any; ଭାଙ୍ଗ;
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ: ଭାଙ୍ଗ;
 	    }
 	}
-	return argtypes[0].type_curr;
+	ଫେରନ୍ତୁ argtypes[0].type_curr;
     }
-    return &t_void;
+    ଫେରନ୍ତୁ &t_void;
 }
-    static type_T *
-ret_copy(int argcount,
+    ସ୍ଥିର type_T *
+ret_copy(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	ଯଦି (argtypes[0].type_decl != ଖାଲି)
 	{
-	    if (argtypes[0].type_decl->tt_type == VAR_LIST)
+	    ଯଦି (argtypes[0].type_decl->tt_type == VAR_LIST)
 		*decl_type = &t_list_any;
-	    else if (argtypes[0].type_decl->tt_type == VAR_DICT)
+	    ଅନ୍ୟଥା ଯଦି (argtypes[0].type_decl->tt_type == VAR_DICT)
 		*decl_type = &t_dict_any;
-	    else
+	    ଅନ୍ୟଥା
 		*decl_type = argtypes[0].type_decl;
 	}
-	if (argtypes[0].type_curr != NULL)
+	ଯଦି (argtypes[0].type_curr != ଖାଲି)
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    else if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
+	    ଯଦି (argtypes[0].type_curr->tt_type == VAR_LIST)
+		ଫେରନ୍ତୁ &t_list_any;
+	    ଅନ୍ୟଥା ଯଦି (argtypes[0].type_curr->tt_type == VAR_DICT)
+		ଫେରନ୍ତୁ &t_dict_any;
 	}
-	return argtypes[0].type_curr;
+	ଫେରନ୍ତୁ argtypes[0].type_curr;
     }
-    return &t_void;
+    ଫେରନ୍ତୁ &t_void;
 }
-    static type_T *
-ret_extend(int argcount,
+    ସ୍ଥିର type_T *
+ret_extend(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
 	// if the second argument has a different current type then the current
 	// type is "any"
-	if (argcount > 1 && !equal_type(argtypes[0].type_curr,
+	ଯଦି (argcount > 1 && !equal_type(argtypes[0].type_curr,
 						     argtypes[1].type_curr, 0))
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-		return &t_blob;
+	    ଯଦି (argtypes[0].type_curr->tt_type == VAR_LIST)
+		ଫେରନ୍ତୁ &t_list_any;
+	    ଯଦି (argtypes[0].type_curr->tt_type == VAR_DICT)
+		ଫେରନ୍ତୁ &t_dict_any;
+	    ଯଦି (argtypes[0].type_curr->tt_type == VAR_BLOB)
+		ଫେରନ୍ତୁ &t_blob;
 	}
-	return argtypes[0].type_curr;
+	ଫେରନ୍ତୁ argtypes[0].type_curr;
     }
-    return &t_void;
+    ଫେରନ୍ତୁ &t_void;
 }
-    static type_T *
-ret_repeat(int argcount,
+    ସ୍ଥିର type_T *
+ret_repeat(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 0)
-	return &t_any;
-    if (argtypes[0].type_curr == &t_number)
-	return &t_string;
-    return argtypes[0].type_curr;
+    ଯଦି (argcount == 0)
+	ଫେରନ୍ତୁ &t_any;
+    ଯଦି (argtypes[0].type_curr == &t_ସଂଖ୍ୟା)
+	ଫେରନ୍ତୁ &t_string;
+    ଫେରନ୍ତୁ argtypes[0].type_curr;
 }
 // for map(): returns first argument but item type may differ
-    static type_T *
-ret_first_cont(int argcount,
+    ସ୍ଥିର type_T *
+ret_first_cont(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST)
-	    return &t_list_any;
-	if (argtypes[0].type_curr->tt_type == VAR_DICT)
-	    return &t_dict_any;
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return argtypes[0].type_curr;
+	ଯଦି (argtypes[0].type_curr->tt_type == VAR_LIST)
+	    ଫେରନ୍ତୁ &t_list_any;
+	ଯଦି (argtypes[0].type_curr->tt_type == VAR_DICT)
+	    ଫେରନ୍ତୁ &t_dict_any;
+	ଯଦି (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    ଫେରନ୍ତୁ argtypes[0].type_curr;
     }
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
 // for get(): the type of the item when a missing item has the same type
-    static type_T *
-ret_get(int argcount,
+    ସ୍ଥିର type_T *
+ret_get(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
 	type_T	*t = argtypes[0].type_curr;
-	type_T	*item = NULL;
+	type_T	*item = ଖାଲି;
 
-	if (t->tt_type == VAR_BLOB)
-	    item = &t_number;
-	else if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	ଯଦି (t->tt_type == VAR_BLOB)
+	    item = &t_ସଂଖ୍ୟା;
+	ଅନ୍ୟଥା ଯଦି (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    item = t->tt_member;
 	// A missing item gives {default} when present, otherwise zero.
-	if (item != NULL && (argcount == 3
+	ଯଦି (item != ଖାଲି && (argcount == 3
 			? equal_type(item, argtypes[2].type_curr, 0)
-			: item->tt_type == VAR_NUMBER))
+			: item->tt_type == VAR_ସଂଖ୍ୟା))
 	{
-	    if (t->tt_type != VAR_BLOB
+	    ଯଦି (t->tt_type != VAR_BLOB
 			    && argtypes[0].type_decl->tt_type == t->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return item;
+	    ଫେରନ୍ତୁ item;
 	}
     }
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
 // for getline()
-    static type_T *
-ret_getline(int argcount,
+    ସ୍ଥିର type_T *
+ret_getline(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 1)
-	return &t_string;
+    ଯଦି (argcount == 1)
+	ଫେରନ୍ତୁ &t_string;
     *decl_type = &t_list_any;
-    return &t_list_string;
+    ଫେରନ୍ତୁ &t_list_string;
 }
 // A string with fewer than N arguments, otherwise it depends on the value of
 // the last one: a string or a list of strings.
-    static type_T *
-ret_string_or_any_1(int argcount,
+    ସ୍ଥିର type_T *
+ret_string_or_any_1(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 1)
-	return &t_string;
-    return &t_any;
+    ଯଦି (argcount < 1)
+	ଫେରନ୍ତୁ &t_string;
+    ଫେରନ୍ତୁ &t_any;
 }
-    static type_T *
-ret_string_or_any_2(int argcount,
+    ସ୍ଥିର type_T *
+ret_string_or_any_2(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 2)
-	return &t_string;
-    return &t_any;
+    ଯଦି (argcount < 2)
+	ଫେରନ୍ତୁ &t_string;
+    ଫେରନ୍ତୁ &t_any;
 }
-    static type_T *
-ret_string_or_any_3(int argcount,
+    ସ୍ଥିର type_T *
+ret_string_or_any_3(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 3)
-	return &t_string;
-    return &t_any;
+    ଯଦି (argcount < 3)
+	ଫେରନ୍ତୁ &t_string;
+    ଫେରନ୍ତୁ &t_any;
 }
-    static type_T *
-ret_string_or_any_4(int argcount,
+    ସ୍ଥିର type_T *
+ret_string_or_any_4(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 4)
-	return &t_string;
-    return &t_any;
+    ଯଦି (argcount < 4)
+	ଫେରନ୍ତୁ &t_string;
+    ଫେରନ୍ତୁ &t_any;
 }
 // for abs()
-    static type_T *
-ret_abs(int argcount,
+    ସ୍ଥିର type_T *
+ret_abs(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
-	return &t_float;
-    return &t_number;
+    ଯଦି (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
+	ଫେରନ୍ତୁ &t_float;
+    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା;
 }
 // for sign_define()
-    static type_T *
-ret_sign_define(int argcount,
+    ସ୍ଥିର type_T *
+ret_sign_define(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
-	return &t_list_number;
-    return &t_number;
+    ଯଦି (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
+	ଫେରନ୍ତୁ &t_list_ସଂଖ୍ୟା;
+    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା;
 }
 // for values(): list of member of first argument
-    static type_T *
-ret_list_member(int argcount,
+    ସ୍ଥିର type_T *
+ret_list_member(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (current_type_gap != NULL
+	ଯଦି (current_type_gap != ଖାଲି
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
 	    t = get_list_type(t->tt_member, current_type_gap);
-	else
+	ଅନ୍ୟଥା
 	    t = &t_list_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (current_type_gap != NULL
+	ଯଦି (current_type_gap != ଖାଲି
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
-	    return get_list_type(t->tt_member, current_type_gap);
+	    ଫେରନ୍ତୁ get_list_type(t->tt_member, current_type_gap);
     }
-    return &t_list_any;
+    ଫେରନ୍ତୁ &t_list_any;
 }
 
 /*
  * Used for getqflist(): returns list if there is no argument, dict if there is
  * one.
  */
-    static type_T *
-ret_list_or_dict_0(int argcount,
+    ସ୍ଥିର type_T *
+ret_list_or_dict_0(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
-	return &t_dict_any;
+    ଯଦି (argcount > 0)
+	ଫେରନ୍ତୁ &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    ଫେରନ୍ତୁ &t_list_dict_any;
 }
 
 /*
  * Used for getloclist(): returns list if there is one argument, dict if there
  * are two.
  */
-    static type_T *
-ret_list_or_dict_1(int argcount,
+    ସ୍ଥିର type_T *
+ret_list_or_dict_1(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 1)
-	return &t_dict_any;
+    ଯଦି (argcount > 1)
+	ଫେରନ୍ତୁ &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    ଫେରନ୍ତୁ &t_list_dict_any;
 }
 
-    static type_T *
-ret_argv(int argcount,
+    ସ୍ଥିର type_T *
+ret_argv(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // argv() returns list of strings
-    if (argcount == 0)
+    ଯଦି (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	ଫେରନ୍ତୁ &t_list_string;
     }
 
     // argv(0) returns a string, but argv(-1] returns a list
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
 
-    static type_T *
-ret_remove(int argcount,
+    ସ୍ଥିର type_T *
+ret_remove(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST
+	ଯଦି (argtypes[0].type_curr->tt_type == VAR_LIST
 		|| argtypes[0].type_curr->tt_type == VAR_DICT)
 	{
-	    if (argcount == 3)
+	    ଯଦି (argcount == 3)
 	    {
 		*decl_type = argtypes[0].type_decl;
-		return argtypes[0].type_curr;
+		ଫେରନ୍ତୁ argtypes[0].type_curr;
 	    }
-	    if (argtypes[0].type_curr->tt_type
+	    ଯଦି (argtypes[0].type_curr->tt_type
 					     == argtypes[0].type_decl->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return argtypes[0].type_curr->tt_member;
+	    ଫେରନ୍ତୁ argtypes[0].type_curr->tt_member;
 	}
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return &t_number;
+	ଯଦି (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା;
     }
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
 
-    static type_T *
-ret_max_min(int argcount,
+    ସ୍ଥିର type_T *
+ret_max_min(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    ଯଦି (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	ଯଦି (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	ଅନ୍ୟଥା
 	    t = &t_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	ଯଦି (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	ଅନ୍ୟଥା
 	    t = &t_any;
-	return t;
+	ଫେରନ୍ତୁ t;
     }
-    return &t_any;
+    ଫେରନ୍ତୁ &t_any;
 }
 
-    static type_T *
-ret_getreg(int argcount,
+    ସ୍ଥିର type_T *
+ret_getreg(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the third argument is passed it's non-zero
-    if (argcount == 3)
+    ଯଦି (argcount == 3)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	ଫେରନ୍ତୁ &t_list_string;
     }
-    return &t_string;
+    ଫେରନ୍ତୁ &t_string;
 }
 
-    static type_T *
-ret_virtcol(int argcount,
+    ସ୍ଥିର type_T *
+ret_virtcol(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the second argument is passed it's non-zero
-    if (argcount > 1)
+    ଯଦି (argcount > 1)
     {
 	*decl_type = &t_list_any;
-	return &t_list_number;
+	ଫେରନ୍ତୁ &t_list_ସଂଖ୍ୟା;
     }
-    return &t_number;
+    ଫେରନ୍ତୁ &t_ସଂଖ୍ୟା;
 }
 
-    static type_T *
-ret_maparg(int argcount,
+    ସ୍ଥିର type_T *
+ret_maparg(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
     // Assume that if the fourth argument is passed it's non-zero
-    if (argcount == 4)
-	return &t_dict_any;
-    return &t_string;
+    ଯଦି (argcount == 4)
+	ଫେରନ୍ତୁ &t_dict_any;
+    ଫେରନ୍ତୁ &t_string;
 }
 
 /*
@@ -1960,22 +1960,22 @@ ret_maparg(int argcount,
  *	- For varargs, f_argcheck must be NULL terminated. The last non-null
  *	  entry in f_argcheck should validate all the remaining args.
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    char	*f_name;	// function name
-    char	f_min_argc;	// minimal number of arguments
-    char	f_max_argc;	// maximal number of arguments
-    char	f_argtype;	// for method: FEARG_ values; bits FE_
+    ଅକ୍ଷର	*f_name;	// function name
+    ଅକ୍ଷର	f_min_argc;	// minimal number of arguments
+    ଅକ୍ଷର	f_max_argc;	// maximal number of arguments
+    ଅକ୍ଷର	f_argtype;	// for method: FEARG_ values; bits FE_
     argcheck_T	*f_argcheck;	// list of functions to check argument types;
 				// use "arg_any" (not NULL) to accept an
 				// argument of any type
-    char	*f_argnames;	// names of the arguments as in the help,
+    ଅକ୍ଷର	*f_argnames;	// names of the arguments as in the help,
 				// separated by ", "; an argument without a
 				// name is empty, NULL when there is none
-    type_T	*(*f_retfunc)(int argcount, type2_T *argtypes,
+    type_T	*(*f_retfunc)(ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount, type2_T *argtypes,
 							   type_T **decl_type);
 				// return type function
-    void	(*f_func)(typval_T *args, typval_T *rvar);
+    ଶୂନ୍ୟ	(*f_func)(typval_T *args, typval_T *rvar);
 				// implementation of function
 } funcentry_T;
 
@@ -1990,53 +1990,53 @@ typedef struct
 #define FEARG_MASK  0x0F    // bits in f_argtype used as argument index
 #define FE_X	    0x10    // builtin accepts a non-value (class, typealias)
 
-#if defined(HAVE_MATH_H)
+#ଯଦି defined(HAVE_MATH_H)
 # define MATH_FUNC(name) name
-#else
-# define MATH_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define MATH_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_TIMERS
 # define TIMER_FUNC(name) name
-#else
-# define TIMER_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define TIMER_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_JOB_CHANNEL
 # define JOB_FUNC(name) name
-#else
-# define JOB_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define JOB_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_PROP_POPUP
 # define PROP_FUNC(name) name
-#else
-# define PROP_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define PROP_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_SIGNS
 # define SIGN_FUNC(name) name
-#else
-# define SIGN_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define SIGN_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_SOUND
 # define SOUND_FUNC(name) name
-#else
-# define SOUND_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define SOUND_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_TERMINAL
 # define TERM_FUNC(name) name
-#else
-# define TERM_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define TERM_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_TABPANEL
 # define TABPANEL_FUNC(name) name
-#else
-# define TABPANEL_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define TABPANEL_FUNC(name) ଖାଲି
 #endif
 #ifdef FEAT_IMAGE
 # define IMAGE_FUNC(name) name
-#else
-# define IMAGE_FUNC(name) NULL
+#ଅନ୍ୟଥା
+# define IMAGE_FUNC(name) ଖାଲି
 #endif
 
-static const funcentry_T global_functions[] =
+ସ୍ଥିର ଅଚଳ funcentry_T global_functions[] =
 {
     {"abs",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
@@ -2047,25 +2047,25 @@ static const funcentry_T global_functions[] =
     {"add",		2, 2, FEARG_1,	    arg2_listblobmod_item,
 			"object, expr",
 			ret_first_arg,	    f_add},
-    {"and",		2, 2, FEARG_1,	    arg2_number,
+    {"and",		2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"expr1, expr2",
-			ret_number,	    f_and},
+			ret_ସଂଖ୍ୟା,	    f_and},
     {"append",		2, 2, FEARG_2,	    arg2_setline,
 			"lnum, text",
-			ret_number_bool,    f_append},
+			ret_ସଂଖ୍ୟା_bool,    f_append},
     {"appendbufline",	3, 3, FEARG_3,	    arg3_setbufline,
 			"buf, lnum, text",
-			ret_number_bool,    f_appendbufline},
-    {"argc",		0, 1, 0,	    arg1_number,
+			ret_ସଂଖ୍ୟା_bool,    f_appendbufline},
+    {"argc",		0, 1, 0,	    arg1_ସଂଖ୍ୟା,
 			"winid",
-			ret_number,	    f_argc},
-    {"argidx",		0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_argidx},
-    {"arglistid",	0, 2, 0,	    arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_argc},
+    {"argidx",		0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_argidx},
+    {"arglistid",	0, 2, 0,	    arg2_ସଂଖ୍ୟା,
 			"winnr, tabnr",
-			ret_number,	    f_arglistid},
-    {"argv",		0, 2, 0,	    arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_arglistid},
+    {"argv",		0, 2, 0,	    arg2_ସଂଖ୍ୟା,
 			"nr, winid",
 			ret_argv,	    f_argv},
     {"asin",		1, 1, FEARG_1,	    arg1_float_or_nr,
@@ -2073,43 +2073,43 @@ static const funcentry_T global_functions[] =
 			ret_float,	    f_asin},
     {"assert_beeps",	1, 1, FEARG_1,	    arg1_string,
 			"cmd",
-			ret_number_bool,    f_assert_beeps},
-    {"assert_equal",	2, 3, FEARG_2,	    NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_assert_beeps},
+    {"assert_equal",	2, 3, FEARG_2,	    ଖାଲି,
 			"expected, actual, msg",
-			ret_number_bool,    f_assert_equal},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_equal},
     {"assert_equalfile", 2, 3, FEARG_1,	    arg3_string,
 			"fname_one, fname_two, msg",
-			ret_number_bool,    f_assert_equalfile},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_equalfile},
     {"assert_exception", 1, 2, 0,	    arg2_string,
 			"error, msg",
-			ret_number_bool,    f_assert_exception},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_exception},
     {"assert_fails",	1, 5, FEARG_1,	    arg15_assert_fails,
 			"cmd, error, msg, lnum, context",
-			ret_number_bool,    f_assert_fails},
-    {"assert_false",	1, 2, FEARG_1,	    NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_assert_fails},
+    {"assert_false",	1, 2, FEARG_1,	    ଖାଲି,
 			"actual, msg",
-			ret_number_bool,    f_assert_false},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_false},
     {"assert_inrange",	3, 4, FEARG_3,	    arg34_assert_inrange,
 			"lower, upper, actual, msg",
-			ret_number_bool,    f_assert_inrange},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_inrange},
     {"assert_match",	2, 3, FEARG_2,	    arg3_string,
 			"pattern, actual, msg",
-			ret_number_bool,    f_assert_match},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_match},
     {"assert_nobeep",	1, 1, FEARG_1,	    arg1_string,
 			"cmd",
-			ret_number_bool,    f_assert_nobeep},
-    {"assert_notequal",	2, 3, FEARG_2,	    NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_assert_nobeep},
+    {"assert_notequal",	2, 3, FEARG_2,	    ଖାଲି,
 			"expected, actual, msg",
-			ret_number_bool,    f_assert_notequal},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_notequal},
     {"assert_notmatch",	2, 3, FEARG_2,	    arg3_string,
 			"pattern, actual, msg",
-			ret_number_bool,    f_assert_notmatch},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_notmatch},
     {"assert_report",	1, 1, FEARG_1,	    arg1_string,
 			"msg",
-			ret_number_bool,    f_assert_report},
-    {"assert_true",	1, 2, FEARG_1,	    NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_assert_report},
+    {"assert_true",	1, 2, FEARG_1,	    ଖାଲି,
 			"actual, msg",
-			ret_number_bool,    f_assert_true},
+			ret_ସଂଖ୍ୟା_bool,    f_assert_true},
     {"atan",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_atan},
@@ -2125,13 +2125,13 @@ static const funcentry_T global_functions[] =
     {"autocmd_get",	0, 1, FEARG_1,	    arg1_dict_any,
 			"opts",
 			ret_list_dict_any,  f_autocmd_get},
-    {"balloon_gettext",	0, 0, 0,	    NULL,
-			NULL,
+    {"balloon_gettext",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,
 #ifdef FEAT_BEVAL
 	    f_balloon_gettext
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"balloon_show",	1, 1, FEARG_1,	    arg1_string_or_list_any,
@@ -2139,17 +2139,17 @@ static const funcentry_T global_functions[] =
 			ret_void,
 #ifdef FEAT_BEVAL
 	    f_balloon_show
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"balloon_split",	1, 1, FEARG_1,	    arg1_string,
 			"msg",
 			ret_list_string,
-#if defined(FEAT_BEVAL_TERM)
+#ଯଦି defined(FEAT_BEVAL_TERM)
 	    f_balloon_split
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"base64_decode",	1, 1, FEARG_1,	    arg1_string,
@@ -2163,7 +2163,7 @@ static const funcentry_T global_functions[] =
 			ret_bool,	    f_bindtextdomain},
     {"blob2list",	1, 1, FEARG_1,	    arg1_blob,
 			"blob",
-			ret_list_number,    f_blob2list},
+			ret_list_ସଂଖ୍ୟା,    f_blob2list},
     {"blob2str",	1, 2, FEARG_1,	    arg2_blob_dict,
 			"blob, options",
 			ret_list_string,    f_blob2str},
@@ -2175,49 +2175,49 @@ static const funcentry_T global_functions[] =
 			ret_string,	    f_browsedir},
     {"bufadd",		1, 1, FEARG_1,	    arg1_string,
 			"name",
-			ret_number,	    f_bufadd},
+			ret_ସଂଖ୍ୟା,	    f_bufadd},
     {"bufexists",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number_bool,    f_bufexists},
+			ret_ସଂଖ୍ୟା_bool,    f_bufexists},
     {"buffer_exists",	1, 1, FEARG_1,	    arg1_buffer,	// obsolete
 			"buf",
-			ret_number_bool,    f_bufexists},
+			ret_ସଂଖ୍ୟା_bool,    f_bufexists},
     {"buffer_name",	0, 1, FEARG_1,	    arg1_buffer,	// obsolete
 			"buf",
 			ret_string,	    f_bufname},
     {"buffer_number",	0, 1, FEARG_1,	    arg1_buffer,	// obsolete
 			"buf",
-			ret_number,	    f_bufnr},
+			ret_ସଂଖ୍ୟା,	    f_bufnr},
     {"buflisted",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number_bool,    f_buflisted},
+			ret_ସଂଖ୍ୟା_bool,    f_buflisted},
     {"bufload",		1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_void,	    f_bufload},
     {"bufloaded",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number_bool,    f_bufloaded},
+			ret_ସଂଖ୍ୟା_bool,    f_bufloaded},
     {"bufname",		0, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_string,	    f_bufname},
     {"bufnr",		0, 2, FEARG_1,	    arg2_buffer_bool,
 			"buf, create",
-			ret_number,	    f_bufnr},
+			ret_ସଂଖ୍ୟା,	    f_bufnr},
     {"bufwinid",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number,	    f_bufwinid},
+			ret_ସଂଖ୍ୟା,	    f_bufwinid},
     {"bufwinnr",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number,	    f_bufwinnr},
-    {"byte2line",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_bufwinnr},
+    {"byte2line",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"byte",
-			ret_number,	    f_byte2line},
-    {"byteidx",		2, 3, FEARG_1,	    arg3_string_number_bool,
+			ret_ସଂଖ୍ୟା,	    f_byte2line},
+    {"byteidx",		2, 3, FEARG_1,	    arg3_string_ସଂଖ୍ୟା_bool,
 			"expr, nr, utf16",
-			ret_number,	    f_byteidx},
-    {"byteidxcomp",	2, 3, FEARG_1,	    arg3_string_number_bool,
+			ret_ସଂଖ୍ୟା,	    f_byteidx},
+    {"byteidxcomp",	2, 3, FEARG_1,	    arg3_string_ସଂଖ୍ୟା_bool,
 			"expr, nr, utf16",
-			ret_number,	    f_byteidxcomp},
+			ret_ସଂଖ୍ୟା,	    f_byteidxcomp},
     {"call",		2, 3, FEARG_1,	    arg3_any_list_dict,
 			"func, arglist, dict",
 			ret_any,	    f_call},
@@ -2226,7 +2226,7 @@ static const funcentry_T global_functions[] =
 			ret_float,	    f_ceil},
     {"ch_canread",	1, 1, FEARG_1,	    arg1_chan_or_job,
 			"handle",
-			ret_number_bool,    JOB_FUNC(f_ch_canread)},
+			ret_ସଂଖ୍ୟା_bool,    JOB_FUNC(f_ch_canread)},
     {"ch_close",	1, 1, FEARG_1,	    arg1_chan_or_job,
 			"handle",
 			ret_void,	    JOB_FUNC(f_ch_close)},
@@ -2241,7 +2241,7 @@ static const funcentry_T global_functions[] =
 			ret_any,	    JOB_FUNC(f_ch_evalraw)},
     {"ch_getbufnr",	2, 2, FEARG_1,	    arg2_chan_or_job_string,
 			"handle, what",
-			ret_number,	    JOB_FUNC(f_ch_getbufnr)},
+			ret_ସଂଖ୍ୟା,	    JOB_FUNC(f_ch_getbufnr)},
     {"ch_getjob",	1, 1, FEARG_1,	    arg1_chan_or_job,
 			"channel",
 			ret_job,	    JOB_FUNC(f_ch_getjob)},
@@ -2281,52 +2281,52 @@ static const funcentry_T global_functions[] =
     {"ch_status",	1, 2, FEARG_1,	    arg2_chan_or_job_dict,
 			"handle, options",
 			ret_string,	    JOB_FUNC(f_ch_status)},
-    {"changenr",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_changenr},
+    {"changenr",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_changenr},
     {"char2nr",		1, 2, FEARG_1,	    arg2_string_bool,
 			"string, utf8",
-			ret_number,	    f_char2nr},
+			ret_ସଂଖ୍ୟା,	    f_char2nr},
     {"charclass",	1, 1, FEARG_1,	    arg1_string,
 			"string",
-			ret_number,	    f_charclass},
-    {"charcol",		1, 2, FEARG_1,	    arg2_string_or_list_number,
+			ret_ସଂଖ୍ୟା,	    f_charclass},
+    {"charcol",		1, 2, FEARG_1,	    arg2_string_or_list_ସଂଖ୍ୟା,
 			"expr, winid",
-			ret_number,	    f_charcol},
-    {"charidx",		2, 4, FEARG_1,	    arg4_string_number_bool_bool,
+			ret_ସଂଖ୍ୟା,	    f_charcol},
+    {"charidx",		2, 4, FEARG_1,	    arg4_string_ସଂଖ୍ୟା_bool_bool,
 			"string, idx, countcc, utf16",
-			ret_number,	    f_charidx},
+			ret_ସଂଖ୍ୟା,	    f_charidx},
     {"chdir",		1, 2, FEARG_1,	    arg2_string,
 			"dir, scope",
 			ret_string,	    f_chdir},
     {"cindent",		1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_cindent},
-    {"clearmatches",	0, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_cindent},
+    {"clearmatches",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"win",
 			ret_void,	    f_clearmatches},
-    {"cmdcomplete_info",0, 0, 0,	    NULL,
-			NULL,
+    {"cmdcomplete_info",0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_any,	    f_cmdcomplete_info},
-    {"col",		1, 2, FEARG_1,	    arg2_string_or_list_number,
+    {"col",		1, 2, FEARG_1,	    arg2_string_or_list_ସଂଖ୍ୟା,
 			"expr, winid",
-			ret_number,	    f_col},
-    {"complete",	2, 2, FEARG_2,	    arg2_number_list,
+			ret_ସଂଖ୍ୟା,	    f_col},
+    {"complete",	2, 2, FEARG_2,	    arg2_ସଂଖ୍ୟା_list,
 			"startcol, matches",
 			ret_void,	    f_complete},
     {"complete_add",	1, 1, FEARG_1,	    arg1_dict_or_string,
 			"expr",
-			ret_number,	    f_complete_add},
-    {"complete_check",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_complete_check},
+			ret_ସଂଖ୍ୟା,	    f_complete_add},
+    {"complete_check",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_complete_check},
     {"complete_info",	0, 1, FEARG_1,	    arg1_list_string,
 			"what",
 			ret_dict_any,	    f_complete_info},
-    {"confirm",		1, 4, FEARG_1,	    arg4_string_string_number_string,
+    {"confirm",		1, 4, FEARG_1,	    arg4_string_string_ସଂଖ୍ୟା_string,
 			"msg, choices, default, type",
-			ret_number,	    f_confirm},
-    {"copy",		1, 1, FEARG_1,	    NULL,
+			ret_ସଂଖ୍ୟା,	    f_confirm},
+    {"copy",		1, 1, FEARG_1,	    ଖାଲି,
 			"expr",
 			ret_copy,	    f_copy},
     {"cos",		1, 1, FEARG_1,	    arg1_float_or_nr,
@@ -2335,22 +2335,22 @@ static const funcentry_T global_functions[] =
     {"cosh",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_cosh},
-    {"count",		2, 4, FEARG_1,	    arg24_count,
+    {"count",		2, 4, FEARG_1,	    arg24_ଗଣନା,
 			"comp, expr, ic, start",
-			ret_number,	    f_count},
-    {"cscope_connection",0,3, 0,	    arg3_number_string_string,
+			ret_ସଂଖ୍ୟା,	    f_ଗଣନା},
+    {"cscope_connection",0,3, 0,	    arg3_ସଂଖ୍ୟା_string_string,
 			"num, dbpath, prepend",
-			ret_number,	    f_cscope_connection},
+			ret_ସଂଖ୍ୟା,	    f_cscope_connection},
     {"cursor",		1, 3, FEARG_1,	    arg13_cursor,
 			"lnum, col, off",
-			ret_number,	    f_cursor},
-    {"debugbreak",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_cursor},
+    {"debugbreak",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"pid",
-			ret_number,
+			ret_ସଂଖ୍ୟା,
 #ifdef MSWIN
 	    f_debugbreak
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"deepcopy",	1, 2, FEARG_1,	    arg12_deepcopy,
@@ -2358,28 +2358,28 @@ static const funcentry_T global_functions[] =
 			ret_copy,	    f_deepcopy},
     {"delete",		1, 2, FEARG_1,	    arg2_string,
 			"fname, flags",
-			ret_number_bool,    f_delete},
+			ret_ସଂଖ୍ୟା_bool,    f_delete},
     {"deletebufline",	2, 3, FEARG_1,	    arg3_buffer_lnum_lnum,
 			"buf, first, last",
-			ret_number_bool,    f_deletebufline},
-    {"did_filetype",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_did_filetype},
+			ret_ସଂଖ୍ୟା_bool,    f_deletebufline},
+    {"did_filetype",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_did_filetype},
     {"diff",		2, 3, FEARG_1,	    arg3_diff,
 			"fromlist, tolist, options",
 			ret_string_or_any_3,  f_diff},
     {"diff_filler",	1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_diff_filler},
-    {"diff_hlID",	2, 2, FEARG_1,	    arg2_lnum_number,
+			ret_ସଂଖ୍ୟା,	    f_diff_filler},
+    {"diff_hlID",	2, 2, FEARG_1,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, col",
-			ret_number,	    f_diff_hlID},
+			ret_ସଂଖ୍ୟା,	    f_diff_hlID},
     {"digraph_get",	1, 1, FEARG_1,	    arg1_string,
 			"chars",
 			ret_string,	    f_digraph_get},
     {"digraph_getlist",	0, 1, FEARG_1,	    arg1_bool,
 			"listall",
-			ret_list_string_items, f_digraph_getlist},
+			ret_list_string_ବସ୍ତୁଗୁଡ଼ିକ, f_digraph_getlist},
     {"digraph_set",	2, 2, FEARG_1,	    arg2_string,
 			"chars, digraph",
 			ret_bool,	f_digraph_set},
@@ -2389,13 +2389,13 @@ static const funcentry_T global_functions[] =
     {"echoraw",		1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_void,	    f_echoraw},
-    {"empty",		1, 1, FEARG_1,	    NULL,
+    {"empty",		1, 1, FEARG_1,	    ଖାଲି,
 			"expr",
-			ret_number_bool,    f_empty},
-    {"environ",		0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_empty},
+    {"environ",		0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_string,    f_environ},
-    {"err_teapot",	0, 1, 0,	    NULL,
+    {"err_teapot",	0, 1, 0,	    ଖାଲି,
 			"expr",
 			ret_void,	    f_err_teapot},
     {"escape",		2, 2, FEARG_1,	    arg2_string,
@@ -2404,12 +2404,12 @@ static const funcentry_T global_functions[] =
     {"eval",		1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_any,	    f_eval},
-    {"eventhandler",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_eventhandler},
+    {"eventhandler",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_eventhandler},
     {"executable",	1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_number,	    f_executable},
+			ret_ସଂଖ୍ୟା,	    f_executable},
     {"execute",		1, 2, FEARG_1,	    arg12_execute,
 			"command, silent",
 			ret_string,	    f_execute},
@@ -2418,10 +2418,10 @@ static const funcentry_T global_functions[] =
 			ret_string,	    f_exepath},
     {"exists",		1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_number_bool,    f_exists},
+			ret_ସଂଖ୍ୟା_bool,    f_exists},
     {"exists_compiled",	1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_number_bool,    f_exists_compiled},
+			ret_ସଂଖ୍ୟା_bool,    f_exists_compiled},
     {"exp",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_exp},
@@ -2442,34 +2442,34 @@ static const funcentry_T global_functions[] =
 			ret_void,	    f_feedkeys},
     {"file_readable",	1, 1, FEARG_1,	    arg1_string,	// obsolete
 			"file",
-			ret_number_bool,    f_filereadable},
+			ret_ସଂଖ୍ୟା_bool,    f_filereadable},
     {"filecopy",	2, 2, FEARG_1,	    arg2_string,
 			"from, to",
-			ret_number_bool,    f_filecopy},
+			ret_ସଂଖ୍ୟା_bool,    f_filecopy},
     {"filereadable",	1, 1, FEARG_1,	    arg1_string,
 			"file",
-			ret_number_bool,    f_filereadable},
+			ret_ସଂଖ୍ୟା_bool,    f_filereadable},
     {"filewritable",	1, 1, FEARG_1,	    arg1_string,
 			"file",
-			ret_number,	    f_filewritable},
+			ret_ସଂଖ୍ୟା,	    f_filewritable},
     {"filter",		2, 2, FEARG_1,	    arg2_filter,
 			"expr1, expr2",
 			ret_first_arg,	    f_filter},
-    {"finddir",		1, 3, FEARG_1,	    arg3_string_string_number,
+    {"finddir",		1, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"name, path, count",
 			ret_string_or_any_3,	    f_finddir},
-    {"findfile",	1, 3, FEARG_1,	    arg3_string_string_number,
+    {"findfile",	1, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"name, path, count",
 			ret_string_or_any_3,	    f_findfile},
-    {"flatten",		1, 2, FEARG_1,	    arg2_list_any_number,
+    {"flatten",		1, 2, FEARG_1,	    arg2_list_any_ସଂଖ୍ୟା,
 			"list, maxdepth",
 			ret_list_any,	    f_flatten},
-    {"flattennew",	1, 2, FEARG_1,	    arg2_list_any_number,
+    {"flattennew",	1, 2, FEARG_1,	    arg2_list_any_ସଂଖ୍ୟା,
 			"list, maxdepth",
 			ret_list_any,	    f_flattennew},
     {"float2nr",	1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
-			ret_number,	    f_float2nr},
+			ret_ସଂଖ୍ୟା,	    f_float2nr},
     {"floor",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_floor},
@@ -2482,26 +2482,26 @@ static const funcentry_T global_functions[] =
     {"fnamemodify",	2, 2, FEARG_1,	    arg2_string,
 			"fname, mods",
 			ret_string,	    f_fnamemodify},
-    {"foldclosed",	1, 2, FEARG_1,	    arg2_lnum_number,
+    {"foldclosed",	1, 2, FEARG_1,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, winid",
-			ret_number,	    f_foldclosed},
-    {"foldclosedend",	1, 2, FEARG_1,	    arg2_lnum_number,
+			ret_ସଂଖ୍ୟା,	    f_foldclosed},
+    {"foldclosedend",	1, 2, FEARG_1,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, winid",
-			ret_number,	    f_foldclosedend},
-    {"foldlevel",	1, 2, FEARG_1,	    arg2_lnum_number,
+			ret_ସଂଖ୍ୟା,	    f_foldclosedend},
+    {"foldlevel",	1, 2, FEARG_1,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, winid",
-			ret_number,	    f_foldlevel},
-    {"foldtext",	0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା,	    f_foldlevel},
+    {"foldtext",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_foldtext},
-    {"foldtextresult",	1, 2, FEARG_1,	    arg2_lnum_number,
+    {"foldtextresult",	1, 2, FEARG_1,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, winid",
 			ret_string,	    f_foldtextresult},
     {"foreach",		2, 2, FEARG_1,	    arg2_foreach,
 			"expr1, expr2",
 			ret_first_arg,	    f_foreach},
-    {"foreground",	0, 0, 0,	    NULL,
-			NULL,
+    {"foreground",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_foreground},
     {"fullcommand",	1, 2, FEARG_1,	    arg2_string_bool,
 			"name, vim9",
@@ -2518,8 +2518,8 @@ static const funcentry_T global_functions[] =
     {"get",		2, 3, FEARG_1,	    arg23_get,
 			"list, idx, default",
 			ret_get,	    f_get},
-    {"getbgcolor",	0, 0, 0,	    NULL,
-			NULL,
+    {"getbgcolor",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_any,	    f_getbgcolor},
     {"getbufinfo",	0, 1, FEARG_1,	    arg1_buffer_or_dict_any,
 			"buf",
@@ -2533,11 +2533,11 @@ static const funcentry_T global_functions[] =
     {"getbufvar",	2, 3, FEARG_1,	    arg3_buffer_string_any,
 			"buf, varname, def",
 			ret_any,	    f_getbufvar},
-    {"getcellpixels",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcellpixels",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_any,	    f_getcellpixels},
-    {"getcellwidths",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcellwidths",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_any,	    f_getcellwidths},
     {"getchangelist",	0, 1, FEARG_1,	    arg1_buffer,
 			"buf",
@@ -2545,41 +2545,41 @@ static const funcentry_T global_functions[] =
     {"getchar",		0, 2, 0,	    arg12_getchar,
 			"expr, opts",
 			ret_any,	    f_getchar},
-    {"getcharmod",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getcharmod},
+    {"getcharmod",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getcharmod},
     {"getcharpos",	1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_list_number,    f_getcharpos},
-    {"getcharsearch",	0, 0, 0,	    NULL,
-			NULL,
+			ret_list_ସଂଖ୍ୟା,    f_getcharpos},
+    {"getcharsearch",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_any,	    f_getcharsearch},
     {"getcharstr",	0, 2, 0,	    arg12_getchar,
 			"expr, opts",
 			ret_string,	    f_getcharstr},
-    {"getcmdcomplpat",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdcomplpat",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdcomplpat},
-    {"getcmdcompltype",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdcompltype",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdcompltype},
-    {"getcmdline",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdline",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdline},
-    {"getcmdpos",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getcmdpos},
-    {"getcmdprompt",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdpos",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getcmdpos},
+    {"getcmdprompt",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdprompt},
-    {"getcmdscreenpos",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getcmdscreenpos},
-    {"getcmdtype",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdscreenpos",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getcmdscreenpos},
+    {"getcmdtype",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdtype},
-    {"getcmdwintype",	0, 0, 0,	    NULL,
-			NULL,
+    {"getcmdwintype",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getcmdwintype},
     {"getcompletion",	2, 3, FEARG_1,	    arg3_string_string_bool,
 			"pat, type, filtered",
@@ -2587,13 +2587,13 @@ static const funcentry_T global_functions[] =
     {"getcompletiontype", 1, 1, FEARG_1,    arg1_string,
 			"pat",
 			ret_string,	    f_getcompletiontype},
-    {"getcurpos",	0, 1, FEARG_1,	    arg1_number,
+    {"getcurpos",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"winid",
-			ret_list_number,    f_getcurpos},
-    {"getcursorcharpos", 0, 1, FEARG_1,	    arg1_number,
+			ret_list_ସଂଖ୍ୟା,    f_getcurpos},
+    {"getcursorcharpos", 0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"winid",
-			ret_list_number,    f_getcursorcharpos},
-    {"getcwd",		0, 2, FEARG_1,	    arg2_number,
+			ret_list_ସଂଖ୍ୟା,    f_getcursorcharpos},
+    {"getcwd",		0, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"winnr, tabnr",
 			ret_string,	    f_getcwd},
     {"getenv",		1, 1, FEARG_1,	    arg1_string,
@@ -2607,46 +2607,46 @@ static const funcentry_T global_functions[] =
 			ret_string,	    f_getfperm},
     {"getfsize",	1, 1, FEARG_1,	    arg1_string,
 			"fname",
-			ret_number,	    f_getfsize},
+			ret_ସଂଖ୍ୟା,	    f_getfsize},
     {"getftime",	1, 1, FEARG_1,	    arg1_string,
 			"fname",
-			ret_number,	    f_getftime},
+			ret_ସଂଖ୍ୟା,	    f_getftime},
     {"getftype",	1, 1, FEARG_1,	    arg1_string,
 			"fname",
 			ret_string,	    f_getftype},
-    {"getimstatus",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_getimstatus},
+    {"getimstatus",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_getimstatus},
     {"getinfo",		2, 3, FEARG_2,	    arg3_string_string_dict,
 			"kind, name, opts",
 			ret_dict_any,	    f_getinfo},
-    {"getjumplist",	0, 2, FEARG_1,	    arg2_number,
+    {"getjumplist",	0, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"winnr, tabnr",
 			ret_list_any,	    f_getjumplist},
     {"getline",		1, 2, FEARG_1,	    arg2_lnum,
 			"lnum, end",
 			ret_getline,	    f_getline},
-    {"getloclist",	1, 2, 0,	    arg2_number_dict_any,
+    {"getloclist",	1, 2, 0,	    arg2_ସଂଖ୍ୟା_dict_any,
 			"nr, what",
 			ret_list_or_dict_1, f_getloclist},
     {"getmarklist",	0, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_list_dict_any,  f_getmarklist},
-    {"getmatches",	0, 1, 0,	    arg1_number,
+    {"getmatches",	0, 1, 0,	    arg1_ସଂଖ୍ୟା,
 			"win",
 			ret_list_dict_any,  f_getmatches},
-    {"getmousepos",	0, 0, 0,	    NULL,
-			NULL,
-			ret_dict_number,    f_getmousepos},
-    {"getmouseshape",	0, 0, 0,	    NULL,
-			NULL,
+    {"getmousepos",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_dict_ସଂଖ୍ୟା,    f_getmousepos},
+    {"getmouseshape",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_getmouseshape},
-    {"getpid",		0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getpid},
+    {"getpid",		0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getpid},
     {"getpos",		1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_list_number,    f_getpos},
+			ret_list_ସଂଖ୍ୟା,    f_getpos},
     {"getqflist",	0, 1, 0,	    arg1_dict_any,
 			"what",
 			ret_list_or_dict_0, f_getqflist},
@@ -2668,37 +2668,37 @@ static const funcentry_T global_functions[] =
     {"getscriptinfo",	0, 1, 0,	    arg1_dict_any,
 			"opts",
 			ret_list_dict_any,  f_getscriptinfo},
-    {"getstacktrace",	0, 0, 0,	    NULL,
-			NULL,
+    {"getstacktrace",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_dict_any,  f_getstacktrace},
-    {"gettabinfo",	0, 1, FEARG_1,	    arg1_number,
+    {"gettabinfo",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"tabnr",
 			ret_list_dict_any,  f_gettabinfo},
-    {"gettabvar",	2, 3, FEARG_1,	    arg3_number_string_any,
+    {"gettabvar",	2, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_string_any,
 			"tabnr, varname, def",
 			ret_any,	    f_gettabvar},
-    {"gettabwinvar",	3, 4, FEARG_1,	    arg4_number_number_string_any,
+    {"gettabwinvar",	3, 4, FEARG_1,	    arg4_ସଂଖ୍ୟା_ସଂଖ୍ୟା_string_any,
 			"tabnr, winnr, varname, def",
 			ret_any,	    f_gettabwinvar},
-    {"gettagstack",	0, 1, FEARG_1,	    arg1_number,
+    {"gettagstack",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"winnr",
 			ret_dict_any,	    f_gettagstack},
     {"gettext",		1, 2, FEARG_1,	    arg2_string,
 			"text, package",
 			ret_string,	    f_gettext},
-    {"getwininfo",	0, 1, FEARG_1,	    arg1_number,
+    {"getwininfo",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"winid",
 			ret_list_dict_any,  f_getwininfo},
-    {"getwinpos",	0, 1, FEARG_1,	    arg1_number,
+    {"getwinpos",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"timeout",
-			ret_list_number,    f_getwinpos},
-    {"getwinposx",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getwinposx},
-    {"getwinposy",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_getwinposy},
-    {"getwinvar",	2, 3, FEARG_1,	    arg3_number_string_any,
+			ret_list_ସଂଖ୍ୟା,    f_getwinpos},
+    {"getwinposx",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getwinposx},
+    {"getwinposy",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_getwinposy},
+    {"getwinvar",	2, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_string_any,
 			"winnr, varname, def",
 			ret_any,	    f_getwinvar},
     {"glob",		1, 4, FEARG_1,	    arg14_glob,
@@ -2712,121 +2712,121 @@ static const funcentry_T global_functions[] =
 			ret_string_or_any_4,	    f_globpath},
     {"has",		1, 2, 0,	    arg2_string_bool,
 			"feature, check",
-			ret_number_bool,    f_has},
+			ret_ସଂଖ୍ୟା_bool,    f_has},
     {"has_key",		2, 2, FEARG_1,	    arg2_dict_any_string_or_nr,
 			"dict, key",
-			ret_number_bool,    f_has_key},
-    {"haslocaldir",	0, 2, FEARG_1,	    arg2_number,
+			ret_ସଂଖ୍ୟା_bool,    f_has_ଚାବି},
+    {"haslocaldir",	0, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"winnr, tabnr",
-			ret_number,	    f_haslocaldir},
+			ret_ସଂଖ୍ୟା,	    f_haslocaldir},
     {"hasmapto",	1, 3, FEARG_1,	    arg3_string_string_bool,
 			"what, mode, abbr",
-			ret_number_bool,    f_hasmapto},
+			ret_ସଂଖ୍ୟା_bool,    f_hasmapto},
     {"highlightID",	1, 1, FEARG_1,	    arg1_string,	// obsolete
 			"name",
-			ret_number,	    f_hlID},
+			ret_ସଂଖ୍ୟା,	    f_hlID},
     {"highlight_exists",1, 1, FEARG_1,	    arg1_string,	// obsolete
 			"name",
-			ret_number_bool,    f_hlexists},
+			ret_ସଂଖ୍ୟା_bool,    f_hlexists},
     {"histadd",		2, 2, FEARG_2,	    arg2_string,
 			"history, item",
-			ret_number_bool,    f_histadd},
-    {"histdel",		1, 2, FEARG_1,	    arg2_string_string_or_number,
+			ret_ସଂଖ୍ୟା_bool,    f_histadd},
+    {"histdel",		1, 2, FEARG_1,	    arg2_string_string_or_ସଂଖ୍ୟା,
 			"history, item",
-			ret_number_bool,    f_histdel},
-    {"histget",		1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା_bool,    f_histdel},
+    {"histget",		1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"history, index",
 			ret_string,	    f_histget},
     {"histnr",		1, 1, FEARG_1,	    arg1_string,
 			"history",
-			ret_number,	    f_histnr},
+			ret_ସଂଖ୍ୟା,	    f_histnr},
     {"hlID",		1, 1, FEARG_1,	    arg1_string,
 			"name",
-			ret_number,	    f_hlID},
+			ret_ସଂଖ୍ୟା,	    f_hlID},
     {"hlexists",	1, 1, FEARG_1,	    arg1_string,
 			"name",
-			ret_number_bool,    f_hlexists},
+			ret_ସଂଖ୍ୟା_bool,    f_hlexists},
     {"hlget",		0, 2, FEARG_1,	    arg2_string_bool,
 			"name, resolve",
 			ret_list_dict_any,  f_hlget},
     {"hlset",		1, 1, FEARG_1,	    arg1_list_any,
 			"list",
-			ret_number_bool,    f_hlset},
-    {"hostname",	0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା_bool,    f_hlset},
+    {"hostname",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_hostname},
     {"iconv",		3, 3, FEARG_1,	    arg3_string,
 			"string, from, to",
 			ret_string,	    f_iconv},
-    {"id",		1, 1, FEARG_1,	    NULL,
+    {"id",		1, 1, FEARG_1,	    ଖାଲି,
 			"item",
 			ret_string,	    f_id},
     {"image_add",	1, 1, FEARG_1,	    arg1_dict_any,
 			"dict",
-			ret_number,	    IMAGE_FUNC(f_image_add)},
-    {"image_discard",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    IMAGE_FUNC(f_image_add)},
+    {"image_discard",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_void,	    IMAGE_FUNC(f_image_discard)},
-    {"image_info",	0, 1, FEARG_1,	    arg1_number,
+    {"image_info",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_list_dict_any,  IMAGE_FUNC(f_image_info)},
     {"indent",		1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_indent},
+			ret_ସଂଖ୍ୟା,	    f_indent},
     {"index",		2, 4, FEARG_1,	    arg24_index,
 			"object, expr, start, ic",
-			ret_number,	    f_index},
+			ret_ସଂଖ୍ୟା,	    f_index},
     {"indexof",		2, 3, FEARG_1,	    arg23_index,
 			"object, expr, opts",
-			ret_number,	    f_indexof},
+			ret_ସଂଖ୍ୟା,	    f_indexof},
     {"input",		1, 3, FEARG_1,	    arg3_string,
 			"prompt, text, completion",
-			ret_string,	    f_input},
+			ret_string,	    f_ନିବେଶ},
     {"inputdialog",	1, 3, FEARG_1,	    arg3_string,
 			"prompt, text, cancelreturn",
 			ret_string,	    f_inputdialog},
     {"inputlist",	1, 1, FEARG_1,	    arg1_list_string,
 			"textlist",
-			ret_number,	    f_inputlist},
-    {"inputrestore",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_inputrestore},
-    {"inputsave",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_inputsave},
+			ret_ସଂଖ୍ୟା,	    f_inputlist},
+    {"inputrestore",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_inputrestore},
+    {"inputsave",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_inputsave},
     {"inputsecret",	1, 2, FEARG_1,	    arg2_string,
 			"prompt, text",
 			ret_string,	    f_inputsecret},
-    {"insert",		2, 3, FEARG_1,	    arg23_insert,
+    {"insert",		2, 3, FEARG_1,	    arg23_ଭର୍ତ୍ତି,
 			"object, item, idx",
-			ret_first_arg,	    f_insert},
+			ret_first_arg,	    f_ଭର୍ତ୍ତି},
     {"instanceof",	2, VARGS, FEARG_1|FE_X,	arg2_instanceof,
 			"object, class",
 			ret_bool,	    f_instanceof},
-    {"interrupt",	0, 0, 0,	    NULL,
-			NULL,
+    {"interrupt",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_interrupt},
-    {"invert",		1, 1, FEARG_1,	    arg1_number,
+    {"invert",		1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
-			ret_number,	    f_invert},
+			ret_ସଂଖ୍ୟା,	    f_invert},
     {"isabsolutepath",	1, 1, FEARG_1,	    arg1_string,
 			"path",
-			ret_number_bool,    f_isabsolutepath},
+			ret_ସଂଖ୍ୟା_bool,    f_isabsolutepath},
     {"isdirectory",	1, 1, FEARG_1,	    arg1_string,
 			"directory",
-			ret_number_bool,    f_isdirectory},
+			ret_ସଂଖ୍ୟା_bool,    f_isdirectory},
     {"isinf",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
-			ret_number,	    MATH_FUNC(f_isinf)},
+			ret_ସଂଖ୍ୟା,	    MATH_FUNC(f_isinf)},
     {"islocked",	1, 1, FEARG_1,	    arg1_string,
 			"expr",
-			ret_number_bool,    f_islocked},
+			ret_ସଂଖ୍ୟା_bool,    f_islocked},
     {"isnan",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
-			ret_number_bool,    MATH_FUNC(f_isnan)},
+			ret_ସଂଖ୍ୟା_bool,    MATH_FUNC(f_isnan)},
     {"items",		1, 1, FEARG_1,	    arg1_list_tuple_dict_blob_or_string,
 			"expr",
-			ret_list_items,	    f_items},
+			ret_list_ବସ୍ତୁଗୁଡ଼ିକ,	    f_ବସ୍ତୁଗୁଡ଼ିକ},
     {"job_getchannel",	1, 1, FEARG_1,	    arg1_job,
 			"job",
 			ret_channel,	    JOB_FUNC(f_job_getchannel)},
@@ -2842,55 +2842,55 @@ static const funcentry_T global_functions[] =
     {"job_status",	1, 1, FEARG_1,	    arg1_job,
 			"job",
 			ret_string,	    JOB_FUNC(f_job_status)},
-    {"job_stop",	1, 2, FEARG_1,	    arg2_job_string_or_number,
+    {"job_stop",	1, 2, FEARG_1,	    arg2_job_string_or_ସଂଖ୍ୟା,
 			"job, how",
-			ret_number_bool,    JOB_FUNC(f_job_stop)},
+			ret_ସଂଖ୍ୟା_bool,    JOB_FUNC(f_job_stop)},
     {"join",		1, 2, FEARG_1,	    arg2_list_or_tuple_string,
 			"expr, sep",
 			ret_string,	    f_join},
     {"js_decode",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_any,	    f_js_decode},
-    {"js_encode",	1, 1, FEARG_1,	    NULL,
+    {"js_encode",	1, 1, FEARG_1,	    ଖାଲି,
 			"expr",
 			ret_string,	    f_js_encode},
     {"json_decode",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_any,	    f_json_decode},
-    {"json_encode",	1, 1, FEARG_1,	    NULL,
+    {"json_encode",	1, 1, FEARG_1,	    ଖାଲି,
 			"expr",
 			ret_string,	    f_json_encode},
     {"keys",		1, 1, FEARG_1,	    arg1_dict_any,
 			"dict",
-			ret_list_string,    f_keys},
+			ret_list_string,    f_ଚାବିଗୁଡ଼ିକ},
     {"keytrans",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_string,	    f_keytrans},
-    {"last_buffer_nr",	0, 0, 0,	    NULL,	// obsolete
-			NULL,
-			ret_number,	    f_last_buffer_nr},
+    {"last_buffer_nr",	0, 0, 0,	    ଖାଲି,	// obsolete
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_last_buffer_nr},
     {"len",		1, 1, FEARG_1,	    arg1_len,
 			"expr",
-			ret_number,	    f_len},
+			ret_ସଂଖ୍ୟା,	    f_len},
     {"libcall",		3, 3, FEARG_3,	    arg3_libcall,
 			"libname, funcname, argument",
 			ret_string,	    f_libcall},
     {"libcallnr",	3, 3, FEARG_3,	    arg3_libcall,
 			"libname, funcname, argument",
-			ret_number,	    f_libcallnr},
-    {"line",		1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା,	    f_libcallnr},
+    {"line",		1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"expr, winid",
-			ret_number,	    f_line},
+			ret_ସଂଖ୍ୟା,	    f_ଧାଡ଼ି},
     {"line2byte",	1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_line2byte},
+			ret_ସଂଖ୍ୟା,	    f_line2byte},
     {"lispindent",	1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_lispindent},
-    {"list2blob",	1, 1, FEARG_1,	    arg1_list_number,
+			ret_ସଂଖ୍ୟା,	    f_lispindent},
+    {"list2blob",	1, 1, FEARG_1,	    arg1_list_ସଂଖ୍ୟା,
 			"list",
 			ret_blob,	    f_list2blob},
-    {"list2str",	1, 2, FEARG_1,	    arg2_list_number_bool,
+    {"list2str",	1, 2, FEARG_1,	    arg2_list_ସଂଖ୍ୟା_bool,
 			"list, utf8",
 			ret_string,	    f_list2str},
     {"list2tuple",	1, 1, FEARG_1,	    arg1_list_any,
@@ -2898,16 +2898,16 @@ static const funcentry_T global_functions[] =
 			ret_tuple_any,	    f_list2tuple},
     {"listener_add",	1, 3, FEARG_2,	    arg3_any_buffer_bool_or_dict,
 			"callback, buf, options",
-			ret_number,	    f_listener_add},
+			ret_ସଂଖ୍ୟା,	    f_listener_add},
     {"listener_flush",	0, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_void,	    f_listener_flush},
-    {"listener_remove",	1, 1, FEARG_1,	    arg1_number,
+    {"listener_remove",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
-			ret_number_bool,    f_listener_remove},
-    {"localtime",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_localtime},
+			ret_ସଂଖ୍ୟା_bool,    f_listener_remove},
+    {"localtime",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_localtime},
     {"log",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_log},
@@ -2919,8 +2919,8 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_LUA
 		f_luaeval
-#else
-		NULL
+#ଅନ୍ୟଥା
+		ଖାଲି
 #endif
 			},
     {"map",		2, 2, FEARG_1,	    arg2_map,
@@ -2943,25 +2943,25 @@ static const funcentry_T global_functions[] =
 			ret_void,	    f_mapset},
     {"match",		2, 4, FEARG_1,	    arg24_match_func,
 			"expr, pat, start, count",
-			ret_number,	    f_match},
+			ret_ସଂଖ୍ୟା,	    f_match},
     {"matchadd",	2, 5, FEARG_1,	    arg25_matchadd,
 			"group, pattern, priority, id, dict",
-			ret_number,	    f_matchadd},
+			ret_ସଂଖ୍ୟା,	    f_matchadd},
     {"matchaddpos",	2, 5, FEARG_1,	    arg25_matchaddpos,
 			"group, pos, priority, id, dict",
-			ret_number,	    f_matchaddpos},
-    {"matcharg",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_matchaddpos},
+    {"matcharg",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
 			ret_list_string,    f_matcharg},
     {"matchbufline",	4, 5, FEARG_1,	    arg45_matchbufline,
 			"buf, pat, lnum, end, dict",
 			ret_list_any,	    f_matchbufline},
-    {"matchdelete",	1, 2, FEARG_1,	    arg2_number,
+    {"matchdelete",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"id, win",
-			ret_number_bool,    f_matchdelete},
+			ret_ସଂଖ୍ୟା_bool,    f_matchdelete},
     {"matchend",	2, 4, FEARG_1,	    arg24_match_func,
 			"expr, pat, start, count",
-			ret_number,	    f_matchend},
+			ret_ସଂଖ୍ୟା,	    f_matchend},
     {"matchfuzzy",	2, 3, FEARG_1,	    arg3_list_string_dict,
 			"list, str, dict",
 			ret_list_any,	    f_matchfuzzy},
@@ -2988,16 +2988,16 @@ static const funcentry_T global_functions[] =
 			ret_dict_any,
 #ifdef FEAT_MENU
 	    f_menu_info
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"min",		1, 1, FEARG_1,	    arg1_list_or_tuple_or_dict,
 			"expr",
 			ret_max_min,	    f_min},
-    {"mkdir",		1, 3, FEARG_1,	    arg3_string_string_number,
+    {"mkdir",		1, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"name, flags, prot",
-			ret_number_bool,    f_mkdir},
+			ret_ସଂଖ୍ୟା_bool,    f_mkdir},
     {"mode",		0, 1, FEARG_1,	    arg1_bool,
 			"expr",
 			ret_string,	    f_mode},
@@ -3006,23 +3006,23 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_MZSCHEME
 	    f_mzeval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"nextnonblank",	1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_nextnonblank},
-    {"ngettext",	3, 4, FEARG_3,	    arg4_string_string_number_string,
+			ret_ସଂଖ୍ୟା,	    f_nextnonblank},
+    {"ngettext",	3, 4, FEARG_3,	    arg4_string_string_ସଂଖ୍ୟା_string,
 			"single, plural, number, domain",
 			ret_string,	    f_ngettext},
-    {"nr2char",		1, 2, FEARG_1,	    arg2_number_bool,
+    {"nr2char",		1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_bool,
 			"expr, utf8",
 			ret_string,	    f_nr2char},
-    {"or",		2, 2, FEARG_1,	    arg2_number,
+    {"or",		2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"expr1, expr2",
-			ret_number,	    f_or},
-    {"pathshorten",	1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା,	    f_or},
+    {"pathshorten",	1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"path, len",
 			ret_string,	    f_pathshorten},
     {"perleval",	1, 1, FEARG_1,	    arg1_string,
@@ -3030,88 +3030,88 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PERL
 	    f_perleval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"popup_atcursor",	2, 2, FEARG_1,	    arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_atcursor)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_atcursor)},
     {"popup_beval",	2, 2, FEARG_1,	    arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_beval)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_beval)},
     {"popup_clear",	0, 1, 0,	    arg1_bool,
 			"force",
 			ret_void,	    PROP_FUNC(f_popup_clear)},
-    {"popup_close",	1, 2, FEARG_1,	    arg2_number_any,
+    {"popup_close",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_any,
 			"id, result",
 			ret_void,	    PROP_FUNC(f_popup_close)},
     {"popup_create",	2, 2, FEARG_1,	    arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_create)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_create)},
     {"popup_dialog",	2, 2, FEARG_1,	    arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_dialog)},
-    {"popup_filter_menu", 2, 2, 0,	    arg2_number_string,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_dialog)},
+    {"popup_filter_menu", 2, 2, 0,	    arg2_ସଂଖ୍ୟା_string,
 			"id, key",
 			ret_bool,	    PROP_FUNC(f_popup_filter_menu)},
-    {"popup_filter_yesno", 2, 2, 0,	    arg2_number_string,
+    {"popup_filter_yesno", 2, 2, 0,	    arg2_ସଂଖ୍ୟା_string,
 			"id, key",
 			ret_bool,	    PROP_FUNC(f_popup_filter_yesno)},
-    {"popup_findecho",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    PROP_FUNC(f_popup_findecho)},
-    {"popup_findinfo",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    PROP_FUNC(f_popup_findinfo)},
-    {"popup_findpreview", 0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    PROP_FUNC(f_popup_findpreview)},
-    {"popup_getoptions", 1, 1, FEARG_1,	    arg1_number,
+    {"popup_findecho",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_findecho)},
+    {"popup_findinfo",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_findinfo)},
+    {"popup_findpreview", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_findpreview)},
+    {"popup_getoptions", 1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_dict_any,	    PROP_FUNC(f_popup_getoptions)},
-    {"popup_getpos",	1, 1, FEARG_1,	    arg1_number,
+    {"popup_getpos",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_dict_any,	    PROP_FUNC(f_popup_getpos)},
-    {"popup_hide",	1, 1, FEARG_1,	    arg1_number,
+    {"popup_hide",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_void,	    PROP_FUNC(f_popup_hide)},
-    {"popup_list",	0, 0, 0,	    NULL,
-			NULL,
-			ret_list_number,    PROP_FUNC(f_popup_list)},
-    {"popup_locate",	2, 2, 0,	    arg2_number,
+    {"popup_list",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_list_ସଂଖ୍ୟା,    PROP_FUNC(f_popup_list)},
+    {"popup_locate",	2, 2, 0,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
-			ret_number,	    PROP_FUNC(f_popup_locate)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_locate)},
     {"popup_menu",	2, 2, FEARG_1,	    arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_menu)},
-    {"popup_move",	2, 2, FEARG_1,	    arg2_number_dict_any,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_menu)},
+    {"popup_move",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_dict_any,
 			"id, options",
 			ret_void,	    PROP_FUNC(f_popup_move)},
     {"popup_notification", 2, 2, FEARG_1,   arg2_str_or_nr_or_list_dict,
 			"what, options",
-			ret_number,	    PROP_FUNC(f_popup_notification)},
-    {"popup_setbuf",	2, 2, FEARG_1,	    arg2_number_buffer,
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_notification)},
+    {"popup_setbuf",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_buffer,
 			"id, buf",
-			ret_number_bool,    PROP_FUNC(f_popup_setbuf)},
-    {"popup_setoptions", 2, 2, FEARG_1,	    arg2_number_dict_any,
+			ret_ସଂଖ୍ୟା_bool,    PROP_FUNC(f_popup_setbuf)},
+    {"popup_setoptions", 2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_dict_any,
 			"id, options",
 			ret_void,	    PROP_FUNC(f_popup_setoptions)},
-    {"popup_settext",	2, 2, FEARG_1,	    arg2_number_string_or_list,
+    {"popup_settext",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_string_or_list,
 			"id, text",
 			ret_void,	    PROP_FUNC(f_popup_settext)},
-    {"popup_show",	1, 1, FEARG_1,	    arg1_number,
+    {"popup_show",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
-			ret_number,	    PROP_FUNC(f_popup_show)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_popup_show)},
     {"pow",		2, 2, FEARG_1,	    arg2_float_or_nr,
 			"x, y",
 			ret_float,	    f_pow},
-    {"preinserted",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_preinserted},
+    {"preinserted",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_preinserted},
     {"prevnonblank",	1, 1, FEARG_1,	    arg1_lnum,
 			"lnum",
-			ret_number,	    f_prevnonblank},
+			ret_ସଂଖ୍ୟା,	    f_prevnonblank},
     {"printf",		1, 19, FEARG_2,	    arg119_printf,
 			"fmt, expr1",
 			ret_string,	    f_printf},
@@ -3127,24 +3127,24 @@ static const funcentry_T global_functions[] =
     {"prompt_setprompt", 2, 2, FEARG_1,	    arg2_buffer_string,
 			"buf, text",
 			ret_void,	    JOB_FUNC(f_prompt_setprompt)},
-    {"prop_add",	3, 3, FEARG_1,	    arg3_number_number_dict,
+    {"prop_add",	3, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_ସଂଖ୍ୟା_dict,
 			"lnum, col, props",
-			ret_number,	    PROP_FUNC(f_prop_add)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_prop_add)},
     {"prop_add_list",	2, 2, FEARG_1,	    arg2_dict_any_list_any,
 			"props",
 			ret_void,	    PROP_FUNC(f_prop_add_list)},
-    {"prop_clear",	1, 3, FEARG_1,	    arg3_number_number_dict,
+    {"prop_clear",	1, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_ସଂଖ୍ୟା_dict,
 			"lnum, lnum_end, props",
 			ret_void,	    PROP_FUNC(f_prop_clear)},
     {"prop_find",	1, 2, FEARG_1,	    arg2_dict_string,
 			"props, direction",
 			ret_dict_any,	    PROP_FUNC(f_prop_find)},
-    {"prop_list",	1, 2, FEARG_1,	    arg2_number_dict_any,
+    {"prop_list",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_dict_any,
 			"lnum, props",
 			ret_list_dict_any,  PROP_FUNC(f_prop_list)},
-    {"prop_remove",	1, 3, FEARG_1,	    arg3_dict_number_number,
+    {"prop_remove",	1, 3, FEARG_1,	    arg3_dict_ସଂଖ୍ୟା_ସଂଖ୍ୟା,
 			"props, lnum, lnum_end",
-			ret_number,	    PROP_FUNC(f_prop_remove)},
+			ret_ସଂଖ୍ୟା,	    PROP_FUNC(f_prop_remove)},
     {"prop_type_add",	2, 2, FEARG_1,	    arg2_string_dict,
 			"name, props",
 			ret_void,	    PROP_FUNC(f_prop_type_add)},
@@ -3160,19 +3160,19 @@ static const funcentry_T global_functions[] =
     {"prop_type_list",	0, 1, FEARG_1,	    arg1_dict_any,
 			"props",
 			ret_list_string,    PROP_FUNC(f_prop_type_list)},
-    {"pum_getpos",	0, 0, 0,	    NULL,
-			NULL,
-			ret_dict_number,    f_pum_getpos},
-    {"pumvisible",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number_bool,    f_pumvisible},
+    {"pum_getpos",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_dict_ସଂଖ୍ୟା,    f_pum_getpos},
+    {"pumvisible",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା_bool,    f_pumvisible},
     {"py3eval",		1, 2, FEARG_1,	    arg2_string_dict,
 			"expr, locals",
 			ret_any,
 #ifdef FEAT_PYTHON3
 	    f_py3eval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 	    },
     {"pyeval",		1, 2, FEARG_1,	    arg2_string_dict,
@@ -3180,26 +3180,26 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PYTHON
 	    f_pyeval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"pyxeval",		1, 2, FEARG_1,	    arg2_string_dict,
 			"expr, locals",
 			ret_any,
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 	    f_pyxeval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
-    {"rand",		0, 1, FEARG_1,	    arg1_list_number,
+    {"rand",		0, 1, FEARG_1,	    arg1_list_ସଂଖ୍ୟା,
 			"expr",
-			ret_number,	    f_rand},
-    {"range",		1, 3, FEARG_1,	    arg3_number,
+			ret_ସଂଖ୍ୟା,	    f_rand},
+    {"range",		1, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା,
 			"expr, max, stride",
-			ret_list_number,    f_range},
-    {"readblob",	1, 3, FEARG_1,	    arg3_string_number_number,
+			ret_list_ସଂଖ୍ୟା,    f_range},
+    {"readblob",	1, 3, FEARG_1,	    arg3_string_ସଂଖ୍ୟା_ସଂଖ୍ୟା,
 			"fname, offset, size",
 			ret_blob,	    f_readblob},
     {"readdir",		1, 3, FEARG_1,	    arg3_string_any_dict,
@@ -3208,43 +3208,43 @@ static const funcentry_T global_functions[] =
     {"readdirex",	1, 3, FEARG_1,	    arg3_string_any_dict,
 			"directory, expr, dict",
 			ret_list_dict_any,  f_readdirex},
-    {"readfile",	1, 3, FEARG_1,	    arg3_string_string_number,
+    {"readfile",	1, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"fname, type, max",
 			ret_list_string,    f_readfile},
     {"redraw_listener_add", 1, 1, FEARG_1,  arg1_dict_any,
 			"opts",
-			ret_number,	    f_redraw_listener_add},
-    {"redraw_listener_remove", 1, 1, FEARG_1, arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_redraw_listener_add},
+    {"redraw_listener_remove", 1, 1, FEARG_1, arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_void,	    f_redraw_listener_remove},
     {"reduce",		2, 3, FEARG_1,	    arg23_reduce,
 			"object, func, initial",
 			ret_any,	    f_reduce},
-    {"reg_executing",	0, 0, 0,	    NULL,
-			NULL,
+    {"reg_executing",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_reg_executing},
-    {"reg_recording",	0, 0, 0,	    NULL,
-			NULL,
+    {"reg_recording",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_reg_recording},
-    {"reltime",		0, 2, FEARG_1,	    arg2_list_number,
+    {"reltime",		0, 2, FEARG_1,	    arg2_list_ସଂଖ୍ୟା,
 			"start, end",
-			ret_list_number,    f_reltime},
-    {"reltimefloat",	1, 1, FEARG_1,	    arg1_list_number,
+			ret_list_ସଂଖ୍ୟା,    f_reltime},
+    {"reltimefloat",	1, 1, FEARG_1,	    arg1_list_ସଂଖ୍ୟା,
 			"time",
 			ret_float,	    f_reltimefloat},
-    {"reltimestr",	1, 1, FEARG_1,	    arg1_list_number,
+    {"reltimestr",	1, 1, FEARG_1,	    arg1_list_ସଂଖ୍ୟା,
 			"time",
 			ret_string,	    f_reltimestr},
-    {"remote_expr",	2, 4, FEARG_1,	    arg24_remote_expr,
+    {"remote_expr",	2, 4, FEARG_1,	    arg24_remote_ପଦସମଷ୍ଟି,
 			"server, string, idvar, timeout",
-			ret_string,	    f_remote_expr},
+			ret_string,	    f_remote_ପଦସମଷ୍ଟି},
     {"remote_foreground", 1, 1, FEARG_1,    arg1_string,
 			"server",
 			ret_void,	    f_remote_foreground},
     {"remote_peek",	1, 2, FEARG_1,	    arg2_string,
 			"serverid, retvar",
-			ret_number,	    f_remote_peek},
-    {"remote_read",	1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା,	    f_remote_peek},
+    {"remote_read",	1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"serverid, timeout",
 			ret_string,	    f_remote_read},
     {"remote_send",	2, 3, FEARG_1,	    arg3_string,
@@ -3258,7 +3258,7 @@ static const funcentry_T global_functions[] =
 			ret_remove,	    f_remove},
     {"rename",		2, 2, FEARG_1,	    arg2_string,
 			"from, to",
-			ret_number_bool,    f_rename},
+			ret_ସଂଖ୍ୟା_bool,    f_rename},
     {"repeat",		2, 2, FEARG_1,	    arg2_repeat,
 			"expr, count",
 			ret_repeat,	    f_repeat},
@@ -3276,113 +3276,113 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_RUBY
 	    f_rubyeval
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
-    {"screenattr",	2, 2, FEARG_1,	    arg2_number,
+    {"screenattr",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
-			ret_number,	    f_screenattr},
-    {"screenchar",	2, 2, FEARG_1,	    arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_screenattr},
+    {"screenchar",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
-			ret_number,	    f_screenchar},
-    {"screenchars",	2, 2, FEARG_1,	    arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_screenchar},
+    {"screenchars",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
-			ret_list_number,    f_screenchars},
-    {"screencol",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_screencol},
-    {"screenpos",	3, 3, FEARG_1,	    arg3_number,
+			ret_list_ସଂଖ୍ୟା,    f_screenchars},
+    {"screencol",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_screencol},
+    {"screenpos",	3, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା,
 			"winid, lnum, col",
-			ret_dict_number,    f_screenpos},
-    {"screenrow",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_screenrow},
-    {"screenstring",	2, 2, FEARG_1,	    arg2_number,
+			ret_dict_ସଂଖ୍ୟା,    f_screenpos},
+    {"screenrow",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_screenrow},
+    {"screenstring",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
 			ret_string,	    f_screenstring},
-    {"search",		1, 5, FEARG_1,	    arg15_search,
+    {"search",		1, 5, FEARG_1,	    arg15_ସନ୍ଧାନ,
 			"pattern, flags, stopline, timeout, skip",
-			ret_number,	    f_search},
+			ret_ସଂଖ୍ୟା,	    f_ସନ୍ଧାନ},
     {"searchcount",	0, 1, FEARG_1,	    arg1_dict_any,
 			"options",
-			ret_dict_number,    f_searchcount},
+			ret_dict_ସଂଖ୍ୟା,    f_searchcount},
     {"searchdecl",	1, 3, FEARG_1,	    arg3_string_bool_bool,
 			"name, global, thisblock",
-			ret_number_bool,    f_searchdecl},
+			ret_ସଂଖ୍ୟା_bool,    f_searchdecl},
     {"searchpair",	3, 7, 0,	    arg37_searchpair,
 			"start, middle, end, flags, skip, stopline, timeout",
-			ret_number,	    f_searchpair},
+			ret_ସଂଖ୍ୟା,	    f_searchpair},
     {"searchpairpos",	3, 7, 0,	    arg37_searchpair,
 			"start, middle, end, flags, skip, stopline, timeout",
-			ret_list_number,    f_searchpairpos},
-    {"searchpos",	1, 5, FEARG_1,	    arg15_search,
+			ret_list_ସଂଖ୍ୟା,    f_searchpairpos},
+    {"searchpos",	1, 5, FEARG_1,	    arg15_ସନ୍ଧାନ,
 			"pattern, flags, stopline, timeout, skip",
-			ret_list_number,    f_searchpos},
+			ret_list_ସଂଖ୍ୟା,    f_searchpos},
     {"server2client",	2, 2, FEARG_1,	    arg2_string,
 			"clientid, string",
-			ret_number_bool,    f_server2client},
+			ret_ସଂଖ୍ୟା_bool,    f_server2client},
     {"serverlist",	0, 1, 0,	    arg1_dict_any,
 			"dict",
 			ret_string_or_any_1,	    f_serverlist},
     {"setbufline",	3, 3, FEARG_3,	    arg3_setbufline,
 			"buf, lnum, text",
-			ret_number_bool,    f_setbufline},
+			ret_ସଂଖ୍ୟା_bool,    f_setbufline},
     {"setbufvar",	3, 3, FEARG_3,	    arg3_buffer_string_any,
 			"buf, varname, val",
 			ret_void,	    f_setbufvar},
     {"setcellwidths",	1, 1, FEARG_1,	    arg1_list_any,
 			"list",
 			ret_void,	    f_setcellwidths},
-    {"setcharpos",	2, 2, FEARG_2,	    arg2_string_list_number,
+    {"setcharpos",	2, 2, FEARG_2,	    arg2_string_list_ସଂଖ୍ୟା,
 			"expr, list",
-			ret_number_bool,    f_setcharpos},
+			ret_ସଂଖ୍ୟା_bool,    f_setcharpos},
     {"setcharsearch",	1, 1, FEARG_1,	    arg1_dict_any,
 			"dict",
 			ret_void,	    f_setcharsearch},
-    {"setcmdline",	1, 2, FEARG_1,	    arg2_string_number,
+    {"setcmdline",	1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"str, pos",
-			ret_number_bool,    f_setcmdline},
-    {"setcmdpos",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା_bool,    f_setcmdline},
+    {"setcmdpos",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"pos",
-			ret_number_bool,    f_setcmdpos},
+			ret_ସଂଖ୍ୟା_bool,    f_setcmdpos},
     {"setcursorcharpos", 1, 3, FEARG_1,	    arg13_cursor,
 			"lnum, col, off",
-			ret_number_bool,    f_setcursorcharpos},
+			ret_ସଂଖ୍ୟା_bool,    f_setcursorcharpos},
     {"setenv",		2, 2, FEARG_2,	    arg2_string_any,
 			"name, val",
 			ret_void,	    f_setenv},
     {"setfperm",	2, 2, FEARG_1,	    arg2_string,
 			"fname, mode",
-			ret_number_bool,    f_setfperm},
+			ret_ସଂଖ୍ୟା_bool,    f_setfperm},
     {"setline",		2, 2, FEARG_2,	    arg2_setline,
 			"lnum, text",
-			ret_number_bool,    f_setline},
+			ret_ସଂଖ୍ୟା_bool,    f_setline},
     {"setloclist",	2, 4, FEARG_2,	    arg24_setloclist,
 			"nr, list, action, what",
-			ret_number_bool,    f_setloclist},
-    {"setmatches",	1, 2, FEARG_1,	    arg2_list_any_number,
+			ret_ସଂଖ୍ୟା_bool,    f_setloclist},
+    {"setmatches",	1, 2, FEARG_1,	    arg2_list_any_ସଂଖ୍ୟା,
 			"list, win",
-			ret_number_bool,    f_setmatches},
-    {"setpos",		2, 2, FEARG_2,	    arg2_string_list_number,
+			ret_ସଂଖ୍ୟା_bool,    f_setmatches},
+    {"setpos",		2, 2, FEARG_2,	    arg2_string_list_ସଂଖ୍ୟା,
 			"expr, list",
-			ret_number_bool,    f_setpos},
+			ret_ସଂଖ୍ୟା_bool,    f_setpos},
     {"setqflist",	1, 3, FEARG_1,	    arg13_setqflist,
 			"list, action, what",
-			ret_number_bool,    f_setqflist},
+			ret_ସଂଖ୍ୟା_bool,    f_setqflist},
     {"setreg",		2, 3, FEARG_2,	    arg3_string_any_string,
 			"regname, value, options",
-			ret_number_bool,    f_setreg},
-    {"settabvar",	3, 3, FEARG_3,	    arg3_number_string_any,
+			ret_ସଂଖ୍ୟା_bool,    f_setreg},
+    {"settabvar",	3, 3, FEARG_3,	    arg3_ସଂଖ୍ୟା_string_any,
 			"tabnr, varname, val",
 			ret_void,	    f_settabvar},
-    {"settabwinvar",	4, 4, FEARG_4,	    arg4_number_number_string_any,
+    {"settabwinvar",	4, 4, FEARG_4,	    arg4_ସଂଖ୍ୟା_ସଂଖ୍ୟା_string_any,
 			"tabnr, winnr, varname, val",
 			ret_void,	    f_settabwinvar},
     {"settagstack",	2, 3, FEARG_2,	    arg23_settagstack,
 			"nr, dict, action",
-			ret_number_bool,    f_settagstack},
-    {"setwinvar",	3, 3, FEARG_3,	    arg3_number_string_any,
+			ret_ସଂଖ୍ୟା_bool,    f_settagstack},
+    {"setwinvar",	3, 3, FEARG_3,	    arg3_ସଂଖ୍ୟା_string_any,
 			"winnr, varname, val",
 			ret_void,	    f_setwinvar},
     {"sha256",		1, 1, FEARG_1,	    arg1_string_or_blob,
@@ -3390,16 +3390,16 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef FEAT_CRYPT
 	    f_sha256
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"shellescape",	1, 2, FEARG_1,	    arg2_string_bool,
 			"string, special",
 			ret_string,	    f_shellescape},
-    {"shiftwidth",	0, 1, FEARG_1,	    arg1_number,
+    {"shiftwidth",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"col",
-			ret_number,	    f_shiftwidth},
+			ret_ସଂଖ୍ୟା,	    f_shiftwidth},
     {"sign_define",	1, 2, FEARG_1,	    arg2_string_or_list_dict,
 			"name, dict",
 			ret_sign_define,	    SIGN_FUNC(f_sign_define)},
@@ -3409,24 +3409,24 @@ static const funcentry_T global_functions[] =
     {"sign_getplaced",	0, 2, FEARG_1,	    arg02_sign_getplaced,
 			"buf, dict",
 			ret_list_dict_any,  SIGN_FUNC(f_sign_getplaced)},
-    {"sign_jump",	3, 3, FEARG_1,	    arg3_number_string_buffer,
+    {"sign_jump",	3, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_string_buffer,
 			"id, group, buf",
-			ret_number,	    SIGN_FUNC(f_sign_jump)},
+			ret_ସଂଖ୍ୟା,	    SIGN_FUNC(f_sign_jump)},
     {"sign_place",	4, 5, FEARG_1,	    arg45_sign_place,
 			"id, group, name, buf, dict",
-			ret_number,	    SIGN_FUNC(f_sign_place)},
+			ret_ସଂଖ୍ୟା,	    SIGN_FUNC(f_sign_place)},
     {"sign_placelist",	1, 1, FEARG_1,	    arg1_list_any,
 			"list",
-			ret_list_number,    SIGN_FUNC(f_sign_placelist)},
+			ret_list_ସଂଖ୍ୟା,    SIGN_FUNC(f_sign_placelist)},
     {"sign_undefine",	0, 1, FEARG_1,	    arg1_string_or_list_string,
 			"name",
-			ret_number_bool,    SIGN_FUNC(f_sign_undefine)},
+			ret_ସଂଖ୍ୟା_bool,    SIGN_FUNC(f_sign_undefine)},
     {"sign_unplace",	1, 2, FEARG_1,	    arg2_string_dict,
 			"group, dict",
-			ret_number_bool,    SIGN_FUNC(f_sign_unplace)},
+			ret_ସଂଖ୍ୟା_bool,    SIGN_FUNC(f_sign_unplace)},
     {"sign_unplacelist", 1, 1, FEARG_1,	    arg1_list_any,
 			"list",
-			ret_list_number,    SIGN_FUNC(f_sign_unplacelist)},
+			ret_list_ସଂଖ୍ୟା,    SIGN_FUNC(f_sign_unplacelist)},
     {"simplify",	1, 1, FEARG_1,	    arg1_string,
 			"filename",
 			ret_string,	    f_simplify},
@@ -3442,16 +3442,16 @@ static const funcentry_T global_functions[] =
     {"sort",		1, 3, FEARG_1,	    arg13_sortuniq,
 			"list, how, dict",
 			ret_first_arg,	    f_sort},
-    {"sound_clear",	0, 0, 0,	    NULL,
-			NULL,
+    {"sound_clear",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    SOUND_FUNC(f_sound_clear)},
     {"sound_playevent",	1, 2, FEARG_1,	    arg2_string_any,
 			"name, callback",
-			ret_number,	    SOUND_FUNC(f_sound_playevent)},
+			ret_ସଂଖ୍ୟା,	    SOUND_FUNC(f_sound_playevent)},
     {"sound_playfile",	1, 2, FEARG_1,	    arg2_string_any,
 			"path, callback",
-			ret_number,	    SOUND_FUNC(f_sound_playfile)},
-    {"sound_stop",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    SOUND_FUNC(f_sound_playfile)},
+    {"sound_stop",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_void,	    SOUND_FUNC(f_sound_stop)},
     {"soundfold",	1, 1, FEARG_1,	    arg1_string,
@@ -3460,7 +3460,7 @@ static const funcentry_T global_functions[] =
     {"spellbadword",	0, 1, FEARG_1,	    arg1_string,
 			"sentence",
 			ret_list_string,    f_spellbadword},
-    {"spellsuggest",	1, 3, FEARG_1,	    arg3_string_number_bool,
+    {"spellsuggest",	1, 3, FEARG_1,	    arg3_string_ସଂଖ୍ୟା_bool,
 			"word, max, capital",
 			ret_list_string,    f_spellsuggest},
     {"split",		1, 3, FEARG_1,	    arg3_string_string_bool,
@@ -3469,9 +3469,9 @@ static const funcentry_T global_functions[] =
     {"sqrt",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_sqrt},
-    {"srand",		0, 1, FEARG_1,	    arg1_number,
+    {"srand",		0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
-			ret_list_number,    f_srand},
+			ret_list_ସଂଖ୍ୟା,    f_srand},
     {"state",		0, 1, FEARG_1,	    arg1_string,
 			"what",
 			ret_string,	    f_state},
@@ -3483,75 +3483,75 @@ static const funcentry_T global_functions[] =
 			ret_float,	    f_str2float},
     {"str2list",	1, 2, FEARG_1,	    arg2_string_bool,
 			"string, utf8",
-			ret_list_number,    f_str2list},
-    {"str2nr",		1, 3, FEARG_1,	    arg3_string_number_bool,
+			ret_list_ସଂଖ୍ୟା,    f_str2list},
+    {"str2nr",		1, 3, FEARG_1,	    arg3_string_ସଂଖ୍ୟା_bool,
 			"string, base, quoted",
-			ret_number,	    f_str2nr},
+			ret_ସଂଖ୍ୟା,	    f_str2nr},
     {"strcharlen",	1, 1, FEARG_1,	    arg1_string_or_nr,
 			"string",
-			ret_number,	    f_strcharlen},
+			ret_ସଂଖ୍ୟା,	    f_strcharlen},
     {"strcharpart",	2, 4, FEARG_1,	    arg24_strpart,
 			"src, start, len, skipcc",
 			ret_string,	    f_strcharpart},
     {"strchars",	1, 2, FEARG_1,	    arg2_string_bool,
 			"string, skipcc",
-			ret_number,	    f_strchars},
-    {"strdisplaywidth",	1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା,	    f_strchars},
+    {"strdisplaywidth",	1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"string, col",
-			ret_number,	    f_strdisplaywidth},
-    {"strftime",	1, 2, FEARG_1,	    arg2_string_number,
+			ret_ସଂଖ୍ୟା,	    f_strdisplaywidth},
+    {"strftime",	1, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"format, time",
 			ret_string,
 #ifdef HAVE_STRFTIME
 	    f_strftime
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
-    {"strgetchar",	2, 2, FEARG_1,	    arg2_string_number,
+    {"strgetchar",	2, 2, FEARG_1,	    arg2_string_ସଂଖ୍ୟା,
 			"str, index",
-			ret_number,	    f_strgetchar},
-    {"stridx",		2, 3, FEARG_1,	    arg3_string_string_number,
+			ret_ସଂଖ୍ୟା,	    f_strgetchar},
+    {"stridx",		2, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"haystack, needle, start",
-			ret_number,	    f_stridx},
-    {"string",		1, 1, FEARG_1|FE_X, NULL,
+			ret_ସଂଖ୍ୟା,	    f_stridx},
+    {"string",		1, 1, FEARG_1|FE_X, ଖାଲି,
 			"expr",
 			ret_string,	    f_string},
     {"strlen",		1, 1, FEARG_1,	    arg1_string_or_nr,
 			"string",
-			ret_number,	    f_strlen},
+			ret_ସଂଖ୍ୟା,	    f_strlen},
     {"strpart",		2, 4, FEARG_1,	    arg24_strpart,
 			"src, start, len, chars",
 			ret_string,	    f_strpart},
     {"strptime",	2, 2, FEARG_1,	    arg2_string,
 			"format, timestring",
-			ret_number,
+			ret_ସଂଖ୍ୟା,
 #ifdef HAVE_STRPTIME
 	    f_strptime
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
-    {"strridx",		2, 3, FEARG_1,	    arg3_string_string_number,
+    {"strridx",		2, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"haystack, needle, start",
-			ret_number,	    f_strridx},
+			ret_ସଂଖ୍ୟା,	    f_strridx},
     {"strtrans",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_string,	    f_strtrans},
     {"strutf16len",	1, 2, FEARG_1,	    arg2_string_bool,
 			"string, countcc",
-			ret_number,	    f_strutf16len},
+			ret_ସଂଖ୍ୟା,	    f_strutf16len},
     {"strwidth",	1, 1, FEARG_1,	    arg1_string,
 			"string",
-			ret_number,	    f_strwidth},
-    {"submatch",	1, 2, FEARG_1,	    arg2_number_bool,
+			ret_ସଂଖ୍ୟା,	    f_strwidth},
+    {"submatch",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_bool,
 			"nr, list",
 			ret_string_or_any_2,	    f_submatch},
     {"substitute",	4, 4, FEARG_1,	    arg4_string_string_any_string,
 			"string, pat, sub, flags",
 			ret_string,	    f_substitute},
-    {"swapfilelist",	0, 0, 0,	    NULL,
-			NULL,
+    {"swapfilelist",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_string,    f_swapfilelist},
     {"swapinfo",	1, 1, FEARG_1,	    arg1_string,
 			"fname",
@@ -3559,44 +3559,44 @@ static const funcentry_T global_functions[] =
     {"swapname",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_string,	    f_swapname},
-    {"synID",		3, 3, 0,	    arg3_lnum_number_bool,
+    {"synID",		3, 3, 0,	    arg3_lnum_ସଂଖ୍ୟା_bool,
 			"lnum, col, trans",
-			ret_number,	    f_synID},
-    {"synIDattr",	2, 3, FEARG_1,	    arg3_number_string_string,
+			ret_ସଂଖ୍ୟା,	    f_synID},
+    {"synIDattr",	2, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_string_string,
 			"synID, what, mode",
 			ret_string,	    f_synIDattr},
-    {"synIDtrans",	1, 1, FEARG_1,	    arg1_number,
+    {"synIDtrans",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"synID",
-			ret_number,	    f_synIDtrans},
-    {"synconcealed",	2, 2, 0,	    arg2_lnum_number,
+			ret_ସଂଖ୍ୟା,	    f_synIDtrans},
+    {"synconcealed",	2, 2, 0,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, col",
 			ret_list_any,	    f_synconcealed},
-    {"synstack",	2, 2, 0,	    arg2_lnum_number,
+    {"synstack",	2, 2, 0,	    arg2_lnum_ସଂଖ୍ୟା,
 			"lnum, col",
-			ret_list_number,    f_synstack},
+			ret_list_ସଂଖ୍ୟା,    f_synstack},
     {"system",		1, 2, FEARG_1,	    arg12_system,
 			"expr, input",
 			ret_string,	    f_system},
     {"systemlist",	1, 2, FEARG_1,	    arg12_system,
 			"expr, input",
 			ret_list_string,    f_systemlist},
-    {"tabpagebuflist",	0, 1, FEARG_1,	    arg1_number,
+    {"tabpagebuflist",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"arg",
-			ret_list_number,    f_tabpagebuflist},
+			ret_list_ସଂଖ୍ୟା,    f_tabpagebuflist},
     {"tabpagenr",	0, 1, 0,	    arg1_string,
 			"arg",
-			ret_number,	    f_tabpagenr},
-    {"tabpagewinnr",	1, 2, FEARG_1,	    arg2_number_string,
+			ret_ସଂଖ୍ୟା,	    f_tabpagenr},
+    {"tabpagewinnr",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_string,
 			"tabarg, arg",
-			ret_number,	    f_tabpagewinnr},
-    {"tabpanel_getinfo", 0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା,	    f_tabpagewinnr},
+    {"tabpanel_getinfo", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_any,	    TABPANEL_FUNC(f_tabpanel_getinfo)},
-    {"tabpanel_scroll",	1, 2, FEARG_1,	    arg2_number_dict_any,
+    {"tabpanel_scroll",	1, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_dict_any,
 			"n, opts",
 			ret_bool,	    TABPANEL_FUNC(f_tabpanel_scroll)},
-    {"tagfiles",	0, 0, 0,	    NULL,
-			NULL,
+    {"tagfiles",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_string,    f_tagfiles},
     {"taglist",		1, 2, FEARG_1,	    arg2_string,
 			"expr, filename",
@@ -3607,33 +3607,33 @@ static const funcentry_T global_functions[] =
     {"tanh",		1, 1, FEARG_1,	    arg1_float_or_nr,
 			"expr",
 			ret_float,	    f_tanh},
-    {"tempname",	0, 0, 0,	    NULL,
-			NULL,
+    {"tempname",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_tempname},
     {"term_dumpdiff",	2, 3, FEARG_1,	    arg3_string_string_dict,
 			"filename1, filename2, options",
-			ret_number,	    TERM_FUNC(f_term_dumpdiff)},
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_dumpdiff)},
     {"term_dumpload",	1, 2, FEARG_1,	    arg2_string_dict,
 			"filename, options",
-			ret_number,	    TERM_FUNC(f_term_dumpload)},
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_dumpload)},
     {"term_dumpwrite",	2, 3, FEARG_2,	    arg3_buffer_string_dict,
 			"buf, filename, options",
 			ret_void,	    TERM_FUNC(f_term_dumpwrite)},
     {"term_getaltscreen", 1, 1, FEARG_1,    arg1_buffer,
 			"buf",
-			ret_number,	    TERM_FUNC(f_term_getaltscreen)},
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_getaltscreen)},
     {"term_getansicolors", 1, 1, FEARG_1,   arg1_buffer,
 			"buf",
 			ret_list_string,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#ଯଦି defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_getansicolors
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
-    {"term_getattr",	2, 2, FEARG_1,	    arg2_number_string,
+    {"term_getattr",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_string,
 			"attr, what",
-			ret_number,	    TERM_FUNC(f_term_getattr)},
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_getattr)},
     {"term_getcursor",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_list_any,	    TERM_FUNC(f_term_getcursor)},
@@ -3645,10 +3645,10 @@ static const funcentry_T global_functions[] =
 			ret_string,	    TERM_FUNC(f_term_getline)},
     {"term_getscrolled", 1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_number,	    TERM_FUNC(f_term_getscrolled)},
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_getscrolled)},
     {"term_getsize",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
-			ret_list_number,    TERM_FUNC(f_term_getsize)},
+			ret_list_ସଂଖ୍ୟା,    TERM_FUNC(f_term_getsize)},
     {"term_getstatus",	1, 1, FEARG_1,	    arg1_buffer,
 			"buf",
 			ret_string,	    TERM_FUNC(f_term_getstatus)},
@@ -3658,9 +3658,9 @@ static const funcentry_T global_functions[] =
     {"term_gettty",	1, 2, FEARG_1,	    arg2_buffer_bool,
 			"buf, input",
 			ret_string,	    TERM_FUNC(f_term_gettty)},
-    {"term_list",	0, 0, 0,	    NULL,
-			NULL,
-			ret_list_number,    TERM_FUNC(f_term_list)},
+    {"term_list",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_list_ସଂଖ୍ୟା,    TERM_FUNC(f_term_list)},
     {"term_scrape",	2, 2, FEARG_1,	    arg2_buffer_lnum,
 			"buf, row",
 			ret_list_dict_any,  TERM_FUNC(f_term_scrape)},
@@ -3670,10 +3670,10 @@ static const funcentry_T global_functions[] =
     {"term_setansicolors", 2, 2, FEARG_1,   arg2_buffer_list_any,
 			"buf, colors",
 			ret_void,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#ଯଦି defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_setansicolors
-#else
-	    NULL
+#ଅନ୍ୟଥା
+	    ଖାଲି
 #endif
 			},
     {"term_setapi",	2, 2, FEARG_1,	    arg2_buffer_string,
@@ -3685,36 +3685,36 @@ static const funcentry_T global_functions[] =
     {"term_setrestore",	2, 2, FEARG_1,	    arg2_buffer_string,
 			"buf, command",
 			ret_void,	    TERM_FUNC(f_term_setrestore)},
-    {"term_setsize",	3, 3, FEARG_1,	    arg3_buffer_number_number,
+    {"term_setsize",	3, 3, FEARG_1,	    arg3_buffer_ସଂଖ୍ୟା_ସଂଖ୍ୟା,
 			"buf, rows, cols",
 			ret_void,	    TERM_FUNC(f_term_setsize)},
     {"term_start",	1, 2, FEARG_1,	    arg2_string_or_list_dict,
 			"cmd, options",
-			ret_number,	    TERM_FUNC(f_term_start)},
-    {"term_wait",	1, 2, FEARG_1,	    arg2_buffer_number,
+			ret_ସଂଖ୍ୟା,	    TERM_FUNC(f_term_start)},
+    {"term_wait",	1, 2, FEARG_1,	    arg2_buffer_ସଂଖ୍ୟା,
 			"buf, time",
 			ret_void,	    TERM_FUNC(f_term_wait)},
-    {"terminalprops",	0, 0, 0,	    NULL,
-			NULL,
+    {"terminalprops",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_string,    f_terminalprops},
-    {"test_alloc_fail",	3, 3, FEARG_1,	    arg3_number,
+    {"test_alloc_fail",	3, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା,
 			"id, countdown, repeat",
 			ret_void,	    f_test_alloc_fail},
-    {"test_autochdir",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_autochdir",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_test_autochdir},
     {"test_feedinput",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_void,	    f_test_feedinput},
-    {"test_garbagecollect_now",	0, 0, 0,    NULL,
-			NULL,
+    {"test_garbagecollect_now",	0, 0, 0,    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_test_garbagecollect_now},
-    {"test_garbagecollect_soon", 0, 0, 0,   NULL,
-			NULL,
+    {"test_garbagecollect_soon", 0, 0, 0,   ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_test_garbagecollect_soon},
     {"test_getvalue",	1, 1, FEARG_1,	    arg1_string,
 			"name",
-			ret_number,	    f_test_getvalue},
+			ret_ସଂଖ୍ୟା,	    f_test_getvalue},
     {"test_gui_event",	2, 2, FEARG_1,	    arg2_string_dict,
 			"event, args",
 			ret_bool,	    f_test_gui_event},
@@ -3724,71 +3724,71 @@ static const funcentry_T global_functions[] =
     {"test_mswin_event", 2, 2, FEARG_1,     arg2_string_dict,
 			"event, args",
 			ret_bool,	    f_test_mswin_event},
-    {"test_null_blob",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_blob",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_blob,	    f_test_null_blob},
-    {"test_null_channel", 0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_channel", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_channel,	    JOB_FUNC(f_test_null_channel)},
-    {"test_null_dict",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_dict",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_dict_any,	    f_test_null_dict},
-    {"test_null_function", 0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_function", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_func_any,	    f_test_null_function},
-    {"test_null_job",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_job",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_job,	    JOB_FUNC(f_test_null_job)},
-    {"test_null_list",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_list",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_list_any,	    f_test_null_list},
-    {"test_null_partial", 0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_partial", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_func_any,	    f_test_null_partial},
-    {"test_null_string", 0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_string", 0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_test_null_string},
-    {"test_null_tuple",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_null_tuple",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_tuple_any,	    f_test_null_tuple},
     {"test_option_not_set", 1, 1, FEARG_1,  arg1_string,
 			"name",
 			ret_void,	    f_test_option_not_set},
-    {"test_override",	2, 2, FEARG_2,	    arg2_string_number,
+    {"test_override",	2, 2, FEARG_2,	    arg2_string_ସଂଖ୍ୟା,
 			"name, val",
 			ret_void,	    f_test_override},
-    {"test_refcount",	1, 1, FEARG_1|FE_X, NULL,
+    {"test_refcount",	1, 1, FEARG_1|FE_X, ଖାଲି,
 			"expr",
-			ret_number,	    f_test_refcount},
-    {"test_setmouse",	2, 2, 0,	    arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_test_refcount},
+    {"test_setmouse",	2, 2, 0,	    arg2_ସଂଖ୍ୟା,
 			"row, col",
 			ret_void,	    f_test_setmouse},
-    {"test_settime",	1, 1, FEARG_1,	    arg1_number,
+    {"test_settime",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
 			ret_void,	    f_test_settime},
-    {"test_srand_seed",	0, 1, FEARG_1,	    arg1_number,
+    {"test_srand_seed",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"seed",
 			ret_void,	    f_test_srand_seed},
-    {"test_unknown",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_unknown",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_any,	    f_test_unknown},
-    {"test_void",	0, 0, 0,	    NULL,
-			NULL,
+    {"test_void",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_test_void},
-    {"timer_info",	0, 1, FEARG_1,	    arg1_number,
+    {"timer_info",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"id",
 			ret_list_dict_any,  TIMER_FUNC(f_timer_info)},
-    {"timer_pause",	2, 2, FEARG_1,	    arg2_number_bool,
+    {"timer_pause",	2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା_bool,
 			"timer, paused",
 			ret_void,	    TIMER_FUNC(f_timer_pause)},
-    {"timer_start",	2, 3, FEARG_1,	    arg3_number_any_dict,
+    {"timer_start",	2, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_any_dict,
 			"time, callback, options",
-			ret_number,	    TIMER_FUNC(f_timer_start)},
-    {"timer_stop",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    TIMER_FUNC(f_timer_start)},
+    {"timer_stop",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"timer",
 			ret_void,	    TIMER_FUNC(f_timer_stop)},
-    {"timer_stopall",	0, 0, 0,	    NULL,
-			NULL,
+    {"timer_stopall",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    TIMER_FUNC(f_timer_stopall)},
     {"tolower",		1, 1, FEARG_1,	    arg1_string,
 			"expr",
@@ -3799,7 +3799,7 @@ static const funcentry_T global_functions[] =
     {"tr",		3, 3, FEARG_1,	    arg3_string,
 			"src, fromstr, tostr",
 			ret_string,	    f_tr},
-    {"trim",		1, 3, FEARG_1,	    arg3_string_string_number,
+    {"trim",		1, 3, FEARG_1,	    arg3_string_string_ସଂଖ୍ୟା,
 			"text, mask, dir",
 			ret_string,	    f_trim},
     {"trunc",		1, 1, FEARG_1,	    arg1_float_or_nr,
@@ -3808,10 +3808,10 @@ static const funcentry_T global_functions[] =
     {"tuple2list",	1, 1, FEARG_1,	    arg1_tuple_any,
 			"tuple",
 			ret_list_any,	    f_tuple2list},
-    {"type",		1, 1, FEARG_1|FE_X, NULL,
+    {"type",		1, 1, FEARG_1|FE_X, ଖାଲି,
 			"expr",
-			ret_number,	    f_type},
-    {"typename",	1, 1, FEARG_1|FE_X, NULL,
+			ret_ସଂଖ୍ୟା,	    f_type},
+    {"typename",	1, 1, FEARG_1|FE_X, ଖାଲି,
 			"expr",
 			ret_string,	    f_typename},
     {"undofile",	1, 1, FEARG_1,	    arg1_string,
@@ -3829,111 +3829,111 @@ static const funcentry_T global_functions[] =
     {"uri_encode",	1, 1, FEARG_1,	    arg1_string,
 			"string",
 			ret_string,	    f_uriencode},
-    {"utf16idx",	2, 4, FEARG_1,	    arg4_string_number_bool_bool,
+    {"utf16idx",	2, 4, FEARG_1,	    arg4_string_ସଂଖ୍ୟା_bool_bool,
 			"string, idx, countcc, charidx",
-			ret_number,	    f_utf16idx},
+			ret_ସଂଖ୍ୟା,	    f_utf16idx},
     {"values",		1, 1, FEARG_1,	    arg1_dict_any,
 			"dict",
-			ret_list_member,    f_values},
-    {"virtcol",		1, 3, FEARG_1,	    arg3_string_or_list_bool_number,
+			ret_list_member,    f_ମୂଲ୍ୟଗୁଡ଼ିକ},
+    {"virtcol",		1, 3, FEARG_1,	    arg3_string_or_list_bool_ସଂଖ୍ୟା,
 			"expr, list, winid",
 			ret_virtcol,	    f_virtcol},
-    {"virtcol2col",	3, 3, FEARG_1,	    arg3_number,
+    {"virtcol2col",	3, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା,
 			"winid, lnum, col",
-			ret_number,	    f_virtcol2col},
+			ret_ସଂଖ୍ୟା,	    f_virtcol2col},
     {"visualmode",	0, 1, 0,	    arg1_bool,
 			"expr",
 			ret_string,	    f_visualmode},
-    {"wildmenumode",	0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_wildmenumode},
-    {"wildtrigger",	0, 0, 0,	    NULL,
-			NULL,
+    {"wildmenumode",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_wildmenumode},
+    {"wildtrigger",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_void,	    f_wildtrigger},
     {"win_execute",	2, 3, FEARG_2,	    arg23_win_execute,
 			"id, command, silent",
 			ret_string,	    f_win_execute},
-    {"win_findbuf",	1, 1, FEARG_1,	    arg1_number,
+    {"win_findbuf",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"bufnr",
-			ret_list_number,    f_win_findbuf},
-    {"win_getid",	0, 2, FEARG_1,	    arg2_number,
+			ret_list_ସଂଖ୍ୟା,    f_win_findbuf},
+    {"win_getid",	0, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"win, tab",
-			ret_number,	    f_win_getid},
-    {"win_gettype",	0, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_win_getid},
+    {"win_gettype",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
 			ret_string,	    f_win_gettype},
-    {"win_gotoid",	1, 1, FEARG_1,	    arg1_number,
+    {"win_gotoid",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
-			ret_number_bool,    f_win_gotoid},
-    {"win_id2tabwin",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା_bool,    f_win_gotoid},
+    {"win_id2tabwin",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
-			ret_list_number,    f_win_id2tabwin},
-    {"win_id2win",	1, 1, FEARG_1,	    arg1_number,
+			ret_list_ସଂଖ୍ୟା,    f_win_id2tabwin},
+    {"win_id2win",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"expr",
-			ret_number,	    f_win_id2win},
-    {"win_move_separator", 2, 2, FEARG_1,   arg2_number,
+			ret_ସଂଖ୍ୟା,	    f_win_id2win},
+    {"win_move_separator", 2, 2, FEARG_1,   arg2_ସଂଖ୍ୟା,
 			"nr, offset",
-			ret_number_bool,    f_win_move_separator},
-    {"win_move_statusline", 2, 2, FEARG_1,  arg2_number,
+			ret_ସଂଖ୍ୟା_bool,    f_win_move_separator},
+    {"win_move_statusline", 2, 2, FEARG_1,  arg2_ସଂଖ୍ୟା,
 			"nr, offset",
-			ret_number_bool,    f_win_move_statusline},
-    {"win_screenpos",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା_bool,    f_win_move_statusline},
+    {"win_screenpos",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
-			ret_list_number,    f_win_screenpos},
-    {"win_splitmove",   2, 3, FEARG_1,	    arg3_number_number_dict,
+			ret_list_ସଂଖ୍ୟା,    f_win_screenpos},
+    {"win_splitmove",   2, 3, FEARG_1,	    arg3_ସଂଖ୍ୟା_ସଂଖ୍ୟା_dict,
 			"nr, target, options",
-			ret_number_bool,    f_win_splitmove},
-    {"winbufnr",	1, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା_bool,    f_win_splitmove},
+    {"winbufnr",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
-			ret_number,	    f_winbufnr},
-    {"wincol",		0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_wincol},
-    {"windowsversion",	0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା,	    f_winbufnr},
+    {"wincol",		0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_wincol},
+    {"windowsversion",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_windowsversion},
-    {"winheight",	1, 1, FEARG_1,	    arg1_number,
+    {"winheight",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
-			ret_number,	    f_winheight},
-    {"winlayout",	0, 1, FEARG_1,	    arg1_number,
+			ret_ସଂଖ୍ୟା,	    f_winheight},
+    {"winlayout",	0, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"tabnr",
 			ret_list_any,	    f_winlayout},
-    {"winline",		0, 0, 0,	    NULL,
-			NULL,
-			ret_number,	    f_winline},
+    {"winline",		0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_ସଂଖ୍ୟା,	    f_winline},
     {"winnr",		0, 1, FEARG_1,	    arg1_string,
 			"arg",
-			ret_number,	    f_winnr},
-    {"winrestcmd",	0, 0, 0,	    NULL,
-			NULL,
+			ret_ସଂଖ୍ୟା,	    f_winnr},
+    {"winrestcmd",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
 			ret_string,	    f_winrestcmd},
     {"winrestview",	1, 1, FEARG_1,	    arg1_dict_any,
 			"dict",
 			ret_void,	    f_winrestview},
-    {"winsaveview",	0, 0, 0,	    NULL,
-			NULL,
-			ret_dict_number,    f_winsaveview},
-    {"winwidth",	1, 1, FEARG_1,	    arg1_number,
+    {"winsaveview",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_dict_ସଂଖ୍ୟା,    f_winsaveview},
+    {"winwidth",	1, 1, FEARG_1,	    arg1_ସଂଖ୍ୟା,
 			"nr",
-			ret_number,	    f_winwidth},
-    {"wordcount",	0, 0, 0,	    NULL,
-			NULL,
-			ret_dict_number,    f_wordcount},
+			ret_ସଂଖ୍ୟା,	    f_winwidth},
+    {"wordcount",	0, 0, 0,	    ଖାଲି,
+			ଖାଲି,
+			ret_dict_ସଂଖ୍ୟା,    f_wordcount},
     {"writefile",	2, 3, FEARG_1,	    arg23_writefile,
 			"object, fname, flags",
-			ret_number_bool,    f_writefile},
-    {"xor",		2, 2, FEARG_1,	    arg2_number,
+			ret_ସଂଖ୍ୟା_bool,    f_writefile},
+    {"xor",		2, 2, FEARG_1,	    arg2_ସଂଖ୍ୟା,
 			"expr1, expr2",
-			ret_number,	    f_xor},
+			ret_ସଂଖ୍ୟା,	    f_xor},
 };
 
 /*
  * Return true if specified function allows a type as an argument.
  */
-    static int
-func_allows_type(int idx)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+func_allows_type(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    return (global_functions[idx].f_argtype & FE_X) != 0;
+    ଫେରନ୍ତୁ (global_functions[idx].f_argtype & FE_X) != 0;
 }
 
 /*
@@ -3941,38 +3941,38 @@ func_allows_type(int idx)
  * or user defined function names.
  */
     char_u *
-get_function_name(expand_T *xp, int idx)
+get_function_name(expand_T *xp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    static int	intidx = -1;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    ଯଦି (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    ଯଦି (intidx < 0)
     {
 	name = get_user_func_name(xp, idx);
-	if (name != NULL)
+	ଯଦି (name != ଖାଲି)
 	{
-	    if (*name != NUL && *name != '<'
+	    ଯଦି (*name != NUL && *name != '<'
 				      && STRNCMP("g:", xp->xp_pattern, 2) == 0)
-		return cat_prefix_varname('g', name);
-	    return name;
+		ଫେରନ୍ତୁ cat_prefix_varname('g', name);
+	    ଫେରନ୍ତୁ name;
 	}
     }
-    if (++intidx < (int)ARRAY_LENGTH(global_functions))
+    ଯଦି (++intidx < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(global_functions))
     {
 	// Skip if the function doesn't have an implementation (feature not
 	// implemented).
-	if (global_functions[intidx].f_func == NULL)
-	    return (char_u *)"";
+	ଯଦି (global_functions[intidx].f_func == ଖାଲି)
+	    ଫେରନ୍ତୁ (char_u *)"";
 	STRCPY(IObuff, global_functions[intidx].f_name);
 	STRCAT(IObuff, "(");
-	if (global_functions[intidx].f_max_argc == 0)
+	ଯଦି (global_functions[intidx].f_max_argc == 0)
 	    STRCAT(IObuff, ")");
-	return IObuff;
+	ଫେରନ୍ତୁ IObuff;
     }
 
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 /*
@@ -3980,20 +3980,20 @@ get_function_name(expand_T *xp, int idx)
  * user defined variable or function names.
  */
     char_u *
-get_expr_name(expand_T *xp, int idx)
+get_ପଦସମଷ୍ଟି_name(expand_T *xp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    static int	intidx = -1;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    ଯଦି (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    ଯଦି (intidx < 0)
     {
 	name = get_function_name(xp, idx);
-	if (name != NULL)
-	    return name;
+	ଯଦି (name != ଖାଲି)
+	    ଫେରନ୍ତୁ name;
     }
-    return get_user_var_name(xp, ++intidx);
+    ଫେରନ୍ତୁ get_user_var_name(xp, ++intidx);
 }
 
 /*
@@ -4001,59 +4001,59 @@ get_expr_name(expand_T *xp, int idx)
  * Return index, or -1 if not found or "implemented" is TRUE and the function
  * is not implemented.
  */
-    static int
-find_internal_func_opt(char_u *name, int implemented)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+find_internal_func_opt(char_u *name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା implemented)
 {
-    int		first = 0;
-    int		last;
-    int		cmp;
-    int		x;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		first = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cmp;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x;
 
-    last = (int)ARRAY_LENGTH(global_functions) - 1;
+    last = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(global_functions) - 1;
 
     // Find the function name in the table. Binary search.
-    while (first <= last)
+    ଯେତେବେଳେ (first <= last)
     {
 	x = first + ((unsigned)(last - first) >> 1);
 	cmp = STRCMP(name, global_functions[x].f_name);
-	if (cmp < 0)
+	ଯଦି (cmp < 0)
 	    last = x - 1;
-	else if (cmp > 0)
+	ଅନ୍ୟଥା ଯଦି (cmp > 0)
 	    first = x + 1;
-	else if (implemented && global_functions[x].f_func == NULL)
-	    break;
-	else
-	    return x;
+	ଅନ୍ୟଥା ଯଦି (implemented && global_functions[x].f_func == ଖାଲି)
+	    ଭାଙ୍ଗ;
+	ଅନ୍ୟଥା
+	    ଫେରନ୍ତୁ x;
     }
-    return -1;
+    ଫେରନ୍ତୁ -1;
 }
 
 /*
  * Find internal function "name" in table "global_functions".
  * Return index, or -1 if not found or the function is not implemented.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 find_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE);
+    ଫେରନ୍ତୁ find_internal_func_opt(name, TRUE);
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 has_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE) >= 0;
+    ଫେରନ୍ତୁ find_internal_func_opt(name, TRUE) >= 0;
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 has_internal_func_name(char_u *name)
 {
-    return find_internal_func_opt(name, FALSE) >= 0;
+    ଫେରନ୍ତୁ find_internal_func_opt(name, FALSE) >= 0;
 }
 
-    char *
-internal_func_name(int idx)
+    ଅକ୍ଷର *
+internal_func_name(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    return global_functions[idx].f_name;
+    ଫେରନ୍ତୁ global_functions[idx].f_name;
 }
 
 /*
@@ -4061,40 +4061,40 @@ internal_func_name(int idx)
  * Uses the list of types on the type stack: "types".
  * Return FAIL and gives an error message when a type is wrong.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 internal_func_check_arg_types(
 	type2_T	*types,
-	int	idx,
-	int	argcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	idx,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	argcount,
 	cctx_T	*cctx)
 {
     // Some internal functions accept types like Class as arguments. For other
     // functions, check the arguments are not types.
-    if (!(func_allows_type(idx)))
+    ଯଦି (!(func_allows_type(idx)))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_type_is_value(types[i].type_curr) == FAIL)
-		return FAIL;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < argcount; ++i)
+	    ଯଦି (check_type_is_ମୂଲ୍ୟ(types[i].type_curr) == FAIL)
+		ଫେରନ୍ତୁ FAIL;
     }
 
-    const argcheck_T	*argchecks = global_functions[idx].f_argcheck;
+    ଅଚଳ argcheck_T	*argchecks = global_functions[idx].f_argcheck;
 
-    if (argchecks == NULL)
-	return OK;
+    ଯଦି (argchecks == ଖାଲି)
+	ଫେରନ୍ତୁ OK;
 
     argcontext_T context;
 
-    context.arg_count = argcount;
+    context.arg_ଗଣନା = argcount;
     context.arg_types = types;
     context.arg_cctx = cctx;
-    for (int i = 0; i < argcount && argchecks[i] != NULL; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < argcount && argchecks[i] != ଖାଲି; ++i)
     {
 	context.arg_idx = i;
-	if (argchecks[i](types[i].type_curr, types[i].type_decl,
+	ଯଦି (argchecks[i](types[i].type_curr, types[i].type_decl,
 							    &context) == FAIL)
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -4102,8 +4102,8 @@ internal_func_check_arg_types(
  * "argcount" is the total argument count, "min_argcount" the non-optional
  * argument count.
  */
-    void
-internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
+    ଶୂନ୍ୟ
+internal_func_get_argcount(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *argcount, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *min_argcount)
 {
     *argcount = global_functions[idx].f_max_argc;
     *min_argcount = global_functions[idx].f_min_argc;
@@ -4118,8 +4118,8 @@ internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
  */
     type_T *
 internal_func_ret_type(
-	int	    idx,
-	int	    argcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    idx,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    argcount,
 	type2_T	    *argtypes,
 	type_T	    **decl_type,
 	garray_T    *type_gap)
@@ -4127,21 +4127,21 @@ internal_func_ret_type(
     type_T *ret;
 
     current_type_gap = type_gap;
-    *decl_type = NULL;
+    *decl_type = ଖାଲି;
     ret = global_functions[idx].f_retfunc(argcount, argtypes, decl_type);
-    if (*decl_type == NULL)
+    ଯଦି (*decl_type == ଖାଲି)
 	*decl_type = ret;
-    current_type_gap = NULL;
-    return ret;
+    current_type_gap = ଖାଲି;
+    ଫେରନ୍ତୁ ret;
 }
 
 /*
  * Return TRUE if "idx" is for the map() function.
  */
-    int
-internal_func_is_map(int idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+internal_func_is_map(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
-    return global_functions[idx].f_func == f_map;
+    ଫେରନ୍ତୁ global_functions[idx].f_func == f_map;
 }
 
 /*
@@ -4150,25 +4150,25 @@ internal_func_is_map(int idx)
  * first argument, 2 if method base is second argument, etc.  9 if method base
  * is last argument.
  */
-    int
-check_internal_func(int idx, int argcount)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+check_internal_func(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount)
 {
     funcerror_T	    res;
-    char	    *name;
+    ଅକ୍ଷର	    *name;
 
-    if (argcount < global_functions[idx].f_min_argc)
+    ଯଦି (argcount < global_functions[idx].f_min_argc)
 	res = FCERR_TOOFEW;
-    else if (argcount > global_functions[idx].f_max_argc)
+    ଅନ୍ୟଥା ଯଦି (argcount > global_functions[idx].f_max_argc)
 	res = FCERR_TOOMANY;
-    else
-	return global_functions[idx].f_argtype & FEARG_MASK;
+    ଅନ୍ୟଥା
+	ଫେରନ୍ତୁ global_functions[idx].f_argtype & FEARG_MASK;
 
     name = internal_func_name(idx);
-    if (res == FCERR_TOOMANY)
+    ଯଦି (res == FCERR_TOOMANY)
 	semsg(_(e_too_many_arguments_for_function_str), name);
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_not_enough_arguments_for_function_str), name);
-    return -1;
+    ଫେରନ୍ତୁ -1;
 }
 
 /*
@@ -4177,51 +4177,51 @@ check_internal_func(int idx, int argcount)
  *
  * Return OK/FAIL.
  */
-    static int
-check_args_for_type(int idx, int argcount, typval_T *argvars)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+check_args_for_type(ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା argcount, typval_T *argvars)
 {
-    if (!func_allows_type(idx))
+    ଯଦି (!func_allows_type(idx))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_typval_is_value(&argvars[i]) == FAIL)
-		return FAIL;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < argcount; ++i)
+	    ଯଦି (check_typval_is_ମୂଲ୍ୟ(&argvars[i]) == FAIL)
+		ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
     funcerror_T
 call_internal_func(
 	char_u	    *name,
-	int	    argcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
-    int i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
     i = find_internal_func(name);
-    if (i < 0)
-	return FCERR_UNKNOWN;
-    if (argcount < global_functions[i].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount > global_functions[i].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(i, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    ଯଦି (i < 0)
+	ଫେରନ୍ତୁ FCERR_UNKNOWN;
+    ଯଦି (argcount < global_functions[i].f_min_argc)
+	ଫେରନ୍ତୁ FCERR_TOOFEW;
+    ଯଦି (argcount > global_functions[i].f_max_argc)
+	ଫେରନ୍ତୁ FCERR_TOOMANY;
+    ଯଦି (check_args_for_type(i, argcount, argvars) == FAIL)
+	ଫେରନ୍ତୁ FCERR_OTHER;
     argvars[argcount].v_type = VAR_UNKNOWN;
     global_functions[i].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[i].f_retfunc == ret_void)
+    ଯଦି (in_vim9script() && global_functions[i].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
-    return FCERR_NONE;
+    ଫେରନ୍ତୁ FCERR_NONE;
 }
 
-    void
+    ଶୂନ୍ୟ
 call_internal_func_by_idx(
-	int	    idx,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    idx,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
     global_functions[idx].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
+    ଯଦି (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
 }
 
@@ -4231,136 +4231,136 @@ call_internal_func_by_idx(
     funcerror_T
 call_internal_method(
 	char_u	    *name,
-	int	    argcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv,
 	typval_T    *basetv)
 {
-    int		fi;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fi;
     typval_T	argv[MAX_FUNC_ARGS + 1];
 
     fi = find_internal_func(name);
-    if (fi < 0)
-	return FCERR_UNKNOWN;
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
-	return FCERR_NOTMETHOD;
-    if (argcount + 1 < global_functions[fi].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount + 1 > global_functions[fi].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(fi, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    ଯଦି (fi < 0)
+	ଫେରନ୍ତୁ FCERR_UNKNOWN;
+    ଯଦି ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
+	ଫେରନ୍ତୁ FCERR_NOTMETHOD;
+    ଯଦି (argcount + 1 < global_functions[fi].f_min_argc)
+	ଫେରନ୍ତୁ FCERR_TOOFEW;
+    ଯଦି (argcount + 1 > global_functions[fi].f_max_argc)
+	ଫେରନ୍ତୁ FCERR_TOOMANY;
+    ଯଦି (check_args_for_type(fi, argcount, argvars) == FAIL)
+	ଫେରନ୍ତୁ FCERR_OTHER;
 
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
+    ଯଦି ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
     {
-	if (argcount < 1)
-	    return FCERR_TOOFEW;
+	ଯଦି (argcount < 1)
+	    ଫେରନ୍ତୁ FCERR_TOOFEW;
 
 	// base value goes second
 	argv[0] = argvars[0];
 	argv[1] = *basetv;
-	for (int i = 1; i < argcount; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
+    ଅନ୍ୟଥା ଯଦି ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
     {
-	if (argcount < 2)
-	    return FCERR_TOOFEW;
+	ଯଦି (argcount < 2)
+	    ଫେରନ୍ତୁ FCERR_TOOFEW;
 
 	// base value goes third
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = *basetv;
-	for (int i = 2; i < argcount; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 2; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
+    ଅନ୍ୟଥା ଯଦି ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
     {
-	if (argcount < 3)
-	    return FCERR_TOOFEW;
+	ଯଦି (argcount < 3)
+	    ଫେରନ୍ତୁ FCERR_TOOFEW;
 
 	// base value goes fourth
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = argvars[2];
 	argv[3] = *basetv;
-	for (int i = 3; i < argcount; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 3; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// FEARG_1: base value goes first
 	argv[0] = *basetv;
-	for (int i = 0; i < argcount; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
     argv[argcount + 1].v_type = VAR_UNKNOWN;
 
-    if (check_args_for_type(fi, argcount + 1, argv) == FAIL)
-	return FCERR_OTHER;
+    ଯଦି (check_args_for_type(fi, argcount + 1, argv) == FAIL)
+	ଫେରନ୍ତୁ FCERR_OTHER;
 
     global_functions[fi].f_func(argv, rettv);
-    return FCERR_NONE;
+    ଫେରନ୍ତୁ FCERR_NONE;
 }
 
 /*
  * Return TRUE for a non-zero Number and a non-empty String.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 non_zero_arg(typval_T *argvars)
 {
-    return ((argvars[0].v_type == VAR_NUMBER
-		&& argvars[0].vval.v_number != 0)
+    ଫେରନ୍ତୁ ((argvars[0].v_type == VAR_ସଂଖ୍ୟା
+		&& argvars[0].vval.v_ସଂଖ୍ୟା != 0)
 	    || (argvars[0].v_type == VAR_BOOL
-		&& argvars[0].vval.v_number == VVAL_TRUE)
+		&& argvars[0].vval.v_ସଂଖ୍ୟା == VVAL_TRUE)
 	    || (argvars[0].v_type == VAR_STRING
-		&& argvars[0].vval.v_string != NULL
+		&& argvars[0].vval.v_string != ଖାଲି
 		&& *argvars[0].vval.v_string != NUL));
 }
 
 /*
  * "and(expr, expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_and(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
-					& tv_get_number_chk(&argvars[1], NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି)
+					& tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
 }
 
 /*
  * "balloon_show()" function
  */
 #ifdef FEAT_BEVAL
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_balloon_gettext(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    if (balloonEval == NULL)
-	return;
+    ଯଦି (balloonEval == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (balloonEval->msg == NULL)
-	rettv->vval.v_string = NULL;
-    else
-	rettv->vval.v_string = vim_strsave(balloonEval->msg);
+    ଯଦି (balloonEval->ସନ୍ଦେଶ == ଖାଲି)
+	rettv->vval.v_string = ଖାଲି;
+    ଅନ୍ୟଥା
+	rettv->vval.v_string = vim_strsave(balloonEval->ସନ୍ଦେଶ);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (balloonEval == NULL)
-	return;
+    ଯଦି (balloonEval == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && check_for_string_or_list_arg(argvars, 0) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_LIST
+    ଯଦି (argvars[0].v_type == VAR_LIST
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
@@ -4369,44 +4369,44 @@ f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 	list_T *l = argvars[0].vval.v_list;
 
 	// empty list removes the balloon
-	post_balloon(balloonEval, NULL,
-		l == NULL || l->lv_len == 0 ? NULL : l);
+	post_balloon(balloonEval, ଖାଲି,
+		l == ଖାଲି || l->lv_len == 0 ? ଖାଲି : l);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	char_u *mesg;
 
-	if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	    return;
+	ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	    ଫେରନ୍ତୁ;
 
 	mesg = tv_get_string_chk(&argvars[0]);
-	if (mesg != NULL)
+	ଯଦି (mesg != ଖାଲି)
 	    // empty string removes the balloon
-	    post_balloon(balloonEval, *mesg == NUL ? NULL : mesg, NULL);
+	    post_balloon(balloonEval, *mesg == NUL ? ଖାଲି : mesg, ଖାଲି);
     }
 }
 
-# if defined(FEAT_BEVAL_TERM)
-    static void
+# ଯଦି defined(FEAT_BEVAL_TERM)
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) != OK)
+	ଫେରନ୍ତୁ;
 
-    char_u *msg;
+    char_u *ସନ୍ଦେଶ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    msg = tv_get_string_chk(&argvars[0]);
-    if (msg != NULL)
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
+    ସନ୍ଦେଶ = tv_get_string_chk(&argvars[0]);
+    ଯଦି (ସନ୍ଦେଶ != ଖାଲି)
     {
 	pumitem_T	*array;
-	int		size = split_message(msg, &array);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		size = split_message(ସନ୍ଦେଶ, &array);
 
 	// Skip the first and last item, they are always empty.
-	for (int i = 1; i < size - 1; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < size - 1; ++i)
 	    list_append_string(rettv->vval.v_list, array[i].pum_text, -1);
-	while (size > 0)
+	ଯେତେବେଳେ (size > 0)
 	    vim_free(array[--size].pum_text);
 	vim_free(array);
     }
@@ -4417,34 +4417,34 @@ f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "base64_decode(string)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_base64_decode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_blob_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL)
+    ଯଦି (str != ଖାଲି)
 	base64_decode(str, STRLEN(str), &rettv->vval.v_blob->bv_ga);
 }
 
 /*
  * "base64_encode(blob)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_base64_encode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_blob_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_blob_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
     blob_T *blob = argvars->vval.v_blob;
-    if (blob != NULL)
+    ଯଦି (blob != ଖାଲି)
 	rettv->vval.v_string =
 	    base64_encode(blob->bv_ga.ga_data, blob->bv_ga.ga_len);
 }
@@ -4461,57 +4461,57 @@ get_buf_arg(typval_T *arg)
     ++emsg_off;
     buf = tv_get_buf(arg, FALSE);
     --emsg_off;
-    if (buf == NULL)
+    ଯଦି (buf == ଖାଲି)
 	semsg(_(e_invalid_buffer_name_str), tv_get_string(arg));
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
  * "bindtextdomain(package, path)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_bindtextdomain(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_TRUE;
+    rettv->vval.v_ସଂଖ୍ୟା = VVAL_TRUE;
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	    || check_for_nonempty_string_arg(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (strcmp((const char *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
+    ଯଦି (strcmp((ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-    else
+    ଅନ୍ୟଥା
     {
-	if (bindtextdomain((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string) == NULL)
+	ଯଦି (bindtextdomain((ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string) == ଖାଲି)
 	{
-	    do_outofmem_msg((long)0);
-	    rettv->vval.v_number = VVAL_FALSE;
+	    do_outofmem_ସନ୍ଦେଶ((long)0);
+	    rettv->vval.v_ସଂଖ୍ୟା = VVAL_FALSE;
 	}
     }
 
-    return;
+    ଫେରନ୍ତୁ;
 }
 
 /*
  * "byte2line(byte)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_byte2line(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
-    rettv->vval.v_number = -1;
-#else
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+#ଅନ୍ୟଥା
     long	boff = 0;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    boff = tv_get_number(&argvars[0]) - 1;  // boff gets -1 on type error
-    if (boff < 0)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = ml_find_line_or_offset(curbuf,
+    boff = tv_get_ସଂଖ୍ୟା(&argvars[0]) - 1;  // boff gets -1 on type error
+    ଯଦି (boff < 0)
+	rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = ml_find_ଧାଡ଼ି_or_offset(curbuf,
 							  (linenr_T)0, &boff);
 #endif
 }
@@ -4519,52 +4519,52 @@ f_byte2line(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "call(func, arglist [, dict])" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_call(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func;
-    partial_T   *partial = NULL;
-    dict_T	*selfdict = NULL;
-    char_u	*tofree = NULL;
+    partial_T   *partial = ଖାଲି;
+    dict_T	*selfdict = ଖାଲି;
+    char_u	*tofree = ଖାଲି;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (check_for_list_arg(argvars, 1) == FAIL)
-	return;
-    if (argvars[1].vval.v_list == NULL)
-	return;
+    ଯଦି (check_for_list_arg(argvars, 1) == FAIL)
+	ଫେରନ୍ତୁ;
+    ଯଦି (argvars[1].vval.v_list == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    ଯଦି (argvars[0].v_type == VAR_FUNC)
 	func = argvars[0].vval.v_string;
-    else if (argvars[0].v_type == VAR_PARTIAL)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_PARTIAL)
     {
 	partial = argvars[0].vval.v_partial;
 	func = partial_name(partial);
     }
-    else
+    ଅନ୍ୟଥା
 	func = tv_get_string(&argvars[0]);
-    if (func == NULL || *func == NUL)
-	return;		// type error, empty name or null function
+    ଯଦି (func == ଖାଲି || *func == NUL)
+	ଫେରନ୍ତୁ;		// type error, empty name or null function
 
-    if (argvars[0].v_type == VAR_STRING)
+    ଯଦି (argvars[0].v_type == VAR_STRING)
     {
 	char_u	*p = func;
-	tofree = trans_function_name(&p, NULL, FALSE, TFN_INT|TFN_QUIET);
-	if (tofree == NULL)
+	tofree = trans_function_name(&p, ଖାଲି, FALSE, TFN_INT|TFN_QUIET);
+	ଯଦି (tofree == ଖାଲି)
 	{
 	    emsg_funcname(e_unknown_function_str, func);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	if (*p == '<')
+	ଯଦି (*p == '<')
 	{
 	    // generic function
 	    char_u *s = append_generic_func_type_args(tofree, STRLEN(tofree),
 									&p);
-	    if (s != NULL)
+	    ଯଦି (s != ଖାଲି)
 	    {
 		vim_free(tofree);
 		tofree = s;
@@ -4573,15 +4573,15 @@ f_call(typval_T *argvars, typval_T *rettv)
 	func = tofree;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    goto done;
+	ଯଦି (check_for_dict_arg(argvars, 2) == FAIL)
+	    ଯାଅ done;
 
 	selfdict = argvars[2].vval.v_dict;
     }
 
-    (void)func_call(func, &argvars[1], partial, selfdict, rettv);
+    (ଶୂନ୍ୟ)func_call(func, &argvars[1], partial, selfdict, rettv);
 
 done:
     vim_free(tofree);
@@ -4590,37 +4590,37 @@ done:
 /*
  * "changenr()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_changenr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = curbuf->b_u_seq_cur;
+    rettv->vval.v_ସଂଖ୍ୟା = curbuf->b_u_seq_cur;
 }
 
 /*
  * "char2nr(string)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_char2nr(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
-	int	utf8 = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+	ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], ଖାଲି);
 
-	if (utf8)
-	    rettv->vval.v_number = utf_ptr2char(tv_get_string(&argvars[0]));
-	else
-	    rettv->vval.v_number = (*mb_ptr2char)(tv_get_string(&argvars[0]));
+	ଯଦି (utf8)
+	    rettv->vval.v_ସଂଖ୍ୟା = utf_ptr2char(tv_get_string(&argvars[0]));
+	ଅନ୍ୟଥା
+	    rettv->vval.v_ସଂଖ୍ୟା = (*mb_ptr2char)(tv_get_string(&argvars[0]));
     }
-    else
-	rettv->vval.v_number = tv_get_string(&argvars[0])[0];
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = tv_get_string(&argvars[0])[0];
 }
 
 /*
@@ -4628,103 +4628,103 @@ f_char2nr(typval_T *argvars, typval_T *rettv)
  * returns the character index of the column. Otherwise, returns the byte index
  * of the column.
  */
-    static void
-get_col(typval_T *argvars, typval_T *rettv, int charcol)
+    ସ୍ଥିର ଶୂନ୍ୟ
+get_col(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା charcol)
 {
     colnr_T	col = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		winchanged = FALSE;
 
-    if (check_for_string_or_list_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL)
-	return;
+    ଯଦି (check_for_string_or_list_arg(argvars, 0) == FAIL
+	    || check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the second argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[1]), &tp);
-	if (wp == NULL || tp == NULL)
-	    return;
+	wp = win_id2wp_tp((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[1]), &tp);
+	ଯଦି (wp == ଖାଲି || tp == ଖାଲି)
+	    ଫେରନ୍ତୁ;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
-	    return;
+	ଯଦି (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	    ଫେରନ୍ତୁ;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, charcol);
-    if (fp != NULL && fnum == curbuf->b_fnum)
+    ଯଦି (fp != ଖାଲି && fnum == curbuf->b_fnum)
     {
-	if (fp->col == MAXCOL)
+	ଯଦି (fp->col == MAXCOL)
 	{
 	    // '> can be MAXCOL, get the length of the line then
-	    if (fp->lnum <= curbuf->b_ml.ml_line_count)
+	    ଯଦି (fp->lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 		col = ml_get_len(fp->lnum) + 1;
-	    else
+	    ଅନ୍ୟଥା
 		col = MAXCOL;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    col = fp->col + 1;
 	    // col(".") when the cursor is on the NUL at the end of the line
 	    // because of "coladd" can be seen as an extra column.
-	    if (virtual_active() && fp == &curwin->w_cursor)
+	    ଯଦି (virtual_active() && fp == &curwin->w_cursor)
 	    {
 		char_u	*p = ml_get_cursor();
 
-		if (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
+		ଯଦି (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
 				 curwin->w_virtcol - curwin->w_cursor.coladd))
 		{
-		    int		l;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
-		    if (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
+		    ଯଦି (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
 			col += l;
 		}
 	    }
 	}
     }
-    rettv->vval.v_number = col;
+    rettv->vval.v_ସଂଖ୍ୟା = col;
 
-    if (winchanged)
+    ଯଦି (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
 /*
  * "charcol()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_charcol(typval_T *argvars, typval_T *rettv)
 {
     get_col(argvars, rettv, TRUE);
 }
 
     win_T *
-get_optional_window(typval_T *argvars, int idx)
+get_optional_window(typval_T *argvars, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     win_T   *win = curwin;
 
-    if (argvars[idx].v_type == VAR_UNKNOWN)
-	return curwin;
+    ଯଦି (argvars[idx].v_type == VAR_UNKNOWN)
+	ଫେରନ୍ତୁ curwin;
 
     win = find_win_by_nr_or_id(&argvars[idx]);
-    if (win == NULL)
+    ଯଦି (win == ଖାଲି)
     {
-	emsg(_(e_invalid_window_number));
-	return NULL;
+	emsg(_(e_invalid_window_ସଂଖ୍ୟା));
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    return win;
+    ଫେରନ୍ତୁ win;
 }
 
 /*
  * "col(string)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_col(typval_T *argvars, typval_T *rettv)
 {
     get_col(argvars, rettv, FALSE);
@@ -4733,72 +4733,72 @@ f_col(typval_T *argvars, typval_T *rettv)
 /*
  * "confirm(message, buttons[, default [, type]])" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_confirm(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#ଯଦି defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     char_u	*message;
-    char_u	*buttons = NULL;
+    char_u	*buttons = ଖାଲି;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		def = 1;
-    int		type = VIM_GENERIC;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		def = 1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type = VIM_GENERIC;
     char_u	*typestr;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
-			&& (check_for_opt_number_arg(argvars, 2) == FAIL
+			&& (check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 			    || (argvars[2].v_type != VAR_UNKNOWN
 				&& check_for_opt_string_arg(argvars, 3) == FAIL))))))
-	return;
+	ଫେରନ୍ତୁ;
 
     message = tv_get_string_chk(&argvars[0]);
-    if (message == NULL)
+    ଯଦି (message == ଖାଲି)
 	error = TRUE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	buttons = tv_get_string_buf_chk(&argvars[1], buf);
-	if (buttons == NULL)
+	ଯଦି (buttons == ଖାଲି)
 	    error = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    def = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    def = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	    ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
 	    {
 		typestr = tv_get_string_buf_chk(&argvars[3], buf2);
-		if (typestr == NULL)
+		ଯଦି (typestr == ଖାଲି)
 		    error = TRUE;
-		else
+		ଅନ୍ୟଥା
 		{
-		    switch (TOUPPER_ASC(*typestr))
+		    ବାଛ (TOUPPER_ASC(*typestr))
 		    {
-			case 'E': type = VIM_ERROR; break;
-			case 'Q': type = VIM_QUESTION; break;
-			case 'I': type = VIM_INFO; break;
-			case 'W': type = VIM_WARNING; break;
-			case 'G': type = VIM_GENERIC; break;
+			ସ୍ଥିତି 'E': type = VIM_ERROR; ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'Q': type = VIM_QUESTION; ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'I': type = VIM_INFO; ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'W': type = VIM_WARNING; ଭାଙ୍ଗ;
+			ସ୍ଥିତି 'G': type = VIM_GENERIC; ଭାଙ୍ଗ;
 		    }
 		}
 	    }
 	}
     }
 
-    if (buttons == NULL || *buttons == NUL)
+    ଯଦି (buttons == ଖାଲି || *buttons == NUL)
 	buttons = (char_u *)_("&Ok");
 
-    if (!error)
-	rettv->vval.v_number = do_dialog(type, NULL, message, buttons,
-							    def, NULL, FALSE);
+    ଯଦି (!error)
+	rettv->vval.v_ସଂଖ୍ୟା = do_dialog(type, ଖାଲି, message, buttons,
+							    def, ଖାଲି, FALSE);
 #endif
 }
 
 /*
  * "copy()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_copy(typval_T *argvars, typval_T *rettv)
 {
     item_copy(&argvars[0], rettv, FALSE, TRUE, 0);
@@ -4809,66 +4809,66 @@ f_copy(typval_T *argvars, typval_T *rettv)
  * If "charcol" is TRUE, then use the column number as a character offset.
  * Otherwise use the column number as a byte offset.
  */
-    static void
-set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_cursorpos(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା charcol)
 {
     long	lnum, col;
     long	coladd = 0;
-    int		set_curswant = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		set_curswant = TRUE;
 
-    if (in_vim9script()
-	    && (check_for_string_or_number_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_string_or_ସଂଖ୍ୟା_or_list_arg(argvars, 0) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL)))
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = -1;
-    if (argvars[0].v_type == VAR_LIST)
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (argvars[0].v_type == VAR_LIST)
     {
 	pos_T	    pos;
 	colnr_T	    curswant = -1;
 
-	if (list2fpos(argvars, &pos, NULL, &curswant, charcol) == FAIL)
+	ଯଦି (list2fpos(argvars, &pos, ଖାଲି, &curswant, charcol) == FAIL)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 	lnum = pos.lnum;
 	col = pos.col;
 	coladd = pos.coladd;
-	if (curswant >= 0)
+	ଯଦି (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    set_curswant = FALSE;
 	}
     }
-    else if ((argvars[0].v_type == VAR_NUMBER
+    ଅନ୍ୟଥା ଯଦି ((argvars[0].v_type == VAR_ସଂଖ୍ୟା
 					    || argvars[0].v_type == VAR_STRING)
-	    && (argvars[1].v_type == VAR_NUMBER
+	    && (argvars[1].v_type == VAR_ସଂଖ୍ୟା
 					   || argvars[1].v_type == VAR_STRING))
     {
 	lnum = tv_get_lnum(argvars);
-	if (lnum < 0)
+	ଯଦି (lnum < 0)
 	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-	else if (lnum == 0)
+	ଅନ୍ୟଥା ଯଦି (lnum == 0)
 	    lnum = curwin->w_cursor.lnum;
-	col = (long)tv_get_number_chk(&argvars[1], NULL);
-	if (charcol)
+	col = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
+	ଯଦି (charcol)
 	    col = buf_charidx_to_byteidx(curbuf, lnum, col) + 1;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    coladd = (long)tv_get_number_chk(&argvars[2], NULL);
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
+	    coladd = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], ଖାଲି);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	emsg(_(e_invalid_argument));
-	return;
+	ଫେରନ୍ତୁ;
     }
-    if (lnum < 0 || col < 0 || coladd < 0)
-	return;		// type error; errmsg already given
-    if (lnum > 0)
+    ଯଦି (lnum < 0 || col < 0 || coladd < 0)
+	ଫେରନ୍ତୁ;		// type error; errmsg already given
+    ଯଦି (lnum > 0)
 	curwin->w_cursor.lnum = lnum;
-    if (col != MAXCOL && --col < 0)
+    ଯଦି (col != MAXCOL && --col < 0)
 	col = 0;
     curwin->w_cursor.col = col;
     curwin->w_cursor.coladd = coladd;
@@ -4876,11 +4876,11 @@ set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
     // Make sure the cursor is in a valid position.
     check_cursor();
     // Correct cursor for multi-byte character.
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
 	mb_adjust_cursor();
 
     curwin->w_set_curswant = set_curswant;
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ସଂଖ୍ୟା = 0;
 }
 
 /*
@@ -4890,7 +4890,7 @@ set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
  * Moves the cursor to the specified line and column.
  * Returns 0 when the position could be set, -1 otherwise.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_cursor(typval_T *argvars, typval_T *rettv)
 {
     set_cursorpos(argvars, rettv, FALSE);
@@ -4900,45 +4900,45 @@ f_cursor(typval_T *argvars, typval_T *rettv)
 /*
  * "debugbreak()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_debugbreak(typval_T *argvars, typval_T *rettv)
 {
-    int		pid;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pid;
 
-    rettv->vval.v_number = FAIL;
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    rettv->vval.v_ସଂଖ୍ୟା = FAIL;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    pid = (int)tv_get_number(&argvars[0]);
-    if (pid == 0)
+    pid = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]);
+    ଯଦି (pid == 0)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
-    if (hProcess == NULL)
-	return;
+    ଯଦି (hProcess == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     DebugBreakProcess(hProcess);
     CloseHandle(hProcess);
-    rettv->vval.v_number = OK;
+    rettv->vval.v_ସଂଖ୍ୟା = OK;
 }
 #endif
 
 /*
  * "deepcopy()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_deepcopy(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	noref = 0;
 
-    if (check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+    ଯଦି (check_for_opt_bool_arg(argvars, 1) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	noref = tv_get_bool_chk(&argvars[1], NULL);
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	noref = tv_get_bool_chk(&argvars[1], ଖାଲି);
 
     item_copy(&argvars[0], rettv, TRUE, TRUE, noref == 0 ? get_copyID() : 0);
 }
@@ -4946,28 +4946,28 @@ f_deepcopy(typval_T *argvars, typval_T *rettv)
 /*
  * "did_filetype()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_did_filetype(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    rettv->vval.v_number = curbuf->b_did_filetype;
+    rettv->vval.v_ସଂଖ୍ୟା = curbuf->b_did_filetype;
 }
 
 /*
  * "echoraw({expr})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *str;
 
-    if (check_secure())
-	return;
+    ଯଦି (check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL && *str != NUL)
+    ଯଦି (str != ଖାଲି && *str != NUL)
     {
 	out_str(str);
 	out_flush();
@@ -4977,134 +4977,134 @@ f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "empty({expr})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_empty(typval_T *argvars, typval_T *rettv)
 {
-    int		n = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = FALSE;
 
-    switch (argvars[0].v_type)
+    ବାଛ (argvars[0].v_type)
     {
-	case VAR_STRING:
-	case VAR_FUNC:
-	    n = argvars[0].vval.v_string == NULL
+	ସ୍ଥିତି VAR_STRING:
+	ସ୍ଥିତି VAR_FUNC:
+	    n = argvars[0].vval.v_string == ଖାଲି
 					  || *argvars[0].vval.v_string == NUL;
-	    break;
-	case VAR_PARTIAL:
-	    n = argvars[0].vval.v_partial == NULL;
-	    break;
-	case VAR_NUMBER:
-	    n = argvars[0].vval.v_number == 0;
-	    break;
-	case VAR_FLOAT:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_PARTIAL:
+	    n = argvars[0].vval.v_partial == ଖାଲି;
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_ସଂଖ୍ୟା:
+	    n = argvars[0].vval.v_ସଂଖ୍ୟା == 0;
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_FLOAT:
 	    n = argvars[0].vval.v_float == 0.0;
-	    break;
-	case VAR_LIST:
-	    n = argvars[0].vval.v_list == NULL
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_LIST:
+	    n = argvars[0].vval.v_list == ଖାଲି
 					|| argvars[0].vval.v_list->lv_len == 0;
-	    break;
-	case VAR_TUPLE:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_TUPLE:
 	    n = tuple_len(argvars[0].vval.v_tuple) == 0;
-	    break;
-	case VAR_DICT:
-	    n = argvars[0].vval.v_dict == NULL
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_DICT:
+	    n = argvars[0].vval.v_dict == ଖାଲି
 			|| argvars[0].vval.v_dict->dv_hashtab.ht_used == 0;
-	    break;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    n = argvars[0].vval.v_number != VVAL_TRUE;
-	    break;
-	case VAR_CLASS:
-	    n = argvars[0].vval.v_class != NULL;
-	    break;
-	case VAR_OBJECT:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_BOOL:
+	ସ୍ଥିତି VAR_SPECIAL:
+	    n = argvars[0].vval.v_ସଂଖ୍ୟା != VVAL_TRUE;
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_CLASS:
+	    n = argvars[0].vval.v_class != ଖାଲି;
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_OBJECT:
 	    n = object_empty(argvars[0].vval.v_object);
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case VAR_BLOB:
-	    n = argvars[0].vval.v_blob == NULL
+	ସ୍ଥିତି VAR_BLOB:
+	    n = argvars[0].vval.v_blob == ଖାଲି
 		|| argvars[0].vval.v_blob->bv_ga.ga_len == 0;
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case VAR_JOB:
+	ସ୍ଥିତି VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    n = argvars[0].vval.v_job == NULL
+	    n = argvars[0].vval.v_job == ଖାଲି
 			   || argvars[0].vval.v_job->jv_status != JOB_STARTED;
-	    break;
+	    ଭାଙ୍ଗ;
 #endif
-	case VAR_CHANNEL:
+	ସ୍ଥିତି VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    n = argvars[0].vval.v_channel == NULL
+	    n = argvars[0].vval.v_channel == ଖାଲି
 			       || !channel_is_open(argvars[0].vval.v_channel);
-	    break;
+	    ଭାଙ୍ଗ;
 #endif
-	case VAR_TYPEALIAS:
-	    n = argvars[0].vval.v_typealias == NULL
-		|| argvars[0].vval.v_typealias->ta_name == NULL
+	ସ୍ଥିତି VAR_TYPEALIAS:
+	    n = argvars[0].vval.v_typealias == ଖାଲି
+		|| argvars[0].vval.v_typealias->ta_name == ଖାଲି
 		|| *argvars[0].vval.v_typealias->ta_name == NUL;
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_INSTR:
+	ସ୍ଥିତି VAR_UNKNOWN:
+	ସ୍ଥିତି VAR_ANY:
+	ସ୍ଥିତି VAR_VOID:
+	ସ୍ଥିତି VAR_INSTR:
 	    internal_error_no_abort("f_empty(UNKNOWN)");
 	    n = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_ସଂଖ୍ୟା = n;
 }
 
 /*
  * "environ()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_environ(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if !defined(AMIGA)
-    int			i = 0;
-    char_u		*entry, *value;
-# if defined (MSWIN)
-#  if !defined(_UCRT)
-    extern wchar_t	**_wenviron;
+#ଯଦି !defined(AMIGA)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			i = 0;
+    char_u		*entry, *ମୂଲ୍ୟ;
+# ଯଦି defined (MSWIN)
+#  ଯଦି !defined(_UCRT)
+    ବାହ୍ୟ wchar_t	**_wenviron;
 #  endif
-# else
-    extern char		**environ;
+# ଅନ୍ୟଥା
+    ବାହ୍ୟ ଅକ୍ଷର		**environ;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
 # ifdef MSWIN
-    if (*_wenviron == NULL)
-	return;
-# else
-    if (*environ == NULL)
-	return;
+    ଯଦି (*_wenviron == ଖାଲି)
+	ଫେରନ୍ତୁ;
+# ଅନ୍ୟଥା
+    ଯଦି (*environ == ଖାଲି)
+	ଫେରନ୍ତୁ;
 # endif
 
-    for (i = 0; ; ++i)
+    ପାଇଁ (i = 0; ; ++i)
     {
 # ifdef MSWIN
 	short_u		*p;
 
-	if ((p = (short_u *)_wenviron[i]) == NULL)
-	    return;
-	entry = utf16_to_enc(p, NULL);
-# else
-	if ((entry = (char_u *)environ[i]) == NULL)
-	    return;
+	ଯଦି ((p = (short_u *)_wenviron[i]) == ଖାଲି)
+	    ଫେରନ୍ତୁ;
+	entry = utf16_to_enc(p, ଖାଲି);
+# ଅନ୍ୟଥା
+	ଯଦି ((entry = (char_u *)environ[i]) == ଖାଲି)
+	    ଫେରନ୍ତୁ;
 	entry = vim_strsave(entry);
 # endif
-	if (entry == NULL) // out of memory
-	    return;
-	if ((value = vim_strchr(entry, '=')) == NULL)
+	ଯଦି (entry == ଖାଲି) // out of memory
+	    ଫେରନ୍ତୁ;
+	ଯଦି ((ମୂଲ୍ୟ = vim_strchr(entry, '=')) == ଖାଲି)
 	{
 	    vim_free(entry);
-	    continue;
+	    ଜାରି;
 	}
-	*value++ = NUL;
-	dict_add_string(rettv->vval.v_dict, (char *)entry, value);
+	*ମୂଲ୍ୟ++ = NUL;
+	dict_add_string(rettv->vval.v_dict, (ଅକ୍ଷର *)entry, ମୂଲ୍ୟ);
 	vim_free(entry);
     }
 #endif
@@ -5113,24 +5113,24 @@ f_environ(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "err_teapot()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_err_teapot(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (argvars[0].v_type == VAR_STRING)
+	ଯଦି (argvars[0].v_type == VAR_STRING)
 	{
 	    char_u *s = tv_get_string_strict(&argvars[0]);
-	    if (*skipwhite(s) == NUL)
-		return;
+	    ଯଦି (*skipwhite(s) == NUL)
+		ଫେରନ୍ତୁ;
 	}
 
-	int err = FALSE;
-	int do_503 = eval_expr_to_bool(&argvars[0], &err);
-	if (!err && do_503)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା err = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_503 = eval_ପଦସମଷ୍ଟି_to_bool(&argvars[0], &err);
+	ଯଦି (!err && do_503)
 	{
 	    emsg(_(e_coffee_currently_not_available));
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
 
@@ -5140,15 +5140,15 @@ f_err_teapot(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "escape({string}, {chars})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_escape(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     rettv->vval.v_string = vim_strsave_escaped(tv_get_string(&argvars[0]),
 					 tv_get_string_buf(&argvars[1], buf));
@@ -5158,102 +5158,102 @@ f_escape(typval_T *argvars, typval_T *rettv)
 /*
  * "eval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_eval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s, *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     s = tv_get_string_chk(&argvars[0]);
-    if (s != NULL)
+    ଯଦି (s != ଖାଲି)
 	s = skipwhite(s);
 
     p = s;
-    if (s == NULL || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
+    ଯଦି (s == ଖାଲି || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
     {
-	if (p != NULL && !aborting())
+	ଯଦି (p != ଖାଲି && !aborting())
 	    semsg(_(e_invalid_expression_str), p);
 	need_clr_eos = FALSE;
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_ସଂଖ୍ୟା;
+	rettv->vval.v_ସଂଖ୍ୟା = 0;
     }
-    else if (*s != NUL)
+    ଅନ୍ୟଥା ଯଦି (*s != NUL)
 	semsg(_(e_trailing_characters_str), s);
 }
 
 /*
  * "eventhandler()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_eventhandler(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = vgetc_busy || input_busy;
+    rettv->vval.v_ସଂଖ୍ୟା = vgetc_busy || ନିବେଶ_busy;
 }
 
-static garray_T	redir_execute_ga;
+ସ୍ଥିର garray_T	redir_execute_ga;
 
 /*
  * Append "value[value_len]" to the execute() output.
  */
-    void
-execute_redir_str(char_u *value, int value_len)
+    ଶୂନ୍ୟ
+execute_redir_str(char_u *ମୂଲ୍ୟ, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ମୂଲ୍ୟ_len)
 {
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
-    if (value_len == -1)
-	len = (int)STRLEN(value);	// Append the entire string
-    else
-	len = value_len;		// Append only "value_len" characters
-    if (ga_grow(&redir_execute_ga, len) == FAIL)
-	return;
+    ଯଦି (ମୂଲ୍ୟ_len == -1)
+	len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(ମୂଲ୍ୟ);	// Append the entire string
+    ଅନ୍ୟଥା
+	len = ମୂଲ୍ୟ_len;		// Append only "value_len" characters
+    ଯଦି (ga_grow(&redir_execute_ga, len) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    mch_memmove((char *)redir_execute_ga.ga_data
-	    + redir_execute_ga.ga_len, value, len);
+    mch_memmove((ଅକ୍ଷର *)redir_execute_ga.ga_data
+	    + redir_execute_ga.ga_len, ମୂଲ୍ୟ, len);
     redir_execute_ga.ga_len += len;
 }
 
-#if defined(FEAT_LUA)
+#ଯଦି defined(FEAT_LUA)
 /*
  * Get next line from a string containing NL separated lines.
  * Called by do_cmdline() to get the next line.
  * Returns an allocated string, or NULL when at the end of the string.
  */
-    static char_u *
-get_str_line(
-    int	    c UNUSED,
-    void    *cookie,
-    int	    indent UNUSED,
+    ସ୍ଥିର char_u *
+get_str_ଧାଡ଼ି(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    c UNUSED,
+    ଶୂନ୍ୟ    *cookie,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     char_u	*start = *(char_u **)cookie;
-    char_u	*line;
+    char_u	*ଧାଡ଼ି;
     char_u	*p;
 
     p = start;
-    if (p == NULL || *p == NUL)
-	return NULL;
+    ଯଦି (p == ଖାଲି || *p == NUL)
+	ଫେରନ୍ତୁ ଖାଲି;
     p = vim_strchr(p, '\n');
-    if (p == NULL)
-	line = vim_strsave(start);
-    else
+    ଯଦି (p == ଖାଲି)
+	ଧାଡ଼ି = vim_strsave(start);
+    ଅନ୍ୟଥା
     {
-	line = vim_strnsave(start, p - start);
+	ଧାଡ଼ି = vim_strnsave(start, p - start);
 	p++;
     }
 
     *(char_u **)cookie = p;
-    return line;
+    ଫେରନ୍ତୁ ଧାଡ଼ି;
 }
 
 /*
  * Execute a series of Ex commands in 'str'
  */
-    void
+    ଶୂନ୍ୟ
 execute_cmds_from_string(char_u *str)
 {
-    do_cmdline(NULL, get_str_line, (void *)&str,
+    do_cmdline(ଖାଲି, get_str_ଧାଡ଼ି, (ଶୂନ୍ୟ *)&str,
 	    DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT|DOCMD_KEYTYPED);
 }
 #endif
@@ -5264,10 +5264,10 @@ execute_cmds_from_string(char_u *str)
  * Returns allocated string, or NULL for end of function.
  */
     char_u *
-get_list_line(
-    int	    c UNUSED,
-    void    *cookie,
-    int	    indent UNUSED,
+get_list_ଧାଡ଼ି(
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    c UNUSED,
+    ଶୂନ୍ୟ    *cookie,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     listitem_T **p = (listitem_T **)cookie;
@@ -5275,143 +5275,143 @@ get_list_line(
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (item == NULL)
-	return NULL;
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
     s = tv_get_string_buf_chk(&item->li_tv, buf);
     *p = item->li_next;
-    return s == NULL ? NULL : vim_strsave(s);
+    ଫେରନ୍ତୁ s == ଖାଲି ? ଖାଲି : vim_strsave(s);
 }
 
 /*
  * "execute()" function
  */
-    void
-execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
+    ଶୂନ୍ୟ
+execute_common(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା arg_off)
 {
-    char_u	*cmd = NULL;
-    list_T	*list = NULL;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_emsg_noredir = emsg_noredir;
-    int		save_redir_execute = redir_execute;
-    int		save_redir_off = redir_off;
+    char_u	*cmd = ଖାଲି;
+    list_T	*list = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_ସନ୍ଦେଶ_silent = ସନ୍ଦେଶ_silent;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_emsg_silent = emsg_silent;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_emsg_noredir = emsg_noredir;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_redir_execute = redir_execute;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_redir_off = redir_off;
     garray_T	save_ga;
-    int		save_msg_col = msg_col;
-    int		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
-    int		echo_output = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_ସନ୍ଦେଶ_col = ସନ୍ଦେଶ_col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		echo_output = FALSE;
 
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
     rettv->v_type = VAR_STRING;
 
-    if (argvars[arg_off].v_type == VAR_LIST)
+    ଯଦି (argvars[arg_off].v_type == VAR_LIST)
     {
 	list = argvars[arg_off].vval.v_list;
-	if (list == NULL || list->lv_len == 0)
+	ଯଦି (list == ଖାଲି || list->lv_len == 0)
 	    // empty list, no commands, empty output
-	    return;
+	    ଫେରନ୍ତୁ;
 	++list->lv_refcount;
     }
-    else if (argvars[arg_off].v_type == VAR_JOB
+    ଅନ୍ୟଥା ଯଦି (argvars[arg_off].v_type == VAR_JOB
 	    || argvars[arg_off].v_type == VAR_CHANNEL)
     {
-	semsg(_(e_using_invalid_value_as_string_str),
+	semsg(_(e_using_invalid_ମୂଲ୍ୟ_as_string_str),
 				       vartype_name(argvars[arg_off].v_type));
-	return;
+	ଫେରନ୍ତୁ;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	cmd = tv_get_string_chk(&argvars[arg_off]);
-	if (cmd == NULL)
-	    return;
+	ଯଦି (cmd == ଖାଲି)
+	    ଫେରନ୍ତୁ;
     }
 
-    if (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u  *s = tv_get_string_buf_chk_strict(&argvars[arg_off + 1], buf,
 							      in_vim9script());
 
-	if (s == NULL)
-	    return;
-	if (*s == NUL)
+	ଯଦି (s == ଖାଲି)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (*s == NUL)
 	    echo_output = TRUE;
-	if (STRNCMP(s, "silent", 6) == 0)
-	    ++msg_silent;
-	if (STRCMP(s, "silent!") == 0)
+	ଯଦି (STRNCMP(s, "silent", 6) == 0)
+	    ++ସନ୍ଦେଶ_silent;
+	ଯଦି (STRCMP(s, "silent!") == 0)
 	{
 	    emsg_silent = TRUE;
 	    emsg_noredir = TRUE;
 	}
     }
-    else
-	++msg_silent;
+    ଅନ୍ୟଥା
+	++ସନ୍ଦେଶ_silent;
 
-    if (redir_execute)
+    ଯଦି (redir_execute)
 	save_ga = redir_execute_ga;
-    ga_init2(&redir_execute_ga, sizeof(char), 500);
+    ga_init2(&redir_execute_ga, ଆକାର(ଅକ୍ଷର), 500);
     redir_execute = TRUE;
     redir_off = FALSE;
-    if (!echo_output)
-	msg_col = 0;  // prevent leading spaces
+    ଯଦି (!echo_output)
+	ସନ୍ଦେଶ_col = 0;  // prevent leading spaces
 
     // For "legacy call execute('cmd')" and "vim9cmd execute('cmd')" apply the
     // command modifiers to "cmd".
     sticky_cmdmod_flags = cmdmod.cmod_flags & (CMOD_LEGACY | CMOD_VIM9CMD);
-    if (cmd != NULL)
+    ଯଦି (cmd != ଖାଲି)
 	do_cmdline_cmd(cmd);
-    else
+    ଅନ୍ୟଥା
     {
 	listitem_T	*item;
 
 	CHECK_LIST_MATERIALIZE(list);
 	item = list->lv_first;
-	do_cmdline(NULL, get_list_line, (void *)&item,
+	do_cmdline(ଖାଲି, get_list_ଧାଡ଼ି, (ଶୂନ୍ୟ *)&item,
 		      DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT|DOCMD_KEYTYPED);
 	--list->lv_refcount;
     }
     sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 
     // Need to append a NUL to the result.
-    if (ga_grow(&redir_execute_ga, 1) == OK)
+    ଯଦି (ga_grow(&redir_execute_ga, 1) == OK)
     {
-	((char *)redir_execute_ga.ga_data)[redir_execute_ga.ga_len] = NUL;
+	((ଅକ୍ଷର *)redir_execute_ga.ga_data)[redir_execute_ga.ga_len] = NUL;
 	rettv->vval.v_string = redir_execute_ga.ga_data;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	ga_clear(&redir_execute_ga);
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ଖାଲି;
     }
-    msg_silent = save_msg_silent;
+    ସନ୍ଦେଶ_silent = save_ସନ୍ଦେଶ_silent;
     emsg_silent = save_emsg_silent;
     emsg_noredir = save_emsg_noredir;
 
     redir_execute = save_redir_execute;
-    if (redir_execute)
+    ଯଦି (redir_execute)
 	redir_execute_ga = save_ga;
     redir_off = save_redir_off;
 
     // "silent reg" or "silent echo x" leaves msg_col somewhere in the line.
-    if (echo_output)
+    ଯଦି (echo_output)
 	// When not working silently: put it in column zero.  A following
 	// "echon" will overwrite the message, unavoidably.
-	msg_col = 0;
-    else
+	ସନ୍ଦେଶ_col = 0;
+    ଅନ୍ୟଥା
 	// When working silently: Put it back where it was, since nothing
 	// should have been written.
-	msg_col = save_msg_col;
+	ସନ୍ଦେଶ_col = save_ସନ୍ଦେଶ_col;
 }
 
 /*
  * "execute()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_execute(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     execute_common(argvars, rettv, 0);
 }
@@ -5419,64 +5419,64 @@ f_execute(typval_T *argvars, typval_T *rettv)
 /*
  * "exists()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_exists(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = FALSE;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     p = tv_get_string(&argvars[0]);
-    if (*p == '$')			// environment variable
+    ଯଦି (*p == '$')			// environment variable
     {
 	// first try "normal" environment variables (fast)
-	if (mch_getenv(p + 1) != NULL)
+	ଯଦି (mch_getenv(p + 1) != ଖାଲି)
 	    n = TRUE;
-	else
+	ଅନ୍ୟଥା
 	{
 	    // try expanding things like $VIM and ${HOME}
 	    p = expand_env_save(p);
-	    if (p != NULL && *p != '$')
+	    ଯଦି (p != ଖାଲି && *p != '$')
 		n = TRUE;
 	    vim_free(p);
 	}
     }
-    else if (*p == '&' || *p == '+')			// option
+    ଅନ୍ୟଥା ଯଦି (*p == '&' || *p == '+')			// option
     {
-	n = (eval_option(&p, NULL, TRUE) == OK);
-	if (*skipwhite(p) != NUL)
+	n = (eval_option(&p, ଖାଲି, TRUE) == OK);
+	ଯଦି (*skipwhite(p) != NUL)
 	    n = FALSE;			// trailing garbage
     }
-    else if (*p == '*')			// internal or user defined function
+    ଅନ୍ୟଥା ଯଦି (*p == '*')			// internal or user defined function
     {
 	n = function_exists(p + 1, FALSE);
     }
-    else if (*p == '?')			// internal function only
+    ଅନ୍ୟଥା ଯଦି (*p == '?')			// internal function only
     {
 	n = has_internal_func_name(p + 1);
     }
-    else if (*p == ':')
+    ଅନ୍ୟଥା ଯଦି (*p == ':')
     {
 	n = cmd_exists(p + 1);
     }
-    else if (*p == '#')
+    ଅନ୍ୟଥା ଯଦି (*p == '#')
     {
-	if (p[1] == '#')
+	ଯଦି (p[1] == '#')
 	    n = autocmd_supported(p + 2);
-	else
+	ଅନ୍ୟଥା
 	    n = au_exists(p + 1);
     }
-    else				// internal variable
+    ଅନ୍ୟଥା				// internal variable
     {
 	n = var_exists(p);
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_ସଂଖ୍ୟା = n;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_exists_compiled(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     emsg(_(e_exists_compiled_can_only_be_used_in_def_function));
@@ -5485,25 +5485,25 @@ f_exists_compiled(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "expand()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_expand(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
     size_t	len;
-    int		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
     expand_T	xpc;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
     char_u	*result;
 #ifdef BACKSLASH_IN_FILENAME
     char_u	*p_csl_save = p_csl;
 #endif
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
 #ifdef BACKSLASH_IN_FILENAME
     // avoid using 'completeslash' here
@@ -5511,59 +5511,59 @@ f_expand(typval_T *argvars, typval_T *rettv)
 #endif
 
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN
 	    && argvars[2].v_type != VAR_UNKNOWN
 	    && tv_get_bool_chk(&argvars[2], &error)
 	    && !error)
-	rettv_list_set(rettv, NULL);
+	rettv_list_set(rettv, ଖାଲି);
 
     s = tv_get_string(&argvars[0]);
-    if (*s == '%' || *s == '#' || *s == '<')
+    ଯଦି (*s == '%' || *s == '#' || *s == '<')
     {
-	char	*errormsg = NULL;
+	ଅକ୍ଷର	*errormsg = ଖାଲି;
 
-	if (p_verbose == 0)
+	ଯଦି (p_verbose == 0)
 	    ++emsg_off;
-	result = eval_vars(s, s, &len, NULL, &errormsg, NULL, FALSE);
-	if (p_verbose == 0)
+	result = eval_vars(s, s, &len, ଖାଲି, &errormsg, ଖାଲି, FALSE);
+	ଯଦି (p_verbose == 0)
 	    --emsg_off;
-	else if (errormsg != NULL)
+	ଅନ୍ୟଥା ଯଦି (errormsg != ଖାଲି)
 	    emsg(errormsg);
-	if (rettv->v_type == VAR_LIST)
+	ଯଦି (rettv->v_type == VAR_LIST)
 	{
-	    if (rettv_list_alloc(rettv) == OK && result != NULL)
+	    ଯଦି (rettv_list_alloc(rettv) == OK && result != ଖାଲି)
 		list_append_string(rettv->vval.v_list, result, -1);
 	    vim_free(result);
 	}
-	else
+	ଅନ୍ୟଥା
 	    rettv->vval.v_string = result;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// When the optional second argument is non-zero, don't remove matches
 	// for 'wildignore' and don't put matches for 'suffixes' at the end.
-	if (argvars[1].v_type != VAR_UNKNOWN
+	ଯଦି (argvars[1].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (!error)
+	ଯଦି (!error)
 	{
 	    ExpandInit(&xpc);
 	    xpc.xp_context = EXPAND_FILES;
-	    if (p_wic)
+	    ଯଦି (p_wic)
 		options += WILD_ICASE;
-	    if (rettv->v_type == VAR_STRING)
-		rettv->vval.v_string = ExpandOne(&xpc, s, NULL,
+	    ଯଦି (rettv->v_type == VAR_STRING)
+		rettv->vval.v_string = ExpandOne(&xpc, s, ଖାଲି,
 							   options, WILD_ALL);
-	    else if (rettv_list_alloc(rettv) == OK)
+	    ଅନ୍ୟଥା ଯଦି (rettv_list_alloc(rettv) == OK)
 	    {
-		ExpandOne(&xpc, s, NULL, options, WILD_ALL_KEEP);
-		for (int i = 0; i < xpc.xp_numfiles; i++)
+		ExpandOne(&xpc, s, ଖାଲି, options, WILD_ALL_KEEP);
+		ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < xpc.xp_numfiles; i++)
 		    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 		ExpandCleanup(&xpc);
 	    }
 	}
-	else
-	    rettv->vval.v_string = NULL;
+	ଅନ୍ୟଥା
+	    rettv->vval.v_string = ଖାଲି;
     }
 #ifdef BACKSLASH_IN_FILENAME
     p_csl = p_csl_save;
@@ -5574,20 +5574,20 @@ f_expand(typval_T *argvars, typval_T *rettv)
  * "expandcmd()" function
  * Expand all the special characters in a command string.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_expandcmd(typval_T *argvars, typval_T *rettv)
 {
     exarg_T	eap;
     char_u	*cmdstr;
-    char	*errormsg = NULL;
-    int		emsgoff = TRUE;
+    ଅକ୍ଷର	*errormsg = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		emsgoff = TRUE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type == VAR_DICT
+    ଯଦି (argvars[1].v_type == VAR_DICT
 		&& dict_get_bool(argvars[1].vval.v_dict, "errmsg", VVAL_FALSE))
 	emsgoff = FALSE;
 
@@ -5599,15 +5599,15 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     eap.arg = cmdstr;
     eap.argt |= EX_NOSPC;
     eap.usefilter = FALSE;
-    eap.nextcmd = NULL;
+    eap.nextcmd = ଖାଲି;
     eap.cmdidx = CMD_USER;
 
-    if (emsgoff)
+    ଯଦି (emsgoff)
 	++emsg_off;
-    if (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
-	if (!emsgoff && errormsg != NULL && *errormsg != NUL)
+    ଯଦି (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
+	ଯଦି (!emsgoff && errormsg != ଖାଲି && *errormsg != NUL)
 	    emsg(errormsg);
-    if (emsgoff)
+    ଯଦି (emsgoff)
 	--emsg_off;
 
     rettv->vval.v_string = cmdstr;
@@ -5616,132 +5616,132 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
 /*
  * "feedkeys()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		remap = TRUE;
-    int		insert = FALSE;
-    char_u	*keys, *flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		remap = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଭର୍ତ୍ତି = FALSE;
+    char_u	*ଚାବିଗୁଡ଼ିକ, *flags;
     char_u	nbuf[NUMBUFLEN];
-    int		typed = FALSE;
-    int		execute = FALSE;
-    int		context = FALSE;
-    int		dangerous = FALSE;
-    int		lowlevel = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		typed = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		execute = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		context = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dangerous = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lowlevel = FALSE;
 
     // This is not allowed in the sandbox.  If the commands would still be
     // executed in the sandbox it would be OK, but it probably happens later,
     // when "sandbox" is no longer set.
-    if (check_secure())
-	return;
+    ଯଦି (check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    keys = tv_get_string(&argvars[0]);
+    ଚାବିଗୁଡ଼ିକ = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-	for ( ; *flags != NUL; ++flags)
+	ପାଇଁ ( ; *flags != NUL; ++flags)
 	{
-	    switch (*flags)
+	    ବାଛ (*flags)
 	    {
-		case 'n': remap = FALSE; break;
-		case 'm': remap = TRUE; break;
-		case 't': typed = TRUE; break;
-		case 'i': insert = TRUE; break;
-		case 'x': execute = TRUE; break;
-		case 'c': context = TRUE; break;
-		case '!': dangerous = TRUE; break;
-		case 'L': lowlevel = TRUE; break;
+		ସ୍ଥିତି 'n': remap = FALSE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'm': remap = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 't': typed = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'i': ଭର୍ତ୍ତି = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'x': execute = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'c': context = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି '!': dangerous = TRUE; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'L': lowlevel = TRUE; ଭାଙ୍ଗ;
 	    }
 	}
     }
 
-    if (*keys != NUL || execute)
+    ଯଦି (*ଚାବିଗୁଡ଼ିକ != NUL || execute)
     {
-	if (lowlevel
+	ଯଦି (lowlevel
 #ifdef FEAT_VTP
 		&& (!is_term_win32()
-		    || (keys[0] == 3 && ctrl_c_interrupts && typed))
+		    || (ଚାବିଗୁଡ଼ିକ[0] == 3 && ctrl_c_interrupts && typed))
 #endif
 	   )
 	{
-#ifdef USE_INPUT_BUF
-	    ch_log(NULL, "feedkeys() lowlevel: %s", keys);
+#ifdef USE_ନିବେଶ_BUF
+	    ch_log(ଖାଲି, "feedkeys() lowlevel: %s", ଚାବିଗୁଡ଼ିକ);
 
-	    int len = (int)STRLEN(keys);
-	    for (int idx = 0; idx < len; ++idx)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(ଚାବିଗୁଡ଼ିକ);
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = 0; idx < len; ++idx)
 	    {
 		// if a CTRL-C was typed, set got_int, similar to what
 		// happens in fill_input_buf()
-		if (keys[idx] == 3 && ctrl_c_interrupts && typed)
+		ଯଦି (ଚାବିଗୁଡ଼ିକ[idx] == 3 && ctrl_c_interrupts && typed)
 		    got_int = TRUE;
-		add_to_input_buf(keys + idx, 1);
+		add_to_ନିବେଶ_buf(ଚାବିଗୁଡ଼ିକ + idx, 1);
 	    }
-#else
-	    emsg(_(e_lowlevel_input_not_supported));
+#ଅନ୍ୟଥା
+	    emsg(_(e_lowlevel_ନିବେଶ_not_supported));
 #endif
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // Need to escape K_SPECIAL and CSI before putting the string in
 	    // the typeahead buffer.
-	    char_u *keys_esc = vim_strsave_escape_csi(keys);
-	    if (keys_esc == NULL)
-		return;
+	    char_u *ଚାବିଗୁଡ଼ିକ_esc = vim_strsave_escape_csi(ଚାବିଗୁଡ଼ିକ);
+	    ଯଦି (ଚାବିଗୁଡ଼ିକ_esc == ଖାଲି)
+		ଫେରନ୍ତୁ;
 
-	    ch_log(NULL, "feedkeys(%s): %s", typed ? "typed" : "", keys);
+	    ch_log(ଖାଲି, "feedkeys(%s): %s", typed ? "typed" : "", ଚାବିଗୁଡ଼ିକ);
 
-	    ins_typebuf(keys_esc, (remap ? REMAP_YES : REMAP_NONE),
-				   insert ? 0 : typebuf.tb_len, !typed, FALSE);
-	    if (vgetc_busy
+	    ins_typebuf(ଚାବିଗୁଡ଼ିକ_esc, (remap ? REMAP_YES : REMAP_NONE),
+				   ଭର୍ତ୍ତି ? 0 : typebuf.tb_len, !typed, FALSE);
+	    ଯଦି (vgetc_busy
 #ifdef FEAT_TIMERS
 		    || timer_busy
 #endif
-		    || input_busy)
+		    || ନିବେଶ_busy)
 		typebuf_was_filled = TRUE;
 
-	    vim_free(keys_esc);
+	    vim_free(ଚାବିଗୁଡ଼ିକ_esc);
 	}
 
-	if (execute)
+	ଯଦି (execute)
 	{
-	    int		save_msg_scroll = msg_scroll;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_ସନ୍ଦେଶ_scroll = ସନ୍ଦେଶ_scroll;
 	    sctx_T	save_sctx;
 
 	    // Avoid a 1 second delay when the keys start Insert mode.
-	    msg_scroll = FALSE;
+	    ସନ୍ଦେଶ_scroll = FALSE;
 
-	    ch_log(NULL, "feedkeys() executing");
+	    ch_log(ଖାଲି, "feedkeys() executing");
 
-	    if (context)
+	    ଯଦି (context)
 	    {
 		save_sctx = current_sctx;
 		current_sctx.sc_sid = 0;
 		current_sctx.sc_version = 0;
 	    }
 
-	    if (!dangerous)
+	    ଯଦି (!dangerous)
 	    {
 		++ex_normal_busy;
 		++in_feedkeys;
 	    }
-	    ++allow_osc_key;
+	    ++allow_osc_ଚାବି;
 	    exec_normal(TRUE, lowlevel, TRUE);
-	    --allow_osc_key;
-	    if (!dangerous)
+	    --allow_osc_ଚାବି;
+	    ଯଦି (!dangerous)
 	    {
 		--ex_normal_busy;
 		--in_feedkeys;
 	    }
 
-	    msg_scroll |= save_msg_scroll;
+	    ସନ୍ଦେଶ_scroll |= save_ସନ୍ଦେଶ_scroll;
 
-	    if (context)
+	    ଯଦି (context)
 		current_sctx = save_sctx;
 	}
     }
@@ -5750,11 +5750,11 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "fnameescape({string})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_fnameescape(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->vval.v_string = vim_strsave_fnameescape(
 					 tv_get_string(&argvars[0]), VSE_NONE);
@@ -5764,17 +5764,17 @@ f_fnameescape(typval_T *argvars, typval_T *rettv)
 /*
  * "foreground()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ଯଦି (gui.in_use)
     {
 	gui_mch_set_foreground();
-	return;
+	ଫେରନ୍ତୁ;
     }
 #endif
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#ଯଦି defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
     win32_set_foreground();
 #endif
 }
@@ -5783,215 +5783,215 @@ f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
  * "function()" function
  * "funcref()" function
  */
-    static void
-common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
+    ସ୍ଥିର ଶୂନ୍ୟ
+common_function(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_funcref)
 {
     char_u	*s;
     char_u	*name;
-    int		use_string = FALSE;
-    partial_T   *arg_pt = NULL;
-    char_u	*trans_name = NULL;
-    int		is_global = FALSE;
-    char_u	*start_bracket = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		use_string = FALSE;
+    partial_T   *arg_pt = ଖାଲି;
+    char_u	*trans_name = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_global = FALSE;
+    char_u	*start_bracket = ଖାଲି;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_opt_list_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    ଯଦି (argvars[0].v_type == VAR_FUNC)
     {
 	// function(MyFunc, [arg], dict)
 	s = argvars[0].vval.v_string;
     }
-    else if (argvars[0].v_type == VAR_PARTIAL
-					 && argvars[0].vval.v_partial != NULL)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_PARTIAL
+					 && argvars[0].vval.v_partial != ଖାଲି)
     {
 	// function(dict.MyFunc, [arg])
 	arg_pt = argvars[0].vval.v_partial;
 	s = partial_name(arg_pt);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// function('MyFunc', [arg], dict)
 	s = tv_get_string(&argvars[0]);
 	use_string = TRUE;
     }
-    if (s == NULL)
+    ଯଦି (s == ଖାଲି)
     {
 	semsg(_(e_invalid_argument_str), "NULL");
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == NULL) || is_funcref)
+    ଯଦି ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == ଖାଲି) || is_funcref)
     {
 	name = s;
 	trans_name = save_function_name(&name, &is_global, FALSE,
-		   TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF, NULL);
-	if (*name == '<')
+		   TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF, ଖାଲି);
+	ଯଦି (*name == '<')
 	{
 	    // generic function
 	    start_bracket = name;
-	    if (skip_generic_func_type_args(&name) == FAIL)
-		goto theend;
+	    ଯଦି (skip_generic_func_type_args(&name) == FAIL)
+		ଯାଅ theend;
 	}
-	if (*name != NUL)
-	    s = NULL;
+	ଯଦି (*name != NUL)
+	    s = ଖାଲି;
     }
 
-    if (s == NULL || *s == NUL || (use_string && VIM_ISDIGIT(*s))
-					 || (is_funcref && trans_name == NULL))
+    ଯଦି (s == ଖାଲି || *s == NUL || (use_string && VIM_ISDIGIT(*s))
+					 || (is_funcref && trans_name == ଖାଲି))
 	semsg(_(e_invalid_argument_str),
 				  use_string ? tv_get_string(&argvars[0]) : s);
     // Don't check an autoload name for existence here.
-    else if (trans_name != NULL && (is_funcref
-			 ? find_func(trans_name, is_global) == NULL
+    ଅନ୍ୟଥା ଯଦି (trans_name != ଖାଲି && (is_funcref
+			 ? find_func(trans_name, is_global) == ଖାଲି
 			 : !translated_function_exists(trans_name, is_global)))
 	semsg(_(e_unknown_function_str_2), s);
-    else
+    ଅନ୍ୟଥା
     {
-	int	dict_idx = 0;
-	int	arg_idx = 0;
-	list_T	*list = NULL;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	dict_idx = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	arg_idx = 0;
+	list_T	*list = ଖାଲି;
 
-	if (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
+	ଯଦି (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
 	    // Expand s: and <SID> into <SNR>nr_, so that the function can
 	    // also be called from another script. Using trans_function_name()
 	    // would also work, but some plugins depend on the name being
 	    // printable text.
 	    name = get_scriptlocal_funcname(s);
-	else if (trans_name != NULL && *trans_name == K_SPECIAL)
+	ଅନ୍ୟଥା ଯଦି (trans_name != ଖାଲି && *trans_name == K_SPECIAL)
 	    name = alloc_printable_func_name(trans_name);
-	else
+	ଅନ୍ୟଥା
 	    name = vim_strsave(s);
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[2].v_type != VAR_UNKNOWN)
+	    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	    {
 		// function(name, [args], dict)
 		arg_idx = 1;
 		dict_idx = 2;
 	    }
-	    else if (argvars[1].v_type == VAR_DICT)
+	    ଅନ୍ୟଥା ଯଦି (argvars[1].v_type == VAR_DICT)
 		// function(name, dict)
 		dict_idx = 1;
-	    else
+	    ଅନ୍ୟଥା
 		// function(name, [args])
 		arg_idx = 1;
-	    if (dict_idx > 0)
+	    ଯଦି (dict_idx > 0)
 	    {
-		if (check_for_dict_arg(argvars, dict_idx) == FAIL)
+		ଯଦି (check_for_dict_arg(argvars, dict_idx) == FAIL)
 		{
 		    vim_free(name);
-		    goto theend;
+		    ଯାଅ theend;
 		}
-		if (argvars[dict_idx].vval.v_dict == NULL)
+		ଯଦି (argvars[dict_idx].vval.v_dict == ଖାଲି)
 		    dict_idx = 0;
 	    }
-	    if (arg_idx > 0)
+	    ଯଦି (arg_idx > 0)
 	    {
-		if (argvars[arg_idx].v_type != VAR_LIST)
+		ଯଦି (argvars[arg_idx].v_type != VAR_LIST)
 		{
 		    emsg(_(e_second_argument_of_function_must_be_list_or_dict));
 		    vim_free(name);
-		    goto theend;
+		    ଯାଅ theend;
 		}
 		list = argvars[arg_idx].vval.v_list;
-		if (list == NULL || list->lv_len == 0)
+		ଯଦି (list == ଖାଲି || list->lv_len == 0)
 		    arg_idx = 0;
-		else if (list->lv_len > MAX_FUNC_ARGS)
+		ଅନ୍ୟଥା ଯଦି (list->lv_len > MAX_FUNC_ARGS)
 		{
 		    emsg_funcname(e_too_many_arguments_for_function_str, s);
 		    vim_free(name);
-		    goto theend;
+		    ଯାଅ theend;
 		}
 	    }
 	}
-	if (dict_idx > 0 || arg_idx > 0 || arg_pt != NULL || is_funcref)
+	ଯଦି (dict_idx > 0 || arg_idx > 0 || arg_pt != ଖାଲି || is_funcref)
 	{
 	    partial_T	*pt = ALLOC_CLEAR_ONE(partial_T);
 
 	    // result is a VAR_PARTIAL
-	    if (pt == NULL)
+	    ଯଦି (pt == ଖାଲି)
 		vim_free(name);
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		if (arg_idx > 0 || (arg_pt != NULL && arg_pt->pt_argc > 0))
+		ଯଦି (arg_idx > 0 || (arg_pt != ଖାଲି && arg_pt->pt_argc > 0))
 		{
 		    listitem_T	*li;
-		    int		i = 0;
-		    int		arg_len = 0;
-		    int		lv_len = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg_len = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lv_len = 0;
 
-		    if (arg_pt != NULL)
+		    ଯଦି (arg_pt != ଖାଲି)
 			arg_len = arg_pt->pt_argc;
-		    if (list != NULL)
+		    ଯଦି (list != ଖାଲି)
 			lv_len = list->lv_len;
 		    pt->pt_argc = arg_len + lv_len;
 		    pt->pt_argv = ALLOC_MULT(typval_T, pt->pt_argc);
-		    if (pt->pt_argv == NULL)
+		    ଯଦି (pt->pt_argv == ଖାଲି)
 		    {
 			vim_free(pt);
 			vim_free(name);
-			goto theend;
+			ଯାଅ theend;
 		    }
-		    for (i = 0; i < arg_len; i++)
+		    ପାଇଁ (i = 0; i < arg_len; i++)
 			copy_tv(&arg_pt->pt_argv[i], &pt->pt_argv[i]);
-		    if (lv_len > 0)
+		    ଯଦି (lv_len > 0)
 		    {
 			CHECK_LIST_MATERIALIZE(list);
-			FOR_ALL_LIST_ITEMS(list, li)
+			FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(list, li)
 			    copy_tv(&li->li_tv, &pt->pt_argv[i++]);
 		    }
 		}
 
 		// For "function(dict.func, [], dict)" and "func" is a partial
 		// use "dict".  That is backwards compatible.
-		if (dict_idx > 0)
+		ଯଦି (dict_idx > 0)
 		{
 		    // The dict is bound explicitly, pt_auto is FALSE.
 		    pt->pt_dict = argvars[dict_idx].vval.v_dict;
 		    ++pt->pt_dict->dv_refcount;
 		}
-		else if (arg_pt != NULL)
+		ଅନ୍ୟଥା ଯଦି (arg_pt != ଖାଲି)
 		{
 		    // If the dict was bound automatically the result is also
 		    // bound automatically.
 		    pt->pt_dict = arg_pt->pt_dict;
 		    pt->pt_auto = arg_pt->pt_auto;
-		    if (pt->pt_dict != NULL)
+		    ଯଦି (pt->pt_dict != ଖାଲି)
 			++pt->pt_dict->dv_refcount;
 		    pt->pt_obj = arg_pt->pt_obj;
-		    if (pt->pt_obj != NULL)
+		    ଯଦି (pt->pt_obj != ଖାଲି)
 			++pt->pt_obj->obj_refcount;
 		}
 
 		pt->pt_refcount = 1;
-		if (arg_pt != NULL && arg_pt->pt_func != NULL)
+		ଯଦି (arg_pt != ଖାଲି && arg_pt->pt_func != ଖାଲି)
 		{
 		    pt->pt_func = arg_pt->pt_func;
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else if (is_funcref)
+		ଅନ୍ୟଥା ଯଦି (is_funcref)
 		{
 		    pt->pt_func = find_func(trans_name, is_global);
-		    if (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != NULL)
+		    ଯଦି (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != ଖାଲି)
 			pt->pt_func = eval_generic_func(pt->pt_func, s,
 							&start_bracket);
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    pt->pt_name = name;
 		    func_ref(name);
 		}
 
-		if (arg_pt != NULL)
+		ଯଦି (arg_pt != ଖାଲି)
 		{
 		    pt->pt_outer_partial = arg_pt;
 		    ++arg_pt->pt_refcount;
@@ -6000,21 +6000,21 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 	    rettv->v_type = VAR_PARTIAL;
 	    rettv->vval.v_partial = pt;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // result is a VAR_FUNC
 	    rettv->v_type = VAR_FUNC;
-	    if (start_bracket == NULL)
+	    ଯଦି (start_bracket == ଖାଲି)
 	    {
 		rettv->vval.v_string = name;
 		func_ref(name);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// generic function
 		size_t len = STRLEN(name) + STRLEN(start_bracket);
 		rettv->vval.v_string = alloc(len + 1);
-		if (rettv->vval.v_string != NULL)
+		ଯଦି (rettv->vval.v_string != ଖାଲି)
 		{
 		    STRCPY(rettv->vval.v_string, name);
 		    STRCAT(rettv->vval.v_string, start_bracket);
@@ -6030,7 +6030,7 @@ theend:
 /*
  * "funcref()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_funcref(typval_T *argvars, typval_T *rettv)
 {
     common_function(argvars, rettv, TRUE);
@@ -6039,7 +6039,7 @@ f_funcref(typval_T *argvars, typval_T *rettv)
 /*
  * "function()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_function(typval_T *argvars, typval_T *rettv)
 {
     common_function(argvars, rettv, FALSE);
@@ -6048,24 +6048,24 @@ f_function(typval_T *argvars, typval_T *rettv)
 /*
  * "garbagecollect()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_garbagecollect(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     // This is postponed until we are back at the toplevel, because we may be
     // using Lists and Dicts internally.  E.g.: ":echo [garbagecollect()]".
     want_garbage_collect = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
 	garbage_collect_at_exit = TRUE;
 }
 
 /*
  * "get()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_get(typval_T *argvars, typval_T *rettv)
 {
     listitem_T	*li;
@@ -6073,161 +6073,161 @@ f_get(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple;
     dictitem_T	*di;
     dict_T	*d;
-    typval_T	*tv = NULL;
-    int		what_is_dict = FALSE;
+    typval_T	*tv = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		what_is_dict = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    ଯଦି (argvars[0].v_type == VAR_BLOB)
     {
-	int error = FALSE;
-	int idx = tv_get_number_chk(&argvars[1], &error);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
 
-	if (!error)
+	ଯଦି (!error)
 	{
-	    rettv->v_type = VAR_NUMBER;
-	    if (idx < 0)
+	    rettv->v_type = VAR_ସଂଖ୍ୟା;
+	    ଯଦି (idx < 0)
 		idx = blob_len(argvars[0].vval.v_blob) + idx;
-	    if (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
-		rettv->vval.v_number = -1;
-	    else
+	    ଯଦି (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
+		rettv->vval.v_ସଂଖ୍ୟା = -1;
+	    ଅନ୍ୟଥା
 	    {
-		rettv->vval.v_number = blob_get(argvars[0].vval.v_blob, idx);
+		rettv->vval.v_ସଂଖ୍ୟା = blob_get(argvars[0].vval.v_blob, idx);
 		tv = rettv;
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) != NULL)
+	ଯଦି ((l = argvars[0].vval.v_list) != ଖାଲି)
 	{
-	    int		error = FALSE;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-	    li = list_find(l, (long)tv_get_number_chk(&argvars[1], &error));
-	    if (!error && li != NULL)
+	    li = list_find(l, (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error));
+	    ଯଦି (!error && li != ଖାଲି)
 		tv = &li->li_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
     {
-	if ((tuple = argvars[0].vval.v_tuple) != NULL)
+	ଯଦି ((tuple = argvars[0].vval.v_tuple) != ଖାଲି)
 	{
-	    int		error = FALSE;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 	    long	idx;
 
-	    idx = (long)tv_get_number_chk(&argvars[1], &error);
-	    if (!error)
+	    idx = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
+	    ଯଦି (!error)
 		tv = tuple_find(tuple, idx);
 	}
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_DICT)
     {
-	if ((d = argvars[0].vval.v_dict) != NULL)
+	ଯଦି ((d = argvars[0].vval.v_dict) != ଖାଲି)
 	{
 	    di = dict_find(d, tv_get_string(&argvars[1]), -1);
-	    if (di != NULL)
+	    ଯଦି (di != ଖାଲି)
 		tv = &di->di_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
     {
 	partial_T	*pt;
 	partial_T	fref_pt;
 
-	if (argvars[0].v_type == VAR_PARTIAL)
+	ଯଦି (argvars[0].v_type == VAR_PARTIAL)
 	    pt = argvars[0].vval.v_partial;
-	else
+	ଅନ୍ୟଥା
 	{
 	    CLEAR_FIELD(fref_pt);
 	    fref_pt.pt_name = argvars[0].vval.v_string;
 	    pt = &fref_pt;
 	}
 
-	if (pt != NULL)
+	ଯଦି (pt != ଖାଲି)
 	{
 	    char_u *what = tv_get_string(&argvars[1]);
 
-	    if (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
+	    ଯଦି (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
 	    {
 		char_u *name = partial_name(pt);
 
 		rettv->v_type = (*what == 'f' ? VAR_FUNC : VAR_STRING);
-		if (name == NULL)
-		    rettv->vval.v_string = NULL;
-		else
+		ଯଦି (name == ଖାଲି)
+		    rettv->vval.v_string = ଖାଲି;
+		ଅନ୍ୟଥା
 		{
-		    if (rettv->v_type == VAR_FUNC)
+		    ଯଦି (rettv->v_type == VAR_FUNC)
 			func_ref(name);
-		    if (*what == 'n' && pt->pt_name == NULL
-							&& pt->pt_func != NULL)
+		    ଯଦି (*what == 'n' && pt->pt_name == ଖାଲି
+							&& pt->pt_func != ଖାଲି)
 			// use <SNR> instead of the byte code
 			name = printable_func_name(pt->pt_func);
 		    rettv->vval.v_string = vim_strsave(name);
 		}
 	    }
-	    else if (STRCMP(what, "dict") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRCMP(what, "dict") == 0)
 	    {
 		what_is_dict = TRUE;
-		if (pt->pt_dict != NULL)
+		ଯଦି (pt->pt_dict != ଖାଲି)
 		    rettv_dict_set(rettv, pt->pt_dict);
 	    }
-	    else if (STRCMP(what, "args") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRCMP(what, "args") == 0)
 	    {
 		rettv->v_type = VAR_LIST;
-		if (rettv_list_alloc(rettv) == OK)
+		ଯଦି (rettv_list_alloc(rettv) == OK)
 		{
-		    int i;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-		    for (i = 0; i < pt->pt_argc; ++i)
+		    ପାଇଁ (i = 0; i < pt->pt_argc; ++i)
 			list_append_tv(rettv->vval.v_list, &pt->pt_argv[i]);
 		}
 	    }
-	    else if (STRCMP(what, "arity") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRCMP(what, "arity") == 0)
 	    {
-		int required = 0, optional = 0, varargs = FALSE;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା required = 0, optional = 0, varargs = FALSE;
 		char_u *name = partial_name(pt);
 
 		get_func_arity(name, &required, &optional, &varargs);
 
 		rettv->v_type = VAR_DICT;
-		if (rettv_dict_alloc(rettv) == OK)
+		ଯଦି (rettv_dict_alloc(rettv) == OK)
 		{
 		    dict_T *dict = rettv->vval.v_dict;
 
 		    // Take into account the arguments of the partial, if any.
 		    // Note that it is possible to supply more arguments than the function
 		    // accepts.
-		    if (pt->pt_argc >= required + optional)
+		    ଯଦି (pt->pt_argc >= required + optional)
 			required = optional = 0;
-		    else if (pt->pt_argc > required)
+		    ଅନ୍ୟଥା ଯଦି (pt->pt_argc > required)
 		    {
 			optional -= pt->pt_argc - required;
 			required = 0;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			required -= pt->pt_argc;
 
-		    dict_add_number(dict, "required", required);
-		    dict_add_number(dict, "optional", optional);
+		    dict_add_ସଂଖ୍ୟା(dict, "required", required);
+		    dict_add_ସଂଖ୍ୟା(dict, "optional", optional);
 		    dict_add_bool(dict, "varargs", varargs);
 		}
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		semsg(_(e_invalid_argument_str), what);
 
 	    // When {what} == "dict" and pt->pt_dict == NULL, evaluate the
 	    // third argument
-	    if (!what_is_dict)
-		return;
+	    ଯଦି (!what_is_dict)
+		ଫେରନ୍ତୁ;
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_argument_of_str_must_be_list_tuple_dictionary_or_blob), "get()");
 
-    if (tv == NULL)
+    ଯଦି (tv == ଖାଲି)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	    copy_tv(&argvars[2], rettv);
     }
-    else
+    ଅନ୍ୟଥା
 	copy_tv(tv, rettv);
 }
 
@@ -6240,43 +6240,43 @@ f_get(typval_T *argvars, typval_T *rettv)
  * Returns an empty list when no value is available, e.g. before the
  * terminal has answered the query, or when "Normal" has no bg colour.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#ଯଦି defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     {
 	bool try_hl = false;
 
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	ଯଦି (gui.in_use)
 	    try_hl = true;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (p_tgc)
+	ଯଦି (p_tgc)
 	    try_hl = true;
 # endif
-	if (try_hl)
+	ଯଦି (try_hl)
 	{
 	    guicolor_T	fg, bg;
-	    int		hl_id = syn_name2id((char_u *)"Normal");
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		hl_id = syn_name2id((char_u *)"Normal");
 
-	    if (hl_id > 0)
+	    ଯଦି (hl_id > 0)
 	    {
-		(void)syn_id2colors(hl_id, &fg, &bg);
-		if (bg != INVALCOLOR)
+		(ଶୂନ୍ୟ)syn_id2colors(hl_id, &fg, &bg);
+		ଯଦି (bg != INVALCOLOR)
 		{
 		    long_u  rgb = GUI_MCH_GET_RGB(bg);
 
-		    list_append_number(rettv->vval.v_list,
+		    list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)((rgb >> 16) & 0xff));
-		    list_append_number(rettv->vval.v_list,
+		    list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)((rgb >> 8) & 0xff));
-		    list_append_number(rettv->vval.v_list,
+		    list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)(rgb & 0xff));
-		    return;
+		    ଫେରନ୍ତୁ;
 		}
 	    }
 	}
@@ -6286,11 +6286,11 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
     {
 	char_u	r = 0, g = 0, b = 0;
 
-	if (term_get_bg_color(&r, &g, &b) == OK)
+	ଯଦି (term_get_bg_color(&r, &g, &b) == OK)
 	{
-	    list_append_number(rettv->vval.v_list, (varnumber_T)r);
-	    list_append_number(rettv->vval.v_list, (varnumber_T)g);
-	    list_append_number(rettv->vval.v_list, (varnumber_T)b);
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)r);
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)g);
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)b);
 	}
     }
 #endif
@@ -6299,29 +6299,29 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getcellpixels()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-#if defined(FEAT_GUI)
-    if (gui.in_use)
+#ଯଦି defined(FEAT_GUI)
+    ଯଦି (gui.in_use)
     {
 	// success pixel size and no gui.
-	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_width);
-	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_height);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)gui.char_width);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)gui.char_height);
     }
-    else
+    ଅନ୍ୟଥା
 #endif
     {
-#if defined(UNIX) || defined(MSWIN)
-	list_append_number(rettv->vval.v_list, (varnumber_T)cell_width);
-	list_append_number(rettv->vval.v_list, (varnumber_T)cell_height);
-#else
+#ଯଦି defined(UNIX) || defined(MSWIN)
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)cell_width);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)cell_height);
+#ଅନ୍ୟଥା
 	// Non-Unix CUIs are not supported, so set this to -1x-1.
-	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
-	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)-1);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)-1);
 #endif
     }
 
@@ -6330,35 +6330,35 @@ f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getchangelist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getchangelist(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     list_T	*l;
     dict_T	*d;
-    int		changelistindex;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		changelistindex;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    ଅନ୍ୟଥା
 	buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf == NULL)
-	return;
+    ଯଦି (buf == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    ଯଦି (l == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     /*
@@ -6366,66 +6366,66 @@ f_getchangelist(typval_T *argvars, typval_T *rettv)
      * current buffer. For other buffers use the stored index for the current
      * window, or, if that's not available, the change list length.
      */
-    if (buf == curwin->w_buffer)
+    ଯଦି (buf == curwin->w_buffer)
     {
 	changelistindex = curwin->w_changelistidx;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	wininfo_T	*wip;
 
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == curwin)
-		break;
-	changelistindex = wip != NULL ? wip->wi_changelistidx
+	    ଯଦି (wip->wi_win == curwin)
+		ଭାଙ୍ଗ;
+	changelistindex = wip != ଖାଲି ? wip->wi_changelistidx
 							: buf->b_changelistlen;
     }
-    list_append_number(rettv->vval.v_list, (varnumber_T)changelistindex);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)changelistindex);
 
-    for (i = 0; i < buf->b_changelistlen; ++i)
+    ପାଇଁ (i = 0; i < buf->b_changelistlen; ++i)
     {
-	if (buf->b_changelist[i].lnum == 0)
-	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	ଯଦି (buf->b_changelist[i].lnum == 0)
+	    ଜାରି;
+	ଯଦି ((d = dict_alloc()) == ଖାଲି)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	dict_add_number(d, "lnum", (long)buf->b_changelist[i].lnum);
-	dict_add_number(d, "col", (long)buf->b_changelist[i].col);
-	dict_add_number(d, "coladd", (long)buf->b_changelist[i].coladd);
+	dict_add_ସଂଖ୍ୟା(d, "lnum", (long)buf->b_changelist[i].lnum);
+	dict_add_ସଂଖ୍ୟା(d, "col", (long)buf->b_changelist[i].col);
+	dict_add_ସଂଖ୍ୟା(d, "coladd", (long)buf->b_changelist[i].coladd);
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 getpos_both(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		getcurpos,
-    int		charcol)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		getcurpos,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		charcol)
 {
-    pos_T	*fp = NULL;
+    pos_T	*fp = ଖାଲି;
     pos_T	pos;
     win_T	*wp = curwin;
     list_T	*l;
-    int		fnum = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fnum = -1;
 
-    if (rettv_list_alloc(rettv) == OK)
+    ଯଦି (rettv_list_alloc(rettv) == OK)
     {
 	l = rettv->vval.v_list;
-	if (getcurpos)
+	ଯଦି (getcurpos)
 	{
-	    if (argvars[0].v_type != VAR_UNKNOWN)
+	    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
 	    {
 		wp = find_win_by_nr_or_id(&argvars[0]);
-		if (wp != NULL)
+		ଯଦି (wp != ଖାଲି)
 		    fp = &wp->w_cursor;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		fp = &curwin->w_cursor;
-	    if (fp != NULL && charcol)
+	    ଯଦି (fp != ଖାଲି && charcol)
 	    {
 		pos = *fp;
 		pos.col =
@@ -6433,33 +6433,33 @@ getpos_both(
 		fp = &pos;
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	    fp = var2fpos(&argvars[0], TRUE, &fnum, charcol);
-	if (fnum != -1)
-	    list_append_number(l, (varnumber_T)fnum);
-	else
-	    list_append_number(l, (varnumber_T)0);
-	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->lnum
+	ଯଦି (fnum != -1)
+	    list_append_ସଂଖ୍ୟା(l, (varnumber_T)fnum);
+	ଅନ୍ୟଥା
+	    list_append_ସଂଖ୍ୟା(l, (varnumber_T)0);
+	list_append_ସଂଖ୍ୟା(l, (fp != ଖାଲି) ? (varnumber_T)fp->lnum
 							    : (varnumber_T)0);
-	list_append_number(l, (fp != NULL)
+	list_append_ସଂଖ୍ୟା(l, (fp != ଖାଲି)
 		     ? (varnumber_T)(fp->col == MAXCOL ? MAXCOL : fp->col + 1)
 							    : (varnumber_T)0);
-	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->coladd :
+	list_append_ସଂଖ୍ୟା(l, (fp != ଖାଲି) ? (varnumber_T)fp->coladd :
 							      (varnumber_T)0);
-	if (getcurpos)
+	ଯଦି (getcurpos)
 	{
-	    int	    save_set_curswant = curwin->w_set_curswant;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    save_set_curswant = curwin->w_set_curswant;
 	    colnr_T save_curswant = curwin->w_curswant;
 	    colnr_T save_virtcol = curwin->w_virtcol;
 
-	    if (wp == curwin)
+	    ଯଦି (wp == curwin)
 		update_curswant();
-	    list_append_number(l, wp == NULL ? 0 : wp->w_curswant == MAXCOL
+	    list_append_ସଂଖ୍ୟା(l, wp == ଖାଲି ? 0 : wp->w_curswant == MAXCOL
 		    ?  (varnumber_T)MAXCOL : (varnumber_T)wp->w_curswant + 1);
 
 	    // Do not change "curswant", as it is unexpected that a get
 	    // function has a side effect.
-	    if (wp == curwin && save_set_curswant)
+	    ଯଦି (wp == curwin && save_set_curswant)
 	    {
 		curwin->w_set_curswant = save_set_curswant;
 		curwin->w_curswant = save_curswant;
@@ -6468,18 +6468,18 @@ getpos_both(
 	    }
 	}
     }
-    else
-	rettv->vval.v_number = FALSE;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = FALSE;
 }
 
 /*
  * "getcharpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     getpos_both(argvars, rettv, FALSE, TRUE);
 }
@@ -6487,39 +6487,39 @@ f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getcharsearch()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getcharsearch(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) != OK)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) != OK)
+	ଫେରନ୍ତୁ;
 
     dict_T *dict = rettv->vval.v_dict;
 
     dict_add_string(dict, "char", last_csearch());
-    dict_add_number(dict, "forward", last_csearch_forward());
-    dict_add_number(dict, "until", last_csearch_until());
+    dict_add_ସଂଖ୍ୟା(dict, "forward", last_csearch_forward());
+    dict_add_ସଂଖ୍ୟା(dict, "until", last_csearch_until());
 }
 
 /*
  * "getenv()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getenv(typval_T *argvars, typval_T *rettv)
 {
-    int	    mustfree = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    mustfree = FALSE;
     char_u  *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     p = vim_getenv(tv_get_string(&argvars[0]), &mustfree);
-    if (p == NULL)
+    ଯଦି (p == ଖାଲି)
     {
 	rettv->v_type = VAR_SPECIAL;
-	rettv->vval.v_number = VVAL_NULL;
-	return;
+	rettv->vval.v_ସଂଖ୍ୟା = VVAL_NULL;
+	ଫେରନ୍ତୁ;
     }
-    if (!mustfree)
+    ଯଦି (!mustfree)
 	p = vim_strsave(p);
     rettv->vval.v_string = p;
     rettv->v_type = VAR_STRING;
@@ -6528,39 +6528,39 @@ f_getenv(typval_T *argvars, typval_T *rettv)
 /*
  * "getfontname()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getfontname(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ଯଦି (gui.in_use)
     {
 	GuiFont font;
-	char_u	*name = NULL;
+	char_u	*name = ଖାଲି;
 
-	if (argvars[0].v_type == VAR_UNKNOWN)
+	ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
 	{
 	    // Get the "Normal" font.  Either the name saved by
 	    // hl_set_font_name() or from the font ID.
 	    font = gui.norm_font;
 	    name = hl_get_font_name();
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    name = tv_get_string(&argvars[0]);
-	    if (STRCMP(name, "*") == 0)	    // don't use font dialog
-		return;
+	    ଯଦି (STRCMP(name, "*") == 0)	    // don't use font dialog
+		ଫେରନ୍ତୁ;
 	    font = gui_mch_get_font(name, FALSE);
-	    if (font == NOFONT)
-		return;	    // Invalid font name, return empty string.
+	    ଯଦି (font == NOFONT)
+		ଫେରନ୍ତୁ;	    // Invalid font name, return empty string.
 	}
 	rettv->vval.v_string = gui_mch_get_fontname(font, name);
-	if (argvars[0].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
 	    gui_mch_free_font(font);
     }
 #endif
@@ -6570,10 +6570,10 @@ f_getfontname(typval_T *argvars UNUSED, typval_T *rettv)
  * The types each argument check function accepts, for getinfo().  A check
  * that depends on another argument accepts "any".
  */
-static struct
+ସ୍ଥିର ସଂରଚନା
 {
     argcheck_T	func;
-    char	*types;	    // separated by commas
+    ଅକ୍ଷର	*types;	    // separated by commas
 } argcheck_types[] =
 {
     {arg_any,			"any"},
@@ -6598,7 +6598,7 @@ static struct
 	    "string,number,blob,list<any>,tuple<any>,dict<any>,object<any>"},
     {arg_list_any,		"list<any>"},
     {arg_list_any_mod,		"list<any>"},
-    {arg_list_number,		"list<number>"},
+    {arg_list_ସଂଖ୍ୟା,		"list<number>"},
     {arg_list_or_blob,		"list<any>,blob"},
     {arg_list_or_blob_mod,	"list<any>,blob"},
     {arg_list_or_dict_or_blob,	"list<any>,dict<any>,blob"},
@@ -6614,7 +6614,7 @@ static struct
 				"list<any>,tuple<any>,dict<any>,blob,string"},
     {arg_lnum,			"string,number"},
     {arg_map_func,		"string,func"},
-    {arg_number,		"number"},
+    {arg_ସଂଖ୍ୟା,		"number"},
     {arg_object,		"object<any>"},
     {arg_remove2,		"number,string"},
     {arg_repeat1,		"string,number,blob,list<any>,tuple<any>"},
@@ -6641,35 +6641,35 @@ static struct
  * The types argument check "check" accepts as a List of strings, or NULL when
  * out of memory.
  */
-    static list_T *
+    ସ୍ଥିର list_T *
 argcheck_type_list(argcheck_T check)
 {
     list_T	*l = list_alloc();
-    char	*types = "any";
+    ଅକ୍ଷର	*types = "any";
 
-    if (l == NULL)
-	return NULL;
-    for (int i = 0; i < (int)ARRAY_LENGTH(argcheck_types); ++i)
-	if (argcheck_types[i].func == check)
+    ଯଦି (l == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(argcheck_types); ++i)
+	ଯଦି (argcheck_types[i].func == check)
 	{
 	    types = argcheck_types[i].types;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
-    for (char *p = types; ; )
+    ପାଇଁ (ଅକ୍ଷର *p = types; ; )
     {
-	char	*end = (char *)vim_strchr((char_u *)p, ',');
-	int	len = end == NULL ? (int)STRLEN(p) : (int)(end - p);
+	ଅକ୍ଷର	*end = (ଅକ୍ଷର *)vim_strchr((char_u *)p, ',');
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	len = end == ଖାଲି ? (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p) : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(end - p);
 
-	if (list_append_string(l, (char_u *)p, len) == FAIL)
+	ଯଦି (list_append_string(l, (char_u *)p, len) == FAIL)
 	{
 	    list_free(l);
-	    return NULL;
+	    ଫେରନ୍ତୁ ଖାଲି;
 	}
-	if (end == NULL)
-	    break;
+	ଯଦି (end == ଖାଲି)
+	    ଭାଙ୍ଗ;
 	p = end + 1;
     }
-    return l;
+    ଫେରନ୍ତୁ l;
 }
 
 /*
@@ -6678,48 +6678,48 @@ argcheck_type_list(argcheck_T check)
  * required but not in "l" get type "any".
  * Returns the number of arguments, -1 for an error.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 getinfo_argtypes(
 	list_T			*l,
-	const funcentry_T	*fe,
+	ଅଚଳ funcentry_T	*fe,
 	type2_T			*argtypes,
 	garray_T		*type_gap)
 {
     listitem_T	*li;
-    int		argcount = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		argcount = 0;
 
-    if (l != NULL)
-	FOR_ALL_LIST_ITEMS(l, li)
+    ଯଦି (l != ଖାଲି)
+	FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(l, li)
 	{
 	    char_u  *s = tv_get_string_chk(&li->li_tv);
 	    char_u  *p = s;
 	    type_T  *type;
 
-	    if (s == NULL)
-		return -1;
-	    if (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
+	    ଯଦି (s == ଖାଲି)
+		ଫେରନ୍ତୁ -1;
+	    ଯଦି (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
 	    {
 		semsg(_(e_too_many_arguments_for_function_str), fe->f_name);
-		return -1;
+		ଫେରନ୍ତୁ -1;
 	    }
-	    type = parse_type(&p, type_gap, NULL, NULL, TRUE);
-	    if (type == NULL)
-		return -1;
-	    if (*skipwhite(p) != NUL)
+	    type = parse_type(&p, type_gap, ଖାଲି, ଖାଲି, TRUE);
+	    ଯଦି (type == ଖାଲି)
+		ଫେରନ୍ତୁ -1;
+	    ଯଦି (*skipwhite(p) != NUL)
 	    {
 		semsg(_(e_type_not_recognized_str), s);
-		return -1;
+		ଫେରନ୍ତୁ -1;
 	    }
 	    argtypes[argcount].type_curr = type;
 	    argtypes[argcount].type_decl = type;
 	    ++argcount;
 	}
-    for ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
+    ପାଇଁ ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
     {
 	argtypes[argcount].type_curr = &t_any;
 	argtypes[argcount].type_decl = &t_any;
     }
-    return argcount;
+    ଫେରନ୍ତୁ argcount;
 }
 
 /*
@@ -6727,34 +6727,34 @@ getinfo_argtypes(
  * "argcount" arguments of the types in "argtypes".  "tofree" is set to what
  * to free.
  */
-    static char *
+    ସ୍ଥିର ଅକ୍ଷର *
 builtin_ret_type_name(
-	int	    idx,
-	int	    argcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    idx,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    argcount,
 	type2_T	    *argtypes,
 	garray_T    *type_gap,
-	char	    **tofree)
+	ଅକ୍ଷର	    **tofree)
 {
     type_T	*decl_type;
     type_T	*ret = internal_func_ret_type(idx, argcount, argtypes,
 							&decl_type, type_gap);
 
-    return type_name(ret, tofree);
+    ଫେରନ୍ତୁ type_name(ret, tofree);
 }
 
 /*
  * What getinfo() can look up, the {kind} argument.
  */
-typedef enum {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା {
     GI_COMMAND,
     GI_FUNCTION,
     GI_OPTION,
     GI_VIMVAR
 } getinfo_kind_T;
 
-static struct
+ସ୍ଥିର ସଂରଚନା
 {
-    char		*name;
+    ଅକ୍ଷର		*name;
     getinfo_kind_T	kind;
 } getinfo_kinds[] =
 {
@@ -6767,176 +6767,176 @@ static struct
 /*
  * "getinfo()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getinfo(typval_T *argvars, typval_T *rettv)
 {
     char_u		*kindname;
     char_u		*name;
     char_u		namebuf[NUMBUFLEN];
     getinfo_kind_T	kind;
-    int			ki;
-    int			idx;
-    const funcentry_T	*fe;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			ki;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			idx;
+    ଅଚଳ funcentry_T	*fe;
     dict_T		*d;
     list_T		*args;
     char_u		*argnames;
     garray_T		type_gap;
     type2_T		argtypes[MAX_FUNC_ARGS];
-    list_T		*argtypes_list = NULL;
-    int			argcount;
-    int			vim9 = -1;	// -1: the context of the caller
-    char		*ret_name;
-    char		*tofree;
+    list_T		*argtypes_list = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			argcount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			vim9 = -1;	// -1: the context of the caller
+    ଅକ୍ଷର		*ret_name;
+    ଅକ୍ଷର		*tofree;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
-    if (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
+    ଯଦି (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
 				|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
-    if (check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
+    ଯଦି (check_for_opt_dict_arg(argvars, 2) == FAIL)
+	ଫେରନ୍ତୁ;
 
     kindname = tv_get_string(&argvars[0]);
-    for (ki = 0; ki < (int)ARRAY_LENGTH(getinfo_kinds); ++ki)
-	if (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
-	    break;
-    if (ki == (int)ARRAY_LENGTH(getinfo_kinds))
+    ପାଇଁ (ki = 0; ki < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(getinfo_kinds); ++ki)
+	ଯଦି (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
+	    ଭାଙ୍ଗ;
+    ଯଦି (ki == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(getinfo_kinds))
     {
 	semsg(_(e_invalid_argument_str), kindname);
-	return;
+	ଫେରନ୍ତୁ;
     }
     kind = getinfo_kinds[ki].kind;
     name = tv_get_string_buf(&argvars[1], namebuf);
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != NULL)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != ଖାଲି)
     {
 	// Each item of {opts} is for one kind.
 	dict_T	    *opts = argvars[2].vval.v_dict;
 	hashitem_T  *hi;
-	int	    todo = (int)opts->dv_hashtab.ht_used;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)opts->dv_hashtab.ht_used;
 
-	FOR_ALL_HASHTAB_ITEMS(&opts->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&opts->dv_hashtab, hi, todo)
 	{
-	    if (HASHITEM_EMPTY(hi))
-		continue;
+	    ଯଦି (HASHITEM_EMPTY(hi))
+		ଜାରି;
 	    --todo;
 	    dictitem_T *di = HI2DI(hi);
 
-	    if (STRCMP(di->di_key, "argtypes") == 0 && kind == GI_FUNCTION
+	    ଯଦି (STRCMP(di->di_ଚାବି, "argtypes") == 0 && kind == GI_FUNCTION
 		    && di->di_tv.v_type == VAR_LIST)
 		argtypes_list = di->di_tv.vval.v_list;
-	    else if (STRCMP(di->di_key, "vim9") == 0 && kind == GI_COMMAND)
+	    ଅନ୍ୟଥା ଯଦି (STRCMP(di->di_ଚାବି, "vim9") == 0 && kind == GI_COMMAND)
 		vim9 = tv_get_bool(&di->di_tv);
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		semsg(_(e_invalid_argument_str), di->di_key);
-		return;
+		semsg(_(e_invalid_argument_str), di->di_ଚାବି);
+		ଫେରନ୍ତୁ;
 	    }
 	}
     }
-    if (kind == GI_VIMVAR)
+    ଯଦି (kind == GI_VIMVAR)
     {
-	if (STRNCMP(name, "v:", 2) == 0)
-	    (void)vim_var_info(name + 2, rettv->vval.v_dict);
-	return;
+	ଯଦି (STRNCMP(name, "v:", 2) == 0)
+	    (ଶୂନ୍ୟ)vim_var_info(name + 2, rettv->vval.v_dict);
+	ଫେରନ୍ତୁ;
     }
-    if (kind == GI_COMMAND)
+    ଯଦି (kind == GI_COMMAND)
     {
-	(void)ex_command_info(name, vim9, rettv->vval.v_dict);
-	return;
+	(ଶୂନ୍ୟ)ex_command_info(name, vim9, rettv->vval.v_dict);
+	ଫେରନ୍ତୁ;
     }
-    if (kind == GI_OPTION)
+    ଯଦି (kind == GI_OPTION)
     {
-	(void)option_info(name, rettv->vval.v_dict);
-	return;
+	(ଶୂନ୍ୟ)option_info(name, rettv->vval.v_dict);
+	ଫେରନ୍ତୁ;
     }
     // A builtin function, also one that is not implemented in this Vim, or a
     // user defined function when there is no builtin one with that name.
     idx = find_internal_func_opt(name, FALSE);
-    if (idx < 0)
+    ଯଦି (idx < 0)
     {
-	(void)user_func_info(name, rettv->vval.v_dict);
-	return;
+	(ଶୂନ୍ୟ)user_func_info(name, rettv->vval.v_dict);
+	ଫେରନ୍ତୁ;
     }
 
     fe = &global_functions[idx];
-    ga_init2(&type_gap, sizeof(type_T *), 10);
+    ga_init2(&type_gap, ଆକାର(type_T *), 10);
     argcount = getinfo_argtypes(argtypes_list, fe, argtypes, &type_gap);
-    if (argcount < 0)
+    ଯଦି (argcount < 0)
     {
 	clear_type_list(&type_gap);
-	return;
+	ଫେରନ୍ତୁ;
     }
     d = rettv->vval.v_dict;
     dict_add_string(d, "name", (char_u *)fe->f_name);
     dict_add_string(d, "kind", (char_u *)"builtin");
-    dict_add_bool(d, "available", fe->f_func != NULL);
-    dict_add_number(d, "minargs", fe->f_min_argc);
-    dict_add_number(d, "maxargs", fe->f_max_argc == VARGS
+    dict_add_bool(d, "available", fe->f_func != ଖାଲି);
+    dict_add_ସଂଖ୍ୟା(d, "minargs", fe->f_min_argc);
+    dict_add_ସଂଖ୍ୟା(d, "maxargs", fe->f_max_argc == VARGS
 						    ? -1 : fe->f_max_argc);
-    dict_add_number(d, "method", fe->f_argtype & FEARG_MASK);
+    dict_add_ସଂଖ୍ୟା(d, "method", fe->f_argtype & FEARG_MASK);
 
     args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    ଯଦି (args == ଖାଲି || dict_add_list(d, "args", args) == FAIL)
     {
 	list_unref(args);
 	clear_type_list(&type_gap);
-	return;
+	ଫେରନ୍ତୁ;
     }
     argnames = (char_u *)fe->f_argnames;
-    for (int i = 0; ; ++i)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; ; ++i)
     {
 	argcheck_T  check;
 	dict_T	    *arg;
 	list_T	    *types;
-	char_u	    *argname = NULL;
-	int	    argnamelen = 0;
+	char_u	    *argname = ଖାଲି;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    argnamelen = 0;
 
-	if (fe->f_argcheck == NULL)
+	ଯଦି (fe->f_argcheck == ଖାଲି)
 	{
 	    // Every argument is "any"; one item stands for all of them when
 	    // there is no maximum.
-	    if (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
-		break;
+	    ଯଦି (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
+		ଭାଙ୍ଗ;
 	    check = arg_any;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // One check per argument up to the maximum; without a maximum the
 	    // checks end with NULL.
-	    if ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
-						|| fe->f_argcheck[i] == NULL)
-		break;
+	    ଯଦି ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
+						|| fe->f_argcheck[i] == ଖାଲି)
+		ଭାଙ୍ଗ;
 	    check = fe->f_argcheck[i];
 	}
 	// The name of the argument, when the help gives one.
-	if (argnames != NULL)
+	ଯଦି (argnames != ଖାଲି)
 	{
 	    char_u  *end = vim_strchr(argnames, ',');
 
 	    argname = argnames;
-	    argnamelen = end == NULL ? (int)STRLEN(argnames)
-						     : (int)(end - argnames);
-	    argnames = end == NULL ? NULL : skipwhite(end + 1);
+	    argnamelen = end == ଖାଲି ? (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(argnames)
+						     : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(end - argnames);
+	    argnames = end == ଖାଲି ? ଖାଲି : skipwhite(end + 1);
 	}
 	arg = dict_alloc();
 	types = argcheck_type_list(check);
-	if (arg == NULL || types == NULL
+	ଯଦି (arg == ଖାଲି || types == ଖାଲି
 		|| dict_add_list(arg, "types", types) == FAIL)
 	{
 	    list_unref(types);
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	if ((argnamelen > 0
+	ଯଦି ((argnamelen > 0
 		    && dict_add_string_len(arg, "name", argname, argnamelen)
 								       == FAIL)
 		|| list_append_dict(args, arg) == FAIL)
 	{
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
 
@@ -6944,13 +6944,13 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     // when it differs with the number of arguments.
     ret_name = builtin_ret_type_name(idx, argcount, argtypes, &type_gap,
 								    &tofree);
-    if (argtypes_list == NULL
+    ଯଦି (argtypes_list == ଖାଲି
 	    && fe->f_max_argc != VARGS && fe->f_max_argc != fe->f_min_argc)
     {
-	char	*tofree_max;
-	char	*max_name;
+	ଅକ୍ଷର	*tofree_max;
+	ଅକ୍ଷର	*max_name;
 
-	for (int i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
 	{
 	    argtypes[i].type_curr = &t_any;
 	    argtypes[i].type_decl = &t_any;
@@ -6958,10 +6958,10 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 	max_name = builtin_ret_type_name(idx, fe->f_max_argc, argtypes,
 						    &type_gap, &tofree_max);
 
-	if (STRCMP(ret_name, max_name) != 0)
+	ଯଦି (STRCMP(ret_name, max_name) != 0)
 	{
 	    vim_free(tofree);
-	    tofree = NULL;
+	    tofree = ଖାଲି;
 	    ret_name = "any";
 	}
 	vim_free(tofree_max);
@@ -6974,56 +6974,56 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 /*
  * "getjumplist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getjumplist(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL)))
+	ଫେରନ୍ତୁ;
 
-    wp = find_tabwin(&argvars[0], &argvars[1], NULL);
-    if (wp == NULL)
-	return;
+    wp = find_tabwin(&argvars[0], &argvars[1], ଖାଲି);
+    ଯଦି (wp == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     cleanup_jumplist(wp, TRUE);
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    ଯଦି (l == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    list_append_number(rettv->vval.v_list, (varnumber_T)wp->w_jumplistidx);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)wp->w_jumplistidx);
 
-    for (i = 0; i < wp->w_jumplistlen; ++i)
+    ପାଇଁ (i = 0; i < wp->w_jumplistlen; ++i)
     {
-	if (wp->w_jumplist[i].fmark.mark.lnum == 0)
-	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	ଯଦି (wp->w_jumplist[i].fmark.mark.lnum == 0)
+	    ଜାରି;
+	ଯଦି ((d = dict_alloc()) == ଖାଲି)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	dict_add_number(d, "lnum", (long)wp->w_jumplist[i].fmark.mark.lnum);
-	dict_add_number(d, "col", (long)wp->w_jumplist[i].fmark.mark.col);
-	dict_add_number(d, "coladd", (long)wp->w_jumplist[i].fmark.mark.coladd);
-	dict_add_number(d, "bufnr", (long)wp->w_jumplist[i].fmark.fnum);
-	if (wp->w_jumplist[i].fname != NULL)
+	dict_add_ସଂଖ୍ୟା(d, "lnum", (long)wp->w_jumplist[i].fmark.mark.lnum);
+	dict_add_ସଂଖ୍ୟା(d, "col", (long)wp->w_jumplist[i].fmark.mark.col);
+	dict_add_ସଂଖ୍ୟା(d, "coladd", (long)wp->w_jumplist[i].fmark.mark.coladd);
+	dict_add_ସଂଖ୍ୟା(d, "bufnr", (long)wp->w_jumplist[i].fmark.fnum);
+	ଯଦି (wp->w_jumplist[i].fname != ଖାଲି)
 	    dict_add_string(d, "filename", wp->w_jumplist[i].fname);
     }
 }
@@ -7031,29 +7031,29 @@ f_getjumplist(typval_T *argvars, typval_T *rettv)
 /*
  * "getpid()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getpid(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = mch_get_pid();
+    rettv->vval.v_ସଂଖ୍ୟା = mch_get_pid();
 }
 
 /*
  * "getcurpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getcurpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     getpos_both(argvars, rettv, TRUE, FALSE);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     getpos_both(argvars, rettv, TRUE, TRUE);
 }
@@ -7061,11 +7061,11 @@ f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
 /*
  * "getpos(string)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     getpos_both(argvars, rettv, FALSE, FALSE);
 }
@@ -7073,14 +7073,14 @@ f_getpos(typval_T *argvars, typval_T *rettv)
 /*
  * Convert from block_def to string
  */
-    static int
-block_def2str(struct block_def *bd, string_T *ret)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+block_def2str(ସଂରଚନା block_def *bd, string_T *ret)
 {
     ret->string = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1);
-    if (ret->string == NULL)
+    ଯଦି (ret->string == ଖାଲି)
     {
 	ret->length = 0;
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     vim_memset(ret->string, ' ', bd->startspaces);
@@ -7091,107 +7091,107 @@ block_def2str(struct block_def *bd, string_T *ret)
     ret->length += bd->endspaces;
     ret->string[ret->length] = NUL;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 getregionpos(
     typval_T	*argvars,
     typval_T	*rettv,
     pos_T	*p1,
     pos_T	*p2,
-    int		*inclusive,
-    int		*region_type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*inclusive,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*region_type,
     oparg_T	*oap)
 {
-    int		fnum1 = -1, fnum2 = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fnum1 = -1, fnum2 = -1;
     char_u	*type;
     buf_T	*findbuf;
     char_u	default_type[] = "v";
-    int		block_width = 0;
-    int		is_select_exclusive;
-    int		l;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		block_width = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_select_exclusive;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return FAIL;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ FAIL;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
 
-    if (list2fpos(&argvars[0], p1, &fnum1, NULL, FALSE) != OK
-	    || list2fpos(&argvars[1], p2, &fnum2, NULL, FALSE) != OK
+    ଯଦି (list2fpos(&argvars[0], p1, &fnum1, ଖାଲି, FALSE) != OK
+	    || list2fpos(&argvars[1], p2, &fnum2, ଖାଲି, FALSE) != OK
 	    || fnum1 != fnum2)
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
 
-    if (argvars[2].v_type == VAR_DICT)
+    ଯଦି (argvars[2].v_type == VAR_DICT)
     {
 	is_select_exclusive = dict_get_bool(
 		argvars[2].vval.v_dict, "exclusive", *p_sel == 'e');
 	type = dict_get_string(
 		argvars[2].vval.v_dict, "type", FALSE);
-	if (type == NULL)
+	ଯଦି (type == ଖାଲି)
 	    type = default_type;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	is_select_exclusive = *p_sel == 'e';
 	type = default_type;
     }
 
-    if (type[0] == 'v' && type[1] == NUL)
+    ଯଦି (type[0] == 'v' && type[1] == NUL)
 	*region_type = MCHAR;
-    else if (type[0] == 'V' && type[1] == NUL)
+    ଅନ୍ୟଥା ଯଦି (type[0] == 'V' && type[1] == NUL)
 	*region_type = MLINE;
-    else if (type[0] == Ctrl_V)
+    ଅନ୍ୟଥା ଯଦି (type[0] == Ctrl_V)
     {
 	char_u *p = type + 1;
 
-	if (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
+	ଯଦି (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	    return FAIL;
+	    semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str_str), "type", type);
+	    ଫେରନ୍ତୁ FAIL;
 	}
 	*region_type = MBLOCK;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	return FAIL;
+	semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str_str), "type", type);
+	ଫେରନ୍ତୁ FAIL;
     }
 
     findbuf = fnum1 != 0 ? buflist_findnr(fnum1) : curbuf;
-    if (findbuf == NULL || findbuf->b_ml.ml_mfp == NULL)
+    ଯଦି (findbuf == ଖାଲି || findbuf->b_ml.ml_mfp == ଖାଲି)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_line_count)
+    ଯଦି (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
     {
-	semsg(_(e_invalid_line_number_nr), p1->lnum);
-	return FAIL;
+	semsg(_(e_invalid_ଧାଡ଼ି_ସଂଖ୍ୟା_nr), p1->lnum);
+	ଫେରନ୍ତୁ FAIL;
     }
-    if (p1->col == MAXCOL)
+    ଯଦି (p1->col == MAXCOL)
 	p1->col = ml_get_buf_len(findbuf, p1->lnum) + 1;
-    else if (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
+    ଅନ୍ୟଥା ଯଦି (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
     {
-	semsg(_(e_invalid_column_number_nr), p1->col);
-	return FAIL;
+	semsg(_(e_invalid_column_ସଂଖ୍ୟା_nr), p1->col);
+	ଫେରନ୍ତୁ FAIL;
     }
 
-    if (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_line_count)
+    ଯଦି (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
     {
-	semsg(_(e_invalid_line_number_nr), p2->lnum);
-	return FAIL;
+	semsg(_(e_invalid_ଧାଡ଼ି_ସଂଖ୍ୟା_nr), p2->lnum);
+	ଫେରନ୍ତୁ FAIL;
     }
-    if (p2->col == MAXCOL)
+    ଯଦି (p2->col == MAXCOL)
 	p2->col = ml_get_buf_len(findbuf, p2->lnum) + 1;
-    else if (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
+    ଅନ୍ୟଥା ଯଦି (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
     {
-	semsg(_(e_invalid_column_number_nr), p2->col);
-	return FAIL;
+	semsg(_(e_invalid_column_ସଂଖ୍ୟା_nr), p2->col);
+	ଫେରନ୍ତୁ FAIL;
     }
 
     curbuf = findbuf;
@@ -7202,7 +7202,7 @@ getregionpos(
     p1->col--;
     p2->col--;
 
-    if (!LT_POS(*p1, *p2))
+    ଯଦି (!LT_POS(*p1, *p2))
     {
 	// swap position
 	pos_T p;
@@ -7212,26 +7212,26 @@ getregionpos(
 	*p2 = p;
     }
 
-    if (*region_type == MCHAR)
+    ଯଦି (*region_type == MCHAR)
     {
 	// Handle 'selection' == "exclusive".
-	if (is_select_exclusive && !EQUAL_POS(*p1, *p2))
+	ଯଦି (is_select_exclusive && !EQUAL_POS(*p1, *p2))
 	    // When backing up to previous line, inclusive becomes false.
 	    *inclusive = !unadjust_for_sel_inner(p2);
 	// If p2 is on NUL (end of line), inclusive becomes false.
-	if (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
+	ଯଦି (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
 	    *inclusive = FALSE;
     }
-    else if (*region_type == MBLOCK)
+    ଅନ୍ୟଥା ଯଦି (*region_type == MBLOCK)
     {
 	colnr_T sc1, ec1, sc2, ec2;
 
 #ifdef FEAT_LINEBREAK
-	int	lbr_saved = reset_lbr();
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	lbr_saved = reset_lbr();
 #endif
 
-	getvvcol(curwin, p1, &sc1, NULL, &ec1, 0);
-	getvvcol(curwin, p2, &sc2, NULL, &ec2, 0);
+	getvvcol(curwin, p1, &sc1, ଖାଲି, &ec1, 0);
+	getvvcol(curwin, p2, &sc2, ଖାଲି, &ec2, 0);
 
 #ifdef FEAT_LINEBREAK
 	restore_lbr(lbr_saved);
@@ -7243,57 +7243,57 @@ getregionpos(
 	oap->start = *p1;
 	oap->end = *p2;
 	oap->start_vcol = MIN(sc1, sc2);
-	if (block_width > 0)
+	ଯଦି (block_width > 0)
 	    oap->end_vcol = oap->start_vcol + block_width - 1;
-	else if (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
+	ଅନ୍ୟଥା ଯଦି (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
 	    oap->end_vcol = sc2 - 1;
-	else
+	ଅନ୍ୟଥା
 	    oap->end_vcol = MAX(ec1, ec2);
     }
 
     // Include the trailing byte of a multi-byte char.
     l = mb_ptr2len((char_u *)ml_get_pos(p2));
-    if (l > 1)
+    ଯଦି (l > 1)
 	p2->col += l - 1;
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * "getregion()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getregion(typval_T *argvars, typval_T *rettv)
 {
     pos_T		p1, p2;
-    int			inclusive = TRUE;
-    int			region_type = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			inclusive = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			region_type = -1;
     oparg_T		oa;
 
     buf_T		*save_curbuf;
-    int			save_virtual;
-    string_T		akt = {NULL, 0};
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			save_virtual;
+    string_T		akt = {ଖାଲି, 0};
     linenr_T		lnum;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    ଯଦି (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+    ପାଇଁ (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
     {
-	int ret = OK;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା ret = OK;
 
-	if (region_type == MBLOCK)
+	ଯଦି (region_type == MBLOCK)
 	{
-	    struct block_def	bd;
+	    ସଂରଚନା block_def	bd;
 
 	    block_prep(&oa, &bd, lnum, FALSE);
 	    block_def2str(&bd, &akt);
 	}
-	else if (region_type == MLINE
+	ଅନ୍ୟଥା ଯଦି (region_type == MLINE
 	    || (p1.lnum < lnum && lnum < p2.lnum))
 	{
 	    string_T	s;
@@ -7301,34 +7301,34 @@ f_getregion(typval_T *argvars, typval_T *rettv)
 	    s.string = ml_get(lnum);
 	    s.length = ml_get_len(lnum);
 	    akt.string = vim_strnsave(s.string, s.length);
-	    if (akt.string == NULL)
+	    ଯଦି (akt.string == ଖାଲି)
 		akt.length = 0;
-	    else
+	    ଅନ୍ୟଥା
 		akt.length = s.length;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    struct block_def	bd;
+	    ସଂରଚନା block_def	bd;
 
 	    charwise_block_prep(p1, p2, &bd, lnum, inclusive);
 	    block_def2str(&bd, &akt);
 	}
 
-	if (akt.string == NULL)
+	ଯଦି (akt.string == ଖାଲି)
 	{
 	    clear_tv(rettv);
-	    (void)rettv_list_alloc(rettv);
-	    break;
+	    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	    ଭାଙ୍ଗ;
 	}
 
-	ret = list_append_string(rettv->vval.v_list, akt.string, (int)akt.length);
+	ret = list_append_string(rettv->vval.v_list, akt.string, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)akt.length);
 	vim_free(akt.string);
 
-	if (ret == FAIL)
+	ଯଦି (ret == FAIL)
 	{
 	    clear_tv(rettv);
-	    (void)rettv_list_alloc(rettv);
-	    break;
+	    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	    ଭାଙ୍ଗ;
 	}
     }
 
@@ -7338,50 +7338,50 @@ f_getregion(typval_T *argvars, typval_T *rettv)
     virtual_op = save_virtual;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 add_regionpos_range(typval_T *rettv, pos_T p1, pos_T p2)
 {
     list_T	*l1, *l2, *l3;
 
     l1 = list_alloc();
-    if (l1 == NULL)
-	return;
+    ଯଦି (l1 == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (list_append_list(rettv->vval.v_list, l1) == FAIL)
+    ଯଦି (list_append_list(rettv->vval.v_list, l1) == FAIL)
     {
 	list_free(l1);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     l2 = list_alloc();
-    if (l2 == NULL)
-	return;
+    ଯଦି (l2 == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (list_append_list(l1, l2) == FAIL)
+    ଯଦି (list_append_list(l1, l2) == FAIL)
     {
 	list_free(l2);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     l3 = list_alloc();
-    if (l3 == NULL)
-	return;
+    ଯଦି (l3 == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (list_append_list(l1, l3) == FAIL)
+    ଯଦି (list_append_list(l1, l3) == FAIL)
     {
 	list_free(l3);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    list_append_number(l2, curbuf->b_fnum);
-    list_append_number(l2, p1.lnum);
-    list_append_number(l2, p1.col);
-    list_append_number(l2, p1.coladd);
+    list_append_ସଂଖ୍ୟା(l2, curbuf->b_fnum);
+    list_append_ସଂଖ୍ୟା(l2, p1.lnum);
+    list_append_ସଂଖ୍ୟା(l2, p1.col);
+    list_append_ସଂଖ୍ୟା(l2, p1.coladd);
 
-    list_append_number(l3, curbuf->b_fnum);
-    list_append_number(l3, p2.lnum);
-    list_append_number(l3, p2.col);
-    list_append_number(l3, p2.coladd);
+    list_append_ସଂଖ୍ୟା(l3, curbuf->b_fnum);
+    list_append_ସଂଖ୍ୟା(l3, p2.lnum);
+    list_append_ସଂଖ୍ୟା(l3, p2.col);
+    list_append_ସଂଖ୍ୟା(l3, p2.coladd);
 }
 
 /*
@@ -7389,101 +7389,101 @@ add_regionpos_range(typval_T *rettv, pos_T p1, pos_T p2)
  * "ret_p1" is set to the start position of the segment and "ret_p2" to its
  * end position.
  */
-    static void
-getregionpos_line(
+    ସ୍ଥିର ଶୂନ୍ୟ
+getregionpos_ଧାଡ଼ି(
     linenr_T	lnum,
     pos_T	p1,
     pos_T	p2,
-    int		inclusive,
-    int		region_type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		inclusive,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		region_type,
     oparg_T	*oap,
-    int		allow_eol,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		allow_eol,
     pos_T	*ret_p1,
     pos_T	*ret_p2)
 {
-    char_u	*line = ml_get(lnum);
-    colnr_T	line_len = ml_get_len(lnum);
+    char_u	*ଧାଡ଼ି = ml_get(lnum);
+    colnr_T	ଧାଡ଼ି_len = ml_get_len(lnum);
 
-    if (region_type == MLINE)
+    ଯଦି (region_type == MLINE)
     {
 	ret_p1->col = 1;
 	ret_p1->coladd = 0;
 	ret_p2->col = MAXCOL;
 	ret_p2->coladd = 0;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	struct block_def	bd;
+	ସଂରଚନା block_def	bd;
 
-	if (region_type == MBLOCK)
+	ଯଦି (region_type == MBLOCK)
 	    block_prep(oap, &bd, lnum, FALSE);
-	else
+	ଅନ୍ୟଥା
 	    charwise_block_prep(p1, p2, &bd, lnum, inclusive);
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	ଯଦି (bd.is_oneChar)  // selection entirely inside one char
 	{
-	    if (region_type == MBLOCK)
+	    ଯଦି (region_type == MBLOCK)
 	    {
-		ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
+		ret_p1->col = mb_prevptr(ଧାଡ଼ି, bd.textstart) - ଧାଡ଼ି + 1;
 		ret_p1->coladd = bd.start_char_vcols
 					   - (bd.start_vcol - oap->start_vcol);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		ret_p1->col = p1.col + 1;
 		ret_p1->coladd = p1.coladd;
 	    }
 	}
-	else if (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
+	ଅନ୍ୟଥା ଯଦି (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
 	{
 	    // blockwise selection entirely beyond end of line
 	    ret_p1->col = MAXCOL;
 	    ret_p1->coladd = oap->start_vcol - bd.start_vcol;
 	    bd.is_oneChar = TRUE;
 	}
-	else if (bd.startspaces > 0)
+	ଅନ୍ୟଥା ଯଦି (bd.startspaces > 0)
 	{
-	    ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
+	    ret_p1->col = mb_prevptr(ଧାଡ଼ି, bd.textstart) - ଧାଡ଼ି + 1;
 	    ret_p1->coladd = bd.start_char_vcols - bd.startspaces;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    ret_p1->col = bd.textcol + 1;
 	    ret_p1->coladd = 0;
 	}
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	ଯଦି (bd.is_oneChar)  // selection entirely inside one char
 	{
 	    ret_p2->col = ret_p1->col;
 	    ret_p2->coladd = ret_p1->coladd + bd.startspaces + bd.endspaces;
 	}
-	else if (bd.endspaces > 0)
+	ଅନ୍ୟଥା ଯଦି (bd.endspaces > 0)
 	{
 	    ret_p2->col = bd.textcol + bd.textlen + 1;
 	    ret_p2->coladd = bd.endspaces;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    ret_p2->col = bd.textcol + bd.textlen;
 	    ret_p2->coladd = 0;
 	}
     }
 
-    if (!allow_eol && ret_p1->col > line_len)
+    ଯଦି (!allow_eol && ret_p1->col > ଧାଡ଼ି_len)
     {
 	ret_p1->col = 0;
 	ret_p1->coladd = 0;
     }
-    else if (ret_p1->col > line_len + 1)
-	ret_p1->col = line_len + 1;
+    ଅନ୍ୟଥା ଯଦି (ret_p1->col > ଧାଡ଼ି_len + 1)
+	ret_p1->col = ଧାଡ଼ି_len + 1;
 
-    if (!allow_eol && ret_p2->col > line_len)
+    ଯଦି (!allow_eol && ret_p2->col > ଧାଡ଼ି_len)
     {
-	ret_p2->col = ret_p1->col == 0 ? 0 : line_len;
+	ret_p2->col = ret_p1->col == 0 ? 0 : ଧାଡ଼ି_len;
 	ret_p2->coladd = 0;
     }
-    else if (ret_p2->col > line_len + 1)
-	ret_p2->col = line_len + 1;
+    ଅନ୍ୟଥା ଯଦି (ret_p2->col > ଧାଡ଼ି_len + 1)
+	ret_p2->col = ଧାଡ଼ି_len + 1;
 
     ret_p1->lnum = lnum;
     ret_p2->lnum = lnum;
@@ -7492,57 +7492,57 @@ getregionpos_line(
 /*
  * "getregionpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getregionpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	p1, p2;
-    int		inclusive = TRUE;
-    int		region_type = -1;
-    int		allow_eol = FALSE;
-    int		bounds_only = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		inclusive = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		region_type = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		allow_eol = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		bounds_only = FALSE;
     oparg_T	oa;
-    int		lnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lnum;
 
     buf_T	*save_curbuf;
-    int		save_virtual;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_virtual;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    ଯଦି (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[2].v_type == VAR_DICT)
+    ଯଦି (argvars[2].v_type == VAR_DICT)
     {
 	allow_eol = dict_get_bool(argvars[2].vval.v_dict, "eol", FALSE);
 	bounds_only = dict_get_bool(argvars[2].vval.v_dict, "bounds", FALSE);
     }
 
-    if (bounds_only)
+    ଯଦି (bounds_only)
     {
 	// Only the outer bounds of the region are wanted, so the lines in
 	// between do not have to be visited.
 	pos_T	start_pos, end_pos;
 
-	getregionpos_line(p1.lnum, p1, p2, inclusive, region_type, &oa,
+	getregionpos_ଧାଡ଼ି(p1.lnum, p1, p2, inclusive, region_type, &oa,
 					   allow_eol, &start_pos, &end_pos);
-	if (p2.lnum != p1.lnum)
+	ଯଦି (p2.lnum != p1.lnum)
 	{
 	    pos_T	unused;
 
-	    getregionpos_line(p2.lnum, p1, p2, inclusive, region_type, &oa,
+	    getregionpos_ଧାଡ଼ି(p2.lnum, p1, p2, inclusive, region_type, &oa,
 					      allow_eol, &unused, &end_pos);
 	}
 	add_regionpos_range(rettv, start_pos, end_pos);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+	ପାଇଁ (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
 	{
 	    pos_T	ret_p1, ret_p2;
 
-	    getregionpos_line(lnum, p1, p2, inclusive, region_type, &oa,
+	    getregionpos_ଧାଡ଼ି(lnum, p1, p2, inclusive, region_type, &oa,
 					      allow_eol, &ret_p1, &ret_p2);
 	    add_regionpos_range(rettv, ret_p1, ret_p2);
 	}
@@ -7559,112 +7559,112 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
  * name from the first argument.
  * Returns zero on error.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 getreg_get_regname(typval_T *argvars)
 {
     char_u  *strregname;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
 	strregname = tv_get_string_chk(&argvars[0]);
-	if (strregname != NULL && in_vim9script() && STRLEN(strregname) > 1)
+	ଯଦି (strregname != ଖାଲି && in_vim9script() && STRLEN(strregname) > 1)
 	{
 	    semsg(_(e_register_name_must_be_one_char_str), strregname);
-	    strregname = NULL;
+	    strregname = ଖାଲି;
 	}
-	if (strregname == NULL)	    // type error; errmsg already given
-	    return 0;
+	ଯଦି (strregname == ଖାଲି)	    // type error; errmsg already given
+	    ଫେରନ୍ତୁ 0;
     }
-    else
+    ଅନ୍ୟଥା
 	// Default to v:register
 	strregname = get_vim_var_str(VV_REG);
 
-    return *strregname == 0 ? '"' : *strregname;
+    ଫେରନ୍ତୁ *strregname == 0 ? '"' : *strregname;
 }
 
 /*
  * "getreg()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
-    int		arg2 = FALSE;
-    int		return_list = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		regname;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		arg2 = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		return_list = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_opt_string_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 2) == FAIL)))))
-	return;
+	ଫେରନ୍ତୁ;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    ଯଦି (regname == 0)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
     {
-	int		error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-	arg2 = (int)tv_get_bool_chk(&argvars[1], &error);
+	arg2 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], &error);
 
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    return_list = (int)tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	ଯଦି (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    return_list = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[2], &error);
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
     }
 
-    if (return_list)
+    ଯଦି (return_list)
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = (list_T *)get_reg_contents(regname,
-				      (arg2 ? GREG_EXPR_SRC : 0) | GREG_LIST);
-	if (rettv->vval.v_list == NULL)
-	    (void)rettv_list_alloc(rettv);
-	else
+				      (arg2 ? GREG_ପଦସମଷ୍ଟି_SRC : 0) | GREG_LIST);
+	ଯଦି (rettv->vval.v_list == ଖାଲି)
+	    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	ଅନ୍ୟଥା
 	    ++rettv->vval.v_list->lv_refcount;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = get_reg_contents(regname,
-						    arg2 ? GREG_EXPR_SRC : 0);
+						    arg2 ? GREG_ପଦସମଷ୍ଟି_SRC : 0);
     }
 }
 
 /*
  * "getregtype()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getregtype(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		regname;
     char_u	buf[NUMBUFLEN + 2];
     long	reglen = 0;
 
     // on error return an empty string
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    ଯଦି (regname == 0)
+	ଫେରନ୍ତୁ;
 
     buf[0] = NUL;
     buf[1] = NUL;
-    switch (get_reg_type(regname, &reglen))
+    ବାଛ (get_reg_type(regname, &reglen))
     {
-	case MLINE: buf[0] = 'V'; break;
-	case MCHAR: buf[0] = 'v'; break;
-	case MBLOCK:
+	ସ୍ଥିତି MLINE: buf[0] = 'V'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି MCHAR: buf[0] = 'v'; ଭାଙ୍ଗ;
+	ସ୍ଥିତି MBLOCK:
 		buf[0] = Ctrl_V;
-		vim_snprintf((char *)buf + 1, NUMBUFLEN + 1, "%ld", reglen + 1);
-		break;
+		vim_snprintf((ଅକ୍ଷର *)buf + 1, NUMBUFLEN + 1, "%ld", reglen + 1);
+		ଭାଙ୍ଗ;
     }
     rettv->vval.v_string = vim_strsave(buf);
 }
@@ -7672,22 +7672,22 @@ f_getregtype(typval_T *argvars, typval_T *rettv)
 /*
  * "gettagstack()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_gettagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp = curwin;			// default is current window
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
-	    return;
+	ଯଦି (wp == ଖାଲି)
+	    ଫେରନ୍ତୁ;
     }
 
     get_tagstack(wp, rettv->vval.v_dict);
@@ -7696,200 +7696,200 @@ f_gettagstack(typval_T *argvars, typval_T *rettv)
 /*
  * "gettext()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_gettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-    char *prev = NULL;
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+    ଅକ୍ଷର *prev = ଖାଲି;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[1].v_type == VAR_STRING &&
-	    argvars[1].vval.v_string != NULL &&
+    ଯଦି (argvars[1].v_type == VAR_STRING &&
+	    argvars[1].vval.v_string != ଖାଲି &&
 	    *(argvars[1].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	prev = bind_textdomain_codeset((const char *)argvars[1].vval.v_string, (char *)p_enc);
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	prev = bind_textdomain_codeset((ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, (ଅକ୍ଷର *)p_enc);
 #endif
 
-#if defined(HAVE_DGETTEXT)
-	rettv->vval.v_string = vim_strsave((char_u *)dgettext((const char *)argvars[1].vval.v_string, (const char *)argvars[0].vval.v_string));
-#else
-	textdomain((const char *)argvars[1].vval.v_string);
+#ଯଦି defined(HAVE_DGETTEXT)
+	rettv->vval.v_string = vim_strsave((char_u *)dgettext((ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string));
+#ଅନ୍ୟଥା
+	textdomain((ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string);
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
-	    bind_textdomain_codeset((const char *)argvars[1].vval.v_string, prev);
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	ଯଦି (prev != ଖାଲି)
+	    bind_textdomain_codeset((ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, prev);
 #endif
     }
-    else
+    ଅନ୍ୟଥା
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 }
 
 // for VIM_VERSION_ defines
-#include "version.h"
+#ଅନ୍ତର୍ଭାଵ "version.h"
 
 /*
  * "has()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_has(typval_T *argvars, typval_T *rettv)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     char_u	*name;
-    int		x = FALSE;
-    int		n = FALSE;
-    typedef struct {
-	char *name;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = FALSE;
+    ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
+	ଅକ୍ଷର *name;
 	short present;
     } has_item_T;
-    static has_item_T has_list[] =
+    ସ୍ଥିର has_item_T has_list[] =
     {
 	{"amiga",
 #ifdef AMIGA
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"android",
 #ifdef __ANDROID__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"arp",
-#if defined(AMIGA) && defined(FEAT_ARP)
+#ଯଦି defined(AMIGA) && defined(FEAT_ARP)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"haiku",
 #ifdef __HAIKU__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"bsd",
-#if defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
+#ଯଦି defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"hpux",
 #ifdef hpux
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"hurd",
 #ifdef __GNU__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"linux",
 #ifdef __linux__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mac",		// Mac OS X (and, once, Mac OS Classic)
 #ifdef MACOS_X
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"osx",		// Mac OS X
 #ifdef MACOS_X
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"macunix",	// Mac OS X, with the darwin feature
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#ଯଦି defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"osxdarwin",	// synonym for macunix
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#ଯଦି defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"qnx",
 #ifdef __QNX__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"sun",
 #ifdef SUN_SYSTEM
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"termux",
 #ifdef __TERMUX__
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"unix",
 #ifdef UNIX
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"vms",
 #ifdef VMS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"win32",
 #ifdef MSWIN
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"win32unix",
 #ifdef WIN32UNIX
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"win64",
 #ifdef _WIN64
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -7897,21 +7897,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"fname_case",
 #ifndef CASE_INSENSITIVE_FILENAME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"acl",
 #ifdef HAVE_ACL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"arabic",
 #ifdef FEAT_ARABIC
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -7919,67 +7919,67 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"autochdir",
 #ifdef FEAT_AUTOCHDIR
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"autoservername",
 #ifdef FEAT_AUTOSERVERNAME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"socketserver",
 #ifdef FEAT_SOCKETSERVER
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"balloon_eval",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"balloon_multiline",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"balloon_eval_term",
 #ifdef FEAT_BEVAL_TERM
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"builtin_terms", 1},
 	{"all_builtin_terms", 1},
 	{"browsefilter",
-#if defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
+#ଯଦି defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF))
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"byte_offset",
 #ifdef FEAT_BYTEOFF
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"channel",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -7987,21 +7987,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"clientserver",
 #ifdef FEAT_CLIENTSERVER
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"clipboard",
 #ifdef FEAT_CLIPBOARD
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"clipboard_provider",
 #ifdef FEAT_CLIPBOARD_PROVIDER
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8012,35 +8012,35 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"conceal",
 #ifdef FEAT_CONCEAL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"cryptv",
 #ifdef FEAT_CRYPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"crypt-blowfish",
 #ifdef FEAT_CRYPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"crypt-blowfish2",
 #ifdef FEAT_CRYPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"cscope",
 #ifdef FEAT_CSCOPE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8048,101 +8048,101 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"cursorshape",
 #ifdef CURSOR_SHAPE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"debug",
 #ifdef DEBUG
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"dialog_con",
 #ifdef FEAT_CON_DIALOG
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"dialog_con_gui",
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#ଯଦି defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"dialog_gui",
 #ifdef FEAT_GUI_DIALOG
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"diff",
 #ifdef FEAT_DIFF
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"digraphs",
 #ifdef FEAT_DIGRAPHS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"directx",
 #ifdef FEAT_DIRECTX
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"dnd",
 #ifdef FEAT_DND
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"drop_file",
 #ifdef HAVE_DROP_FILE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"emacs_tags",
 #ifdef FEAT_EMACS_TAGS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"eval", 1},		// always present, of course!
 	{"ex_extra", 1},	// graduated feature
 	{"extra_search",
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"file_in_path", 1},
 	{"filterpipe",
-#if defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
+#ଯଦି defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"find_in_path",
 #ifdef FEAT_FIND_ID
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8150,29 +8150,29 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"folding",
 #ifdef FEAT_FOLDING
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"footer", 0},
 	{"fork",
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#ଯଦି !defined(USE_SYSTEM) && defined(UNIX)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gettext",
 #ifdef FEAT_GETTEXT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui",
 #ifdef FEAT_GUI
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8181,42 +8181,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_gtk",
 #ifdef FEAT_GUI_GTK
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_gtk2",
-#if defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
+#ଯଦି defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_gtk3",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK3)
+#ଯଦି defined(FEAT_GUI_GTK) && defined(USE_GTK3)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_gtk4",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#ଯଦି defined(FEAT_GUI_GTK) && defined(USE_GTK4)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_gnome",
 #ifdef FEAT_GUI_GNOME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_haiku",
 #ifdef FEAT_GUI_HAIKU
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8224,42 +8224,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_motif",
 #ifdef FEAT_GUI_MOTIF
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_photon",
 #ifdef FEAT_GUI_PHOTON
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"gui_win32",
 #ifdef FEAT_GUI_MSWIN
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"iconv",
-#if defined(HAVE_ICONV_H) && defined(USE_ICONV)
+#ଯଦି defined(HAVE_ICONV_H) && defined(USE_ICONV)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"image",
 #ifdef FEAT_IMAGE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"image_popup",
 #ifdef FEAT_IMAGE_POPUP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8267,14 +8267,14 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ipv6",
 #ifdef FEAT_IPV6
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 	},
 	{"job",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8282,7 +8282,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"keymap",
 #ifdef FEAT_KEYMAP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8290,21 +8290,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"langmap",
 #ifdef FEAT_LANGMAP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"libcall",
 #ifdef FEAT_LIBCALL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"linebreak",
 #ifdef FEAT_LINEBREAK
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8312,23 +8312,23 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"listcmds", 1},
 	{"localmap", 1},
 	{"lua",
-#if defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
+#ଯଦି defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"menu",
 #ifdef FEAT_MENU
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mksession",
 #ifdef FEAT_SESSION
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8337,70 +8337,70 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"mouseshape",
 #ifdef FEAT_MOUSESHAPE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_dec",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_gpm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_jsbterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_netterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_pterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_sgr",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_sysmouse",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_urxvt",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mouse_xterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#ଯଦି (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8408,28 +8408,28 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"multi_byte_ime",
 #ifdef FEAT_MBYTE_IME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"multi_lang",
 #ifdef FEAT_MULTI_LANG
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"mzscheme",
-#if defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
+#ଯଦି defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"nanotime",
 #ifdef ST_MTIM_NSEC
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 	},
@@ -8437,156 +8437,156 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ole",
 #ifdef FEAT_OLE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"packages",
 #ifdef FEAT_EVAL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"path_extra", 1},
 	{"perl",
-#if defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
+#ଯଦି defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"persistent_undo",
 #ifdef FEAT_PERSISTENT_UNDO
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python_compiled",
-#if defined(FEAT_PYTHON)
+#ଯଦି defined(FEAT_PYTHON)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python_dynamic",
-#if defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
+#ଯଦି defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python",
-#if defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
+#ଯଦି defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"pythonx",
-#if (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
+#ଯଦି (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
 	|| (defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3))
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python3_compiled",
-#if defined(FEAT_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON3)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python3_dynamic",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python3_stable",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
+#ଯଦି defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"python3",
-#if defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"popupwin",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"postscript",
 #ifdef FEAT_POSTSCRIPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"pango",
 #ifdef FEAT_PRINT_PANGO
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"printer",
 #ifdef FEAT_PRINTER
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"profile",
 #ifdef FEAT_PROFILE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"prof_nsec",
 #ifdef PROF_NSEC
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"reltime",
 #ifdef FEAT_RELTIME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"quickfix",
 #ifdef FEAT_QUICKFIX
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"rightleft",
 #ifdef FEAT_RIGHTLEFT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"ruby",
-#if defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
+#ଯଦି defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8596,7 +8596,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"signs",
 #ifdef FEAT_SIGNS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8604,106 +8604,106 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"startuptime",
 #ifdef STARTUPTIME
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"statusline",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"statusline_click",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"netbeans_intg",
 #ifdef FEAT_NETBEANS_INTG
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"sodium",
-#if defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
+#ଯଦି defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"sound",
 #ifdef FEAT_SOUND
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"spell",
 #ifdef FEAT_SPELL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"syntax",
 #ifdef FEAT_SYN_HL
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"system",
-#if defined(USE_SYSTEM) || !defined(UNIX)
+#ଯଦି defined(USE_SYSTEM) || !defined(UNIX)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"tabpanel",
-#if defined(FEAT_TABPANEL)
+#ଯଦି defined(FEAT_TABPANEL)
 		1,
-#else
+#ଅନ୍ୟଥା
 		0,
 #endif
 	},
 	{"tag_binary", 1},	// graduated feature
 	{"tcl",
-#if defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
+#ଯଦି defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"termguicolors",
 #ifdef FEAT_TERMGUICOLORS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"terminal",
-#if defined(FEAT_TERMINAL) && !defined(MSWIN)
+#ଯଦି defined(FEAT_TERMINAL) && !defined(MSWIN)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"terminfo",
 #ifdef TERMINFO
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"termresponse",
 #ifdef FEAT_TERMRESPONSE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8711,21 +8711,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"textprop",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"tgetent",
 #ifdef HAVE_TGETENT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"timers",
 #ifdef FEAT_TIMERS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8733,7 +8733,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"toolbar",
 #ifdef FEAT_TOOLBAR
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8742,7 +8742,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vartabs",
 #ifdef FEAT_VARTABS
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8750,7 +8750,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"viminfo",
 #ifdef FEAT_VIMINFO
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8766,21 +8766,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vtp",
 #ifdef FEAT_VTP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"wayland",
 #ifdef FEAT_WAYLAND
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"wayland_clipboard",
 #ifdef FEAT_WAYLAND_CLIPBOARD
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
@@ -8790,121 +8790,121 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"winaltkeys",
 #ifdef FEAT_WAK
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"writebackup",
 #ifdef FEAT_WRITEBACKUP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xattr",
 #ifdef FEAT_XATTR
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xim",
 #ifdef FEAT_XIM
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xfontset",
 #ifdef FEAT_XFONTSET
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xpm",
-#if defined(FEAT_XPM_W32) || defined(HAVE_XPM)
+#ଯଦି defined(FEAT_XPM_W32) || defined(HAVE_XPM)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xpm_w32",	// for backward compatibility
 #ifdef FEAT_XPM_W32
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xsmp",
 #ifdef USE_XSMP
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xsmp_interact",
 #ifdef USE_XSMP_INTERACT
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xterm_clipboard",
 #ifdef FEAT_XCLIPBOARD
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"xterm_save",
 #ifdef FEAT_XTERM_SAVE
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{"X11",
-#if defined(UNIX) && defined(FEAT_X11)
+#ଯଦି defined(UNIX) && defined(FEAT_X11)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
 	{":tearoff",
 // same #ifdef as used for ex_tearoff().
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#ଯଦି defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 		1
-#else
+#ଅନ୍ୟଥା
 		0
 #endif
 		},
-	{NULL, 0}
+	{ଖାଲି, 0}
     };
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     name = tv_get_string(&argvars[0]);
 
     // Fast-path: check features not in has_list[] first to avoid the full
     // linear scan for very common queries like has('patch-...').
-    if (STRNICMP(name, "patch", 5) == 0)
+    ଯଦି (STRNICMP(name, "patch", 5) == 0)
     {
 	x = TRUE;
-	if (name[5] == '-'
+	ଯଦି (name[5] == '-'
 		&& STRLEN(name) >= 11
 		&& (name[6] >= '1' && name[6] <= '9'))
 	{
-	    char	*end;
-	    int	major, minor;
+	    ଅକ୍ଷର	*end;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	major, minor;
 
 	    // This works for patch-8.1.2, patch-9.0.3, patch-10.0.4, etc.
 	    // Not for patch-9.10.5.
-	    major = (int)strtoul((char *)name + 6, &end, 10);
-	    if (*end == '.' && vim_isdigit(end[1])
+	    major = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)strtoul((ଅକ୍ଷର *)name + 6, &end, 10);
+	    ଯଦି (*end == '.' && vim_isdigit(end[1])
 		    && end[2] == '.' && vim_isdigit(end[3]))
 	    {
 		minor = atoi(end + 1);
@@ -8917,86 +8917,86 @@ f_has(typval_T *argvars, typval_T *rettv)
 				 && has_patch(atoi(end + 3))))));
 	    }
 	}
-	else if (SAFE_isdigit(name[5]))
-	    n = has_patch(atoi((char *)name + 5));
+	ଅନ୍ୟଥା ଯଦି (SAFE_isdigit(name[5]))
+	    n = has_patch(atoi((ଅକ୍ଷର *)name + 5));
     }
-    else if (STRICMP(name, "vim_starting") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "vim_starting") == 0)
     {
 	x = TRUE;
 	n = (starting != 0);
     }
-    else if (STRICMP(name, "ttyin") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "ttyin") == 0)
     {
 	x = TRUE;
-	n = mch_input_isatty();
+	n = mch_ନିବେଶ_isatty();
     }
-    else if (STRICMP(name, "ttyout") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "ttyout") == 0)
     {
 	x = TRUE;
 	n = stdout_isatty;
     }
-    else if (STRICMP(name, "multi_byte_encoding") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "multi_byte_encoding") == 0)
     {
 	x = TRUE;
 	n = has_mbyte;
     }
-    else if (STRICMP(name, "gui_running") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "gui_running") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_GUI
 	n = (gui.in_use || gui.starting);
 #endif
     }
-    else if (STRICMP(name, "browse") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "browse") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+#ଯଦି defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	n = gui.in_use;	// gui_mch_browse() works when GUI is running
 #endif
     }
-    else if (STRICMP(name, "syntax_items") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "syntax_items") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_SYN_HL
 	n = syntax_present(curwin);
 #endif
     }
-    else if (STRICMP(name, "vcon") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "vcon") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_VTP
 	n = is_term_win32() && has_vtp_working();
 #endif
     }
-    else if (STRICMP(name, "netbeans_enabled") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "netbeans_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_NETBEANS_INTG
 	n = netbeans_active();
 #endif
     }
-    else if (STRICMP(name, "mouse_gpm_enabled") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "mouse_gpm_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_MOUSE_GPM
 	n = gpm_enabled();
 #endif
     }
-    else if (STRICMP(name, "conpty") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "conpty") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#ଯଦି defined(FEAT_TERMINAL) && defined(MSWIN)
 	n = use_conpty();
 #endif
     }
-    else if (STRICMP(name, "clipboard_working") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "clipboard_working") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
 	n = clipmethod == CLIPMETHOD_PROVIDER ? TRUE : clip_star.available;
 #endif
     }
-    else if (STRICMP(name, "unnamedplus") == 0)
+    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "unnamedplus") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
@@ -9004,74 +9004,74 @@ f_has(typval_T *argvars, typval_T *rettv)
 	// but becomes unavailable if on a platform that doesn't support it
 	// and clipmethod is "none".
 	// (Windows, MacOS).
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# ଯଦି defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	n = TRUE;
 # elif defined(FEAT_EVAL)
-	if (clipmethod == CLIPMETHOD_PROVIDER)
+	ଯଦି (clipmethod == CLIPMETHOD_PROVIDER)
 	    n = TRUE;
-	else
+	ଅନ୍ୟଥା
 	    n = FALSE;
-# else
+# ଅନ୍ୟଥା
 	n = FALSE;
 # endif
 #endif
     }
 
     // Look up in has_list[] only if not already handled above.
-    if (x == FALSE)
+    ଯଦି (x == FALSE)
     {
-	for (i = 0; has_list[i].name != NULL; ++i)
-	    if (STRICMP(name, has_list[i].name) == 0)
+	ପାଇଁ (i = 0; has_list[i].name != ଖାଲି; ++i)
+	    ଯଦି (STRICMP(name, has_list[i].name) == 0)
 	    {
 		x = TRUE;
 		n = has_list[i].present;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
 	// features also in has_list[] but sometimes enabled at runtime
-	if (x == TRUE && n == FALSE)
+	ଯଦି (x == TRUE && n == FALSE)
 	{
-	    if (0)
+	    ଯଦି (0)
 	    {
 		// intentionally empty
 	    }
 #ifdef VIMDLL
-	    else if (STRICMP(name, "filterpipe") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "filterpipe") == 0)
 		n = gui.in_use || gui.starting;
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
-	    else if (STRICMP(name, "iconv") == 0)
+#ଯଦି defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "iconv") == 0)
 		n = iconv_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_LUA
-	    else if (STRICMP(name, "lua") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "lua") == 0)
 		n = lua_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_MZSCHEME
-	    else if (STRICMP(name, "mzscheme") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "mzscheme") == 0)
 		n = mzscheme_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PERL
-	    else if (STRICMP(name, "perl") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "perl") == 0)
 		n = perl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON
-	    else if (STRICMP(name, "python") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "python") == 0)
 		n = python_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON3
-	    else if (STRICMP(name, "python3") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "python3") == 0)
 		n = python3_enabled(FALSE);
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
-	    else if (STRICMP(name, "pythonx") == 0)
+#ଯଦି defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "pythonx") == 0)
 	    {
-# if defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
-		if (p_pyx == 0)
+# ଯଦି defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
+		ଯଦି (p_pyx == 0)
 		    n = python3_enabled(FALSE) || python_enabled(FALSE);
-		else if (p_pyx == 3)
+		ଅନ୍ୟଥା ଯଦି (p_pyx == 3)
 		    n = python3_enabled(FALSE);
-		else if (p_pyx == 2)
+		ଅନ୍ୟଥା ଯଦି (p_pyx == 2)
 		    n = python_enabled(FALSE);
 # elif defined(DYNAMIC_PYTHON)
 		n = python_enabled(FALSE);
@@ -9081,56 +9081,56 @@ f_has(typval_T *argvars, typval_T *rettv)
 	    }
 #endif
 #ifdef DYNAMIC_RUBY
-	    else if (STRICMP(name, "ruby") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "ruby") == 0)
 		n = ruby_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_TCL
-	    else if (STRICMP(name, "tcl") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "tcl") == 0)
 		n = tcl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_SODIUM
-	    else if (STRICMP(name, "sodium") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "sodium") == 0)
 		n = sodium_enabled(FALSE);
 #endif
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
-	    else if (STRICMP(name, "terminal") == 0)
+#ଯଦି defined(FEAT_TERMINAL) && defined(MSWIN)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "terminal") == 0)
 		n = terminal_enabled();
 #endif
 #ifdef DYNAMIC_GPM
-	    else if (STRICMP(name, "mouse_gpm") == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRICMP(name, "mouse_gpm") == 0)
 		n = gpm_available();
 #endif
 	}
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
 	// return whether feature could ever be enabled
-	rettv->vval.v_number = x;
-    else
+	rettv->vval.v_ସଂଖ୍ୟା = x;
+    ଅନ୍ୟଥା
 	// return whether feature is enabled
-	rettv->vval.v_number = n;
+	rettv->vval.v_ସଂଖ୍ୟା = n;
 }
 
 /*
  * Return TRUE if "feature" can change later.
  * Also when checking for the feature has side effects, such as loading a DLL.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 dynamic_feature(char_u *feature)
 {
-    return (feature == NULL
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+    ଫେରନ୍ତୁ (feature == ଖାଲି
+#ଯଦି defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	    || (STRICMP(feature, "browse") == 0 && !gui.in_use)
 #endif
 #ifdef VIMDLL
 	    || STRICMP(feature, "filterpipe") == 0
 #endif
-#if defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+#ଯଦି defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
 	    // this can only change on Unix where the ":gui" command could be
 	    // used.
 	    || (STRICMP(feature, "gui_running") == 0 && !gui.in_use)
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+#ଯଦି defined(USE_ICONV) && defined(DYNAMIC_ICONV)
 	    || STRICMP(feature, "iconv") == 0
 #endif
 #ifdef DYNAMIC_LUA
@@ -9154,7 +9154,7 @@ dynamic_feature(char_u *feature)
 #ifdef DYNAMIC_PYTHON3
 	    || STRICMP(feature, "python3") == 0
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+#ଯଦି defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
 	    || STRICMP(feature, "pythonx") == 0
 #endif
 #ifdef DYNAMIC_RUBY
@@ -9169,7 +9169,7 @@ dynamic_feature(char_u *feature)
 	    // once "starting" is zero it will stay that way
 	    || (STRICMP(feature, "vim_starting") == 0 && starting != 0)
 	    || STRICMP(feature, "multi_byte_encoding") == 0
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#ଯଦି defined(FEAT_TERMINAL) && defined(MSWIN)
 	    || STRICMP(feature, "conpty") == 0
 #endif
 	    );
@@ -9178,57 +9178,57 @@ dynamic_feature(char_u *feature)
 /*
  * "haslocaldir()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_haslocaldir(typval_T *argvars, typval_T *rettv)
 {
-    tabpage_T	*tp = NULL;
-    win_T	*wp = NULL;
+    tabpage_T	*tp = ଖାଲି;
+    win_T	*wp = ଖାଲି;
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL)))
+	ଫେରନ୍ତୁ;
 
     wp = find_tabwin(&argvars[0], &argvars[1], &tp);
 
     // Check for window-local and tab-local directories
-    if (wp != NULL && wp->w_localdir != NULL)
-	rettv->vval.v_number = 1;
-    else if (tp != NULL && tp->tp_localdir != NULL)
-	rettv->vval.v_number = 2;
-    else
-	rettv->vval.v_number = 0;
+    ଯଦି (wp != ଖାଲି && wp->w_localdir != ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = 1;
+    ଅନ୍ୟଥା ଯଦି (tp != ଖାଲି && tp->tp_localdir != ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = 2;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = 0;
 }
 
 /*
  * "highlightID(name)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_hlID(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = syn_name2id(tv_get_string(&argvars[0]));
+    rettv->vval.v_ସଂଖ୍ୟା = syn_name2id(tv_get_string(&argvars[0]));
 }
 
 /*
  * "highlight_exists()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_hlexists(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = highlight_exists(tv_get_string(&argvars[0]));
+    rettv->vval.v_ସଂଖ୍ୟା = highlight_exists(tv_get_string(&argvars[0]));
 }
 
 /*
  * "hostname()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_hostname(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u hostname[256];
@@ -9245,41 +9245,41 @@ f_hostname(typval_T *argvars UNUSED, typval_T *rettv)
  * Return empty string if not an object.
  */
 #ifdef VMS // VMS does not have defined uintptr_t
-# if defined(HAVE_NO_LONG_LONG)
-typedef unsigned int uintptr_t;
-# else
-typedef unsigned long long uintptr_t;
+# ଯଦି defined(HAVE_NO_LONG_LONG)
+ପ୍ରକାରବ୍ୟାଖ୍ୟା unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା uintptr_t;
+# ଅନ୍ୟଥା
+ପ୍ରକାରବ୍ୟାଖ୍ୟା unsigned long long uintptr_t;
 # endif
 #endif // VMS
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_id(typval_T *argvars, typval_T *rettv)
 {
-    char    numbuf[NUMBUFLEN];
-    char    *p = numbuf;
+    ଅକ୍ଷର    numbuf[NUMBUFLEN];
+    ଅକ୍ଷର    *p = numbuf;
 
-    switch (argvars[0].v_type)
+    ବାଛ (argvars[0].v_type)
     {
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-	case VAR_OBJECT:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_BLOB:
+	ସ୍ଥିତି VAR_LIST:
+	ସ୍ଥିତି VAR_TUPLE:
+	ସ୍ଥିତି VAR_DICT:
+	ସ୍ଥିତି VAR_OBJECT:
+	ସ୍ଥିତି VAR_JOB:
+	ସ୍ଥିତି VAR_CHANNEL:
+	ସ୍ଥିତି VAR_BLOB:
 	    // Assume pointer value in typval_T vval union at common location.
-	    if (argvars[0].vval.v_object != NULL)
+	    ଯଦି (argvars[0].vval.v_object != ଖାଲି)
 	    {
 		// "v" gets the address as an integer
-		uintptr_t v = (uintptr_t)(void *)argvars[0].vval.v_object;
+		uintptr_t v = (uintptr_t)(ଶୂନ୍ୟ *)argvars[0].vval.v_object;
 		// Build a hex string from the item's address; it is in
 		// reverse order. Ignore trailing zeros.
-		for (; p < numbuf + sizeof(uintptr_t) * 2 && v != 0;
+		ପାଇଁ (; p < numbuf + ଆକାର(uintptr_t) * 2 && v != 0;
 								++p, v >>= 4)
 		    *p = "0123456789abcdef"[v & 0xf];
 	    }
-	default:
-	    break;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	    ଭାଙ୍ଗ;
     }
     *p = NUL;
 
@@ -9290,41 +9290,41 @@ f_id(typval_T *argvars, typval_T *rettv)
 /*
  * index() function for a blob
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 index_func_blob(typval_T *argvars, typval_T *rettv)
 {
     typval_T	tv;
     blob_T	*b;
-    int		start = 0;
-    int		error = FALSE;
-    int		ic = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		start = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic = FALSE;
 
     b = argvars[0].vval.v_blob;
-    if (b == NULL)
-	return;
+    ଯଦି (b == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	start = tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
     }
 
-    if (start < 0)
+    ଯଦି (start < 0)
     {
 	start = blob_len(b) + start;
-	if (start < 0)
+	ଯଦି (start < 0)
 	    start = 0;
     }
 
-    for (int idx = start; idx < blob_len(b); ++idx)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = start; idx < blob_len(b); ++idx)
     {
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = blob_get(b, idx);
-	if (tv_equal(&tv, &argvars[1], ic))
+	tv.v_type = VAR_ସଂଖ୍ୟା;
+	tv.vval.v_ସଂଖ୍ୟା = blob_get(b, idx);
+	ଯଦି (tv_equal(&tv, &argvars[1], ic))
 	{
-	    rettv->vval.v_number = idx;
-	    return;
+	    rettv->vval.v_ସଂଖ୍ୟା = idx;
+	    ଫେରନ୍ତୁ;
 	}
     }
 }
@@ -9332,91 +9332,91 @@ index_func_blob(typval_T *argvars, typval_T *rettv)
 /*
  * index() function for a tuple
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 index_func_tuple(typval_T *argvars, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		ic = FALSE;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    if (tuple == NULL)
-	return;
+    ଯଦି (tuple == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    int	start_idx = 0;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	start_idx = 0;
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	start_idx = tv_get_number_chk(&argvars[2], &error);
-	if (!error && argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
-	    return;
+	start_idx = tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	ଯଦି (!error && argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[3], &error);
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
     }
 
-    rettv->vval.v_number = index_tuple(tuple, &argvars[1], start_idx, ic);
+    rettv->vval.v_ସଂଖ୍ୟା = index_tuple(tuple, &argvars[1], start_idx, ic);
 }
 
 /*
  * index() function for a list
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 index_func_list(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*item;
     long	idx = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;
+    ଯଦି (l == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     CHECK_LIST_MATERIALIZE(l);
     item = l->lv_first;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
-	item = list_find(l, (long)tv_get_number_chk(&argvars[2], &error));
+	item = list_find(l, (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error));
 	idx = l->lv_u.mat.lv_idx;
-	if (argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
-	    item = NULL;
+	ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[3], &error);
+	ଯଦି (error)
+	    item = ଖାଲି;
     }
 
-    for ( ; item != NULL; item = item->li_next, ++idx)
-	if (tv_equal(&item->li_tv, &argvars[1], ic))
+    ପାଇଁ ( ; item != ଖାଲି; item = item->li_next, ++idx)
+	ଯଦି (tv_equal(&item->li_tv, &argvars[1], ic))
 	{
-	    rettv->vval.v_number = idx;
-	    break;
+	    rettv->vval.v_ସଂଖ୍ୟା = idx;
+	    ଭାଙ୍ଗ;
 	}
 }
 
 /*
  * "index()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_index(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		    && check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL)
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    ଯଦି (argvars[0].v_type == VAR_BLOB)
 	index_func_blob(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
 	index_func_tuple(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_LIST)
 	index_func_list(argvars, rettv);
-    else
+    ଅନ୍ୟଥା
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -9425,25 +9425,25 @@ f_index(typval_T *argvars, typval_T *rettv)
  * The expression is expected to return a boolean value.  The caller should set
  * the VV_KEY and VV_VAL vim variables before calling this function.
  */
-    int
-indexof_eval_expr(typval_T *expr)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+indexof_eval_ପଦସମଷ୍ଟି(typval_T *ପଦସମଷ୍ଟି)
 {
     typval_T	argv[3];
     typval_T	newtv;
     varnumber_T	found;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_ଚାବି);
     argv[1] = *get_vim_var_tv(VV_VAL);
     newtv.v_type = VAR_UNKNOWN;
 
-    if (eval_expr_typval(expr, FALSE, argv, 2, NULL, &newtv) == FAIL)
-	return FALSE;
+    ଯଦି (eval_ପଦସମଷ୍ଟି_typval(ପଦସମଷ୍ଟି, FALSE, argv, 2, ଖାଲି, &newtv) == FAIL)
+	ଫେରନ୍ତୁ FALSE;
 
     found = tv_get_bool_chk(&newtv, &error);
     clear_tv(&newtv);
 
-    return error ? FALSE : found;
+    ଫେରନ୍ତୁ error ? FALSE : found;
 }
 
 /*
@@ -9451,39 +9451,39 @@ indexof_eval_expr(typval_T *expr)
  * 'startidx' and return the index of the byte where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the bytes.
  */
-    static int
-indexof_blob(blob_T *b, long startidx, typval_T *expr)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+indexof_blob(blob_T *b, long startidx, typval_T *ପଦସମଷ୍ଟି)
 {
     long	idx = 0;
 
-    if (b == NULL)
-	return -1;
+    ଯଦି (b == ଖାଲି)
+	ଫେରନ୍ତୁ -1;
 
-    if (startidx < 0)
+    ଯଦି (startidx < 0)
     {
 	// negative index: index from the last byte
 	startidx = blob_len(b) + startidx;
-	if (startidx < 0)
+	ଯଦି (startidx < 0)
 	    startidx = 0;
     }
 
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
-    set_vim_var_type(VV_VAL, VAR_NUMBER);
+    set_vim_var_type(VV_ଚାବି, VAR_ସଂଖ୍ୟା);
+    set_vim_var_type(VV_VAL, VAR_ସଂଖ୍ୟା);
 
-    int		called_emsg_start = called_emsg;
-    for (idx = startidx; idx < blob_len(b); ++idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		called_emsg_start = called_emsg;
+    ପାଇଁ (idx = startidx; idx < blob_len(b); ++idx)
     {
-	set_vim_var_nr(VV_KEY, idx);
+	set_vim_var_nr(VV_ଚାବି, idx);
 	set_vim_var_nr(VV_VAL, blob_get(b, idx));
 
-	if (indexof_eval_expr(expr))
-	    return idx;
+	ଯଦି (indexof_eval_ପଦସମଷ୍ଟି(ପଦସମଷ୍ଟି))
+	    ଫେରନ୍ତୁ idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	ଯଦି (called_emsg != called_emsg_start)
+	    ଫେରନ୍ତୁ -1;
     }
 
-    return -1;
+    ଫେରନ୍ତୁ -1;
 }
 
 /*
@@ -9491,263 +9491,263 @@ indexof_blob(blob_T *b, long startidx, typval_T *expr)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    static int
-indexof_list(list_T *l, long startidx, typval_T *expr)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+indexof_list(list_T *l, long startidx, typval_T *ପଦସମଷ୍ଟି)
 {
     listitem_T	*item;
     long	idx = 0;
-    int		found;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		found;
 
-    if (l == NULL)
-	return -1;
+    ଯଦି (l == ଖାଲି)
+	ଫେରନ୍ତୁ -1;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (startidx == 0)
+    ଯଦି (startidx == 0)
 	item = l->lv_first;
-    else
+    ଅନ୍ୟଥା
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
 	item = list_find(l, startidx);
-	if (item != NULL)
+	ଯଦି (item != ଖାଲି)
 	    idx = l->lv_u.mat.lv_idx;
     }
 
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_ଚାବି, VAR_ସଂଖ୍ୟା);
 
-    int		called_emsg_start = called_emsg;
-    for ( ; item != NULL; item = item->li_next, ++idx)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		called_emsg_start = called_emsg;
+    ପାଇଁ ( ; item != ଖାଲି; item = item->li_next, ++idx)
     {
-	set_vim_var_nr(VV_KEY, idx);
+	set_vim_var_nr(VV_ଚାବି, idx);
 	copy_tv(&item->li_tv, get_vim_var_tv(VV_VAL));
 
-	found = indexof_eval_expr(expr);
+	found = indexof_eval_ପଦସମଷ୍ଟି(ପଦସମଷ୍ଟି);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	ଯଦି (found)
+	    ଫେରନ୍ତୁ idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	ଯଦି (called_emsg != called_emsg_start)
+	    ଫେରନ୍ତୁ -1;
     }
 
-    return -1;
+    ଫେରନ୍ତୁ -1;
 }
 
 /*
  * "indexof()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_indexof(typval_T *argvars, typval_T *rettv)
 {
     long	startidx = 0;
     typval_T	save_val;
-    typval_T	save_key;
-    int		save_did_emsg;
+    typval_T	save_ଚାବି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_did_emsg;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 	    || check_for_string_or_func_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if ((argvars[1].v_type == VAR_STRING &&
-		(argvars[1].vval.v_string == NULL
+    ଯଦି ((argvars[1].v_type == VAR_STRING &&
+		(argvars[1].vval.v_string == ଖାଲି
 		 || *argvars[1].vval.v_string == NUL))
 	    || (argvars[1].v_type == VAR_FUNC
-		&& argvars[1].vval.v_partial == NULL))
-	return;
+		&& argvars[1].vval.v_partial == ଖାଲି))
+	ଫେରନ୍ତୁ;
 
-    if (argvars[2].v_type == VAR_DICT)
-	startidx = dict_get_number_def(argvars[2].vval.v_dict, "startidx", 0);
+    ଯଦି (argvars[2].v_type == VAR_DICT)
+	startidx = dict_get_ସଂଖ୍ୟା_def(argvars[2].vval.v_dict, "startidx", 0);
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_ଚାବି, &save_ଚାବି);
 
     // We reset "did_emsg" to be able to detect whether an error occurred
     // during evaluation of the expression.
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	rettv->vval.v_number = indexof_blob(argvars[0].vval.v_blob, startidx,
+    ଯଦି (argvars[0].v_type == VAR_BLOB)
+	rettv->vval.v_ସଂଖ୍ୟା = indexof_blob(argvars[0].vval.v_blob, startidx,
 								&argvars[1]);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	rettv->vval.v_number = indexof_tuple(argvars[0].vval.v_tuple, startidx,
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
+	rettv->vval.v_ସଂଖ୍ୟା = indexof_tuple(argvars[0].vval.v_tuple, startidx,
 								&argvars[1]);
-    else
-	rettv->vval.v_number = indexof_list(argvars[0].vval.v_list, startidx,
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = indexof_list(argvars[0].vval.v_list, startidx,
 								&argvars[1]);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_ଚାବି, &save_ଚାବି);
     restore_vimvar(VV_VAL, &save_val);
     did_emsg |= save_did_emsg;
 }
 
-static int inputsecret_flag = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା inputsecret_flag = 0;
 
 /*
  * "input()" function
  *     Also handles inputsecret() when inputsecret is set.
  */
-    static void
-f_input(typval_T *argvars, typval_T *rettv)
+    ସ୍ଥିର ଶୂନ୍ୟ
+f_ନିବେଶ(typval_T *argvars, typval_T *rettv)
 {
-    get_user_input(argvars, rettv, FALSE, inputsecret_flag);
+    get_user_ନିବେଶ(argvars, rettv, FALSE, inputsecret_flag);
 }
 
 /*
  * "inputdialog()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_inputdialog(typval_T *argvars, typval_T *rettv)
 {
-#if defined(FEAT_GUI_TEXTDIALOG)
+#ଯଦି defined(FEAT_GUI_TEXTDIALOG)
     // Use a GUI dialog if the GUI is running and 'c' is not in 'guioptions'
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    ଯଦି (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == ଖାଲି)
     {
 	char_u	*message;
 	char_u	buf[NUMBUFLEN];
 	char_u	*defstr = (char_u *)"";
 
-	if (in_vim9script()
+	ଯଦି (in_vim9script()
 		&& (check_for_string_arg(argvars, 0) == FAIL
 		    || check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
 			&& check_for_opt_string_arg(argvars, 2) == FAIL)))
-	    return;
+	    ଫେରନ୍ତୁ;
 
 	message = tv_get_string_chk(&argvars[0]);
-	if (argvars[1].v_type != VAR_UNKNOWN
-		&& (defstr = tv_get_string_buf_chk(&argvars[1], buf)) != NULL)
+	ଯଦି (argvars[1].v_type != VAR_UNKNOWN
+		&& (defstr = tv_get_string_buf_chk(&argvars[1], buf)) != ଖାଲି)
 	    vim_strncpy(IObuff, defstr, IOSIZE - 1);
-	else
+	ଅନ୍ୟଥା
 	    IObuff[0] = NUL;
-	if (message != NULL && defstr != NULL
-		&& do_dialog(VIM_QUESTION, NULL, message,
+	ଯଦି (message != ଖାଲି && defstr != ଖାଲି
+		&& do_dialog(VIM_QUESTION, ଖାଲି, message,
 			  (char_u *)_("&OK\n&Cancel"), 1, IObuff, FALSE) == 1)
 	    rettv->vval.v_string = vim_strsave(IObuff);
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (message != NULL && defstr != NULL
+	    ଯଦି (message != ଖାଲି && defstr != ଖାଲି
 					&& argvars[1].v_type != VAR_UNKNOWN
 					&& argvars[2].v_type != VAR_UNKNOWN)
 		rettv->vval.v_string = vim_strsave(
 				      tv_get_string_buf(&argvars[2], buf));
-	    else
-		rettv->vval.v_string = NULL;
+	    ଅନ୍ୟଥା
+		rettv->vval.v_string = ଖାଲି;
 	}
 	rettv->v_type = VAR_STRING;
     }
-    else
+    ଅନ୍ୟଥା
 #endif
-	get_user_input(argvars, rettv, TRUE, inputsecret_flag);
+	get_user_ନିବେଶ(argvars, rettv, TRUE, inputsecret_flag);
 }
 
 /*
  * "inputlist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_inputlist(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
-    int		selected;
-    int		mouse_used;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		selected;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mouse_used;
 
-#ifdef NO_CONSOLE_INPUT
+#ifdef NO_CONSOLE_ନିବେଶ
     // While starting up, there is no place to enter text. When running tests
     // with --not-a-term we assume feedkeys() will be used.
-    if (no_console_input() && !is_not_a_term())
-	return;
+    ଯଦି (no_console_ନିବେଶ() && !is_not_a_term())
+	ଫେରନ୍ତୁ;
 #endif
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
+    ଯଦି (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == ଖାଲି)
     {
 	semsg(_(e_argument_of_str_must_be_list), "inputlist()");
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    msg_start();
-    msg_row = Rows - 1;	// for when 'cmdheight' > 1
-    lines_left = Rows;	// avoid more prompt
-    msg_scroll = TRUE;
-    msg_clr_eos();
+    ସନ୍ଦେଶ_start();
+    ସନ୍ଦେଶ_row = Rows - 1;	// for when 'cmdheight' > 1
+    ଧାଡ଼ିଗୁଡ଼ିକ_ବାମ = Rows;	// avoid more prompt
+    ସନ୍ଦେଶ_scroll = TRUE;
+    ସନ୍ଦେଶ_clr_eos();
 
     l = argvars[0].vval.v_list;
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(l, li)
     {
-	msg_puts((char *)tv_get_string(&li->li_tv));
-	msg_putchar('\n');
+	ସନ୍ଦେଶ_puts((ଅକ୍ଷର *)tv_get_string(&li->li_tv));
+	ସନ୍ଦେଶ_putchar('\n');
     }
 
     // Ask for choice.
-    selected = prompt_for_number(&mouse_used);
-    if (mouse_used)
-	selected -= lines_left;
+    selected = prompt_for_ସଂଖ୍ୟା(&mouse_used);
+    ଯଦି (mouse_used)
+	selected -= ଧାଡ଼ିଗୁଡ଼ିକ_ବାମ;
 
-    rettv->vval.v_number = selected;
+    rettv->vval.v_ସଂଖ୍ୟା = selected;
 }
 
-static garray_T	    ga_userinput = {0, 0, sizeof(tasave_T), 4, NULL};
+ସ୍ଥିର garray_T	    ga_userinput = {0, 0, ଆକାର(tasave_T), 4, ଖାଲି};
 
 /*
  * "inputrestore()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_inputrestore(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (ga_userinput.ga_len > 0)
+    ଯଦି (ga_userinput.ga_len > 0)
     {
 	--ga_userinput.ga_len;
 	restore_typeahead((tasave_T *)(ga_userinput.ga_data)
 						  + ga_userinput.ga_len, TRUE);
 	// default return is zero == OK
     }
-    else if (p_verbose > 1)
+    ଅନ୍ୟଥା ଯଦି (p_verbose > 1)
     {
-	verb_msg(_("called inputrestore() more often than inputsave()"));
-	rettv->vval.v_number = 1; // Failed
+	verb_ସନ୍ଦେଶ(_("called inputrestore() more often than inputsave()"));
+	rettv->vval.v_ସଂଖ୍ୟା = 1; // Failed
     }
 }
 
 /*
  * "inputsave()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_inputsave(typval_T *argvars UNUSED, typval_T *rettv)
 {
     // Add an entry to the stack of typeahead storage.
-    if (ga_grow(&ga_userinput, 1) == OK)
+    ଯଦି (ga_grow(&ga_userinput, 1) == OK)
     {
 	save_typeahead((tasave_T *)(ga_userinput.ga_data)
 						       + ga_userinput.ga_len);
 	++ga_userinput.ga_len;
 	// default return is zero == OK
     }
-    else
-	rettv->vval.v_number = 1; // Failed
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = 1; // Failed
 }
 
 /*
  * "inputsecret()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_inputsecret(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     ++cmdline_star;
     ++inputsecret_flag;
-    f_input(argvars, rettv);
+    f_ନିବେଶ(argvars, rettv);
     --cmdline_star;
     --inputsecret_flag;
 }
@@ -9755,7 +9755,7 @@ f_inputsecret(typval_T *argvars, typval_T *rettv)
 /*
  * "interrupt()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_interrupt(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     got_int = TRUE;
@@ -9764,26 +9764,26 @@ f_interrupt(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "invert(expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_invert(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = ~tv_get_number_chk(&argvars[0], NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = ~tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି);
 }
 
 /*
  * Free resources in lval_root allocated by fill_exec_lval_root().
  */
-    static void
-free_lval_root(lval_root_T *root)
+    ସ୍ଥିର ଶୂନ୍ୟ
+free_lval_ମୂଳ(lval_ମୂଳ_T *ମୂଳ)
 {
-    if (root->lr_tv != NULL)
-	free_tv(root->lr_tv);
-    class_unref(root->lr_cl_exec);
-    root->lr_tv = NULL;
-    root->lr_cl_exec = NULL;
+    ଯଦି (ମୂଳ->lr_tv != ଖାଲି)
+	free_tv(ମୂଳ->lr_tv);
+    class_unref(ମୂଳ->lr_cl_exec);
+    ମୂଳ->lr_tv = ଖାଲି;
+    ମୂଳ->lr_cl_exec = ଖାଲି;
 }
 
 /*
@@ -9797,177 +9797,177 @@ free_lval_root(lval_root_T *root)
  * Free resources and return FAIL if the root should not be used. Otherwise OK.
  */
 
-    static int
-fix_variable_reference_lval_root(lval_root_T *root, char_u *name)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+fix_variable_reference_lval_ମୂଳ(lval_ମୂଳ_T *ମୂଳ, char_u *name)
 {
 
     // Check if lr_tv is the name of an object/class reference: name start with
     // "this" or name is class variable. Clear lr_tv if neither.
-    int found_member = FALSE;
-    if (root->lr_tv->v_type == VAR_OBJECT)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା found_member = FALSE;
+    ଯଦି (ମୂଳ->lr_tv->v_type == VAR_OBJECT)
     {
-	if (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
+	ଯଦି (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
 	    found_member = TRUE;
     }
-    if (!found_member)	// not object member, try class member
+    ଯଦି (!found_member)	// not object member, try class member
     {
 	// Explicitly check if the name is a class member.
 	// If it's not then do nothing.
 	char_u	*end;
-	for (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
+	ପାଇଁ (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
 	    ;
-	int idx = class_member_idx(root->lr_cl_exec, name, end - name);
-	if (idx >= 0)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = class_member_idx(ମୂଳ->lr_cl_exec, name, end - name);
+	ଯଦି (idx >= 0)
 	{
 	    // A class variable, replace lr_tv with it
-	    clear_tv(root->lr_tv);
-	    copy_tv(&root->lr_cl_exec->class_members_tv[idx], root->lr_tv);
+	    clear_tv(ମୂଳ->lr_tv);
+	    copy_tv(&ମୂଳ->lr_cl_exec->class_members_tv[idx], ମୂଳ->lr_tv);
 	    found_member = TRUE;
 	}
     }
-    if (!found_member)
+    ଯଦି (!found_member)
     {
-	free_tv(root->lr_tv);
-	root->lr_tv = NULL;	    // Not a member variable
+	free_tv(ମୂଳ->lr_tv);
+	ମୂଳ->lr_tv = ଖାଲି;	    // Not a member variable
     }
     // If FAIL, then must free_lval_root(root);
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * "islocked()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_islocked(typval_T *argvars, typval_T *rettv)
 {
     lval_T	lv;
     char_u	*end;
     dictitem_T	*di;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     char_u *name = tv_get_string(&argvars[0]);
 #ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: f_islocked(): name: %s", name);
+    ch_log(ଖାଲି, "LKVAR: f_islocked(): name: %s", name);
 #endif
 
-    lval_root_T	aroot;	// fully initialized in fill_exec_lval_root
-    lval_root_T *root = NULL;
+    lval_ମୂଳ_T	aroot;	// fully initialized in fill_exec_lval_root
+    lval_ମୂଳ_T *ମୂଳ = ଖାଲି;
 
     // Set up lval_root if executing in a method.
-    if (fill_exec_lval_root(&aroot) == OK)
+    ଯଦି (fill_exec_lval_ମୂଳ(&aroot) == OK)
     {
 	// Almost always produces a valid lval_root since lr_cl_exec is used
 	// for access verification, lr_tv may be set to NULL.
-	if (fix_variable_reference_lval_root(&aroot, name) == OK)
-	    root = &aroot;
+	ଯଦି (fix_variable_reference_lval_ମୂଳ(&aroot, name) == OK)
+	    ମୂଳ = &aroot;
     }
 
-    lval_root_T	*lval_root_save = lval_root;
-    lval_root = root;
-    end = get_lval(name, NULL, &lv, FALSE, FALSE,
+    lval_ମୂଳ_T	*lval_ମୂଳ_save = lval_ମୂଳ;
+    lval_ମୂଳ = ମୂଳ;
+    end = get_lval(name, ଖାଲି, &lv, FALSE, FALSE,
 			     GLV_NO_AUTOLOAD | GLV_READ_ONLY | GLV_NO_DECL,
 			     FNE_CHECK_START);
-    lval_root = lval_root_save;
+    lval_ମୂଳ = lval_ମୂଳ_save;
 
-    if (end != NULL && lv.ll_name != NULL)
+    ଯଦି (end != ଖାଲି && lv.ll_name != ଖାଲି)
     {
-	if (*end != NUL)
+	ଯଦି (*end != NUL)
 	{
 	    semsg(_(lv.ll_name == lv.ll_name_end
 		   ? e_invalid_argument_str : e_trailing_characters_str), end);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (lv.ll_tv == NULL)
+	    ଯଦି (lv.ll_tv == ଖାଲି)
 	    {
-		di = find_var(lv.ll_name, NULL, TRUE);
-		if (di != NULL)
+		di = find_var(lv.ll_name, ଖାଲି, TRUE);
+		ଯଦି (di != ଖାଲି)
 		{
 		    // Consider a variable locked when:
 		    // 1. the variable itself is locked
 		    // 2. the value of the variable is locked.
 		    // 3. the List or Dict value is locked.
-		    rettv->vval.v_number = ((di->di_flags & DI_FLAGS_LOCK)
+		    rettv->vval.v_ସଂଖ୍ୟା = ((di->di_flags & DI_FLAGS_LOCK)
 						   || tv_islocked(&di->di_tv));
 		}
 	    }
-	    else if (lv.ll_is_root)
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_is_ମୂଳ)
 	    {
-		rettv->vval.v_number = tv_islocked(lv.ll_tv);
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(lv.ll_tv);
 	    }
-	    else if (lv.ll_object != NULL)
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_object != ଖାଲି)
 	    {
 		typval_T *tv = ((typval_T *)(lv.ll_object + 1)) + lv.ll_oi;
-		rettv->vval.v_number = tv_islocked(tv);
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(tv);
 #ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR: f_islocked(): name %s (obj)", lv.ll_name);
+		ch_log(ଖାଲି, "LKVAR: f_islocked(): name %s (obj)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_class != NULL)
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_class != ଖାଲି)
 	    {
 		typval_T *tv = &lv.ll_class->class_members_tv[lv.ll_oi];
-		rettv->vval.v_number = tv_islocked(tv);
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(tv);
 #ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR: f_islocked(): name %s (cl)", lv.ll_name);
+		ch_log(ଖାଲି, "LKVAR: f_islocked(): name %s (cl)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_range)
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_range)
 		emsg(_(e_range_not_allowed));
-	    else if (lv.ll_newkey != NULL)
-		semsg(_(e_key_not_present_in_dictionary_str), lv.ll_newkey);
-	    else if (lv.ll_list != NULL)
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_newkey != ଖାଲି)
+		semsg(_(e_ଚାବି_not_present_in_dictionary_str), lv.ll_newkey);
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_list != ଖାଲି)
 		// List item.
-		rettv->vval.v_number = tv_islocked(&lv.ll_li->li_tv);
-	    else if (lv.ll_tuple != NULL)
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(&lv.ll_li->li_tv);
+	    ଅନ୍ୟଥା ଯଦି (lv.ll_tuple != ଖାଲି)
 		// Tuple item.
-		rettv->vval.v_number = tv_islocked(lv.ll_tv);
-	    else
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(lv.ll_tv);
+	    ଅନ୍ୟଥା
 		// Dictionary item.
-		rettv->vval.v_number = tv_islocked(&lv.ll_di->di_tv);
+		rettv->vval.v_ସଂଖ୍ୟା = tv_islocked(&lv.ll_di->di_tv);
 	}
     }
 
-    if (root != NULL)
-	free_lval_root(root);
+    ଯଦି (ମୂଳ != ଖାଲି)
+	free_lval_ମୂଳ(ମୂଳ);
     clear_lval(&lv);
 }
 
 /*
  * "items()" function
  */
-    static void
-f_items(typval_T *argvars, typval_T *rettv)
+    ସ୍ଥିର ଶୂନ୍ୟ
+f_ବସ୍ତୁଗୁଡ଼ିକ(typval_T *argvars, typval_T *rettv)
 {
-    if (argvars[0].v_type == VAR_STRING)
+    ଯଦି (argvars[0].v_type == VAR_STRING)
 	string2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_LIST)
 	list2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
 	tuple2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_BLOB)
 	blob2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_DICT)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_DICT)
 	dict2items(argvars, rettv);
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr), 1);
 }
 
 /*
  * "keytrans()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_keytrans(typval_T *argvars, typval_T *rettv)
 {
     char_u *escaped;
 
     rettv->v_type = VAR_STRING;
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || argvars[0].vval.v_string == NULL)
-	return;
+    ଯଦି (check_for_string_arg(argvars, 0) == FAIL
+	    || argvars[0].vval.v_string == ଖାଲି)
+	ଫେରନ୍ତୁ;
     // Need to escape K_SPECIAL and CSI for mb_unescape().
     escaped = vim_strsave_escape_csi(argvars[0].vval.v_string);
     rettv->vval.v_string = str2special_save(escaped, TRUE, TRUE);
@@ -9977,111 +9977,111 @@ f_keytrans(typval_T *argvars, typval_T *rettv)
 /*
  * "last_buffer_nr()" function.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_last_buffer_nr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		n = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = 0;
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (n < buf->b_fnum)
+	ଯଦି (n < buf->b_fnum)
 	    n = buf->b_fnum;
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_ସଂଖ୍ୟା = n;
 }
 
 /*
  * "len()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_len(typval_T *argvars, typval_T *rettv)
 {
-    switch (argvars[0].v_type)
+    ବାଛ (argvars[0].v_type)
     {
-	case VAR_STRING:
-	case VAR_NUMBER:
-	    rettv->vval.v_number = (varnumber_T)STRLEN(
+	ସ୍ଥିତି VAR_STRING:
+	ସ୍ଥିତି VAR_ସଂଖ୍ୟା:
+	    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)STRLEN(
 					       tv_get_string(&argvars[0]));
-	    break;
-	case VAR_BLOB:
-	    rettv->vval.v_number = blob_len(argvars[0].vval.v_blob);
-	    break;
-	case VAR_LIST:
-	    rettv->vval.v_number = list_len(argvars[0].vval.v_list);
-	    break;
-	case VAR_TUPLE:
-	    rettv->vval.v_number = tuple_len(argvars[0].vval.v_tuple);
-	    break;
-	case VAR_DICT:
-	    rettv->vval.v_number = dict_len(argvars[0].vval.v_dict);
-	    break;
-	case VAR_OBJECT:
-	    rettv->vval.v_number = object_len(argvars[0].vval.v_object);
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_FLOAT:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_BLOB:
+	    rettv->vval.v_ସଂଖ୍ୟା = blob_len(argvars[0].vval.v_blob);
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_LIST:
+	    rettv->vval.v_ସଂଖ୍ୟା = list_len(argvars[0].vval.v_list);
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_TUPLE:
+	    rettv->vval.v_ସଂଖ୍ୟା = tuple_len(argvars[0].vval.v_tuple);
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_DICT:
+	    rettv->vval.v_ସଂଖ୍ୟା = dict_len(argvars[0].vval.v_dict);
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_OBJECT:
+	    rettv->vval.v_ସଂଖ୍ୟା = object_len(argvars[0].vval.v_object);
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_UNKNOWN:
+	ସ୍ଥିତି VAR_ANY:
+	ସ୍ଥିତି VAR_VOID:
+	ସ୍ଥିତି VAR_BOOL:
+	ସ୍ଥିତି VAR_SPECIAL:
+	ସ୍ଥିତି VAR_FLOAT:
+	ସ୍ଥିତି VAR_FUNC:
+	ସ୍ଥିତି VAR_PARTIAL:
+	ସ୍ଥିତି VAR_JOB:
+	ସ୍ଥିତି VAR_CHANNEL:
+	ସ୍ଥିତି VAR_INSTR:
+	ସ୍ଥିତି VAR_CLASS:
+	ସ୍ଥିତି VAR_TYPEALIAS:
 	    emsg(_(e_invalid_type_for_len));
-	    break;
+	    ଭାଙ୍ଗ;
     }
 }
 
-    static void
-libcall_common(typval_T *argvars UNUSED, typval_T *rettv, int type)
+    ସ୍ଥିର ଶୂନ୍ୟ
+libcall_common(typval_T *argvars UNUSED, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
 #ifdef FEAT_LIBCALL
     char_u		*string_in;
     char_u		**string_result;
-    int			nr_result;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			nr_result;
 #endif
 
     rettv->v_type = type;
-    if (type != VAR_NUMBER)
-	rettv->vval.v_string = NULL;
+    ଯଦି (type != VAR_ସଂଖ୍ୟା)
+	rettv->vval.v_string = ଖାଲି;
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_string_or_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_string_or_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL))
+	ଫେରନ୍ତୁ;
 
 #ifdef FEAT_LIBCALL
     // The first two args must be strings, otherwise it's meaningless
-    if (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
+    ଯଦି (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
     {
-	string_in = NULL;
-	if (argvars[2].v_type == VAR_STRING)
+	string_in = ଖାଲି;
+	ଯଦି (argvars[2].v_type == VAR_STRING)
 	    string_in = argvars[2].vval.v_string;
-	if (type == VAR_NUMBER)
+	ଯଦି (type == VAR_ସଂଖ୍ୟା)
 	{
-	    string_result = NULL;
+	    string_result = ଖାଲି;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    rettv->vval.v_string = NULL;
+	    rettv->vval.v_string = ଖାଲି;
 	    string_result = &rettv->vval.v_string;
 	}
-	if (mch_libcall(argvars[0].vval.v_string,
+	ଯଦି (mch_libcall(argvars[0].vval.v_string,
 			     argvars[1].vval.v_string,
 			     string_in,
-			     argvars[2].vval.v_number,
+			     argvars[2].vval.v_ସଂଖ୍ୟା,
 			     string_result,
 			     &nr_result) == OK
-		&& type == VAR_NUMBER)
-	    rettv->vval.v_number = nr_result;
+		&& type == VAR_ସଂଖ୍ୟା)
+	    rettv->vval.v_ସଂଖ୍ୟା = nr_result;
     }
 #endif
 }
@@ -10089,7 +10089,7 @@ libcall_common(typval_T *argvars UNUSED, typval_T *rettv, int type)
 /*
  * "libcall()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_libcall(typval_T *argvars, typval_T *rettv)
 {
     libcall_common(argvars, rettv, VAR_STRING);
@@ -10098,43 +10098,43 @@ f_libcall(typval_T *argvars, typval_T *rettv)
 /*
  * "libcallnr()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_libcallnr(typval_T *argvars, typval_T *rettv)
 {
-    libcall_common(argvars, rettv, VAR_NUMBER);
+    libcall_common(argvars, rettv, VAR_ସଂଖ୍ୟା);
 }
 
 /*
  * "line(string, [winid])" function
  */
-    static void
-f_line(typval_T *argvars, typval_T *rettv)
+    ସ୍ଥିର ଶୂନ୍ୟ
+f_ଧାଡ଼ି(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum = 0;
-    pos_T	*fp = NULL;
-    int		fnum;
-    int		id;
+    pos_T	*fp = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	// use window specified in the second argument
-	id = (int)tv_get_number(&argvars[1]);
+	id = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[1]);
 	wp = win_id2wp_tp(id, &tp);
-	if (wp != NULL && tp != NULL)
+	ଯଦି (wp != ଖାଲି && tp != ଖାଲି)
 	{
-	    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+	    ଯଦି (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
 	    {
 		// With 'splitkeep' != cursor and in diff mode, prevent that the
 		// window scrolls and keep the topline.
-		if (*p_spk != 'c'
+		ଯଦି (*p_spk != 'c'
 #ifdef FEAT_DIFF
 		|| (curwin->w_p_diff && switchwin.sw_curwin->w_p_diff)
 #endif
@@ -10147,36 +10147,36 @@ f_line(typval_T *argvars, typval_T *rettv)
 	    restore_win_noblock(&switchwin, TRUE);
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	// use current window
 	fp = var2fpos(&argvars[0], TRUE, &fnum, FALSE);
 
-    if (fp != NULL)
+    ଯଦି (fp != ଖାଲି)
 	lnum = fp->lnum;
-    rettv->vval.v_number = lnum;
+    rettv->vval.v_ସଂଖ୍ୟା = lnum;
 }
 
 /*
  * "line2byte(lnum)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_line2byte(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
-    rettv->vval.v_number = -1;
-#else
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+#ଅନ୍ୟଥା
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count + 1)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = ml_find_line_or_offset(curbuf, lnum, NULL);
-    if (rettv->vval.v_number >= 0)
-	++rettv->vval.v_number;
+    ଯଦି (lnum < 1 || lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା + 1)
+	rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = ml_find_ଧାଡ଼ି_or_offset(curbuf, lnum, ଖାଲି);
+    ଯଦି (rettv->vval.v_ସଂଖ୍ୟା >= 0)
+	++rettv->vval.v_ସଂଖ୍ୟା;
 #endif
 }
 
@@ -10184,24 +10184,24 @@ f_line2byte(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "luaeval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_luaeval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_luaeval(str, argvars + 1, rettv);
 }
 #endif
 
-typedef enum
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା
 {
     MATCH_END,	    // matchend()
     MATCH_MATCH,    // match()
@@ -10210,12 +10210,12 @@ typedef enum
     MATCH_POS	    // matchstrpos()
 } matchtype_T;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 {
-    char_u	*str = NULL;
+    char_u	*str = ଖାଲି;
     long	len = 0;
-    char_u	*expr = NULL;
+    char_u	*ପଦସମଷ୍ଟି = ଖାଲି;
     char_u	*pat;
     regmatch_T	regmatch;
     char_u	patbuf[NUMBUFLEN];
@@ -10224,166 +10224,166 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
     long	start = 0;
     long	nth = 1;
     colnr_T	startcol = 0;
-    int		match = 0;
-    list_T	*l = NULL;
-    listitem_T	*li = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		match = 0;
+    list_T	*l = ଖାଲି;
+    listitem_T	*li = ଖାଲି;
     long	idx = 0;
-    int		prev_lock = 0;
-    char_u	*tofree = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		prev_lock = 0;
+    char_u	*tofree = ଖାଲି;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
-    rettv->vval.v_number = -1;
-    if (type == MATCH_LIST || type == MATCH_POS)
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (type == MATCH_LIST || type == MATCH_POS)
     {
 	// type MATCH_LIST: return empty list when there are no matches.
 	// type MATCH_POS: return ["", -1, -1, -1]
-	if (rettv_list_alloc(rettv) == FAIL)
-	    goto theend;
-	if (type == MATCH_POS
+	ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	    ଯାଅ theend;
+	ଯଦି (type == MATCH_POS
 		&& (list_append_string(rettv->vval.v_list,
 					    (char_u *)"", 0) == FAIL
-		    || list_append_number(rettv->vval.v_list,
+		    || list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)-1) == FAIL
-		    || list_append_number(rettv->vval.v_list,
+		    || list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)-1) == FAIL
-		    || list_append_number(rettv->vval.v_list,
+		    || list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (varnumber_T)-1) == FAIL))
 	{
 		list_free(rettv->vval.v_list);
-		rettv->vval.v_list = NULL;
-		goto theend;
+		rettv->vval.v_list = ଖାଲି;
+		ଯାଅ theend;
 	}
     }
-    else if (type == MATCH_STR)
+    ଅନ୍ୟଥା ଯଦି (type == MATCH_STR)
     {
 	rettv->v_type = VAR_STRING;
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ଖାଲି;
     }
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	goto theend;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 3) == FAIL)))
+	ଯାଅ theend;
 
-    if (argvars[0].v_type == VAR_LIST)
+    ଯଦି (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) == NULL)
-	    goto theend;
+	ଯଦି ((l = argvars[0].vval.v_list) == ଖାଲି)
+	    ଯାଅ theend;
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	expr = str = tv_get_string(&argvars[0]);
+	ପଦସମଷ୍ଟି = str = tv_get_string(&argvars[0]);
 	len = (long)STRLEN(str);
     }
 
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
-	goto theend;
+    ଯଦି (pat == ଖାଲି)
+	ଯାଅ theend;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    error = FALSE;
 
-	start = (long)tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    goto theend;
-	if (l != NULL)
+	start = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
+	ଯଦି (error)
+	    ଯାଅ theend;
+	ଯଦି (l != ଖାଲି)
 	{
 	    li = list_find(l, start);
-	    if (li == NULL)
-		goto theend;
+	    ଯଦି (li == ଖାଲି)
+		ଯାଅ theend;
 	    idx = l->lv_u.mat.lv_idx;	// use the cached index
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (start < 0)
+	    ଯଦି (start < 0)
 		start = 0;
-	    if (start > len)
-		goto theend;
+	    ଯଦି (start > len)
+		ଯାଅ theend;
 	    // When "count" argument is there ignore matches before "start",
 	    // otherwise skip part of the string.  Differs when pattern is "^"
 	    // or "\<".
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
 		startcol = start;
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		str += start;
 		len -= start;
 	    }
 	}
 
-	if (argvars[3].v_type != VAR_UNKNOWN)
-	    nth = (long)tv_get_number_chk(&argvars[3], &error);
-	if (error)
-	    goto theend;
+	ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
+	    nth = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[3], &error);
+	ଯଦି (error)
+	    ଯାଅ theend;
     }
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    ଯଦି (regmatch.regprog != ଖାଲି)
     {
 	regmatch.rm_ic = p_ic;
 
 	// Lock the list, the string() method of an object item could remove
 	// the item the loop is standing on.
-	if (l != NULL)
+	ଯଦି (l != ଖାଲି)
 	{
 	    prev_lock = l->lv_lock;
-	    if (l->lv_lock == 0)
+	    ଯଦି (l->lv_lock == 0)
 		l->lv_lock = VAR_LOCKED;
 	}
 
-	for (;;)
+	ପାଇଁ (;;)
 	{
-	    if (l != NULL)
+	    ଯଦି (l != ଖାଲି)
 	    {
-		if (li == NULL)
+		ଯଦି (li == ଖାଲି)
 		{
 		    match = FALSE;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		vim_free(tofree);
-		expr = str = echo_string(&li->li_tv, &tofree, strbuf, 0);
-		if (str == NULL)
-		    break;
+		ପଦସମଷ୍ଟି = str = echo_string(&li->li_tv, &tofree, strbuf, 0);
+		ଯଦି (str == ଖାଲି)
+		    ଭାଙ୍ଗ;
 	    }
 
 	    match = vim_regexec_nl(&regmatch, str, startcol);
 
-	    if (match && --nth <= 0)
-		break;
-	    if (l == NULL && !match)
-		break;
+	    ଯଦି (match && --nth <= 0)
+		ଭାଙ୍ଗ;
+	    ଯଦି (l == ଖାଲି && !match)
+		ଭାଙ୍ଗ;
 
 	    // Advance to just after the match.
-	    if (l != NULL)
+	    ଯଦି (l != ଖାଲି)
 	    {
 		li = li->li_next;
 		++idx;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		startcol = (colnr_T)(regmatch.startp[0]
 				    + (*mb_ptr2len)(regmatch.startp[0]) - str);
-		if (startcol > (colnr_T)len
+		ଯଦି (startcol > (colnr_T)len
 				      || str + startcol <= regmatch.startp[0])
 		{
 		    match = FALSE;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
 	}
 
-	if (match)
+	ଯଦି (match)
 	{
-	    if (type == MATCH_POS)
+	    ଯଦି (type == MATCH_POS)
 	    {
 		listitem_T *li1 = rettv->vval.v_list->lv_first;
 		listitem_T *li2 = li1->li_next;
@@ -10393,62 +10393,62 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 		vim_free(li1->li_tv.vval.v_string);
 		li1->li_tv.vval.v_string = vim_strnsave(regmatch.startp[0],
 					regmatch.endp[0] - regmatch.startp[0]);
-		li3->li_tv.vval.v_number =
-				      (varnumber_T)(regmatch.startp[0] - expr);
-		li4->li_tv.vval.v_number =
-					(varnumber_T)(regmatch.endp[0] - expr);
-		if (l != NULL)
-		    li2->li_tv.vval.v_number = (varnumber_T)idx;
+		li3->li_tv.vval.v_ସଂଖ୍ୟା =
+				      (varnumber_T)(regmatch.startp[0] - ପଦସମଷ୍ଟି);
+		li4->li_tv.vval.v_ସଂଖ୍ୟା =
+					(varnumber_T)(regmatch.endp[0] - ପଦସମଷ୍ଟି);
+		ଯଦି (l != ଖାଲି)
+		    li2->li_tv.vval.v_ସଂଖ୍ୟା = (varnumber_T)idx;
 	    }
-	    else if (type == MATCH_LIST)
+	    ଅନ୍ୟଥା ଯଦି (type == MATCH_LIST)
 	    {
-		int i;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
 		// return list with matched string and submatches
-		for (i = 0; i < NSUBEXP; ++i)
+		ପାଇଁ (i = 0; i < NSUBEXP; ++i)
 		{
-		    if (regmatch.endp[i] == NULL)
+		    ଯଦି (regmatch.endp[i] == ଖାଲି)
 		    {
-			if (list_append_string(rettv->vval.v_list,
-							    NULL, 0) == FAIL)
-			    break;
+			ଯଦି (list_append_string(rettv->vval.v_list,
+							    ଖାଲି, 0) == FAIL)
+			    ଭାଙ୍ଗ;
 		    }
-		    else if (list_append_string(rettv->vval.v_list,
+		    ଅନ୍ୟଥା ଯଦି (list_append_string(rettv->vval.v_list,
 				regmatch.startp[i],
-				(int)(regmatch.endp[i] - regmatch.startp[i]))
+				(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(regmatch.endp[i] - regmatch.startp[i]))
 			    == FAIL)
-			break;
+			ଭାଙ୍ଗ;
 		}
 	    }
-	    else if (type == MATCH_STR)
+	    ଅନ୍ୟଥା ଯଦି (type == MATCH_STR)
 	    {
 		// return matched string
-		if (l != NULL)
+		ଯଦି (l != ଖାଲି)
 		    copy_tv(&li->li_tv, rettv);
-		else
+		ଅନ୍ୟଥା
 		    rettv->vval.v_string = vim_strnsave(regmatch.startp[0],
 					regmatch.endp[0] - regmatch.startp[0]);
 	    }
-	    else if (l != NULL)
-		rettv->vval.v_number = idx;
-	    else
+	    ଅନ୍ୟଥା ଯଦି (l != ଖାଲି)
+		rettv->vval.v_ସଂଖ୍ୟା = idx;
+	    ଅନ୍ୟଥା
 	    {
-		if (type != MATCH_END)
-		    rettv->vval.v_number =
+		ଯଦି (type != MATCH_END)
+		    rettv->vval.v_ସଂଖ୍ୟା =
 				      (varnumber_T)(regmatch.startp[0] - str);
-		else
-		    rettv->vval.v_number =
+		ଅନ୍ୟଥା
+		    rettv->vval.v_ସଂଖ୍ୟା =
 					(varnumber_T)(regmatch.endp[0] - str);
-		rettv->vval.v_number += (varnumber_T)(str - expr);
+		rettv->vval.v_ସଂଖ୍ୟା += (varnumber_T)(str - ପଦସମଷ୍ଟି);
 	    }
 	}
-	if (l != NULL)
+	ଯଦି (l != ଖାଲି)
 	    l->lv_lock = prev_lock;
 	eval_regfree(pat, regmatch.regprog);
     }
 
 theend:
-    if (type == MATCH_POS && l == NULL && rettv->vval.v_list != NULL)
+    ଯଦି (type == MATCH_POS && l == ଖାଲି && rettv->vval.v_list != ଖାଲି)
 	// matchstrpos() without a list: drop the second item.
 	listitem_remove(rettv->vval.v_list,
 				       rettv->vval.v_list->lv_first->li_next);
@@ -10462,152 +10462,152 @@ theend:
  * If "submatches" is TRUE, then submatch information is also returned.
  * "matchbuf" is TRUE when called for matchbufline().
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 get_matches_in_str(
     char_u	*str,
     regmatch_T	*rmp,
     list_T	*mlist,
-    int		idx,
-    int		submatches,
-    int		matchbuf)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		submatches,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		matchbuf)
 {
     long	len = (long)STRLEN(str);
-    int		match = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		match = 0;
     colnr_T	startidx = 0;
 
-    for (;;)
+    ପାଇଁ (;;)
     {
 	match = vim_regexec_nl(rmp, str, startidx);
-	if (!match)
-	    break;
+	ଯଦି (!match)
+	    ଭାଙ୍ଗ;
 
 	dict_T *d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
-	if (list_append_dict(mlist, d) == FAIL)
+	ଯଦି (d == ଖାଲି)
+	    ଫେରନ୍ତୁ FAIL;
+	ଯଦି (list_append_dict(mlist, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 	}
 
-	if (dict_add_number(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
-	    return FAIL;
+	ଯଦି (dict_add_ସଂଖ୍ୟା(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
+	    ଫେରନ୍ତୁ FAIL;
 
-	if (dict_add_number(d, "byteidx",
+	ଯଦି (dict_add_ସଂଖ୍ୟା(d, "byteidx",
 		    (colnr_T)(rmp->startp[0] - str)) == FAIL)
-	    return FAIL;
+	    ଫେରନ୍ତୁ FAIL;
 
-	if (dict_add_string_len(d, "text", rmp->startp[0],
-		    (int)(rmp->endp[0] - rmp->startp[0])) == FAIL)
-	    return FAIL;
+	ଯଦି (dict_add_string_len(d, "text", rmp->startp[0],
+		    (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(rmp->endp[0] - rmp->startp[0])) == FAIL)
+	    ଫେରନ୍ତୁ FAIL;
 
-	if (submatches)
+	ଯଦି (submatches)
 	{
 	    list_T *sml = list_alloc();
-	    if (sml == NULL)
-		return FAIL;
+	    ଯଦି (sml == ଖାଲି)
+		ଫେରନ୍ତୁ FAIL;
 
-	    if (dict_add_list(d, "submatches", sml) == FAIL)
+	    ଯଦି (dict_add_list(d, "submatches", sml) == FAIL)
 	    {
 		list_unref(sml);
-		return FAIL;
+		ଫେରନ୍ତୁ FAIL;
 	    }
 
 	    // return a list with the submatches
-	    for (int i = 1; i < NSUBEXP; ++i)
+	    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < NSUBEXP; ++i)
 	    {
-		if (rmp->endp[i] == NULL)
+		ଯଦି (rmp->endp[i] == ଖାଲି)
 		{
-		    if (list_append_string(sml, (char_u *)"", 0) == FAIL)
-			return FAIL;
+		    ଯଦି (list_append_string(sml, (char_u *)"", 0) == FAIL)
+			ଫେରନ୍ତୁ FAIL;
 		}
-		else if (list_append_string(sml, rmp->startp[i],
-			    (int)(rmp->endp[i] - rmp->startp[i])) == FAIL)
-		    return FAIL;
+		ଅନ୍ୟଥା ଯଦି (list_append_string(sml, rmp->startp[i],
+			    (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(rmp->endp[i] - rmp->startp[i])) == FAIL)
+		    ଫେରନ୍ତୁ FAIL;
 	    }
 	}
 	startidx = (colnr_T)(rmp->endp[0] - str);
-	if (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
-	    break;
+	ଯଦି (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
+	    ଭାଙ୍ଗ;
     }
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * "matchbufline()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchbufline(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*retlist = NULL;
+    list_T	*retlist = ଖାଲି;
     char_u	*save_cpo;
     char_u	patbuf[NUMBUFLEN];
     regmatch_T	regmatch;
 
-    rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (rettv_list_alloc(rettv) != OK)
+	ଫେରନ୍ତୁ;
     retlist = rettv->vval.v_list;
 
-    if (check_for_buffer_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_buffer_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_lnum_arg(argvars, 2) == FAIL
 	    || check_for_lnum_arg(argvars, 3) == FAIL
 	    || check_for_opt_dict_arg(argvars, 4) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    int prev_did_emsg = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା prev_did_emsg = did_emsg;
     buf_T *buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
+    ଯଦି (buf == ଖାଲି)
     {
-	if (did_emsg == prev_did_emsg)
+	ଯଦି (did_emsg == prev_did_emsg)
 	    semsg(_(e_invalid_buffer_name_str), tv_get_string(&argvars[0]));
-	return;
+	ଫେରନ୍ତୁ;
     }
-    if (buf->b_ml.ml_mfp == NULL)
+    ଯଦି (buf->b_ml.ml_mfp == ଖାଲି)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     char_u *pat = tv_get_string_buf(&argvars[1], patbuf);
 
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
     linenr_T slnum = tv_get_lnum_buf(&argvars[2], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (slnum < 1)
+    ଯଦି (did_emsg > did_emsg_before)
+	ଫେରନ୍ତୁ;
+    ଯଦି (slnum < 1)
     {
-	semsg(_(e_invalid_value_for_argument_str), "lnum");
-	return;
+	semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str), "lnum");
+	ଫେରନ୍ତୁ;
     }
 
     linenr_T elnum = tv_get_lnum_buf(&argvars[3], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (elnum < 1 || elnum < slnum)
+    ଯଦି (did_emsg > did_emsg_before)
+	ଫେରନ୍ତୁ;
+    ଯଦି (elnum < 1 || elnum < slnum)
     {
-	semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	return;
+	semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str), "end_lnum");
+	ଫେରନ୍ତୁ;
     }
 
-    if (elnum > buf->b_ml.ml_line_count)
-	elnum = buf->b_ml.ml_line_count;
+    ଯଦି (elnum > buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+	elnum = buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
 
-    int		submatches = FALSE;
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		submatches = FALSE;
+    ଯଦି (argvars[4].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[4].vval.v_dict;
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    ଯଦି (di != ଖାଲି)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		ଯଦି (di->di_tv.v_type != VAR_BOOL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "submatches");
-		    return;
+		    semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str), "submatches");
+		    ଫେରନ୍ତୁ;
 		}
 		submatches = tv_get_bool(&di->di_tv);
 	    }
@@ -10619,16 +10619,16 @@ f_matchbufline(typval_T *argvars, typval_T *rettv)
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
-	goto theend;
+    ଯଦି (regmatch.regprog == ଖାଲି)
+	ଯାଅ theend;
     regmatch.rm_ic = p_ic;
 
-    while (slnum <= elnum)
+    ଯେତେବେଳେ (slnum <= elnum)
     {
 	char_u *str = ml_get_buf(buf, slnum, FALSE);
-	if (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
+	ଯଦି (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
 								TRUE) == FAIL)
-	    goto cleanup;
+	    ଯାଅ cleanup;
 	slnum++;
     }
 
@@ -10642,7 +10642,7 @@ theend:
 /*
  * "match()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_match(typval_T *argvars, typval_T *rettv)
 {
     find_some_match(argvars, rettv, MATCH_MATCH);
@@ -10651,7 +10651,7 @@ f_match(typval_T *argvars, typval_T *rettv)
 /*
  * "matchend()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchend(typval_T *argvars, typval_T *rettv)
 {
     find_some_match(argvars, rettv, MATCH_END);
@@ -10660,7 +10660,7 @@ f_matchend(typval_T *argvars, typval_T *rettv)
 /*
  * "matchlist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchlist(typval_T *argvars, typval_T *rettv)
 {
     find_some_match(argvars, rettv, MATCH_LIST);
@@ -10669,7 +10669,7 @@ f_matchlist(typval_T *argvars, typval_T *rettv)
 /*
  * "matchstr()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchstr(typval_T *argvars, typval_T *rettv)
 {
     find_some_match(argvars, rettv, MATCH_STR);
@@ -10678,71 +10678,71 @@ f_matchstr(typval_T *argvars, typval_T *rettv)
 /*
  * "matchstrlist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchstrlist(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*retlist = NULL;
+    list_T	*retlist = ଖାଲି;
     char_u	*save_cpo;
-    list_T	*l = NULL;
-    listitem_T	*li = NULL;
+    list_T	*l = ଖାଲି;
+    listitem_T	*li = ଖାଲି;
     char_u	patbuf[NUMBUFLEN];
     regmatch_T	regmatch;
 
-    rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (rettv_list_alloc(rettv) != OK)
+	ଫେରନ୍ତୁ;
     retlist = rettv->vval.v_list;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if ((l = argvars[0].vval.v_list) == NULL)
-	return;
+    ଯଦି ((l = argvars[0].vval.v_list) == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
-	return;
+    ଯଦି (pat == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
-	goto theend;
+    ଯଦି (regmatch.regprog == ଖାଲି)
+	ଯାଅ theend;
     regmatch.rm_ic = p_ic;
 
-    int		submatches = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		submatches = FALSE;
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    ଯଦି (di != ଖାଲି)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		ଯଦି (di->di_tv.v_type != VAR_BOOL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "submatches");
-		    goto cleanup;
+		    semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str), "submatches");
+		    ଯାଅ cleanup;
 		}
 		submatches = tv_get_bool(&di->di_tv);
 	    }
 	}
     }
 
-    int idx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = 0;
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(l, li)
     {
-	if (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != NULL)
+	ଯଦି (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != ଖାଲି)
 	{
 	    char_u *str = li->li_tv.vval.v_string;
-	    if (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
+	    ଯଦି (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
 								FALSE) == FAIL)
-		goto cleanup;
+		ଯାଅ cleanup;
 	}
 	idx++;
     }
@@ -10757,113 +10757,113 @@ theend:
 /*
  * "matchstrpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_matchstrpos(typval_T *argvars, typval_T *rettv)
 {
     find_some_match(argvars, rettv, MATCH_POS);
 }
 
-    static void
-max_min(typval_T *argvars, typval_T *rettv, int domax)
+    ସ୍ଥିର ଶୂନ୍ୟ
+max_min(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା domax)
 {
     varnumber_T	n = 0;
 
-    if (in_vim9script() &&
+    ଯଦି (in_vim9script() &&
 	    check_for_list_or_tuple_or_dict_arg(argvars, 0) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ସଂଖ୍ୟା = 0;
 
-    if (argvars[0].v_type == VAR_LIST)
+    ଯଦି (argvars[0].v_type == VAR_LIST)
     {
 	list_T		*l;
 	listitem_T	*li;
-	typval_T	*tv = NULL;
+	typval_T	*tv = ଖାଲି;
 
 	l = argvars[0].vval.v_list;
-	if (l != NULL && l->lv_len > 0)
+	ଯଦି (l != ଖାଲି && l->lv_len > 0)
 	{
-	    if (l->lv_first == &range_list_item)
+	    ଯଦି (l->lv_first == &range_list_item)
 	    {
-		if ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
+		ଯଦି ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
 		    n = l->lv_u.nonmat.lv_start;
-		else
+		ଅନ୍ୟଥା
 		    n = l->lv_u.nonmat.lv_start + ((varnumber_T)l->lv_len - 1)
 						    * l->lv_u.nonmat.lv_stride;
-		rettv->vval.v_number = n;
+		rettv->vval.v_ସଂଖ୍ୟା = n;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		FOR_ALL_LIST_ITEMS(l, li)
+		FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(l, li)
 		{
-		    if (tv == NULL)
+		    ଯଦି (tv == ଖାଲି)
 			tv = &li->li_tv;
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			int res;
-			if (typval_compare2(&li->li_tv, tv,
-				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା res;
+			ଯଦି (typval_compare2(&li->li_tv, tv,
+				domax ? ପଦସମଷ୍ଟି_GREATER : ପଦସମଷ୍ଟି_SMALLER, FALSE, &res) == FAIL)
+			    ଫେରନ୍ତୁ;
+			ଯଦି (res == OK)
 			    tv = &li->li_tv;
 		    }
 		}
 
-		if (tv != NULL)
+		ଯଦି (tv != ଖାଲି)
 		    copy_tv(tv, rettv);
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
     {
 	typval_T *tv;
 
 	tv = tuple_max_min(argvars[0].vval.v_tuple, domax);
-	if (tv != NULL)
+	ଯଦି (tv != ଖାଲି)
 	    copy_tv(tv, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_DICT)
     {
 	dict_T		*d;
 	hashitem_T	*hi;
-	int		todo;
-	typval_T	*tv = NULL;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
+	typval_T	*tv = ଖାଲି;
 
 	d = argvars[0].vval.v_dict;
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	{
-	    todo = (int)d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+	    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		ଯଦି (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
-		    if (tv == NULL)
+		    ଯଦି (tv == ଖାଲି)
 			tv = &HI2DI(hi)->di_tv;
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			int res;
-			if (typval_compare2(&HI2DI(hi)->di_tv, tv,
-				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା res;
+			ଯଦି (typval_compare2(&HI2DI(hi)->di_tv, tv,
+				domax ? ପଦସମଷ୍ଟି_GREATER : ପଦସମଷ୍ଟି_SMALLER, FALSE, &res) == FAIL)
+			    ଫେରନ୍ତୁ;
+			ଯଦି (res == OK)
 			    tv = &HI2DI(hi)->di_tv;
 		    }
 		}
 	    }
 	}
 
-	if (tv != NULL)
+	ଯଦି (tv != ଖାଲି)
 	    copy_tv(tv, rettv);
     }
-    else
+    ଅନ୍ୟଥା
 	semsg(_(e_argument_of_str_must_be_list_or_dictionary), domax ? "max()" : "min()");
 }
 
 /*
  * "max()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_max(typval_T *argvars, typval_T *rettv)
 {
     max_min(argvars, rettv, TRUE);
@@ -10872,33 +10872,33 @@ f_max(typval_T *argvars, typval_T *rettv)
 /*
  * "min()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_min(typval_T *argvars, typval_T *rettv)
 {
     max_min(argvars, rettv, FALSE);
 }
 
-#if defined(FEAT_MZSCHEME)
+#ଯଦି defined(FEAT_MZSCHEME)
 /*
  * "mzeval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_mzeval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_mzeval(str, rettv);
 }
 
-    void
+    ଶୂନ୍ୟ
 mzscheme_call_vim(char_u *name, typval_T *args, typval_T *rettv)
 {
     typval_T argvars[3];
@@ -10915,99 +10915,99 @@ mzscheme_call_vim(char_u *name, typval_T *args, typval_T *rettv)
 /*
  * "nextnonblank()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_nextnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    for (lnum = tv_get_lnum(argvars); ; ++lnum)
+    ପାଇଁ (lnum = tv_get_lnum(argvars); ; ++lnum)
     {
-	if (lnum < 0 || lnum > curbuf->b_ml.ml_line_count)
+	ଯଦି (lnum < 0 || lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 	{
 	    lnum = 0;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
-	if (*skipwhite(ml_get(lnum)) != NUL)
-	    break;
+	ଯଦି (*skipwhite(ml_get(lnum)) != NUL)
+	    ଭାଙ୍ଗ;
     }
-    rettv->vval.v_number = lnum;
+    rettv->vval.v_ସଂଖ୍ୟା = lnum;
 }
 
 
 /*
  * "ngettext()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_ngettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-    char *prev = NULL;
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+    ଅକ୍ଷର *prev = ଖାଲି;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    ଯଦି (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_nonempty_string_arg(argvars, 1) == FAIL
-	|| check_for_number_arg(argvars, 2) == FAIL
+	|| check_for_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 	|| check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[3].v_type == VAR_STRING &&
-	    argvars[3].vval.v_string != NULL &&
+    ଯଦି (argvars[3].v_type == VAR_STRING &&
+	    argvars[3].vval.v_string != ଖାଲି &&
 	    *(argvars[3].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	prev = bind_textdomain_codeset((const char *)argvars[3].vval.v_string, (char *)p_enc);
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	prev = bind_textdomain_codeset((ଅଚଳ ଅକ୍ଷର *)argvars[3].vval.v_string, (ଅକ୍ଷର *)p_enc);
 #endif
 
-#if defined(HAVE_DNGETTEXT)
-	rettv->vval.v_string = vim_strsave((char_u *)dngettext((const char *)argvars[3].vval.v_string, (const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, (int)argvars[2].vval.v_number));
-#else
-	textdomain((const char *)argvars[3].vval.v_string);
-	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
+#ଯଦି defined(HAVE_DNGETTEXT)
+	rettv->vval.v_string = vim_strsave((char_u *)dngettext((ଅଚଳ ଅକ୍ଷର *)argvars[3].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)argvars[2].vval.v_ସଂଖ୍ୟା));
+#ଅନ୍ୟଥା
+	textdomain((ଅଚଳ ଅକ୍ଷର *)argvars[3].vval.v_string);
+	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, argvars[2].vval.v_ସଂଖ୍ୟା));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
-	    bind_textdomain_codeset((const char *)argvars[3].vval.v_string, prev);
+#ଯଦି defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	ଯଦି (prev != ଖାଲି)
+	    bind_textdomain_codeset((ଅଚଳ ଅକ୍ଷର *)argvars[3].vval.v_string, prev);
 #endif
     }
-    else
-	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
+    ଅନ୍ୟଥା
+	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((ଅଚଳ ଅକ୍ଷର *)argvars[0].vval.v_string, (ଅଚଳ ଅକ୍ଷର *)argvars[1].vval.v_string, argvars[2].vval.v_ସଂଖ୍ୟା));
 }
 
 
 /*
  * "nr2char()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_nr2char(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (has_mbyte)
+    ଯଦି (has_mbyte)
     {
-	int	utf8 = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
-	if (utf8)
-	    buf[utf_char2bytes((int)tv_get_number(&argvars[0]), buf)] = NUL;
-	else
-	    buf[(*mb_char2bytes)((int)tv_get_number(&argvars[0]), buf)] = NUL;
+	ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], ଖାଲି);
+	ଯଦି (utf8)
+	    buf[utf_char2bytes((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]), buf)] = NUL;
+	ଅନ୍ୟଥା
+	    buf[(*mb_char2bytes)((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]), buf)] = NUL;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	buf[0] = (char_u)tv_get_number(&argvars[0]);
+	buf[0] = (char_u)tv_get_ସଂଖ୍ୟା(&argvars[0]);
 	buf[1] = NUL;
     }
     rettv->v_type = VAR_STRING;
@@ -11017,33 +11017,33 @@ f_nr2char(typval_T *argvars, typval_T *rettv)
 /*
  * "or(expr, expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_or(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
-					| tv_get_number_chk(&argvars[1], NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି)
+					| tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
 }
 
 #ifdef FEAT_PERL
 /*
  * "perleval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_perleval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_perleval(str, rettv);
@@ -11053,58 +11053,58 @@ f_perleval(typval_T *argvars, typval_T *rettv)
 /*
  * "prevnonblank()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_prevnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
+    ଯଦି (lnum < 1 || lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 	lnum = 0;
-    else
-	while (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
+    ଅନ୍ୟଥା
+	ଯେତେବେଳେ (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
 	    --lnum;
-    rettv->vval.v_number = lnum;
+    rettv->vval.v_ସଂଖ୍ୟା = lnum;
 }
 
 // This dummy va_list is here because:
 // - passing a NULL pointer doesn't work when va_list isn't a pointer
 // - locally in the function results in a "used before set" warning
 // - using va_start() to initialize it gives "function with fixed args" error
-static va_list	ap;
+ସ୍ଥିର va_list	ap;
 
 /*
  * "printf()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_printf(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
     char_u	*s;
-    int		saved_did_emsg = did_emsg;
-    char	*fmt;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		saved_did_emsg = did_emsg;
+    ଅକ୍ଷର	*fmt;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (in_vim9script() && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_or_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     // Get the required length, allocate the buffer and do it for real.
     did_emsg = FALSE;
-    fmt = (char *)tv_get_string_buf(&argvars[0], buf);
-    len = vim_vsnprintf_typval(NULL, 0, fmt, ap, argvars + 1);
-    if (!did_emsg)
+    fmt = (ଅକ୍ଷର *)tv_get_string_buf(&argvars[0], buf);
+    len = vim_vsnprintf_typval(ଖାଲି, 0, fmt, ap, argvars + 1);
+    ଯଦି (!did_emsg)
     {
 	s = alloc(len + 1);
-	if (s != NULL)
+	ଯଦି (s != ଖାଲି)
 	{
 	    rettv->vval.v_string = s;
-	    (void)vim_vsnprintf_typval((char *)s, len + 1, fmt,
+	    (ଶୂନ୍ୟ)vim_vsnprintf_typval((ଅକ୍ଷର *)s, len + 1, fmt,
 							      ap, argvars + 1);
 	}
     }
@@ -11114,58 +11114,58 @@ f_printf(typval_T *argvars, typval_T *rettv)
 /*
  * "pum_getpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_pum_getpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
     pum_set_event_info(rettv->vval.v_dict);
 }
 
 /*
  * "pumvisible()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_pumvisible(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (pum_visible())
-	rettv->vval.v_number = 1;
+    ଯଦି (pum_visible())
+	rettv->vval.v_ସଂଖ୍ୟା = 1;
 }
 
 #ifdef FEAT_PYTHON3
 /*
  * "py3eval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_py3eval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (p_pyx == 0)
+    ଯଦି (p_pyx == 0)
 	p_pyx = 3;
 
-    if (argvars[1].v_type == VAR_DICT)
+    ଯଦି (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    ଅନ୍ୟଥା ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg(_(e_dictionary_required));
-	return;
+	ଫେରନ୍ତୁ;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	locals = NULL;
+	locals = ଖାଲି;
     }
 
     str = tv_get_string_buf(&argvars[0], buf);
@@ -11177,36 +11177,36 @@ f_py3eval(typval_T *argvars, typval_T *rettv)
 /*
  * "pyeval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_pyeval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && (
+    ଯଦି (in_vim9script() && (
 	    check_for_string_arg(argvars, 0) == FAIL ||
 	    check_for_opt_dict_arg(argvars, 1) == FAIL ) )
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (p_pyx == 0)
+    ଯଦି (p_pyx == 0)
 	p_pyx = 2;
 
-    if (argvars[1].v_type == VAR_DICT)
+    ଯଦି (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    ଅନ୍ୟଥା ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg( "Invalid argument: must be dict" );
-	return;
+	ଫେରନ୍ତୁ;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	locals = NULL;
+	locals = ଖାଲି;
     }
 
     str = tv_get_string_buf(&argvars[0], buf);
@@ -11214,26 +11214,26 @@ f_pyeval(typval_T *argvars, typval_T *rettv)
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * "pyxeval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_pyxeval(typval_T *argvars, typval_T *rettv)
 {
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# ଯଦି defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    ଯଦି (p_pyx == 2)
 	f_pyeval(argvars, rettv);
-    else
+    ଅନ୍ୟଥା
 	f_py3eval(argvars, rettv);
 # elif defined(FEAT_PYTHON)
     f_pyeval(argvars, rettv);
@@ -11243,65 +11243,65 @@ f_pyxeval(typval_T *argvars, typval_T *rettv)
 }
 #endif
 
-static UINT32_T srand_seed_for_testing = 0;
-static int	srand_seed_for_testing_is_used = FALSE;
+ସ୍ଥିର UINT32_T srand_seed_for_testing = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	srand_seed_for_testing_is_used = FALSE;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_test_srand_seed(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
 	srand_seed_for_testing_is_used = FALSE;
-    else
+    ଅନ୍ୟଥା
     {
-	srand_seed_for_testing = (UINT32_T)tv_get_number(&argvars[0]);
+	srand_seed_for_testing = (UINT32_T)tv_get_ସଂଖ୍ୟା(&argvars[0]);
 	srand_seed_for_testing_is_used = TRUE;
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 init_srand(UINT32_T *x)
 {
-    struct {
-	union {
-	    UINT32_T number;
-	    char_u   bytes[sizeof(UINT32_T)];
+    ସଂରଚନା {
+	ସଂଘ {
+	    UINT32_T ସଂଖ୍ୟା;
+	    char_u   bytes[ଆକାର(UINT32_T)];
 	} contents;
     } buf;
 
-    if (srand_seed_for_testing_is_used)
+    ଯଦି (srand_seed_for_testing_is_used)
     {
 	*x = srand_seed_for_testing;
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (mch_get_random(buf.contents.bytes, sizeof(buf.contents.bytes)) == OK)
+    ଯଦି (mch_get_random(buf.contents.bytes, ଆକାର(buf.contents.bytes)) == OK)
     {
-	*x = buf.contents.number;
-	return;
+	*x = buf.contents.ସଂଖ୍ୟା;
+	ଫେରନ୍ତୁ;
     }
 
     // The system's random number generator doesn't work, fall back to:
     // - randombytes_random()
     // - reltime() or time()
     // - XOR with process ID
-#if defined(FEAT_SODIUM)
-    if (crypt_sodium_init() >= 0)
+#ଯଦି defined(FEAT_SODIUM)
+    ଯଦି (crypt_sodium_init() >= 0)
 	*x = crypt_sodium_randombytes_random();
-    else
+    ଅନ୍ୟଥା
 #endif
     {
-#if defined(FEAT_RELTIME)
+#ଯଦି defined(FEAT_RELTIME)
 	proftime_T res;
 	profile_start(&res);
-# if defined(MSWIN)
-	*x = (UINT32_T)res.LowPart;
-# else
+# ଯଦି defined(MSWIN)
+	*x = (UINT32_T)res.ତଳ_Part;
+# ଅନ୍ୟଥା
 	*x = (UINT32_T)res.tv_fsec;
 # endif
-#else
+#ଅନ୍ୟଥା
 	*x = vim_time();
 #endif
 	*x ^= mch_get_pid();
@@ -11327,22 +11327,22 @@ init_srand(UINT32_T *x)
 /*
  * "rand()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_rand(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*l = NULL;
-    static UINT32_T	gx, gy, gz, gw;
-    static int	initialized = FALSE;
+    list_T	*l = ଖାଲି;
+    ସ୍ଥିର UINT32_T	gx, gy, gz, gw;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	initialized = FALSE;
     listitem_T	*lx, *ly, *lz, *lw;
     UINT32_T	x = 0, y, z, w, t, result;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// When no argument is given use the global seed list.
-	if (initialized == FALSE)
+	ଯଦି (initialized == FALSE)
 	{
 	    // Initialize the global seed list.
 	    init_srand(&x);
@@ -11356,79 +11356,79 @@ f_rand(typval_T *argvars, typval_T *rettv)
 
 	SHUFFLE_XOSHIRO128STARSTAR(gx, gy, gz, gw);
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_LIST)
     {
 	l = argvars[0].vval.v_list;
-	if (l == NULL || list_len(l) != 4)
-	    goto theend;
+	ଯଦି (l == ଖାଲି || list_len(l) != 4)
+	    ଯାଅ theend;
 
 	lx = list_find(l, 0L);
 	ly = list_find(l, 1L);
 	lz = list_find(l, 2L);
 	lw = list_find(l, 3L);
-	if (lx == NULL || ly == NULL || lz == NULL || lw == NULL)
-	    goto theend;
-	if (lx->li_tv.v_type != VAR_NUMBER
-		|| ly->li_tv.v_type != VAR_NUMBER
-		|| lz->li_tv.v_type != VAR_NUMBER
-		|| lw->li_tv.v_type != VAR_NUMBER)
-	    goto theend;
-	x = (UINT32_T)lx->li_tv.vval.v_number;
-	y = (UINT32_T)ly->li_tv.vval.v_number;
-	z = (UINT32_T)lz->li_tv.vval.v_number;
-	w = (UINT32_T)lw->li_tv.vval.v_number;
+	ଯଦି (lx == ଖାଲି || ly == ଖାଲି || lz == ଖାଲି || lw == ଖାଲି)
+	    ଯାଅ theend;
+	ଯଦି (lx->li_tv.v_type != VAR_ସଂଖ୍ୟା
+		|| ly->li_tv.v_type != VAR_ସଂଖ୍ୟା
+		|| lz->li_tv.v_type != VAR_ସଂଖ୍ୟା
+		|| lw->li_tv.v_type != VAR_ସଂଖ୍ୟା)
+	    ଯାଅ theend;
+	x = (UINT32_T)lx->li_tv.vval.v_ସଂଖ୍ୟା;
+	y = (UINT32_T)ly->li_tv.vval.v_ସଂଖ୍ୟା;
+	z = (UINT32_T)lz->li_tv.vval.v_ସଂଖ୍ୟା;
+	w = (UINT32_T)lw->li_tv.vval.v_ସଂଖ୍ୟା;
 
 	SHUFFLE_XOSHIRO128STARSTAR(x, y, z, w);
 
-	lx->li_tv.vval.v_number = (varnumber_T)x;
-	ly->li_tv.vval.v_number = (varnumber_T)y;
-	lz->li_tv.vval.v_number = (varnumber_T)z;
-	lw->li_tv.vval.v_number = (varnumber_T)w;
+	lx->li_tv.vval.v_ସଂଖ୍ୟା = (varnumber_T)x;
+	ly->li_tv.vval.v_ସଂଖ୍ୟା = (varnumber_T)y;
+	lz->li_tv.vval.v_ସଂଖ୍ୟା = (varnumber_T)z;
+	lw->li_tv.vval.v_ସଂଖ୍ୟା = (varnumber_T)w;
     }
-    else
-	goto theend;
+    ଅନ୍ୟଥା
+	ଯାଅ theend;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = (varnumber_T)result;
-    return;
+    rettv->v_type = VAR_ସଂଖ୍ୟା;
+    rettv->vval.v_ସଂଖ୍ୟା = (varnumber_T)result;
+    ଫେରନ୍ତୁ;
 
 theend:
     semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = -1;
+    rettv->v_type = VAR_ସଂଖ୍ୟା;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 }
 
 /*
  * "srand()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_srand(typval_T *argvars, typval_T *rettv)
 {
     UINT32_T x = 0, z;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
     {
 	init_srand(&x);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	int	    error = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    error = FALSE;
 
-	x = (UINT32_T)tv_get_number_chk(&argvars[0], &error);
-	if (error)
-	    return;
+	x = (UINT32_T)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], &error);
+	ଯଦି (error)
+	    ଫେରନ୍ତୁ;
     }
 
-    list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
-    list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
-    list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
-    list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
 }
 
 #undef ROTL
@@ -11438,58 +11438,58 @@ f_srand(typval_T *argvars, typval_T *rettv)
 /*
  * "range()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_range(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	start;
     varnumber_T	end;
     varnumber_T	stride = 1;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL)))
+	ଫେରନ୍ତୁ;
 
-    start = tv_get_number_chk(&argvars[0], &error);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    start = tv_get_ସଂଖ୍ୟା_chk(&argvars[0], &error);
+    ଯଦି (argvars[1].v_type == VAR_UNKNOWN)
     {
 	end = start - 1;
 	start = 0;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	end = tv_get_number_chk(&argvars[1], &error);
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    stride = tv_get_number_chk(&argvars[2], &error);
+	end = tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &error);
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
+	    stride = tv_get_ସଂଖ୍ୟା_chk(&argvars[2], &error);
     }
 
-    if (error)
-	return;		// type error; errmsg already given
-    if (stride == 0)
+    ଯଦି (error)
+	ଫେରନ୍ତୁ;		// type error; errmsg already given
+    ଯଦି (stride == 0)
     {
 	emsg(_(e_stride_is_zero));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // The stride is stored in "lv_stride", which is an int.
-    if (stride < INT_MIN || stride > INT_MAX)
+    ଯଦି (stride < INT_MIN || stride > INT_MAX)
     {
-	char	buf[NUMBUFLEN];
+	ଅକ୍ଷର	buf[NUMBUFLEN];
 
-	vim_snprintf(buf, sizeof(buf), "%lld", stride);
+	vim_snprintf(buf, ଆକାର(buf), "%lld", stride);
 	semsg(_(e_val_too_large), buf);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     uvarnumber_T	len;
 
-    if (stride > 0 ? end < start : end > start)
+    ଯଦି (stride > 0 ? end < start : end > start)
     {
 	// One step before the start gives an empty list, further away is
 	// an error.  Subtract unsigned to avoid an overflow.
@@ -11497,33 +11497,33 @@ f_range(typval_T *argvars, typval_T *rettv)
 				  ? (uvarnumber_T)start - (uvarnumber_T)end
 				  : (uvarnumber_T)end - (uvarnumber_T)start;
 
-	if (back > 1)
+	ଯଦି (back > 1)
 	{
 	    emsg(_(e_start_past_end));
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 	len = 0;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	varnumber_T	astride = stride > 0 ? stride : -stride;
 	uvarnumber_T	span = stride > 0
 				  ? (uvarnumber_T)end - (uvarnumber_T)start
 				  : (uvarnumber_T)start - (uvarnumber_T)end;
-	uvarnumber_T	count = span / (uvarnumber_T)astride;
+	uvarnumber_T	ଗଣନା_2 = span / (uvarnumber_T)astride;
 
 	// The number of items is "count" + 1 and must fit in "lv_len".
-	if (count >= (uvarnumber_T)INT_MAX)
+	ଯଦି (ଗଣନା_2 >= (uvarnumber_T)INT_MAX)
 	{
-	    char	buf[NUMBUFLEN];
+	    ଅକ୍ଷର	buf[NUMBUFLEN];
 
 	    // "count + 1" can wrap around.
-	    vim_snprintf(buf, sizeof(buf), "%llu",
-			      count < UVARNUM_MAX ? count + 1 : UVARNUM_MAX);
+	    vim_snprintf(buf, ଆକାର(buf), "%llu",
+			      ଗଣନା_2 < UVARNUM_MAX ? ଗଣନା_2 + 1 : UVARNUM_MAX);
 	    semsg(_(e_val_too_large), buf);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	len = count + 1;
+	len = ଗଣନା_2 + 1;
     }
 
     list_T *list = rettv->vval.v_list;
@@ -11534,113 +11534,113 @@ f_range(typval_T *argvars, typval_T *rettv)
     list->lv_first = &range_list_item;
     list->lv_u.nonmat.lv_start = start;
     list->lv_u.nonmat.lv_end = end;
-    list->lv_u.nonmat.lv_stride = (int)stride;
-    list->lv_len = (int)len;
+    list->lv_u.nonmat.lv_stride = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)stride;
+    list->lv_len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)len;
 }
 
 /*
  * Materialize "list".
  * Do not call directly, use CHECK_LIST_MATERIALIZE()
  */
-    void
+    ଶୂନ୍ୟ
 range_list_materialize(list_T *list)
 {
     varnumber_T start = list->lv_u.nonmat.lv_start;
     varnumber_T end = list->lv_u.nonmat.lv_end;
-    int		stride = list->lv_u.nonmat.lv_stride;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		stride = list->lv_u.nonmat.lv_stride;
     varnumber_T i;
 
-    list->lv_first = NULL;
-    list->lv_u.mat.lv_last = NULL;
+    list->lv_first = ଖାଲି;
+    list->lv_u.mat.lv_last = ଖାଲି;
     list->lv_len = 0;
-    list->lv_u.mat.lv_idx_item = NULL;
-    for (i = start; stride > 0 ? i <= end : i >= end; i += stride)
+    list->lv_u.mat.lv_idx_item = ଖାଲି;
+    ପାଇଁ (i = start; stride > 0 ? i <= end : i >= end; i += stride)
     {
-	if (list_append_number(list, i) == FAIL)
-	    break;
-	if (list->lv_lock & VAR_ITEMS_LOCKED)
+	ଯଦି (list_append_ସଂଖ୍ୟା(list, i) == FAIL)
+	    ଭାଙ୍ଗ;
+	ଯଦି (list->lv_lock & VAR_ବସ୍ତୁଗୁଡ଼ିକ_LOCKED)
 	    list->lv_u.mat.lv_last->li_tv.v_lock = VAR_LOCKED;
     }
-    list->lv_lock &= ~VAR_ITEMS_LOCKED;
+    list->lv_lock &= ~VAR_ବସ୍ତୁଗୁଡ଼ିକ_LOCKED;
 }
 
 /*
  * "getreginfo()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_getreginfo(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		regname;
     char_u	buf[NUMBUFLEN + 2];
     size_t	buflen;
     long	reglen = 0;
     dict_T	*dict;
     list_T	*list;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    ଯଦି (regname == 0)
+	ଫେରନ୍ତୁ;
 
-    if (regname == '@')
+    ଯଦି (regname == '@')
 	regname = '"';
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
     dict = rettv->vval.v_dict;
 
-    list = (list_T *)get_reg_contents(regname, GREG_EXPR_SRC | GREG_LIST);
-    if (list == NULL)
-	return;
-    if (dict_add_list(dict, "regcontents", list) == FAIL)
+    list = (list_T *)get_reg_contents(regname, GREG_ପଦସମଷ୍ଟି_SRC | GREG_LIST);
+    ଯଦି (list == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (dict_add_list(dict, "regcontents", list) == FAIL)
 	list_unref(list);
 
-    switch (get_reg_type(regname, &reglen))
+    ବାଛ (get_reg_type(regname, &reglen))
     {
-	case MLINE:
+	ସ୍ଥିତି MLINE:
 	    buf[0] = 'V';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MCHAR:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି MCHAR:
 	    buf[0] = 'v';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MBLOCK:
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି MBLOCK:
+	    buflen = vim_snprintf_safelen((ଅକ୍ଷର *)buf, ଆକାର(buf),
 		"%c%ld", Ctrl_V, reglen + 1);
-	    break;
-	default:
+	    ଭାଙ୍ଗ;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 	    buf[0] = NUL;
 	    buflen = 0;
-	    break;
+	    ଭାଙ୍ଗ;
     }
-    (void)dict_add_string_len(dict, (char *)"regtype", buf, (int)buflen);
+    (ଶୂନ୍ୟ)dict_add_string_len(dict, (ଅକ୍ଷର *)"regtype", buf, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)buflen);
 
     buf[0] = get_register_name(get_unname_register());
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    if (regname == '"')
-	(void)dict_add_string_len(dict, (char *)"points_to", buf, (int)buflen);
-    else
+    ଯଦି (regname == '"')
+	(ଶୂନ୍ୟ)dict_add_string_len(dict, (ଅକ୍ଷର *)"points_to", buf, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)buflen);
+    ଅନ୍ୟଥା
     {
 	dictitem_T	*item = dictitem_alloc((char_u *)"isunnamed");
 
-	if (item != NULL)
+	ଯଦି (item != ଖାଲି)
 	{
 	    item->di_tv.v_type = VAR_BOOL;
-	    item->di_tv.vval.v_number = regname == buf[0]
+	    item->di_tv.vval.v_ସଂଖ୍ୟା = regname == buf[0]
 						      ? VVAL_TRUE : VVAL_FALSE;
-	    (void)dict_add(dict, item);
+	    (ଶୂନ୍ୟ)dict_add(dict, item);
 	}
     }
 }
 
-    static void
-return_register(int regname, typval_T *rettv)
+    ସ୍ଥିର ଶୂନ୍ୟ
+return_register(ପୂର୍ଣ୍ଣସଂଖ୍ୟା regname, typval_T *rettv)
 {
     char_u buf[2] = {NUL, NUL};
 
@@ -11652,7 +11652,7 @@ return_register(int regname, typval_T *rettv)
 /*
  * "reg_executing()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_reg_executing(typval_T *argvars UNUSED, typval_T *rettv)
 {
     return_register(reg_executing, rettv);
@@ -11661,7 +11661,7 @@ f_reg_executing(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "reg_recording()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_reg_recording(typval_T *argvars UNUSED, typval_T *rettv)
 {
     return_register(reg_recording, rettv);
@@ -11670,83 +11670,83 @@ f_reg_recording(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "rename({from}, {to})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_rename(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = vim_rename(tv_get_string(&argvars[0]),
+    rettv->vval.v_ସଂଖ୍ୟା = vim_rename(tv_get_string(&argvars[0]),
 				      tv_get_string_buf(&argvars[1], buf));
 }
 
 /*
  * Repeat the list "l" "n" times and set "rettv" to the new list.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 repeat_list(list_T *l, varnumber_T n, typval_T *rettv)
 {
-    int slen = list_len(l);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା slen = list_len(l);
 
-    if (rettv_list_alloc(rettv) == FAIL
-	    || l == NULL
+    ଯଦି (rettv_list_alloc(rettv) == FAIL
+	    || l == ଖାଲି
 	    || n <= 0
 	    || slen == 0)
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
+    ଯଦି (check_repeat_ଗଣନା(slen, n) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    while (n-- > 0)
-	if (list_extend(rettv->vval.v_list, l, NULL) == FAIL)
-	    break;
+    ଯେତେବେଳେ (n-- > 0)
+	ଯଦି (list_extend(rettv->vval.v_list, l, ଖାଲି) == FAIL)
+	    ଭାଙ୍ଗ;
 }
 
 /*
  * Repeat the blob "b" "n" times and set "rettv" to the new blob.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 repeat_blob(typval_T *blob_tv, varnumber_T n, typval_T *rettv)
 {
-    int		slen;
-    int		len;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		slen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     blob_T	*blob = blob_tv->vval.v_blob;
 
-    if (rettv_blob_alloc(rettv) == FAIL
-	    || blob == NULL
+    ଯଦି (rettv_blob_alloc(rettv) == FAIL
+	    || blob == ଖାଲି
 	    || n <= 0)
-	return;
+	ଫେରନ୍ତୁ;
 
     slen = blob->bv_ga.ga_len;
-    if (slen <= 0)
-	return;
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
-    len = slen * (int)n;
+    ଯଦି (slen <= 0)
+	ଫେରନ୍ତୁ;
+    ଯଦି (check_repeat_ଗଣନା(slen, n) == FAIL)
+	ଫେରନ୍ତୁ;
+    len = slen * (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)n;
 
-    if (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
-	return;
+    ଯଦି (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->vval.v_blob->bv_ga.ga_len = len;
 
-    for (i = 0; i < slen; ++i)
-	if (blob_get(blob, i) != 0)
-	    break;
+    ପାଇଁ (i = 0; i < slen; ++i)
+	ଯଦି (blob_get(blob, i) != 0)
+	    ଭାଙ୍ଗ;
 
-    if (i == slen)
+    ଯଦି (i == slen)
 	// No need to copy since all bytes are already zero
-	return;
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; i < (int)n; ++i)
+    ପାଇଁ (i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)n; ++i)
 	blob_set_range(rettv->vval.v_blob,
 		(long)i * slen, ((long)i + 1) * slen - 1, blob_tv);
 }
@@ -11754,37 +11754,37 @@ repeat_blob(typval_T *blob_tv, varnumber_T n, typval_T *rettv)
 /*
  * Repeat the string "str" "n" times and set "rettv" to the new string.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 repeat_string(typval_T *str_tv, varnumber_T n, typval_T *rettv)
 {
     char_u	*p;
     size_t	slen;
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
     char_u	*r;
-    int		done;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		done;
 
     p = tv_get_string(str_tv);
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
     slen = STRLEN(p);
-    if (slen == 0 || n <= 0)
-	return;
-    if (check_repeat_count((varnumber_T)slen, n) == FAIL)
-	return;
-    len = (int)slen * (int)n;
+    ଯଦି (slen == 0 || n <= 0)
+	ଫେରନ୍ତୁ;
+    ଯଦି (check_repeat_ଗଣନା((varnumber_T)slen, n) == FAIL)
+	ଫେରନ୍ତୁ;
+    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)slen * (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)n;
 
     r = alloc((size_t)len + 1);
-    if (r == NULL)
-	return;
+    ଯଦି (r == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     mch_memmove(r, p, slen);
-    done = (int)slen;
-    while (done < len)
+    done = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)slen;
+    ଯେତେବେଳେ (done < len)
     {
-	int copy_len = done;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା copy_len = done;
 
-	if (copy_len > len - done)
+	ଯଦି (copy_len > len - done)
 	    copy_len = len - done;
 	mch_memmove(r + done, r, (size_t)copy_len);
 	done += copy_len;
@@ -11797,24 +11797,24 @@ repeat_string(typval_T *str_tv, varnumber_T n, typval_T *rettv)
 /*
  * "repeat()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_repeat(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_repeat_func_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    n = tv_get_number(&argvars[1]);
-    if (argvars[0].v_type == VAR_LIST)
+    n = tv_get_ସଂଖ୍ୟା(&argvars[1]);
+    ଯଦି (argvars[0].v_type == VAR_LIST)
 	repeat_list(argvars[0].vval.v_list, n, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_TUPLE)
 	tuple_repeat(argvars[0].vval.v_tuple, n, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type == VAR_BLOB)
 	repeat_blob(&argvars[0], n, rettv);
-    else
+    ଅନ୍ୟଥା
 	repeat_string(&argvars[0], n, rettv);
 }
 
@@ -11832,114 +11832,114 @@ f_repeat(typval_T *argvars, typval_T *rettv)
  * Possibly sets "p_ws".
  * Returns BACKWARD, FORWARD or zero (for an error).
  */
-    static int
-get_search_arg(typval_T *varp, int *flagsp)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_ସନ୍ଧାନ_arg(typval_T *varp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *flagsp)
 {
-    int		dir = FORWARD;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir = FORWARD;
     char_u	*flags;
     char_u	nbuf[NUMBUFLEN];
-    int		mask;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mask;
 
-    if (varp->v_type == VAR_UNKNOWN)
-	return FORWARD;
+    ଯଦି (varp->v_type == VAR_UNKNOWN)
+	ଫେରନ୍ତୁ FORWARD;
 
     flags = tv_get_string_buf_chk(varp, nbuf);
-    if (flags == NULL)
-	return 0;		// type error; errmsg already given
-    while (*flags != NUL)
+    ଯଦି (flags == ଖାଲି)
+	ଫେରନ୍ତୁ 0;		// type error; errmsg already given
+    ଯେତେବେଳେ (*flags != NUL)
     {
-	switch (*flags)
+	ବାଛ (*flags)
 	{
-	    case 'b': dir = BACKWARD; break;
-	    case 'w': p_ws = TRUE; break;
-	    case 'W': p_ws = FALSE; break;
-	    default:  mask = 0;
-		      if (flagsp != NULL)
-			  switch (*flags)
+	    ସ୍ଥିତି 'b': dir = BACKWARD; ଭାଙ୍ଗ;
+	    ସ୍ଥିତି 'w': p_ws = TRUE; ଭାଙ୍ଗ;
+	    ସ୍ଥିତି 'W': p_ws = FALSE; ଭାଙ୍ଗ;
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:  mask = 0;
+		      ଯଦି (flagsp != ଖାଲି)
+			  ବାଛ (*flags)
 			  {
-			      case 'c': mask = SP_START; break;
-			      case 'e': mask = SP_END; break;
-			      case 'm': mask = SP_RETCOUNT; break;
-			      case 'n': mask = SP_NOMOVE; break;
-			      case 'p': mask = SP_SUBPAT; break;
-			      case 'r': mask = SP_REPEAT; break;
-			      case 's': mask = SP_SETPCMARK; break;
-			      case 'z': mask = SP_COLUMN; break;
+			      ସ୍ଥିତି 'c': mask = SP_START; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'e': mask = SP_END; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'm': mask = SP_RETCOUNT; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'n': mask = SP_NOMOVE; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'p': mask = SP_SUBPAT; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'r': mask = SP_REPEAT; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 's': mask = SP_SETPCMARK; ଭାଙ୍ଗ;
+			      ସ୍ଥିତି 'z': mask = SP_COLUMN; ଭାଙ୍ଗ;
 			  }
-		      if (mask == 0)
+		      ଯଦି (mask == 0)
 		      {
 			  semsg(_(e_invalid_argument_str), flags);
 			  dir = 0;
 		      }
-		      else
+		      ଅନ୍ୟଥା
 			  *flagsp |= mask;
 	}
-	if (dir == 0)
-	    break;
+	ଯଦି (dir == 0)
+	    ଭାଙ୍ଗ;
 	++flags;
     }
-    return dir;
+    ଫେରନ୍ତୁ dir;
 }
 
 /*
  * Shared by search() and searchpos() functions.
  */
-    static int
-search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ସନ୍ଧାନ_cmn(typval_T *argvars, pos_T *match_pos, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *flagsp)
 {
-    int		flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags;
     char_u	*pat;
     size_t	patlen;
     pos_T	pos;
     pos_T	save_cursor;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		retval = 0;	// default: FAIL
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_p_ws = p_ws;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retval = 0;	// default: FAIL
     long	lnum_stop = 0;
 #ifdef FEAT_RELTIME
     long	time_limit = 0;
 #endif
-    int		options = SEARCH_KEEP;
-    int		subpatnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options = ସନ୍ଧାନ_KEEP;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		subpatnum;
     searchit_arg_T sia;
-    int		use_skip = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		use_skip = FALSE;
     pos_T	firstpos;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 2) == FAIL
+		    && (check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL
 			|| (argvars[2].v_type != VAR_UNKNOWN
-			    && check_for_opt_number_arg(argvars, 3) == FAIL)))))
-	goto theend;
+			    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 3) == FAIL)))))
+	ଯାଅ theend;
 
     pat = tv_get_string(&argvars[0]);
-    dir = get_search_arg(&argvars[1], flagsp);	// may set p_ws
-    if (dir == 0)
-	goto theend;
+    dir = get_ସନ୍ଧାନ_arg(&argvars[1], flagsp);	// may set p_ws
+    ଯଦି (dir == 0)
+	ଯାଅ theend;
     flags = *flagsp;
-    if (flags & SP_START)
-	options |= SEARCH_START;
-    if (flags & SP_END)
-	options |= SEARCH_END;
-    if (flags & SP_COLUMN)
-	options |= SEARCH_COL;
+    ଯଦି (flags & SP_START)
+	options |= ସନ୍ଧାନ_START;
+    ଯଦି (flags & SP_END)
+	options |= ସନ୍ଧାନ_END;
+    ଯଦି (flags & SP_COLUMN)
+	options |= ସନ୍ଧାନ_COL;
 
     // Optional arguments: line number to stop searching, timeout and skip.
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
-	lnum_stop = (long)tv_get_number_chk(&argvars[2], NULL);
-	if (lnum_stop < 0)
-	    goto theend;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	lnum_stop = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[2], ଖାଲି);
+	ଯଦି (lnum_stop < 0)
+	    ଯାଅ theend;
+	ଯଦି (argvars[3].v_type != VAR_UNKNOWN)
 	{
 #ifdef FEAT_RELTIME
-	    time_limit = (long)tv_get_number_chk(&argvars[3], NULL);
-	    if (time_limit < 0)
-		goto theend;
+	    time_limit = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[3], ଖାଲି);
+	    ଯଦି (time_limit < 0)
+		ଯାଅ theend;
 #endif
-	    use_skip = eval_expr_valid_arg(&argvars[4]);
+	    use_skip = eval_ପଦସମଷ୍ଟି_valid_arg(&argvars[4]);
 	}
     }
 
@@ -11949,11 +11949,11 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
      * Also, Only the SP_NOMOVE or the SP_SETPCMARK flag can be set. Both
      * flags cannot be set. Check for that condition also.
      */
-    if (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
+    ଯଦି (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	goto theend;
+	ଯାଅ theend;
     }
 
     pos = save_cursor = curwin->w_cursor;
@@ -11967,55 +11967,55 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     patlen = STRLEN(pat);
 
     // Repeat until {skip} returns FALSE.
-    for (;;)
+    ପାଇଁ (;;)
     {
-	subpatnum = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
-						     options, RE_SEARCH, &sia);
+	subpatnum = searchit(curwin, curbuf, &pos, ଖାଲି, dir, pat, patlen, 1L,
+						     options, RE_ସନ୍ଧାନ, &sia);
 	// finding the first match again means there is no match where {skip}
 	// evaluates to zero.
-	if (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
+	ଯଦି (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
 	    subpatnum = FAIL;
 
-	if (subpatnum == FAIL || !use_skip)
+	ଯଦି (subpatnum == FAIL || !use_skip)
 	    // didn't find it or no skip argument
-	    break;
-	if (firstpos.lnum == 0)
+	    ଭାଙ୍ଗ;
+	ଯଦି (firstpos.lnum == 0)
 	    firstpos = pos;
 
 	// If the skip expression matches, ignore this match.
 	{
-	    int	    do_skip;
-	    int	    err;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    do_skip;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    err;
 	    pos_T   save_pos = curwin->w_cursor;
 
 	    curwin->w_cursor = pos;
 	    err = FALSE;
-	    do_skip = eval_expr_to_bool(&argvars[4], &err);
+	    do_skip = eval_ପଦସମଷ୍ଟି_to_bool(&argvars[4], &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    ଯଦି (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		subpatnum = FAIL;
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	    if (!do_skip)
-		break;
+	    ଯଦି (!do_skip)
+		ଭାଙ୍ଗ;
 	}
 
 	// clear the start flag to avoid getting stuck here
-	options &= ~SEARCH_START;
+	options &= ~ସନ୍ଧାନ_START;
     }
 
-    if (subpatnum != FAIL)
+    ଯଦି (subpatnum != FAIL)
     {
-	if (flags & SP_SUBPAT)
+	ଯଦି (flags & SP_SUBPAT)
 	    retval = subpatnum;
-	else
+	ଅନ୍ୟଥା
 	    retval = pos.lnum;
-	if (flags & SP_SETPCMARK)
+	ଯଦି (flags & SP_SETPCMARK)
 	    setpcmark();
 	curwin->w_cursor = pos;
-	if (match_pos != NULL)
+	ଯଦି (match_pos != ଖାଲି)
 	{
 	    // Store the match cursor position
 	    match_pos->lnum = pos.lnum;
@@ -12027,31 +12027,31 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     }
 
     // If 'n' flag is used: restore cursor position.
-    if (flags & SP_NOMOVE)
+    ଯଦି (flags & SP_NOMOVE)
 	curwin->w_cursor = save_cursor;
-    else
+    ଅନ୍ୟଥା
 	curwin->w_set_curswant = true;
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 #ifdef FEAT_RUBY
 /*
  * "rubyeval()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_rubyeval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_rubyeval(str, rettv);
@@ -12061,92 +12061,92 @@ f_rubyeval(typval_T *argvars, typval_T *rettv)
 /*
  * "screenattr()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screenattr(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows
+    row = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି) - 1;
+    col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି) - 1;
+    ଯଦି (row < 0 || row >= screen_Rows
 	    || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
-	c = ScreenAttrs[LineOffset[row] + col];
-    rettv->vval.v_number = c;
+    ଅନ୍ୟଥା
+	c = ScreenAttrs[ଧାଡ଼ି_Offset[row] + col];
+    rettv->vval.v_ସଂଖ୍ୟା = c;
 }
 
 /*
  * "screenchar()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screenchar(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+    row = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି) - 1;
+    col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି) - 1;
+    ଯଦି (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
+    ଅନ୍ୟଥା
     {
 	char_u buf[MB_MAXBYTES + 1];
-	screen_getbytes(row, col, buf, NULL);
+	screen_getbytes(row, col, buf, ଖାଲି);
 	c = (*mb_ptr2char)(buf);
     }
-    rettv->vval.v_number = c;
+    rettv->vval.v_ସଂଖ୍ୟା = c;
 }
 
 /*
  * "screenchars()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screenchars(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି) - 1;
+    col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି) - 1;
+    ଯଦି (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	ଫେରନ୍ତୁ;
 
     char_u buf[MB_MAXBYTES + 1];
-    screen_getbytes(row, col, buf, NULL);
-    int pcc[MAX_MCO];
-    if (enc_utf8)
+    screen_getbytes(row, col, buf, ଖାଲି);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା pcc[MAX_MCO];
+    ଯଦି (enc_utf8)
 	c = utfc_ptr2char(buf, pcc);
-    else
+    ଅନ୍ୟଥା
 	c = (*mb_ptr2char)(buf);
-    list_append_number(rettv->vval.v_list, (varnumber_T)c);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)c);
 
-    if (enc_utf8)
-	for (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
-	    list_append_number(rettv->vval.v_list, (varnumber_T)pcc[i]);
+    ଯଦି (enc_utf8)
+	ପାଇଁ (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)pcc[i]);
 }
 
 /*
@@ -12154,171 +12154,171 @@ f_screenchars(typval_T *argvars, typval_T *rettv)
  *
  * First column is 1 to be consistent with virtcol().
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screencol(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = screen_screencol() + 1;
+    rettv->vval.v_ସଂଖ୍ୟା = screen_screencol() + 1;
 }
 
 /*
  * "screenrow()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screenrow(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = screen_screenrow() + 1;
+    rettv->vval.v_ସଂଖ୍ୟା = screen_screenrow() + 1;
 }
 
 /*
  * "screenstring()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_screenstring(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col;
     char_u	buf[MB_MAXBYTES + 1];
 
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି) - 1;
+    col = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି) - 1;
+    ଯଦି (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	ଫେରନ୍ତୁ;
 
-    screen_getbytes(row, col, buf, NULL);
+    screen_getbytes(row, col, buf, ଖାଲି);
     rettv->vval.v_string = vim_strsave(buf);
 }
 
 /*
  * "search()" function
  */
-    static void
-f_search(typval_T *argvars, typval_T *rettv)
+    ସ୍ଥିର ଶୂନ୍ୟ
+f_ସନ୍ଧାନ(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags = 0;
 
-    rettv->vval.v_number = search_cmn(argvars, NULL, &flags);
+    rettv->vval.v_ସଂଖ୍ୟା = ସନ୍ଧାନ_cmn(argvars, ଖାଲି, &flags);
 }
 
 /*
  * "searchdecl()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_searchdecl(typval_T *argvars, typval_T *rettv)
 {
-    int		locally = TRUE;
-    int		thisblock = FALSE;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		locally = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		thisblock = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
     char_u	*name;
 
-    rettv->vval.v_number = 1;	// default: FAIL
+    rettv->vval.v_ସଂଖ୍ୟା = 1;	// default: FAIL
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
     name = tv_get_string_chk(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
-	locally = !(int)tv_get_bool_chk(&argvars[1], &error);
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    thisblock = (int)tv_get_bool_chk(&argvars[2], &error);
+	locally = !(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], &error);
+	ଯଦି (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    thisblock = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[2], &error);
     }
-    if (!error && name != NULL)
-	rettv->vval.v_number = find_decl(name, (int)STRLEN(name),
-				     locally, thisblock, SEARCH_KEEP) == FAIL;
+    ଯଦି (!error && name != ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = find_decl(name, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(name),
+				     locally, thisblock, ସନ୍ଧାନ_KEEP) == FAIL;
 }
 
 /*
  * Used by searchpair() and searchpairpos()
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 {
     char_u	*spat, *mpat, *epat;
     typval_T	*skip;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_p_ws = p_ws;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags = 0;
     char_u	nbuf1[NUMBUFLEN];
     char_u	nbuf2[NUMBUFLEN];
-    int		retval = 0;		// default: FAIL
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retval = 0;		// default: FAIL
     long	lnum_stop = 0;
     long	time_limit = 0;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
 		|| check_for_opt_string_arg(argvars, 3) == FAIL
 		|| (argvars[3].v_type != VAR_UNKNOWN
 		    && argvars[4].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 5) == FAIL
+		    && (check_for_opt_ସଂଖ୍ୟା_arg(argvars, 5) == FAIL
 			|| (argvars[5].v_type != VAR_UNKNOWN
-			    && check_for_opt_number_arg(argvars, 6) == FAIL)))))
-	goto theend;
+			    && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 6) == FAIL)))))
+	ଯାଅ theend;
 
     // Get the three pattern arguments: start, middle, end. Will result in an
     // error if not a valid argument.
     spat = tv_get_string_chk(&argvars[0]);
     mpat = tv_get_string_buf_chk(&argvars[1], nbuf1);
     epat = tv_get_string_buf_chk(&argvars[2], nbuf2);
-    if (spat == NULL || mpat == NULL || epat == NULL)
-	goto theend;	    // type error
+    ଯଦି (spat == ଖାଲି || mpat == ଖାଲି || epat == ଖାଲି)
+	ଯାଅ theend;	    // type error
 
     // Handle the optional fourth argument: flags
-    dir = get_search_arg(&argvars[3], &flags); // may set p_ws
-    if (dir == 0)
-	goto theend;
+    dir = get_ସନ୍ଧାନ_arg(&argvars[3], &flags); // may set p_ws
+    ଯଦି (dir == 0)
+	ଯାଅ theend;
 
     // Don't accept SP_END or SP_SUBPAT.
     // Only one of the SP_NOMOVE or SP_SETPCMARK flags can be set.
-    if ((flags & (SP_END | SP_SUBPAT)) != 0
+    ଯଦି ((flags & (SP_END | SP_SUBPAT)) != 0
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[3]));
-	goto theend;
+	ଯାଅ theend;
     }
 
     // Using 'r' implies 'W', otherwise it doesn't work.
-    if (flags & SP_REPEAT)
+    ଯଦି (flags & SP_REPEAT)
 	p_ws = FALSE;
 
     // Optional fifth argument: skip expression
-    if (argvars[3].v_type == VAR_UNKNOWN
+    ଯଦି (argvars[3].v_type == VAR_UNKNOWN
 	    || argvars[4].v_type == VAR_UNKNOWN)
-	skip = NULL;
-    else
+	skip = ଖାଲି;
+    ଅନ୍ୟଥା
     {
 	// Type is checked later.
 	skip = &argvars[4];
 
-	if (argvars[5].v_type != VAR_UNKNOWN)
+	ଯଦି (argvars[5].v_type != VAR_UNKNOWN)
 	{
-	    lnum_stop = (long)tv_get_number_chk(&argvars[5], NULL);
-	    if (lnum_stop < 0)
+	    lnum_stop = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[5], ଖାଲି);
+	    ଯଦି (lnum_stop < 0)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[5]));
-		goto theend;
+		ଯାଅ theend;
 	    }
 #ifdef FEAT_RELTIME
-	    if (argvars[6].v_type != VAR_UNKNOWN)
+	    ଯଦି (argvars[6].v_type != VAR_UNKNOWN)
 	    {
-		time_limit = (long)tv_get_number_chk(&argvars[6], NULL);
-		if (time_limit < 0)
+		time_limit = (long)tv_get_ସଂଖ୍ୟା_chk(&argvars[6], ଖାଲି);
+		ଯଦି (time_limit < 0)
 		{
 		    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[6]));
-		    goto theend;
+		    ଯାଅ theend;
 		}
 	    }
 #endif
@@ -12331,39 +12331,39 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 /*
  * "searchpair()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_searchpair(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = searchpair_cmn(argvars, NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = searchpair_cmn(argvars, ଖାଲି);
 }
 
 /*
  * "searchpairpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_searchpairpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lnum = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (searchpair_cmn(argvars, &match_pos) > 0)
+    ଯଦି (searchpair_cmn(argvars, &match_pos) > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
     }
 
-    list_append_number(rettv->vval.v_list, (varnumber_T)lnum);
-    list_append_number(rettv->vval.v_list, (varnumber_T)col);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)lnum);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)col);
 }
 
 /*
@@ -12376,15 +12376,15 @@ do_searchpair(
     char_u	*spat,	    // start pattern
     char_u	*mpat,	    // middle pattern
     char_u	*epat,	    // end pattern
-    int		dir,	    // BACKWARD or FORWARD
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dir,	    // BACKWARD or FORWARD
     typval_T	*skip,	    // skip expression
-    int		flags,	    // SP_SETPCMARK and other SP_ values
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags,	    // SP_SETPCMARK and other SP_ values
     pos_T	*match_pos,
     linenr_T	lnum_stop,  // stop at this line if not zero
     long	time_limit UNUSED) // stop after this many msec
 {
     char_u	*save_cpo;
-    char_u	*pat, *pat2 = NULL, *pat3 = NULL;
+    char_u	*pat, *pat2 = ଖାଲି, *pat3 = ଖାଲି;
     size_t	patlen;
     size_t	spatlen;
     size_t	epatlen;
@@ -12398,12 +12398,12 @@ do_searchpair(
     pos_T	foundpos;
     pos_T	save_cursor;
     pos_T	save_pos;
-    int		n;
-    int		r;
-    int		nest = 1;
-    int		use_skip = FALSE;
-    int		err;
-    int		options = SEARCH_KEEP;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nest = 1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		use_skip = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		err;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		options = ସନ୍ଧାନ_KEEP;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
@@ -12415,29 +12415,29 @@ do_searchpair(
     epatlen = STRLEN(epat);
     pat2size = spatlen + epatlen + 17;
     pat2 = alloc(pat2size);
-    if (pat2 == NULL)
-	goto theend;
+    ଯଦି (pat2 == ଖାଲି)
+	ଯାଅ theend;
     pat3size = spatlen + STRLEN(mpat) + epatlen + 25;
     pat3 = alloc(pat3size);
-    if (pat3 == NULL)
-	goto theend;
-    pat2len = vim_snprintf((char *)pat2, pat2size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)", spat, epat);
-    if (*mpat == NUL)
+    ଯଦି (pat3 == ଖାଲି)
+	ଯାଅ theend;
+    pat2len = vim_snprintf((ଅକ୍ଷର *)pat2, pat2size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)", spat, epat);
+    ଯଦି (*mpat == NUL)
     {
 	STRCPY(pat3, pat2);
 	pat3len = pat2len;
     }
-    else
-	pat3len = vim_snprintf((char *)pat3, pat3size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)\\|\\(%s\\m\\)",
+    ଅନ୍ୟଥା
+	pat3len = vim_snprintf((ଅକ୍ଷର *)pat3, pat3size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)\\|\\(%s\\m\\)",
 							    spat, epat, mpat);
-    if (flags & SP_START)
-	options |= SEARCH_START;
+    ଯଦି (flags & SP_START)
+	options |= ସନ୍ଧାନ_START;
 
-    if (skip != NULL)
-	use_skip = eval_expr_valid_arg(skip);
+    ଯଦି (skip != ଖାଲି)
+	use_skip = eval_ପଦସମଷ୍ଟି_valid_arg(skip);
 
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    ଯଦି (time_limit > 0)
 	init_regexp_timeout(time_limit);
 #endif
     save_cursor = curwin->w_cursor;
@@ -12446,86 +12446,86 @@ do_searchpair(
     CLEAR_POS(&foundpos);
     pat = pat3;
     patlen = pat3len;
-    for (;;)
+    ପାଇଁ (;;)
     {
 	searchit_arg_T sia;
 
 	CLEAR_FIELD(sia);
 	sia.sa_stop_lnum = lnum_stop;
-	n = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
-						     options, RE_SEARCH, &sia);
-	if (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
+	n = searchit(curwin, curbuf, &pos, ଖାଲି, dir, pat, patlen, 1L,
+						     options, RE_ସନ୍ଧାନ, &sia);
+	ଯଦି (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
 	    // didn't find it or found the first match again: FAIL
-	    break;
+	    ଭାଙ୍ଗ;
 
-	if (firstpos.lnum == 0)
+	ଯଦି (firstpos.lnum == 0)
 	    firstpos = pos;
-	if (EQUAL_POS(pos, foundpos))
+	ଯଦି (EQUAL_POS(pos, foundpos))
 	{
 	    // Found the same position again.  Can happen with a pattern that
 	    // has "\zs" at the end and searching backwards.  Advance one
 	    // character and try again.
-	    if (dir == BACKWARD)
+	    ଯଦି (dir == BACKWARD)
 		decl(&pos);
-	    else
+	    ଅନ୍ୟଥା
 		incl(&pos);
 	}
 	foundpos = pos;
 
 	// clear the start flag to avoid getting stuck here
-	options &= ~SEARCH_START;
+	options &= ~ସନ୍ଧାନ_START;
 
 	// If the skip pattern matches, ignore this match.
-	if (use_skip)
+	ଯଦି (use_skip)
 	{
 	    save_pos = curwin->w_cursor;
 	    curwin->w_cursor = pos;
 	    err = FALSE;
-	    r = eval_expr_to_bool(skip, &err);
+	    r = eval_ପଦସମଷ୍ଟି_to_bool(skip, &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    ଯଦି (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		curwin->w_cursor = save_cursor;
 		retval = -1;
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	    if (r)
-		continue;
+	    ଯଦି (r)
+		ଜାରି;
 	}
 
-	if ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
+	ଯଦି ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
 	{
 	    // Found end when searching backwards or start when searching
 	    // forward: nested pair.
 	    ++nest;
 	    pat = pat2;		// nested, don't search for middle
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // Found end when searching forward or start when searching
 	    // backward: end of (nested) pair; or found middle in outer pair.
-	    if (--nest == 1)
+	    ଯଦି (--nest == 1)
 		pat = pat3;	// outer level, search for middle
 	}
 
-	if (nest == 0)
+	ଯଦି (nest == 0)
 	{
 	    // Found the match: return matchcount or line number.
-	    if (flags & SP_RETCOUNT)
+	    ଯଦି (flags & SP_RETCOUNT)
 		++retval;
-	    else
+	    ଅନ୍ୟଥା
 		retval = pos.lnum;
-	    if (flags & SP_SETPCMARK)
+	    ଯଦି (flags & SP_SETPCMARK)
 		setpcmark();
 	    curwin->w_cursor = pos;
-	    if (!(flags & SP_REPEAT))
-		break;
+	    ଯଦି (!(flags & SP_REPEAT))
+		ଭାଙ୍ଗ;
 	    nest = 1;	    // search for next unmatched
 	}
     }
 
-    if (match_pos != NULL)
+    ଯଦି (match_pos != ଖାଲି)
     {
 	// Store the match cursor position
 	match_pos->lnum = curwin->w_cursor.lnum;
@@ -12533,57 +12533,57 @@ do_searchpair(
     }
 
     // If 'n' flag is used or search failed: restore cursor position.
-    if ((flags & SP_NOMOVE) || retval == 0)
+    ଯଦି ((flags & SP_NOMOVE) || retval == 0)
 	curwin->w_cursor = save_cursor;
 
 theend:
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    ଯଦି (time_limit > 0)
 	disable_regexp_timeout();
 #endif
     vim_free(pat2);
     vim_free(pat3);
-    if (p_cpo == empty_option)
+    ଯଦି (p_cpo == empty_option)
 	p_cpo = save_cpo;
-    else
+    ଅନ୍ୟଥା
     {
 	// Darn, evaluating the {skip} expression changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	ଯଦି (*p_cpo == NUL)
+	    set_option_ମୂଲ୍ୟ_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 /*
  * "searchpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_searchpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
-    int		n;
-    int		flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		lnum = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    n = search_cmn(argvars, &match_pos, &flags);
-    if (n > 0)
+    n = ସନ୍ଧାନ_cmn(argvars, &match_pos, &flags);
+    ଯଦି (n > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
     }
 
-    list_append_number(rettv->vval.v_list, (varnumber_T)lnum);
-    list_append_number(rettv->vval.v_list, (varnumber_T)col);
-    if (flags & SP_SUBPAT)
-	list_append_number(rettv->vval.v_list, (varnumber_T)n);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)lnum);
+    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)col);
+    ଯଦି (flags & SP_SUBPAT)
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, (varnumber_T)n);
 }
 
 /*
@@ -12591,102 +12591,102 @@ f_searchpos(typval_T *argvars, typval_T *rettv)
  * If "charpos" is TRUE, then use the column number as a character offset.
  * Otherwise use the column number as a byte offset.
  */
-    static void
-set_position(typval_T *argvars, typval_T *rettv, int charpos)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_position(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା charpos)
 {
     pos_T	pos;
-    int		fnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		fnum;
     char_u	*name;
     colnr_T	curswant = -1;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     name = tv_get_string_chk(argvars);
-    if (name == NULL)
-	return;
+    ଯଦି (name == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
-	return;
+    ଯଦି (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
+	ଫେରନ୍ତୁ;
 
-    if (pos.col != MAXCOL && --pos.col < 0)
+    ଯଦି (pos.col != MAXCOL && --pos.col < 0)
 	pos.col = 0;
-    if ((name[0] == '.' && name[1] == NUL))
+    ଯଦି ((name[0] == '.' && name[1] == NUL))
     {
 	// set cursor; "fnum" is ignored
 	curwin->w_cursor = pos;
-	if (curswant >= 0)
+	ଯଦି (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    curwin->w_set_curswant = false;
 	}
 	check_cursor();
-	rettv->vval.v_number = 0;
+	rettv->vval.v_ସଂଖ୍ୟା = 0;
     }
-    else if (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
+    ଅନ୍ୟଥା ଯଦି (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
     {
 	// set mark
-	if (setmark_pos(name[1], &pos, fnum) == OK)
-	    rettv->vval.v_number = 0;
+	ଯଦି (setmark_pos(name[1], &pos, fnum) == OK)
+	    rettv->vval.v_ସଂଖ୍ୟା = 0;
     }
-    else
+    ଅନ୍ୟଥା
 	emsg(_(e_invalid_argument));
 }
 /*
  * "setcharpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setcharpos(typval_T *argvars, typval_T *rettv)
 {
     set_position(argvars, rettv, TRUE);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setcharsearch(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*d;
     dictitem_T	*di;
     char_u	*csearch;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_dict_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if ((d = argvars[0].vval.v_dict) == NULL)
-	return;
+    ଯଦି ((d = argvars[0].vval.v_dict) == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     csearch = dict_get_string(d, "char", FALSE);
-    if (csearch != NULL)
+    ଯଦି (csearch != ଖାଲି)
     {
-	if (enc_utf8)
+	ଯଦି (enc_utf8)
 	{
-	    int pcc[MAX_MCO];
-	    int c = utfc_ptr2char(csearch, pcc);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା pcc[MAX_MCO];
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = utfc_ptr2char(csearch, pcc);
 
 	    set_last_csearch(c, csearch, utfc_ptr2len(csearch));
 	}
-	else
+	ଅନ୍ୟଥା
 	    set_last_csearch(PTR2CHAR(csearch),
 		    csearch, mb_ptr2len(csearch));
     }
 
     di = dict_find(d, (char_u *)"forward", -1);
-    if (di != NULL)
-	set_csearch_direction((int)tv_get_number(&di->di_tv)
+    ଯଦି (di != ଖାଲି)
+	set_csearch_direction((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&di->di_tv)
 		? FORWARD : BACKWARD);
 
     di = dict_find(d, (char_u *)"until", -1);
-    if (di != NULL)
-	set_csearch_until(!!tv_get_number(&di->di_tv));
+    ଯଦି (di != ଖାଲି)
+	set_csearch_until(!!tv_get_ସଂଖ୍ୟା(&di->di_tv));
 }
 
 /*
  * "setcursorcharpos" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setcursorcharpos(typval_T *argvars, typval_T *rettv)
 {
     set_cursorpos(argvars, rettv, TRUE);
@@ -12695,76 +12695,76 @@ f_setcursorcharpos(typval_T *argvars, typval_T *rettv)
 /*
  * "setenv()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setenv(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u   namebuf[NUMBUFLEN];
     char_u   valbuf[NUMBUFLEN];
     char_u  *name;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     // setting an environment variable may be dangerous, e.g. you could
     // setenv GCONV_PATH=/tmp and then have iconv() unexpectedly call
     // a shell command using some shared library:
-    if (check_restricted() || check_secure())
-	return;
+    ଯଦି (check_restricted() || check_secure())
+	ଫେରନ୍ତୁ;
 
     name = tv_get_string_buf(&argvars[0], namebuf);
-    if (argvars[1].v_type == VAR_SPECIAL
-				      && argvars[1].vval.v_number == VVAL_NULL)
+    ଯଦି (argvars[1].v_type == VAR_SPECIAL
+				      && argvars[1].vval.v_ସଂଖ୍ୟା == VVAL_NULL)
 	vim_unsetenv_ext(name);
-    else
+    ଅନ୍ୟଥା
 	vim_setenv_ext(name, tv_get_string_buf(&argvars[1], valbuf));
 }
 
 /*
  * "setfperm({fname}, {mode})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setfperm(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     char_u	modebuf[NUMBUFLEN];
     char_u	*mode_str;
-    int		i;
-    int		mask;
-    int		mode = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mask;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mode = 0;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ସଂଖ୍ୟା = 0;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     fname = tv_get_string_chk(&argvars[0]);
-    if (fname == NULL)
-	return;
+    ଯଦି (fname == ଖାଲି)
+	ଫେରନ୍ତୁ;
     mode_str = tv_get_string_buf_chk(&argvars[1], modebuf);
-    if (mode_str == NULL)
-	return;
-    if (STRLEN(mode_str) != 9)
+    ଯଦି (mode_str == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (STRLEN(mode_str) != 9)
     {
 	semsg(_(e_invalid_argument_str), mode_str);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     mask = 1;
-    for (i = 8; i >= 0; --i)
+    ପାଇଁ (i = 8; i >= 0; --i)
     {
-	if (mode_str[i] != '-')
+	ଯଦି (mode_str[i] != '-')
 	    mode |= mask;
 	mask = mask << 1;
     }
-    rettv->vval.v_number = mch_setperm(fname, mode) == OK;
+    rettv->vval.v_ସଂଖ୍ୟା = mch_setperm(fname, mode) == OK;
 }
 
 /*
  * "setpos()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setpos(typval_T *argvars, typval_T *rettv)
 {
     set_position(argvars, rettv, FALSE);
@@ -12773,142 +12773,142 @@ f_setpos(typval_T *argvars, typval_T *rettv)
 /*
  * Translate a register type string to the yank type and block length
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 {
     char_u *stropt = *pp;
-    switch (*stropt)
+    ବାଛ (*stropt)
     {
-	case 'v': case 'c':	// character-wise selection
+	ସ୍ଥିତି 'v': ସ୍ଥିତି 'c':	// character-wise selection
 	    *yank_type = MCHAR;
-	    break;
-	case 'V': case 'l':	// line-wise selection
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି 'V': ସ୍ଥିତି 'l':	// line-wise selection
 	    *yank_type = MLINE;
-	    break;
-	case 'b': case Ctrl_V:	// block-wise selection
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି 'b': ସ୍ଥିତି Ctrl_V:	// block-wise selection
 	    *yank_type = MBLOCK;
-	    if (VIM_ISDIGIT(stropt[1]))
+	    ଯଦି (VIM_ISDIGIT(stropt[1]))
 	    {
 		++stropt;
 		*block_len = getdigits(&stropt) - 1;
 		--stropt;
 	    }
-	    break;
-	default:
-	    return FAIL;
+	    ଭାଙ୍ଗ;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	    ଫେରନ୍ତୁ FAIL;
     }
     *pp = stropt;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * "setreg()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_setreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		regname;
     char_u	*strregname;
     char_u	*stropt;
     char_u	*strval;
-    int		append;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		append;
     char_u	yank_type;
     long	block_len;
     typval_T	*regcontents;
-    int		pointreg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		pointreg;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     pointreg = 0;
-    regcontents = NULL;
+    regcontents = ଖାଲି;
     block_len = -1;
     yank_type = MAUTO;
     append = FALSE;
 
     strregname = tv_get_string_chk(argvars);
-    rettv->vval.v_number = 1;		// FAIL is default
+    rettv->vval.v_ସଂଖ୍ୟା = 1;		// FAIL is default
 
-    if (strregname == NULL)
-	return;		// type error; errmsg already given
-    if (in_vim9script() && STRLEN(strregname) > 1)
+    ଯଦି (strregname == ଖାଲି)
+	ଫେରନ୍ତୁ;		// type error; errmsg already given
+    ଯଦି (in_vim9script() && STRLEN(strregname) > 1)
     {
 	semsg(_(e_register_name_must_be_one_char_str), strregname);
-	return;
+	ଫେରନ୍ତୁ;
     }
     regname = *strregname;
-    if (regname == 0 || regname == '@')
+    ଯଦି (regname == 0 || regname == '@')
 	regname = '"';
 
-    if (argvars[1].v_type == VAR_DICT)
+    ଯଦି (argvars[1].v_type == VAR_DICT)
     {
 	dict_T	    *d = argvars[1].vval.v_dict;
 	dictitem_T  *di;
 
-	if (d == NULL || d->dv_hashtab.ht_used == 0)
+	ଯଦି (d == ଖାଲି || d->dv_hashtab.ht_used == 0)
 	{
 	    // Empty dict, clear the register (like setreg(0, []))
-	    char_u *lstval[2] = {NULL, NULL};
+	    char_u *lstval[2] = {ଖାଲି, ଖାଲି};
 	    write_reg_contents_lst(regname, lstval, 0, FALSE, MAUTO, -1);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 
 	di = dict_find(d, (char_u *)"regcontents", -1);
-	if (di != NULL)
+	ଯଦି (di != ଖାଲି)
 	    regcontents = &di->di_tv;
 
 	stropt = dict_get_string(d, "regtype", FALSE);
-	if (stropt != NULL)
+	ଯଦି (stropt != ଖାଲି)
 	{
-	    int ret = get_yank_type(&stropt, &yank_type, &block_len);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ret = get_yank_type(&stropt, &yank_type, &block_len);
 
-	    if (ret == FAIL || *++stropt != NUL)
+	    ଯଦି (ret == FAIL || *++stropt != NUL)
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "value");
-		return;
+		semsg(_(e_invalid_ମୂଲ୍ୟ_for_argument_str), "value");
+		ଫେରନ୍ତୁ;
 	    }
 	}
 
-	if (regname == '"')
+	ଯଦି (regname == '"')
 	{
 	    stropt = dict_get_string(d, "points_to", FALSE);
-	    if (stropt != NULL)
+	    ଯଦି (stropt != ଖାଲି)
 	    {
 		pointreg = *stropt;
 		regname = pointreg;
 	    }
 	}
-	else if (dict_get_bool(d, "isunnamed", -1) > 0)
+	ଅନ୍ୟଥା ଯଦି (dict_get_bool(d, "isunnamed", -1) > 0)
 	    pointreg = regname;
     }
-    else
+    ଅନ୍ୟଥା
 	regcontents = &argvars[1];
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (yank_type != MAUTO)
+	ଯଦି (yank_type != MAUTO)
 	{
 	    semsg(_(e_too_many_arguments_for_function_str), "setreg");
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 
 	stropt = tv_get_string_chk(&argvars[2]);
-	if (stropt == NULL)
-	    return;		// type error
-	for (; *stropt != NUL; ++stropt)
-	    switch (*stropt)
+	ଯଦି (stropt == ଖାଲି)
+	    ଫେରନ୍ତୁ;		// type error
+	ପାଇଁ (; *stropt != NUL; ++stropt)
+	    ବାଛ (*stropt)
 	    {
-		case 'a': case 'A':	// append
+		ସ୍ଥିତି 'a': ସ୍ଥିତି 'A':	// append
 		    append = TRUE;
-		    break;
-		default:
+		    ଭାଙ୍ଗ;
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		    get_yank_type(&stropt, &yank_type, &block_len);
 	    }
     }
 
-    if (regcontents && regcontents->v_type == VAR_LIST)
+    ଯଦି (regcontents && regcontents->v_type == VAR_LIST)
     {
 	char_u		**lstval;
 	char_u		**allocval;
@@ -12917,147 +12917,147 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	char_u		**curallocval;
 	list_T		*ll = regcontents->vval.v_list;
 	listitem_T	*li;
-	int		len;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
 	// If the list is NULL handle like an empty list.
-	len = ll == NULL ? 0 : ll->lv_len;
+	len = ll == ଖାଲି ? 0 : ll->lv_len;
 
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    return;
+	ଯଦି (lstval == ଖାଲି)
+	    ଫେରନ୍ତୁ;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (ll != NULL)
+	ଯଦି (ll != ଖାଲି)
 	{
 	    CHECK_LIST_MATERIALIZE(ll);
-	    FOR_ALL_LIST_ITEMS(ll, li)
+	    FOR_ALL_LIST_ବସ୍ତୁଗୁଡ଼ିକ(ll, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
-		    goto free_lstval;
-		if (strval == buf)
+		ଯଦି (strval == ଖାଲି)
+		    ଯାଅ free_lstval;
+		ଯଦି (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
-			goto free_lstval;
+		    ଯଦି (strval == ଖାଲି)
+			ଯାଅ free_lstval;
 		    *curallocval++ = strval;
 		}
 		*curval++ = strval;
 	    }
 	}
-	*curval++ = NULL;
+	*curval++ = ଖାଲି;
 
 	write_reg_contents_lst(regname, lstval, -1,
 						append, yank_type, block_len);
 free_lstval:
-	while (curallocval > allocval)
+	ଯେତେବେଳେ (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
-    else if (regcontents)
+    ଅନ୍ୟଥା ଯଦି (regcontents)
     {
 	strval = tv_get_string_chk(regcontents);
-	if (strval == NULL)
-	    return;
+	ଯଦି (strval == ଖାଲି)
+	    ଫେରନ୍ତୁ;
 	write_reg_contents_ex(regname, strval, -1,
 						append, yank_type, block_len);
     }
-    if (pointreg != 0)
+    ଯଦି (pointreg != 0)
 	get_yank_register(pointreg, TRUE);
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ସଂଖ୍ୟା = 0;
 }
 
 /*
  * "settagstack()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_settagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     dict_T	*d;
-    int		action = 'r';
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		action = 'r';
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_ସଂଖ୍ୟା = -1;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     // first argument: window number or id
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	return;
+    ଯଦି (wp == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // second argument: dict with items to set in the tag stack
-    if (check_for_dict_arg(argvars, 1) == FAIL)
-	return;
+    ଯଦି (check_for_dict_arg(argvars, 1) == FAIL)
+	ଫେରନ୍ତୁ;
     d = argvars[1].vval.v_dict;
-    if (d == NULL)
-	return;
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // third argument: action - 'a' for append and 'r' for replace.
     // default is to replace the stack.
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type == VAR_UNKNOWN)
 	action = 'r';
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    ଅନ୍ୟଥା ଯଦି (check_for_string_arg(argvars, 2) == FAIL)
+	ଫେରନ୍ତୁ;
+    ଅନ୍ୟଥା
     {
 	char_u	*actstr;
 	actstr = tv_get_string_chk(&argvars[2]);
-	if (actstr == NULL)
-	    return;
-	if ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
+	ଯଦି (actstr == ଖାଲି)
+	    ଫେରନ୍ତୁ;
+	ଯଦି ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
 		&& actstr[1] == NUL)
 	    action = *actstr;
-	else
+	ଅନ୍ୟଥା
 	{
 	    semsg(_(e_invalid_action_str_2), actstr);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
 
-    if (set_tagstack(wp, d, action) == OK)
-	rettv->vval.v_number = 0;
+    ଯଦି (set_tagstack(wp, d, action) == OK)
+	rettv->vval.v_ସଂଖ୍ୟା = 0;
 }
 
 #ifdef FEAT_CRYPT
 /*
  * "sha256({expr})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_sha256(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
-    if (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ଖାଲି;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    ଯଦି (argvars[0].v_type == VAR_BLOB)
     {
 	blob_T *blob = argvars[0].vval.v_blob;
-	p = blob != NULL ? (char_u *)blob->bv_ga.ga_data : (char_u *)"";
-	len = blob != NULL ? blob->bv_ga.ga_len : 0;
-	rettv->vval.v_string = vim_strsave(sha256_bytes(p, len, NULL, 0));
+	p = blob != ଖାଲି ? (char_u *)blob->bv_ga.ga_data : (char_u *)"";
+	len = blob != ଖାଲି ? blob->bv_ga.ga_len : 0;
+	rettv->vval.v_string = vim_strsave(sha256_bytes(p, len, ଖାଲି, 0));
     }
-    else
+    ଅନ୍ୟଥା
     {
 	p = tv_get_string(&argvars[0]);
 	rettv->vval.v_string = vim_strsave(
-				    sha256_bytes(p, (int)STRLEN(p), NULL, 0));
+				    sha256_bytes(p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p), ଖାଲି, 0));
     }
 }
 #endif // FEAT_CRYPT
@@ -13065,15 +13065,15 @@ f_sha256(typval_T *argvars, typval_T *rettv)
 /*
  * "shellescape({string})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_shellescape(typval_T *argvars, typval_T *rettv)
 {
-    int do_special;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_special;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     do_special = non_zero_arg(&argvars[1]);
     rettv->vval.v_string = vim_strsave_shellescape(
@@ -13084,46 +13084,46 @@ f_shellescape(typval_T *argvars, typval_T *rettv)
 /*
  * shiftwidth() function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_shiftwidth(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = 0;
+    rettv->vval.v_ସଂଖ୍ୟା = 0;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
 	long	col;
 
-	col = (long)tv_get_number_chk(argvars, NULL);
-	if (col < 0)
-	    return;	// type error; errmsg already given
+	col = (long)tv_get_ସଂଖ୍ୟା_chk(argvars, ଖାଲି);
+	ଯଦି (col < 0)
+	    ଫେରନ୍ତୁ;	// type error; errmsg already given
 #ifdef FEAT_VARTABS
-	rettv->vval.v_number = get_sw_value_col(curbuf, col, FALSE);
-	return;
+	rettv->vval.v_ସଂଖ୍ୟା = get_sw_ମୂଲ୍ୟ_col(curbuf, col, FALSE);
+	ଫେରନ୍ତୁ;
 #endif
     }
 
-    rettv->vval.v_number = get_sw_value(curbuf);
+    rettv->vval.v_ସଂଖ୍ୟା = get_sw_ମୂଲ୍ୟ(curbuf);
 }
 
 /*
  * "soundfold({word})" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_soundfold(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
     s = tv_get_string(&argvars[0]);
 #ifdef FEAT_SPELL
     rettv->vval.v_string = eval_soundfold(s);
-#else
+#ଅନ୍ୟଥା
     rettv->vval.v_string = vim_strsave(s);
 #endif
 }
@@ -13131,66 +13131,66 @@ f_soundfold(typval_T *argvars, typval_T *rettv)
 /*
  * "spellbadword()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_spellbadword(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*word = (char_u *)"";
-    hlf_T	attr = HLF_COUNT;
-    int		len = 0;
+    hlf_T	attr = HLF_ଗଣନା;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = 0;
 #ifdef FEAT_SPELL
-    int		wo_spell_save = curwin->w_p_spell;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (!curwin->w_p_spell)
+    ଯଦି (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    ଯଦି (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	ଫେରନ୍ତୁ;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	ଫେରନ୍ତୁ;
     }
 
 #ifdef FEAT_SPELL
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// Find the start and length of the badly spelled word.
 	len = spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, &attr);
-	if (len != 0)
+	ଯଦି (len != 0)
 	{
 	    word = ml_get_cursor();
 	    curwin->w_set_curswant = true;
 	}
     }
-    else if (*curbuf->b_s.b_p_spl != NUL)
+    ଅନ୍ୟଥା ଯଦି (*curbuf->b_s.b_p_spl != NUL)
     {
 	char_u	*str = tv_get_string_chk(&argvars[0]);
-	int	capcol = -1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	capcol = -1;
 
-	if (str != NULL)
+	ଯଦି (str != ଖାଲି)
 	{
 	    // Check the argument for spelling.
-	    while (*str != NUL)
+	    ଯେତେବେଳେ (*str != NUL)
 	    {
 		len = spell_check(curwin, str, &attr, &capcol, FALSE);
-		if (attr != HLF_COUNT)
+		ଯଦି (attr != HLF_ଗଣନା)
 		{
 		    word = str;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		str += len;
 		capcol -= len;
@@ -13202,102 +13202,102 @@ f_spellbadword(typval_T *argvars UNUSED, typval_T *rettv)
 #endif
 
     list_append_string(rettv->vval.v_list, word, len);
-    switch (attr)
+    ବାଛ (attr)
     {
-    case HLF_SPB:
+    ସ୍ଥିତି HLF_SPB:
 	list_append_string(rettv->vval.v_list, (char_u *)"bad", STRLEN_LITERAL("bad"));
-	break;
+	ଭାଙ୍ଗ;
 
-    case HLF_SPR:
+    ସ୍ଥିତି HLF_SPR:
 	list_append_string(rettv->vval.v_list, (char_u *)"rare", STRLEN_LITERAL("rare"));
-	break;
+	ଭାଙ୍ଗ;
 
-    case HLF_SPL:
+    ସ୍ଥିତି HLF_SPL:
 	list_append_string(rettv->vval.v_list, (char_u *)"local", STRLEN_LITERAL("local"));
-	break;
+	ଭାଙ୍ଗ;
 
-    case HLF_SPC:
+    ସ୍ଥିତି HLF_SPC:
 	list_append_string(rettv->vval.v_list, (char_u *)"caps", STRLEN_LITERAL("caps"));
-	break;
+	ଭାଙ୍ଗ;
 
-    default:
+    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
-	break;
+	ଭାଙ୍ଗ;
     }
 }
 
 /*
  * "spellsuggest()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_spellsuggest(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_SPELL
     char_u	*str;
-    int		typeerr = FALSE;
-    int		maxcount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		typeerr = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		maxcount;
     garray_T	ga;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     listitem_T	*li;
-    int		need_capital = FALSE;
-    int		wo_spell_save = curwin->w_p_spell;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		need_capital = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (!curwin->w_p_spell)
+    ଯଦି (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    ଯଦି (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	ଫେରନ୍ତୁ;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	ଫେରନ୍ତୁ;
     }
 
 #ifdef FEAT_SPELL
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
-	maxcount = (int)tv_get_number_chk(&argvars[1], &typeerr);
-	if (maxcount <= 0)
-	    return;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	maxcount = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[1], &typeerr);
+	ଯଦି (maxcount <= 0)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    need_capital = (int)tv_get_bool_chk(&argvars[2], &typeerr);
-	    if (typeerr)
-		return;
+	    need_capital = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[2], &typeerr);
+	    ଯଦି (typeerr)
+		ଫେରନ୍ତୁ;
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	maxcount = 25;
 
     spell_suggest_list(&ga, str, maxcount, need_capital, FALSE);
 
-    for (i = 0; i < ga.ga_len; ++i)
+    ପାଇଁ (i = 0; i < ga.ga_len; ++i)
     {
 	str = ((char_u **)ga.ga_data)[i];
 
 	li = listitem_alloc();
-	if (li == NULL)
+	ଯଦି (li == ଖାଲି)
 	    vim_free(str);
-	else
+	ଅନ୍ୟଥା
 	{
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.v_lock = 0;
@@ -13310,75 +13310,75 @@ f_spellsuggest(typval_T *argvars UNUSED, typval_T *rettv)
 #endif
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_split(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
     char_u	*end;
-    char_u	*pat = NULL;
+    char_u	*pat = ଖାଲି;
     regmatch_T	regmatch;
     char_u	patbuf[NUMBUFLEN];
     char_u	*save_cpo;
-    int		match;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		match;
     colnr_T	col = 0;
-    int		keepempty = FALSE;
-    int		typeerr = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		keepempty = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		typeerr = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
 	pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-	if (pat == NULL)
+	ଯଦି (pat == ଖାଲି)
 	    typeerr = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    keepempty = (int)tv_get_bool_chk(&argvars[2], &typeerr);
+	ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
+	    keepempty = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[2], &typeerr);
     }
-    if (pat == NULL || *pat == NUL)
+    ଯଦି (pat == ଖାଲି || *pat == NUL)
 	pat = (char_u *)"[\\x01- ]\\+";
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	goto theend;
-    if (typeerr)
-	goto theend;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଯାଅ theend;
+    ଯଦି (typeerr)
+	ଯାଅ theend;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    ଯଦି (regmatch.regprog != ଖାଲି)
     {
 	regmatch.rm_ic = FALSE;
-	while (*str != NUL || keepempty)
+	ଯେତେବେଳେ (*str != NUL || keepempty)
 	{
-	    if (*str == NUL)
+	    ଯଦି (*str == NUL)
 		match = FALSE;	// empty item at the end
-	    else
+	    ଅନ୍ୟଥା
 		match = vim_regexec_nl(&regmatch, str, col);
-	    if (match)
+	    ଯଦି (match)
 		end = regmatch.startp[0];
-	    else
+	    ଅନ୍ୟଥା
 		end = str + STRLEN(str);
-	    if (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
+	    ଯଦି (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
 			   && *str != NUL && match && end < regmatch.endp[0]))
 	    {
-		if (list_append_string(rettv->vval.v_list, str,
-						    (int)(end - str)) == FAIL)
-		    break;
+		ଯଦି (list_append_string(rettv->vval.v_list, str,
+						    (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(end - str)) == FAIL)
+		    ଭାଙ୍ଗ;
 	    }
-	    if (!match)
-		break;
+	    ଯଦି (!match)
+		ଭାଙ୍ଗ;
 	    // Advance to just after the match.
-	    if (regmatch.endp[0] > str)
+	    ଯଦି (regmatch.endp[0] > str)
 		col = 0;
-	    else
+	    ଅନ୍ୟଥା
 		// Don't get stuck at the same match.
 		col = (*mb_ptr2len)(regmatch.endp[0]);
 	    str = regmatch.endp[0];
@@ -13394,37 +13394,37 @@ theend:
 /*
  * "submatch()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_submatch(typval_T *argvars, typval_T *rettv)
 {
-    int		error = FALSE;
-    int		no;
-    int		retList = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		no;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retList = 0;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    no = (int)tv_get_number_chk(&argvars[0], &error);
-    if (error)
-	return;
-    if (no < 0 || no >= NSUBEXP)
+    no = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା_chk(&argvars[0], &error);
+    ଯଦି (error)
+	ଫେରନ୍ତୁ;
+    ଯଦି (no < 0 || no >= NSUBEXP)
     {
-	semsg(_(e_invalid_submatch_number_nr), no);
-	return;
+	semsg(_(e_invalid_submatch_ସଂଖ୍ୟା_nr), no);
+	ଫେରନ୍ତୁ;
     }
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	retList = (int)tv_get_bool_chk(&argvars[1], &error);
-    if (error)
-	return;
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
+	retList = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[1], &error);
+    ଯଦି (error)
+	ଫେରନ୍ତୁ;
 
-    if (retList == 0)
+    ଯଦି (retList == 0)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = reg_submatch(no);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = reg_submatch_list(no);
@@ -13434,7 +13434,7 @@ f_submatch(typval_T *argvars, typval_T *rettv)
 /*
  * "substitute()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_substitute(typval_T *argvars, typval_T *rettv)
 {
     char_u	patbuf[NUMBUFLEN];
@@ -13442,223 +13442,223 @@ f_substitute(typval_T *argvars, typval_T *rettv)
     char_u	flagsbuf[NUMBUFLEN];
     char_u	*str;
     char_u	*pat;
-    char_u	*sub = NULL;
-    typval_T	*expr = NULL;
+    char_u	*sub = ଖାଲି;
+    typval_T	*ପଦସମଷ୍ଟି = ଖାଲି;
     char_u	*flg;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     str = tv_get_string_chk(&argvars[0]);
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
     flg = tv_get_string_buf_chk(&argvars[3], flagsbuf);
 
-    if (argvars[2].v_type == VAR_FUNC
+    ଯଦି (argvars[2].v_type == VAR_FUNC
 	    || argvars[2].v_type == VAR_PARTIAL
 	    || argvars[2].v_type == VAR_INSTR
 	    || argvars[2].v_type == VAR_CLASS
 	    || argvars[2].v_type == VAR_OBJECT)
-	expr = &argvars[2];
-    else
+	ପଦସମଷ୍ଟି = &argvars[2];
+    ଅନ୍ୟଥା
 	sub = tv_get_string_buf_chk(&argvars[2], subbuf);
 
     rettv->v_type = VAR_STRING;
-    if (str == NULL || pat == NULL || (sub == NULL && expr == NULL)
-								|| flg == NULL)
-	rettv->vval.v_string = NULL;
-    else
-	rettv->vval.v_string = do_string_sub(str, STRLEN(str), pat, sub, expr, flg, NULL);
+    ଯଦି (str == ଖାଲି || pat == ଖାଲି || (sub == ଖାଲି && ପଦସମଷ୍ଟି == ଖାଲି)
+								|| flg == ଖାଲି)
+	rettv->vval.v_string = ଖାଲି;
+    ଅନ୍ୟଥା
+	rettv->vval.v_string = do_string_sub(str, STRLEN(str), pat, sub, ପଦସମଷ୍ଟି, flg, ଖାଲି);
 }
 
 /*
  * "swapfilelist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_swapfilelist(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    recover_names(NULL, FALSE, rettv->vval.v_list, 0, NULL);
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
+    recover_names(ଖାଲି, FALSE, rettv->vval.v_list, 0, ଖାଲି);
 }
 
 /*
  * "swapinfo(swap_filename)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_swapinfo(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (rettv_dict_alloc(rettv) == OK)
+    ଯଦି (rettv_dict_alloc(rettv) == OK)
 	get_b0_dict(tv_get_string(argvars), rettv->vval.v_dict);
 }
 
 /*
  * "swapname(expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_swapname(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL
-					|| buf->b_ml.ml_mfp->mf_fname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    ଯଦି (buf == ଖାଲି || buf->b_ml.ml_mfp == ଖାଲି
+					|| buf->b_ml.ml_mfp->mf_fname == ଖାଲି)
+	rettv->vval.v_string = ଖାଲି;
+    ଅନ୍ୟଥା
 	rettv->vval.v_string = vim_strsave(buf->b_ml.ml_mfp->mf_fname);
 }
 
 /*
  * "synID(lnum, col, trans)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_synID(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		id = 0;
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		trans;
-    int		transerr = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		trans;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		transerr = FALSE;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL
 		|| check_for_bool_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(argvars);		// -1 on type error
-    col = (linenr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
-    trans = (int)tv_get_bool_chk(&argvars[2], &transerr);
+    col = (linenr_T)tv_get_ସଂଖ୍ୟା(&argvars[1]) - 1;	// -1 on type error
+    trans = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_bool_chk(&argvars[2], &transerr);
 
-    if (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    ଯଦି (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା
 	    && col >= 0 && col < (long)ml_get_len(lnum))
-	id = syn_get_id(curwin, lnum, col, trans, NULL, FALSE);
+	id = syn_get_id(curwin, lnum, col, trans, ଖାଲି, FALSE);
 #endif
 
-    rettv->vval.v_number = id;
+    rettv->vval.v_ସଂଖ୍ୟା = id;
 }
 
 /*
  * "synIDattr(id, what [, mode])" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    char_u	*p = NULL;
+    char_u	*p = ଖାଲି;
 #ifdef FEAT_SYN_HL
-    int		id;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		id;
     char_u	*what;
     char_u	*mode;
     char_u	modebuf[NUMBUFLEN];
-    int		modec;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		modec;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]);
     what = tv_get_string(&argvars[1]);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	mode = tv_get_string_buf(&argvars[2], modebuf);
 	modec = TOLOWER_ASC(mode[0]);
-	if (modec != 't' && modec != 'c' && modec != 'g')
+	ଯଦି (modec != 't' && modec != 'c' && modec != 'g')
 	    modec = 0;	// replace invalid with current
     }
-    else
+    ଅନ୍ୟଥା
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	if (USE_24BIT)
+# ଯଦି defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	ଯଦି (USE_24BIT)
 	    modec = 'g';
-	else
+	ଅନ୍ୟଥା
 # endif
-	    if (t_colors > 1)
+	    ଯଦି (t_colors > 1)
 		modec = 'c';
-	    else
+	    ଅନ୍ୟଥା
 		modec = 't';
     }
 
-    switch (TOLOWER_ASC(what[0]))
+    ବାଛ (TOLOWER_ASC(what[0]))
     {
-	case 'b':
-		if (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
+	ସ୍ଥିତି 'b':
+		ଯଦି (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
 		    p = highlight_color(id, what, modec);
-		else					// bold
+		ଅନ୍ୟଥା					// bold
 		    p = highlight_has_attr(id, HL_BOLD, modec);
-		break;
+		ଭାଙ୍ଗ;
 
-	case 'f':					// fg[#] or font
+	ସ୍ଥିତି 'f':					// fg[#] or font
 		p = highlight_color(id, what, modec);
-		break;
+		ଭାଙ୍ଗ;
 
-	case 'i':
-		if (TOLOWER_ASC(what[1]) == 'n')	// inverse
+	ସ୍ଥିତି 'i':
+		ଯଦି (TOLOWER_ASC(what[1]) == 'n')	// inverse
 		    p = highlight_has_attr(id, HL_INVERSE, modec);
-		else					// italic
+		ଅନ୍ୟଥା					// italic
 		    p = highlight_has_attr(id, HL_ITALIC, modec);
-		break;
+		ଭାଙ୍ଗ;
 
-	case 'n':
-		if (TOLOWER_ASC(what[1]) == 'o')	// nocombine
+	ସ୍ଥିତି 'n':
+		ଯଦି (TOLOWER_ASC(what[1]) == 'o')	// nocombine
 		    p = highlight_has_attr(id, HL_NOCOMBINE, modec);
-		else					// name
-		    p = get_highlight_name_ext(NULL, id - 1, FALSE);
-		break;
+		ଅନ୍ୟଥା					// name
+		    p = get_highlight_name_ext(ଖାଲି, id - 1, FALSE);
+		ଭାଙ୍ଗ;
 
-	case 'r':					// reverse
+	ସ୍ଥିତି 'r':					// reverse
 		p = highlight_has_attr(id, HL_INVERSE, modec);
-		break;
+		ଭାଙ୍ଗ;
 
-	case 's':
-		if (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
+	ସ୍ଥିତି 's':
+		ଯଦି (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
 		    p = highlight_color(id, what, modec);
 							// strikeout
-		else if (TOLOWER_ASC(what[1]) == 't' &&
+		ଅନ୍ୟଥା ଯଦି (TOLOWER_ASC(what[1]) == 't' &&
 			TOLOWER_ASC(what[2]) == 'r')
 		    p = highlight_has_attr(id, HL_STRIKETHROUGH, modec);
-		else					// standout
+		ଅନ୍ୟଥା					// standout
 		    p = highlight_has_attr(id, HL_STANDOUT, modec);
-		break;
+		ଭାଙ୍ଗ;
 
-	case 'u':
-		if (STRLEN(what) >= 9)
+	ସ୍ଥିତି 'u':
+		ଯଦି (STRLEN(what) >= 9)
 		{
-		    if (TOLOWER_ASC(what[5]) == 'l')
+		    ଯଦି (TOLOWER_ASC(what[5]) == 'l')
 							// underline
 			p = highlight_has_attr(id, HL_UNDERLINE, modec);
-		    else if (TOLOWER_ASC(what[5]) != 'd')
+		    ଅନ୍ୟଥା ଯଦି (TOLOWER_ASC(what[5]) != 'd')
 							// undercurl
 			p = highlight_has_attr(id, HL_UNDERCURL, modec);
-		    else if (TOLOWER_ASC(what[6]) != 'o')
+		    ଅନ୍ୟଥା ଯଦି (TOLOWER_ASC(what[6]) != 'o')
 							// underdashed
 			p = highlight_has_attr(id, HL_UNDERDASHED, modec);
-		    else if (TOLOWER_ASC(what[7]) == 'u')
+		    ଅନ୍ୟଥା ଯଦି (TOLOWER_ASC(what[7]) == 'u')
 							// underdouble
 			p = highlight_has_attr(id, HL_UNDERDOUBLE, modec);
-		    else
+		    ଅନ୍ୟଥା
 							// underdotted
 			p = highlight_has_attr(id, HL_UNDERDOTTED, modec);
 		}
-		else
+		ଅନ୍ୟଥା
 							// ul
 		    p = highlight_color(id, what, modec);
-		break;
+		ଭାଙ୍ଗ;
     }
 
-    if (p != NULL)
+    ଯଦି (p != ଖାଲି)
 	p = vim_strsave(p);
 #endif
     rettv->v_type = VAR_STRING;
@@ -13668,85 +13668,85 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "synIDtrans(id)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_synIDtrans(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		id;
 
 #ifdef FEAT_SYN_HL
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]);
 
-    if (id > 0)
+    ଯଦି (id > 0)
 	id = syn_get_final_id(id);
-    else
+    ଅନ୍ୟଥା
 #endif
 	id = 0;
 
-    rettv->vval.v_number = id;
+    rettv->vval.v_ସଂଖ୍ୟା = id;
 }
 
 /*
  * "synconcealed(lnum, col)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#ଯଦି defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     linenr_T	lnum;
     colnr_T	col;
-    int		syntax_flags = 0;
-    int		cchar;
-    int		matchid = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		syntax_flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cchar;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		matchid = 0;
     char_u	str[NUMBUFLEN];
 #endif
 
-    rettv_list_set(rettv, NULL);
+    rettv_list_set(rettv, ଖାଲି);
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#ଯଦି defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     lnum = tv_get_lnum(argvars);		// -1 on type error
-    col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
+    col = (colnr_T)tv_get_ସଂଖ୍ୟା(&argvars[1]) - 1;	// -1 on type error
 
     CLEAR_FIELD(str);
 
-    if (rettv_list_alloc(rettv) == OK)
+    ଯଦି (rettv_list_alloc(rettv) == OK)
     {
-	if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+	ଯଦି (lnum >= 1 && lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && curwin->w_p_cole > 0)
 	{
-	    (void)syn_get_id(curwin, lnum, col, FALSE, NULL, FALSE);
+	    (ଶୂନ୍ୟ)syn_get_id(curwin, lnum, col, FALSE, ଖାଲି, FALSE);
 	    syntax_flags = get_syntax_info(&matchid);
 
 	    // get the conceal character
-	    if ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
+	    ଯଦି ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
 	    {
 		cchar = syn_get_sub_char();
-		if (cchar == NUL && curwin->w_p_cole == 1)
+		ଯଦି (cchar == NUL && curwin->w_p_cole == 1)
 		    cchar = (curwin->w_lcs_chars.conceal == NUL) ? ' '
 					: curwin->w_lcs_chars.conceal;
-		if (cchar != NUL)
+		ଯଦି (cchar != NUL)
 		{
-		    if (has_mbyte)
+		    ଯଦି (has_mbyte)
 			(*mb_char2bytes)(cchar, str);
-		    else
+		    ଅନ୍ୟଥା
 			str[0] = cchar;
 		}
 	    }
 	}
 
-	list_append_number(rettv->vval.v_list,
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 					    (syntax_flags & HL_CONCEAL) != 0);
 	// -1 to auto-determine strlen
 	list_append_string(rettv->vval.v_list, str, -1);
-	list_append_number(rettv->vval.v_list, matchid);
+	list_append_ସଂଖ୍ୟା(rettv->vval.v_list, matchid);
     }
 #endif
 }
@@ -13754,39 +13754,39 @@ f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "synstack(lnum, col)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_synstack(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		i;
-    int		id;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		id;
 #endif
 
-    rettv_list_set(rettv, NULL);
+    rettv_list_set(rettv, ଖାଲି);
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
 #ifdef FEAT_SYN_HL
     lnum = tv_get_lnum(argvars);		// -1 on type error
-    col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
+    col = (colnr_T)tv_get_ସଂଖ୍ୟା(&argvars[1]) - 1;	// -1 on type error
 
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    ଯଦି (lnum >= 1 && lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && rettv_list_alloc(rettv) == OK)
     {
-	(void)syn_get_id(curwin, lnum, col, FALSE, NULL, TRUE);
-	for (i = 0; ; ++i)
+	(ଶୂନ୍ୟ)syn_get_id(curwin, lnum, col, FALSE, ଖାଲି, TRUE);
+	ପାଇଁ (i = 0; ; ++i)
 	{
-	    id = syn_get_stack_item(i);
-	    if (id < 0)
-		break;
-	    if (list_append_number(rettv->vval.v_list, id) == FAIL)
-		break;
+	    id = syn_get_ଗଦା_item(i);
+	    ଯଦି (id < 0)
+		ଭାଙ୍ଗ;
+	    ଯଦି (list_append_ସଂଖ୍ୟା(rettv->vval.v_list, id) == FAIL)
+		ଭାଙ୍ଗ;
 	}
     }
 #endif
@@ -13795,52 +13795,52 @@ f_synstack(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "tabpagebuflist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_tabpagebuflist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     tabpage_T	*tp;
-    win_T	*wp = NULL;
+    win_T	*wp = ଖାଲି;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    ଅନ୍ୟଥା
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp != NULL)
+	tp = find_tabpage((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[0]));
+	ଯଦି (tp != ଖାଲି)
 	    wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
     }
-    if (wp != NULL && rettv_list_alloc(rettv) == OK)
+    ଯଦି (wp != ଖାଲି && rettv_list_alloc(rettv) == OK)
     {
-	for (; wp != NULL; wp = wp->w_next)
-	    if (list_append_number(rettv->vval.v_list,
+	ପାଇଁ (; wp != ଖାଲି; wp = wp->w_next)
+	    ଯଦି (list_append_ସଂଖ୍ୟା(rettv->vval.v_list,
 						wp->w_buffer->b_fnum) == FAIL)
-		break;
+		ଭାଙ୍ଗ;
     }
 }
 
 /*
  * "tagfiles()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_tagfiles(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*fname;
     tagname_T	tn;
-    int		first;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		first;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	return;
+    ଯଦି (fname == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    for (first = TRUE; ; first = FALSE)
-	if (get_tagfname(&tn, first, fname) == FAIL
+    ପାଇଁ (first = TRUE; ; first = FALSE)
+	ଯଦି (get_tagfname(&tn, first, fname) == FAIL
 		|| list_append_string(rettv->vval.v_list, fname, -1) == FAIL)
-	    break;
+	    ଭାଙ୍ଗ;
     tagname_free(&tn);
     vim_free(fname);
 }
@@ -13848,175 +13848,175 @@ f_tagfiles(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "taglist()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_taglist(typval_T *argvars, typval_T *rettv)
 {
-    char_u  *fname = NULL;
+    char_u  *fname = ଖାଲି;
     char_u  *tag_pattern;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     tag_pattern = tv_get_string(&argvars[0]);
 
-    rettv->vval.v_number = FALSE;
-    if (*tag_pattern == NUL)
-	return;
+    rettv->vval.v_ସଂଖ୍ୟା = FALSE;
+    ଯଦି (*tag_pattern == NUL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
 	fname = tv_get_string(&argvars[1]);
-    if (rettv_list_alloc(rettv) == OK)
-	(void)get_tags(rettv->vval.v_list, tag_pattern, fname);
+    ଯଦି (rettv_list_alloc(rettv) == OK)
+	(ଶୂନ୍ୟ)get_tags(rettv->vval.v_list, tag_pattern, fname);
 }
 
 /*
  * "type(expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_type(typval_T *argvars, typval_T *rettv)
 {
-    int n = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = -1;
 
-    switch (argvars[0].v_type)
+    ବାଛ (argvars[0].v_type)
     {
-	case VAR_NUMBER:  n = VAR_TYPE_NUMBER; break;
-	case VAR_STRING:  n = VAR_TYPE_STRING; break;
-	case VAR_PARTIAL:
-	case VAR_FUNC:    n = VAR_TYPE_FUNC; break;
-	case VAR_LIST:    n = VAR_TYPE_LIST; break;
-	case VAR_TUPLE:   n = VAR_TYPE_TUPLE; break;
-	case VAR_DICT:    n = VAR_TYPE_DICT; break;
-	case VAR_FLOAT:   n = VAR_TYPE_FLOAT; break;
-	case VAR_BOOL:	  n = VAR_TYPE_BOOL; break;
-	case VAR_SPECIAL: n = VAR_TYPE_NONE; break;
-	case VAR_JOB:     n = VAR_TYPE_JOB; break;
-	case VAR_CHANNEL: n = VAR_TYPE_CHANNEL; break;
-	case VAR_BLOB:    n = VAR_TYPE_BLOB; break;
-	case VAR_INSTR:   n = VAR_TYPE_INSTR; break;
-	case VAR_TYPEALIAS: n = VAR_TYPE_TYPEALIAS; break;
-	case VAR_CLASS:
+	ସ୍ଥିତି VAR_ସଂଖ୍ୟା:  n = VAR_TYPE_ସଂଖ୍ୟା; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_STRING:  n = VAR_TYPE_STRING; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_PARTIAL:
+	ସ୍ଥିତି VAR_FUNC:    n = VAR_TYPE_FUNC; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_LIST:    n = VAR_TYPE_LIST; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_TUPLE:   n = VAR_TYPE_TUPLE; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_DICT:    n = VAR_TYPE_DICT; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_FLOAT:   n = VAR_TYPE_FLOAT; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_BOOL:	  n = VAR_TYPE_BOOL; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_SPECIAL: n = VAR_TYPE_NONE; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_JOB:     n = VAR_TYPE_JOB; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_CHANNEL: n = VAR_TYPE_CHANNEL; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_BLOB:    n = VAR_TYPE_BLOB; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_INSTR:   n = VAR_TYPE_INSTR; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_TYPEALIAS: n = VAR_TYPE_TYPEALIAS; ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_CLASS:
 	    {
 		class_T *cl = argvars[0].vval.v_class;
-		if (cl != NULL && IS_ENUM(cl))
+		ଯଦି (cl != ଖାଲି && IS_ENUM(cl))
 		    n = VAR_TYPE_ENUM;
-		else
+		ଅନ୍ୟଥା
 		    n = VAR_TYPE_CLASS;
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	case VAR_OBJECT:
+	ସ୍ଥିତି VAR_OBJECT:
 	    {
 		object_T *obj = argvars[0].vval.v_object;
 
-		if (obj == NULL)
+		ଯଦି (obj == ଖାଲି)
 		    n = VAR_TYPE_OBJECT;
-		else
+		ଅନ୍ୟଥା
 		{
 		    class_T *cl = argvars[0].vval.v_object->obj_class;
-		    if (IS_ENUM(cl))
+		    ଯଦି (IS_ENUM(cl))
 			n = VAR_TYPE_ENUMVALUE;
-		    else
+		    ଅନ୍ୟଥା
 			n = VAR_TYPE_OBJECT;
 		}
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	case VAR_VOID:
-	    emsg(_(e_cannot_use_void_value));
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
+	ସ୍ଥିତି VAR_VOID:
+	    emsg(_(e_cannot_use_void_ମୂଲ୍ୟ));
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VAR_UNKNOWN:
+	ସ୍ଥିତି VAR_ANY:
 	    internal_error_no_abort("f_type(UNKNOWN)");
 	    n = -1;
-	    break;
+	    ଭାଙ୍ଗ;
     }
-    rettv->vval.v_number = n;
+    rettv->vval.v_ସଂଖ୍ୟା = n;
 }
 
 /*
  * "virtcol({expr}, [, {list} [, {winid}]])" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_virtcol(typval_T *argvars, typval_T *rettv)
 {
     colnr_T	vcol_start = 0;
     colnr_T	vcol_end = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		winchanged = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_bool_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))))
-	return;
+			|| check_for_opt_ସଂଖ୍ୟା_arg(argvars, 2) == FAIL))))
+	ଫେରନ୍ତୁ;
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the third argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[2]), &tp);
-	if (wp == NULL || tp == NULL)
-	    goto theend;
+	wp = win_id2wp_tp((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)tv_get_ସଂଖ୍ୟା(&argvars[2]), &tp);
+	ଯଦି (wp == ଖାଲି || tp == ଖାଲି)
+	    ଯାଅ theend;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
-	    goto theend;
+	ଯଦି (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	    ଯାଅ theend;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, FALSE);
-    if (fp != NULL && fp->lnum <= curbuf->b_ml.ml_line_count
+    ଯଦି (fp != ଖାଲି && fp->lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା
 	    && fnum == curbuf->b_fnum)
     {
 	// Limit the column to a valid value, getvvcol() doesn't check.
-	if (fp->col < 0)
+	ଯଦି (fp->col < 0)
 	    fp->col = 0;
-	else
+	ଅନ୍ୟଥା
 	{
-	    len = (int)ml_get_len(fp->lnum);
-	    if (fp->col > len)
+	    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ml_get_len(fp->lnum);
+	    ଯଦି (fp->col > len)
 		fp->col = len;
 	}
-	getvvcol(curwin, fp, &vcol_start, NULL, &vcol_end, 0);
+	getvvcol(curwin, fp, &vcol_start, ଖାଲି, &vcol_end, 0);
 	++vcol_start;
 	++vcol_end;
     }
 
 theend:
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
     {
-	if (rettv_list_alloc(rettv) == OK)
+	ଯଦି (rettv_list_alloc(rettv) == OK)
 	{
-	    list_append_number(rettv->vval.v_list, vcol_start);
-	    list_append_number(rettv->vval.v_list, vcol_end);
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, vcol_start);
+	    list_append_ସଂଖ୍ୟା(rettv->vval.v_list, vcol_end);
 	}
-	else
-	    rettv->vval.v_number = 0;
+	ଅନ୍ୟଥା
+	    rettv->vval.v_ସଂଖ୍ୟା = 0;
     }
-    else
-	rettv->vval.v_number = vcol_end;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = vcol_end;
 
-    if (winchanged)
+    ଯଦି (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
 /*
  * "visualmode()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_visualmode(typval_T *argvars, typval_T *rettv)
 {
     char_u	str[2];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     rettv->v_type = VAR_STRING;
     str[0] = curbuf->b_visual_mode_eval;
@@ -14024,24 +14024,24 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = vim_strsave(str);
 
     // A non-zero number or non-empty string argument: reset mode.
-    if (non_zero_arg(&argvars[0]))
+    ଯଦି (non_zero_arg(&argvars[0]))
 	curbuf->b_visual_mode_eval = NUL;
 }
 
 /*
  * "wildmenumode()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_wildmenumode(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
-	rettv->vval.v_number = 1;
+    ଯଦି (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
+	rettv->vval.v_ସଂଖ୍ୟା = 1;
 }
 
 /*
  * "windowsversion()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_windowsversion(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     rettv->v_type = VAR_STRING;
@@ -14051,27 +14051,27 @@ f_windowsversion(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "wordcount()" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_wordcount(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
     cursor_pos_info(rettv->vval.v_dict);
 }
 
 /*
  * "xor(expr, expr)" function
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 f_xor(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
+		|| check_for_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
-					^ tv_get_number_chk(&argvars[1], NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି)
+					^ tv_get_ସଂଖ୍ୟା_chk(&argvars[1], ଖାଲି);
 }
 
 #endif // FEAT_EVAL

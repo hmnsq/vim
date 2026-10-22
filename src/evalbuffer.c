@@ -11,55 +11,55 @@
  * evalbuffer.c: Buffer related builtin functions
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 /*
  * Mark references in functions of buffers.
  */
-    int
-set_ref_in_buffers(int copyID)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+set_ref_in_buffers(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
-    int		abort = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		abort = FALSE;
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
 	listener_T *lnr;
 
-	for (lnr = bp->b_listener; !abort && lnr != NULL; lnr = lnr->lr_next)
+	ପାଇଁ (lnr = bp->b_listener; !abort && lnr != ଖାଲି; lnr = lnr->lr_next)
 	    abort = abort || set_ref_in_callback(&lnr->lr_callback, copyID);
 # ifdef FEAT_JOB_CHANNEL
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_prompt_callback, copyID);
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_prompt_interrupt, copyID);
 # endif
 # ifdef FEAT_COMPL_FUNC
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_cfu_cb, copyID);
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_ofu_cb, copyID);
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_tsrfu_cb, copyID);
-	if (!abort && bp->b_p_cpt_cb != NULL)
+	ଯଦି (!abort && bp->b_p_cpt_cb != ଖାଲି)
 	    abort = abort || set_ref_in_cpt_callbacks(bp->b_p_cpt_cb,
-		    bp->b_p_cpt_count, copyID);
+		    bp->b_p_cpt_ଗଣନା, copyID);
 # endif
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_tfu_cb, copyID);
-	if (!abort)
+	ଯଦି (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_ffu_cb, copyID);
-	if (abort)
-	    break;
+	ଯଦି (abort)
+	    ଭାଙ୍ଗ;
     }
-    return abort;
+    ଫେରନ୍ତୁ abort;
 }
 
     buf_T *
-buflist_find_by_name(char_u *name, int curtab_only)
+buflist_find_by_name(char_u *name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା curtab_only)
 {
-    int		save_magic;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		save_magic;
     char_u	*save_cpo;
     buf_T	*buf;
 
@@ -74,7 +74,7 @@ buflist_find_by_name(char_u *name, int curtab_only)
 
     p_magic = save_magic;
     p_cpo = save_cpo;
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
@@ -83,34 +83,34 @@ buflist_find_by_name(char_u *name, int curtab_only)
     buf_T *
 find_buffer(typval_T *avar)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = ଖାଲି;
 
-    if (avar->v_type == VAR_NUMBER)
-	buf = buflist_findnr((int)avar->vval.v_number);
-    else if (in_vim9script() && check_for_string_arg(avar, 0) == FAIL)
-	return NULL;
-    else if (avar->v_type == VAR_STRING && avar->vval.v_string != NULL)
+    ଯଦି (avar->v_type == VAR_ସଂଖ୍ୟା)
+	buf = buflist_findnr((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)avar->vval.v_ସଂଖ୍ୟା);
+    ଅନ୍ୟଥା ଯଦି (in_vim9script() && check_for_string_arg(avar, 0) == FAIL)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଅନ୍ୟଥା ଯଦି (avar->v_type == VAR_STRING && avar->vval.v_string != ଖାଲି)
     {
 	buf = buflist_findname_exp(avar->vval.v_string);
-	if (buf == NULL)
+	ଯଦି (buf == ଖାଲି)
 	{
 	    // No full path name match, try a match with a URL or a "nofile"
 	    // buffer, these don't use the full path.
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_fname != NULL
+		ଯଦି (buf->b_fname != ଖାଲି
 			&& (path_with_url(buf->b_fname) || bt_nofilename(buf))
 			&& STRCMP(buf->b_fname, avar->vval.v_string) == 0)
-		    break;
+		    ଭାଙ୍ଗ;
 	}
     }
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
  * If there is a window for "curbuf", make it the current window.
  */
-    static void
-find_win_for_curbuf(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_win_for_curbuf(ଶୂନ୍ୟ)
 {
     wininfo_T *wip;
 
@@ -119,19 +119,19 @@ find_win_for_curbuf(void)
     // Do check the buffer is still there.
     FOR_ALL_BUF_WININFO(curbuf, wip)
     {
-	if (wip->wi_win != NULL && wip->wi_win->w_buffer == curbuf)
+	ଯଦି (wip->wi_win != ଖାଲି && wip->wi_win->w_buffer == curbuf)
 	{
 	    curwin = wip->wi_win;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
 }
 
-typedef struct {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
     win_T	*cob_curwin_save;
     aco_save_T	cob_aco;
-    int		cob_using_aco;
-    int		cob_save_VIsual_active;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cob_using_aco;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cob_save_VIsual_active;
 } cob_T;
 
 /*
@@ -144,7 +144,7 @@ typedef struct {
  *
  * If this fails then "curbuf" will not be equal to "buf".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 change_other_buffer_prepare(cob_T *cob, buf_T *buf)
 {
     CLEAR_POINTER(cob);
@@ -157,25 +157,25 @@ change_other_buffer_prepare(cob_T *cob, buf_T *buf)
     curbuf = buf;
     find_win_for_curbuf();  // simplest: find existing window for "buf"
 
-    if (curwin->w_buffer != buf)
+    ଯଦି (curwin->w_buffer != buf)
     {
 	// No existing window for this buffer.  It is dangerous to have
 	// curwin->w_buffer differ from "curbuf", use the autocmd window.
 	curbuf = curwin->w_buffer;
 	aucmd_prepbuf(&cob->cob_aco, buf);
-	if (curbuf == buf)
+	ଯଦି (curbuf == buf)
 	    cob->cob_using_aco = TRUE;
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 change_other_buffer_restore(cob_T *cob)
 {
-    if (cob->cob_using_aco)
+    ଯଦି (cob->cob_using_aco)
     {
 	aucmd_restbuf(&cob->cob_aco);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	curwin = cob->cob_curwin_save;
 	curbuf = curwin->w_buffer;
@@ -187,125 +187,125 @@ change_other_buffer_restore(cob_T *cob)
  * Set line or list of lines in buffer "buf" to "lines".
  * Any type is allowed and converted to a string.
  */
-    static void
-set_buffer_lines(
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(
 	buf_T	    *buf,
 	linenr_T    lnum_arg,
-	int	    append,
-	typval_T    *lines,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    append,
+	typval_T    *ଧାଡ଼ିଗୁଡ଼ିକ,
 	typval_T    *rettv)
 {
     linenr_T    lnum = lnum_arg + (append ? 1 : 0);
-    char_u	*line = NULL;
-    list_T	*l = NULL;
-    listitem_T	*li = NULL;
+    char_u	*ଧାଡ଼ି = ଖାଲି;
+    list_T	*l = ଖାଲି;
+    listitem_T	*li = ଖାଲି;
     long	added = 0;
     linenr_T	append_lnum;
 
     // When using the current buffer ml_mfp will be set if needed.  Useful when
     // setline() is used on startup.  For other buffers the buffer must be
     // loaded.
-    int is_curbuf = buf == curbuf;
-    if (buf == NULL || (!is_curbuf && buf->b_ml.ml_mfp == NULL) || lnum < 1)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_curbuf = buf == curbuf;
+    ଯଦି (buf == ଖାଲି || (!is_curbuf && buf->b_ml.ml_mfp == ଖାଲି) || lnum < 1)
     {
-	rettv->vval.v_number = 1;	// FAIL
-	if (in_vim9script() && lnum < 1)
-	    semsg(_(e_invalid_line_number_nr), lnum_arg);
-	return;
+	rettv->vval.v_ସଂଖ୍ୟା = 1;	// FAIL
+	ଯଦି (in_vim9script() && lnum < 1)
+	    semsg(_(e_invalid_ଧାଡ଼ି_ସଂଖ୍ୟା_nr), lnum_arg);
+	ଫେରନ୍ତୁ;
     }
 
     // After this don't use "return", goto "cleanup"!
     cob_T cob;
-    if (!is_curbuf)
+    ଯଦି (!is_curbuf)
 	// set "curbuf" to "buf" and find a window for this buffer
 	change_other_buffer_prepare(&cob, buf);
 
-    if (append)
+    ଯଦି (append)
 	// appendbufline() uses the line number below which we insert
 	append_lnum = lnum - 1;
-    else
+    ଅନ୍ୟଥା
 	// setbufline() uses the line number above which we insert, we only
 	// append if it's below the last line
-	append_lnum = curbuf->b_ml.ml_line_count;
+	append_lnum = curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
 
-    if (lines->v_type == VAR_LIST)
+    ଯଦି (ଧାଡ଼ିଗୁଡ଼ିକ->v_type == VAR_LIST)
     {
-	l = lines->vval.v_list;
-	if (l == NULL || list_len(l) == 0)
+	l = ଧାଡ଼ିଗୁଡ଼ିକ->vval.v_list;
+	ଯଦି (l == ଖାଲି || list_len(l) == 0)
 	{
 	    // not appending anything always succeeds
-	    goto done;
+	    ଯାଅ done;
 	}
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
     }
-    else
-	line = typval_tostring(lines, FALSE);
+    ଅନ୍ୟଥା
+	ଧାଡ଼ି = typval_tostring(ଧାଡ଼ିଗୁଡ଼ିକ, FALSE);
 
     // default result is zero == OK
-    for (;;)
+    ପାଇଁ (;;)
     {
-	if (l != NULL)
+	ଯଦି (l != ଖାଲି)
 	{
 	    // list argument, get next string
-	    if (li == NULL)
-		break;
-	    vim_free(line);
-	    line = typval_tostring(&li->li_tv, FALSE);
+	    ଯଦି (li == ଖାଲି)
+		ଭାଙ୍ଗ;
+	    vim_free(ଧାଡ଼ି);
+	    ଧାଡ଼ି = typval_tostring(&li->li_tv, FALSE);
 	    li = li->li_next;
 	}
 
-	rettv->vval.v_number = 1;	// FAIL
-	if (line == NULL || lnum > curbuf->b_ml.ml_line_count + 1)
-	    break;
+	rettv->vval.v_ସଂଖ୍ୟା = 1;	// FAIL
+	ଯଦି (ଧାଡ଼ି == ଖାଲି || lnum > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା + 1)
+	    ଭାଙ୍ଗ;
 
 	// When coming here from Insert mode, sync undo, so that this can be
 	// undone separately from what was previously inserted.
-	if (u_sync_once == 2)
+	ଯଦି (u_sync_once == 2)
 	{
 	    u_sync_once = 1; // notify that u_sync() was called
 	    u_sync(TRUE);
 	}
 
-	if (!append && lnum <= curbuf->b_ml.ml_line_count)
+	ଯଦି (!append && lnum <= curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 	{
 	    // Existing line, replace it.
 	    // Removes any existing text properties.
-	    if (u_savesub(lnum) == OK && ml_replace_len(
-		      lnum, line, (colnr_T)STRLEN(line) + 1, TRUE, TRUE) == OK)
+	    ଯଦି (u_savesub(lnum) == OK && ml_replace_len(
+		      lnum, ଧାଡ଼ି, (colnr_T)STRLEN(ଧାଡ଼ି) + 1, TRUE, TRUE) == OK)
 	    {
 		changed_bytes(lnum, 0);
-		if (is_curbuf && lnum == curwin->w_cursor.lnum)
+		ଯଦି (is_curbuf && lnum == curwin->w_cursor.lnum)
 		    check_cursor_col();
-		rettv->vval.v_number = 0;	// OK
+		rettv->vval.v_ସଂଖ୍ୟା = 0;	// OK
 	    }
 	}
-	else if (added > 0 || u_save(lnum - 1, lnum) == OK)
+	ଅନ୍ୟଥା ଯଦି (added > 0 || u_save(lnum - 1, lnum) == OK)
 	{
 	    // append the line
 	    ++added;
-	    if (ml_append(lnum - 1, line, (colnr_T)0, FALSE) == OK)
-		rettv->vval.v_number = 0;	// OK
+	    ଯଦି (ml_append(lnum - 1, ଧାଡ଼ି, (colnr_T)0, FALSE) == OK)
+		rettv->vval.v_ସଂଖ୍ୟା = 0;	// OK
 	}
 
-	if (l == NULL)			// only one string argument
-	    break;
+	ଯଦି (l == ଖାଲି)			// only one string argument
+	    ଭାଙ୍ଗ;
 	++lnum;
     }
-    vim_free(line);
+    vim_free(ଧାଡ଼ି);
 
-    if (added > 0)
+    ଯଦି (added > 0)
     {
 	win_T	    *wp;
 	tabpage_T   *tp;
 
-	appended_lines_mark(append_lnum, added);
+	appended_ଧାଡ଼ିଗୁଡ଼ିକ_mark(append_lnum, added);
 
 	// Only adjust the cursor for buffers other than the current, unless it
 	// is the current window.  For curbuf and other windows it has been
 	// done in mark_adjust_internal().
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf
+	    ଯଦି (wp->w_buffer == buf
 		    && (wp->w_buffer != curbuf || wp == curwin)
 		    && wp->w_cursor.lnum > append_lnum)
 		wp->w_cursor.lnum += added;
@@ -313,225 +313,225 @@ set_buffer_lines(
 
 	// Only update the window view if w_buffer matches curbuf, otherwise
 	// the computations will be wrong.
-	if (curwin->w_buffer == curbuf)
+	ଯଦି (curwin->w_buffer == curbuf)
 	    update_topline();
     }
 
 done:
-    if (!is_curbuf)
+    ଯଦି (!is_curbuf)
 	change_other_buffer_restore(&cob);
 }
 
 /*
  * "append(lnum, string/list)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_append(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(&argvars[0]);
-    if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, TRUE, &argvars[1], rettv);
+    ଯଦି (did_emsg == did_emsg_before)
+	set_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(curbuf, lnum, TRUE, &argvars[1], rettv);
 }
 
 /*
  * Set or append lines to a buffer.
  */
-    static void
-buf_set_append_line(typval_T *argvars, typval_T *rettv, int append)
+    ସ୍ଥିର ଶୂନ୍ୟ
+buf_set_append_ଧାଡ଼ି(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା append)
 {
     linenr_T	lnum;
     buf_T	*buf;
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
-		|| check_for_string_or_number_or_list_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_string_or_ସଂଖ୍ୟା_or_list_arg(argvars, 2) == FAIL))
+	ଫେରନ୍ତୁ;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	rettv->vval.v_number = 1; // FAIL
-    else
+    ଯଦି (buf == ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = 1; // FAIL
+    ଅନ୍ୟଥା
     {
 	lnum = tv_get_lnum_buf(&argvars[1], buf);
-	if (did_emsg == did_emsg_before)
-	    set_buffer_lines(buf, lnum, append, &argvars[2], rettv);
+	ଯଦି (did_emsg == did_emsg_before)
+	    set_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(buf, lnum, append, &argvars[2], rettv);
     }
 }
 
 /*
  * "appendbufline(buf, lnum, string/list)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_appendbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, TRUE);
+    buf_set_append_ଧାଡ଼ି(argvars, rettv, TRUE);
 }
 
 /*
  * "bufadd(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufadd(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     name = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = buflist_add(*name == NUL ? NULL : name, 0);
+    rettv->vval.v_ସଂଖ୍ୟା = buflist_add(*name == NUL ? ଖାଲି : name, 0);
 }
 
 /*
  * "bufexists(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufexists(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = (find_buffer(&argvars[0]) != NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = (find_buffer(&argvars[0]) != ଖାଲି);
 }
 
 /*
  * "buflisted(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_buflisted(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_p_bl);
+    rettv->vval.v_ସଂଖ୍ୟା = (buf != ଖାଲି && buf->b_p_bl);
 }
 
 /*
  * "bufload(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufload(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     buf = get_buf_arg(&argvars[0]);
-    if (buf != NULL)
+    ଯଦି (buf != ଖାଲି)
 	buffer_ensure_loaded(buf);
 }
 
 /*
  * "bufloaded(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufloaded(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_ml.ml_mfp != NULL);
+    rettv->vval.v_ସଂଖ୍ୟା = (buf != ଖାଲି && buf->b_ml.ml_mfp != ଖାଲି);
 }
 
 /*
  * "bufname(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufname(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     typval_T	*tv = &argvars[0];
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (tv->v_type == VAR_UNKNOWN)
+    ଯଦି (tv->v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    ଅନ୍ୟଥା
 	buf = tv_get_buf_from_arg(tv);
     rettv->v_type = VAR_STRING;
-    if (buf != NULL && buf->b_fname != NULL)
+    ଯଦି (buf != ଖାଲି && buf->b_fname != ଖାଲି)
 	rettv->vval.v_string = vim_strsave(buf->b_fname);
-    else
-	rettv->vval.v_string = NULL;
+    ଅନ୍ୟଥା
+	rettv->vval.v_string = ଖାଲି;
 }
 
 /*
  * "bufnr(expr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufnr(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    int		error = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		error = FALSE;
     char_u	*name;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_opt_buffer_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 1) == FAIL)))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[0].v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    ଅନ୍ୟଥା
 	buf = tv_get_buf_from_arg(&argvars[0]);
 
     // If the buffer isn't found and the second argument is not zero create a
     // new buffer.
-    if (buf == NULL
+    ଯଦି (buf == ଖାଲି
 	    && argvars[1].v_type != VAR_UNKNOWN
 	    && tv_get_bool_chk(&argvars[1], &error) != 0
 	    && !error
-	    && (name = tv_get_string_chk(&argvars[0])) != NULL
+	    && (name = tv_get_string_chk(&argvars[0])) != ଖାଲି
 	    && !error)
-	buf = buflist_new(name, NULL, (linenr_T)1, 0);
+	buf = buflist_new(name, ଖାଲି, (linenr_T)1, 0);
 
-    if (buf != NULL)
-	rettv->vval.v_number = buf->b_fnum;
-    else
-	rettv->vval.v_number = -1;
+    ଯଦି (buf != ଖାଲି)
+	rettv->vval.v_ସଂଖ୍ୟା = buf->b_fnum;
+    ଅନ୍ୟଥା
+	rettv->vval.v_ସଂଖ୍ୟା = -1;
 }
 
-    static void
-buf_win_common(typval_T *argvars, typval_T *rettv, int get_nr)
+    ସ୍ଥିର ଶୂନ୍ୟ
+buf_win_common(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା get_nr)
 {
     win_T	*wp;
-    int		winnr = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		winnr = 0;
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
     FOR_ALL_WINDOWS(wp)
     {
 	++winnr;
-	if (wp->w_buffer == buf)
-	    break;
+	ଯଦି (wp->w_buffer == buf)
+	    ଭାଙ୍ଗ;
     }
-    rettv->vval.v_number = (wp != NULL ? (get_nr ? winnr : wp->w_id) : -1);
+    rettv->vval.v_ସଂଖ୍ୟା = (wp != ଖାଲି ? (get_nr ? winnr : wp->w_id) : -1);
 }
 
 /*
  * "bufwinid(nr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufwinid(typval_T *argvars, typval_T *rettv)
 {
     buf_win_common(argvars, rettv, FALSE);
@@ -540,7 +540,7 @@ f_bufwinid(typval_T *argvars, typval_T *rettv)
 /*
  * "bufwinnr(nr)" function
  */
-    void
+    ଶୂନ୍ୟ
 f_bufwinnr(typval_T *argvars, typval_T *rettv)
 {
     buf_win_common(argvars, rettv, TRUE);
@@ -549,93 +549,93 @@ f_bufwinnr(typval_T *argvars, typval_T *rettv)
 /*
  * "deletebufline()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_deletebufline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     linenr_T	first, last;
     linenr_T	lnum;
-    long	count;
-    int		is_curbuf;
+    long	ଗଣନା_2;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_curbuf;
     tabpage_T	*tp;
     win_T	*wp;
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
 
-    rettv->vval.v_number = 1;	// FAIL by default
+    rettv->vval.v_ସଂଖ୍ୟା = 1;	// FAIL by default
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    ଯଦି (buf == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     first = tv_get_lnum_buf(&argvars[1], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (did_emsg > did_emsg_before)
+	ଫେରନ୍ତୁ;
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
 	last = tv_get_lnum_buf(&argvars[2], buf);
-    else
+    ଅନ୍ୟଥା
 	last = first;
 
-    if (buf->b_ml.ml_mfp == NULL || first < 1
-			   || first > buf->b_ml.ml_line_count || last < first)
-	return;
+    ଯଦି (buf->b_ml.ml_mfp == ଖାଲି || first < 1
+			   || first > buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା || last < first)
+	ଫେରନ୍ତୁ;
 
     // After this don't use "return", goto "cleanup"!
     is_curbuf = buf == curbuf;
     cob_T cob;
-    if (!is_curbuf)
+    ଯଦି (!is_curbuf)
 	// set "curbuf" to "buf" and find a window for this buffer
 	change_other_buffer_prepare(&cob, buf);
 
-    if (last > curbuf->b_ml.ml_line_count)
-	last = curbuf->b_ml.ml_line_count;
-    count = last - first + 1;
+    ଯଦି (last > curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+	last = curbuf->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
+    ଗଣନା_2 = last - first + 1;
 
     // When coming here from Insert mode, sync undo, so that this can be
     // undone separately from what was previously inserted.
-    if (u_sync_once == 2)
+    ଯଦି (u_sync_once == 2)
     {
 	u_sync_once = 1; // notify that u_sync() was called
 	u_sync(TRUE);
     }
 
-    if (u_save(first - 1, last + 1) == FAIL)
-	goto cleanup;
+    ଯଦି (u_save(first - 1, last + 1) == FAIL)
+	ଯାଅ cleanup;
 
-    for (lnum = first; lnum <= last; ++lnum)
+    ପାଇଁ (lnum = first; lnum <= last; ++lnum)
 	ml_delete_flags(first, ML_DEL_MESSAGE);
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == buf)
+	ଯଦି (wp->w_buffer == buf)
 	{
-	    if (wp->w_cursor.lnum > last)
-		wp->w_cursor.lnum -= count;
-	    else if (wp->w_cursor.lnum > first)
+	    ଯଦି (wp->w_cursor.lnum > last)
+		wp->w_cursor.lnum -= ଗଣନା_2;
+	    ଅନ୍ୟଥା ଯଦି (wp->w_cursor.lnum > first)
 		wp->w_cursor.lnum = first;
-	    if (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_line_count)
-		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_line_count;
+	    ଯଦି (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
+		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_ଧାଡ଼ି_ଗଣନା;
 	    wp->w_valid = 0;
-	    if (wp->w_cursor.lnum <= wp->w_topline)
+	    ଯଦି (wp->w_cursor.lnum <= wp->w_topline)
 		wp->w_topline = 1;
 	}
     check_cursor_col();
-    deleted_lines_mark(first, count);
-    rettv->vval.v_number = 0; // OK
+    deleted_ଧାଡ଼ିଗୁଡ଼ିକ_mark(first, ଗଣନା_2);
+    rettv->vval.v_ସଂଖ୍ୟା = 0; // OK
 
 cleanup:
-    if (!is_curbuf)
+    ଯଦି (!is_curbuf)
 	change_other_buffer_restore(&cob);
 }
 
 /*
  * Returns buffer options, variables and other attributes in a dictionary.
  */
-    static dict_T *
+    ସ୍ଥିର dict_T *
 get_buffer_info(buf_T *buf)
 {
     dict_T	*dict;
@@ -644,58 +644,58 @@ get_buffer_info(buf_T *buf)
     list_T	*windows;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ଯଦି (dict == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    dict_add_number(dict, "bufnr", buf->b_fnum);
+    dict_add_ସଂଖ୍ୟା(dict, "bufnr", buf->b_fnum);
     dict_add_string(dict, "name", buf->b_ffname);
-    dict_add_number(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
+    dict_add_ସଂଖ୍ୟା(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
 						     : buflist_findlnum(buf));
-    dict_add_number(dict, "linecount", buf->b_ml.ml_line_count);
-    dict_add_number(dict, "loaded", buf->b_ml.ml_mfp != NULL);
-    dict_add_number(dict, "listed", buf->b_p_bl);
-    dict_add_number(dict, "changed", bufIsChanged(buf));
-    dict_add_number(dict, "changedtick", CHANGEDTICK(buf));
-    dict_add_number(dict, "hidden",
-			    buf->b_ml.ml_mfp != NULL && buf->b_nwindows == 0);
-    dict_add_number(dict, "command", buf == cmdwin_buf);
+    dict_add_ସଂଖ୍ୟା(dict, "linecount", buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା);
+    dict_add_ସଂଖ୍ୟା(dict, "loaded", buf->b_ml.ml_mfp != ଖାଲି);
+    dict_add_ସଂଖ୍ୟା(dict, "listed", buf->b_p_bl);
+    dict_add_ସଂଖ୍ୟା(dict, "changed", bufIsChanged(buf));
+    dict_add_ସଂଖ୍ୟା(dict, "changedtick", CHANGEDTICK(buf));
+    dict_add_ସଂଖ୍ୟା(dict, "hidden",
+			    buf->b_ml.ml_mfp != ଖାଲି && buf->b_nwindows == 0);
+    dict_add_ସଂଖ୍ୟା(dict, "command", buf == cmdwin_buf);
 
     // Get a reference to buffer variables
     dict_add_dict(dict, "variables", buf->b_vars);
 
     // List of windows displaying this buffer
     windows = list_alloc();
-    if (windows != NULL)
+    ଯଦି (windows != ଖାଲି)
     {
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+	    ଯଦି (wp->w_buffer == buf)
+		list_append_ସଂଖ୍ୟା(windows, (varnumber_T)wp->w_id);
 	dict_add_list(dict, "windows", windows);
     }
 
 # ifdef FEAT_PROP_POPUP
     // List of popup windows displaying this buffer
     windows = list_alloc();
-    if (windows != NULL)
+    ଯଦି (windows != ଖାଲି)
     {
 	FOR_ALL_POPUPWINS(wp)
-	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+	    ଯଦି (wp->w_buffer == buf)
+		list_append_ସଂଖ୍ୟା(windows, (varnumber_T)wp->w_id);
 	FOR_ALL_TABPAGES(tp)
 	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf)
-		    list_append_number(windows, (varnumber_T)wp->w_id);
+		ଯଦି (wp->w_buffer == buf)
+		    list_append_ସଂଖ୍ୟା(windows, (varnumber_T)wp->w_id);
 
 	dict_add_list(dict, "popups", windows);
     }
 # endif
 
 # ifdef FEAT_SIGNS
-    if (buf->b_signlist != NULL)
+    ଯଦି (buf->b_signlist != ଖାଲି)
     {
 	// List of signs placed in this buffer
 	list_T	*signs = list_alloc();
-	if (signs != NULL)
+	ଯଦି (signs != ଖାଲି)
 	{
 	    get_buffer_signs(buf, signs);
 	    dict_add_list(dict, "signs", signs);
@@ -704,39 +704,39 @@ get_buffer_info(buf_T *buf)
 # endif
 
 # ifdef FEAT_VIMINFO
-    dict_add_number(dict, "lastused", buf->b_last_used);
+    dict_add_ସଂଖ୍ୟା(dict, "lastused", buf->b_last_used);
 # endif
 
-    return dict;
+    ଫେରନ୍ତୁ dict;
 }
 
 /*
  * "getbufinfo()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_getbufinfo(typval_T *argvars, typval_T *rettv)
 {
-    buf_T	*buf = NULL;
-    buf_T	*argbuf = NULL;
+    buf_T	*buf = ଖାଲି;
+    buf_T	*argbuf = ଖାଲି;
     dict_T	*d;
-    int		filtered = FALSE;
-    int		sel_buflisted = FALSE;
-    int		sel_bufloaded = FALSE;
-    int		sel_bufmodified = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		filtered = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sel_buflisted = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sel_bufloaded = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sel_bufmodified = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_list_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && check_for_opt_buffer_or_dict_arg(argvars, 0) == FAIL)
-	return;
+	ଫେରନ୍ତୁ;
 
     // List of all the buffers or selected buffers
-    if (argvars[0].v_type == VAR_DICT)
+    ଯଦି (argvars[0].v_type == VAR_DICT)
     {
 	dict_T	*sel_d = argvars[0].vval.v_dict;
 
-	if (sel_d != NULL)
+	ଯଦି (sel_d != ଖାଲି)
 	{
 	    filtered = TRUE;
 	    sel_buflisted = dict_get_bool(sel_d, "buflisted", FALSE);
@@ -745,29 +745,29 @@ f_getbufinfo(typval_T *argvars, typval_T *rettv)
 									FALSE);
 	}
     }
-    else if (argvars[0].v_type != VAR_UNKNOWN)
+    ଅନ୍ୟଥା ଯଦି (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// Information about one buffer.  Argument specifies the buffer
 	argbuf = tv_get_buf_from_arg(&argvars[0]);
-	if (argbuf == NULL)
-	    return;
+	ଯଦି (argbuf == ଖାଲି)
+	    ଫେରନ୍ତୁ;
     }
 
     // Return information about all the buffers or a specified buffer
     FOR_ALL_BUFFERS(buf)
     {
-	if (argbuf != NULL && argbuf != buf)
-	    continue;
-	if (filtered && ((sel_bufloaded && buf->b_ml.ml_mfp == NULL)
+	ଯଦି (argbuf != ଖାଲି && argbuf != buf)
+	    ଜାରି;
+	ଯଦି (filtered && ((sel_bufloaded && buf->b_ml.ml_mfp == ଖାଲି)
 			|| (sel_buflisted && !buf->b_p_bl)
 			|| (sel_bufmodified && !buf->b_changed)))
-	    continue;
+	    ଜାରି;
 
 	d = get_buffer_info(buf);
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	    list_append_dict(rettv->vval.v_list, d);
-	if (argbuf != NULL)
-	    return;
+	ଯଦି (argbuf != ଖାଲି)
+	    ଫେରନ୍ତୁ;
     }
 }
 
@@ -777,105 +777,105 @@ f_getbufinfo(typval_T *argvars, typval_T *rettv)
  * buffer.
  * If 'retlist' is TRUE, then the lines are returned as a Vim List.
  */
-    static void
-get_buffer_lines(
+    ସ୍ଥିର ଶୂନ୍ୟ
+get_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(
     buf_T	*buf,
     linenr_T	start,
     linenr_T	end,
-    int		retlist,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retlist,
     typval_T	*rettv)
 {
-    if (!retlist)
+    ଯଦି (!retlist)
     {
 	rettv->v_type = VAR_STRING;
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ଖାଲି;
     }
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL || start < 0)
+    ଯଦି (buf == ଖାଲି || buf->b_ml.ml_mfp == ଖାଲି || start < 0)
     {
-	if (retlist)
-	    (void)rettv_list_alloc(rettv);
-	return;
+	ଯଦି (retlist)
+	    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	ଫେରନ୍ତୁ;
     }
 
-    if (!retlist)
+    ଯଦି (!retlist)
     {
-	if (start >= 1 && start <= buf->b_ml.ml_line_count)
+	ଯଦି (start >= 1 && start <= buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା)
 	    rettv->vval.v_string =
 		vim_strnsave(ml_get_buf(buf, start, FALSE),
 		    ml_get_buf_len(buf, start));
-	else
+	ଅନ୍ୟଥା
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	list_T		*l;
 	listitem_T	*li;
 
 	start = MAX(start, 1);
-	end = MIN(end, buf->b_ml.ml_line_count);
-	if (end < start)
-	    goto nolist;
+	end = MIN(end, buf->b_ml.ml_ଧାଡ଼ି_ଗଣନା);
+	ଯଦି (end < start)
+	    ଯାଅ nolist;
 
 	// The number of lines is known, so allocate the list and its items
 	// in one allocation.
-	l = list_alloc_with_items((int)(end - start + 1));
-	if (l == NULL)
-	    goto nolist;
+	l = list_alloc_with_ବସ୍ତୁଗୁଡ଼ିକ((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(end - start + 1));
+	ଯଦି (l == ଖାଲି)
+	    ଯାଅ nolist;
 	rettv_list_set(rettv, l);
 
 	// The items are already linked and zeroed, so only the string needs
 	// to be filled in.
-	for (li = l->lv_first; start <= end; ++start, li = li->li_next)
+	ପାଇଁ (li = l->lv_first; start <= end; ++start, li = li->li_next)
 	{
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.vval.v_string = vim_strnsave(ml_get_buf(buf, start, FALSE),
 						   ml_get_buf_len(buf, start));
 	}
     }
-    return;
+    ଫେରନ୍ତୁ;
 
 nolist:
-    (void)rettv_list_alloc(rettv);
+    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
 }
 
 /*
  * "retlist" TRUE: "getbufline()" function
  * "retlist" FALSE: "getbufoneline()" function
  */
-    static void
-getbufline(typval_T *argvars, typval_T *rettv, int retlist)
+    ସ୍ଥିର ଶୂନ୍ୟ
+getbufline(typval_T *argvars, typval_T *rettv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା retlist)
 {
     linenr_T	lnum = 1;
     linenr_T	end = 1;
     buf_T	*buf;
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 2) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf != NULL)
+    ଯଦି (buf != ଖାଲି)
     {
 	lnum = tv_get_lnum_buf(&argvars[1], buf);
-	if (did_emsg > did_emsg_before)
-	    return;
-	if (argvars[2].v_type == VAR_UNKNOWN)
+	ଯଦି (did_emsg > did_emsg_before)
+	    ଫେରନ୍ତୁ;
+	ଯଦି (argvars[2].v_type == VAR_UNKNOWN)
 	    end = lnum;
-	else
+	ଅନ୍ୟଥା
 	    end = tv_get_lnum_buf(&argvars[2], buf);
     }
 
-    get_buffer_lines(buf, lnum, end, retlist, rettv);
+    get_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(buf, lnum, end, retlist, rettv);
 }
 
 /*
  * "getbufline()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_getbufline(typval_T *argvars, typval_T *rettv)
 {
     getbufline(argvars, rettv, TRUE);
@@ -884,7 +884,7 @@ f_getbufline(typval_T *argvars, typval_T *rettv)
 /*
  * "getbufoneline()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_getbufoneline(typval_T *argvars, typval_T *rettv)
 {
     getbufline(argvars, rettv, FALSE);
@@ -893,66 +893,66 @@ f_getbufoneline(typval_T *argvars, typval_T *rettv)
 /*
  * "getline(lnum, [end])" function
  */
-    void
+    ଶୂନ୍ୟ
 f_getline(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
     linenr_T	end;
-    int		retlist;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retlist;
 
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(argvars);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ଯଦି (argvars[1].v_type == VAR_UNKNOWN)
     {
 	end = 0;
 	retlist = FALSE;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	end = tv_get_lnum(&argvars[1]);
 	retlist = TRUE;
     }
 
-    get_buffer_lines(curbuf, lnum, end, retlist, rettv);
+    get_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(curbuf, lnum, end, retlist, rettv);
 }
 
 /*
  * "setbufline()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_setbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, FALSE);
+    buf_set_append_ଧାଡ଼ି(argvars, rettv, FALSE);
 }
 
 /*
  * "setline()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_setline(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
-    int		did_emsg_before = did_emsg;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_emsg_before = did_emsg;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
     lnum = tv_get_lnum(&argvars[0]);
-    if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, FALSE, &argvars[1], rettv);
+    ଯଦି (did_emsg == did_emsg_before)
+	set_buffer_ଧାଡ଼ିଗୁଡ଼ିକ(curbuf, lnum, FALSE, &argvars[1], rettv);
 }
 #endif  // FEAT_EVAL
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ଯଦି defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Make "buf" the current buffer.  restore_buffer() MUST be called to undo.
  * No autocommands will be executed.  Use aucmd_prepbuf() if there are any.
  */
-    void
+    ଶୂନ୍ୟ
 switch_buffer(bufref_T *save_curbuf, buf_T *buf)
 {
     block_autocmds();
@@ -969,7 +969,7 @@ switch_buffer(bufref_T *save_curbuf, buf_T *buf)
 /*
  * Restore the current buffer after using switch_buffer().
  */
-    void
+    ଶୂନ୍ୟ
 restore_buffer(bufref_T *save_curbuf)
 {
     unblock_autocmds();
@@ -977,7 +977,7 @@ restore_buffer(bufref_T *save_curbuf)
     --disable_fold_update;
 # endif
     // Check for valid buffer, just in case.
-    if (bufref_valid(save_curbuf))
+    ଯଦି (bufref_valid(save_curbuf))
     {
 	--curbuf->b_nwindows;
 	curwin->w_buffer = save_curbuf->br_buf;
@@ -991,16 +991,16 @@ restore_buffer(bufref_T *save_curbuf)
  * If found OK is returned and "wp" and "tp" are set to the window and tabpage.
  * If not found FAIL is returned.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 find_win_for_buf(
     buf_T     *buf,
     win_T     **wp,
     tabpage_T **tp)
 {
     FOR_ALL_TAB_WINDOWS(*tp, *wp)
-	if ((*wp)->w_buffer == buf)
-	    return OK;
-    return FAIL;
+	ଯଦି ((*wp)->w_buffer == buf)
+	    ଫେରନ୍ତୁ OK;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 /*
@@ -1009,7 +1009,7 @@ find_win_for_buf(
  * Caller must initialize save_curbuf to NULL.
  * restore_win_for_buf() MUST be called later!
  */
-    void
+    ଶୂନ୍ୟ
 switch_to_win_for_buf(
 	buf_T	    *buf,
 	switchwin_T *switchwin,
@@ -1018,23 +1018,23 @@ switch_to_win_for_buf(
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (find_win_for_buf(buf, &wp, &tp) == FAIL)
+    ଯଦି (find_win_for_buf(buf, &wp, &tp) == FAIL)
 	switch_buffer(save_curbuf, buf);
-    else if (switch_win(switchwin, wp, tp, TRUE) == FAIL)
+    ଅନ୍ୟଥା ଯଦି (switch_win(switchwin, wp, tp, TRUE) == FAIL)
     {
 	restore_win(switchwin, TRUE);
 	switch_buffer(save_curbuf, buf);
     }
 }
 
-    void
+    ଶୂନ୍ୟ
 restore_win_for_buf(
 	switchwin_T *switchwin,
 	bufref_T    *save_curbuf)
 {
-    if (save_curbuf->br_buf == NULL)
+    ଯଦି (save_curbuf->br_buf == ଖାଲି)
 	restore_win(switchwin, TRUE);
-    else
+    ଅନ୍ୟଥା
 	restore_buffer(save_curbuf);
 }
 #endif

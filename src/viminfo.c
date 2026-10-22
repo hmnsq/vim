@@ -11,61 +11,61 @@
  * viminfo.c: viminfo related functions
  */
 
-#include "vim.h"
-#include "version.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
+#ଅନ୍ତର୍ଭାଵ "version.h"
 
 /*
  * Structure used for reading from the viminfo file.
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    char_u	*vir_line;	// text of the current line
+    char_u	*vir_ଧାଡ଼ି;	// text of the current line
     FILE	*vir_fd;	// file descriptor
     vimconv_T	vir_conv;	// encoding conversion
-    int		vir_version;	// viminfo version detected or -1
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		vir_version;	// viminfo version detected or -1
     garray_T	vir_barlines;	// lines starting with |
 } vir_T;
 
-typedef enum {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା {
     BVAL_NR,
     BVAL_STRING,
     BVAL_EMPTY
 } btype_T;
 
-typedef struct {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
     btype_T	bv_type;
     long	bv_nr;
     char_u	*bv_string;
     char_u	*bv_tofree;	// free later when not NULL
-    int		bv_len;		// length of bv_string
-    int		bv_allocated;	// bv_string was allocated
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		bv_len;		// length of bv_string
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		bv_allocated;	// bv_string was allocated
 } bval_T;
 
-#if defined(FEAT_VIMINFO)
+#ଯଦି defined(FEAT_VIMINFO)
 
-static int  viminfo_errcnt;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା  viminfo_errcnt;
 
 /*
  * Find the parameter represented by the given character (eg ''', ':', '"', or
  * '/') in the 'viminfo' option and return a pointer to the string after it.
  * Return NULL if the parameter is not specified in the string.
  */
-    static char_u *
-find_viminfo_parameter(int type)
+    ସ୍ଥିର char_u *
+find_viminfo_parameter(ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     char_u  *p;
 
-    for (p = p_viminfo; *p; ++p)
+    ପାଇଁ (p = p_viminfo; *p; ++p)
     {
-	if (*p == type)
-	    return p + 1;
-	if (*p == 'n')		    // 'n' is always the last one
-	    break;
+	ଯଦି (*p == type)
+	    ଫେରନ୍ତୁ p + 1;
+	ଯଦି (*p == 'n')		    // 'n' is always the last one
+	    ଭାଙ୍ଗ;
 	p = vim_strchr(p, ',');	    // skip until next ','
-	if (p == NULL)		    // hit the end without finding parameter
-	    break;
+	ଯଦି (p == ଖାଲି)		    // hit the end without finding parameter
+	    ଭାଙ୍ଗ;
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 /*
@@ -75,15 +75,15 @@ find_viminfo_parameter(int type)
  * If the parameter is not specified in the string or there is no following
  * number, return -1.
  */
-    int
-get_viminfo_parameter(int type)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_viminfo_parameter(ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     char_u  *p;
 
     p = find_viminfo_parameter(type);
-    if (p != NULL && VIM_ISDIGIT(*p))
-	return atoi((char *)p);
-    return -1;
+    ଯଦି (p != ଖାଲି && VIM_ISDIGIT(*p))
+	ଫେରନ୍ତୁ atoi((ଅକ୍ଷର *)p);
+    ଫେରନ୍ତୁ -1;
 }
 
 /*
@@ -94,48 +94,48 @@ get_viminfo_parameter(int type)
  * expand environment variables.
  * Returns an allocated string.  NULL when out of memory.
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 viminfo_filename(char_u *file)
 {
-    if (file == NULL || *file == NUL)
+    ଯଦି (file == ଖାଲି || *file == NUL)
     {
 	size_t  len;
 
-	if (*p_viminfofile != NUL)
+	ଯଦି (*p_viminfofile != NUL)
 	    file = p_viminfofile;
-	else if ((file = find_viminfo_parameter('n')) == NULL || *file == NUL)
+	ଅନ୍ୟଥା ଯଦି ((file = find_viminfo_parameter('n')) == ଖାଲି || *file == NUL)
 	{
 #ifdef VIMINFO_FILE2
 # ifdef VMS
-	    if (mch_getenv((char_u *)"SYS$LOGIN") == NULL)
-# else
+	    ଯଦି (mch_getenv((char_u *)"SYS$LOGIN") == ଖାଲି)
+# ଅନ୍ୟଥା
 #  ifdef MSWIN
 	    // Use $VIM only if $HOME is the default "C:/".
-	    if (STRCMP(vim_getenv((char_u *)"HOME", NULL), "C:/") == 0
-		    && mch_getenv((char_u *)"HOME") == NULL)
-#  else
-	    if (mch_getenv((char_u *)"HOME") == NULL)
+	    ଯଦି (STRCMP(vim_getenv((char_u *)"HOME", ଖାଲି), "C:/") == 0
+		    && mch_getenv((char_u *)"HOME") == ଖାଲି)
+#  ଅନ୍ୟଥା
+	    ଯଦି (mch_getenv((char_u *)"HOME") == ଖାଲି)
 #  endif
 # endif
 	    {
 		// don't use $VIM when not available.
 		expand_env((char_u *)"$VIM", NameBuff, MAXPATHL);
-		if (STRCMP("$VIM", NameBuff) != 0)  // $VIM was expanded
+		ଯଦି (STRCMP("$VIM", NameBuff) != 0)  // $VIM was expanded
 		    file = (char_u *)VIMINFO_FILE2;
-		else
+		ଅନ୍ୟଥା
 		    file = (char_u *)VIMINFO_FILE;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 #endif
 		file = (char_u *)VIMINFO_FILE;
 	}
 	len = expand_env(file, NameBuff, MAXPATHL);
 	file = NameBuff;
 
-	return vim_strnsave(file, len);
+	ଫେରନ୍ତୁ vim_strnsave(file, len);
     }
 
-    return vim_strsave(file);
+    ଫେରନ୍ତୁ vim_strsave(file);
 }
 
 /*
@@ -148,16 +148,16 @@ viminfo_filename(char_u *file)
  * - write " CTRL-V <length> \n " in first line
  * - write " < <string> \n "	  in second line
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 viminfo_writestring(FILE *fd, char_u *p)
 {
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
     char_u	*s;
-    int		len = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = 0;
 
-    for (s = p; *s != NUL; ++s)
+    ପାଇଁ (s = p; *s != NUL; ++s)
     {
-	if (*s == Ctrl_V || *s == '\n')
+	ଯଦି (*s == Ctrl_V || *s == '\n')
 	    ++len;
 	++len;
     }
@@ -166,15 +166,15 @@ viminfo_writestring(FILE *fd, char_u *p)
     // line.  Take into account that some room is needed for what comes before
     // the string (e.g., variable name).  Add something to the length for the
     // '<', NL and trailing NUL.
-    if (len > LSIZE / 2)
+    ଯଦି (len > LSIZE / 2)
 	fprintf(fd, "\026%d\n<", len + 3);
 
-    while ((c = *p++) != NUL)
+    ଯେତେବେଳେ ((c = *p++) != NUL)
     {
-	if (c == Ctrl_V || c == '\n')
+	ଯଦି (c == Ctrl_V || c == '\n')
 	{
 	    putc(Ctrl_V, fd);
-	    if (c == '\n')
+	    ଯଦି (c == '\n')
 		c = 'n';
 	}
 	putc(c, fd);
@@ -187,49 +187,49 @@ viminfo_writestring(FILE *fd, char_u *p)
  * Breaks the line in less than LSIZE pieces when needed.
  * Returns remaining characters in the line.
  */
-    static int
-barline_writestring(FILE *fd, char_u *s, int remaining_start)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+barline_writestring(FILE *fd, char_u *s, ପୂର୍ଣ୍ଣସଂଖ୍ୟା remaining_start)
 {
     char_u *p;
-    int	    remaining = remaining_start;
-    int	    len = 2;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    remaining = remaining_start;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len = 2;
 
     // Count the number of characters produced, including quotes.
-    for (p = s; *p != NUL; ++p)
+    ପାଇଁ (p = s; *p != NUL; ++p)
     {
-	if (*p == NL)
+	ଯଦି (*p == NL)
 	    len += 2;
-	else if (*p == '"' || *p == '\\')
+	ଅନ୍ୟଥା ଯଦି (*p == '"' || *p == '\\')
 	    len += 2;
-	else
+	ଅନ୍ୟଥା
 	    ++len;
     }
-    if (len > remaining - 2)
+    ଯଦି (len > remaining - 2)
     {
 	fprintf(fd, ">%d\n|<", len);
 	remaining = LSIZE - 20;
     }
 
     putc('"', fd);
-    for (p = s; *p != NUL; ++p)
+    ପାଇଁ (p = s; *p != NUL; ++p)
     {
-	if (*p == NL)
+	ଯଦି (*p == NL)
 	{
 	    putc('\\', fd);
 	    putc('n', fd);
 	    --remaining;
 	}
-	else if (*p == '"' || *p == '\\')
+	ଅନ୍ୟଥା ଯଦି (*p == '"' || *p == '\\')
 	{
 	    putc('\\', fd);
 	    putc(*p, fd);
 	    --remaining;
 	}
-	else
+	ଅନ୍ୟଥା
 	    putc(*p, fd);
 	--remaining;
 
-	if (remaining < 3)
+	ଯଦି (remaining < 3)
 	{
 	    putc('\n', fd);
 	    putc('|', fd);
@@ -239,7 +239,7 @@ barline_writestring(FILE *fd, char_u *s, int remaining_start)
 	}
     }
     putc('"', fd);
-    return remaining - 2;
+    ଫେରନ୍ତୁ remaining - 2;
 }
 
 /*
@@ -252,82 +252,82 @@ barline_writestring(FILE *fd, char_u *s, int remaining_start)
  *
  * Return the string in allocated memory (NULL when out of memory).
  */
-    static char_u *
+    ସ୍ଥିର char_u *
 viminfo_readstring(
     vir_T	*virp,
-    int		off,		    // offset for virp->vir_line
-    int		convert)	    // convert the string
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		off,		    // offset for virp->vir_line
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		convert)	    // convert the string
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ଖାଲି;
     char_u	*s, *d;
     long	len;
 
-    if (virp->vir_line[off] == Ctrl_V && vim_isdigit(virp->vir_line[off + 1]))
+    ଯଦି (virp->vir_ଧାଡ଼ି[off] == Ctrl_V && vim_isdigit(virp->vir_ଧାଡ଼ି[off + 1]))
     {
-	len = atol((char *)virp->vir_line + off + 1);
-	if (len > 1 && len < 1000000)
+	len = atol((ଅକ୍ଷର *)virp->vir_ଧାଡ଼ି + off + 1);
+	ଯଦି (len > 1 && len < 1000000)
 	    retval = lalloc(len, TRUE);
-	if (retval == NULL)
+	ଯଦି (retval == ଖାଲି)
 	{
 	    // Invalid length, line too long, out of memory?  Skip next line.
-	    (void)vim_fgets(virp->vir_line, 10, virp->vir_fd);
-	    return NULL;
+	    (ଶୂନ୍ୟ)vim_fgets(virp->vir_ଧାଡ଼ି, 10, virp->vir_fd);
+	    ଫେରନ୍ତୁ ଖାଲି;
 	}
-	(void)vim_fgets(retval, (int)len, virp->vir_fd);
+	(ଶୂନ୍ୟ)vim_fgets(retval, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)len, virp->vir_fd);
 	s = retval + 1;	    // Skip the leading '<'
     }
-    else
+    ଅନ୍ୟଥା
     {
-	retval = vim_strsave(virp->vir_line + off);
-	if (retval == NULL)
-	    return NULL;
+	retval = vim_strsave(virp->vir_ଧାଡ଼ି + off);
+	ଯଦି (retval == ଖାଲି)
+	    ଫେରନ୍ତୁ ଖାଲି;
 	s = retval;
     }
 
     // Change CTRL-V CTRL-V to CTRL-V and CTRL-V n to \n in-place.
     d = retval;
-    while (*s != NUL && *s != '\n')
+    ଯେତେବେଳେ (*s != NUL && *s != '\n')
     {
-	if (s[0] == Ctrl_V && s[1] != NUL)
+	ଯଦି (s[0] == Ctrl_V && s[1] != NUL)
 	{
-	    if (s[1] == 'n')
+	    ଯଦି (s[1] == 'n')
 		*d++ = '\n';
-	    else
+	    ଅନ୍ୟଥା
 		*d++ = Ctrl_V;
 	    s += 2;
 	}
-	else
+	ଅନ୍ୟଥା
 	    *d++ = *s++;
     }
     *d = NUL;
 
-    if (convert && virp->vir_conv.vc_type != CONV_NONE && *retval != NUL)
+    ଯଦି (convert && virp->vir_conv.vc_type != CONV_NONE && *retval != NUL)
     {
-	d = string_convert(&virp->vir_conv, retval, NULL);
-	if (d != NULL)
+	d = string_convert(&virp->vir_conv, retval, ଖାଲି);
+	ଯଦି (d != ଖାଲି)
 	{
 	    vim_free(retval);
 	    retval = d;
 	}
     }
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
 /*
  * Read a line from the viminfo file.
  * Returns TRUE for end-of-file;
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 viminfo_readline(vir_T *virp)
 {
-    return vim_fgets(virp->vir_line, LSIZE, virp->vir_fd);
+    ଫେରନ୍ତୁ vim_fgets(virp->vir_ଧାଡ଼ି, LSIZE, virp->vir_fd);
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 read_viminfo_bufferlist(
     vir_T	*virp,
-    int		writing)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		writing)
 {
     char_u	*tab;
     linenr_T	lnum;
@@ -340,23 +340,23 @@ read_viminfo_bufferlist(
     xline = viminfo_readstring(virp, 1, FALSE);
 
     // don't read in if there are files on the command-line or if writing:
-    if (xline != NULL && !writing && ARGCOUNT == 0
-				       && find_viminfo_parameter('%') != NULL)
+    ଯଦି (xline != ଖାଲି && !writing && ARGCOUNT == 0
+				       && find_viminfo_parameter('%') != ଖାଲି)
     {
 	// Format is: <fname> Tab <lnum> Tab <col>.
 	// Watch out for a Tab in the file name, work from the end.
 	lnum = 0;
 	col = 0;
 	tab = vim_strrchr(xline, '\t');
-	if (tab != NULL)
+	ଯଦି (tab != ଖାଲି)
 	{
 	    *tab++ = '\0';
-	    col = (colnr_T)atoi((char *)tab);
+	    col = (colnr_T)atoi((ଅକ୍ଷର *)tab);
 	    tab = vim_strrchr(xline, '\t');
-	    if (tab != NULL)
+	    ଯଦି (tab != ଖାଲି)
 	    {
 		*tab++ = '\0';
-		lnum = atol((char *)tab);
+		lnum = atol((ଅକ୍ଷର *)tab);
 	    }
 	}
 
@@ -366,7 +366,7 @@ read_viminfo_bufferlist(
 	sfname = shorten_fname1(NameBuff);
 
 	buf = buflist_new(NameBuff, sfname, (linenr_T)0, BLN_LISTED);
-	if (buf != NULL)	// just in case...
+	ଯଦି (buf != ଖାଲି)	// just in case...
 	{
 	    buf->b_last_cursor.lnum = lnum;
 	    buf->b_last_cursor.col = col;
@@ -375,59 +375,59 @@ read_viminfo_bufferlist(
     }
     vim_free(xline);
 
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
 /*
  * Return TRUE if "name" is on removable media (depending on 'viminfo').
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 removable(char_u *name)
 {
     char_u  *p;
     char_u  part[51];
-    int	    part_len;
-    int	    retval = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    part_len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    retval = FALSE;
 
-    name = home_replace_save(NULL, name);
-    if (name == NULL)
-	return FALSE;
-    for (p = p_viminfo; *p; )
+    name = home_replace_save(ଖାଲି, name);
+    ଯଦି (name == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
+    ପାଇଁ (p = p_viminfo; *p; )
     {
-	part_len = copy_option_part(&p, part, sizeof(part), ", ");
-	if (part[0] == 'r')
+	part_len = copy_option_part(&p, part, ଆକାର(part), ", ");
+	ଯଦି (part[0] == 'r')
 	{
-	    if (MB_STRNICMP(part + 1, name, part_len - 1) == 0)
+	    ଯଦି (MB_STRNICMP(part + 1, name, part_len - 1) == 0)
 	    {
 		retval = TRUE;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
     vim_free(name);
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_bufferlist(FILE *fp)
 {
     buf_T	*buf;
     win_T	*win;
     tabpage_T	*tp;
-    char_u	*line;
-    int		max_buffers;
+    char_u	*ଧାଡ଼ି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_buffers;
 
-    if (find_viminfo_parameter('%') == NULL)
-	return;
+    ଯଦି (find_viminfo_parameter('%') == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // Without a number -1 is returned: do all buffers.
     max_buffers = get_viminfo_parameter('%');
 
     // Allocate room for the file name, lnum and col.
-#define LINE_BUF_LEN (MAXPATHL + 40)
-    line = alloc(LINE_BUF_LEN);
-    if (line == NULL)
-	return;
+#define ଧାଡ଼ି_BUF_LEN (MAXPATHL + 40)
+    ଧାଡ଼ି = alloc(ଧାଡ଼ି_BUF_LEN);
+    ଯଦି (ଧାଡ଼ି == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     FOR_ALL_TAB_WINDOWS(tp, win)
 	set_last_cursor(win);
@@ -437,93 +437,93 @@ write_viminfo_bufferlist(FILE *fp)
     {
 	size_t	linelen;
 
-	if (buf->b_fname == NULL
+	ଯଦି (buf->b_fname == ଖାଲି
 		|| !buf->b_p_bl
 		|| bt_quickfix(buf)
 		|| bt_terminal(buf)
 		|| removable(buf->b_ffname))
-	    continue;
+	    ଜାରି;
 
-	if (max_buffers-- == 0)
-	    break;
+	ଯଦି (max_buffers-- == 0)
+	    ଭାଙ୍ଗ;
 	putc('%', fp);
-	linelen = home_replace(NULL, buf->b_ffname, line, MAXPATHL, TRUE);
-	vim_snprintf((char *)line + linelen, LINE_BUF_LEN - linelen, "\t%ld\t%d",
+	linelen = home_replace(ଖାଲି, buf->b_ffname, ଧାଡ଼ି, MAXPATHL, TRUE);
+	vim_snprintf((ଅକ୍ଷର *)ଧାଡ଼ି + linelen, ଧାଡ଼ି_BUF_LEN - linelen, "\t%ld\t%d",
 			(long)buf->b_last_cursor.lnum,
 			buf->b_last_cursor.col);
-	viminfo_writestring(fp, line);
+	viminfo_writestring(fp, ଧାଡ଼ି);
     }
-    vim_free(line);
+    vim_free(ଧାଡ଼ି);
 }
 
 /*
  * Buffers for history read from a viminfo file.  Only valid while reading.
  */
-static histentry_T *viminfo_history[HIST_COUNT] =
-					       {NULL, NULL, NULL, NULL, NULL};
-static int	viminfo_hisidx[HIST_COUNT] = {0, 0, 0, 0, 0};
-static int	viminfo_hislen[HIST_COUNT] = {0, 0, 0, 0, 0};
-static int	viminfo_add_at_front = FALSE;
+ସ୍ଥିର histentry_T *viminfo_history[HIST_ଗଣନା] =
+					       {ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି};
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	viminfo_hisidx[HIST_ଗଣନା] = {0, 0, 0, 0, 0};
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	viminfo_hislen[HIST_ଗଣନା] = {0, 0, 0, 0, 0};
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	viminfo_add_at_front = FALSE;
 
 /*
  * Translate a history type number to the associated character.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 hist_type2char(
-    int	    type,
-    int	    use_question)	    // use '?' instead of '/'
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    type,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    use_question)	    // use '?' instead of '/'
 {
-    if (type == HIST_CMD)
-	return ':';
-    if (type == HIST_SEARCH)
+    ଯଦି (type == HIST_CMD)
+	ଫେରନ୍ତୁ ':';
+    ଯଦି (type == HIST_ସନ୍ଧାନ)
     {
-	if (use_question)
-	    return '?';
-	else
-	    return '/';
+	ଯଦି (use_question)
+	    ଫେରନ୍ତୁ '?';
+	ଅନ୍ୟଥା
+	    ଫେରନ୍ତୁ '/';
     }
-    if (type == HIST_EXPR)
-	return '=';
-    return '@';
+    ଯଦି (type == HIST_ପଦସମଷ୍ଟି)
+	ଫେରନ୍ତୁ '=';
+    ଫେରନ୍ତୁ '@';
 }
 
 /*
  * Prepare for reading the history from the viminfo file.
  * This allocates history arrays to store the read history lines.
  */
-    static void
-prepare_viminfo_history(int asklen, int writing)
+    ସ୍ଥିର ଶୂନ୍ୟ
+prepare_viminfo_history(ପୂର୍ଣ୍ଣସଂଖ୍ୟା asklen, ପୂର୍ଣ୍ଣସଂଖ୍ୟା writing)
 {
-    int	    i;
-    int	    num;
-    int	    type;
-    int	    len;
-    int	    hislen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    ଅଙ୍କ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    hislen;
 
     init_history();
     hislen = get_hislen();
     viminfo_add_at_front = (asklen != 0 && !writing);
-    if (asklen > hislen)
+    ଯଦି (asklen > hislen)
 	asklen = hislen;
 
-    for (type = 0; type < HIST_COUNT; ++type)
+    ପାଇଁ (type = 0; type < HIST_ଗଣନା; ++type)
     {
 	histentry_T *histentry = get_histentry(type);
 
 	// Count the number of empty spaces in the history list.  Entries read
 	// from viminfo previously are also considered empty.  If there are
 	// more spaces available than we request, then fill them up.
-	for (i = 0, num = 0; i < hislen; i++)
-	    if (histentry[i].hisstr == NULL || histentry[i].viminfo)
-		num++;
+	ପାଇଁ (i = 0, ଅଙ୍କ = 0; i < hislen; i++)
+	    ଯଦି (histentry[i].hisstr == ଖାଲି || histentry[i].viminfo)
+		ଅଙ୍କ++;
 	len = asklen;
-	if (num > len)
-	    len = num;
-	if (len <= 0)
-	    viminfo_history[type] = NULL;
-	else
+	ଯଦି (ଅଙ୍କ > len)
+	    len = ଅଙ୍କ;
+	ଯଦି (len <= 0)
+	    viminfo_history[type] = ଖାଲି;
+	ଅନ୍ୟଥା
 	    viminfo_history[type] = LALLOC_MULT(histentry_T, len);
-	if (viminfo_history[type] == NULL)
+	ଯଦି (viminfo_history[type] == ଖାଲି)
 	    len = 0;
 	viminfo_hislen[type] = len;
 	viminfo_hisidx[type] = 0;
@@ -534,36 +534,36 @@ prepare_viminfo_history(int asklen, int writing)
  * Accept a line from the viminfo, store it in the history array when it's
  * new.
  */
-    static int
-read_viminfo_history(vir_T *virp, int writing)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_history(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା writing)
 {
-    int		type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type;
     long_u	len;
-    char_u	*val = NULL;
+    char_u	*val = ଖାଲି;
     char_u	*p;
 
-    type = hist_char2type(virp->vir_line[0]);
-    if (viminfo_hisidx[type] >= viminfo_hislen[type])
-	goto done;
+    type = hist_char2type(virp->vir_ଧାଡ଼ି[0]);
+    ଯଦି (viminfo_hisidx[type] >= viminfo_hislen[type])
+	ଯାଅ done;
 
     val = viminfo_readstring(virp, 1, TRUE);
-    if (val == NULL || *val == NUL)
-	goto done;
+    ଯଦି (val == ଖାଲି || *val == NUL)
+	ଯାଅ done;
 
-    int sep = (*val == ' ' ? NUL : *val);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା sep = (*val == ' ' ? NUL : *val);
 
-    if (in_history(type, val + (type == HIST_SEARCH), viminfo_add_at_front,
+    ଯଦି (in_history(type, val + (type == HIST_ସନ୍ଧାନ), viminfo_add_at_front,
 								sep, writing))
-	goto done;
+	ଯାଅ done;
 
     // Need to re-allocate to append the separator byte.
     len = STRLEN(val);
-    if (type == HIST_SEARCH)
+    ଯଦି (type == HIST_ସନ୍ଧାନ)
     {
 	p = alloc((size_t)len + 1);	    // +1 for the NUL. val already
 					    // includes the separator.
-	if (p == NULL)
-	    goto done;
+	ଯଦି (p == ଖାଲି)
+	    ଯାଅ done;
 
 	// Search entry: Move the separator from the first
 	// column to after the NUL.
@@ -571,11 +571,11 @@ read_viminfo_history(vir_T *virp, int writing)
 	p[len] = sep;
 	--len;				    // take into account the shortened string
     }
-    else
+    ଅନ୍ୟଥା
     {
 	p = alloc((size_t)len + 2);	    // +1 for NUL and +1 for separator
-	if (p == NULL)
-	    goto done;
+	ଯଦି (p == ଖାଲି)
+	    ଯାଅ done;
 
 	// Not a search entry: No separator in the viminfo
 	// file, add a NUL separator.
@@ -591,78 +591,78 @@ read_viminfo_history(vir_T *virp, int writing)
 
 done:
     vim_free(val);
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
 /*
  * Accept a new style history line from the viminfo, store it in the history
  * array when it's new.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 handle_viminfo_history(
-	garray_T    *values,
-	int	    writing)
+	garray_T    *ମୂଲ୍ୟଗୁଡ଼ିକ,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    writing)
 {
-    int		type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type;
     long_u	len;
     char_u	*val;
     char_u	*p;
-    bval_T	*vp = (bval_T *)values->ga_data;
+    bval_T	*vp = (bval_T *)ମୂଲ୍ୟଗୁଡ଼ିକ->ga_data;
 
     // Check the format:
     // |{bartype},{histtype},{timestamp},{separator},"text"
-    if (values->ga_len < 4
+    ଯଦି (ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len < 4
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || (vp[2].bv_type != BVAL_NR && vp[2].bv_type != BVAL_EMPTY)
 	    || vp[3].bv_type != BVAL_STRING)
-	return;
+	ଫେରନ୍ତୁ;
 
     type = vp[0].bv_nr;
-    if (type >= HIST_COUNT)
-	return;
+    ଯଦି (type >= HIST_ଗଣନା)
+	ଫେରନ୍ତୁ;
 
-    if (viminfo_hisidx[type] >= viminfo_hislen[type])
-	return;
+    ଯଦି (viminfo_hisidx[type] >= viminfo_hislen[type])
+	ଫେରନ୍ତୁ;
 
     val = vp[3].bv_string;
-    if (val == NULL || *val == NUL)
-	return;
+    ଯଦି (val == ଖାଲି || *val == NUL)
+	ଫେରନ୍ତୁ;
 
-    int sep = type == HIST_SEARCH && vp[2].bv_type == BVAL_NR
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା sep = type == HIST_ସନ୍ଧାନ && vp[2].bv_type == BVAL_NR
 							? vp[2].bv_nr : NUL;
-    int idx;
-    int overwrite = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା overwrite = FALSE;
 
-    if (in_history(type, val, viminfo_add_at_front, sep, writing))
-	return;
+    ଯଦି (in_history(type, val, viminfo_add_at_front, sep, writing))
+	ଫେରନ୍ତୁ;
 
     // If lines were written by an older Vim we need to avoid
     // getting duplicates. See if the entry already exists.
-    for (idx = 0; idx < viminfo_hisidx[type]; ++idx)
+    ପାଇଁ (idx = 0; idx < viminfo_hisidx[type]; ++idx)
     {
 	p = viminfo_history[type][idx].hisstr;
 	len = viminfo_history[type][idx].hisstrlen;
-	if (STRCMP(val, p) == 0
-		&& (type != HIST_SEARCH || sep == p[len + 1]))
+	ଯଦି (STRCMP(val, p) == 0
+		&& (type != HIST_ସନ୍ଧାନ || sep == p[len + 1]))
 	{
 	    overwrite = TRUE;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
     }
 
-    if (!overwrite)
+    ଯଦି (!overwrite)
     {
 	// Need to re-allocate to append the separator byte.
 	len = vp[3].bv_len;
 	p = alloc(len + 2);
     }
-    else
+    ଅନ୍ୟଥା
 	len = 0; // for picky compilers
-    if (p != NULL)
+    ଯଦି (p != ଖାଲି)
     {
 	viminfo_history[type][idx].time_set = vp[1].bv_nr;
-	if (!overwrite)
+	ଯଦି (!overwrite)
 	{
 	    mch_memmove(p, val, (size_t)len + 1);
 	    // Put the separator after the NUL.
@@ -679,127 +679,127 @@ handle_viminfo_history(
 /*
  * Concatenate history lines from viminfo after the lines typed in this Vim.
  */
-    static void
-concat_history(int type)
+    ସ୍ଥିର ଶୂନ୍ୟ
+concat_history(ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
-    int		idx;
-    int		i;
-    int		hislen = get_hislen();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		hislen = get_hislen();
     histentry_T *histentry = get_histentry(type);
-    int		*hisidx = get_hisidx(type);
-    int		*hisnum = get_hisnum(type);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*hisidx = get_hisidx(type);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*hisnum = get_hisnum(type);
 
     idx = *hisidx + viminfo_hisidx[type];
-    if (idx >= hislen)
+    ଯଦି (idx >= hislen)
 	idx -= hislen;
-    else if (idx < 0)
+    ଅନ୍ୟଥା ଯଦି (idx < 0)
 	idx = hislen - 1;
-    if (viminfo_add_at_front)
+    ଯଦି (viminfo_add_at_front)
 	*hisidx = idx;
-    else
+    ଅନ୍ୟଥା
     {
-	if (*hisidx == -1)
+	ଯଦି (*hisidx == -1)
 	    *hisidx = hislen - 1;
-	do
+	କର
 	{
-	    if (histentry[idx].hisstr != NULL || histentry[idx].viminfo)
-		break;
-	    if (++idx == hislen)
+	    ଯଦି (histentry[idx].hisstr != ଖାଲି || histentry[idx].viminfo)
+		ଭାଙ୍ଗ;
+	    ଯଦି (++idx == hislen)
 		idx = 0;
-	} while (idx != *hisidx);
-	if (idx != *hisidx && --idx < 0)
+	} ଯେତେବେଳେ (idx != *hisidx);
+	ଯଦି (idx != *hisidx && --idx < 0)
 	    idx = hislen - 1;
     }
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    ପାଇଁ (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	vim_free(histentry[idx].hisstr);
 	histentry[idx].hisstr = viminfo_history[type][i].hisstr;
 	histentry[idx].hisstrlen = viminfo_history[type][i].hisstrlen;
 	histentry[idx].viminfo = TRUE;
 	histentry[idx].time_set = viminfo_history[type][i].time_set;
-	if (--idx < 0)
+	ଯଦି (--idx < 0)
 	    idx = hislen - 1;
     }
     idx += 1;
     idx %= hislen;
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    ପାଇଁ (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	histentry[idx++].hisnum = ++*hisnum;
 	idx %= hislen;
     }
 }
 
-    static int
-sort_hist(const void *s1, const void *s2)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+sort_hist(ଅଚଳ ଶୂନ୍ୟ *s1, ଅଚଳ ଶୂନ୍ୟ *s2)
 {
     histentry_T *p1 = *(histentry_T **)s1;
     histentry_T *p2 = *(histentry_T **)s2;
 
-    if (p1->time_set < p2->time_set) return -1;
-    if (p1->time_set > p2->time_set) return 1;
-    return 0;
+    ଯଦି (p1->time_set < p2->time_set) ଫେରନ୍ତୁ -1;
+    ଯଦି (p1->time_set > p2->time_set) ଫେରନ୍ତୁ 1;
+    ଫେରନ୍ତୁ 0;
 }
 
 /*
  * Merge history lines from viminfo and lines typed in this Vim based on the
  * timestamp;
  */
-    static void
-merge_history(int type)
+    ସ୍ଥିର ଶୂନ୍ୟ
+merge_history(ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
-    int		max_len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_len;
     histentry_T **tot_hist;
     histentry_T *new_hist;
-    int		i;
-    int		len;
-    int		hislen = get_hislen();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		hislen = get_hislen();
     histentry_T *histentry = get_histentry(type);
-    int		*hisidx = get_hisidx(type);
-    int		*hisnum = get_hisnum(type);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*hisidx = get_hisidx(type);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*hisnum = get_hisnum(type);
 
     // Make one long list with all entries.
     max_len = hislen + viminfo_hisidx[type];
     tot_hist = ALLOC_MULT(histentry_T *, max_len);
     new_hist = ALLOC_MULT(histentry_T, hislen);
-    if (tot_hist == NULL || new_hist == NULL)
+    ଯଦି (tot_hist == ଖାଲି || new_hist == ଖାଲି)
     {
 	vim_free(tot_hist);
 	vim_free(new_hist);
-	return;
+	ଫେରନ୍ତୁ;
     }
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    ପାଇଁ (i = 0; i < viminfo_hisidx[type]; i++)
 	tot_hist[i] = &viminfo_history[type][i];
     len = i;
-    for (i = 0; i < hislen; i++)
-	if (histentry[i].hisstr != NULL)
+    ପାଇଁ (i = 0; i < hislen; i++)
+	ଯଦି (histentry[i].hisstr != ଖାଲି)
 	    tot_hist[len++] = &histentry[i];
 
     // Sort the list on timestamp.
-    qsort((void *)tot_hist, (size_t)len, sizeof(histentry_T *), sort_hist);
+    qsort((ଶୂନ୍ୟ *)tot_hist, (size_t)len, ଆକାର(histentry_T *), sort_hist);
 
     // Keep the newest ones.
-    for (i = 0; i < hislen; i++)
+    ପାଇଁ (i = 0; i < hislen; i++)
     {
-	if (i < len)
+	ଯଦି (i < len)
 	{
 	    new_hist[i] = *tot_hist[i];
-	    tot_hist[i]->hisstr = NULL;
+	    tot_hist[i]->hisstr = ଖାଲି;
 	    tot_hist[i]->hisstrlen = 0;
-	    if (new_hist[i].hisnum == 0)
+	    ଯଦି (new_hist[i].hisnum == 0)
 		new_hist[i].hisnum = ++*hisnum;
 	}
-	else
+	ଅନ୍ୟଥା
 	    clear_hist_entry(&new_hist[i]);
     }
     *hisidx = (i < len ? i : len) - 1;
 
     // Free what is not kept.
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    ପାଇଁ (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	vim_free(viminfo_history[type][i].hisstr);
 	viminfo_history[type][i].hisstrlen = 0;
     }
-    for (i = 0; i < hislen; i++)
+    ପାଇଁ (i = 0; i < hislen; i++)
     {
 	vim_free(histentry[i].hisstr);
 	histentry[i].hisstrlen = 0;
@@ -812,20 +812,20 @@ merge_history(int type)
 /*
  * Finish reading history lines from viminfo.  Not used when writing viminfo.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 finish_viminfo_history(vir_T *virp)
 {
-    int	type;
-    int merge = virp->vir_version >= VIMINFO_VERSION_WITH_HISTORY;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା merge = virp->vir_version >= VIMINFO_VERSION_WITH_HISTORY;
 
-    for (type = 0; type < HIST_COUNT; ++type)
+    ପାଇଁ (type = 0; type < HIST_ଗଣନା; ++type)
     {
-	if (get_histentry(type) == NULL)
-	    continue;
+	ଯଦି (get_histentry(type) == ଖାଲି)
+	    ଜାରି;
 
-	if (merge)
+	ଯଦି (merge)
 	    merge_history(type);
-	else
+	ଅନ୍ୟଥା
 	    concat_history(type);
 
 	VIM_CLEAR(viminfo_history[type]);
@@ -839,76 +839,76 @@ finish_viminfo_history(vir_T *virp)
  * file, data is in viminfo_history[].
  * When "merge" is FALSE just write all history lines.  Used for ":wviminfo!".
  */
-    static void
-write_viminfo_history(FILE *fp, int merge)
+    ସ୍ଥିର ଶୂନ୍ୟ
+write_viminfo_history(FILE *fp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା merge)
 {
-    int	    i;
-    int	    type;
-    int	    num_saved;
-    int     round;
-    int	    hislen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    ଅଙ୍କ_saved;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା     round;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    hislen;
 
     init_history();
     hislen = get_hislen();
-    if (hislen == 0)
-	return;
-    for (type = 0; type < HIST_COUNT; ++type)
+    ଯଦି (hislen == 0)
+	ଫେରନ୍ତୁ;
+    ପାଇଁ (type = 0; type < HIST_ଗଣନା; ++type)
     {
 	histentry_T *histentry = get_histentry(type);
-	int	    *hisidx = get_hisidx(type);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    *hisidx = get_hisidx(type);
 
-	num_saved = get_viminfo_parameter(hist_type2char(type, FALSE));
-	if (num_saved == 0)
-	    continue;
-	if (num_saved < 0)  // Use default
-	    num_saved = hislen;
+	ଅଙ୍କ_saved = get_viminfo_parameter(hist_type2char(type, FALSE));
+	ଯଦି (ଅଙ୍କ_saved == 0)
+	    ଜାରି;
+	ଯଦି (ଅଙ୍କ_saved < 0)  // Use default
+	    ଅଙ୍କ_saved = hislen;
 	fprintf(fp, _("\n# %s History (newest to oldest):\n"),
 			    type == HIST_CMD ? _("Command Line") :
-			    type == HIST_SEARCH ? _("Search String") :
-			    type == HIST_EXPR ? _("Expression") :
-			    type == HIST_INPUT ? _("Input Line") :
+			    type == HIST_ସନ୍ଧାନ ? _("Search String") :
+			    type == HIST_ପଦସମଷ୍ଟି ? _("Expression") :
+			    type == HIST_ନିବେଶ ? _("Input Line") :
 					_("Debug Line"));
-	if (num_saved > hislen)
-	    num_saved = hislen;
+	ଯଦି (ଅଙ୍କ_saved > hislen)
+	    ଅଙ୍କ_saved = hislen;
 
 	// Merge typed and viminfo history:
 	// round 1: history of typed commands.
 	// round 2: history from recently read viminfo.
-	for (round = 1; round <= 2; ++round)
+	ପାଇଁ (round = 1; round <= 2; ++round)
 	{
-	    if (round == 1)
+	    ଯଦି (round == 1)
 		// start at newest entry, somewhere in the list
 		i = *hisidx;
-	    else if (viminfo_hisidx[type] > 0)
+	    ଅନ୍ୟଥା ଯଦି (viminfo_hisidx[type] > 0)
 		// start at newest entry, first in the list
 		i = 0;
-	    else
+	    ଅନ୍ୟଥା
 		// empty list
 		i = -1;
-	    if (i >= 0)
-		while (num_saved > 0
+	    ଯଦି (i >= 0)
+		ଯେତେବେଳେ (ଅଙ୍କ_saved > 0
 			&& !(round == 2 && i >= viminfo_hisidx[type]))
 		{
 		    char_u  *p;
 		    size_t  plen;
 		    time_t  timestamp;
-		    int	    c = NUL;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    c = NUL;
 
-		    if (round == 1)
+		    ଯଦି (round == 1)
 		    {
 			p = histentry[i].hisstr;
 			plen = histentry[i].hisstrlen;
 			timestamp = histentry[i].time_set;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
-			if (viminfo_history[type] == NULL)
+			ଯଦି (viminfo_history[type] == ଖାଲି)
 			{
-			    p = NULL;
+			    p = ଖାଲି;
 			    plen = 0;
 			    timestamp = 0;
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    p = viminfo_history[type][i].hisstr;
 			    plen = viminfo_history[type][i].hisstrlen;
@@ -916,15 +916,15 @@ write_viminfo_history(FILE *fp, int merge)
 			}
 		    }
 
-		    if (p != NULL && (round == 2
+		    ଯଦି (p != ଖାଲି && (round == 2
 				       || !merge
 				       || !histentry[i].viminfo))
 		    {
-			--num_saved;
+			--ଅଙ୍କ_saved;
 			fputc(hist_type2char(type, TRUE), fp);
 			// For the search history: put the separator in the
 			// second column; use a space if there isn't one.
-			if (type == HIST_SEARCH)
+			ଯଦି (type == HIST_ସନ୍ଧାନ)
 			{
 			    c = p[plen + 1];
 			    putc(c == NUL ? ' ' : c, fp);
@@ -932,13 +932,13 @@ write_viminfo_history(FILE *fp, int merge)
 			viminfo_writestring(fp, p);
 
 			{
-			    char    cbuf[NUMBUFLEN];
+			    ଅକ୍ଷର    cbuf[NUMBUFLEN];
 
 			    // New style history with a bar line. Format:
 			    // |{bartype},{histtype},{timestamp},{separator},"text"
-			    if (c == NUL)
+			    ଯଦି (c == NUL)
 				cbuf[0] = NUL;
-			    else
+			    ଅନ୍ୟଥା
 				sprintf(cbuf, "%d", c);
 			    fprintf(fp, "|%d,%d,%ld,%s,", BARTYPE_HISTORY,
 						 type, (long)timestamp, cbuf);
@@ -946,24 +946,24 @@ write_viminfo_history(FILE *fp, int merge)
 			    putc('\n', fp);
 			}
 		    }
-		    if (round == 1)
+		    ଯଦି (round == 1)
 		    {
 			// Decrement index, loop around and stop when back at
 			// the start.
-			if (--i < 0)
+			ଯଦି (--i < 0)
 			    i = hislen - 1;
-			if (i == *hisidx)
-			    break;
+			ଯଦି (i == *hisidx)
+			    ଭାଙ୍ଗ;
 		    }
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			// Increment index. Stop at the end in the while.
 			++i;
 		    }
 		}
 	}
-	for (i = 0; i < viminfo_hisidx[type]; ++i)
-	    if (viminfo_history[type] != NULL)
+	ପାଇଁ (i = 0; i < viminfo_hisidx[type]; ++i)
+	    ଯଦି (viminfo_history[type] != ଖାଲି)
 	    {
 		vim_free(viminfo_history[type][i].hisstr);
 		viminfo_history[type][i].hisstrlen = 0;
@@ -973,26 +973,26 @@ write_viminfo_history(FILE *fp, int merge)
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_barlines(vir_T *virp, FILE *fp_out)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     garray_T	*gap = &virp->vir_barlines;
-    int		seen_useful = FALSE;
-    char	*line;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		seen_useful = FALSE;
+    ଅକ୍ଷର	*ଧାଡ଼ି;
 
-    if (gap->ga_len <= 0)
-	return;
+    ଯଦି (gap->ga_len <= 0)
+	ଫେରନ୍ତୁ;
 
     fputs(_("\n# Bar lines, copied verbatim:\n"), fp_out);
 
     // Skip over continuation lines until seeing a useful line.
-    for (i = 0; i < gap->ga_len; ++i)
+    ପାଇଁ (i = 0; i < gap->ga_len; ++i)
     {
-	line = ((char **)(gap->ga_data))[i];
-	if (seen_useful || line[1] != '<')
+	ଧାଡ଼ି = ((ଅକ୍ଷର **)(gap->ga_data))[i];
+	ଯଦି (seen_useful || ଧାଡ଼ି[1] != '<')
 	{
-	    fputs(line, fp_out);
+	    fputs(ଧାଡ଼ି, fp_out);
 	    seen_useful = TRUE;
 	}
     }
@@ -1003,37 +1003,37 @@ write_viminfo_barlines(vir_T *virp, FILE *fp_out)
  * Add each decoded value to "values".
  * Returns TRUE if the next line is to be read after using the parsed values.
  */
-    static int
-barline_parse(vir_T *virp, char_u *text, garray_T *values)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+barline_parse(vir_T *virp, char_u *text, garray_T *ମୂଲ୍ୟଗୁଡ଼ିକ)
 {
     char_u  *p = text;
-    char_u  *nextp = NULL;
-    char_u  *buf = NULL;
-    bval_T  *value;
-    int	    i;
-    int	    allocated = FALSE;
-    int	    eof;
+    char_u  *nextp = ଖାଲି;
+    char_u  *buf = ଖାଲି;
+    bval_T  *ମୂଲ୍ୟ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    allocated = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    eof;
     char_u  *sconv;
-    int	    converted;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    converted;
 
-    while (*p == ',')
+    ଯେତେବେଳେ (*p == ',')
     {
 	++p;
-	if (ga_grow(values, 1) == FAIL)
-	    break;
-	value = (bval_T *)(values->ga_data) + values->ga_len;
+	ଯଦି (ga_grow(ମୂଲ୍ୟଗୁଡ଼ିକ, 1) == FAIL)
+	    ଭାଙ୍ଗ;
+	ମୂଲ୍ୟ = (bval_T *)(ମୂଲ୍ୟଗୁଡ଼ିକ->ga_data) + ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len;
 
-	if (*p == '>')
+	ଯଦି (*p == '>')
 	{
 	    // Need to read a continuation line.  Put strings in allocated
 	    // memory, because virp->vir_line is overwritten.
-	    if (!allocated)
+	    ଯଦି (!allocated)
 	    {
-		for (i = 0; i < values->ga_len; ++i)
+		ପାଇଁ (i = 0; i < ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len; ++i)
 		{
-		    bval_T  *vp = (bval_T *)(values->ga_data) + i;
+		    bval_T  *vp = (bval_T *)(ମୂଲ୍ୟଗୁଡ଼ିକ->ga_data) + i;
 
-		    if (vp->bv_type == BVAL_STRING && !vp->bv_allocated)
+		    ଯଦି (vp->bv_type == BVAL_STRING && !vp->bv_allocated)
 		    {
 			vp->bv_string = vim_strnsave(vp->bv_string, vp->bv_len);
 			vp->bv_allocated = TRUE;
@@ -1042,7 +1042,7 @@ barline_parse(vir_T *virp, char_u *text, garray_T *values)
 		allocated = TRUE;
 	    }
 
-	    if (vim_isdigit(p[1]))
+	    ଯଦି (vim_isdigit(p[1]))
 	    {
 		size_t len;
 		size_t todo;
@@ -1057,162 +1057,162 @@ barline_parse(vir_T *virp, char_u *text, garray_T *values)
 		++p;
 		len = getdigits(&p);
 		buf = alloc(len + 1);
-		if (buf == NULL)
-		    return TRUE;
+		ଯଦି (buf == ଖାଲି)
+		    ଫେରନ୍ତୁ TRUE;
 		p = buf;
-		for (todo = len; todo > 0; todo -= n)
+		ପାଇଁ (todo = len; todo > 0; todo -= n)
 		{
 		    eof = viminfo_readline(virp);
-		    if (eof || virp->vir_line[0] != '|'
-						  || virp->vir_line[1] != '<')
+		    ଯଦି (eof || virp->vir_ଧାଡ଼ି[0] != '|'
+						  || virp->vir_ଧାଡ଼ି[1] != '<')
 		    {
 			// File was truncated or garbled. Read another line if
 			// this one starts with '|'.
 			vim_free(buf);
-			return eof || virp->vir_line[0] == '|';
+			ଫେରନ୍ତୁ eof || virp->vir_ଧାଡ଼ି[0] == '|';
 		    }
 		    // Get length of text, excluding |< and NL chars.
-		    n = STRLEN(virp->vir_line);
-		    while (n > 2 && (virp->vir_line[n - 1] == NL
-					     || virp->vir_line[n - 1] == CAR))
+		    n = STRLEN(virp->vir_ଧାଡ଼ି);
+		    ଯେତେବେଳେ (n > 2 && (virp->vir_ଧାଡ଼ି[n - 1] == NL
+					     || virp->vir_ଧାଡ଼ି[n - 1] == CAR))
 			--n;
 		    n -= 2;
-		    if (n > todo)
+		    ଯଦି (n > todo)
 		    {
 			// more values follow after the string
-			nextp = virp->vir_line + 2 + todo;
+			nextp = virp->vir_ଧାଡ଼ି + 2 + todo;
 			n = todo;
 		    }
-		    mch_memmove(p, virp->vir_line + 2, n);
+		    mch_memmove(p, virp->vir_ଧାଡ଼ି + 2, n);
 		    p += n;
 		}
 		*p = NUL;
 		p = buf;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// Line ending in ">" continues in the next line:
 		//     |{bartype},{lots of values},>
 		//     |<{value},{value}
 		eof = viminfo_readline(virp);
-		if (eof || virp->vir_line[0] != '|'
-					      || virp->vir_line[1] != '<')
+		ଯଦି (eof || virp->vir_ଧାଡ଼ି[0] != '|'
+					      || virp->vir_ଧାଡ଼ି[1] != '<')
 		    // File was truncated or garbled. Read another line if
 		    // this one starts with '|'.
-		    return eof || virp->vir_line[0] == '|';
-		p = virp->vir_line + 2;
+		    ଫେରନ୍ତୁ eof || virp->vir_ଧାଡ଼ି[0] == '|';
+		p = virp->vir_ଧାଡ଼ି + 2;
 	    }
 	}
 
-	if (SAFE_isdigit(*p))
+	ଯଦି (SAFE_isdigit(*p))
 	{
-	    value->bv_type = BVAL_NR;
-	    value->bv_nr = getdigits(&p);
-	    ++values->ga_len;
+	    ମୂଲ୍ୟ->bv_type = BVAL_NR;
+	    ମୂଲ୍ୟ->bv_nr = getdigits(&p);
+	    ++ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len;
 	}
-	else if (*p == '"')
+	ଅନ୍ୟଥା ଯଦି (*p == '"')
 	{
-	    int	    len = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len = 0;
 	    char_u  *s = p;
 
 	    // Unescape special characters in-place.
 	    ++p;
-	    while (*p != '"')
+	    ଯେତେବେଳେ (*p != '"')
 	    {
-		if (*p == NL || *p == NUL)
-		    return TRUE;  // syntax error, drop the value
-		if (*p == '\\')
+		ଯଦି (*p == NL || *p == NUL)
+		    ଫେରନ୍ତୁ TRUE;  // syntax error, drop the value
+		ଯଦି (*p == '\\')
 		{
 		    ++p;
-		    if (*p == 'n')
+		    ଯଦି (*p == 'n')
 			s[len++] = '\n';
-		    else
+		    ଅନ୍ୟଥା
 			s[len++] = *p;
 		    ++p;
 		}
-		else
+		ଅନ୍ୟଥା
 		    s[len++] = *p++;
 	    }
 	    ++p;
 	    s[len] = NUL;
 
 	    converted = FALSE;
-	    value->bv_tofree = NULL;
-	    if (virp->vir_conv.vc_type != CONV_NONE && *s != NUL)
+	    ମୂଲ୍ୟ->bv_tofree = ଖାଲି;
+	    ଯଦି (virp->vir_conv.vc_type != CONV_NONE && *s != NUL)
 	    {
-		sconv = string_convert(&virp->vir_conv, s, NULL);
-		if (sconv != NULL)
+		sconv = string_convert(&virp->vir_conv, s, ଖାଲି);
+		ଯଦି (sconv != ଖାଲି)
 		{
-		    if (s == buf)
+		    ଯଦି (s == buf)
 			// the converted string is stored in bv_string and
 			// freed later, also need to free "buf" later
-			value->bv_tofree = buf;
+			ମୂଲ୍ୟ->bv_tofree = buf;
 		    s = sconv;
-		    len = (int)STRLEN(s);
+		    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(s);
 		    converted = TRUE;
 		}
 	    }
 
 	    // Need to copy in allocated memory if the string wasn't allocated
 	    // above and we did allocate before, thus vir_line may change.
-	    if (s != buf && allocated && !converted)
+	    ଯଦି (s != buf && allocated && !converted)
 		s = vim_strnsave(s, len);
-	    value->bv_string = s;
-	    value->bv_type = BVAL_STRING;
-	    value->bv_len = len;
-	    value->bv_allocated = allocated || converted;
-	    ++values->ga_len;
-	    if (nextp != NULL)
+	    ମୂଲ୍ୟ->bv_string = s;
+	    ମୂଲ୍ୟ->bv_type = BVAL_STRING;
+	    ମୂଲ୍ୟ->bv_len = len;
+	    ମୂଲ୍ୟ->bv_allocated = allocated || converted;
+	    ++ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len;
+	    ଯଦି (nextp != ଖାଲି)
 	    {
 		// values following a long string
 		p = nextp;
-		nextp = NULL;
+		nextp = ଖାଲି;
 	    }
 	}
-	else if (*p == ',')
+	ଅନ୍ୟଥା ଯଦି (*p == ',')
 	{
-	    value->bv_type = BVAL_EMPTY;
-	    ++values->ga_len;
+	    ମୂଲ୍ୟ->bv_type = BVAL_EMPTY;
+	    ++ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len;
 	}
-	else
-	    break;
+	ଅନ୍ୟଥା
+	    ଭାଙ୍ଗ;
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_version(FILE *fp_out)
 {
     fprintf(fp_out, "# Viminfo version\n|%d,%d\n\n",
 					    BARTYPE_VERSION, VIMINFO_VERSION);
 }
 
-    static int
-no_viminfo(void)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+no_viminfo(ଶୂନ୍ୟ)
 {
     // "vim -i NONE" does not read or write a viminfo file
-    return STRCMP(p_viminfofile, "NONE") == 0;
+    ଫେରନ୍ତୁ STRCMP(p_viminfofile, "NONE") == 0;
 }
 
 /*
  * Report an error for reading a viminfo file.
  * Count the number of errors.	When there are more than 10, return TRUE.
  */
-    static int
-viminfo_error(char *errnum, char *message, char_u *line)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+viminfo_error(ଅକ୍ଷର *errnum, ଅକ୍ଷର *message, char_u *ଧାଡ଼ି)
 {
-    vim_snprintf((char *)IObuff, IOSIZE, _("%sviminfo: %s in line: "),
+    vim_snprintf((ଅକ୍ଷର *)IObuff, IOSIZE, _("%sviminfo: %s in line: "),
 							     errnum, message);
-    STRNCAT(IObuff, line, IOSIZE - STRLEN(IObuff) - 1);
-    if (IObuff[STRLEN(IObuff) - 1] == '\n')
+    STRNCAT(IObuff, ଧାଡ଼ି, IOSIZE - STRLEN(IObuff) - 1);
+    ଯଦି (IObuff[STRLEN(IObuff) - 1] == '\n')
 	IObuff[STRLEN(IObuff) - 1] = NUL;
-    emsg((char *)IObuff);
-    if (++viminfo_errcnt >= 10)
+    emsg((ଅକ୍ଷର *)IObuff);
+    ଯଦି (++viminfo_errcnt >= 10)
     {
 	emsg(_(e_viminfo_too_many_errors_skipping_rest_of_file));
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
@@ -1220,99 +1220,99 @@ viminfo_error(char *errnum, char *message, char_u *line)
  * 'encoding'.  If different and the 'c' flag is in 'viminfo', setup for
  * conversion of text with iconv() in viminfo_readstring().
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 viminfo_encoding(vir_T *virp)
 {
     char_u	*p;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    if (get_viminfo_parameter('c') != 0)
+    ଯଦି (get_viminfo_parameter('c') != 0)
     {
-	p = vim_strchr(virp->vir_line, '=');
-	if (p != NULL)
+	p = vim_strchr(virp->vir_ଧାଡ଼ି, '=');
+	ଯଦି (p != ଖାଲି)
 	{
 	    // remove trailing newline
 	    ++p;
-	    for (i = 0; vim_isprintc(p[i]); ++i)
+	    ପାଇଁ (i = 0; vim_isprintc(p[i]); ++i)
 		;
 	    p[i] = NUL;
 
 	    convert_setup(&virp->vir_conv, p, p_enc);
 	}
     }
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 /*
  * Restore global vars that start with a capital from the viminfo file
  */
-    static int
-read_viminfo_varlist(vir_T *virp, int writing)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_varlist(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା writing)
 {
     char_u	*tab;
-    int		type = VAR_NUMBER;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type = VAR_ସଂଖ୍ୟା;
     typval_T	tv;
     funccal_entry_T funccal_entry;
 
-    if (!writing && (find_viminfo_parameter('!') != NULL))
+    ଯଦି (!writing && (find_viminfo_parameter('!') != ଖାଲି))
     {
-	tab = vim_strchr(virp->vir_line + 1, '\t');
-	if (tab != NULL)
+	tab = vim_strchr(virp->vir_ଧାଡ଼ି + 1, '\t');
+	ଯଦି (tab != ଖାଲି)
 	{
 	    *tab++ = '\0';	// isolate the variable name
-	    switch (*tab)
+	    ବାଛ (*tab)
 	    {
-		case 'S': type = VAR_STRING; break;
-		case 'F': type = VAR_FLOAT; break;
-		case 'D': type = VAR_DICT; break;
-		case 'L': type = VAR_LIST; break;
-		case 'B': type = VAR_BLOB; break;
-		case 'X': type = VAR_SPECIAL; break;
-		case 'T': type = VAR_TUPLE; break;
+		ସ୍ଥିତି 'S': type = VAR_STRING; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'F': type = VAR_FLOAT; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'D': type = VAR_DICT; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'L': type = VAR_LIST; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'B': type = VAR_BLOB; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'X': type = VAR_SPECIAL; ଭାଙ୍ଗ;
+		ସ୍ଥିତି 'T': type = VAR_TUPLE; ଭାଙ୍ଗ;
 	    }
 
 	    tab = vim_strchr(tab, '\t');
-	    if (tab != NULL)
+	    ଯଦି (tab != ଖାଲି)
 	    {
 		tv.v_type = type;
-		if (type == VAR_STRING || type == VAR_DICT
+		ଯଦି (type == VAR_STRING || type == VAR_DICT
 			|| type == VAR_LIST || type == VAR_BLOB
 			|| type == VAR_TUPLE)
 		    tv.vval.v_string = viminfo_readstring(virp,
-				       (int)(tab - virp->vir_line + 1), TRUE);
-		else if (type == VAR_FLOAT)
-		    (void)string2float(tab + 1, &tv.vval.v_float, FALSE);
-		else
+				       (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(tab - virp->vir_ଧାଡ଼ି + 1), TRUE);
+		ଅନ୍ୟଥା ଯଦି (type == VAR_FLOAT)
+		    (ଶୂନ୍ୟ)string2float(tab + 1, &tv.vval.v_float, FALSE);
+		ଅନ୍ୟଥା
 		{
-		    tv.vval.v_number = atol((char *)tab + 1);
-		    if (type == VAR_SPECIAL && (tv.vval.v_number == VVAL_FALSE
-					     || tv.vval.v_number == VVAL_TRUE))
+		    tv.vval.v_ସଂଖ୍ୟା = atol((ଅକ୍ଷର *)tab + 1);
+		    ଯଦି (type == VAR_SPECIAL && (tv.vval.v_ସଂଖ୍ୟା == VVAL_FALSE
+					     || tv.vval.v_ସଂଖ୍ୟା == VVAL_TRUE))
 			tv.v_type = VAR_BOOL;
 		}
-		if (type == VAR_DICT || type == VAR_LIST || type == VAR_TUPLE)
+		ଯଦି (type == VAR_DICT || type == VAR_LIST || type == VAR_TUPLE)
 		{
-		    typval_T *etv = eval_expr(tv.vval.v_string, NULL);
+		    typval_T *etv = eval_ପଦସମଷ୍ଟି(tv.vval.v_string, ଖାଲି);
 
-		    if (etv == NULL)
+		    ଯଦି (etv == ଖାଲି)
 			// Failed to parse back the dict or list, use it as a
 			// string.
 			tv.v_type = VAR_STRING;
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			vim_free(tv.vval.v_string);
 			tv = *etv;
 			vim_free(etv);
 		    }
 		}
-		else if (type == VAR_BLOB)
+		ଅନ୍ୟଥା ଯଦି (type == VAR_BLOB)
 		{
 		    blob_T *blob = string2blob(tv.vval.v_string);
 
-		    if (blob == NULL)
+		    ଯଦି (blob == ଖାଲି)
 			// Failed to parse back the blob, use it as a string.
 			tv.v_type = VAR_STRING;
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			vim_free(tv.vval.v_string);
 			tv.v_type = VAR_BLOB;
@@ -1322,127 +1322,127 @@ read_viminfo_varlist(vir_T *virp, int writing)
 
 		// when in a function use global variables
 		save_funccal(&funccal_entry);
-		set_var(virp->vir_line + 1, &tv, FALSE);
+		set_var(virp->vir_ଧାଡ଼ି + 1, &tv, FALSE);
 		restore_funccal();
 
-		if (tv.v_type == VAR_STRING)
+		ଯଦି (tv.v_type == VAR_STRING)
 		    vim_free(tv.vval.v_string);
-		else if (tv.v_type == VAR_DICT || tv.v_type == VAR_LIST ||
+		ଅନ୍ୟଥା ଯଦି (tv.v_type == VAR_DICT || tv.v_type == VAR_LIST ||
 			tv.v_type == VAR_BLOB)
 		    clear_tv(&tv);
 	    }
 	}
     }
 
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
 /*
  * Write global vars that start with a capital to the viminfo file
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_varlist(FILE *fp)
 {
     hashtab_T	*gvht = get_globvar_ht();
     hashitem_T	*hi;
     dictitem_T	*this_var;
-    int		todo;
-    char	*s = "";
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
+    ଅକ୍ଷର	*s = "";
     char_u	*p;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
 
-    if (find_viminfo_parameter('!') == NULL)
-	return;
+    ଯଦି (find_viminfo_parameter('!') == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     fputs(_("\n# global variables:\n"), fp);
 
-    todo = (int)gvht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(gvht, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)gvht->ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(gvht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    this_var = HI2DI(hi);
-	    if (var_flavour(this_var->di_key) == VAR_FLAVOUR_VIMINFO)
+	    ଯଦି (var_flavour(this_var->di_ଚାବି) == VAR_FLAVOUR_VIMINFO)
 	    {
-		switch (this_var->di_tv.v_type)
+		ବାଛ (this_var->di_tv.v_type)
 		{
-		    case VAR_STRING:  s = "STR"; break;
-		    case VAR_NUMBER:  s = "NUM"; break;
-		    case VAR_FLOAT:   s = "FLO"; break;
-		    case VAR_DICT:
+		    ସ୍ଥିତି VAR_STRING:  s = "STR"; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି VAR_ସଂଖ୍ୟା:  s = "NUM"; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି VAR_FLOAT:   s = "FLO"; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି VAR_DICT:
 			  {
 			      dict_T	*di = this_var->di_tv.vval.v_dict;
-			      int	copyID = get_copyID();
+			      ପୂର୍ଣ୍ଣସଂଖ୍ୟା	copyID = get_copyID();
 
 			      s = "DIC";
-			      if (di != NULL && !set_ref_in_ht(
-					 &di->dv_hashtab, copyID, NULL, NULL)
+			      ଯଦି (di != ଖାଲି && !set_ref_in_ht(
+					 &di->dv_hashtab, copyID, ଖାଲି, ଖାଲି)
 				      && di->dv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  ଜାରି;
+			      ଭାଙ୍ଗ;
 			  }
-		    case VAR_LIST:
+		    ସ୍ଥିତି VAR_LIST:
 			  {
 			      list_T	*l = this_var->di_tv.vval.v_list;
-			      int	copyID = get_copyID();
+			      ପୂର୍ଣ୍ଣସଂଖ୍ୟା	copyID = get_copyID();
 
 			      s = "LIS";
-			      if (l != NULL && !set_ref_in_list_items(
-						       l, copyID, NULL, NULL)
+			      ଯଦି (l != ଖାଲି && !set_ref_in_list_ବସ୍ତୁଗୁଡ଼ିକ(
+						       l, copyID, ଖାଲି, ଖାଲି)
 				      && l->lv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  ଜାରି;
+			      ଭାଙ୍ଗ;
 			  }
-		    case VAR_TUPLE:
+		    ସ୍ଥିତି VAR_TUPLE:
 			  {
 			      tuple_T	*tuple = this_var->di_tv.vval.v_tuple;
-			      int	copyID = get_copyID();
+			      ପୂର୍ଣ୍ଣସଂଖ୍ୟା	copyID = get_copyID();
 
 			      s = "TUP";
-			      if (tuple != NULL && !set_ref_in_tuple_items(
-					       tuple, copyID, NULL, NULL)
+			      ଯଦି (tuple != ଖାଲି && !set_ref_in_tuple_ବସ୍ତୁଗୁଡ଼ିକ(
+					       tuple, copyID, ଖାଲି, ଖାଲି)
 				      && tuple->tv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  ଜାରି;
+			      ଭାଙ୍ଗ;
 			  }
-		    case VAR_BLOB:    s = "BLO"; break;
-		    case VAR_BOOL:    s = "XPL"; break;  // backwards compat.
-		    case VAR_SPECIAL: s = "XPL"; break;
+		    ସ୍ଥିତି VAR_BLOB:    s = "BLO"; ଭାଙ୍ଗ;
+		    ସ୍ଥିତି VAR_BOOL:    s = "XPL"; ଭାଙ୍ଗ;  // backwards compat.
+		    ସ୍ଥିତି VAR_SPECIAL: s = "XPL"; ଭାଙ୍ଗ;
 
-		    case VAR_UNKNOWN:
-		    case VAR_ANY:
-		    case VAR_VOID:
-		    case VAR_FUNC:
-		    case VAR_PARTIAL:
-		    case VAR_JOB:
-		    case VAR_CHANNEL:
-		    case VAR_INSTR:
-		    case VAR_CLASS:
-		    case VAR_OBJECT:
-		    case VAR_TYPEALIAS:
-				      continue;
+		    ସ୍ଥିତି VAR_UNKNOWN:
+		    ସ୍ଥିତି VAR_ANY:
+		    ସ୍ଥିତି VAR_VOID:
+		    ସ୍ଥିତି VAR_FUNC:
+		    ସ୍ଥିତି VAR_PARTIAL:
+		    ସ୍ଥିତି VAR_JOB:
+		    ସ୍ଥିତି VAR_CHANNEL:
+		    ସ୍ଥିତି VAR_INSTR:
+		    ସ୍ଥିତି VAR_CLASS:
+		    ସ୍ଥିତି VAR_OBJECT:
+		    ସ୍ଥିତି VAR_TYPEALIAS:
+				      ଜାରି;
 		}
-		fprintf(fp, "!%s\t%s\t", this_var->di_key, s);
-		if (this_var->di_tv.v_type == VAR_BOOL
+		fprintf(fp, "!%s\t%s\t", this_var->di_ଚାବି, s);
+		ଯଦି (this_var->di_tv.v_type == VAR_BOOL
 				      || this_var->di_tv.v_type == VAR_SPECIAL)
 		{
 		    // do not use "v:true" but "1"
-		    sprintf((char *)numbuf, "%ld",
-					  (long)this_var->di_tv.vval.v_number);
+		    sprintf((ଅକ୍ଷର *)numbuf, "%ld",
+					  (long)this_var->di_tv.vval.v_ସଂଖ୍ୟା);
 		    p = numbuf;
-		    tofree = NULL;
+		    tofree = ଖାଲି;
 		}
-		else
+		ଅନ୍ୟଥା
 		    p = echo_string(&this_var->di_tv, &tofree, numbuf, 0);
-		if (p != NULL)
+		ଯଦି (p != ଖାଲି)
 		    viminfo_writestring(fp, p);
 		vim_free(tofree);
 	    }
@@ -1451,21 +1451,21 @@ write_viminfo_varlist(FILE *fp)
 }
 #endif // FEAT_EVAL
 
-    static int
-read_viminfo_sub_string(vir_T *virp, int force)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_sub_string(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force)
 {
-    if (force || get_old_sub() == NULL)
+    ଯଦି (force || get_old_sub() == ଖାଲି)
 	set_old_sub(viminfo_readstring(virp, 1, TRUE));
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_sub_string(FILE *fp)
 {
     char_u *old_sub = get_old_sub();
 
-    if (get_viminfo_parameter('/') == 0 || old_sub == NULL)
-	return;
+    ଯଦି (get_viminfo_parameter('/') == 0 || old_sub == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     fputs(_("\n# Last Substitute String:\n$"), fp);
     viminfo_writestring(fp, old_sub);
@@ -1475,19 +1475,19 @@ write_viminfo_sub_string(FILE *fp)
  * Functions relating to reading/writing the search pattern from viminfo
  */
 
-    static int
-read_viminfo_search_pattern(vir_T *virp, int force, int writing)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_ସନ୍ଧାନ_pattern(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force, ପୂର୍ଣ୍ଣସଂଖ୍ୟା writing)
 {
     char_u	*lp;
-    int		idx = -1;
-    int		magic = FALSE;
-    int		no_scs = FALSE;
-    int		off_line = FALSE;
-    int		off_end = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		magic = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		no_scs = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		off_ଧାଡ଼ି = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		off_end = 0;
     long	off = 0;
-    int		setlast = FALSE;
-#ifdef FEAT_SEARCH_EXTRA
-    static int	hlsearch_on = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		setlast = FALSE;
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	hlsearch_on = FALSE;
 #endif
     char_u	*val;
     spat_T	*spat;
@@ -1505,53 +1505,53 @@ read_viminfo_search_pattern(vir_T *virp, int force, int writing)
     // <off>: decimal, offset
     // <last>: '~' last used pattern
     // <which>: '/' search pat, '&' subst. pat
-    lp = virp->vir_line;
-    if (lp[0] == '~' && (lp[1] == 'm' || lp[1] == 'M'))	// new line type
+    lp = virp->vir_ଧାଡ଼ି;
+    ଯଦି (lp[0] == '~' && (lp[1] == 'm' || lp[1] == 'M'))	// new line type
     {
-	if (lp[1] == 'M')		// magic on
+	ଯଦି (lp[1] == 'M')		// magic on
 	    magic = TRUE;
-	if (lp[2] == 's')
+	ଯଦି (lp[2] == 's')
 	    no_scs = TRUE;
-	if (lp[3] == 'L')
-	    off_line = TRUE;
-	if (lp[4] == 'E')
-	    off_end = SEARCH_END;
+	ଯଦି (lp[3] == 'L')
+	    off_ଧାଡ଼ି = TRUE;
+	ଯଦି (lp[4] == 'E')
+	    off_end = ସନ୍ଧାନ_END;
 	lp += 5;
 	off = getdigits(&lp);
     }
-    if (lp[0] == '~')		// use this pattern for last-used pattern
+    ଯଦି (lp[0] == '~')		// use this pattern for last-used pattern
     {
 	setlast = TRUE;
 	lp++;
     }
-    if (lp[0] == '/')
-	idx = RE_SEARCH;
-    else if (lp[0] == '&')
+    ଯଦି (lp[0] == '/')
+	idx = RE_ସନ୍ଧାନ;
+    ଅନ୍ୟଥା ଯଦି (lp[0] == '&')
 	idx = RE_SUBST;
-#ifdef FEAT_SEARCH_EXTRA
-    else if (lp[0] == 'h')	// ~h: 'hlsearch' highlighting off
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+    ଅନ୍ୟଥା ଯଦି (lp[0] == 'h')	// ~h: 'hlsearch' highlighting off
 	hlsearch_on = FALSE;
-    else if (lp[0] == 'H')	// ~H: 'hlsearch' highlighting on
+    ଅନ୍ୟଥା ଯଦି (lp[0] == 'H')	// ~H: 'hlsearch' highlighting on
 	hlsearch_on = TRUE;
 #endif
-    if (idx >= 0)
+    ଯଦି (idx >= 0)
     {
 	spat = get_spat(idx);
-	if (force || spat->pat == NULL)
+	ଯଦି (force || spat->pat == ଖାଲି)
 	{
-	    val = viminfo_readstring(virp, (int)(lp - virp->vir_line + 1),
+	    val = viminfo_readstring(virp, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(lp - virp->vir_ଧାଡ଼ି + 1),
 									TRUE);
-	    if (val != NULL)
+	    ଯଦି (val != ଖାଲି)
 	    {
-		if (!writing)
+		ଯଦି (!writing)
 		{
-		    set_last_search_pat(val, idx, magic, setlast);
+		    set_last_ସନ୍ଧାନ_pat(val, idx, magic, setlast);
 		    spat->no_scs = no_scs;
-		    spat->off.line = off_line;
+		    spat->off.ଧାଡ଼ି = off_ଧାଡ଼ି;
 		    spat->off.end = off_end;
 		    spat->off.off = off;
-#ifdef FEAT_SEARCH_EXTRA
-		    if (setlast)
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
+		    ଯଦି (setlast)
 			set_no_hlsearch(!hlsearch_on);
 #endif
 		}
@@ -1559,26 +1559,26 @@ read_viminfo_search_pattern(vir_T *virp, int force, int writing)
 	    }
 	}
     }
-    return viminfo_readline(virp);
+    ଫେରନ୍ତୁ viminfo_readline(virp);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 wvsp_one(
     FILE	*fp,	// file to write to
-    int		idx,	// spats[] index
-    char	*s,	// search pat
-    int		sc)	// dir char
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx,	// spats[] index
+    ଅକ୍ଷର	*s,	// search pat
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		sc)	// dir char
 {
     spat_T	*spat = get_spat(idx);
-    if (spat->pat == NULL)
-	return;
+    ଯଦି (spat->pat == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     fprintf(fp, _("\n# Last %sSearch Pattern:\n~"), s);
     // off.dir is not stored, it's reset to forward
     fprintf(fp, "%c%c%c%c%ld%s%c",
 	    spat->magic    ? 'M' : 'm',	// magic
 	    spat->no_scs   ? 's' : 'S',	// smartcase
-	    spat->off.line ? 'L' : 'l',	// line offset
+	    spat->off.ଧାଡ଼ି ? 'L' : 'l',	// line offset
 	    spat->off.end  ? 'E' : 'e',	// offset from end
 	    spat->off.off,			// offset
 	    get_spat_last_idx() == idx ? "~" : "",	// last used pat
@@ -1586,17 +1586,17 @@ wvsp_one(
     viminfo_writestring(fp, spat->pat);
 }
 
-    static void
-write_viminfo_search_pattern(FILE *fp)
+    ସ୍ଥିର ଶୂନ୍ୟ
+write_viminfo_ସନ୍ଧାନ_pattern(FILE *fp)
 {
-    if (get_viminfo_parameter('/') == 0)
-	return;
+    ଯଦି (get_viminfo_parameter('/') == 0)
+	ଫେରନ୍ତୁ;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_ସନ୍ଧାନ_EXTRA
     fprintf(fp, "\n# hlsearch on (H) or off (h):\n~%c",
-	    (no_hlsearch || find_viminfo_parameter('h') != NULL) ? 'h' : 'H');
+	    (no_hlsearch || find_viminfo_parameter('h') != ଖାଲି) ? 'h' : 'H');
 #endif
-    wvsp_one(fp, RE_SEARCH, "", '/');
+    wvsp_one(fp, RE_ସନ୍ଧାନ, "", '/');
     wvsp_one(fp, RE_SUBST, _("Substitute "), '&');
 }
 
@@ -1604,7 +1604,7 @@ write_viminfo_search_pattern(FILE *fp)
  * Functions relating to reading/writing registers from viminfo
  */
 
-static yankreg_T *y_read_regs = NULL;
+ସ୍ଥିର yankreg_T *y_read_regs = ଖାଲି;
 
 #define REG_PREVIOUS 1
 #define REG_EXEC 2
@@ -1612,135 +1612,135 @@ static yankreg_T *y_read_regs = NULL;
 /*
  * Prepare for reading viminfo registers when writing viminfo later.
  */
-    static void
-prepare_viminfo_registers(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+prepare_viminfo_registers(ଶୂନ୍ୟ)
 {
-    y_read_regs = ALLOC_CLEAR_MULT(yankreg_T, NUM_REGISTERS);
+    y_read_regs = ALLOC_CLEAR_MULT(yankreg_T, ଅଙ୍କ_REGISTERS);
 }
 
-    static void
-finish_viminfo_registers(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+finish_viminfo_registers(ଶୂନ୍ୟ)
 {
-    int		i;
-    int		j;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		j;
 
-    if (y_read_regs == NULL)
-	return;
+    ଯଦି (y_read_regs == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
-	if (y_read_regs[i].y_array != NULL)
+    ପାଇଁ (i = 0; i < ଅଙ୍କ_REGISTERS; ++i)
+	ଯଦି (y_read_regs[i].y_array != ଖାଲି)
 	{
-	    for (j = 0; j < y_read_regs[i].y_size; j++)
+	    ପାଇଁ (j = 0; j < y_read_regs[i].y_size; j++)
 		vim_free(y_read_regs[i].y_array[j].string);
 	    vim_free(y_read_regs[i].y_array);
 	}
     VIM_CLEAR(y_read_regs);
 }
 
-    static int
-read_viminfo_register(vir_T *virp, int force)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_register(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force)
 {
-    int		eof;
-    int		do_it = TRUE;
-    int		size;
-    int		limit;
-    int		i;
-    int		set_prev = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		eof;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		do_it = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		size;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		limit;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		set_prev = FALSE;
     char_u	*str;
-    string_T	*array = NULL;
-    int		new_type = MCHAR; // init to shut up compiler
+    string_T	*array = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		new_type = MCHAR; // init to shut up compiler
     colnr_T	new_width = 0; // init to shut up compiler
     yankreg_T	*y_current_p;
 
     // We only get here (hopefully) if line[0] == '"'
-    str = virp->vir_line + 1;
+    str = virp->vir_ଧାଡ଼ି + 1;
 
     // If the line starts with "" this is the y_previous register.
-    if (*str == '"')
+    ଯଦି (*str == '"')
     {
 	set_prev = TRUE;
 	str++;
     }
 
-    if (!ASCII_ISALNUM(*str) && *str != '-')
+    ଯଦି (!ASCII_ISALNUM(*str) && *str != '-')
     {
-	if (viminfo_error("E577: ", _(e_illegal_register_name), virp->vir_line))
-	    return TRUE;	// too many errors, pretend end-of-file
+	ଯଦି (viminfo_error("E577: ", _(e_illegal_register_name), virp->vir_ଧାଡ଼ି))
+	    ଫେରନ୍ତୁ TRUE;	// too many errors, pretend end-of-file
 	do_it = FALSE;
     }
     get_yank_register(*str++, FALSE);
     y_current_p = get_y_current();
-    if (!force && y_current_p->y_array != NULL)
+    ଯଦି (!force && y_current_p->y_array != ଖାଲି)
 	do_it = FALSE;
 
-    if (*str == '@')
+    ଯଦି (*str == '@')
     {
 	// "x@: register x used for @@
-	if (force || get_execreg_lastc() == NUL)
+	ଯଦି (force || get_execreg_lastc() == NUL)
 	    set_execreg_lastc(str[-1]);
     }
 
     size = 0;
     limit = 100;	// Optimized for registers containing <= 100 lines
-    if (do_it)
+    ଯଦି (do_it)
     {
 	// Build the new register in array[].
 	// y_array is kept as-is until done.
 	// The "do_it" flag is reset when something is wrong, in which case
 	// array[] needs to be freed.
-	if (set_prev)
+	ଯଦି (set_prev)
 	    set_y_previous(y_current_p);
 	array = ALLOC_MULT(string_T, limit);
 	str = skipwhite(skiptowhite(str));
-	if (STRNCMP(str, "CHAR", 4) == 0)
+	ଯଦି (STRNCMP(str, "CHAR", 4) == 0)
 	    new_type = MCHAR;
-	else if (STRNCMP(str, "BLOCK", 5) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNCMP(str, "BLOCK", 5) == 0)
 	    new_type = MBLOCK;
-	else
+	ଅନ୍ୟଥା
 	    new_type = MLINE;
 	// get the block width; if it's missing we get a zero, which is OK
 	str = skipwhite(skiptowhite(str));
 	new_width = getdigits(&str);
     }
 
-    while (!(eof = viminfo_readline(virp))
-		    && (virp->vir_line[0] == TAB || virp->vir_line[0] == '<'))
+    ଯେତେବେଳେ (!(eof = viminfo_readline(virp))
+		    && (virp->vir_ଧାଡ଼ି[0] == TAB || virp->vir_ଧାଡ଼ି[0] == '<'))
     {
-	if (do_it)
+	ଯଦି (do_it)
 	{
-	    if (size == limit)
+	    ଯଦି (size == limit)
 	    {
 		string_T *new_array = (string_T *)
-				    alloc((size_t)limit * 2 * sizeof(string_T));
+				    alloc((size_t)limit * 2 * ଆକାର(string_T));
 
-		if (new_array == NULL)
+		ଯଦି (new_array == ଖାଲି)
 		{
 		    do_it = FALSE;
-		    break;
+		    ଭାଙ୍ଗ;
 		}
-		for (i = 0; i < limit; i++)
+		ପାଇଁ (i = 0; i < limit; i++)
 		    new_array[i] = array[i];
 		vim_free(array);
 		array = new_array;
 		limit *= 2;
 	    }
 	    str = viminfo_readstring(virp, 1, TRUE);
-	    if (str != NULL)
+	    ଯଦି (str != ଖାଲି)
 	    {
 		array[size].string = str;
 		array[size].length = STRLEN(str);
 		++size;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		// error, don't store the result
 		do_it = FALSE;
 	}
     }
 
-    if (do_it)
+    ଯଦି (do_it)
     {
 	// free y_array[]
-	for (i = 0; i < y_current_p->y_size; i++)
+	ପାଇଁ (i = 0; i < y_current_p->y_size; i++)
 	    vim_free(y_current_p->y_array[i].string);
 	vim_free(y_current_p->y_array);
 
@@ -1748,21 +1748,21 @@ read_viminfo_register(vir_T *virp, int force)
 	y_current_p->y_width = new_width;
 	y_current_p->y_size = size;
 	y_current_p->y_time_set = 0;
-	if (size == 0)
+	ଯଦି (size == 0)
 	{
-	    y_current_p->y_array = NULL;
+	    y_current_p->y_array = ଖାଲି;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // Move the lines from array[] to y_array[].
 	    y_current_p->y_array = ALLOC_MULT(string_T, size);
-	    for (i = 0; i < size; i++)
+	    ପାଇଁ (i = 0; i < size; i++)
 	    {
-		if (y_current_p->y_array == NULL)
+		ଯଦି (y_current_p->y_array == ଖାଲି)
 		{
 		    VIM_CLEAR_STRING(array[i]);
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    y_current_p->y_array[i].string = array[i].string;
 		    y_current_p->y_array[i].length = array[i].length;
@@ -1770,113 +1770,113 @@ read_viminfo_register(vir_T *virp, int force)
 	    }
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Free array[] if it was filled.
-	for (i = 0; i < size; i++)
+	ପାଇଁ (i = 0; i < size; i++)
 	    vim_free(array[i].string);
     }
     vim_free(array);
 
-    return eof;
+    ଫେରନ୍ତୁ eof;
 }
 
 /*
  * Accept a new style register line from the viminfo, store it when it's new.
  */
-    static void
-handle_viminfo_register(garray_T *values, int force)
+    ସ୍ଥିର ଶୂନ୍ୟ
+handle_viminfo_register(garray_T *ମୂଲ୍ୟଗୁଡ଼ିକ, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force)
 {
-    bval_T	*vp = (bval_T *)values->ga_data;
-    int		flags;
-    int		name;
-    int		type;
-    int		linecount;
-    int		width;
+    bval_T	*vp = (bval_T *)ମୂଲ୍ୟଗୁଡ଼ିକ->ga_data;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		name;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		linecount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		width;
     time_t	timestamp;
     yankreg_T	*y_ptr;
     yankreg_T	*y_regs_p = get_y_regs();
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
     // Check the format:
     // |{bartype},{flags},{name},{type},
     //      {linecount},{width},{timestamp},"line1","line2"
-    if (values->ga_len < 6
+    ଯଦି (ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len < 6
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || vp[2].bv_type != BVAL_NR
 	    || vp[3].bv_type != BVAL_NR
 	    || vp[4].bv_type != BVAL_NR
 	    || vp[5].bv_type != BVAL_NR)
-	return;
+	ଫେରନ୍ତୁ;
     flags = vp[0].bv_nr;
     name = vp[1].bv_nr;
-    if (name < 0 || name >= NUM_REGISTERS)
-	return;
+    ଯଦି (name < 0 || name >= ଅଙ୍କ_REGISTERS)
+	ଫେରନ୍ତୁ;
     type = vp[2].bv_nr;
-    if (type != MCHAR && type != MLINE && type != MBLOCK)
-	return;
+    ଯଦି (type != MCHAR && type != MLINE && type != MBLOCK)
+	ଫେରନ୍ତୁ;
     linecount = vp[3].bv_nr;
-    if (values->ga_len < 6 + linecount)
-	return;
+    ଯଦି (ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len < 6 + linecount)
+	ଫେରନ୍ତୁ;
     width = vp[4].bv_nr;
-    if (width < 0)
-	return;
+    ଯଦି (width < 0)
+	ଫେରନ୍ତୁ;
 
-    if (y_read_regs != NULL)
+    ଯଦି (y_read_regs != ଖାଲି)
 	// Reading viminfo for merging and writing.  Store the register
 	// content, don't update the current registers.
 	y_ptr = &y_read_regs[name];
-    else
+    ଅନ୍ୟଥା
 	y_ptr = &y_regs_p[name];
 
     // Do not overwrite unless forced or the timestamp is newer.
     timestamp = (time_t)vp[5].bv_nr;
-    if (y_ptr->y_array != NULL && !force
+    ଯଦି (y_ptr->y_array != ଖାଲି && !force
 			 && (timestamp == 0 || y_ptr->y_time_set > timestamp))
-	return;
+	ଫେରନ୍ତୁ;
 
-    if (y_ptr->y_array != NULL)
-	for (i = 0; i < y_ptr->y_size; i++)
+    ଯଦି (y_ptr->y_array != ଖାଲି)
+	ପାଇଁ (i = 0; i < y_ptr->y_size; i++)
 	    vim_free(y_ptr->y_array[i].string);
     vim_free(y_ptr->y_array);
 
-    if (y_read_regs == NULL)
+    ଯଦି (y_read_regs == ଖାଲି)
     {
-	if (flags & REG_PREVIOUS)
+	ଯଦି (flags & REG_PREVIOUS)
 	    set_y_previous(y_ptr);
-	if ((flags & REG_EXEC) && (force || get_execreg_lastc() == NUL))
+	ଯଦି ((flags & REG_EXEC) && (force || get_execreg_lastc() == NUL))
 	    set_execreg_lastc(get_register_name(name));
     }
     y_ptr->y_type = type;
     y_ptr->y_width = width;
     y_ptr->y_size = linecount;
     y_ptr->y_time_set = timestamp;
-    if (linecount == 0)
+    ଯଦି (linecount == 0)
     {
-	y_ptr->y_array = NULL;
-	return;
+	y_ptr->y_array = ଖାଲି;
+	ଫେରନ୍ତୁ;
     }
     y_ptr->y_array = ALLOC_MULT(string_T, linecount);
-    if (y_ptr->y_array == NULL)
+    ଯଦି (y_ptr->y_array == ଖାଲି)
     {
 	y_ptr->y_size = 0; // ensure object state is consistent
-	return;
+	ଫେରନ୍ତୁ;
     }
-    for (i = 0; i < linecount; i++)
+    ପାଇଁ (i = 0; i < linecount; i++)
     {
-	if (vp[i + 6].bv_allocated)
+	ଯଦି (vp[i + 6].bv_allocated)
 	{
 	    y_ptr->y_array[i].string = vp[i + 6].bv_string;
 	    y_ptr->y_array[i].length = vp[i + 6].bv_len;
-	    vp[i + 6].bv_string = NULL;
+	    vp[i + 6].bv_string = ଖାଲି;
 	}
-	else if (vp[i + 6].bv_type != BVAL_STRING)
+	ଅନ୍ୟଥା ଯଦି (vp[i + 6].bv_type != BVAL_STRING)
 	{
-	    free(y_ptr->y_array);
-	    y_ptr->y_array = NULL;
+	    ମୁକ୍ତ(y_ptr->y_array);
+	    y_ptr->y_array = ଖାଲି;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    y_ptr->y_array[i].string = vim_strnsave(vp[i + 6].bv_string, vp[i + 6].bv_len);
 	    y_ptr->y_array[i].length = vp[i + 6].bv_len;
@@ -1884,15 +1884,15 @@ handle_viminfo_register(garray_T *values, int force)
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_registers(FILE *fp)
 {
-    int		i, j;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i, j;
     char_u	*type;
     char_u	c;
-    int		num_lines;
-    int		max_num_lines;
-    int		max_kbyte;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_kbyte;
     long	len;
     yankreg_T	*y_ptr;
     yankreg_T	*y_regs_p = get_y_regs();
@@ -1900,108 +1900,108 @@ write_viminfo_registers(FILE *fp)
     fputs(_("\n# Registers:\n"), fp);
 
     // Get '<' value, use old '"' value if '<' is not found.
-    max_num_lines = get_viminfo_parameter('<');
-    if (max_num_lines < 0)
-	max_num_lines = get_viminfo_parameter('"');
-    if (max_num_lines == 0)
-	return;
+    max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ = get_viminfo_parameter('<');
+    ଯଦି (max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ < 0)
+	max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ = get_viminfo_parameter('"');
+    ଯଦି (max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ == 0)
+	ଫେରନ୍ତୁ;
     max_kbyte = get_viminfo_parameter('s');
-    if (max_kbyte == 0)
-	return;
+    ଯଦି (max_kbyte == 0)
+	ଫେରନ୍ତୁ;
 
-    for (i = 0; i < NUM_REGISTERS; i++)
+    ପାଇଁ (i = 0; i < ଅଙ୍କ_REGISTERS; i++)
     {
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+#ଯଦି defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
 	// Skip '*'/'+' register, we don't want them back next time
-	if (i == STAR_REGISTER || i == PLUS_REGISTER || i == REAL_PLUS_REGISTER)
-	    continue;
+	ଯଦି (i == STAR_REGISTER || i == PLUS_REGISTER || i == REAL_PLUS_REGISTER)
+	    ଜାରି;
 #endif
 #ifdef FEAT_DND
 	// Neither do we want the '~' register
-	if (i == TILDE_REGISTER)
-	    continue;
+	ଯଦି (i == TILDE_REGISTER)
+	    ଜାରି;
 #endif
 	// When reading viminfo for merging and writing: Use the register from
 	// viminfo if it's newer.
-	if (y_read_regs != NULL
-		&& y_read_regs[i].y_array != NULL
-		&& (y_regs_p[i].y_array == NULL ||
+	ଯଦି (y_read_regs != ଖାଲି
+		&& y_read_regs[i].y_array != ଖାଲି
+		&& (y_regs_p[i].y_array == ଖାଲି ||
 			    y_read_regs[i].y_time_set > y_regs_p[i].y_time_set))
 	    y_ptr = &y_read_regs[i];
-	else if (y_regs_p[i].y_array == NULL)
-	    continue;
-	else
+	ଅନ୍ୟଥା ଯଦି (y_regs_p[i].y_array == ଖାଲି)
+	    ଜାରି;
+	ଅନ୍ୟଥା
 	    y_ptr = &y_regs_p[i];
 
 	// Skip empty registers.
-	num_lines = y_ptr->y_size;
-	if (num_lines == 0
-		|| (num_lines == 1 && y_ptr->y_type == MCHAR
+	ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ = y_ptr->y_size;
+	ଯଦି (ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ == 0
+		|| (ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ == 1 && y_ptr->y_type == MCHAR
 					&& *y_ptr->y_array[0].string == NUL))
-	    continue;
+	    ଜାରି;
 
-	if (max_kbyte > 0)
+	ଯଦି (max_kbyte > 0)
 	{
 	    // Skip register if there is more text than the maximum size.
 	    len = 0;
-	    for (j = 0; j < num_lines; j++)
+	    ପାଇଁ (j = 0; j < ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ; j++)
 		len += (long)y_ptr->y_array[j].length + 1L;
-	    if (len > (long)max_kbyte * 1024L)
-		continue;
+	    ଯଦି (len > (long)max_kbyte * 1024L)
+		ଜାରି;
 	}
 
-	switch (y_ptr->y_type)
+	ବାଛ (y_ptr->y_type)
 	{
-	    case MLINE:
+	    ସ୍ଥିତି MLINE:
 		type = (char_u *)"LINE";
-		break;
-	    case MCHAR:
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି MCHAR:
 		type = (char_u *)"CHAR";
-		break;
-	    case MBLOCK:
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି MBLOCK:
 		type = (char_u *)"BLOCK";
-		break;
-	    default:
+		ଭାଙ୍ଗ;
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		semsg(_(e_unknown_register_type_nr), y_ptr->y_type);
 		type = (char_u *)"LINE";
-		break;
+		ଭାଙ୍ଗ;
 	}
-	if (get_y_previous() == &y_regs_p[i])
+	ଯଦି (get_y_previous() == &y_regs_p[i])
 	    fprintf(fp, "\"");
 	c = get_register_name(i);
 	fprintf(fp, "\"%c", c);
-	if (c == get_execreg_lastc())
+	ଯଦି (c == get_execreg_lastc())
 	    fprintf(fp, "@");
-	fprintf(fp, "\t%s\t%d\n", type, (int)y_ptr->y_width);
+	fprintf(fp, "\t%s\t%d\n", type, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y_ptr->y_width);
 
 	// If max_num_lines < 0, then we save ALL the lines in the register
-	if (max_num_lines > 0 && num_lines > max_num_lines)
-	    num_lines = max_num_lines;
-	for (j = 0; j < num_lines; j++)
+	ଯଦି (max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ > 0 && ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ > max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ)
+	    ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ = max_ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ;
+	ପାଇଁ (j = 0; j < ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ; j++)
 	{
 	    putc('\t', fp);
 	    viminfo_writestring(fp, y_ptr->y_array[j].string);
 	}
 
 	{
-	    int	    flags = 0;
-	    int	    remaining;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    flags = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    remaining;
 
 	    // New style with a bar line. Format:
 	    // |{bartype},{flags},{name},{type},
 	    //      {linecount},{width},{timestamp},"line1","line2"
 	    // flags: REG_PREVIOUS - register is y_previous
 	    //	      REG_EXEC - used for @@
-	    if (get_y_previous() == &y_regs_p[i])
+	    ଯଦି (get_y_previous() == &y_regs_p[i])
 		flags |= REG_PREVIOUS;
-	    if (c == get_execreg_lastc())
+	    ଯଦି (c == get_execreg_lastc())
 		flags |= REG_EXEC;
 	    fprintf(fp, "|%d,%d,%d,%d,%d,%d,%ld", BARTYPE_REGISTER, flags,
-		    i, y_ptr->y_type, num_lines, (int)y_ptr->y_width,
+		    i, y_ptr->y_type, ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y_ptr->y_width,
 		    (long)y_ptr->y_time_set);
 	    // 11 chars for type/flags/name/type, 3 * 20 for numbers
 	    remaining = LSIZE - 71;
-	    for (j = 0; j < num_lines; j++)
+	    ପାଇଁ (j = 0; j < ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ; j++)
 	    {
 		putc(',', fp);
 		--remaining;
@@ -2017,24 +2017,24 @@ write_viminfo_registers(FILE *fp)
  * Functions relating to reading/writing marks from viminfo
  */
 
-static xfmark_T *vi_namedfm = NULL;
-static xfmark_T *vi_jumplist = NULL;
-static int vi_jumplist_len = 0;
+ସ୍ଥିର xfmark_T *vi_namedfm = ଖାଲି;
+ସ୍ଥିର xfmark_T *vi_jumplist = ଖାଲି;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା vi_jumplist_len = 0;
 
-    static void
-write_one_mark(FILE *fp_out, int c, pos_T *pos)
+    ସ୍ଥିର ଶୂନ୍ୟ
+write_one_mark(FILE *fp_out, ପୂର୍ଣ୍ଣସଂଖ୍ୟା c, pos_T *pos)
 {
-    if (pos->lnum != 0)
-	fprintf(fp_out, "\t%c\t%ld\t%d\n", c, (long)pos->lnum, (int)pos->col);
+    ଯଦି (pos->lnum != 0)
+	fprintf(fp_out, "\t%c\t%ld\t%d\n", c, (long)pos->lnum, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pos->col);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_buffer_marks(buf_T *buf, FILE *fp_out)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     pos_T	pos;
 
-    home_replace(NULL, buf->b_ffname, IObuff, IOSIZE, TRUE);
+    home_replace(ଖାଲି, buf->b_ffname, IObuff, IOSIZE, TRUE);
     fprintf(fp_out, "\n> ");
     viminfo_writestring(fp_out, IObuff);
 
@@ -2045,27 +2045,27 @@ write_buffer_marks(buf_T *buf, FILE *fp_out)
     write_one_mark(fp_out, '*', &pos);
 
     write_one_mark(fp_out, '"', &buf->b_last_cursor);
-    write_one_mark(fp_out, '^', &buf->b_last_insert);
+    write_one_mark(fp_out, '^', &buf->b_last_ଭର୍ତ୍ତି);
     write_one_mark(fp_out, '.', &buf->b_last_change);
     // changelist positions are stored oldest first
-    for (i = 0; i < buf->b_changelistlen; ++i)
+    ପାଇଁ (i = 0; i < buf->b_changelistlen; ++i)
     {
 	// skip duplicates
-	if (i == 0 || !EQUAL_POS(buf->b_changelist[i - 1],
+	ଯଦି (i == 0 || !EQUAL_POS(buf->b_changelist[i - 1],
 							 buf->b_changelist[i]))
 	    write_one_mark(fp_out, '+', &buf->b_changelist[i]);
     }
-    for (i = 0; i < NMARKS; i++)
+    ପାଇଁ (i = 0; i < NMARKS; i++)
 	write_one_mark(fp_out, 'a' + i, &buf->b_namedm[i]);
 }
 
 /*
  * Return TRUE if marks for "buf" should not be written.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 skip_for_viminfo(buf_T *buf)
 {
-    return bt_terminal(buf) || removable(buf->b_ffname);
+    ଫେରନ୍ତୁ bt_terminal(buf) || removable(buf->b_ffname);
 }
 
 /*
@@ -2073,12 +2073,12 @@ skip_for_viminfo(buf_T *buf)
  * When "buflist" is not NULL fill it with the buffers for which marks are to
  * be written.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_marks(FILE *fp_out, garray_T *buflist)
 {
     buf_T	*buf;
-    int		is_mark_set;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_mark_set;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     win_T	*win;
     tabpage_T	*tp;
 
@@ -2091,50 +2091,50 @@ write_viminfo_marks(FILE *fp_out, garray_T *buflist)
     {
 	// Only write something if buffer has been loaded and at least one
 	// mark is set.
-	if (buf->b_marks_read)
+	ଯଦି (buf->b_marks_read)
 	{
-	    if (buf->b_last_cursor.lnum != 0)
+	    ଯଦି (buf->b_last_cursor.lnum != 0)
 		is_mark_set = TRUE;
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		is_mark_set = FALSE;
-		for (i = 0; i < NMARKS; i++)
-		    if (buf->b_namedm[i].lnum != 0)
+		ପାଇଁ (i = 0; i < NMARKS; i++)
+		    ଯଦି (buf->b_namedm[i].lnum != 0)
 		    {
 			is_mark_set = TRUE;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 	    }
-	    if (is_mark_set && buf->b_ffname != NULL
+	    ଯଦି (is_mark_set && buf->b_ffname != ଖାଲି
 		      && buf->b_ffname[0] != NUL
 		      && !skip_for_viminfo(buf))
 	    {
-		if (buflist == NULL)
+		ଯଦି (buflist == ଖାଲି)
 		    write_buffer_marks(buf, fp_out);
-		else if (ga_grow(buflist, 1) == OK)
+		ଅନ୍ୟଥା ଯଦି (ga_grow(buflist, 1) == OK)
 		    ((buf_T **)buflist->ga_data)[buflist->ga_len++] = buf;
 	    }
 	}
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_one_filemark(
     FILE	*fp,
     xfmark_T	*fm,
-    int		c1,
-    int		c2)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c1,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c2)
 {
     char_u	*name;
 
-    if (fm->fmark.mark.lnum == 0)	// not set
-	return;
+    ଯଦି (fm->fmark.mark.lnum == 0)	// not set
+	ଫେରନ୍ତୁ;
 
-    if (fm->fmark.fnum != 0)		// there is a buffer
+    ଯଦି (fm->fmark.fnum != 0)		// there is a buffer
 	name = buflist_nr2name(fm->fmark.fnum, TRUE, FALSE);
-    else
+    ଅନ୍ୟଥା
 	name = fm->fname;		// use name from .viminfo
-    if (name != NULL && *name != NUL)
+    ଯଦି (name != ଖାଲି && *name != NUL)
     {
 	fprintf(fp, "%c%c  %ld  %ld  ", c1, c2, (long)fm->fmark.mark.lnum,
 						    (long)fm->fmark.mark.col);
@@ -2149,33 +2149,33 @@ write_one_filemark(
 	putc('\n', fp);
     }
 
-    if (fm->fmark.fnum != 0)
+    ଯଦି (fm->fmark.fnum != 0)
 	vim_free(name);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 write_viminfo_filemarks(FILE *fp)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     char_u	*name;
     buf_T	*buf;
     xfmark_T	*namedfm_p = get_namedfm();
     xfmark_T	*fm;
-    int		vi_idx;
-    int		idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		vi_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx;
 
-    if (get_viminfo_parameter('f') == 0)
-	return;
+    ଯଦି (get_viminfo_parameter('f') == 0)
+	ଫେରନ୍ତୁ;
 
     fputs(_("\n# File marks:\n"), fp);
 
     // Write the filemarks 'A - 'Z
-    for (i = 0; i < NMARKS; i++)
+    ପାଇଁ (i = 0; i < NMARKS; i++)
     {
-	if (vi_namedfm != NULL
+	ଯଦି (vi_namedfm != ଖାଲି
 			&& (vi_namedfm[i].time_set > namedfm_p[i].time_set))
 	    fm = &vi_namedfm[i];
-	else
+	ଅନ୍ୟଥା
 	    fm = &namedfm_p[i];
 	write_one_filemark(fp, fm, '\'', i + 'A');
     }
@@ -2184,35 +2184,35 @@ write_viminfo_filemarks(FILE *fp)
     // That one, or else the last one is deleted.
     // Move '0 to '1, '1 to '2, etc. until the matching one or '9
     // Set the '0 mark to current cursor position.
-    if (curbuf->b_ffname != NULL && !skip_for_viminfo(curbuf))
+    ଯଦି (curbuf->b_ffname != ଖାଲି && !skip_for_viminfo(curbuf))
     {
 	name = buflist_nr2name(curbuf->b_fnum, TRUE, FALSE);
-	for (i = NMARKS; i < NMARKS + EXTRA_MARKS - 1; ++i)
-	    if (namedfm_p[i].fmark.mark.lnum == curwin->w_cursor.lnum
-		    && (namedfm_p[i].fname == NULL
+	ପାଇଁ (i = NMARKS; i < NMARKS + EXTRA_MARKS - 1; ++i)
+	    ଯଦି (namedfm_p[i].fmark.mark.lnum == curwin->w_cursor.lnum
+		    && (namedfm_p[i].fname == ଖାଲି
 			    ? namedfm_p[i].fmark.fnum == curbuf->b_fnum
-			    : (name != NULL
+			    : (name != ଖାଲି
 				    && STRCMP(name, namedfm_p[i].fname) == 0)))
-		break;
+		ଭାଙ୍ଗ;
 	vim_free(name);
 
 	vim_free(namedfm_p[i].fname);
-	for ( ; i > NMARKS; --i)
+	ପାଇଁ ( ; i > NMARKS; --i)
 	    namedfm_p[i] = namedfm_p[i - 1];
 	namedfm_p[NMARKS].fmark.mark = curwin->w_cursor;
 	namedfm_p[NMARKS].fmark.fnum = curbuf->b_fnum;
-	namedfm_p[NMARKS].fname = NULL;
+	namedfm_p[NMARKS].fname = ଖାଲି;
 	namedfm_p[NMARKS].time_set = vim_time();
     }
 
     // Write the filemarks '0 - '9.  Newest (highest timestamp) first.
     vi_idx = NMARKS;
     idx = NMARKS;
-    for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+    ପାଇଁ (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
     {
-	xfmark_T *vi_fm = vi_namedfm != NULL ? &vi_namedfm[vi_idx] : NULL;
+	xfmark_T *vi_fm = vi_namedfm != ଖାଲି ? &vi_namedfm[vi_idx] : ଖାଲି;
 
-	if (vi_fm != NULL
+	ଯଦି (vi_fm != ଖାଲି
 		&& vi_fm->fmark.mark.lnum != 0
 		&& (vi_fm->time_set > namedfm_p[idx].time_set
 		    || namedfm_p[idx].fmark.mark.lnum == 0))
@@ -2220,16 +2220,16 @@ write_viminfo_filemarks(FILE *fp)
 	    fm = vi_fm;
 	    ++vi_idx;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    fm = &namedfm_p[idx++];
-	    if (vi_fm != NULL
+	    ଯଦି (vi_fm != ଖାଲି
 		  && vi_fm->fmark.mark.lnum == fm->fmark.mark.lnum
 		  && vi_fm->time_set == fm->time_set
 		  && ((vi_fm->fmark.fnum != 0
 			  && vi_fm->fmark.fnum == fm->fmark.fnum)
-		      || (vi_fm->fname != NULL
-			  && fm->fname != NULL
+		      || (vi_fm->fname != ଖାଲି
+			  && fm->fname != ଖାଲି
 			  && STRCMP(vi_fm->fname, fm->fname) == 0)))
 		++vi_idx;  // skip duplicate
 	}
@@ -2242,24 +2242,24 @@ write_viminfo_filemarks(FILE *fp)
     cleanup_jumplist(curwin, FALSE);
     vi_idx = 0;
     idx = curwin->w_jumplistlen - 1;
-    for (i = 0; i < JUMPLISTSIZE; ++i)
+    ପାଇଁ (i = 0; i < JUMPLISTSIZE; ++i)
     {
 	xfmark_T	*vi_fm;
 
-	fm = idx >= 0 ? &curwin->w_jumplist[idx] : NULL;
-	vi_fm = (vi_jumplist != NULL && vi_idx < vi_jumplist_len)
-					? &vi_jumplist[vi_idx] : NULL;
-	if (fm == NULL && vi_fm == NULL)
-	    break;
-	if (fm == NULL || (vi_fm != NULL && fm->time_set < vi_fm->time_set))
+	fm = idx >= 0 ? &curwin->w_jumplist[idx] : ଖାଲି;
+	vi_fm = (vi_jumplist != ଖାଲି && vi_idx < vi_jumplist_len)
+					? &vi_jumplist[vi_idx] : ଖାଲି;
+	ଯଦି (fm == ଖାଲି && vi_fm == ଖାଲି)
+	    ଭାଙ୍ଗ;
+	ଯଦି (fm == ଖାଲି || (vi_fm != ଖାଲି && fm->time_set < vi_fm->time_set))
 	{
 	    fm = vi_fm;
 	    ++vi_idx;
 	}
-	else
+	ଅନ୍ୟଥା
 	    --idx;
-	if (fm->fmark.fnum == 0
-		|| ((buf = buflist_findnr(fm->fmark.fnum)) != NULL
+	ଯଦି (fm->fmark.fnum == 0
+		|| ((buf = buflist_findnr(fm->fmark.fnum)) != ଖାଲି
 		    && !skip_for_viminfo(buf)))
 	    write_one_filemark(fp, fm, '-', '\'');
     }
@@ -2268,15 +2268,15 @@ write_viminfo_filemarks(FILE *fp)
 /*
  * Compare functions for qsort() below, that compares b_last_used.
  */
-    int
-buf_compare(const void *s1, const void *s2)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+buf_compare(ଅଚଳ ଶୂନ୍ୟ *s1, ଅଚଳ ଶୂନ୍ୟ *s2)
 {
     buf_T *buf1 = *(buf_T **)s1;
     buf_T *buf2 = *(buf_T **)s2;
 
-    if (buf1->b_last_used == buf2->b_last_used)
-	return 0;
-    return buf1->b_last_used > buf2->b_last_used ? -1 : 1;
+    ଯଦି (buf1->b_last_used == buf2->b_last_used)
+	ଫେରନ୍ତୁ 0;
+    ଫେରନ୍ତୁ buf1->b_last_used > buf2->b_last_used ? -1 : 1;
 }
 
 /*
@@ -2286,240 +2286,240 @@ buf_compare(const void *s1, const void *s2)
  * fp_out == NULL && (flags & VIF_ONLY_CURBUF): bail out after curbuf marks
  * fp_out == NULL && (flags & VIF_GET_OLDFILES | VIF_FORCEIT): fill v:oldfiles
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 copy_viminfo_marks(
     vir_T	*virp,
     FILE	*fp_out,
     garray_T	*buflist,
-    int		eof,
-    int		flags)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		eof,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags)
 {
-    char_u	*line = virp->vir_line;
+    char_u	*ଧାଡ଼ି = virp->vir_ଧାଡ଼ି;
     buf_T	*buf;
-    int		num_marked_files;
-    int		load_marks;
-    int		copy_marks_out;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଅଙ୍କ_marked_files;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		load_marks;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		copy_marks_out;
     char_u	*str;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
     char_u	*p;
     char_u	*name_buf;
     pos_T	pos;
 #ifdef FEAT_EVAL
-    list_T	*list = NULL;
+    list_T	*list = ଖାଲି;
 #endif
-    int		count = 0;
-    int		buflist_used = 0;
-    buf_T	*buflist_buf = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_2 = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		buflist_used = 0;
+    buf_T	*buflist_buf = ଖାଲି;
 
-    if ((name_buf = alloc(LSIZE)) == NULL)
-	return;
+    ଯଦି ((name_buf = alloc(LSIZE)) == ଖାଲି)
+	ଫେରନ୍ତୁ;
     *name_buf = NUL;
 
-    if (fp_out != NULL && buflist->ga_len > 0)
+    ଯଦି (fp_out != ଖାଲି && buflist->ga_len > 0)
     {
 	// Sort the list of buffers on b_last_used.
 	qsort(buflist->ga_data, (size_t)buflist->ga_len,
-						sizeof(buf_T *), buf_compare);
+						ଆକାର(buf_T *), buf_compare);
 	buflist_buf = ((buf_T **)buflist->ga_data)[0];
     }
 
 #ifdef FEAT_EVAL
-    if (fp_out == NULL && (flags & (VIF_GET_OLDFILES | VIF_FORCEIT)))
+    ଯଦି (fp_out == ଖାଲି && (flags & (VIF_GET_OLDFILES | VIF_FORCEIT)))
     {
 	list = list_alloc();
-	if (list != NULL)
+	ଯଦି (list != ଖାଲି)
 	    set_vim_var_list(VV_OLDFILES, list);
     }
 #endif
 
-    num_marked_files = get_viminfo_parameter('\'');
-    while (!eof && (count < num_marked_files || fp_out == NULL))
+    ଅଙ୍କ_marked_files = get_viminfo_parameter('\'');
+    ଯେତେବେଳେ (!eof && (ଗଣନା_2 < ଅଙ୍କ_marked_files || fp_out == ଖାଲି))
     {
-	if (line[0] != '>')
+	ଯଦି (ଧାଡ଼ି[0] != '>')
 	{
-	    if (line[0] != '\n' && line[0] != '\r' && line[0] != '#')
+	    ଯଦି (ଧାଡ଼ି[0] != '\n' && ଧାଡ଼ି[0] != '\r' && ଧାଡ଼ି[0] != '#')
 	    {
-		if (viminfo_error("E576: ", _(e_nonr_missing_gt), line))
-		    break;	// too many errors, return now
+		ଯଦି (viminfo_error("E576: ", _(e_nonr_missing_gt), ଧାଡ଼ି))
+		    ଭାଙ୍ଗ;	// too many errors, return now
 	    }
-	    eof = vim_fgets(line, LSIZE, virp->vir_fd);
-	    continue;		// Skip this dud line
+	    eof = vim_fgets(ଧାଡ଼ି, LSIZE, virp->vir_fd);
+	    ଜାରି;		// Skip this dud line
 	}
 
 	// Handle long line and translate escaped characters.
 	// Find file name, set str to start.
 	// Ignore leading and trailing white space.
-	str = skipwhite(line + 1);
-	str = viminfo_readstring(virp, (int)(str - virp->vir_line), FALSE);
-	if (str == NULL)
-	    continue;
+	str = skipwhite(ଧାଡ଼ି + 1);
+	str = viminfo_readstring(virp, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(str - virp->vir_ଧାଡ଼ି), FALSE);
+	ଯଦି (str == ଖାଲି)
+	    ଜାରି;
 	p = str + STRLEN(str);
-	while (p != str && (*p == NUL || vim_isspace(*p)))
+	ଯେତେବେଳେ (p != str && (*p == NUL || vim_isspace(*p)))
 	    p--;
-	if (*p)
+	ଯଦି (*p)
 	    p++;
 	*p = NUL;
 
 #ifdef FEAT_EVAL
-	if (list != NULL)
+	ଯଦି (list != ଖାଲି)
 	    list_append_string(list, str, -1);
 #endif
 
 	// If fp_out == NULL, load marks for current buffer.
 	// If fp_out != NULL, copy marks for buffers not in buflist.
 	load_marks = copy_marks_out = FALSE;
-	if (fp_out == NULL)
+	ଯଦି (fp_out == ଖାଲି)
 	{
-	    if ((flags & VIF_WANT_MARKS) && curbuf->b_ffname != NULL)
+	    ଯଦି ((flags & VIF_WANT_MARKS) && curbuf->b_ffname != ଖାଲି)
 	    {
-		if (*name_buf == NUL)	    // only need to do this once
-		    home_replace(NULL, curbuf->b_ffname, name_buf, LSIZE, TRUE);
-		if (fnamecmp(str, name_buf) == 0)
+		ଯଦି (*name_buf == NUL)	    // only need to do this once
+		    home_replace(ଖାଲି, curbuf->b_ffname, name_buf, LSIZE, TRUE);
+		ଯଦି (fnamecmp(str, name_buf) == 0)
 		    load_marks = TRUE;
 	    }
 	}
-	else // fp_out != NULL
+	ଅନ୍ୟଥା // fp_out != NULL
 	{
 	    // This is slow if there are many buffers!!
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_ffname != NULL)
+		ଯଦି (buf->b_ffname != ଖାଲି)
 		{
-		    home_replace(NULL, buf->b_ffname, name_buf, LSIZE, TRUE);
-		    if (fnamecmp(str, name_buf) == 0)
-			break;
+		    home_replace(ଖାଲି, buf->b_ffname, name_buf, LSIZE, TRUE);
+		    ଯଦି (fnamecmp(str, name_buf) == 0)
+			ଭାଙ୍ଗ;
 		}
 
 	    // Copy marks if the buffer has not been loaded.
-	    if (buf == NULL || !buf->b_marks_read)
+	    ଯଦି (buf == ଖାଲି || !buf->b_marks_read)
 	    {
-		int	did_read_line = FALSE;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା	did_read_ଧାଡ଼ି = FALSE;
 
-		if (buflist_buf != NULL)
+		ଯଦି (buflist_buf != ଖାଲି)
 		{
 		    // Read the next line.  If it has the "*" mark compare the
 		    // time stamps.  Write entries from "buflist" that are
 		    // newer.
-		    if (!viminfo_readline(virp) && line[0] == TAB)
+		    ଯଦି (!viminfo_readline(virp) && ଧାଡ଼ି[0] == TAB)
 		    {
-			did_read_line = TRUE;
-			if (line[1] == '*')
+			did_read_ଧାଡ଼ି = TRUE;
+			ଯଦି (ଧାଡ଼ି[1] == '*')
 			{
 			    long	ltime;
 
-			    sscanf((char *)line + 2, "%ld ", &ltime);
-			    while ((time_T)ltime < buflist_buf->b_last_used)
+			    sscanf((ଅକ୍ଷର *)ଧାଡ଼ି + 2, "%ld ", &ltime);
+			    ଯେତେବେଳେ ((time_T)ltime < buflist_buf->b_last_used)
 			    {
 				write_buffer_marks(buflist_buf, fp_out);
-				if (++count >= num_marked_files)
-				    break;
-				if (++buflist_used == buflist->ga_len)
+				ଯଦି (++ଗଣନା_2 >= ଅଙ୍କ_marked_files)
+				    ଭାଙ୍ଗ;
+				ଯଦି (++buflist_used == buflist->ga_len)
 				{
-				    buflist_buf = NULL;
-				    break;
+				    buflist_buf = ଖାଲି;
+				    ଭାଙ୍ଗ;
 				}
 				buflist_buf =
 				   ((buf_T **)buflist->ga_data)[buflist_used];
 			    }
 			}
-			else
+			ଅନ୍ୟଥା
 			{
 			    // No timestamp, must be written by an older Vim.
 			    // Assume all remaining buffers are older than
 			    // ours.
-			    while (count < num_marked_files
+			    ଯେତେବେଳେ (ଗଣନା_2 < ଅଙ୍କ_marked_files
 					    && buflist_used < buflist->ga_len)
 			    {
 				buflist_buf = ((buf_T **)buflist->ga_data)
 							     [buflist_used++];
 				write_buffer_marks(buflist_buf, fp_out);
-				++count;
+				++ଗଣନା_2;
 			    }
-			    buflist_buf = NULL;
+			    buflist_buf = ଖାଲି;
 			}
 
-			if (count >= num_marked_files)
+			ଯଦି (ଗଣନା_2 >= ଅଙ୍କ_marked_files)
 			{
 			    vim_free(str);
-			    break;
+			    ଭାଙ୍ଗ;
 			}
 		    }
 		}
 
 		fputs("\n> ", fp_out);
 		viminfo_writestring(fp_out, str);
-		if (did_read_line)
-		    fputs((char *)line, fp_out);
+		ଯଦି (did_read_ଧାଡ଼ି)
+		    fputs((ଅକ୍ଷର *)ଧାଡ଼ି, fp_out);
 
-		count++;
+		ଗଣନା_2++;
 		copy_marks_out = TRUE;
 	    }
 	}
 	vim_free(str);
 
 	pos.coladd = 0;
-	while (!(eof = viminfo_readline(virp)) && line[0] == TAB)
+	ଯେତେବେଳେ (!(eof = viminfo_readline(virp)) && ଧାଡ଼ି[0] == TAB)
 	{
-	    if (load_marks)
+	    ଯଦି (load_marks)
 	    {
-		if (line[1] != NUL)
+		ଯଦି (ଧାଡ଼ି[1] != NUL)
 		{
 		    unsigned u;
 
-		    sscanf((char *)line + 2, "%ld %u", &pos.lnum, &u);
+		    sscanf((ଅକ୍ଷର *)ଧାଡ଼ି + 2, "%ld %u", &pos.lnum, &u);
 		    pos.col = u;
-		    switch (line[1])
+		    ବାଛ (ଧାଡ଼ି[1])
 		    {
-			case '"': curbuf->b_last_cursor = pos; break;
-			case '^': curbuf->b_last_insert = pos; break;
-			case '.': curbuf->b_last_change = pos; break;
-			case '+':
+			ସ୍ଥିତି '"': curbuf->b_last_cursor = pos; ଭାଙ୍ଗ;
+			ସ୍ଥିତି '^': curbuf->b_last_ଭର୍ତ୍ତି = pos; ଭାଙ୍ଗ;
+			ସ୍ଥିତି '.': curbuf->b_last_change = pos; ଭାଙ୍ଗ;
+			ସ୍ଥିତି '+':
 				  // changelist positions are stored oldest
 				  // first
-				  if (curbuf->b_changelistlen == JUMPLISTSIZE)
+				  ଯଦି (curbuf->b_changelistlen == JUMPLISTSIZE)
 				      // list is full, remove oldest entry
 				      mch_memmove(curbuf->b_changelist,
 					    curbuf->b_changelist + 1,
-					    sizeof(pos_T) * (JUMPLISTSIZE - 1));
-				  else
+					    ଆକାର(pos_T) * (JUMPLISTSIZE - 1));
+				  ଅନ୍ୟଥା
 				      ++curbuf->b_changelistlen;
 				  curbuf->b_changelist[
 					   curbuf->b_changelistlen - 1] = pos;
-				  break;
+				  ଭାଙ୍ଗ;
 
 				  // Using the line number for the last-used
 				  // timestamp.
-			case '*': curbuf->b_last_used = pos.lnum; break;
+			ସ୍ଥିତି '*': curbuf->b_last_used = pos.lnum; ଭାଙ୍ଗ;
 
-			default:  if ((i = line[1] - 'a') >= 0 && i < NMARKS)
+			ପୂର୍ବନିର୍ଦ୍ଧାରିତ:  ଯଦି ((i = ଧାଡ଼ି[1] - 'a') >= 0 && i < NMARKS)
 				      curbuf->b_namedm[i] = pos;
 		    }
 		}
 	    }
-	    else if (copy_marks_out)
-		fputs((char *)line, fp_out);
+	    ଅନ୍ୟଥା ଯଦି (copy_marks_out)
+		fputs((ଅକ୍ଷର *)ଧାଡ଼ି, fp_out);
 	}
 
-	if (load_marks)
+	ଯଦି (load_marks)
 	{
 	    win_T	*wp;
 
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		if (wp->w_buffer == curbuf)
+		ଯଦି (wp->w_buffer == curbuf)
 		    wp->w_changelistidx = curbuf->b_changelistlen;
 	    }
-	    if (flags & VIF_ONLY_CURBUF)
-		break;
+	    ଯଦି (flags & VIF_ONLY_CURBUF)
+		ଭାଙ୍ଗ;
 	}
     }
 
-    if (fp_out != NULL)
+    ଯଦି (fp_out != ଖାଲି)
 	// Write any remaining entries from buflist.
-	while (count < num_marked_files && buflist_used < buflist->ga_len)
+	ଯେତେବେଳେ (ଗଣନା_2 < ଅଙ୍କ_marked_files && buflist_used < buflist->ga_len)
 	{
 	    buflist_buf = ((buf_T **)buflist->ga_data)[buflist_used++];
 	    write_buffer_marks(buflist_buf, fp_out);
-	    ++count;
+	    ++ଗଣନା_2;
 	}
 
     vim_free(name_buf);
@@ -2529,55 +2529,55 @@ copy_viminfo_marks(
  * Read marks for the current buffer from the viminfo file, when we support
  * buffer marks and the buffer has a name.
  */
-    void
-check_marks_read(void)
+    ଶୂନ୍ୟ
+check_marks_read(ଶୂନ୍ୟ)
 {
-    if (!curbuf->b_marks_read && get_viminfo_parameter('\'') > 0
-						  && curbuf->b_ffname != NULL)
-	read_viminfo(NULL, VIF_WANT_MARKS | VIF_ONLY_CURBUF);
+    ଯଦି (!curbuf->b_marks_read && get_viminfo_parameter('\'') > 0
+						  && curbuf->b_ffname != ଖାଲି)
+	read_viminfo(ଖାଲି, VIF_WANT_MARKS | VIF_ONLY_CURBUF);
 
     // Always set b_marks_read; needed when 'viminfo' is changed to include
     // the ' parameter after opening a buffer.
     curbuf->b_marks_read = true;
 }
 
-    static int
-read_viminfo_filemark(vir_T *virp, int force)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_filemark(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force)
 {
     char_u	*str;
     xfmark_T	*namedfm_p = get_namedfm();
     xfmark_T	*fm;
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
     // We only get here if line[0] == '\'' or '-'.
     // Illegal mark names are ignored (for future expansion).
-    str = virp->vir_line + 1;
-    if (*str <= 127
-	    && ((*virp->vir_line == '\''
+    str = virp->vir_ଧାଡ଼ି + 1;
+    ଯଦି (*str <= 127
+	    && ((*virp->vir_ଧାଡ଼ି == '\''
 				       && (VIM_ISDIGIT(*str) || SAFE_isupper(*str)))
-	     || (*virp->vir_line == '-' && *str == '\'')))
+	     || (*virp->vir_ଧାଡ଼ି == '-' && *str == '\'')))
     {
-	if (*str == '\'')
+	ଯଦି (*str == '\'')
 	{
 	    // If the jumplist isn't full insert fmark as oldest entry
-	    if (curwin->w_jumplistlen == JUMPLISTSIZE)
-		fm = NULL;
-	    else
+	    ଯଦି (curwin->w_jumplistlen == JUMPLISTSIZE)
+		fm = ଖାଲି;
+	    ଅନ୍ୟଥା
 	    {
-		for (i = curwin->w_jumplistlen; i > 0; --i)
+		ପାଇଁ (i = curwin->w_jumplistlen; i > 0; --i)
 		    curwin->w_jumplist[i] = curwin->w_jumplist[i - 1];
 		++curwin->w_jumplistidx;
 		++curwin->w_jumplistlen;
 		fm = &curwin->w_jumplist[0];
 		fm->fmark.mark.lnum = 0;
-		fm->fname = NULL;
+		fm->fname = ଖାଲି;
 	    }
 	}
-	else if (VIM_ISDIGIT(*str))
+	ଅନ୍ୟଥା ଯଦି (VIM_ISDIGIT(*str))
 	    fm = &namedfm_p[*str - '0' + NMARKS];
-	else
+	ଅନ୍ୟଥା
 	    fm = &namedfm_p[*str - 'A'];
-	if (fm != NULL && (fm->fmark.mark.lnum == 0 || force))
+	ଯଦି (fm != ଖାଲି && (fm->fmark.mark.lnum == 0 || force))
 	{
 	    str = skipwhite(str + 1);
 	    fm->fmark.mark.lnum = getdigits(&str);
@@ -2587,39 +2587,39 @@ read_viminfo_filemark(vir_T *virp, int force)
 	    fm->fmark.fnum = 0;
 	    str = skipwhite(str);
 	    vim_free(fm->fname);
-	    fm->fname = viminfo_readstring(virp, (int)(str - virp->vir_line),
+	    fm->fname = viminfo_readstring(virp, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(str - virp->vir_ଧାଡ଼ି),
 								       FALSE);
 	    fm->time_set = 0;
 	}
     }
-    return vim_fgets(virp->vir_line, LSIZE, virp->vir_fd);
+    ଫେରନ୍ତୁ vim_fgets(virp->vir_ଧାଡ଼ି, LSIZE, virp->vir_fd);
 }
 
 /*
  * Prepare for reading viminfo marks when writing viminfo later.
  */
-    static void
-prepare_viminfo_marks(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+prepare_viminfo_marks(ଶୂନ୍ୟ)
 {
     vi_namedfm = ALLOC_CLEAR_MULT(xfmark_T, NMARKS + EXTRA_MARKS);
     vi_jumplist = ALLOC_CLEAR_MULT(xfmark_T, JUMPLISTSIZE);
     vi_jumplist_len = 0;
 }
 
-    static void
-finish_viminfo_marks(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+finish_viminfo_marks(ଶୂନ୍ୟ)
 {
-    int		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
-    if (vi_namedfm != NULL)
+    ଯଦି (vi_namedfm != ଖାଲି)
     {
-	for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+	ପାଇଁ (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
 	    vim_free(vi_namedfm[i].fname);
 	VIM_CLEAR(vi_namedfm);
     }
-    if (vi_jumplist != NULL)
+    ଯଦି (vi_jumplist != ଖାଲି)
     {
-	for (i = 0; i < vi_jumplist_len; ++i)
+	ପାଇଁ (i = 0; i < vi_jumplist_len; ++i)
 	    vim_free(vi_jumplist[i].fname);
 	VIM_CLEAR(vi_jumplist);
     }
@@ -2628,132 +2628,132 @@ finish_viminfo_marks(void)
 /*
  * Accept a new style mark line from the viminfo, store it when it's new.
  */
-    static void
-handle_viminfo_mark(garray_T *values, int force)
+    ସ୍ଥିର ଶୂନ୍ୟ
+handle_viminfo_mark(garray_T *ମୂଲ୍ୟଗୁଡ଼ିକ, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force)
 {
-    bval_T	*vp = (bval_T *)values->ga_data;
-    int		name;
+    bval_T	*vp = (bval_T *)ମୂଲ୍ୟଗୁଡ଼ିକ->ga_data;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		name;
     linenr_T	lnum;
     colnr_T	col;
     time_t	timestamp;
-    xfmark_T	*fm = NULL;
+    xfmark_T	*fm = ଖାଲି;
 
     // Check the format:
     // |{bartype},{name},{lnum},{col},{timestamp},{filename}
-    if (values->ga_len < 5
+    ଯଦି (ମୂଲ୍ୟଗୁଡ଼ିକ->ga_len < 5
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || vp[2].bv_type != BVAL_NR
 	    || vp[3].bv_type != BVAL_NR
 	    || vp[4].bv_type != BVAL_STRING)
-	return;
+	ଫେରନ୍ତୁ;
 
     name = vp[0].bv_nr;
-    if (name != '\'' && !VIM_ISDIGIT(name) && !ASCII_ISUPPER(name))
-	return;
+    ଯଦି (name != '\'' && !VIM_ISDIGIT(name) && !ASCII_ISUPPER(name))
+	ଫେରନ୍ତୁ;
     lnum = vp[1].bv_nr;
     col = vp[2].bv_nr;
-    if (lnum <= 0 || col < 0)
-	return;
+    ଯଦି (lnum <= 0 || col < 0)
+	ଫେରନ୍ତୁ;
     timestamp = (time_t)vp[3].bv_nr;
 
-    if (name == '\'')
+    ଯଦି (name == '\'')
     {
-	if (vi_jumplist != NULL)
+	ଯଦି (vi_jumplist != ଖାଲି)
 	{
-	    if (vi_jumplist_len < JUMPLISTSIZE)
+	    ଯଦି (vi_jumplist_len < JUMPLISTSIZE)
 		fm = &vi_jumplist[vi_jumplist_len++];
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    int idx;
-	    int i;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
 	    // If we have a timestamp insert it in the right place.
-	    if (timestamp != 0)
+	    ଯଦି (timestamp != 0)
 	    {
-		for (idx = curwin->w_jumplistlen - 1; idx >= 0; --idx)
-		    if (curwin->w_jumplist[idx].time_set < timestamp)
+		ପାଇଁ (idx = curwin->w_jumplistlen - 1; idx >= 0; --idx)
+		    ଯଦି (curwin->w_jumplist[idx].time_set < timestamp)
 		    {
 			++idx;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 		// idx cannot be zero now
-		if (idx < 0 && curwin->w_jumplistlen < JUMPLISTSIZE)
+		ଯଦି (idx < 0 && curwin->w_jumplistlen < JUMPLISTSIZE)
 		    // insert as the oldest entry
 		    idx = 0;
 	    }
-	    else if (curwin->w_jumplistlen < JUMPLISTSIZE)
+	    ଅନ୍ୟଥା ଯଦି (curwin->w_jumplistlen < JUMPLISTSIZE)
 		// insert as oldest entry
 		idx = 0;
-	    else
+	    ଅନ୍ୟଥା
 		idx = -1;
 
-	    if (idx >= 0)
+	    ଯଦି (idx >= 0)
 	    {
-		if (curwin->w_jumplistlen == JUMPLISTSIZE)
+		ଯଦି (curwin->w_jumplistlen == JUMPLISTSIZE)
 		{
 		    // Drop the oldest entry.
 		    --idx;
 		    vim_free(curwin->w_jumplist[0].fname);
-		    for (i = 0; i < idx; ++i)
+		    ପାଇଁ (i = 0; i < idx; ++i)
 			curwin->w_jumplist[i] = curwin->w_jumplist[i + 1];
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    // Move newer entries forward.
-		    for (i = curwin->w_jumplistlen; i > idx; --i)
+		    ପାଇଁ (i = curwin->w_jumplistlen; i > idx; --i)
 			curwin->w_jumplist[i] = curwin->w_jumplist[i - 1];
 		    ++curwin->w_jumplistidx;
 		    ++curwin->w_jumplistlen;
 		}
 		fm = &curwin->w_jumplist[idx];
 		fm->fmark.mark.lnum = 0;
-		fm->fname = NULL;
+		fm->fname = ଖାଲି;
 		fm->time_set = 0;
 	    }
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
-	int		idx;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx;
 	xfmark_T	*namedfm_p = get_namedfm();
 
-	if (VIM_ISDIGIT(name))
+	ଯଦି (VIM_ISDIGIT(name))
 	{
-	    if (vi_namedfm != NULL)
+	    ଯଦି (vi_namedfm != ଖାଲି)
 		idx = name - '0' + NMARKS;
-	    else
+	    ଅନ୍ୟଥା
 	    {
-		int i;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
 		// Do not use the name from the viminfo file, insert in time
 		// order.
-		for (idx = NMARKS; idx < NMARKS + EXTRA_MARKS; ++idx)
-		    if (namedfm_p[idx].time_set < timestamp)
-			break;
-		if (idx == NMARKS + EXTRA_MARKS)
+		ପାଇଁ (idx = NMARKS; idx < NMARKS + EXTRA_MARKS; ++idx)
+		    ଯଦି (namedfm_p[idx].time_set < timestamp)
+			ଭାଙ୍ଗ;
+		ଯଦି (idx == NMARKS + EXTRA_MARKS)
 		    // All existing entries are newer.
-		    return;
+		    ଫେରନ୍ତୁ;
 		i = NMARKS + EXTRA_MARKS - 1;
 
 		vim_free(namedfm_p[i].fname);
-		for ( ; i > idx; --i)
+		ପାଇଁ ( ; i > idx; --i)
 		    namedfm_p[i] = namedfm_p[i - 1];
-		namedfm_p[idx].fname = NULL;
+		namedfm_p[idx].fname = ଖାଲି;
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	    idx = name - 'A';
-	if (vi_namedfm != NULL)
+	ଯଦି (vi_namedfm != ଖାଲି)
 	    fm = &vi_namedfm[idx];
-	else
+	ଅନ୍ୟଥା
 	    fm = &namedfm_p[idx];
     }
 
-    if (fm != NULL)
+    ଯଦି (fm != ଖାଲି)
     {
-	if (vi_namedfm != NULL || fm->fmark.mark.lnum == 0
+	ଯଦି (vi_namedfm != ଖାଲି || fm->fmark.mark.lnum == 0
 					  || fm->time_set < timestamp || force)
 	{
 	    fm->fmark.mark.lnum = lnum;
@@ -2761,27 +2761,27 @@ handle_viminfo_mark(garray_T *values, int force)
 	    fm->fmark.mark.coladd = 0;
 	    fm->fmark.fnum = 0;
 	    vim_free(fm->fname);
-	    if (vp[4].bv_allocated)
+	    ଯଦି (vp[4].bv_allocated)
 	    {
 		fm->fname = vp[4].bv_string;
-		vp[4].bv_string = NULL;
+		vp[4].bv_string = ଖାଲି;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		fm->fname = vim_strsave(vp[4].bv_string);
 	    fm->time_set = timestamp;
 	}
     }
 }
 
-    static int
-read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+read_viminfo_barline(vir_T *virp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା got_encoding, ପୂର୍ଣ୍ଣସଂଖ୍ୟା force, ପୂର୍ଣ୍ଣସଂଖ୍ୟା writing)
 {
-    char_u	*p = virp->vir_line + 1;
-    int		bartype;
-    garray_T	values;
+    char_u	*p = virp->vir_ଧାଡ଼ି + 1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		bartype;
+    garray_T	ମୂଲ୍ୟଗୁଡ଼ିକ;
     bval_T	*vp;
-    int		i;
-    int		read_next = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		read_next = TRUE;
 
     // The format is: |{bartype},{value},...
     // For a very long string:
@@ -2791,64 +2791,64 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
     // For a long line not using a string
     //     |{bartype},{lots of values},>
     //     |<{value},{value}
-    if (*p == '<')
+    ଯଦି (*p == '<')
     {
 	// Continuation line of an unrecognized item.
-	if (writing)
-	    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+	ଯଦି (writing)
+	    ga_copy_string(&virp->vir_barlines, virp->vir_ଧାଡ଼ି);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	ga_init2(&values, sizeof(bval_T), 20);
+	ga_init2(&ମୂଲ୍ୟଗୁଡ଼ିକ, ଆକାର(bval_T), 20);
 	bartype = getdigits(&p);
-	switch (bartype)
+	ବାଛ (bartype)
 	{
-	    case BARTYPE_VERSION:
+	    ସ୍ଥିତି BARTYPE_VERSION:
 		// Only use the version when it comes before the encoding.
 		// If it comes later it was copied by a Vim version that
 		// doesn't understand the version.
-		if (!got_encoding)
+		ଯଦି (!got_encoding)
 		{
-		    read_next = barline_parse(virp, p, &values);
-		    vp = (bval_T *)values.ga_data;
-		    if (values.ga_len > 0 && vp->bv_type == BVAL_NR)
+		    read_next = barline_parse(virp, p, &ମୂଲ୍ୟଗୁଡ଼ିକ);
+		    vp = (bval_T *)ମୂଲ୍ୟଗୁଡ଼ିକ.ga_data;
+		    ଯଦି (ମୂଲ୍ୟଗୁଡ଼ିକ.ga_len > 0 && vp->bv_type == BVAL_NR)
 			virp->vir_version = vp->bv_nr;
 		}
-		break;
+		ଭାଙ୍ଗ;
 
-	    case BARTYPE_HISTORY:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_history(&values, writing);
-		break;
+	    ସ୍ଥିତି BARTYPE_HISTORY:
+		read_next = barline_parse(virp, p, &ମୂଲ୍ୟଗୁଡ଼ିକ);
+		handle_viminfo_history(&ମୂଲ୍ୟଗୁଡ଼ିକ, writing);
+		ଭାଙ୍ଗ;
 
-	    case BARTYPE_REGISTER:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_register(&values, force);
-		break;
+	    ସ୍ଥିତି BARTYPE_REGISTER:
+		read_next = barline_parse(virp, p, &ମୂଲ୍ୟଗୁଡ଼ିକ);
+		handle_viminfo_register(&ମୂଲ୍ୟଗୁଡ଼ିକ, force);
+		ଭାଙ୍ଗ;
 
-	    case BARTYPE_MARK:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_mark(&values, force);
-		break;
+	    ସ୍ଥିତି BARTYPE_MARK:
+		read_next = barline_parse(virp, p, &ମୂଲ୍ୟଗୁଡ଼ିକ);
+		handle_viminfo_mark(&ମୂଲ୍ୟଗୁଡ଼ିକ, force);
+		ଭାଙ୍ଗ;
 
-	    default:
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		// copy unrecognized line (for future use)
-		if (writing)
-		    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+		ଯଦି (writing)
+		    ga_copy_string(&virp->vir_barlines, virp->vir_ଧାଡ଼ି);
 	}
-	for (i = 0; i < values.ga_len; ++i)
+	ପାଇଁ (i = 0; i < ମୂଲ୍ୟଗୁଡ଼ିକ.ga_len; ++i)
 	{
-	    vp = (bval_T *)values.ga_data + i;
-	    if (vp->bv_type == BVAL_STRING && vp->bv_allocated)
+	    vp = (bval_T *)ମୂଲ୍ୟଗୁଡ଼ିକ.ga_data + i;
+	    ଯଦି (vp->bv_type == BVAL_STRING && vp->bv_allocated)
 		vim_free(vp->bv_string);
 	    vim_free(vp->bv_tofree);
 	}
-	ga_clear(&values);
+	ga_clear(&ମୂଲ୍ୟଗୁଡ଼ିକ);
     }
 
-    if (read_next)
-	return viminfo_readline(virp);
-    return FALSE;
+    ଯଦି (read_next)
+	ଫେରନ୍ତୁ viminfo_readline(virp);
+    ଫେରନ୍ତୁ FALSE;
 }
 
 /*
@@ -2856,136 +2856,136 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
  * first part of the viminfo file which contains everything but the marks that
  * are local to a file.  Returns TRUE when end-of-file is reached. -- webb
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 read_viminfo_up_to_marks(
     vir_T	*virp,
-    int		forceit,
-    int		writing)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		forceit,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		writing)
 {
-    int		eof;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		eof;
     buf_T	*buf;
-    int		got_encoding = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		got_encoding = FALSE;
 
     prepare_viminfo_history(forceit ? 9999 : 0, writing);
 
     eof = viminfo_readline(virp);
-    while (!eof && virp->vir_line[0] != '>')
+    ଯେତେବେଳେ (!eof && virp->vir_ଧାଡ଼ି[0] != '>')
     {
-	switch (virp->vir_line[0])
+	ବାଛ (virp->vir_ଧାଡ଼ି[0])
 	{
 		// Characters reserved for future expansion, ignored now
-	    case '+': // "+40 /path/dir file", for running vim without args
-	    case '^': // to be defined
-	    case '<': // long line - ignored
+	    ସ୍ଥିତି '+': // "+40 /path/dir file", for running vim without args
+	    ସ୍ଥିତି '^': // to be defined
+	    ସ୍ଥିତି '<': // long line - ignored
 		// A comment or empty line.
-	    case NUL:
-	    case '\r':
-	    case '\n':
-	    case '#':
+	    ସ୍ଥିତି NUL:
+	    ସ୍ଥିତି '\r':
+	    ସ୍ଥିତି '\n':
+	    ସ୍ଥିତି '#':
 		eof = viminfo_readline(virp);
-		break;
-	    case '|':
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '|':
 		eof = read_viminfo_barline(virp, got_encoding,
 							    forceit, writing);
-		break;
-	    case '*': // "*encoding=value"
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '*': // "*encoding=value"
 		got_encoding = TRUE;
 		eof = viminfo_encoding(virp);
-		break;
-	    case '!': // global variable
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '!': // global variable
 #ifdef FEAT_EVAL
 		eof = read_viminfo_varlist(virp, writing);
-#else
+#ଅନ୍ୟଥା
 		eof = viminfo_readline(virp);
 #endif
-		break;
-	    case '%': // entry for buffer list
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '%': // entry for buffer list
 		eof = read_viminfo_bufferlist(virp, writing);
-		break;
-	    case '"':
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '"':
 		// When registers are in bar lines skip the old style register
 		// lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_REGISTERS)
+		ଯଦି (virp->vir_version < VIMINFO_VERSION_WITH_REGISTERS)
 		    eof = read_viminfo_register(virp, forceit);
-		else
-		    do
+		ଅନ୍ୟଥା
+		    କର
 		    {
 			eof = viminfo_readline(virp);
-		    } while (!eof && (virp->vir_line[0] == TAB
-						|| virp->vir_line[0] == '<'));
-		break;
-	    case '/':	    // Search string
-	    case '&':	    // Substitute search string
-	    case '~':	    // Last search string, followed by '/' or '&'
-		eof = read_viminfo_search_pattern(virp, forceit, writing);
-		break;
-	    case '$':
+		    } ଯେତେବେଳେ (!eof && (virp->vir_ଧାଡ଼ି[0] == TAB
+						|| virp->vir_ଧାଡ଼ି[0] == '<'));
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '/':	    // Search string
+	    ସ୍ଥିତି '&':	    // Substitute search string
+	    ସ୍ଥିତି '~':	    // Last search string, followed by '/' or '&'
+		eof = read_viminfo_ସନ୍ଧାନ_pattern(virp, forceit, writing);
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '$':
 		eof = read_viminfo_sub_string(virp, forceit);
-		break;
-	    case ':':
-	    case '?':
-	    case '=':
-	    case '@':
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି ':':
+	    ସ୍ଥିତି '?':
+	    ସ୍ଥିତି '=':
+	    ସ୍ଥିତି '@':
 		// When history is in bar lines skip the old style history
 		// lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_HISTORY)
+		ଯଦି (virp->vir_version < VIMINFO_VERSION_WITH_HISTORY)
 		    eof = read_viminfo_history(virp, writing);
-		else
+		ଅନ୍ୟଥା
 		    eof = viminfo_readline(virp);
-		break;
-	    case '-':
-	    case '\'':
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି '-':
+	    ସ୍ଥିତି '\'':
 		// When file marks are in bar lines skip the old style lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_MARKS)
+		ଯଦି (virp->vir_version < VIMINFO_VERSION_WITH_MARKS)
 		    eof = read_viminfo_filemark(virp, forceit);
-		else
+		ଅନ୍ୟଥା
 		    eof = viminfo_readline(virp);
-		break;
-	    default:
-		if (viminfo_error("E575: ", _(e_illegal_starting_char),
-			    virp->vir_line))
+		ଭାଙ୍ଗ;
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+		ଯଦି (viminfo_error("E575: ", _(e_illegal_starting_char),
+			    virp->vir_ଧାଡ଼ି))
 		    eof = TRUE;
-		else
+		ଅନ୍ୟଥା
 		    eof = viminfo_readline(virp);
-		break;
+		ଭାଙ୍ଗ;
 	}
     }
 
     // Finish reading history items.
-    if (!writing)
+    ଯଦି (!writing)
 	finish_viminfo_history(virp);
 
     // Change file names to buffer numbers for fmarks.
     FOR_ALL_BUFFERS(buf)
 	fmarks_check_names(buf);
 
-    return eof;
+    ଫେରନ୍ତୁ eof;
 }
 
 /*
  * do_viminfo() -- Should only be called from read_viminfo() & write_viminfo().
  */
-    static void
-do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
+    ସ୍ଥିର ଶୂନ୍ୟ
+do_viminfo(FILE *fp_in, FILE *fp_out, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags)
 {
-    int		eof = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		eof = FALSE;
     vir_T	vir;
-    int		merge = FALSE;
-    int		do_copy_marks = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		merge = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		do_copy_marks = FALSE;
     garray_T	buflist;
 
-    if ((vir.vir_line = alloc(LSIZE)) == NULL)
-	return;
+    ଯଦି ((vir.vir_ଧାଡ଼ି = alloc(LSIZE)) == ଖାଲି)
+	ଫେରନ୍ତୁ;
     vir.vir_fd = fp_in;
     vir.vir_conv.vc_type = CONV_NONE;
-    ga_init2(&vir.vir_barlines, sizeof(char_u *), 100);
+    ga_init2(&vir.vir_barlines, ଆକାର(char_u *), 100);
     vir.vir_version = -1;
 
-    if (fp_in != NULL)
+    ଯଦି (fp_in != ଖାଲି)
     {
-	if (flags & VIF_WANT_INFO)
+	ଯଦି (flags & VIF_WANT_INFO)
 	{
-	    if (fp_out != NULL)
+	    ଯଦି (fp_out != ଖାଲି)
 	    {
 		// Registers and marks are read and kept separate from what
 		// this Vim is using.  They are merged when writing.
@@ -2994,20 +2994,20 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	    }
 
 	    eof = read_viminfo_up_to_marks(&vir,
-					 flags & VIF_FORCEIT, fp_out != NULL);
+					 flags & VIF_FORCEIT, fp_out != ଖାଲି);
 	    merge = TRUE;
 	}
-	else if (flags != 0)
+	ଅନ୍ୟଥା ଯଦି (flags != 0)
 	    // Skip info, find start of marks
-	    while (!(eof = viminfo_readline(&vir))
-		    && vir.vir_line[0] != '>')
+	    ଯେତେବେଳେ (!(eof = viminfo_readline(&vir))
+		    && vir.vir_ଧାଡ଼ି[0] != '>')
 		;
 
 	do_copy_marks = (flags & (VIF_WANT_MARKS | VIF_ONLY_CURBUF
 					    | VIF_GET_OLDFILES | VIF_FORCEIT));
     }
 
-    if (fp_out != NULL)
+    ଯଦି (fp_out != ଖାଲି)
     {
 	// Write the info:
 	fprintf(fp_out, _("# This viminfo file was generated by Vim %s.\n"),
@@ -3016,7 +3016,7 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	write_viminfo_version(fp_out);
 	fputs(_("# Value of 'encoding' when this file was written\n"), fp_out);
 	fprintf(fp_out, "*encoding=%s\n\n", p_enc);
-	write_viminfo_search_pattern(fp_out);
+	write_viminfo_ସନ୍ଧାନ_pattern(fp_out);
 	write_viminfo_sub_string(fp_out);
 	write_viminfo_history(fp_out, merge);
 	write_viminfo_registers(fp_out);
@@ -3029,21 +3029,21 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	write_viminfo_bufferlist(fp_out);
 	write_viminfo_barlines(&vir, fp_out);
 
-	if (do_copy_marks)
-	    ga_init2(&buflist, sizeof(buf_T *), 50);
-	write_viminfo_marks(fp_out, do_copy_marks ? &buflist : NULL);
+	ଯଦି (do_copy_marks)
+	    ga_init2(&buflist, ଆକାର(buf_T *), 50);
+	write_viminfo_marks(fp_out, do_copy_marks ? &buflist : ଖାଲି);
     }
 
-    if (do_copy_marks)
+    ଯଦି (do_copy_marks)
     {
 	copy_viminfo_marks(&vir, fp_out, &buflist, eof, flags);
-	if (fp_out != NULL)
+	ଯଦି (fp_out != ଖାଲି)
 	    ga_clear(&buflist);
     }
 
-    vim_free(vir.vir_line);
-    if (vir.vir_conv.vc_type != CONV_NONE)
-	convert_setup(&vir.vir_conv, NULL, NULL);
+    vim_free(vir.vir_ଧାଡ଼ି);
+    ଯଦି (vir.vir_conv.vc_type != CONV_NONE)
+	convert_setup(&vir.vir_conv, ଖାଲି, ଖାଲି);
     ga_clear_strings(&vir.vir_barlines);
 }
 
@@ -3051,24 +3051,24 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
  * read_viminfo() -- Read the viminfo file.  Registers etc. which are already
  * set are not over-written unless "flags" includes VIF_FORCEIT. -- webb
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 read_viminfo(
     char_u	*file,	    // file name or NULL to use default name
-    int		flags)	    // VIF_WANT_INFO et al.
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		flags)	    // VIF_WANT_INFO et al.
 {
     FILE	*fp;
     char_u	*fname;
     stat_T	st;		// mch_stat() of existing viminfo file
 
-    if (no_viminfo())
-	return FAIL;
+    ଯଦି (no_viminfo())
+	ଫେରନ୍ତୁ FAIL;
 
     fname = viminfo_filename(file);	// get file name in allocated buffer
-    if (fname == NULL)
-	return FAIL;
-    fp = mch_fopen((char *)fname, READBIN);
+    ଯଦି (fname == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
+    fp = mch_fopen((ଅକ୍ଷର *)fname, READBIN);
 
-    if (p_verbose > 0)
+    ଯଦି (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Reading viminfo file \"%s\"%s%s%s%s"),
@@ -3076,24 +3076,24 @@ read_viminfo(
 		(flags & VIF_WANT_INFO) ? _(" info") : "",
 		(flags & VIF_WANT_MARKS) ? _(" marks") : "",
 		(flags & VIF_GET_OLDFILES) ? _(" oldfiles") : "",
-		fp == NULL ? _(" FAILED") : "");
+		fp == ଖାଲି ? _(" FAILED") : "");
 	verbose_leave();
     }
 
     vim_free(fname);
-    if (fp == NULL)
-	return FAIL;
-    if (mch_fstat(fileno(fp), &st) < 0 || S_ISDIR(st.st_mode))
+    ଯଦି (fp == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
+    ଯଦି (mch_fstat(fileno(fp), &st) < 0 || S_ISDIR(st.st_mode))
     {
 	fclose(fp);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     viminfo_errcnt = 0;
-    do_viminfo(fp, NULL, flags);
+    do_viminfo(fp, ଖାଲି, flags);
 
     fclose(fp);
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -3103,64 +3103,64 @@ read_viminfo(
  * If "forceit" is TRUE, then the old file is not read in, and only internal
  * info is written to the file.
  */
-    void
-write_viminfo(char_u *file, int forceit)
+    ଶୂନ୍ୟ
+write_viminfo(char_u *file, ପୂର୍ଣ୍ଣସଂଖ୍ୟା forceit)
 {
     char_u	*fname;
-    FILE	*fp_in = NULL;	// input viminfo file, if any
-    FILE	*fp_out = NULL;	// output viminfo file
-    char_u	*tempname = NULL;	// name of temp viminfo file
+    FILE	*fp_in = ଖାଲି;	// input viminfo file, if any
+    FILE	*fp_out = ଖାଲି;	// output viminfo file
+    char_u	*tempname = ଖାଲି;	// name of temp viminfo file
     stat_T	st_new;		// mch_stat() of potential new file
     stat_T	st_old;		// mch_stat() of existing viminfo file
-#if defined(UNIX) || defined(VMS)
+#ଯଦି defined(UNIX) || defined(VMS)
     mode_t	umask_save;
 #endif
 #ifdef UNIX
-    int		shortname = FALSE;	// use 8.3 file name
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		shortname = FALSE;	// use 8.3 file name
 #endif
 #ifdef MSWIN
-    int		hidden = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		hidden = FALSE;
 #endif
 
-    if (no_viminfo())
-	return;
+    ଯଦି (no_viminfo())
+	ଫେରନ୍ତୁ;
 
     fname = viminfo_filename(file);	// may set to default if NULL
-    if (fname == NULL)
-	return;
+    ଯଦି (fname == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    fp_in = mch_fopen((char *)fname, READBIN);
-    if (fp_in == NULL)
+    fp_in = mch_fopen((ଅକ୍ଷର *)fname, READBIN);
+    ଯଦି (fp_in == ଖାଲି)
     {
-	int fd;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା fd;
 
 	// if it does exist, but we can't read it, don't try writing
-	if (mch_stat((char *)fname, &st_new) == 0)
-	    goto end;
+	ଯଦି (mch_stat((ଅକ୍ଷର *)fname, &st_new) == 0)
+	    ଯାଅ end;
 
 	// Create the new .viminfo non-accessible for others, because it may
 	// contain text from non-accessible documents. It is up to the user to
 	// widen access (e.g. to a group). This may also fail if there is a
 	// race condition, then just give up.
-	fd = mch_open((char *)fname,
+	fd = mch_open((ଅକ୍ଷର *)fname,
 			    O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW, 0600);
-	if (fd < 0)
-	    goto end;
+	ଯଦି (fd < 0)
+	    ଯାଅ end;
 	fp_out = fdopen(fd, WRITEBIN);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// There is an existing viminfo file.  Create a temporary file to
 	// write the new viminfo into, in the same directory as the
 	// existing viminfo file, which will be renamed once all writing is
 	// successful.
-	if (mch_fstat(fileno(fp_in), &st_old) < 0
+	ଯଦି (mch_fstat(fileno(fp_in), &st_old) < 0
 		|| S_ISDIR(st_old.st_mode)
 #ifdef UNIX
 		// For Unix we check the owner of the file.  It's not very nice
 		// to overwrite a user's viminfo file after a "su root", with a
 		// viminfo file that the user can't read.
-		|| (getuid() != ROOT_UID
+		|| (getuid() != ମୂଳ_UID
 		    && !(st_old.st_uid == getuid()
 			    ? (st_old.st_mode & 0200)
 			    : (st_old.st_gid == getgid()
@@ -3169,13 +3169,13 @@ write_viminfo(char_u *file, int forceit)
 #endif
 		)
 	{
-	    int	tt = msg_didany;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	tt = ସନ୍ଦେଶ_didany;
 
 	    // avoid a wait_return() for this message, it's annoying
 	    semsg(_(e_viminfo_file_is_not_writable_str), fname);
-	    msg_didany = tt;
+	    ସନ୍ଦେଶ_didany = tt;
 	    fclose(fp_in);
-	    goto end;
+	    ଯାଅ end;
 	}
 #ifdef MSWIN
 	// Get the file attributes of the existing viminfo file.
@@ -3188,65 +3188,65 @@ write_viminfo(char_u *file, int forceit)
 	// stat() and open().  Use mch_open() with O_EXCL to avoid that.
 	// May try twice: Once normal and once with shortname set, just in
 	// case somebody puts his viminfo file in an 8.3 filesystem.
-	for (;;)
+	ପାଇଁ (;;)
 	{
-	    int		next_char = 'z';
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		next_char = 'z';
 	    char_u	*wp;
 
 	    tempname = buf_modname(
 #ifdef UNIX
 				    shortname,
-#else
+#ଅନ୍ୟଥା
 				    FALSE,
 #endif
 				    fname,
 #ifdef VMS
 				    (char_u *)"-tmp",
-#else
+#ଅନ୍ୟଥା
 				    (char_u *)".tmp",
 #endif
 				    FALSE);
-	    if (tempname == NULL)		// out of memory
-		break;
+	    ଯଦି (tempname == ଖାଲି)		// out of memory
+		ଭାଙ୍ଗ;
 
 	    // Try a series of names.  Change one character, just before
 	    // the extension.  This should also work for an 8.3
 	    // file name, when after adding the extension it still is
 	    // the same file as the original.
 	    wp = tempname + STRLEN(tempname) - 5;
-	    if (wp < gettail(tempname))	    // empty file name?
+	    ଯଦି (wp < gettail(tempname))	    // empty file name?
 		wp = gettail(tempname);
-	    for (;;)
+	    ପାଇଁ (;;)
 	    {
 		// Check if tempfile already exists.  Never overwrite an
 		// existing file!
-		if (mch_stat((char *)tempname, &st_new) == 0)
+		ଯଦି (mch_stat((ଅକ୍ଷର *)tempname, &st_new) == 0)
 		{
 #ifdef UNIX
 		    // Check if tempfile is same as original file.  May happen
 		    // when modname() gave the same file back.  E.g.  silly
 		    // link, or file name-length reached.  Try again with
 		    // shortname set.
-		    if (!shortname && st_new.st_dev == st_old.st_dev
+		    ଯଦି (!shortname && st_new.st_dev == st_old.st_dev
 						&& st_new.st_ino == st_old.st_ino)
 		    {
 			VIM_CLEAR(tempname);
 			shortname = TRUE;
-			break;
+			ଭାଙ୍ଗ;
 		    }
 #endif
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    // Try creating the file exclusively.  This may fail if
 		    // another Vim tries to do it at the same time.
 #ifdef VMS
 		    // fdopen() fails for some reason
 		    umask_save = umask(077);
-		    fp_out = mch_fopen((char *)tempname, WRITEBIN);
-		    (void)umask(umask_save);
-#else
-		    int	fd;
+		    fp_out = mch_fopen((ଅକ୍ଷର *)tempname, WRITEBIN);
+		    (ଶୂନ୍ୟ)umask(umask_save);
+#ଅନ୍ୟଥା
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	fd;
 
 		    // Use mch_open() to be able to use O_NOFOLLOW and set file
 		    // protection:
@@ -3255,86 +3255,86 @@ write_viminfo(char_u *file, int forceit)
 		    // Others: r&w for user only.
 # ifdef UNIX
 		    umask_save = umask(0);
-		    fd = mch_open((char *)tempname,
+		    fd = mch_open((ଅକ୍ଷର *)tempname,
 			    O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW,
-					(int)((st_old.st_mode & 0777) | 0600));
-		    (void)umask(umask_save);
-# else
-		    fd = mch_open((char *)tempname,
+					(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((st_old.st_mode & 0777) | 0600));
+		    (ଶୂନ୍ୟ)umask(umask_save);
+# ଅନ୍ୟଥା
+		    fd = mch_open((ଅକ୍ଷର *)tempname,
 			     O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW, 0600);
 # endif
-		    if (fd < 0)
+		    ଯଦି (fd < 0)
 		    {
-			fp_out = NULL;
+			fp_out = ଖାଲି;
 # ifdef EEXIST
 			// Avoid trying lots of names while the problem is lack
 			// of permission, only retry if the file already
 			// exists.
-			if (errno != EEXIST)
-			    break;
+			ଯଦି (errno != EEXIST)
+			    ଭାଙ୍ଗ;
 # endif
 		    }
-		    else
+		    ଅନ୍ୟଥା
 			fp_out = fdopen(fd, WRITEBIN);
 #endif // VMS
-		    if (fp_out != NULL)
-			break;
+		    ଯଦି (fp_out != ଖାଲି)
+			ଭାଙ୍ଗ;
 		}
 
 		// Assume file exists, try again with another name.
-		if (next_char == 'a' - 1)
+		ଯଦି (next_char == 'a' - 1)
 		{
 		    // They all exist?  Must be something wrong! Don't write
 		    // the viminfo file then.
 		    semsg(_(e_too_many_viminfo_temp_files_like_str), tempname);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		*wp = next_char;
 		--next_char;
 	    }
 
-	    if (tempname != NULL)
-		break;
+	    ଯଦି (tempname != ଖାଲି)
+		ଭାଙ୍ଗ;
 	    // continue if shortname was set
 	}
 
-#if defined(UNIX) && defined(HAVE_FCHOWN)
-	if (tempname != NULL && fp_out != NULL)
+#ଯଦି defined(UNIX) && defined(HAVE_FCHOWN)
+	ଯଦି (tempname != ଖାଲି && fp_out != ଖାଲି)
 	{
 		stat_T	tmp_st;
 
 	    // Make sure the original owner can read/write the tempfile and
 	    // otherwise preserve permissions, making sure the group matches.
-	    if (mch_stat((char *)tempname, &tmp_st) >= 0)
+	    ଯଦି (mch_stat((ଅକ୍ଷର *)tempname, &tmp_st) >= 0)
 	    {
-		if (st_old.st_uid != tmp_st.st_uid)
+		ଯଦି (st_old.st_uid != tmp_st.st_uid)
 		    // Changing the owner might fail, in which case the
 		    // file will now be owned by the current user, oh well.
 		    vim_ignored = fchown(fileno(fp_out), st_old.st_uid, -1);
-		if (st_old.st_gid != tmp_st.st_gid
+		ଯଦି (st_old.st_gid != tmp_st.st_gid
 			&& fchown(fileno(fp_out), -1, st_old.st_gid) == -1)
 		    // can't set the group to what it should be, remove
 		    // group permissions
-		    (void)mch_setperm(tempname, 0600);
+		    (ଶୂନ୍ୟ)mch_setperm(tempname, 0600);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		// can't stat the file, set conservative permissions
-		(void)mch_setperm(tempname, 0600);
+		(ଶୂନ୍ୟ)mch_setperm(tempname, 0600);
 	}
 #endif
     }
 
     // Check if the new viminfo file can be written to.
-    if (fp_out == NULL)
+    ଯଦି (fp_out == ଖାଲି)
     {
 	semsg(_(e_cant_write_viminfo_file_str),
-		       (fp_in == NULL || tempname == NULL) ? fname : tempname);
-	if (fp_in != NULL)
+		       (fp_in == ଖାଲି || tempname == ଖାଲି) ? fname : tempname);
+	ଯଦି (fp_in != ଖାଲି)
 	    fclose(fp_in);
-	goto end;
+	ଯାଅ end;
     }
 
-    if (p_verbose > 0)
+    ଯଦି (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Writing viminfo file \"%s\""), fname);
@@ -3344,29 +3344,29 @@ write_viminfo(char_u *file, int forceit)
     viminfo_errcnt = 0;
     do_viminfo(fp_in, fp_out, forceit ? 0 : (VIF_WANT_INFO | VIF_WANT_MARKS));
 
-    if (fclose(fp_out) == EOF)
+    ଯଦି (fclose(fp_out) == EOF)
 	++viminfo_errcnt;
 
-    if (fp_in != NULL)
+    ଯଦି (fp_in != ଖାଲି)
     {
 	fclose(fp_in);
 
 	// In case of an error keep the original viminfo file.  Otherwise
 	// rename the newly written file.  Give an error if that fails.
-	if (viminfo_errcnt == 0)
+	ଯଦି (viminfo_errcnt == 0)
 	{
-	    if (vim_rename(tempname, fname) == -1)
+	    ଯଦି (vim_rename(tempname, fname) == -1)
 	    {
 		++viminfo_errcnt;
 		semsg(_(e_cant_rename_viminfo_file_to_str), fname);
 	    }
 #ifdef MSWIN
 	    // If the viminfo file was hidden then also hide the new file.
-	    else if (hidden)
+	    ଅନ୍ୟଥା ଯଦି (hidden)
 		mch_hide(fname);
 #endif
 	}
-	if (viminfo_errcnt > 0)
+	ଯଦି (viminfo_errcnt > 0)
 	    mch_remove(tempname);
     }
 
@@ -3378,22 +3378,22 @@ end:
 /*
  * ":rviminfo" and ":wviminfo".
  */
-    void
+    ଶୂନ୍ୟ
 ex_viminfo(
     exarg_T	*eap)
 {
     char_u	*save_viminfo;
 
     save_viminfo = p_viminfo;
-    if (*p_viminfo == NUL)
+    ଯଦି (*p_viminfo == NUL)
 	p_viminfo = (char_u *)"'100";
-    if (eap->cmdidx == CMD_rviminfo)
+    ଯଦି (eap->cmdidx == CMD_rviminfo)
     {
-	if (read_viminfo(eap->arg, VIF_WANT_INFO | VIF_WANT_MARKS
+	ଯଦି (read_viminfo(eap->arg, VIF_WANT_INFO | VIF_WANT_MARKS
 				  | (eap->forceit ? VIF_FORCEIT : 0)) == FAIL)
 	    emsg(_(e_cannot_open_viminfo_file_for_reading));
     }
-    else
+    ଅନ୍ୟଥା
 	write_viminfo(eap->arg, eap->forceit);
     p_viminfo = save_viminfo;
 }

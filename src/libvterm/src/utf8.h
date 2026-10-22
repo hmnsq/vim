@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#ଯଦି defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  ଯଦି(codepoint < 0x0000080) ଫେରନ୍ତୁ 1;
+  ଯଦି(codepoint < 0x0000800) ଫେରନ୍ତୁ 2;
+  ଯଦି(codepoint < 0x0010000) ଫେରନ୍ତୁ 3;
+  ଯଦି(codepoint < 0x0200000) ଫେରନ୍ତୁ 4;
+  ଯଦି(codepoint < 0x4000000) ଫେରନ୍ତୁ 5;
+  ଫେରନ୍ତୁ 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା fill_utf8(long codepoint, ଅକ୍ଷର *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#ଯଦି defined(DEFINE_INLINES) || USE_INLINE
+INLINE ପୂର୍ଣ୍ଣସଂଖ୍ୟା fill_utf8(long codepoint, ଅକ୍ଷର *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  ପୂର୍ଣ୍ଣସଂଖ୍ୟା nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  ପୂର୍ଣ୍ଣସଂଖ୍ୟା b = nbytes;
+  ଯେତେବେଳେ(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  ବାଛ(nbytes) {
+    ସ୍ଥିତି 1: str[0] =        (codepoint & 0x7f); ଭାଙ୍ଗ;
+    ସ୍ଥିତି 2: str[0] = 0xc0 | (codepoint & 0x1f); ଭାଙ୍ଗ;
+    ସ୍ଥିତି 3: str[0] = 0xe0 | (codepoint & 0x0f); ଭାଙ୍ଗ;
+    ସ୍ଥିତି 4: str[0] = 0xf0 | (codepoint & 0x07); ଭାଙ୍ଗ;
+    ସ୍ଥିତି 5: str[0] = 0xf8 | (codepoint & 0x03); ଭାଙ୍ଗ;
+    ସ୍ଥିତି 6: str[0] = 0xfc | (codepoint & 0x01); ଭାଙ୍ଗ;
   }
 
-  return nbytes;
+  ଫେରନ୍ତୁ nbytes;
 }
 #endif
 /* end copy */

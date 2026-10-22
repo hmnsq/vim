@@ -12,14 +12,14 @@
 #ifndef WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#ଅନ୍ତର୍ଭାଵ <windows.h>
 
-#include "xpm_w32.h"
+#ଅନ୍ତର୍ଭାଵ "xpm_w32.h"
 
 // Engage Windows support in libXpm
 #define FOR_MSW
 
-#include "xpm.h"
+#ଅନ୍ତର୍ଭାଵ "xpm.h"
 
 /*
  * Tries to load an Xpm image from the file "filename".
@@ -27,30 +27,30 @@
  * Returns 0 on success and stores image and mask BITMAPS in "hImage" and
  * "hShape".
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 LoadXpmImage(
-    char    *filename,
+    ଅକ୍ଷର    *filename,
     HBITMAP *hImage,
     HBITMAP *hShape)
 {
     XImage	    *img;  // loaded image
     XImage	    *shp;  // shapeimage
     XpmAttributes   attr;
-    int		    res;
-    HDC		    hdc = CreateCompatibleDC(NULL);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    res;
+    HDC		    hdc = CreateCompatibleDC(ଖାଲି);
 
     attr.valuemask = 0;
     res = XpmReadFileToImage(&hdc, filename, &img, &shp, &attr);
     DeleteDC(hdc);
-    if (res < 0)
-	return -1;
-    if (shp == NULL)
+    ଯଦି (res < 0)
+	ଫେରନ୍ତୁ -1;
+    ଯଦି (shp == ଖାଲି)
     {
-	if (img)
+	ଯଦି (img)
 	    XDestroyImage(img);
-	return -1;
+	ଫେରନ୍ତୁ -1;
     }
     *hImage = img->bitmap;
     *hShape = shp->bitmap;
-    return 0;
+    ଫେରନ୍ତୁ 0;
 }

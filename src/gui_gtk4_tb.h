@@ -10,7 +10,7 @@
 #ifndef GUI_GTK4_TB_H
 #define GUI_GTK4_TB_H
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
 #ifdef FEAT_TOOLBAR
 
@@ -19,13 +19,13 @@
 # define VIM_TYPE_TOOLBAR (vim_toolbar_get_type())
 G_DECLARE_FINAL_TYPE(VimToolbar, vim_toolbar, VIM, TOOLBAR, GtkWidget)
 
-typedef struct _VimToolbarItem VimToolbarItem;
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା _VimToolbarItem VimToolbarItem;
 
-GtkWidget *vim_toolbar_new(void);
-GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, int idx);
-GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, int idx);
-void vim_toolbar_set_style(VimToolbar *self, int style, int iconsize);
-void vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
+GtkWidget *vim_toolbar_new(ଶୂନ୍ୟ);
+GtkWidget *vim_toolbar_ଭର୍ତ୍ତି_button(VimToolbar *self, GtkWidget *icon, ଅଚଳ ଅକ୍ଷର *text, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx);
+GtkWidget *vim_toolbar_ଭର୍ତ୍ତି_separator(VimToolbar *self, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx);
+ଶୂନ୍ୟ vim_toolbar_set_style(VimToolbar *self, ପୂର୍ଣ୍ଣସଂଖ୍ୟା style, ପୂର୍ଣ୍ଣସଂଖ୍ୟା iconsize);
+ଶୂନ୍ୟ vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
 
 #endif
 

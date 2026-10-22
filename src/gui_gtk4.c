@@ -21,16 +21,16 @@
  * - gtk_window_new() takes no arguments
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
 #ifdef FEAT_GUI_GTK
 
-#include <gdk/gdkkeysyms.h>
-#include <gdk/gdk.h>
-#include <gtk/gtk.h>
-#include "gui_gtk4_f.h"
-#include "gui_gtk4_cb.h"
-#include "gui_gtk4_da.h"
+#ଅନ୍ତର୍ଭାଵ <gdk/gdkkeysyms.h>
+#ଅନ୍ତର୍ଭାଵ <gdk/gdk.h>
+#ଅନ୍ତର୍ଭାଵ <gtk/gtk.h>
+#ଅନ୍ତର୍ଭାଵ "gui_gtk4_f.h"
+#ଅନ୍ତର୍ଭାଵ "gui_gtk4_cb.h"
+#ଅନ୍ତର୍ଭାଵ "gui_gtk4_da.h"
 #ifdef FEAT_TOOLBAR
 # include "gui_gtk4_tb.h"
 #endif
@@ -42,249 +42,249 @@
  * Geometry string parser, replacing XParseGeometry to remove X11 dependency.
  * Format: [WIDTHxHEIGHT][{+-}XOFF{+-}YOFF]
  */
-#define NoValue		0x0000
-#define WidthValue	0x0004
-#define HeightValue	0x0008
+#define No_ମୂଲ୍ୟ		0x0000
+#define Width_ମୂଲ୍ୟ	0x0004
+#define Height_ମୂଲ୍ୟ	0x0008
 
-    static int
-vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+vim_parse_geometry(ଅଚଳ ଅକ୍ଷର *str, unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା *width, unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା *height)
 {
-    int mask = NoValue;
-    char *end;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା mask = No_ମୂଲ୍ୟ;
+    ଅକ୍ଷର *end;
     long val;
 
-    if (str == NULL || *str == NUL)
-	return mask;
+    ଯଦି (str == ଖାଲି || *str == NUL)
+	ଫେରନ୍ତୁ mask;
 
     // Parse width
-    if (*str != '+' && *str != '-')
+    ଯଦି (*str != '+' && *str != '-')
     {
 	val = strtol(str, &end, 10);
-	if (end != str)
+	ଯଦି (end != str)
 	{
-	    *width = (unsigned int)val;
-	    mask |= WidthValue;
+	    *width = (unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା)val;
+	    mask |= Width_ମୂଲ୍ୟ;
 	    str = end;
 	}
     }
 
     // Parse 'x' or 'X' separator and height
-    if (*str == 'x' || *str == 'X')
+    ଯଦି (*str == 'x' || *str == 'X')
     {
 	str++;
 	val = strtol(str, &end, 10);
-	if (end != str)
+	ଯଦି (end != str)
 	{
-	    *height = (unsigned int)val;
-	    mask |= HeightValue;
+	    *height = (unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା)val;
+	    mask |= Height_ମୂଲ୍ୟ;
 	    str = end;
 	}
     }
 
-    return mask;
+    ଫେରନ୍ତୁ mask;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ଯଦି defined(FEAT_MOUSESHAPE)
 // Last set mouse pointer shape
-static int last_shape = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_shape = 0;
 #endif
 
 #define DEFAULT_FONT	"Monospace 10"
 
 // Cursor blinking state
-static enum {
+ସ୍ଥିର ଗଣନା {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
 // GTK4 main loop compatibility
-static int gtk4_main_loop_level = 0;
-static int gtk4_main_loop_quit = FALSE;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା gtk4_main_loop_level = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା gtk4_main_loop_quit = FALSE;
 
 #ifdef USE_GRESOURCE
 # include "auto/gui_gtk_gresources.h"
 #endif
 
-typedef gboolean timeout_cb_type;
+ପ୍ରକାରବ୍ୟାଖ୍ୟା gboolean timeout_cb_type;
 
 /*
  * Table of special key mappings.
  */
-static struct special_key
+ସ୍ଥିର ସଂରଚନା special_ଚାବି
 {
-    guint key_sym;
+    guint ଚାବି_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+ଅଚଳ special_ଚାବିଗୁଡ଼ିକ[] =
 {
-    {GDK_KEY_Up,	'k', 'u'},
-    {GDK_KEY_Down,	'k', 'd'},
-    {GDK_KEY_Left,	'k', 'l'},
-    {GDK_KEY_Right,	'k', 'r'},
-    {GDK_KEY_F1,	'k', '1'},
-    {GDK_KEY_F2,	'k', '2'},
-    {GDK_KEY_F3,	'k', '3'},
-    {GDK_KEY_F4,	'k', '4'},
-    {GDK_KEY_F5,	'k', '5'},
-    {GDK_KEY_F6,	'k', '6'},
-    {GDK_KEY_F7,	'k', '7'},
-    {GDK_KEY_F8,	'k', '8'},
-    {GDK_KEY_F9,	'k', '9'},
-    {GDK_KEY_F10,	'k', ';'},
-    {GDK_KEY_F11,	'F', '1'},
-    {GDK_KEY_F12,	'F', '2'},
-    {GDK_KEY_Help,	'%', '1'},
-    {GDK_KEY_Undo,	'&', '8'},
-    {GDK_KEY_BackSpace,	'k', 'b'},
-    {GDK_KEY_Insert,	'k', 'I'},
-    {GDK_KEY_Delete,	'k', 'D'},
-    {GDK_KEY_Home,	'k', 'h'},
-    {GDK_KEY_End,	'@', '7'},
-    {GDK_KEY_Prior,	'k', 'P'},
-    {GDK_KEY_Next,	'k', 'N'},
-    {GDK_KEY_Print,	'%', '9'},
-    {GDK_KEY_KP_Left,	'k', 'l'},
-    {GDK_KEY_KP_Right,	'k', 'r'},
-    {GDK_KEY_KP_Up,	'k', 'u'},
-    {GDK_KEY_KP_Down,	'k', 'd'},
-    {GDK_KEY_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
-    {GDK_KEY_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
-    {GDK_KEY_KP_Home,	'K', '1'},
-    {GDK_KEY_KP_End,	'K', '4'},
-    {GDK_KEY_KP_Prior,	'K', '3'},
-    {GDK_KEY_KP_Next,	'K', '5'},
-    {GDK_KEY_KP_Add,	'K', '6'},
-    {GDK_KEY_KP_Subtract, 'K', '7'},
-    {GDK_KEY_KP_Divide,	'K', '8'},
-    {GDK_KEY_KP_Multiply, 'K', '9'},
-    {GDK_KEY_KP_Enter,	'K', 'A'},
-    {GDK_KEY_KP_Decimal,	'K', 'B'},
-    {GDK_KEY_KP_0,	'K', 'C'},
-    {GDK_KEY_KP_1,	'K', 'D'},
-    {GDK_KEY_KP_2,	'K', 'E'},
-    {GDK_KEY_KP_3,	'K', 'F'},
-    {GDK_KEY_KP_4,	'K', 'G'},
-    {GDK_KEY_KP_5,	'K', 'H'},
-    {GDK_KEY_KP_6,	'K', 'I'},
-    {GDK_KEY_KP_7,	'K', 'J'},
-    {GDK_KEY_KP_8,	'K', 'K'},
-    {GDK_KEY_KP_9,	'K', 'L'},
+    {GDK_ଚାବି_Up,	'k', 'u'},
+    {GDK_ଚାବି_Down,	'k', 'd'},
+    {GDK_ଚାବି_ବାମ,	'k', 'l'},
+    {GDK_ଚାବି_ଡାହାଣ,	'k', 'r'},
+    {GDK_ଚାବି_F1,	'k', '1'},
+    {GDK_ଚାବି_F2,	'k', '2'},
+    {GDK_ଚାବି_F3,	'k', '3'},
+    {GDK_ଚାବି_F4,	'k', '4'},
+    {GDK_ଚାବି_F5,	'k', '5'},
+    {GDK_ଚାବି_F6,	'k', '6'},
+    {GDK_ଚାବି_F7,	'k', '7'},
+    {GDK_ଚାବି_F8,	'k', '8'},
+    {GDK_ଚାବି_F9,	'k', '9'},
+    {GDK_ଚାବି_F10,	'k', ';'},
+    {GDK_ଚାବି_F11,	'F', '1'},
+    {GDK_ଚାବି_F12,	'F', '2'},
+    {GDK_ଚାବି_Help,	'%', '1'},
+    {GDK_ଚାବି_Undo,	'&', '8'},
+    {GDK_ଚାବି_Back_Space,	'k', 'b'},
+    {GDK_ଚାବି_ଭର୍ତ୍ତି,	'k', 'I'},
+    {GDK_ଚାବି_Delete,	'k', 'D'},
+    {GDK_ଚାବି_Home,	'k', 'h'},
+    {GDK_ଚାବି_End,	'@', '7'},
+    {GDK_ଚାବି_Prior,	'k', 'P'},
+    {GDK_ଚାବି_Next,	'k', 'N'},
+    {GDK_ଚାବି_Print,	'%', '9'},
+    {GDK_ଚାବି_KP_ବାମ,	'k', 'l'},
+    {GDK_ଚାବି_KP_ଡାହାଣ,	'k', 'r'},
+    {GDK_ଚାବି_KP_Up,	'k', 'u'},
+    {GDK_ଚାବି_KP_Down,	'k', 'd'},
+    {GDK_ଚାବି_KP_ଭର୍ତ୍ତି,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_ଚାବି_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
+    {GDK_ଚାବି_KP_Home,	'K', '1'},
+    {GDK_ଚାବି_KP_End,	'K', '4'},
+    {GDK_ଚାବି_KP_Prior,	'K', '3'},
+    {GDK_ଚାବି_KP_Next,	'K', '5'},
+    {GDK_ଚାବି_KP_Add,	'K', '6'},
+    {GDK_ଚାବି_KP_Subtract, 'K', '7'},
+    {GDK_ଚାବି_KP_Divide,	'K', '8'},
+    {GDK_ଚାବି_KP_Multiply, 'K', '9'},
+    {GDK_ଚାବି_KP_Enter,	'K', 'A'},
+    {GDK_ଚାବି_KP_Decimal,	'K', 'B'},
+    {GDK_ଚାବି_KP_0,	'K', 'C'},
+    {GDK_ଚାବି_KP_1,	'K', 'D'},
+    {GDK_ଚାବି_KP_2,	'K', 'E'},
+    {GDK_ଚାବି_KP_3,	'K', 'F'},
+    {GDK_ଚାବି_KP_4,	'K', 'G'},
+    {GDK_ଚାବି_KP_5,	'K', 'H'},
+    {GDK_ଚାବି_KP_6,	'K', 'I'},
+    {GDK_ଚାବି_KP_7,	'K', 'J'},
+    {GDK_ଚାବି_KP_8,	'K', 'K'},
+    {GDK_ଚାବି_KP_9,	'K', 'L'},
     {0, 0, 0}
 };
 
-    static int
-keyval_to_string(unsigned int keyval, char_u *string)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+keyval_to_string(unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା keyval, char_u *string)
 {
-    int		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
     guint32	uc;
 
     uc = gdk_keyval_to_unicode(keyval);
-    if (uc != 0)
+    ଯଦି (uc != 0)
     {
-	len = utf_char2bytes((int)uc, string);
+	len = utf_char2bytes((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)uc, string);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	len = 1;
-	switch (keyval)
+	ବାଛ (keyval)
 	{
-	    case GDK_KEY_Tab: case GDK_KEY_KP_Tab: case GDK_KEY_ISO_Left_Tab:
+	    ସ୍ଥିତି GDK_ଚାବି_Tab: ସ୍ଥିତି GDK_ଚାବି_KP_Tab: ସ୍ଥିତି GDK_ଚାବି_ISO_ବାମ_Tab:
 		string[0] = TAB;
-		break;
-	    case GDK_KEY_Linefeed:
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି GDK_ଚାବି_Linefeed:
 		string[0] = NL;
-		break;
-	    case GDK_KEY_Return: case GDK_KEY_ISO_Enter: case GDK_KEY_3270_Enter:
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି GDK_ଚାବି_Return: ସ୍ଥିତି GDK_ଚାବି_ISO_Enter: ସ୍ଥିତି GDK_ଚାବି_3270_Enter:
 		string[0] = CAR;
-		break;
-	    case GDK_KEY_Escape:
+		ଭାଙ୍ଗ;
+	    ସ୍ଥିତି GDK_ଚାବି_Escape:
 		string[0] = ESC;
-		break;
-	    default:
+		ଭାଙ୍ଗ;
+	    ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		len = 0;
-		break;
+		ଭାଙ୍ଗ;
 	}
     }
     string[len] = NUL;
-    return len;
+    ଫେରନ୍ତୁ len;
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 modifiers_gdk2vim(guint state)
 {
-    int modifiers = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    ଯଦି (state & GDK_SHIFT_MASK)
 	modifiers |= MOD_MASK_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    ଯଦି (state & GDK_CONTROL_MASK)
 	modifiers |= MOD_MASK_CTRL;
-    if (state & GDK_ALT_MASK)
+    ଯଦି (state & GDK_ALT_MASK)
 	modifiers |= MOD_MASK_ALT;
-    if (state & GDK_META_MASK)
+    ଯଦି (state & GDK_META_MASK)
 	modifiers |= MOD_MASK_META;
-    if (state & GDK_SUPER_MASK)
+    ଯଦି (state & GDK_SUPER_MASK)
 	modifiers |= MOD_MASK_CMD;
 
-    return modifiers;
+    ଫେରନ୍ତୁ modifiers;
 }
 
-static GtkWidget *vbox;		// the main vertical box
+ସ୍ଥିର GtkWidget *vbox;		// the main vertical box
 
 // Forward declarations for event callbacks
-static gboolean key_press_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void key_release_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void button_press_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void button_release_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void motion_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static void enter_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static gboolean scroll_event(GtkEventControllerScroll *controller, double dx, double dy, gpointer data);
-static void focus_in_event(GtkEventControllerFocus *controller, gpointer data);
-static void focus_out_event(GtkEventControllerFocus *controller, gpointer data);
+ସ୍ଥିର gboolean ଚାବି_press_event(Gtk_Event_Controller_ଚାବି *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ ଚାବି_release_event(Gtk_Event_Controller_ଚାବି *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ button_press_event(GtkGestureClick *gesture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_press, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ button_release_event(GtkGestureClick *gesture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_press, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ motion_notify_event(GtkEventControllerMotion *controller, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ enter_notify_event(GtkEventControllerMotion *controller, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data);
+ସ୍ଥିର gboolean scroll_event(GtkEventControllerScroll *controller, ଦ୍ୱିଗୁଣ dx, ଦ୍ୱିଗୁଣ dy, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ focus_in_event(GtkEventControllerFocus *controller, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ focus_out_event(GtkEventControllerFocus *controller, gpointer data);
 #ifdef FEAT_DND
-static gboolean drop_cb(GtkDropTargetAsync *target, GdkDrop *drop, double x, double y, void *data);
+ସ୍ଥିର gboolean drop_cb(GtkDropTargetAsync *target, GdkDrop *drop, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, ଶୂନ୍ୟ *data);
 #endif
 #ifdef FEAT_GUI_TABLINE
-static void tabline_enter_cb(GtkEventController *controller, double x, double y, void *udata);
-static void on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static void on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static VimMenu *create_tabline_popup_menu(void);
-static void tabline_add_css(void);
-static void tabline_menu_press_event(GtkGestureClick *gesture, int n_press, double x, double y, GtkWidget *popover);
+ସ୍ଥିର ଶୂନ୍ୟ tabline_enter_cb(GtkEventController *controller, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, ଶୂନ୍ୟ *udata);
+ସ୍ଥିର ଶୂନ୍ୟ on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
+ସ୍ଥିର VimMenu *create_tabline_popup_menu(ଶୂନ୍ୟ);
+ସ୍ଥିର ଶୂନ୍ୟ tabline_add_css(ଶୂନ୍ୟ);
+ସ୍ଥିର ଶୂନ୍ୟ tabline_menu_press_event(GtkGestureClick *gesture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_press, ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, GtkWidget *popover);
 #endif
-static void mainwin_destroy_cb(GObject *object, gpointer data);
-static gboolean delete_event_cb(GtkWindow *window, gpointer data);
-static int query_pointer_pos(int *x, int *y, GdkModifierType *state);
-static void mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_data);
-static void set_form_size(int width, int height);
-static void drawarea_realize_cb(GtkWidget *widget, gpointer data);
-static void drawarea_unrealize_cb(GtkWidget *widget, gpointer data);
-static void clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data);
+ସ୍ଥିର ଶୂନ୍ୟ mainwin_destroy_cb(GObject *object, gpointer data);
+ସ୍ଥିର gboolean delete_event_cb(GtkWindow *window, gpointer data);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା query_pointer_pos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *y, GdkModifierType *state);
+ସ୍ଥିର ଶୂନ୍ୟ mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_data);
+ସ୍ଥିର ଶୂନ୍ୟ set_form_size(ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height);
+ସ୍ଥିର ଶୂନ୍ୟ drawarea_realize_cb(GtkWidget *widget, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ drawarea_unrealize_cb(GtkWidget *widget, gpointer data);
+ସ୍ଥିର ଶୂନ୍ୟ clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data);
 #ifdef FEAT_MENU
-static void show_menubar_popover(void);
+ସ୍ଥିର ଶୂନ୍ୟ show_menubar_popover(ଶୂନ୍ୟ);
 #endif
 
-static const char *prgname = NULL;
+ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *prgname = ଖାଲି;
 
 /*
  * Check if "s" is the option "name" (which includes the leading dash(es)).
  * "value" is set to the value if the option uses 'opt=val' format.
  */
-    static gboolean
-arg_match(const char *s, const char *name, char **value)
+    ସ୍ଥିର gboolean
+arg_match(ଅଚଳ ଅକ୍ଷର *s, ଅଚଳ ଅକ୍ଷର *name, ଅକ୍ଷର **ମୂଲ୍ୟ)
 {
     size_t  len = strlen(name);
 
-    if (strncmp(s, name, len) != 0)
-	return FALSE;
-    if (s[len] == '=')
-	*value = (char *)s + len + 1;
-    else if (s[len] != NUL)
+    ଯଦି (strncmp(s, name, len) != 0)
+	ଫେରନ୍ତୁ FALSE;
+    ଯଦି (s[len] == '=')
+	*ମୂଲ୍ୟ = (ଅକ୍ଷର *)s + len + 1;
+    ଅନ୍ୟଥା ଯଦି (s[len] != NUL)
 	// Something follows the option name that isn't "=": this is a
 	// different, longer option (e.g. "-fnord" while matching "-fn").
-	return FALSE;
-    return TRUE;
+	ଫେରନ୍ତୁ FALSE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -292,76 +292,76 @@ arg_match(const char *s, const char *name, char **value)
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    ଶୂନ୍ୟ
+gui_mch_prepare(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *argc, ଅକ୍ଷର **argv)
 {
     // Don't call gtk_init() here.  It will be called in
     // gui_mch_init_check() after the fork.  Calling it before fork
     // breaks the display connection in the child process, causing gvim
     // to fail to start without --nofork.
 
-    int	i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	i = 0;
 
-    while (i < *argc)
+    ଯେତେବେଳେ (i < *argc)
     {
-	char	*s = argv[i];
-	char	*value = NULL;
-	int	has_inline_value = FALSE;
-	int	n_strip;
+	ଅକ୍ଷର	*s = argv[i];
+	ଅକ୍ଷର	*ମୂଲ୍ୟ = ଖାଲି;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	has_inline_ମୂଲ୍ୟ = FALSE;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	n_strip;
 
-	if (s[0] != '-' && s[0] != '+')
+	ଯଦି (s[0] != '-' && s[0] != '+')
 	{
 	    ++i;
-	    continue;
+	    ଜାରି;
 	}
 
-	if (strchr(s, '=') != NULL)
-	    has_inline_value = TRUE;
+	ଯଦି (strchr(s, '=') != ଖାଲି)
+	    has_inline_ମୂଲ୍ୟ = TRUE;
 
 	// If the value was not given inline (no "="), it would come from the
 	// next argv element.  Do not treat that next element as this option's
 	// value if it is "--" (end-of-options marker) or is another option.
-	if (!has_inline_value)
+	ଯଦି (!has_inline_ମୂଲ୍ୟ)
 	{
-	    if (i + 1 < *argc
+	    ଯଦି (i + 1 < *argc
 		    && strcmp(argv[i + 1], "--") != 0
 		    && !((argv[i + 1][0] == '-' || argv[i + 1][0] == '+')
 			&& !vim_isdigit(argv[i + 1][1])))
-		value = argv[i + 1];
-	    else
-		value = NULL;
+		ମୂଲ୍ୟ = argv[i + 1];
+	    ଅନ୍ୟଥା
+		ମୂଲ୍ୟ = ଖାଲି;
 	}
 
-	if (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
-	    font_argument = value;
-	else if (arg_match(s, "-geom", &value)
-		|| arg_match(s, "-geometry", &value))
+	ଯଦି (arg_match(s, "-fn", &ମୂଲ୍ୟ) || arg_match(s, "-font", &ମୂଲ୍ୟ))
+	    font_argument = ମୂଲ୍ୟ;
+	ଅନ୍ୟଥା ଯଦି (arg_match(s, "-geom", &ମୂଲ୍ୟ)
+		|| arg_match(s, "-geometry", &ମୂଲ୍ୟ))
 	{
-	    if (value != NULL)
-		gui.geom = vim_strsave((char_u *)value);
+	    ଯଦି (ମୂଲ୍ୟ != ଖାଲି)
+		gui.geom = vim_strsave((char_u *)ମୂଲ୍ୟ);
 	}
-	else if (arg_match(s, "-bg", &value)
-		|| arg_match(s, "-background", &value))
-	    background_argument = value;
-	else if (arg_match(s, "-fg", &value)
-		|| arg_match(s, "-foreground", &value))
-	    foreground_argument = value;
+	ଅନ୍ୟଥା ଯଦି (arg_match(s, "-bg", &ମୂଲ୍ୟ)
+		|| arg_match(s, "-background", &ମୂଲ୍ୟ))
+	    background_argument = ମୂଲ୍ୟ;
+	ଅନ୍ୟଥା ଯଦି (arg_match(s, "-fg", &ମୂଲ୍ୟ)
+		|| arg_match(s, "-foreground", &ମୂଲ୍ୟ))
+	    foreground_argument = ମୂଲ୍ୟ;
 #ifdef FEAT_NETBEANS_INTG
-	else if (strncmp(s, "-nb", 3) == 0)
+	ଅନ୍ୟଥା ଯଦି (strncmp(s, "-nb", 3) == 0)
 	{
 	    gui.dofork = false; // don't fork() when starting GUI
 	    netbeansArg = argv[i];
-	    has_inline_value = TRUE; // -nb uses non standard syntax, just
+	    has_inline_ମୂଲ୍ୟ = TRUE; // -nb uses non standard syntax, just
 				     // remove the flag.
 	}
 #endif
-	else if (arg_match(s, "--prg-name", &value))
+	ଅନ୍ୟଥା ଯଦି (arg_match(s, "--prg-name", &ମୂଲ୍ୟ))
 	    // GTK4 specific
-	    prgname = value;
-	else
+	    prgname = ମୂଲ୍ୟ;
+	ଅନ୍ୟଥା
 	{
 	    i++;
-	    continue;
+	    ଜାରି;
 	}
 
 	// Remove the flag from the argument vector.
@@ -369,16 +369,16 @@ gui_mch_prepare(int *argc, char **argv)
 	// Move the argument's value as well, but only if it was consumed
 	// from a separate argv element (the "-opt=value" form lives inside
 	// the flag's own element and is stripped along with it already).
-	if (value != NULL && !has_inline_value)
+	ଯଦି (ମୂଲ୍ୟ != ଖାଲି && !has_inline_ମୂଲ୍ୟ)
 	    n_strip = 2;
 
-	if (*argc - n_strip >= i)
+	ଯଦି (*argc - n_strip >= i)
 	{
 	    *argc -= n_strip;
-	    if (*argc > i)
+	    ଯଦି (*argc > i)
 		mch_memmove(&argv[i], &argv[i + n_strip],
-			(*argc - i) * sizeof(char *));
-	    argv[*argc] = NULL;
+			(*argc - i) * ଆକାର(ଅକ୍ଷର *));
+	    argv[*argc] = ଖାଲି;
 	}
     }
 }
@@ -386,59 +386,59 @@ gui_mch_prepare(int *argc, char **argv)
 /*
  * Free all GUI related resources.
  */
-    void
-gui_mch_free_all(void)
+    ଶୂନ୍ୟ
+gui_mch_free_all(ଶୂନ୍ୟ)
 {
 }
 
-    static guint
-timeout_add(int time, timeout_cb_type (*callback)(gpointer), int *flagp)
+    ସ୍ଥିର guint
+timeout_add(ପୂର୍ଣ୍ଣସଂଖ୍ୟା time, timeout_cb_type (*callback)(gpointer), ପୂର୍ଣ୍ଣସଂଖ୍ୟା *flagp)
 {
-    return g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
+    ଫେରନ୍ତୁ g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 timeout_remove(guint timer)
 {
     g_source_remove(timer);
 }
 
-static long_u blink_waittime = 700;
-static long_u blink_ontime = 400;
-static long_u blink_offtime = 250;
-static guint blink_timer = 0;
+ସ୍ଥିର long_u blink_waittime = 700;
+ସ୍ଥିର long_u blink_ontime = 400;
+ସ୍ଥିର long_u blink_offtime = 250;
+ସ୍ଥିର guint blink_timer = 0;
 
-    static timeout_cb_type
+    ସ୍ଥିର timeout_cb_type
 blink_cb(gpointer data UNUSED)
 {
-    if (blink_state == BLINK_ON)
+    ଯଦି (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = timeout_add(blink_offtime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_offtime, blink_cb, ଖାଲି);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = timeout_add(blink_ontime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_ontime, blink_cb, ଖାଲି);
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    int
-gui_mch_is_blinking(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_is_blinking(ଶୂନ୍ୟ)
 {
-    return blink_state != BLINK_NONE;
+    ଫେରନ୍ତୁ blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_is_blink_off(ଶୂନ୍ୟ)
 {
-    return blink_state == BLINK_OFF;
+    ଫେରନ୍ତୁ blink_state == BLINK_OFF;
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_blinking(long waittime, long on, long off)
 {
     blink_waittime = waittime;
@@ -446,68 +446,68 @@ gui_mch_set_blinking(long waittime, long on, long off)
     blink_offtime = off;
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    ଶୂନ୍ୟ
+gui_mch_stop_blink(ପୂର୍ଣ୍ଣସଂଖ୍ୟା may_call_gui_update_cursor)
 {
-    if (blink_timer)
+    ଯଦି (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    ଯଦି (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    void
-gui_mch_start_blink(void)
+    ଶୂନ୍ୟ
+gui_mch_start_blink(ଶୂନ୍ୟ)
 {
-    if (blink_timer)
+    ଯଦି (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    ଯଦି (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
-	blink_timer = timeout_add(blink_waittime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_waittime, blink_cb, ଖାଲି);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
 }
 
-    int
-gui_mch_early_init_check(int give_message UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_early_init_check(ପୂର୍ଣ୍ଣସଂଖ୍ୟା give_message UNUSED)
 {
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    int
-gui_mch_init_check(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_init_check(ଶୂନ୍ୟ)
 {
     // This defaults to argv[0], but we want it to match the name of the
     // shipped gvim.desktop so that Vim's windows can be associated with this
     // file.  Also sets WM_CLASS on X11. If "--prg-name" is specified, then use
     // that.
-    g_set_prgname(prgname == NULL ? "gvim" : prgname);
+    g_set_prgname(prgname == ଖାଲି ? "gvim" : prgname);
 
     // Suppress noisy EGL warnings when GL is not available.  Only set
     // this when actually starting the GUI, so non-GUI invocations are
     // not affected.
-    if (g_getenv("EGL_LOG_LEVEL") == NULL)
+    ଯଦି (g_getenv("EGL_LOG_LEVEL") == ଖାଲି)
 	setenv("EGL_LOG_LEVEL", "fatal", 0);
 
     // Call gtk_init() here after fork().  Calling it before fork() breaks
     // the display connection in the child process.
     gtk_init();
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Initialise the GUI.  Create all the windows, set up all the callbacks etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_init(ଶୂନ୍ୟ)
 {
     // Allocate GdkRGBA color structs.
     gui.fgcolor = g_new0(GdkRGBA, 1);
@@ -531,9 +531,9 @@ gui_mch_init(void)
     pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "close-request",
-		     G_CALLBACK(delete_event_cb), NULL);
+		     G_CALLBACK(delete_event_cb), ଖାଲି);
     g_signal_connect(G_OBJECT(gui.mainwin), "notify::fullscreened",
-		     G_CALLBACK(mainwin_fullscreened_cb), NULL);
+		     G_CALLBACK(mainwin_fullscreened_cb), ଖାଲି);
 
     // A vertical box holds the menubar, toolbar and main text window.
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -566,15 +566,15 @@ gui_mch_init(void)
     gtk_box_append(GTK_BOX(vbox), gui.tabline);
 
     g_signal_connect(G_OBJECT(gui.tabline), "switch-page",
-		     G_CALLBACK(on_select_tab), NULL);
+		     G_CALLBACK(on_select_tab), ଖାଲି);
     g_signal_connect(G_OBJECT(gui.tabline), "page-reordered",
-		     G_CALLBACK(on_tab_reordered), NULL);
+		     G_CALLBACK(on_tab_reordered), ଖାଲି);
 
     {
 	GtkEventController *mcontroller = gtk_event_controller_motion_new();
 
 	g_signal_connect(mcontroller, "enter",
-		G_CALLBACK(tabline_enter_cb), NULL);
+		G_CALLBACK(tabline_enter_cb), ଖାଲି);
 
 	// Make sure that tabline_enter_cb() is always called before
 	// tabpage_enter_cb().
@@ -625,18 +625,18 @@ gui_mch_init(void)
     vim_form_put(VIM_FORM(gui.formwin), gui.drawarea, 0, 0);
 
     g_signal_connect(G_OBJECT(gui.drawarea), "realize",
-		     G_CALLBACK(drawarea_realize_cb), NULL);
+		     G_CALLBACK(drawarea_realize_cb), ଖାଲି);
     g_signal_connect(G_OBJECT(gui.drawarea), "unrealize",
-		     G_CALLBACK(drawarea_unrealize_cb), NULL);
+		     G_CALLBACK(drawarea_unrealize_cb), ଖାଲି);
 
     // Set up event controllers.
     {
-	GtkEventController *key_ctrl = gtk_event_controller_key_new();
-	g_signal_connect(key_ctrl, "key-pressed",
-			 G_CALLBACK(key_press_event), NULL);
-	g_signal_connect(key_ctrl, "key-released",
-			 G_CALLBACK(key_release_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, key_ctrl);
+	GtkEventController *ଚାବି_ctrl = gtk_event_controller_ଚାବି_new();
+	g_signal_connect(ଚାବି_ctrl, "key-pressed",
+			 G_CALLBACK(ଚାବି_press_event), ଖାଲି);
+	g_signal_connect(ଚାବି_ctrl, "key-released",
+			 G_CALLBACK(ଚାବି_release_event), ଖାଲି);
+	gtk_widget_add_controller(gui.drawarea, ଚାବି_ctrl);
 #ifdef FEAT_XIM
 	xim_init();
 #endif
@@ -646,18 +646,18 @@ gui_mch_init(void)
 	GtkGesture *click = gtk_gesture_click_new();
 	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
 	g_signal_connect(click, "pressed",
-			 G_CALLBACK(button_press_event), NULL);
+			 G_CALLBACK(button_press_event), ଖାଲି);
 	g_signal_connect(click, "released",
-			 G_CALLBACK(button_release_event), NULL);
+			 G_CALLBACK(button_release_event), ଖାଲି);
 	gtk_widget_add_controller(gui.drawarea, GTK_EVENT_CONTROLLER(click));
     }
 
     {
 	GtkEventController *motion = gtk_event_controller_motion_new();
 	g_signal_connect(motion, "motion",
-			 G_CALLBACK(motion_notify_event), NULL);
+			 G_CALLBACK(motion_notify_event), ଖାଲି);
 	g_signal_connect(motion, "enter",
-			 G_CALLBACK(enter_notify_event), NULL);
+			 G_CALLBACK(enter_notify_event), ଖାଲି);
 	gtk_widget_add_controller(gui.drawarea, motion);
     }
 
@@ -666,16 +666,16 @@ gui_mch_init(void)
 		GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES
 		| GTK_EVENT_CONTROLLER_SCROLL_DISCRETE);
 	g_signal_connect(scroll, "scroll",
-			 G_CALLBACK(scroll_event), NULL);
+			 G_CALLBACK(scroll_event), ଖାଲି);
 	gtk_widget_add_controller(gui.drawarea, scroll);
     }
 
     {
 	GtkEventController *focus = gtk_event_controller_focus_new();
 	g_signal_connect(focus, "enter",
-			 G_CALLBACK(focus_in_event), NULL);
+			 G_CALLBACK(focus_in_event), ଖାଲି);
 	g_signal_connect(focus, "leave",
-			 G_CALLBACK(focus_out_event), NULL);
+			 G_CALLBACK(focus_out_event), ଖାଲି);
 	gtk_widget_add_controller(gui.drawarea, focus);
     }
 
@@ -683,12 +683,12 @@ gui_mch_init(void)
     // Set up drag-and-drop target for files and text. We use async variant so
     // we can handle html format.
     {
-	gui.drop_target = gtk_drop_target_async_new(NULL,
+	gui.drop_target = gtk_drop_target_async_new(ଖାଲି,
 		GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
 	gui_gtk_set_dnd_targets();
 	g_signal_connect(gui.drop_target, "drop",
-			 G_CALLBACK(drop_cb), NULL);
+			 G_CALLBACK(drop_cb), ଖାଲି);
 	gtk_widget_add_controller(gui.drawarea,
 		GTK_EVENT_CONTROLLER(gui.drop_target));
     }
@@ -697,17 +697,17 @@ gui_mch_init(void)
     gui.border_offset = gui.border_width;
 
     // Create a blank (invisible) cursor for hiding the mouse pointer.
-    gui.blank_pointer = gdk_cursor_new_from_name("none", NULL);
+    gui.blank_pointer = gdk_cursor_new_from_name("none", ଖାଲି);
 
     {
 	GdkDisplay   *display = gtk_widget_get_display(gui.mainwin);
 	GdkClipboard *primary = gdk_display_get_primary_clipboard(display);
 	GdkClipboard *regular = gdk_display_get_clipboard(display);
 
-	if (primary != NULL)
+	ଯଦି (primary != ଖାଲି)
 	    g_signal_connect(primary, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_star);
-	if (regular != NULL)
+	ଯଦି (regular != ଖାଲି)
 	    g_signal_connect(regular, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_plus);
     }
@@ -715,39 +715,39 @@ gui_mch_init(void)
     gui.regular_provider = vim_content_provider_new(&clip_plus);
     gui.primary_provider = vim_content_provider_new(&clip_star);
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    void
-gui_mch_new_colors(void)
+    ଶୂନ୍ୟ
+gui_mch_new_colors(ଶୂନ୍ୟ)
 {
-    if (gui.drawarea != NULL && gtk_widget_get_realized(gui.drawarea))
+    ଯଦି (gui.drawarea != ଖାଲି && gtk_widget_get_realized(gui.drawarea))
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_open(ଶୂନ୍ୟ)
 {
     guicolor_T fg_pixel = INVALCOLOR;
     guicolor_T bg_pixel = INVALCOLOR;
     guint pixel_width;
     guint pixel_height;
 
-    if (gui.geom != NULL)
+    ଯଦି (gui.geom != ଖାଲି)
     {
-	int		mask;
-	unsigned int	w, h;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		mask;
+	unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା	w, h;
 
-	mask = vim_parse_geometry((char *)gui.geom, &w, &h);
+	mask = vim_parse_geometry((ଅକ୍ଷର *)gui.geom, &w, &h);
 
-	if (mask & WidthValue)
+	ଯଦି (mask & Width_ମୂଲ୍ୟ)
 	    Columns = w;
-	if (mask & HeightValue)
+	ଯଦି (mask & Height_ମୂଲ୍ୟ)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
+	    ଯଦି (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
 	    Rows = h;
 	}
@@ -755,12 +755,12 @@ gui_mch_open(void)
 
 	VIM_CLEAR(gui.geom);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Use 80x24 as the default GUI size, unless geometry was specified.
-	if (Columns > 80)
+	ଯଦି (Columns > 80)
 	    Columns = 80;
-	if (Rows > 24)
+	ଯଦି (Rows > 24)
 	    Rows = 24;
     }
 
@@ -770,22 +770,22 @@ gui_mch_open(void)
     pixel_width  += get_menu_tool_width();
     pixel_height += get_menu_tool_height();
 
-    if (foreground_argument != NULL)
+    ଯଦି (foreground_argument != ଖାଲି)
 	fg_pixel = gui_get_color((char_u *)foreground_argument);
-    if (fg_pixel == INVALCOLOR)
+    ଯଦି (fg_pixel == INVALCOLOR)
 	fg_pixel = gui_get_color((char_u *)"Black");
 
-    if (background_argument != NULL)
+    ଯଦି (background_argument != ଖାଲି)
 	bg_pixel = gui_get_color((char_u *)background_argument);
-    if (bg_pixel == INVALCOLOR)
+    ଯଦି (bg_pixel == INVALCOLOR)
 	bg_pixel = gui_get_color((char_u *)"White");
 
-    if (found_reverse_arg)
+    ଯଦି (found_reverse_arg)
     {
 	gui.def_norm_pixel = bg_pixel;
 	gui.def_back_pixel = fg_pixel;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	gui.def_norm_pixel = fg_pixel;
 	gui.def_back_pixel = bg_pixel;
@@ -796,11 +796,11 @@ gui_mch_open(void)
     highlight_gui_started();
 
     g_signal_connect(G_OBJECT(gui.mainwin), "destroy",
-		     G_CALLBACK(mainwin_destroy_cb), NULL);
+		     G_CALLBACK(mainwin_destroy_cb), ଖାଲି);
     // Resize is handled by GtkForm's size_allocate callback.
 
-    set_form_size((int)pixel_width - get_menu_tool_width(),
-	    (int)pixel_height - get_menu_tool_height());
+    set_form_size((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pixel_width - get_menu_tool_width(),
+	    (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)pixel_height - get_menu_tool_height());
 
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 
@@ -812,13 +812,13 @@ gui_mch_open(void)
     gtk_widget_grab_focus(gui.drawarea);
     gui_focus_change(TRUE);
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    void
-gui_mch_exit(int rc UNUSED)
+    ଶୂନ୍ୟ
+gui_mch_exit(ପୂର୍ଣ୍ଣସଂଖ୍ୟା rc UNUSED)
 {
-    if (gui.mainwin != NULL)
+    ଯଦି (gui.mainwin != ଖାଲି)
     {
 #ifdef FEAT_GUI_TABLINE
 	// Must unparent popover menu for tabline or we will get warning
@@ -836,8 +836,8 @@ gui_mch_exit(int rc UNUSED)
 
 	    FOR_ALL_MENUS(menu)
 	    {
-		if ((menu->name[0] == ']' || menu_is_popup(menu->name))
-			&& menu->submenu_id != NULL)
+		ଯଦି ((menu->name[0] == ']' || menu_is_popup(menu->name))
+			&& menu->submenu_id != ଖାଲି)
 		    gtk_widget_unparent(menu->submenu_id);
 	    }
 	}
@@ -846,51 +846,51 @@ gui_mch_exit(int rc UNUSED)
     }
 }
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_get_winpos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *y)
 {
     // GTK4 does not provide a window position API.
     *x = 0;
     *y = 0;
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
-    void
-gui_mch_set_winpos(int x UNUSED, int y UNUSED)
+    ଶୂନ୍ୟ
+gui_mch_set_winpos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y UNUSED)
 {
     // GTK4/Wayland: window positioning not available
 }
 
-    int
-gui_mch_maximized(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_maximized(ଶୂନ୍ୟ)
 {
-    return gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
+    ଫେରନ୍ତୁ gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_unmaximize(void)
+    ଶୂନ୍ୟ
+gui_mch_unmaximize(ଶୂନ୍ୟ)
 {
-    if (gui.mainwin != NULL)
+    ଯଦି (gui.mainwin != ଖାଲି)
 	gtk_window_unmaximize(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_set_fullscreen(int flag)
+    ଶୂନ୍ୟ
+gui_mch_set_fullscreen(ପୂର୍ଣ୍ଣସଂଖ୍ୟା flag)
 {
-    if (gui.mainwin == NULL)
-	return;
-    if (flag)
+    ଯଦି (gui.mainwin == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (flag)
 	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
+    ଅନ୍ୟଥା
 	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 mainwin_fullscreened_cb(GObject *obj,
 	GParamSpec *pspec UNUSED, gpointer user_data UNUSED)
 {
     // Force a redraw of the drawing area when entering fullscreen mode.
-    if (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
+    ଯଦି (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
 	gui_focus_change(TRUE);
 }
 
@@ -906,10 +906,10 @@ mainwin_fullscreened_cb(GObject *obj,
  * crash.  Use gui_resize_shell() to recalculate Rows/Columns from the current
  * window size instead.
  */
-    void
-gui_mch_newfont(void)
+    ଶୂନ୍ୟ
+gui_mch_newfont(ଶୂନ୍ୟ)
 {
-    int w, h;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, h;
 
     // Do not subtract width and height with menubar, toolbar, etc, because
     // those are not part of the shell.
@@ -918,11 +918,11 @@ gui_mch_newfont(void)
     gui_resize_shell(w, h);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_settitle(char_u *title, char_u *icon UNUSED)
 {
-    if (title != NULL && gui.mainwin != NULL)
-	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (const char *)title);
+    ଯଦି (title != ଖାଲି && gui.mainwin != ଖାଲି)
+	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (ଅଚଳ ଅକ୍ଷର *)title);
 }
 
 /*
@@ -933,13 +933,13 @@ gui_mch_settitle(char_u *title, char_u *icon UNUSED)
  * it actually is (while the window size is up to date), causing a negative
  * "decor_height".
  */
-    void
-gui_gtk_init_decor_height(void)
+    ଶୂନ୍ୟ
+gui_gtk_init_decor_height(ଶୂନ୍ୟ)
 {
-    int h = gtk_widget_get_height(gui.mainwin);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା h = gtk_widget_get_height(gui.mainwin);
 
-    if (h == 0)
-	return;
+    ଯଦି (h == 0)
+	ଫେରନ୍ତୁ;
 
     h -= get_menu_tool_height();
     h -= gtk_widget_get_height(gui.formwin);
@@ -951,14 +951,14 @@ gui_gtk_init_decor_height(void)
  * Ask for the form widget, and thus the shell, to become "width" by "height"
  * pixels.
  */
-    static void
-set_form_size(int width, int height)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_form_size(ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height)
 {
     // Nothing to do when the form widget already has this size: no allocation
     // would follow and the size request below would never be dropped.
-    if (gtk_widget_get_width(gui.formwin) == width
+    ଯଦି (gtk_widget_get_width(gui.formwin) == width
 	    && gtk_widget_get_height(gui.formwin) == height)
-	return;
+	ଫେରନ୍ତୁ;
 
     // Remember the size the form widget is supposed to get. An allocation
     // that arrives before the compositor has answered this request still has
@@ -980,34 +980,34 @@ set_form_size(int width, int height)
     gtk_widget_set_size_request(gui.formwin, width, height);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width UNUSED, int min_height UNUSED,
-	int base_width UNUSED, int base_height UNUSED,
-	int direction UNUSED)
+    ଶୂନ୍ୟ
+gui_mch_set_shellsize(ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା min_width UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା min_height UNUSED,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା base_width UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା base_height UNUSED,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା direction UNUSED)
 {
     set_form_size(width, height);
 
     gui_mch_update();
 }
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    ଶୂନ୍ୟ
+gui_mch_get_screen_dimensions(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *screen_w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *screen_h)
 {
     GdkDisplay *display = gtk_widget_get_display(gui.mainwin);
     GdkSurface *surface = gtk_native_get_surface(GTK_NATIVE(gui.mainwin));
 
-    if (surface != NULL)
+    ଯଦି (surface != ଖାଲି)
     {
 	GdkMonitor *monitor = gdk_display_get_monitor_at_surface(display,
 		surface);
-	if (monitor != NULL)
+	ଯଦି (monitor != ଖାଲି)
 	{
 	    GdkRectangle geom;
 	    gdk_monitor_get_geometry(monitor, &geom);
 	    *screen_w = geom.width;
 	    *screen_h = geom.height;
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
 
@@ -1016,44 +1016,44 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
 }
 
 #ifdef FEAT_MENU
-    void
-gui_mch_enable_menu(int showit)
+    ଶୂନ୍ୟ
+gui_mch_enable_menu(ପୂର୍ଣ୍ଣସଂଖ୍ୟା showit)
 {
-    if (gui.menubar != NULL)
+    ଯଦି (gui.menubar != ଖାଲି)
     {
 	gtk_widget_set_visible(gui.menubar, showit);
 	// Draw area might become blank after this for some reason, queue a
 	// redraw, same for toolbar as well.
-	if (gui.drawarea != NULL)
+	ଯଦି (gui.drawarea != ଖାଲି)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
 #endif
 
 #ifdef FEAT_TOOLBAR
-    void
-gui_mch_show_toolbar(int showit)
+    ଶୂନ୍ୟ
+gui_mch_show_toolbar(ପୂର୍ଣ୍ଣସଂଖ୍ୟା showit)
 {
-    if (gui.toolbar != NULL)
+    ଯଦି (gui.toolbar != ଖାଲି)
     {
 	gtk_widget_set_visible(gui.toolbar, showit);
-	if (showit)
+	ଯଦି (showit)
 	    vim_toolbar_set_style(VIM_TOOLBAR(gui.toolbar),
 		    toolbar_flags, tbis_flags);
-	if (gui.drawarea != NULL)
+	ଯଦି (gui.drawarea != ଖାଲି)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
 #endif
 
-    void
-gui_mch_set_dark_theme(int dark)
+    ଶୂନ୍ୟ
+gui_mch_set_dark_theme(ପୂର୍ଣ୍ଣସଂଖ୍ୟା dark)
 {
     // GTK4: use GtkSettings
     GtkSettings *settings = gtk_settings_get_default();
-    if (settings != NULL)
+    ଯଦି (settings != ଖାଲି)
 	g_object_set(settings, "gtk-application-prefer-dark-theme",
-		(gboolean)dark, NULL);
+		(gboolean)dark, ଖାଲି);
 }
 
 /*
@@ -1062,12 +1062,12 @@ gui_mch_set_dark_theme(int dark)
  * ============================================================
  */
 
-    int
-gui_mch_adjust_charheight(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_adjust_charheight(ଶୂନ୍ୟ)
 {
     PangoFontMetrics *metrics;
-    int ascent;
-    int descent;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ascent;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା descent;
 
     metrics = pango_context_get_metrics(gui.text_context, gui.norm_font,
 			    pango_context_get_language(gui.text_context));
@@ -1081,153 +1081,153 @@ gui_mch_adjust_charheight(void)
     gui.char_ascent = MAX(gui.char_ascent, 0);
     gui.char_height = MAX(gui.char_height, gui.char_ascent + 1);
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-typedef struct {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
     PangoFontDescription    *result;
     gboolean		    done;
 } FontDialogData;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 font_dialog_finish_cb(GObject *source, GAsyncResult *res, gpointer data)
 {
     FontDialogData *fdd = (FontDialogData *)data;
     fdd->result = gtk_font_dialog_choose_font_finish(
-		    GTK_FONT_DIALOG(source), res, NULL);
+		    GTK_FONT_DIALOG(source), res, ଖାଲି);
     fdd->done = TRUE;
 }
 
-    static gboolean
+    ସ୍ଥିର gboolean
 font_filter(gpointer item, gpointer data UNUSED)
 {
-    if (PANGO_IS_FONT_FAMILY(item))
-	return pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
-    if (PANGO_IS_FONT_FACE(item))
+    ଯଦି (PANGO_IS_FONT_FAMILY(item))
+	ଫେରନ୍ତୁ pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
+    ଯଦି (PANGO_IS_FONT_FACE(item))
     {
 	PangoFontFamily *family = pango_font_face_get_family(
 		PANGO_FONT_FACE(item));
-	if (family != NULL)
-	    return pango_font_family_is_monospace(family);
+	ଯଦି (family != ଖାଲି)
+	    ଫେରନ୍ତୁ pango_font_family_is_monospace(family);
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
     char_u *
 gui_mch_font_dialog(char_u *oldval)
 {
     GtkFontDialog	*dlg;
-    PangoFontDescription *initial = NULL;
-    char_u		*fontname = NULL;
+    PangoFontDescription *initial = ଖାଲି;
+    char_u		*fontname = ଖାଲି;
     FontDialogData	fdd;
 
     dlg = gtk_font_dialog_new();
     gtk_font_dialog_set_modal(dlg, TRUE);
     gtk_font_dialog_set_filter(dlg,
 	    GTK_FILTER(gtk_custom_filter_new(
-		    (GtkCustomFilterFunc)font_filter, NULL, NULL)));
+		    (GtkCustomFilterFunc)font_filter, ଖାଲି, ଖାଲି)));
 
-    if (oldval != NULL && oldval[0] != NUL)
+    ଯଦି (oldval != ଖାଲି && oldval[0] != NUL)
     {
 	char_u *oldname;
 
-	if (output_conv.vc_type != CONV_NONE)
-	    oldname = string_convert(&output_conv, oldval, NULL);
-	else
+	ଯଦି (output_conv.vc_type != CONV_NONE)
+	    oldname = string_convert(&output_conv, oldval, ଖାଲି);
+	ଅନ୍ୟଥା
 	    oldname = oldval;
 
-	if (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
+	ଯଦି (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
 	{
 	    char_u *p = vim_strnsave(oldname, STRLEN(oldname) + 3);
-	    if (p != NULL)
+	    ଯଦି (p != ଖାଲି)
 	    {
 		STRCPY(p + STRLEN(p), " 10");
-		if (oldname != oldval)
+		ଯଦି (oldname != oldval)
 		    vim_free(oldname);
 		oldname = p;
 	    }
 	}
 
-	initial = pango_font_description_from_string((const char *)oldname);
-	if (oldname != oldval)
+	initial = pango_font_description_from_string((ଅଚଳ ଅକ୍ଷର *)oldname);
+	ଯଦି (oldname != oldval)
 	    vim_free(oldname);
     }
-    else
+    ଅନ୍ୟଥା
 	initial = pango_font_description_from_string(DEFAULT_FONT);
 
-    fdd.result = NULL;
+    fdd.result = ଖାଲି;
     fdd.done = FALSE;
 
     gtk_font_dialog_choose_font(dlg, GTK_WINDOW(gui.mainwin),
-	    initial, NULL, font_dialog_finish_cb, &fdd);
+	    initial, ଖାଲି, font_dialog_finish_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ଯେତେବେଳେ (!fdd.done)
+	g_main_context_iteration(ଖାଲି, TRUE);
 
-    if (fdd.result != NULL)
+    ଯଦି (fdd.result != ଖାଲି)
     {
-	char *name = pango_font_description_to_string(fdd.result);
-	if (name != NULL)
+	ଅକ୍ଷର *name = pango_font_description_to_string(fdd.result);
+	ଯଦି (name != ଖାଲି)
 	{
 	    char_u *p;
 
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    ଯଦି (p != ଖାଲି && ନିବେଶ_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&ନିବେଶ_conv, p, ଖାଲି);
 		vim_free(p);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		fontname = p;
 	}
 	pango_font_description_free(fdd.result);
     }
 
-    if (initial != NULL)
+    ଯଦି (initial != ଖାଲି)
 	pango_font_description_free(initial);
     g_object_unref(dlg);
 
-    return fontname;
+    ଫେରନ୍ତୁ fontname;
 }
 
 /*
  * Build a table of glyphs for ASCII characters 32..126.
  * This avoids the overhead of itemize+shape for the common case.
  */
-    static void
-ascii_glyph_table_init(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+ascii_glyph_table_init(ଶୂନ୍ୟ)
 {
     char_u	    ascii_chars[2 * 128];
     PangoAttrList   *attr_list;
     GList	    *item_list;
-    int		    i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    i;
 
-    if (gui.ascii_glyphs != NULL)
+    ଯଦି (gui.ascii_glyphs != ଖାଲି)
 	pango_glyph_string_free(gui.ascii_glyphs);
-    if (gui.ascii_font != NULL)
+    ଯଦି (gui.ascii_font != ଖାଲି)
 	g_object_unref(gui.ascii_font);
 
-    gui.ascii_glyphs = NULL;
-    gui.ascii_font   = NULL;
+    gui.ascii_glyphs = ଖାଲି;
+    gui.ascii_font   = ଖାଲି;
 
-    for (i = 0; i < 128; ++i)
+    ପାଇଁ (i = 0; i < 128; ++i)
     {
-	if (i >= 32 && i < 127)
+	ଯଦି (i >= 32 && i < 127)
 	    ascii_chars[2 * i] = i;
-	else
+	ଅନ୍ୟଥା
 	    ascii_chars[2 * i] = '?';
 	ascii_chars[2 * i + 1] = ' ';
     }
 
     attr_list = pango_attr_list_new();
-    item_list = pango_itemize(gui.text_context, (const char *)ascii_chars,
-			      0, sizeof(ascii_chars), attr_list, NULL);
+    item_list = pango_itemize(gui.text_context, (ଅଚଳ ଅକ୍ଷର *)ascii_chars,
+			      0, ଆକାର(ascii_chars), attr_list, ଖାଲି);
 
-    if (item_list != NULL && item_list->next == NULL)
+    ଯଦି (item_list != ଖାଲି && item_list->next == ଖାଲି)
     {
 	PangoItem   *item;
-	int	    width;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    width;
 
 	item  = (PangoItem *)item_list->data;
 	width = gui.char_width * PANGO_SCALE;
@@ -1237,12 +1237,12 @@ ascii_glyph_table_init(void)
 
 	gui.ascii_glyphs = pango_glyph_string_new();
 
-	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
+	pango_shape((ଅଚଳ ଅକ୍ଷର *)ascii_chars, ଆକାର(ascii_chars),
 		    &item->analysis, gui.ascii_glyphs);
 
-	if (gui.ascii_glyphs->num_glyphs == (int)sizeof(ascii_chars))
+	ଯଦି (gui.ascii_glyphs->ଅଙ୍କ_glyphs == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ଆକାର(ascii_chars))
 	{
-	    for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	    ପାଇଁ (i = 0; i < gui.ascii_glyphs->ଅଙ୍କ_glyphs; ++i)
 	    {
 		PangoGlyphGeometry *geom;
 
@@ -1251,22 +1251,22 @@ ascii_glyph_table_init(void)
 		geom->width = width;
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    pango_glyph_string_free(gui.ascii_glyphs);
-	    gui.ascii_glyphs = NULL;
+	    gui.ascii_glyphs = ଖାଲି;
 	    g_object_unref(gui.ascii_font);
-	    gui.ascii_font = NULL;
+	    gui.ascii_font = ଖାଲି;
 	}
     }
 
-    g_list_foreach(item_list, (GFunc)(void *)&pango_item_free, NULL);
+    g_list_foreach(item_list, (GFunc)(ଶୂନ୍ୟ *)&pango_item_free, ଖାଲି);
     g_list_free(item_list);
     pango_attr_list_unref(attr_list);
 }
 
-    static void
-get_styled_font_variants(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+get_styled_font_variants(ଶୂନ୍ୟ)
 {
     PangoFontDescription    *bold_font_desc;
     PangoFont		    *plain_font;
@@ -1275,14 +1275,14 @@ get_styled_font_variants(void)
     gui.font_can_bold = FALSE;
 
     plain_font = pango_context_load_font(gui.text_context, gui.norm_font);
-    if (plain_font == NULL)
-	return;
+    ଯଦି (plain_font == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     bold_font_desc = pango_font_description_copy_static(gui.norm_font);
     pango_font_description_set_weight(bold_font_desc, PANGO_WEIGHT_BOLD);
 
     bold_font = pango_context_load_font(gui.text_context, bold_font_desc);
-    if (bold_font != NULL)
+    ଯଦି (bold_font != ଖାଲି)
     {
 	gui.font_can_bold = (bold_font != plain_font);
 	g_object_unref(bold_font);
@@ -1292,19 +1292,19 @@ get_styled_font_variants(void)
     g_object_unref(plain_font);
 }
 
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_init_font(char_u *font_name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା fontset UNUSED)
 {
     PangoFontDescription    *font_desc;
     PangoLayout		    *layout;
-    int			    width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			    width;
 
-    if (font_name == NULL)
+    ଯଦି (font_name == ଖାଲି)
 	font_name = (char_u *)DEFAULT_FONT;
 
     font_desc = gui_mch_get_font(font_name, FALSE);
-    if (font_desc == NULL)
-	return FAIL;
+    ଯଦି (font_desc == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font_desc;
@@ -1313,11 +1313,11 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
 
     layout = pango_layout_new(gui.text_context);
     pango_layout_set_text(layout, "MW", 2);
-    pango_layout_get_size(layout, &width, NULL);
+    pango_layout_get_size(layout, &width, ଖାଲି);
     g_object_unref(layout);
 
     gui.char_width = (width / 2 + PANGO_SCALE / 2) / PANGO_SCALE;
-    if (gui.char_width <= 0)
+    ଯଦି (gui.char_width <= 0)
 	gui.char_width = 8;
 
     gui_mch_adjust_charheight();
@@ -1331,71 +1331,71 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     // update the position after we've initialized font. Make sure to not go out
     // of bounds of the screen.
     {
-	int im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
-	int im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
 	im_set_position(im_row, im_col);
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *name, int report_error)
+gui_mch_get_font(char_u *name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା report_error)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    ଯଦି (name == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    font = pango_font_description_from_string((ଅଚଳ ଅକ୍ଷର *)name);
+    ଯଦି (font == ଖାଲି)
     {
-	if (report_error)
+	ଯଦି (report_error)
 	    semsg(_(e_unknown_font_str), name);
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
+    ଯଦି (pango_font_description_get_size(font) <= 0)
 	pango_font_description_set_size(font, 10 * PANGO_SCALE);
 
-    return font;
+    ଫେରନ୍ତୁ font;
 }
 
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name UNUSED)
 {
-    if (font != NOFONT)
+    ଯଦି (font != NOFONT)
     {
-	char *desc = pango_font_description_to_string(font);
+	ଅକ୍ଷର *desc = pango_font_description_to_string(font);
 	char_u *ret = vim_strsave((char_u *)desc);
 	g_free(desc);
-	return ret;
+	ଫେରନ୍ତୁ ret;
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    ଯଦି (font != NOFONT)
 	pango_font_description_free(font);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_expand_font(
     optexpand_T	*args,
-    void	*param,
-    int		(*add_match)(char_u *val))
+    ଶୂନ୍ୟ	*param,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		(*add_match)(char_u *val))
 {
-    PangoFontFamily	**font_families = NULL;
-    int			n_families = 0;
-    int			wide = *(int *)param;
+    PangoFontFamily	**font_families = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			n_families = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			wide = *(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    ଯଦି (args->oe_include_orig_val && *args->oe_opt_ମୂଲ୍ୟ == NUL && !wide)
     {
 	// If guifont is empty, suggest the default so the user can modify it.
-	if (add_match((char_u *)DEFAULT_FONT) != OK)
-	    return;
+	ଯଦି (add_match((char_u *)DEFAULT_FONT) != OK)
+	    ଫେରନ୍ତୁ;
     }
 
     pango_context_list_families(
@@ -1403,32 +1403,32 @@ gui_mch_expand_font(
 	    &font_families,
 	    &n_families);
 
-    for (int i = 0; i < n_families; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n_families; i++)
     {
-	if (!wide && !pango_font_family_is_monospace(font_families[i]))
-	    continue;
+	ଯଦି (!wide && !pango_font_family_is_monospace(font_families[i]))
+	    ଜାରି;
 
-	const char *fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	ଅଚଳ ଅକ୍ଷର *fam_name = pango_font_family_get_name(font_families[i]);
+	ଯଦି (ନିବେଶ_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv,
-		    (char_u *)fam_name, NULL);
-	    if (buf != NULL)
+	    char_u *buf = string_convert(&ନିବେଶ_conv,
+		    (char_u *)fam_name, ଖାଲି);
+	    ଯଦି (buf != ଖାଲି)
 	    {
-		if (add_match(buf) != OK)
+		ଯଦି (add_match(buf) != OK)
 		{
 		    vim_free(buf);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		vim_free(buf);
 	    }
-	    else
-		break;
+	    ଅନ୍ୟଥା
+		ଭାଙ୍ଗ;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (add_match((char_u *)fam_name) != OK)
-		break;
+	    ଯଦି (add_match((char_u *)fam_name) != OK)
+		ଭାଙ୍ଗ;
 	}
     }
 
@@ -1444,22 +1444,22 @@ gui_mch_expand_font(
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    if (!gui.in_use)
-	return INVALCOLOR;
+    ଯଦି (!gui.in_use)
+	ଫେରନ୍ତୁ INVALCOLOR;
 
-    if (name != NULL)
-	return gui_get_color_cmn(name);
+    ଯଦି (name != ଖାଲି)
+	ଫେରନ୍ତୁ gui_get_color_cmn(name);
 
-    return INVALCOLOR;
+    ଫେରନ୍ତୁ INVALCOLOR;
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(ପୂର୍ଣ୍ଣସଂଖ୍ୟା r, ପୂର୍ଣ୍ଣସଂଖ୍ୟା g, ପୂର୍ଣ୍ଣସଂଖ୍ୟା b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ଫେରନ୍ତୁ gui_get_rgb_color_cmn(r, g, b);
 }
 
-    static GdkRGBA
+    ସ୍ଥିର GdkRGBA
 color_to_rgba(guicolor_T color)
 {
     GdkRGBA rgba;
@@ -1467,22 +1467,22 @@ color_to_rgba(guicolor_T color)
     rgba.green = ((color & 0xff00) >> 8) / 255.0;
     rgba.blue  = (color & 0xff) / 255.0;
     rgba.alpha = 1.0;
-    return rgba;
+    ଫେରନ୍ତୁ rgba;
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_fg_color(guicolor_T color)
 {
     *gui.fgcolor = color_to_rgba(color);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_bg_color(guicolor_T color)
 {
     *gui.bgcolor = color_to_rgba(color);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_sp_color(guicolor_T color)
 {
     *gui.spcolor = color_to_rgba(color);
@@ -1491,7 +1491,7 @@ gui_mch_set_sp_color(guicolor_T color)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return pixel;
+    ଫେରନ୍ତୁ pixel;
 }
 
 /*
@@ -1500,66 +1500,66 @@ gui_mch_get_rgb(guicolor_T pixel)
  * ============================================================
  */
 
-    void
-gui_gtk4_update_size(void)
+    ଶୂନ୍ୟ
+gui_gtk4_update_size(ଶୂନ୍ୟ)
 {
     vim_draw_area_set_size(VIM_DRAW_AREA(gui.drawarea),
-	    gui.num_rows, gui.num_cols);
+	    gui.ଅଙ୍କ_rows, gui.ଅଙ୍କ_cols);
 }
 
 #ifdef FEAT_NETBEANS_INTG
-    void
+    ଶୂନ୍ୟ
 gui_gtk4_add_multisign(
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		width,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		height)
 {
     vim_draw_area_add_multisign(VIM_DRAW_AREA(gui.drawarea), surf, row, col,
 	    width, height);
 }
 #endif
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    ଶୂନ୍ୟ
+gui_mch_clear_block(ପୂର୍ଣ୍ଣସଂଖ୍ୟା row1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col1, ପୂର୍ଣ୍ଣସଂଖ୍ୟା row2, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col2)
 {
     vim_draw_area_clear_block(VIM_DRAW_AREA(gui.drawarea), row1,
 	    col1, row2, col2);
-    if (gui.drawarea != NULL)
+    ଯଦି (gui.drawarea != ଖାଲି)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_clear_all(void)
+    ଶୂନ୍ୟ
+gui_mch_clear_all(ଶୂନ୍ୟ)
 {
     vim_draw_area_clear(VIM_DRAW_AREA(gui.drawarea));
-    if (gui.drawarea != NULL)
+    ଯଦି (gui.drawarea != ଖାଲି)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    ଶୂନ୍ୟ
+gui_mch_delete_ଧାଡ଼ିଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row, row + num_lines, gui.scroll_region_bot,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row, row + ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ, gui.scroll_region_bot,
+	    gui.scroll_region_ବାମ, gui.scroll_region_ଡାହାଣ);
     gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot, gui.scroll_region_right);
+	    gui.scroll_region_bot - ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ + 1, gui.scroll_region_ବାମ,
+	    gui.scroll_region_bot, gui.scroll_region_ଡାହାଣ);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    ଶୂନ୍ୟ
+gui_mch_ଭର୍ତ୍ତି_ଧାଡ଼ିଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row + num_lines, row, gui.scroll_region_bot - num_lines,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row + ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ, row, gui.scroll_region_bot - ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ,
+	    gui.scroll_region_ବାମ, gui.scroll_region_ଡାହାଣ);
     gui_clear_block(
-	    row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+	    row, gui.scroll_region_ବାମ,
+	    row + ଅଙ୍କ_ଧାଡ଼ିଗୁଡ଼ିକ - 1, gui.scroll_region_ଡାହାଣ);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
@@ -1567,8 +1567,8 @@ gui_mch_insert_lines(int row, int num_lines)
 /*
  * See vim_draw_area_set_cursor() for more information
  */
-    void
-gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
+    ଶୂନ୍ୟ
+gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h)
 {
     gui_mch_set_bg_color(bg);
     gui_mch_set_fg_color(fg);
@@ -1576,18 +1576,18 @@ gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_flash(int msec)
+    ଶୂନ୍ୟ
+gui_mch_flash(ପୂର୍ଣ୍ଣସଂଖ୍ୟା msec)
 {
     // Invert the screen, wait, then invert back
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)Rows - 1, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)Columns - 1);
     gui_mch_flush();
     ui_delay((long)msec, TRUE);
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)Rows - 1, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)Columns - 1);
 }
 
-    void
-gui_mch_invert_rectangle(int r, int c, int nr, int nc)
+    ଶୂନ୍ୟ
+gui_mch_invert_rectangle(ପୂର୍ଣ୍ଣସଂଖ୍ୟା r, ପୂର୍ଣ୍ଣସଂଖ୍ୟା c, ପୂର୍ଣ୍ଣସଂଖ୍ୟା nr, ପୂର୍ଣ୍ଣସଂଖ୍ୟା nc)
 {
     vim_draw_area_invert_block(VIM_DRAW_AREA(gui.drawarea), r, c, nr, nc);
     gtk_widget_queue_draw(gui.drawarea);
@@ -1599,183 +1599,183 @@ gui_mch_invert_rectangle(int r, int c, int nr, int nc)
  * ============================================================
  */
 
-    static gboolean
-key_press_event(GtkEventControllerKey *controller UNUSED,
-	guint key_sym, guint keycode UNUSED,
+    ସ୍ଥିର gboolean
+ଚାବି_press_event(Gtk_Event_Controller_ଚାବି *controller UNUSED,
+	guint ଚାବି_sym, guint keycode UNUSED,
 	GdkModifierType state, gpointer data UNUSED)
 {
     char_u	string[32], string2[32];
-    int		len;
-    int		i;
-    int		modifiers;
-    int		key;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		modifiers;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଚାବି;
     char_u	*s, *d;
 
 #ifdef FEAT_XIM
     // Let the input method have a go at the key event.
     // If it consumed the event, we're done.
-    if (xic != NULL)
+    ଯଦି (xic != ଖାଲି)
     {
 	GdkEvent *event = gtk_event_controller_get_current_event(
 		GTK_EVENT_CONTROLLER(controller));
-	if (event != NULL && gtk_im_context_filter_keypress(xic, event))
-	    return TRUE;
+	ଯଦି (event != ଖାଲି && gtk_im_context_filter_keypress(xic, event))
+	    ଫେରନ୍ତୁ TRUE;
     }
 #endif
 
 #ifdef FEAT_MENU
-    if (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
+    ଯଦି (ଚାବି_sym == GDK_ଚାବି_F10 && gui.menubar != ଖାଲି)
     {
-	static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+	ସ୍ଥିର char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 
-	if (check_map(k10, State, FALSE, TRUE, FALSE, NULL, NULL) == NULL)
+	ଯଦି (check_map(k10, State, FALSE, TRUE, FALSE, ଖାଲି, ଖାଲି) == ଖାଲି)
 	{
 	    show_menubar_popover();
-	    return TRUE;
+	    ଫେରନ୍ତୁ TRUE;
 	}
     }
 #endif
 
-    len = keyval_to_string(key_sym, string2);
+    len = keyval_to_string(ଚାବି_sym, string2);
 
-    if (len > 1 && input_conv.vc_type != CONV_NONE)
-	len = convert_input(string2, len, sizeof(string2));
+    ଯଦି (len > 1 && ନିବେଶ_conv.vc_type != CONV_NONE)
+	len = convert_ନିବେଶ(string2, len, ଆକାର(string2));
 
     s = string2;
     d = string;
-    for (i = 0; i < len; ++i)
+    ପାଇଁ (i = 0; i < len; ++i)
     {
 	*d++ = s[i];
-	if (d[-1] == CSI && d + 2 < string + sizeof(string))
+	ଯଦି (d[-1] == CSI && d + 2 < string + ଆକାର(string))
 	{
 	    *d++ = KS_EXTRA;
-	    *d++ = (int)KE_CSI;
+	    *d++ = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)KE_CSI;
 	}
     }
     len = d - string;
 
     // Shift-Tab results in Left_Tab
-    if (key_sym == GDK_KEY_ISO_Left_Tab)
+    ଯଦି (ଚାବି_sym == GDK_ଚାବି_ISO_ବାମ_Tab)
     {
-	key_sym = GDK_KEY_Tab;
+	ଚାବି_sym = GDK_ଚାବି_Tab;
 	state |= GDK_SHIFT_MASK;
     }
 
 #ifdef FEAT_MENU
     // If there is a menu and 'wak' is "yes", or 'wak' is "menu" and the key
     // is a menu shortcut, we ignore everything with the ALT modifier.
-    if ((state & GDK_ALT_MASK)
+    ଯଦି ((state & GDK_ALT_MASK)
 	    && gui.menu_is_active
 	    && (*p_wak == 'y'
 		|| (*p_wak == 'm'
 		    && len == 1
 		    && gui_is_menu_shortcut(string[0]))))
 	// Tell GTK we have not handled the key (so it can handle it).
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
 #endif
 
     // Check for special keys
-    if (len == 0 || len == 1)
+    ଯଦି (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	ପାଇଁ (i = 0; special_ଚାବିଗୁଡ଼ିକ[i].ଚାବି_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    ଯଦି (special_ଚାବିଗୁଡ଼ିକ[i].ଚାବି_sym == ଚାବି_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_ଚାବିଗୁଡ଼ିକ[i].code0;
+		string[2] = special_ଚାବିଗୁଡ଼ିକ[i].code1;
 		len = -3;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
 
-    if (len == 0)
-	return TRUE;
+    ଯଦି (len == 0)
+	ଫେରନ୍ତୁ TRUE;
 
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    ଯଦି (len == -3)
+	ଚାବି = TO_SPECIAL(string[1], string[2]);
+    ଅନ୍ୟଥା
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	ଚାବି = mb_ptr2char(string);
     }
 
     modifiers = modifiers_gdk2vim(state);
 
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    ଚାବି = simplify_ଚାବି(ଚାବି, &modifiers);
+    ଯଦି (ଚାବି == CSI)
+	ଚାବି = K_CSI;
+    ଯଦି (IS_SPECIAL(ଚାବି))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_SECOND(ଚାବି);
+	string[2] = K_THIRD(ଚାବି);
 	len = 3;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	key = may_adjust_key_for_ctrl(modifiers, key);
-	modifiers = may_remove_shift_modifier(modifiers, key);
-	len = mb_char2bytes(key, string);
+	ଚାବି = may_adjust_ଚାବି_for_ctrl(modifiers, ଚାବି);
+	modifiers = may_remove_shift_modifier(modifiers, ଚାବି);
+	len = mb_char2bytes(ଚାବି, string);
     }
 
-    if (modifiers != 0)
+    ଯଦି (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	add_to_ନିବେଶ_buf(string2, 3);
     }
 
     {
-	int int_ch = check_for_interrupt(key, modifiers);
-	if (int_ch != NUL)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା int_ch = check_for_interrupt(ଚାବି, modifiers);
+	ଯଦି (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_ନିବେଶ_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    add_to_ନିବେଶ_buf(string, len);
 
-    if (p_mh)
+    ଯଦି (p_mh)
 	gui_mch_mousehide(TRUE);
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
-    static void
-key_release_event(GtkEventControllerKey *controller UNUSED,
+    ସ୍ଥିର ଶୂନ୍ୟ
+ଚାବି_release_event(Gtk_Event_Controller_ଚାବି *controller UNUSED,
 	guint keyval UNUSED, guint keycode UNUSED,
 	GdkModifierType state UNUSED, gpointer data UNUSED)
 {
 }
 
-static int mouse_timed_out = TRUE;
-static guint mouse_click_timer = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା mouse_timed_out = TRUE;
+ସ୍ଥିର guint mouse_click_timer = 0;
 
-    static timeout_cb_type
+    ସ୍ଥିର timeout_cb_type
 mouse_click_timer_cb(gpointer data)
 {
-    *(int *)data = TRUE;
-    return FALSE;
+    *(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)data = TRUE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 modifiers_gdk2mouse(guint state)
 {
-    int modifiers = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    ଯଦି (state & GDK_SHIFT_MASK)
 	modifiers |= MOUSE_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    ଯଦି (state & GDK_CONTROL_MASK)
 	modifiers |= MOUSE_CTRL;
-    if (state & GDK_ALT_MASK)
+    ଯଦି (state & GDK_ALT_MASK)
 	modifiers |= MOUSE_ALT;
 
-    return modifiers;
+    ଫେରନ୍ତୁ modifiers;
 }
 
 // GdkModifierType has no mask covering the mouse buttons only.
@@ -1784,18 +1784,18 @@ modifiers_gdk2mouse(guint state)
 
 // Track which mouse button is currently pressed for drag detection.
 // -1 means no button is pressed (MOUSE_LEFT is 0x00, so can't use 0).
-static int mouse_pressed_button = -1;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା mouse_pressed_button = -1;
 
-static guint motion_repeat_timer = 0;
-static gboolean motion_repeat_offset = FALSE;
-static int mouse_press_x = -1, mouse_press_y = -1;
+ସ୍ଥିର guint motion_repeat_timer = 0;
+ସ୍ଥିର gboolean motion_repeat_offset = FALSE;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା mouse_press_x = -1, mouse_press_y = -1;
 
-    static void
-button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ସ୍ଥିର ଶୂନ୍ୟ
+button_press_event(GtkGestureClick *gesture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_press UNUSED,
+	ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data UNUSED)
 {
-    int button;
-    int repeated_click = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା button;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା repeated_click = FALSE;
     int_u vim_modifiers;
     guint btn;
     GdkModifierType state;
@@ -1806,7 +1806,7 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     state = gdk_event_get_modifier_state(event);
     btn = gdk_button_event_get_button(event);
 
-    if (!mouse_timed_out && mouse_click_timer)
+    ଯଦି (!mouse_timed_out && mouse_click_timer)
     {
 	timeout_remove(mouse_click_timer);
 	mouse_click_timer = 0;
@@ -1817,29 +1817,29 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     mouse_click_timer = timeout_add(p_mouset, mouse_click_timer_cb,
 	    &mouse_timed_out);
 
-    switch (btn)
+    ବାଛ (btn)
     {
-	case 1: button = MOUSE_LEFT; break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
-	case 8: button = MOUSE_X1; break;
-	case 9: button = MOUSE_X2; break;
-	default: return;
+	ସ୍ଥିତି 1: button = MOUSE_ବାମ; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 2: button = MOUSE_ମଧ୍ୟ; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 3: button = MOUSE_ଡାହାଣ; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 8: button = MOUSE_X1; ଭାଙ୍ଗ;
+	ସ୍ଥିତି 9: button = MOUSE_X2; ଭାଙ୍ଗ;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ: ଫେରନ୍ତୁ;
     }
 
-    mouse_press_x = (int)x;
-    mouse_press_y = (int)y;
+    mouse_press_x = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x;
+    mouse_press_y = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y;
 
     mouse_pressed_button = button;
     vim_modifiers = modifiers_gdk2mouse(state);
-    gui_send_mouse_event(button, (int)x, (int)y, repeated_click, vim_modifiers);
+    gui_send_mouse_event(button, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y, repeated_click, vim_modifiers);
 }
 
-    static void
-button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    ସ୍ଥିର ଶୂନ୍ୟ
+button_release_event(GtkGestureClick *gesture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_press UNUSED,
+	ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data UNUSED)
 {
-    int vim_modifiers;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା vim_modifiers;
     GdkModifierType state;
     GdkEvent *event;
 
@@ -1849,46 +1849,46 @@ button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
     vim_modifiers = modifiers_gdk2mouse(state);
 
     // If we are repeating motion events, then stop
-    if (motion_repeat_timer != 0)
+    ଯଦି (motion_repeat_timer != 0)
     {
 	timeout_remove(motion_repeat_timer);
 	motion_repeat_timer = 0;
     }
 
     mouse_pressed_button = -1;
-    gui_send_mouse_event(MOUSE_RELEASE, (int)x, (int)y, FALSE, vim_modifiers);
+    gui_send_mouse_event(MOUSE_RELEASE, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y, FALSE, vim_modifiers);
 }
 
-static double prev_mouse_x = -1.0;
-static double prev_mouse_y = -1.0;
+ସ୍ଥିର ଦ୍ୱିଗୁଣ prev_mouse_x = -1.0;
+ସ୍ଥିର ଦ୍ୱିଗୁଣ prev_mouse_y = -1.0;
 
-static GdkModifierType cur_state = 0;
+ସ୍ଥିର GdkModifierType cur_state = 0;
 
-    static timeout_cb_type
+    ସ୍ଥିର timeout_cb_type
 mouse_repeat_timer_cb(gpointer data UNUSED)
 {
-    int x, y;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, y;
 
-    if (mouse_pressed_button == -1)
+    ଯଦି (mouse_pressed_button == -1)
     {
 	motion_repeat_timer = 0;
-	return G_SOURCE_REMOVE;
+	ଫେରନ୍ତୁ G_SOURCE_REMOVE;
     }
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
-	return G_SOURCE_CONTINUE;
+    ଯଦି (vim_used_in_ନିବେଶ_buf() > 10)
+	ଫେରନ୍ତୁ G_SOURCE_CONTINUE;
 
-    x = (int)prev_mouse_x;
-    y = (int)prev_mouse_y;
+    x = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)prev_mouse_x;
+    y = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)prev_mouse_y;
 
     // Fake a motion event.
     //
     // Trick: Pretend the mouse moved to the next character on every other
     // event, otherwise drag events will be discarded, because they are still in
     // the same character.
-    if (motion_repeat_offset)
+    ଯଦି (motion_repeat_offset)
 	x += gui.char_width;
     motion_repeat_offset = !motion_repeat_offset;
 
@@ -1896,12 +1896,12 @@ mouse_repeat_timer_cb(gpointer data UNUSED)
 	    modifiers_gdk2mouse(cur_state));
 
     // Always continue, when button is released, then this timer is removed.
-    return G_SOURCE_CONTINUE;
+    ଫେରନ୍ତୁ G_SOURCE_CONTINUE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 motion_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+	ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data UNUSED)
 {
     GdkEvent *event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
@@ -1909,10 +1909,10 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     // The button release event may have gone to another widget, e.g. a modal
     // dialog. Forget about the pressed button when no button is down anymore,
     // otherwise moving the mouse would be taken for a drag.
-    if (mouse_pressed_button >= 0 && event != NULL
+    ଯଦି (mouse_pressed_button >= 0 && event != ଖାଲି
 	    && !(gdk_event_get_modifier_state(event) & ANY_BUTTON_MASK))
     {
-	if (motion_repeat_timer != 0)
+	ଯଦି (motion_repeat_timer != 0)
 	{
 	    timeout_remove(motion_repeat_timer);
 	    motion_repeat_timer = 0;
@@ -1920,15 +1920,15 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	mouse_pressed_button = -1;
     }
 
-    if (mouse_pressed_button >= 0)
+    ଯଦି (mouse_pressed_button >= 0)
     {
 	GdkModifierType state;
-	int		w, h;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		w, h;
 
-	if (event != NULL)
+	ଯଦି (event != ଖାଲି)
 	{
 	    cur_state = state = gdk_event_get_modifier_state(event);
-	    gui_send_mouse_event(MOUSE_DRAG, (int)x, (int)y,
+	    gui_send_mouse_event(MOUSE_DRAG, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y,
 		    FALSE, modifiers_gdk2mouse(state));
 	}
 
@@ -1940,37 +1940,37 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	w = gtk_widget_get_width(gui.drawarea);
 	h = gtk_widget_get_height(gui.drawarea);
 
-	if (motion_repeat_timer > 0)
+	ଯଦି (motion_repeat_timer > 0)
 	    timeout_remove(motion_repeat_timer);
 
-	if (x < 0 || y < 0 || x >= w || y >= h)
+	ଯଦି (x < 0 || y < 0 || x >= w || y >= h)
 	{
-	    int	dx, dy;
-	    int offshoot;
-	    int	delay;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	dx, dy;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା offshoot;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	delay;
 
 	    dx = x < 0 ? -x + mouse_press_x : x - mouse_press_x;
 	    dy = y < 0 ? -y + mouse_press_y : y - mouse_press_y;
 
 	    offshoot = dx > dy ? dx : dy;
 
-	    if (offshoot > 127)
+	    ଯଦି (offshoot > 127)
 		delay = 5;
-	    else
+	    ଅନ୍ୟଥା
 		delay = (130 * (127 - offshoot)) / 127 + 5;
 
 	    motion_repeat_timer = timeout_add(delay,
-		    mouse_repeat_timer_cb, NULL);
+		    mouse_repeat_timer_cb, ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 	    motion_repeat_timer = 0;
     }
-    else
-	gui_mouse_moved((int)x, (int)y);
+    ଅନ୍ୟଥା
+	gui_mouse_moved((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y);
 
     // Only unhide if mouse actually moved. GTK seems to send a motion event
     // when switching tabs, causing the cursor to unhide.
-    if (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
+    ଯଦି (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
 		|| (fabs(prev_mouse_x - x) > 0.05
 		    && fabs(prev_mouse_y - y) > 0.05)))
 	gui_mch_mousehide(FALSE);
@@ -1983,9 +1983,9 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 enter_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+	ଦ୍ୱିଗୁଣ x, ଦ୍ୱିଗୁଣ y, gpointer data UNUSED)
 {
     prev_mouse_x = x;
     prev_mouse_y = y;
@@ -1994,93 +1994,93 @@ enter_notify_event(GtkEventControllerMotion *controller UNUSED,
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static gboolean
+    ସ୍ଥିର gboolean
 scroll_event(GtkEventControllerScroll *controller UNUSED,
-	double dx UNUSED, double dy, gpointer data UNUSED)
+	ଦ୍ୱିଗୁଣ dx UNUSED, ଦ୍ୱିଗୁଣ dy, gpointer data UNUSED)
 {
-    int button;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା button;
     int_u vim_modifiers;
-    int x, y;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, y;
     GdkModifierType state;
     GdkEvent *event;
 
     event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
-    if (event == NULL)
-	return FALSE;
+    ଯଦି (event == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     state = gdk_event_get_modifier_state(event);
 
-    if (dy < 0)
+    ଯଦି (dy < 0)
 	button = MOUSE_4;	// scroll up
-    else if (dy > 0)
+    ଅନ୍ୟଥା ଯଦି (dy > 0)
 	button = MOUSE_5;	// scroll down
-    else if (dx < 0)
+    ଅନ୍ୟଥା ଯଦି (dx < 0)
 	button = MOUSE_7;	// scroll left
-    else if (dx > 0)
+    ଅନ୍ୟଥା ଯଦି (dx > 0)
 	button = MOUSE_6;	// scroll right
-    else
-	return FALSE;
+    ଅନ୍ୟଥା
+	ଫେରନ୍ତୁ FALSE;
 
     vim_modifiers = modifiers_gdk2mouse(state);
 
     gui_mch_getmouse(&x, &y);
     gui_send_mouse_event(button, x, y, FALSE, vim_modifiers);
 
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 focus_in_event(GtkEventControllerFocus *controller UNUSED,
 	gpointer data UNUSED)
 {
-    if (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    ଯଦି (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(TRUE);
-	if (blink_state == BLINK_NONE)
+	ଯଦି (blink_state == BLINK_NONE)
 	    gui_mch_start_blink();
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 focus_out_event(GtkEventControllerFocus *controller UNUSED,
 	gpointer data UNUSED)
 {
-    if (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    ଯଦି (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(FALSE);
-	if (blink_state != BLINK_NONE)
+	ଯଦି (blink_state != BLINK_NONE)
 	    gui_mch_stop_blink(TRUE);
     }
 }
 
-#if defined(FEAT_IMAGE)
-    static void
+#ଯଦି defined(FEAT_IMAGE)
+    ସ୍ଥିର ଶୂନ୍ୟ
 scale_factor_cb(GdkSurface  *surface,
 	GParamSpec	    *pspec UNUSED,
-	void		    *udata UNUSED)
+	ଶୂନ୍ୟ		    *udata UNUSED)
 {
     gui.scale = gdk_surface_get_scale(surface);
     redraw_all_later(UPD_VALID);
 }
 #endif
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 drawarea_realize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
 {
-#if defined(FEAT_IMAGE)
+#ଯଦି defined(FEAT_IMAGE)
     // Use GdkSurface, as that handles fractional scale values.
     GdkSurface *surface = gtk_native_get_surface(
 	    gtk_widget_get_native(gui.drawarea));
 
     gui.scale = gdk_surface_get_scale(surface);
     g_signal_connect(G_OBJECT(surface), "notify::scale",
-	    G_CALLBACK(scale_factor_cb), NULL);
+	    G_CALLBACK(scale_factor_cb), ଖାଲି);
     redraw_all_later(UPD_VALID);
 #endif
     gui_mch_new_colors();
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
 {
 #ifdef FEAT_XIM
@@ -2088,7 +2088,7 @@ drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
 #endif
 }
 
-typedef enum
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା
 {
     READ_DATA_CLIP,	    // Clipboard data
     READ_DATA_DROP,	    // URI or text DND data
@@ -2098,33 +2098,33 @@ typedef enum
 #define READDATA_BUFSIZE 4096
 
 // Used for reading clipboard and DND data.
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     ReadDataType    type;
 
     GCancellable    *cancel;
     GByteArray	    *arr; // NULL when not needed
-    char	    *buf; // NULL when not needed
+    ଅକ୍ଷର	    *buf; // NULL when not needed
 } ReadData;
 
 #ifdef FEAT_DND
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     ReadData	rd;
     GdkDrop	*drop;
-    int		x;
-    int		y;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		y;
 } DropReadData;
 #endif
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     ReadData	rd;
     Clipboard_T *cbd;
-    char	*mime_type;
+    ଅକ୍ଷର	*mime_type;
 } ClipReadData;
 
-    static ReadData *
+    ସ୍ଥିର ReadData *
 read_data_new(ReadDataType type, size_t sz)
 {
     ReadData *rd = g_malloc0(sz);
@@ -2132,71 +2132,71 @@ read_data_new(ReadDataType type, size_t sz)
     rd->type = type;
     rd->cancel = g_cancellable_new();
 
-    if (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
+    ଯଦି (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
     {
 	rd->arr = g_byte_array_new();
 	rd->buf = g_malloc(READDATA_BUFSIZE);
     }
 
-    return rd;
+    ଫେରନ୍ତୁ rd;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 read_data_free(ReadData *rd)
 {
     g_cancellable_cancel(rd->cancel);
 
-    if (rd->type == READ_DATA_CLIP)
+    ଯଦି (rd->type == READ_DATA_CLIP)
 	g_free(((ClipReadData *)rd)->mime_type);
-    else if (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
+    ଅନ୍ୟଥା ଯଦି (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
 	g_object_unref(((DropReadData *)rd)->drop);
     g_object_unref(rd->cancel);
-    if (rd->arr != NULL)
+    ଯଦି (rd->arr != ଖାଲି)
 	g_byte_array_free(rd->arr, TRUE);
     g_free(rd->buf);
     g_free(rd);
 }
 
 #ifdef FEAT_DND
-static void drop_read_text(GdkDrop *drop, char_u *text);
+ସ୍ଥିର ଶୂନ୍ୟ drop_read_text(GdkDrop *drop, char_u *text);
 #endif
 
 /*
  * General purpose callback for reading data from an input stream, either from
  * clipboard or DND.
  */
-    static void
-read_data_input_cb(
+    ସ୍ଥିର ଶୂନ୍ୟ
+read_data_ନିବେଶ_cb(
 	GInputStream	*stream,
 	GAsyncResult	*result,
 	ReadData	*rd)
 {
-    ssize_t r = g_input_stream_read_finish(stream, result, NULL);
+    ssize_t r = g_ନିବେଶ_stream_read_finish(stream, result, ଖାଲି);
 
-    if (r == -1)
+    ଯଦି (r == -1)
     {
 	// Error occurred
 	DropReadData *drd = (DropReadData *)rd;
 
-	if (rd->type == READ_DATA_DROP_DATA)
+	ଯଦି (rd->type == READ_DATA_DROP_DATA)
 	    gdk_drop_finish(drd->drop, 0);
     }
-    else if (r == 0)
+    ଅନ୍ୟଥା ଯଦି (r == 0)
     {
 	// EOF, don't need to check for READ_DATA_DROP because that uses GType.
-	if (rd->type == READ_DATA_CLIP)
+	ଯଦି (rd->type == READ_DATA_CLIP)
 	{
 	    ClipReadData    *crd = (ClipReadData *)rd;
 	    long	    len;
 	    char_u	    *actual, *final;
-	    int		    motion_type = MAUTO;
-	    char_u	    *tofree = NULL;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    motion_type = MAUTO;
+	    char_u	    *tofree = ଖାଲି;
 
 	    len = (long)rd->arr->len;
 	    actual = final = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
+	    rd->arr = ଖାଲି;
 
-	    if (clip_convert_data(&final, &len, &motion_type,
+	    ଯଦି (clip_convert_data(&final, &len, &motion_type,
 			STRCMP(crd->mime_type, VIM_MIMETYPE_NAME) == 0,
 			STRCMP(crd->mime_type, VIMENC_MIMETYPE_NAME) == 0,
 			&tofree) == OK)
@@ -2205,29 +2205,29 @@ read_data_input_cb(
 	    vim_free(tofree);
 	}
 #ifdef FEAT_DND
-	else if (rd->type == READ_DATA_DROP_DATA)
+	ଅନ୍ୟଥା ଯଦି (rd->type == READ_DATA_DROP_DATA)
 	{
 	    DropReadData    *drd = (DropReadData *)rd;
 	    char_u	    *str;
 
 	    // Append NUL
-	    g_byte_array_append(rd->arr, (const uint8_t *)"", 1);
+	    g_byte_array_append(rd->arr, (ଅଚଳ uint8_t *)"", 1);
 	    str = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
+	    rd->arr = ଖାଲି;
 	    drop_read_text(drd->drop, str);
 	    g_free(str);
 	    gdk_drop_finish(drd->drop, gdk_drop_get_actions(drd->drop));
 	}
 #endif
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Continue reading
-	g_byte_array_append(rd->arr, (const uint8_t *)rd->buf, r);
-	g_input_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
-		G_PRIORITY_HIGH,
-		rd->cancel, (GAsyncReadyCallback)read_data_input_cb, rd);
-	return;
+	g_byte_array_append(rd->arr, (ଅଚଳ uint8_t *)rd->buf, r);
+	g_ନିବେଶ_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
+		G_PRIORITY_ଉପର,
+		rd->cancel, (GAsyncReadyCallback)read_data_ନିବେଶ_cb, rd);
+	ଫେରନ୍ତୁ;
     }
 
     read_data_free(rd);
@@ -2238,15 +2238,15 @@ read_data_input_cb(
 /*
  * Set up for receiving DND items.
  */
-    void
-gui_gtk_set_dnd_targets(void)
+    ଶୂନ୍ୟ
+gui_gtk_set_dnd_targets(ଶୂନ୍ୟ)
 {
     GdkContentFormatsBuilder	*builder = gdk_content_formats_builder_new();
     GdkContentFormats		*formats;
 
     gdk_content_formats_builder_add_gtype(builder, GDK_TYPE_FILE_LIST);
     gdk_content_formats_builder_add_gtype(builder, G_TYPE_STRING);
-    if (clip_html)
+    ଯଦି (clip_html)
 	gdk_content_formats_builder_add_mime_type(builder, "text/html");
 
     formats = gdk_content_formats_builder_free_to_formats(builder);
@@ -2257,7 +2257,7 @@ gui_gtk_set_dnd_targets(void)
 /*
  * Handle textual DND data. Note that this does not finish the drop.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 {
     GdkModifierType state;
@@ -2270,64 +2270,64 @@ drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 	(char_u)KE_DROP
     };
 
-    if (text == NULL || *text == NUL || !query_pointer_pos(NULL, NULL, &state))
-	return;
+    ଯଦି (text == ଖାଲି || *text == NUL || !query_pointer_pos(ଖାଲି, ଖାଲି, &state))
+	ଫେରନ୍ତୁ;
 
     dnd_yank_drag_data((char_u *)text, (long)STRLEN(text));
 
     dropkey[2] = modifiers_gdk2vim(state);
-    if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
-    else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+    ଯଦି (dropkey[2] != 0)
+	add_to_ନିବେଶ_buf(dropkey, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ଆକାର(dropkey));
+    ଅନ୍ୟଥା
+	add_to_ନିବେଶ_buf(dropkey + 3, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(ଆକାର(dropkey) - 3));
 }
 
-    static void
-drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+    ସ୍ଥିର ଶୂନ୍ୟ
+drop_read_ମୂଲ୍ୟ_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
 {
-    const GValue    *value = gdk_drop_read_value_finish(drop, result, NULL);
+    ଅଚଳ GValue    *ମୂଲ୍ୟ = gdk_drop_read_ମୂଲ୍ୟ_finish(drop, result, ଖାଲି);
     gboolean	    success = FALSE;
 
-    if (value == NULL)
-	goto exit;
+    ଯଦି (ମୂଲ୍ୟ == ଖାଲି)
+	ଯାଅ exit;
 
-    if (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
+    ଯଦି (G_ମୂଲ୍ୟ_HOLDS(ମୂଲ୍ୟ, GDK_TYPE_FILE_LIST))
     {
-	GSList	*files = g_value_get_boxed(value);
-	int	nfiles = g_slist_length(files);
+	GSList	*files = g_ମୂଲ୍ୟ_get_boxed(ମୂଲ୍ୟ);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	nfiles = g_slist_length(files);
 	char_u	**fnames;
-	int	i;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	i;
 
-	if (nfiles <= 0)
-	    goto exit;
+	ଯଦି (nfiles <= 0)
+	    ଯାଅ exit;
 
 	fnames = ALLOC_MULT(char_u *, nfiles);
-	if (fnames == NULL)
-	    goto exit;
+	ଯଦି (fnames == ଖାଲି)
+	    ଯାଅ exit;
 
 	i = 0;
-	for (GSList *l = files; l != NULL; l = l->next)
+	ପାଇଁ (GSList *l = files; l != ଖାଲି; l = l->next)
 	{
 	    GFile *file = l->data;
-	    char *path = g_file_get_path(file);
-	    if (path != NULL)
+	    ଅକ୍ଷର *path = g_file_get_path(file);
+	    ଯଦି (path != ଖାଲି)
 		fnames[i++] = vim_strsave((char_u *)path);
 	    g_free(path);
 	}
 	nfiles = i;
 
-	if (nfiles > 0)
+	ଯଦି (nfiles > 0)
 	    gui_handle_drop(drd->x, drd->y, 0, fnames, nfiles);
-	else
+	ଅନ୍ୟଥା
 	    vim_free(fnames);
 	success = TRUE;
     }
-    else if (G_VALUE_HOLDS(value, G_TYPE_STRING))
+    ଅନ୍ୟଥା ଯଦି (G_ମୂଲ୍ୟ_HOLDS(ମୂଲ୍ୟ, G_TYPE_STRING))
     {
-	const char *text = g_value_get_string(value);
+	ଅଚଳ ଅକ୍ଷର *text = g_ମୂଲ୍ୟ_get_string(ମୂଲ୍ୟ);
 
-	if (text == NULL || *text == NUL)
-	    goto exit;
+	ଯଦି (text == ଖାଲି || *text == NUL)
+	    ଯାଅ exit;
 
 	drop_read_text(drop, (char_u *)text);
 	success = TRUE;
@@ -2338,88 +2338,88 @@ exit:
     read_data_free(&drd->rd);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 drop_read_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
 {
     GInputStream    *in_stream;
-    const char	    *m;
+    ଅଚଳ ଅକ୍ଷର	    *m;
 
-    in_stream = gdk_drop_read_finish(drop, result, &m, NULL);
-    if (in_stream == NULL || STRCMP(m, "text/html") != 0)
+    in_stream = gdk_drop_read_finish(drop, result, &m, ଖାଲି);
+    ଯଦି (in_stream == ଖାଲି || STRCMP(m, "text/html") != 0)
     {
 	read_data_free(&drd->rd);
 	gdk_drop_finish(drop, 0);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    assert(STRCMP(m, "text/html") == 0);
+    ପ୍ରତିଜ୍ଞା(STRCMP(m, "text/html") == 0);
 
     // GTK docs says not to use blocking read calls, so do it async.
-    g_input_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    drd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, drd);
+    g_ନିବେଶ_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_ଉପର,
+	    drd->rd.cancel, (GAsyncReadyCallback)read_data_ନିବେଶ_cb, drd);
 }
 
 // GCancellable of current DND operation, else NULL.
-static GCancellable *dnd_cancel = NULL;
-static guint dnd_timeout_id = 0;
+ସ୍ଥିର GCancellable *dnd_cancel = ଖାଲି;
+ସ୍ଥିର guint dnd_timeout_id = 0;
 
-    static gboolean
-drop_timeout_cb(void *udata UNUSED)
+    ସ୍ଥିର gboolean
+drop_timeout_cb(ଶୂନ୍ୟ *udata UNUSED)
 {
     g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     dnd_timeout_id = 0;
 
-    return G_SOURCE_REMOVE;
+    ଫେରନ୍ତୁ G_SOURCE_REMOVE;
 }
 
 /*
  * Drag-and-drop handler for files and text.
  */
-    static gboolean
+    ସ୍ଥିର gboolean
 drop_cb(
 	GtkDropTargetAsync  *target UNUSED,
 	GdkDrop		    *drop,
-	double		    x,
-	double		    y,
-	void		    *udata UNUSED)
+	ଦ୍ୱିଗୁଣ		    x,
+	ଦ୍ୱିଗୁଣ		    y,
+	ଶୂନ୍ୟ		    *udata UNUSED)
 {
     GdkContentFormats	*formats = gdk_drop_get_formats(drop);
-    DropReadData	*drd = NULL;
+    DropReadData	*drd = ଖାଲି;
 
-    if (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
+    ଯଦି (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (DropReadData *)read_data_new(READ_DATA_DROP, ଆକାର(*drd));
+	gdk_drop_read_ମୂଲ୍ୟ_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_ଉପର,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_ମୂଲ୍ୟ_cb, drd);
     }
-    else if (clip_html
+    ଅନ୍ୟଥା ଯଦି (clip_html
 	    && gdk_content_formats_contain_mime_type(formats, "text/html"))
     {
-	static const char *m[] = {"text/html", NULL};
+	ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *m[] = {"text/html", ଖାଲି};
 
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP_DATA, sizeof(*drd));
-	gdk_drop_read_async(drop, m, G_PRIORITY_HIGH,
+	drd = (DropReadData *)read_data_new(READ_DATA_DROP_DATA, ଆକାର(*drd));
+	gdk_drop_read_async(drop, m, G_PRIORITY_ଉପର,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_cb, drd);
     }
-    else if (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
+    ଅନ୍ୟଥା ଯଦି (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, G_TYPE_STRING, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (DropReadData *)read_data_new(READ_DATA_DROP, ଆକାର(*drd));
+	gdk_drop_read_ମୂଲ୍ୟ_async(drop, G_TYPE_STRING, G_PRIORITY_ଉପର,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_ମୂଲ୍ୟ_cb, drd);
     }
 
-    if (dnd_cancel != NULL)
+    ଯଦି (dnd_cancel != ଖାଲି)
 	g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     g_clear_handle_id(&dnd_timeout_id, timeout_remove);
 
-    if (drd != NULL)
+    ଯଦି (drd != ଖାଲି)
     {
 	drd->drop = g_object_ref(drop);
-	drd->x = (int)x;
-	drd->y = (int)y;
+	drd->x = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)x;
+	drd->y = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)y;
 	dnd_cancel = g_object_ref(drd->rd.cancel);
 
 	// Trying to spin the event loop here causes this GTK assertion error:
@@ -2429,28 +2429,28 @@ drop_cb(
 	// the first place anyways.
 
 	// Add a 3 second timeout
-	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, NULL);
+	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, ଖାଲି);
 
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 #endif
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
 {
-    gui.mainwin = NULL;
-    gui.drawarea = NULL;
-    if (!exiting)
+    gui.mainwin = ଖାଲି;
+    gui.drawarea = ଖାଲି;
+    ଯଦି (!exiting)
 	gui_shell_closed();
 }
 
-    static gboolean
+    ସ୍ଥିର gboolean
 delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
 {
     gui_shell_closed();
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -2459,73 +2459,73 @@ delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
  * ============================================================
  */
 
-    static timeout_cb_type
-input_timer_cb(gpointer data)
+    ସ୍ଥିର timeout_cb_type
+ନିବେଶ_timer_cb(gpointer data)
 {
-    int *timed_out = (int *)data;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *timed_out = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)data;
 
     *timed_out = TRUE;
-    return FALSE;	// don't call me again
+    ଫେରନ୍ତୁ FALSE;	// don't call me again
 }
 
-    void
-gui_mch_update(void)
+    ଶୂନ୍ୟ
+gui_mch_update(ଶୂନ୍ୟ)
 {
-    int cnt = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cnt = 0;
 
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    ଯେତେବେଳେ (g_main_context_pending(ଖାଲି) && !vim_is_ନିବେଶ_buf_full()
 								&& ++cnt < 100)
-	g_main_context_iteration(NULL, TRUE);
+	g_main_context_iteration(ଖାଲି, TRUE);
 }
 
 #ifdef FEAT_JOB_CHANNEL
-    static timeout_cb_type
+    ସ୍ଥିର timeout_cb_type
 channel_poll_cb(gpointer data UNUSED)
 {
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
     channel_handle_events(TRUE);
     parse_queued_messages();
-    return TRUE; // Keep repeating
+    ଫେରନ୍ତୁ TRUE; // Keep repeating
 }
 #endif
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 gui_mch_wait_for_chars(long wtime)
 {
-    int		focus;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		focus;
     guint	timer;
-    static int	timed_out;
-    int		retval = FAIL;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	timed_out;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		retval = FAIL;
 #ifdef FEAT_JOB_CHANNEL
     guint	channel_timer = 0;
 #endif
 
     timed_out = FALSE;
 
-    if (wtime >= 0)
+    ଯଦି (wtime >= 0)
 	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
-    else
+						   ନିବେଶ_timer_cb, &timed_out);
+    ଅନ୍ୟଥା
 	timer = 0;
 
 #ifdef FEAT_JOB_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = timeout_add(20, channel_poll_cb, NULL);
+    ଯଦି (channel_any_keep_open())
+	channel_timer = timeout_add(20, channel_poll_cb, ଖାଲି);
 #endif
 
     focus = gui.in_focus;
 
-    do
+    କର
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	ଯଦି (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    ଯଦି (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    ଅନ୍ୟଥା
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -2536,189 +2536,189 @@ gui_mch_wait_for_chars(long wtime)
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
-	    goto theend;
+	ଯଦି (did_add_timer)
+	    ଯାଅ theend;
 # endif
 #endif
 
-	if (gui.mainwin == NULL)
-	    goto theend;
+	ଯଦି (gui.mainwin == ଖାଲି)
+	    ଯାଅ theend;
 
 	// gtk_main_quit() is a wake-up request; consume it so later
 	// waits resume.
-	if (gtk4_main_loop_quit)
+	ଯଦି (gtk4_main_loop_quit)
 	{
 	    gtk4_main_loop_quit = FALSE;
-	    goto theend;
+	    ଯାଅ theend;
 	}
 
-	if (!input_available())
+	ଯଦି (!ନିବେଶ_available())
 	{
 	    ++gtk4_main_loop_level;
-	    g_main_context_iteration(NULL, TRUE);
+	    g_main_context_iteration(ଖାଲି, TRUE);
 	    --gtk4_main_loop_level;
 	}
 
-	if (input_available())
+	ଯଦି (ନିବେଶ_available())
 	{
 	    retval = OK;
-	    goto theend;
+	    ଯାଅ theend;
 	}
-    } while (wtime < 0 || !timed_out);
+    } ଯେତେବେଳେ (wtime < 0 || !timed_out);
 
     gui_mch_update();
 
 theend:
-    if (timer != 0 && !timed_out)
+    ଯଦି (timer != 0 && !timed_out)
 	timeout_remove(timer);
 #ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != 0)
+    ଯଦି (channel_timer != 0)
 	timeout_remove(channel_timer);
 #endif
 
-    return retval;
+    ଫେରନ୍ତୁ retval;
 }
 
-    void
-gui_mch_flush(void)
+    ଶୂନ୍ୟ
+gui_mch_flush(ଶୂନ୍ୟ)
 {
     // Ensure the offscreen surface content gets painted to the widget.
-    if (gui.drawarea != NULL)
+    ଯଦି (gui.drawarea != ଖାଲି)
 	gtk_widget_queue_draw(gui.drawarea);
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    ଯଦି (gui.mainwin != ଖାଲି && gtk_widget_get_realized(gui.mainwin))
 	gdk_display_flush(gtk_widget_get_display(gui.mainwin));
 }
 
-    void
-gui_mch_beep(void)
+    ଶୂନ୍ୟ
+gui_mch_beep(ଶୂନ୍ୟ)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    ଯଦି (gui.mainwin != ଖାଲି && gtk_widget_get_realized(gui.mainwin))
     {
 	display = gtk_widget_get_display(gui.mainwin);
-	if (display != NULL)
+	ଯଦି (display != ଖାଲି)
 	    gdk_display_beep(display);
     }
 }
 
-    void *
-gui_mch_get_display(void)
+    ଶୂନ୍ୟ *
+gui_mch_get_display(ଶୂନ୍ୟ)
 {
-    if (gui.mainwin != NULL && gtk_widget_get_display(gui.mainwin))
-	return gtk_widget_get_display(gui.mainwin);
-    return NULL;
+    ଯଦି (gui.mainwin != ଖାଲି && gtk_widget_get_display(gui.mainwin))
+	ଫେରନ୍ତୁ gtk_widget_get_display(gui.mainwin);
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    void
-gui_mch_iconify(void)
+    ଶୂନ୍ୟ
+gui_mch_iconify(ଶୂନ୍ୟ)
 {
     gtk_window_minimize(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_set_foreground(void)
+    ଶୂନ୍ୟ
+gui_mch_set_foreground(ଶୂନ୍ୟ)
 {
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 }
 
-    static int
-query_pointer_pos(int *x, int *y, GdkModifierType *state)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+query_pointer_pos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *y, GdkModifierType *state)
 {
     GtkNative	    *native;
     GdkSurface	    *surface;
     GdkDisplay	    *display;
     GdkSeat	    *seat;
     GdkDevice	    *pointer;
-    double	     sx, sy, nx, ny;
+    ଦ୍ୱିଗୁଣ	     sx, sy, nx, ny;
     graphene_point_t src, dst;
 
-    if (gui.drawarea == NULL)
-	return FALSE;
+    ଯଦି (gui.drawarea == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     native = gtk_widget_get_native(gui.drawarea);
-    if (native == NULL)
-	return FALSE;
+    ଯଦି (native == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     surface = gtk_native_get_surface(native);
-    if (surface == NULL)
-	return FALSE;
+    ଯଦି (surface == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     display = gtk_widget_get_display(gui.drawarea);
-    if (display == NULL)
-	return FALSE;
+    ଯଦି (display == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     seat = gdk_display_get_default_seat(display);
-    if (seat == NULL)
-	return FALSE;
+    ଯଦି (seat == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
     pointer = gdk_seat_get_pointer(seat);
-    if (pointer == NULL)
-	return FALSE;
+    ଯଦି (pointer == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
-    if (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
-	return FALSE;
+    ଯଦି (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
+	ଫେରନ୍ତୁ FALSE;
 
-    if (x != NULL && y != NULL)
+    ଯଦି (x != ଖାଲି && y != ଖାଲି)
     {
 	gtk_native_get_surface_transform(native, &nx, &ny);
-	src.x = (float)(sx - nx);
-	src.y = (float)(sy - ny);
-	if (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
+	src.x = (ଦଶମିକ)(sx - nx);
+	src.y = (ଦଶମିକ)(sy - ny);
+	ଯଦି (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
 		    &src, &dst))
-	    return FALSE;
+	    ଫେରନ୍ତୁ FALSE;
 
-	*x = (int)dst.x;
-	*y = (int)dst.y;
+	*x = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.x;
+	*y = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.y;
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    ଶୂନ୍ୟ
+gui_mch_getmouse(ପୂର୍ଣ୍ଣସଂଖ୍ୟା *x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *y)
 {
-    if (!query_pointer_pos(x, y, NULL))
+    ଯଦି (!query_pointer_pos(x, y, ଖାଲି))
     {
 	*x = 0;
 	*y = 0;
     }
 }
 
-    void
-gui_mch_setmouse(int x UNUSED, int y UNUSED)
+    ଶୂନ୍ୟ
+gui_mch_setmouse(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x UNUSED, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y UNUSED)
 {
     // GTK4/Wayland: cannot warp pointer
 }
 
-    void
-gui_mch_mousehide(int hide)
+    ଶୂନ୍ୟ
+gui_mch_mousehide(ପୂର୍ଣ୍ଣସଂଖ୍ୟା hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    ଯଦି (gui.pointer_hidden == hide)
+	ଫେରନ୍ତୁ;
 
     gui.pointer_hidden = hide;
-    if (gui.blank_pointer != NULL)
+    ଯଦି (gui.blank_pointer != ଖାଲି)
     {
-	if (hide)
+	ଯଦି (hide)
 	    gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-	else
+	ଅନ୍ୟଥା
 #ifdef FEAT_MOUSESHAPE
 	    mch_set_mouse_shape(last_shape);
-#else
-	    gtk_widget_set_cursor(gui.drawarea, NULL);
+#ଅନ୍ୟଥା
+	    gtk_widget_set_cursor(gui.drawarea, ଖାଲି);
 #endif
     }
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
-	    return OK;
-    return FAIL;
+    ପାଇଁ (i = 0; special_ଚାବିଗୁଡ଼ିକ[i].ଚାବି_sym != 0; i++)
+	ଯଦି (name[0] == special_ଚାବିଗୁଡ଼ିକ[i].code0
+		&& name[1] == special_ଚାବିଗୁଡ଼ିକ[i].code1)
+	    ଫେରନ୍ତୁ OK;
+    ଫେରନ୍ତୁ FAIL;
 }
 
-    void
-gui_mch_forked(void)
+    ଶୂନ୍ୟ
+gui_mch_forked(ଶୂନ୍ୟ)
 {
 }
 
@@ -2726,56 +2726,56 @@ gui_mch_forked(void)
  * Try getting the actual size of the scrollbar, and update gui.scrollbar_width
  * and gui.scrollbar_height.
  */
-    static void
-gui_gtk4_update_scrollbar_size(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+gui_gtk4_update_scrollbar_size(ଶୂନ୍ୟ)
 {
     win_T	*wp;
-    int		w = -1, h = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		w = -1, h = -1;
     GtkWidget	*sbar;
 
     FOR_ALL_WINDOWS(wp)
     {
-	sbar = wp->w_scrollbars[SBAR_LEFT].id;
+	sbar = wp->w_scrollbars[SBAR_ବାମ].id;
 
-	if (sbar == NULL || !gtk_widget_get_visible(sbar)
-		|| (!gui.which_scrollbars[SBAR_LEFT]
-		    && wp->w_scrollbars[SBAR_RIGHT].id != NULL))
-	    sbar = wp->w_scrollbars[SBAR_RIGHT].id;
+	ଯଦି (sbar == ଖାଲି || !gtk_widget_get_visible(sbar)
+		|| (!gui.which_scrollbars[SBAR_ବାମ]
+		    && wp->w_scrollbars[SBAR_ଡାହାଣ].id != ଖାଲି))
+	    sbar = wp->w_scrollbars[SBAR_ଡାହାଣ].id;
 
-	if (sbar != NULL && gtk_widget_get_visible(sbar))
+	ଯଦି (sbar != ଖାଲି && gtk_widget_get_visible(sbar))
 	{
 	    GtkRequisition  min, nat;
-	    int		    sw;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    sw;
 
 	    // Use preferred size, since widget may not have its size allocated
 	    // yet.
 	    gtk_widget_get_preferred_size(sbar, &min, &nat);
 	    sw = MAX(min.width, nat.width);
-	    if (sw > 0)
+	    ଯଦି (sw > 0)
 	    {
 		w = sw;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
 
     }
 
     sbar = gui.bottom_sbar.id;
-    if (sbar != NULL && gtk_widget_get_visible(sbar))
+    ଯଦି (sbar != ଖାଲି && gtk_widget_get_visible(sbar))
     {
 	GtkRequisition min, nat;
-	int		    sh;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    sh;
 
 	gtk_widget_get_preferred_size(sbar, &min, &nat);
 	sh = MAX(min.height, nat.height);
 
-	if (sh > 0)
+	ଯଦି (sh > 0)
 	    h = sh;
     }
 
-    if (w != -1)
+    ଯଦି (w != -1)
 	gui.scrollbar_width = w;
-    if (h != -1)
+    ଯଦି (h != -1)
 	gui.scrollbar_height = h;
 }
 
@@ -2786,32 +2786,32 @@ gui_gtk4_update_scrollbar_size(void)
  * ============================================================
  */
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    ଶୂନ୍ୟ
+gui_mch_enable_scrollbar(scrollbar_T *sb, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flag)
 {
-    if (sb->id != NULL)
+    ଯଦି (sb->id != ଖାଲି)
     {
 	gboolean was_visible = gtk_widget_get_visible(sb->id);
 
 	gtk_widget_set_visible(sb->id, flag);
 
-	if (!was_visible && flag)
+	ଯଦି (!was_visible && flag)
 	    gui_gtk4_update_scrollbar_size();
     }
 }
 
-#if defined(FEAT_MENU)
+#ଯଦି defined(FEAT_MENU)
 /*
  * ============================================================
  * Menu stubs
  * ============================================================
  */
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    ଶୂନ୍ୟ
+gui_mch_menu_grey(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା grey)
 {
-    if (menu->id == NULL)
-	return;
+    ଯଦି (menu->id == ଖାଲି)
+	ଫେରନ୍ତୁ;
     gtk_widget_set_sensitive(menu->id, !grey);
     gui_mch_update();
 }
@@ -2819,17 +2819,17 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
 /*
  * Make menu item hidden or not hidden.
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    ଶୂନ୍ୟ
+gui_mch_menu_hidden(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା hidden)
 {
-    if (menu->id == NULL)
-	return;
+    ଯଦି (menu->id == ଖାଲି)
+	ଫେରନ୍ତୁ;
     gtk_widget_set_visible(menu->id, !hidden);
     gui_mch_update();
 }
 
-    void
-gui_mch_draw_menubar(void)
+    ଶୂନ୍ୟ
+gui_mch_draw_menubar(ଶୂନ୍ୟ)
 {
     // Just make sure that the visual changes get effect immediately
     gui_mch_update();
@@ -2843,41 +2843,41 @@ gui_mch_draw_menubar(void)
  */
 
 #ifdef FEAT_GUI_TABLINE
-    void
-gui_mch_show_tabline(int showit)
+    ଶୂନ୍ୟ
+gui_mch_show_tabline(ପୂର୍ଣ୍ଣସଂଖ୍ୟା showit)
 {
-    if (gui.tabline == NULL)
-	return;
+    ଯଦି (gui.tabline == ଖାଲି)
+	ଫେରନ୍ତୁ;
     gtk_widget_set_visible(gui.tabline, showit);
     gui_mch_update();
 }
 
-    int
-gui_mch_showing_tabline(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_showing_tabline(ଶୂନ୍ୟ)
 {
-    return gui.tabline != NULL && gtk_widget_get_visible(gui.tabline);
+    ଫେରନ୍ତୁ gui.tabline != ଖାଲି && gtk_widget_get_visible(gui.tabline);
 }
 
-static int ignore_tabline_evt = FALSE;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା ignore_tabline_evt = FALSE;
 // Page hovered over in tab line, zero indicates none
-static int tabpage_hover = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tabpage_hover = 0;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabpage_enter_cb(
 	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata)
+	ଦ୍ୱିଗୁଣ		    x UNUSED,
+	ଦ୍ୱିଗୁଣ		    y UNUSED,
+	ଶୂନ୍ୟ		    *udata)
 {
     tabpage_hover = GPOINTER_TO_INT(udata);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabline_enter_cb(
 	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata UNUSED)
+	ଦ୍ୱିଗୁଣ		    x UNUSED,
+	ଦ୍ୱିଗୁଣ		    y UNUSED,
+	ଶୂନ୍ୟ		    *udata UNUSED)
 {
     tabpage_hover = 0;
 }
@@ -2886,11 +2886,11 @@ tabline_enter_cb(
  * CSS for the tab pages line: flat rounded tabs, the current tab with a light
  * background.  Only applies to the notebook with the "vim-tabline" CSS class.
  */
-    static void
-tabline_add_css(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+tabline_add_css(ଶୂନ୍ୟ)
 {
     GtkCssProvider  *provider;
-    static const char *css =
+    ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *css =
 	"notebook.vim-tabline > header {"
 	"  background: none; border: none; padding: 6px 1px; }"
 	"notebook.vim-tabline > header > tabs { margin: 0; }"
@@ -2935,9 +2935,9 @@ tabline_add_css(void)
 	"  min-width: 24px; }";
 
     provider = gtk_css_provider_new();
-# if GTK_CHECK_VERSION(4, 12, 0)
+# ଯଦି GTK_CHECK_VERSION(4, 12, 0)
     gtk_css_provider_load_from_string(provider, css);
-# else
+# ଅନ୍ୟଥା
     gtk_css_provider_load_from_data(provider, css, -1);
 # endif
     gtk_style_context_add_provider_for_display(
@@ -2949,46 +2949,46 @@ tabline_add_css(void)
 /*
  * Handle clicking the close button of a tab.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tab_close_clicked_cb(GtkButton *button UNUSED, gpointer data)
 {
-    int idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx = gtk_notebook_page_ଅଙ୍କ(GTK_NOTEBOOK(gui.tabline),
 							   GTK_WIDGET(data));
 
-    if (idx >= 0)
+    ଯଦି (idx >= 0)
 	send_tabline_menu_event(idx + 1, TABLINE_MENU_CLOSE);
 }
 
-    void
-gui_mch_update_tabline(void)
+    ଶୂନ୍ୟ
+gui_mch_update_tabline(ଶୂନ୍ୟ)
 {
     GtkWidget	*page;
     GtkWidget	*event_box;
     GtkWidget	*label;
     tabpage_T	*tp;
-    int		nr = 0;
-    int		tab_num;
-    int		curtabidx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nr = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		tab_ଅଙ୍କ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curtabidx = 0;
     char_u	*labeltext;
 
-    if (gui.tabline == NULL)
-	return;
+    ଯଦି (gui.tabline == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     ignore_tabline_evt = TRUE;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    ପାଇଁ (tp = first_tabpage; tp != ଖାଲି; tp = tp->tp_next, ++nr)
     {
 	GtkNotebookPage	    *page_widget;
 	GtkWidget	    *tab_widget;
 	GtkEventController  *mcontroller;
 
-	if (tp == curtab)
+	ଯଦି (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_ଅଙ୍କ = nr + 1;
 
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
-	if (page == NULL)
+	ଯଦି (page == ଖାଲି)
 	{
 	    GtkWidget	*spacer;
 	    GtkWidget	*close_button;
@@ -3019,12 +3019,12 @@ gui_mch_update_tabline(void)
 		    G_CALLBACK(tab_close_clicked_cb), page);
 	    gtk_box_append(GTK_BOX(event_box), close_button);
 
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
+	    gtk_notebook_ଭର୍ତ୍ତି_page(GTK_NOTEBOOK(gui.tabline),
 		    page, event_box, nr);
 	    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
 		    page, TRUE);
 	    g_object_set(gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page),
-		    "tab-expand", TRUE, NULL);
+		    "tab-expand", TRUE, ଖାଲି);
 	}
 
 	// Attach motion event controller to detect which tab page is currently
@@ -3032,105 +3032,105 @@ gui_mch_update_tabline(void)
 	page_widget = gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page);
 	mcontroller = gtk_event_controller_motion_new();
 	g_signal_connect(mcontroller, "enter", G_CALLBACK(tabpage_enter_cb),
-		GINT_TO_POINTER(tab_num));
+		GINT_TO_POINTER(tab_ଅଙ୍କ));
 	gtk_event_controller_set_propagation_phase(
 		mcontroller, GTK_PHASE_CAPTURE);
-	g_object_get(page_widget, "tab", &tab_widget, NULL);
+	g_object_get(page_widget, "tab", &tab_widget, ଖାଲି);
 	gtk_widget_add_controller(tab_widget, mcontroller);
 
 	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), page);
 	label = g_object_get_data(G_OBJECT(event_box), "label");
 	get_tabline_label(tp, FALSE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
-	if (label != NULL && GTK_IS_LABEL(label))
-	    gtk_label_set_text(GTK_LABEL(label), (const char *)labeltext);
+	ଯଦି (label != ଖାଲି && GTK_IS_LABEL(label))
+	    gtk_label_set_text(GTK_LABEL(label), (ଅଚଳ ଅକ୍ଷର *)labeltext);
 	CONVERT_TO_UTF8_FREE(labeltext);
 
 	get_tabline_label(tp, TRUE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
-	gtk_widget_set_tooltip_text(event_box, (const gchar *)labeltext);
+	gtk_widget_set_tooltip_text(event_box, (ଅଚଳ gchar *)labeltext);
 	CONVERT_TO_UTF8_FREE(labeltext);
     }
 
-    while (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
+    ଯେତେବେଳେ (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != ଖାଲି)
 	gtk_notebook_remove_page(GTK_NOTEBOOK(gui.tabline), nr);
 
     // With a single tab the tab is not highlighted and has no close button.
-    if (nr == 1)
+    ଯଦି (nr == 1)
 	gtk_widget_add_css_class(gui.tabline, "single-tab");
-    else
+    ଅନ୍ୟଥା
 	gtk_widget_remove_css_class(gui.tabline, "single-tab");
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
+    ଯଦି (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), curtabidx);
 
     ignore_tabline_evt = FALSE;
 }
 
-    void
-gui_mch_set_curtab(int nr)
+    ଶୂନ୍ୟ
+gui_mch_set_curtab(ପୂର୍ଣ୍ଣସଂଖ୍ୟା nr)
 {
-    if (gui.tabline != NULL)
+    ଯଦି (gui.tabline != ଖାଲି)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), nr - 1);
 }
 
 /*
  * Handle selecting one of the tabs.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 on_select_tab(
 	GtkNotebook	*notebook UNUSED,
 	gpointer	*page UNUSED,
 	gint		idx,
 	gpointer	data UNUSED)
 {
-    if (!ignore_tabline_evt)
+    ଯଦି (!ignore_tabline_evt)
 	send_tabline_event(idx + 1);
 }
 
 /*
  * Handle reordering the tabs (using D&D).
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 on_tab_reordered(
 	GtkNotebook	*notebook UNUSED,
 	gpointer	*page UNUSED,
 	gint		idx,
 	gpointer	data UNUSED)
 {
-    if (ignore_tabline_evt)
-	return;
+    ଯଦି (ignore_tabline_evt)
+	ଫେରନ୍ତୁ;
 
-    if ((tabpage_index(curtab) - 1) < idx)
+    ଯଦି ((tabpage_index(curtab) - 1) < idx)
 	tabpage_move(idx + 1);
-    else
+    ଅନ୍ୟଥା
 	tabpage_move(idx);
 }
 
 /*
  * Handle selecting an item in the tab line popup menu.
  */
-    static void
-tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, void *udata)
+    ସ୍ଥିର ଶୂନ୍ୟ
+tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, ଶୂନ୍ୟ *udata)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    ଯଦି (event == VIM_MENU_ITEM_CLICKED)
 	send_tabline_menu_event(tabpage_hover, GPOINTER_TO_INT(udata));
 }
 
-    static void
-add_tabline_menu_item(VimMenu *menu, const char *name, int resp)
+    ସ୍ଥିର ଶୂନ୍ୟ
+add_tabline_menu_item(VimMenu *menu, ଅଚଳ ଅକ୍ଷର *name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା resp)
 {
     VimMenuItem *item = VIM_MENU_ITEM(vim_menu_item_new(name,
 		tabline_menu_event_cb, GINT_TO_POINTER(resp)));
 
-    vim_menu_insert_item(menu, item, -1);
+    vim_menu_ଭର୍ତ୍ତି_item(menu, item, -1);
 }
 
 /*
  * Create a menu for the tab line.
  */
-    static VimMenu *
-create_tabline_popup_menu(void)
+    ସ୍ଥିର VimMenu *
+create_tabline_popup_menu(ଶୂନ୍ୟ)
 {
     VimMenu *menu = VIM_MENU(vim_menu_new());
 
@@ -3138,21 +3138,21 @@ create_tabline_popup_menu(void)
     add_tabline_menu_item(menu, _("New Tab"), TABLINE_MENU_NEW);
     add_tabline_menu_item(menu, _("Open Tab..."), TABLINE_MENU_OPEN);
 
-    return menu;
+    ଫେରନ୍ତୁ menu;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabline_menu_press_event(
 	GtkGestureClick *gesture,
-	int		n_press UNUSED,
-	double		x,
-	double		y,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_press UNUSED,
+	ଦ୍ୱିଗୁଣ		x,
+	ଦ୍ୱିଗୁଣ		y,
 	GtkWidget	*popover)
 {
     guint but;
 
     but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-    if (but == GDK_BUTTON_SECONDARY)
+    ଯଦି (but == GDK_BUTTON_SECONDARY)
     {
 	// Right mouse button pressed, popup menu
 	GdkRectangle rect;
@@ -3164,16 +3164,16 @@ tabline_menu_press_event(
 	gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
 	gtk_popover_popup(GTK_POPOVER(popover));
     }
-    else if (but == GDK_BUTTON_PRIMARY)
+    ଅନ୍ୟଥା ଯଦି (but == GDK_BUTTON_PRIMARY)
     {
-	if (tabpage_hover == 0)
+	ଯଦି (tabpage_hover == 0)
 	    // Click after all tabs moves to next tab page.  When "x" is
 	    // small guess it's the left button.
 	    send_tabline_event(x < 50 ? -1 : 0);
     }
-    else if (but == GDK_BUTTON_MIDDLE)
+    ଅନ୍ୟଥା ଯଦି (but == GDK_BUTTON_ମଧ୍ୟ)
     {
-	if (tabpage_hover != 0)
+	ଯଦି (tabpage_hover != 0)
 	    // Middle mouse click on tabpage label closes that tab.
 	    send_tabline_menu_event(tabpage_hover, TABLINE_MENU_CLOSE);
     }
@@ -3186,18 +3186,18 @@ tabline_menu_press_event(
  * ============================================================
  */
 
-#if defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_SIGN_ICONS)
 # define SIGN_WIDTH  (2 * gui.char_width)
 # define SIGN_HEIGHT (gui.char_height)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    ଶୂନ୍ୟ
+gui_mch_drawsign(ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, ପୂର୍ଣ୍ଣସଂଖ୍ୟା typenr)
 {
     GdkTexture *sign;
 
     sign = (GdkTexture *)sign_get_image(typenr);
-    if (sign == NULL)
-	return;
+    ଯଦି (sign == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     vim_draw_area_add_sign(VIM_DRAW_AREA(gui.drawarea), sign,
 	    row, col, SIGN_WIDTH, SIGN_HEIGHT);
@@ -3205,29 +3205,29 @@ gui_mch_drawsign(int row, int col, int typenr)
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void *
+    ଶୂନ୍ୟ *
 gui_mch_register_sign(char_u *signfile)
 {
-    if (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
+    ଯଦି (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
     {
-	GError	    *error = NULL;
+	GError	    *error = ଖାଲି;
 	GdkTexture  *sign;
 
-	sign = gdk_texture_new_from_filename((const char *)signfile,
+	sign = gdk_texture_new_from_filename((ଅଚଳ ଅକ୍ଷର *)signfile,
 							    &error);
-	if (sign != NULL)
-	    return sign;
+	ଯଦି (sign != ଖାଲି)
+	    ଫେରନ୍ତୁ sign;
 
 	semsg("E255: %s", error->message);
 	g_error_free(error);
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    ଶୂନ୍ୟ
+gui_mch_destroy_sign(ଶୂନ୍ୟ *sign)
 {
-    if (sign != NULL)
+    ଯଦି (sign != ଖାଲି)
 	g_object_unref(sign);
 }
 #endif
@@ -3245,28 +3245,28 @@ gui_mch_destroy_sign(void *sign)
  * uses the fast cached glyph path.
  * Returns the number of display cells used.
  */
-    int
-gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_gtk_draw_string(ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, char_u *s, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags)
 {
-    int cells;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା cells;
 
     cells = vim_draw_area_draw_string(VIM_DRAW_AREA(gui.drawarea),
 	    row, col, s, len, flags);
 
-    if (gui.drawarea != NULL)
+    ଯଦି (gui.drawarea != ଖାଲି)
 	gtk_widget_queue_draw(gui.drawarea);
 
-    return cells;
+    ଫେରନ୍ତୁ cells;
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
 {
     // GTK4: not applicable
-    return FAIL;
+    ଫେରନ୍ତୁ FAIL;
 }
 
-#if defined(FEAT_MENU)
+#ଯଦି defined(FEAT_MENU)
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
  * if necessary.  The caller must vim_free() the returned string.
@@ -3277,42 +3277,42 @@ gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
  *	&	_	stripped if use_mnemonic == FALSE
  *	<Tab>		end of menu label text
  */
-    static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+    ସ୍ଥିର char_u *
+translate_mnemonic_tag(char_u *name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    n_underscores = 0;
 
     name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    ଯଦି (name == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    ପାଇଁ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ଯଦି (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    ଯଦି (buf != ଖାଲି)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	ପାଇଁ (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    ଯଦି (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    ଅନ୍ୟଥା ଯଦି (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    ଅନ୍ୟଥା ଯଦି (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    ଅନ୍ୟଥା ଯଦି (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -3321,51 +3321,51 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
     }
 
     CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
-    void
-gui_gtk_set_mnemonics(int enable)
+    ଶୂନ୍ୟ
+gui_gtk_set_mnemonics(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
-	    continue;
+	ଯଦି (menu->id == ଖାଲି)
+	    ଜାରି;
 
 	name = translate_mnemonic_tag(menu->name, enable);
 	// Don't think the check if necessary but still do it anyways
-	if (VIM_IS_MENU_BAR_ITEM(menu->id))
+	ଯଦି (VIM_IS_MENU_BAR_ITEM(menu->id))
 	    vim_menu_bar_item_set_text(VIM_MENU_BAR_ITEM(menu->id),
-		    (const char *)name);
+		    (ଅଚଳ ଅକ୍ଷର *)name);
 	vim_free(name);
     }
 }
 
-    static void
-popupmenu_closed_cb(GtkWidget *popover, void *udata UNUSED)
+    ସ୍ଥିର ଶୂନ୍ୟ
+popupmenu_closed_cb(GtkWidget *popover, ଶୂନ୍ୟ *udata UNUSED)
 {
     gtk_widget_unparent(popover);
-    if (gui.drawarea != NULL)
+    ଯଦି (gui.drawarea != ଖାଲି)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
 /*
  * Open a popup for the given menu at point (x, y).
  */
-    static void
-gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
+    ସ୍ଥିର ଶୂନ୍ୟ
+gui_gtk_popup_at(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y)
 {
     GtkWidget	    *popover;
     GdkRectangle    rect;
 
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    ଯଦି (menu == ଖାଲି || menu->submenu_id == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     popover = vim_menu_copy(VIM_MENU(menu->submenu_id));
     gtk_widget_set_parent(popover, gui.drawarea);
@@ -3380,23 +3380,23 @@ gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
     gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
 
     g_signal_connect(GTK_POPOVER(popover), "closed",
-	    G_CALLBACK(popupmenu_closed_cb), NULL);
+	    G_CALLBACK(popupmenu_closed_cb), ଖାଲି);
     gtk_popover_popup(GTK_POPOVER(popover));
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    ଶୂନ୍ୟ
+gui_make_popup(char_u *path_name, ପୂର୍ଣ୍ଣସଂଖ୍ୟା mouse_pos)
 {
     vimmenu_T	*menu;
-    int		x, y;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x, y;
 
     menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    ଯଦି (menu == ଖାଲି || menu->submenu_id == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (mouse_pos)
+    ଯଦି (mouse_pos)
 	gui_mch_getmouse(&x, &y);
-    else
+    ଅନ୍ୟଥା
     {
 	x = FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
 	y = FILL_Y(W_WINROW(curwin) + curwin->w_wrow + 1) + 1;
@@ -3407,14 +3407,14 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 }
 #endif // FEAT_MENU
 
-    int
-get_menu_tool_width(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_menu_tool_width(ଶୂନ୍ୟ)
 {
-    return 0;
+    ଫେରନ୍ତୁ 0;
 }
 
-    int
-get_menu_tool_height(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_menu_tool_height(ଶୂନ୍ୟ)
 {
     GtkWidget *widgets[] = {
 #ifdef FEAT_MENU
@@ -3428,20 +3428,20 @@ get_menu_tool_height(void)
 #endif
     };
 
-    int height = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା height = 0;
 
-    for (int i = 0; i < (int)ARRAY_LENGTH(widgets); i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(widgets); i++)
     {
 	GtkRequisition	min;
 	GtkRequisition	nat;
-	int		h;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		h;
 
-	if (widgets[i] == NULL || !gtk_widget_get_visible(widgets[i]))
-	    continue;
+	ଯଦି (widgets[i] == ଖାଲି || !gtk_widget_get_visible(widgets[i]))
+	    ଜାରି;
 
 	h = gtk_widget_get_height(widgets[i]);
 
-	if (h == 0)
+	ଯଦି (h == 0)
 	{
 	    // Allocation hasn't been updated yet (widget just became visible).
 	    // Query the preferred height so the caller gets a valid value
@@ -3452,23 +3452,23 @@ get_menu_tool_height(void)
 	    gtk_widget_get_preferred_size(widgets[i], &min, &nat);
 	    height += MAX(min.height, nat.height);
 	}
-	else
+	ଅନ୍ୟଥା
 	    height += h;
     }
-    return height;
+    ଫେରନ୍ତୁ height;
 }
 
 /*
  * Update selection targets for regular and primary selections.
  */
-    void
+    ଶୂନ୍ୟ
 gui_gtk_update_selection_formats(Clipboard_T *cbd)
 {
     // This will call the ref_formats() vfunc of the content provider, see
     // gui_gtk4_cb.c
-    if (cbd == &clip_plus)
+    ଯଦି (cbd == &clip_plus)
 	gdk_content_provider_content_changed(gui.regular_provider);
-    else
+    ଅନ୍ୟଥା
 	gdk_content_provider_content_changed(gui.primary_provider);
 }
 
@@ -3476,84 +3476,84 @@ gui_gtk_update_selection_formats(Clipboard_T *cbd)
  * Get the GdkClipboard and GdkContentProvider for the given Clipboard_T.
  * clip_star (*) uses PRIMARY, clip_plus (+) uses CLIPBOARD.
  */
-    static GdkClipboard *
+    ସ୍ଥିର GdkClipboard *
 gtk4_get_clipboard(Clipboard_T *cbd, GdkContentProvider **provider)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin == NULL)
-	return NULL;
+    ଯଦି (gui.mainwin == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     display = gtk_widget_get_display(gui.mainwin);
-    if (display == NULL)
-	return NULL;
+    ଯଦି (display == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    if (cbd == &clip_plus)
+    ଯଦି (cbd == &clip_plus)
     {
-	if (provider != NULL)
+	ଯଦି (provider != ଖାଲି)
 	    *provider = gui.regular_provider;
-	return gdk_display_get_clipboard(display);
+	ଫେରନ୍ତୁ gdk_display_get_clipboard(display);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (provider != NULL)
+	ଯଦି (provider != ଖାଲି)
 	    *provider = gui.primary_provider;
-	return gdk_display_get_primary_clipboard(display);
+	ଫେରନ୍ତୁ gdk_display_get_primary_clipboard(display);
     }
 }
 
 /*
  * Callback for gdk_clipboard_read_async().
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 clip_read_cb(GdkClipboard *cb, GAsyncResult *result, ClipReadData *crd)
 {
     GInputStream    *in_stream;
-    const char	    *mime_type;
+    ଅଚଳ ଅକ୍ଷର	    *mime_type;
 
-    in_stream = gdk_clipboard_read_finish(cb, result, &mime_type, NULL);
-    if (in_stream == NULL)
+    in_stream = gdk_clipboard_read_finish(cb, result, &mime_type, ଖାଲି);
+    ଯଦି (in_stream == ଖାଲି)
     {
 	read_data_free(&crd->rd);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // Not sure if we need to copy the string, but do it anyways.
     crd->mime_type = g_strdup(mime_type);
-    g_input_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    crd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, crd);
+    g_ନିବେଶ_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_ଉପର,
+	    crd->rd.cancel, (GAsyncReadyCallback)read_data_ନିବେଶ_cb, crd);
 }
 
 /*
  * Request the selection from the clipboard.
  */
-    void
+    ଶୂନ୍ୟ
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    static const char *mimes_no_html[] = {
+    ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *mimes_no_html[] = {
 	VIMENC_MIMETYPE_NAME,
 	VIM_MIMETYPE_NAME,
 	"text/plain;charset=utf-8",
 	"text/plain",
-	NULL
+	ଖାଲି
     };
 
     GdkClipboard *clipboard;
     ClipReadData *crd;
     GCancellable *cancel;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ଖାଲି);
+    ଯଦି (clipboard == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    crd = (ClipReadData *)read_data_new(READ_DATA_CLIP, sizeof(*crd));
+    crd = (ClipReadData *)read_data_new(READ_DATA_CLIP, ଆକାର(*crd));
     crd->cbd = cbd;
     cancel = g_object_ref(crd->rd.cancel);
 
     gdk_clipboard_read_async(
 	    clipboard, clip_html ? supported_mimes : mimes_no_html,
-	    G_PRIORITY_HIGH, crd->rd.cancel,
+	    G_PRIORITY_ଉପର, crd->rd.cancel,
 	    (GAsyncReadyCallback)clip_read_cb, crd);
 
     {
@@ -3562,97 +3562,97 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	// Spin until the done receiving data, with a 3-second wall-clock
 	// timeout as a safety net. Use the GCancellable as a way to signal if
 	// done (and also use it to cancel if timed out as well).
-	start = time(NULL);
-	while (!g_cancellable_is_cancelled(cancel)
-		&& time(NULL) < start + 3)
-	    g_main_context_iteration(NULL, TRUE);
+	start = time(ଖାଲି);
+	ଯେତେବେଳେ (!g_cancellable_is_cancelled(cancel)
+		&& time(ଖାଲି) < start + 3)
+	    g_main_context_iteration(ଖାଲି, TRUE);
 
 	g_cancellable_cancel(cancel);
 	g_object_unref(cancel);
     }
 }
 
-static int in_clipboard_set = FALSE;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା in_clipboard_set = FALSE;
 
 /*
  * Send the current selection to the clipboard. Do nothing for because we
  * subclass GdkContentProvider which will provide the data only when needed.
  */
-    void
+    ଶୂନ୍ୟ
 clip_mch_set_selection(Clipboard_T *cbd UNUSED)
 {
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data)
 {
     Clipboard_T *cbd = (Clipboard_T *)user_data;
 
-    if (in_clipboard_set)
-	return;
-    if (gdk_clipboard_is_local(clipboard))
-	return;
+    ଯଦି (in_clipboard_set)
+	ଫେରନ୍ତୁ;
+    ଯଦି (gdk_clipboard_is_local(clipboard))
+	ଫେରନ୍ତୁ;
     clip_lose_selection(cbd);
 }
 
 /*
  * Own the selection.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     GdkContentProvider	*cp;
     GdkClipboard	*cb = gtk4_get_clipboard(cbd, &cp);
-    int			ret;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			ret;
 
-    if (cb == NULL)
-	return FAIL;
+    ଯଦି (cb == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     in_clipboard_set = TRUE;
     ret = gdk_clipboard_set_content(cb, cp);
     in_clipboard_set = FALSE;
 
-    return ret ? OK : FAIL;
+    ଫେରନ୍ତୁ ret ? OK : FAIL;
 }
 
 /*
  * Disown the selection.  In GTK4, we clear the clipboard content to
  * release ownership.
  */
-    void
+    ଶୂନ୍ୟ
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     GdkClipboard *clipboard;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ଖାଲି);
+    ଯଦି (clipboard == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     // Only release ownership if we still own it. We don't want to clear the
     // current selection when we aren't actually the source.
-    if (gdk_clipboard_is_local(clipboard))
-	gdk_clipboard_set_content(clipboard, NULL);
+    ଯଦି (gdk_clipboard_is_local(clipboard))
+	gdk_clipboard_set_content(clipboard, ଖାଲି);
 }
 
 // GTK4 does not have gtk_main_level/gtk_main_quit.
 // Provide compatibility stubs using a simple flag.
     guint
-gtk_main_level(void)
+gtk_main_level(ଶୂନ୍ୟ)
 {
-    return gtk4_main_loop_level;
+    ଫେରନ୍ତୁ gtk4_main_loop_level;
 }
 
-    void
-gtk_main_quit(void)
+    ଶୂନ୍ୟ
+gtk_main_quit(ଶୂନ୍ୟ)
 {
     gtk4_main_loop_quit = TRUE;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#ଯଦି defined(FEAT_MOUSESHAPE)
 
 // Table of CSS cursor names corresponding to Vim's mouse shape IDs.
 // Keep in sync with the mshape_names[] table in misc2.c.
-static const char *mshape_css_names[] =
+ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *mshape_css_names[] =
 {
     "default",			// arrow
     "none",			// blank
@@ -3673,32 +3673,32 @@ static const char *mshape_css_names[] =
     "default"			// last entry
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    ଶୂନ୍ୟ
+mch_set_mouse_shape(ପୂର୍ଣ୍ଣସଂଖ୍ୟା shape)
 {
     GdkCursor	*c;
-    const char	*css_name = "default";
+    ଅଚଳ ଅକ୍ଷର	*css_name = "default";
 
-    if (gui.drawarea == NULL)
-	return;
+    ଯଦି (gui.drawarea == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    ଯଦି (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-    else
+    ଅନ୍ୟଥା
     {
-	if (shape >= MSHAPE_NUMBERED)
+	ଯଦି (shape >= MSHAPE_NUMBERED)
 	    css_name = "default";
-	else if (shape < (int)ARRAY_LENGTH(mshape_css_names))
+	ଅନ୍ୟଥା ଯଦି (shape < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(mshape_css_names))
 	    css_name = mshape_css_names[shape];
-	else
-	    return;
+	ଅନ୍ୟଥା
+	    ଫେରନ୍ତୁ;
 
 	// GTK4: gdk_cursor_new_from_name(name, fallback)
-	c = gdk_cursor_new_from_name(css_name, NULL);
+	c = gdk_cursor_new_from_name(css_name, ଖାଲି);
 	gtk_widget_set_cursor(gui.drawarea, c);
 	g_object_unref(G_OBJECT(c));
     }
-    if (shape != MSHAPE_HIDE)
+    ଯଦି (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 
@@ -3712,8 +3712,8 @@ mch_set_mouse_shape(int shape)
 
 
 
-static int last_text_area_w = 0;
-static int last_text_area_h = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_text_area_w = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା last_text_area_h = 0;
 
 /*
  * ============================================================
@@ -3728,7 +3728,7 @@ static int last_text_area_h = 0;
  * Icon name table for toolbar buttons.
  * Must match toolbar_names[] in menu.c.
  */
-static const char * const toolbar_icon_names[] =
+ସ୍ଥିର ଅଚଳ ଅକ୍ଷର * ଅଚଳ toolbar_icon_names[] =
 {
     /* 00 */ "document-new",
     /* 01 */ "document-open",
@@ -3763,28 +3763,28 @@ static const char * const toolbar_icon_names[] =
     /* 30 */ "image-missing",
 };
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 toolbar_button_clicked_cb(GtkWidget *widget UNUSED, gpointer data)
 {
     gui_menu_cb((vimmenu_T *)data);
 }
 
-    static GtkWidget *
+    ସ୍ଥିର GtkWidget *
 create_toolbar_icon(vimmenu_T *menu)
 {
     char_u	buf[MAXPATHL];
-    GtkWidget	*image = NULL;
+    GtkWidget	*image = ଖାଲି;
 
     // Try specified icon file first
-    if (menu->iconfile != NULL)
+    ଯଦି (menu->iconfile != ଖାଲି)
     {
 	expand_env(menu->iconfile, buf, MAXPATHL);
-	if (vim_fexists(buf))
+	ଯଦି (vim_fexists(buf))
 	{
 	    GdkTexture *texture = gdk_texture_new_from_filename(
-		    (const char *)buf, NULL);
+		    (ଅଚଳ ଅକ୍ଷର *)buf, ଖାଲି);
 
-	    if (texture != NULL)
+	    ଯଦି (texture != ଖାଲି)
 	    {
 		image = gtk_image_new_from_paintable(
 			GDK_PAINTABLE(texture));
@@ -3795,50 +3795,50 @@ create_toolbar_icon(vimmenu_T *menu)
     }
 
     // Use themed icon
-    if (image == NULL)
+    ଯଦି (image == ଖାଲି)
     {
-	const char *icon_name = "image-missing";
-	int n = (int)ARRAY_LENGTH(toolbar_icon_names);
+	ଅଚଳ ଅକ୍ଷର *icon_name = "image-missing";
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(toolbar_icon_names);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n)
+	ଯଦି (menu->iconidx >= 0 && menu->iconidx < n)
 	    icon_name = toolbar_icon_names[menu->iconidx];
 
 	image = gtk_image_new_from_icon_name(icon_name);
     }
 
-    return image;
+    ଫେରନ୍ତୁ image;
 }
 # endif
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 menu_button_clicked_cb(
 	VimMenuItem	    *item UNUSED,
 	VimMenuItemEvent    event,
 	vimmenu_T	    *menu)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    ଯଦି (event == VIM_MENU_ITEM_CLICKED)
 	gui_menu_cb(menu);
-    else if (event == VIM_MENU_ITEM_SELECTED)
+    ଅନ୍ୟଥା ଯଦି (event == VIM_MENU_ITEM_SELECTED)
     {
 	// Show tooltip instantly in cmdline message.
 	char_u		*tooltip;
-	static gboolean did_msg = FALSE;
+	ସ୍ଥିର gboolean did_ସନ୍ଦେଶ = FALSE;
 
-	if (State & MODE_CMDLINE)
-	    return;
+	ଯଦି (State & MODE_CMDLINE)
+	    ଫେରନ୍ତୁ;
 
 	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+	ଯଦି (tooltip != ଖାଲି && utf_valid_string(tooltip, ଖାଲି))
 	{
-	    msg((char *)tooltip);
-	    did_msg = TRUE;
+	    ସନ୍ଦେଶ((ଅକ୍ଷର *)tooltip);
+	    did_ସନ୍ଦେଶ = TRUE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
-	else if (did_msg)
+	ଅନ୍ୟଥା ଯଦି (did_ସନ୍ଦେଶ)
 	{
-	    msg("");
-	    did_msg = FALSE;
+	    ସନ୍ଦେଶ("");
+	    did_ସନ୍ଦେଶ = FALSE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
@@ -3846,15 +3846,15 @@ menu_button_clicked_cb(
     }
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    ଶୂନ୍ୟ
+gui_mch_add_menu(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     vimmenu_T	*parent;
     GtkWidget	*parent_widget;
     gboolean	use_mnemonic;
     char_u	*text;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    ଯଦି (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	// Attach the popover to drawarea's parent rather than to drawarea
 	// itself. GtkDrawingArea is a leaf widget whose snapshot does not
@@ -3862,58 +3862,58 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	// leave the drawing area blank while the popover is open.
 	menu->submenu_id = g_object_ref_sink(vim_menu_new());
 	gtk_widget_set_parent(menu->submenu_id, gui.drawarea);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     parent = menu->parent;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    ଯଦି ((parent != ଖାଲି && parent->submenu_id == ଖାଲି)
 	    || !menu_is_menubar(menu->name))
-	return;
+	ଫେରନ୍ତୁ;
 
     menu->submenu_id = g_object_ref_sink(vim_menu_new());
 
-    use_mnemonic = parent != NULL || p_wak[0] != 'n';
+    use_mnemonic = parent != ଖାଲି || p_wak[0] != 'n';
     text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-    if (parent != NULL)
+    ଯଦି (parent != ଖାଲି)
     {
 	parent_widget = parent->submenu_id;
 	menu->id = g_object_ref_sink(vim_menu_item_new(
-		    (const char *)text, NULL, NULL));
+		    (ଅଚଳ ଅକ୍ଷର *)text, ଖାଲି, ଖାଲି));
 
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(menu->id),
 		VIM_MENU(menu->submenu_id));
-	vim_menu_insert_item(VIM_MENU(parent_widget),
+	vim_menu_ଭର୍ତ୍ତି_item(VIM_MENU(parent_widget),
 		VIM_MENU_ITEM(menu->id), idx);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	parent_widget = gui.menubar;
 	menu->id = g_object_ref_sink(vim_menu_bar_item_new(
-		    (const char *)text, VIM_MENU(menu->submenu_id)));
+		    (ଅଚଳ ଅକ୍ଷର *)text, VIM_MENU(menu->submenu_id)));
 
-	vim_menu_bar_insert_item(VIM_MENU_BAR(parent_widget),
+	vim_menu_bar_ଭର୍ତ୍ତି_item(VIM_MENU_BAR(parent_widget),
 		VIM_MENU_BAR_ITEM(menu->id), idx);
     }
 
     vim_free(text);
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    ଶୂନ୍ୟ
+gui_mch_add_menu_item(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     vimmenu_T	*parent = menu->parent;
 
 # ifdef FEAT_TOOLBAR
-    if (parent != NULL && menu_is_toolbar(parent->name))
+    ଯଦି (parent != ଖାଲି && menu_is_toolbar(parent->name))
     {
-	if (menu_is_separator(menu->name))
+	ଯଦି (menu_is_separator(menu->name))
 	{
 	    menu->id =
-		vim_toolbar_insert_separator(VIM_TOOLBAR(gui.toolbar), idx);
+		vim_toolbar_ଭର୍ତ୍ତି_separator(VIM_TOOLBAR(gui.toolbar), idx);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    GtkWidget	*btn;
 	    GtkWidget	*icon;
@@ -3922,13 +3922,13 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 
 	    text    = CONVERT_TO_UTF8(menu->dname);
 	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    ଯଦି (tooltip != ଖାଲି && !utf_valid_string(tooltip, ଖାଲି))
 		CONVERT_TO_UTF8_FREE(tooltip);
 
 	    icon = create_toolbar_icon(menu);
-	    btn = vim_toolbar_insert_button(VIM_TOOLBAR(gui.toolbar),
-		    icon, (const char *)text, idx);
-	    gtk_widget_set_tooltip_text(btn, (const gchar *)tooltip);
+	    btn = vim_toolbar_ଭର୍ତ୍ତି_button(VIM_TOOLBAR(gui.toolbar),
+		    icon, (ଅଚଳ ଅକ୍ଷର *)text, idx);
+	    gtk_widget_set_tooltip_text(btn, (ଅଚଳ gchar *)tooltip);
 
 	    g_signal_connect(btn, "clicked",
 		    G_CALLBACK(toolbar_button_clicked_cb), menu);
@@ -3937,40 +3937,40 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    CONVERT_TO_UTF8_FREE(text);
 	    CONVERT_TO_UTF8_FREE(tooltip);
 	}
-	return;
+	ଫେରନ୍ତୁ;
     }
 # endif
 
     // Menu items (non-toolbar)
-    if (parent == NULL || parent->submenu_id == NULL)
-	return;
+    ଯଦି (parent == ଖାଲି || parent->submenu_id == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (menu_is_separator(menu->name))
+    ଯଦି (menu_is_separator(menu->name))
     {
-	menu->id = g_object_ref_sink(vim_menu_insert_separator(
+	menu->id = g_object_ref_sink(vim_menu_ଭର୍ତ୍ତି_separator(
 		VIM_MENU(parent->submenu_id), idx));
     }
-    else
+    ଅନ୍ୟଥା
     {
 	char_u	    *text;
-	char_u	    *accel_text = NULL;
+	char_u	    *accel_text = ଖାଲି;
 	gboolean    use_mnemonic;
 
 	use_mnemonic = p_wak[0] != 'n';
 	text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-	if (menu->actext != NULL && menu->actext[0] != NUL)
+	ଯଦି (menu->actext != ଖାଲି && menu->actext[0] != NUL)
 	    accel_text = CONVERT_TO_UTF8(menu->actext);
 
 	// Add our own reference to the widget
-	menu->id = g_object_ref_sink(vim_menu_item_new((const char *)text,
+	menu->id = g_object_ref_sink(vim_menu_item_new((ଅଚଳ ଅକ୍ଷର *)text,
 		    (VimMenuItemFunc)menu_button_clicked_cb, menu));
 
-	if (accel_text != NULL)
+	ଯଦି (accel_text != ଖାଲି)
 	    vim_menu_item_set_accel(VIM_MENU_ITEM(menu->id),
-		    (const char *)accel_text);
+		    (ଅଚଳ ଅକ୍ଷର *)accel_text);
 
-	vim_menu_insert_item(VIM_MENU(parent->submenu_id),
+	vim_menu_ଭର୍ତ୍ତି_item(VIM_MENU(parent->submenu_id),
 		VIM_MENU_ITEM(menu->id), idx);
 
 	vim_free(text);
@@ -3978,51 +3978,51 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+    ଶୂନ୍ୟ
+gui_mch_toggle_tearoffs(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable UNUSED)
 {
     // GTK4: tearoff menus don't exist.
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
     char_u *tooltip;
 
-    if (menu->id == NULL)
-	return;
+    ଯଦି (menu->id == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-	gtk_widget_set_tooltip_text(menu->id, (const char *)tooltip);
+    ଯଦି (tooltip != ଖାଲି && utf_valid_string(tooltip, ଖାଲି))
+	gtk_widget_set_tooltip_text(menu->id, (ଅଚଳ ଅକ୍ଷର *)tooltip);
     CONVERT_TO_UTF8_FREE(tooltip);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // For toolbar buttons and separators, remove from the toolbar box.
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    ଯଦି (menu->parent != ଖାଲି && menu_is_toolbar(menu->parent->name))
     {
-	if (menu->id != NULL)
+	ଯଦି (menu->id != ଖାଲି)
 	{
 	    vim_toolbar_remove(VIM_TOOLBAR(gui.toolbar), menu->id);
-	    menu->id = NULL;
+	    menu->id = ଖାଲି;
 	}
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // For popup menus, unparent the menu as well
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    ଯଦି (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
-	if (menu->submenu_id != NULL)
+	ଯଦି (menu->submenu_id != ଖାଲି)
 	    gtk_widget_unparent(menu->submenu_id);
     }
-    else if (menu->parent == NULL && menu->id != NULL)
+    ଅନ୍ୟଥା ଯଦି (menu->parent == ଖାଲି && menu->id != ଖାଲି)
 	// Remove from menubar, if not NULL.
 	vim_menu_bar_remove(VIM_MENU_BAR(gui.menubar), menu->id);
     // "menu->id" is NULL for window toolbar
-    else if (menu->id != NULL)
+    ଅନ୍ୟଥା ଯଦି (menu->id != ଖାଲି)
 	// Remove from parent menu
 	vim_menu_remove(VIM_MENU(menu->parent->submenu_id), menu->id);
 
@@ -4030,30 +4030,30 @@ gui_mch_destroy_menu(vimmenu_T *menu)
     g_clear_object(&menu->id);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    int x, y;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, y;
 
     gui_mch_getmouse(&x, &y);
     gui_gtk_popup_at(menu, x, y);
 }
 
-    static void
-show_menubar_popover(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+show_menubar_popover(ଶୂନ୍ୟ)
 {
     GtkWidget	    *menu;
     GdkRectangle    rect;
 
-    if (gui.menubar == NULL || gui.drawarea == NULL)
-	return;
+    ଯଦି (gui.menubar == ଖାଲି || gui.drawarea == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    if (gtk_widget_is_visible(gui.menubar))
+    ଯଦି (gtk_widget_is_visible(gui.menubar))
     {
 	// If menubar is visible, then just show first menu in menubar, like how
 	// GTK traditionally seems to do it?
-	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), NULL);
-	return;
+	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), ଖାଲି);
+	ଫେରନ୍ତୁ;
     }
 
     // Copy and convert the menubar into a menu popover
@@ -4066,7 +4066,7 @@ show_menubar_popover(void)
     rect.width = 1;
     rect.height = 1;
     gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rect);
-    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), NULL);
+    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), ଖାଲି);
     gtk_popover_popup(GTK_POPOVER(menu));
 }
 
@@ -4078,79 +4078,79 @@ show_menubar_popover(void)
  * ============================================================
  */
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 {
     GtkAdjustment *adj;
 
-    if (sb->id == NULL)
-	return;
-    if (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
-	return;
+    ଯଦି (sb->id == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ଯଦି (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
+	ଫେରନ୍ତୁ;
 
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
     gtk_adjustment_set_lower(adj, 0.0);
     gtk_adjustment_set_upper(adj, (gdouble)max + 1);
-    gtk_adjustment_set_value(adj, (gdouble)val);
+    gtk_adjustment_set_ମୂଲ୍ୟ(adj, (gdouble)val);
     gtk_adjustment_set_step_increment(adj, 1.0);
     gtk_adjustment_set_page_increment(adj, (gdouble)(size > 2 ? size - 2 : 1));
     gtk_adjustment_set_page_size(adj, (gdouble)size);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    ଶୂନ୍ୟ
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h)
 {
-    if (sb->id != NULL)
+    ଯଦି (sb->id != ଖାଲି)
 	vim_form_move_resize(VIM_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_get_scrollbar_xpadding(ଶୂନ୍ୟ)
 {
-    int formwin_w = gtk_widget_get_width(gui.formwin);
-    int sbar_w = 0;
-    int xpad;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା formwin_w = gtk_widget_get_width(gui.formwin);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା sbar_w = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା xpad;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
+    ଯଦି (gui.which_scrollbars[SBAR_ବାମ])
 	sbar_w += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    ଯଦି (gui.which_scrollbars[SBAR_ଡାହାଣ])
 	sbar_w += gui.scrollbar_width;
 
     xpad = formwin_w - last_text_area_w - sbar_w;
-    return (xpad < 0) ? 0 : xpad;
+    ଫେରନ୍ତୁ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_get_scrollbar_ypadding(ଶୂନ୍ୟ)
 {
-    int formwin_h = gtk_widget_get_height(gui.formwin);
-    int ypad;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା formwin_h = gtk_widget_get_height(gui.formwin);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ypad;
 
     ypad = formwin_h - last_text_area_h;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    ଯଦି (gui.which_scrollbars[SBAR_BOTTOM])
 	ypad -= gui.scrollbar_height;
 
-    return (ypad < 0) ? 0 : ypad;
+    ଫେରନ୍ତୁ (ypad < 0) ? 0 : ypad;
 }
 
-    static void
-adjustment_value_changed(GtkAdjustment *adj, gpointer data UNUSED)
+    ସ୍ଥିର ଶୂନ୍ୟ
+adjustment_ମୂଲ୍ୟ_changed(GtkAdjustment *adj, gpointer data UNUSED)
 {
     scrollbar_T *sb = (scrollbar_T *)g_object_get_data(G_OBJECT(adj), "vim-sb");
-    long value = (long)gtk_adjustment_get_value(adj);
+    long ମୂଲ୍ୟ = (long)gtk_adjustment_get_ମୂଲ୍ୟ(adj);
 
-    if (sb != NULL)
-	gui_drag_scrollbar(sb, value, FALSE);
+    ଯଦି (sb != ଖାଲି)
+	gui_drag_scrollbar(sb, ମୂଲ୍ୟ, FALSE);
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    ଶୂନ୍ୟ
+gui_mch_create_scrollbar(scrollbar_T *sb, ପୂର୍ଣ୍ଣସଂଖ୍ୟା orient)
 {
     GtkAdjustment *adj;
-    if (orient == SBAR_HORIZ)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-    else
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
+    ଯଦି (orient == SBAR_HORIZ)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, ଖାଲି);
+    ଅନ୍ୟଥା
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, ଖାଲି);
 
     gtk_widget_add_css_class(sb->id, "vim-scrollbar");
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
@@ -4160,16 +4160,16 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
 
     g_object_set_data(G_OBJECT(adj), "vim-sb", (gpointer)sb);
     g_signal_connect(G_OBJECT(adj), "value-changed",
-	    G_CALLBACK(adjustment_value_changed), NULL);
+	    G_CALLBACK(adjustment_ମୂଲ୍ୟ_changed), ଖାଲି);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    ଯଦି (sb->id != ଖାଲି)
     {
 	vim_form_remove(VIM_FORM(gui.formwin), sb->id);
-	sb->id = NULL;
+	sb->id = ଖାଲି;
     }
 }
 
@@ -4179,13 +4179,13 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * ============================================================
  */
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ଶୂନ୍ୟ
+gui_mch_set_text_area_pos(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, ପୂର୍ଣ୍ଣସଂଖ୍ୟା y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h)
 {
     // "h" may be negative especially when draw area size is smaller than
     // "gui.char_height".
-    if (w <= 0 || h <= 0)
-	return;
+    ଯଦି (w <= 0 || h <= 0)
+	ଫେରନ୍ତୁ;
     last_text_area_w = w;
     last_text_area_h = h;
 
@@ -4196,30 +4196,30 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Calculate the number of pixels to bleed background color to. Should be called
  * after all UI elements are positioned and resized.
  */
-    void
-gui_gtk4_calculate_bleed(int width, int height)
+    ଶୂନ୍ୟ
+gui_gtk4_calculate_bleed(ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height)
 {
-    int old_right = gui.bleed_right;
-    int old_bot = gui.bleed_bot;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା old_ଡାହାଣ = gui.bleed_ଡାହାଣ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା old_bot = gui.bleed_bot;
 
-    gui.bleed_right = width - last_text_area_w;
+    gui.bleed_ଡାହାଣ = width - last_text_area_w;
     gui.bleed_bot = height - last_text_area_h;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    ଯଦି (gui.which_scrollbars[SBAR_ବାମ])
+	gui.bleed_ଡାହାଣ -= gui.scrollbar_width;
+    ଯଦି (gui.which_scrollbars[SBAR_ଡାହାଣ])
+	gui.bleed_ଡାହାଣ -= gui.scrollbar_width;
+    ଯଦି (gui.which_scrollbars[SBAR_BOTTOM])
 	gui.bleed_bot -= gui.scrollbar_height;
 
     // Not sure if this can happen, but be safe...
-    if (gui.bleed_right < 0)
-	gui.bleed_right = 0;
-    if (gui.bleed_bot < 0)
+    ଯଦି (gui.bleed_ଡାହାଣ < 0)
+	gui.bleed_ଡାହାଣ = 0;
+    ଯଦି (gui.bleed_bot < 0)
 	gui.bleed_bot = 0;
 
     // Make sure to update draw area if changed
-    if (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
+    ଯଦି (old_ଡାହାଣ != gui.bleed_ଡାହାଣ || old_bot != gui.bleed_bot)
 	gtk_widget_queue_draw(GTK_WIDGET(gui.drawarea));
 }
 
@@ -4232,40 +4232,40 @@ gui_gtk4_calculate_bleed(int width, int height)
 /*
  * Blocking helper: run a GtkFileDialog and wait for result.
  */
-typedef struct {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
     GFile	*result;
     gboolean	done;
 } FileDialogData;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 file_dialog_open_cb(GObject *source, GAsyncResult *res, gpointer data)
 {
     FileDialogData *fdd = (FileDialogData *)data;
     fdd->result = gtk_file_dialog_open_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+		    GTK_FILE_DIALOG(source), res, ଖାଲି);
     fdd->done = TRUE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 file_dialog_save_cb(GObject *source, GAsyncResult *res, gpointer data)
 {
     FileDialogData *fdd = (FileDialogData *)data;
     fdd->result = gtk_file_dialog_save_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+		    GTK_FILE_DIALOG(source), res, ଖାଲି);
     fdd->done = TRUE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 file_dialog_folder_cb(GObject *source, GAsyncResult *res, gpointer data)
 {
     FileDialogData *fdd = (FileDialogData *)data;
     fdd->result = gtk_file_dialog_select_folder_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+		    GTK_FILE_DIALOG(source), res, ଖାଲି);
     fdd->done = TRUE;
 }
 
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(ପୂର୍ଣ୍ଣସଂଖ୍ୟା saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext UNUSED,
@@ -4275,14 +4275,14 @@ gui_mch_browse(int saving,
     GtkFileDialog   *dlg;
     FileDialogData  fdd;
     char_u	    dirbuf[MAXPATHL];
-    char_u	    *result = NULL;
+    char_u	    *result = ଖାଲି;
     GListStore	    *filters;
 
     title = CONVERT_TO_UTF8(title);
 
-    if (initdir == NULL || *initdir == NUL)
+    ଯଦି (initdir == ଖାଲି || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    ଅନ୍ୟଥା ଯଦି (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     add_pathsep(dirbuf);
 
@@ -4290,51 +4290,51 @@ gui_mch_browse(int saving,
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    ଯଦି (title != ଖାଲି)
+	gtk_file_dialog_set_title(dlg, (ଅଚଳ ଅକ୍ଷର *)title);
 
     {
-	GFile *dir = g_file_new_for_path((const char *)dirbuf);
+	GFile *dir = g_file_new_for_path((ଅଚଳ ଅକ୍ଷର *)dirbuf);
 	gtk_file_dialog_set_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
     // Add file filters
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
-    if (filter != NULL && *filter != NUL)
+    ଯଦି (filter != ଖାଲି && *filter != NUL)
     {
-	int		i = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i = 0;
 	char_u		*patt;
 	char_u		*p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	ଯଦି (patt != ଖାଲି)
 	{
-	    while (p != NULL && *p != NUL)
+	    ଯେତେବେଳେ (p != ଖାଲି && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		ଯଦି (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
+		    ଯଦି (*p == '\t')
 			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    ଅନ୍ୟଥା
 		    {
 			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			ଯଦି (*p == '\n')
 			{
 			    g_list_store_append(filters, gfilter);
 			    g_object_unref(gfilter);
-			    if (*(p + 1) != NUL)
+			    ଯଦି (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    p++;
 		    i++;
@@ -4346,26 +4346,26 @@ gui_mch_browse(int saving,
     gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(filters));
     g_object_unref(filters);
 
-    if (saving && dflt != NULL && *dflt != NUL)
-	gtk_file_dialog_set_initial_name(dlg, (const char *)dflt);
+    ଯଦି (saving && dflt != ଖାଲି && *dflt != NUL)
+	gtk_file_dialog_set_initial_name(dlg, (ଅଚଳ ଅକ୍ଷର *)dflt);
 
-    fdd.result = NULL;
+    fdd.result = ଖାଲି;
     fdd.done = FALSE;
 
-    if (saving)
-	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    ଯଦି (saving)
+	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), ଖାଲି,
 		file_dialog_save_cb, &fdd);
-    else
-	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    ଅନ୍ୟଥା
+	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), ଖାଲି,
 		file_dialog_open_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ଯେତେବେଳେ (!fdd.done)
+	g_main_context_iteration(ଖାଲି, TRUE);
 
-    if (fdd.result != NULL)
+    ଯଦି (fdd.result != ଖାଲି)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	ଅକ୍ଷର *path = g_file_get_path(fdd.result);
+	ଯଦି (path != ଖାଲି)
 	{
 	    result = vim_strsave((char_u *)path);
 	    g_free(path);
@@ -4376,7 +4376,7 @@ gui_mch_browse(int saving,
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    ଫେରନ୍ତୁ result;
 }
 
     char_u *
@@ -4384,36 +4384,36 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     GtkFileDialog	*dlg;
     FileDialogData	fdd;
-    char_u		*result = NULL;
+    char_u		*result = ଖାଲି;
 
     title = CONVERT_TO_UTF8(title);
     gui_mch_mousehide(FALSE);
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    ଯଦି (title != ଖାଲି)
+	gtk_file_dialog_set_title(dlg, (ଅଚଳ ଅକ୍ଷର *)title);
 
-    if (initdir != NULL && *initdir != NUL)
+    ଯଦି (initdir != ଖାଲି && *initdir != NUL)
     {
-	GFile *dir = g_file_new_for_path((const char *)initdir);
+	GFile *dir = g_file_new_for_path((ଅଚଳ ଅକ୍ଷର *)initdir);
 	gtk_file_dialog_set_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
-    fdd.result = NULL;
+    fdd.result = ଖାଲି;
     fdd.done = FALSE;
 
-    gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), ଖାଲି,
 	    file_dialog_folder_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    ଯେତେବେଳେ (!fdd.done)
+	g_main_context_iteration(ଖାଲି, TRUE);
 
-    if (fdd.result != NULL)
+    ଯଦି (fdd.result != ଖାଲି)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	ଅକ୍ଷର *path = g_file_get_path(fdd.result);
+	ଯଦି (path != ଖାଲି)
 	{
 	    result = vim_strsave((char_u *)path);
 	    g_free(path);
@@ -4424,7 +4424,7 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    ଫେରନ୍ତୁ result;
 }
 
 /*
@@ -4439,145 +4439,145 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
  * "button_string" is duplicated; caller must free the duplicated string via
  * *tofree.
  */
-    static char **
-split_button_string(char_u *button_string, int *n_buttons, char **tofree)
+    ସ୍ଥିର ଅକ୍ଷର **
+split_button_string(char_u *button_string, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *n_buttons, ଅକ୍ଷର **tofree)
 {
-    char	    **array;
+    ଅକ୍ଷର	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା    ଗଣନା_2 = 1;
 
-    button_string = (char_u *)g_strdup((const char *)button_string);
+    button_string = (char_u *)g_strdup((ଅଚଳ ଅକ୍ଷର *)button_string);
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+    ପାଇଁ (p = button_string; *p != NUL; ++p)
+	ଯଦି (*p == DLG_BUTTON_SEP)
+	    ++ଗଣନା_2;
 
-    array = g_malloc_n(count, sizeof(char *));
-    count = 0;
+    array = g_malloc_n(ଗଣନା_2, ଆକାର(ଅକ୍ଷର *));
+    ଗଣନା_2 = 0;
 
-    if (array != NULL)
+    ଯଦି (array != ଖାଲି)
     {
-	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	array[ଗଣନା_2++] = (ଅକ୍ଷର *)button_string;
+	ପାଇଁ (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    ଯଦି (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[ଗଣନା_2++] = (ଅକ୍ଷର *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    ଅନ୍ୟଥା ଯଦି (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    ଅନ୍ୟଥା
 		MB_PTR_ADV(p);
 	}
     }
 
-    *tofree = (char *)button_string;
-    *n_buttons = count;
-    return array;
+    *tofree = (ଅକ୍ଷର *)button_string;
+    *n_buttons = ଗଣନା_2;
+    ଫେରନ୍ତୁ array;
 }
 
 /*
  * Convert VIM_GENERIC, VIM_ERROR, etc into an icon name. Returns NULL for
  * VIM_GENERIC.
  */
-    static const char *
-dialog_type_to_icon(int type)
+    ସ୍ଥିର ଅଚଳ ଅକ୍ଷର *
+dialog_type_to_icon(ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
-    switch (type)
+    ବାଛ (type)
     {
-	case VIM_ERROR:
-	    return "dialog-error-symbolic";
-	case VIM_WARNING:
-	    return "dialog-warning-symbolic";
-	case VIM_INFO:
-	    return "dialog-information-symbolic";
-	case VIM_QUESTION:
-	    return "dialog-question-symbolic";
-	default:
-	    break;
+	ସ୍ଥିତି VIM_ERROR:
+	    ଫେରନ୍ତୁ "dialog-error-symbolic";
+	ସ୍ଥିତି VIM_WARNING:
+	    ଫେରନ୍ତୁ "dialog-warning-symbolic";
+	ସ୍ଥିତି VIM_INFO:
+	    ଫେରନ୍ତୁ "dialog-information-symbolic";
+	ସ୍ଥିତି VIM_QUESTION:
+	    ଫେରନ୍ତୁ "dialog-question-symbolic";
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
+	    ଭାଙ୍ଗ;
     }
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 // Data associated with each button in the dialog
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    int		but_idx;
-    int		*response;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		but_idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		*response;
     gboolean	*done;
 } DialogButtonState;
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     GtkWidget	*win;
     gboolean	*done;
     gboolean	no_alt;
 } DialogState;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dialog_button_clicked_cb(GtkButton *button UNUSED, DialogButtonState *state)
 {
     *state->response = state->but_idx;
     *state->done = TRUE;
 }
 
-    static gboolean
-dialog_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    ସ୍ଥିର gboolean
+dialog_ଚାବି_pressed_cb(
+	Gtk_Event_Controller_ଚାବି	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
 	DialogState		*dstate)
 {
-    if (keyval == GDK_KEY_Escape)
+    ଯଦି (keyval == GDK_ଚାବି_Escape)
     {
 	*dstate->done = TRUE;
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
     }
 
-    if (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
-	return gtk_widget_mnemonic_activate(dstate->win, FALSE);
-    return FALSE;
+    ଯଦି (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
+	ଫେରନ୍ତୁ gtk_widget_mnemonic_activate(dstate->win, FALSE);
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    static gboolean
+    ସ୍ଥିର gboolean
 dialog_close_request_cb(GtkWindow *win UNUSED, gboolean *win_closed)
 {
     *win_closed = TRUE;
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 gui_mch_dialog(
-	int	type,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	type,
 	char_u	*title,
 	char_u	*message,
 	char_u	*buttons,
-	int	def_but,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	def_but,
 	char_u	*textfield,
-	int	ex_cmd UNUSED)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	ex_cmd UNUSED)
 {
     GtkWindow		*win = GTK_WINDOW(gtk_window_new());
     GtkWidget		*vertbox;
     GtkWidget		*message_box;
-    const char		*icon_name;
+    ଅଚଳ ଅକ୍ଷର		*icon_name;
     GtkWidget		*icon;
     GtkWidget		*label;
-    GtkWidget		*entry = NULL;
+    GtkWidget		*entry = ଖାଲି;
     char_u		*utf8_title;
     char_u		*utf8_message;
-    GtkEventController *key_controller;
-    DialogButtonState	*but_states = NULL;
-    char		*tofree = NULL;
-    int			response = -1;
+    GtkEventController *ଚାବି_controller;
+    DialogButtonState	*but_states = ଖାଲି;
+    ଅକ୍ଷର		*tofree = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			response = -1;
     gboolean		done = FALSE;
     gboolean		win_closed = FALSE;
     DialogState		state;
 
     utf8_title = CONVERT_TO_UTF8(title);
-    if (utf8_title != NULL)
-	gtk_window_set_title(win, (const char *)utf8_title);
+    ଯଦି (utf8_title != ଖାଲି)
+	gtk_window_set_title(win, (ଅଚଳ ଅକ୍ଷର *)utf8_title);
     CONVERT_TO_UTF8_FREE(utf8_title);
 
     gtk_window_set_transient_for(win, GTK_WINDOW(gui.mainwin));
@@ -4590,7 +4590,7 @@ gui_mch_dialog(
     // Create main vertical layout container
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 16);
     gtk_window_set_child(win, vertbox);
-    gtk_widget_set_margin_top(vertbox, 24);
+    gtk_widget_set_margin_ଶୀର୍ଷ(vertbox, 24);
     gtk_widget_set_margin_bottom(vertbox, 24);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
@@ -4602,7 +4602,7 @@ gui_mch_dialog(
 
     // If type is not VIM_GENERIC, add an icon to make the dialog look nicer :)
     icon_name = dialog_type_to_icon(type);
-    if (icon_name != NULL)
+    ଯଦି (icon_name != ଖାଲି)
     {
 	icon = gtk_image_new_from_icon_name(icon_name);
 	gtk_image_set_icon_size(GTK_IMAGE(icon), GTK_ICON_SIZE_LARGE);
@@ -4610,7 +4610,7 @@ gui_mch_dialog(
     }
 
     utf8_message = CONVERT_TO_UTF8(message);
-    label = gtk_label_new((const char *)utf8_message);
+    label = gtk_label_new((ଅଚଳ ଅକ୍ଷର *)utf8_message);
     CONVERT_TO_UTF8_FREE(utf8_message);
     gtk_label_set_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), 40);
@@ -4618,23 +4618,23 @@ gui_mch_dialog(
 
     // Close the dialog when the <Esc> key is pressed. Also allow using
     // mnemonics without <Alt> key (if there is no text field).
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(dialog_key_pressed_cb), &state);
-    gtk_widget_add_controller(GTK_WIDGET(win), key_controller);
+    ଚାବି_controller = gtk_event_controller_ଚାବି_new();
+    g_signal_connect(ଚାବି_controller, "key-pressed",
+	    G_CALLBACK(dialog_ଚାବି_pressed_cb), &state);
+    gtk_widget_add_controller(GTK_WIDGET(win), ଚାବି_controller);
     state.done = &done;
     state.win = GTK_WIDGET(win);
 
-    if (textfield != NULL)
+    ଯଦି (textfield != ଖାଲି)
     {
 	// Add text entry so user can enter text
 	char_u *utf8_text = CONVERT_TO_UTF8(textfield);
 
 	entry = gtk_entry_new();
 
-	if (utf8_text != NULL)
-	    gtk_editable_set_text(GTK_EDITABLE(entry), (const char *)utf8_text);
-	else
+	ଯଦି (utf8_text != ଖାଲି)
+	    gtk_editable_set_text(GTK_EDITABLE(entry), (ଅଚଳ ଅକ୍ଷର *)utf8_text);
+	ଅନ୍ୟଥା
 	    gtk_editable_set_text(GTK_EDITABLE(entry), "");
 	CONVERT_TO_UTF8_FREE(utf8_text);
 
@@ -4644,21 +4644,21 @@ gui_mch_dialog(
 	gtk_box_append(GTK_BOX(vertbox), entry);
 	state.no_alt = FALSE;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	GListModel  *controllers;
-	int	    len;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len;
 
 	// Set all shortcut controllers in the window to not require a modifier
 	// for mnemonics.
 	controllers = gtk_widget_observe_controllers(GTK_WIDGET(win));
-	len  = g_list_model_get_n_items(controllers);
-	for (int i = 0; i < len; i++)
+	len  = g_list_model_get_n_ବସ୍ତୁଗୁଡ଼ିକ(controllers);
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < len; i++)
 	{
 	    GtkEventController *controller;
 
 	    controller = g_list_model_get_item(controllers, i);
-	    if (GTK_IS_SHORTCUT_CONTROLLER(controller))
+	    ଯଦି (GTK_IS_SHORTCUT_CONTROLLER(controller))
 		gtk_shortcut_controller_set_mnemonics_modifiers(
 			GTK_SHORTCUT_CONTROLLER(controller), 0);
 	}
@@ -4668,16 +4668,16 @@ gui_mch_dialog(
 	state.no_alt = TRUE;
     }
 
-    if (buttons != NULL)
+    ଯଦି (buttons != ଖାଲି)
     {
 	GtkWidget   *but_box;
-	char	    **buttons_arr; // Note that array is allocated, not strings
-	int	    n_buttons;
+	ଅକ୍ଷର	    **buttons_arr; // Note that array is allocated, not strings
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    n_buttons;
 
 	// Check 'v' flag in 'guioptions': vertical button placement.
-	if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+	ଯଦି (vim_strchr(p_go, GO_VERTICAL) != ଖାଲି)
 	    but_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-	else
+	ଅନ୍ୟଥା
 	    but_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 
 	gtk_widget_set_halign(but_box, GTK_ALIGN_CENTER);
@@ -4686,20 +4686,20 @@ gui_mch_dialog(
 
 	buttons_arr = split_button_string(buttons, &n_buttons, &tofree);
 
-	but_states = g_malloc_n(n_buttons, sizeof(DialogButtonState));
+	but_states = g_malloc_n(n_buttons, ଆକାର(DialogButtonState));
 
-	for (int i = 0; i < n_buttons; i++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n_buttons; i++)
 	{
 	    char_u		*but_label;
 	    GtkWidget		*but;
 	    DialogButtonState	*but_state = but_states + i;
 
 	    but_label = CONVERT_TO_UTF8((char_u *)buttons_arr[i]);
-	    if (but_label == NULL)
-		continue;
+	    ଯଦି (but_label == ଖାଲି)
+		ଜାରି;
 
-	    but = gtk_button_new_with_mnemonic((char *)but_label);
-	    if (i == def_but - 1)
+	    but = gtk_button_new_with_mnemonic((ଅକ୍ଷର *)but_label);
+	    ଯଦି (i == def_but - 1)
 		gtk_window_set_default_widget(win, but);
 	    gtk_box_append(GTK_BOX(but_box), but);
 	    CONVERT_TO_UTF8_FREE(but_label);
@@ -4716,12 +4716,12 @@ gui_mch_dialog(
 
     gtk_window_present(win);
 
-    while (!done && !win_closed)
-	g_main_context_iteration(NULL, TRUE);
+    ଯେତେବେଳେ (!done && !win_closed)
+	g_main_context_iteration(ଖାଲି, TRUE);
 
-    if (done)
+    ଯଦି (done)
     {
-	if (textfield != NULL)
+	ଯଦି (textfield != ଖାଲି)
 	{
 	    // Get the text the user entered
 	    char_u *text;
@@ -4738,7 +4738,7 @@ gui_mch_dialog(
     g_free(tofree);
 
     // Vim buttons are indexed starting from one.
-    return response == -1 ? 0 : response + 1;
+    ଫେରନ୍ତୁ response == -1 ? 0 : response + 1;
 }
 
 /*
@@ -4753,7 +4753,7 @@ gui_mch_dialog(
  * ============================================================
  */
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     GtkWidget *dialog;
     GtkWidget *what;	    // Find what entry
@@ -4767,13 +4767,13 @@ typedef struct
     GtkWidget *all;	    // 'Replace All' action button
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {0};
-static SharedFindReplace repl_widgets = {0};
+ସ୍ଥିର SharedFindReplace find_widgets = {0};
+ସ୍ଥିର SharedFindReplace repl_widgets = {0};
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 {
-    int			flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			flags;
     char_u		*find_text;
     char_u		*repl_text;
     gboolean		direction_down;
@@ -4781,12 +4781,12 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 
     flags = GPOINTER_TO_INT(data);
 
-    if (flags == FRD_FINDNEXT)
+    ଯଦି (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = ଖାଲି;
 	sfr = &find_widgets;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	repl_text = (char_u *)gtk_editable_get_text(
 		GTK_EDITABLE(repl_widgets.with));
@@ -4797,9 +4797,9 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     direction_down = gtk_check_button_get_active(
 	    GTK_CHECK_BUTTON(sfr->down));
 
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
+    ଯଦି (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
 	flags |= FRD_WHOLE_WORD;
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
+    ଯଦି (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
 	flags |= FRD_MATCH_CASE;
 
     repl_text = CONVERT_FROM_UTF8(repl_text);
@@ -4809,29 +4809,29 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     CONVERT_FROM_UTF8_FREE(find_text);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dialog_destroyed_cb(GtkWidget *widget UNUSED, gpointer data)
 {
-    *(GtkWidget **)data = NULL;
+    *(GtkWidget **)data = ଖାଲି;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
 {
-    const gchar	*entry_text;
+    ଅଚଳ gchar	*entry_text;
     gboolean	nonempty;
 
     entry_text = gtk_editable_get_text(GTK_EDITABLE(entry));
 
-    if (!entry_text)
-	return; // Shouldn't happen
+    ଯଦି (!entry_text)
+	ଫେରନ୍ତୁ; // Shouldn't happen
 
     nonempty = (entry_text[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
+    ଯଦି (dialog == find_widgets.dialog)
 	gtk_widget_set_sensitive(find_widgets.find, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    ଯଦି (dialog == repl_widgets.dialog)
     {
 	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
 	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
@@ -4839,9 +4839,9 @@ entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
     }
 }
 
-    static gboolean
-find_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    ସ୍ଥିର gboolean
+find_ଚାବି_pressed_cb(
+	Gtk_Event_Controller_ଚାବି	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
@@ -4849,55 +4849,55 @@ find_key_pressed_cb(
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    ଯଦି (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	ଫେରନ୍ତୁ FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (keyval == GDK_KEY_Escape)
+    ଯଦି (keyval == GDK_ଚାବି_Escape)
     {
 	// Destroy rather than hide the dialog: reusing a hidden toplevel loses
 	// window decorations on Wayland
 	gtk_window_destroy(GTK_WINDOW(frdp->dialog));
-	return TRUE;
+	ଫେରନ୍ତୁ TRUE;
     }
 
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    static void
-entry_activate_cb(GtkWidget *widget UNUSED, void *udata)
+    ସ୍ଥିର ଶୂନ୍ୟ
+entry_activate_cb(GtkWidget *widget UNUSED, ଶୂନ୍ୟ *udata)
 {
     gtk_widget_grab_focus(GTK_WIDGET(udata));
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_replace_dialog_create(char_u *arg, ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_replace)
 {
     SharedFindReplace	*frdp;
     char_u		*entry_text;
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			wword = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			mcase = !p_ic;
     GtkWidget		*vertbox, *grid, *hbox, *tmp, *btn;
     gboolean		sensitive;
-    GtkEventController	*key_controller;
+    GtkEventController	*ଚାବି_controller;
 
     frdp = do_replace ? &repl_widgets : &find_widgets;
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    ଯଦି (entry_text != ଖାଲି && output_conv.vc_type != CONV_NONE)
     {
 	char_u *old = entry_text;
-	entry_text = string_convert(&output_conv, entry_text, NULL);
+	entry_text = string_convert(&output_conv, entry_text, ଖାଲି);
 	vim_free(old);
     }
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog != NULL)
+    ଯଦି (frdp->dialog != ଖାଲି)
     {
-	if (entry_text != NULL)
+	ଯଦି (entry_text != ଖାଲି)
 	{
 	    gtk_editable_set_text(GTK_EDITABLE(frdp->what),
-		    (char *)entry_text);
+		    (ଅକ୍ଷର *)entry_text);
 	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->wword),
 		    (gboolean)wword);
 	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->mcase),
@@ -4909,12 +4909,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && g_utf8_strlen(
+	ଯଦି (do_replace && g_utf8_strlen(
 		    gtk_editable_get_text(GTK_EDITABLE(frdp->what)), -1) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
 	vim_free(entry_text);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // Create a new dialog window.
@@ -4933,7 +4933,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
-    gtk_widget_set_margin_top(vertbox, 12);
+    gtk_widget_set_margin_ଶୀର୍ଷ(vertbox, 12);
     gtk_widget_set_margin_bottom(vertbox, 12);
     gtk_window_set_child(GTK_WINDOW(frdp->dialog), vertbox);
 
@@ -4950,12 +4950,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
     frdp->what = gtk_entry_new();
     gtk_widget_set_hexpand(frdp->what, TRUE);
-    sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
-	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (char *)entry_text);
+    sensitive = (entry_text != ଖାଲି && entry_text[0] != NUL);
+    ଯଦି (entry_text != ଖାଲି)
+	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (ଅକ୍ଷର *)entry_text);
     gtk_grid_attach(GTK_GRID(grid), frdp->what, 1, 0, 1, 1);
 
-    if (do_replace)
+    ଯଦି (do_replace)
     {
 	// "Replace with:" label + entry
 	tmp = gtk_label_new(_("Replace with:"));
@@ -4973,7 +4973,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
 		G_CALLBACK(entry_activate_cb), frdp->with);
     }
-    else
+    ଅନ୍ୟଥା
 	// Make the entry activation do the search.
 	gtk_entry_set_activates_default(GTK_ENTRY(frdp->what), TRUE);
 
@@ -5016,10 +5016,10 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_widget_set_sensitive(btn, sensitive);
     frdp->find = btn;
 
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(find_key_pressed_cb), frdp);
-    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), key_controller);
+    ଚାବି_controller = gtk_event_controller_ଚାବି_new();
+    g_signal_connect(ଚାବି_controller, "key-pressed",
+	    G_CALLBACK(find_ଚାବି_pressed_cb), frdp);
+    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), ଚାବି_controller);
 
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 	    G_CALLBACK(entry_changed_cb), frdp->dialog);
@@ -5030,7 +5030,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    GINT_TO_POINTER(do_replace ? FRD_R_FINDNEXT : FRD_FINDNEXT));
     gtk_box_append(GTK_BOX(hbox), btn);
 
-    if (do_replace)
+    ଯଦି (do_replace)
     {
 	btn = gtk_button_new_with_label(_("Replace"));
 	gtk_widget_set_sensitive(btn, sensitive);
@@ -5054,23 +5054,23 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
     gtk_window_present(GTK_WINDOW(frdp->dialog));
     gtk_widget_grab_focus(frdp->what);
-    if (do_replace && entry_text != NULL && entry_text[0] != NUL)
+    ଯଦି (do_replace && entry_text != ଖାଲି && entry_text[0] != NUL)
 	gtk_widget_grab_focus(frdp->with);
 
     vim_free(entry_text);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    ଯଦି (gui.in_use)
 	find_replace_dialog_create(eap->arg, FALSE);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    ଯଦି (gui.in_use)
 	find_replace_dialog_create(eap->arg, TRUE);
 }
 
@@ -5080,7 +5080,7 @@ gui_mch_replace_dialog(exarg_T *eap)
  * ============================================================
  */
 
-    void
+    ଶୂନ୍ୟ
 ex_helpfind(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
@@ -5093,19 +5093,19 @@ ex_helpfind(exarg_T *eap UNUSED)
  */
 
 #ifdef USE_GTK4_PRINT_DIALOG
-static GtkPrintDialog *print_dialog = NULL;
-static GtkPrintSettings *print_settings = NULL;
-static GtkPageSetup *page_setup = NULL;
-static GtkPrintSetup *print_setup = NULL;
-static GFile *print_file;
+ସ୍ଥିର GtkPrintDialog *print_dialog = ଖାଲି;
+ସ୍ଥିର GtkPrintSettings *print_settings = ଖାଲି;
+ସ୍ଥିର GtkPageSetup *page_setup = ଖାଲି;
+ସ୍ଥିର GtkPrintSetup *print_setup = ଖାଲି;
+ସ୍ଥିର GFile *print_file;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
 {
-    GError *error = NULL;
+    GError *error = ଖାଲି;
     print_setup = gtk_print_dialog_setup_finish(dialog, result, &error);
 
-    if (print_setup == NULL)
+    ଯଦି (print_setup == ଖାଲି)
     {
 	semsg(_(e_print_error_str), error->message);
 	g_error_free(error);
@@ -5121,86 +5121,86 @@ print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
 gui_gtk4_print_dialog(
 	prt_settings_T	*psettings,
 	char_u		*jobname,
-	double		*page_width,
-	double		*page_height)
+	ଦ୍ୱିଗୁଣ		*page_width,
+	ଦ୍ୱିଗୁଣ		*page_height)
 {
     GtkPrintDialog  *dialog = gtk_print_dialog_new();
     gboolean	    done = FALSE;
     char_u	    *temp;
 
-    gtk_print_dialog_set_title(dialog, (const char *)jobname);
+    gtk_print_dialog_set_title(dialog, (ଅଚଳ ଅକ୍ଷର *)jobname);
     gtk_print_dialog_set_modal(dialog, TRUE);
 
-    print_dialog = NULL;
-    print_setup = NULL;
+    print_dialog = ଖାଲି;
+    print_setup = ଖାଲି;
 
-    if (print_settings == NULL)
+    ଯଦି (print_settings == ଖାଲି)
     {
 	option_table_T *opt;
 
 	print_settings = gtk_print_settings_new();
 
 	opt = &printer_opts[OPT_PRINT_DUPLEX];
-	if (opt->present)
+	ଯଦି (opt->present)
 	{
-	    if (STRNICMP(opt->string, "off", 3) == 0)
+	    ଯଦି (STRNICMP(opt->string, "off", 3) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_SIMPLEX);
-	    else if (STRNICMP(opt->string, "short", 5) == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRNICMP(opt->string, "short", 5) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_VERTICAL);
-	    else
+	    ଅନ୍ୟଥା
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_HORIZONTAL);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PORTRAIT];
-	if (opt->present)
+	ଯଦି (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    ଯଦି (*opt->string == 'y')
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_PORTRAIT);
-	    else
+	    ଅନ୍ୟଥା
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_LANDSCAPE);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PAPER];
-	if (opt->present)
+	ଯଦି (opt->present)
 	{
 	    gtk_print_settings_set_paper_size(print_settings,
-		    gtk_paper_size_new((const char *)opt->string));
+		    gtk_paper_size_new((ଅଚଳ ଅକ୍ଷର *)opt->string));
 	}
 
 	opt = &printer_opts[OPT_PRINT_COLLATE];
-	if (opt->present)
+	ଯଦି (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    ଯଦି (*opt->string == 'y')
 		gtk_print_settings_set_collate(print_settings, TRUE);
-	    else
+	    ଅନ୍ୟଥା
 		gtk_print_settings_set_collate(print_settings, FALSE);
 	}
     }
 
-    if (page_setup == NULL)
+    ଯଦି (page_setup == ଖାଲି)
 	page_setup = gtk_page_setup_new();
 
     gtk_print_dialog_set_print_settings(dialog, print_settings);
     gtk_print_dialog_set_page_setup(dialog, page_setup);
 
-    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
+    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), ଖାଲି,
 	    (GAsyncReadyCallback)print_dialog_cb, &done);
 
-    while (!done)
-	g_main_context_iteration(NULL, TRUE);
+    ଯେତେବେଳେ (!done)
+	g_main_context_iteration(ଖାଲି, TRUE);
 
-    if (print_setup == NULL)
+    ଯଦି (print_setup == ଖାଲି)
     {
 	g_object_unref(dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_ସନ୍ଦେଶ = FALSE;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
 
     g_clear_object(&print_settings);
@@ -5222,31 +5222,31 @@ gui_gtk4_print_dialog(
 	    GTK_UNIT_POINTS);
 
     temp  = vim_tempname('p', FALSE);
-    if (temp == NULL)
+    ଯଦି (temp == ଖାଲି)
     {
 	emsg(_(e_cant_find_temp_file_for_writing));
 	g_clear_object(&dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_ସନ୍ଦେଶ = FALSE;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
-    print_file = g_file_new_for_path((char *)temp);
+    print_file = g_file_new_for_path((ଅକ୍ଷର *)temp);
 
     print_dialog = dialog;
 
-    return temp;
+    ଫେରନ୍ତୁ temp;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 print_file_cb(
 	GtkPrintDialog	*dialog,
 	GAsyncResult	*result,
 	GFile		*file)
 {
-    char *path = g_file_get_path(file);
+    ଅକ୍ଷର *path = g_file_get_path(file);
 
-    (void)gtk_print_dialog_print_file_finish(dialog, result, NULL);
+    (ଶୂନ୍ୟ)gtk_print_dialog_print_file_finish(dialog, result, ଖାଲି);
     g_object_unref(dialog);
 
     // Don't use g_file_delete() to be consistent
@@ -5255,16 +5255,16 @@ print_file_cb(
 }
 
 
-    void
-gui_gtk4_print_finish(void)
+    ଶୂନ୍ୟ
+gui_gtk4_print_finish(ଶୂନ୍ୟ)
 {
-    if (print_dialog != NULL)
+    ଯଦି (print_dialog != ଖାଲି)
     {
 	gtk_print_dialog_print_file(
 		print_dialog, GTK_WINDOW(gui.mainwin),
-		print_setup, print_file, NULL,
+		print_setup, print_file, ଖାଲି,
 		(GAsyncReadyCallback)print_file_cb, print_file);
-	print_dialog = NULL;
+	print_dialog = ଖାଲି;
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
     }
 }
@@ -5272,18 +5272,18 @@ gui_gtk4_print_finish(void)
 
 #ifdef FEAT_IMAGE_GUI
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     GdkTexture *texture;
 } image_gdk_T;
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    GskRenderNode   **nodes; // Note that elements may be NULL
-    int		    n_nodes;
+    Gsk_Render_ଗଣ୍ଠି   **nodes; // Note that elements may be NULL
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    n_nodes;
 } image_placement_gdk_T;
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 image_gui_init(image_T *img)
 {
     image_gdk_T	    *ctx = ALLOC_CLEAR_ONE(image_gdk_T);
@@ -5291,14 +5291,14 @@ image_gui_init(image_T *img)
     size_t	    stride;
     GBytes	    *bytes;
     size_t	    size;
-    int		    w, h;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    w, h;
 
-    if (ctx == NULL)
-	return FAIL;
+    ଯଦି (ctx == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
-    if (img->fmt == IMAGE_FORMAT_RGBA)
+    ଯଦି (img->fmt == IMAGE_FORMAT_RGBA)
 	fmt = GDK_MEMORY_R8G8B8A8;
-    else
+    ଅନ୍ୟଥା
 	fmt = GDK_MEMORY_R8G8B8;
 
     image_get_dimensions(img, &w, &h);
@@ -5311,10 +5311,10 @@ image_gui_init(image_T *img)
     g_bytes_unref(bytes);
 
     img->backend_data = ctx;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    void
+    ଶୂନ୍ୟ
 image_gui_uninit(image_T *img)
 {
     image_gdk_T *ctx = img->backend_data;
@@ -5323,37 +5323,37 @@ image_gui_uninit(image_T *img)
     vim_free(ctx);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 clear_nodes(image_placement_gdk_T *ctx)
 {
-    if (ctx->nodes == NULL || gui.drawarea == NULL)
-	return;
+    ଯଦି (ctx->nodes == ଖାଲି || gui.drawarea == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    for (int i = 0; i < ctx->n_nodes; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < ctx->n_nodes; i++)
     {
-	if (ctx->nodes[i] == NULL)
-	    continue;
+	ଯଦି (ctx->nodes[i] == ଖାଲି)
+	    ଜାରି;
 	vim_draw_area_remove_external(
 		VIM_DRAW_AREA(gui.drawarea), ctx->nodes[i]);
-	gsk_render_node_unref(ctx->nodes[i]);
+	gsk_render_ଗଣ୍ଠି_unref(ctx->nodes[i]);
     }
     g_clear_pointer(&ctx->nodes, g_free);
     ctx->n_nodes = 0;
 }
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 image_placement_gui_init(image_placement_T *place)
 {
     image_placement_gdk_T *ctx = ALLOC_CLEAR_ONE(image_placement_gdk_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    ଯଦି (ctx == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     place->backend_data = ctx;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
-    void
+    ଶୂନ୍ୟ
 image_placement_gui_uninit(image_placement_T *place)
 {
     image_placement_gdk_T *ctx = place->backend_data;
@@ -5362,64 +5362,64 @@ image_placement_gui_uninit(image_placement_T *place)
     vim_free(ctx);
 }
 
-    void
+    ଶୂନ୍ୟ
 image_placement_gui_draw(image_placement_T *place)
 {
     image_T		    *img = place->img;
     image_placement_gdk_T   *ctx = place->backend_data;
     image_gdk_T		    *ictx = img->backend_data;
     pixman_box32_t	    *rects;
-    int			    n_rects;
-    int			    iw, ih;
-    GskRenderNode	    *texture_node;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			    n_rects;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			    iw, ih;
+    Gsk_Render_ଗଣ୍ଠି	    *texture_ଗଣ୍ଠି;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL)
-	return;
+    ଯଦି (rects == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     clear_nodes(ctx);
-    if (n_rects == 0)
-	return;
+    ଯଦି (n_rects == 0)
+	ଫେରନ୍ତୁ;
 
     image_get_dimensions(img, &iw, &ih);
-    texture_node = gsk_texture_node_new(ictx->texture,
+    texture_ଗଣ୍ଠି = gsk_texture_ଗଣ୍ଠି_new(ictx->texture,
 	    &GRAPHENE_RECT_INIT(
 		FILL_X(place->col) - FILL_X(place->crop_box.x1),
 		FILL_Y(place->row) - FILL_Y(place->crop_box.y1)
 		+ FILL_Y(place->row_off),
 		PHY2LOG(iw), PHY2LOG(ih)));
 
-    if (texture_node == NULL)
+    ଯଦି (texture_ଗଣ୍ଠି == ଖାଲି)
 	// Not sure if this can happen...
-	return;
+	ଫେରନ୍ତୁ;
 
-    ctx->nodes = g_malloc_n(n_rects, sizeof(GskRenderNode *));
+    ctx->nodes = g_malloc_n(n_rects, ଆକାର(Gsk_Render_ଗଣ୍ଠି *));
     ctx->n_nodes = n_rects;
 
-    for (int i = 0; i < n_rects; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
-	GskRenderNode	*node;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row, col;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		posx, posy;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x, y, w, h;
+	Gsk_Render_ଗଣ୍ଠି	*ଗଣ୍ଠି;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 	posx = FILL_X(col);
 	posy = FILL_Y(row);
 
-	node = gsk_clip_node_new(texture_node,
+	ଗଣ୍ଠି = gsk_clip_ଗଣ୍ଠି_new(texture_ଗଣ୍ଠି,
 		&GRAPHENE_RECT_INIT(posx, posy, w, h));
 
-	if (node != NULL)
-	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), node);
+	ଯଦି (ଗଣ୍ଠି != ଖାଲି)
+	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), ଗଣ୍ଠି);
 
-	ctx->nodes[i] = node;
+	ctx->nodes[i] = ଗଣ୍ଠି;
     }
-    gsk_render_node_unref(texture_node);
+    gsk_render_ଗଣ୍ଠି_unref(texture_ଗଣ୍ଠି);
 }
 
-    void
+    ଶୂନ୍ୟ
 image_placement_gui_clear(image_placement_T *place)
 {
     image_placement_gdk_T   *ctx = place->backend_data;

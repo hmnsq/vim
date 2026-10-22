@@ -12,23 +12,23 @@
  */
 
 #undef NDEBUG
-#include <assert.h>
+#ଅନ୍ତର୍ଭାଵ <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#ଅନ୍ତର୍ଭାଵ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "charset.c"
+#ଅନ୍ତର୍ଭାଵ "charset.c"
 
 /*
  * Test the results of vim_iswordc() and vim_iswordp() are matched.
  */
-    static void
-test_isword_funcs_utf8(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+test_isword_funcs_utf8(ଶୂନ୍ୟ)
 {
     buf_T buf;
-    int c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା c;
 
     CLEAR_FIELD(buf);
     p_enc = (char_u *)"utf-8";
@@ -40,16 +40,16 @@ test_isword_funcs_utf8(void)
     curbuf = &buf;
     mb_init(); // calls init_chartab()
 
-    for (c = 0; c < 0x10000; ++c)
+    ପାଇଁ (c = 0; c < 0x10000; ++c)
     {
 	char_u p[4] = {0};
-	int c1;
-	int retc;
-	int retp;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା c1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା retc;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା retp;
 
 	utf_char2bytes(c, p);
 	c1 = utf_ptr2char(p);
-	if (c != c1)
+	ଯଦି (c != c1)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -60,7 +60,7 @@ test_isword_funcs_utf8(void)
 	}
 	retc = vim_iswordc_buf(c, &buf);
 	retp = vim_iswordp_buf(p, &buf);
-	if (retc != retp)
+	ଯଦି (retc != retp)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -73,10 +73,10 @@ test_isword_funcs_utf8(void)
     }
 }
 
-    int
-main(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ମୁଖ୍ୟ(ଶୂନ୍ୟ)
 {
     estack_init();
     test_isword_funcs_utf8();
-    return 0;
+    ଫେରନ୍ତୁ 0;
 }

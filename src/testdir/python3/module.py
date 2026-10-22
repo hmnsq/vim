@@ -1,2 +1,2 @@
-import before_1
+ଆମଦାନୀ before_1
 dir = '3'

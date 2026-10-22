@@ -20,14 +20,14 @@
  *
  */
 
-#if !defined(XPREPARE_H)
+#ଯଦି !defined(XPREPARE_H)
 #define XPREPARE_H
 
 
 
-int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ଅଚଳ *xpp,
 		    xdfenv_t *xe);
-void xdl_free_env(xdfenv_t *xe);
+ଶୂନ୍ୟ xdl_free_env(xdfenv_t *xe);
 
 
 

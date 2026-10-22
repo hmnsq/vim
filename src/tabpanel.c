@@ -11,16 +11,16 @@
  * tabpanel.c:
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_TABPANEL)
+#ଯଦି defined(FEAT_TABPANEL)
 
-static void do_by_tplmode(int tplmode, int col_start, int col_end,
-	int *pcurtab_row, int *ptabpagenr);
-static void tabpanel_free_click_regions(void);
-static void tabpanel_append_click_regions(stl_clickrec_T *clicktab,
-	char_u *buf, int row, int col_start, int col_end, int tabnr);
-static void draw_tabpanel_scrollbar(int screen_col);
+ସ୍ଥିର ଶୂନ୍ୟ do_by_tplmode(ପୂର୍ଣ୍ଣସଂଖ୍ୟା tplmode, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col_start, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col_end,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା *pcurtab_row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା *ptabpagenr);
+ସ୍ଥିର ଶୂନ୍ୟ tabpanel_free_click_regions(ଶୂନ୍ୟ);
+ସ୍ଥିର ଶୂନ୍ୟ tabpanel_append_click_regions(stl_clickrec_T *clicktab,
+	char_u *buf, ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col_start, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col_end, ପୂର୍ଣ୍ଣସଂଖ୍ୟା tabnr);
+ସ୍ଥିର ଶୂନ୍ୟ draw_tabpanel_scrollbar(ପୂର୍ଣ୍ଣସଂଖ୍ୟା screen_col);
 
 // set pcurtab_row. don't redraw tabpanel.
 #define TPLMODE_GET_CURTAB_ROW	0
@@ -35,82 +35,82 @@ static void draw_tabpanel_scrollbar(int screen_col);
 #define SCROLL_LEN		1
 
 // tpl_align's values
-#define ALIGN_LEFT		0
-#define ALIGN_RIGHT		1
+#define ALIGN_ବାମ		0
+#define ALIGN_ଡାହାଣ		1
 
-static char_u *opt_name = (char_u *)"tabpanel";
-static int opt_scope = OPT_LOCAL;
-static int tpl_align = ALIGN_LEFT;
-static int tpl_columns = 20;
-static bool tpl_is_vert = false;
-static bool tpl_scrollbar = false;
-static int tpl_scroll_offset = 0;
-static int tpl_total_rows = 0;
-static int tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
-static tabpage_T *tpl_last_curtab = NULL;   // last curtab seen by draw_tabpanel
+ସ୍ଥିର char_u *opt_name = (char_u *)"tabpanel";
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା opt_scope = OPT_LOCAL;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tpl_align = ALIGN_ବାମ;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tpl_columns = 20;
+ସ୍ଥିର bool tpl_is_vert = false;
+ସ୍ଥିର bool tpl_scrollbar = false;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tpl_scroll_offset = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tpl_total_rows = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
+ସ୍ଥିର tabpage_T *tpl_last_curtab = ଖାଲି;   // last curtab seen by draw_tabpanel
 
-typedef struct {
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା {
     win_T   *wp;
     win_T   *cwp;
     char_u  *user_defined;
-    int	maxrow;
-    int	offsetrow;
-    int	*prow;
-    int	*pcol;
-    int	attr;
-    int	col_start;
-    int	col_end;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	maxrow;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	offsetrow;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	*prow;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	*pcol;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	attr;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_start;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_end;
 } tabpanel_T;
 
-    int
-tabpanelopt_changed(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+tabpanelopt_changed(ଶୂନ୍ୟ)
 {
     char_u	*p;
-    int		new_align = ALIGN_LEFT;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		new_align = ALIGN_ବାମ;
     long	new_columns = 20;
     bool	new_is_vert = false;
     bool	new_scrollbar = false;
 
     p = p_tplo;
-    while (*p != NUL)
+    ଯେତେବେଳେ (*p != NUL)
     {
-	if (STRNCMP(p, "align:", 6) == 0)
+	ଯଦି (STRNCMP(p, "align:", 6) == 0)
 	{
 	    p += 6;
-	    if (STRNCMP(p, "left", 4) == 0)
+	    ଯଦି (STRNCMP(p, "left", 4) == 0)
 	    {
 		p += 4;
-		new_align = ALIGN_LEFT;
+		new_align = ALIGN_ବାମ;
 	    }
-	    else if (STRNCMP(p, "right", 5) == 0)
+	    ଅନ୍ୟଥା ଯଦି (STRNCMP(p, "right", 5) == 0)
 	    {
 		p += 5;
-		new_align = ALIGN_RIGHT;
+		new_align = ALIGN_ଡାହାଣ;
 	    }
-	    else
-		return FAIL;
+	    ଅନ୍ୟଥା
+		ଫେରନ୍ତୁ FAIL;
 	}
-	else if (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
+	ଅନ୍ୟଥା ଯଦି (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
 	{
 	    p += 8;
 	    new_columns = getdigits(&p);
-	    if (new_columns < 0 || new_columns > 1000)
-		return FAIL;
+	    ଯଦି (new_columns < 0 || new_columns > 1000)
+		ଫେରନ୍ତୁ FAIL;
 	}
-	else if (STRNCMP(p, "vert", 4) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNCMP(p, "vert", 4) == 0)
 	{
 	    p += 4;
 	    new_is_vert = true;
 	}
-	else if (STRNCMP(p, "scrollbar", 9) == 0)
+	ଅନ୍ୟଥା ଯଦି (STRNCMP(p, "scrollbar", 9) == 0)
 	{
 	    p += 9;
 	    new_scrollbar = true;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ଯଦି (*p != ',' && *p != NUL)
+	    ଫେରନ୍ତୁ FAIL;
+	ଯଦି (*p == ',')
 	    ++p;
     }
 
@@ -120,67 +120,67 @@ tabpanelopt_changed(void)
     tpl_scrollbar = new_scrollbar;
 
     // Re-center the current tab on the next redraw.
-    tpl_last_curtab = NULL;
+    tpl_last_curtab = ଖାଲି;
 
     shell_new_columns();
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Drop any internal reference to "tp", so draw_tabpanel() never compares
  * against a dangling pointer after the tabpage has been freed.
  */
-    void
-tabpanel_forget_tabpage(const tabpage_T *tp)
+    ଶୂନ୍ୟ
+tabpanel_forget_tabpage(ଅଚଳ tabpage_T *tp)
 {
-    if (tpl_last_curtab == tp)
-	tpl_last_curtab = NULL;
+    ଯଦି (tpl_last_curtab == tp)
+	tpl_last_curtab = ଖାଲି;
 }
 
 /*
  * Return the width of tabpanel.
  */
-    int
-tabpanel_width(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+tabpanel_width(ଶୂନ୍ୟ)
 {
-    switch (p_stpl)
+    ବାଛ (p_stpl)
     {
-	case 0:
-	    return 0;
-	case 1:
-	    if (first_tabpage->tp_next == NULL)
-		return 0;
+	ସ୍ଥିତି 0:
+	    ଫେରନ୍ତୁ 0;
+	ସ୍ଥିତି 1:
+	    ଯଦି (first_tabpage->tp_next == ଖାଲି)
+		ଫେରନ୍ତୁ 0;
     }
-    if (Columns < tpl_columns)
-	return 0;
-    else
-	return tpl_columns;
+    ଯଦି (Columns < tpl_columns)
+	ଫେରନ୍ତୁ 0;
+    ଅନ୍ୟଥା
+	ଫେରନ୍ତୁ tpl_columns;
 }
 
 /*
  * Return the offset of a window considering the width of tabpanel.
  */
-    int
-tabpanel_leftcol(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+tabpanel_leftcol(ଶୂନ୍ୟ)
 {
-    return tpl_align == ALIGN_RIGHT ? 0 : tabpanel_width();
+    ଫେରନ୍ତୁ tpl_align == ALIGN_ଡାହାଣ ? 0 : tabpanel_width();
 }
 
 /*
  * Free previously resolved 'tabpanel' click regions.
  */
-    static void
-tabpanel_free_click_regions(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+tabpanel_free_click_regions(ଶୂନ୍ୟ)
 {
-    int n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା n;
 
-    if (tabpanel_stl_click != NULL)
+    ଯଦି (tabpanel_stl_click != ଖାଲି)
     {
-	for (n = 0; n < tabpanel_stl_click_count; n++)
+	ପାଇଁ (n = 0; n < tabpanel_stl_click_ଗଣନା; n++)
 	    vim_free(tabpanel_stl_click[n].funcname);
 	VIM_CLEAR(tabpanel_stl_click);
     }
-    tabpanel_stl_click_count = 0;
+    tabpanel_stl_click_ଗଣନା = 0;
 }
 
 /*
@@ -189,64 +189,64 @@ tabpanel_free_click_regions(void)
  * tabpanel_stl_click array.  The caller keeps ownership of the funcname
  * strings inside "clicktab" — this function makes its own copies.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabpanel_append_click_regions(
 	stl_clickrec_T	*clicktab,
 	char_u		*buf,
-	int		row,
-	int		col_start,
-	int		col_end,
-	int		tabnr)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col_start,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col_end,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		tabnr)
 {
-    int		count = 0;
-    int		n;
-    int		base_col;
-    int		acc_width = 0;
-    int		max_w = col_end - col_start;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ଗଣନା_2 = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		base_col;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		acc_width = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_w = col_end - col_start;
     char_u	*p;
-    char_u	*cur_funcname = NULL;
-    int		cur_minwid = 0;
-    int		region_start_col;
+    char_u	*cur_funcname = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cur_minwid = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		region_start_col;
     stl_click_region_T *new_arr;
-    int		limit;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		limit;
 
-    if (clicktab == NULL)
-	return;
+    ଯଦି (clicktab == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    for (n = 0; clicktab[n].start != NULL; n++)
-	count++;
-    if (count == 0)
-	return;
+    ପାଇଁ (n = 0; clicktab[n].start != ଖାଲି; n++)
+	ଗଣନା_2++;
+    ଯଦି (ଗଣନା_2 == 0)
+	ଫେରନ୍ତୁ;
 
-    base_col = (tpl_align == ALIGN_RIGHT ? topframe->fr_width : 0) + col_start;
+    base_col = (tpl_align == ALIGN_ଡାହାଣ ? topframe->fr_width : 0) + col_start;
     region_start_col = base_col;
 
     // Grow the global array to make room for up to "count" more regions
     // (one close for each record plus a possible trailing region).
     new_arr = vim_realloc(tabpanel_stl_click,
-	    sizeof(stl_click_region_T) * (tabpanel_stl_click_count + count + 1));
-    if (new_arr == NULL)
-	return;
+	    ଆକାର(stl_click_region_T) * (tabpanel_stl_click_ଗଣନା + ଗଣନା_2 + 1));
+    ଯଦି (new_arr == ଖାଲି)
+	ଫେରନ୍ତୁ;
     tabpanel_stl_click = new_arr;
 
     p = buf;
-    for (n = 0; clicktab[n].start != NULL; n++)
+    ପାଇଁ (n = 0; clicktab[n].start != ଖାଲି; n++)
     {
-	acc_width += vim_strnsize(p, (int)(clicktab[n].start - p));
+	acc_width += vim_strnsize(p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(clicktab[n].start - p));
 	p = clicktab[n].start;
 	limit = acc_width < max_w ? acc_width : max_w;
 
-	if (cur_funcname != NULL)
+	ଯଦି (cur_funcname != ଖାଲି)
 	{
 	    stl_click_region_T *r =
-				&tabpanel_stl_click[tabpanel_stl_click_count];
+				&tabpanel_stl_click[tabpanel_stl_click_ଗଣନା];
 	    r->row = row;
 	    r->col_start = region_start_col;
 	    r->col_end = base_col + limit;
 	    r->funcname = vim_strsave(cur_funcname);
 	    r->minwid = cur_minwid;
 	    r->tabnr = tabnr;
-	    tabpanel_stl_click_count++;
+	    tabpanel_stl_click_ଗଣନା++;
 	}
 
 	cur_funcname = clicktab[n].funcname;
@@ -255,16 +255,16 @@ tabpanel_append_click_regions(
     }
 
     // Close the final region if it extends to the end.
-    if (cur_funcname != NULL)
+    ଯଦି (cur_funcname != ଖାଲି)
     {
-	stl_click_region_T *r = &tabpanel_stl_click[tabpanel_stl_click_count];
+	stl_click_region_T *r = &tabpanel_stl_click[tabpanel_stl_click_ଗଣନା];
 	r->row = row;
 	r->col_start = region_start_col;
 	r->col_end = base_col + max_w;
 	r->funcname = vim_strsave(cur_funcname);
 	r->minwid = cur_minwid;
 	r->tabnr = tabnr;
-	tabpanel_stl_click_count++;
+	tabpanel_stl_click_ଗଣନା++;
     }
 }
 
@@ -274,43 +274,43 @@ tabpanel_append_click_regions(
  * scrollbar drag operations leave curtab unchanged, so the user's chosen
  * offset is preserved in those cases.
  */
-    static void
-follow_curtab_if_needed(int curtab_row)
+    ସ୍ଥିର ଶୂନ୍ୟ
+follow_curtab_if_needed(ପୂର୍ଣ୍ଣସଂଖ୍ୟା curtab_row)
 {
-    if (Rows <= 0 || curtab == tpl_last_curtab)
-	return;
+    ଯଦି (Rows <= 0 || curtab == tpl_last_curtab)
+	ଫେରନ୍ତୁ;
 
-    if (curtab_row < tpl_scroll_offset)
+    ଯଦି (curtab_row < tpl_scroll_offset)
 	tpl_scroll_offset = curtab_row;
-    else if (curtab_row >= tpl_scroll_offset + Rows)
+    ଅନ୍ୟଥା ଯଦି (curtab_row >= tpl_scroll_offset + Rows)
 	tpl_scroll_offset = curtab_row - Rows + 1;
 
-    int max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
 
-    if (tpl_scroll_offset < 0)
+    ଯଦି (tpl_scroll_offset < 0)
 	tpl_scroll_offset = 0;
-    else if (tpl_scroll_offset > max_offset)
+    ଅନ୍ୟଥା ଯଦି (tpl_scroll_offset > max_offset)
 	tpl_scroll_offset = max_offset;
 }
 
 /*
  * draw the tabpanel.
  */
-    void
-draw_tabpanel(void)
+    ଶୂନ୍ୟ
+draw_tabpanel(ଶୂନ୍ୟ)
 {
-    int saved_KeyTyped = KeyTyped;
-    int saved_got_int = got_int;
-    int maxwidth = tabpanel_width();
-    int vs_attr = HL_ATTR(HLF_C);
-    int curtab_row = 0;
-    int vsrow = 0;
-    int is_right = tpl_align == ALIGN_RIGHT;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା saved_ଚାବି_Typed = ଚାବି_Typed;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା saved_got_int = got_int;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା maxwidth = tabpanel_width();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା vs_attr = HL_ATTR(HLF_C);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା curtab_row = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା vsrow = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_ଡାହାଣ = tpl_align == ALIGN_ଡାହାଣ;
 
-    if (maxwidth == 0)
+    ଯଦି (maxwidth == 0)
     {
 	tabpanel_free_click_regions();
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // Discard old click regions — they'll be rebuilt during redraw below.
@@ -319,79 +319,79 @@ draw_tabpanel(void)
     // Reset got_int to avoid build_stl_str_hl() isn't evaluated.
     got_int = FALSE;
 
-    int sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
-    int sb_screen_col = -1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା sb_screen_col = -1;
 
     // The scrollbar is always placed at the right edge of the tabpanel,
     // regardless of 'align'.  The vertical separator sits at the panel's
     // boundary with the buffer area (left edge for align:right, right edge
     // for align:left).
-    if (tpl_is_vert)
+    ଯଦି (tpl_is_vert)
     {
-	if (is_right)
+	ଯଦି (is_ଡାହାଣ)
 	{
 	    // Panel on the right: vert at panel's left edge, scrollbar at
 	    // panel's right edge (= screen's right edge).
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, VERT_LEN,
-		    maxwidth - sb_len, &curtab_row, NULL);
+		    maxwidth - sb_len, &curtab_row, ଖାଲି);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, VERT_LEN, maxwidth - sb_len,
-		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+		    &curtab_row, ଖାଲି);
+	    ପାଇଁ (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			topframe->fr_width, vs_attr);
-	    if (tpl_scrollbar)
+	    ଯଦି (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // Panel on the left: scrollbar just left of vert, vert at
 	    // panel's right edge (boundary with buffer).
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0,
-		    maxwidth - VERT_LEN - sb_len, &curtab_row, NULL);
+		    maxwidth - VERT_LEN - sb_len, &curtab_row, ଖାଲି);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - VERT_LEN - sb_len,
-		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+		    &curtab_row, ଖାଲି);
+	    ପାଇଁ (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			maxwidth - VERT_LEN, vs_attr);
-	    if (tpl_scrollbar)
+	    ଯଦି (tpl_scrollbar)
 		sb_screen_col = maxwidth - VERT_LEN - SCROLL_LEN;
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (is_right)
+	ଯଦି (is_ଡାହାଣ)
 	{
 	    // Panel on the right, no vert: scrollbar at screen's right edge.
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
-		    &curtab_row, NULL);
+		    &curtab_row, ଖାଲି);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
-		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+		    &curtab_row, ଖାଲି);
+	    ଯଦି (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
-		    &curtab_row, NULL);
+		    &curtab_row, ଖାଲି);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
-		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+		    &curtab_row, ଖାଲି);
+	    ଯଦି (tpl_scrollbar)
 		sb_screen_col = maxwidth - SCROLL_LEN;
 	}
     }
 
     tpl_scrollbar_col = sb_screen_col;
-    if (sb_screen_col >= 0)
+    ଯଦି (sb_screen_col >= 0)
 	draw_tabpanel_scrollbar(sb_screen_col);
 
     got_int |= saved_got_int;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = saved_KeyTyped;
+    ଚାବି_Typed = saved_ଚାବି_Typed;
 
     tpl_last_curtab = curtab;
     redraw_tabpanel = FALSE;
@@ -400,93 +400,93 @@ draw_tabpanel(void)
 /*
  * Return tabpagenr when clicking and dragging in tabpanel.
  */
-    int
-get_tabpagenr_on_tabpanel(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_tabpagenr_on_tabpanel(ଶୂନ୍ୟ)
 {
-    int		maxwidth = tabpanel_width();
-    int		curtab_row = 0;
-    int		tabpagenr = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		maxwidth = tabpanel_width();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curtab_row = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		tabpagenr = 0;
 
-    if (maxwidth == 0)
-	return -1;
+    ଯଦି (maxwidth == 0)
+	ଫେରନ୍ତୁ -1;
 
-    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth, &curtab_row, NULL);
+    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth, &curtab_row, ଖାଲି);
     do_by_tplmode(TPLMODE_GET_TABPAGENR, 0, maxwidth, &curtab_row,
 	    &tabpagenr);
 
-    return tabpagenr;
+    ଫେରନ୍ତୁ tabpagenr;
 }
 
 /*
  * Fill tailing area between {start_row} and {end_row - 1}.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 screen_fill_tailing_area(
-	int	tplmode,
-	int	row_start,
-	int	row_end,
-	int	col_start,
-	int	col_end,
-	int	attr)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	tplmode,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	row_start,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	row_end,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_start,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_end,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	attr)
 {
-    int is_right = tpl_align == ALIGN_RIGHT;
-    if (tplmode == TPLMODE_REDRAW)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_ଡାହାଣ = tpl_align == ALIGN_ଡାହାଣ;
+    ଯଦି (tplmode == TPLMODE_REDRAW)
 	screen_fill(row_start, row_end,
-		(is_right ? topframe->fr_width : 0) + col_start,
-		(is_right ? topframe->fr_width : 0) + col_end,
+		(is_ଡାହାଣ ? topframe->fr_width : 0) + col_start,
+		(is_ଡାହାଣ ? topframe->fr_width : 0) + col_end,
 		TPL_FILLCHAR, TPL_FILLCHAR, attr);
 }
 
 /*
  * screen_puts_len() for tabpanel.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 screen_puts_len_for_tabpanel(
-	int	    tplmode,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    tplmode,
 	char_u	    *p,
-	int	    len,
-	int	    attr,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    attr,
 	tabpanel_T  *pargs)
 {
-    int		j;
-    int		chlen;
-    int		chcells;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		j;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		chlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		chcells;
     char_u	buf[IOSIZE];
     char_u	*temp;
 
-    for (j = 0; j < len;)
+    ପାଇଁ (j = 0; j < len;)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	ଯଦି (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& pargs->maxrow <= *pargs->prow - pargs->offsetrow)
-	    break;
+	    ଭାଙ୍ଗ;
 
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	    chlen = (*mb_ptr2len)(p + j);
-	else
+	ଅନ୍ୟଥା
 	    chlen = 1;
 
-	for (int k = 0; k < chlen; k++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < chlen; k++)
 	    buf[k] = p[j + k];
 	buf[chlen] = NUL;
 	j += chlen;
 
 	// Make all characters printable.
 	temp = transstr(buf);
-	if (temp != NULL)
+	ଯଦି (temp != ଖାଲି)
 	{
-	    vim_strncpy(buf, temp, sizeof(buf) - 1);
+	    vim_strncpy(buf, temp, ଆକାର(buf) - 1);
 	    vim_free(temp);
 	}
 
-	if (has_mbyte)
+	ଯଦି (has_mbyte)
 	    chcells = (*mb_ptr2cells)(buf);
-	else
+	ଅନ୍ୟଥା
 	    chcells = 1;
 
-	if (pargs->col_end < (*pargs->pcol) + chcells)
+	ଯଦି (pargs->col_end < (*pargs->pcol) + chcells)
 	{
 	    // fill the tailing area of current row.
-	    if (*pargs->prow - pargs->offsetrow >= 0
+	    ଯଦି (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 		screen_fill_tailing_area(tplmode,
 			*pargs->prow - pargs->offsetrow,
@@ -494,16 +494,16 @@ screen_puts_len_for_tabpanel(
 			*pargs->pcol, pargs->col_end, attr);
 	    *pargs->pcol = pargs->col_end;
 
-	    if (pargs->col_end < chcells)
-		break;
+	    ଯଦି (pargs->col_end < chcells)
+		ଭାଙ୍ଗ;
 	}
 
-	if (*pargs->pcol + chcells <= pargs->col_end)
+	ଯଦି (*pargs->pcol + chcells <= pargs->col_end)
 	{
-	    int off = (tpl_align == ALIGN_RIGHT)
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା off = (tpl_align == ALIGN_ଡାହାଣ)
 		    ? topframe->fr_width
 		    : 0;
-	    if (tplmode == TPLMODE_REDRAW
+	    ଯଦି (tplmode == TPLMODE_REDRAW
 		    && (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow))
 		screen_puts(buf, *pargs->prow - pargs->offsetrow,
@@ -516,35 +516,35 @@ screen_puts_len_for_tabpanel(
 /*
  * default tabpanel drawing behavior if 'tabpanel' option is empty.
  */
-    static void
-draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_tabpanel_default(ପୂର୍ଣ୍ଣସଂଖ୍ୟା tplmode, tabpanel_T *pargs)
 {
-    int		modified;
-    int		wincount;
-    int		len = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		modified;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		wincount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		len = 0;
     char_u	buf[2] = { NUL, NUL };
 
     modified = FALSE;
-    for (wincount = 0; pargs->wp != NULL;
+    ପାଇଁ (wincount = 0; pargs->wp != ଖାଲି;
 	    pargs->wp = pargs->wp->w_next, ++wincount)
-	if (bufIsChanged(pargs->wp->w_buffer))
+	ଯଦି (bufIsChanged(pargs->wp->w_buffer))
 	    modified = TRUE;
 
-    if (modified || wincount > 1)
+    ଯଦି (modified || wincount > 1)
     {
-	if (wincount > 1)
+	ଯଦି (wincount > 1)
 	{
-	    vim_snprintf((char *)NameBuff, MAXPATHL, "%d", wincount);
-	    len = (int)STRLEN(NameBuff);
+	    vim_snprintf((ଅକ୍ଷର *)NameBuff, MAXPATHL, "%d", wincount);
+	    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(NameBuff);
 	    screen_puts_len_for_tabpanel(tplmode, NameBuff, len,
-#if defined(FEAT_SYN_HL)
+#ଯଦି defined(FEAT_SYN_HL)
 		    hl_combine_attr(pargs->attr, HL_ATTR(HLF_T)),
-#else
+#ଅନ୍ୟଥା
 		    pargs->attr,
 #endif
 		    pargs);
 	}
-	if (modified)
+	ଯଦି (modified)
 	{
 	    buf[0] = '+';
 	    screen_puts_len_for_tabpanel(tplmode, buf, 1, pargs->attr, pargs);
@@ -556,11 +556,11 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
 
     get_trans_bufname(pargs->cwp->w_buffer);
     shorten_dir(NameBuff);
-    len = (int)STRLEN(NameBuff);
+    len = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(NameBuff);
     screen_puts_len_for_tabpanel(tplmode, NameBuff, len, pargs->attr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    ଯଦି (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1,
@@ -572,47 +572,47 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
  * Draw tabpanel content with highlight handling.
  * Processes hltab entries and fills tailing area.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_tabpanel_with_highlight(
-	int	    tplmode,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    tplmode,
 	char_u	    *buf,
 	stl_hlrec_T *hltab,
 	tabpanel_T  *pargs)
 {
     char_u	*p;
-    int		curattr;
-    int		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		curattr;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
 
     curattr = pargs->attr;
     p = buf;
-    for (n = 0; hltab[n].start != NULL; n++)
+    ପାଇଁ (n = 0; hltab[n].start != ଖାଲି; n++)
     {
-	screen_puts_len_for_tabpanel(tplmode, p, (int)(hltab[n].start - p),
+	screen_puts_len_for_tabpanel(tplmode, p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(hltab[n].start - p),
 		curattr, pargs);
 	p = hltab[n].start;
-	if (hltab[n].userhl == 0)
+	ଯଦି (hltab[n].userhl == 0)
 	    curattr = pargs->attr;
-	else if (hltab[n].userhl < 0)
+	ଅନ୍ୟଥା ଯଦି (hltab[n].userhl < 0)
 	    curattr = syn_id2attr(-hltab[n].userhl);
 #ifdef FEAT_TERMINAL
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	ଅନ୍ୟଥା ଯଦି (pargs->wp != ଖାଲି && pargs->wp != curwin
 		&& bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stltermnc[hltab[n].userhl - 1];
-	else if (pargs->wp != NULL && bt_terminal(pargs->wp->w_buffer)
+	ଅନ୍ୟଥା ଯଦି (pargs->wp != ଖାଲି && bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlterm[hltab[n].userhl - 1];
 #endif
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	ଅନ୍ୟଥା ଯଦି (pargs->wp != ଖାଲି && pargs->wp != curwin
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlnc[hltab[n].userhl - 1];
-	else
+	ଅନ୍ୟଥା
 	    curattr = highlight_user[hltab[n].userhl - 1];
     }
-    screen_puts_len_for_tabpanel(tplmode, p, (int)STRLEN(p), curattr, pargs);
+    screen_puts_len_for_tabpanel(tplmode, p, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)STRLEN(p), curattr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    ଯଦି (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1, *pargs->pcol,
@@ -623,20 +623,20 @@ draw_tabpanel_with_highlight(
 /*
  * do something by tplmode for drawing tabpanel.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 do_by_tplmode(
-	int	tplmode,
-	int	col_start,
-	int	col_end,
-	int	*pcurtab_row,
-	int	*ptabpagenr)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	tplmode,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_start,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	col_end,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	*pcurtab_row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	*ptabpagenr)
 {
-    int		attr_tplf = HL_ATTR(HLF_TPLF);
-    int		attr_tpls = HL_ATTR(HLF_TPLS);
-    int		attr_tpl = HL_ATTR(HLF_TPL);
-    int		col = col_start;
-    int		row = 0;
-    tabpage_T	*tp = NULL;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		attr_tplf = HL_ATTR(HLF_TPLF);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		attr_tpls = HL_ATTR(HLF_TPLS);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		attr_tpl = HL_ATTR(HLF_TPL);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col = col_start;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row = 0;
+    tabpage_T	*tp = ଖାଲି;
     typval_T	v;
     tabpanel_T	args;
 
@@ -645,40 +645,40 @@ do_by_tplmode(
     args.col_start = col_start;
     args.col_end = col_end;
 
-    if (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
+    ଯଦି (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
 	args.offsetrow = tpl_scroll_offset;
 
     tp = first_tabpage;
 
-    for (row = 0; tp != NULL; row++)
+    ପାଇଁ (row = 0; tp != ଖାଲି; row++)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	ଯଦି (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& args.maxrow <= row - args.offsetrow)
-	    break;
+	    ଭାଙ୍ଗ;
 
 	col = col_start;
 
-	v.v_type = VAR_NUMBER;
-	v.vval.v_number = tabpage_index(tp);
+	v.v_type = VAR_ସଂଖ୍ୟା;
+	v.vval.v_ସଂଖ୍ୟା = tabpage_index(tp);
 	set_var((char_u *)"g:actual_curtabpage", &v, TRUE);
 
-	if (tp->tp_topframe == topframe)
+	ଯଦି (tp->tp_topframe == topframe)
 	{
 	    args.attr = attr_tpls;
-	    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+	    ଯଦି (tplmode == TPLMODE_GET_CURTAB_ROW)
 		// Capture the row of the current tab and keep iterating so
 		// tpl_total_rows receives the true content height below.
 		*pcurtab_row = row;
 	}
-	else
+	ଅନ୍ୟଥା
 	    args.attr = attr_tpl;
 
-	if (tp == curtab)
+	ଯଦି (tp == curtab)
 	{
 	    args.cwp = curwin;
 	    args.wp = firstwin;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    args.cwp = tp->tp_curwin;
 	    args.wp = tp->tp_firstwin;
@@ -686,31 +686,31 @@ do_by_tplmode(
 
 	char_u	*usefmt = vim_strsave(p_tpl);
 
-	if (usefmt != NULL && *usefmt != NUL)
+	ଯଦି (usefmt != ଖାଲି && *usefmt != NUL)
 	{
-	    int	carry_hl = 0;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	carry_hl = 0;
 
-	    while (*usefmt != NUL)
+	    ଯେତେବେଳେ (*usefmt != NUL)
 	    {
 		char_u	buf[IOSIZE];
 		stl_hlrec_T	*hltab;
 		stl_hlrec_T	*tabtab;
-		stl_clickrec_T	*clicktab = NULL;
+		stl_clickrec_T	*clicktab = ଖାଲି;
 
-		if (tplmode != TPLMODE_GET_CURTAB_ROW
+		ଯଦି (tplmode != TPLMODE_GET_CURTAB_ROW
 			&& args.maxrow <= row - args.offsetrow)
-		    break;
+		    ଭାଙ୍ଗ;
 
 		buf[0] = NUL;
 #ifdef ENABLE_STL_MODE_MULTI_NL
-		(void)build_stl_str_hl_mline_nl
-#else
-		(void)build_stl_str_hl_mline
+		(ଶୂନ୍ୟ)build_stl_str_hl_mline_nl
+#ଅନ୍ୟଥା
+		(ଶୂନ୍ୟ)build_stl_str_hl_mline
 #endif
-			(args.cwp, buf, sizeof(buf),
+			(args.cwp, buf, ଆକାର(buf),
 			&usefmt, opt_name, opt_scope, TPL_FILLCHAR,
 			args.col_end - args.col_start, &hltab, &tabtab,
-			tplmode == TPLMODE_REDRAW ? &clicktab : NULL,
+			tplmode == TPLMODE_REDRAW ? &clicktab : ଖାଲି,
 			&carry_hl);
 
 		args.prow = &row;
@@ -720,33 +720,33 @@ do_by_tplmode(
 
 		// Record any %[FuncName] click regions for this line once
 		// the text has been drawn.  Only visible rows participate.
-		if (tplmode == TPLMODE_REDRAW && clicktab != NULL)
+		ଯଦି (tplmode == TPLMODE_REDRAW && clicktab != ଖାଲି)
 		{
-		    int screen_row = row - args.offsetrow;
-		    int m;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା screen_row = row - args.offsetrow;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା m;
 
-		    if (screen_row >= 0 && screen_row < args.maxrow)
+		    ଯଦି (screen_row >= 0 && screen_row < args.maxrow)
 			tabpanel_append_click_regions(clicktab, buf,
 				screen_row, args.col_start, args.col_end,
-				(int)v.vval.v_number);
+				(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)v.vval.v_ସଂଖ୍ୟା);
 		    // We took ownership of the click records — free the
 		    // function names (matches the non-NULL clicktab path in
 		    // build_stl_str_hl()).
-		    for (m = 0; clicktab[m].start != NULL; m++)
+		    ପାଇଁ (m = 0; clicktab[m].start != ଖାଲି; m++)
 			vim_free(clicktab[m].funcname);
 		}
 
 		// Move to next line for %@
-		if (*usefmt != NUL)
+		ଯଦି (*usefmt != NUL)
 		{
 		    row++;
 		    col = col_start;
 		}
 	    }
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    args.user_defined = NULL;
+	    args.user_defined = ଖାଲି;
 	    args.prow = &row;
 	    args.pcol = &col;
 	    draw_tabpanel_default(tplmode, &args);
@@ -757,11 +757,11 @@ do_by_tplmode(
 
 	tp = tp->tp_next;
 
-	if ((tplmode == TPLMODE_GET_TABPAGENR)
+	ଯଦି ((tplmode == TPLMODE_GET_TABPAGENR)
 		&& (mouse_row <= (row - args.offsetrow)))
 	{
-	    *ptabpagenr = v.vval.v_number;
-	    break;
+	    *ptabpagenr = v.vval.v_ସଂଖ୍ୟା;
+	    ଭାଙ୍ଗ;
 	}
     }
 
@@ -772,7 +772,7 @@ do_by_tplmode(
     // Capture the true content height during the GET_CURTAB_ROW pass, which
     // ignores maxrow and therefore walks every tab.  REDRAW stops at the
     // visible edge so its "row" is clamped and unusable here.
-    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+    ଯଦି (tplmode == TPLMODE_GET_CURTAB_ROW)
 	tpl_total_rows = row;
 }
 
@@ -781,41 +781,41 @@ do_by_tplmode(
  * The scrollbar spans the full screen height.  The thumb position and size
  * are derived from tpl_scroll_offset, tpl_total_rows and Rows.
  */
-    static void
-draw_tabpanel_scrollbar(int screen_col)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_tabpanel_scrollbar(ପୂର୍ଣ୍ଣସଂଖ୍ୟା screen_col)
 {
-    int attr_sb = HL_ATTR(HLF_PSB);
-    int attr_thumb = HL_ATTR(HLF_PST);
-    int thumb_top = 0;
-    int thumb_height = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା attr_sb = HL_ATTR(HLF_PSB);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା attr_thumb = HL_ATTR(HLF_PST);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା thumb_ଶୀର୍ଷ = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା thumb_height = 0;
 
-    if (tpl_total_rows > Rows && Rows > 0)
+    ଯଦି (tpl_total_rows > Rows && Rows > 0)
     {
-	int max_offset = tpl_total_rows - Rows;
-	int track_range;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_offset = tpl_total_rows - Rows;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା track_range;
 
 	thumb_height = Rows * Rows / tpl_total_rows;
-	if (thumb_height < 1)
+	ଯଦି (thumb_height < 1)
 	    thumb_height = 1;
 
 	// Map tpl_scroll_offset onto the track: at offset 0 the thumb's top
 	// is at row 0, at the maximum offset its bottom reaches the last
 	// row.  This is the exact inverse of tabpanel_drag_scrollbar().
 	track_range = Rows - thumb_height;
-	if (track_range > 0 && max_offset > 0)
-	    thumb_top = track_range * tpl_scroll_offset / max_offset;
-	else
-	    thumb_top = 0;
-	if (thumb_top + thumb_height > Rows)
-	    thumb_top = Rows - thumb_height;
-	if (thumb_top < 0)
-	    thumb_top = 0;
+	ଯଦି (track_range > 0 && max_offset > 0)
+	    thumb_ଶୀର୍ଷ = track_range * tpl_scroll_offset / max_offset;
+	ଅନ୍ୟଥା
+	    thumb_ଶୀର୍ଷ = 0;
+	ଯଦି (thumb_ଶୀର୍ଷ + thumb_height > Rows)
+	    thumb_ଶୀର୍ଷ = Rows - thumb_height;
+	ଯଦି (thumb_ଶୀର୍ଷ < 0)
+	    thumb_ଶୀର୍ଷ = 0;
     }
 
-    for (int r = 0; r < Rows; r++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < Rows; r++)
     {
 	bool on_thumb = thumb_height > 0
-	    && r >= thumb_top && r < thumb_top + thumb_height;
+	    && r >= thumb_ଶୀର୍ଷ && r < thumb_ଶୀର୍ଷ + thumb_height;
 	screen_putchar(TPL_FILLCHAR, r, screen_col,
 		on_thumb ? attr_thumb : attr_sb);
     }
@@ -825,11 +825,11 @@ draw_tabpanel_scrollbar(int screen_col)
  * Return true if the mouse is currently positioned over the tabpanel area.
  */
     bool
-mouse_on_tabpanel(void)
+mouse_on_tabpanel(ଶୂନ୍ୟ)
 {
-    if (tabpanel_width() == 0)
-	return false;
-    return mouse_col < firstwin->w_wincol
+    ଯଦି (tabpanel_width() == 0)
+	ଫେରନ୍ତୁ false;
+    ଫେରନ୍ତୁ mouse_col < firstwin->w_wincol
 	|| mouse_col >= firstwin->w_wincol + topframe->fr_width;
 }
 
@@ -839,9 +839,9 @@ mouse_on_tabpanel(void)
  * scrollbar is not enabled or not yet drawn.
  */
     bool
-mouse_on_tabpanel_scrollbar(void)
+mouse_on_tabpanel_scrollbar(ଶୂନ୍ୟ)
 {
-    return tpl_scrollbar && tpl_scrollbar_col >= 0
+    ଫେରନ୍ତୁ tpl_scrollbar && tpl_scrollbar_col >= 0
 	&& mouse_col == tpl_scrollbar_col;
 }
 
@@ -852,38 +852,38 @@ mouse_on_tabpanel_scrollbar(void)
  * Returns true if the event was consumed (offset changed or not).
  */
     bool
-tabpanel_drag_scrollbar(int screen_row)
+tabpanel_drag_scrollbar(ପୂର୍ଣ୍ଣସଂଖ୍ୟା screen_row)
 {
-    int thumb_height;
-    int max_offset;
-    int track_range;
-    int thumb_top;
-    int new_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା thumb_height;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା track_range;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା thumb_ଶୀର୍ଷ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା new_offset;
 
-    if (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
-	return false;
+    ଯଦି (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
+	ଫେରନ୍ତୁ false;
 
     thumb_height = Rows * Rows / tpl_total_rows;
-    if (thumb_height < 1)
+    ଯଦି (thumb_height < 1)
 	thumb_height = 1;
     track_range = Rows - thumb_height;
-    if (track_range <= 0)
-	return true;
+    ଯଦି (track_range <= 0)
+	ଫେରନ୍ତୁ true;
 
     max_offset = tpl_total_rows - Rows;
-    thumb_top = screen_row - thumb_height / 2;
-    if (thumb_top < 0)
-	thumb_top = 0;
-    if (thumb_top > track_range)
-	thumb_top = track_range;
+    thumb_ଶୀର୍ଷ = screen_row - thumb_height / 2;
+    ଯଦି (thumb_ଶୀର୍ଷ < 0)
+	thumb_ଶୀର୍ଷ = 0;
+    ଯଦି (thumb_ଶୀର୍ଷ > track_range)
+	thumb_ଶୀର୍ଷ = track_range;
 
-    new_offset = thumb_top * max_offset / track_range;
-    if (new_offset != tpl_scroll_offset)
+    new_offset = thumb_ଶୀର୍ଷ * max_offset / track_range;
+    ଯଦି (new_offset != tpl_scroll_offset)
     {
 	tpl_scroll_offset = new_offset;
 	redraw_tabpanel = TRUE;
     }
-    return true;
+    ଫେରନ୍ତୁ true;
 }
 
 /*
@@ -891,29 +891,29 @@ tabpanel_drag_scrollbar(int screen_row)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_scroll(int dir, int count)
+tabpanel_scroll(ପୂର୍ଣ୍ଣସଂଖ୍ୟା dir, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଗଣନା_2)
 {
-    int max_offset;
-    int new_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା new_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    ଯଦି (tabpanel_width() == 0)
+	ଫେରନ୍ତୁ false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ଯଦି (max_offset < 0)
 	max_offset = 0;
 
-    new_offset = tpl_scroll_offset + (dir > 0 ? count : -count);
-    if (new_offset < 0)
+    new_offset = tpl_scroll_offset + (dir > 0 ? ଗଣନା_2 : -ଗଣନା_2);
+    ଯଦି (new_offset < 0)
 	new_offset = 0;
-    if (new_offset > max_offset)
+    ଯଦି (new_offset > max_offset)
 	new_offset = max_offset;
-    if (new_offset == tpl_scroll_offset)
-	return false;
+    ଯଦି (new_offset == tpl_scroll_offset)
+	ଫେରନ୍ତୁ false;
 
     tpl_scroll_offset = new_offset;
     redraw_tabpanel = TRUE;
-    return true;
+    ଫେରନ୍ତୁ true;
 }
 
 /*
@@ -921,97 +921,97 @@ tabpanel_scroll(int dir, int count)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_set_offset(int offset)
+tabpanel_set_offset(ପୂର୍ଣ୍ଣସଂଖ୍ୟା offset)
 {
-    int max_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    ଯଦି (tabpanel_width() == 0)
+	ଫେରନ୍ତୁ false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ଯଦି (max_offset < 0)
 	max_offset = 0;
 
-    if (offset < 0)
+    ଯଦି (offset < 0)
 	offset = 0;
-    if (offset > max_offset)
+    ଯଦି (offset > max_offset)
 	offset = max_offset;
-    if (offset == tpl_scroll_offset)
-	return false;
+    ଯଦି (offset == tpl_scroll_offset)
+	ଫେରନ୍ତୁ false;
 
     tpl_scroll_offset = offset;
     redraw_tabpanel = TRUE;
-    return true;
+    ଫେରନ୍ତୁ true;
 }
 
 /*
  * "tabpanel_getinfo()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_tabpanel_getinfo(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*d;
-    int		max_offset;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		max_offset;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	ଫେରନ୍ତୁ;
     d = rettv->vval.v_dict;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ଯଦି (max_offset < 0)
 	max_offset = 0;
 
     dict_add_string(d, "align",
-	    (char_u *)(tpl_align == ALIGN_RIGHT ? "right" : "left"));
-    dict_add_number(d, "columns", tabpanel_width());
+	    (char_u *)(tpl_align == ALIGN_ଡାହାଣ ? "right" : "left"));
+    dict_add_ସଂଖ୍ୟା(d, "columns", tabpanel_width());
     dict_add_bool(d, "scrollbar", tpl_scrollbar);
-    dict_add_number(d, "offset", tpl_scroll_offset);
-    dict_add_number(d, "total", tpl_total_rows);
-    dict_add_number(d, "max_offset", max_offset);
+    dict_add_ସଂଖ୍ୟା(d, "offset", tpl_scroll_offset);
+    dict_add_ସଂଖ୍ୟା(d, "total", tpl_total_rows);
+    dict_add_ସଂଖ୍ୟା(d, "max_offset", max_offset);
 }
 
 /*
  * "tabpanel_scroll()" function
  */
-    void
+    ଶୂନ୍ୟ
 f_tabpanel_scroll(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
-    int		absolute = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		absolute = 0;
     bool	changed;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_ସଂଖ୍ୟା = VVAL_FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    ଯଦି (in_vim9script()
+	    && (check_for_ସଂଖ୍ୟା_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ଫେରନ୍ତୁ;
 
-    n = tv_get_number_chk(&argvars[0], NULL);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    n = tv_get_ସଂଖ୍ୟା_chk(&argvars[0], ଖାଲି);
+    ଯଦି (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == NULL)
+	ଯଦି (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == ଖାଲି)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
 	absolute = dict_get_bool(argvars[1].vval.v_dict, "absolute", FALSE);
     }
 
     // Clamp to int range to avoid signed overflow when casting and negating.
-    if (n > INT_MAX)
+    ଯଦି (n > INT_MAX)
 	n = INT_MAX;
-    else if (n < -INT_MAX)
+    ଅନ୍ୟଥା ଯଦି (n < -INT_MAX)
 	n = -INT_MAX;
 
-    if (absolute)
-	changed = tabpanel_set_offset((int)n);
-    else
+    ଯଦି (absolute)
+	changed = tabpanel_set_offset((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)n);
+    ଅନ୍ୟଥା
 	changed = tabpanel_scroll(n >= 0 ? 1 : -1,
-				  (int)(n >= 0 ? n : -n));
+				  (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(n >= 0 ? n : -n));
 
-    rettv->vval.v_number = changed ? VVAL_TRUE : VVAL_FALSE;
+    rettv->vval.v_ସଂଖ୍ୟା = changed ? VVAL_TRUE : VVAL_FALSE;
 }
 
 #endif // FEAT_TABPANEL

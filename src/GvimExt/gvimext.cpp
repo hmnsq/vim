@@ -14,18 +14,18 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#include "gvimext.h"
-#include "../version.h"
+#ଅନ୍ତର୍ଭାଵ "gvimext.h"
+#ଅନ୍ତର୍ଭାଵ "../version.h"
 
-#define ARRAY_LENGTH(a) (sizeof(a) / sizeof((a)[0]))
+#define ARRAY_LENGTH(a) (ଆକାର(a) / ଆକାର((a)[0]))
 
-static char *searchpath(char *name);
+ସ୍ଥିର ଅକ୍ଷର *searchpath(ଅକ୍ଷର *name);
 
 // Always get an error while putting the following stuff to the
 // gvimext.h file as class protected variables, give up and
 // declare them as global stuff
 FORMATETC fmte = {CF_HDROP,
-		  (DVTARGETDEVICE FAR *)NULL,
+		  (DVTARGETDEVICE FAR *)ଖାଲି,
 		  DVASPECT_CONTENT,
 		  -1,
 		  TYMED_HGLOBAL
@@ -52,8 +52,8 @@ UINT cbFiles = 0;
 // When "runtime" is non-zero, we were called to find the runtime directory.
 // Returns the path in name[BUFSIZE].  It's empty when it fails.
 //
-    static void
-getGvimName(char *name, BOOL runtime)
+    ସ୍ଥିର ଶୂନ୍ୟ
+getGvimName(ଅକ୍ଷର *name, BOOL runtime)
 {
     HKEY	keyhandle;
     DWORD	hlen;
@@ -62,71 +62,71 @@ getGvimName(char *name, BOOL runtime)
     // HKEY_CURRENT_USER first, then fall back to HKEY_LOCAL_MACHINE if
     // not found.
     name[0] = 0;
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
+    ଯଦି (Reg_Open_ଚାବି_Ex(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
+				       ଚାବି_READ, &keyhandle) == ERROR_SUCCESS)
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	ଯଦି (Reg_Query_ମୂଲ୍ୟ_Ex(keyhandle, "path", 0, ଖାଲି, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
-	else
+	ଅନ୍ୟଥା
 	    name[hlen] = 0;
-	RegCloseKey(keyhandle);
+	Reg_Close_ଚାବି(keyhandle);
     }
 
-    if ((name[0] == 0) &&
-	    (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS))
+    ଯଦି ((name[0] == 0) &&
+	    (Reg_Open_ଚାବି_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+				       ଚାବି_READ, &keyhandle) == ERROR_SUCCESS))
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	ଯଦି (Reg_Query_ମୂଲ୍ୟ_Ex(keyhandle, "path", 0, ଖାଲି, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
-	else
+	ଅନ୍ୟଥା
 	    name[hlen] = 0;
-	RegCloseKey(keyhandle);
+	Reg_Close_ଚାବି(keyhandle);
     }
 
     // Registry didn't work, use the search path.
-    if (name[0] == 0)
-	strcpy(name, searchpath((char *)"gvim.exe"));
+    ଯଦି (name[0] == 0)
+	strcpy(name, searchpath((ଅକ୍ଷର *)"gvim.exe"));
 
-    if (!runtime)
+    ଯଦି (!runtime)
     {
 	// Only when looking for the executable, not the runtime dir, we can
 	// search for the batch file or a name without a path.
-	if (name[0] == 0)
-	    strcpy(name, searchpath((char *)"gvim.bat"));
-	if (name[0] == 0)
+	ଯଦି (name[0] == 0)
+	    strcpy(name, searchpath((ଅକ୍ଷର *)"gvim.bat"));
+	ଯଦି (name[0] == 0)
 	    strcpy(name, "gvim");	// finds gvim.bat or gvim.exe
     }
 }
 
-    static void
-getGvimInvocation(char *name)
+    ସ୍ଥିର ଶୂନ୍ୟ
+getGvimInvocation(ଅକ୍ଷର *name)
 {
     getGvimName(name, FALSE);
     // avoid that Vim tries to expand wildcards in the file names
     strcat(name, " --literal");
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 getGvimInvocationW(wchar_t *nameW)
 {
-    char *name;
+    ଅକ୍ଷର *name;
 
-    name = (char *)malloc(BUFSIZE);
+    name = (ଅକ୍ଷର *)malloc(BUFSIZE);
     getGvimInvocation(name);
     mbstowcs(nameW, name, BUFSIZE);
-    free(name);
+    ମୁକ୍ତ(name);
 }
 
-    static BOOL
+    ସ୍ଥିର BOOL
 FileExists(LPCTSTR szPath)
 {
     DWORD dwAttrib = GetFileAttributes(szPath);
 
-    return (dwAttrib != INVALID_FILE_ATTRIBUTES
+    ଫେରନ୍ତୁ (dwAttrib != INVALID_FILE_ATTRIBUTES
 	    && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -135,82 +135,82 @@ FileExists(LPCTSTR szPath)
 // The result is empty when it failed.
 // When it works, the path ends in a slash or backslash.
 //
-    static void
-getRuntimeDir(char *buf)
+    ସ୍ଥିର ଶୂନ୍ୟ
+getRuntimeDir(ଅକ୍ଷର *buf)
 {
-    int		idx;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx;
 
     getGvimName(buf, TRUE);
-    if (buf[0] == 0)
-	return;
+    ଯଦି (buf[0] == 0)
+	ଫେରନ୍ତୁ;
 
     // When no path found, use the search path to expand it.
-    if (strchr(buf, '/') == NULL && strchr(buf, '\\') == NULL)
+    ଯଦି (strchr(buf, '/') == ଖାଲି && strchr(buf, '\\') == ଖାଲି)
 	strcpy(buf, searchpath(buf));
 
     // remove "gvim.exe" from the end
-    for (idx = (int)strlen(buf) - 1; idx >= 0; idx--)
-	if (buf[idx] == '\\' || buf[idx] == '/')
+    ପାଇଁ (idx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)strlen(buf) - 1; idx >= 0; idx--)
+	ଯଦି (buf[idx] == '\\' || buf[idx] == '/')
 	{
 	    buf[++idx] = 0;
-	    break;
+	    ଭାଙ୍ଗ;
 	}
 
     // Check the existence of defaults.vim
-    char *p = buf + idx;
+    ଅକ୍ଷର *p = buf + idx;
     strcpy(p, "defaults.vim");
-    if (FileExists(buf))
+    ଯଦି (FileExists(buf))
     {
 	*p = 0;		// Cut "defaults.vim"
-	return;
+	ଫେରନ୍ତୁ;
     }
     // Check the existence of vimXX\defaults.vim
     strcpy(p, VIM_VERSION_NODOT "\\" "defaults.vim");
-    if (FileExists(buf))
+    ଯଦି (FileExists(buf))
     {
 	p[ARRAY_LENGTH(VIM_VERSION_NODOT)] = 0;	// Cut "defaults.vim"
-	return;
+	ଫେରନ୍ତୁ;
     }
     // Check the existence of runtime\defaults.vim
     strcpy(p, "runtime" "\\" "defaults.vim");
-    if (FileExists(buf))
+    ଯଦି (FileExists(buf))
     {
 	p[ARRAY_LENGTH("runtime")] = 0;		// Cut "defaults.vim"
-	return;
+	ଫେରନ୍ତୁ;
     }
     // Not found
     buf[0] = 0;
-    return;
+    ଫେରନ୍ତୁ;
 }
 
     WCHAR *
-utf8_to_utf16(const char *s)
+utf8_to_utf16(ଅଚଳ ଅକ୍ଷର *s)
 {
-    int size = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
-    WCHAR *buf = (WCHAR *)malloc(size * sizeof(WCHAR));
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା size = MultiByteToWideChar(CP_UTF8, 0, s, -1, ଖାଲି, 0);
+    WCHAR *buf = (WCHAR *)malloc(size * ଆକାର(WCHAR));
     MultiByteToWideChar(CP_UTF8, 0, s, -1, buf, size);
-    return buf;
+    ଫେରନ୍ତୁ buf;
 }
 
     HBITMAP
-IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
+IconToBitmap(HICON hIcon, HBRUSH hBackground, ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height)
 {
-    HDC hDC = GetDC(NULL);
+    HDC hDC = GetDC(ଖାଲି);
     HDC hMemDC = CreateCompatibleDC(hDC);
     HBITMAP hMemBmp = CreateCompatibleBitmap(hDC, width, height);
-    HBITMAP hResultBmp = NULL;
+    HBITMAP hResultBmp = ଖାଲି;
     HGDIOBJ hOrgBMP = SelectObject(hMemDC, hMemBmp);
 
     DrawIconEx(hMemDC, 0, 0, hIcon, width, height, 0, hBackground, DI_NORMAL);
 
     hResultBmp = hMemBmp;
-    hMemBmp = NULL;
+    hMemBmp = ଖାଲି;
 
     SelectObject(hMemDC, hOrgBMP);
     DeleteDC(hMemDC);
-    ReleaseDC(NULL, hDC);
+    ReleaseDC(ଖାଲି, hDC);
     DestroyIcon(hIcon);
-    return hResultBmp;
+    ଫେରନ୍ତୁ hResultBmp;
 }
 
 //
@@ -220,9 +220,9 @@ IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
 # define _(x)	    x
 # define W_impl(x) _wcsdup(L##x)
 # define W(x)	    W_impl(x)
-# define set_gettext_codeset()	    NULL
+# define set_gettext_codeset()	    ଖାଲି
 # define restore_gettext_codeset(x)
-#else
+#ଅନ୍ୟଥା
 # define _(x)	    (*dyn_libintl_gettext)(x)
 # define W(x)	    utf8_to_utf16(x)
 # define VIMPACKAGE "vim"
@@ -232,19 +232,19 @@ IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
 # endif
 
 // Dummy functions
-static char *null_libintl_gettext(const char *);
-static char *null_libintl_textdomain(const char *);
-static char *null_libintl_bindtextdomain(const char *, const char *);
-static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int dyn_libintl_init(char *dir);
-static void dyn_libintl_end(void);
+ସ୍ଥିର ଅକ୍ଷର *null_libintl_gettext(ଅଚଳ ଅକ୍ଷର *);
+ସ୍ଥିର ଅକ୍ଷର *null_libintl_textdomain(ଅଚଳ ଅକ୍ଷର *);
+ସ୍ଥିର ଅକ୍ଷର *null_libintl_bindtextdomain(ଅଚଳ ଅକ୍ଷର *, ଅଚଳ ଅକ୍ଷର *);
+ସ୍ଥିର ଅକ୍ଷର *null_libintl_bind_textdomain_codeset(ଅଚଳ ଅକ୍ଷର *, ଅଚଳ ଅକ୍ଷର *);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା dyn_libintl_init(ଅକ୍ଷର *dir);
+ସ୍ଥିର ଶୂନ୍ୟ dyn_libintl_end(ଶୂନ୍ୟ);
 
-static HINSTANCE hLibintlDLL = 0;
-static char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
-static char *(*dyn_libintl_textdomain)(const char *) = null_libintl_textdomain;
-static char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
+ସ୍ଥିର HINSTANCE hLibintlDLL = 0;
+ସ୍ଥିର ଅକ୍ଷର *(*dyn_libintl_gettext)(ଅଚଳ ଅକ୍ଷର *) = null_libintl_gettext;
+ସ୍ଥିର ଅକ୍ଷର *(*dyn_libintl_textdomain)(ଅଚଳ ଅକ୍ଷର *) = null_libintl_textdomain;
+ସ୍ଥିର ଅକ୍ଷର *(*dyn_libintl_bindtextdomain)(ଅଚଳ ଅକ୍ଷର *, ଅଚଳ ଅକ୍ଷର *)
 						= null_libintl_bindtextdomain;
-static char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
+ସ୍ଥିର ଅକ୍ଷର *(*dyn_libintl_bind_textdomain_codeset)(ଅଚଳ ଅକ୍ଷର *, ଅଚଳ ଅକ୍ଷର *)
 				       = null_libintl_bind_textdomain_codeset;
 
 //
@@ -252,123 +252,123 @@ static char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
 // "dir" is the directory where the libintl.dll might be.
 // Return 1 for success, 0 for failure.
 //
-    static int
-dyn_libintl_init(char *dir)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dyn_libintl_init(ଅକ୍ଷର *dir)
 {
-    int		i;
-    static struct
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
+    ସ୍ଥିର ସଂରଚନା
     {
-	char	    *name;
+	ଅକ୍ଷର	    *name;
 	FARPROC	    *ptr;
     } libintl_entry[] =
     {
-	{(char *)"gettext",		(FARPROC*)&dyn_libintl_gettext},
-	{(char *)"textdomain",		(FARPROC*)&dyn_libintl_textdomain},
-	{(char *)"bindtextdomain",	(FARPROC*)&dyn_libintl_bindtextdomain},
-	{(char *)"bind_textdomain_codeset", (FARPROC*)&dyn_libintl_bind_textdomain_codeset},
-	{NULL, NULL}
+	{(ଅକ୍ଷର *)"gettext",		(FARPROC*)&dyn_libintl_gettext},
+	{(ଅକ୍ଷର *)"textdomain",		(FARPROC*)&dyn_libintl_textdomain},
+	{(ଅକ୍ଷର *)"bindtextdomain",	(FARPROC*)&dyn_libintl_bindtextdomain},
+	{(ଅକ୍ଷର *)"bind_textdomain_codeset", (FARPROC*)&dyn_libintl_bind_textdomain_codeset},
+	{ଖାଲି, ଖାଲି}
     };
     DWORD	len, len2;
-    LPWSTR	buf = NULL;
-    LPWSTR	buf2 = NULL;
+    LPWSTR	buf = ଖାଲି;
+    LPWSTR	buf2 = ଖାଲି;
 
     // No need to initialize twice.
-    if (hLibintlDLL)
-	return 1;
+    ଯଦି (hLibintlDLL)
+	ଫେରନ୍ତୁ 1;
 
     // Load gettext library from $VIMRUNTIME\GvimExt{64,32} directory.
     // Add the directory to $PATH temporarily.
-    len = GetEnvironmentVariableW(L"PATH", NULL, 0);
+    len = GetEnvironmentVariableW(L"PATH", ଖାଲି, 0);
     len2 = MAX_PATH + 1 + len;
-    buf = (LPWSTR)malloc(len * sizeof(WCHAR));
-    buf2 = (LPWSTR)malloc(len2 * sizeof(WCHAR));
-    if (buf != NULL && buf2 != NULL)
+    buf = (LPWSTR)malloc(len * ଆକାର(WCHAR));
+    buf2 = (LPWSTR)malloc(len2 * ଆକାର(WCHAR));
+    ଯଦି (buf != ଖାଲି && buf2 != ଖାଲି)
     {
 	GetEnvironmentVariableW(L"PATH", buf, len);
 # ifdef _WIN64
 	_snwprintf(buf2, len2, L"%S\\GvimExt64;%s", dir, buf);
-# else
+# ଅନ୍ୟଥା
 	_snwprintf(buf2, len2, L"%S\\GvimExt32;%s", dir, buf);
 # endif
 	SetEnvironmentVariableW(L"PATH", buf2);
 	hLibintlDLL = LoadLibrary(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT
-	if (!hLibintlDLL)
+	ଯଦି (!hLibintlDLL)
 	    hLibintlDLL = LoadLibrary(GETTEXT_DLL_ALT);
 # endif
 	SetEnvironmentVariableW(L"PATH", buf);
     }
-    free(buf);
-    free(buf2);
-    if (!hLibintlDLL)
-	return 0;
+    ମୁକ୍ତ(buf);
+    ମୁକ୍ତ(buf2);
+    ଯଦି (!hLibintlDLL)
+	ଫେରନ୍ତୁ 0;
 
     // Get the addresses of the functions we need.
-    for (i = 0; libintl_entry[i].name != NULL
-					 && libintl_entry[i].ptr != NULL; ++i)
+    ପାଇଁ (i = 0; libintl_entry[i].name != ଖାଲି
+					 && libintl_entry[i].ptr != ଖାଲି; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
-					      libintl_entry[i].name)) == NULL)
+	ଯଦି ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
+					      libintl_entry[i].name)) == ଖାଲି)
 	{
 	    dyn_libintl_end();
-	    return 0;
+	    ଫେରନ୍ତୁ 0;
 	}
     }
-    return 1;
+    ଫେରନ୍ତୁ 1;
 }
 
-    static void
-dyn_libintl_end(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+dyn_libintl_end(ଶୂନ୍ୟ)
 {
-    if (hLibintlDLL)
+    ଯଦି (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
-    hLibintlDLL			= NULL;
+    hLibintlDLL			= ଖାଲି;
     dyn_libintl_gettext		= null_libintl_gettext;
     dyn_libintl_textdomain	= null_libintl_textdomain;
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset	= null_libintl_bind_textdomain_codeset;
 }
 
-    static char *
-null_libintl_gettext(const char *msgid)
+    ସ୍ଥିର ଅକ୍ଷର *
+null_libintl_gettext(ଅଚଳ ଅକ୍ଷର *msgid)
 {
-    return (char *)msgid;
+    ଫେରନ୍ତୁ (ଅକ୍ଷର *)msgid;
 }
 
-    static char *
-null_libintl_textdomain(const char * /* domainname */)
+    ସ୍ଥିର ଅକ୍ଷର *
+null_libintl_textdomain(ଅଚଳ ଅକ୍ଷର * /* domainname */)
 {
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    static char *
-null_libintl_bindtextdomain(const char * /* domainname */, const char * /* dirname */)
+    ସ୍ଥିର ଅକ୍ଷର *
+null_libintl_bindtextdomain(ଅଚଳ ଅକ୍ଷର * /* domainname */, ଅଚଳ ଅକ୍ଷର * /* dirname */)
 {
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
-    static char *
-null_libintl_bind_textdomain_codeset(const char * /* domainname */, const char * /* codeset */)
+    ସ୍ଥିର ଅକ୍ଷର *
+null_libintl_bind_textdomain_codeset(ଅଚଳ ଅକ୍ଷର * /* domainname */, ଅଚଳ ଅକ୍ଷର * /* codeset */)
 {
-    return NULL;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 //
 // Setup for translating strings.
 //
-    static void
-dyn_gettext_load(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+dyn_gettext_load(ଶୂନ୍ୟ)
 {
-    char    szBuff[BUFSIZE];
+    ଅକ୍ଷର    szBuff[BUFSIZE];
     DWORD   len;
 
     // Try to locate the runtime files.  The path is used to find libintl.dll
     // and the vim.mo files.
     getRuntimeDir(szBuff);
-    if (szBuff[0] != 0)
+    ଯଦି (szBuff[0] != 0)
     {
 	len = (DWORD)strlen(szBuff);
-	if (dyn_libintl_init(szBuff))
+	ଯଦି (dyn_libintl_init(szBuff))
 	{
 	    strcpy(szBuff + len, "lang");
 
@@ -378,8 +378,8 @@ dyn_gettext_load(void)
     }
 }
 
-    static void
-dyn_gettext_free(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+dyn_gettext_free(ଶୂନ୍ୟ)
 {
     dyn_libintl_end();
 }
@@ -387,24 +387,24 @@ dyn_gettext_free(void)
 //
 // Use UTF-8 for gettext. Returns previous codeset.
 //
-    static char *
-set_gettext_codeset(void)
+    ସ୍ଥିର ଅକ୍ଷର *
+set_gettext_codeset(ଶୂନ୍ୟ)
 {
-    char *prev = dyn_libintl_bind_textdomain_codeset(VIMPACKAGE, NULL);
-    prev = _strdup((prev != NULL) ? prev : "char");
+    ଅକ୍ଷର *prev = dyn_libintl_bind_textdomain_codeset(VIMPACKAGE, ଖାଲି);
+    prev = _strdup((prev != ଖାଲି) ? prev : "char");
     dyn_libintl_bind_textdomain_codeset(VIMPACKAGE, "utf-8");
 
-    return prev;
+    ଫେରନ୍ତୁ prev;
 }
 
 //
 // Restore previous codeset for gettext.
 //
-    static void
-restore_gettext_codeset(char *prev)
+    ସ୍ଥିର ଶୂନ୍ୟ
+restore_gettext_codeset(ଅକ୍ଷର *prev)
 {
     dyn_libintl_bind_textdomain_codeset(VIMPACKAGE, prev);
-    free(prev);
+    ମୁକ୍ତ(prev);
 }
 #endif // FEAT_GETTEXT
 
@@ -412,46 +412,46 @@ restore_gettext_codeset(char *prev)
 // Global variables
 //
 UINT      g_cRefThisDll = 0;    // Reference count of this DLL.
-HINSTANCE g_hmodThisDll = NULL;	// Handle to this DLL itself.
+HINSTANCE g_hmodThisDll = ଖାଲି;	// Handle to this DLL itself.
 
 
 //---------------------------------------------------------------------------
 // DllMain
 //---------------------------------------------------------------------------
-extern "C" int APIENTRY
+ବାହ୍ୟ "C" ପୂର୍ଣ୍ଣସଂଖ୍ୟା APIENTRY
 DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID  /* lpReserved */)
 {
-    switch (dwReason)
+    ବାଛ (dwReason)
     {
-    case DLL_PROCESS_ATTACH:
+    ସ୍ଥିତି DLL_PROCESS_ATTACH:
 	// Extension DLL one-time initialization
 	g_hmodThisDll = hInstance;
-	break;
+	ଭାଙ୍ଗ;
 
-    case DLL_PROCESS_DETACH:
-	break;
+    ସ୍ଥିତି DLL_PROCESS_DETACH:
+	ଭାଙ୍ଗ;
     }
 
-    return 1;   // ok
+    ଫେରନ୍ତୁ 1;   // ok
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 inc_cRefThisDLL()
 {
 #ifdef FEAT_GETTEXT
-    if (g_cRefThisDll == 0)
+    ଯଦି (g_cRefThisDll == 0)
 	dyn_gettext_load();
 #endif
     InterlockedIncrement((LPLONG)&g_cRefThisDll);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dec_cRefThisDLL()
 {
 #ifdef FEAT_GETTEXT
-    if (InterlockedDecrement((LPLONG)&g_cRefThisDll) == 0)
+    ଯଦି (InterlockedDecrement((LPLONG)&g_cRefThisDll) == 0)
 	dyn_gettext_free();
-#else
+#ଅନ୍ୟଥା
     InterlockedDecrement((LPLONG)&g_cRefThisDll);
 #endif
 }
@@ -460,23 +460,23 @@ dec_cRefThisDLL()
 // DllCanUnloadNow
 //---------------------------------------------------------------------------
 
-STDAPI DllCanUnloadNow(void)
+STDAPI DllCanUnloadNow(ଶୂନ୍ୟ)
 {
-    return (g_cRefThisDll == 0 ? S_OK : S_FALSE);
+    ଫେରନ୍ତୁ (g_cRefThisDll == 0 ? S_OK : S_FALSE);
 }
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
-    *ppvOut = NULL;
+    *ppvOut = ଖାଲି;
 
-    if (IsEqualIID(rclsid, CLSID_ShellExtension))
+    ଯଦି (IsEqualIID(rclsid, CLSID_ShellExtension))
     {
-	CShellExtClassFactory *pcf = new CShellExtClassFactory;
+	CShellExtClassFactory *pcf = ନୂତନ CShellExtClassFactory;
 
-	return pcf->QueryInterface(riid, ppvOut);
+	ଫେରନ୍ତୁ pcf->QueryInterface(riid, ppvOut);
     }
 
-    return CLASS_E_CLASSNOTAVAILABLE;
+    ଫେରନ୍ତୁ CLASS_E_CLASSNOTAVAILABLE;
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
@@ -494,71 +494,71 @@ CShellExtClassFactory::~CShellExtClassFactory()
 STDMETHODIMP CShellExtClassFactory::QueryInterface(REFIID riid,
 						   LPVOID FAR *ppv)
 {
-    *ppv = NULL;
+    *ppv = ଖାଲି;
 
     // any interface on this object is the object pointer
 
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    ଯଦି (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
-	*ppv = (LPCLASSFACTORY)this;
+	*ppv = (LPCLASSFACTORY)ଏହି;
 
 	AddRef();
 
-	return NOERROR;
+	ଫେରନ୍ତୁ NOERROR;
     }
 
-    return E_NOINTERFACE;
+    ଫେରନ୍ତୁ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG) CShellExtClassFactory::AddRef()
 {
-    return InterlockedIncrement((LPLONG)&m_cRef);
+    ଫେରନ୍ତୁ InterlockedIncrement((LPLONG)&m_cRef);
 }
 
 STDMETHODIMP_(ULONG) CShellExtClassFactory::Release()
 {
-    if (InterlockedDecrement((LPLONG)&m_cRef))
-	return m_cRef;
+    ଯଦି (InterlockedDecrement((LPLONG)&m_cRef))
+	ଫେରନ୍ତୁ m_cRef;
 
-    delete this;
+    delete ଏହି;
 
-    return 0L;
+    ଫେରନ୍ତୁ 0L;
 }
 
 STDMETHODIMP CShellExtClassFactory::CreateInstance(LPUNKNOWN pUnkOuter,
 						      REFIID riid,
 						      LPVOID *ppvObj)
 {
-    *ppvObj = NULL;
+    *ppvObj = ଖାଲି;
 
     // Shell extensions typically don't support aggregation (inheritance)
 
-    if (pUnkOuter)
-	return CLASS_E_NOAGGREGATION;
+    ଯଦି (pUnkOuter)
+	ଫେରନ୍ତୁ CLASS_E_NOAGGREGATION;
 
     // Create the main shell extension object.  The shell will then call
     // QueryInterface with IID_IShellExtInit--this is how shell extensions are
     // initialized.
 
-    LPCSHELLEXT pShellExt = new CShellExt();  // create the CShellExt object
+    LPCSHELLEXT pShellExt = ନୂତନ CShellExt();  // create the CShellExt object
 
-    if (NULL == pShellExt)
-	return E_OUTOFMEMORY;
+    ଯଦି (ଖାଲି == pShellExt)
+	ଫେରନ୍ତୁ E_OUTOFMEMORY;
 
-    return pShellExt->QueryInterface(riid, ppvObj);
+    ଫେରନ୍ତୁ pShellExt->QueryInterface(riid, ppvObj);
 }
 
 
 STDMETHODIMP CShellExtClassFactory::LockServer(BOOL  /* fLock */)
 {
-    return NOERROR;
+    ଫେରନ୍ତୁ NOERROR;
 }
 
 // *********************** CShellExt *************************
 CShellExt::CShellExt()
 {
     m_cRef = 0L;
-    m_pDataObj = NULL;
+    m_pDataObj = ଖାଲି;
 
     inc_cRefThisDLL();
 
@@ -567,52 +567,52 @@ CShellExt::CShellExt()
 
 CShellExt::~CShellExt()
 {
-    if (m_pDataObj)
+    ଯଦି (m_pDataObj)
 	m_pDataObj->Release();
 
     dec_cRefThisDLL();
 
-    if (m_hVimIconBitmap)
+    ଯଦି (m_hVimIconBitmap)
 	DeleteObject(m_hVimIconBitmap);
 }
 
 STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
-    *ppv = NULL;
+    *ppv = ଖାଲି;
 
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
+    ଯଦି (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
-	*ppv = (LPSHELLEXTINIT)this;
+	*ppv = (LPSHELLEXTINIT)ଏହି;
     }
-    else if (IsEqualIID(riid, IID_IContextMenu))
+    ଅନ୍ୟଥା ଯଦି (IsEqualIID(riid, IID_IContextMenu))
     {
-	*ppv = (LPCONTEXTMENU)this;
+	*ppv = (LPCONTEXTMENU)ଏହି;
     }
 
-    if (*ppv)
+    ଯଦି (*ppv)
     {
 	AddRef();
 
-	return NOERROR;
+	ଫେରନ୍ତୁ NOERROR;
     }
 
-    return E_NOINTERFACE;
+    ଫେରନ୍ତୁ E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG) CShellExt::AddRef()
 {
-    return InterlockedIncrement((LPLONG)&m_cRef);
+    ଫେରନ୍ତୁ InterlockedIncrement((LPLONG)&m_cRef);
 }
 
 STDMETHODIMP_(ULONG) CShellExt::Release()
 {
 
-    if (InterlockedDecrement((LPLONG)&m_cRef))
-	return m_cRef;
+    ଯଦି (InterlockedDecrement((LPLONG)&m_cRef))
+	ଫେରନ୍ତୁ m_cRef;
 
-    delete this;
+    delete ଏହି;
 
-    return 0L;
+    ଫେରନ୍ତୁ 0L;
 }
 
 
@@ -641,18 +641,18 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST  /* pIDFolder */,
 				   HKEY  /* hRegKey */)
 {
     // Initialize can be called more than once
-    if (m_pDataObj)
+    ଯଦି (m_pDataObj)
 	m_pDataObj->Release();
 
     // duplicate the object pointer and registry handle
 
-    if (pDataObj)
+    ଯଦି (pDataObj)
     {
 	m_pDataObj = pDataObj;
 	pDataObj->AddRef();
     }
 
-    return NOERROR;
+    ଫେରନ୍ତୁ NOERROR;
 }
 
 
@@ -684,7 +684,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     UINT idCmd = idCmdFirst;
 
     hres = m_pDataObj->GetData(&fmte, &medium);
-    if (medium.hGlobal)
+    ଯଦି (medium.hGlobal)
 	cbFiles = DragQueryFileW((HDROP)medium.hGlobal, (UINT)-1, 0, 0);
 
     // InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
@@ -693,77 +693,77 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     m_cntOfHWnd = 0;
 
     HKEY keyhandle;
-    bool showExisting = true;
-    bool showIcons = true;
+    ତାର୍କିକ showExisting = ସତ୍ୟ;
+    ତାର୍କିକ showIcons = ସତ୍ୟ;
 
     // Check whether "Edit with existing Vim" entries are disabled.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
+    ଯଦି (Reg_Open_ଚାବି_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+				       ଚାବି_READ, &keyhandle) == ERROR_SUCCESS)
     {
-	if (RegQueryValueEx(keyhandle, "DisableEditWithExisting", 0, NULL,
-						 NULL, NULL) == ERROR_SUCCESS)
-	    showExisting = false;
-	if (RegQueryValueEx(keyhandle, "DisableContextMenuIcons", 0, NULL,
-						 NULL, NULL) == ERROR_SUCCESS)
-	    showIcons = false;
-	RegCloseKey(keyhandle);
+	ଯଦି (Reg_Query_ମୂଲ୍ୟ_Ex(keyhandle, "DisableEditWithExisting", 0, ଖାଲି,
+						 ଖାଲି, ଖାଲି) == ERROR_SUCCESS)
+	    showExisting = ମିଥ୍ୟା;
+	ଯଦି (Reg_Query_ମୂଲ୍ୟ_Ex(keyhandle, "DisableContextMenuIcons", 0, ଖାଲି,
+						 ଖାଲି, ଖାଲି) == ERROR_SUCCESS)
+	    showIcons = ମିଥ୍ୟା;
+	Reg_Close_ଚାବି(keyhandle);
     }
 
     // Use UTF-8 for gettext.
-    char *prev = set_gettext_codeset();
+    ଅକ୍ଷର *prev = set_gettext_codeset();
 
     // Retrieve all the vim instances, unless disabled.
-    if (showExisting)
-	EnumWindows(EnumWindowsProc, (LPARAM)this);
+    ଯଦି (showExisting)
+	EnumWindows(EnumWindowsProc, (LPARAM)ଏହି);
 
-    MENUITEMINFOW mii = { sizeof(MENUITEMINFOW) };
+    MENUITEMINFOW mii = { ଆକାର(MENUITEMINFOW) };
     mii.fMask = MIIM_STRING | MIIM_ID;
-    if (showIcons)
+    ଯଦି (showIcons)
     {
 	mii.fMask |= MIIM_BITMAP;
 	mii.hbmpItem = m_hVimIconBitmap;
     }
 
-    if (cbFiles > 1)
+    ଯଦି (cbFiles > 1)
     {
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with Vim using &tabpages"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
-	free(mii.dwTypeData);
+	ଭର୍ତ୍ତି_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
+	ମୁକ୍ତ(mii.dwTypeData);
 
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with single &Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
-	free(mii.dwTypeData);
+	ଭର୍ତ୍ତି_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
+	ମୁକ୍ତ(mii.dwTypeData);
 
-	if (cbFiles <= 4)
+	ଯଦି (cbFiles <= 4)
 	{
 	    // Can edit up to 4 files in diff mode
 	    mii.wID = idCmd++;
 	    mii.dwTypeData = W(_("Diff with Vim"));
 	    mii.cch = wcslen(mii.dwTypeData);
-	    InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
-	    free(mii.dwTypeData);
+	    ଭର୍ତ୍ତି_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
+	    ମୁକ୍ତ(mii.dwTypeData);
 	    m_edit_existing_off = 3;
 	}
-	else
+	ଅନ୍ୟଥା
 	    m_edit_existing_off = 2;
 
     }
-    else
+    ଅନ୍ୟଥା
     {
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with &Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
-	free(mii.dwTypeData);
+	ଭର୍ତ୍ତି_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
+	ମୁକ୍ତ(mii.dwTypeData);
 	m_edit_existing_off = 1;
     }
 
-    HMENU hSubMenu = NULL;
-    if (m_cntOfHWnd > 1)
+    HMENU hSubMenu = ଖାଲି;
+    ଯଦି (m_cntOfHWnd > 1)
     {
 	hSubMenu = CreatePopupMenu();
 	mii.fMask |= MIIM_SUBMENU;
@@ -771,39 +771,39 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.dwTypeData = W(_("Edit with existing Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
 	mii.hSubMenu = hSubMenu;
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
-	free(mii.dwTypeData);
+	ଭର୍ତ୍ତି_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
+	ମୁକ୍ତ(mii.dwTypeData);
 	mii.fMask = mii.fMask & ~MIIM_SUBMENU;
-	mii.hSubMenu = NULL;
+	mii.hSubMenu = ଖାଲି;
     }
     // Now display all the vim instances
-    for (int i = 0; i < m_cntOfHWnd; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < m_cntOfHWnd; i++)
     {
 	WCHAR title[BUFSIZE];
 	WCHAR temp[BUFSIZE];
-	int index;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା index;
 	HMENU hmenu;
 
 	// Obtain window title, continue if can not
-	if (GetWindowTextW(m_hWnd[i], title, BUFSIZE - 1) == 0)
-	    continue;
+	ଯଦି (GetWindowTextW(m_hWnd[i], title, BUFSIZE - 1) == 0)
+	    ଜାରି;
 	// Truncate the title before the path, keep the file name
 	WCHAR *pos = wcschr(title, L'(');
-	if (pos != NULL)
+	ଯଦି (pos != ଖାଲି)
 	{
-	    if (pos > title && pos[-1] == L' ')
+	    ଯଦି (pos > title && pos[-1] == L' ')
 		--pos;
 	    *pos = 0;
 	}
 	// Now concatenate
-	if (m_cntOfHWnd > 1)
+	ଯଦି (m_cntOfHWnd > 1)
 	    temp[0] = L'\0';
-	else
+	ଅନ୍ୟଥା
 	{
 	    WCHAR *s = W(_("Edit with existing Vim - "));
 	    wcsncpy(temp, s, BUFSIZE - 1);
 	    temp[BUFSIZE - 1] = L'\0';
-	    free(s);
+	    ମୁକ୍ତ(s);
 	}
 	wcsncat(temp, title, BUFSIZE - 1 - wcslen(temp));
 	temp[BUFSIZE - 1] = L'\0';
@@ -811,17 +811,17 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.wID = idCmd++;
 	mii.dwTypeData = temp;
 	mii.cch = wcslen(mii.dwTypeData);
-	if (m_cntOfHWnd > 1)
+	ଯଦି (m_cntOfHWnd > 1)
 	{
 	    hmenu = hSubMenu;
 	    index = i;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    hmenu = hMenu;
 	    index = indexMenu++;
 	}
-	InsertMenuItemW(hmenu, index, TRUE, &mii);
+	ଭର୍ତ୍ତି_Menu_Item_W(hmenu, index, TRUE, &mii);
     }
     // InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
 
@@ -829,7 +829,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     restore_gettext_codeset(prev);
 
     // Must return number of menu items we added.
-    return ResultFromShort(idCmd-idCmdFirst);
+    ଫେରନ୍ତୁ ResultFromShort(idCmd-idCmdFirst);
 }
 
 //
@@ -850,50 +850,50 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 {
     HRESULT hr = E_INVALIDARG;
-    int gvimExtraOptions;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା gvimExtraOptions;
 
     // If HIWORD(lpcmi->lpVerb) then we have been called programmatically
     // and lpVerb is a command that should be invoked.  Otherwise, the shell
     // has called us, and LOWORD(lpcmi->lpVerb) is the menu ID the user has
     // selected.  Actually, it's (menu ID - idCmdFirst) from QueryContextMenu().
-    if (!HIWORD(lpcmi->lpVerb))
+    ଯଦି (!HIWORD(lpcmi->lpVerb))
     {
 	UINT idCmd = LOWORD(lpcmi->lpVerb);
 
-	if (idCmd >= m_edit_existing_off)
+	ଯଦି (idCmd >= m_edit_existing_off)
 	{
 	    // Existing with vim instance
-	    hr = PushToWindow(lpcmi->hwnd,
+	    hr = ଠେଲ_To_Window(lpcmi->hwnd,
 		    lpcmi->lpDirectory,
 		    lpcmi->lpVerb,
 		    lpcmi->lpParameters,
 		    lpcmi->nShow,
 		    idCmd - m_edit_existing_off);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    switch (idCmd)
+	    ବାଛ (idCmd)
 	    {
-		case 0:
+		ସ୍ଥିତି 0:
 		    gvimExtraOptions = EDIT_WITH_VIM_USE_TABPAGES;
-		    break;
-		case 1:
+		    ଭାଙ୍ଗ;
+		ସ୍ଥିତି 1:
 		    gvimExtraOptions = EDIT_WITH_VIM_NO_OPTIONS;
-		    break;
-		case 2:
+		    ଭାଙ୍ଗ;
+		ସ୍ଥିତି 2:
 		    gvimExtraOptions = EDIT_WITH_VIM_IN_DIFF_MODE;
-		    break;
-		default:
+		    ଭାଙ୍ଗ;
+		ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 		    // If execution reaches this point we likely have an
 		    // inconsistency between the code that setup the menus
 		    // and this code that determines what the user
 		    // selected.  This should be detected and fixed during
 		    // development.
-		    return E_FAIL;
+		    ଫେରନ୍ତୁ E_FAIL;
 	    }
 
             LPCMINVOKECOMMANDINFOEX lpcmiex = (LPCMINVOKECOMMANDINFOEX)lpcmi;
-            LPCWSTR currentDirectory = lpcmi->cbSize == sizeof(CMINVOKECOMMANDINFOEX) ? lpcmiex->lpDirectoryW : NULL;
+            LPCWSTR currentDirectory = lpcmi->cbSize == ଆକାର(CMINVOKECOMMANDINFOEX) ? lpcmiex->lpDirectoryW : ଖାଲି;
 
 	    hr = InvokeSingleGvim(lpcmi->hwnd,
 		    currentDirectory,
@@ -903,29 +903,29 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 		    gvimExtraOptions);
 	}
     }
-    return hr;
+    ଫେରନ୍ତୁ hr;
 }
 
-STDMETHODIMP CShellExt::PushToWindow(HWND  /* hParent */,
+STDMETHODIMP CShellExt::ଠେଲ_To_Window(HWND  /* hParent */,
 				   LPCSTR  /* pszWorkingDir */,
 				   LPCSTR  /* pszCmd */,
 				   LPCSTR  /* pszParam */,
-				   int  /* iShowCmd */,
-				   int idHWnd)
+				   ପୂର୍ଣ୍ଣସଂଖ୍ୟା  /* iShowCmd */,
+				   ପୂର୍ଣ୍ଣସଂଖ୍ୟା idHWnd)
 {
     HWND hWnd = m_hWnd[idHWnd];
 
     // Show and bring vim instance to foreground
-    if (IsIconic(hWnd) != 0)
+    ଯଦି (IsIconic(hWnd) != 0)
 	ShowWindow(hWnd, SW_RESTORE);
-    else
+    ଅନ୍ୟଥା
 	ShowWindow(hWnd, SW_SHOW);
     SetForegroundWindow(hWnd);
 
     // Post the selected files to the vim instance
     PostMessage(hWnd, WM_DROPFILES, (WPARAM)medium.hGlobal, 0);
 
-    return NOERROR;
+    ଫେରନ୍ତୁ NOERROR;
 }
 
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR  /* idCmd */,
@@ -935,67 +935,67 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR  /* idCmd */,
 					 UINT cchMax)
 {
     // Use UTF-8 for gettext.
-    char *prev = set_gettext_codeset();
+    ଅକ୍ଷର *prev = set_gettext_codeset();
 
     WCHAR *s = W(_("Edits the selected file(s) with Vim"));
-    if (uFlags == GCS_HELPTEXTW && cchMax > wcslen(s))
+    ଯଦି (uFlags == GCS_HELPTEXTW && cchMax > wcslen(s))
 	wcscpy((WCHAR *)pszName, s);
-    free(s);
+    ମୁକ୍ତ(s);
 
     // Restore previous codeset.
     restore_gettext_codeset(prev);
 
-    return NOERROR;
+    ଫେରନ୍ତୁ NOERROR;
 }
 
 BOOL CALLBACK CShellExt::EnumWindowsProc(HWND hWnd, LPARAM lParam)
 {
-    char temp[BUFSIZE];
+    ଅକ୍ଷର temp[BUFSIZE];
 
     // First do a bunch of check
     // No invisible window
-    if (!IsWindowVisible(hWnd))
-	return TRUE;
+    ଯଦି (!IsWindowVisible(hWnd))
+	ଫେରନ୍ତୁ TRUE;
     // No child window ???
     // if (GetParent(hWnd)) return TRUE;
     // Class name should be Vim, if failed to get class name, return
-    if (GetClassName(hWnd, temp, ARRAY_LENGTH(temp)) == 0)
-	return TRUE;
+    ଯଦି (GetClassName(hWnd, temp, ARRAY_LENGTH(temp)) == 0)
+	ଫେରନ୍ତୁ TRUE;
     // Compare class name to that of vim, if not, return
-    if (_strnicmp(temp, "vim", ARRAY_LENGTH("vim")) != 0)
-	return TRUE;
+    ଯଦି (_strnicmp(temp, "vim", ARRAY_LENGTH("vim")) != 0)
+	ଫେରନ୍ତୁ TRUE;
     // First check if the number of vim instance exceeds MAX_HWND
     CShellExt *cs = (CShellExt*) lParam;
-    if (cs->m_cntOfHWnd >= MAX_HWND)
-	return FALSE;	// stop enumeration
+    ଯଦି (cs->m_cntOfHWnd >= MAX_HWND)
+	ଫେରନ୍ତୁ FALSE;	// stop enumeration
     // Now we get the vim window, put it into some kind of array
     cs->m_hWnd[cs->m_cntOfHWnd] = hWnd;
     cs->m_cntOfHWnd ++;
 
-    return TRUE; // continue enumeration (otherwise this would be false)
+    ଫେରନ୍ତୁ TRUE; // continue enumeration (otherwise this would be false)
 }
 
 BOOL CShellExt::LoadMenuIcon()
 {
-    char vimExeFile[BUFSIZE];
+    ଅକ୍ଷର vimExeFile[BUFSIZE];
     getGvimName(vimExeFile, TRUE);
-    if (vimExeFile[0] == '\0')
-	return FALSE;
+    ଯଦି (vimExeFile[0] == '\0')
+	ଫେରନ୍ତୁ FALSE;
     HICON hVimIcon;
-    if (ExtractIconEx(vimExeFile, 0, NULL, &hVimIcon, 1) == 0)
-	return FALSE;
+    ଯଦି (ExtractIconEx(vimExeFile, 0, ଖାଲି, &hVimIcon, 1) == 0)
+	ଫେରନ୍ତୁ FALSE;
     m_hVimIconBitmap = IconToBitmap(hVimIcon,
 	    GetSysColorBrush(COLOR_MENU),
 	    GetSystemMetrics(SM_CXSMICON),
 	    GetSystemMetrics(SM_CYSMICON));
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
-    static char *
-searchpath(char *name)
+    ସ୍ଥିର ଅକ୍ଷର *
+searchpath(ଅକ୍ଷର *name)
 {
-    static union {
-	char	location[2 * BUFSIZE];
+    ସ୍ଥିର ସଂଘ {
+	ଅକ୍ଷର	location[2 * BUFSIZE];
 	WCHAR	wname[BUFSIZE];
     };
     WCHAR wlocation[BUFSIZE + 1];
@@ -1003,13 +1003,13 @@ searchpath(char *name)
     // There appears to be a bug in FindExecutableA() on Windows NT.
     // Use FindExecutableW() instead...
     MultiByteToWideChar(CP_ACP, 0, name, -1, wname, BUFSIZE);
-    if (FindExecutableW(wname, L"", wlocation) > (HINSTANCE)32)
+    ଯଦି (FindExecutableW(wname, L"", wlocation) > (HINSTANCE)32)
     {
 	WideCharToMultiByte(CP_ACP, 0, wlocation, -1,
-		location, sizeof(location), NULL, NULL);
-	return location;
+		location, ଆକାର(location), ଖାଲି, ଖାଲି);
+	ଫେରନ୍ତୁ location;
     }
-    return (char *)"";
+    ଫେରନ୍ତୁ (ଅକ୍ଷର *)"";
 }
 
 
@@ -1017,8 +1017,8 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 				   LPCWSTR  workingDir,
 				   LPCSTR  /* pszCmd */,
 				   LPCSTR  /* pszParam */,
-				   int  /* iShowCmd */,
-				   int gvimExtraOptions)
+				   ପୂର୍ଣ୍ଣସଂଖ୍ୟା  /* iShowCmd */,
+				   ପୂର୍ଣ୍ଣସଂଖ୍ୟା gvimExtraOptions)
 {
     wchar_t	m_szFileUserClickedOn[BUFSIZE];
     wchar_t	*cmdStrW;
@@ -1027,16 +1027,16 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
     UINT i;
 
     cmdlen = BUFSIZE;
-    cmdStrW  = (wchar_t *) malloc(cmdlen * sizeof(wchar_t));
-    if (cmdStrW == NULL)
-	return E_FAIL;
+    cmdStrW  = (wchar_t *) malloc(cmdlen * ଆକାର(wchar_t));
+    ଯଦି (cmdStrW == ଖାଲି)
+	ଫେରନ୍ତୁ E_FAIL;
     getGvimInvocationW(cmdStrW);
 
-    if (gvimExtraOptions == EDIT_WITH_VIM_IN_DIFF_MODE)
+    ଯଦି (gvimExtraOptions == EDIT_WITH_VIM_IN_DIFF_MODE)
 	wcscat(cmdStrW, L" -d");
-    else if (gvimExtraOptions == EDIT_WITH_VIM_USE_TABPAGES)
+    ଅନ୍ୟଥା ଯଦି (gvimExtraOptions == EDIT_WITH_VIM_USE_TABPAGES)
 	wcscat(cmdStrW, L" -p");
-    for (i = 0; i < cbFiles; i++)
+    ପାଇଁ (i = 0; i < cbFiles; i++)
     {
 	DragQueryFileW((HDROP)medium.hGlobal,
 		i,
@@ -1044,14 +1044,14 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 		ARRAY_LENGTH(m_szFileUserClickedOn));
 
 	len = wcslen(cmdStrW) + wcslen(m_szFileUserClickedOn) + 4;
-	if (len > cmdlen)
+	ଯଦି (len > cmdlen)
 	{
 	    cmdlen = len + BUFSIZE;
-	    wchar_t *cmdStrW_new = (wchar_t *)realloc(cmdStrW, cmdlen * sizeof(wchar_t));
-	    if (cmdStrW_new == NULL)
+	    wchar_t *cmdStrW_new = (wchar_t *)realloc(cmdStrW, cmdlen * ଆକାର(wchar_t));
+	    ଯଦି (cmdStrW_new == ଖାଲି)
 	    {
-		free(cmdStrW);
-		return E_FAIL;
+		ମୁକ୍ତ(cmdStrW);
+		ଫେରନ୍ତୁ E_FAIL;
 	    }
 	    cmdStrW = cmdStrW_new;
 	}
@@ -1063,42 +1063,42 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
 
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    ZeroMemory(&si, ଆକାର(si));
+    si.cb = ଆକାର(si);
 
     // Start the child process.
-    if (!CreateProcessW(NULL,	// No module name (use command line).
+    ଯଦି (!CreateProcessW(ଖାଲି,	// No module name (use command line).
 		cmdStrW,	// Command line.
-		NULL,		// Process handle not inheritable.
-		NULL,		// Thread handle not inheritable.
+		ଖାଲି,		// Process handle not inheritable.
+		ଖାଲି,		// Thread handle not inheritable.
 		FALSE,		// Set handle inheritance to FALSE.
 		0,		// No creation flags.
-		NULL,		// Use parent's environment block.
+		ଖାଲି,		// Use parent's environment block.
 		workingDir,	// Use parent's starting directory.
 		&si,		// Pointer to STARTUPINFO structure.
 		&pi)		// Pointer to PROCESS_INFORMATION structure.
        )
     {
 	// Use UTF-8 for gettext.
-	char *prev = set_gettext_codeset();
+	ଅକ୍ଷର *prev = set_gettext_codeset();
 
-	WCHAR *msg = W(_("Error creating process: Check if gvim is in your path!"));
+	WCHAR *ସନ୍ଦେଶ = W(_("Error creating process: Check if gvim is in your path!"));
 	WCHAR *title = W(_("gvimext.dll error"));
 
-	MessageBoxW(hParent, msg, title, MB_OK);
+	MessageBoxW(hParent, ସନ୍ଦେଶ, title, MB_OK);
 
-	free(msg);
-	free(title);
+	ମୁକ୍ତ(ସନ୍ଦେଶ);
+	ମୁକ୍ତ(title);
 
 	// Restore previous codeset.
 	restore_gettext_codeset(prev);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
     }
-    free(cmdStrW);
+    ମୁକ୍ତ(cmdStrW);
 
-    return NOERROR;
+    ଫେରନ୍ତୁ NOERROR;
 }

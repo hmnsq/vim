@@ -8,39 +8,39 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/RowColumn.h>
-#include <Xm/PushB.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Separator.h>
-#include <Xm/Label.h>
-#include <Xm/CascadeB.h>
-#include <Xm/ScrollBar.h>
-#include <Xm/MenuShell.h>
-#include <Xm/DrawingA.h>
-#if (XmVersion >= 1002)
+#ଅନ୍ତର୍ଭାଵ <Xm/Form.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/RowColumn.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/PushB.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/Text.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/TextF.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/Separator.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/Label.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/CascadeB.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/ScrollBar.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/MenuShell.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/DrawingA.h>
+#ଯଦି (XmVersion >= 1002)
 # include <Xm/RepType.h>
 #endif
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/XmP.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/Frame.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/LabelG.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/ToggleBG.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/SeparatoG.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/XmP.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#ଅନ୍ତର୍ଭାଵ <X11/keysym.h>
+#ଅନ୍ତର୍ଭାଵ <X11/Xatom.h>
+#ଅନ୍ତର୍ଭାଵ <X11/StringDefs.h>
+#ଅନ୍ତର୍ଭାଵ <X11/Intrinsic.h>
 #ifdef HAVE_X11_XPM_H
-# if defined(VMS)
+# ଯଦି defined(VMS)
 #  include <xpm.h>
-# else
+# ଅନ୍ୟଥା
 #  include <X11/xpm.h>
 # endif
-#else
+#ଅନ୍ୟଥା
 # ifdef HAVE_XM_XPMP_H
 #  include <Xm/XpmP.h>
 # endif
@@ -49,9 +49,9 @@
 # include <Xm/Notebook.h>
 #endif
 
-#include "gui_xmebw.h"	// for our Enhanced Button Widget
+#ଅନ୍ତର୍ଭାଵ "gui_xmebw.h"	// for our Enhanced Button Widget
 
-#if defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
+#ଯଦି defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
 # include "../pixmaps/alert.xpm"
 # include "../pixmaps/error.xpm"
 # include "../pixmaps/generic.xpm"
@@ -61,38 +61,38 @@
 
 #define MOTIF_POPUP
 
-extern Widget vimShell;
+ବାହ୍ୟ Widget vimShell;
 
-static Widget vimForm;
-static Widget textAreaForm;
+ସ୍ଥିର Widget vimForm;
+ସ୍ଥିର Widget textAreaForm;
 Widget textArea;
 #ifdef FEAT_TOOLBAR
-static Widget toolBarFrame;
-static Widget toolBar;
+ସ୍ଥିର Widget toolBarFrame;
+ସ୍ଥିର Widget toolBar;
 #endif
 #ifdef FEAT_GUI_TABLINE
-static Widget	tabLine;
-static Widget	tabLine_menu = 0;
-static int	showing_tabline = 0;
+ସ୍ଥିର Widget	tab_ଧାଡ଼ି;
+ସ୍ଥିର Widget	tab_ଧାଡ଼ି_menu = 0;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	showing_tabline = 0;
 #endif
 #ifdef FEAT_MENU
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 // remember the last set value for the tearoff item
-static int tearoff_val = (int)XmTEAR_OFF_ENABLED;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା tearoff_val = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED;
 # endif
-static Widget menuBar;
+ସ୍ଥିର Widget menuBar;
 #endif
 
 #ifdef FEAT_TOOLBAR
-static void reset_focus(void);
+ସ୍ଥିର ଶୂନ୍ୟ reset_focus(ଶୂନ୍ୟ);
 #endif
 
-static void gui_motif_menu_colors(Widget id);
-static void gui_motif_scroll_colors(Widget id);
+ସ୍ଥିର ଶୂନ୍ୟ gui_motif_menu_colors(Widget id);
+ସ୍ଥିର ଶୂନ୍ୟ gui_motif_scroll_colors(Widget id);
 
-#if (XmVersion >= 1002)
+#ଯଦି (XmVersion >= 1002)
 # define STRING_TAG  XmFONTLIST_DEFAULT_TAG
-#else
+#ଅନ୍ୟଥା
 # define STRING_TAG  XmSTRING_DEFAULT_CHARSET
 #endif
 
@@ -100,23 +100,23 @@ static void gui_motif_scroll_colors(Widget id);
  * Call-back routines.
  */
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 scroll_cb(Widget w UNUSED, XtPointer client_data, XtPointer call_data)
 {
     scrollbar_T *sb;
-    long	value;
-    int		dragging;
+    long	ମୂଲ୍ୟ;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dragging;
 
     sb = gui_find_scrollbar((long)client_data);
 
-    value = ((XmScrollBarCallbackStruct *)call_data)->value;
+    ମୂଲ୍ୟ = ((XmScrollBarCallbackStruct *)call_data)->ମୂଲ୍ୟ;
     dragging = (((XmScrollBarCallbackStruct *)call_data)->reason ==
-							      (int)XmCR_DRAG);
-    gui_drag_scrollbar(sb, value, dragging);
+							      (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmCR_DRAG);
+    gui_drag_scrollbar(sb, ମୂଲ୍ୟ, dragging);
 }
 
 #ifdef FEAT_GUI_TABLINE
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabline_cb(
     Widget	w UNUSED,
     XtPointer	client_data UNUSED,
@@ -125,11 +125,11 @@ tabline_cb(
     XmNotebookCallbackStruct *nptr;
 
     nptr = (XmNotebookCallbackStruct *)call_data;
-    if (nptr->reason != (int)XmCR_NONE)
-	send_tabline_event(nptr->page_number);
+    ଯଦି (nptr->reason != (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmCR_NONE)
+	send_tabline_event(nptr->page_ସଂଖ୍ୟା);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabline_button_cb(
     Widget	w,
     XtPointer	client_data UNUSED,
@@ -137,53 +137,53 @@ tabline_button_cb(
 {
     XtPointer	cmd, tab_idx;
 
-    XtVaGetValues(w, XmNuserData, &cmd, NULL);
-    XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNuserData, &cmd, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି_menu, XmNuserData, &tab_idx, ଖାଲି);
 
-    send_tabline_menu_event((int)(long)tab_idx, (int)(long)cmd);
+    send_tabline_menu_event((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(long)tab_idx, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(long)cmd);
 }
 
 /*
  * Tabline single mouse click timeout handler
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 motif_tabline_timer_cb (
     XtPointer		timed_out,
     XtIntervalId	*interval_id UNUSED)
 {
-    *((int *)timed_out) = TRUE;
+    *((ପୂର୍ଣ୍ଣସଂଖ୍ୟା *)timed_out) = TRUE;
 }
 
 /*
  * check if the tabline tab scroller is clicked
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 tabline_scroller_clicked(
-    char		*scroller_name,
+    ଅକ୍ଷର		*scroller_name,
     XButtonPressedEvent *event)
 {
     Widget	tab_scroll_w;
     Position	pos_x, pos_y;
     Dimension	width, height;
 
-    tab_scroll_w = XtNameToWidget(tabLine, scroller_name);
-    if (tab_scroll_w != (Widget)0)
+    tab_scroll_w = XtNameToWidget(tab_ଧାଡ଼ି, scroller_name);
+    ଯଦି (tab_scroll_w != (Widget)0)
     {
-	XtVaGetValues(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
-		      &width, XmNheight, &height, NULL);
-	if (pos_x >= 0)
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
+		      &width, XmNheight, &height, ଖାଲି);
+	ଯଦି (pos_x >= 0)
 	{
 	    // Tab scroller (next) is visible
-	    if (event->x >= pos_x && event->x <= pos_x + width
+	    ଯଦି (event->x >= pos_x && event->x <= pos_x + width
 		    && event->y >= pos_y && event->y <= pos_y + height)
 		// Clicked on the scroller
-		return TRUE;
+		ଫେରନ୍ତୁ TRUE;
 	}
     }
-    return FALSE;
+    ଫେରନ୍ତୁ FALSE;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 tabline_menu_cb(
     Widget	w,
     XtPointer	closure UNUSED,
@@ -192,21 +192,21 @@ tabline_menu_cb(
 {
     Widget			tab_w;
     XButtonPressedEvent		*event;
-    int				tab_idx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା				tab_idx = 0;
     WidgetList			children;
-    Cardinal			numChildren;
-    static XtIntervalId		timer = (XtIntervalId)0;
-    static int			timed_out = TRUE;
+    Cardinal			ଅଙ୍କ_Children;
+    ସ୍ଥିର XtIntervalId		timer = (XtIntervalId)0;
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା			timed_out = TRUE;
 
     event = (XButtonPressedEvent *)e;
 
-    if (event->button == Button1)
+    ଯଦି (event->button == Button1)
     {
-	if (tabline_scroller_clicked("MajorTabScrollerNext", event)
+	ଯଦି (tabline_scroller_clicked("MajorTabScrollerNext", event)
 	    || tabline_scroller_clicked("MajorTabScrollerPrevious", event))
-	    return;
+	    ଫେରନ୍ତୁ;
 
-	if (!timed_out)
+	ଯଦି (!timed_out)
 	{
 	    XtRemoveTimeOut(timer);
 	    timed_out = TRUE;
@@ -216,7 +216,7 @@ tabline_menu_cb(
 	     */
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    /*
 	     * Single click on the tabline gutter, start a timer to check
@@ -226,53 +226,53 @@ tabline_menu_cb(
 				    motif_tabline_timer_cb, &timed_out);
 	    timed_out = FALSE;
 	}
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (event->button == Button2)
+    ଯଦି (event->button == Button2)
     {
 	// Middle mouse click on tabpage label closes that tab.
-	XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
-	send_tabline_menu_event(tab_idx, (int)TABLINE_MENU_CLOSE);
-	return;
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି_menu, XmNuserData, &tab_idx, ଖାଲି);
+	send_tabline_menu_event(tab_idx, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)TABLINE_MENU_CLOSE);
+	ଫେରନ୍ତୁ;
     }
 
-    if (event->button != Button3)
-	return;
+    ଯଦି (event->button != Button3)
+	ଫେରନ୍ତୁ;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    ଯଦି (hold_gui_events || cmdwin_type != 0)
+	ଫେରନ୍ତୁ;
 
-    if (event->subwindow != None)
+    ଯଦି (event->subwindow != None)
     {
 	tab_w = XtWindowToWidget(XtDisplay(w), event->subwindow);
 	// LINTED: avoid warning: dubious operation on enum
-	if (tab_w != (Widget)0 && XmIsPushButton(tab_w))
-	    XtVaGetValues(tab_w, XmNpageNumber, &tab_idx, NULL);
+	ଯଦି (tab_w != (Widget)0 && Xm_Is_ଠେଲ_Button(tab_w))
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_w, Xm_Npage_ସଂଖ୍ୟା, &tab_idx, ଖାଲି);
     }
 
-    XtVaSetValues(tabLine_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
-    XtVaGetValues(tabLine_menu, XmNchildren, &children, XmNnumChildren,
-		  &numChildren, NULL);
-    XtManageChildren(children, numChildren);
-    XmMenuPosition(tabLine_menu, (XButtonPressedEvent *)e) ;
-    XtManageChild(tabLine_menu);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି_menu, XmNuserData, (XtPointer)(long)tab_idx, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି_menu, XmNchildren, &children, XmNnumChildren,
+		  &ଅଙ୍କ_Children, ଖାଲି);
+    XtManageChildren(children, ଅଙ୍କ_Children);
+    XmMenuPosition(tab_ଧାଡ଼ି_menu, (XButtonPressedEvent *)e) ;
+    XtManageChild(tab_ଧାଡ଼ି_menu);
 }
 
-    static void
-tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
+    ସ୍ଥିର ଶୂନ୍ୟ
+tabline_balloon_cb(BalloonEval *beval, ପୂର୍ଣ୍ଣସଂଖ୍ୟା state UNUSED)
 {
-    int		nr;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nr;
     tabpage_T	*tp;
 
-    if (beval->target == (Widget)0)
-	return;
+    ଯଦି (beval->target == (Widget)0)
+	ଫେରନ୍ତୁ;
 
-    XtVaGetValues(beval->target, XmNpageNumber, &nr, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(beval->target, Xm_Npage_ସଂଖ୍ୟା, &nr, ଖାଲି);
     tp = find_tabpage(nr);
-    if (tp == NULL)
-	return;
+    ଯଦି (tp == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     get_tabline_label(tp, TRUE);
     gui_mch_post_balloon(beval, NameBuff);
@@ -289,25 +289,25 @@ tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
  * By Marcin Dalecki.
  */
 
-#include <Xm/XmP.h>
-#include <Xm/LabelP.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/XmP.h>
+#ଅନ୍ତର୍ଭାଵ <Xm/LabelP.h>
 
-static XtExposeProc old_label_expose = NULL;
+ସ୍ଥିର XtExposeProc old_label_expose = ଖାଲି;
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 label_expose(Widget _w, XEvent *_event, Region _region)
 {
     GC		    insensitiveGC;
     XmLabelWidget   lw = (XmLabelWidget)_w;
-    unsigned char   label_type = (int)XmSTRING;
+    unsigned ଅକ୍ଷର   label_type = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmSTRING;
 
-    XtVaGetValues(_w, XmNlabelType, &label_type, (XtPointer)0);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(_w, XmNlabelType, &label_type, (XtPointer)0);
 
-    if (XtIsSensitive(_w) || label_type != (int)XmSTRING)
+    ଯଦି (XtIsSensitive(_w) || label_type != (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmSTRING)
 	(*old_label_expose)(_w, _event, _region);
-    else
+    ଅନ୍ୟଥା
     {
-	XGCValues   values;
+	XGCValues   ମୂଲ୍ୟଗୁଡ଼ିକ;
 	XtGCMask    mask;
 	XtGCMask    dynamic;
 	XFontStruct *fs;
@@ -319,51 +319,51 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 
 	mask = GCForeground | GCBackground | GCGraphicsExposures;
 	dynamic = GCClipMask | GCClipXOrigin | GCClipYOrigin;
-	values.graphics_exposures = False;
+	ମୂଲ୍ୟଗୁଡ଼ିକ.graphics_exposures = False;
 
-	if (fs != 0)
+	ଯଦି (fs != 0)
 	{
 	    mask |= GCFont;
-	    values.font = fs->fid;
+	    ମୂଲ୍ୟଗୁଡ଼ିକ.font = fs->fid;
 	}
 
-	if (lw->primitive.top_shadow_pixmap != None
-		&& lw->primitive.top_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
+	ଯଦି (lw->primitive.ଶୀର୍ଷ_shadow_pixmap != None
+		&& lw->primitive.ଶୀର୍ଷ_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
 	{
 	    mask |= GCFillStyle | GCTile;
-	    values.fill_style = FillTiled;
-	    values.tile = lw->primitive.top_shadow_pixmap;
+	    ମୂଲ୍ୟଗୁଡ଼ିକ.fill_style = FillTiled;
+	    ମୂଲ୍ୟଗୁଡ଼ିକ.tile = lw->primitive.ଶୀର୍ଷ_shadow_pixmap;
 	}
 
 	lw->label.TextRect.x += 1;
 	lw->label.TextRect.y += 1;
-	if (lw->label._acc_text != 0)
+	ଯଦି (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x += 1;
 	    lw->label.acc_TextRect.y += 1;
 	}
 
-	values.foreground = lw->primitive.top_shadow_color;
-	values.background = lw->core.background_pixel;
+	ମୂଲ୍ୟଗୁଡ଼ିକ.foreground = lw->primitive.ଶୀର୍ଷ_shadow_color;
+	ମୂଲ୍ୟଗୁଡ଼ିକ.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &ମୂଲ୍ୟଗୁଡ଼ିକ, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
 	lw->label.TextRect.x -= 1;
 	lw->label.TextRect.y -= 1;
-	if (lw->label._acc_text != 0)
+	ଯଦି (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x -= 1;
 	    lw->label.acc_TextRect.y -= 1;
 	}
 
-	values.foreground = lw->primitive.bottom_shadow_color;
-	values.background = lw->core.background_pixel;
+	ମୂଲ୍ୟଗୁଡ଼ିକ.foreground = lw->primitive.bottom_shadow_color;
+	ମୂଲ୍ୟଗୁଡ଼ିକ.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &ମୂଲ୍ୟଗୁଡ଼ିକ, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -374,20 +374,20 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 /*
  * Create all the motif widgets necessary.
  */
-    void
-gui_x11_create_widgets(void)
+    ଶୂନ୍ୟ
+gui_x11_create_widgets(ଶୂନ୍ୟ)
 {
 #ifdef FEAT_GUI_TABLINE
     Widget	button, scroller;
     Arg		args[10];
-    int		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
     XmString	xms;
 #endif
 
     /*
      * Install the 3D shade effect drawing routines.
      */
-    if (old_label_expose == NULL)
+    ଯଦି (old_label_expose == ଖାଲି)
     {
 	old_label_expose = xmLabelWidgetClass->core_class.expose;
 	xmLabelWidgetClass->core_class.expose = label_expose;
@@ -401,12 +401,12 @@ gui_x11_create_widgets(void)
     /*
      * Install the tearOffModel resource converter.
      */
-#if (XmVersion >= 1002)
+#ଯଦି (XmVersion >= 1002)
     XmRepTypeInstallTearOffModelConverter();
 #endif
 
     // Make sure the "Quit" menu entry of the window manager is ignored
-    XtVaSetValues(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(vimShell, XmNdeleteResponse, XmDO_NOTHING, ଖାଲି);
 
     vimForm = XtVaCreateManagedWidget("vimForm",
 	xmFormWidgetClass, vimShell,
@@ -416,15 +416,15 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(vimForm);
 
 #ifdef FEAT_MENU
     {
 	Arg al[7]; // Make sure there is enough room for arguments!
-	int ac = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା ac = 0;
 
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 	XtSetArg(al[ac], XmNtearOffModel, tearoff_val); ac++;
 # endif
 	XtSetArg(al[ac], XmNleftAttachment,  XmATTACH_FORM); ac++;
@@ -453,7 +453,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(toolBarFrame);
 
     toolBar = XtVaCreateManagedWidget("toolBar",
@@ -470,7 +470,7 @@ gui_x11_create_widgets(void)
 	XmNmarginHeight, 0,
 	XmNmarginWidth, 0,
 	XmNadjustLast, True,
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(toolBar);
 
 #endif
@@ -481,18 +481,18 @@ gui_x11_create_widgets(void)
     XtSetArg(args[n], XmNbindingType, XmNONE); n++;
     XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
     XtSetArg(args[n], XmNbackPageSize, XmNONE); n++;
-    XtSetArg(args[n], XmNbackPageNumber, 0); n++;
-    XtSetArg(args[n], XmNbackPagePlacement, XmTOP_RIGHT); n++;
+    XtSetArg(args[n], Xm_Nback_Page_ସଂଖ୍ୟା, 0); n++;
+    XtSetArg(args[n], XmNbackPagePlacement, Xm_ଶୀର୍ଷ_ଡାହାଣ); n++;
     XtSetArg(args[n], XmNmajorTabSpacing, 0); n++;
     XtSetArg(args[n], XmNshadowThickness, 0); n++;
     XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
     XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-    tabLine = XmCreateNotebook(vimForm, "Vim tabline", args, n);
+    tab_ଧାଡ଼ି = XmCreateNotebook(vimForm, "Vim tabline", args, n);
 
-    XtAddCallback(tabLine, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
-			NULL);
-    XtAddEventHandler(tabLine, ButtonPressMask, False,
-			(XtEventHandler)tabline_menu_cb, NULL);
+    XtAddCallback(tab_ଧାଡ଼ି, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
+			ଖାଲି);
+    XtAddEventHandler(tab_ଧାଡ଼ି, ButtonPressMask, False,
+			(XtEventHandler)tabline_menu_cb, ଖାଲି);
 
     gui.tabline_height = TABLINE_HEIGHT;
 
@@ -503,42 +503,42 @@ gui_x11_create_widgets(void)
      * managed by the Notebook widget and the notebook widget geometry
      * is adjusted to account for the minor scroller widgets.
      */
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerNext");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerPrevious");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
+    scroller = XtNameToWidget(tab_ଧାଡ଼ି, "MinorTabScrollerNext");
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, ଖାଲି);
+    scroller = XtNameToWidget(tab_ଧାଡ଼ି, "MinorTabScrollerPrevious");
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, ଖାଲି);
 
     // Create the tabline popup menu
-    tabLine_menu = XmCreatePopupMenu(tabLine, "tabline popup", NULL, 0);
+    tab_ଧାଡ଼ି_menu = XmCreatePopupMenu(tab_ଧାଡ଼ି, "tabline popup", ଖାଲି, 0);
 
     // Add the buttons to the tabline popup menu
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
-    xms = XmStringCreate((char *)"Close tab", STRING_TAG);
+    xms = XmStringCreate((ଅକ୍ଷର *)"Close tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Close", args, n);
+    button = Xm_Create_ଠେଲ_Button(tab_ଧାଡ଼ି_menu, "Close", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, ଖାଲି);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
-    xms = XmStringCreate((char *)"New Tab", STRING_TAG);
+    xms = XmStringCreate((ଅକ୍ଷର *)"New Tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "New Tab", args, n);
+    button = Xm_Create_ଠେଲ_Button(tab_ଧାଡ଼ି_menu, "New Tab", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, ଖାଲି);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
-    xms = XmStringCreate((char *)"Open tab...", STRING_TAG);
+    xms = XmStringCreate((ଅକ୍ଷର *)"Open tab...", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Open tab...", args, n);
+    button = Xm_Create_ଠେଲ_Button(tab_ଧାଡ଼ି_menu, "Open tab...", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, ଖାଲି);
     XmStringFree(xms);
 #endif
 
@@ -551,7 +551,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	ଖାଲି);
     gui_motif_scroll_colors(textAreaForm);
 
     textArea = XtVaCreateManagedWidget("textArea",
@@ -570,7 +570,7 @@ gui_x11_create_widgets(void)
 	XmNborderWidth, 0,
 	XmNhighlightThickness, 0,
 	XmNshadowThickness, 0,
-	NULL);
+	ଖାଲି);
 
     /*
      * Install the callbacks.
@@ -584,21 +584,21 @@ gui_x11_create_widgets(void)
 /*
  * Called when the GUI is not going to start after all.
  */
-    void
-gui_x11_destroy_widgets(void)
+    ଶୂନ୍ୟ
+gui_x11_destroy_widgets(ଶୂନ୍ୟ)
 {
-    textArea = NULL;
+    textArea = ଖାଲି;
 #ifdef FEAT_MENU
-    menuBar = NULL;
+    menuBar = ଖାଲି;
 #endif
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_text_area_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    x UNUSED,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    y UNUSED,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    w UNUSED,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    h UNUSED)
 {
 #ifdef FEAT_TOOLBAR
     // Give keyboard focus to the textArea instead of the toolbar.
@@ -606,46 +606,46 @@ gui_mch_set_text_area_pos(
 #endif
 }
 
-    void
-gui_x11_set_back_color(void)
+    ଶୂନ୍ୟ
+gui_x11_set_back_color(ଶୂନ୍ୟ)
 {
-    if (textArea != NULL)
-#if (XmVersion >= 1002)
+    ଯଦି (textArea != ଖାଲି)
+#ଯଦି (XmVersion >= 1002)
 	XmChangeColor(textArea, gui.back_pixel);
-#else
-	XtVaSetValues(textArea,
+#ଅନ୍ୟଥା
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textArea,
 		  XmNbackground, gui.back_pixel,
-		  NULL);
+		  ଖାଲି);
 #endif
 }
 
 /*
  * Manage dialog centered on pointer.
  */
-    void
+    ଶୂନ୍ୟ
 manage_centered(Widget dialog_child)
 {
     Widget shell = XtParent(dialog_child);
-    Window root, child;
-    unsigned int mask;
-    unsigned int width, height, border_width, depth;
-    int x, y, win_x, win_y, maxX, maxY;
+    Window ମୂଳ, child;
+    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା mask;
+    unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, height, border_width, depth;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା x, y, win_x, win_y, maxX, maxY;
     Boolean mappedWhenManaged;
 
     // Temporarily set value of XmNmappedWhenManaged
     // to stop the dialog from popping up right away
-    XtVaGetValues(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
-    XtVaSetValues(shell, XmNmappedWhenManaged, False, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(shell, XmNmappedWhenManaged, &mappedWhenManaged, ଖାଲି);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(shell, XmNmappedWhenManaged, False, ଖାଲି);
 
     XtManageChild(dialog_child);
 
     // Get the pointer position (x, y)
-    XQueryPointer(XtDisplay(shell), XtWindow(shell), &root, &child,
+    XQueryPointer(XtDisplay(shell), XtWindow(shell), &ମୂଳ, &child,
 		  &x, &y, &win_x, &win_y, &mask);
 
     // Translate the pointer position (x, y) into a position for the new
     // window that will place the pointer at its center
-    XGetGeometry(XtDisplay(shell), XtWindow(shell), &root, &win_x, &win_y,
+    XGetGeometry(XtDisplay(shell), XtWindow(shell), &ମୂଳ, &win_x, &win_y,
 		 &width, &height, &border_width, &depth);
     width += 2 * border_width;
     height += 2 * border_width;
@@ -655,26 +655,26 @@ manage_centered(Widget dialog_child)
     // Ensure that the dialog remains on screen
     maxX = XtScreen(shell)->width - width;
     maxY = XtScreen(shell)->height - height;
-    if (x < 0)
+    ଯଦି (x < 0)
 	x = 0;
-    if (x > maxX)
+    ଯଦି (x > maxX)
 	x = maxX;
-    if (y < 0)
+    ଯଦି (y < 0)
 	y = 0;
-    if (y > maxY)
+    ଯଦି (y > maxY)
 	y = maxY;
 
     // Set desired window position in the DialogShell
-    XtVaSetValues(shell, XmNx, x, XmNy, y, NULL);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(shell, XmNx, x, XmNy, y, ଖାଲି);
 
     // Map the widget
     XtMapWidget(shell);
 
     // Restore the value of XmNmappedWhenManaged
-    XtVaSetValues(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(shell, XmNmappedWhenManaged, mappedWhenManaged, ଖାଲି);
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
+#ଯଦି defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
 
 /*
  * Encapsulate the way an XmFontList is created.
@@ -684,22 +684,22 @@ gui_motif_create_fontlist(XFontStruct *font)
 {
     XmFontList font_list;
 
-# if (XmVersion <= 1001)
+# ଯଦି (XmVersion <= 1001)
     // Motif 1.1 method
     font_list = XmFontListCreate(font, STRING_TAG);
-# else
+# ଅନ୍ୟଥା
     // Motif 1.2 method
     XmFontListEntry font_list_entry;
 
     font_list_entry = XmFontListEntryCreate(STRING_TAG, XmFONT_IS_FONT,
 					    (XtPointer)font);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(ଖାଲି, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
 # endif
-    return font_list;
+    ଫେରନ୍ତୁ font_list;
 }
 
-# if ((XmVersion > 1001) && defined(FEAT_XFONTSET))
+# ଯଦି ((XmVersion > 1001) && defined(FEAT_XFONTSET))
     XmFontList
 gui_motif_fontset2fontlist(XFontSet *fontset)
 {
@@ -711,132 +711,132 @@ gui_motif_fontset2fontlist(XFontSet *fontset)
     font_list_entry = XmFontListEntryCreate(STRING_TAG,
 					    XmFONT_IS_FONTSET,
 					    (XtPointer)*fontset);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(ଖାଲି, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
-    return font_list;
+    ଫେରନ୍ତୁ font_list;
 }
 # endif
 
 #endif
 
-#if defined(FEAT_MENU)
+#ଯଦି defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-static void gui_motif_add_actext(vimmenu_T *menu);
-# if (XmVersion >= 1002)
-static void toggle_tearoff(Widget wid);
-static void gui_mch_recurse_tearoffs(vimmenu_T *menu);
+ସ୍ଥିର ଶୂନ୍ୟ gui_motif_add_actext(vimmenu_T *menu);
+# ଯଦି (XmVersion >= 1002)
+ସ୍ଥିର ଶୂନ୍ୟ toggle_tearoff(Widget wid);
+ସ୍ଥିର ଶୂନ୍ୟ gui_mch_recurse_tearoffs(vimmenu_T *menu);
 # endif
-static void submenu_change(vimmenu_T *mp, int colors);
+ସ୍ଥିର ଶୂନ୍ୟ submenu_change(vimmenu_T *mp, ପୂର୍ଣ୍ଣସଂଖ୍ୟା colors);
 
-static void do_set_mnemonics(int enable);
-static int menu_enabled = TRUE;
+ସ୍ଥିର ଶୂନ୍ୟ do_set_mnemonics(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା menu_enabled = TRUE;
 
-    void
-gui_mch_enable_menu(int flag)
+    ଶୂନ୍ୟ
+gui_mch_enable_menu(ପୂର୍ଣ୍ଣସଂଖ୍ୟା flag)
 {
-    if (flag)
+    ଯଦି (flag)
     {
 	XtManageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	ଯଦି (XtIsManaged(XtParent(toolBar)))
 	{
 	    // toolBar is attached to top form
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, menuBar,
-		NULL);
+		ଖାଲି);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      ଖାଲି);
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
 	XtUnmanageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	ଯଦି (XtIsManaged(XtParent(toolBar)))
 	{
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_FORM,
-		NULL);
+		ଖାଲି);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      ଖାଲି);
 	}
     }
 
@@ -845,54 +845,54 @@ gui_mch_enable_menu(int flag)
 /*
  * Enable or disable mnemonics for the toplevel menus.
  */
-    void
-gui_motif_set_mnemonics(int enable)
+    ଶୂନ୍ୟ
+gui_motif_set_mnemonics(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable)
 {
     /*
      * Don't enable menu mnemonics when the menu bar is disabled, LessTif
      * crashes when using a mnemonic then.
      */
-    if (!menu_enabled)
+    ଯଦି (!menu_enabled)
 	enable = FALSE;
     do_set_mnemonics(enable);
 }
 
-    static void
-do_set_mnemonics(int enable)
+    ସ୍ଥିର ଶୂନ୍ୟ
+do_set_mnemonics(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable)
 {
     vimmenu_T	*menu;
 
     FOR_ALL_MENUS(menu)
-	if (menu->id != (Widget)0)
-	    XtVaSetValues(menu->id,
+	ଯଦି (menu->id != (Widget)0)
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menu->id,
 		    XmNmnemonic, enable ? menu->mnemonic : NUL,
-		    NULL);
+		    ଖାଲି);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    ଶୂନ୍ୟ
+gui_mch_add_menu(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     XmString	label;
     Widget	shell;
     vimmenu_T	*parent = menu->parent;
 
 # ifdef MOTIF_POPUP
-    if (menu_is_popup(menu->name))
+    ଯଦି (menu_is_popup(menu->name))
     {
 	Arg arg[2];
-	int n = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = 0;
 
 	// Only create the popup menu when it's actually used, otherwise there
 	// is a delay when using the right mouse button.
-#  if (XmVersion <= 1002)
-	if (mouse_model_popup())
+#  ଯଦି (XmVersion <= 1002)
+	ଯଦି (mouse_model_popup())
 #  endif
 	{
-	    if (gui.menu_bg_pixel != INVALCOLOR)
+	    ଯଦି (gui.menu_bg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[0], XmNbackground, gui.menu_bg_pixel); n++;
 	    }
-	    if (gui.menu_fg_pixel != INVALCOLOR)
+	    ଯଦି (gui.menu_fg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[1], XmNforeground, gui.menu_fg_pixel); n++;
 	    }
@@ -900,39 +900,39 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 								      arg, n);
 	    menu->id = (Widget)0;
 	}
-	return;
+	ଫେରନ୍ତୁ;
     }
 # endif
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == (Widget)0))
-	return;
+    ଯଦି (!menu_is_menubar(menu->name)
+	    || (parent != ଖାଲି && parent->submenu_id == (Widget)0))
+	ଫେରନ୍ତୁ;
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((ଅକ୍ଷର *)menu->dname, STRING_TAG);
+    ଯଦି (label == ଖାଲି)
+	ଫେରନ୍ତୁ;
     menu->id = XtVaCreateWidget("subMenu",
 	    xmCascadeButtonWidgetClass,
-	    (parent == NULL) ? menuBar : parent->submenu_id,
+	    (parent == ଖାଲି) ? menuBar : parent->submenu_id,
 	    XmNlabelString, label,
 	    XmNmnemonic, p_wak[0] == 'n' ? NUL : menu->mnemonic,
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 	    // submenu: count the tearoff item (needed for LessTif)
-	    XmNpositionIndex, idx + (parent != NULL
-			   && tearoff_val == (int)XmTEAR_OFF_ENABLED ? 1 : 0),
+	    XmNpositionIndex, idx + (parent != ଖାଲି
+			   && tearoff_val == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED ? 1 : 0),
 # endif
-	    NULL);
+	    ଖାଲି);
     XmStringFree(label);
 
-    if (menu->id == (Widget)0)		// failed
-	return;
+    ଯଦି (menu->id == (Widget)0)		// failed
+	ଫେରନ୍ତୁ;
 
     // The "Help" menu is a special case, and should be placed at the far
     // right hand side of the menu-bar.  It's recognized by its high priority.
-    if (parent == NULL && menu->priority >= 9999)
-	XtVaSetValues(menuBar,
+    ଯଦି (parent == ଖାଲି && menu->priority >= 9999)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menuBar,
 		XmNmenuHelpWidget, menu->id,
-		NULL);
+		ଖାଲି);
 
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
@@ -944,29 +944,29 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	xmMenuShellWidgetClass, menu->id,
 	XmNwidth, 1,
 	XmNheight, 1,
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(shell);
     menu->submenu_id = XtVaCreateWidget("rowColumnMenu",
 	xmRowColumnWidgetClass, shell,
 	XmNrowColumnType, XmMENU_PULLDOWN,
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(menu->submenu_id);
 
-    if (menu->submenu_id == (Widget)0)		// failed
-	return;
+    ଯଦି (menu->submenu_id == (Widget)0)		// failed
+	ଫେରନ୍ତୁ;
 
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
     // Set the colors for the tear off widget
     toggle_tearoff(menu->submenu_id);
 # endif
 
-    XtVaSetValues(menu->id,
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menu->id,
 	XmNsubMenuId, menu->submenu_id,
-	NULL);
+	ଖାଲି);
 
     // When we add a top-level item to the menu bar, we can figure out how
     // high the menu bar should be.
-    if (parent == NULL)
+    ଯଦି (parent == ଖାଲି)
 	gui_mch_compute_menu_height(menu->id);
 }
 
@@ -974,59 +974,59 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 /*
  * Add mnemonic and accelerator text to a menu button.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 gui_motif_add_actext(vimmenu_T *menu)
 {
     XmString	label;
 
     // Add accelerator text, if there is one
-    if (menu->actext == NULL || menu->id == (Widget)0)
-	return;
+    ଯଦି (menu->actext == ଖାଲି || menu->id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
-    label = XmStringCreate((char *)menu->actext, STRING_TAG);
-    if (label == NULL)
-	return;
-    XtVaSetValues(menu->id, XmNacceleratorText, label, NULL);
+    label = XmStringCreate((ଅକ୍ଷର *)menu->actext, STRING_TAG);
+    ଯଦି (label == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menu->id, XmNacceleratorText, label, ଖାଲି);
     XmStringFree(label);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    ଶୂନ୍ୟ
+gui_mch_toggle_tearoffs(ପୂର୍ଣ୍ଣସଂଖ୍ୟା enable)
 {
-# if (XmVersion >= 1002)
-    if (enable)
-	tearoff_val = (int)XmTEAR_OFF_ENABLED;
-    else
-	tearoff_val = (int)XmTEAR_OFF_DISABLED;
+# ଯଦି (XmVersion >= 1002)
+    ଯଦି (enable)
+	tearoff_val = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED;
+    ଅନ୍ୟଥା
+	tearoff_val = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_DISABLED;
     toggle_tearoff(menuBar);
-    gui_mch_recurse_tearoffs(root_menu);
+    gui_mch_recurse_tearoffs(ମୂଳ_menu);
 # endif
 }
 
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 /*
  * Set the tearoff for one menu widget on or off, and set the color of the
  * tearoff widget.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 toggle_tearoff(Widget wid)
 {
     Widget	w;
 
-    XtVaSetValues(wid, XmNtearOffModel, tearoff_val, NULL);
-    if (tearoff_val == (int)XmTEAR_OFF_ENABLED
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(wid, XmNtearOffModel, tearoff_val, ଖାଲି);
+    ଯଦି (tearoff_val == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED
 	    && (w = XmGetTearOffControl(wid)) != (Widget)0)
 	gui_motif_menu_colors(w);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 gui_mch_recurse_tearoffs(vimmenu_T *menu)
 {
-    while (menu != NULL)
+    ଯେତେବେଳେ (menu != ଖାଲି)
     {
-	if (!menu_is_popup(menu->name))
+	ଯଦି (!menu_is_popup(menu->name))
 	{
-	    if (menu->submenu_id != (Widget)0)
+	    ଯଦି (menu->submenu_id != (Widget)0)
 		toggle_tearoff(menu->submenu_id);
 	    gui_mch_recurse_tearoffs(menu->children);
 	}
@@ -1035,13 +1035,13 @@ gui_mch_recurse_tearoffs(vimmenu_T *menu)
 }
 # endif
 
-    int
-gui_mch_text_area_extra_height(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_text_area_extra_height(ଶୂନ୍ୟ)
 {
     Dimension	shadowHeight;
 
-    XtVaGetValues(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
-    return shadowHeight;
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm, XmNshadowThickness, &shadowHeight, ଖାଲି);
+    ଫେରନ୍ତୁ shadowHeight;
 }
 
 /*
@@ -1049,37 +1049,37 @@ gui_mch_text_area_extra_height(void)
  * We need to check all the items for their position and height, for the case
  * there are several rows, and/or some characters extend higher or lower.
  */
-    void
+    ଶୂନ୍ୟ
 gui_mch_compute_menu_height(
     Widget	id)		    // can be NULL when deleting menu
 {
     Dimension	y, maxy;
     Dimension	margin, shadow;
     vimmenu_T	*mp;
-    static Dimension	height = 21;	// normal height of a menu item
+    ସ୍ଥିର Dimension	height = 21;	// normal height of a menu item
 
     /*
      * Get the height of the new item, before managing it, because it will
      * still reflect the font size.  After managing it depends on the menu
      * height, which is what we just wanted to get!.
      */
-    if (id != (Widget)0)
-	XtVaGetValues(id, XmNheight, &height, NULL);
+    ଯଦି (id != (Widget)0)
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNheight, &height, ଖାଲି);
 
     // Find any menu Widget, to be able to call XtManageChild()
-    else
+    ଅନ୍ୟଥା
 	FOR_ALL_MENUS(mp)
-	    if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	    ଯଦି (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	    {
 		id = mp->id;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 
     /*
      * Now manage the menu item, to make them all be positioned (makes an
      * extra row when needed, removes it when not needed).
      */
-    if (id != (Widget)0)
+    ଯଦି (id != (Widget)0)
 	XtManageChild(id);
 
     /*
@@ -1088,18 +1088,18 @@ gui_mch_compute_menu_height(
     maxy = 0;
     FOR_ALL_MENUS(mp)
     {
-	if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	ଯଦି (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	{
-	    XtVaGetValues(mp->id, XmNy, &y, NULL);
-	    if (y > maxy)
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(mp->id, XmNy, &y, ଖାଲି);
+	    ଯଦି (y > maxy)
 		maxy = y;
 	}
     }
 
-    XtVaGetValues(menuBar,
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(menuBar,
 	XmNmarginHeight, &margin,
 	XmNshadowThickness, &shadow,
-	NULL);
+	ଖାଲି);
 
     /*
      * This computation is the result of trial-and-error:
@@ -1116,8 +1116,8 @@ gui_mch_compute_menu_height(
     // Somehow the menu bar doesn't resize automatically.  Set it here,
     // even though this is a catch 22.  Don't do this when starting up,
     // somehow the menu gets very high then.
-    if (gui.shell_created)
-	XtVaSetValues(menuBar, XmNheight, gui.menu_height, NULL);
+    ଯଦି (gui.shell_created)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menuBar, XmNheight, gui.menu_height, ଖାଲି);
 }
 
 # ifdef FEAT_TOOLBAR
@@ -1127,16 +1127,16 @@ gui_mch_compute_menu_height(
  */
 #  include "gui_x11_pm.h"
 
-static char **get_toolbar_pixmap(vimmenu_T *menu, char **fname);
+ସ୍ଥିର ଅକ୍ଷର **get_toolbar_pixmap(vimmenu_T *menu, ଅକ୍ଷର **fname);
 
 /*
  * Read an Xpm file.  Return OK or FAIL.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 check_xpm(char_u *path)
 {
     XpmAttributes attrs;
-    int		status;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		status;
     Pixmap	mask;
     Pixmap	map;
 
@@ -1144,13 +1144,13 @@ check_xpm(char_u *path)
 
     // Create the "sensitive" pixmap
     status = XpmReadFileToPixmap(gui.dpy,
-	    RootWindow(gui.dpy, DefaultScreen(gui.dpy)),
-	    (char *)path, &map, &mask, &attrs);
+	    ମୂଳ_Window(gui.dpy, DefaultScreen(gui.dpy)),
+	    (ଅକ୍ଷର *)path, &map, &mask, &attrs);
     XpmFreeAttributes(&attrs);
 
-    if (status == XpmSuccess)
-	return OK;
-    return FAIL;
+    ଯଦି (status == XpmSuccess)
+	ଫେରନ୍ତୁ OK;
+    ଫେରନ୍ତୁ FAIL;
 }
 
 
@@ -1160,103 +1160,103 @@ check_xpm(char_u *path)
  * (in allocated memory).
  * Return a blank pixmap if it fails.
  */
-    static char **
-get_toolbar_pixmap(vimmenu_T *menu, char **fname)
+    ସ୍ଥିର ଅକ୍ଷର **
+get_toolbar_pixmap(vimmenu_T *menu, ଅକ୍ଷର **fname)
 {
     char_u	buf[MAXPATHL];		// buffer storing expanded pathname
-    char	**xpm = NULL;		// xpm array
-    int		res;
+    ଅକ୍ଷର	**xpm = ଖାଲି;		// xpm array
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		res;
 
-    *fname = NULL;
+    *fname = ଖାଲି;
     buf[0] = NUL;			// start with NULL path
 
-    if (menu->iconfile != NULL)
+    ଯଦି (menu->iconfile != ଖାଲି)
     {
 	// Use the "icon="  argument.
 	gui_find_iconfile(menu->iconfile, buf, "xpm");
 	res = check_xpm(buf);
 
 	// If it failed, try using the menu name.
-	if (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
+	ଯଦି (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
 	    res = check_xpm(buf);
-	if (res == OK)
+	ଯଦି (res == OK)
 	{
-	    *fname = (char *)vim_strsave(buf);
-	    return tb_blank_xpm;
+	    *fname = (ଅକ୍ଷର *)vim_strsave(buf);
+	    ଫେରନ୍ତୁ tb_blank_xpm;
 	}
     }
 
-    if (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
+    ଯଦି (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
     {
-	if (menu->iconidx >= 0 && menu->iconidx
-	       < (int)(sizeof(built_in_pixmaps) / sizeof(built_in_pixmaps[0])))
+	ଯଦି (menu->iconidx >= 0 && menu->iconidx
+	       < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(ଆକାର(built_in_pixmaps) / ଆକାର(built_in_pixmaps[0])))
 	    xpm = built_in_pixmaps[menu->iconidx];
-	else
+	ଅନ୍ୟଥା
 	    xpm = tb_blank_xpm;
     }
 
-    return xpm;
+    ଫେରନ୍ତୁ xpm;
 }
 
 /*
  * Add arguments for the toolbar pixmap to a menu item.
  */
-    static int
-add_pixmap_args(vimmenu_T *menu, Arg *args, int n)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+add_pixmap_args(vimmenu_T *menu, Arg *args, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     vim_free(menu->xpm_fname);
     menu->xpm = get_toolbar_pixmap(menu, &menu->xpm_fname);
-    if (menu->xpm == NULL)
+    ଯଦି (menu->xpm == ଖାଲି)
     {
 	XtSetArg(args[n], XmNlabelType, XmSTRING); n++;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (menu->xpm_fname != NULL)
+	ଯଦି (menu->xpm_fname != ଖାଲି)
 	{
 	    XtSetArg(args[n], XmNpixmapFile, menu->xpm_fname); n++;
 	}
 	XtSetArg(args[n], XmNpixmapData, menu->xpm); n++;
 	XtSetArg(args[n], XmNlabelLocation, XmBOTTOM); n++;
     }
-    return n;
+    ଫେରନ୍ତୁ n;
 }
 # endif // FEAT_TOOLBAR
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    ଶୂନ୍ୟ
+gui_mch_add_menu_item(vimmenu_T *menu, ପୂର୍ଣ୍ଣସଂଖ୍ୟା idx)
 {
     XmString	label;
     vimmenu_T	*parent = menu->parent;
 
-# if (XmVersion <= 1002)
+# ଯଦି (XmVersion <= 1002)
     // Don't add Popup menu items when the popup menu isn't used.
-    if (menu_is_child_of_popup(menu) && !mouse_model_popup())
-	return;
+    ଯଦି (menu_is_child_of_popup(menu) && !mouse_model_popup())
+	ଫେରନ୍ତୁ;
 # endif
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    ଯଦି (menu_is_toolbar(parent->name))
     {
 	WidgetClass	type;
-	XmString	xms = NULL;    // fallback label if pixmap not found
-	int		n;
+	XmString	xms = ଖାଲି;    // fallback label if pixmap not found
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
 	Arg		args[18];
 
 	n = 0;
-	if (menu_is_separator(menu->name))
+	ଯଦି (menu_is_separator(menu->name))
 	{
-	    char	*cp;
+	    ଅକ୍ଷର	*cp;
 	    Dimension	wid;
 
 	    /*
 	     * A separator has the format "-sep%d[:%d]-". The optional :%d is
 	     * a width specifier. If no width is specified then we choose one.
 	     */
-	    cp = (char *)vim_strchr(menu->name, ':');
-	    if (cp != NULL)
+	    cp = (ଅକ୍ଷର *)vim_strchr(menu->name, ':');
+	    ଯଦି (cp != ଖାଲି)
 		wid = (Dimension)atoi(++cp);
-	    else
+	    ଅନ୍ୟଥା
 		wid = 4;
 
 	    type = xmSeparatorWidgetClass;
@@ -1265,7 +1265,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
 	    XtSetArg(args[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    // Without shadows one can't sense whatever the button has been
 	    // pressed or not! However we want to save a bit of space...
@@ -1277,7 +1277,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNtraversalOn, False); n++;
 	    // Set the label here, so that we can switch between icons/text
 	    // by changing the XmNlabelType resource.
-	    xms = XmStringCreate((char *)menu->dname, STRING_TAG);
+	    xms = XmStringCreate((ଅକ୍ଷର *)menu->dname, STRING_TAG);
 	    XtSetArg(args[n], XmNlabelString, xms); n++;
 
 	    n = add_pixmap_args(menu, args, n);
@@ -1286,19 +1286,19 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	}
 
 	XtSetArg(args[n], XmNpositionIndex, idx); n++;
-	if (menu->id == NULL)
+	ଯଦି (menu->id == ଖାଲି)
 	{
-	    menu->id = XtCreateManagedWidget((char *)menu->dname,
+	    menu->id = XtCreateManagedWidget((ଅକ୍ଷର *)menu->dname,
 			type, toolBar, args, n);
-	    if (menu->id != NULL && type == xmEnhancedButtonWidgetClass)
+	    ଯଦି (menu->id != ଖାଲି && type == xmEnhancedButtonWidgetClass)
 	    {
 		XtAddCallback(menu->id,
 			XmNactivateCallback, gui_x11_menu_cb, menu);
 	    }
 	}
-	else
-	    XtSetValues(menu->id, args, n);
-	if (xms != NULL)
+	ଅନ୍ୟଥା
+	    Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(menu->id, args, n);
+	ଯଦି (xms != ଖାଲି)
 	    XmStringFree(xms);
 
 #  ifdef FEAT_BEVAL_GUI
@@ -1306,55 +1306,55 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 #  endif
 
 	menu->parent = parent;
-	menu->submenu_id = NULL;
+	menu->submenu_id = ଖାଲି;
 	// When adding first item to toolbar it might have to be enabled .
-	if (!XtIsManaged(XtParent(toolBar))
-		    && vim_strchr(p_go, GO_TOOLBAR) != NULL)
+	ଯଦି (!XtIsManaged(XtParent(toolBar))
+		    && vim_strchr(p_go, GO_TOOLBAR) != ଖାଲି)
 	    gui_mch_show_toolbar(TRUE);
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
-	return;
+	ଫେରନ୍ତୁ;
     } // toolbar menu item
 # endif
 
     // No parent, must be a non-menubar menu
-    if (parent->submenu_id == (Widget)0)
-	return;
+    ଯଦି (parent->submenu_id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     menu->submenu_id = (Widget)0;
 
     // Add menu separator
-    if (menu_is_separator(menu->name))
+    ଯଦି (menu_is_separator(menu->name))
     {
 	menu->id = XtVaCreateWidget("subMenu",
 		xmSeparatorGadgetClass, parent->submenu_id,
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 		// count the tearoff item (needed for LessTif)
-		XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+		XmNpositionIndex, idx + (tearoff_val == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-		NULL);
+		ଖାଲି);
 	gui_motif_menu_colors(menu->id);
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((ଅକ୍ଷର *)menu->dname, STRING_TAG);
+    ଯଦି (label == ଖାଲି)
+	ଫେରନ୍ତୁ;
     menu->id = XtVaCreateWidget("subMenu",
-	xmPushButtonWidgetClass, parent->submenu_id,
+	xm_ଠେଲ_Button_Widget_Class, parent->submenu_id,
 	XmNlabelString, label,
 	XmNmnemonic, menu->mnemonic,
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 	// count the tearoff item (needed for LessTif)
-	XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+	XmNpositionIndex, idx + (tearoff_val == (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-	NULL);
+	ଖାଲି);
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
     XmStringFree(label);
 
-    if (menu->id != (Widget)0)
+    ଯଦି (menu->id != (Widget)0)
     {
 	XtAddCallback(menu->id, XmNactivateCallback, gui_x11_menu_cb,
 		(XtPointer)menu);
@@ -1363,35 +1363,35 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     }
 }
 
-# if (XmVersion <= 1002)
+# ଯଦି (XmVersion <= 1002)
 /*
  * This function will destroy/create the popup menus dynamically,
  * according to the value of 'mousemodel'.
  * This will fix the "right mouse button freeze" that occurs when
  * there exists a popup menu but it isn't managed.
  */
-    void
+    ଶୂନ୍ୟ
 gui_motif_update_mousemodel(vimmenu_T *menu)
 {
-    int		idx = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		idx = 0;
 
     // When GUI hasn't started the menus have not been created.
-    if (!gui.in_use)
-	return;
+    ଯଦି (!gui.in_use)
+	ଫେରନ୍ତୁ;
 
-    while (menu)
+    ଯେତେବେଳେ (menu)
     {
-      if (menu->children != NULL)
+      ଯଦି (menu->children != ଖାଲି)
       {
-	  if (menu_is_popup(menu->name))
+	  ଯଦି (menu_is_popup(menu->name))
 	  {
-	      if (mouse_model_popup())
+	      ଯଦି (mouse_model_popup())
 	      {
 		  // Popup menu will be used.  Create the popup menus.
 		  gui_mch_add_menu(menu, idx);
 		  gui_motif_update_mousemodel(menu->children);
 	      }
-	      else
+	      ଅନ୍ୟଥା
 	      {
 		  // Popup menu will not be used.  Destroy the popup menus.
 		  gui_motif_update_mousemodel(menu->children);
@@ -1399,11 +1399,11 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 	      }
 	  }
       }
-      else if (menu_is_child_of_popup(menu))
+      ଅନ୍ୟଥା ଯଦି (menu_is_child_of_popup(menu))
       {
-	  if (mouse_model_popup())
+	  ଯଦି (mouse_model_popup())
 	      gui_mch_add_menu_item(menu, idx);
-	  else
+	  ଅନ୍ୟଥା
 	      gui_mch_destroy_menu(menu);
       }
       menu = menu->next;
@@ -1412,34 +1412,34 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 }
 # endif
 
-    void
-gui_mch_new_menu_colors(void)
+    ଶୂନ୍ୟ
+gui_mch_new_menu_colors(ଶୂନ୍ୟ)
 {
-    if (menuBar == (Widget)0)
-	return;
+    ଯଦି (menuBar == (Widget)0)
+	ଫେରନ୍ତୁ;
     gui_motif_menu_colors(menuBar);
 # ifdef FEAT_TOOLBAR
     gui_motif_menu_colors(toolBarFrame);
     gui_motif_menu_colors(toolBar);
 # endif
 
-    submenu_change(root_menu, TRUE);
+    submenu_change(ମୂଳ_menu, TRUE);
 }
 
-    void
-gui_mch_new_menu_font(void)
+    ଶୂନ୍ୟ
+gui_mch_new_menu_font(ଶୂନ୍ୟ)
 {
-    if (menuBar == (Widget)0)
-	return;
-    submenu_change(root_menu, FALSE);
+    ଯଦି (menuBar == (Widget)0)
+	ଫେରନ୍ତୁ;
+    submenu_change(ମୂଳ_menu, FALSE);
     {
 	Dimension   height;
 	Position w, h;
 
-	XtVaGetValues(menuBar, XmNheight, &height, NULL);
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(menuBar, XmNheight, &height, ଖାଲି);
 	gui.menu_height = height;
 
-	XtVaGetValues(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(vimShell, XtNwidth, &w, XtNheight, &h, ଖାଲି);
 	gui_resize_shell(w, h
 # ifdef FEAT_XIM
 		- xim_get_status_area_height()
@@ -1450,105 +1450,105 @@ gui_mch_new_menu_font(void)
     ui_new_shellsize();
 }
 
-# if defined(FEAT_BEVAL_GUI)
-    void
-gui_mch_new_tooltip_font(void)
+# ଯଦି defined(FEAT_BEVAL_GUI)
+    ଶୂନ୍ୟ
+gui_mch_new_tooltip_font(ଶୂନ୍ୟ)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *menu;
 
-    if (toolBar == (Widget)0)
-	return;
+    ଯଦି (toolBar == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     menu = gui_find_menu((char_u *)"ToolBar");
-    if (menu != NULL)
+    ଯଦି (menu != ଖାଲି)
 	submenu_change(menu, FALSE);
 #  endif
 }
 
-    void
-gui_mch_new_tooltip_colors(void)
+    ଶୂନ୍ୟ
+gui_mch_new_tooltip_colors(ଶୂନ୍ୟ)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *toolbar;
 
-    if (toolBar == (Widget)0)
-	return;
+    ଯଦି (toolBar == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     toolbar = gui_find_menu((char_u *)"ToolBar");
-    if (toolbar != NULL)
+    ଯଦି (toolbar != ଖାଲି)
 	submenu_change(toolbar, TRUE);
 #  endif
 }
 # endif
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 submenu_change(
     vimmenu_T	*menu,
-    int		colors)		// TRUE for colors, FALSE for font
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		colors)		// TRUE for colors, FALSE for font
 {
     vimmenu_T	*mp;
 
-    for (mp = menu; mp != NULL; mp = mp->next)
+    ପାଇଁ (mp = menu; mp != ଖାଲି; mp = mp->next)
     {
-	if (mp->id != (Widget)0)
+	ଯଦି (mp->id != (Widget)0)
 	{
-	    if (colors)
+	    ଯଦି (colors)
 	    {
 		gui_motif_menu_colors(mp->id);
 # ifdef FEAT_TOOLBAR
 		// For a toolbar item: Free the pixmap and allocate a new one,
 		// so that the background color is right.
-		if (mp->xpm != NULL)
+		ଯଦି (mp->xpm != ଖାଲି)
 		{
-		    int		n = 0;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = 0;
 		    Arg		args[18];
 
 		    n = add_pixmap_args(mp, args, n);
-		    XtSetValues(mp->id, args, n);
+		    Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(mp->id, args, n);
 		}
 #  ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		ଯଦି (mp->tip != ଖାଲି)
 		{
 		    Arg args[2];
 
 		    args[0].name = XmNbackground;
-		    args[0].value = gui.tooltip_bg_pixel;
+		    args[0].ମୂଲ୍ୟ = gui.tooltip_bg_pixel;
 		    args[1].name = XmNforeground;
-		    args[1].value = gui.tooltip_fg_pixel;
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    args[1].ମୂଲ୍ୟ = gui.tooltip_fg_pixel;
+		    Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(mp->tip->balloonLabel, &args[0], Xt_ସଂଖ୍ୟା(args));
 		}
 #  endif
 # endif
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		gui_motif_menu_fontlist(mp->id);
 # ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		ଯଦି (mp->tip != ଖାଲି)
 		{
 		    Arg args[1];
 
 		    args[0].name = XmNfontList;
-		    args[0].value = (XtArgVal)gui_motif_fontset2fontlist(
+		    args[0].ମୂଲ୍ୟ = (XtArgVal)gui_motif_fontset2fontlist(
 						    &gui.tooltip_fontset);
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(mp->tip->balloonLabel, &args[0], Xt_ସଂଖ୍ୟା(args));
 		}
 # endif
 	    }
 	}
 
-	if (mp->children != NULL)
+	ଯଦି (mp->children != ଖାଲି)
 	{
-# if (XmVersion >= 1002)
+# ଯଦି (XmVersion >= 1002)
 	    // Set the colors/font for the tear off widget
-	    if (mp->submenu_id != (Widget)0)
+	    ଯଦି (mp->submenu_id != (Widget)0)
 	    {
-		if (colors)
+		ଯଦି (colors)
 		    gui_motif_menu_colors(mp->submenu_id);
-		else
+		ଅନ୍ୟଥା
 		    gui_motif_menu_fontlist(mp->submenu_id);
 		toggle_tearoff(mp->submenu_id);
 	    }
@@ -1562,26 +1562,26 @@ submenu_change(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    ଶୂନ୍ୟ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Please be sure to destroy the parent widget first (i.e. menu->id).
     // On the other hand, problems have been reported that the submenu must be
     // deleted first...
-    if (menu->submenu_id != (Widget)0)
+    ଯଦି (menu->submenu_id != (Widget)0)
     {
 	XtDestroyWidget(menu->submenu_id);
 	menu->submenu_id = (Widget)0;
     }
 
-    if (menu->id == (Widget)0)
-	return;
+    ଯଦି (menu->id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     Widget	    parent;
 
     parent = XtParent(menu->id);
-# if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
-    if (parent == toolBar && menu->tip != NULL)
+# ଯଦି defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+    ଯଦି (parent == toolBar && menu->tip != ଖାଲି)
     {
 	// We try to destroy this before the actual menu, because there are
 	// callbacks, etc. that will be unregistered during the tooltip
@@ -1592,29 +1592,29 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 	// deallocated by Xt, and unknown behaviour will ensue (probably
 	// a core dump).
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = ଖାଲି;
     }
 # endif
     XtDestroyWidget(menu->id);
     menu->id = (Widget)0;
-    if (parent == menuBar)
+    ଯଦି (parent == menuBar)
 	gui_mch_compute_menu_height((Widget)0);
 # ifdef FEAT_TOOLBAR
-    else if (parent == toolBar)
+    ଅନ୍ୟଥା ଯଦି (parent == toolBar)
     {
-	Cardinal    num_children;
+	Cardinal    ଅଙ୍କ_children;
 
 	// When removing last toolbar item, don't display the toolbar.
-	XtVaGetValues(toolBar, XmNnumChildren, &num_children, NULL);
-	if (num_children == 0)
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBar, XmNnumChildren, &ଅଙ୍କ_children, ଖାଲି);
+	ଯଦି (ଅଙ୍କ_children == 0)
 	    gui_mch_show_toolbar(FALSE);
-	else
+	ଅନ୍ୟଥା
 	    gui.toolbar_height = gui_mch_compute_toolbar_height();
     }
 # endif
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 {
 # ifdef MOTIF_POPUP
@@ -1628,11 +1628,11 @@ gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 /*
  * Set the menu and scrollbar colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    ଶୂନ୍ୟ
+gui_mch_def_colors(ଶୂନ୍ୟ)
 {
-    if (!gui.in_use)
-	return;
+    ଯଦି (!gui.in_use)
+	ଫେରନ୍ତୁ;
 
     gui.menu_fg_pixel = gui_get_color((char_u *)gui.rsrc_menu_fg_name);
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
@@ -1651,202 +1651,202 @@ gui_mch_def_colors(void)
  * Scrollbar stuff.
  */
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_scrollbar_thumb(
     scrollbar_T *sb,
     long	val,
     long	size,
     long	max)
 {
-    if (sb->id != (Widget)0)
-	XtVaSetValues(sb->id,
+    ଯଦି (sb->id != (Widget)0)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(sb->id,
 		  XmNvalue, val,
 		  XmNsliderSize, size,
 		  XmNpageIncrement, (size > 2 ? size - 2 : 1),
 		  XmNmaximum, max + 1,	    // Motif has max one past the end
-		  NULL);
+		  ଖାଲି);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		x,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		y,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		w,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		h)
 {
-    if (sb->id == (Widget)0)
-	return;
+    ଯଦି (sb->id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
-    if (sb->type == SBAR_LEFT || sb->type == SBAR_RIGHT)
+    ଯଦି (sb->type == SBAR_ବାମ || sb->type == SBAR_ଡାହାଣ)
     {
-	if (y == 0)
+	ଯଦି (y == 0)
 	    h -= gui.border_offset;
-	else
+	ଅନ୍ୟଥା
 	    y -= gui.border_offset;
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(sb->id,
 		XmNtopOffset, y,
 		XmNbottomOffset, -y - h,
 		XmNwidth, w,
-		NULL);
+		ଖାଲି);
     }
-    else
-	XtVaSetValues(sb->id,
+    ଅନ୍ୟଥା
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(sb->id,
 		XmNtopOffset, y,
 		XmNleftOffset, x,
-		XmNrightOffset, gui.which_scrollbars[SBAR_RIGHT]
+		XmNrightOffset, gui.which_scrollbars[SBAR_ଡାହାଣ]
 						     ? gui.scrollbar_width : 0,
 		XmNheight, h,
-		NULL);
+		ଖାଲି);
     XtManageChild(sb->id);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_get_scrollbar_xpadding(ଶୂନ୍ୟ)
 {
-    int xpad;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା xpad;
     Dimension tw, ww;
     Position  tx;
 
-    XtVaGetValues(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
-    XtVaGetValues(vimShell, XtNwidth, &ww, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(textArea, XtNwidth, &tw, XtNx, &tx, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(vimShell, XtNwidth, &ww, ଖାଲି);
     xpad = ww - tw - tx - gui.scrollbar_width;
-    return (xpad < 0) ? 0 : xpad;
+    ଫେରନ୍ତୁ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_get_scrollbar_ypadding(ଶୂନ୍ୟ)
 {
-    int ypad;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ypad;
     Dimension th, wh;
     Position  ty;
 
-    XtVaGetValues(textArea, XtNheight, &th, XtNy, &ty, NULL);
-    XtVaGetValues(vimShell, XtNheight, &wh, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(textArea, XtNheight, &th, XtNy, &ty, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(vimShell, XtNheight, &wh, ଖାଲି);
     ypad = wh - th - ty - gui.scrollbar_height;
-    return (ypad < 0) ? 0 : ypad;
+    ଫେରନ୍ତୁ (ypad < 0) ? 0 : ypad;
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    ଶୂନ୍ୟ
+gui_mch_enable_scrollbar(scrollbar_T *sb, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flag)
 {
     Arg		args[16];
-    int		n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n;
 
-    if (sb->id == (Widget)0)
-	return;
+    ଯଦି (sb->id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     n = 0;
-    if (flag)
+    ଯଦି (flag)
     {
-	switch (sb->type)
+	ବାଛ (sb->type)
 	{
-	    case SBAR_LEFT:
+	    ସ୍ଥିତି SBAR_ବାମ:
 		XtSetArg(args[n], XmNleftOffset, gui.scrollbar_width); n++;
-		break;
+		ଭାଙ୍ଗ;
 
-	    case SBAR_RIGHT:
+	    ସ୍ଥିତି SBAR_ଡାହାଣ:
 		XtSetArg(args[n], XmNrightOffset, gui.scrollbar_width); n++;
-		break;
+		ଭାଙ୍ଗ;
 
-	    case SBAR_BOTTOM:
+	    ସ୍ଥିତି SBAR_BOTTOM:
 		XtSetArg(args[n], XmNbottomOffset, gui.scrollbar_height);n++;
-		break;
+		ଭାଙ୍ଗ;
 	}
-	XtSetValues(textArea, args, n);
+	Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textArea, args, n);
 	XtManageChild(sb->id);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (!gui.which_scrollbars[sb->type])
+	ଯଦି (!gui.which_scrollbars[sb->type])
 	{
 	    // The scrollbars of this type are all disabled, adjust the
 	    // textArea attachment offset.
-	    switch (sb->type)
+	    ବାଛ (sb->type)
 	    {
-		case SBAR_LEFT:
+		ସ୍ଥିତି SBAR_ବାମ:
 		    XtSetArg(args[n], XmNleftOffset, 0); n++;
-		    break;
+		    ଭାଙ୍ଗ;
 
-		case SBAR_RIGHT:
+		ସ୍ଥିତି SBAR_ଡାହାଣ:
 		    XtSetArg(args[n], XmNrightOffset, 0); n++;
-		    break;
+		    ଭାଙ୍ଗ;
 
-		case SBAR_BOTTOM:
+		ସ୍ଥିତି SBAR_BOTTOM:
 		    XtSetArg(args[n], XmNbottomOffset, 0);n++;
-		    break;
+		    ଭାଙ୍ଗ;
 	    }
-	    XtSetValues(textArea, args, n);
+	    Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textArea, args, n);
 	}
 	XtUnmanageChild(sb->id);
     }
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		orient)	// SBAR_VERT or SBAR_HORIZ
 {
     Arg		args[16];
-    int		n = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n = 0;
 
     XtSetArg(args[n], XmNminimum, 0); n++;
     XtSetArg(args[n], XmNorientation,
 	    (orient == SBAR_VERT) ? XmVERTICAL : XmHORIZONTAL); n++;
 
-    switch (sb->type)
+    ବାଛ (sb->type)
     {
-	case SBAR_LEFT:
+	ସ୍ଥିତି SBAR_ବାମ:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case SBAR_RIGHT:
+	ସ୍ଥିତି SBAR_ଡାହାଣ:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    ଭାଙ୍ଗ;
 
-	case SBAR_BOTTOM:
+	ସ୍ଥିତି SBAR_BOTTOM:
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNheight, gui.scrollbar_height); n++;
-	    break;
+	    ଭାଙ୍ଗ;
     }
 
     sb->id = XtCreateWidget("scrollBar",
 	    xmScrollBarWidgetClass, textAreaForm, args, n);
-    if (sb->id == (Widget)0)
-	return;
+    ଯଦି (sb->id == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     gui_mch_set_scrollbar_colors(sb);
     XtAddCallback(sb->id, XmNvalueChangedCallback,
 	    scroll_cb, (XtPointer)sb->ident);
     XtAddCallback(sb->id, XmNdragCallback,
 	    scroll_cb, (XtPointer)sb->ident);
-    XtAddEventHandler(sb->id, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(sb->id, ଚାବି_Press_Mask, FALSE, gui_x11_ଚାବି_hit_cb,
 	    (XtPointer)0);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    ଯଦି (sb->id != (Widget)0)
 	XtDestroyWidget(sb->id);
 }
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    ଯଦି (sb->id != (Widget)0)
     {
-	if (gui.scroll_bg_pixel != INVALCOLOR)
+	ଯଦି (gui.scroll_bg_pixel != INVALCOLOR)
 	{
-#if (XmVersion>=1002)
+#ଯଦି (XmVersion>=1002)
 	    // This should not only set the through color but also adjust
 	    // related colors, such as shadows.
 	    XmChangeColor(sb->id, gui.scroll_bg_pixel);
@@ -1854,20 +1854,20 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 
 	    // Set the through color directly, in case XmChangeColor() decided
 	    // to change it.
-	    XtVaSetValues(sb->id,
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(sb->id,
 		    XmNtroughColor, gui.scroll_bg_pixel,
-		    NULL);
+		    ଖାଲି);
 	}
 
-	if (gui.scroll_fg_pixel != INVALCOLOR)
-	    XtVaSetValues(sb->id,
+	ଯଦି (gui.scroll_fg_pixel != INVALCOLOR)
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(sb->id,
 		    XmNforeground, gui.scroll_fg_pixel,
 		    XmNbackground, gui.scroll_fg_pixel,
-		    NULL);
+		    ଖାଲି);
     }
 
     // This is needed for the rectangle below the vertical scrollbars.
-    if (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
+    ଯଦି (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
 	gui_motif_scroll_colors(textAreaForm);
 }
 
@@ -1876,9 +1876,9 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
  */
 
     Window
-gui_x11_get_wid(void)
+gui_x11_get_wid(ଶୂନ୍ୟ)
 {
-    return(XtWindow(textArea));
+    ଫେରନ୍ତୁ(XtWindow(textArea));
 }
 
 /*
@@ -1887,65 +1887,65 @@ gui_x11_get_wid(void)
  * keyboard focus.  If the mnemonic is on a label, look in the userData field
  * of the label to see if it points to another widget, and give that the focus.
  */
-    static void
-do_mnemonic(Widget w, unsigned int keycode)
+    ସ୍ଥିର ଶୂନ୍ୟ
+do_mnemonic(Widget w, unsigned ପୂର୍ଣ୍ଣସଂଖ୍ୟା keycode)
 {
     WidgetList	    children;
-    int		    numChildren, i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    ଅଙ୍କ_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    char	    mneString[2];
+    ଚାବି_Sym	    mnemonic = '\0';
+    ଅକ୍ଷର	    mneString[2];
     Widget	    userData;
-    unsigned char   rowColType;
+    unsigned ଅକ୍ଷର   rowColType;
 
-    if (XtIsComposite(w))
+    ଯଦି (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	ଯଦି (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNrowColumnType, &rowColType, ଖାଲି);
+	    isMenu = (rowColType != (unsigned ଅକ୍ଷର)XmWORK_AREA);
 	}
-	else
+	ଅନ୍ୟଥା
 	    isMenu = False;
-	if (!isMenu)
+	ଯଦି (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-			  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNchildren, &children, XmNnumChildren,
+			  &ଅଙ୍କ_Children, ଖାଲି);
+	    ପାଇଁ (i = 0; i < ଅଙ୍କ_Children; i++)
 		do_mnemonic(children[i], keycode);
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNmnemonic, &mnemonic, ଖାଲି);
+	ଯଦି (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    if (XKeysymToKeycode(XtDisplay(XtParent(w)),
+	    ଯଦି (XKeysymToKeycode(XtDisplay(XtParent(w)),
 				       XStringToKeysym(mneString)) == keycode)
 	    {
-		if (XtClass(w) == xmLabelWidgetClass
+		ଯଦି (XtClass(w) == xmLabelWidgetClass
 			|| XtClass(w) == xmLabelGadgetClass)
 		{
-		    XtVaGetValues(w, XmNuserData, &userData, NULL);
-		    if (userData != NULL && XtIsWidget(userData))
+		    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNuserData, &userData, ଖାଲି);
+		    ଯଦି (userData != ଖାଲି && XtIsWidget(userData))
 			XmProcessTraversal(userData, XmTRAVERSE_CURRENT);
 		}
-		else
+		ଅନ୍ୟଥା
 		{
-		    XKeyPressedEvent keyEvent;
+		    XKeyPressedEvent ଚାବି_Event;
 
 		    XmProcessTraversal(w, XmTRAVERSE_CURRENT);
 
-		    CLEAR_FIELD(keyEvent);
-		    keyEvent.type = KeyPress;
-		    keyEvent.serial = 1;
-		    keyEvent.send_event = True;
-		    keyEvent.display = XtDisplay(w);
-		    keyEvent.window = XtWindow(w);
-		    XtCallActionProc(w, "Activate", (XEvent *) & keyEvent,
-								     NULL, 0);
+		    CLEAR_FIELD(ଚାବି_Event);
+		    ଚାବି_Event.type = ଚାବି_Press;
+		    ଚାବି_Event.serial = 1;
+		    ଚାବି_Event.send_event = True;
+		    ଚାବି_Event.display = XtDisplay(w);
+		    ଚାବି_Event.window = XtWindow(w);
+		    XtCallActionProc(w, "Activate", (XEvent *) & ଚାବି_Event,
+								     ଖାଲି, 0);
 		}
 	    }
 	}
@@ -1955,7 +1955,7 @@ do_mnemonic(Widget w, unsigned int keycode)
 /*
  * Callback routine for dialog mnemonic processing.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 mnemonic_event(
 	Widget	    w,
 	XtPointer   call_data UNUSED,
@@ -1971,41 +1971,41 @@ mnemonic_event(
  * a passive grab to the dialog widget for the mnemonic character, thus
  * directing mnemonic events to the dialog widget.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 add_mnemonic_grabs(Widget dialog, Widget w)
 {
-    char	    mneString[2];
+    ଅକ୍ଷର	    mneString[2];
     WidgetList	    children;
-    int		    numChildren, i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    ଅଙ୍କ_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    unsigned char   rowColType;
+    ଚାବି_Sym	    mnemonic = '\0';
+    unsigned ଅକ୍ଷର   rowColType;
 
-    if (XtIsComposite(w))
+    ଯଦି (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	ଯଦି (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNrowColumnType, &rowColType, ଖାଲି);
+	    isMenu = (rowColType != (unsigned ଅକ୍ଷର)XmWORK_AREA);
 	}
-	else
+	ଅନ୍ୟଥା
 	    isMenu = False;
-	if (!isMenu)
+	ଯଦି (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-							  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNchildren, &children, XmNnumChildren,
+							  &ଅଙ୍କ_Children, ଖାଲି);
+	    ପାଇଁ (i = 0; i < ଅଙ୍କ_Children; i++)
 		add_mnemonic_grabs(dialog, children[i]);
 	}
     }
-    else
+    ଅନ୍ୟଥା
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(w, XmNmnemonic, &mnemonic, ଖାଲି);
+	ଯଦି (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    XtGrabKey(dialog, XKeysymToKeycode(XtDisplay(dialog),
+	    Xt_Grab_ଚାବି(dialog, XKeysymToKeycode(XtDisplay(dialog),
 						  XStringToKeysym(mneString)),
 		    Mod1Mask, True, GrabModeAsync, GrabModeAsync);
 	}
@@ -2021,75 +2021,75 @@ add_mnemonic_grabs(Widget dialog, Widget w)
  * the appropriate label and set the XmNuserData resource of the label to the
  * widget to get the focus when the mnemonic is typed.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 activate_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    ଯଦି (!dialog)
+	ଫେରନ୍ତୁ;
 
-    XtAddEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    XtAddEventHandler(dialog, ଚାବି_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) ଖାଲି);
     add_mnemonic_grabs(dialog, dialog);
 }
 
 /*
  * Removes the event handler and key-grabs for dialog mnemonic handling.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 suppress_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    ଯଦି (!dialog)
+	ଫେରନ୍ତୁ;
 
-    XtUngrabKey(dialog, AnyKey, Mod1Mask);
-    XtRemoveEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    Xt_Ungrab_ଚାବି(dialog, Any_ଚାବି, Mod1Mask);
+    XtRemoveEventHandler(dialog, ଚାବି_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) ଖାଲି);
 }
 
-#if defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
+#ଯଦି defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
 /*
  * Use the 'guifont' or 'guifontset' as a fontlist for a dialog widget.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 set_fontlist(Widget id)
 {
     XmFontList fl;
 
 # ifdef FONTSET_ALWAYS
-    if (gui.fontset != NOFONTSET)
+    ଯଦି (gui.fontset != NOFONTSET)
     {
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.fontset);
-	if (fl != NULL)
+	ଯଦି (fl != ଖାଲି)
 	{
-	    if (XtIsManaged(id))
+	    ଯଦି (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    ଅନ୍ୟଥା
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.norm_font != NOFONT)
+# ଅନ୍ୟଥା
+    ଯଦି (gui.norm_font != NOFONT)
     {
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.norm_font);
-	if (fl != NULL)
+	ଯଦି (fl != ଖାଲି)
 	{
-	    if (XtIsManaged(id))
+	    ଯଦି (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    ଅନ୍ୟଥା
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 	    XmFontListFree(fl);
 	}
     }
@@ -2097,7 +2097,7 @@ set_fontlist(Widget id)
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#ଯଦି defined(FEAT_BROWSE)
 
 /*
  * file selector related stuff
@@ -2106,19 +2106,19 @@ set_fontlist(Widget id)
 # include <Xm/FileSB.h>
 # include <Xm/XmStrDefs.h>
 
-typedef struct dialog_callback_arg
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା dialog_callback_arg
 {
-    char *  args;   // not used right now
-    int	    id;
+    ଅକ୍ଷର *  args;   // not used right now
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    id;
 } dcbarg_T;
 
-static Widget dialog_wgt;
-static char *browse_fname = NULL;
-static XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
+ସ୍ଥିର Widget dialog_wgt;
+ସ୍ଥିର ଅକ୍ଷର *browse_fname = ଖାଲି;
+ସ୍ଥିର XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
 				// used to set up XmStrings
 
-static void DialogCancelCB(Widget, XtPointer, XtPointer);
-static void DialogAcceptCB(Widget, XtPointer, XtPointer);
+ସ୍ଥିର ଶୂନ୍ୟ DialogCancelCB(Widget, XtPointer, XtPointer);
+ସ୍ଥିର ଶୂନ୍ୟ DialogAcceptCB(Widget, XtPointer, XtPointer);
 
 /*
  * This function is used to translate the predefined label text of the
@@ -2129,29 +2129,29 @@ static void DialogAcceptCB(Widget, XtPointer, XtPointer);
  * - equalize the messages between different GUI implementations as far as
  * possible.
  */
-    static void
-set_predefined_label(Widget parent, String name, char *new_label)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_predefined_label(Widget parent, String name, ଅକ୍ଷର *new_label)
 {
     XmString	str;
     Widget	w;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    ଚାବି_Sym	mnemonic = NUL;
 
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    ଯଦି (!w)
+	ଫେରନ୍ତୁ;
 
     p = vim_strsave((char_u *)new_label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    ଯଦି (p == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ପାଇଁ (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	ଯଦି (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = STRLEN(next);
 
-	    if (len > 0)
+	    ଯଦି (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -2159,28 +2159,28 @@ set_predefined_label(Widget parent, String name, char *new_label)
 	}
     }
 
-    str = XmStringCreate((char *)p, STRING_TAG);
+    str = XmStringCreate((ଅକ୍ଷର *)p, STRING_TAG);
     vim_free(p);
 
-    if (str != NULL)
+    ଯଦି (str != ଖାଲି)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 set_predefined_fontlist(Widget parent, String name)
 {
     Widget w;
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    ଯଦି (!w)
+	ଫେରନ୍ତୁ;
 
     set_fontlist(w);
 }
@@ -2191,7 +2191,7 @@ set_predefined_fontlist(Widget parent, String name)
  */
     char_u *
 gui_mch_browse(
-    int		saving UNUSED,	// select file to write
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		saving UNUSED,	// select file to write
     char_u	*title,		// title for the window
     char_u	*dflt,		// default name
     char_u	*ext UNUSED,	// not used (extension added)
@@ -2201,23 +2201,23 @@ gui_mch_browse(
     char_u	dirbuf[MAXPATHL];
     char_u	dfltbuf[MAXPATHL];
     char_u	*pattern;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ଖାଲି;
 
     // There a difference between the resource name and value, Therefore, we
     // avoid to (ab-)use the (maybe internationalized!) dialog title as a
     // dialog name.
 
-    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", NULL, 0);
+    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", ଖାଲି, 0);
 
-    if (initdir == NULL || *initdir == NUL)
+    ଯଦି (initdir == ଖାଲି || *initdir == NUL)
     {
 	mch_dirname(dirbuf, MAXPATHL);
 	initdir = dirbuf;
     }
 
-    if (dflt == NULL)
+    ଯଦି (dflt == ଖାଲି)
 	dflt = (char_u *)"";
-    else if (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
+    ଅନ୍ୟଥା ଯଦି (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
     {
 	// The default selection should be the full path, "dflt" is only the
 	// file name.
@@ -2229,36 +2229,36 @@ gui_mch_browse(
 
     // Can only use one pattern for a file name.  Get the first pattern out of
     // the filter.  An empty pattern means everything matches.
-    if (filter == NULL)
+    ଯଦି (filter == ଖାଲି)
 	pattern = (char_u *)"";
-    else
+    ଅନ୍ୟଥା
     {
 	char_u	*s, *p;
 
 	s = filter;
-	for (p = filter; *p != NUL; ++p)
+	ପାଇଁ (p = filter; *p != NUL; ++p)
 	{
-	    if (*p == '\t')	// end of description, start of pattern
+	    ଯଦି (*p == '\t')	// end of description, start of pattern
 		s = p + 1;
-	    if (*p == ';' || *p == '\n')	// end of (first) pattern
-		break;
+	    ଯଦି (*p == ';' || *p == '\n')	// end of (first) pattern
+		ଭାଙ୍ଗ;
 	}
 	pattern = vim_strnsave(s, p - s);
 	tofree = pattern;
-	if (pattern == NULL)
+	ଯଦି (pattern == ଖାଲି)
 	    pattern = (char_u *)"";
     }
 
-    XtVaSetValues(dialog_wgt,
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialog_wgt,
 	XtVaTypedArg,
-	    XmNdirectory, XmRString, (char *)initdir, STRLEN(initdir) + 1,
+	    XmNdirectory, XmRString, (ଅକ୍ଷର *)initdir, STRLEN(initdir) + 1,
 	XtVaTypedArg,
-	    XmNdirSpec,	XmRString, (char *)dflt, STRLEN(dflt) + 1,
+	    XmNdirSpec,	XmRString, (ଅକ୍ଷର *)dflt, STRLEN(dflt) + 1,
 	XtVaTypedArg,
-	    XmNpattern,	XmRString, (char *)pattern, STRLEN(pattern) + 1,
+	    XmNpattern,	XmRString, (ଅକ୍ଷର *)pattern, STRLEN(pattern) + 1,
 	XtVaTypedArg,
-	    XmNdialogTitle, XmRString, (char *)title, STRLEN(title) + 1,
-	NULL);
+	    XmNdialogTitle, XmRString, (ଅକ୍ଷର *)title, STRLEN(title) + 1,
+	ଖାଲି);
 
     set_predefined_label(dialog_wgt, "Apply", _("&Filter"));
     set_predefined_label(dialog_wgt, "Cancel", _("&Cancel"));
@@ -2275,32 +2275,32 @@ gui_mch_browse(
     set_predefined_fontlist(dialog_wgt, "ItemsListSW.ItemsList");
 
     gui_motif_menu_colors(dialog_wgt);
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-	XtVaSetValues(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
+    ଯଦି (gui.scroll_bg_pixel != INVALCOLOR)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, ଖାଲି);
 
     XtAddCallback(dialog_wgt, XmNokCallback, DialogAcceptCB, (XtPointer)0);
     XtAddCallback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (XtPointer)0);
     // We have no help in this window, so hide help button
     XtUnmanageChild(XmFileSelectionBoxGetChild(dialog_wgt,
-					(unsigned char)XmDIALOG_HELP_BUTTON));
+					(unsigned ଅକ୍ଷର)XmDIALOG_HELP_BUTTON));
 
     manage_centered(dialog_wgt);
     activate_dialog_mnemonics(dialog_wgt);
 
     // sit in a loop until the dialog box has gone away
-    do
+    କର
     {
 	XtAppProcessEvent(XtWidgetToApplicationContext(dialog_wgt),
-	    (XtInputMask)XtIMAll);
-    } while (XtIsManaged(dialog_wgt));
+	    (Xt_ନିବେଶ_Mask)XtIMAll);
+    } ଯେତେବେଳେ (XtIsManaged(dialog_wgt));
 
     suppress_dialog_mnemonics(dialog_wgt);
     XtDestroyWidget(dialog_wgt);
     vim_free(tofree);
 
-    if (browse_fname == NULL)
-	return NULL;
-    return vim_strsave((char_u *)browse_fname);
+    ଯଦି (browse_fname == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଫେରନ୍ତୁ vim_strsave((char_u *)browse_fname);
 }
 
 /*
@@ -2312,16 +2312,16 @@ gui_mch_browse(
 /*
  * Process callback from Dialog cancel actions.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 DialogCancelCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
     XtPointer	call_data UNUSED)	//  data from widget class
 {
-    if (browse_fname != NULL)
+    ଯଦି (browse_fname != ଖାଲି)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = ଖାଲି;
     }
     XtUnmanageChild(dialog_wgt);
 }
@@ -2329,7 +2329,7 @@ DialogCancelCB(
 /*
  * Process callback from Dialog actions.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 DialogAcceptCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
@@ -2337,15 +2337,15 @@ DialogAcceptCB(
 {
     XmFileSelectionBoxCallbackStruct *fcb;
 
-    if (browse_fname != NULL)
+    ଯଦି (browse_fname != ଖାଲି)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = ଖାଲି;
     }
     fcb = (XmFileSelectionBoxCallbackStruct *)call_data;
 
     // get the filename from the file selection box
-    XmStringGetLtoR(fcb->value, charset, &browse_fname);
+    XmStringGetLtoR(fcb->ମୂଲ୍ୟ, charset, &browse_fname);
 
     // popdown the file selection box
     XtUnmanageChild(dialog_wgt);
@@ -2353,69 +2353,69 @@ DialogAcceptCB(
 
 #endif // FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#ଯଦି defined(FEAT_GUI_DIALOG)
 
-static int	dialogStatus;
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା	dialogStatus;
 
 /*
  * Callback function for the textfield.  When CR is hit this works like
  * hitting the "OK" button, ESC like "Cancel".
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 keyhit_callback(
     Widget		w,
     XtPointer		client_data UNUSED,
     XEvent		*event,
     Boolean		*cont UNUSED)
 {
-    char	buf[2];
-    KeySym	key_sym;
+    ଅକ୍ଷର	buf[2];
+    ଚାବି_Sym	ଚାବି_sym;
 
-    if (XLookupString(&(event->xkey), buf, 2, &key_sym, NULL) == 1)
+    ଯଦି (XLookupString(&(event->xkey), buf, 2, &ଚାବି_sym, ଖାଲି) == 1)
     {
-	if (*buf == CAR)
+	ଯଦି (*buf == CAR)
 	    dialogStatus = 1;
-	else if (*buf == ESC)
+	ଅନ୍ୟଥା ଯଦି (*buf == ESC)
 	    dialogStatus = 2;
     }
-    if ((key_sym == XK_Left || key_sym == XK_Right)
+    ଯଦି ((ଚାବି_sym == XK_ବାମ || ଚାବି_sym == XK_ଡାହାଣ)
 	    && !(event->xkey.state & ShiftMask))
 	XmTextFieldClearSelection(w, XtLastTimestampProcessed(gui.dpy));
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 butproc(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
-    dialogStatus = (int)(long)client_data + 1;
+    dialogStatus = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(long)client_data + 1;
 }
 
 # ifdef HAVE_XPM
 
-    static Widget
+    ସ୍ଥିର Widget
 create_pixmap_label(
     Widget	parent,
     String	name,
-    char	**data,
+    ଅକ୍ଷର	**data,
     ArgList	args,
     Cardinal	arg)
 {
     Widget		label;
     Display		*dsp;
     Screen		*scr;
-    int			depth;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			depth;
     Pixmap		pixmap = 0;
     XpmAttributes	attr;
     Boolean		rs;
-    XpmColorSymbol	color[5] =
+    Xpm_Color_ପ୍ରତୀକ	color[5] =
     {
-	{"none", NULL, 0},
-	{"iconColor1", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"selectColor", NULL, 0}
+	{"none", ଖାଲି, 0},
+	{"iconColor1", ଖାଲି, 0},
+	{"bottomShadowColor", ଖାଲି, 0},
+	{"topShadowColor", ଖାଲି, 0},
+	{"selectColor", ଖାଲି, 0}
     };
 
     label = XmCreateLabelGadget(parent, name, args, arg);
@@ -2427,7 +2427,7 @@ create_pixmap_label(
      */
     dsp = XtDisplayOfObject(label);
     scr = XtScreenOfObject(label);
-    XtVaGetValues(XtIsSubclass(label, coreWidgetClass)
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(XtIsSubclass(label, coreWidgetClass)
 	    ?  label : XtParent(label),
 		  XmNdepth, &depth,
 		  XmNbackground, &color[0].pixel,
@@ -2435,95 +2435,95 @@ create_pixmap_label(
 		  XmNbottomShadowColor, &color[2].pixel,
 		  XmNtopShadowColor, &color[3].pixel,
 		  XmNhighlight, &color[4].pixel,
-		  NULL);
+		  ଖାଲି);
 
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmDepth;
     attr.colorsymbols = color;
     attr.numsymbols = 5;
     attr.closeness = 65535;
     attr.depth = depth;
-    XpmCreatePixmapFromData(dsp, RootWindowOfScreen(scr),
-		    data, &pixmap, NULL, &attr);
+    XpmCreatePixmapFromData(dsp, ମୂଳ_Window_Of_Screen(scr),
+		    data, &pixmap, ଖାଲି, &attr);
 
-    XtVaGetValues(label, XmNrecomputeSize, &rs, NULL);
-    XtVaSetValues(label, XmNrecomputeSize, True, NULL);
-    XtVaSetValues(label,
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(label, XmNrecomputeSize, &rs, ଖାଲି);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(label, XmNrecomputeSize, True, ଖାଲି);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(label,
 	    XmNlabelType, XmPIXMAP,
 	    XmNlabelPixmap, pixmap,
-	    NULL);
-    XtVaSetValues(label, XmNrecomputeSize, rs, NULL);
+	    ଖାଲି);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(label, XmNrecomputeSize, rs, ଖାଲି);
 
-    return label;
+    ଫେରନ୍ତୁ label;
 }
 # endif
 
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 gui_mch_dialog(
-    int		type UNUSED,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		type UNUSED,
     char_u	*title,
     char_u	*message,
     char_u	*button_names,
-    int		dfltbutton,
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		dfltbutton,
     char_u	*textfield,		// buffer of size IOSIZE
-    int		ex_cmd UNUSED)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ex_cmd UNUSED)
 {
     char_u		*buts;
     char_u		*p, *next;
     XtAppContext	app;
     XmString		label;
-    int			butcount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			butcount;
     Widget		w;
-    Widget		dialogform = NULL;
-    Widget		form = NULL;
-    Widget		dialogtextfield = NULL;
+    Widget		dialogform = ଖାଲି;
+    Widget		form = ଖାଲି;
+    Widget		dialogtextfield = ଖାଲି;
     Widget		*buttons;
-    Widget		sep_form = NULL;
+    Widget		sep_form = ଖାଲି;
     Boolean		vertical;
-    Widget		separator = NULL;
-    int			n;
+    Widget		separator = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			n;
     Arg			args[6];
 # ifdef HAVE_XPM
-    char		**icon_data = NULL;
-    Widget		dialogpixmap = NULL;
+    ଅକ୍ଷର		**icon_data = ଖାଲି;
+    Widget		dialogpixmap = ଖାଲି;
 # endif
 
-    if (title == NULL)
+    ଯଦି (title == ଖାଲି)
 	title = (char_u *)_("Vim dialog");
 
     // if our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
-    dialogform = XmCreateFormDialog(vimShell, (char *)"dialog", NULL, 0);
+    dialogform = XmCreateFormDialog(vimShell, (ଅକ୍ଷର *)"dialog", ଖାଲି, 0);
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL);
+    vertical = (vim_strchr(p_go, GO_VERTICAL) != ଖାଲି);
 
     // Set the title of the Dialog window
-    label = XmStringCreateSimple((char *)title);
-    if (label == NULL)
-	return -1;
-    XtVaSetValues(dialogform,
+    label = XmStringCreateSimple((ଅକ୍ଷର *)title);
+    ଯଦି (label == ଖାଲି)
+	ଫେରନ୍ତୁ -1;
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogform,
 	    XmNdialogTitle, label,
 	    XmNhorizontalSpacing, 4,
 	    XmNverticalSpacing, vertical ? 0 : 4,
-	    NULL);
+	    ଖାଲି);
     XmStringFree(label);
 
     // make a copy, so that we can insert NULs
     buts = vim_strsave(button_names);
-    if (buts == NULL)
-	return -1;
+    ଯଦି (buts == ଖାଲି)
+	ଫେରନ୍ତୁ -1;
 
     // Count the number of buttons and allocate buttons[].
     butcount = 1;
-    for (p = buts; *p; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    ପାଇଁ (p = buts; *p; ++p)
+	ଯଦି (*p == DLG_BUTTON_SEP)
 	    ++butcount;
     buttons = ALLOC_MULT(Widget, butcount);
-    if (buttons == NULL)
+    ଯଦି (buttons == ଖାଲି)
     {
 	vim_free(buts);
-	return -1;
+	ଫେରନ୍ତୁ -1;
     }
 
     /*
@@ -2531,60 +2531,60 @@ gui_mch_dialog(
      */
     sep_form = (Widget) 0;
     p = buts;
-    for (butcount = 0; *p; ++butcount)
+    ପାଇଁ (butcount = 0; *p; ++butcount)
     {
-	KeySym mnemonic = NUL;
+	ଚାବି_Sym mnemonic = NUL;
 
-	for (next = p; *next; ++next)
+	ପାଇଁ (next = p; *next; ++next)
 	{
-	    if (*next == DLG_HOTKEY_CHAR)
+	    ଯଦି (*next == DLG_HOTKEY_CHAR)
 	    {
-		int len = STRLEN(next);
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = STRLEN(next);
 
-		if (len > 0)
+		ଯଦି (len > 0)
 		{
 		    mch_memmove(next, next + 1, len);
 		    mnemonic = next[0];
 		}
 	    }
-	    if (*next == DLG_BUTTON_SEP)
+	    ଯଦି (*next == DLG_BUTTON_SEP)
 	    {
 		*next++ = NUL;
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
-	label = XmStringCreate(_((char *)p), STRING_TAG);
-	if (label == NULL)
-	    break;
+	label = XmStringCreate(_((ଅକ୍ଷର *)p), STRING_TAG);
+	ଯଦି (label == ଖାଲି)
+	    ଭାଙ୍ଗ;
 
 	buttons[butcount] = XtVaCreateManagedWidget("button",
-		xmPushButtonWidgetClass, dialogform,
+		xm_ଠେଲ_Button_Widget_Class, dialogform,
 		XmNlabelString, label,
 		XmNmnemonic, mnemonic,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNshowAsDefault, butcount == dfltbutton - 1,
 		XmNdefaultButtonShadowThickness, 1,
-		NULL);
+		ଖାଲି);
 	XmStringFree(label);
 	gui_motif_menu_fontlist(buttons[butcount]);
 
 	// Layout properly.
 
-	if (butcount > 0)
+	ଯଦି (butcount > 0)
 	{
-	    if (vertical)
-		XtVaSetValues(buttons[butcount],
+	    ଯଦି (vertical)
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(buttons[butcount],
 			XmNtopWidget, buttons[butcount - 1],
-			NULL);
-	    else
+			ଖାଲି);
+	    ଅନ୍ୟଥା
 	    {
-		if (*next == NUL)
+		ଯଦି (*next == NUL)
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(buttons[butcount],
 			    XmNrightAttachment, XmATTACH_FORM,
 			    XmNrightOffset, 4,
-			    NULL);
+			    ଖାଲି);
 
 		    // fill in a form as invisible separator
 		    sep_form = XtVaCreateWidget("separatorForm",
@@ -2595,26 +2595,26 @@ gui_mch_dialog(
 			    XmNrightWidget, buttons[butcount],
 			    XmNbottomAttachment, XmATTACH_FORM,
 			    XmNbottomOffset, 4,
-			    NULL);
+			    ଖାଲି);
 		    XtManageChild(sep_form);
 		}
-		else
+		ଅନ୍ୟଥା
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(buttons[butcount],
 			    XmNleftAttachment, XmATTACH_WIDGET,
 			    XmNleftWidget, buttons[butcount - 1],
-			    NULL);
+			    ଖାଲି);
 		}
 	    }
 	}
-	else if (!vertical)
+	ଅନ୍ୟଥା ଯଦି (!vertical)
 	{
-	    if (*next == NUL)
+	    ଯଦି (*next == NUL)
 	    {
-		XtVaSetValues(buttons[0],
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(buttons[0],
 			XmNrightAttachment, XmATTACH_FORM,
 			XmNrightOffset, 4,
-			NULL);
+			ଖାଲି);
 
 		// fill in a form as invisible separator
 		sep_form = XtVaCreateWidget("separatorForm",
@@ -2625,14 +2625,14 @@ gui_mch_dialog(
 			XmNrightWidget, buttons[0],
 			XmNbottomAttachment, XmATTACH_FORM,
 			XmNbottomOffset, 4,
-			NULL);
+			ଖାଲି);
 		XtManageChild(sep_form);
 	    }
-	    else
-		XtVaSetValues(buttons[0],
+	    ଅନ୍ୟଥା
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(buttons[0],
 			XmNleftAttachment, XmATTACH_FORM,
 			XmNleftOffset, 4,
-			NULL);
+			ଖାଲି);
 	}
 
 	XtAddCallback(buttons[butcount], XmNactivateCallback,
@@ -2642,7 +2642,7 @@ gui_mch_dialog(
     vim_free(buts);
 
     separator = (Widget) 0;
-    if (butcount > 0)
+    ଯଦି (butcount > 0)
     {
 	// Create the separator for beauty.
 	n = 0;
@@ -2656,28 +2656,28 @@ gui_mch_dialog(
 	XtManageChild(separator);
     }
 
-    if (textfield != NULL)
+    ଯଦି (textfield != ଖାଲି)
     {
 	dialogtextfield = XtVaCreateWidget("textField",
 		xmTextFieldWidgetClass, dialogform,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	if (butcount > 0)
-	    XtVaSetValues(dialogtextfield,
+		ଖାଲି);
+	ଯଦି (butcount > 0)
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(dialogtextfield,
+		    ଖାଲି);
+	ଅନ୍ୟଥା
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ଖାଲି);
 
 	set_fontlist(dialogtextfield);
-	XmTextFieldSetString(dialogtextfield, (char *)textfield);
+	XmTextFieldSetString(dialogtextfield, (ଅକ୍ଷର *)textfield);
 	XtManageChild(dialogtextfield);
-	XtAddEventHandler(dialogtextfield, KeyPressMask, False,
-			    (XtEventHandler)keyhit_callback, (XtPointer)NULL);
+	XtAddEventHandler(dialogtextfield, ଚାବି_Press_Mask, False,
+			    (XtEventHandler)keyhit_callback, (XtPointer)ଖାଲି);
     }
 
     // Form holding both message and pixmap labels
@@ -2686,29 +2686,29 @@ gui_mch_dialog(
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    NULL);
+	    ଖାଲି);
     XtManageChild(form);
 
 # ifdef HAVE_XPM
     // Add a pixmap, left of the message.
-    switch (type)
+    ବାଛ (type)
     {
-	case VIM_GENERIC:
+	ସ୍ଥିତି VIM_GENERIC:
 	    icon_data = generic_xpm;
-	    break;
-	case VIM_ERROR:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VIM_ERROR:
 	    icon_data = error_xpm;
-	    break;
-	case VIM_WARNING:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VIM_WARNING:
 	    icon_data = alert_xpm;
-	    break;
-	case VIM_INFO:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VIM_INFO:
 	    icon_data = info_xpm;
-	    break;
-	case VIM_QUESTION:
+	    ଭାଙ୍ଗ;
+	ସ୍ଥିତି VIM_QUESTION:
 	    icon_data = quest_xpm;
-	    break;
-	default:
+	    ଭାଙ୍ଗ;
+	ପୂର୍ବନିର୍ଦ୍ଧାରିତ:
 	    icon_data = generic_xpm;
     }
 
@@ -2730,11 +2730,11 @@ gui_mch_dialog(
     // properly localized string, we use LtoR here. The symptom is that the
     // string is not shown properly in multiple lines as it does in native
     // Motif.
-    label = XmStringCreateLtoR((char *)message, STRING_TAG);
-    if (label == NULL)
+    label = XmStringCreateLtoR((ଅକ୍ଷର *)message, STRING_TAG);
+    ଯଦି (label == ଖାଲି)
     {
 	vim_free(buttons);
-	return -1;
+	ଫେରନ୍ତୁ -1;
     }
     w = XtVaCreateManagedWidget("dialogMessage",
 				xmLabelGadgetClass, form,
@@ -2745,7 +2745,7 @@ gui_mch_dialog(
 # ifdef HAVE_XPM
 				XmNleftAttachment, XmATTACH_WIDGET,
 				XmNleftWidget, dialogpixmap,
-# else
+# ଅନ୍ୟଥା
 				XmNleftAttachment, XmATTACH_FORM,
 # endif
 				XmNleftOffset, 8,
@@ -2753,46 +2753,46 @@ gui_mch_dialog(
 				XmNrightOffset, 8,
 				XmNbottomAttachment, XmATTACH_FORM,
 				XmNbottomOffset, 8,
-				NULL);
+				ଖାଲି);
     XmStringFree(label);
     set_fontlist(w);
 
-    if (textfield != NULL)
+    ଯଦି (textfield != ଖାଲି)
     {
-	XtVaSetValues(form,
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(form,
 		XmNbottomAttachment, XmATTACH_WIDGET,
 		XmNbottomWidget, dialogtextfield,
-		NULL);
+		ଖାଲି);
     }
-    else
+    ଅନ୍ୟଥା
     {
-	if (butcount > 0)
-	    XtVaSetValues(form,
+	ଯଦି (butcount > 0)
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(form,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(form,
+		    ଖାଲି);
+	ଅନ୍ୟଥା
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(form,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ଖାଲି);
     }
 
-    if (dfltbutton < 1)
+    ଯଦି (dfltbutton < 1)
 	dfltbutton = 1;
-    if (dfltbutton > butcount)
+    ଯଦି (dfltbutton > butcount)
 	dfltbutton = butcount;
-    XtVaSetValues(dialogform,
-	    XmNdefaultButton, buttons[dfltbutton - 1], NULL);
-    if (textfield != NULL)
-	XtVaSetValues(dialogform, XmNinitialFocus, dialogtextfield, NULL);
-    else
-	XtVaSetValues(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
-									NULL);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogform,
+	    XmNdefaultButton, buttons[dfltbutton - 1], ଖାଲି);
+    ଯଦି (textfield != ଖାଲି)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogform, XmNinitialFocus, dialogtextfield, ଖାଲି);
+    ଅନ୍ୟଥା
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
+									ଖାଲି);
 
     manage_centered(dialogform);
     activate_dialog_mnemonics(dialogform);
 
-    if (textfield != NULL && *textfield != NUL)
+    ଯଦି (textfield != ଖାଲି && *textfield != NUL)
     {
 	// This only works after the textfield has been realised.
 	XmTextFieldSetSelection(dialogtextfield,
@@ -2806,95 +2806,95 @@ gui_mch_dialog(
 
     // Loop until a button is pressed or the dialog is killed somehow.
     dialogStatus = -1;
-    for (;;)
+    ପାଇଁ (;;)
     {
-	XtAppProcessEvent(app, (XtInputMask)XtIMAll);
-	if (dialogStatus >= 0 || !XtIsManaged(dialogform))
-	    break;
+	XtAppProcessEvent(app, (Xt_ନିବେଶ_Mask)XtIMAll);
+	ଯଦି (dialogStatus >= 0 || !XtIsManaged(dialogform))
+	    ଭାଙ୍ଗ;
     }
 
     vim_free(buttons);
 
-    if (textfield != NULL)
+    ଯଦି (textfield != ଖାଲି)
     {
 	p = (char_u *)XmTextGetString(dialogtextfield);
-	if (p == NULL || dialogStatus < 0)
+	ଯଦି (p == ଖାଲି || dialogStatus < 0)
 	    *textfield = NUL;
-	else
+	ଅନ୍ୟଥା
 	    vim_strncpy(textfield, p, IOSIZE - 1);
-	XtFree((char *)p);
+	XtFree((ଅକ୍ଷର *)p);
     }
 
     suppress_dialog_mnemonics(dialogform);
     XtDestroyWidget(dialogform);
 
-    return dialogStatus;
+    ଫେରନ୍ତୁ dialogStatus;
 }
 #endif // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#ଯଦି defined(FEAT_TOOLBAR)
+    ଶୂନ୍ୟ
+gui_mch_show_toolbar(ପୂର୍ଣ୍ଣସଂଖ୍ୟା showit)
 {
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	ଅଙ୍କ_Children;	    // how many children toolBar has
 
-    if (toolBar == (Widget)0)
-	return;
-    XtVaGetValues(toolBar, XmNnumChildren, &numChildren, NULL);
-    if (showit && numChildren > 0)
+    ଯଦି (toolBar == (Widget)0)
+	ଫେରନ୍ତୁ;
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBar, XmNnumChildren, &ଅଙ୍କ_Children, ଖାଲି);
+    ଯଦି (showit && ଅଙ୍କ_Children > 0)
     {
 	// Assume that we want to show the toolbar if p_toolbar contains
 	// valid option settings, therefore p_toolbar must not be NULL.
 	WidgetList  children;
 
-	XtVaGetValues(toolBar, XmNchildren, &children, NULL);
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBar, XmNchildren, &children, ଖାଲି);
 	{
-	    void    (*action)(BalloonEval *);
-	    int	    text = 0;
+	    ଶୂନ୍ୟ    (*action)(BalloonEval *);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    text = 0;
 
-	    if (strstr((const char *)p_toolbar, "tooltips"))
+	    ଯଦି (strstr((ଅଚଳ ଅକ୍ଷର *)p_toolbar, "tooltips"))
 		action = &gui_mch_enable_beval_area;
-	    else
+	    ଅନ୍ୟଥା
 		action = &gui_mch_disable_beval_area;
-	    if (strstr((const char *)p_toolbar, "text"))
+	    ଯଦି (strstr((ଅଚଳ ଅକ୍ଷର *)p_toolbar, "text"))
 		text = 1;
-	    else if (strstr((const char *)p_toolbar, "icons"))
+	    ଅନ୍ୟଥା ଯଦି (strstr((ଅଚଳ ଅକ୍ଷର *)p_toolbar, "icons"))
 		text = -1;
-	    if (text != 0)
+	    ଯଦି (text != 0)
 	    {
 		vimmenu_T   *toolbar;
 		vimmenu_T   *cur;
 
 		FOR_ALL_MENUS(toolbar)
-		    if (menu_is_toolbar(toolbar->dname))
-			break;
+		    ଯଦି (menu_is_toolbar(toolbar->dname))
+			ଭାଙ୍ଗ;
 		// Assumption: toolbar is NULL if there is no toolbar,
 		//	       otherwise it contains the toolbar menu structure.
 		//
 		// Assumption: "numChildren" == the number of items in the list
 		//	       of items beginning with toolbar->children.
-		if (toolbar)
+		ଯଦି (toolbar)
 		{
-		    for (cur = toolbar->children; cur; cur = cur->next)
+		    ପାଇଁ (cur = toolbar->children; cur; cur = cur->next)
 		    {
 			Arg	    args[1];
-			int	    n = 0;
+			ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    n = 0;
 
 			// Enable/Disable tooltip (OK to enable while
 			// currently enabled).
-			if (cur->tip != NULL)
+			ଯଦି (cur->tip != ଖାଲି)
 			    (*action)(cur->tip);
-			if (!menu_is_separator(cur->name))
+			ଯଦି (!menu_is_separator(cur->name))
 			{
-			    if (text == 1 || cur->xpm == NULL)
+			    ଯଦି (text == 1 || cur->xpm == ଖାଲି)
 			    {
 				XtSetArg(args[n], XmNlabelType, XmSTRING);
 				++n;
 			    }
-			    if (cur->id != NULL)
+			    ଯଦି (cur->id != ଖାଲି)
 			    {
 				XtUnmanageChild(cur->id);
-				XtSetValues(cur->id, args, n);
+				Xt_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(cur->id, args, n);
 				XtManageChild(cur->id);
 			    }
 			}
@@ -2905,75 +2905,75 @@ gui_mch_show_toolbar(int showit)
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
 	XtManageChild(XtParent(toolBar));
 # ifdef FEAT_GUI_TABLINE
-	if (showing_tabline)
+	ଯଦି (showing_tabline)
 	{
-	    XtVaSetValues(tabLine,
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	    XtVaSetValues(textAreaForm,
+			  ଖାଲି);
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_ଧାଡ଼ି,
+			  ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 # endif
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	if (XtIsManaged(menuBar))
-	    XtVaSetValues(XtParent(toolBar),
+			  ଖାଲି);
+	ଯଦି (XtIsManaged(menuBar))
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, menuBar,
-		    NULL);
-	else
-	    XtVaSetValues(XtParent(toolBar),
+		    ଖାଲି);
+	ଅନ୍ୟଥା
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_FORM,
-		    NULL);
+		    ଖାଲି);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	gui.toolbar_height = 0;
-	if (XtIsManaged(menuBar))
+	ଯଦି (XtIsManaged(menuBar))
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    ଯଦି (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      ଖାଲି);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_ଧାଡ଼ି,
+			      ଖାଲି);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      ଖାଲି);
 	}
 
 	XtUnmanageChild(XtParent(toolBar));
@@ -2986,61 +2986,61 @@ gui_mch_show_toolbar(int showit)
  * such that the user can type page up/down etc. and have the
  * input go to the editor window, not the button
  */
-    static void
-reset_focus(void)
+    ସ୍ଥିର ଶୂନ୍ୟ
+reset_focus(ଶୂନ୍ୟ)
 {
-    if (textArea != NULL)
+    ଯଦି (textArea != ଖାଲି)
 	XmProcessTraversal(textArea, XmTRAVERSE_CURRENT);
 }
 
-    int
-gui_mch_compute_toolbar_height(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_compute_toolbar_height(ଶୂନ୍ୟ)
 {
     Dimension	borders;
     Dimension	height;		    // total Toolbar height
     Dimension	whgt;		    // height of each widget
     WidgetList	children;	    // list of toolBar's children
-    Cardinal	numChildren;	    // how many children toolBar has
-    int		i;
+    Cardinal	ଅଙ୍କ_Children;	    // how many children toolBar has
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		i;
 
     borders = 0;
     height = 0;
-    if (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
+    ଯଦି (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
     {				    // get height of XmFrame parent
 	Dimension	fst;
 	Dimension	fmh;
 	Dimension	tst;
 	Dimension	tmh;
 
-	XtVaGetValues(toolBarFrame,
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBarFrame,
 		XmNshadowThickness, &fst,
 		XmNmarginHeight, &fmh,
-		NULL);
+		ଖାଲି);
 	borders += fst + fmh;
-	XtVaGetValues(toolBar,
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBar,
 		XmNshadowThickness, &tst,
 		XmNmarginHeight, &tmh,
 		XmNchildren, &children,
-		XmNnumChildren, &numChildren, NULL);
+		XmNnumChildren, &ଅଙ୍କ_Children, ଖାଲି);
 	borders += tst + tmh;
-	for (i = 0; i < (int)numChildren; i++)
+	ପାଇଁ (i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ଅଙ୍କ_Children; i++)
 	{
 	    whgt = 0;
-	    XtVaGetValues(children[i], XmNheight, &whgt, NULL);
-	    if (height < whgt)
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(children[i], XmNheight, &whgt, ଖାଲି);
+	    ଯଦି (height < whgt)
 		height = whgt;
 	}
     }
 # ifdef LESSTIF_VERSION
     // Hack: When starting up we get wrong dimensions.
-    if (height < 10)
+    ଯଦି (height < 10)
 	height = 24;
 # endif
 
-    return (int)(height + (borders << 1));
+    ଫେରନ୍ତୁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(height + (borders << 1));
 }
 
-    void
+    ଶୂନ୍ୟ
 motif_get_toolbar_colors(
     Pixel       *bgp,
     Pixel       *fgp,
@@ -3048,75 +3048,75 @@ motif_get_toolbar_colors(
     Pixel       *tsp,
     Pixel       *hsp)
 {
-    XtVaGetValues(toolBar,
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(toolBar,
 	    XmNbackground, bgp,
 	    XmNforeground, fgp,
 	    XmNbottomShadowColor, bsp,
 	    XmNtopShadowColor, tsp,
 	    XmNhighlightColor, hsp,
-	    NULL);
+	    ଖାଲି);
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#ଯଦି defined(FEAT_GUI_TABLINE)
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    ଶୂନ୍ୟ
+gui_mch_show_tabline(ପୂର୍ଣ୍ଣସଂଖ୍ୟା showit)
 {
-    if (tabLine == (Widget)0)
-	return;
+    ଯଦି (tab_ଧାଡ଼ି == (Widget)0)
+	ଫେରନ୍ତୁ;
 
-    if (!showit != !showing_tabline)
+    ଯଦି (!showit != !showing_tabline)
     {
-	if (showit)
+	ଯଦି (showit)
 	{
-	    XtManageChild(tabLine);
-	    XtUnmanageChild(XtNameToWidget(tabLine, "PageScroller"));
-	    XtUnmanageChild(XtNameToWidget(tabLine, "MinorTabScrollerNext"));
-	    XtUnmanageChild(XtNameToWidget(tabLine,
+	    XtManageChild(tab_ଧାଡ଼ି);
+	    XtUnmanageChild(XtNameToWidget(tab_ଧାଡ଼ି, "PageScroller"));
+	    XtUnmanageChild(XtNameToWidget(tab_ଧାଡ଼ି, "MinorTabScrollerNext"));
+	    XtUnmanageChild(XtNameToWidget(tab_ଧାଡ଼ି,
 					   "MinorTabScrollerPrevious"));
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(tabLine,
+	    ଯଦି (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), ଖାଲି);
+	    ଅନ୍ୟଥା
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(tabLine,
+		ଯଦି (XtIsManaged(menuBar))
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, ଖାଲି);
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(tabLine,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
-	    XtVaSetValues(textAreaForm,
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି,
+			      XmNtopAttachment, XmATTACH_FORM, ଖାଲି);
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_ଧାଡ଼ି,
+			  ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    XtUnmanageChild(tabLine);
+	    XtUnmanageChild(tab_ଧାଡ଼ି);
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(textAreaForm,
+	    ଯଦି (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), ଖାଲି);
+	    ଅନ୍ୟଥା
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(textAreaForm,
+		ଯଦି (XtIsManaged(menuBar))
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, ଖାଲି);
+	    ଅନ୍ୟଥା
 # endif
-		XtVaSetValues(textAreaForm,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(textAreaForm,
+			      XmNtopAttachment, XmATTACH_FORM, ଖାଲି);
 	}
 	showing_tabline = showit;
     }
@@ -3125,41 +3125,41 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+gui_mch_showing_tabline(ଶୂନ୍ୟ)
 {
-    return tabLine != (Widget)0 && showing_tabline;
+    ଫେରନ୍ତୁ tab_ଧାଡ଼ି != (Widget)0 && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    ଶୂନ୍ୟ
+gui_mch_update_tabline(ଶୂନ୍ୟ)
 {
     tabpage_T		*tp;
-    int			nr = 1, n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			nr = 1, n;
     Arg			args[10];
-    int			curtabidx = 0, currentpage;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			curtabidx = 0, currentpage;
     Widget		tab;
     XmNotebookPageInfo	page_info;
     XmNotebookPageStatus page_status;
-    int			last_page, tab_count;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			last_page, tab_ଗଣନା;
     XmString		label_str;
-    char		*label_cstr;
+    ଅକ୍ଷର		*label_cstr;
     BalloonEval		*beval;
 
-    if (tabLine == (Widget)0)
-	return;
+    ଯଦି (tab_ଧାଡ଼ି == (Widget)0)
+	ଫେରନ୍ତୁ;
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    ପାଇଁ (tp = first_tabpage; tp != ଖାଲି; tp = tp->tp_next, ++nr)
     {
-	if (tp == curtab)
+	ଯଦି (tp == curtab)
 	    curtabidx = nr;
 
-	page_status = XmNotebookGetPageInfo(tabLine, nr, &page_info);
-	if (page_status == XmPAGE_INVALID
+	page_status = XmNotebookGetPageInfo(tab_ଧାଡ଼ି, nr, &page_info);
+	ଯଦି (page_status == XmPAGE_INVALID
 		|| page_info.major_tab_widget == (Widget)0)
 	{
 	    // Add the tab
@@ -3169,28 +3169,28 @@ gui_mch_update_tabline(void)
 	    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
 	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
 	    XtSetArg(args[n], XmNshadowThickness , 1); n++;
-	    tab = XmCreatePushButton(tabLine, "-Empty-", args, n);
+	    tab = Xm_Create_ଠେଲ_Button(tab_ଧାଡ଼ି, "-Empty-", args, n);
 	    XtManageChild(tab);
-	    beval = gui_mch_create_beval_area(tab, NULL, tabline_balloon_cb,
-									NULL);
-	    XtVaSetValues(tab, XmNuserData, beval, NULL);
+	    beval = gui_mch_create_beval_area(tab, ଖାଲି, tabline_balloon_cb,
+									ଖାଲି);
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab, XmNuserData, beval, ଖାଲି);
 	}
-	else
+	ଅନ୍ୟଥା
 	    tab = page_info.major_tab_widget;
 
-	XtVaSetValues(tab, XmNpageNumber, nr, NULL);
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab, Xm_Npage_ସଂଖ୍ୟା, nr, ଖାଲି);
 
 	/*
 	 * Change the label text only if it is different
 	 */
-	XtVaGetValues(tab, XmNlabelString, &label_str, NULL);
-	if (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
+	Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab, XmNlabelString, &label_str, ଖାଲି);
+	ଯଦି (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
 	{
 	    get_tabline_label(tp, FALSE);
-	    if (STRCMP(label_cstr, NameBuff) != 0)
+	    ଯଦି (STRCMP(label_cstr, NameBuff) != 0)
 	    {
-		XtVaSetValues(tab, XtVaTypedArg, XmNlabelString, XmRString,
-			      NameBuff, STRLEN(NameBuff) + 1, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab, XtVaTypedArg, XmNlabelString, XmRString,
+			      NameBuff, STRLEN(NameBuff) + 1, ଖାଲି);
 		/*
 		 * Force a resize of the tab label button
 		 */
@@ -3201,19 +3201,19 @@ gui_mch_update_tabline(void)
 	}
     }
 
-    tab_count = nr - 1;
+    tab_ଗଣନା = nr - 1;
 
-    XtVaGetValues(tabLine, XmNlastPageNumber, &last_page, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Nlast_Page_ସଂଖ୍ୟା, &last_page, ଖାଲି);
 
     // Remove any old labels.
-    while (nr <= last_page)
+    ଯେତେବେଳେ (nr <= last_page)
     {
-	if (XmNotebookGetPageInfo(tabLine, nr, &page_info) != XmPAGE_INVALID
-	    && page_info.page_number == nr
+	ଯଦି (XmNotebookGetPageInfo(tab_ଧାଡ଼ି, nr, &page_info) != XmPAGE_INVALID
+	    && page_info.page_ସଂଖ୍ୟା == nr
 	    && page_info.major_tab_widget != (Widget)0)
 	{
-	    XtVaGetValues(page_info.major_tab_widget, XmNuserData, &beval, NULL);
-	    if (beval != NULL)
+	    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(page_info.major_tab_widget, XmNuserData, &beval, ଖାଲି);
+	    ଯଦି (beval != ଖାଲି)
 		gui_mch_destroy_beval_area(beval);
 	    XtUnmanageChild(page_info.major_tab_widget);
 	    XtDestroyWidget(page_info.major_tab_widget);
@@ -3221,108 +3221,108 @@ gui_mch_update_tabline(void)
 	nr++;
     }
 
-    XtVaSetValues(tabLine, XmNlastPageNumber, tab_count, NULL);
+    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Nlast_Page_ସଂଖ୍ୟା, tab_ଗଣନା, ଖାଲି);
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != curtabidx)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, curtabidx, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Ncurrent_Page_ସଂଖ୍ୟା, &currentpage, ଖାଲି);
+    ଯଦି (currentpage != curtabidx)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Ncurrent_Page_ସଂଖ୍ୟା, curtabidx, ଖାଲି);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    ଶୂନ୍ୟ
+gui_mch_set_curtab(ପୂର୍ଣ୍ଣସଂଖ୍ୟା nr)
 {
-    int		currentpage;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		currentpage;
 
-    if (tabLine == (Widget)0)
-	return;
+    ଯଦି (tab_ଧାଡ଼ି == (Widget)0)
+	ଫେରନ୍ତୁ;
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != nr)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, nr, NULL);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Ncurrent_Page_ସଂଖ୍ୟା, &currentpage, ଖାଲି);
+    ଯଦି (currentpage != nr)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(tab_ଧାଡ଼ି, Xm_Ncurrent_Page_ସଂଖ୍ୟା, nr, ଖାଲି);
 }
 #endif
 
 /*
  * Set the colors of Widget "id" to the menu colors.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 gui_motif_menu_colors(Widget id)
 {
-    if (gui.menu_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    ଯଦି (gui.menu_bg_pixel != INVALCOLOR)
+#ଯଦି (XmVersion >= 1002)
 	XmChangeColor(id, gui.menu_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.menu_bg_pixel, NULL);
+#ଅନ୍ୟଥା
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNbackground, gui.menu_bg_pixel, ଖାଲି);
 #endif
-    if (gui.menu_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.menu_fg_pixel, NULL);
+    ଯଦି (gui.menu_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNforeground, gui.menu_fg_pixel, ଖାଲି);
 }
 
 /*
  * Set the colors of Widget "id" to the scrollbar colors.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 gui_motif_scroll_colors(Widget id)
 {
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    ଯଦି (gui.scroll_bg_pixel != INVALCOLOR)
+#ଯଦି (XmVersion >= 1002)
 	XmChangeColor(id, gui.scroll_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.scroll_bg_pixel, NULL);
+#ଅନ୍ୟଥା
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNbackground, gui.scroll_bg_pixel, ଖାଲି);
 #endif
-    if (gui.scroll_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.scroll_fg_pixel, NULL);
+    ଯଦି (gui.scroll_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNforeground, gui.scroll_fg_pixel, ଖାଲି);
 }
 
 /*
  * Set the fontlist for Widget "id" to use gui.menu_fontset or gui.menu_font.
  */
-    void
+    ଶୂନ୍ୟ
 gui_motif_menu_fontlist(Widget id UNUSED)
 {
 #ifdef FEAT_MENU
 # ifdef FONTSET_ALWAYS
-    if (gui.menu_fontset != NOFONTSET)
+    ଯଦି (gui.menu_fontset != NOFONTSET)
     {
 	XmFontList fl;
 
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.menu_fontset);
-	if (fl != NULL)
+	ଯଦି (fl != ଖାଲି)
 	{
-	    if (XtIsManaged(id))
+	    ଯଦି (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    ଅନ୍ୟଥା
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.menu_font != NOFONT)
+# ଅନ୍ୟଥା
+    ଯଦି (gui.menu_font != NOFONT)
     {
 	XmFontList fl;
 
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.menu_font);
-	if (fl != NULL)
+	ଯଦି (fl != ଖାଲି)
 	{
-	    if (XtIsManaged(id))
+	    ଯଦି (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    ଅନ୍ୟଥା
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(id, XmNfontList, fl, ଖାଲି);
 	    XmFontListFree(fl);
 	}
     }
@@ -3335,7 +3335,7 @@ gui_motif_menu_fontlist(Widget id UNUSED)
  * We don't create it twice for the sake of speed.
  */
 
-typedef struct _SharedFindReplace
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା _SharedFindReplace
 {
     Widget dialog;	// the main dialog widget
     Widget wword;	// 'Exact match' check button
@@ -3352,10 +3352,10 @@ typedef struct _SharedFindReplace
     Widget cancel;
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+ସ୍ଥିର SharedFindReplace find_widgets = {ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି};
+ସ୍ଥିର SharedFindReplace repl_widgets = {ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି, ଖାଲି};
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_replace_destroy_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3363,12 +3363,12 @@ find_replace_destroy_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    ଯଦି (cd != ଖାଲି)
        // suppress_dialog_mnemonics(cd->dialog);
 	cd->dialog = (Widget)0;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_replace_dismiss_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3376,11 +3376,11 @@ find_replace_dismiss_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    ଯଦି (cd != ଖାଲି)
 	XtUnmanageChild(cd->dialog);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 entry_activate_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3389,20 +3389,20 @@ entry_activate_callback(
     XmProcessTraversal((Widget)client_data, XmTRAVERSE_CURRENT);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_replace_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
     long_u	flags = (long_u)client_data;
-    char	*find_text, *repl_text;
+    ଅକ୍ଷର	*find_text, *repl_text;
     Boolean	direction_down = TRUE;
     Boolean	wword;
     Boolean	mcase;
     SharedFindReplace *sfr;
 
-    if (flags == FRD_UNDO)
+    ଯଦି (flags == FRD_UNDO)
     {
 	char_u	*save_cpo = p_cpo;
 
@@ -3411,77 +3411,77 @@ find_replace_callback(
 	u_undo(1);
 	p_cpo = save_cpo;
 	gui_update_screen();
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    ଯଦି (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = ଖାଲି;
 	sfr = &find_widgets;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	repl_text = XmTextFieldGetString(repl_widgets.with);
 	sfr = &repl_widgets;
     }
     find_text = XmTextFieldGetString(sfr->what);
-    XtVaGetValues(sfr->down, XmNset, &direction_down, NULL);
-    XtVaGetValues(sfr->wword, XmNset, &wword, NULL);
-    XtVaGetValues(sfr->mcase, XmNset, &mcase, NULL);
-    if (wword)
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(sfr->down, XmNset, &direction_down, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(sfr->wword, XmNset, &wword, ଖାଲି);
+    Xt_Va_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(sfr->mcase, XmNset, &mcase, ଖାଲି);
+    ଯଦି (wword)
 	flags |= FRD_WHOLE_WORD;
-    if (mcase)
+    ଯଦି (mcase)
 	flags |= FRD_MATCH_CASE;
 
-    (void)gui_do_findrepl((int)flags, (char_u *)find_text, (char_u *)repl_text,
+    (ଶୂନ୍ୟ)gui_do_findrepl((ପୂର୍ଣ୍ଣସଂଖ୍ୟା)flags, (char_u *)find_text, (char_u *)repl_text,
 							      direction_down);
 
-    if (find_text != NULL)
+    ଯଦି (find_text != ଖାଲି)
 	XtFree(find_text);
-    if (repl_text != NULL)
+    ଯଦି (repl_text != ଖାଲି)
 	XtFree(repl_text);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 find_replace_keypress(
     Widget		w UNUSED,
     SharedFindReplace	*frdp,
     XKeyEvent		*event,
     Boolean		*b UNUSED)
 {
-    KeySym keysym;
+    ଚାବି_Sym keysym;
 
-    if (frdp == NULL)
-	return;
+    ଯଦି (frdp == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     keysym = XLookupKeysym(event, 0);
 
     // the scape key pops the whole dialog down
-    if (keysym == XK_Escape)
+    ଯଦି (keysym == XK_Escape)
 	XtUnmanageChild(frdp->dialog);
 }
 
-    static void
-set_label(Widget w, char *label)
+    ସ୍ଥିର ଶୂନ୍ୟ
+set_label(Widget w, ଅକ୍ଷର *label)
 {
     XmString	str;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    ଚାବି_Sym	mnemonic = NUL;
 
-    if (!w)
-	return;
+    ଯଦି (!w)
+	ଫେରନ୍ତୁ;
 
     p = vim_strsave((char_u *)label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    ଯଦି (p == ଖାଲି)
+	ଫେରନ୍ତୁ;
+    ପାଇଁ (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	ଯଦି (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା len = STRLEN(next);
 
-	    if (len > 0)
+	    ଯଦି (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -3489,33 +3489,33 @@ set_label(Widget w, char *label)
 	}
     }
 
-    str = XmStringCreateSimple((char *)p);
+    str = XmStringCreateSimple((ଅକ୍ଷର *)p);
     vim_free(p);
-    if (str)
+    ଯଦି (str)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    ସ୍ଥିର ଶୂନ୍ୟ
+find_replace_dialog_create(char_u *arg, ପୂର୍ଣ୍ଣସଂଖ୍ୟା do_replace)
 {
     SharedFindReplace	*frdp;
     Widget		separator;
-    Widget		input_form;
+    Widget		ନିବେଶ_form;
     Widget		button_form;
     Widget		toggle_form;
     Widget		frame;
     XmString		str;
-    int			n;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			n;
     Arg			args[6];
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			wword = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			mcase = !p_ic;
     Dimension		width;
     Dimension		widest;
     char_u		*entry_text;
@@ -3526,31 +3526,31 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog)
+    ଯଦି (frdp->dialog)
     {
 	gui_motif_synch_fonts();
 
 	// If the window is already up, just pop it to the top
-	if (XtIsManaged(frdp->dialog))
+	ଯଦି (XtIsManaged(frdp->dialog))
 	    XMapRaised(XtDisplay(frdp->dialog),
 					    XtWindow(XtParent(frdp->dialog)));
-	else
+	ଅନ୍ୟଥା
 	    XtManageChild(frdp->dialog);
 	XtPopup(XtParent(frdp->dialog), XtGrabNone);
 	XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 
-	if (entry_text != NULL)
-	    XmTextFieldSetString(frdp->what, (char *)entry_text);
+	ଯଦି (entry_text != ଖାଲି)
+	    XmTextFieldSetString(frdp->what, (ଅକ୍ଷର *)entry_text);
 	vim_free(entry_text);
 
-	XtVaSetValues(frdp->wword, XmNset, wword, NULL);
-	return;
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(frdp->wword, XmNset, wword, ଖାଲି);
+	ଫେରନ୍ତୁ;
     }
 
     // Create a fresh new dialog window
-    if (do_replace)
+    ଯଦି (do_replace)
 	 str = XmStringCreateSimple(_("VIM - Search and Replace..."));
-    else
+    ଅନ୍ୟଥା
 	 str = XmStringCreateSimple(_("VIM - Search..."));
 
     n = 0;
@@ -3571,63 +3571,63 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    ଖାଲି);
 
     frdp->find = XtVaCreateManagedWidget("findButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_ଠେଲ_Button_Widget_Class, button_form,
 	    XmNsensitive, True,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    ଖାଲି);
     set_label(frdp->find, _("Find &Next"));
 
     XtAddCallback(frdp->find, XmNactivateCallback,
 	    find_replace_callback,
 	    (do_replace ? (XtPointer)FRD_R_FINDNEXT : (XtPointer)FRD_FINDNEXT));
 
-    if (do_replace)
+    ଯଦି (do_replace)
     {
 	frdp->replace = XtVaCreateManagedWidget("replaceButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ଠେଲ_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->find,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		ଖାଲି);
 	set_label(frdp->replace, _("&Replace"));
 	XtAddCallback(frdp->replace, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACE);
 
 	frdp->all = XtVaCreateManagedWidget("replaceAllButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ଠେଲ_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->replace,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		ଖାଲି);
 	set_label(frdp->all, _("Replace &All"));
 	XtAddCallback(frdp->all, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACEALL);
 
 	frdp->undo = XtVaCreateManagedWidget("undoButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ଠେଲ_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->all,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		ଖାଲି);
 	set_label(frdp->undo, _("&Undo"));
 	XtAddCallback(frdp->undo, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_UNDO);
     }
 
     frdp->cancel = XtVaCreateManagedWidget("closeButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_ଠେଲ_Button_Widget_Class, button_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    NULL);
+	    ଖାଲି);
     set_label(frdp->cancel, _("&Cancel"));
     XtAddCallback(frdp->cancel, XmNactivateCallback,
 	    find_replace_dismiss_callback, frdp);
@@ -3645,7 +3645,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     separator = XmCreateSeparatorGadget(frdp->dialog, "separator", args, n);
     XtManageChild(separator);
 
-    input_form = XtVaCreateWidget("inputForm",
+    ନିବେଶ_form = XtVaCreateWidget("inputForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
@@ -3654,7 +3654,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 4,
-	    NULL);
+	    ଖାଲି);
 
     {
 	Widget label_what;
@@ -3662,47 +3662,47 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	str = XmStringCreateSimple(_("Find what:"));
 	label_what = XtVaCreateManagedWidget("whatLabel",
-		xmLabelGadgetClass, input_form,
+		xmLabelGadgetClass, ନିବେଶ_form,
 		XmNlabelString, str,
 		XmNleftAttachment,	XmATTACH_FORM,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNtopOffset, 4,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(label_what);
 
 	frdp->what = XtVaCreateManagedWidget("whatText",
-		xmTextFieldWidgetClass, input_form,
+		xmTextFieldWidgetClass, ନିବେଶ_form,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
 		XmNleftAttachment, XmATTACH_FORM,
-		NULL);
+		ଖାଲି);
 
-	if (do_replace)
+	ଯଦି (do_replace)
 	{
 	    frdp->with = XtVaCreateManagedWidget("withText",
-		    xmTextFieldWidgetClass,	input_form,
+		    xmTextFieldWidgetClass,	ନିବେଶ_form,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNrightAttachment, XmATTACH_FORM,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ଖାଲି);
 
 	    XtAddCallback(frdp->with, XmNactivateCallback,
 		    find_replace_callback, (XtPointer) FRD_R_FINDNEXT);
 
 	    str = XmStringCreateSimple(_("Replace with:"));
 	    label_with = XtVaCreateManagedWidget("withLabel",
-		    xmLabelGadgetClass, input_form,
+		    xmLabelGadgetClass, ନିବେଶ_form,
 		    XmNlabelString, str,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    ଖାଲି);
 	    XmStringFree(str);
 	    gui_motif_menu_fontlist(label_with);
 
@@ -3712,12 +3712,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	     */
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    entry_activate_callback, frdp->with);
-	    XtAddEventHandler(frdp->with, KeyPressMask, False,
+	    XtAddEventHandler(frdp->with, ଚାବି_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer) frdp);
 
 	}
-	else
+	ଅନ୍ୟଥା
 	{
 	    /*
 	     * Make the entry activation do the search.
@@ -3725,29 +3725,29 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    find_replace_callback, (XtPointer)FRD_FINDNEXT);
 	}
-	XtAddEventHandler(frdp->what, KeyPressMask, False,
+	XtAddEventHandler(frdp->what, ଚାବି_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer)frdp);
 
 	// Get the maximum width between the label widgets and line them up.
 	n = 0;
 	XtSetArg(args[n], XmNwidth, &width); n++;
-	XtGetValues(label_what, args, n);
+	Xt_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(label_what, args, n);
 	widest = width;
-	if (do_replace)
+	ଯଦି (do_replace)
 	{
-	    XtGetValues(label_with, args, n);
-	    if (width > widest)
+	    Xt_Get_ମୂଲ୍ୟଗୁଡ଼ିକ(label_with, args, n);
+	    ଯଦି (width > widest)
 		widest = width;
 	}
 
-	XtVaSetValues(frdp->what, XmNleftOffset, widest, NULL);
-	if (do_replace)
-	    XtVaSetValues(frdp->with, XmNleftOffset, widest, NULL);
+	Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(frdp->what, XmNleftOffset, widest, ଖାଲି);
+	ଯଦି (do_replace)
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(frdp->with, XmNleftOffset, widest, ଖାଲି);
 
     }
 
-    XtManageChild(input_form);
+    XtManageChild(ନିବେଶ_form);
 
     {
 	Widget radio_box;
@@ -3756,13 +3756,13 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	frame = XtVaCreateWidget("directionFrame",
 		xmFrameWidgetClass, frdp->dialog,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, input_form,
+		XmNtopWidget, ନିବେଶ_form,
 		XmNtopOffset, 4,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
-		XmNrightWidget, input_form,
-		NULL);
+		XmNrightWidget, ନିବେଶ_form,
+		ଖାଲି);
 
 	str = XmStringCreateSimple(_("Direction"));
 	w = XtVaCreateManagedWidget("directionFrameLabel",
@@ -3770,19 +3770,19 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		XmNlabelString, str,
 		XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 		XmNchildType, XmFRAME_TITLE_CHILD,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(w);
 
 	radio_box = XmCreateRadioBox(frame, "radioBox",
-		(ArgList)NULL, 0);
+		(ArgList)ଖାଲି, 0);
 
 	str = XmStringCreateSimple( _("Up"));
 	frdp->up = XtVaCreateManagedWidget("upRadioButton",
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, False,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->up);
 
@@ -3791,7 +3791,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, True,
-		NULL);
+		ଖାଲି);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->down);
 
@@ -3807,11 +3807,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightWidget, frame,
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, input_form,
+	    XmNtopWidget, ନିବେଶ_form,
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    ଖାଲି);
 
     str = XmStringCreateSimple(_("Match whole word only"));
     frdp->wword = XtVaCreateManagedWidget("wordToggle",
@@ -3822,7 +3822,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
 	    XmNset, wword,
-	    NULL);
+	    ଖାଲି);
     XmStringFree(str);
 
     str = XmStringCreateSimple(_("Match case"));
@@ -3835,15 +3835,15 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopWidget, frdp->wword,
 	    XmNtopOffset, 4,
 	    XmNset, mcase,
-	    NULL);
+	    ଖାଲି);
     XmStringFree(str);
     gui_motif_menu_fontlist(frdp->wword);
     gui_motif_menu_fontlist(frdp->mcase);
 
     XtManageChild(toggle_form);
 
-    if (entry_text != NULL)
-	XmTextFieldSetString(frdp->what, (char *)entry_text);
+    ଯଦି (entry_text != ଖାଲି)
+	XmTextFieldSetString(frdp->what, (ଅକ୍ଷର *)entry_text);
     vim_free(entry_text);
 
     gui_motif_synch_fonts();
@@ -3853,21 +3853,21 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 }
 
-   void
+   ଶୂନ୍ୟ
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    ଯଦି (!gui.in_use)
+	ଫେରନ୍ତୁ;
 
     find_replace_dialog_create(eap->arg, FALSE);
 }
 
 
-    void
+    ଶୂନ୍ୟ
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    ଯଦି (!gui.in_use)
+	ଫେରନ୍ତୁ;
 
     find_replace_dialog_create(eap->arg, TRUE);
 }
@@ -3878,31 +3878,31 @@ gui_mch_replace_dialog(exarg_T *eap)
  * If you don't understand why this should be needed, please try to
  * search for "pi\xea\xb6\xe6" in iso8859-2.
  */
-    void
-gui_motif_synch_fonts(void)
+    ଶୂନ୍ୟ
+gui_motif_synch_fonts(ଶୂନ୍ୟ)
 {
     SharedFindReplace *frdp;
-    int		    do_replace;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    do_replace;
     XFontStruct	    *font;
     XmFontList	    font_list;
 
     // FIXME: Unless we find out how to create a XmFontList from a XFontSet,
     // we just give up here on font synchronization.
     font = (XFontStruct *)gui.norm_font;
-    if (font == NULL)
-	return;
+    ଯଦି (font == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
     font_list = gui_motif_create_fontlist(font);
 
     // OK this loop is a bit tricky...
-    for (do_replace = 0; do_replace <= 1; ++do_replace)
+    ପାଇଁ (do_replace = 0; do_replace <= 1; ++do_replace)
     {
 	frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
-	if (frdp->dialog)
+	ଯଦି (frdp->dialog)
 	{
-	    XtVaSetValues(frdp->what, XmNfontList, font_list, NULL);
-	    if (do_replace)
-		XtVaSetValues(frdp->with, XmNfontList, font_list, NULL);
+	    Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(frdp->what, XmNfontList, font_list, ଖାଲି);
+	    ଯଦି (do_replace)
+		Xt_Va_Set_ମୂଲ୍ୟଗୁଡ଼ିକ(frdp->with, XmNfontList, font_list, ଖାଲି);
 	}
     }
 

@@ -29,14 +29,14 @@
 
 #ifdef _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#ଅନ୍ତର୍ଭାଵ <ctype.h>
+#ଅନ୍ତର୍ଭାଵ <io.h>
+#ଅନ୍ତର୍ଭାଵ <wchar.h>
+#ଅନ୍ତର୍ଭାଵ <windows.h>
 
 #ifdef USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# ଯଦି !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,12 +45,12 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#ଅନ୍ୟଥା // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# ଯଦି defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  ଅନ୍ୟଥା
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
@@ -58,131 +58,131 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#ଅନ୍ୟଥା
 # define UNUSED
 #endif
 
-#include "iscygpty.h"
+#ଅନ୍ତର୍ଭାଵ "iscygpty.h"
 
 //#define USE_DYNFILEID
 #ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+ପ୍ରକାରବ୍ୟାଖ୍ୟା BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
 		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+ସ୍ଥିର pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = ଖାଲି;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
+ସ୍ଥିର BOOL WINAPI stub_GetFileInformationByHandleEx(
 		HANDLE						hFile UNUSED,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
 		LPVOID						lpFileInformation UNUSED,
 		DWORD						dwBufferSize UNUSED)
 {
-	return FALSE;
+	ଫେରନ୍ତୁ FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+ସ୍ଥିର ଶୂନ୍ୟ setup_fileid_api(ଶୂନ୍ୟ)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	ଯଦି (pGetFileInformationByHandleEx != ଖାଲି) {
+		ଫେରନ୍ତୁ;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
 		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	ଯଦି (pGetFileInformationByHandleEx == ଖାଲି) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# ଅନ୍ୟଥା
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#ଅନ୍ୟଥା
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
 # define setup_fileid_api()
 #endif
 
 
 #define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+	(wcsncmp((s), (prefix), ଆକାର(prefix) / ଆକାର(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_cygpty(ପୂର୍ଣ୍ଣସଂଖ୍ୟା fd)
 {
 #ifdef STUB_IMPL
-	return 0;
-#else
+	ଫେରନ୍ତୁ 0;
+#ଅନ୍ୟଥା
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା size = ଆକାର(FILE_NAME_INFO) + ଆକାର(WCHAR) * (MAX_PATH - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = ଖାଲି;
 
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	ଯଦି (h == INVALID_HANDLE_ମୂଲ୍ୟ) {
+		ଫେରନ୍ତୁ 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	ଯଦି (GetFileType(h) != FILE_TYPE_PIPE) {
+		ଫେରନ୍ତୁ 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = malloc(size + ଆକାର(WCHAR));
+	ଯଦି (nameinfo == ଖାଲି) {
+		ଫେରନ୍ତୁ 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	ଯଦି (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
+		nameinfo->FileName[nameinfo->FileNameLength / ଆକାର(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		ଯଦି (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} ଅନ୍ୟଥା ଯଦି (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} ଅନ୍ୟଥା {
+			p = ଖାଲି;
 		}
-		if (p != NULL) {
+		ଯଦି (p != ଖାଲି) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			ଯେତେବେଳେ (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			ଯଦି (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} ଅନ୍ୟଥା {
+				p = ଖାଲି;
 			}
 		}
-		if (p != NULL) {
+		ଯଦି (p != ଖାଲି) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			ଯେତେବେଳେ (*p && iswascii(*p) && isdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			ଯଦି (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} ଅନ୍ୟଥା ଯଦି (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} ଅନ୍ୟଥା {
+				p = ଖାଲି;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
+	ମୁକ୍ତ(nameinfo);
+	ଫେରନ୍ତୁ (p != ଖାଲି);
 #endif // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା is_cygpty_used(ଶୂନ୍ୟ)
 {
-	int fd, ret = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	ପାଇଁ (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	ଫେରନ୍ତୁ ret;
 }
 
 #endif // _WIN32

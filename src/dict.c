@@ -11,33 +11,33 @@
  * dict.c: Dictionary support
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#if defined(FEAT_EVAL)
+#ଯଦି defined(FEAT_EVAL)
 
 // List head for garbage collection. Although there can be a reference loop
 // from partial to dict to partial, we don't need to keep track of the partial,
 // since it will get freed when the dict is unused and gets freed.
-static dict_T		*first_dict = NULL;
+ସ୍ଥିର dict_T		*first_dict = ଖାଲି;
 
 /*
  * Allocate an empty header for a dictionary.
  * Caller should take care of the reference count.
  */
     dict_T *
-dict_alloc(void)
+dict_alloc(ଶୂନ୍ୟ)
 {
     dict_T *d;
 
     d = ALLOC_CLEAR_ONE(dict_T);
-    if (d == NULL)
-	return NULL;
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     // Add the dict to the list of dicts for garbage collection.
-    if (first_dict != NULL)
+    ଯଦି (first_dict != ଖାଲି)
 	first_dict->dv_used_prev = d;
     d->dv_used_next = first_dict;
-    d->dv_used_prev = NULL;
+    d->dv_used_prev = ଖାଲି;
     first_dict = d;
 
     hash_init(&d->dv_hashtab);
@@ -45,7 +45,7 @@ dict_alloc(void)
     d->dv_scope = 0;
     d->dv_refcount = 0;
     d->dv_copyID = 0;
-    return d;
+    ଫେରନ୍ତୁ d;
 }
 
 /*
@@ -55,47 +55,47 @@ dict_alloc(void)
 dict_alloc_id(alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
+    ଯଦି (alloc_fail_id == id && alloc_does_fail(ଆକାର(list_T)))
+	ଫେରନ୍ତୁ ଖାଲି;
 #endif
-    return (dict_alloc());
+    ଫେରନ୍ତୁ (dict_alloc());
 }
 
     dict_T *
-dict_alloc_lock(int lock)
+dict_alloc_lock(ପୂର୍ଣ୍ଣସଂଖ୍ୟା lock)
 {
     dict_T *d = dict_alloc();
 
-    if (d != NULL)
+    ଯଦି (d != ଖାଲି)
 	d->dv_lock = lock;
-    return d;
+    ଫେରନ୍ତୁ d;
 }
 
 /*
  * Allocate an empty dict for a return value.
  * Returns OK or FAIL.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 rettv_dict_alloc(typval_T *rettv)
 {
     dict_T	*d = dict_alloc_lock(0);
 
-    if (d == NULL)
-	return FAIL;
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
 
     rettv_dict_set(rettv, d);
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Set a dictionary as the return value
  */
-    void
+    ଶୂନ୍ୟ
 rettv_dict_set(typval_T *rettv, dict_T *d)
 {
     rettv->v_type = VAR_DICT;
     rettv->vval.v_dict = d;
-    if (d != NULL)
+    ଯଦି (d != ଖାଲି)
 	++d->dv_refcount;
 }
 
@@ -103,34 +103,34 @@ rettv_dict_set(typval_T *rettv, dict_T *d)
  * Free a Dictionary, including all non-container items it contains.
  * Ignores the reference count.
  */
-    void
+    ଶୂନ୍ୟ
 dict_free_contents(dict_T *d)
 {
     hashtab_free_contents(&d->dv_hashtab);
     free_type(d->dv_type);
-    d->dv_type = NULL;
+    d->dv_type = ଖାଲି;
 }
 
 /*
  * Clear hashtab "ht" and dict items it contains.
  * If "ht" is not freed then you should call hash_init() next!
  */
-    void
+    ଶୂନ୍ୟ
 hashtab_free_contents(hashtab_T *ht)
 {
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
     hashitem_T	*hi;
     dictitem_T	*di;
 
-    if (check_hashtab_frozen(ht, "clear dict"))
-	return;
+    ଯଦି (check_hashtab_frozen(ht, "clear dict"))
+	ଫେରନ୍ତୁ;
 
     // Lock the hashtab, we don't want it to resize while freeing items.
     hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ht->ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    // Remove the item before deleting it, just in case there is
 	    // something recursive causing trouble.
@@ -145,23 +145,23 @@ hashtab_free_contents(hashtab_T *ht)
     hash_clear(ht);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dict_free_dict(dict_T *d)
 {
     // Remove the dict from the list of dicts for garbage collection.
-    if (d->dv_used_prev == NULL)
+    ଯଦି (d->dv_used_prev == ଖାଲି)
 	first_dict = d->dv_used_next;
-    else
+    ଅନ୍ୟଥା
 	d->dv_used_prev->dv_used_next = d->dv_used_next;
-    if (d->dv_used_next != NULL)
+    ଯଦି (d->dv_used_next != ଖାଲି)
 	d->dv_used_next->dv_used_prev = d->dv_used_prev;
     vim_free(d);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dict_free(dict_T *d)
 {
-    if (!in_free_unref_items)
+    ଯଦି (!in_free_unref_ବସ୍ତୁଗୁଡ଼ିକ)
     {
 	dict_free_contents(d);
 	dict_free_dict(d);
@@ -172,10 +172,10 @@ dict_free(dict_T *d)
  * Unreference a Dictionary: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ଶୂନ୍ୟ
 dict_unref(dict_T *d)
 {
-    if (d != NULL && --d->dv_refcount <= 0)
+    ଯଦି (d != ଖାଲି && --d->dv_refcount <= 0)
 	dict_free(d);
 }
 
@@ -183,14 +183,14 @@ dict_unref(dict_T *d)
  * Go through the list of dicts and free items without the copyID.
  * Returns TRUE if something was freed.
  */
-    int
-dict_free_nonref(int copyID)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_free_nonref(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
     dict_T	*dd;
-    int		did_free = FALSE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		did_free = FALSE;
 
-    for (dd = first_dict; dd != NULL; dd = dd->dv_used_next)
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    ପାଇଁ (dd = first_dict; dd != ଖାଲି; dd = dd->dv_used_next)
+	ଯଦି ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the Dictionary and ordinary items it contains, but don't
 	    // recurse into Lists and Dictionaries, they will be in the list
@@ -198,18 +198,18 @@ dict_free_nonref(int copyID)
 	    dict_free_contents(dd);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ଫେରନ୍ତୁ did_free;
 }
 
-    void
-dict_free_items(int copyID)
+    ଶୂନ୍ୟ
+dict_free_ବସ୍ତୁଗୁଡ଼ିକ(ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
     dict_T	*dd, *dd_next;
 
-    for (dd = first_dict; dd != NULL; dd = dd_next)
+    ପାଇଁ (dd = first_dict; dd != ଖାଲି; dd = dd_next)
     {
 	dd_next = dd->dv_used_next;
-	if ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	ଯଦି ((dd->dv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	    dict_free_dict(dd);
     }
 }
@@ -222,54 +222,54 @@ dict_free_items(int copyID)
  * Returns NULL when out of memory.
  */
     dictitem_T *
-dictitem_alloc(char_u *key)
+dictitem_alloc(char_u *ଚାବି)
 {
     dictitem_T *di;
-    size_t len = STRLEN(key);
+    size_t len = STRLEN(ଚାବି);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ଚାବି) + len + 1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    mch_memmove(di->di_key, key, len + 1);
+    mch_memmove(di->di_ଚାବି, ଚାବି, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     di->di_tv.v_lock = 0;
     di->di_tv.v_type = VAR_UNKNOWN;
-    return di;
+    ଫେରନ୍ତୁ di;
 }
 
 /*
  * Make a copy of a Dictionary item.
  */
-    static dictitem_T *
+    ସ୍ଥିର dictitem_T *
 dictitem_copy(dictitem_T *org)
 {
     dictitem_T *di;
-    size_t	len = STRLEN(org->di_key);
+    size_t	len = STRLEN(org->di_ଚାବି);
 
-    di = alloc(offsetof(dictitem_T, di_key) + len + 1);
-    if (di == NULL)
-	return NULL;
+    di = alloc(offsetof(dictitem_T, di_ଚାବି) + len + 1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    mch_memmove(di->di_key, org->di_key, len + 1);
+    mch_memmove(di->di_ଚାବି, org->di_ଚାବି, len + 1);
     di->di_flags = DI_FLAGS_ALLOC;
     copy_tv(&org->di_tv, &di->di_tv);
-    return di;
+    ଫେରନ୍ତୁ di;
 }
 
 /*
  * Remove item "item" from Dictionary "dict" and free it.
  * "command" is used for the error message when the hashtab if frozen.
  */
-    void
-dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
+    ଶୂନ୍ୟ
+dictitem_remove(dict_T *dict, dictitem_T *item, ଅକ୍ଷର *command)
 {
     hashitem_T	*hi;
 
-    hi = hash_find(&dict->dv_hashtab, item->di_key);
-    if (HASHITEM_EMPTY(hi))
+    hi = hash_find(&dict->dv_hashtab, item->di_ଚାବି);
+    ଯଦି (HASHITEM_EMPTY(hi))
 	internal_error("dictitem_remove()");
-    else
+    ଅନ୍ୟଥା
 	hash_remove(&dict->dv_hashtab, hi, command);
     dictitem_free(item);
 }
@@ -277,11 +277,11 @@ dictitem_remove(dict_T *dict, dictitem_T *item, char *command)
 /*
  * Free a dict item.  Also clears the value.
  */
-    void
+    ଶୂନ୍ୟ
 dictitem_free(dictitem_T *item)
 {
     clear_tv(&item->di_tv);
-    if (item->di_flags & DI_FLAGS_ALLOC)
+    ଯଦି (item->di_flags & DI_FLAGS_ALLOC)
 	vim_free(item);
 }
 
@@ -292,77 +292,77 @@ dictitem_free(dictitem_T *item)
  * Returns NULL when out of memory.
  */
     dict_T *
-dict_copy(dict_T *orig, int deep, int top, int copyID)
+dict_copy(dict_T *orig, ପୂର୍ଣ୍ଣସଂଖ୍ୟା deep, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ଶୀର୍ଷ, ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID)
 {
     dict_T	*copy;
     dictitem_T	*di;
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
     hashitem_T	*hi;
 
-    if (orig == NULL)
-	return NULL;
+    ଯଦି (orig == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
     copy = dict_alloc();
-    if (copy == NULL)
-	return NULL;
+    ଯଦି (copy == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    if (copyID != 0)
+    ଯଦି (copyID != 0)
     {
 	orig->dv_copyID = copyID;
 	orig->dv_copydict = copy;
     }
-    if (orig->dv_type == NULL || top || deep)
-	copy->dv_type = NULL;
-    else
+    ଯଦି (orig->dv_type == ଖାଲି || ଶୀର୍ଷ || deep)
+	copy->dv_type = ଖାଲି;
+    ଅନ୍ୟଥା
 	copy->dv_type = alloc_type(orig->dv_type);
 
-    todo = (int)orig->dv_hashtab.ht_used;
-    for (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)orig->dv_hashtab.ht_used;
+    ପାଇଁ (hi = orig->dv_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 
-	    di = dictitem_alloc(hi->hi_key);
-	    if (di == NULL)
-		break;
-	    if (deep)
+	    di = dictitem_alloc(hi->hi_ଚାବି);
+	    ଯଦି (di == ଖାଲି)
+		ଭାଙ୍ଗ;
+	    ଯଦି (deep)
 	    {
-		if (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
+		ଯଦି (item_copy(&HI2DI(hi)->di_tv, &di->di_tv,
 			    deep, FALSE, copyID) == FAIL)
 		{
 		    vim_free(di);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		copy_tv(&HI2DI(hi)->di_tv, &di->di_tv);
-	    if (dict_add(copy, di) == FAIL)
+	    ଯଦି (dict_add(copy, di) == FAIL)
 	    {
 		dictitem_free(di);
-		break;
+		ଭାଙ୍ଗ;
 	    }
 	}
     }
 
     ++copy->dv_refcount;
-    if (todo > 0)
+    ଯଦି (todo > 0)
     {
 	dict_unref(copy);
-	copy = NULL;
+	copy = ଖାଲି;
     }
 
-    return copy;
+    ଫେରନ୍ତୁ copy;
 }
 
 /*
  * Check for adding a function to g: or s: (in Vim9 script) or l:.
  * If the name is wrong give an error message and return TRUE.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
 {
-    return (d == get_globvar_dict()
+    ଫେରନ୍ତୁ (d == get_globvar_dict()
 		|| (in_vim9script() && SCRIPT_ID_VALID(current_sctx.sc_sid)
 		   && d == &SCRIPT_ITEM(current_sctx.sc_sid)->sn_vars->sv_dict)
 		|| &d->dv_hashtab == get_funccal_local_ht())
@@ -374,68 +374,68 @@ dict_wrong_func_name(dict_T *d, typval_T *tv, char_u *name)
  * Add item "item" to Dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 dict_add(dict_T *d, dictitem_T *item)
 {
-    if (dict_wrong_func_name(d, &item->di_tv, item->di_key))
-	return FAIL;
-    return hash_add(&d->dv_hashtab, item->di_key, "add to dictionary");
+    ଯଦି (dict_wrong_func_name(d, &item->di_tv, item->di_ଚାବି))
+	ଫେରନ୍ତୁ FAIL;
+    ଫେରନ୍ତୁ hash_add(&d->dv_hashtab, item->di_ଚାବି, "add to dictionary");
 }
 
 /*
  * Add a number or special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    static int
-dict_add_number_special(
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_ସଂଖ୍ୟା_special(
     dict_T	*d,
-    char	*key,
+    ଅକ୍ଷର	*ଚାବି,
     varnumber_T	nr,
     vartype_T	vartype)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     item->di_tv.v_type = vartype;
-    item->di_tv.vval.v_number = nr;
-    if (dict_add(d, item) == FAIL)
+    item->di_tv.vval.v_ସଂଖ୍ୟା = nr;
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a number entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_number(dict_T *d, char *key, varnumber_T nr)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_ସଂଖ୍ୟା(dict_T *d, ଅକ୍ଷର *ଚାବି, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_NUMBER);
+    ଫେରନ୍ତୁ dict_add_ସଂଖ୍ୟା_special(d, ଚାବି, nr, VAR_ସଂଖ୍ୟା);
 }
 
 /*
  * Add a special entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_bool(dict_T *d, char *key, varnumber_T nr)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_bool(dict_T *d, ଅକ୍ଷର *ଚାବି, varnumber_T nr)
 {
-    return dict_add_number_special(d, key, nr, VAR_BOOL);
+    ଫେରନ୍ତୁ dict_add_ସଂଖ୍ୟା_special(d, ଚାବି, nr, VAR_BOOL);
 }
 
 /*
  * Add a string entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string(dict_T *d, char *key, char_u *str)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_string(dict_T *d, ଅକ୍ଷର *ଚାବି, char_u *str)
 {
-    return dict_add_string_len(d, key, str, -1);
+    ଫେରନ୍ତୁ dict_add_string_len(d, ଚାବି, str, -1);
 }
 
 /*
@@ -444,122 +444,122 @@ dict_add_string(dict_T *d, char *key, char_u *str)
  * When "len" is -1 use the whole string, otherwise only this many bytes.
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_string_len(dict_T *d, char *key, char_u *str, int len)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_string_len(dict_T *d, ଅକ୍ଷର *ଚାବି, char_u *str, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     dictitem_T	*item;
-    char_u	*val = NULL;
+    char_u	*val = ଖାଲି;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     item->di_tv.v_type = VAR_STRING;
-    if (str != NULL)
+    ଯଦି (str != ଖାଲି)
     {
-	if (len == -1)
+	ଯଦି (len == -1)
 	    val = vim_strsave(str);
-	else
+	ଅନ୍ୟଥା
 	    val = vim_strnsave(str, len);
     }
     item->di_tv.vval.v_string = val;
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a list entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_list(dict_T *d, char *key, list_T *list)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_list(dict_T *d, ଅକ୍ଷର *ଚାବି, list_T *list)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     item->di_tv.v_type = VAR_LIST;
     item->di_tv.vval.v_list = list;
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	// Detach "list" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_list = NULL;
+	item->di_tv.vval.v_list = ଖାଲି;
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
     ++list->lv_refcount;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a typval_T entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_tv(dict_T *d, char *key, typval_T *tv)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_tv(dict_T *d, ଅକ୍ଷର *ଚାବି, typval_T *tv)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     copy_tv(tv, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a callback to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_callback(dict_T *d, char *key, callback_T *cb)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_callback(dict_T *d, ଅକ୍ଷର *ଚାବି, callback_T *cb)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     put_callback(cb, &item->di_tv);
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
  * Add a function entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_func(dict_T *d, char *key, ufunc_T *fp)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_func(dict_T *d, ଅକ୍ଷର *ଚାବି, ufunc_T *fp)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     item->di_tv.v_type = VAR_FUNC;
     item->di_tv.vval.v_string = vim_strnsave(fp->uf_name, fp->uf_namelen);
     // Reference before dict_add() so dictitem_free()'s unref stays balanced on failure.
     func_ref(item->di_tv.vval.v_string);
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -569,12 +569,12 @@ dict_add_func(dict_T *d, char *key, ufunc_T *fp)
  * iterate over, no error is given.
  * NOTE: The dictionary must not change until iterating is finished!
  */
-    void
+    ଶୂନ୍ୟ
 dict_iterate_start(typval_T *var, dict_iterator_T *iter)
 {
-    if (var->v_type != VAR_DICT || var->vval.v_dict == NULL)
+    ଯଦି (var->v_type != VAR_DICT || var->vval.v_dict == ଖାଲି)
 	iter->dit_todo = 0;
-    else
+    ଅନ୍ୟଥା
     {
 	dict_T	*d = var->vval.v_dict;
 
@@ -596,45 +596,45 @@ dict_iterate_next(dict_iterator_T *iter, typval_T **tv_result)
     dictitem_T	*di;
     char_u      *result;
 
-    if (iter->dit_todo == 0)
-	return NULL;
+    ଯଦି (iter->dit_todo == 0)
+	ଫେରନ୍ତୁ ଖାଲି;
 
-    while (HASHITEM_EMPTY(iter->dit_hi))
+    ଯେତେବେଳେ (HASHITEM_EMPTY(iter->dit_hi))
 	++iter->dit_hi;
 
     di = HI2DI(iter->dit_hi);
-    result = di->di_key;
+    result = di->di_ଚାବି;
     *tv_result = &di->di_tv;
 
     --iter->dit_todo;
     ++iter->dit_hi;
-    return result;
+    ଫେରନ୍ତୁ result;
 }
 
 /*
  * Add a dict entry to dictionary "d".
  * Returns FAIL when out of memory and when key already exists.
  */
-    int
-dict_add_dict(dict_T *d, char *key, dict_T *dict)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_add_dict(dict_T *d, ଅକ୍ଷର *ଚାବି, dict_T *dict)
 {
     dictitem_T	*item;
 
-    item = dictitem_alloc((char_u *)key);
-    if (item == NULL)
-	return FAIL;
+    item = dictitem_alloc((char_u *)ଚାବି);
+    ଯଦି (item == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     item->di_tv.v_type = VAR_DICT;
     item->di_tv.vval.v_dict = dict;
-    if (dict_add(d, item) == FAIL)
+    ଯଦି (dict_add(d, item) == FAIL)
     {
 	// Detach "dict" so dictitem_free() does not unref it: on failure
 	// ownership stays with the caller.
-	item->di_tv.vval.v_dict = NULL;
+	item->di_tv.vval.v_dict = ଖାଲି;
 	dictitem_free(item);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
     ++dict->dv_refcount;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -643,9 +643,9 @@ dict_add_dict(dict_T *d, char *key, dict_T *dict)
     long
 dict_len(dict_T *d)
 {
-    if (d == NULL)
-	return 0L;
-    return (long)d->dv_hashtab.ht_used;
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ 0L;
+    ଫେରନ୍ତୁ (long)d->dv_hashtab.ht_used;
 }
 
 /*
@@ -654,62 +654,62 @@ dict_len(dict_T *d)
  * Returns NULL when not found.
  */
     dictitem_T *
-dict_find(dict_T *d, char_u *key, int len)
+dict_find(dict_T *d, char_u *ଚାବି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
 #define AKEYLEN 200
     char_u	buf[AKEYLEN];
     char_u	*akey;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ଖାଲି;
     hashitem_T	*hi;
 
-    if (d == NULL)
-	return NULL;
-    if (len < 0)
-	akey = key;
-    else if (len >= AKEYLEN)
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଯଦି (len < 0)
+	akey = ଚାବି;
+    ଅନ୍ୟଥା ଯଦି (len >= AKEYLEN)
     {
-	tofree = akey = vim_strnsave(key, len);
-	if (akey == NULL)
-	    return NULL;
+	tofree = akey = vim_strnsave(ଚାବି, len);
+	ଯଦି (akey == ଖାଲି)
+	    ଫେରନ୍ତୁ ଖାଲି;
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Avoid a malloc/free by using buf[].
-	mch_memmove(buf, key, (size_t)len);
+	mch_memmove(buf, ଚାବି, (size_t)len);
 	buf[len] = NUL;
 	akey = buf;
     }
 
     hi = hash_find(&d->dv_hashtab, akey);
     vim_free(tofree);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return HI2DI(hi);
+    ଯଦି (HASHITEM_EMPTY(hi))
+	ଫେରନ୍ତୁ ଖାଲି;
+    ଫେରନ୍ତୁ HI2DI(hi);
 }
 
 /*
  * Returns TRUE if "key" is present in Dictionary "d".
  */
-    int
-dict_has_key(dict_T *d, char *key)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_has_ଚାବି(dict_T *d, ଅକ୍ଷର *ଚାବି)
 {
-    return dict_find(d, (char_u *)key, -1) != NULL;
+    ଫେରନ୍ତୁ dict_find(d, (char_u *)ଚାବି, -1) != ଖାଲି;
 }
 
 /*
  * Get a typval_T item from a dictionary and copy it into "rettv".
  * Returns FAIL if the entry doesn't exist or out of memory.
  */
-    int
-dict_get_tv(dict_T *d, char *key, typval_T *rettv)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+dict_get_tv(dict_T *d, ଅକ୍ଷର *ଚାବି, typval_T *rettv)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return FAIL;
+    di = dict_find(d, (char_u *)ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ FAIL;
     copy_tv(&di->di_tv, rettv);
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -719,18 +719,18 @@ dict_get_tv(dict_T *d, char *key, typval_T *rettv)
  * Returns NULL if the entry doesn't exist or out of memory.
  */
     char_u *
-dict_get_string(dict_T *d, char *key, int save)
+dict_get_string(dict_T *d, ଅକ୍ଷର *ଚାବି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା save)
 {
     dictitem_T	*di;
     char_u	*s;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_find(d, (char_u *)ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
     s = tv_get_string(&di->di_tv);
-    if (save && s != NULL)
+    ଯଦି (save && s != ଖାଲି)
 	s = vim_strsave(s);
-    return s;
+    ଫେରନ୍ତୁ s;
 }
 
 /*
@@ -738,9 +738,9 @@ dict_get_string(dict_T *d, char *key, int save)
  * Returns 0 if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number(dict_T *d, char *key)
+dict_get_ସଂଖ୍ୟା(dict_T *d, ଅକ୍ଷର *ଚାବି)
 {
-    return dict_get_number_def(d, key, 0);
+    ଫେରନ୍ତୁ dict_get_ସଂଖ୍ୟା_def(d, ଚାବି, 0);
 }
 
 /*
@@ -748,14 +748,14 @@ dict_get_number(dict_T *d, char *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_number_def(dict_T *d, char *key, int def)
+dict_get_ସଂଖ୍ୟା_def(dict_T *d, ଅକ୍ଷର *ଚାବି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_number(&di->di_tv);
+    di = dict_find(d, (char_u *)ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ def;
+    ଫେରନ୍ତୁ tv_get_ସଂଖ୍ୟା(&di->di_tv);
 }
 
 /*
@@ -764,19 +764,19 @@ dict_get_number_def(dict_T *d, char *key, int def)
  * Give an error if the entry is not a number.
  */
     varnumber_T
-dict_get_number_check(dict_T *d, char_u *key)
+dict_get_ସଂଖ୍ୟା_check(dict_T *d, char_u *ଚାବି)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
-	return 0;
-    if (di->di_tv.v_type != VAR_NUMBER)
+    di = dict_find(d, ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ 0;
+    ଯଦି (di->di_tv.v_type != VAR_ସଂଖ୍ୟା)
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&di->di_tv));
-	return 0;
+	ଫେରନ୍ତୁ 0;
     }
-    return tv_get_number(&di->di_tv);
+    ଫେରନ୍ତୁ tv_get_ସଂଖ୍ୟା(&di->di_tv);
 }
 
 /*
@@ -784,14 +784,14 @@ dict_get_number_check(dict_T *d, char_u *key)
  * Returns "def" if the entry doesn't exist.
  */
     varnumber_T
-dict_get_bool(dict_T *d, char *key, int def)
+dict_get_bool(dict_T *d, ଅକ୍ଷର *ଚାବି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା def)
 {
     dictitem_T	*di;
 
-    di = dict_find(d, (char_u *)key, -1);
-    if (di == NULL)
-	return def;
-    return tv_get_bool(&di->di_tv);
+    di = dict_find(d, (char_u *)ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
+	ଫେରନ୍ତୁ def;
+    ଫେରନ୍ତୁ tv_get_bool(&di->di_tv);
 }
 
 /*
@@ -799,44 +799,44 @@ dict_get_bool(dict_T *d, char *key, int def)
  * May return NULL.
  */
     char_u *
-dict2string(typval_T *tv, int copyID, int restore_copyID)
+dict2string(typval_T *tv, ପୂର୍ଣ୍ଣସଂଖ୍ୟା copyID, ପୂର୍ଣ୍ଣସଂଖ୍ୟା restore_copyID)
 {
     garray_T	ga;
-    int		first = TRUE;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		first = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     hashitem_T	*hi;
     char_u	*s;
     dict_T	*d;
-    int		todo;
-    int		prev_lock;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		prev_lock;
 
-    if ((d = tv->vval.v_dict) == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    ଯଦି ((d = tv->vval.v_dict) == ଖାଲି)
+	ଫେରନ୍ତୁ ଖାଲି;
+    ga_init2(&ga, ଆକାର(ଅକ୍ଷର), 80);
     ga_append(&ga, '{');
 
     // Lock the dict, the string() method of an object item could remove an
     // item or make the hashtab resize while we iterate over it.
     prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
+    ଯଦି (d->dv_lock == 0)
 	d->dv_lock = VAR_LOCKED;
     hash_lock(&d->dv_hashtab);
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d->dv_hashtab.ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 
-	    if (first)
+	    ଯଦି (first)
 		first = FALSE;
-	    else
+	    ଅନ୍ୟଥା
 		GA_CONCAT_LITERAL(&ga, ", ");
 
-	    tofree = string_quote(hi->hi_key, FALSE);
-	    if (tofree != NULL)
+	    tofree = string_quote(hi->hi_ଚାବି, FALSE);
+	    ଯଦି (tofree != ଖାଲି)
 	    {
 		ga_concat(&ga, tofree);
 		vim_free(tofree);
@@ -844,58 +844,58 @@ dict2string(typval_T *tv, int copyID, int restore_copyID)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	    s = echo_string_core(&HI2DI(hi)->di_tv, &tofree, numbuf, copyID,
 						 FALSE, restore_copyID, TRUE);
-	    if (s != NULL)
+	    ଯଦି (s != ଖାଲି)
 		ga_concat(&ga, s);
 	    vim_free(tofree);
-	    if (s == NULL || did_echo_string_emsg)
-		break;
-	    line_breakcheck();
+	    ଯଦି (s == ଖାଲି || did_echo_string_emsg)
+		ଭାଙ୍ଗ;
+	    ଧାଡ଼ି_breakcheck();
 
 	}
     }
     hash_unlock(&d->dv_hashtab);
     d->dv_lock = prev_lock;
-    if (todo > 0)
+    ଯଦି (todo > 0)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	ଫେରନ୍ତୁ ଖାଲି;
     }
 
     ga_append(&ga, '}');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ଫେରନ୍ତୁ (char_u *)ga.ga_data;
 }
 
 /*
  * Advance over a literal key, including "-".  If the first character is not a
  * literal key character then "key" is returned.
  */
-    static char_u *
-skip_literal_key(char_u *key)
+    ସ୍ଥିର char_u *
+skip_literal_ଚାବି(char_u *ଚାବି)
 {
     char_u *p;
 
-    for (p = key; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
+    ପାଇଁ (p = ଚାବି; ASCII_ISALNUM(*p) || *p == '_' || *p == '-'; ++p)
 	;
-    return p;
+    ଫେରନ୍ତୁ p;
 }
 
 /*
  * Get the key for #{key: val} into "tv" and advance "arg".
  * Return FAIL when there is no valid key.
  */
-    static int
-get_literal_key_tv(char_u **arg, typval_T *tv)
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+get_literal_ଚାବି_tv(char_u **arg, typval_T *tv)
 {
-    char_u *p = skip_literal_key(*arg);
+    char_u *p = skip_literal_ଚାବି(*arg);
 
-    if (p == *arg)
-	return FAIL;
+    ଯଦି (p == *arg)
+	ଫେରନ୍ତୁ FAIL;
     tv->v_type = VAR_STRING;
     tv->vval.v_string = vim_strnsave(*arg, p - *arg);
 
     *arg = p;
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -907,36 +907,36 @@ get_literal_key_tv(char_u **arg, typval_T *tv)
  * "arg" is advanced to just after the key.
  */
     char_u *
-get_literal_key(char_u **arg)
+get_literal_ଚାବି(char_u **arg)
 {
-    char_u	*key;
+    char_u	*ଚାବି;
     char_u	*end;
     typval_T	rettv;
 
-    if (**arg == '\'')
+    ଯଦି (**arg == '\'')
     {
-	if (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	ଯଦି (eval_lit_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ଫେରନ୍ତୁ ଖାଲି;
+	ଚାବି = rettv.vval.v_string;
     }
-    else if (**arg == '"')
+    ଅନ୍ୟଥା ଯଦି (**arg == '"')
     {
-	if (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
-	    return NULL;
-	key = rettv.vval.v_string;
+	ଯଦି (eval_string(arg, &rettv, TRUE, FALSE) == FAIL)
+	    ଫେରନ୍ତୁ ଖାଲି;
+	ଚାବି = rettv.vval.v_string;
     }
-    else
+    ଅନ୍ୟଥା
     {
-	end = skip_literal_key(*arg);
-	if (end == *arg)
+	end = skip_literal_ଚାବି(*arg);
+	ଯଦି (end == *arg)
 	{
-	    semsg(_(e_invalid_key_str), *arg);
-	    return NULL;
+	    semsg(_(e_invalid_ଚାବି_str), *arg);
+	    ଫେରନ୍ତୁ ଖାଲି;
 	}
-	key = vim_strnsave(*arg, end - *arg);
+	ଚାବି = vim_strnsave(*arg, end - *arg);
 	*arg = end;
     }
-    return key;
+    ଫେରନ୍ତୁ ଚାବି;
 }
 
 /*
@@ -945,20 +945,20 @@ get_literal_key(char_u **arg)
  * "literal" is TRUE for #{key: val}
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
-eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, ପୂର୍ଣ୍ଣସଂଖ୍ୟା literal)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		evaluate = evalarg == ଖାଲି ? FALSE
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
-    dict_T	*d = NULL;
+    dict_T	*d = ଖାଲି;
     typval_T	tvkey;
     typval_T	tv;
-    char_u	*key = NULL;
+    char_u	*ଚାବି = ଖାଲି;
     dictitem_T	*item;
-    char_u	*curly_expr = skipwhite(*arg + 1);
+    char_u	*curly_ପଦସମଷ୍ଟି = skipwhite(*arg + 1);
     char_u	buf[NUMBUFLEN];
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		vim9script = in_vim9script();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		had_comma;
 
     // First check if it's not a curly-braces expression: {expr}.
     // Must do this without evaluating, otherwise a function may be called
@@ -966,53 +966,53 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
     // first item.
     // "{}" is an empty Dictionary.
     // "#{abc}" is never a curly-braces expression.
-    if (!vim9script
-	    && *curly_expr != '}'
+    ଯଦି (!vim9script
+	    && *curly_ପଦସମଷ୍ଟି != '}'
 	    && !literal
-	    && eval1(&curly_expr, &tv, NULL) == OK
-	    && *skipwhite(curly_expr) == '}')
-	return NOTDONE;
+	    && eval1(&curly_ପଦସମଷ୍ଟି, &tv, ଖାଲି) == OK
+	    && *skipwhite(curly_ପଦସମଷ୍ଟି) == '}')
+	ଫେରନ୍ତୁ NOTDONE;
 
-    if (evaluate)
+    ଯଦି (evaluate)
     {
 	d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
+	ଯଦି (d == ଖାଲି)
+	    ଫେରନ୍ତୁ FAIL;
     }
     tvkey.v_type = VAR_UNKNOWN;
     tv.v_type = VAR_UNKNOWN;
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != '}' && **arg != NUL)
+    ଯେତେବେଳେ (**arg != '}' && **arg != NUL)
     {
-	int	has_bracket = vim9script && **arg == '[';
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	has_bracket = vim9script && **arg == '[';
 
-	if (literal)
+	ଯଦି (literal)
 	{
-	    if (get_literal_key_tv(arg, &tvkey) == FAIL)
-		goto failret;
+	    ଯଦି (get_literal_ଚାବି_tv(arg, &tvkey) == FAIL)
+		ଯାଅ failret;
 	}
-	else if (vim9script && !has_bracket)
+	ଅନ୍ୟଥା ଯଦି (vim9script && !has_bracket)
 	{
-	    tvkey.vval.v_string = get_literal_key(arg);
-	    if (tvkey.vval.v_string == NULL)
-		goto failret;
+	    tvkey.vval.v_string = get_literal_ଚାବି(arg);
+	    ଯଦି (tvkey.vval.v_string == ଖାଲି)
+		ଯାଅ failret;
 	    tvkey.v_type = VAR_STRING;
 	}
-	else
+	ଅନ୍ୟଥା
 	{
-	    if (has_bracket)
+	    ଯଦି (has_bracket)
 		*arg = skipwhite(*arg + 1);
-	    if (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
-		goto failret;
-	    if (has_bracket)
+	    ଯଦି (eval1(arg, &tvkey, evalarg) == FAIL)	// recursive!
+		ଯାଅ failret;
+	    ଯଦି (has_bracket)
 	    {
 		*arg = skipwhite(*arg);
-		if (**arg != ']')
+		ଯଦି (**arg != ']')
 		{
-		    emsg(_(e_missing_matching_bracket_after_dict_key));
+		    emsg(_(e_missing_matching_bracket_after_dict_ଚାବି));
 		    clear_tv(&tvkey);
-		    goto failret;
+		    ଯାଅ failret;
 		}
 		++*arg;
 	    }
@@ -1020,67 +1020,67 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the colon should come right after the key, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	ଯଦି (!vim9script)
 	    *arg = skipwhite(*arg);
-	if (**arg != ':')
+	ଯଦି (**arg != ':')
 	{
-	    if (*skipwhite(*arg) == ':')
+	    ଯଦି (*skipwhite(*arg) == ':')
 		semsg(_(e_no_white_space_allowed_before_str_str), ":", *arg);
-	    else
+	    ଅନ୍ୟଥା
 		semsg(_(e_missing_colon_in_dictionary_str), *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ଯାଅ failret;
 	}
-	if (evaluate)
+	ଯଦି (evaluate)
 	{
-	    if (tvkey.v_type == VAR_FLOAT)
+	    ଯଦି (tvkey.v_type == VAR_FLOAT)
 	    {
 		tvkey.vval.v_string = typval_tostring(&tvkey, TRUE);
 		tvkey.v_type = VAR_STRING;
 	    }
-	    key = tv_get_string_buf_chk(&tvkey, buf);
-	    if (key == NULL)
+	    ଚାବି = tv_get_string_buf_chk(&tvkey, buf);
+	    ଯଦି (ଚାବି == ଖାଲି)
 	    {
 		// "key" is NULL when tv_get_string_buf_chk() gave an errmsg
 		clear_tv(&tvkey);
-		goto failret;
+		ଯାଅ failret;
 	    }
 	}
-	if (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
+	ଯଦି (vim9script && (*arg)[1] != NUL && !VIM_ISWHITE((*arg)[1]))
 	{
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg);
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ଯାଅ failret;
 	}
 
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	ଯଦି (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	{
 	    clear_tv(&tvkey);
-	    goto failret;
+	    ଯାଅ failret;
 	}
-	if (check_typval_is_value(&tv) == FAIL)
+	ଯଦି (check_typval_is_ମୂଲ୍ୟ(&tv) == FAIL)
 	{
 	    clear_tv(&tvkey);
 	    clear_tv(&tv);
-	    goto failret;
+	    ଯାଅ failret;
 	}
-	if (evaluate)
+	ଯଦି (evaluate)
 	{
-	    item = dict_find(d, key, -1);
-	    if (item != NULL)
+	    item = dict_find(d, ଚାବି, -1);
+	    ଯଦି (item != ଖାଲି)
 	    {
-		semsg(_(e_duplicate_key_in_dictionary_str), key);
+		semsg(_(e_duplicate_ଚାବି_in_dictionary_str), ଚାବି);
 		clear_tv(&tvkey);
 		clear_tv(&tv);
-		goto failret;
+		ଯାଅ failret;
 	    }
-	    item = dictitem_alloc(key);
-	    if (item != NULL)
+	    item = dictitem_alloc(ଚାବି);
+	    ଯଦି (item != ଖାଲି)
 	    {
 		item->di_tv = tv;
 		item->di_tv.v_lock = 0;
-		if (dict_add(d, item) == FAIL)
+		ଯଦି (dict_add(d, item) == FAIL)
 		    dictitem_free(item);
 	    }
 	}
@@ -1088,48 +1088,48 @@ eval_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int literal)
 
 	// the comma should come right after the value, but this wasn't checked
 	// previously, so only require it in Vim9 script.
-	if (!vim9script)
+	ଯଦି (!vim9script)
 	    *arg = skipwhite(*arg);
 	had_comma = **arg == ',';
-	if (had_comma)
+	ଯଦି (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
+	    ଯଦି (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		ଯାଅ failret;
 	    }
 	    *arg = skipwhite_and_nl(*arg + 1);
 	}
 
 	// the "}" can be on the next line
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == '}')
-	    break;
-	if (!had_comma)
+	ଯଦି (**arg == '}')
+	    ଭାଙ୍ଗ;
+	ଯଦି (!had_comma)
 	{
-	    if (**arg == ',')
+	    ଯଦି (**arg == ',')
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", *arg);
-	    else
+	    ଅନ୍ୟଥା
 		semsg(_(e_missing_comma_in_dictionary_str), *arg);
-	    goto failret;
+	    ଯାଅ failret;
 	}
     }
 
-    if (**arg != '}')
+    ଯଦି (**arg != '}')
     {
-	if (evalarg != NULL)
+	ଯଦି (evalarg != ଖାଲି)
 	    semsg(_(e_missing_dict_end_str), *arg);
 failret:
-	if (d != NULL)
+	ଯଦି (d != ଖାଲି)
 	    dict_free(d);
-	return FAIL;
+	ଫେରନ୍ତୁ FAIL;
     }
 
     *arg = *arg + 1;
-    if (evaluate)
+    ଯଦି (evaluate)
 	rettv_dict_set(rettv, d);
 
-    return OK;
+    ଫେରନ୍ତୁ OK;
 }
 
 /*
@@ -1138,25 +1138,25 @@ failret:
  * On return, "*arg" points to the character after the Dict.
  * Return OK or FAIL.  Returns NOTDONE for {expr}.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
-    int		vim9script = in_vim9script();
-    int		ret = OK;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		vim9script = in_vim9script();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ret = OK;
 
-    if (vim9script)
+    ଯଦି (vim9script)
     {
 	ret = vim9_bad_comment(*arg) ? FAIL : NOTDONE;
     }
-    else if ((*arg)[1] == '{')
+    ଅନ୍ୟଥା ଯଦି ((*arg)[1] == '{')
     {
 	++*arg;
 	ret = eval_dict(arg, rettv, evalarg, TRUE);
     }
-    else
+    ଅନ୍ୟଥା
 	ret = NOTDONE;
 
-    return ret;
+    ଫେରନ୍ତୁ ret;
 }
 
 /*
@@ -1167,83 +1167,83 @@ eval_lit_dict(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  * Otherwise duplicate keys are ignored ("action" is "keep").
  * "func_name" is used for reporting where an error occurred.
  */
-    void
-dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
+    ଶୂନ୍ୟ
+dict_extend(dict_T *d1, dict_T *d2, char_u *action, ଅକ୍ଷର *func_name)
 {
     dictitem_T	*di1;
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
     char_u	*arg_errmsg = (char_u *)N_("extend() argument");
     type_T	*type;
 
-    if (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
-	return;
+    ଯଦି (check_hashtab_frozen(&d1->dv_hashtab, "extend"))
+	ଫେରନ୍ତୁ;
 
-    if (*action == 'm')
+    ଯଦି (*action == 'm')
     {
-	if (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
-	    return;
+	ଯଦି (check_hashtab_frozen(&d2->dv_hashtab, "extend"))
+	    ଫେରନ୍ତୁ;
 	hash_lock(&d2->dv_hashtab);  // don't rehash on hash_remove()
     }
 
-    if (d1->dv_type != NULL && d1->dv_type->tt_member != NULL)
+    ଯଦି (d1->dv_type != ଖାଲି && d1->dv_type->tt_member != ଖାଲି)
 	type = d1->dv_type->tt_member;
-    else
-	type = NULL;
+    ଅନ୍ୟଥା
+	type = ଖାଲି;
 
-    todo = (int)d2->dv_hashtab.ht_used;
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d2->dv_hashtab.ht_used;
     hashitem_T *hi2;
-    FOR_ALL_HASHTAB_ITEMS(&d2->dv_hashtab, hi2, todo)
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d2->dv_hashtab, hi2, todo)
     {
-	if (!HASHITEM_EMPTY(hi2))
+	ଯଦି (!HASHITEM_EMPTY(hi2))
 	{
 	    --todo;
-	    di1 = dict_find(d1, hi2->hi_key, -1);
+	    di1 = dict_find(d1, hi2->hi_ଚାବି, -1);
 	    // Check the key to be valid when adding to any scope.
-	    if (d1->dv_scope != 0 && !valid_varname(hi2->hi_key, -1, TRUE))
-		break;
+	    ଯଦି (d1->dv_scope != 0 && !valid_varname(hi2->hi_ଚାବି, -1, TRUE))
+		ଭାଙ୍ଗ;
 
-	    if (type != NULL
+	    ଯଦି (type != ଖାଲି
 		     && check_typval_arg_type(type, &HI2DI(hi2)->di_tv,
 							 func_name, 0) == FAIL)
-		break;
+		ଭାଙ୍ଗ;
 
-	    if (di1 == NULL)
+	    ଯଦି (di1 == ଖାଲି)
 	    {
-		if (*action == 'm')
+		ଯଦି (*action == 'm')
 		{
 		    // Cheap way to move a dict item from "d2" to "d1".
 		    // If dict_add() fails then "d2" won't be empty.
 		    di1 = HI2DI(hi2);
-		    if (dict_add(d1, di1) == OK)
+		    ଯଦି (dict_add(d1, di1) == OK)
 			hash_remove(&d2->dv_hashtab, hi2, "extend");
 		}
-		else
+		ଅନ୍ୟଥା
 		{
 		    di1 = dictitem_copy(HI2DI(hi2));
-		    if (di1 != NULL && dict_add(d1, di1) == FAIL)
+		    ଯଦି (di1 != ଖାଲି && dict_add(d1, di1) == FAIL)
 			dictitem_free(di1);
 		}
 	    }
-	    else if (*action == 'e')
+	    ଅନ୍ୟଥା ଯଦି (*action == 'e')
 	    {
-		semsg(_(e_key_already_exists_str), hi2->hi_key);
-		break;
+		semsg(_(e_ଚାବି_already_exists_str), hi2->hi_ଚାବି);
+		ଭାଙ୍ଗ;
 	    }
-	    else if (*action == 'f' && HI2DI(hi2) != di1)
+	    ଅନ୍ୟଥା ଯଦି (*action == 'f' && HI2DI(hi2) != di1)
 	    {
-		if (value_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
+		ଯଦି (ମୂଲ୍ୟ_check_lock(di1->di_tv.v_lock, arg_errmsg, TRUE)
 			|| var_check_ro(di1->di_flags, arg_errmsg, TRUE))
-		    break;
+		    ଭାଙ୍ଗ;
 		// Disallow replacing a builtin function.
-		if (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_key))
-		    break;
+		ଯଦି (dict_wrong_func_name(d1, &HI2DI(hi2)->di_tv, hi2->hi_ଚାବି))
+		    ଭାଙ୍ଗ;
 		clear_tv(&di1->di_tv);
 		copy_tv(&HI2DI(hi2)->di_tv, &di1->di_tv);
 	    }
 	}
     }
 
-    if (*action == 'm')
+    ଯଦି (*action == 'm')
 	hash_unlock(&d2->dv_hashtab);
 }
 
@@ -1253,46 +1253,46 @@ dict_extend(dict_T *d1, dict_T *d2, char_u *action, char *func_name)
     dictitem_T *
 dict_lookup(hashitem_T *hi)
 {
-    return HI2DI(hi);
+    ଫେରନ୍ତୁ HI2DI(hi);
 }
 
 /*
  * Return TRUE when two dictionaries have exactly the same key/values.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 dict_equal(
     dict_T	*d1,
     dict_T	*d2,
-    int		ic)	    // ignore case for strings
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ic)	    // ignore case for strings
 {
     hashitem_T	*hi;
     dictitem_T	*item2;
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
 
-    if (d1 == d2)
-	return TRUE;
-    if (dict_len(d1) != dict_len(d2))
-	return FALSE;
-    if (dict_len(d1) == 0)
+    ଯଦି (d1 == d2)
+	ଫେରନ୍ତୁ TRUE;
+    ଯଦି (dict_len(d1) != dict_len(d2))
+	ଫେରନ୍ତୁ FALSE;
+    ଯଦି (dict_len(d1) == 0)
 	// empty and NULL dicts are considered equal
-	return TRUE;
-    if (d1 == NULL || d2 == NULL)
-	return FALSE;
+	ଫେରନ୍ତୁ TRUE;
+    ଯଦି (d1 == ଖାଲି || d2 == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
 
-    todo = (int)d1->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d1->dv_hashtab, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d1->dv_hashtab.ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d1->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
-	    item2 = dict_find(d2, hi->hi_key, -1);
-	    if (item2 == NULL)
-		return FALSE;
-	    if (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
-		return FALSE;
+	    item2 = dict_find(d2, hi->hi_ଚାବି, -1);
+	    ଯଦି (item2 == ଖାଲି)
+		ଫେରନ୍ତୁ FALSE;
+	    ଯଦି (!tv_equal(&HI2DI(hi)->di_tv, &item2->di_tv, ic))
+		ଫେରନ୍ତୁ FALSE;
 	    --todo;
 	}
     }
-    return TRUE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -1300,110 +1300,110 @@ dict_equal(
  * if "ic" is TRUE.
  */
     long
-dict_count(dict_T *d, typval_T *needle, int ic)
+dict_ଗଣନା(dict_T *d, typval_T *needle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ic)
 {
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
     hashitem_T	*hi;
     long	n = 0;
 
-    if (d == NULL)
-	return 0;
+    ଯଦି (d == ଖାଲି)
+	ଫେରନ୍ତୁ 0;
 
-    todo = (int)d->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d->dv_hashtab.ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
-	    if (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
+	    ଯଦି (tv_equal(&HI2DI(hi)->di_tv, needle, ic))
 		++n;
 	}
     }
 
-    return n;
+    ଫେରନ୍ତୁ n;
 }
 
 /*
  * extend() a Dict. Append Dict argvars[1] to Dict argvars[0] and return the
  * resulting Dict in "rettv".  "is_new" is TRUE for extendnew().
  */
-    void
+    ଶୂନ୍ୟ
 dict_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	ଅକ୍ଷର		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		is_new,
 	typval_T	*rettv)
 {
     dict_T	*d1, *d2;
     char_u	*action;
-    int	i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	i;
 
     d1 = argvars[0].vval.v_dict;
-    if (d1 == NULL)
+    ଯଦି (d1 == ଖାଲି)
     {
 	emsg(_(e_cannot_extend_null_dict));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
-    if (!is_new && value_check_lock(d1->dv_lock, arg_errmsg, TRUE))
-	return;
+    ଯଦି (!is_new && ମୂଲ୍ୟ_check_lock(d1->dv_lock, arg_errmsg, TRUE))
+	ଫେରନ୍ତୁ;
 
-    if (is_new)
+    ଯଦି (is_new)
     {
 	d1 = dict_copy(d1, FALSE, TRUE, get_copyID());
-	if (d1 == NULL)
-	    return;
+	ଯଦି (d1 == ଖାଲି)
+	    ଫେରନ୍ତୁ;
     }
 
     d2 = argvars[1].vval.v_dict;
-    if (d2 == NULL)
-	goto theend;
+    ଯଦି (d2 == ଖାଲି)
+	ଯାଅ theend;
 
     // Check the third argument.
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
-	static char *(av[]) = {"keep", "force", "error"};
+	ସ୍ଥିର ଅକ୍ଷର *(av[]) = {"keep", "force", "error"};
 
 	action = tv_get_string_chk(&argvars[2]);
-	if (action == NULL)
+	ଯଦି (action == ଖାଲି)
 	{
-	    if (is_new)
+	    ଯଦି (is_new)
 		dict_unref(d1);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
-	for (i = 0; i < 3; ++i)
-	    if (STRCMP(action, av[i]) == 0)
-		break;
-	if (i == 3)
+	ପାଇଁ (i = 0; i < 3; ++i)
+	    ଯଦି (STRCMP(action, av[i]) == 0)
+		ଭାଙ୍ଗ;
+	ଯଦି (i == 3)
 	{
-	    if (is_new)
+	    ଯଦି (is_new)
 		dict_unref(d1);
 	    semsg(_(e_invalid_argument_str), action);
-	    return;
+	    ଫେରନ୍ତୁ;
 	}
     }
-    else
+    ଅନ୍ୟଥା
 	action = (char_u *)"force";
 
-    if (type != NULL && check_typval_arg_type(type, &argvars[1],
+    ଯଦି (type != ଖାଲି && check_typval_arg_type(type, &argvars[1],
 							 func_name, 2) == FAIL)
     {
-	if (is_new)
+	ଯଦି (is_new)
 	    dict_unref(d1);
-	return;
+	ଫେରନ୍ତୁ;
     }
     dict_extend(d1, d2, action, func_name);
 
 theend:
-    if (is_new)
+    ଯଦି (is_new)
     {
 	rettv->v_type = VAR_DICT;
 	rettv->vval.v_dict = d1;
 	rettv->v_lock = FALSE;
     }
-    else
+    ଅନ୍ୟଥା
 	copy_tv(&argvars[0], rettv);
 }
 
@@ -1411,160 +1411,160 @@ theend:
  * Implementation of map(), filter(), foreach() for a Dict.  Apply "expr" to
  * every item in Dict "d" and return the result in "rettv".
  */
-    void
+    ଶୂନ୍ୟ
 dict_filter_map(
 	dict_T		*d,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	ଅକ୍ଷର		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*ପଦସମଷ୍ଟି,
 	typval_T	*rettv)
 {
-    dict_T	*d_ret = NULL;
+    dict_T	*d_ret = ଖାଲି;
     hashtab_T	*ht;
     hashitem_T	*hi;
     dictitem_T	*di;
-    int		todo;
-    int		rem;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ଯଦି (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_DICT;
-	rettv->vval.v_dict = NULL;
+	rettv->vval.v_dict = ଖାଲି;
     }
-    if (d == NULL
+    ଯଦି (d == ଖାଲି
 	  || (filtermap == FILTERMAP_FILTER
-			&& value_check_lock(d->dv_lock, arg_errmsg, TRUE)))
-	return;
+			&& ମୂଲ୍ୟ_check_lock(d->dv_lock, arg_errmsg, TRUE)))
+	ଫେରନ୍ତୁ;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    ଯଦି (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_dict_alloc(rettv) == FAIL)
-	    return;
+	ଯଦି (rettv_dict_alloc(rettv) == FAIL)
+	    ଫେରନ୍ତୁ;
 	d_ret = rettv->vval.v_dict;
     }
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_ପଦସମଷ୍ଟି_get_funccal(ପଦସମଷ୍ଟି, &newtv);
 
-    int prev_lock = d->dv_lock;
-    if (d->dv_lock == 0)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା prev_lock = d->dv_lock;
+    ଯଦି (d->dv_lock == 0)
 	d->dv_lock = VAR_LOCKED;
     ht = &d->dv_hashtab;
     hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ht->ht_used;
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
-	    int		r;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		r;
 
 	    --todo;
 	    di = HI2DI(hi);
-	    if (filtermap == FILTERMAP_MAP
-		    && (value_check_lock(di->di_tv.v_lock,
+	    ଯଦି (filtermap == FILTERMAP_MAP
+		    && (ମୂଲ୍ୟ_check_lock(di->di_tv.v_lock,
 			    arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags,
 			    arg_errmsg, TRUE)))
-		break;
-	    set_vim_var_string(VV_KEY, di->di_key, -1);
-	    r = filter_map_one(&di->di_tv, expr, filtermap, fc, &newtv, &rem);
-	    clear_tv(get_vim_var_tv(VV_KEY));
-	    if (r == FAIL || did_emsg)
+		ଭାଙ୍ଗ;
+	    set_vim_var_string(VV_ଚାବି, di->di_ଚାବି, -1);
+	    r = filter_map_one(&di->di_tv, ପଦସମଷ୍ଟି, filtermap, fc, &newtv, &rem);
+	    clear_tv(get_vim_var_tv(VV_ଚାବି));
+	    ଯଦି (r == FAIL || did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		ଭାଙ୍ଗ;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    ଯଦି (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		ଯଦି (argtype != ଖାଲି && check_typval_arg_type(
 			     argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    ଭାଙ୍ଗ;
 		}
 		// map(): replace the dict item value
 		clear_tv(&di->di_tv);
 		newtv.v_lock = 0;
 		di->di_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    ଅନ୍ୟଥା ଯଦି (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): add the item value to the new dict
-		r = dict_add_tv(d_ret, (char *)di->di_key, &newtv);
+		r = dict_add_tv(d_ret, (ଅକ୍ଷର *)di->di_ଚାବି, &newtv);
 		clear_tv(&newtv);
-		if (r == FAIL)
-		    break;
+		ଯଦି (r == FAIL)
+		    ଭାଙ୍ଗ;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    ଅନ୍ୟଥା ଯଦି (filtermap == FILTERMAP_FILTER && rem)
 	    {
 		// filter(false): remove the item from the dict
-		if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+		ଯଦି (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 			|| var_check_ro(di->di_flags, arg_errmsg, TRUE))
-		    break;
+		    ଭାଙ୍ଗ;
 		dictitem_remove(d, di, "filter");
 	    }
 	}
     }
     hash_unlock(ht);
     d->dv_lock = prev_lock;
-    if (fc != NULL)
+    ଯଦି (fc != ଖାଲି)
 	remove_funccal();
 }
 
 /*
  * "remove({dict})" function
  */
-    void
+    ଶୂନ୍ୟ
 dict_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     dict_T	*d;
-    char_u	*key;
+    char_u	*ଚାବି;
     dictitem_T	*di;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ଯଦି (argvars[2].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments_for_function_str), "remove()");
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     d = argvars[0].vval.v_dict;
-    if (d == NULL || value_check_lock(d->dv_lock, arg_errmsg, TRUE))
-	return;
+    ଯଦି (d == ଖାଲି || ମୂଲ୍ୟ_check_lock(d->dv_lock, arg_errmsg, TRUE))
+	ଫେରନ୍ତୁ;
 
-    key = tv_get_string_chk(&argvars[1]);
-    if (key == NULL)
-	return;
+    ଚାବି = tv_get_string_chk(&argvars[1]);
+    ଯଦି (ଚାବି == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    di = dict_find(d, key, -1);
-    if (di == NULL)
+    di = dict_find(d, ଚାବି, -1);
+    ଯଦି (di == ଖାଲି)
     {
-	semsg(_(e_key_not_present_in_dictionary_str), key);
-	return;
+	semsg(_(e_ଚାବି_not_present_in_dictionary_str), ଚାବି);
+	ଫେରନ୍ତୁ;
     }
 
-    if (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
+    ଯଦି (var_check_fixed(di->di_flags, arg_errmsg, TRUE)
 	    || var_check_ro(di->di_flags, arg_errmsg, TRUE))
-	return;
+	ଫେରନ୍ତୁ;
 
     *rettv = di->di_tv;
     init_tv(&di->di_tv);
     dictitem_remove(d, di, "remove()");
 }
 
-typedef enum {
-    DICT2LIST_KEYS,
-    DICT2LIST_VALUES,
-    DICT2LIST_ITEMS,
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା {
+    DICT2_LIST_ଚାବିଗୁଡ଼ିକ,
+    DICT2_LIST_ମୂଲ୍ୟଗୁଡ଼ିକ,
+    DICT2_LIST_ବସ୍ତୁଗୁଡ଼ିକ,
 } dict2list_T;
 
 /*
  * Turn a dict into a list.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
 {
     list_T	*l;
@@ -1573,122 +1573,122 @@ dict2list(typval_T *argvars, typval_T *rettv, dict2list_T what)
     hashitem_T	*hi;
     listitem_T	*li;
     dict_T	*d;
-    int		todo;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
+    ଯଦି (check_for_dict_arg(argvars, 0) == FAIL)
     {
 	// invalid argument, return an empty list
-	(void)rettv_list_alloc(rettv);
-	return;
+	(ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	ଫେରନ୍ତୁ;
     }
 
     // NULL dict behaves like an empty dict
     d = argvars[0].vval.v_dict;
-    todo = d == NULL ? 0 : (int)d->dv_hashtab.ht_used;
+    todo = d == ଖାଲି ? 0 : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)d->dv_hashtab.ht_used;
 
     // The number of items is known, allocate the list and all its items in
     // one go for efficiency.
-    l = list_alloc_with_items(todo);
-    if (l == NULL)
+    l = list_alloc_with_ବସ୍ତୁଗୁଡ଼ିକ(todo);
+    ଯଦି (l == ଖାଲି)
     {
-	(void)rettv_list_alloc(rettv);
-	return;
+	(ଶୂନ୍ୟ)rettv_list_alloc(rettv);
+	ଫେରନ୍ତୁ;
     }
     rettv_list_set(rettv, l);
-    if (todo == 0)
+    ଯଦି (todo == 0)
 	// NULL or empty dict, return the empty list
-	return;
+	ଫେରନ୍ତୁ;
 
     li = l->lv_first;
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ଯଦି (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
 
-	    if (what == DICT2LIST_KEYS)
+	    ଯଦି (what == DICT2_LIST_ଚାବିଗୁଡ଼ିକ)
 	    {
 		// keys()
 		li->li_tv.v_type = VAR_STRING;
 		li->li_tv.v_lock = 0;
-		li->li_tv.vval.v_string = vim_strsave(di->di_key);
+		li->li_tv.vval.v_string = vim_strsave(di->di_ଚାବି);
 	    }
-	    else if (what == DICT2LIST_VALUES)
+	    ଅନ୍ୟଥା ଯଦି (what == DICT2_LIST_ମୂଲ୍ୟଗୁଡ଼ିକ)
 	    {
 		// values()
 		copy_tv(&di->di_tv, &li->li_tv);
 	    }
-	    else
+	    ଅନ୍ୟଥା
 	    {
 		// items()
-		l2 = list_alloc_with_items(2);
+		l2 = list_alloc_with_ବସ୍ତୁଗୁଡ଼ିକ(2);
 		li->li_tv.v_type = VAR_LIST;
 		li->li_tv.v_lock = 0;
 		li->li_tv.vval.v_list = l2;
-		if (l2 == NULL)
-		    goto alloc_failed;
+		ଯଦି (l2 == ଖାଲି)
+		    ଯାଅ alloc_failed;
 		++l2->lv_refcount;
 
 		l2->lv_first->li_tv.v_type = VAR_STRING;
-		l2->lv_first->li_tv.vval.v_string = vim_strsave(di->di_key);
-		if (l2->lv_first->li_tv.vval.v_string == NULL)
-		    goto alloc_failed;
+		l2->lv_first->li_tv.vval.v_string = vim_strsave(di->di_ଚାବି);
+		ଯଦି (l2->lv_first->li_tv.vval.v_string == ଖାଲି)
+		    ଯାଅ alloc_failed;
 		copy_tv(&di->di_tv, &l2->lv_u.mat.lv_last->li_tv);
 	    }
 	    li = li->li_next;
 	}
     }
-    return;
+    ଫେରନ୍ତୁ;
 
 alloc_failed:
     // On a memory allocation failure some of the pre-allocated items may be
     // left unset; free the whole list and return an empty one instead.
     list_unref(l);
-    (void)rettv_list_alloc(rettv);
+    (ଶୂନ୍ୟ)rettv_list_alloc(rettv);
 }
 
 /*
  * "items(dict)" function
  */
-    void
+    ଶୂନ୍ୟ
 dict2items(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_ITEMS);
+    dict2list(argvars, rettv, DICT2_LIST_ବସ୍ତୁଗୁଡ଼ିକ);
 }
 
 /*
  * "keys()" function
  */
-    void
-f_keys(typval_T *argvars, typval_T *rettv)
+    ଶୂନ୍ୟ
+f_ଚାବିଗୁଡ଼ିକ(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_KEYS);
+    dict2list(argvars, rettv, DICT2_LIST_ଚାବିଗୁଡ଼ିକ);
 }
 
 /*
  * "values(dict)" function
  */
-    void
-f_values(typval_T *argvars, typval_T *rettv)
+    ଶୂନ୍ୟ
+f_ମୂଲ୍ୟଗୁଡ଼ିକ(typval_T *argvars, typval_T *rettv)
 {
-    dict2list(argvars, rettv, DICT2LIST_VALUES);
+    dict2list(argvars, rettv, DICT2_LIST_ମୂଲ୍ୟଗୁଡ଼ିକ);
 }
 
 /*
  * Make each item in the dict readonly (not the value of the item).
  */
-    void
-dict_set_items_ro(dict_T *di)
+    ଶୂନ୍ୟ
+dict_set_ବସ୍ତୁଗୁଡ଼ିକ_ro(dict_T *di)
 {
-    int		todo = (int)di->dv_hashtab.ht_used;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		todo = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)di->dv_hashtab.ht_used;
     hashitem_T	*hi;
 
     // Set readonly
-    FOR_ALL_HASHTAB_ITEMS(&di->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_ବସ୍ତୁଗୁଡ଼ିକ(&di->dv_hashtab, hi, todo)
     {
-	if (HASHITEM_EMPTY(hi))
-	    continue;
+	ଯଦି (HASHITEM_EMPTY(hi))
+	    ଜାରି;
 	--todo;
 	HI2DI(hi)->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
     }
@@ -1697,22 +1697,22 @@ dict_set_items_ro(dict_T *di)
 /*
  * "has_key()" function
  */
-    void
-f_has_key(typval_T *argvars, typval_T *rettv)
+    ଶୂନ୍ୟ
+f_has_ଚାବି(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ଯଦି (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_string_or_ସଂଖ୍ୟା_arg(argvars, 1) == FAIL))
+	ଫେରନ୍ତୁ;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    ଯଦି (check_for_dict_arg(argvars, 0) == FAIL)
+	ଫେରନ୍ତୁ;
 
-    if (argvars[0].vval.v_dict == NULL)
-	return;
+    ଯଦି (argvars[0].vval.v_dict == ଖାଲି)
+	ଫେରନ୍ତୁ;
 
-    rettv->vval.v_number = dict_has_key(argvars[0].vval.v_dict,
-				(char *)tv_get_string(&argvars[1]));
+    rettv->vval.v_ସଂଖ୍ୟା = dict_has_ଚାବି(argvars[0].vval.v_dict,
+				(ଅକ୍ଷର *)tv_get_string(&argvars[1]));
 }
 
 #endif // defined(FEAT_EVAL)

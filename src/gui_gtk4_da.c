@@ -7,63 +7,63 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ଅନ୍ତର୍ଭାଵ "vim.h"
 
-#include <gtk/gtk.h>
-#include "gui_gtk4_da.h"
+#ଅନ୍ତର୍ଭାଵ <gtk/gtk.h>
+#ଅନ୍ତର୍ଭାଵ "gui_gtk4_da.h"
 
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Used for sign icons and netbeans multisign indicator. It is in a DrawGlyphs
  * so that it can move/be manipulated with the text.
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     GdkTexture	*texture;
-    int		width;
-    int		height;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		height;
 } DrawSign;
 #endif
 
 /*
  * Temporary struct when drawing string representing visual attributes of a cell
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     uint32_t	bg_color;
     uint32_t	fg_color;   // Only used for underlines
     uint32_t	sp_color;
-    int		draw_flags; // DRAW_* flags, only DRAW_UNDERL, DRAW_UNDERC, and
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		draw_flags; // DRAW_* flags, only DRAW_UNDERL, DRAW_UNDERC, and
 			    // DRAW_STRIKE are used.
 } DrawAttr;
 
 /*
  * Represents the glyphs of a single cell.
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    int refcount;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା refcount;
 
     uint32_t	fg_color;
     PangoFont	*font;
     // If "font" is NULL, "dsign" is used, otherwise "glyphs" is used.
-    union
+    ସଂଘ
     {
 	PangoGlyphInfo  *glyphs; // May be NULL
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 	DrawSign	*dsign;
 #endif
     };
-    int n_glyphs;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_glyphs;
 } DrawGlyphs;
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     DrawGlyphs *dglyphs;
 } DrawCell;
 
-typedef enum
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଗଣନା
 {
     DRAW_LAYER_BACKGROUND,  // Background color, buf stores bg color
     DRAW_LAYER_TEXT,	    // Text glyphs + underline, buf stores fg color (for
@@ -74,9 +74,9 @@ typedef enum
     N_DRAW_LAYERS
 } DrawLayerType;
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
-    GskRenderNode   *node;
+    Gsk_Render_ଗଣ୍ଠି   *ଗଣ୍ଠି;
     gboolean	    dirty;
 
     // RGBA buffer, pixel size is number of cells in the row. Note that for the
@@ -88,57 +88,57 @@ typedef struct
 #define UNDERC_OFFSET(n_cols) (0)
 #define STRIKE_OFFSET(n_cols) (n_cols)
 
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     DrawLayer	dlayers[N_DRAW_LAYERS];
     DrawCell	*cells;
-    int		n_cells; // For convenience
-    int		row;	 // For convenience
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_cells; // For convenience
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row;	 // For convenience
 
     // Pre generated mask of of under decorations
-    GskRenderNode *underl_mask;
-    GskRenderNode *underc_mask;
-    GskRenderNode *strike_mask;
+    Gsk_Render_ଗଣ୍ଠି *underl_mask;
+    Gsk_Render_ଗଣ୍ଠି *underc_mask;
+    Gsk_Render_ଗଣ୍ଠି *strike_mask;
 } DrawRow;
 
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End) \
-    do { \
+#define ଭର୍ତ୍ତି_PANGO_ATTR(Attribute, AttrList, Start, End) \
+    କର { \
 	PangoAttribute *tmp_attr_; \
 	tmp_attr_ = (Attribute); \
 	tmp_attr_->start_index = (Start); \
 	tmp_attr_->end_index = (End); \
-	pango_attr_list_insert((AttrList), tmp_attr_); \
-    } while (FALSE)
+	pango_attr_list_ଭର୍ତ୍ତି((AttrList), tmp_attr_); \
+    } ଯେତେବେଳେ (FALSE)
 #define CELLS2PANGO(c) ((c) * gui.char_width * PANGO_SCALE)
 
 /*
  * Attributes of cursor
  */
-typedef struct
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ସଂରଚନା
 {
     gboolean draw; // If cursor should be drawn
-    int width;
-    int height;
-    int n_cells; // Cells covered, 2 for a double width character
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା height;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_cells; // Cells covered, 2 for a double width character
     GdkRGBA bg_color;
     GdkRGBA fg_color;
 } DrawCursor;
 
-struct _VimDrawArea
+ସଂରଚନା _VimDrawArea
 {
     GtkWidget parent;
 
     DrawRow *rows;
 
-    int n_rows;
-    int	n_cols;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_rows;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	n_cols;
 
-    int	bleed_right;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	bleed_ଡାହାଣ;
 
     // Used for snapshot vfunc call when rendering text, kept around so there is
     // no need to allocate a new one each time.
     GArray	*glyph_buf;
-    GPtrArray	*node_buf;
+    GPtrArray	*ଗଣ୍ଠି_buf;
 
     DrawCursor cursor;
 
@@ -148,27 +148,27 @@ struct _VimDrawArea
 #endif
 };
 
-static void draw_row_init(DrawRow *drow, int row, int cols);
-static void draw_row_clear(DrawRow *drow);
-static void draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t);
-static void vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
+ସ୍ଥିର ଶୂନ୍ୟ draw_row_init(DrawRow *drow, ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols);
+ସ୍ଥିର ଶୂନ୍ୟ draw_row_clear(DrawRow *drow);
+ସ୍ଥିର ଶୂନ୍ୟ draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t);
+ସ୍ଥିର ଶୂନ୍ୟ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
 
-static GdkRGBA white_rgba = {1, 1, 1, 1};
+ସ୍ଥିର GdkRGBA white_rgba = {1, 1, 1, 1};
 
 G_DEFINE_TYPE(VimDrawArea, vim_draw_area, GTK_TYPE_WIDGET)
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 vim_draw_area_finalize(GObject *obj)
 {
     VimDrawArea *self = VIM_DRAW_AREA(obj);
 
     vim_draw_area_clear(self);
-    for (int r = 0; r < self->n_rows; r++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < self->n_rows; r++)
 	draw_row_clear(self->rows + r);
     g_free(self->rows);
 
     g_array_free(self->glyph_buf, TRUE);
-    g_ptr_array_free(self->node_buf, TRUE);
+    g_ptr_array_free(self->ଗଣ୍ଠି_buf, TRUE);
 
 #ifdef FEAT_IMAGE_GUI
     g_hash_table_unref(self->external);
@@ -177,7 +177,7 @@ vim_draw_area_finalize(GObject *obj)
     G_OBJECT_CLASS(vim_draw_area_parent_class)->finalize(obj);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 vim_draw_area_class_init(VimDrawAreaClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -191,43 +191,43 @@ vim_draw_area_class_init(VimDrawAreaClass *class)
     gtk_widget_class_set_layout_manager_type(widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 vim_draw_area_init(VimDrawArea *self)
 {
-    self->bleed_right = -1;
+    self->bleed_ଡାହାଣ = -1;
 #ifdef FEAT_IMAGE_GUI
     self->external = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-	    NULL, (GDestroyNotify)gsk_render_node_unref);
+	    ଖାଲି, (GDestroyNotify)gsk_render_ଗଣ୍ଠି_unref);
 #endif
-    self->glyph_buf = g_array_new(FALSE, FALSE, sizeof(PangoGlyphInfo));
-    self->node_buf = g_ptr_array_new_with_free_func(
-	    (GDestroyNotify)gsk_render_node_unref);
+    self->glyph_buf = g_array_new(FALSE, FALSE, ଆକାର(PangoGlyphInfo));
+    self->ଗଣ୍ଠି_buf = g_ptr_array_new_with_free_func(
+	    (GDestroyNotify)gsk_render_ଗଣ୍ଠି_unref);
 
 }
 
     GtkWidget *
-vim_draw_area_new(void)
+vim_draw_area_new(ଶୂନ୍ୟ)
 {
-    return g_object_new(VIM_TYPE_DRAW_AREA, NULL);
+    ଫେରନ୍ତୁ g_object_new(VIM_TYPE_DRAW_AREA, ଖାଲି);
 }
 
 /*
  * Set the size of the draw area to "rows" and "cols".
  */
-    void
-vim_draw_area_set_size(VimDrawArea *self, int rows, int cols)
+    ଶୂନ୍ୟ
+vim_draw_area_set_size(VimDrawArea *self, ପୂର୍ଣ୍ଣସଂଖ୍ୟା rows, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols)
 {
-    if (self->rows != NULL && self->n_rows == rows && self->n_cols == cols)
-	return;
-    if (rows == 0 || cols == 0)
-	return;
+    ଯଦି (self->rows != ଖାଲି && self->n_rows == rows && self->n_cols == cols)
+	ଫେରନ୍ତୁ;
+    ଯଦି (rows == 0 || cols == 0)
+	ଫେରନ୍ତୁ;
 
     vim_draw_area_clear(self);
 
-    for (int r = 0; r < self->n_rows; r++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < self->n_rows; r++)
 	draw_row_clear(self->rows + r);
-    self->rows = g_realloc_n(self->rows, rows, sizeof(DrawRow));
-    for (int r = 0; r < rows; r++)
+    self->rows = g_realloc_n(self->rows, rows, ଆକାର(DrawRow));
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < rows; r++)
 	draw_row_init(self->rows + r, r, cols);
 
     self->n_rows = rows;
@@ -237,26 +237,26 @@ vim_draw_area_set_size(VimDrawArea *self, int rows, int cols)
 /*
  * Convert the GdkRGBA to a packed uint32_t.
  */
-    static uint32_t
-rgba_to_u32(const GdkRGBA *rgba)
+    ସ୍ଥିର uint32_t
+rgba_to_u32(ଅଚଳ GdkRGBA *rgba)
 {
-    union { uint32_t val; uint8_t bytes[4]; } color;
+    ସଂଘ { uint32_t val; uint8_t bytes[4]; } color;
 
     color.bytes[0] = (uint8_t)(CLAMP(rgba->red,   0.0, 1.0) * 255.0 + 0.5);
     color.bytes[1] = (uint8_t)(CLAMP(rgba->green, 0.0, 1.0) * 255.0 + 0.5);
     color.bytes[2] = (uint8_t)(CLAMP(rgba->blue,  0.0, 1.0) * 255.0 + 0.5);
     color.bytes[3] = (uint8_t)(CLAMP(rgba->alpha, 0.0, 1.0) * 255.0 + 0.5);
 
-    return color.val;
+    ଫେରନ୍ତୁ color.val;
 }
 
 /*
  * Convert the 32 bit RGBA value to a GdkRGBA
  */
-    static GdkRGBA
+    ସ୍ଥିର GdkRGBA
 u32_to_rgba(uint32_t val)
 {
-    union { uint32_t val; uint8_t bytes[4]; } packed;
+    ସଂଘ { uint32_t val; uint8_t bytes[4]; } packed;
     GdkRGBA color;
 
     packed.val = val;
@@ -264,160 +264,160 @@ u32_to_rgba(uint32_t val)
     color.green = packed.bytes[1] / 255.0;
     color.blue  = packed.bytes[2] / 255.0;
     color.alpha = packed.bytes[3] / 255.0;
-    return color;
+    ଫେରନ୍ତୁ color;
 }
 
 /*
  * Return TRUE if "rgb" equals "rgba", ignoring the alpha channel.
  */
-    static gboolean
+    ସ୍ଥିର gboolean
 color_equal_u32(guicolor_T rgb, uint32_t rgba)
 {
-    union { uint32_t val; uint8_t bytes[4]; } packed;
+    ସଂଘ { uint32_t val; uint8_t bytes[4]; } packed;
     guicolor_T	res;
 
     packed.val = rgba;
     res = ((guicolor_T)packed.bytes[0] << 16) |
 	((guicolor_T)packed.bytes[1] << 8)  |
 	packed.bytes[2];
-    return res == rgb;
+    ଫେରନ୍ତୁ res == rgb;
 }
 
 /*
  * Checks if a RGBA pixel buffer is fully transparent.
  */
-    static inline gboolean
-rgba_is_transparent(const uint32_t *buf, int n_pixels)
+    ସ୍ଥିର ଧାଡ଼ିଭିତରେ gboolean
+rgba_is_transparent(ଅଚଳ uint32_t *buf, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n_pixels)
 {
     // Could also compare 2 pixels at once using a 64 bit integer, but not sure
     // if that might cause alignment issues...
-    for (int i = 0; i < n_pixels; i++)
-	if (buf[i] != 0)
-	    return FALSE;
-    return TRUE;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n_pixels; i++)
+	ଯଦି (buf[i] != 0)
+	    ଫେରନ୍ତୁ FALSE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
  * Return TRUE if "glyph" has ink (not whitespace).
  */
-    static gboolean
+    ସ୍ଥିର gboolean
 glyph_has_ink(PangoFont *font, PangoGlyphInfo glyph)
 {
     PangoRectangle ink;
 
-    pango_font_get_glyph_extents (font, glyph.glyph, &ink, NULL);
+    pango_font_get_glyph_extents (font, glyph.glyph, &ink, ଖାଲି);
 
-    return ink.width > 0 && ink.height > 0;
+    ଫେରନ୍ତୁ ink.width > 0 && ink.height > 0;
 }
 
 /*
  * Apply the 'guifontwide' font to double-width characters in the string.
  */
-    static void
-apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
+    ସ୍ଥିର ଶୂନ୍ୟ
+apply_wide_font_attr(char_u *s, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, PangoAttrList *attr_list)
 {
-    char_u  *start = NULL;
+    char_u  *start = ଖାଲି;
     char_u  *p;
-    int	    uc;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    uc;
 
-    for (p = s; p < s + len; p += utf_byte2len(*p))
+    ପାଇଁ (p = s; p < s + len; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
 
-	if (start == NULL)
+	ଯଦି (start == ଖାଲି)
 	{
-	    if (uc >= 0x80 && utf_char2cells(uc) == 2)
+	    ଯଦି (uc >= 0x80 && utf_char2cells(uc) == 2)
 		start = p;
 	}
-	else if (uc < 0x80
+	ଅନ୍ୟଥା ଯଦି (uc < 0x80
 		|| (utf_char2cells(uc) != 2 && !utf_iscomposing(uc)))
 	{
-	    INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+	    ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 		    attr_list, start - s, p - s);
-	    start = NULL;
+	    start = ଖାଲି;
 	}
     }
 
-    if (start != NULL)
-	INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+    ଯଦି (start != ଖାଲି)
+	ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 		attr_list, start - s, len);
 }
 
 /*
  * Count the number of display cells occupied by a glyph cluster.
  */
-    static int
-count_cluster_cells(
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
+ଗଣନା_cluster_cells(
 	char_u		    *s,
 	PangoItem	    *item,
 	PangoGlyphString    *glyphs,
-	int		    i,
-	int		    *cluster_width,
-	int		    *last_glyph_rbearing)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    i,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    *cluster_width,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    *last_glyph_rbearing)
 {
     char_u  *p;
-    int	    next;
-    int	    start, end;
-    int	    width;
-    int	    uc;
-    int	    cellcount = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    next;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    start, end;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    uc;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cellcount = 0;
 
     width = glyphs->glyphs[i].geometry.width;
 
-    for (next = i + 1; next < glyphs->num_glyphs; ++next)
+    ପାଇଁ (next = i + 1; next < glyphs->ଅଙ୍କ_glyphs; ++next)
     {
-	if (glyphs->glyphs[next].attr.is_cluster_start)
-	    break;
-	else if (glyphs->glyphs[next].geometry.width > width)
+	ଯଦି (glyphs->glyphs[next].attr.is_cluster_start)
+	    ଭାଙ୍ଗ;
+	ଅନ୍ୟଥା ଯଦି (glyphs->glyphs[next].geometry.width > width)
 	    width = glyphs->glyphs[next].geometry.width;
     }
 
     start = item->offset + glyphs->log_clusters[i];
-    end   = item->offset + ((next < glyphs->num_glyphs) ?
+    end   = item->offset + ((next < glyphs->ଅଙ୍କ_glyphs) ?
 	    glyphs->log_clusters[next] : item->length);
 
-    for (p = s + start; p < s + end; p += utf_byte2len(*p))
+    ପାଇଁ (p = s + start; p < s + end; p += utf_byte2len(*p))
     {
 	uc = utf_ptr2char(p);
-	if (uc < 0x80)
+	ଯଦି (uc < 0x80)
 	    ++cellcount;
-	else if (!utf_iscomposing(uc))
+	ଅନ୍ୟଥା ଯଦି (!utf_iscomposing(uc))
 	    cellcount += utf_char2cells(uc);
     }
 
-    if (last_glyph_rbearing != NULL
-	    && cellcount > 0 && next == glyphs->num_glyphs)
+    ଯଦି (last_glyph_rbearing != ଖାଲି
+	    && cellcount > 0 && next == glyphs->ଅଙ୍କ_glyphs)
     {
 	PangoRectangle ink_rect;
 
 	pango_font_get_glyph_extents(item->analysis.font,
 		glyphs->glyphs[i].glyph,
-		&ink_rect, NULL);
+		&ink_rect, ଖାଲି);
 
-	if (PANGO_RBEARING(ink_rect) > 0)
+	ଯଦି (PANGO_RBEARING(ink_rect) > 0)
 	    *last_glyph_rbearing = PANGO_RBEARING(ink_rect);
     }
 
-    if (cellcount > 0)
+    ଯଦି (cellcount > 0)
 	*cluster_width = width;
 
-    return cellcount;
+    ଫେରନ୍ତୁ cellcount;
 }
 
 /*
  * Handle combining characters that form a zero-width cluster.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 setup_zero_width_cluster(
 	PangoItem	*item,
 	PangoGlyphInfo	*glyph,
-	int		last_cellcount,
-	int		last_cluster_width,
-	int		last_glyph_rbearing)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last_cellcount,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last_cluster_width,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		last_glyph_rbearing)
 {
     PangoRectangle  ink_rect;
     PangoRectangle  logical_rect;
-    int		    width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    width;
 
     width = last_cellcount * gui.char_width * PANGO_SCALE;
     glyph->geometry.x_offset = -width + MAX(0, width - last_cluster_width) / 2;
@@ -426,22 +426,22 @@ setup_zero_width_cluster(
     pango_font_get_glyph_extents(item->analysis.font,
 	    glyph->glyph,
 	    &ink_rect, &logical_rect);
-    if (ink_rect.x < 0)
+    ଯଦି (ink_rect.x < 0)
     {
 	glyph->geometry.x_offset += last_glyph_rbearing;
 	glyph->geometry.y_offset  = logical_rect.height
 	    - (gui.char_height - p_linespace) * PANGO_SCALE;
     }
-    else
+    ଅନ୍ୟଥା
 	glyph->geometry.x_offset = -width + MAX(0, width - ink_rect.width) / 2;
 }
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Create a new draw sign icon with the given texture.
  */
-    static DrawSign *
-draw_sign_new(GdkTexture *texture, int width, int height)
+    ସ୍ଥିର DrawSign *
+draw_sign_new(GdkTexture *texture, ପୂର୍ଣ୍ଣସଂଖ୍ୟା width, ପୂର୍ଣ୍ଣସଂଖ୍ୟା height)
 {
     DrawSign *dsign = g_new0(DrawSign, 1);
 
@@ -449,10 +449,10 @@ draw_sign_new(GdkTexture *texture, int width, int height)
     dsign->width = width;
     dsign->height = height;
 
-    return dsign;
+    ଫେରନ୍ତୁ dsign;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_sign_free(DrawSign *dsign)
 {
     g_object_unref(dsign->texture);
@@ -460,13 +460,13 @@ draw_sign_free(DrawSign *dsign)
 }
 #endif
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_attr_init(
 	DrawAttr	*dattr,
-	const GdkRGBA	*bg_color,
-	const GdkRGBA	*fg_color,
-	const GdkRGBA	*sp_color,
-	int		draw_flags)
+	ଅଚଳ GdkRGBA	*bg_color,
+	ଅଚଳ GdkRGBA	*fg_color,
+	ଅଚଳ GdkRGBA	*sp_color,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		draw_flags)
 {
     dattr->bg_color = rgba_to_u32(bg_color);
     dattr->fg_color = rgba_to_u32(fg_color);
@@ -478,15 +478,15 @@ draw_attr_init(
  * Apply the draw attr to the row for the given col/cell. Only dirty layers that
  * have actually changed.
  */
-    static void
-draw_attr_apply(DrawAttr *dattr, int col, DrawRow *drow)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_attr_apply(DrawAttr *dattr, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, DrawRow *drow)
 {
     uint32_t	*bg_cell = drow->dlayers[DRAW_LAYER_BACKGROUND].buf + col;
     uint32_t	*text_cell = drow->dlayers[DRAW_LAYER_TEXT].buf + col;
     uint32_t	*underc_cell;
     uint32_t	*strike_cell;
     uint32_t	fg_color = 0, bg_color = 0, sp_color = 0;
-    int		draw_flags = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		draw_flags = 0;
     gboolean	bg_is_default = TRUE;
 
     underc_cell = drow->dlayers[DRAW_LAYER_SPECIAL].buf +
@@ -495,7 +495,7 @@ draw_attr_apply(DrawAttr *dattr, int col, DrawRow *drow)
 	col + STRIKE_OFFSET(drow->n_cells);
 
     // If "dattr" is NULL, then make the pixels transparent.
-    if (dattr != NULL)
+    ଯଦି (dattr != ଖାଲି)
     {
 	fg_color = dattr->fg_color;
 	bg_color = dattr->bg_color;
@@ -504,70 +504,70 @@ draw_attr_apply(DrawAttr *dattr, int col, DrawRow *drow)
 	bg_is_default = color_equal_u32(gui.back_pixel, bg_color);
     }
 
-    if (*bg_cell != bg_color && !(*bg_cell == 0 && bg_is_default))
+    ଯଦି (*bg_cell != bg_color && !(*bg_cell == 0 && bg_is_default))
     {
 	draw_row_dirty_layer(drow, DRAW_LAYER_BACKGROUND);
 
 	// If "bg_color" is same as global background color, then use
 	// transparent color.
-	if (bg_is_default)
+	ଯଦି (bg_is_default)
 	    *bg_cell = 0;
-	else
+	ଅନ୍ୟଥା
 	    *bg_cell = bg_color;
     }
-    if ((draw_flags & DRAW_UNDERL && *text_cell != fg_color)
+    ଯଦି ((draw_flags & DRAW_UNDERL && *text_cell != fg_color)
 	    || (!(draw_flags & DRAW_UNDERL) && *text_cell != 0))
     {
 	draw_row_dirty_layer(drow, DRAW_LAYER_TEXT);
-	if (draw_flags & DRAW_UNDERL)
+	ଯଦି (draw_flags & DRAW_UNDERL)
 	    *text_cell = fg_color;
-	else
+	ଅନ୍ୟଥା
 	    *text_cell = 0;
     }
-    if ((draw_flags & DRAW_UNDERC && *underc_cell != sp_color)
+    ଯଦି ((draw_flags & DRAW_UNDERC && *underc_cell != sp_color)
 	    || (!(draw_flags & DRAW_UNDERC) && *underc_cell != 0))
     {
 	draw_row_dirty_layer(drow, DRAW_LAYER_SPECIAL);
-	if (draw_flags & DRAW_UNDERC)
+	ଯଦି (draw_flags & DRAW_UNDERC)
 	    *underc_cell = sp_color;
-	else
+	ଅନ୍ୟଥା
 	    *underc_cell = 0;
     }
-    if ((draw_flags & DRAW_STRIKE && *strike_cell != sp_color)
+    ଯଦି ((draw_flags & DRAW_STRIKE && *strike_cell != sp_color)
 	    || (!(draw_flags & DRAW_STRIKE) && *strike_cell != 0))
     {
 	draw_row_dirty_layer(drow, DRAW_LAYER_SPECIAL);
-	if (draw_flags & DRAW_STRIKE)
+	ଯଦି (draw_flags & DRAW_STRIKE)
 	    *strike_cell = sp_color;
-	else
+	ଅନ୍ୟଥା
 	    *strike_cell = 0;
     }
 }
 
-    static DrawGlyphs *
+    ସ୍ଥିର DrawGlyphs *
 draw_glyphs_new(
 	PangoFont	*font,
 	PangoGlyphInfo	*glyphs,
-	int		n_glyphs,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_glyphs,
 	uint32_t	fg_color)
 {
     DrawGlyphs *dglyphs = g_new0(DrawGlyphs, 1);
 
     dglyphs->refcount = 1;
     dglyphs->font = g_object_ref(font);
-    dglyphs->glyphs = g_memdup2(glyphs, sizeof(*glyphs) * n_glyphs);
+    dglyphs->glyphs = g_memdup2(glyphs, ଆକାର(*glyphs) * n_glyphs);
     dglyphs->n_glyphs = n_glyphs;
     dglyphs->fg_color = fg_color;
 
-    return dglyphs;
+    ଫେରନ୍ତୁ dglyphs;
 }
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
 /*
  * Create a new draw glyphs that shows the given sign. Note that ownership of
  * "dsign" is taken.
  */
-    static DrawGlyphs *
+    ସ୍ଥିର DrawGlyphs *
 draw_glyphs_new_sign(DrawSign *dsign)
 {
     DrawGlyphs *dglyphs = g_new0(DrawGlyphs, 1);
@@ -575,26 +575,26 @@ draw_glyphs_new_sign(DrawSign *dsign)
     dglyphs->refcount = 1;
     dglyphs->dsign = dsign;
 
-    return dglyphs;
+    ଫେରନ୍ତୁ dglyphs;
 }
 #endif
 
-    static DrawGlyphs *
+    ସ୍ଥିର DrawGlyphs *
 draw_glyphs_ref(DrawGlyphs *dglyphs)
 {
     dglyphs->refcount++;
-    return dglyphs;
+    ଫେରନ୍ତୁ dglyphs;
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_glyphs_unref(DrawGlyphs *dglyphs)
 {
-    if (--dglyphs->refcount <= 0)
+    ଯଦି (--dglyphs->refcount <= 0)
     {
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
-	if (dglyphs->font == NULL)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+	ଯଦି (dglyphs->font == ଖାଲି)
 	    draw_sign_free(dglyphs->dsign);
-	else
+	ଅନ୍ୟଥା
 #endif
 	{
 	    g_free(dglyphs->glyphs);
@@ -608,25 +608,25 @@ draw_glyphs_unref(DrawGlyphs *dglyphs)
  * Return TRUE if "a" and "b" are same. If either are NULL, return FALSE, if
  * both are NULL, return TRUE.
  */
-    static gboolean
+    ସ୍ଥିର gboolean
 draw_glyphs_same(DrawGlyphs *a, DrawGlyphs *b)
 {
-    if (a == NULL && b == NULL)
-	return TRUE;
-    if (a == NULL || b == NULL)
-	return FALSE;
-    if (a->fg_color != b->fg_color)
-	return FALSE;
-    if (a->n_glyphs != b->n_glyphs || a->font != b->font)
-	return FALSE;
-    for (int i = 0; i < a->n_glyphs; i++)
-	if (a->glyphs[i].glyph != b->glyphs[i].glyph
+    ଯଦି (a == ଖାଲି && b == ଖାଲି)
+	ଫେରନ୍ତୁ TRUE;
+    ଯଦି (a == ଖାଲି || b == ଖାଲି)
+	ଫେରନ୍ତୁ FALSE;
+    ଯଦି (a->fg_color != b->fg_color)
+	ଫେରନ୍ତୁ FALSE;
+    ଯଦି (a->n_glyphs != b->n_glyphs || a->font != b->font)
+	ଫେରନ୍ତୁ FALSE;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < a->n_glyphs; i++)
+	ଯଦି (a->glyphs[i].glyph != b->glyphs[i].glyph
 		|| a->glyphs[i].geometry.width != b->glyphs[i].geometry.width
 		|| a->glyphs[i].geometry.x_offset != b->glyphs[i].geometry.x_offset
 		|| a->glyphs[i].geometry.y_offset != b->glyphs[i].geometry.y_offset
 		|| a->glyphs[i].attr.is_cluster_start != b->glyphs[i].attr.is_cluster_start)
-	    return FALSE;
-    return TRUE;
+	    ଫେରନ୍ତୁ FALSE;
+    ଫେରନ୍ତୁ TRUE;
 }
 
 /*
@@ -635,123 +635,123 @@ draw_glyphs_same(DrawGlyphs *a, DrawGlyphs *b)
  * "bleed" is TRUE, then expand the buffer by 1 cell (clipped by draw area
  * width), using the color of the rightmost cell.
  */
-    static GskRenderNode *
+    ସ୍ଥିର Gsk_Render_ଗଣ୍ଠି *
 draw_layer_get_texture(
 	DrawLayer   *dlayer,
-	int	    row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    row,
 	VimDrawArea *da,
-	int	    off,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    off,
 	gboolean    bleed)
 {
     GBytes	    *bytes;
     GdkTexture	    *texture;
-    GskRenderNode   *node;
-    int		    height;
+    Gsk_Render_ଗଣ୍ଠି   *ଗଣ୍ଠି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    height;
 
-#if GTK_CHECK_VERSION(4,24,0)
+#ଯଦି GTK_CHECK_VERSION(4,24,0)
     height = gui.char_height;
-#else
+#ଅନ୍ୟଥା
     height = gui.char_height + 1;
 #endif
 
-    if (bleed)
+    ଯଦି (bleed)
     {
 	GByteArray *arr = g_byte_array_new();
 
 	g_byte_array_append(arr, (uint8_t *)(dlayer->buf + off),
-		sizeof(uint32_t) * da->n_cols);
+		ଆକାର(uint32_t) * da->n_cols);
 	g_byte_array_append(arr,
 		(uint8_t *)(dlayer->buf + off + (da->n_cols - 1)),
-		sizeof(uint32_t)); // Add bleed using last pixel of buffer
+		ଆକାର(uint32_t)); // Add bleed using last pixel of buffer
 	bytes = g_byte_array_free_to_bytes(arr);
     }
-    else
-	bytes = g_bytes_new(dlayer->buf + off, sizeof(uint32_t) * da->n_cols);
+    ଅନ୍ୟଥା
+	bytes = g_bytes_new(dlayer->buf + off, ଆକାର(uint32_t) * da->n_cols);
 
     texture = gdk_memory_texture_new(da->n_cols + bleed, 1,
 	    GDK_MEMORY_R8G8B8A8, bytes, (da->n_cols + bleed) * 4);
     g_bytes_unref(bytes);
 
     // Scale texture to actual size
-    node = gsk_texture_scale_node_new(texture,
+    ଗଣ୍ଠି = gsk_texture_scale_ଗଣ୍ଠି_new(texture,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
 		(da->n_cols + bleed) * gui.char_width, gui.char_height + bleed),
 	    GSK_SCALING_FILTER_NEAREST);
-    if (bleed)
+    ଯଦି (bleed)
     {
-	GskRenderNode *new;
+	Gsk_Render_ଗଣ୍ଠି *new;
 
-	new = gsk_clip_node_new(node,
+	new = gsk_clip_ଗଣ୍ଠି_new(ଗଣ୍ଠି,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
-		    da->n_cols * gui.char_width + da->bleed_right, height));
-	gsk_render_node_unref(node);
-	node = new;
+		    da->n_cols * gui.char_width + da->bleed_ଡାହାଣ, height));
+	gsk_render_ଗଣ୍ଠି_unref(ଗଣ୍ଠି);
+	ଗଣ୍ଠି = new;
     }
     g_object_unref(texture);
-    return node;
+    ଫେରନ୍ତୁ ଗଣ୍ଠି;
 }
 
-    static void
-draw_row_init(DrawRow *drow, int row, int cols)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_row_init(DrawRow *drow, ପୂର୍ଣ୍ଣସଂଖ୍ୟା row, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols)
 {
-    drow->cells = g_malloc0_n(cols, sizeof(DrawCell));
+    drow->cells = g_malloc0_n(cols, ଆକାର(DrawCell));
     drow->n_cells = cols;
     drow->row = row;
-    drow->underl_mask = drow->underc_mask = drow->strike_mask = NULL;
+    drow->underl_mask = drow->underc_mask = drow->strike_mask = ଖାଲି;
 
-    memset(drow->dlayers, 0, sizeof(DrawLayer) * N_DRAW_LAYERS);
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    memset(drow->dlayers, 0, ଆକାର(DrawLayer) * N_DRAW_LAYERS);
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା l = 0; l < N_DRAW_LAYERS; l++)
     {
 	DrawLayer *dlayer = drow->dlayers + l;
 
 	// Make the buffer transparent initially
-	if (l == DRAW_LAYER_SPECIAL)
+	ଯଦି (l == DRAW_LAYER_SPECIAL)
 	    dlayer->buf = g_malloc0_n(cols * 2, 4);
-	else
+	ଅନ୍ୟଥା
 	    dlayer->buf = g_malloc0_n(cols, 4);
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_clear(DrawRow *drow)
 {
     g_free(drow->cells);
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା l = 0; l < N_DRAW_LAYERS; l++)
     {
 	DrawLayer *dlayer = drow->dlayers + l;
 
-	if (dlayer->node != NULL)
-	    gsk_render_node_unref(dlayer->node);
+	ଯଦି (dlayer->ଗଣ୍ଠି != ଖାଲି)
+	    gsk_render_ଗଣ୍ଠି_unref(dlayer->ଗଣ୍ଠି);
 	g_free(dlayer->buf);
     }
-    g_clear_pointer(&drow->underl_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->underc_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->strike_mask, gsk_render_node_unref);
+    g_clear_pointer(&drow->underl_mask, gsk_render_ଗଣ୍ଠି_unref);
+    g_clear_pointer(&drow->underc_mask, gsk_render_ଗଣ୍ଠି_unref);
+    g_clear_pointer(&drow->strike_mask, gsk_render_ଗଣ୍ଠି_unref);
 }
 
 /*
  * Dirty the given layer for the row so it is rendered again.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t)
 {
     DrawLayer *dlayer = drow->dlayers + dlayer_t;
 
     dlayer->dirty = TRUE;
-    g_clear_pointer(&dlayer->node, gsk_render_node_unref);
+    g_clear_pointer(&dlayer->ଗଣ୍ଠି, gsk_render_ଗଣ୍ଠି_unref);
 }
 
 /*
  * If the cell at "col" is inverted, then uninvert and set the layer as dirty.
  * Otherwise do nothing.
  */
-    static void
-draw_row_uninvert_cell(DrawRow *drow, int col)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_row_uninvert_cell(DrawRow *drow, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col)
 {
     uint32_t *buf = drow->dlayers[DRAW_LAYER_OVERLAY].buf;
 
     // If pixel is white, then it is inverted.
-    if (buf[col] == 0xffffffff)
+    ଯଦି (buf[col] == 0xffffffff)
     {
 	draw_row_dirty_layer(drow, DRAW_LAYER_OVERLAY);
 	buf[col] = 0;
@@ -762,22 +762,22 @@ draw_row_uninvert_cell(DrawRow *drow, int col)
  * Set the cell in the row to the glyphs and attrs (that represents the cell).
  * This will dirty the changed layers of the row.
  */
-    static void
-draw_row_set_cell(DrawRow *drow, int col, DrawGlyphs *dglyphs, DrawAttr *dattr)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_row_set_cell(DrawRow *drow, ପୂର୍ଣ୍ଣସଂଖ୍ୟା col, DrawGlyphs *dglyphs, DrawAttr *dattr)
 {
     DrawCell *dcell = drow->cells + col;
 
-    if (!draw_glyphs_same(dglyphs, dcell->dglyphs))
+    ଯଦି (!draw_glyphs_same(dglyphs, dcell->dglyphs))
 	draw_row_dirty_layer(drow, DRAW_LAYER_TEXT);
 
     // When drawing double width characters in the snapshot vfunc, pointer
     // equality of the DrawGlyphs is used. Must make sure to always keep the
     // pointer in sync, even if glyphs are technically the "same".
-    if (dcell->dglyphs != dglyphs)
+    ଯଦି (dcell->dglyphs != dglyphs)
     {
-	if (dcell->dglyphs != NULL)
+	ଯଦି (dcell->dglyphs != ଖାଲି)
 	    draw_glyphs_unref(dcell->dglyphs);
-	dcell->dglyphs = dglyphs == NULL ? NULL : draw_glyphs_ref(dglyphs);
+	dcell->dglyphs = dglyphs == ଖାଲି ? ଖାଲି : draw_glyphs_ref(dglyphs);
     }
 
     draw_attr_apply(dattr, col, drow);
@@ -788,20 +788,20 @@ draw_row_set_cell(DrawRow *drow, int col, DrawGlyphs *dglyphs, DrawAttr *dattr)
  * Same as draw_row_set_cell(), but fills in the cells between "col1" and "col2"
  * (inclusive).
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_fill(
 	DrawRow	    *drow,
-	int	    col1,
-	int	    col2,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col2,
 	DrawGlyphs  *dglyphs,
 	DrawAttr    *dattr,
 	DrawCursor  *cursor)
 {
-    for (int c = col1; c <= col2; c++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = col1; c <= col2; c++)
 	draw_row_set_cell(drow, c, dglyphs, dattr);
 
     // Clear cursor if its in the region
-    if (gui.cursor_row == drow->row && gui.cursor_col >= col1
+    ଯଦି (gui.cursor_row == drow->row && gui.cursor_col >= col1
 	    && gui.cursor_col <= col2)
 	cursor->draw = FALSE;
 }
@@ -810,17 +810,17 @@ draw_row_fill(
  * Move the cells between "col1" and "col2" from "src" to "dest", overwriting
  * the existing cells. This will clear the source cells.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_move_to(
 	DrawRow	    *dest_row,
 	DrawRow	    *src_row,
-	int	    col1,
-	int	    col2,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col2,
 	VimDrawArea *da)
 {
-    int move_size = (col2 - col1 + 1) * sizeof(DrawCell);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା move_size = (col2 - col1 + 1) * ଆକାର(DrawCell);
 
-    draw_row_fill(dest_row, col1, col2, NULL, NULL, &da->cursor);
+    draw_row_fill(dest_row, col1, col2, ଖାଲି, ଖାଲି, &da->cursor);
     memmove(dest_row->cells + col1, src_row->cells + col1, move_size);
     // NULL the draw cells so we don't double unreference.
     memset(src_row->cells + col1, 0, move_size);
@@ -828,19 +828,19 @@ draw_row_move_to(
 
     // Move the layer buffers
     move_size = (col2 - col1 + 1) * 4;
-    for (int l = 0; l < N_DRAW_LAYERS; l++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା l = 0; l < N_DRAW_LAYERS; l++)
     {
 	uint32_t *src = src_row->dlayers[l].buf;
 	uint32_t *dest = dest_row->dlayers[l].buf;
 
-	if (l == DRAW_LAYER_SPECIAL)
+	ଯଦି (l == DRAW_LAYER_SPECIAL)
 	{
 	    memmove(dest + col1 + UNDERC_OFFSET(dest_row->n_cells),
 		    src + col1 + UNDERC_OFFSET(src_row->n_cells), move_size);
 	    memmove(dest + col1 + STRIKE_OFFSET(dest_row->n_cells),
 		    src + col1 + STRIKE_OFFSET(src_row->n_cells), move_size);
 	}
-	else
+	ଅନ୍ୟଥା
 	    memmove(dest + col1, src + col1, move_size);
 	draw_row_dirty_layer(dest_row, l);
     }
@@ -849,112 +849,112 @@ draw_row_move_to(
 /*
  * If background layer is dirty, then render it.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_render_background(DrawRow *drow, VimDrawArea *da)
 {
     DrawLayer *dlayer = drow->dlayers + DRAW_LAYER_BACKGROUND;
 
-    if (!dlayer->dirty)
-	return;
+    ଯଦି (!dlayer->dirty)
+	ଫେରନ୍ତୁ;
 
     dlayer->dirty = FALSE;
 
     // If background is transparent, don't add a render node.
-    if (rgba_is_transparent(dlayer->buf, da->n_cols))
-	return;
+    ଯଦି (rgba_is_transparent(dlayer->buf, da->n_cols))
+	ଫେରନ୍ତୁ;
 
     // Add a 1 cell bleed, then use a clip node to clip it to the draw area
     // width. This just makes things like status bars look a bit nicer when draw
     // area size is not an exact multiple of the cell size.
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->ଗଣ୍ଠି = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
 }
 
 /*
  * Ensure the given under decorations are generated.
  */
-    static void
-draw_row_ensure_decor(DrawRow *drow, int flags)
+    ସ୍ଥିର ଶୂନ୍ୟ
+draw_row_ensure_decor(DrawRow *drow, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags)
 {
-    if (flags & DRAW_UNDERL && drow->underl_mask == NULL)
-	drow->underl_mask = gsk_color_node_new(&white_rgba,
+    ଯଦି (flags & DRAW_UNDERL && drow->underl_mask == ଖାଲି)
+	drow->underl_mask = gsk_color_ଗଣ୍ଠି_new(&white_rgba,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(drow->row + 1) - 1,
 		    FILL_X(drow->n_cells), 1));
 
-    if (flags & DRAW_STRIKE && drow->strike_mask == NULL)
-	drow->strike_mask = gsk_color_node_new(&white_rgba,
+    ଯଦି (flags & DRAW_STRIKE && drow->strike_mask == ଖାଲି)
+	drow->strike_mask = gsk_color_ଗଣ୍ଠି_new(&white_rgba,
 		&GRAPHENE_RECT_INIT(FILL_X(0),
-		    FILL_Y(drow->row) + (int)(gui.char_height / 2),
+		    FILL_Y(drow->row) + (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(gui.char_height / 2),
 		    FILL_X(drow->n_cells), 1));
 
-    if (flags & DRAW_UNDERC && drow->underc_mask == NULL)
+    ଯଦି (flags & DRAW_UNDERC && drow->underc_mask == ଖାଲି)
     {
-	static const int val[8] = {1, 0, 0, 0, 1, 2, 2, 2};
+	ସ୍ଥିର ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା val[8] = {1, 0, 0, 0, 1, 2, 2, 2};
 
-	int y = FILL_Y(drow->row + 1) - 1;
-	int x_start = FILL_X(0);
-	int x_end = FILL_X(drow->n_cells);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା y = FILL_Y(drow->row + 1) - 1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା x_start = FILL_X(0);
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା x_end = FILL_X(drow->n_cells);
 
 	// Instead of rendering the entire pattern, use a repeating node to
 	// render a single cycle of the undercurl, taking advantage of the GPU
 	// (if using opengl or vulkan renderer).
-	GskRenderNode *child = NULL;
+	Gsk_Render_ଗଣ୍ଠି *child = ଖାଲି;
 
 	// GskPath was added in GSK 4.14, otherwise use Cairo
-#if GTK_CHECK_VERSION(4, 14, 0)
+#ଯଦି GTK_CHECK_VERSION(4, 14, 0)
 	GskPathBuilder	*builder;
 	GskPath		*path;
 	GskStroke       *stroke;
-	GskRenderNode	*color_node;
+	Gsk_Render_ଗଣ୍ଠି	*color_ଗଣ୍ଠି;
 	graphene_rect_t bounds;
 
 	builder = gsk_path_builder_new();
 
 	// Start at X = -1 (val[7]) to ensure a fully formed stroke at X = 0
 	gsk_path_builder_move_to(builder, -1, y - val[7] + 0.5);
-	gsk_path_builder_line_to(builder, 0, y - val[0] + 0.5);
+	gsk_path_builder_ଧାଡ଼ି_to(builder, 0, y - val[0] + 0.5);
 
-	for (int i = 1; i < 8; i++)
-	    gsk_path_builder_line_to(builder, i, y - val[i] + 0.5);
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < 8; i++)
+	    gsk_path_builder_ଧାଡ଼ି_to(builder, i, y - val[i] + 0.5);
 
 	// Extend to X = 9 (val[1]) to ensure a fully formed stroke at X = 8
-	gsk_path_builder_line_to(builder, 8, y - val[0] + 0.5);
-	gsk_path_builder_line_to(builder, 9, y - val[1] + 0.5);
+	gsk_path_builder_ଧାଡ଼ି_to(builder, 8, y - val[0] + 0.5);
+	gsk_path_builder_ଧାଡ଼ି_to(builder, 9, y - val[1] + 0.5);
 
 	path = gsk_path_builder_free_to_path(builder);
 	stroke = gsk_stroke_new(1.0);
 
 	gsk_path_get_stroke_bounds(path, stroke, &bounds);
-	color_node = gsk_color_node_new(&white_rgba, &bounds);
-	child = gsk_stroke_node_new(color_node, path, stroke);
+	color_ଗଣ୍ଠି = gsk_color_ଗଣ୍ଠି_new(&white_rgba, &bounds);
+	child = gsk_stroke_ଗଣ୍ଠି_new(color_ଗଣ୍ଠି, path, stroke);
 
 	gsk_stroke_free(stroke);
 	gsk_path_unref(path);
-	gsk_render_node_unref(color_node);
-#else
+	gsk_render_ଗଣ୍ଠି_unref(color_ଗଣ୍ଠି);
+#ଅନ୍ୟଥା
 	cairo_t *cr;
 
-	child = gsk_cairo_node_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
-	cr = gsk_cairo_node_get_draw_context(child);
+	child = gsk_cairo_ଗଣ୍ଠି_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
+	cr = gsk_cairo_ଗଣ୍ଠି_get_draw_context(child);
 
-	cairo_set_line_width(cr, 1.0);
+	cairo_set_ଧାଡ଼ି_width(cr, 1.0);
 	cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
 
 	cairo_move_to(cr, -1, y - val[7] + 0.5);
-	cairo_line_to(cr, 0, y - val[0] + 0.5);
+	cairo_ଧାଡ଼ି_to(cr, 0, y - val[0] + 0.5);
 
-	for (int i = 1; i < 8; ++i)
-	    cairo_line_to(cr, i, y - val[i] + 0.5);
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < 8; ++i)
+	    cairo_ଧାଡ଼ି_to(cr, i, y - val[i] + 0.5);
 
-	cairo_line_to(cr, 8, y - val[0] + 0.5);
-	cairo_line_to(cr, 9, y - val[1] + 0.5);
+	cairo_ଧାଡ଼ି_to(cr, 8, y - val[0] + 0.5);
+	cairo_ଧାଡ଼ି_to(cr, 9, y - val[1] + 0.5);
 
 	cairo_stroke(cr);
 	cairo_destroy(cr);
 #endif
-	drow->underc_mask = gsk_repeat_node_new(
+	drow->underc_mask = gsk_repeat_ଗଣ୍ଠି_new(
 		&GRAPHENE_RECT_INIT(x_start, y - 3, x_end - x_start, 5),
 		child, &GRAPHENE_RECT_INIT(0.0f, y - 3, 8.0f, 5.0f));
-	gsk_render_node_unref(child);
+	gsk_render_ଗଣ୍ଠି_unref(child);
     }
 }
 
@@ -963,102 +963,102 @@ draw_row_ensure_decor(DrawRow *drow, int flags)
  * node. Note that the render node may still be NULL if there is nothing to
  * display.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 {
     DrawLayer	*dlayer = drow->dlayers + DRAW_LAYER_TEXT;
     GArray	*glyph_buf;
     GPtrArray	*nodes;
-    PangoFont	*cur_font = NULL;
-    int		start_col = 0;
-    int		empty_cells = 0;
+    PangoFont	*cur_font = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		start_col = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		empty_cells = 0;
     uint32_t	cur_fg = 0;
-    int		c;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		c;
 
-    if (!dlayer->dirty)
-	return;
+    ଯଦି (!dlayer->dirty)
+	ଫେରନ୍ତୁ;
 
     glyph_buf = da->glyph_buf;
-    nodes = da->node_buf;
+    nodes = da->ଗଣ୍ଠି_buf;
 
     g_array_set_size(glyph_buf, 0);
     g_ptr_array_set_size(nodes, 0);
 
     // GskTextNode does not use the "log_clusters" array of PangoGlyphString, so
     // we don't need to set it.
-#define FLUSH_NODE() \
-    do { \
-	if (cur_font != NULL) \
+#define FLUSH_ଗଣ୍ଠି() \
+    କର { \
+	ଯଦି (cur_font != ଖାଲି) \
 	{ \
 	    PangoGlyphString	glyph_str; \
-	    GskRenderNode	*node; \
+	    Gsk_Render_ଗଣ୍ଠି	*ଗଣ୍ଠି; \
 	    GdkRGBA		fg_color = u32_to_rgba(cur_fg); \
 	    glyph_str.glyphs = (PangoGlyphInfo *)glyph_buf->data; \
-	    glyph_str.num_glyphs = glyph_buf->len; \
-	    node = gsk_text_node_new(cur_font, &glyph_str, &fg_color, \
+	    glyph_str.ଅଙ୍କ_glyphs = glyph_buf->len; \
+	    ଗଣ୍ଠି = gsk_text_ଗଣ୍ଠି_new(cur_font, &glyph_str, &fg_color, \
 		    &GRAPHENE_POINT_INIT(TEXT_X(start_col), \
 			TEXT_Y(drow->row))); \
-	    if (node != NULL) \
-		g_ptr_array_add(nodes, node); \
+	    ଯଦି (ଗଣ୍ଠି != ଖାଲି) \
+		g_ptr_array_add(nodes, ଗଣ୍ଠି); \
 	    g_array_set_size(glyph_buf, 0); \
-	    cur_font = NULL; \
+	    cur_font = ଖାଲି; \
 	} \
-    } while (FALSE)
+    } ଯେତେବେଳେ (FALSE)
 
-    for (c = 0; c < da->n_cols; c++)
+    ପାଇଁ (c = 0; c < da->n_cols; c++)
     {
 	DrawCell    *dcell = drow->cells + c;
 	DrawGlyphs  *dglyphs = dcell->dglyphs;
-	int	    prev_len;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    prev_len;
 
-	if (dglyphs == NULL)
+	ଯଦି (dglyphs == ଖାଲି)
 	{
 	    empty_cells++;
-	    continue;
+	    ଜାରି;
 	}
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
-	else if (dglyphs->font == NULL)
+#ଯଦି defined(FEAT_NETBEANS_INTG) || defined(FEAT_SIGN_ICONS)
+	ଅନ୍ୟଥା ଯଦି (dglyphs->font == ଖାଲି)
 	{
 	    // Add sign icon
-	    GskRenderNode   *snode;
-	    int		    w;
+	    Gsk_Render_ଗଣ୍ଠି   *snode;
+	    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    w;
 
-	    FLUSH_NODE();
+	    FLUSH_ଗଣ୍ଠି();
 
-	    snode = gsk_texture_scale_node_new(dglyphs->dsign->texture,
+	    snode = gsk_texture_scale_ଗଣ୍ଠି_new(dglyphs->dsign->texture,
 		    &GRAPHENE_RECT_INIT(FILL_X(c), FILL_Y(drow->row),
 			dglyphs->dsign->width, dglyphs->dsign->height),
 		    GSK_SCALING_FILTER_TRILINEAR);
 	    w = (dglyphs->dsign->width + gui.char_width - 1) / gui.char_width;
 
-	    if (snode != NULL)
+	    ଯଦି (snode != ଖାଲି)
 		g_ptr_array_add(nodes, snode);
 	    // Skip the cells the draw sign covers.
 	    c += w - 1; // Subtract one because we increment by one in the for
 			// loop
-	    continue;
+	    ଜାରି;
 	}
 #endif
-	else if (dglyphs->font != cur_font || cur_fg != dglyphs->fg_color)
+	ଅନ୍ୟଥା ଯଦି (dglyphs->font != cur_font || cur_fg != dglyphs->fg_color)
 	{
-	    FLUSH_NODE();
+	    FLUSH_ଗଣ୍ଠି();
 	    cur_font = dglyphs->font;
 	    start_col = c;
 	    cur_fg = dglyphs->fg_color;
 	}
 
 	// Don't want to render double width characters twice.
-	if (c > 0 && drow->cells[c - 1].dglyphs == dglyphs)
-	    continue;
+	ଯଦି (c > 0 && drow->cells[c - 1].dglyphs == dglyphs)
+	    ଜାରି;
 
 	prev_len = glyph_buf->len;
 	g_array_append_vals(glyph_buf, dglyphs->glyphs, dglyphs->n_glyphs);
 
 	// Inject the accumulated space width into the glyphs that
 	// have ink.
-	if (empty_cells > 0)
+	ଯଦି (empty_cells > 0)
 	{
-	    if (prev_len > 0)
+	    ଯଦି (prev_len > 0)
 	    {
 		// Spaces occurred between valid text: extend
 		// previous character's advance
@@ -1071,28 +1071,28 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 	}
     }
 
-    FLUSH_NODE();
+    FLUSH_ଗଣ୍ଠି();
 
-#undef FLUSH_NODE
+#undef FLUSH_ଗଣ୍ଠି
 
-    if (nodes->len > 0)
+    ଯଦି (nodes->len > 0)
     {
 	// Add underline mask (if needed).
-	GskRenderNode *source;
-	GskRenderNode *node;
+	Gsk_Render_ଗଣ୍ଠି *source;
+	Gsk_Render_ଗଣ୍ଠି *ଗଣ୍ଠି;
 
 	draw_row_ensure_decor(drow, DRAW_UNDERL);
-	if (!rgba_is_transparent(dlayer->buf, drow->n_cells))
+	ଯଦି (!rgba_is_transparent(dlayer->buf, drow->n_cells))
 	{
 	    source = draw_layer_get_texture(dlayer, drow->row, da, 0, FALSE);
-	    node = gsk_mask_node_new(source, drow->underl_mask,
+	    ଗଣ୍ଠି = gsk_mask_ଗଣ୍ଠି_new(source, drow->underl_mask,
 		    GSK_MASK_MODE_ALPHA);
-	    gsk_render_node_unref(source);
-	    g_ptr_array_add(nodes, node);
+	    gsk_render_ଗଣ୍ଠି_unref(source);
+	    g_ptr_array_add(nodes, ଗଣ୍ଠି);
 	}
 
-	dlayer->node = gsk_container_node_new(
-		(GskRenderNode **)nodes->pdata, nodes->len);
+	dlayer->ଗଣ୍ଠି = gsk_container_ଗଣ୍ଠି_new(
+		(Gsk_Render_ଗଣ୍ଠି **)nodes->pdata, nodes->len);
     }
     dlayer->dirty = FALSE;
 }
@@ -1100,49 +1100,49 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 /*
  * Render undercurl and strikethough, which use the special colour.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_render_special(DrawRow *drow, VimDrawArea *da)
 {
     DrawLayer	    *dlayer = drow->dlayers + DRAW_LAYER_SPECIAL;
-    GskRenderNode   *source;
-    GskRenderNode   *nodes[2];
-    int		    n_nodes = 0;
+    Gsk_Render_ଗଣ୍ଠି   *source;
+    Gsk_Render_ଗଣ୍ଠି   *nodes[2];
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    n_nodes = 0;
 
-    if (!dlayer->dirty)
-	return;
+    ଯଦି (!dlayer->dirty)
+	ଫେରନ୍ତୁ;
 
     draw_row_ensure_decor(drow, DRAW_UNDERC | DRAW_STRIKE);
 
-    if (!rgba_is_transparent(dlayer->buf + UNDERC_OFFSET(drow->n_cells),
+    ଯଦି (!rgba_is_transparent(dlayer->buf + UNDERC_OFFSET(drow->n_cells),
 		drow->n_cells))
     {
 	source = draw_layer_get_texture(dlayer, drow->row, da,
 		UNDERC_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->underc_mask,
+	nodes[n_nodes++] = gsk_mask_ଗଣ୍ଠି_new(source, drow->underc_mask,
 		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	gsk_render_ଗଣ୍ଠି_unref(source);
     }
 
-    if (!rgba_is_transparent(dlayer->buf + STRIKE_OFFSET(drow->n_cells),
+    ଯଦି (!rgba_is_transparent(dlayer->buf + STRIKE_OFFSET(drow->n_cells),
 		drow->n_cells))
     {
 	source = draw_layer_get_texture(dlayer, drow->row, da,
 		STRIKE_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->strike_mask,
+	nodes[n_nodes++] = gsk_mask_ଗଣ୍ଠି_new(source, drow->strike_mask,
 		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	gsk_render_ଗଣ୍ଠି_unref(source);
     }
 
-    if (n_nodes == 1)
+    ଯଦି (n_nodes == 1)
     {
-	dlayer->node = nodes[0];
+	dlayer->ଗଣ୍ଠି = nodes[0];
     }
-    else if (n_nodes > 0)
+    ଅନ୍ୟଥା ଯଦି (n_nodes > 0)
     {
-	dlayer->node = gsk_container_node_new(nodes, 2);
+	dlayer->ଗଣ୍ଠି = gsk_container_ଗଣ୍ଠି_new(nodes, 2);
 	// gsk_container_node_new() takes its own ref
-	for (int i = 0; i < (int)ARRAY_LENGTH(nodes); i++)
-	    gsk_render_node_unref(nodes[i]);
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)ARRAY_LENGTH(nodes); i++)
+	    gsk_render_ଗଣ୍ଠି_unref(nodes[i]);
     }
 
     dlayer->dirty = FALSE;
@@ -1151,99 +1151,99 @@ draw_row_render_special(DrawRow *drow, VimDrawArea *da)
 /*
  * Render white color blocks used for blend to invert cells.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_render_overlay(DrawRow *drow, VimDrawArea *da)
 {
     DrawLayer *dlayer = drow->dlayers + DRAW_LAYER_OVERLAY;
 
-    if (!dlayer->dirty)
-	return;
+    ଯଦି (!dlayer->dirty)
+	ଫେରନ୍ତୁ;
 
     dlayer->dirty = FALSE;
 
     // If no invert regions, don't do anything.
-    if (rgba_is_transparent(dlayer->buf, da->n_cols))
-	return;
+    ଯଦି (rgba_is_transparent(dlayer->buf, da->n_cols))
+	ଫେରନ୍ତୁ;
 
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->ଗଣ୍ଠି = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
 }
 
 /*
  * Add the glyph cluster to the raw area with given attributes and font.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 draw_row_add_cluster(
 	DrawRow		*drow,
 	DrawAttr	*dattr,
-	int		col,
-	int		n_cells,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_cells,
 	PangoFont	*font,
 	PangoGlyphInfo	*glyphs,
-	int		n_glyphs,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_glyphs,
 	VimDrawArea	*da)
 {
-    DrawGlyphs *dglyphs = NULL;
+    DrawGlyphs *dglyphs = ଖାଲି;
 
-    if (col + n_cells > da->n_cols)
-	return;
+    ଯଦି (col + n_cells > da->n_cols)
+	ଫେରନ୍ତୁ;
 
     // If there is no ink ("glyphs" is NULL), then just set the "dglyphs" of
     // each cell to NULL.
-    if (glyphs != NULL)
+    ଯଦି (glyphs != ଖାଲି)
 	dglyphs = draw_glyphs_new(font, glyphs, n_glyphs, dattr->fg_color);
 
     draw_row_fill(drow, col, col + n_cells - 1, dglyphs, dattr, &da->cursor);
 
-    if (dglyphs != NULL)
+    ଯଦି (dglyphs != ଖାଲି)
 	draw_glyphs_unref(dglyphs);
 }
 
 /*
  * Add the string to the draw area. This will handle the 'guiligatures' option.
  */
-    static int
+    ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 vim_draw_area_add_string(
 	VimDrawArea *self,
 	DrawRow	    *drow,
 	DrawAttr    *dattr,
-	int	    col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col,
 	char_u	    *s,
-	int	    len,
-	int	    draw_flags)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    draw_flags)
 {
     PangoGlyphString	*glyphs;
-    PangoAttrList	*attr_list = NULL;
-    int			start_idx = -1;
+    PangoAttrList	*attr_list = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			start_idx = -1;
     GList		*item_list;
-    int			column_offset = 0;
-    int			cluster_width;
-    int			last_glyph_rbearing;
-    int			cells = 0;
-    int			i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			column_offset = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			cluster_width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			last_glyph_rbearing;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			cells = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା			i = 0;
     gboolean		has_unicode = FALSE;
     gboolean		needs_shaping = FALSE;
 
     // Scan the string, and find spans where ligatures should not happen. We
     // must ensure that attribute boundaries do not split a base character from
     // its combining marks, as Pango breaks items at attribute boundaries.
-    while (i < len)
+    ଯେତେବେଳେ (i < len)
     {
-	int	clen = 1;
-	int	is_composing = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	clen = 1;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	is_composing = 0;
 	bool	want_disable;
 
-	if (s[i] >= 0x80)
+	ଯଦି (s[i] >= 0x80)
 	{
 	    clen = utf_ptr2len(s + i);
 	    is_composing = utf_iscomposing(utf_ptr2char(s + i));
 	    has_unicode = TRUE;
 	}
 
-	if (is_composing)
+	ଯଦି (is_composing)
 	    // Do not change state mid-cluster. Inherit the previous character's
 	    // state.
 	    want_disable = (start_idx != -1);
-	else
+	ଅନ୍ୟଥା
 	    // Base character: disable ligatures if it's an ASCII non-ligature
 	    // char.
 	    want_disable = (s[i] < 0x80 && !gui.ligatures_map[s[i]]);
@@ -1252,19 +1252,19 @@ vim_draw_area_add_string(
 	// the string must go through Pango's shaping engine -- the ASCII
 	// fast path below draws cached glyphs one-by-one and can never
 	// produce a ligature, regardless of 'guiligatures'.
-	if (!is_composing && !want_disable)
+	ଯଦି (!is_composing && !want_disable)
 	    needs_shaping = TRUE;
 
-	if (want_disable)
+	ଯଦି (want_disable)
 	{
-	    if (start_idx == -1)
+	    ଯଦି (start_idx == -1)
 		start_idx = i;
 	}
-	else if (start_idx != -1)
+	ଅନ୍ୟଥା ଯଦି (start_idx != -1)
 	{
-	    if (attr_list == NULL)
+	    ଯଦି (attr_list == ଖାଲି)
 		attr_list = pango_attr_list_new();
-	    INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+	    ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
 		    attr_list, start_idx, i);
 	    start_idx = -1;
 	}
@@ -1274,13 +1274,13 @@ vim_draw_area_add_string(
     // Fast path for pure ASCII: use cached glyph table. Skip this path when
     // there are non-ascii characters in the string, font attributes, or if
     // there's a possible ligature.
-    if (!(draw_flags & DRAW_ITALIC)
+    ଯଦି (!(draw_flags & DRAW_ITALIC)
 	    && !((draw_flags & DRAW_BOLD) && gui.font_can_bold)
-	    && gui.ascii_glyphs != NULL
+	    && gui.ascii_glyphs != ଖାଲି
 	    && !has_unicode
 	    && !needs_shaping)
     {
-	for (i = 0; i < len; ++i)
+	ପାଇଁ (i = 0; i < len; ++i)
 	{
 	    PangoGlyphInfo  glyph = gui.ascii_glyphs->glyphs[2 * s[i]];
 	    gboolean	    has_ink;
@@ -1288,46 +1288,46 @@ vim_draw_area_add_string(
 	    has_ink = glyph_has_ink(gui.ascii_font, glyph);
 
 	    draw_row_add_cluster(drow, dattr, col + i, 1,
-		    gui.ascii_font, has_ink ? &glyph : NULL, 1, self);
+		    gui.ascii_font, has_ink ? &glyph : ଖାଲି, 1, self);
 	}
 
 	column_offset = len;
-	goto exit;
+	ଯାଅ exit;
     }
 
     glyphs = pango_glyph_string_new();
 
-    if (attr_list == NULL)
+    ଯଦି (attr_list == ଖାଲି)
 	attr_list = pango_attr_list_new();
 
-    if (start_idx != -1)
-	INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+    ଯଦି (start_idx != -1)
+	ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
 		attr_list, start_idx, len);
 
     cluster_width = PANGO_SCALE * gui.char_width;
     last_glyph_rbearing = PANGO_SCALE * gui.char_width;
 
     // If 'guifontwide' is set then use that for double-width characters.
-    if (gui.wide_font != NULL)
+    ଯଦି (gui.wide_font != ଖାଲି)
 	apply_wide_font_attr(s, len, attr_list);
 
-    if ((draw_flags & DRAW_BOLD) && gui.font_can_bold)
-	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+    ଯଦି ((draw_flags & DRAW_BOLD) && gui.font_can_bold)
+	ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
-    if (draw_flags & DRAW_ITALIC)
-	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+    ଯଦି (draw_flags & DRAW_ITALIC)
+	ଭର୍ତ୍ତି_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
     item_list = pango_itemize(gui.text_context,
-	    (const char *)s, 0, len, attr_list, NULL);
+	    (ଅଚଳ ଅକ୍ଷର *)s, 0, len, attr_list, ଖାଲି);
 
-    while (item_list != NULL)
+    ଯେତେବେଳେ (item_list != ଖାଲି)
     {
 	PangoItem   *item = item_list->data;
-	int	    item_cells = 0;
-	int	    cluster_start_idx = 0;
-	int	    current_cluster_col = col + column_offset;
-	int	    current_cluster_cells = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    item_cells = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    cluster_start_idx = 0;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    current_cluster_col = col + column_offset;
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    current_cluster_cells = 0;
 	gboolean    current_cluster_ink = FALSE;
 
 	item_list = g_list_delete_link(item_list, item_list);
@@ -1335,35 +1335,35 @@ vim_draw_area_add_string(
 	// Force LTR direction; Vim handles bidi on its own.
 	item->analysis.level = (item->analysis.level + 1) & (~1U);
 
-	pango_shape_full((const char *)s + item->offset, item->length,
-		(const char *)s, len, &item->analysis, glyphs);
+	pango_shape_full((ଅଚଳ ଅକ୍ଷର *)s + item->offset, item->length,
+		(ଅଚଳ ଅକ୍ଷର *)s, len, &item->analysis, glyphs);
 
 	// Fixed-width hack: assign a fixed width to each glyph based on the
 	// number of cells it occupies, handling composing characters and
 	// cluster boundaries properly.
 	//
 	// At the end of each cluster, add it to the draw area.
-	for (i = 0; i < glyphs->num_glyphs; ++i)
+	ପାଇଁ (i = 0; i < glyphs->ଅଙ୍କ_glyphs; ++i)
 	{
 	    PangoGlyphInfo *glyph;
 
 	    glyph = &glyphs->glyphs[i];
 
-	    if (glyph->attr.is_cluster_start)
+	    ଯଦି (glyph->attr.is_cluster_start)
 	    {
-		int cellcount;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା cellcount;
 
-		cellcount = count_cluster_cells(
+		cellcount = ଗଣନା_cluster_cells(
 			s, item, glyphs, i, &cluster_width,
-			(item_list != NULL) ? &last_glyph_rbearing : NULL);
+			(item_list != ଖାଲି) ? &last_glyph_rbearing : ଖାଲି);
 
-		if (i > 0 && cellcount > 0)
+		ଯଦି (i > 0 && cellcount > 0)
 		{
 		    draw_row_add_cluster(drow, dattr,
 			    current_cluster_col, current_cluster_cells,
 			    item->analysis.font,
 			    current_cluster_ink ?
-			    glyphs->glyphs + cluster_start_idx : NULL,
+			    glyphs->glyphs + cluster_start_idx : ଖାଲି,
 			    i - cluster_start_idx, self);
 
 		    current_cluster_col += current_cluster_cells;
@@ -1372,16 +1372,16 @@ vim_draw_area_add_string(
 		    current_cluster_cells = 0;
 		}
 
-		if (cellcount > 0)
+		ଯଦି (cellcount > 0)
 		{
-		    int width;
+		    ପୂର୍ଣ୍ଣସଂଖ୍ୟା width;
 
 		    width = cellcount * gui.char_width * PANGO_SCALE;
 		    glyph->geometry.x_offset +=
 			MAX(0, width - cluster_width) / 2;
 		    glyph->geometry.width = width;
 		}
-		else
+		ଅନ୍ୟଥା
 		    setup_zero_width_cluster(item, glyph, cells,
 			    cluster_width,
 			    last_glyph_rbearing);
@@ -1390,11 +1390,11 @@ vim_draw_area_add_string(
 		cells = cellcount;
 		current_cluster_cells += cellcount;
 	    }
-	    else if (i > 0)
+	    ଅନ୍ୟଥା ଯଦି (i > 0)
 	    {
-		int width;
+		ପୂର୍ଣ୍ଣସଂଖ୍ୟା width;
 
-		if (glyph->geometry.x_offset >= 0)
+		ଯଦି (glyph->geometry.x_offset >= 0)
 		{
 		    glyphs->glyphs[i].geometry.width =
 			glyphs->glyphs[i - 1].geometry.width;
@@ -1404,21 +1404,21 @@ vim_draw_area_add_string(
 		glyph->geometry.x_offset +=
 		    MAX(0, width - cluster_width) / 2;
 	    }
-	    else
+	    ଅନ୍ୟଥା
 		glyph->geometry.width = 0;
 
 
-	    if (!current_cluster_ink)
+	    ଯଦି (!current_cluster_ink)
 		current_cluster_ink = glyph_has_ink(
 			item->analysis.font, *glyph);
 	}
-	if (glyphs->num_glyphs > 0)
+	ଯଦି (glyphs->ଅଙ୍କ_glyphs > 0)
 	    draw_row_add_cluster(drow, dattr,
 		    current_cluster_col, current_cluster_cells,
 		    item->analysis.font,
 		    current_cluster_ink ?
-		    glyphs->glyphs + cluster_start_idx : NULL,
-		    glyphs->num_glyphs - cluster_start_idx, self);
+		    glyphs->glyphs + cluster_start_idx : ଖାଲି,
+		    glyphs->ଅଙ୍କ_glyphs - cluster_start_idx, self);
 
 	pango_item_free(item);
 	column_offset += item_cells;
@@ -1427,40 +1427,40 @@ vim_draw_area_add_string(
     pango_glyph_string_free(glyphs);
 
 exit:
-    if (attr_list != NULL)
+    ଯଦି (attr_list != ଖାଲି)
 	pango_attr_list_unref(attr_list);
 
-    return column_offset;
+    ଫେରନ୍ତୁ column_offset;
 }
 
 /*
  * Draw the given string at position (col, row) on the draw area.
  */
-    int
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା
 vim_draw_area_draw_string(
 	VimDrawArea *self,
-	int	    row,
-	int	    col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col,
 	char_u	    *s,
-	int	    len,
-	int	    flags)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    len,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    flags)
 {
     DrawRow	*drow;
     DrawAttr	dattr;
-    char_u	*conv_buf = NULL;
-    int		convlen;
-    int		n_cells ;
+    char_u	*conv_buf = ଖାଲି;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		convlen;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		n_cells ;
 
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row >= self->n_rows
 		|| col >= self->n_cols))
-	return len;
+	ଫେରନ୍ତୁ len;
 
-    if (output_conv.vc_type != CONV_NONE)
+    ଯଦି (output_conv.vc_type != CONV_NONE)
     {
 	convlen = len;
 	conv_buf = string_convert(&output_conv, s, &convlen);
-	if (conv_buf != NULL)
+	ଯଦି (conv_buf != ଖାଲି)
 	{
 	    s = conv_buf;
 	    len = convlen;
@@ -1468,10 +1468,10 @@ vim_draw_area_draw_string(
     }
 
     // Safety check: pango crashes with invalid utf-8.
-    if (!utf_valid_string(s, s + len))
+    ଯଦି (!utf_valid_string(s, s + len))
     {
 	vim_free(conv_buf);
-	return len;
+	ଫେରନ୍ତୁ len;
     }
 
     drow = self->rows + row;
@@ -1481,35 +1481,35 @@ vim_draw_area_draw_string(
 
     vim_free(conv_buf);
 
-    return n_cells;
+    ଫେରନ୍ତୁ n_cells;
 }
 
 /*
  * Clear out the block with the given bounds (inclusive).
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_clear_block(
 	VimDrawArea	*self,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row2,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col2)
 {
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row1 >= self->n_rows
 		|| col1 >= self->n_cols
 		|| row2 >= self->n_rows
 		|| col2 >= self->n_cols))
-	return;
+	ଫେରନ୍ତୁ;
 
-    for (int r = row1; r <= row2; r++)
-	draw_row_fill(self->rows + r, col1, col2, NULL, NULL, &self->cursor);
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = row1; r <= row2; r++)
+	draw_row_fill(self->rows + r, col1, col2, ଖାଲି, ଖାଲି, &self->cursor);
 }
 
 /*
  * Clear out the entire draw area
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_clear(VimDrawArea *self)
 {
     vim_draw_area_clear_block(self, 0, 0, self->n_rows - 1, self->n_cols - 1);
@@ -1520,47 +1520,47 @@ vim_draw_area_clear(VimDrawArea *self)
  * "col2" (making a rectangle region), to the row "to". The previous region that
  * was moved is cleared.
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_move_block(
 	VimDrawArea *self,
-	int	    to,
-	int	    row1,
-	int	    row2,
-	int	    col1,
-	int	    col2)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    to,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    row1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    row2,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col1,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col2)
 {
-    int offset = row2 - row1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା offset = row2 - row1;
 
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row1 >= self->n_rows
 		|| row2 >= self->n_rows
 		|| to >= self->n_rows
 		|| col1 >= self->n_cols
 		|| col2 >= self->n_cols))
-	return;
+	ଫେରନ୍ତୁ;
 
-    assert(row2 >= row1);
-    assert(col2 >= col1);
-    assert(row1 != to);
+    ପ୍ରତିଜ୍ଞା(row2 >= row1);
+    ପ୍ରତିଜ୍ଞା(col2 >= col1);
+    ପ୍ରତିଜ୍ଞା(row1 != to);
 
-    if (row1 > to)
+    ଯଦି (row1 > to)
     {
 	// "row1" is below "to", start moving rows starting at "row1". Rows are
 	// being shifted upwards.
-	for (int o = 0; o <= offset; o++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା o = 0; o <= offset; o++)
 	    draw_row_move_to(self->rows + to + o, self->rows + row1 + o,
 		    col1, col2, self);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// "row1" is above "to", must start moving rows starting at "row2". Rows
 	// are being shifted downwards.
-	for (int o = offset; o >= 0; o--)
-	    if (to + o >= self->n_rows)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା o = offset; o >= 0; o--)
+	    ଯଦି (to + o >= self->n_rows)
 		// "src_row" is being "moved" off the screen, no need to move
 		// it physically.
 		vim_draw_area_clear_block(self, row1 + o, col1, row1 + o, col2);
-	    else
+	    ଅନ୍ୟଥା
 		draw_row_move_to(self->rows + to + o, self->rows + row1 + o,
 			col1, col2, self);
     }
@@ -1572,8 +1572,8 @@ vim_draw_area_move_block(
  * block cursor is used, if "w" and "h" is -1 then a hollow cursor is used,
  * otherwise a part cursor with dimensions "w" and "h" is used.
  */
-    void
-vim_draw_area_set_cursor(VimDrawArea *self, int w, int h)
+    ଶୂନ୍ୟ
+vim_draw_area_set_cursor(VimDrawArea *self, ପୂର୍ଣ୍ଣସଂଖ୍ୟା w, ପୂର୍ଣ୍ଣସଂଖ୍ୟା h)
 {
     self->cursor.draw = TRUE;
     self->cursor.width = w;
@@ -1588,62 +1588,62 @@ vim_draw_area_set_cursor(VimDrawArea *self, int w, int h)
 /*
  * Invert the rectangle in the draw area.
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_invert_block(
 	VimDrawArea	*self,
-	int		row,
-	int		col,
-	int		nrows,
-	int		ncols)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		nrows,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		ncols)
 {
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row >= self->n_rows
 		|| col >= self->n_cols
 		|| row + nrows - 1 >= self->n_rows
 		|| col + ncols - 1 >= self->n_cols))
-	return;
+	ଫେରନ୍ତୁ;
 
-    for (int r = row; r < row + nrows; r++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = row; r < row + nrows; r++)
     {
 	DrawRow	    *drow = self->rows + r;
 	DrawLayer   *dlayer = drow->dlayers + DRAW_LAYER_OVERLAY;
 
-	for (int c = 0; c < ncols; c++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା c = 0; c < ncols; c++)
 	    dlayer->buf[c + col] = ~dlayer->buf[c + col];
 	draw_row_dirty_layer(drow, DRAW_LAYER_OVERLAY);
     }
 }
 
-#if defined(FEAT_SIGN_ICONS)
+#ଯଦି defined(FEAT_SIGN_ICONS)
 /*
  * Add a sign texture at the given row and column, and scale it to "width" and
  * "height".
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_add_sign(
 	VimDrawArea *self,
 	GdkTexture  *sign,
-	int	    row,
-	int	    col,
-	int	    width,
-	int	    height)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    width,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା	    height)
 {
     DrawRow	*drow;
     DrawSign	*dsign;
     DrawGlyphs	*dglyphs;
-    int		cells;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cells;
 
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row >= self->n_rows
 		|| col >= self->n_cols))
-	return;
+	ଫେରନ୍ତୁ;
 
     drow = self->rows + row;
     dsign = draw_sign_new(sign, width, height);
     dglyphs = draw_glyphs_new_sign(dsign);
     cells = (width + gui.char_width - 1) / gui.char_width;
 
-    draw_row_fill(drow, col, col + cells - 1, dglyphs, NULL, &self->cursor);
+    draw_row_fill(drow, col, col + cells - 1, dglyphs, ଖାଲି, &self->cursor);
     draw_glyphs_unref(dglyphs);
 }
 #endif
@@ -1653,26 +1653,26 @@ vim_draw_area_add_sign(
  * Add a multi sign indicator at the given position. "surf" should be in ARGB
  * format.
  */
-    void
+    ଶୂନ୍ୟ
 vim_draw_area_add_multisign(
 	VimDrawArea	*self,
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		row,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		col,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		width,
+	ପୂର୍ଣ୍ଣସଂଖ୍ୟା		height)
 {
     DrawRow	*drow;
     DrawSign	*dsign;
     DrawGlyphs	*dglyphs;
-    int		cells;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		cells;
     GdkTexture	*texture;
     GBytes	*bytes;
 
-    if (unlikely(self->rows == NULL
+    ଯଦି (unlikely(self->rows == ଖାଲି
 		|| row >= self->n_rows
 		|| col >= self->n_cols))
-	return;
+	ଫେରନ୍ତୁ;
 
     cairo_surface_flush(surf);
     bytes = g_bytes_new_with_free_func(cairo_image_surface_get_data(surf),
@@ -1693,7 +1693,7 @@ vim_draw_area_add_multisign(
     dglyphs = draw_glyphs_new_sign(dsign);
     cells = (width + gui.char_width - 1) / gui.char_width;
 
-    draw_row_fill(drow, col, col + cells - 1, dglyphs, NULL, &self->cursor);
+    draw_row_fill(drow, col, col + cells - 1, dglyphs, ଖାଲି, &self->cursor);
     draw_glyphs_unref(dglyphs);
 }
 #endif
@@ -1703,16 +1703,16 @@ vim_draw_area_add_multisign(
 /*
  * Add an external node to be rendered, adding a new reference to the node.
  */
-    void
-vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node)
+    ଶୂନ୍ୟ
+vim_draw_area_add_external(VimDrawArea *self, Gsk_Render_ଗଣ୍ଠି *ଗଣ୍ଠି)
 {
-    g_hash_table_add(self->external, gsk_render_node_ref(node));
+    g_hash_table_add(self->external, gsk_render_ଗଣ୍ଠି_ref(ଗଣ୍ଠି));
 }
 
-    void
-vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node)
+    ଶୂନ୍ୟ
+vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_ଗଣ୍ଠି *ଗଣ୍ଠି)
 {
-    g_hash_table_remove(self->external, node);
+    g_hash_table_remove(self->external, ଗଣ୍ଠି);
 }
 
 #endif
@@ -1720,22 +1720,22 @@ vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node)
 /*
  * Add the cursor to the snapshot.
  */
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 vim_draw_area_snapshot_cursor(
 	VimDrawArea	*self,
-	GskRenderNode	*text_node,	// May be NULL
-	GskRenderNode	*special_node,	// May be NULL
+	Gsk_Render_ଗଣ୍ଠି	*text_ଗଣ୍ଠି,	// May be NULL
+	Gsk_Render_ଗଣ୍ଠି	*special_ଗଣ୍ଠି,	// May be NULL
 	GtkSnapshot	*snapshot)
 {
     DrawCursor	    *cursor = &self->cursor;
-    int		    w = cursor->width;
-    int		    h = cursor->height;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    w = cursor->width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    h = cursor->height;
     graphene_rect_t rect;
 
-    if (!cursor->draw)
-	return;
+    ଯଦି (!cursor->draw)
+	ଫେରନ୍ତୁ;
 
-    if (cursor->width <= 0 && cursor->height <= 0)
+    ଯଦି (cursor->width <= 0 && cursor->height <= 0)
     {
 	w += gui.char_width * cursor->n_cells;
 	h = gui.char_height;
@@ -1743,18 +1743,18 @@ vim_draw_area_snapshot_cursor(
 
     graphene_rect_init(&rect,
 #ifdef FEAT_RIGHTLEFT
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.cursor_col + 1) - w :
+	    CURSOR_BAR_ଡାହାଣ ? FILL_X(gui.cursor_col + 1) - w :
 #endif
 	    FILL_X(gui.cursor_col),
 	    FILL_Y(gui.cursor_row) + gui.char_height - h, w, h);
 
 
-    if (cursor->width == -1 && cursor->height == -1)
+    ଯଦି (cursor->width == -1 && cursor->height == -1)
     {
 	// Create hollow cursor
 	GskRoundedRect	    outline;
-	static const float  border[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	const GdkRGBA	    color[4] = {
+	ସ୍ଥିର ଅଚଳ ଦଶମିକ  border[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+	ଅଚଳ GdkRGBA	    color[4] = {
 	    cursor->bg_color, cursor->bg_color,
 	    cursor->bg_color, cursor->bg_color
 	} ;
@@ -1762,58 +1762,58 @@ vim_draw_area_snapshot_cursor(
 	gsk_rounded_rect_init_from_rect(&outline, &rect, 0.0f);
 	gtk_snapshot_append_border(snapshot, &outline, border, color);
     }
-    else
+    ଅନ୍ୟଥା
     {
 	// Create block style cursor, by masking the text + under decorations
 	// with the fg color.
 	gtk_snapshot_append_color(snapshot, &cursor->bg_color, &rect);
 
-	gtk_snapshot_push_mask(snapshot, GSK_MASK_MODE_ALPHA);
+	gtk_snapshot_ଠେଲ_mask(snapshot, GSK_MASK_MODE_ALPHA);
 
 	// Used as an "outline" for the fg color.
-	if (text_node != NULL)
-	    gtk_snapshot_append_node(snapshot, text_node);
-	if (special_node != NULL)
-	    gtk_snapshot_append_node(snapshot, special_node);
+	ଯଦି (text_ଗଣ୍ଠି != ଖାଲି)
+	    gtk_snapshot_append_ଗଣ୍ଠି(snapshot, text_ଗଣ୍ଠି);
+	ଯଦି (special_ଗଣ୍ଠି != ଖାଲି)
+	    gtk_snapshot_append_ଗଣ୍ଠି(snapshot, special_ଗଣ୍ଠି);
 
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_କାଢ଼(snapshot);
 
 	gtk_snapshot_append_color(snapshot, &cursor->fg_color, &rect);
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_କାଢ଼(snapshot);
     }
 }
 
-    static void
+    ସ୍ଥିର ଶୂନ୍ୟ
 vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 {
     VimDrawArea	    *self = VIM_DRAW_AREA(widget);
-    int		    height, width;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା		    height, width;
     GtkSnapshot	    *body_snapshot;
-    GtkSnapshot	    *invert_snapshot = NULL;
-    GskRenderNode   *body_node;
-    GskRenderNode   *invert_node = NULL;
+    GtkSnapshot	    *invert_snapshot = ଖାଲି;
+    Gsk_Render_ଗଣ୍ଠି   *body_ଗଣ୍ଠି;
+    Gsk_Render_ଗଣ୍ଠି   *invert_ଗଣ୍ଠି = ଖାଲି;
 #ifdef FEAT_IMAGE_GUI
-    GskRenderNode   *ext_node;
+    Gsk_Render_ଗଣ୍ଠି   *ext_ଗଣ୍ଠି;
     GHashTableIter  iter;
 #endif
 
     gui_mch_set_bg_color(gui.back_pixel);
     height = gtk_widget_get_height(widget) + gui.bleed_bot;
-    width = gtk_widget_get_width(widget) + gui.bleed_right;
+    width = gtk_widget_get_width(widget) + gui.bleed_ଡାହାଣ;
 
-    if (self->rows == NULL)
+    ଯଦି (self->rows == ଖାଲି)
     {
 	gtk_snapshot_append_color(snapshot, gui.bgcolor,
 		&GRAPHENE_RECT_INIT(0, 0, width, height));
-	return;
+	ଫେରନ୍ତୁ;
     }
 
     // If number of pixels to bleed has changed, then dirty the background and
     // overlay layers of all rows.
-    if (self->bleed_right == -1 || self->bleed_right != gui.bleed_right)
+    ଯଦି (self->bleed_ଡାହାଣ == -1 || self->bleed_ଡାହାଣ != gui.bleed_ଡାହାଣ)
     {
-	self->bleed_right = gui.bleed_right;
-	for (int r = 0; r < self->n_rows; r++)
+	self->bleed_ଡାହାଣ = gui.bleed_ଡାହାଣ;
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < self->n_rows; r++)
 	{
 	    draw_row_dirty_layer(self->rows + r, DRAW_LAYER_BACKGROUND);
 	    draw_row_dirty_layer(self->rows + r, DRAW_LAYER_OVERLAY);
@@ -1823,11 +1823,11 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
     // First append everything that should be inverted to another snapshot, then
     // free that snapshot into a node so it can be blended (if needed).
     body_snapshot = gtk_snapshot_new();
-#if GTK_CHECK_VERSION(4,24,0)
+#ଯଦି GTK_CHECK_VERSION(4,24,0)
     gtk_snapshot_set_snap(body_snapshot, GSK_RECT_SNAP_ROUND);
 #endif
 
-    for (int r = 0; r < self->n_rows; r++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା r = 0; r < self->n_rows; r++)
     {
 	DrawRow *drow = self->rows + r;
 
@@ -1836,66 +1836,66 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 	draw_row_render_special(drow, self);
 	draw_row_render_overlay(drow, self);
 
-	for (int l = 0; l < N_DRAW_LAYERS; l++)
+	ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା l = 0; l < N_DRAW_LAYERS; l++)
 	{
 	    DrawLayer *dlayer = drow->dlayers + l;
 
-	    if (dlayer->node != NULL)
+	    ଯଦି (dlayer->ଗଣ୍ଠି != ଖାଲି)
 	    {
-		if (l == DRAW_LAYER_OVERLAY)
+		ଯଦି (l == DRAW_LAYER_OVERLAY)
 		{
-		    if (invert_snapshot == NULL)
+		    ଯଦି (invert_snapshot == ଖାଲି)
 		    {
 			invert_snapshot = gtk_snapshot_new();
-#if GTK_CHECK_VERSION(4,24,0)
+#ଯଦି GTK_CHECK_VERSION(4,24,0)
 			gtk_snapshot_set_snap(invert_snapshot,
 				GSK_RECT_SNAP_ROUND);
 #endif
 		    }
-		    gtk_snapshot_append_node(invert_snapshot, dlayer->node);
+		    gtk_snapshot_append_ଗଣ୍ଠି(invert_snapshot, dlayer->ଗଣ୍ଠି);
 		}
-		else
-		    gtk_snapshot_append_node(body_snapshot, dlayer->node);
+		ଅନ୍ୟଥା
+		    gtk_snapshot_append_ଗଣ୍ଠି(body_snapshot, dlayer->ଗଣ୍ଠି);
 	    }
 	}
 
-	if (r == gui.cursor_row)
+	ଯଦି (r == gui.cursor_row)
 	    vim_draw_area_snapshot_cursor(self,
-		    drow->dlayers[DRAW_LAYER_TEXT].node,
-		    drow->dlayers[DRAW_LAYER_SPECIAL].node,
+		    drow->dlayers[DRAW_LAYER_TEXT].ଗଣ୍ଠି,
+		    drow->dlayers[DRAW_LAYER_SPECIAL].ଗଣ୍ଠି,
 		    body_snapshot);
     }
 
-    if (invert_snapshot != NULL)
-	gtk_snapshot_push_blend(snapshot, GSK_BLEND_MODE_DIFFERENCE);
+    ଯଦି (invert_snapshot != ଖାଲି)
+	gtk_snapshot_ଠେଲ_blend(snapshot, GSK_BLEND_MODE_DIFFERENCE);
 
     gtk_snapshot_append_color(snapshot, gui.bgcolor,
 	    &GRAPHENE_RECT_INIT(0, 0, width, height));
-    body_node = gtk_snapshot_free_to_node(body_snapshot);
-    if (body_node != NULL)
+    body_ଗଣ୍ଠି = gtk_snapshot_free_to_ଗଣ୍ଠି(body_snapshot);
+    ଯଦି (body_ଗଣ୍ଠି != ଖାଲି)
     {
-	gtk_snapshot_append_node(snapshot, body_node);
-	gsk_render_node_unref(body_node);
+	gtk_snapshot_append_ଗଣ୍ଠି(snapshot, body_ଗଣ୍ଠି);
+	gsk_render_ଗଣ୍ଠି_unref(body_ଗଣ୍ଠି);
     }
 
 #ifdef FEAT_IMAGE_GUI
     // Allow external nodes to be inverted
     g_hash_table_iter_init(&iter, self->external);
 
-    while (g_hash_table_iter_next(&iter, (void **)&ext_node, NULL))
-	gtk_snapshot_append_node(snapshot, ext_node);
+    ଯେତେବେଳେ (g_hash_table_iter_next(&iter, (ଶୂନ୍ୟ **)&ext_ଗଣ୍ଠି, ଖାଲି))
+	gtk_snapshot_append_ଗଣ୍ଠି(snapshot, ext_ଗଣ୍ଠି);
 #endif
 
-    if (invert_snapshot != NULL)
+    ଯଦି (invert_snapshot != ଖାଲି)
     {
-	gtk_snapshot_pop(snapshot);
-	invert_node = gtk_snapshot_free_to_node(invert_snapshot);
+	gtk_snapshot_କାଢ଼(snapshot);
+	invert_ଗଣ୍ଠି = gtk_snapshot_free_to_ଗଣ୍ଠି(invert_snapshot);
 	// Not sure if it can be NULL but still check
-	if (invert_node != NULL)
+	ଯଦି (invert_ଗଣ୍ଠି != ଖାଲି)
 	{
-	    gtk_snapshot_append_node(snapshot, invert_node);
-	    gsk_render_node_unref(invert_node);
+	    gtk_snapshot_append_ଗଣ୍ଠି(snapshot, invert_ଗଣ୍ଠି);
+	    gsk_render_ଗଣ୍ଠି_unref(invert_ଗଣ୍ଠି);
 	}
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_କାଢ଼(snapshot);
     }
 }
