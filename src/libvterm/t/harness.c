@@ -1,159 +1,159 @@
-#include "vterm.h"
-#include "../src/vterm_internal.h" // We pull in some internal bits too
+#अन्तर्भाव "vterm.h"
+#अन्तर्भाव "../src/vterm_internal.h" // We pull in some internal bits too
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#अन्तर्भाव <assert.h>
+#अन्तर्भाव <stdio.h>
+#अन्तर्भाव <string.h>
 
 #define streq(a,b) (!strcmp(a,b))
 #define strstartswith(a,b) (!strncmp(a,b,strlen(b)))
 
-static size_t inplace_hex2bytes(char *s)
+स्थिर size_t inplace_hex2bytes(वर्ण *s)
 {
-  char *inpos = s, *outpos = s;
+  वर्ण *inpos = s, *outpos = s;
 
-  while(*inpos) {
-    unsigned int ch;
-    if(sscanf(inpos, "%2x", &ch) < 1)
-      break;
+  यावत्(*inpos) {
+    unsigned पूर्णाङ्क ch;
+    यदि(sscanf(inpos, "%2x", &ch) < 1)
+      भङ्ग;
     *outpos = ch;
     outpos += 1; inpos += 2;
   }
 
-  return outpos - s;
+  प्रत्यागम outpos - s;
 }
 
-static VTermModifier strpe_modifiers(char **strp)
+स्थिर VTermModifier strpe_modifiers(वर्ण **strp)
 {
   VTermModifier state = 0;
 
-  while((*strp)[0]) {
-    switch(((*strp)++)[0]) {
-      case 'S': state |= VTERM_MOD_SHIFT; break;
-      case 'C': state |= VTERM_MOD_CTRL;  break;
-      case 'A': state |= VTERM_MOD_ALT;   break;
-      default: return state;
+  यावत्((*strp)[0]) {
+    विकल्प(((*strp)++)[0]) {
+      पक्ष 'S': state |= VTERM_MOD_SHIFT; भङ्ग;
+      पक्ष 'C': state |= VTERM_MOD_CTRL;  भङ्ग;
+      पक्ष 'A': state |= VTERM_MOD_ALT;   भङ्ग;
+      स्वभाव: प्रत्यागम state;
     }
   }
 
-  return state;
+  प्रत्यागम state;
 }
 
-static VTermKey strp_key(char *str)
+स्थिर VTerm_कुंजी strp_कुंजी(वर्ण *str)
 {
-  static struct {
-    char *name;
-    VTermKey key;
-  } keys[] = {
-    { "Up",    VTERM_KEY_UP },
-    { "Tab",   VTERM_KEY_TAB },
-    { "Enter", VTERM_KEY_ENTER },
-    { "KP0",   VTERM_KEY_KP_0 },
-    { "F1",    VTERM_KEY_FUNCTION(1) },
-    { NULL,    VTERM_KEY_NONE },
+  स्थिर संरचना {
+    वर्ण *name;
+    VTerm_कुंजी कुंजी;
+  } कुंजियाँ[] = {
+    { "Up",    VTERM_कुंजी_UP },
+    { "Tab",   VTERM_कुंजी_TAB },
+    { "Enter", VTERM_कुंजी_ENTER },
+    { "KP0",   VTERM_कुंजी_KP_0 },
+    { "F1",    VTERM_कुंजी_FUNCTION(1) },
+    { रिक्त,    VTERM_कुंजी_NONE },
   };
-  int i;
+  पूर्णाङ्क i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  प्रति(i = 0; कुंजियाँ[i].name; i++) {
+    यदि(streq(str, कुंजियाँ[i].name))
+      प्रत्यागम कुंजियाँ[i].कुंजी;
   }
 
-  return VTERM_KEY_NONE;
+  प्रत्यागम VTERM_कुंजी_NONE;
 }
 
-static void print_color(const VTermColor *col)
+स्थिर शून्य print_color(ध्रुव VTermColor *col)
 {
-  if (VTERM_COLOR_IS_RGB(col)) {
+  यदि (VTERM_COLOR_IS_RGB(col)) {
     printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
   }
-  else if (VTERM_COLOR_IS_INDEXED(col)) {
+  अन्यथा यदि (VTERM_COLOR_IS_INDEXED(col)) {
     printf("idx(%d", col->index);
   }
-  else {
+  अन्यथा {
     printf("invalid(%d", col->type);
   }
-  if (VTERM_COLOR_IS_DEFAULT_FG(col)) {
+  यदि (VTERM_COLOR_IS_DEFAULT_FG(col)) {
     printf(",is_default_fg");
   }
-  if (VTERM_COLOR_IS_DEFAULT_BG(col)) {
+  यदि (VTERM_COLOR_IS_DEFAULT_BG(col)) {
     printf(",is_default_bg");
   }
   printf(")");
 }
 
-static VTermColor strpe_color(char **strp)
+स्थिर VTermColor strpe_color(वर्ण **strp)
 {
   uint8_t r, g, b, idx;
-  int len = 0;
+  पूर्णाङ्क len = 0;
   VTermColor col;
 
-  if(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
+  यदि(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
     *strp += len;
     vterm_color_rgb(&col, r, g, b);
   }
-  else if(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
+  अन्यथा यदि(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
     *strp += len;
     vterm_color_indexed(&col, idx);
   }
-  else
+  अन्यथा
     vterm_color_rgb(&col, 127, 127, 127);
 
-  return col;
+  प्रत्यागम col;
 }
 
-static VTerm *vt;
-static VTermState *state;
-static VTermScreen *screen;
+स्थिर VTerm *vt;
+स्थिर VTermState *state;
+स्थिर VTermScreen *screen;
 
-static VTermEncodingInstance encoding;
+स्थिर VTermEncodingInstance encoding;
 
-static void term_output(const char *s, size_t len, void *user UNUSED)
+स्थिर शून्य term_output(ध्रुव वर्ण *s, size_t len, शून्य *user UNUSED)
 {
   size_t i;
 
   printf("output ");
-  for(i = 0; i < len; i++)
-    printf("%x%s", (unsigned char)s[i], i < len-1 ? "," : "\n");
+  प्रति(i = 0; i < len; i++)
+    printf("%x%s", (unsigned वर्ण)s[i], i < len-1 ? "," : "\n");
 }
 
-static void printhex(const char *s, size_t len)
+स्थिर शून्य printhex(ध्रुव वर्ण *s, size_t len)
 {
-  while(len--)
+  यावत्(len--)
     printf("%02x", (uint8_t)(s++)[0]);
 }
 
-static int parser_text(const char bytes[], size_t len, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_text(ध्रुव वर्ण bytes[], size_t len, शून्य *user UNUSED)
 {
   size_t i;
 
   printf("text ");
-  for(i = 0; i < len; i++) {
-    unsigned char b = bytes[i];
-    if(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
-      break;
+  प्रति(i = 0; i < len; i++) {
+    unsigned वर्ण b = bytes[i];
+    यदि(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
+      भङ्ग;
     printf(i ? ",%x" : "%x", b);
   }
   printf("\n");
 
-  return i;
+  प्रत्यागम i;
 }
 
-static int parser_control(unsigned char control, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_control(unsigned वर्ण control, शून्य *user UNUSED)
 {
   printf("control %02x\n", control);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_escape(ध्रुव वर्ण bytes[], size_t len, शून्य *user UNUSED)
 {
-  if(bytes[0] >= 0x20 && bytes[0] < 0x30) {
-    if(len < 2)
-      return -1;
+  यदि(bytes[0] >= 0x20 && bytes[0] < 0x30) {
+    यदि(len < 2)
+      प्रत्यागम -1;
     len = 2;
   }
-  else {
+  अन्यथा {
     len = 1;
   }
 
@@ -161,135 +161,135 @@ static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
   printhex(bytes, len);
   printf("\n");
 
-  return len;
+  प्रत्यागम len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_csi(ध्रुव वर्ण *leader, ध्रुव long args[], पूर्णाङ्क argcount, ध्रुव वर्ण *intermed, वर्ण command, शून्य *user UNUSED)
 {
-  int i;
+  पूर्णाङ्क i;
   printf("csi %02x", command);
 
-  if(leader && leader[0]) {
+  यदि(leader && leader[0]) {
     printf(" L=");
-    for(i = 0; leader[i]; i++)
+    प्रति(i = 0; leader[i]; i++)
       printf("%02x", leader[i]);
   }
 
-  for(i = 0; i < argcount; i++) {
-    char sep = i ? ',' : ' ';
+  प्रति(i = 0; i < argcount; i++) {
+    वर्ण sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
+    यदि(args[i] == CSI_ARG_MISSING)
       printf("%c*", sep);
-    else
+    अन्यथा
       printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
   }
 
-  if(intermed && intermed[0]) {
+  यदि(intermed && intermed[0]) {
     printf(" I=");
-    for(i = 0; intermed[i]; i++)
+    प्रति(i = 0; intermed[i]; i++)
       printf("%02x", intermed[i]);
   }
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_osc(int command, VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_osc(पूर्णाङ्क command, VTermStringFragment frag, शून्य *user UNUSED)
 {
 
   printf("osc ");
 
-  if(frag.initial) {
-    if(command == -1)
+  यदि(frag.initial) {
+    यदि(command == -1)
       printf("[");
-    else
+    अन्यथा
       printf("[%d;", command);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_dcs(ध्रुव वर्ण *command, size_t commandlen, VTermStringFragment frag, शून्य *user UNUSED)
 {
   printf("dcs ");
 
-  if(frag.initial) {
+  यदि(frag.initial) {
     size_t i;
     printf("[");
-    for(i = 0; i < commandlen; i++)
+    प्रति(i = 0; i < commandlen; i++)
       printf("%02x", command[i]);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_apc(VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_apc(VTermStringFragment frag, शून्य *user UNUSED)
 {
   printf("apc ");
 
-  if(frag.initial)
+  यदि(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_pm(VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_pm(VTermStringFragment frag, शून्य *user UNUSED)
 {
   printf("pm ");
 
-  if(frag.initial)
+  यदि(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int parser_sos(VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क parser_sos(VTermStringFragment frag, शून्य *user UNUSED)
 {
   printf("sos ");
 
-  if(frag.initial)
+  यदि(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static VTermParserCallbacks parser_cbs = {
+स्थिर VTermParserCallbacks parser_cbs = {
   parser_text, // text
   parser_control, // control
   parser_escape, // escape
@@ -299,10 +299,10 @@ static VTermParserCallbacks parser_cbs = {
   parser_apc, // apc
   parser_pm, // pm
   parser_sos, // sos
-  NULL // resize
+  रिक्त // resize
 };
 
-static VTermStateFallbacks fallbacks = {
+स्थिर VTermStateFallbacks fallbacks = {
   parser_control, // control
   parser_csi, // csi
   parser_osc, // osc
@@ -314,198 +314,198 @@ static VTermStateFallbacks fallbacks = {
 
 /* These callbacks are shared by State and Screen */
 
-static int want_movecursor = 0;
-static VTermPos state_pos;
-static int movecursor(VTermPos pos, VTermPos oldpos UNUSED, int visible UNUSED, void *user UNUSED)
+स्थिर पूर्णाङ्क want_movecursor = 0;
+स्थिर VTermPos state_pos;
+स्थिर पूर्णाङ्क movecursor(VTermPos pos, VTermPos oldpos UNUSED, पूर्णाङ्क visible UNUSED, शून्य *user UNUSED)
 {
   state_pos = pos;
 
-  if(want_movecursor)
+  यदि(want_movecursor)
     printf("movecursor %d,%d\n", pos.row, pos.col);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_premove = 0;
-static int premove(VTermRect rect, void *user UNUSED)
+स्थिर पूर्णाङ्क want_premove = 0;
+स्थिर पूर्णाङ्क premove(VTermRect rect, शून्य *user UNUSED)
 {
-  if(!want_premove)
-    return 0;
+  यदि(!want_premove)
+    प्रत्यागम 0;
 
   printf("premove %d..%d,%d..%d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_scrollrect = 0;
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user UNUSED)
+स्थिर पूर्णाङ्क want_scrollrect = 0;
+स्थिर पूर्णाङ्क scrollrect(VTermRect rect, पूर्णाङ्क downward, पूर्णाङ्क rightward, शून्य *user UNUSED)
 {
-  if(!want_scrollrect)
-    return 0;
+  यदि(!want_scrollrect)
+    प्रत्यागम 0;
 
   printf("scrollrect %d..%d,%d..%d => %+d,%+d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       downward, rightward);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_moverect = 0;
-static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
+स्थिर पूर्णाङ्क want_moverect = 0;
+स्थिर पूर्णाङ्क moverect(VTermRect dest, VTermRect src, शून्य *user UNUSED)
 {
-  if(!want_moverect)
-    return 0;
+  यदि(!want_moverect)
+    प्रत्यागम 0;
 
   printf("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
       src.start_row,  src.end_row,  src.start_col,  src.end_col,
       dest.start_row, dest.end_row, dest.start_col, dest.end_col);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+स्थिर पूर्णाङ्क want_settermprop = 0;
+स्थिर पूर्णाङ्क settermprop(VTermProp prop, VTerm_मूल्य *val, शून्य *user UNUSED)
 {
-  VTermValueType type;
-  if(!want_settermprop)
-    return 1;
+  VTerm_मूल्य_Type type;
+  यदि(!want_settermprop)
+    प्रत्यागम 1;
 
   type = vterm_get_prop_type(prop);
-  switch(type) {
-  case VTERM_VALUETYPE_BOOL:
+  विकल्प(type) {
+  पक्ष VTERM_VALUETYPE_BOOL:
     printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
-    return 1;
-  case VTERM_VALUETYPE_INT:
-    printf("settermprop %d %d\n", prop, val->number);
-    return 1;
-  case VTERM_VALUETYPE_STRING:
+    प्रत्यागम 1;
+  पक्ष VTERM_VALUETYPE_INT:
+    printf("settermprop %d %d\n", prop, val->संख्या);
+    प्रत्यागम 1;
+  पक्ष VTERM_VALUETYPE_STRING:
     printf("settermprop %d %s\"%.*s\"%s\n", prop,
         val->string.initial ? "[" : "", val->string.len, val->string.str, val->string.final ? "]" : "");
-    return 1;
-  case VTERM_VALUETYPE_COLOR:
+    प्रत्यागम 1;
+  पक्ष VTERM_VALUETYPE_COLOR:
     printf("settermprop %d ", prop);
     print_color(&val->color);
     printf("\n");
-    return 1;
+    प्रत्यागम 1;
 
-  case VTERM_N_VALUETYPES:
-    return 0;
+  पक्ष VTERM_N_VALUETYPES:
+    प्रत्यागम 0;
   }
 
-  return 0;
+  प्रत्यागम 0;
 }
 
 // These callbacks are for State
 
-static int want_state_putglyph = 0;
-static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
+स्थिर पूर्णाङ्क want_state_putglyph = 0;
+स्थिर पूर्णाङ्क state_putglyph(VTermGlyphInfo *info, VTermPos pos, शून्य *user UNUSED)
 {
-  int i;
-  if(!want_state_putglyph)
-    return 1;
+  पूर्णाङ्क i;
+  यदि(!want_state_putglyph)
+    प्रत्यागम 1;
 
   printf("putglyph ");
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
+  प्रति(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
     printf(i ? ",%x" : "%x", info->chars[i]);
   printf(" %d %d,%d", info->width, pos.row, pos.col);
-  if(info->protected_cell)
+  यदि(info->protected_cell)
     printf(" prot");
-  if(info->dwl)
+  यदि(info->dwl)
     printf(" dwl");
-  if(info->dhl)
+  यदि(info->dhl)
     printf(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_state_erase = 0;
-static int state_erase(VTermRect rect, int selective, void *user UNUSED)
+स्थिर पूर्णाङ्क want_state_erase = 0;
+स्थिर पूर्णाङ्क state_erase(VTermRect rect, पूर्णाङ्क selective, शून्य *user UNUSED)
 {
-  if(!want_state_erase)
-    return 1;
+  यदि(!want_state_erase)
+    प्रत्यागम 1;
 
   printf("erase %d..%d,%d..%d%s\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       selective ? " selective" : "");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static struct {
-  int bold;
-  int underline;
-  int italic;
-  int blink;
-  int reverse;
-  int conceal;
-  int strike;
-  int font;
-  int small;
-  int baseline;
+स्थिर संरचना {
+  पूर्णाङ्क bold;
+  पूर्णाङ्क underline;
+  पूर्णाङ्क italic;
+  पूर्णाङ्क blink;
+  पूर्णाङ्क reverse;
+  पूर्णाङ्क conceal;
+  पूर्णाङ्क strike;
+  पूर्णाङ्क font;
+  पूर्णाङ्क small;
+  पूर्णाङ्क baseline;
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+स्थिर पूर्णाङ्क state_setpenattr(VTermAttr attr, VTerm_मूल्य *val, शून्य *user UNUSED)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  विकल्प(attr) {
+  पक्ष VTERM_ATTR_BOLD:
     state_pen.bold = val->boolean;
-    break;
-  case VTERM_ATTR_UNDERLINE:
-    state_pen.underline = val->number;
-    break;
-  case VTERM_ATTR_ITALIC:
+    भङ्ग;
+  पक्ष VTERM_ATTR_UNDERLINE:
+    state_pen.underline = val->संख्या;
+    भङ्ग;
+  पक्ष VTERM_ATTR_ITALIC:
     state_pen.italic = val->boolean;
-    break;
-  case VTERM_ATTR_BLINK:
+    भङ्ग;
+  पक्ष VTERM_ATTR_BLINK:
     state_pen.blink = val->boolean;
-    break;
-  case VTERM_ATTR_REVERSE:
+    भङ्ग;
+  पक्ष VTERM_ATTR_REVERSE:
     state_pen.reverse = val->boolean;
-    break;
-  case VTERM_ATTR_CONCEAL:
+    भङ्ग;
+  पक्ष VTERM_ATTR_CONCEAL:
     state_pen.conceal = val->boolean;
-    break;
-  case VTERM_ATTR_STRIKE:
+    भङ्ग;
+  पक्ष VTERM_ATTR_STRIKE:
     state_pen.strike = val->boolean;
-    break;
-  case VTERM_ATTR_FONT:
-    state_pen.font = val->number;
-    break;
-  case VTERM_ATTR_SMALL:
+    भङ्ग;
+  पक्ष VTERM_ATTR_FONT:
+    state_pen.font = val->संख्या;
+    भङ्ग;
+  पक्ष VTERM_ATTR_SMALL:
     state_pen.small = val->boolean;
-    break;
-  case VTERM_ATTR_BASELINE:
-    state_pen.baseline = val->number;
-    break;
-  case VTERM_ATTR_FOREGROUND:
+    भङ्ग;
+  पक्ष VTERM_ATTR_BASELINE:
+    state_pen.baseline = val->संख्या;
+    भङ्ग;
+  पक्ष VTERM_ATTR_FOREGROUND:
     state_pen.foreground = val->color;
-    break;
-  case VTERM_ATTR_BACKGROUND:
+    भङ्ग;
+  पक्ष VTERM_ATTR_BACKGROUND:
     state_pen.background = val->color;
-    break;
+    भङ्ग;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  पक्ष VTERM_N_ATTRS:
+    प्रत्यागम 0;
   }
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+स्थिर पूर्णाङ्क state_setlineinfo(पूर्णाङ्क row UNUSED, ध्रुव VTerm_पंक्ति_Info *newinfo UNUSED, ध्रुव VTerm_पंक्ति_Info *oldinfo UNUSED, शून्य *user UNUSED)
 {
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_state_scrollback = 0;
-static int state_sb_clear(void *user UNUSED) {
-  if(!want_state_scrollback)
-    return 1;
+स्थिर पूर्णाङ्क want_state_scrollback = 0;
+स्थिर पूर्णाङ्क state_sb_clear(शून्य *user UNUSED) {
+  यदि(!want_state_scrollback)
+    प्रत्यागम 1;
 
   printf("sb_clear\n");
-  return 0;
+  प्रत्यागम 0;
 }
 
 VTermStateCallbacks state_cbs = {
@@ -514,34 +514,34 @@ VTermStateCallbacks state_cbs = {
   scrollrect, // scrollrect
   moverect, // moverect
   state_erase, // erase
-  NULL, // initpen
+  रिक्त, // initpen
   state_setpenattr, // setpenattr
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
+  रिक्त, // bell
+  रिक्त, // resize
   state_setlineinfo, // setlineinfo
   state_sb_clear, // sb_clear
   premove, // premove
 };
 
-static int selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
+स्थिर पूर्णाङ्क selection_set(VTermSelectionMask mask, VTermStringFragment frag, शून्य *user UNUSED)
 {
   printf("selection-set mask=%04X ", mask);
-  if(frag.initial)
+  यदि(frag.initial)
     printf("[");
   printhex(frag.str, frag.len);
-  if(frag.final)
+  यदि(frag.final)
     printf("]");
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int selection_query(VTermSelectionMask mask, void *user UNUSED)
+स्थिर पूर्णाङ्क selection_query(VTermSelectionMask mask, शून्य *user UNUSED)
 {
   printf("selection-query mask=%04X\n", mask);
 
-  return 1;
+  प्रत्यागम 1;
 }
 
 VTermSelectionCallbacks selection_cbs = {
@@ -549,43 +549,43 @@ VTermSelectionCallbacks selection_cbs = {
   .query = selection_query,
 };
 
-static int want_screen_damage = 0;
-static int want_screen_damage_cells = 0;
-static int screen_damage(VTermRect rect, void *user UNUSED)
+स्थिर पूर्णाङ्क want_screen_damage = 0;
+स्थिर पूर्णाङ्क want_screen_damage_cells = 0;
+स्थिर पूर्णाङ्क screen_damage(VTermRect rect, शून्य *user UNUSED)
 {
-  if(!want_screen_damage)
-    return 1;
+  यदि(!want_screen_damage)
+    प्रत्यागम 1;
 
   printf("damage %d..%d,%d..%d",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  if(want_screen_damage_cells) {
-    int equals = FALSE;
-    int row;
-    int col;
+  यदि(want_screen_damage_cells) {
+    पूर्णाङ्क equals = FALSE;
+    पूर्णाङ्क row;
+    पूर्णाङ्क col;
 
-    for(row = rect.start_row; row < rect.end_row; row++) {
-      int eol = rect.end_col;
-      while(eol > rect.start_col) {
+    प्रति(row = rect.start_row; row < rect.end_row; row++) {
+      पूर्णाङ्क eol = rect.end_col;
+      यावत्(eol > rect.start_col) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
 	pos.col = eol-1;
         vterm_screen_get_cell(screen, pos, &cell);
-        if(cell.chars[0])
-          break;
+        यदि(cell.chars[0])
+          भङ्ग;
 
         eol--;
       }
 
-      if(eol == rect.start_col)
-        break;
+      यदि(eol == rect.start_col)
+        भङ्ग;
 
-      if(!equals)
+      यदि(!equals)
         printf(" ="), equals = TRUE;
 
       printf(" %d<", row);
-      for(col = rect.start_col; col < eol; col++) {
+      प्रति(col = rect.start_col; col < eol; col++) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
@@ -599,58 +599,58 @@ static int screen_damage(VTermRect rect, void *user UNUSED)
 
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int want_screen_scrollback = 0;
-static int screen_sb_pushline4(int cols, const VTermScreenCell *cells, int continuation, void *user UNUSED)
+स्थिर पूर्णाङ्क want_screen_scrollback = 0;
+स्थिर पूर्णाङ्क screen_sb_pushline4(पूर्णाङ्क cols, ध्रुव VTermScreenCell *cells, पूर्णाङ्क continuation, शून्य *user UNUSED)
 {
-  int eol;
-  int c;
+  पूर्णाङ्क eol;
+  पूर्णाङ्क c;
 
-  if(!want_screen_scrollback)
-    return 1;
+  यदि(!want_screen_scrollback)
+    प्रत्यागम 1;
 
   eol = cols;
-  while(eol && !cells[eol-1].chars[0])
+  यावत्(eol && !cells[eol-1].chars[0])
     eol--;
 
   printf("sb_pushline %d%s =", cols, continuation ? " cont" : "");
-  for(c = 0; c < eol; c++)
+  प्रति(c = 0; c < eol; c++)
     printf(" %02X", cells[c].chars[0]);
   printf("\n");
 
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int screen_sb_popline(int cols, VTermScreenCell *cells, void *user UNUSED)
+स्थिर पूर्णाङ्क screen_sb_popline(पूर्णाङ्क cols, VTermScreenCell *cells, शून्य *user UNUSED)
 {
-  int col;
+  पूर्णाङ्क col;
 
-  if(!want_screen_scrollback)
-    return 0;
+  यदि(!want_screen_scrollback)
+    प्रत्यागम 0;
 
   // All lines of scrollback contain "ABCDE"
-  for(col = 0; col < cols; col++) {
-    if(col < 5)
+  प्रति(col = 0; col < cols; col++) {
+    यदि(col < 5)
       cells[col].chars[0] = 'A' + col;
-    else
+    अन्यथा
       cells[col].chars[0] = 0;
 
     cells[col].width = 1;
   }
 
   printf("sb_popline %d\n", cols);
-  return 1;
+  प्रत्यागम 1;
 }
 
-static int screen_sb_clear(void *user UNUSED)
+स्थिर पूर्णाङ्क screen_sb_clear(शून्य *user UNUSED)
 {
-  if(!want_screen_scrollback)
-    return 1;
+  यदि(!want_screen_scrollback)
+    प्रत्यागम 1;
 
   printf("sb_clear\n");
-  return 0;
+  प्रत्यागम 0;
 }
 
 VTermScreenCallbacks screen_cbs = {
@@ -658,213 +658,213 @@ VTermScreenCallbacks screen_cbs = {
   moverect, // moverect
   movecursor, // movecursor
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
-  NULL, // sb_pushline
+  रिक्त, // bell
+  रिक्त, // resize
+  रिक्त, // sb_pushline
   screen_sb_popline, // sb_popline
   screen_sb_clear, // sb_clear
   screen_sb_pushline4, // sb_pushline4
 };
 
-int main(int argc UNUSED, char **argv UNUSED)
+पूर्णाङ्क main(पूर्णाङ्क argc UNUSED, वर्ण **argv UNUSED)
 {
-  char line[1024] = {0};
-  int flag;
+  वर्ण पंक्ति[1024] = {0};
+  पूर्णाङ्क flag;
 
-  int err;
+  पूर्णाङ्क err;
 
-  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stdout, रिक्त, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
-    char *nl;
+  यावत्(fgets(पंक्ति, परिमाण पंक्ति, stdin)) {
+    वर्ण *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    यदि((nl = strchr(पंक्ति, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
-      if(!vt)
+    यदि(streq(पंक्ति, "INIT")) {
+      यदि(!vt)
         vt = vterm_new(25, 80);
 
       // Somehow this makes tests fail
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
-      assert(vt);
-      vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
+    अन्यथा यदि(streq(पंक्ति, "WANTPARSER")) {
+      प्रतिज्ञा(vt);
+      vterm_parser_set_callbacks(vt, &parser_cbs, रिक्त);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
-      int i = 9;
-      int sense = 1;
-      assert(vt);
-      if(!state) {
+    अन्यथा यदि(strstartswith(पंक्ति, "WANTSTATE") && (पंक्ति[9] == '\0' || पंक्ति[9] == ' ')) {
+      पूर्णाङ्क i = 9;
+      पूर्णाङ्क sense = 1;
+      प्रतिज्ञा(vt);
+      यदि(!state) {
         state = vterm_obtain_state(vt);
-        vterm_state_set_callbacks(state, &state_cbs, NULL);
+        vterm_state_set_callbacks(state, &state_cbs, रिक्त);
         vterm_state_callbacks_has_premove(state);
         /* In some tests we want to check the behaviour of overflowing the
          * buffer, so make it nicely small
          */
-        vterm_state_set_selection_callbacks(state, &selection_cbs, NULL, NULL, 16);
+        vterm_state_set_selection_callbacks(state, &selection_cbs, रिक्त, रिक्त, 16);
         vterm_state_set_bold_highbright(state, 1);
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      यावत्(पंक्ति[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '+':
+      प्रति( ; पंक्ति[i]; i++)
+        विकल्प(पंक्ति[i]) {
+        पक्ष '+':
           sense = 1;
-          break;
-        case '-':
+          भङ्ग;
+        पक्ष '-':
           sense = 0;
-          break;
-        case 'g':
+          भङ्ग;
+        पक्ष 'g':
           want_state_putglyph = sense;
-          break;
-        case 's':
+          भङ्ग;
+        पक्ष 's':
           want_scrollrect = sense;
-          break;
-        case 'P':
+          भङ्ग;
+        पक्ष 'P':
           want_premove = sense;
-          break;
-        case 'm':
+          भङ्ग;
+        पक्ष 'm':
           want_moverect = sense;
-          break;
-        case 'e':
+          भङ्ग;
+        पक्ष 'e':
           want_state_erase = sense;
-          break;
-        case 'p':
+          भङ्ग;
+        पक्ष 'p':
           want_settermprop = sense;
-          break;
-        case 'f':
-          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : NULL, NULL);
-          break;
-        case 'b':
+          भङ्ग;
+        पक्ष 'f':
+          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : रिक्त, रिक्त);
+          भङ्ग;
+        पक्ष 'b':
           want_state_scrollback = sense;
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", line[i]);
+          भङ्ग;
+        स्वभाव:
+          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", पंक्ति[i]);
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
-      int i = 10;
-      int sense = 1;
-      assert(vt);
-      if(!screen)
+    अन्यथा यदि(strstartswith(पंक्ति, "WANTSCREEN") && (पंक्ति[10] == '\0' || पंक्ति[10] == ' ')) {
+      पूर्णाङ्क i = 10;
+      पूर्णाङ्क sense = 1;
+      प्रतिज्ञा(vt);
+      यदि(!screen)
         screen = vterm_obtain_screen(vt);
-      vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
+      vterm_screen_set_callbacks(screen, &screen_cbs, रिक्त);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      यावत्(पंक्ति[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '-':
+      प्रति( ; पंक्ति[i]; i++)
+        विकल्प(पंक्ति[i]) {
+        पक्ष '-':
           sense = 0;
-          break;
-        case 'a':
+          भङ्ग;
+        पक्ष 'a':
           vterm_screen_enable_altscreen(screen, 1);
-          break;
-        case 'd':
+          भङ्ग;
+        पक्ष 'd':
           want_screen_damage = sense;
-          break;
-        case 'D':
+          भङ्ग;
+        पक्ष 'D':
           want_screen_damage = sense;
           want_screen_damage_cells = sense;
-          break;
-        case 'm':
+          भङ्ग;
+        पक्ष 'm':
           want_moverect = sense;
-          break;
-        case 'c':
+          भङ्ग;
+        पक्ष 'c':
           want_movecursor = sense;
-          break;
-        case 'p':
+          भङ्ग;
+        पक्ष 'p':
           want_settermprop = 1;
-          break;
-        case 'b':
+          भङ्ग;
+        पक्ष 'b':
           want_screen_scrollback = sense;
-          break;
-        case 'r':
+          भङ्ग;
+        पक्ष 'r':
           vterm_screen_enable_reflow(screen, sense);
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", line[i]);
+          भङ्ग;
+        स्वभाव:
+          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", पंक्ति[i]);
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
+    अन्यथा यदि(sscanf(पंक्ति, "UTF8 %d", &flag)) {
       vterm_set_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
-      if(state) {
+    अन्यथा यदि(streq(पंक्ति, "RESET")) {
+      यदि(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
       }
-      if(screen) {
+      यदि(screen) {
         vterm_screen_reset(screen, 1);
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
-      int rows, cols;
-      char *linep = line + 7;
-      while(linep[0] == ' ')
+    अन्यथा यदि(strstartswith(पंक्ति, "RESIZE ")) {
+      पूर्णाङ्क rows, cols;
+      वर्ण *linep = पंक्ति + 7;
+      यावत्(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d, %d", &rows, &cols);
       vterm_set_size(vt, rows, cols);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
-      char *bytes = line + 5;
+    अन्यथा यदि(strstartswith(पंक्ति, "PUSH ")) {
+      वर्ण *bytes = पंक्ति + 5;
       size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+      प्रतिज्ञा(len);
 
-      size_t written = vterm_input_write(vt, bytes, len);
-      if(written < len)
+      size_t written = vterm_निवेश_write(vt, bytes, len);
+      यदि(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    अन्यथा यदि(streq(पंक्ति, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-      if(encoding.enc->init)
+      यदि(encoding.enc->init)
         (*encoding.enc->init)(encoding.enc, encoding.data);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
-      char *bytes = line + 6;
+    अन्यथा यदि(strstartswith(पंक्ति, "ENCIN ")) {
+      वर्ण *bytes = पंक्ति + 6;
       size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+      प्रतिज्ञा(len);
 
       uint32_t cp[1024];
-      int cpi = 0;
+      पूर्णाङ्क cpi = 0;
       size_t pos = 0;
 
       (*encoding.enc->decode)(encoding.enc, encoding.data,
           cp, &cpi, len, bytes, &pos, len);
 
-      if(cpi > 0) {
-	int i;
+      यदि(cpi > 0) {
+	पूर्णाङ्क i;
         printf("encout ");
-        for(i = 0; i < cpi; i++) {
+        प्रति(i = 0; i < cpi; i++) {
           printf(i ? ",%x" : "%x", cp[i]);
         }
         printf("\n");
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
-      char *linep = line + 7;
-      unsigned int c = 0;
+    अन्यथा यदि(strstartswith(पंक्ति, "INCHAR ")) {
+      वर्ण *linep = पंक्ति + 7;
+      unsigned पूर्णाङ्क c = 0;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       sscanf(linep, " %x", &c);
@@ -872,360 +872,360 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    अन्यथा यदि(strstartswith(पंक्ति, "INKEY ")) {
       VTermModifier mod;
-      VTermKey key;
-      char *linep = line + 6;
-      while(linep[0] == ' ')
+      VTerm_कुंजी कुंजी;
+      वर्ण *linep = पंक्ति + 6;
+      यावत्(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
-      key = strp_key(linep);
+      कुंजी = strp_कुंजी(linep);
 
-      vterm_keyboard_key(vt, key, mod);
+      vterm_keyboard_कुंजी(vt, कुंजी, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
-      char *linep = line + 6;
-      if(streq(linep, "START"))
+    अन्यथा यदि(strstartswith(पंक्ति, "PASTE ")) {
+      वर्ण *linep = पंक्ति + 6;
+      यदि(streq(linep, "START"))
         vterm_keyboard_start_paste(vt);
-      else if(streq(linep, "END"))
+      अन्यथा यदि(streq(linep, "END"))
         vterm_keyboard_end_paste(vt);
-      else
-        goto abort_line;
+      अन्यथा
+        गच्छ abort_पंक्ति;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
-      assert(state);
-      char *linep = line + 6;
-      if(streq(linep, "IN"))
+    अन्यथा यदि(strstartswith(पंक्ति, "FOCUS ")) {
+      प्रतिज्ञा(state);
+      वर्ण *linep = पंक्ति + 6;
+      यदि(streq(linep, "IN"))
         vterm_state_focus_in(state);
-      else if(streq(linep, "OUT"))
+      अन्यथा यदि(streq(linep, "OUT"))
         vterm_state_focus_out(state);
-      else
-        goto abort_line;
+      अन्यथा
+        गच्छ abort_पंक्ति;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
-      char *linep = line + 10;
-      int row, col, len;
+    अन्यथा यदि(strstartswith(पंक्ति, "MOUSEMOVE ")) {
+      वर्ण *linep = पंक्ति + 10;
+      पूर्णाङ्क row, col, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d,%d%n", &row, &col, &len);
       linep += len;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_move(vt, row, col, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
-      char *linep = line + 9;
-      char press;
-      int button, len;
+    अन्यथा यदि(strstartswith(पंक्ति, "MOUSEBTN ")) {
+      वर्ण *linep = पंक्ति + 9;
+      वर्ण press;
+      पूर्णाङ्क button, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
       sscanf(linep, "%c %d%n", &press, &button, &len);
       linep += len;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
-      char *linep = line + 10;
-      unsigned int mask;
-      int len;
+    अन्यथा यदि(strstartswith(पंक्ति, "SELECTION ")) {
+      वर्ण *linep = पंक्ति + 10;
+      unsigned पूर्णाङ्क mask;
+      पूर्णाङ्क len;
       VTermStringFragment frag = { 0 };
       sscanf(linep, "%x%n", &mask, &len);
       linep += len;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
-      if(linep[0] == '[') {
+      यदि(linep[0] == '[') {
         frag.initial = TRUE;
         linep++;
-        while(linep[0] == ' ')
+        यावत्(linep[0] == ' ')
           linep++;
       }
       frag.len = inplace_hex2bytes(linep);
       frag.str = linep;
-      assert(frag.len);
+      प्रतिज्ञा(frag.len);
 
       linep += frag.len * 2;
-      while(linep[0] == ' ')
+      यावत्(linep[0] == ' ')
         linep++;
-      if(linep[0] == ']') {
+      यदि(linep[0] == ']') {
         frag.final = TRUE;
       }
       vterm_state_send_selection(state, mask, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
-      assert(screen);
-      char *linep = line + 12;
-      while(linep[0] == ' ')
+    अन्यथा यदि(strstartswith(पंक्ति, "DAMAGEMERGE ")) {
+      प्रतिज्ञा(screen);
+      वर्ण *linep = पंक्ति + 12;
+      यावत्(linep[0] == ' ')
         linep++;
-      if(streq(linep, "CELL"))
+      यदि(streq(linep, "CELL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_CELL);
-      else if(streq(linep, "ROW"))
+      अन्यथा यदि(streq(linep, "ROW"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_ROW);
-      else if(streq(linep, "SCREEN"))
+      अन्यथा यदि(streq(linep, "SCREEN"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCREEN);
-      else if(streq(linep, "SCROLL"))
+      अन्यथा यदि(streq(linep, "SCROLL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
-      assert(screen);
+    अन्यथा यदि(strstartswith(पंक्ति, "DAMAGEFLUSH")) {
+      प्रतिज्ञा(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
-      assert(screen);
-      char *linep = line + 14;
-      while(linep[0] == ' ')
+    अन्यथा यदि(strstartswith(पंक्ति, "SETDEFAULTCOL ")) {
+      प्रतिज्ञा(screen);
+      वर्ण *linep = पंक्ति + 14;
+      यावत्(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
-      if(linep[0]) {
-        while(linep[0] == ' ')
+      यदि(linep[0]) {
+        यावत्(linep[0] == ' ')
           linep++;
         VTermColor bg = strpe_color(&linep);
 
         vterm_screen_set_default_colors(screen, &fg, &bg);
       }
-      else
-        vterm_screen_set_default_colors(screen, &fg, NULL);
+      अन्यथा
+        vterm_screen_set_default_colors(screen, &fg, रिक्त);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
-        assert(state);
+    अन्यथा यदि(पंक्ति[0] == '?') {
+      यदि(streq(पंक्ति, "?cursor")) {
+        प्रतिज्ञा(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
-        if(pos.row != state_pos.row)
+        यदि(pos.row != state_pos.row)
           printf("! row mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else if(pos.col != state_pos.col)
+        अन्यथा यदि(pos.col != state_pos.col)
           printf("! col mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else
+        अन्यथा
           printf("%d,%d\n", state_pos.row, state_pos.col);
       }
-      else if(strstartswith(line, "?pen ")) {
-        assert(state);
-        VTermValue val;
-        char *linep = line + 5;
-        while(linep[0] == ' ')
+      अन्यथा यदि(strstartswith(पंक्ति, "?pen ")) {
+        प्रतिज्ञा(state);
+        VTerm_मूल्य val;
+        वर्ण *linep = पंक्ति + 5;
+        यावत्(linep[0] == ' ')
           linep++;
 
 #define BOOLSTR(v) ((v) ? "on" : "off")
 
-        if(streq(linep, "bold")) {
+        यदि(streq(linep, "bold")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BOLD, &val);
-          if(val.boolean != state_pen.bold)
+          यदि(val.boolean != state_pen.bold)
             printf("! pen bold mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.bold));
-          else
+          अन्यथा
             printf("%s\n", BOOLSTR(state_pen.bold));
         }
-        else if(streq(linep, "underline")) {
+        अन्यथा यदि(streq(linep, "underline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_UNDERLINE, &val);
-          if(val.boolean != state_pen.underline)
+          यदि(val.boolean != state_pen.underline)
             printf("! pen underline mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.underline);
-          else
+          अन्यथा
             printf("%d\n", state_pen.underline);
         }
-        else if(streq(linep, "italic")) {
+        अन्यथा यदि(streq(linep, "italic")) {
           vterm_state_get_penattr(state, VTERM_ATTR_ITALIC, &val);
-          if(val.boolean != state_pen.italic)
+          यदि(val.boolean != state_pen.italic)
             printf("! pen italic mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.italic));
-          else
+          अन्यथा
             printf("%s\n", BOOLSTR(state_pen.italic));
         }
-        else if(streq(linep, "blink")) {
+        अन्यथा यदि(streq(linep, "blink")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BLINK, &val);
-          if(val.boolean != state_pen.blink)
+          यदि(val.boolean != state_pen.blink)
             printf("! pen blink mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.blink));
-          else
+          अन्यथा
             printf("%s\n", BOOLSTR(state_pen.blink));
         }
-        else if(streq(linep, "reverse")) {
+        अन्यथा यदि(streq(linep, "reverse")) {
           vterm_state_get_penattr(state, VTERM_ATTR_REVERSE, &val);
-          if(val.boolean != state_pen.reverse)
+          यदि(val.boolean != state_pen.reverse)
             printf("! pen reverse mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.reverse));
-          else
+          अन्यथा
             printf("%s\n", BOOLSTR(state_pen.reverse));
         }
-        else if(streq(linep, "font")) {
+        अन्यथा यदि(streq(linep, "font")) {
           vterm_state_get_penattr(state, VTERM_ATTR_FONT, &val);
-          if(val.boolean != state_pen.font)
+          यदि(val.boolean != state_pen.font)
             printf("! pen font mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.font);
-          else
+          अन्यथा
             printf("%d\n", state_pen.font);
         }
-        else if(streq(linep, "small")) {
+        अन्यथा यदि(streq(linep, "small")) {
           vterm_state_get_penattr(state, VTERM_ATTR_SMALL, &val);
-          if(val.boolean != state_pen.small)
+          यदि(val.boolean != state_pen.small)
             printf("! pen small mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.small));
-          else
+          अन्यथा
             printf("%s\n", BOOLSTR(state_pen.small));
         }
-        else if(streq(linep, "baseline")) {
+        अन्यथा यदि(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
+          यदि(val.संख्या != state_pen.baseline)
             printf("! pen baseline mismatch: state=%d, event=%d\n",
-                val.number, state_pen.baseline);
-          else
+                val.संख्या, state_pen.baseline);
+          अन्यथा
             printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
                          : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
                          : "normal");
         }
-        else if(streq(linep, "foreground")) {
+        अन्यथा यदि(streq(linep, "foreground")) {
           print_color(&state_pen.foreground);
           printf("\n");
         }
-        else if(streq(linep, "background")) {
+        अन्यथा यदि(streq(linep, "background")) {
           print_color(&state_pen.background);
           printf("\n");
         }
-        else
+        अन्यथा
           printf("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
-        assert(state);
-        char *linep = line + 10;
-        int row;
-        const VTermLineInfo *info;
-        while(linep[0] == ' ')
+      अन्यथा यदि(strstartswith(पंक्ति, "?lineinfo ")) {
+        प्रतिज्ञा(state);
+        वर्ण *linep = पंक्ति + 10;
+        पूर्णाङ्क row;
+        ध्रुव VTerm_पंक्ति_Info *info;
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d", &row) < 1) {
+        यदि(sscanf(linep, "%d", &row) < 1) {
           printf("! lineinfo unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
         info = vterm_state_get_lineinfo(state, row);
-        if(info->doublewidth)
+        यदि(info->doublewidth)
           printf("dwl ");
-        if(info->doubleheight)
+        यदि(info->doubleheight)
           printf("dhl ");
-        if(info->continuation)
+        यदि(info->continuation)
           printf("cont ");
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
-        assert(screen);
-        char *linep = line + 13;
+      अन्यथा यदि(strstartswith(पंक्ति, "?screen_chars ")) {
+        प्रतिज्ञा(screen);
+        वर्ण *linep = पंक्ति + 13;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
+        यदि(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
           ; // fine
-        else if(sscanf(linep, "%d", &rect.start_row) == 1) {
+        अन्यथा यदि(sscanf(linep, "%d", &rect.start_row) == 1) {
           rect.end_row = rect.start_row + 1;
           rect.start_col = 0;
-          vterm_get_size(vt, NULL, &rect.end_col);
+          vterm_get_size(vt, रिक्त, &rect.end_col);
         }
-        else {
+        अन्यथा {
           printf("! screen_chars unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
-        len = vterm_screen_get_chars(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        len = vterm_screen_get_chars(screen, रिक्त, 0, rect);
+        यदि(len == (size_t)-1)
           printf("! screen_chars error\n");
-        else if(len == 0)
+        अन्यथा यदि(len == 0)
           printf("\n");
-        else {
-          uint32_t *chars = malloc(sizeof(uint32_t) * len);
+        अन्यथा {
+          uint32_t *chars = malloc(परिमाण(uint32_t) * len);
           size_t i;
           vterm_screen_get_chars(screen, chars, len, rect);
-          for(i = 0; i < len; i++) {
+          प्रति(i = 0; i < len; i++) {
             printf("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
           }
-          free(chars);
+          मुक्त(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
-        assert(screen);
-        char *linep = line + 12;
+      अन्यथा यदि(strstartswith(पंक्ति, "?screen_text ")) {
+        प्रतिज्ञा(screen);
+        वर्ण *linep = पंक्ति + 12;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
+        यदि(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
           printf("! screen_text unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
-        len = vterm_screen_get_text(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        len = vterm_screen_get_text(screen, रिक्त, 0, rect);
+        यदि(len == (size_t)-1)
           printf("! screen_text error\n");
-        else if(len == 0)
+        अन्यथा यदि(len == 0)
           printf("\n");
-        else {
+        अन्यथा {
           // Put an overwrite guard at both ends of the buffer
-          unsigned char *buffer = malloc(len + 4);
-          unsigned char *text = buffer + 2;
+          unsigned वर्ण *buffer = malloc(len + 4);
+          unsigned वर्ण *text = buffer + 2;
           text[-2] = 0x55; text[-1] = 0xAA;
           text[len] = 0x55; text[len+1] = 0xAA;
 
-          vterm_screen_get_text(screen, (char *)text, len, rect);
+          vterm_screen_get_text(screen, (वर्ण *)text, len, rect);
 
-          if(text[-2] != 0x55 || text[-1] != 0xAA)
+          यदि(text[-2] != 0x55 || text[-1] != 0xAA)
             printf("! screen_get_text buffer overrun left [%02x,%02x]\n", text[-2], text[-1]);
-          else if(text[len] != 0x55 || text[len+1] != 0xAA)
+          अन्यथा यदि(text[len] != 0x55 || text[len+1] != 0xAA)
             printf("! screen_get_text buffer overrun right [%02x,%02x]\n", text[len], text[len+1]);
-          else
+          अन्यथा
 	  {
 	    size_t i;
-            for(i = 0; i < len; i++) {
+            प्रति(i = 0; i < len; i++) {
               printf("0x%02x%s", text[i], i < len-1 ? "," : "\n");
             }
 	  }
 
-          free(buffer);
+          मुक्त(buffer);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
-        assert(screen);
-        char *linep = line + 12;
-	int i;
+      अन्यथा यदि(strstartswith(पंक्ति, "?screen_cell ")) {
+        प्रतिज्ञा(screen);
+        वर्ण *linep = पंक्ति + 12;
+	पूर्णाङ्क i;
         VTermPos pos;
         VTermScreenCell cell;
-        while(linep[0] == ' ')
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        यदि(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_cell unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
-        if(!vterm_screen_get_cell(screen, pos, &cell))
-          goto abort_line;
+        यदि(!vterm_screen_get_cell(screen, pos, &cell))
+          गच्छ abort_पंक्ति;
         printf("{");
-        for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
+        प्रति(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
           printf("%s0x%x", i ? "," : "", cell.chars[i]);
         }
         printf("} width=%d attrs={", cell.width);
-        if(cell.attrs.bold)      printf("B");
-        if(cell.attrs.underline) printf("U%d", cell.attrs.underline);
-        if(cell.attrs.italic)    printf("I");
-        if(cell.attrs.blink)     printf("K");
-        if(cell.attrs.reverse)   printf("R");
-        if(cell.attrs.font)      printf("F%d", cell.attrs.font);
-        if(cell.attrs.small)     printf("S");
-        if(cell.attrs.baseline)  printf(
+        यदि(cell.attrs.bold)      printf("B");
+        यदि(cell.attrs.underline) printf("U%d", cell.attrs.underline);
+        यदि(cell.attrs.italic)    printf("I");
+        यदि(cell.attrs.blink)     printf("K");
+        यदि(cell.attrs.reverse)   printf("R");
+        यदि(cell.attrs.font)      printf("F%d", cell.attrs.font);
+        यदि(cell.attrs.small)     printf("S");
+        यदि(cell.attrs.baseline)  printf(
             cell.attrs.baseline == VTERM_BASELINE_RAISE ? "^" :
                                                           "_");
         printf("} ");
-        if(cell.attrs.dwl)       printf("dwl ");
-        if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
+        यदि(cell.attrs.dwl)       printf("dwl ");
+        यदि(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
         printf("fg=");
         vterm_screen_convert_color_to_rgb(screen, &cell.fg);
         print_color(&cell.fg);
@@ -1234,53 +1234,53 @@ int main(int argc UNUSED, char **argv UNUSED)
         print_color(&cell.bg);
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
-        assert(screen);
+      अन्यथा यदि(strstartswith(पंक्ति, "?screen_eol ")) {
+        प्रतिज्ञा(screen);
         VTermPos pos;
-        char *linep = line + 12;
-        while(linep[0] == ' ')
+        वर्ण *linep = पंक्ति + 12;
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        यदि(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_eol unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
         printf("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
-        assert(screen);
+      अन्यथा यदि(strstartswith(पंक्ति, "?screen_attrs_extent ")) {
+        प्रतिज्ञा(screen);
         VTermPos pos;
         VTermRect rect;
-        char *linep = line + 21;
-        while(linep[0] == ' ')
+        वर्ण *linep = पंक्ति + 21;
+        यावत्(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        यदि(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_attrs_extent unrecognised input\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
 	rect.start_col = 0;
 	rect.end_col   = -1;
-        if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
+        यदि(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
           printf("! screen_attrs_extent failed\n");
-          goto abort_line;
+          गच्छ abort_पंक्ति;
         }
         printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
       }
-      else
+      अन्यथा
         printf("?\n");
 
-      memset(line, 0, sizeof line);
-      continue;
+      memset(पंक्ति, 0, परिमाण पंक्ति);
+      अनुवर्त;
     }
 
-    else
-      abort_line: err = 1;
+    अन्यथा
+      abort_पंक्ति: err = 1;
 
     outlen = vterm_output_get_buffer_current(vt);
-    if(outlen > 0) {
-      char outbuff[1024];
+    यदि(outlen > 0) {
+      वर्ण outbuff[1024];
       vterm_output_read(vt, outbuff, outlen);
 
-      term_output(outbuff, outlen, NULL);
+      term_output(outbuff, outlen, रिक्त);
     }
 
     printf(err ? "?\n" : "DONE\n");
@@ -1288,5 +1288,5 @@ int main(int argc UNUSED, char **argv UNUSED)
 
   vterm_free(vt);
 
-  return 0;
+  प्रत्यागम 0;
 }
