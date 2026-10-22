@@ -12,34 +12,34 @@
  * os_qnx.c
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
+#यदि defined(FEAT_GUI_PHOTON)
+पूर्णाङ्क is_photon_available;
 #endif
 
-void qnx_init(void)
+शून्य qnx_init(शून्य)
 {
-#if defined(FEAT_GUI_PHOTON)
+#यदि defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
     CLEAR_FIELD(parms);
     parms.flags = Ph_DYNAMIC_BUFFER;
 
-    is_photon_available = (PhAttach(NULL, &parms) != NULL) ? TRUE : FALSE;
+    is_photon_available = (PhAttach(रिक्त, &parms) != रिक्त) ? TRUE : FALSE;
 #endif
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#यदि defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
 # define CLIP_TYPE_TEXT "TEXT"
 
 // Turn on the clipboard for a console vim when photon is running
-void qnx_clip_init(void)
+शून्य qnx_clip_init(शून्य)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    यदि (is_photon_available == TRUE && !gui.in_use)
 	clip_init(TRUE);
 }
 
@@ -47,106 +47,106 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+पूर्णाङ्क
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 
-void
+शून्य
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
 }
 
-void
+शून्य
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
-    void	    *cbdata;
+    पूर्णाङ्क		    type = MLINE, clip_length = 0, is_type_set = FALSE;
+    शून्य	    *cbdata;
     PhClipHeader    *clip_header;
-    char_u	    *clip_text = NULL;
+    char_u	    *clip_text = रिक्त;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    cbdata = PhClipboardPasteStart(Ph_निवेश_Group(रिक्त));
+    यदि (cbdata == रिक्त)
+	प्रत्यागम;
 
     // Look for the vim specific clip first
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    यदि (clip_header != रिक्त && clip_header->data != रिक्त)
     {
-	switch(*(char *) clip_header->data)
+	विकल्प(*(वर्ण *) clip_header->data)
 	{
-	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    स्वभाव: // fallthrough to line type
+	    पक्ष 'L': type = MLINE; भङ्ग;
+	    पक्ष 'C': type = MCHAR; भङ्ग;
+	    पक्ष 'B': type = MBLOCK; भङ्ग;
 	}
 	is_type_set = TRUE;
     }
 
     // Try for just normal text
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    यदि (clip_header != रिक्त)
     {
 	clip_text = clip_header->data;
 	clip_length  = clip_header->length - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	यदि (clip_text != रिक्त && is_type_set == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
+    यदि ((clip_text != रिक्त) && (clip_length > 0))
 	clip_yank_selection(type, clip_text, clip_length, cbd);
 
     PhClipboardPasteFinish(cbdata);
 }
 
-void
+शून्य
 clip_mch_set_selection(Clipboard_T *cbd)
 {
-    int type;
+    पूर्णाङ्क type;
     long_u  len;
-    char_u *text_clip, vim_clip[2], *str = NULL;
+    char_u *text_clip, vim_clip[2], *str = रिक्त;
     PhClipHeader clip_header[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    यदि (cbd->owned == TRUE)
+	प्रत्यागम;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    यदि (type >= 0)
     {
 	text_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	यदि (text_clip && vim_clip)
 	{
 	    CLEAR_FIELD(clip_header);
 
 	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
+	    clip_header[0].length = परिमाण(vim_clip);
 	    clip_header[0].data   = vim_clip;
 
 	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
 	    clip_header[1].length = len + 1;
 	    clip_header[1].data   = text_clip;
 
-	    switch(type)
+	    विकल्प(type)
 	    {
-		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		स्वभाव: // fallthrough to MLINE
+		पक्ष MLINE:	*vim_clip = 'L'; भङ्ग;
+		पक्ष MCHAR:	*vim_clip = 'C'; भङ्ग;
+		पक्ष MBLOCK:	*vim_clip = 'B'; भङ्ग;
 	    }
 
 	    vim_strncpy(text_clip, str, len);
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_निवेश_Group(रिक्त), 2, clip_header);
 	}
 	vim_free(text_clip);
     }
