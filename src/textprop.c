@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#གལ་ཏེ defined(FEAT_PROP_POPUP)
 
 static void um_store_changes(unpacked_memline_T *um);
 
@@ -21,10 +21,10 @@ static void um_store_changes(unpacked_memline_T *um);
  * Free virtual text strings in a detached unpacked memline's props.
  */
     static void
-um_free_vtext(textprop_T *props, int count)
+um_free_vtext(textprop_T *props, ཧྲིལ count)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+    ཆེད་དུ (ཧྲིལ i = 0; i < count; ++i)
+	གལ་ཏེ (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
 
@@ -34,7 +34,7 @@ um_free_vtext(textprop_T *props, int count)
     static void
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    གལ་ཏེ (um->detached)
     {
 	VIM_CLEAR(um->text);
 	um_free_vtext(um->props, um->prop_count);
@@ -57,7 +57,7 @@ um_open(buf_T *buf)
 
     CLEAR_FIELD(um);
     um.buf = buf;
-    return um;
+    ཕྱིར um;
 }
 
 /*
@@ -67,23 +67,23 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_line(unpacked_memline_T *um, linenr_T lnum, ཧྲིལ extra_props)
 {
     char_u	*line;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    ཧྲིལ		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    གལ་ཏེ (um->buf == NULL)
+	ཕྱིར false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    གལ་ཏེ (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    གལ་ཏེ (lnum == 0)
+	ཕྱིར true;	// just unload
 
     line = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
@@ -93,15 +93,15 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     um->text_size = (colnr_T)textlen;
     um->text = line;
 
-    if (propdata_len == 0)
-	return true;
+    གལ་ཏེ (propdata_len == 0)
+	ཕྱིར true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    གལ་ཏེ (propdata_len < PROP_COUNT_SIZE + parimaa_na(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	ཕྱིར false;
     }
 
     uint16_t    prop_count;
@@ -109,46 +109,46 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     char_u	    *props_start;
 
     mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    གལ་ཏེ (!text_prop_count_valid(prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	ཕྱིར false;
     }
-    proplen = (int)prop_count;
+    proplen = (ཧྲིལ)prop_count;
     props_start = count_ptr + PROP_COUNT_SIZE;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    གལ་ཏེ (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	ཕྱིར false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    གལ་ཏེ (um->props == NULL)
     {
 	um->buf = NULL;
-	return false;
+	ཕྱིར false;
     }
     um->prop_size = proplen + extra_props;
     um->prop_count = proplen;
-    mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
+    mch_memmove(um->props, props_start, proplen * parimaa_na(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	གལ་ཏེ (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
 	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	དེ་མིན
 	    um->props[i].u.tp_text = NULL;
     }
 
-    return true;
+    ཕྱིར true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, ཧྲིལ extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
+    གལ་ཏེ (!um_goto_line(&um, lnum, extra_props))
 	um.buf = NULL;
-    return um;
+    ཕྱིར um;
 }
 
 /*
@@ -175,38 +175,38 @@ um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    གལ་ཏེ (um->detached || um->buf == NULL)
+	ཕྱིར um->detached;
 
     newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    གལ་ཏེ (newtext == NULL)
     {
 	um->buf = NULL;
-	return false;
+	ཕྱིར false;
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < um->prop_count; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	གལ་ཏེ (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
 	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
 
-	    if (copy == NULL)
+	    གལ་ཏེ (copy == NULL)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
+		ཆེད་དུ (ཧྲིལ j = 0; j < i; ++j)
+		    གལ་ཏེ (um->props[j].tp_id < 0)
 			VIM_CLEAR(um->props[j].u.tp_text);
 		VIM_CLEAR(um->text);
 		um->buf = NULL;
-		return false;
+		ཕྱིར false;
 	    }
 	    um->props[i].u.tp_text = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    ཕྱིར true;
 }
 
 /*
@@ -216,15 +216,15 @@ um_detach(unpacked_memline_T *um)
     bool
 um_set_text(unpacked_memline_T *um, char_u *text)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
+    གལ་ཏེ (um->buf == NULL)
+	ཕྱིར false;
+    གལ་ཏེ (um->detached)
 	vim_free(um->text);
     um->text = text;
     um->text_size = (colnr_T)STRLEN(text) + 1;
     um->text_changed = true;
     um->detached = true;
-    return true;
+    ཕྱིར true;
 }
 
 /*
@@ -232,20 +232,20 @@ um_set_text(unpacked_memline_T *um, char_u *text)
  * Returns true on success.
  */
     static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+um_grow_props(unpacked_memline_T *um, ཧྲིལ needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    གལ་ཏེ (um->prop_count + needed <= um->prop_size)
+	ཕྱིར true;
 
-    int	    new_size = um->prop_count + needed;
+    ཧྲིལ	    new_size = um->prop_count + needed;
     textprop_T  *newprops = vim_realloc(um->props,
-					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+					    new_size * parimaa_na(textprop_T));
+    གལ་ཏེ (newprops == NULL)
+	ཕྱིར false;
     um->props = newprops;
     um->prop_size = new_size;
 
-    return true;
+    ཕྱིར true;
 }
 
 /*
@@ -255,14 +255,14 @@ um_grow_props(unpacked_memline_T *um, int needed)
     static void
 um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    གལ་ཏེ (um->buf == NULL)
+	ཕྱིར;
+    གལ་ཏེ (!um->detached && !um_detach(um))
+	ཕྱིར;
+    གལ་ཏེ (!um_grow_props(um, 1))
     {
 	um->buf = NULL;
-	return;
+	ཕྱིར;
     }
     um->props[um->prop_count++] = *prop;
 }
@@ -273,7 +273,7 @@ um_add_prop(unpacked_memline_T *um, textprop_T *prop)
     void
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    ཆེད་དུ (ཧྲིལ i = 0, j = um->prop_count - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, ཧྲིལ prop_count)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    གལ་ཏེ (lnum < 1 || lnum > buf->b_ml.ml_line_count)
     {
 	um.buf = NULL;
-	return um;
+	ཕྱིར um;
     }
 
     char_u *line = ml_get_buf(buf, lnum, FALSE);
     char_u *text_copy = vim_strsave(line);
 
-    if (text_copy == NULL)
+    གལ་ཏེ (text_copy == NULL)
     {
 	um.buf = NULL;
-	return um;
+	ཕྱིར um;
     }
     um.lnum = lnum;
     um.text = text_copy;
     um.text_size = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    གལ་ཏེ (prop_count > 0)
     {
 	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	གལ་ཏེ (um.props == NULL)
 	{
 	    vim_free(um.text);
 	    um.buf = NULL;
-	    return um;
+	    ཕྱིར um;
 	}
 	um.prop_size = prop_count;
     }
 
-    return um;
+    ཕྱིར um;
 }
 
 /*
@@ -335,29 +335,29 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  */
     static void
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					ཧྲིལ tp_id, ཧྲིལ tp_type, ཧྲིལ flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    གལ་ཏེ (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+	ཕྱིར;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    གལ་ཏེ (neighbor.buf == NULL)
+	ཕྱིར;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < neighbor.prop_count; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	གལ་ཏེ (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
-		break;
+	    གལ་ཏེ (!neighbor.detached && !um_detach(&neighbor))
+		bha_nga;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
 	    p->tp_flags &= ~flag;
-	    break;
+	    bha_nga;
 	}
     }
     um_close(&neighbor);
@@ -369,26 +369,26 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Also adjusts continuation flags on neighboring lines.
  */
     void
-um_delete_prop(unpacked_memline_T *um, int index)
+um_delete_prop(unpacked_memline_T *um, ཧྲིལ index)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    གལ་ཏེ (um->buf == NULL || index < 0 || index >= um->prop_count)
+	ཕྱིར;
+    གལ་ཏེ (!um->detached && !um_detach(um))
+	ཕྱིར;
 
     prop = &um->props[index];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    གལ་ཏེ (prop->tp_flags & TP_FLAG_CONT_PREV)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+    གལ་ཏེ (prop->tp_flags & TP_FLAG_CONT_NEXT)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+    གལ་ཏེ (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	VIM_CLEAR(prop->u.tp_text);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
@@ -403,45 +403,45 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * the read side has not been converted yet.
  */
     static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+um_pack(unpacked_memline_T *um, ཧྲིལ *packed_len)
 {
     uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    ཧྲིལ		vtext_size = 0;
+    ཧྲིལ		total_len;
     char_u	*buf;
     char_u	*count_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < um->prop_count; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
+	གལ་ཏེ (prop->tp_flags & TP_FLAG_DELETED)
 	    continue;
 	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	གལ་ཏེ (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    གལ་ཏེ (live_count == 0)
     {
 	// No properties: just text, no prop_count header.
 	total_len = um->text_size;
 	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
+	གལ་ཏེ (buf == NULL)
+	    ཕྱིར NULL;
 	*packed_len = total_len;
 	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	ཕྱིར buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
+    total_len = um->text_size + (ཧྲིལ)PROP_COUNT_SIZE
+		+ live_count * (ཧྲིལ)parimaa_na(textprop_T) + vtext_size;
     buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
+    གལ་ཏེ (buf == NULL)
+	ཕྱིར NULL;
     *packed_len = total_len;
 
     mch_memmove(buf, um->text, um->text_size);
@@ -450,32 +450,32 @@ um_pack(unpacked_memline_T *um, int *packed_len)
     mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
 
     prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    vtext_dest = prop_dest + live_count * parimaa_na(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < um->prop_count; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
+	གལ་ཏེ (prop.tp_flags & TP_FLAG_DELETED)
 	    continue;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	གལ་ཏེ (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    ཧྲིལ copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	དེ་མིན
 	    prop.u.tp_text_offset = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
-	mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	prop_dest += sizeof(textprop_T);
+	mch_memmove(prop_dest, &prop, parimaa_na(textprop_T));
+	prop_dest += parimaa_na(textprop_T);
     }
 
-    return buf;
+    ཕྱིར buf;
 }
 
 /*
@@ -485,31 +485,31 @@ um_pack(unpacked_memline_T *um, int *packed_len)
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    ཧྲིལ	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    གལ་ཏེ (!um->detached || um->buf == NULL || um->lnum == 0)
+	ཕྱིར;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    གལ་ཏེ (packed == NULL)
     {
 	um->buf = NULL;
-	return;
+	ཕྱིར;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    གལ་ཏེ (um->buf->b_ml.ml_line_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
+    དེ་མིན གལ་ཏེ (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
 	(void)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
     um_free_vtext(um->props, um->prop_count);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+    གལ་ཏེ (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	vim_free(um->buf->b_ml.ml_line_ptr);
     um->buf->b_ml.ml_line_ptr = packed;
     um->buf->b_ml.ml_line_len = packed_len;
@@ -527,9 +527,9 @@ um_store_changes(unpacked_memline_T *um)
     void
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    གལ་ཏེ (um->buf == NULL)
+	ཕྱིར;
+    གལ་ཏེ (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
     um->buf = NULL;
@@ -561,7 +561,7 @@ static hashtab_T *global_proptypes = NULL;
 static proptype_T **global_proparray = NULL;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+static ཧྲིལ proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
@@ -573,19 +573,19 @@ find_prop_type_hi(char_u *name, buf_T *buf)
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    གལ་ཏེ (*name == NUL)
+	ཕྱིར NULL;
+    གལ་ཏེ (buf == NULL)
 	ht = global_proptypes;
-    else
+    དེ་མིན
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
+    གལ་ཏེ (ht == NULL)
+	ཕྱིར NULL;
     hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    གལ་ཏེ (HASHITEM_EMPTY(hi))
+	ཕྱིར NULL;
+    ཕྱིར hi;
 }
 
 /*
@@ -596,23 +596,23 @@ find_prop_type(char_u *name, buf_T *buf)
 {
     hashitem_T	*hi = find_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    གལ་ཏེ (hi == NULL)
+	ཕྱིར NULL;
+    ཕྱིར HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
+    ཧྲིལ
 find_prop_type_id(char_u *name, buf_T *buf)
 {
     proptype_T *pt = find_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    གལ་ཏེ (pt == NULL)
+	ཕྱིར 0;
+    ཕྱིར pt->pt_id;
 }
 
 /*
@@ -625,11 +625,11 @@ lookup_prop_type(char_u *name, buf_T *buf)
 {
     proptype_T *type = find_prop_type(name, buf);
 
-    if (type == NULL)
+    གལ་ཏེ (type == NULL)
 	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    གལ་ཏེ (type == NULL)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    ཕྱིར type;
 }
 
 /*
@@ -639,27 +639,27 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    static ཧྲིལ
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    གལ་ཏེ (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	ཕྱིར FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
+    གལ་ཏེ (arg->vval.v_dict == NULL)
+	ཕྱིར OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
+    གལ་ཏེ (di != NULL && (di->di_tv.v_type != VAR_NUMBER
 					      || di->di_tv.vval.v_number != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	གལ་ཏེ (*buf == NULL)
+	    ཕྱིར FAIL;
     }
-    return OK;
+    ཕྱིར OK;
 }
 
 /*
@@ -671,16 +671,16 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
     linenr_T	start_lnum;
     colnr_T	start_col;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	ཕྱིར;
 
     start_lnum = tv_get_number(&argvars[0]);
     start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    གལ་ཏེ (check_for_dict_arg(argvars, 2) == FAIL)
+	ཕྱིར;
 
     rettv->vval.v_number = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
@@ -692,14 +692,14 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
+    static ཧྲིལ
 prop_add_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
+	ཧྲིལ		id,
 	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
+	ཧྲིལ		text_padding_left,
+	ཧྲིལ		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
 	colnr_T		start_col,
@@ -707,49 +707,49 @@ prop_add_one(
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
+    ཧྲིལ		proplen;
     char_u	*props = NULL;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    ཧྲིལ		i;
     textprop_T	tmp_prop;
     char_u	*text = text_arg;
-    int		res = FAIL;
+    ཧྲིལ		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
+    གལ་ཏེ (type == NULL)
 	goto theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    གལ་ཏེ (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
 	goto theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    གལ་ཏེ (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
 	goto theend;
     }
 
-    if (buf->b_ml.ml_mfp == NULL)
+    གལ་ཏེ (buf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
 	goto theend;
     }
 
-    if (text != NULL)
+    གལ་ཏེ (text != NULL)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	ཆེད་དུ (p = text; *p != NUL; MB_PTR_ADV(p))
+	    གལ་ཏེ (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    ཆེད་དུ (lnum = start_lnum; lnum <= end_lnum; ++lnum)
     {
 	colnr_T col;	    // start column use in tp_col
 	colnr_T sort_col;   // column where it appears
@@ -760,39 +760,39 @@ prop_add_one(
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	གལ་ཏེ (proplen >= 0xffff)
 	{
 	    emsg(_(e_too_many_text_properties_on_a_single_line));
 	    goto theend;
 	}
 
-	if (lnum == start_lnum)
+	གལ་ཏེ (lnum == start_lnum)
 	    col = start_col;
-	else
+	དེ་མིན
 	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	གལ་ཏེ (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
 	{
 	    semsg(_(e_invalid_column_number_nr), (long)start_col);
 	    goto theend;
 	}
 	sort_col = col;
 
-	if (lnum == end_lnum)
+	གལ་ཏེ (lnum == end_lnum)
 	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
+	དེ་མིན
+	    length = (ཧྲིལ)textlen - col + 1;
+	གལ་ཏེ (length > (long)textlen)
+	    length = (ཧྲིལ)textlen;	// can include the end-of-line
+	གལ་ཏེ (length < 0)
 	    length = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	གལ་ཏེ (text_arg != NULL)
 	{
 	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    གལ་ཏེ (col == 0)
 	    {
 		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		གལ་ཏེ ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
 		    sort_col = MAXCOL;
 	    }
 	}
@@ -809,51 +809,51 @@ prop_add_one(
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
 	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
+	གལ་ཏེ (text_arg != NULL)
 	    tmp_prop.u.tp_text = text_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	ཆེད་དུ (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
 	    colnr_T	prop_col;
 
-	    mch_memmove(&existing, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&existing, props + i * parimaa_na(textprop_T),
+							   parimaa_na(textprop_T));
 	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
 				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
-		break;
+	    གལ་ཏེ (prop_col >= sort_col)
+		bha_nga;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
+	ཧྲིལ		vtext_total = 0;
+	ཧྲིལ		new_line_len;
 	char_u	*count_dest;
 	char_u	*vtext_dest;
-	int		j;
+	ཧྲིལ		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	ཆེད་དུ (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
-	    mch_memmove(&ep, props + j * sizeof(textprop_T),
-							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    mch_memmove(&ep, props + j * parimaa_na(textprop_T),
+							parimaa_na(textprop_T));
+	    གལ་ཏེ (ep.tp_id < 0 && ep.tp_len > 0)
 		vtext_total += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
+	གལ་ཏེ (text_arg != NULL)
 	    vtext_total += length + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
+	new_line_len = (ཧྲིལ)textlen + (ཧྲིལ)PROP_COUNT_SIZE
+			+ new_propcount * (ཧྲིལ)parimaa_na(textprop_T)
 			+ vtext_total;
 	newtext = alloc(new_line_len);
-	if (newtext == NULL)
+	གལ་ཏེ (newtext == NULL)
 	    goto theend;
 
 	// Copy line text.
@@ -866,25 +866,25 @@ prop_add_one(
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
 	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
-	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
+	གལ་ཏེ (i > 0)
+	    mch_memmove(newprops, props, parimaa_na(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
-	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
-					props + i * sizeof(textprop_T),
-					sizeof(textprop_T) * (proplen - i));
+	གལ་ཏེ (i < proplen)
+	    mch_memmove(newprops + (i + 1) * parimaa_na(textprop_T),
+					props + i * parimaa_na(textprop_T),
+					parimaa_na(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
-	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	vtext_dest = newprops + new_propcount * parimaa_na(textprop_T);
+	ཆེད་དུ (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
+	    གལ་ཏེ (j == i)
 		continue;  // handle new prop separately below
-	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
-		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    mch_memmove(&ep, newprops + j * parimaa_na(textprop_T),
+		    parimaa_na(textprop_T));
+	    གལ་ཏེ (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
 		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
@@ -892,29 +892,29 @@ prop_add_one(
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
 		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
-		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
-			sizeof(textprop_T));
+		mch_memmove(newprops + j * parimaa_na(textprop_T), &ep,
+			parimaa_na(textprop_T));
 		vtext_dest += ep.tp_len + 1;
 	    }
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	གལ་ཏེ (text_arg != NULL)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    ཧྲིལ copysize = tmp_prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
 				    (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	དེ་མིན
 	    tmp_prop.u.tp_text_offset = 0;
 
-	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
-							sizeof(textprop_T));
+	mch_memmove(newprops + i * parimaa_na(textprop_T), &tmp_prop,
+							parimaa_na(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	གལ་ཏེ (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(buf->b_ml.ml_line_ptr);
 	buf->b_ml.ml_line_ptr = newtext;
 	buf->b_ml.ml_line_len = new_line_len;
@@ -927,7 +927,7 @@ prop_add_one(
 
 theend:
     vim_free(text);
-    return res;
+    ཕྱིར res;
 }
 
 /*
@@ -943,45 +943,45 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    ཧྲིལ		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
     linenr_T	start_lnum;
     colnr_T	start_col;
     linenr_T	end_lnum;
     colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    ཧྲིལ		error = FALSE;
+    ཧྲིལ		prev_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    གལ་ཏེ (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	ཕྱིར;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    གལ་ཏེ (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	ཕྱིར;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    གལ་ཏེ (dict == NULL || !dict_has_key(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	ཕྱིར;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    གལ་ཏེ (dict_has_key(dict, "id"))
     {
 	vimlong_T x;
 	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	གལ་ཏེ (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    ཕྱིར;
 	}
-	id = (int)x;
+	id = (ཧྲིལ)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    གལ་ཏེ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ཕྱིར;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
@@ -989,50 +989,50 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
     buf->b_has_textprop = true;  // this is never reset
     FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	གལ་ཏེ (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    ཕྱིར;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
 	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
+	གལ་ཏེ (!error)
 	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
+	གལ་ཏེ (!error)
 	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
+	གལ་ཏེ (!error)
 	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
+	ཧྲིལ this_id = id;
+	གལ་ཏེ (!error && pos_list->lv_len > 4)
 	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
+	གལ་ཏེ (error || start_lnum <= 0 || start_col <= 0
 		  || end_lnum <= 0 || end_col <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
+	    གལ་ཏེ (prev_did_emsg == did_emsg)
 		emsg(_(e_invalid_argument));
-	    return;
+	    ཕྱིར;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
+	གལ་ཏེ (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
 			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	    ཕྱིར;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+static ཧྲིལ vt_id_counter = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
+    static ཧྲིལ
 get_textprop_id(void)
 {
-    if (vt_id_counter > 0)
+    གལ་ཏེ (vt_id_counter > 0)
 	vt_id_counter = 0;
-    return --vt_id_counter;
+    ཕྱིར --vt_id_counter;
 }
 
 /*
@@ -1041,7 +1041,7 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
+    ཧྲིལ
 prop_add_common(
 	linenr_T    start_lnum,
 	colnr_T	    start_col,
@@ -1053,70 +1053,70 @@ prop_add_common(
     colnr_T	end_col;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
+    ཧྲིལ		id = 0;
     char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    ཧྲིལ		text_padding_left = 0;
+    ཧྲིལ		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    གལ་ཏེ (dict == NULL || !dict_has_key(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
 	goto theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    གལ་ཏེ (dict_has_key(dict, "end_lnum"))
     {
 	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	གལ་ཏེ (end_lnum < start_lnum)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
 	    goto theend;
 	}
     }
-    else
+    དེ་མིན
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    གལ་ཏེ (dict_has_key(dict, "length"))
     {
 	long length = dict_get_number(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	གལ་ཏེ (length < 0 || end_lnum > start_lnum)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "length");
 	    goto theend;
 	}
 	end_col = start_col + length;
     }
-    else if (dict_has_key(dict, "end_col"))
+    དེ་མིན གལ་ཏེ (dict_has_key(dict, "end_col"))
     {
 	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	གལ་ཏེ (end_col <= 0)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "end_col");
 	    goto theend;
 	}
     }
-    else if (start_lnum == end_lnum)
+    དེ་མིན གལ་ཏེ (start_lnum == end_lnum)
 	end_col = start_col;
-    else
+    དེ་མིན
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    གལ་ཏེ (dict_has_key(dict, "id"))
     {
 	vimlong_T x;
 	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	གལ་ཏེ (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
 	    goto theend;
 	}
-	id = (int)x;
+	id = (ཧྲིལ)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    གལ་ཏེ (dict_has_key(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
+	གལ་ཏེ (dict_has_key(dict, "length")
 		|| dict_has_key(dict, "end_col")
 		|| dict_has_key(dict, "end_lnum"))
 	{
@@ -1125,54 +1125,54 @@ prop_add_common(
 	}
 
 	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
+	གལ་ཏེ (text == NULL)
 	    goto theend;
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	གལ་ཏེ (dict_has_key(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
+	    གལ་ཏེ (p == NULL)
 		goto theend;
-	    if (start_col != 0)
+	    གལ་ཏེ (start_col != 0)
 	    {
 		emsg(_(e_can_only_use_text_align_when_column_is_zero));
 		goto theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
+	    གལ་ཏེ (STRCMP(p, "right") == 0)
 		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    དེ་མིན གལ་ཏེ (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
+	    དེ་མིན གལ་ཏེ (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    དེ་མིན གལ་ཏེ (STRCMP(p, "after") != 0)
 	    {
 		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	གལ་ཏེ (dict_has_key(dict, "text_padding_left"))
 	{
 	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    གལ་ཏེ (text_padding_left < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	གལ་ཏེ (dict_has_key(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
+	    གལ་ཏེ (p == NULL)
 		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    གལ་ཏེ (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    དེ་མིན གལ་ཏེ (STRCMP(p, "truncate") != 0)
 	    {
 		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
 		goto theend;
@@ -1182,24 +1182,24 @@ prop_add_common(
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    གལ་ཏེ (start_col < (text == NULL ? 1 : 0))
     {
 	semsg(_(e_invalid_column_number_nr), (long)start_col);
 	goto theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    གལ་ཏེ (start_col > 0 && text_padding_left > 0)
     {
 	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
 	goto theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+    གལ་ཏེ (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
 	goto theend;
 
-    if (text != NULL)
+    གལ་ཏེ (text != NULL)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    དེ་མིན གལ་ཏེ (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
 	goto theend;
@@ -1218,7 +1218,7 @@ prop_add_common(
 
 theend:
     vim_free(text);
-    return id;
+    ཕྱིར id;
 }
 
 /*
@@ -1227,8 +1227,8 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    ཧྲིལ
+get_text_props(buf_T *buf, linenr_T lnum, char_u **props, ཧྲིལ will_change)
 {
     char_u	*text;
     size_t	textlen;
@@ -1237,38 +1237,38 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    གལ་ཏེ ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
+	ཕྱིར 0;
 
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
     propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    གལ་ཏེ (propdata_len == 0)
+	ཕྱིར 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    གལ་ཏེ (propdata_len < PROP_COUNT_SIZE + parimaa_na(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ཕྱིར 0;
     }
     mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    གལ་ཏེ (!text_prop_count_valid(prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ཕྱིར 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    གལ་ཏེ (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
+					   (ཧྲིལ)prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ཕྱིར 0;
     }
     *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    ཕྱིར (ཧྲིལ)prop_count;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
+    ཧྲིལ
 prop_count_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    ཧྲིལ		count = get_text_props(buf, lnum, &props, FALSE);
+    ཧྲིལ		result = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    ཧྲིལ		i;
+    ཧྲིལ		next_right_goes_below = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    གལ་ཏེ (count == 0)
+	ཕྱིར 0;
+    ཆེད་དུ (i = 0; i < count; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	mch_memmove(&prop, props + i * parimaa_na(prop), parimaa_na(prop));
+	གལ་ཏེ (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
+	    གལ་ཏེ ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
 		    || (next_right_goes_below
 				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
 	    {
 		++result;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
+	    དེ་མིན གལ་ཏེ (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
 		next_right_goes_below = TRUE;
 	}
     }
-    return result;
+    ཕྱིར result;
 }
 
 /**
@@ -1313,25 +1313,25 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    ཧྲིལ
+count_props(linenr_T lnum, ཧྲིལ only_starting, ཧྲིལ last_line)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    ཧྲིལ		proplen = get_text_props(curbuf, lnum, &props, 0);
+    ཧྲིལ		result = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < proplen; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
+	mch_memmove(&prop, props + i * parimaa_na(prop), parimaa_na(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
+	གལ་ཏེ ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
 		|| (!last_line && prop.tp_col == MAXCOL))
 	    --result;
     }
-    return result;
+    ཕྱིར result;
 }
 
 static textprop_T	*text_prop_compare_props;
@@ -1341,16 +1341,16 @@ static buf_T		*text_prop_compare_buf;
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    static ཧྲིལ
+text_prop_order(ཧྲིལ flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    གལ་ཏེ (flags & TP_FLAG_ALIGN_ABOVE)
+	ཕྱིར 0;
+    གལ་ཏེ (flags & TP_FLAG_ALIGN_RIGHT)
+	ཕྱིར 2;
+    གལ་ཏེ (flags & TP_FLAG_ALIGN_BELOW)
+	ཕྱིར 3;
+    ཕྱིར 1;
 }
 
 /*
@@ -1358,57 +1358,57 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
+    static ཧྲིལ
 text_prop_compare(const void *s1, const void *s2)
 {
-    int  idx1, idx2;
+    ཧྲིལ  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
+    idx1 = *(ཧྲིལ *)s1;
+    idx2 = *(ཧྲིལ *)s2;
     tp1 = &text_prop_compare_props[idx1];
     tp2 = &text_prop_compare_props[idx2];
     col1 = tp1->tp_col;
     col2 = tp2->tp_col;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    གལ་ཏེ ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	ཕྱིར tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    གལ་ཏེ (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	ཧྲིལ order1 = text_prop_order(tp1->tp_flags);
+	ཧྲིལ order2 = text_prop_order(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	གལ་ཏེ (order1 != order2)
+	    ཕྱིར order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
     pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
     pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    གལ་ཏེ (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	གལ་ཏེ (pt1 == NULL)
+	    ཕྱིར -1;
+	གལ་ཏེ (pt2 == NULL)
+	    ཕྱིར 1;
+	གལ་ཏེ (pt1->pt_priority != pt2->pt_priority)
+	    ཕྱིར pt1->pt_priority > pt2->pt_priority ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    གལ་ཏེ (col1 != col2)
+	ཕྱིར col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    གལ་ཏེ (tp1->tp_id < 0)
+	ཕྱིར tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    ཕྱིར 0;
 }
 
 /*
@@ -1419,12 +1419,12 @@ text_prop_compare(const void *s1, const void *s2)
 sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	ཧྲིལ	    *idxs,
+	ཧྲིལ	    count)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((void *)idxs, (size_t)count, parimaa_na(ཧྲིལ), text_prop_compare);
 }
 
 /*
@@ -1434,37 +1434,37 @@ sort_text_props(
     bool
 find_prop_in_lines(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	ཧྲིལ	    type_id,
+	ཧྲིལ	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum,
 	linenr_T    first_lnum,
 	linenr_T    last_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    གལ་ཏེ (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
+	ཕྱིར false;
 
-    if (first_lnum < 1)
+    གལ་ཏེ (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
+    གལ་ཏེ (last_lnum > wp->w_buffer->b_ml.ml_line_count)
 	last_lnum = wp->w_buffer->b_ml.ml_line_count;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    ཆེད་དུ (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	ཧྲིལ	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
+	ཆེད་དུ (ཧྲིལ i = 0; i < count; ++i)
 	{
-	    mch_memmove(prop, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    mch_memmove(prop, props + i * parimaa_na(textprop_T),
+							   parimaa_na(textprop_T));
+	    གལ་ཏེ (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
 		*found_lnum = lnum;
-		return true;
+		ཕྱིར true;
 	    }
 	}
     }
-    return false;
+    ཕྱིར false;
 }
 
 /*
@@ -1475,14 +1475,14 @@ find_prop_in_lines(
     bool
 find_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	ཧྲིལ	    type_id,
+	ཧྲིལ	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    ཕྱིར find_prop_in_lines(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1494,63 +1494,63 @@ find_visible_prop(
  * Only works for the current buffer.
  */
     static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+set_text_props(linenr_T lnum, textprop_T *tps, ཧྲིལ count)
 {
     char_u  *text;
     char_u  *newtext;
-    int	    textlen;
+    ཧྲིལ	    textlen;
 
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    གལ་ཏེ (count == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
+	གལ་ཏེ (newtext == NULL)
+	    ཕྱིར;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	གལ་ཏེ (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(curbuf->b_ml.ml_line_ptr);
 	curbuf->b_ml.ml_line_ptr = newtext;
 	curbuf->b_ml.ml_line_len = textlen;
 	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
     }
-    else
+    དེ་མིན
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
 	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
+	ཧྲིལ	    vtext_size = 0;
+	ཧྲིལ	    total_len;
 	char_u	    *count_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	ཧྲིལ	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	ཆེད་དུ (i = 0; i < count; ++i)
+	    གལ་ཏེ (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
 		vtext_size += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
+	total_len = textlen + (ཧྲིལ)PROP_COUNT_SIZE
+		    + count * (ཧྲིལ)parimaa_na(textprop_T) + vtext_size;
 	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
+	གལ་ཏེ (newtext == NULL)
+	    ཕྱིར;
 	mch_memmove(newtext, text, textlen);
 
 	count_dest = newtext + textlen;
 	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
 
 	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	vtext_dest = prop_dest + count * parimaa_na(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	ཆེད་དུ (i = 0; i < count; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    གལ་ཏེ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		ཧྲིལ copysize = prop.tp_len + 1;
 
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
@@ -1558,13 +1558,13 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
 		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 		vtext_dest += copysize;
 	    }
-	    else
+	    དེ་མིན
 		prop.u.tp_text_offset = 0;
-	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	    prop_dest += sizeof(textprop_T);
+	    mch_memmove(prop_dest, &prop, parimaa_na(textprop_T));
+	    prop_dest += parimaa_na(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	གལ་ཏེ (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(curbuf->b_ml.ml_line_ptr);
 	curbuf->b_ml.ml_line_ptr = newtext;
 	curbuf->b_ml.ml_line_len = total_len;
@@ -1583,40 +1583,40 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_count_header(char_u *line, ཧྲིལ line_len, ཧྲིལ textlen, ཧྲིལ *new_len)
 {
-    int		prop_bytes = line_len - textlen;
+    ཧྲིལ		prop_bytes = line_len - textlen;
     uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    ཧྲིལ		vtext_size = 0;
+    ཧྲིལ		total;
     char_u	*newline;
     char_u	*count_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    ཧྲིལ		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    གལ་ཏེ (prop_bytes <= 0 || prop_bytes % parimaa_na(textprop_T) != 0)
     {
 	*new_len = line_len;
-	return NULL;
+	ཕྱིར NULL;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_count = (uint16_t)(prop_bytes / parimaa_na(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    ཆེད་དུ (i = 0; i < (ཧྲིལ)prop_count; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, line + textlen + i * parimaa_na(textprop_T),
+							parimaa_na(textprop_T));
+	གལ་ཏེ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
+    total = textlen + (ཧྲིལ)PROP_COUNT_SIZE + prop_bytes + vtext_size;
     newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
+    གལ་ཏེ (newline == NULL)
+	ཕྱིར NULL;
     *new_len = total;
 
     mch_memmove(newline, line, textlen);
@@ -1625,62 +1625,62 @@ props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
     prop_dest = count_dest + PROP_COUNT_SIZE;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    ཆེད་དུ (i = 0; i < (ཧྲིལ)prop_count; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, line + textlen + i * parimaa_na(textprop_T),
+							parimaa_na(textprop_T));
+	གལ་ཏེ (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    ཧྲིལ copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
 	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	དེ་མིན
 	    prop.u.tp_text_offset = 0;
-	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
-							sizeof(textprop_T));
+	mch_memmove(prop_dest + i * parimaa_na(textprop_T), &prop,
+							parimaa_na(textprop_T));
     }
-    return newline;
+    ཕྱིར newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
     void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+add_text_props(linenr_T lnum, textprop_T *text_props, ཧྲིལ text_prop_count)
 {
     unpacked_memline_T	um;
-    int			i;
+    ཧྲིལ			i;
 
     um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    གལ་ཏེ (um.buf == NULL)
+	ཕྱིར;
+    གལ་ཏེ (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	ཕྱིར;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    གལ་ཏེ (um.prop_count + text_prop_count > um.prop_size)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+		(um.prop_count + text_prop_count) * parimaa_na(textprop_T));
+	གལ་ཏེ (newprops == NULL)
 	{
 	    um_abort(&um);
-	    return;
+	    ཕྱིར;
 	}
 	um.props = newprops;
 	um.prop_size = um.prop_count + text_prop_count;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
+    ཆེད་དུ (i = 0; i < text_prop_count; ++i)
 	um.props[um.prop_count++] = text_props[i];
 
     um_close(&um);
@@ -1689,61 +1689,61 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
+    static ཧྲིལ
 compare_pt(const void *s1, const void *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    ཕྱིར tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
     static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+find_type_by_id(hashtab_T *ht, proptype_T ***array, ཧྲིལ id)
 {
-    int low = 0;
-    int high;
+    ཧྲིལ low = 0;
+    ཧྲིལ high;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    གལ་ཏེ (ht == NULL || ht->ht_used == 0)
+	ཕྱིར NULL;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    གལ་ཏེ (*array == NULL)
     {
 	long	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	ཧྲིལ	    i = 0;
 
 	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
+	གལ་ཏེ (*array == NULL)
+	    ཕྱིར NULL;
 	todo = (long)ht->ht_used;
 	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    གལ་ཏེ (!HASHITEM_EMPTY(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
 	    }
 	}
-	qsort((void *)*array, ht->ht_used, sizeof(proptype_T *), compare_pt);
+	qsort((void *)*array, ht->ht_used, parimaa_na(proptype_T *), compare_pt);
     }
 
     // binary search in the sorted array
     high = ht->ht_used;
-    while (high > low)
+    སྐབས (high > low)
     {
-	int m = (high + low) / 2;
+	ཧྲིལ m = (high + low) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
+	གལ་ཏེ ((*array)[m]->pt_id == id)
+	    ཕྱིར (*array)[m];
+	གལ་ཏེ ((*array)[m]->pt_id > id)
 	    high = m;
-	else
+	དེ་མིན
 	    low = m + 1;
     }
-    return NULL;
+    ཕྱིར NULL;
 }
 
 /*
@@ -1753,11 +1753,11 @@ find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    ཧྲིལ buflocal = TRUE;
+    ཧྲིལ virtualtext_prop = prop->tp_id < 0;
 
     dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    གལ་ཏེ (!virtualtext_prop)
     {
 	dict_add_number(dict, "length", prop->tp_len);
 	dict_add_number(dict, "id", prop->tp_id);
@@ -1766,20 +1766,20 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
     dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    གལ་ཏེ (pt == NULL)
     {
 	pt = find_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
+    གལ་ཏེ (pt != NULL)
 	dict_add_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
+    གལ་ཏེ (buflocal)
 	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
+    དེ་མིན
 	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    གལ་ཏེ (virtualtext_prop)
     {
 	string_T    text_align = {NULL, 0};
 
@@ -1787,21 +1787,21 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	གལ་ཏེ (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
 	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	དེ་མིན གལ་ཏེ (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
+	དེ་མིན གལ་ཏེ (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
 	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
+	གལ་ཏེ (text_align.string != NULL)
 	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+		text_align.string, (ཧྲིལ)text_align.length);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
+	གལ་ཏེ (prop->tp_flags & TP_FLAG_WRAP)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
+	གལ་ཏེ (prop->tp_padleft != 0)
 	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
     }
 }
@@ -1811,14 +1811,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+text_prop_type_by_id(buf_T *buf, ཧྲིལ id)
 {
     proptype_T *type;
 
     type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
+    གལ་ཏེ (type == NULL)
 	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    ཕྱིར type;
 }
 
 /*
@@ -1827,7 +1827,7 @@ text_prop_type_by_id(buf_T *buf, int id)
     bool
 text_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    ཕྱིར text_prop_type_by_id(buf, prop->tp_type) != NULL;
 }
 
 /*
@@ -1840,53 +1840,53 @@ f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
     linenr_T end;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    ཧྲིལ	    did_clear = FALSE;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ཕྱིར;
 
     start = tv_get_number(&argvars[0]);
     end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	གལ་ཏེ (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    གལ་ཏེ (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		ཕྱིར;
 	}
     }
-    if (start < 1 || end < 1)
+    གལ་ཏེ (start < 1 || end < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	ཕྱིར;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	ཆེད་དུ (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    ཧྲིལ idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
-	    if (um.prop_count > 0)
+	    གལ་ཏེ (lnum > buf->b_ml.ml_line_count)
+		bha_nga;
+	    གལ་ཏེ (!um_goto_line(&um, lnum, 0))
+		bha_nga;
+	    གལ་ཏེ (um.prop_count > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		ཆེད་དུ (idx = um.prop_count - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    གལ་ཏེ (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
@@ -1900,145 +1900,145 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    ཧྲིལ		lnum_start;
+    ཧྲིལ		start_pos_has_prop = 0;
+    ཧྲིལ		seen_end = FALSE;
+    ཧྲིལ		id = 0;
+    ཧྲིལ		id_found = FALSE;
+    ཧྲིལ		type_id = -1;
+    ཧྲིལ		skipstart = FALSE;
+    ཧྲིལ		lnum = -1;
+    ཧྲིལ		col = -1;
+    ཧྲིལ		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    ཧྲིལ		both;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ཕྱིར;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    གལ་ཏེ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	ཕྱིར;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    གལ་ཏེ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ཕྱིར;
+    གལ་ཏེ (buf->b_ml.ml_mfp == NULL)
+	ཕྱིར;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	གལ་ཏེ (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	དེ་མིན གལ་ཏེ (*dir_s != 'f')
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ཕྱིར;
 	}
     }
 
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    གལ་ཏེ (di != NULL)
 	lnum = tv_get_number(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
+    གལ་ཏེ (di != NULL)
 	col = tv_get_number(&di->di_tv);
 
-    if (lnum == -1)
+    གལ་ཏེ (lnum == -1)
     {
 	lnum = cursor->lnum;
 	col = cursor->col + 1;
     }
-    else if (col == -1)
+    དེ་མིན གལ་ཏེ (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    གལ་ཏེ (lnum < 1 || lnum > buf->b_ml.ml_line_count)
     {
 	emsg(_(e_invalid_range));
-	return;
+	ཕྱིར;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    གལ་ཏེ (dict_has_key(dict, "id"))
     {
 	id = dict_get_number(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    གལ་ཏེ (dict_has_key(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	གལ་ཏེ (type == NULL)
+	    ཕྱིར;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    གལ་ཏེ (!id_found && type_id == -1)
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	ཕྱིར;
     }
-    if (both && (!id_found || type_id == -1))
+    གལ་ཏེ (both && (!id_found || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	ཕྱིར;
     }
 
     lnum_start = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    གལ་ཏེ (rettv_dict_alloc(rettv) == FAIL)
+	ཕྱིར;
 
-    while (1)
+    སྐབས (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	ཧྲིལ	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	ཧྲིལ	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	ཧྲིལ	    prop_start;
+	ཧྲིལ	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	ཆེད་དུ (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
 	{
-	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&prop, prop_start_ptr + i * parimaa_na(textprop_T),
+							   parimaa_na(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    གལ་ཏེ (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
 		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
+	    དེ་མིན
 		prop.u.tp_text = NULL;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    གལ་ཏེ (lnum == lnum_start)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
 		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		གལ་ཏེ (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
+		    གལ་ཏེ (!is_floating_vtext && prop.tp_col > col)
 			continue;
 		}
-		else if (!is_floating_vtext
+		དེ་མིན གལ་ཏེ (!is_floating_vtext
 		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
 		    continue;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
+	    གལ་ཏེ (both ? prop.tp_id == id && prop.tp_type == type_id
 		     : (id_found && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
+		གལ་ཏེ (lnum_start == lnum
 			&& col >= prop.tp_col
 			&& (col <= prop.tp_col + prop.tp_len
 							 - (prop.tp_len != 0)))
@@ -2050,22 +2050,22 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		// The property does not continue on the next line, it ends on
 		// this line.
 		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
+		གལ་ཏེ (!prop_start && prop_end && dir == FORWARD)
 		    seen_end = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		གལ་ཏེ (!prop_start)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    གལ་ཏེ (start_pos_has_prop && !skipstart)
 			dir = BACKWARD;
 		    continue;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		གལ་ཏེ (start_pos_has_prop && skipstart && !seen_end)
 		{
 		    start_pos_has_prop = 0;
 		    continue;
@@ -2074,20 +2074,20 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
 		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		ཕྱིར;
 	    }
 	}
 
-	if (dir > 0)
+	གལ་ཏེ (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
-		break;
+	    གལ་ཏེ (lnum >= buf->b_ml.ml_line_count)
+		bha_nga;
 	    lnum++;
 	}
-	else
+	དེ་མིན
 	{
-	    if (lnum <= 1)
-		break;
+	    གལ་ཏེ (lnum <= 1)
+		bha_nga;
 	    lnum--;
 	}
     }
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    static ཧྲིལ
+prop_type_or_id_in_list(ཧྲིལ *types_or_ids, ཧྲིལ len, ཧྲིལ type_or_id)
 {
-    int i;
+    ཧྲིལ i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    ཆེད་དུ (i = 0; i < len; i++)
+	གལ་ཏེ (types_or_ids[i] == type_or_id)
+	    ཕྱིར TRUE;
 
-    return FALSE;
+    ཕྱིར FALSE;
 }
 
 /*
@@ -2121,33 +2121,33 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
 get_props_in_line(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	ཧྲིལ		*prop_types,
+	ཧྲིལ		prop_types_len,
+	ཧྲིལ		*prop_ids,
+	ཧྲིལ		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	ཧྲིལ		add_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    ཧྲིལ		count;
+    ཧྲིལ		i;
     textprop_T	prop;
 
     count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    ཆེད་དུ (i = 0; i < count; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(textprop_T),
-		sizeof(textprop_T));
+	mch_memmove(&prop, props + i * parimaa_na(textprop_T),
+		parimaa_na(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	གལ་ཏེ (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
 	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	དེ་མིན
 	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
+	གལ་ཏེ ((prop_types == NULL
 		    || prop_type_or_id_in_list(prop_types, prop_types_len,
 			prop.tp_type))
 		&& (prop_ids == NULL
@@ -2156,12 +2156,12 @@ get_props_in_line(
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
-		break;
+	    གལ་ཏེ (d == NULL)
+		bha_nga;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
+	    གལ་ཏེ (add_lnum)
 		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    གལ་ཏེ (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    static ཧྲིལ *
+get_prop_types_from_names(list_T *l, buf_T *buf, ཧྲིལ *num_types)
 {
-    int		*prop_types;
+    ཧྲིལ		*prop_types;
     listitem_T	*li;
-    int		i;
+    ཧྲིལ		i;
     char_u	*name;
     proptype_T	*type;
 
     *num_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(ཧྲིལ, list_len(l));
+    གལ་ཏེ (prop_types == NULL)
+	ཕྱིར NULL;
 
     i = 0;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	གལ་ཏེ (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
 	    goto errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
+	གལ་ཏེ (name == NULL)
 	    goto errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
+	གལ་ཏེ (type == NULL)
 	    goto errret;
 	prop_types[i++] = type->pt_id;
     }
 
     *num_types = i;
-    return prop_types;
+    ཕྱིར prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    ཕྱིར NULL;
 }
 
 /*
@@ -2218,38 +2218,38 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    static ཧྲིལ *
+get_prop_ids_from_list(list_T *l, ཧྲིལ *num_ids)
 {
-    int		*prop_ids;
+    ཧྲིལ		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    ཧྲིལ		i = 0;
+    ཧྲིལ		id;
+    ཧྲིལ		error;
 
     *num_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(ཧྲིལ, list_len(l));
+    གལ་ཏེ (prop_ids == NULL)
+	ཕྱིར NULL;
 
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, li)
     {
 	error = FALSE;
 	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
+	གལ་ཏེ (error)
 	    goto errret;
 
 	prop_ids[i++] = id;
     }
 
     *num_ids = i;
-    return prop_ids;
+    ཕྱིར prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    ཕྱིར NULL;
 }
 
 /*
@@ -2262,90 +2262,90 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
     linenr_T	start_lnum;
     linenr_T	end_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    ཧྲིལ		add_lnum = FALSE;
+    ཧྲིལ		*prop_types = NULL;
+    ཧྲིལ		prop_types_len = 0;
+    ཧྲིལ		*prop_ids = NULL;
+    ཧྲིལ		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ཕྱིར;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    གལ་ཏེ (rettv_list_alloc(rettv) == FAIL)
+	ཕྱིར;
 
     // default: get text properties on current line
     start_lnum = tv_get_number(&argvars[0]);
     end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	གལ་ཏེ (check_for_dict_arg(argvars, 1) == FAIL)
+	    ཕྱིར;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	གལ་ཏེ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ཕྱིར;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	གལ་ཏེ (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    གལ་ཏེ (di->di_tv.v_type != VAR_NUMBER)
 	    {
 		emsg(_(e_number_required));
-		return;
+		ཕྱིར;
 	    }
 	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    གལ་ཏེ (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
 		// line
 		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
+	    དེ་མིན གལ་ཏེ (end_lnum > buf->b_ml.ml_line_count)
 		end_lnum = buf->b_ml.ml_line_count;
 	    add_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	གལ་ཏེ (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    གལ་ཏེ (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		ཕྱིར;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    གལ་ཏེ (l != NULL && list_len(l) > 0)
 	    {
 		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		གལ་ཏེ (prop_types == NULL)
+		    ཕྱིར;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	གལ་ཏེ (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    གལ་ཏེ (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
 		goto errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    གལ་ཏེ (l != NULL && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
+		གལ་ཏེ (prop_ids == NULL)
 		    goto errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    གལ་ཏེ (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
+    དེ་མིན
+	ཆེད་དུ (lnum = start_lnum; lnum <= end_lnum; lnum++)
 	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
@@ -2368,80 +2368,80 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     linenr_T	last_changed = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    ཧྲིལ		do_all;
+    ཧྲིལ		id = -MAXCOL;
+    ཧྲིལ		type_id = -1;	    // for a single "type"
+    ཧྲིལ		*type_ids = NULL;   // array, for a list of "types", allocated
+    ཧྲིལ		num_type_ids = 0;   // number of elements in "type_ids"
+    ཧྲིལ		both;
 
     rettv->vval.v_number = 0;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	ཕྱིར;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    གལ་ཏེ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	ཕྱིར;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
 	start = tv_get_number(&argvars[1]);
 	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	གལ་ཏེ (argvars[2].v_type != VAR_UNKNOWN)
 	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	གལ་ཏེ (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    ཕྱིར;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    གལ་ཏེ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ཕྱིར;
+    གལ་ཏེ (buf->b_ml.ml_mfp == NULL)
+	ཕྱིར;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    གལ་ཏེ (dict_has_key(dict, "id"))
 	id = dict_get_number(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    གལ་ཏེ (dict_has_key(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	གལ་ཏེ (type == NULL)
+	    ཕྱིར;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    གལ་ཏེ (dict_has_key(dict, "types"))
     {
 	typval_T types;
 	listitem_T *li = NULL;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	གལ་ཏེ (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( parimaa_na(ཧྲིལ) * types.vval.v_list->lv_len );
 
 	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
+		གལ་ཏེ (li->li_tv.v_type != VAR_STRING)
 		    continue;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
+		གལ་ཏེ (!prop_type)
 		    goto cleanup_prop_remove;
 
 		type_ids[num_type_ids++] = prop_type->pt_id;
@@ -2450,76 +2450,76 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    གལ་ཏེ (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
 	goto cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    གལ་ཏེ (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
 	goto cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    གལ་ཏེ (type_id != -1 && num_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
 	goto cleanup_prop_remove;
     }
 
-    if (end == 0)
+    གལ་ཏེ (end == 0)
 	end = buf->b_ml.ml_line_count;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	ཆེད་དུ (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    ཧྲིལ idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
+	    གལ་ཏེ (lnum > buf->b_ml.ml_line_count)
+		bha_nga;
+	    གལ་ཏེ (!um_goto_line(&um, lnum, 0))
+		bha_nga;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    ཆེད་དུ (idx = 0; idx < um.prop_count; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		ཧྲིལ	    matches_id = 0;
+		ཧྲིལ	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
+		གལ་ཏེ (prop->tp_flags & TP_FLAG_DELETED)
 		    continue;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		གལ་ཏེ (num_type_ids > 0)
 		{
-		    int idx2;
+		    ཧྲིལ idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    ཆེད་དུ (idx2 = 0; !matches_type && idx2 < num_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		དེ་མིན
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		གལ་ཏེ (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
+		    གལ་ཏེ (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
 		    ++rettv->vval.v_number;
-		    if (!do_all)
-			break;
+		    གལ་ཏེ (!do_all)
+			bha_nga;
 		}
 	    }
 	}
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    གལ་ཏེ (first_changed > 0)
     {
 	changed_line_display_buf(buf);
 	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
@@ -2534,7 +2534,7 @@ cleanup_prop_remove:
  * Common for f_prop_type_add() and f_prop_type_change().
  */
     static void
-prop_type_set(typval_T *argvars, int add)
+prop_type_set(typval_T *argvars, ཧྲིལ add)
 {
     char_u	*name;
     buf_T	*buf = NULL;
@@ -2542,126 +2542,126 @@ prop_type_set(typval_T *argvars, int add)
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	ཕྱིར;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    གལ་ཏེ (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ཕྱིར;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    གལ་ཏེ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	ཕྱིར;
     dict = argvars[1].vval.v_dict;
 
     prop = find_prop_type(name, buf);
-    if (add)
+    གལ་ཏེ (add)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	གལ་ཏེ (prop != NULL)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    ཕྱིར;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	གལ་ཏེ (prop == NULL)
+	    ཕྱིར;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	གལ་ཏེ (buf == NULL)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	དེ་མིན
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	གལ་ཏེ (*htp == NULL)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    གལ་ཏེ (*htp == NULL)
 	    {
 		vim_free(prop);
-		return;
+		ཕྱིར;
 	    }
 	    hash_init(*htp);
 	}
 	hash_add(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    དེ་མིན
     {
-	if (prop == NULL)
+	གལ་ཏེ (prop == NULL)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    ཕྱིར;
 	}
     }
 
-    if (dict != NULL)
+    གལ་ཏེ (dict != NULL)
     {
 	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    ཧྲིལ		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    གལ་ཏེ (highlight != NULL && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    གལ་ཏེ (hl_id <= 0)
 	    {
 		semsg(_(e_unknown_highlight_group_name_str),
 			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+		ཕྱིར;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
 	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    གལ་ཏེ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    དེ་མིན
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
 	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    གལ་ཏེ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    དེ་མིན
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
 	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	    prop->pt_priority = tv_get_number(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    གལ་ཏེ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
+	    དེ་མིན
 		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
 	}
 
 	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	གལ་ཏེ (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    གལ་ཏེ (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
+	    དེ་མིན
 		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
 	}
     }
@@ -2695,37 +2695,37 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
     buf_T	*buf = NULL;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ཕྱིར;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    གལ་ཏེ (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ཕྱིར;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	གལ་ཏེ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ཕྱིར;
     }
 
     hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    གལ་ཏེ (hi == NULL)
+	ཕྱིར;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    གལ་ཏེ (buf == NULL)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    དེ་མིན
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2746,37 +2746,37 @@ f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    གལ་ཏེ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ཕྱིར;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    གལ་ཏེ (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ཕྱིར;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    གལ་ཏེ (rettv_dict_alloc(rettv) == FAIL)
+	ཕྱིར;
 
     proptype_T  *prop = NULL;
     buf_T	    *buf = NULL;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	གལ་ཏེ (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ཕྱིར;
     }
 
     prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    གལ་ཏེ (prop == NULL)
+	ཕྱིར;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
+    གལ་ཏེ (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
     dict_add_number(d, "priority", prop->pt_priority);
     dict_add_number(d, "combine",
@@ -2787,7 +2787,7 @@ f_prop_type_get(typval_T *argvars, typval_T *rettv)
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
     dict_add_number(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
+    གལ་ཏེ (buf != NULL)
 	dict_add_number(d, "bufnr", buf->b_fnum);
 }
 
@@ -2800,7 +2800,7 @@ list_types(hashtab_T *ht, list_T *l)
     todo = (long)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	གལ་ཏེ (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2818,23 +2818,23 @@ f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
     buf_T *buf = NULL;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    གལ་ཏེ (rettv_list_alloc(rettv) == FAIL)
+	ཕྱིར;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    གལ་ཏེ (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	ཕྱིར;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    གལ་ཏེ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	གལ་ཏེ (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    ཕྱིར;
     }
-    if (buf == NULL)
+    གལ་ཏེ (buf == NULL)
     {
-	if (global_proptypes != NULL)
+	གལ་ཏེ (global_proptypes != NULL)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    དེ་མིན གལ་ཏེ (buf->b_proptypes != NULL)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
@@ -2847,13 +2847,13 @@ clear_ht_prop_types(hashtab_T *ht)
     long	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    གལ་ཏེ (ht == NULL)
+	ཕྱིར;
 
     todo = (long)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	གལ་ཏེ (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,7 +2866,7 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#གལ་ཏེ defined(EXITFREE)
 /*
  * Free all global property types.
  */
@@ -2891,10 +2891,10 @@ clear_buf_prop_types(buf_T *buf)
 }
 
 // Struct used to return two values from adjust_prop().
-typedef struct
+typedef sa_nracanaa
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    ཧྲིལ dirty;	    // if the property was changed
+    ཧྲིལ can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2910,27 +2910,27 @@ typedef struct
 adjust_prop(
 	textprop_T  *prop,
 	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	ཧྲིལ	    added,
+	ཧྲིལ	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    ཧྲིལ		start_incl;
+    ཧྲིལ		end_incl;
+    ཧྲིལ		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    གལ་ཏེ (prop->tp_col == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	ཕྱིར res;
     }
 
     pt = text_prop_type_by_id(curbuf, prop->tp_type);
     start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
 				|| (flags & APC_SUBSTITUTE)
 				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+    གལ་ཏེ (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
 	start_incl = FALSE;
@@ -2939,31 +2939,31 @@ adjust_prop(
     // do not drop zero-width props if they later can increase in size
     droppable = !(start_incl || end_incl);
 
-    if (added > 0)
+    གལ་ཏེ (added > 0)
     {
-	if (col + 1 <= prop->tp_col
+	གལ་ཏེ (col + 1 <= prop->tp_col
 		- (start_incl || (prop->tp_len == 0 && end_incl)))
 	    // Change is entirely before the text property: Only shift
 	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	དེ་མིན གལ་ཏེ (col + 1 < prop->tp_col + prop->tp_len + end_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    དེ་མིན གལ་ཏེ (prop->tp_col > col + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	གལ་ཏེ (prop->tp_col + added < col + 1)
 	{
-	    if (prop->tp_id < 0)
+	    གལ་ཏེ (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    དེ་མིན
 	    {
 		prop->tp_len += (prop->tp_col - 1 - col) + added;
 		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		གལ་ཏེ (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
@@ -2974,33 +2974,33 @@ adjust_prop(
 		}
 	    }
 	}
-	else
+	དེ་མིན
 	    prop->tp_col += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    དེ་མིན གལ་ཏེ (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	གལ་ཏེ (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
 	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	དེ་མིན
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    ཧྲིལ after = col - added - (prop->tp_col - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	གལ་ཏེ (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
 			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
     }
-    else
+    དེ་མིན
 	res.dirty = FALSE;
 
-    return res;
+    ཕྱིར res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    ཧྲིལ
 adjust_prop_columns(
 	linenr_T    lnum,
 	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	ཧྲིལ	    bytes_added,
+	ཧྲིལ	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    ཧྲིལ		dirty = FALSE;
+    ཧྲིལ		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    གལ་ཏེ (text_prop_frozen > 0)
+	ཕྱིར FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    གལ་ཏེ (um.buf == NULL || um.prop_count == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	ཕྱིར FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    ཆེད་དུ (ri = 0; ri < um.prop_count; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
 	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	གལ་ཏེ (res.dirty)
 	{
-	    if (!dirty)
+	    གལ་ཏེ (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		གལ་ཏེ (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    ཕྱིར FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		གལ་ཏེ ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    ཕྱིར FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	གལ་ཏེ (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
 	    continue;
 	}
     }
-    if (dirty)
+    གལ་ཏེ (dirty)
 	um_close(&um);
-    else
+    དེ་མིན
 	um_abort(&um);
-    return dirty;
+    ཕྱིར dirty;
 }
 
 /*
@@ -3091,23 +3091,23 @@ adjust_prop_columns(
 adjust_props_for_split(
 	linenr_T    lnum_props,
 	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	ཧྲིལ	    kept,
+	ཧྲིལ	    deleted,
+	ཧྲིལ	    at_eol)
 {
     char_u	*props;
-    int		count;
+    ཧྲིལ		count;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    ཧྲིལ		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    གལ་ཏེ (!curbuf->b_has_textprop)
+	ཕྱིར;
 
     // Get the text properties from "lnum_props".
     count = get_text_props(curbuf, lnum_props, &props, FALSE);
-    ga_init2(&prevprop, sizeof(textprop_T), 10);
-    ga_init2(&nextprop, sizeof(textprop_T), 10);
+    ga_init2(&prevprop, parimaa_na(textprop_T), 10);
+    ga_init2(&nextprop, parimaa_na(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
     char_u *count_ptr = props - PROP_COUNT_SIZE;
@@ -3115,25 +3115,25 @@ adjust_props_for_split(
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < count; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	ཧྲིལ	    start_incl, end_incl;
+	ཧྲིལ	    cont_prev, cont_next;
+	ཧྲིལ	    prop_col;
 
 	// copy the prop to an aligned structure
-	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
+	mch_memmove(&prop, props + i * parimaa_na(textprop_T), parimaa_na(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	གལ་ཏེ (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
 	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	དེ་མིན
 	    prop.u.tp_text = NULL;
 
 	pt = text_prop_type_by_id(curbuf, prop.tp_type);
@@ -3143,63 +3143,63 @@ adjust_props_for_split(
 	// a text prop "above" behaves like it is on the first text column
 	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
 
-	if (prop_col == MAXCOL)
+	གལ་ཏེ (prop_col == MAXCOL)
 	{
 	    cont_prev = at_eol;
 	    cont_next = !at_eol;
 	}
-	else
+	དེ་མིན
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
+	    ཧྲིལ is_floating_vtext = (prop.tp_id < 0
 						&& prop.tp_col == MAXCOL);
 
 	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
+	    གལ་ཏེ (is_floating_vtext)
 		cont_next = FALSE;
-	    else
+	    དེ་མིན
 		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
+	གལ་ཏེ (prop.tp_id < 0 && cont_next)
 	    cont_prev = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	གལ་ཏེ (cont_prev && ga_grow(&prevprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    ཧྲིལ is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
+	    གལ་ཏེ (!is_vtext && p->tp_col + p->tp_len >= kept)
 		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
+	    གལ་ཏེ (cont_next)
 		p->tp_flags |= TP_FLAG_CONT_NEXT;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	གལ་ཏེ (cont_next && ga_grow(&nextprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    ཧྲིལ is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    གལ་ཏེ (p->tp_col != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
+		གལ་ཏེ (p->tp_col > skipped)
 		    p->tp_col -= skipped - 1;
-		else
+		དེ་མིན
 		{
-		    if (!is_vtext)
+		    གལ་ཏེ (!is_vtext)
 			p->tp_len -= skipped - p->tp_col;
 		    p->tp_col = 1;
 		}
 	    }
-	    if (cont_prev)
+	    གལ་ཏེ (cont_prev)
 		p->tp_flags |= TP_FLAG_CONT_PREV;
 	}
     }
@@ -3221,51 +3221,51 @@ adjust_props_for_split(
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	ཧྲིལ		    last_line,
 	long		    col,
-	int		    removed)
+	ཧྲིལ		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    གལ་ཏེ (um->buf == NULL)
+	ཕྱིར;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    གལ་ཏེ (r_um.buf == NULL)
+	ཕྱིར;
+    གལ་ཏེ (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	ཕྱིར;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    ཆེད་དུ (ཧྲིལ i = r_um.prop_count - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	ཧྲིལ	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
+	གལ་ཏེ (prop->tp_col == MAXCOL && !last_line)
 	    continue;  // drop floating text for non-last lines
 	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	གལ་ཏེ (last_line || end)
 	{
 	    um_add_prop(um, prop);
 	    prop->u.tp_text = NULL;  // ownership transferred
 	}
-	else
+	དེ་མིན
 	{
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    ཆེད་དུ (ཧྲིལ j = 0; j < um->prop_count; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		གལ་ཏེ ((op->tp_flags & TP_FLAG_CONT_PREV)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
@@ -3273,10 +3273,10 @@ prepend_joined_props(
 		    op->tp_len += op->tp_col - prop->tp_col;
 		    op->tp_col = prop->tp_col;
 		    op->tp_flags = prop->tp_flags;
-		    break;
+		    bha_nga;
 		}
 	    }
-	    if (!found)
+	    གལ་ཏེ (!found)
 		internal_error("text property above joined line not found");
 	}
     }
@@ -3287,16 +3287,16 @@ prepend_joined_props(
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
     static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+remember_cleared_prop(garray_T *gap, ཧྲིལ which, textprop_T *prop, ཧྲིལ flag)
 {
     undoprop_T	*up;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
-	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    གལ་ཏེ (which == UNDOPROP_NONE)
+	ཕྱིར;
+    གལ་ཏེ (gap->ga_itemsize == 0)
+	ga_init2(gap, parimaa_na(undoprop_T), 4);
+    གལ་ཏེ (ga_grow(gap, 1) == FAIL)
+	ཕྱིར;
     up = (undoprop_T *)gap->ga_data + gap->ga_len++;
     up->up_which = which;
     up->up_type = prop->tp_type;
@@ -3316,8 +3316,8 @@ adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	ཧྲིལ	    above_which,
+	ཧྲིལ	    below_which)
 {
     unpacked_memline_T	above;
     unpacked_memline_T	below;
@@ -3326,57 +3326,57 @@ adjust_props_for_undo(
     bool		below_changed = false;
     bool		cont_next = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    གལ་ཏེ (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
+	ཕྱིར;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
+    གལ་ཏེ (above.buf == NULL)
+	ཕྱིར;
+    ཆེད་དུ (ཧྲིལ i = 0; i < above.prop_count; ++i)
+	གལ་ཏེ (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
 	    cont_next = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    གལ་ཏེ (cont_next && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	ཕྱིར;
     }
 
     below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    གལ་ཏེ (below.buf == NULL)
     {
 	um_abort(&above);
-	return;
+	ཕྱིར;
     }
-    if (below.prop_count > 0)
+    གལ་ཏེ (below.prop_count > 0)
     {
 	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
+	གལ་ཏེ (paired == NULL)
 	    goto theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < above.prop_count; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
+	གལ་ཏེ (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
 	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	ཆེད་དུ (ཧྲིལ j = 0; j < below.prop_count; ++j)
 	{
 	    textprop_T *next = &below.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
+	    གལ་ཏེ (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
 		    && next->tp_id == prop->tp_id
 		    && next->tp_type == prop->tp_type)
 	    {
 		paired[j] = true;
 		found = true;
-		break;
+		bha_nga;
 	    }
 	}
-	if (!found)
+	གལ་ཏེ (!found)
 	{
 	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
 	    above_changed = true;
@@ -3384,12 +3384,12 @@ adjust_props_for_undo(
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    ཆེད་དུ (ཧྲིལ j = 0; j < below.prop_count; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
+	གལ་ཏེ (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
 	    continue;
-	if (!below.detached && !um_detach(&below))
-	    break;
+	གལ་ཏེ (!below.detached && !um_detach(&below))
+	    bha_nga;
 	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
 	below_changed = true;
 	remember_cleared_prop(gap, below_which, &below.props[j],
@@ -3397,13 +3397,13 @@ adjust_props_for_undo(
     }
 
 theend:
-    if (below_changed)
+    གལ་ཏེ (below_changed)
 	um_close(&below);
-    else
+    དེ་མིན
 	um_abort(&below);
-    if (above_changed)
+    གལ་ཏེ (above_changed)
 	um_close(&above);
-    else
+    དེ་མིན
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3418,52 +3418,52 @@ restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	ཧྲིལ	    which)
 {
     unpacked_memline_T	um;
     bool		changed = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+    གལ་ཏེ (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
 					  || lnum > buf->b_ml.ml_line_count)
-	return;
+	ཕྱིར;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    གལ་ཏེ (um.buf == NULL)
+	ཕྱིར;
+    ཆེད་དུ (ཧྲིལ r = 0; r < gap->ga_len; ++r)
     {
 	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
 
-	if (up->up_which != which)
+	གལ་ཏེ (up->up_which != which)
 	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	ཆེད་དུ (ཧྲིལ i = 0; i < um.prop_count; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
+	    གལ་ཏེ (prop->tp_type != up->up_type || prop->tp_id != up->up_id
 		    || prop->tp_col != up->up_col
 		    || (prop->tp_flags & up->up_flag))
 		continue;
-	    if (!um.detached && !um_detach(&um))
+	    གལ་ཏེ (!um.detached && !um_detach(&um))
 		goto theend;
 	    um.props[i].tp_flags |= up->up_flag;
 	    changed = true;
-	    break;
+	    bha_nga;
 	}
     }
 
 theend:
-    if (changed)
+    གལ་ཏེ (changed)
 	um_close(&um);
-    else
+    དེ་མིན
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_count_valid(ཧྲིལ prop_count, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
+    གལ་ཏེ (propdata_len < PROP_COUNT_SIZE)
+	ཕྱིར false;
+    ཕྱིར (size_t)prop_count * parimaa_na(textprop_T)
 		    <= propdata_len - PROP_COUNT_SIZE;
 }
 
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, ཧྲིལ prop_count, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    ཆེད་དུ (ཧྲིལ i = 0; i < prop_count; ++i)
     {
 	textprop_T  prop;
 
-	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
-							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
+	mch_memmove(&prop, props + (size_t)i * parimaa_na(textprop_T),
+							  parimaa_na(textprop_T));
+	གལ་ཏེ (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
 	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	གལ་ཏེ (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    ཕྱིར false;
     }
-    return true;
+    ཕྱིར true;
 }
 
 #endif // FEAT_PROP_POPUP

@@ -11,7 +11,7 @@
 
 #ifdef USE_GTK3
 # include <gtk/gtk.h>
-#else
+#དེ་མིན
 # include <gdk/gdk.h>
 # include <gtk/gtkcontainer.h>
 #endif
@@ -27,7 +27,7 @@ extern "C" {
 # define GTK_FORM_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE((obj), GTK_TYPE_FORM))
 # define GTK_IS_FORM_CLASS(klass)       (G_TYPE_CHECK_CLASS_TYPE((klass), GTK_TYPE_FORM))
-#else
+#དེ་མིན
 # define GTK_FORM(obj)		       (GTK_CHECK_CAST ((obj), GTK_TYPE_FORM, GtkForm))
 # define GTK_FORM_CLASS(klass)	       (GTK_CHECK_CLASS_CAST ((klass), GTK_TYPE_FORM, GtkFormClass))
 # define GTK_IS_FORM(obj)	       (GTK_CHECK_TYPE ((obj), GTK_TYPE_FORM))
@@ -35,10 +35,10 @@ extern "C" {
 #endif
 
 
-typedef struct _GtkForm GtkForm;
-typedef struct _GtkFormClass GtkFormClass;
+typedef sa_nracanaa _GtkForm GtkForm;
+typedef sa_nracanaa _GtkFormClass GtkFormClass;
 
-struct _GtkForm
+sa_nracanaa _GtkForm
 {
     GtkContainer container;
 
@@ -47,14 +47,14 @@ struct _GtkForm
     gint freeze_count;
 };
 
-struct _GtkFormClass
+sa_nracanaa _GtkFormClass
 {
     GtkContainerClass parent_class;
 };
 
 #ifdef USE_GTK3
 GType gui_gtk_form_get_type(void);
-#else
+#དེ་མིན
 GtkType gui_gtk_form_get_type(void);
 #endif
 

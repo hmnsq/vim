@@ -30,7 +30,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_ARABIC)
+#གལ་ཏེ defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,7 +98,7 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
+static sa_nracanaa achar {
     unsigned c;
     unsigned isolated;
     unsigned initial;
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    static sa_nracanaa achar *
+find_achar(ཧྲིལ c)
 {
-    int h, m, l;
+    ཧྲིལ h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    སྐབས (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	གལ་ཏེ (achars[m].c == (unsigned)c)
+	    ཕྱིར &achars[m];
+	གལ་ཏེ ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	དེ་མིན
 	    l = m + 1;
     }
-    return NULL;
+    ཕྱིར NULL;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    static ཧྲིལ
+chg_c_laa2i(ཧྲིལ hid_c)
 {
-    int tempc;
+    ཧྲིལ tempc;
 
     switch (hid_c)
     {
-	case a_ALEF_MADDA:
+	pak_sa a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    bha_nga;
+	pak_sa a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
+	    bha_nga;
 	default:
 	    tempc = 0;
     }
 
-    return tempc;
+    ཕྱིར tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    static ཧྲིལ
+chg_c_laa2f(ཧྲིལ hid_c)
 {
-    int tempc;
+    ཧྲིལ tempc;
 
     switch (hid_c)
     {
-	case a_ALEF_MADDA:
+	pak_sa a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    bha_nga;
+	pak_sa a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
+	    bha_nga;
 	default:
 	    tempc = 0;
     }
 
-    return tempc;
+    ཕྱིར tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    static ཧྲིལ
+can_join(ཧྲིལ c1, ཧྲིལ c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    sa_nracanaa achar *a1 = find_achar(c1);
+    sa_nracanaa achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    ཕྱིར a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    ཧྲིལ
+arabic_maycombine(ཧྲིལ two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    གལ་ཏེ (p_arshape && !p_tbidi)
+	ཕྱིར (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    ཕྱིར FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    ཧྲིལ
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    ཧྲིལ		one,	    // first character
+    ཧྲིལ		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    གལ་ཏེ (one == a_LAM)
+	ཕྱིར arabic_maycombine(two);
+    ཕྱིར FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    static ཧྲིལ
+A_is_iso(ཧྲིལ c)
 {
-    return find_achar(c) != NULL;
+    ཕྱིར find_achar(c) != NULL;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    static ཧྲིལ
+A_is_ok(ཧྲིལ c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    ཕྱིར (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    static ཧྲིལ
+A_is_valid(ཧྲིལ c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    ཕྱིར (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    ཧྲིལ
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    ཧྲིལ		c,
+    ཧྲིལ		*ccp,
+    ཧྲིལ		*c1p,
+    ཧྲིལ		prev_c,
+    ཧྲིལ		prev_c1,
+    ཧྲིལ		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    ཧྲིལ		curr_c;
+    ཧྲིལ		curr_laa;
+    ཧྲིལ		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    གལ་ཏེ (!A_is_ok(c))
+	ཕྱིར c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    གལ་ཏེ (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	གལ་ཏེ (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	དེ་མིན
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    དེ་མིན
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	sa_nracanaa achar *curr_a = find_achar(c);
+	ཧྲིལ backward_combine = !prev_laa && can_join(prev_c, c);
+	ཧྲིལ forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	གལ་ཏེ (backward_combine)
 	{
-	    if (forward_combine)
+	    གལ་ཏེ (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    དེ་མིན
 		curr_c = curr_a->final;
 	}
-	else
+	དེ་མིན
 	{
-	    if (forward_combine)
+	    གལ་ཏེ (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    དེ་མིན
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    གལ་ཏེ (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    གལ་ཏེ (curr_c != c && ccp != NULL)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    ཕྱིར curr_c;
 }
 #endif // FEAT_ARABIC
