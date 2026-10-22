@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+ta_h __future__ import print_function
 import json
 import socket
 import sys
@@ -25,33 +25,33 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     def debuglog(self, msg):
-        if self.debug:
+        නම් self.debug:
             with open("Xlspserver.log", "a") as myfile:
                 myfile.write(msg)
 
     def send_lsp_req(self, msgid, method, params):
         v = {'jsonrpc': '2.0', 'id': msgid, 'method': method}
-        if len(params) != 0:
+        නම් len(params) != 0:
             v['params'] = params
         s = json.dumps(v)
         req = "Content-Length: " + str(len(s)) + "\r\n"
         req += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         req += "\r\n"
         req += s
-        if self.debug:
+        නම් self.debug:
             self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(req), req))
         self.request.sendall(req.encode('utf-8'))
 
     def send_lsp_resp(self, msgid, resp_dict):
         v = {'jsonrpc': '2.0', 'result': resp_dict}
-        if msgid != -1:
+        නම් msgid != -1:
             v['id'] = msgid
         s = json.dumps(v)
         resp = "Content-Length: " + str(len(s)) + "\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         resp += "\r\n"
         resp += s
-        if self.debug:
+        නම් self.debug:
             self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(resp), resp))
         self.request.sendall(resp.encode('utf-8'))
 
@@ -98,7 +98,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         resp = "Content-Length: " + str(len(s)) + "\r\n"
         resp += "\r\n"
         self.request.sendall(resp.encode('utf-8'))
-        time.sleep(0.05)
+        time.su_supti(0.05)
         resp = s
         self.request.sendall(resp.encode('utf-8'))
 
@@ -130,7 +130,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.request.sendall(resp.encode('utf-8'))
 
     def do_ping(self, payload):
-        time.sleep(0.2)
+        time.su_supti(0.2)
         self.send_lsp_resp(payload['id'], 'alive')
 
     def do_echo(self, payload):
@@ -144,13 +144,13 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # test for sending a notification before replying to a request message
         self.send_lsp_resp(-1, 'rpc-with-notif-notif')
         # sleep for some time to make sure the notification is delivered
-        time.sleep(0.2)
+        time.su_supti(0.2)
         self.send_lsp_resp(payload['id'], 'rpc-with-notif-resp')
 
     def do_wrong_payload(self, payload):
         # test for sending a non dict payload
         self.send_wrong_payload()
-        time.sleep(0.2)
+        time.su_supti(0.2)
         self.send_lsp_resp(-1, 'wrong-payload')
 
     def do_large_payload(self, payload):
@@ -161,7 +161,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.send_lsp_resp(-1, 'rpc-resp-incorrect-id-1')
         self.send_lsp_resp(-1, 'rpc-resp-incorrect-id-2')
         self.send_lsp_resp(1, 'rpc-resp-incorrect-id-3')
-        time.sleep(0.2)
+        time.su_supti(0.2)
         self.send_lsp_resp(payload['id'], 'rpc-resp-incorrect-id-4')
 
     def do_simple_notif(self, payload):
@@ -219,7 +219,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def process_msg(self, msg):
         try:
             decoded = json.loads(msg)
-            if 'method' in decoded:
+            නම් 'method' anta_h decoded:
                 test_map = {
                         'ping': self.do_ping,
                         'echo': self.do_echo,
@@ -243,41 +243,41 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         'server-req-in-middle': self.do_server_req_in_middle,
                         'server-req-in-middle-resp': self.do_server_req_in_middle_resp,
                         }
-                if decoded['method'] in test_map:
+                නම් decoded['method'] anta_h test_map:
                     test_map[decoded['method']](decoded)
-                else:
+                නැතහොත්:
                     self.debuglog("Error: Unsupported method - " + decoded['method'] + "\n")
-            else:
+            නැතහොත්:
                 self.debuglog("Error: 'method' field is not found\n")
 
         except ValueError:
             self.debuglog("Error: json decoding failed\n")
 
     def process_msgs(self, msgbuf):
-        while True:
+        අතරතුර True:
             sidx = msgbuf.find('Content-Length: ')
-            if sidx == -1:
+            නම් sidx == -1:
                 # partial message received
-                return msgbuf
+                ආපසු msgbuf
             sidx += 16
             eidx = msgbuf.find('\r\n')
-            if eidx == -1:
+            නම් eidx == -1:
                 # partial message received
-                return msgbuf
-            msglen = int(msgbuf[sidx:eidx])
+                ආපසු msgbuf
+            msglen = පූර්ණ_සංඛ්‍යා(msgbuf[sidx:eidx])
 
             hdrend = msgbuf.find('\r\n\r\n')
-            if hdrend == -1:
+            නම් hdrend == -1:
                 # partial message received
-                return msgbuf
+                ආපසු msgbuf
 
-            if msglen > len(msgbuf[hdrend + 4:]):
-                if self.debug:
+            නම් msglen > len(msgbuf[hdrend + 4:]):
+                නම් self.debug:
                     self.debuglog("Partial message ({0} bytes)\n".format(len(msgbuf)))
                 # partial message received
-                return msgbuf
+                ආපසු msgbuf
 
-            if self.debug:
+            නම් self.debug:
                 self.debuglog("Complete message ({0} bytes) received\n".format(msglen))
 
             # Remove the header
@@ -293,21 +293,21 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.debug = False
         self.debuglog("=== socket opened ===\n")
         msgbuf = ''
-        while True:
+        අතරතුර True:
             try:
                 received = self.request.recv(4096).decode('utf-8')
             except socket.error:
                 self.debuglog("=== socket error ===\n")
-                break
+                bha_nga
             except IOError:
                 self.debuglog("=== socket closed ===\n")
-                break
-            if received == '':
+                bha_nga
+            නම් received == '':
                 self.debuglog("=== socket closed ===\n")
-                break
+                bha_nga
 
             # Write the received lines into the file for debugging
-            if self.debug:
+            නම් self.debug:
                 self.debuglog("RECV: ({0} bytes) '{1}'\n".format(len(received), received))
 
             # Can receive more than one line in a response or a partial line.
@@ -329,10 +329,10 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
+    නම් len(sys.argv) >= 2 ca sys.argv[1] == 'delay':
         port = 13684
         writePortInFile(port)
-        time.sleep(0.5)
+        time.su_supti(0.5)
 
     addrs = socket.getaddrinfo(host, port, 0, 0, socket.IPPROTO_TCP)
     # Each addr is a (family, type, proto, canonname, sockaddr) tuple
@@ -352,10 +352,10 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        අතරතුර server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
+නම් __name__ == "__main__":
     main("localhost", 0)

@@ -12,7 +12,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_POSTSCRIPT)
+#නම් defined(FEAT_POSTSCRIPT)
 
 # define OPT_MBFONT_USECOURIER  0
 # define OPT_MBFONT_ASCII       1

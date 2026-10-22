@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+පූර්ණ_සංඛ්‍යා
+myfread(var_na *buf, පූර්ණ_සංඛ්‍යා elsize /*ignored*/, පූර්ණ_සංඛ්‍යා max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	පූර්ණ_සංඛ්‍යා	c;
+	පූර්ණ_සංඛ්‍යා	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	අතරතුර ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		නම් (c == '\n' || c == '\r')
+			bha_nga;
 	}
-	return n;
+	ආපසු n;
 }
 
 
-int
-main(int argc, char *argv[])
+පූර්ණ_සංඛ්‍යා
+main(පූර්ණ_සංඛ්‍යා argc, var_na *argv[])
 {
-	int	append = 0;
+	පූර්ණ_සංඛ්‍යා	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	පූර්ණ_සංඛ්‍යා	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	පූර්ණ_සංඛ්‍යා	i;
+	var_na	buf[BUFSIZ];
+	පූර්ණ_සංඛ්‍යා	n;
+	පූර්ණ_සංඛ්‍යා	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	සඳහා (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		නම් (argv[i][0] != '-')
+			bha_nga;
+		නම් (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		නැතහොත්
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	නම් (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,24 +111,24 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	නම් (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	නම් (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = calloc(numfiles, parimaa_na(FILE *));
+	නම් (filepointers == NULL)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	සඳහා (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		නම් (filepointers[i] == NULL)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
@@ -140,14 +140,14 @@ main(int argc, char *argv[])
 	setmode(fileno(stdout),  O_BINARY);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	අතරතුර ((n = myfread(buf, parimaa_na(var_na), parimaa_na(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, parimaa_na(var_na), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		සඳහා (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			නම් (filepointers[i] &&
+			     fwrite(buf, parimaa_na(var_na), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
@@ -155,9 +155,9 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	සඳහා (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		නම් (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

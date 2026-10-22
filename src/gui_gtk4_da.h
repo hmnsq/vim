@@ -18,18 +18,18 @@
 G_DECLARE_FINAL_TYPE(VimDrawArea, vim_draw_area, VIM, DRAW_AREA, GtkWidget)
 
 GtkWidget *vim_draw_area_new(void);
-void vim_draw_area_set_size(VimDrawArea *self, int rows, int cols);
-int vim_draw_area_draw_string(VimDrawArea *self, int row, int col, char_u *s, int len, int flags);
-void vim_draw_area_clear_block(VimDrawArea *self, int row1, int col1, int row2, int col2);
+void vim_draw_area_set_size(VimDrawArea *self, පූර්ණ_සංඛ්‍යා rows, පූර්ණ_සංඛ්‍යා cols);
+පූර්ණ_සංඛ්‍යා vim_draw_area_draw_string(VimDrawArea *self, පූර්ණ_සංඛ්‍යා row, පූර්ණ_සංඛ්‍යා col, char_u *s, පූර්ණ_සංඛ්‍යා len, පූර්ණ_සංඛ්‍යා flags);
+void vim_draw_area_clear_block(VimDrawArea *self, පූර්ණ_සංඛ්‍යා row1, පූර්ණ_සංඛ්‍යා col1, පූර්ණ_සංඛ්‍යා row2, පූර්ණ_සංඛ්‍යා col2);
 void vim_draw_area_clear(VimDrawArea *self);
-void vim_draw_area_move_block(VimDrawArea *self, int to, int row1, int row2, int col1, int col2);
-void vim_draw_area_set_cursor(VimDrawArea *self, int w, int h);
-void vim_draw_area_invert_block(VimDrawArea *self, int row, int col, int nrows, int ncols);
-#if defined(FEAT_SIGN_ICONS)
-void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, int row, int col, int width, int height);
+void vim_draw_area_move_block(VimDrawArea *self, පූර්ණ_සංඛ්‍යා to, පූර්ණ_සංඛ්‍යා row1, පූර්ණ_සංඛ්‍යා row2, පූර්ණ_සංඛ්‍යා col1, පූර්ණ_සංඛ්‍යා col2);
+void vim_draw_area_set_cursor(VimDrawArea *self, පූර්ණ_සංඛ්‍යා w, පූර්ණ_සංඛ්‍යා h);
+void vim_draw_area_invert_block(VimDrawArea *self, පූර්ණ_සංඛ්‍යා row, පූර්ණ_සංඛ්‍යා col, පූර්ණ_සංඛ්‍යා nrows, පූර්ණ_සංඛ්‍යා ncols);
+#නම් defined(FEAT_SIGN_ICONS)
+void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, පූර්ණ_සංඛ්‍යා row, පූර්ණ_සංඛ්‍යා col, පූර්ණ_සංඛ්‍යා width, පූර්ණ_සංඛ්‍යා height);
 #endif
 #ifdef FEAT_NETBEANS_INTG
-void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, int row, int col, int width, int height);
+void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, පූර්ණ_සංඛ්‍යා row, පූර්ණ_සංඛ්‍යා col, පූර්ණ_සංඛ්‍යා width, පූර්ණ_සංඛ්‍යා height);
 #endif
 #ifdef FEAT_IMAGE_GUI
 void vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node);

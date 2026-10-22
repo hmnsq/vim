@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+පූර්ණ_සංඛ්‍යා main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    සඳහා (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	පූර්ණ_සංඛ්‍යා cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	නම් (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    ආපසු 0;
 }

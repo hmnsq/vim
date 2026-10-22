@@ -47,11 +47,11 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#නම් __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
 #define FUNC(f, t, p) extern t f p
 #define LFUNC(f, t, p) static t f p
-#else /* k&R */
+#නැතහොත් /* k&R */
 #define FUNC(f, t, p) extern t f()
 #define LFUNC(f, t, p) static t f()
 #endif
@@ -76,19 +76,19 @@ typedef COLORREF Pixel;
 
 #define PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
 
-typedef struct {
+typedef sa_nracanaa {
     Pixel pixel;
     BYTE red, green, blue;
 }      XColor;
 
-typedef struct {
+typedef sa_nracanaa {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    unsigned පූර්ණ_සංඛ්‍යා width;
+    unsigned පූර්ණ_සංඛ්‍යා height;
+    unsigned පූර්ණ_සංඛ්‍යා depth;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
+#නම් defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 /* some replacements for X... functions */
@@ -97,26 +97,26 @@ extern "C" {
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefaultDepth, පූර්ණ_සංඛ්‍යා, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
+    FUNC(XParseColor, පූර්ණ_සංඛ්‍යා, (Display *, Colormap *, var_na *, XColor *));
+    FUNC(XAllocColor, පූර්ණ_සංඛ්‍යා, (Display *, Colormap *, XColor *));
     FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
+			      XColor *xcolors, පූර්ණ_සංඛ්‍යා ncolors));
+    FUNC(XFreeColors, පූර්ණ_සංඛ්‍යා, (Display *d, Colormap cmap,
 			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+			    පූර්ණ_සංඛ්‍යා npixels, unsigned long planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, පූර්ණ_සංඛ්‍යා depth, පූර්ණ_සංඛ්‍යා format,
+				  පූර්ණ_සංඛ්‍යා x, පූර්ණ_සංඛ්‍යා y, පූර්ණ_සංඛ්‍යා width, පූර්ණ_සංඛ්‍යා height,
+				  පූර්ණ_සංඛ්‍යා pad, පූර්ණ_සංඛ්‍යා foo));
 
 /* free and destroy bitmap */
     FUNC(XDestroyImage, void /* ? */ , (XImage *));
 /* free only, bitmap remains */
     FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+#නම් defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
 #endif /* cplusplus */
 

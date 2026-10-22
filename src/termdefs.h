@@ -12,18 +12,18 @@
  * here are optional, except "cm" (cursor motion).
  */
 
-#if defined(SASC) && SASC < 658
+#නම් defined(SASC) && SASC < 658
 /*
  * The SAS C compiler has a bug that makes typedefs being forgotten
  * in include files.  Has been fixed in version 6.58.
  */
-typedef unsigned char char_u;
+typedef unsigned var_na char_u;
 #endif
 
 /*
  * Index of the termcap codes in the term_strings array.
  */
-enum SpecialKey
+ga_nanaa SpecialKey
 {
     KS_NAME = 0,// name of this terminal entry
     KS_CE,	// clear to end of line
@@ -231,14 +231,14 @@ extern char_u *(term_strings[]);    // current terminal strings
 #define T_BSU	(TERM_STR(KS_BSU))	// begin synchronized update
 #define T_ESU	(TERM_STR(KS_ESU))	// end synchronized update
 
-typedef enum {
+typedef ga_nanaa {
     TMODE_COOK,	    // terminal mode for external cmds and Ex mode
     TMODE_SLEEP,    // terminal mode for sleeping (cooked but no echo)
     TMODE_RAW,	    // terminal mode for Normal and Insert mode
     TMODE_UNKNOWN   // after executing a shell
 } tmode_T;
 
-#if defined(MSWIN)
+#නම් defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
 extern const char_u cterm_ansi_idx[];
 #endif
