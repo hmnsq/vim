@@ -13,41 +13,41 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
 
-    static int
+    static จำนวนเต็ม
 win_getid(typval_T *argvars)
 {
-    int	    winnr;
+    จำนวนเต็ม	    winnr;
     win_T   *wp;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
-	return curwin->w_id;
+    ถ้า (argvars[0].v_type == VAR_UNKNOWN)
+	คืน curwin->w_id;
     winnr = tv_get_number(&argvars[0]);
-    if (winnr <= 0)
-	return 0;
+    ถ้า (winnr <= 0)
+	คืน 0;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    ถ้า (argvars[1].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    มิฉะนั้น
     {
 	tabpage_T	*tp;
-	int		tabnr = tv_get_number(&argvars[1]);
+	จำนวนเต็ม		tabnr = tv_get_number(&argvars[1]);
 
 	FOR_ALL_TABPAGES(tp)
-	    if (--tabnr == 0)
-		break;
-	if (tp == NULL)
-	    return -1;
-	if (tp == curtab)
+	    ถ้า (--tabnr == 0)
+		bha_nga;
+	ถ้า (tp == NULL)
+	    คืน -1;
+	ถ้า (tp == curtab)
 	    wp = firstwin;
-	else
+	มิฉะนั้น
 	    wp = tp->tp_firstwin;
     }
-    for ( ; wp != NULL; wp = wp->w_next)
-	if (--winnr == 0)
-	    return wp->w_id;
-    return 0;
+    สำหรับ ( ; wp != NULL; wp = wp->w_next)
+	ถ้า (--winnr == 0)
+	    คืน wp->w_id;
+    คืน 0;
 }
 
     static void
@@ -55,19 +55,19 @@ win_id2tabwin(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		winnr = 1;
-    int		tabnr = 1;
-    int		id = tv_get_number(&argvars[0]);
+    จำนวนเต็ม		winnr = 1;
+    จำนวนเต็ม		tabnr = 1;
+    จำนวนเต็ม		id = tv_get_number(&argvars[0]);
 
     FOR_ALL_TABPAGES(tp)
     {
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
-	    if (wp->w_id == id)
+	    ถ้า (wp->w_id == id)
 	    {
 		list_append_number(list, tabnr);
 		list_append_number(list, winnr);
-		return;
+		คืน;
 	    }
 	    ++winnr;
 	}
@@ -82,9 +82,9 @@ win_id2tabwin(typval_T *argvars, list_T *list)
  * Return the window pointer of window "id".
  */
     win_T *
-win_id2wp(int id)
+win_id2wp(จำนวนเต็ม id)
 {
-    return win_id2wp_tp(id, NULL);
+    คืน win_id2wp_tp(id, NULL);
 }
 
 /*
@@ -92,54 +92,54 @@ win_id2wp(int id)
  * Returns NULL when not found.
  */
     win_T *
-win_id2wp_tp(int id, tabpage_T **tpp)
+win_id2wp_tp(จำนวนเต็ม id, tabpage_T **tpp)
 {
     win_T	*wp;
     tabpage_T   *tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	ถ้า (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    ถ้า (tpp != NULL)
 		*tpp = tp;
-	    return wp;
+	    คืน wp;
 	}
 # ifdef FEAT_PROP_POPUP
     // popup windows are in separate lists
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	     if (wp->w_id == id)
+	     ถ้า (wp->w_id == id)
 	     {
-		 if (tpp != NULL)
+		 ถ้า (tpp != NULL)
 		     *tpp = tp;
-		 return wp;
+		 คืน wp;
 	     }
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
+	ถ้า (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    ถ้า (tpp != NULL)
 		*tpp = curtab;  // any tabpage would do
-	    return wp;
+	    คืน wp;
 	}
 # endif
 
-    return NULL;
+    คืน NULL;
 }
 
-    static int
+    static จำนวนเต็ม
 win_id2win(typval_T *argvars)
 {
     win_T   *wp;
-    int	    nr = 1;
-    int	    id = tv_get_number(&argvars[0]);
+    จำนวนเต็ม	    nr = 1;
+    จำนวนเต็ม	    id = tv_get_number(&argvars[0]);
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_id == id)
-	    return nr;
+	ถ้า (wp->w_id == id)
+	    คืน nr;
 	++nr;
     }
-    return 0;
+    คืน 0;
 }
 
     void
@@ -147,10 +147,10 @@ win_findbuf(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		bufnr = tv_get_number(&argvars[0]);
+    จำนวนเต็ม		bufnr = tv_get_number(&argvars[0]);
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer->b_fnum == bufnr)
+	    ถ้า (wp->w_buffer->b_fnum == bufnr)
 		list_append_number(list, wp->w_id);
 }
 
@@ -165,39 +165,39 @@ find_win_by_nr(
     tabpage_T	*tp)	// NULL for current tab page
 {
     win_T	*wp;
-    int		nr = (int)tv_get_number_chk(vp, NULL);
+    จำนวนเต็ม		nr = (จำนวนเต็ม)tv_get_number_chk(vp, NULL);
 
-    if (nr < 0)
-	return NULL;
-    if (nr == 0)
-	return curwin;
+    ถ้า (nr < 0)
+	คืน NULL;
+    ถ้า (nr == 0)
+	คืน curwin;
 
     FOR_ALL_WINDOWS_IN_TAB(tp, wp)
     {
-	if (nr >= LOWEST_WIN_ID)
+	ถ้า (nr >= LOWEST_WIN_ID)
 	{
-	    if (wp->w_id == nr)
-		return wp;
+	    ถ้า (wp->w_id == nr)
+		คืน wp;
 	}
-	else if (--nr <= 0)
-	    break;
+	มิฉะนั้น ถ้า (--nr <= 0)
+	    bha_nga;
     }
-    if (nr >= LOWEST_WIN_ID)
+    ถ้า (nr >= LOWEST_WIN_ID)
     {
 # ifdef FEAT_PROP_POPUP
 	// check tab-local popup windows
-	for (wp = (tp == NULL ? curtab : tp)->tp_first_popupwin;
+	สำหรับ (wp = (tp == NULL ? curtab : tp)->tp_first_popupwin;
 						   wp != NULL; wp = wp->w_next)
-	    if (wp->w_id == nr)
-		return wp;
+	    ถ้า (wp->w_id == nr)
+		คืน wp;
 	// check global popup windows
 	FOR_ALL_POPUPWINS(wp)
-	    if (wp->w_id == nr)
-		return wp;
+	    ถ้า (wp->w_id == nr)
+		คืน wp;
 # endif
-	return NULL;
+	คืน NULL;
     }
-    return wp;
+    คืน wp;
 }
 
 /*
@@ -208,11 +208,11 @@ find_win_by_nr(
     win_T *
 find_win_by_nr_or_id(typval_T *vp)
 {
-    int	nr = (int)tv_get_number_chk(vp, NULL);
+    จำนวนเต็ม	nr = (จำนวนเต็ม)tv_get_number_chk(vp, NULL);
 
-    if (nr >= LOWEST_WIN_ID)
-	return win_id2wp(tv_get_number(vp));
-    return find_win_by_nr(vp, NULL);
+    ถ้า (nr >= LOWEST_WIN_ID)
+	คืน win_id2wp(tv_get_number(vp));
+    คืน find_win_by_nr(vp, NULL);
 }
 
 /*
@@ -229,92 +229,92 @@ find_tabwin(
     tabpage_T	*tp = NULL;
     long	n;
 
-    if (wvp->v_type != VAR_UNKNOWN)
+    ถ้า (wvp->v_type != VAR_UNKNOWN)
     {
-	if (tvp->v_type != VAR_UNKNOWN)
+	ถ้า (tvp->v_type != VAR_UNKNOWN)
 	{
 	    n = (long)tv_get_number(tvp);
-	    if (n >= 0)
+	    ถ้า (n >= 0)
 		tp = find_tabpage(n);
 	}
-	else
+	มิฉะนั้น
 	    tp = curtab;
 
-	if (tp != NULL)
+	ถ้า (tp != NULL)
 	{
 	    wp = find_win_by_nr(wvp, tp);
-	    if (wp == NULL && wvp->v_type == VAR_NUMBER
+	    ถ้า (wp == NULL && wvp->v_type == VAR_NUMBER
 						&& wvp->vval.v_number != -1)
 		// A window with the specified number is not found
 		tp = NULL;
 	}
     }
-    else
+    มิฉะนั้น
     {
 	wp = curwin;
 	tp = curtab;
     }
 
-    if (ptp != NULL)
+    ถ้า (ptp != NULL)
 	*ptp = tp;
 
-    return wp;
+    คืน wp;
 }
 
 /*
  * Get the layout of the given tab page for winlayout() and add it to "l".
  */
     static void
-get_framelayout(frame_T *fr, list_T *l, int outer)
+get_framelayout(frame_T *fr, list_T *l, จำนวนเต็ม outer)
 {
     frame_T	*child;
     list_T	*fr_list;
     list_T	*win_list;
 
-    if (fr == NULL)
-	return;
+    ถ้า (fr == NULL)
+	คืน;
 
-    if (outer)
+    ถ้า (outer)
 	// outermost call from f_winlayout()
 	fr_list = l;
-    else
+    มิฉะนั้น
     {
 	fr_list = list_alloc();
-	if (fr_list == NULL)
-	    return;
-	if (list_append_list(l, fr_list) == FAIL)
+	ถ้า (fr_list == NULL)
+	    คืน;
+	ถ้า (list_append_list(l, fr_list) == FAIL)
 	{
 	    list_free(fr_list);
-	    return;
+	    คืน;
 	}
     }
 
-    if (fr->fr_layout == FR_LEAF)
+    ถ้า (fr->fr_layout == FR_LEAF)
     {
-	if (fr->fr_win != NULL)
+	ถ้า (fr->fr_win != NULL)
 	{
 	    list_append_string(fr_list, (char_u *)"leaf", STRLEN_LITERAL("leaf"));
 	    list_append_number(fr_list, fr->fr_win->w_id);
 	}
     }
-    else
+    มิฉะนั้น
     {
-	if (fr->fr_layout == FR_ROW)
+	ถ้า (fr->fr_layout == FR_ROW)
 	    list_append_string(fr_list, (char_u *)"row", STRLEN_LITERAL("row"));
-	else
+	มิฉะนั้น
 	    list_append_string(fr_list, (char_u *)"col", STRLEN_LITERAL("col"));
 
 	win_list = list_alloc();
-	if (win_list == NULL)
-	    return;
-	if (list_append_list(fr_list, win_list) == FAIL)
+	ถ้า (win_list == NULL)
+	    คืน;
+	ถ้า (list_append_list(fr_list, win_list) == FAIL)
 	{
 	    list_free(win_list);
-	    return;
+	    คืน;
 	}
 
 	child = fr->fr_child;
-	while (child != NULL)
+	ขณะ (child != NULL)
 	{
 	    get_framelayout(child, win_list, FALSE);
 	    child = child->fr_next;
@@ -325,78 +325,78 @@ get_framelayout(frame_T *fr, list_T *l, int outer)
 /*
  * Common code for tabpagewinnr() and winnr().
  */
-    static int
+    static จำนวนเต็ม
 get_winnr(tabpage_T *tp, typval_T *argvar)
 {
     win_T	*twin;
-    int		nr = 1;
+    จำนวนเต็ม		nr = 1;
     win_T	*wp;
     char_u	*arg;
 
     twin = (tp == curtab) ? curwin : tp->tp_curwin;
-    if (argvar->v_type != VAR_UNKNOWN)
+    ถ้า (argvar->v_type != VAR_UNKNOWN)
     {
-	int	invalid_arg = FALSE;
+	จำนวนเต็ม	invalid_arg = FALSE;
 
 	arg = tv_get_string_chk(argvar);
-	if (arg == NULL)
+	ถ้า (arg == NULL)
 	    nr = 0;		// type error; errmsg already given
-	else if (STRCMP(arg, "$") == 0)
+	มิฉะนั้น ถ้า (STRCMP(arg, "$") == 0)
 	    twin = (tp == curtab) ? lastwin : tp->tp_lastwin;
-	else if (STRCMP(arg, "#") == 0)
+	มิฉะนั้น ถ้า (STRCMP(arg, "#") == 0)
 	{
 	    twin = (tp == curtab) ? prevwin : tp->tp_prevwin;
 	}
-	else
+	มิฉะนั้น
 	{
 	    long	count;
 	    char_u	*endp;
 
 	    // Extract the window count (if specified). e.g. winnr('3j')
-	    count = strtol((char *)arg, (char **)&endp, 10);
-	    if (count <= 0)
+	    count = strtol((var_na *)arg, (var_na **)&endp, 10);
+	    ถ้า (count <= 0)
 		count = 1;	// if count is not specified, default to 1
-	    if (endp != NULL && *endp != '\0')
+	    ถ้า (endp != NULL && *endp != '\0')
 	    {
-		if (STRCMP(endp, "j") == 0)
+		ถ้า (STRCMP(endp, "j") == 0)
 		    twin = win_vert_neighbor(tp, twin, FALSE, count);
-		else if (STRCMP(endp, "k") == 0)
+		มิฉะนั้น ถ้า (STRCMP(endp, "k") == 0)
 		    twin = win_vert_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "h") == 0)
+		มิฉะนั้น ถ้า (STRCMP(endp, "h") == 0)
 		    twin = win_horz_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "l") == 0)
+		มิฉะนั้น ถ้า (STRCMP(endp, "l") == 0)
 		    twin = win_horz_neighbor(tp, twin, FALSE, count);
-		else
+		มิฉะนั้น
 		    invalid_arg = TRUE;
 	    }
-	    else
+	    มิฉะนั้น
 		invalid_arg = TRUE;
 	}
-	if (twin == NULL)
+	ถ้า (twin == NULL)
 	    nr = 0;
 
-	if (invalid_arg)
+	ถ้า (invalid_arg)
 	{
 	    semsg(_(e_invalid_expression_str), arg);
 	    nr = 0;
 	}
     }
 
-    if (nr <= 0)
-	return 0;
+    ถ้า (nr <= 0)
+	คืน 0;
 
-    for (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
+    สำหรับ (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
 	    wp != twin; wp = wp->w_next)
     {
-	if (wp == NULL)
+	ถ้า (wp == NULL)
 	{
 	    // didn't find it in this tabpage
 	    nr = 0;
-	    break;
+	    bha_nga;
 	}
 	++nr;
     }
-    return nr;
+    คืน nr;
 }
 
 /*
@@ -408,8 +408,8 @@ get_win_info(win_T *wp, short tpnr, short winnr)
     dict_T	*dict;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ถ้า (dict == NULL)
+	คืน NULL;
 
     // make sure w_botline is valid
     validate_botline_win(wp);
@@ -443,7 +443,7 @@ get_win_info(win_T *wp, short tpnr, short winnr)
     // Add a reference to window variables
     dict_add_dict(dict, "variables", wp->w_vars);
 
-    return dict;
+    คืน dict;
 }
 
 /*
@@ -451,20 +451,20 @@ get_win_info(win_T *wp, short tpnr, short winnr)
  * as a dictionary.
  */
     static dict_T *
-get_tabpage_info(tabpage_T *tp, int tp_idx)
+get_tabpage_info(tabpage_T *tp, จำนวนเต็ม tp_idx)
 {
     win_T	*wp;
     dict_T	*dict;
     list_T	*l;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    ถ้า (dict == NULL)
+	คืน NULL;
 
     dict_add_number(dict, "tabnr", tp_idx);
 
     l = list_alloc();
-    if (l != NULL)
+    ถ้า (l != NULL)
     {
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	    list_append_number(l, (varnumber_T)wp->w_id);
@@ -474,7 +474,7 @@ get_tabpage_info(tabpage_T *tp, int tp_idx)
     // Make a reference to tabpage variables
     dict_add_dict(dict, "variables", tp->tp_vars);
 
-    return dict;
+    คืน dict;
 }
 
 /*
@@ -485,33 +485,33 @@ f_gettabinfo(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp, *tparg = NULL;
     dict_T	*d;
-    int		tpnr = 0;
+    จำนวนเต็ม		tpnr = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_list_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// Information about one tab page
-	tparg = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-	if (tparg == NULL)
-	    return;
+	tparg = find_tabpage((จำนวนเต็ม)tv_get_number_chk(&argvars[0], NULL));
+	ถ้า (tparg == NULL)
+	    คืน;
     }
 
     // Get information about a specific tab page or all tab pages
     FOR_ALL_TABPAGES(tp)
     {
 	tpnr++;
-	if (tparg != NULL && tp != tparg)
+	ถ้า (tparg != NULL && tp != tparg)
 	    continue;
 	d = get_tabpage_info(tp, tpnr);
-	if (d != NULL)
+	ถ้า (d != NULL)
 	    list_append_dict(rettv->vval.v_list, d);
-	if (tparg != NULL)
-	    return;
+	ถ้า (tparg != NULL)
+	    คืน;
     }
 }
 
@@ -526,17 +526,17 @@ f_getwininfo(typval_T *argvars, typval_T *rettv)
     dict_T	*d;
     short	tabnr = 0, winnr;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_list_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wparg = win_id2wp(tv_get_number(&argvars[0]));
-	if (wparg == NULL)
-	    return;
+	ถ้า (wparg == NULL)
+	    คืน;
     }
 
     // Collect information about either all the windows across all the tab
@@ -548,30 +548,30 @@ f_getwininfo(typval_T *argvars, typval_T *rettv)
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
 	    winnr++;
-	    if (wparg != NULL && wp != wparg)
+	    ถ้า (wparg != NULL && wp != wparg)
 		continue;
 	    d = get_win_info(wp, tabnr, winnr);
-	    if (d != NULL)
+	    ถ้า (d != NULL)
 		list_append_dict(rettv->vval.v_list, d);
-	    if (wparg != NULL)
+	    ถ้า (wparg != NULL)
 		// found information about a specific window
-		return;
+		คืน;
 	}
     }
 # ifdef FEAT_PROP_POPUP
-    if (wparg != NULL)
+    ถ้า (wparg != NULL)
     {
 	tabnr = 0;
 	FOR_ALL_TABPAGES(tp)
 	{
 	    tabnr++;
 	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		if (wp == wparg)
+		ถ้า (wp == wparg)
 		    goto found;
 	}
 found:
 	d = get_win_info(wparg, tp == NULL ? 0 : tabnr, 0);
-	if (d != NULL)
+	ถ้า (d != NULL)
 	    list_append_dict(rettv->vval.v_list, d);
     }
 # endif
@@ -583,22 +583,22 @@ found:
     void
 f_getwinpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int x = -1;
-    int y = -1;
+    จำนวนเต็ม x = -1;
+    จำนวนเต็ม y = -1;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_list_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-# if defined(FEAT_GUI) \
+# ถ้า defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
 	varnumber_T timeout = 100;
 
-	if (argvars[0].v_type != VAR_UNKNOWN)
+	ถ้า (argvars[0].v_type != VAR_UNKNOWN)
 	    timeout = tv_get_number(&argvars[0]);
 
 	(void)ui_get_winpos(&x, &y, timeout);
@@ -616,14 +616,14 @@ f_getwinpos(typval_T *argvars UNUSED, typval_T *rettv)
 f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+# ถ้า defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
 
     {
-	int	    x, y;
+	จำนวนเต็ม	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
+	ถ้า (ui_get_winpos(&x, &y, 100) == OK)
 	    rettv->vval.v_number = x;
     }
 # endif
@@ -636,13 +636,13 @@ f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
 f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+# ถ้า defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
-	int	    x, y;
+	จำนวนเต็ม	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
+	ถ้า (ui_get_winpos(&x, &y, 100) == OK)
 	    rettv->vval.v_number = y;
     }
 # endif
@@ -654,28 +654,28 @@ f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_tabpagenr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    จำนวนเต็ม		nr = 1;
     char_u	*arg;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type != VAR_UNKNOWN)
     {
 	arg = tv_get_string_chk(&argvars[0]);
 	nr = 0;
-	if (arg != NULL)
+	ถ้า (arg != NULL)
 	{
-	    if (STRCMP(arg, "$") == 0)
+	    ถ้า (STRCMP(arg, "$") == 0)
 		nr = tabpage_index(NULL) - 1;
-	    else if (STRCMP(arg, "#") == 0)
+	    มิฉะนั้น ถ้า (STRCMP(arg, "#") == 0)
 		nr = valid_tabpage(lastused_tabpage) ?
 					tabpage_index(lastused_tabpage) : 0;
-	    else
+	    มิฉะนั้น
 		semsg(_(e_invalid_expression_str), arg);
 	}
     }
-    else
+    มิฉะนั้น
 	nr = tabpage_index(curtab);
     rettv->vval.v_number = nr;
 }
@@ -686,18 +686,18 @@ f_tabpagenr(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_tabpagewinnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    จำนวนเต็ม		nr = 1;
     tabpage_T	*tp;
 
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	คืน;
 
-    tp = find_tabpage((int)tv_get_number(&argvars[0]));
-    if (tp == NULL)
+    tp = find_tabpage((จำนวนเต็ม)tv_get_number(&argvars[0]));
+    ถ้า (tp == NULL)
 	nr = 0;
-    else
+    มิฉะนั้น
 	nr = get_winnr(tp, &argvars[1]);
     rettv->vval.v_number = nr;
 }
@@ -708,7 +708,7 @@ f_tabpagewinnr(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_win_execute(typval_T *argvars, typval_T *rettv)
 {
-    int		id;
+    จำนวนเต็ม		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
@@ -717,30 +717,30 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_string_or_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	คืน;
 
-    id = (int)tv_get_number(argvars);
+    id = (จำนวนเต็ม)tv_get_number(argvars);
     wp = win_id2wp_tp(id, &tp);
-    if (wp == NULL || tp == NULL)
-	return;
+    ถ้า (wp == NULL || tp == NULL)
+	คืน;
 
     pos_T	curpos = wp->w_cursor;
     char_u	cwd[MAXPATHL];
-    int	cwd_status = FAIL;
+    จำนวนเต็ม	cwd_status = FAIL;
 # ifdef FEAT_AUTOCHDIR
     char_u	autocwd[MAXPATHL];
-    int	apply_acd = FALSE;
+    จำนวนเต็ม	apply_acd = FALSE;
     char_u	*save_sfname = NULL;
 # endif
 
     // Getting and setting directory can be slow on some systems, only do
     // this when the current or target window/tab have a local directory or
     // 'acd' is set.
-    if (curwin != wp
+    ถ้า (curwin != wp
 	    && (curwin->w_localdir != NULL
 		|| wp->w_localdir != NULL
 		|| (curtab != tp
@@ -755,9 +755,9 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
 # ifdef FEAT_AUTOCHDIR
     // If 'acd' is set, check we are using that directory.  If yes, then
     // apply 'acd' afterwards, otherwise restore the current directory.
-    if (cwd_status == OK && p_acd)
+    ถ้า (cwd_status == OK && p_acd)
     {
-	if (curbuf->b_sfname != NULL && curbuf->b_fname == curbuf->b_sfname)
+	ถ้า (curbuf->b_sfname != NULL && curbuf->b_fname == curbuf->b_sfname)
 	    save_sfname = vim_strsave(curbuf->b_sfname);
 	do_autochdir();
 	apply_acd = mch_dirname(autocwd, MAXPATHL) == OK
@@ -765,25 +765,25 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
     }
 # endif
 
-    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+    ถ้า (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
     {
 	check_cursor();
 	execute_common(argvars, rettv, 1);
     }
     restore_win_noblock(&switchwin, TRUE);
 # ifdef FEAT_AUTOCHDIR
-    if (apply_acd)
+    ถ้า (apply_acd)
     {
 	vim_free(save_sfname);
 	do_autochdir();
     }
-    else
+    มิฉะนั้น
 # endif
-	if (cwd_status == OK)
+	ถ้า (cwd_status == OK)
 	{
-	    mch_chdir((char *)cwd);
+	    mch_chdir((var_na *)cwd);
 # ifdef FEAT_AUTOCHDIR
-	    if (save_sfname != NULL)
+	    ถ้า (save_sfname != NULL)
 	    {
 		vim_free(curbuf->b_sfname);
 		curbuf->b_sfname = save_sfname;
@@ -793,13 +793,13 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
 	}
 
     // Update the status line if the cursor moved.
-    if (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
+    ถ้า (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
 	wp->w_redr_status = true;
 
     // In case the command moved the cursor or changed the Visual area,
     // check it is valid.
     check_cursor();
-    if (VIsual_active)
+    ถ้า (VIsual_active)
 	check_pos(curbuf, &VIsual);
 }
 
@@ -809,10 +809,10 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
     void
 f_win_findbuf(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (rettv_list_alloc(rettv) == OK)
+    ถ้า (rettv_list_alloc(rettv) == OK)
 	win_findbuf(argvars, rettv->vval.v_list);
 }
 
@@ -822,11 +822,11 @@ f_win_findbuf(typval_T *argvars, typval_T *rettv)
     void
 f_win_getid(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+	คืน;
 
     rettv->vval.v_number = win_getid(argvars);
 }
@@ -839,37 +839,37 @@ f_win_gotoid(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		id;
+    จำนวนเต็ม		id;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     id = tv_get_number(&argvars[0]);
-    if (curwin->w_id == id)
+    ถ้า (curwin->w_id == id)
     {
 	// Nothing to do.
 	rettv->vval.v_number = 1;
-	return;
+	คืน;
     }
 
-    if (text_or_buf_locked())
-	return;
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
-    if (popup_is_popup(curwin) && curbuf->b_term != NULL)
+    ถ้า (text_or_buf_locked())
+	คืน;
+# ถ้า defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+    ถ้า (popup_is_popup(curwin) && curbuf->b_term != NULL)
     {
 	emsg(_(e_not_allowed_for_terminal_in_popup_window));
-	return;
+	คืน;
     }
 # endif
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	ถ้า (wp->w_id == id)
 	{
 	    // When jumping to another buffer stop Visual mode.
-	    if (VIsual_active && wp->w_buffer != curbuf)
+	    ถ้า (VIsual_active && wp->w_buffer != curbuf)
 		end_visual_mode();
 	    goto_tabpage_win(tp, wp);
 	    rettv->vval.v_number = 1;
-	    return;
+	    คืน;
 	}
 }
 
@@ -879,10 +879,10 @@ f_win_gotoid(typval_T *argvars, typval_T *rettv)
     void
 f_win_id2tabwin(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (rettv_list_alloc(rettv) == OK)
+    ถ้า (rettv_list_alloc(rettv) == OK)
 	win_id2tabwin(argvars, rettv->vval.v_list);
 }
 
@@ -892,8 +892,8 @@ f_win_id2tabwin(typval_T *argvars, typval_T *rettv)
     void
 f_win_id2win(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     rettv->vval.v_number = win_id2win(argvars);
 }
@@ -905,25 +905,25 @@ f_win_id2win(typval_T *argvars, typval_T *rettv)
 f_win_move_separator(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    จำนวนเต็ม		offset;
 
     rettv->vval.v_number = FALSE;
 
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    ถ้า (wp == NULL || win_valid_popup(wp))
+	คืน;
+    ถ้า (!win_valid(wp))
     {
 	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	คืน;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
+    offset = (จำนวนเต็ม)tv_get_number(&argvars[1]);
     win_drag_vsep_line(wp, offset);
     rettv->vval.v_number = TRUE;
 }
@@ -935,25 +935,25 @@ f_win_move_separator(typval_T *argvars, typval_T *rettv)
 f_win_move_statusline(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    จำนวนเต็ม		offset;
 
     rettv->vval.v_number = FALSE;
 
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    ถ้า (wp == NULL || win_valid_popup(wp))
+	คืน;
+    ถ้า (!win_valid(wp))
     {
 	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	คืน;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
+    offset = (จำนวนเต็ม)tv_get_number(&argvars[1]);
     win_drag_status_line(wp, offset);
     rettv->vval.v_number = TRUE;
 }
@@ -966,11 +966,11 @@ f_win_screenpos(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_list_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
     list_append_number(rettv->vval.v_list, wp == NULL ? 0 : wp->w_winrow + 1);
@@ -985,60 +985,60 @@ f_win_splitmove(typval_T *argvars, typval_T *rettv)
 {
     win_T   *wp, *targetwin;
     win_T   *oldwin = curwin;
-    int     flags = 0, size = 0;
+    จำนวนเต็ม     flags = 0, size = 0;
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    ถ้า (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
     targetwin = find_win_by_nr_or_id(&argvars[1]);
 
-    if (wp == NULL || targetwin == NULL || wp == targetwin
+    ถ้า (wp == NULL || targetwin == NULL || wp == targetwin
 	    || !win_valid(wp) || !win_valid(targetwin)
 	    || win_valid_popup(wp) || win_valid_popup(targetwin))
     {
 	emsg(_(e_invalid_window_number));
-	return;
+	คืน;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T      *d;
 	dictitem_T  *di;
 
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	ถ้า (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    คืน;
 
 	d = argvars[2].vval.v_dict;
-	if (dict_get_bool(d, "vertical", FALSE))
+	ถ้า (dict_get_bool(d, "vertical", FALSE))
 	    flags |= WSP_VERT;
-	if ((di = dict_find(d, (char_u *)"rightbelow", -1)) != NULL)
+	ถ้า ((di = dict_find(d, (char_u *)"rightbelow", -1)) != NULL)
 	    flags |= tv_get_bool(&di->di_tv) ? WSP_BELOW : WSP_ABOVE;
-	size = (int)dict_get_number(d, "size");
+	size = (จำนวนเต็ม)dict_get_number(d, "size");
     }
 
     // Check if we're allowed to continue before we bother switching windows.
-    if (text_or_buf_locked() || check_split_disallowed(wp) == FAIL)
-	return;
+    ถ้า (text_or_buf_locked() || check_split_disallowed(wp) == FAIL)
+	คืน;
 
-    if (curwin != targetwin)
+    ถ้า (curwin != targetwin)
 	win_goto(targetwin);
 
     // Autocommands may have sent us elsewhere or closed "wp" or "oldwin".
-    if (curwin == targetwin && win_valid(wp))
+    ถ้า (curwin == targetwin && win_valid(wp))
     {
-	if (win_splitmove(wp, size, flags) == OK)
+	ถ้า (win_splitmove(wp, size, flags) == OK)
 	    rettv->vval.v_number = 0;
     }
-    else
+    มิฉะนั้น
 	emsg(_(e_autocommands_caused_command_to_abort));
 
-    if (oldwin != curwin && win_valid(oldwin))
+    ถ้า (oldwin != curwin && win_valid(oldwin))
 	win_goto(oldwin);
 }
 
@@ -1053,32 +1053,32 @@ f_win_gettype(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
+	ถ้า (wp == NULL)
 	{
 	    rettv->vval.v_string = vim_strsave((char_u *)"unknown");
-	    return;
+	    คืน;
 	}
     }
-    if (is_aucmd_win(wp))
+    ถ้า (is_aucmd_win(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"autocmd");
-# if defined(FEAT_QUICKFIX)
-    else if (wp->w_p_pvw)
+# ถ้า defined(FEAT_QUICKFIX)
+    มิฉะนั้น ถ้า (wp->w_p_pvw)
 	rettv->vval.v_string = vim_strsave((char_u *)"preview");
 # endif
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(wp))
+    มิฉะนั้น ถ้า (WIN_IS_POPUP(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"popup");
 # endif
-    else if (wp == cmdwin_win)
+    มิฉะนั้น ถ้า (wp == cmdwin_win)
 	rettv->vval.v_string = vim_strsave((char_u *)"command");
 # ifdef FEAT_QUICKFIX
-    else if (bt_quickfix(wp->w_buffer))
+    มิฉะนั้น ถ้า (bt_quickfix(wp->w_buffer))
 	rettv->vval.v_string = vim_strsave((char_u *)
 		(wp->w_llist_ref != NULL ? "loclist" : "quickfix"));
 # endif
@@ -1094,8 +1094,8 @@ f_getcmdwintype(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
     rettv->vval.v_string = alloc(2);
-    if (rettv->vval.v_string == NULL)
-	return;
+    ถ้า (rettv->vval.v_string == NULL)
+	คืน;
 
     rettv->vval.v_string[0] = cmdwin_type;
     rettv->vval.v_string[1] = NUL;
@@ -1109,13 +1109,13 @@ f_winbufnr(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
+    ถ้า (wp == NULL)
 	rettv->vval.v_number = -1;
-    else
+    มิฉะนั้น
 	rettv->vval.v_number = wp->w_buffer->b_fnum;
 }
 
@@ -1126,9 +1126,9 @@ f_winbufnr(typval_T *argvars, typval_T *rettv)
 f_wincol(typval_T *argvars UNUSED, typval_T *rettv)
 {
     validate_cursor();
-    int col = curwin->w_wcol + 1;
+    จำนวนเต็ม col = curwin->w_wcol + 1;
 # ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    ถ้า (curwin->w_p_rl)
 	col = curwin->w_width - curwin->w_wcol - cursor_screen_cells() + 1;
 # endif
     rettv->vval.v_number = col;
@@ -1142,13 +1142,13 @@ f_winheight(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
+    ถ้า (wp == NULL)
 	rettv->vval.v_number = -1;
-    else
+    มิฉะนั้น
 	rettv->vval.v_number = wp->w_height;
 }
 
@@ -1160,19 +1160,19 @@ f_winlayout(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_list_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type == VAR_UNKNOWN)
 	tp = curtab;
-    else
+    มิฉะนั้น
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp == NULL)
-	    return;
+	tp = find_tabpage((จำนวนเต็ม)tv_get_number(&argvars[0]));
+	ถ้า (tp == NULL)
+	    คืน;
     }
 
     get_framelayout(tp->tp_topframe, rettv->vval.v_list, TRUE);
@@ -1194,10 +1194,10 @@ f_winline(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_winnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    จำนวนเต็ม		nr = 1;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	คืน;
 
     nr = get_winnr(curtab, &argvars[0]);
     rettv->vval.v_number = nr;
@@ -1210,25 +1210,25 @@ f_winnr(typval_T *argvars UNUSED, typval_T *rettv)
 f_winrestcmd(typval_T *argvars UNUSED, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
-    int		winnr;
+    จำนวนเต็ม		i;
+    จำนวนเต็ม		winnr;
     garray_T	ga;
     char_u	buf[50];
 
-    ga_init2(&ga, sizeof(char), 70);
+    ga_init2(&ga, parimaa_na(var_na), 70);
 
     // Do this twice to handle some window layouts properly.
-    for (i = 0; i < 2; ++i)
+    สำหรับ (i = 0; i < 2; ++i)
     {
 	winnr = 1;
 	FOR_ALL_WINDOWS(wp)
 	{
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((var_na *)buf, parimaa_na(buf),
 		":%dresize %d|", winnr, wp->w_height);
 	    ga_concat_len(&ga, buf, buflen);
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((var_na *)buf, parimaa_na(buf),
 		"vert :%dresize %d|", winnr, wp->w_width);
 	    ga_concat_len(&ga, buf, buflen);
 	    ++winnr;
@@ -1248,31 +1248,31 @@ f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	คืน;
 
     dict = argvars[0].vval.v_dict;
-    if (dict_has_key(dict, "lnum"))
+    ถ้า (dict_has_key(dict, "lnum"))
 	curwin->w_cursor.lnum = (linenr_T)dict_get_number(dict, "lnum");
-    if (dict_has_key(dict, "col"))
+    ถ้า (dict_has_key(dict, "col"))
 	curwin->w_cursor.col = (colnr_T)dict_get_number(dict, "col");
-    if (dict_has_key(dict, "coladd"))
+    ถ้า (dict_has_key(dict, "coladd"))
 	curwin->w_cursor.coladd = (colnr_T)dict_get_number(dict, "coladd");
-    if (dict_has_key(dict, "curswant"))
+    ถ้า (dict_has_key(dict, "curswant"))
     {
 	curwin->w_curswant = (colnr_T)dict_get_number(dict, "curswant");
 	curwin->w_set_curswant = false;
     }
 
-    if (dict_has_key(dict, "topline"))
+    ถ้า (dict_has_key(dict, "topline"))
 	set_topline(curwin, (linenr_T)dict_get_number(dict, "topline"));
 # ifdef FEAT_DIFF
-    if (dict_has_key(dict, "topfill"))
-	curwin->w_topfill = (int)dict_get_number(dict, "topfill");
+    ถ้า (dict_has_key(dict, "topfill"))
+	curwin->w_topfill = (จำนวนเต็ม)dict_get_number(dict, "topfill");
 # endif
-    if (dict_has_key(dict, "leftcol"))
+    ถ้า (dict_has_key(dict, "leftcol"))
 	curwin->w_leftcol = (colnr_T)dict_get_number(dict, "leftcol");
-    if (dict_has_key(dict, "skipcol"))
+    ถ้า (dict_has_key(dict, "skipcol"))
 	curwin->w_skipcol = (colnr_T)dict_get_number(dict, "skipcol");
 
     check_cursor();
@@ -1280,9 +1280,9 @@ f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
     win_new_width(curwin, curwin->w_width);
     changed_window_setting();
 
-    if (curwin->w_topline <= 0)
+    ถ้า (curwin->w_topline <= 0)
 	curwin->w_topline = 1;
-    if (curwin->w_topline > curbuf->b_ml.ml_line_count)
+    ถ้า (curwin->w_topline > curbuf->b_ml.ml_line_count)
 	curwin->w_topline = curbuf->b_ml.ml_line_count;
 # ifdef FEAT_DIFF
     check_topfill(curwin, TRUE);
@@ -1297,8 +1297,8 @@ f_winsaveview(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*dict;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_dict_alloc(rettv) == FAIL)
+	คืน;
     dict = rettv->vval.v_dict;
 
     dict_add_number(dict, "lnum", (long)curwin->w_cursor.lnum);
@@ -1323,18 +1323,18 @@ f_winwidth(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	คืน;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
+    ถ้า (wp == NULL)
 	rettv->vval.v_number = -1;
-    else
+    มิฉะนั้น
 	rettv->vval.v_number = wp->w_width;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ถ้า defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Set "win" to be the curwin and "tp" to be the current tab page.
  * restore_win() MUST be called to undo, also when FAIL is returned.
@@ -1343,54 +1343,54 @@ f_winwidth(typval_T *argvars, typval_T *rettv)
  * triggered, another tabpage access is limited.
  * Returns FAIL if switching to "win" failed.
  */
-    int
+    จำนวนเต็ม
 switch_win(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	จำนวนเต็ม	    no_display)
 {
     block_autocmds();
-    return switch_win_noblock(switchwin, win, tp, no_display);
+    คืน switch_win_noblock(switchwin, win, tp, no_display);
 }
 
 /*
  * As switch_win() but without blocking autocommands.
  */
-    int
+    จำนวนเต็ม
 switch_win_noblock(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	จำนวนเต็ม	    no_display)
 {
     CLEAR_POINTER(switchwin);
     switchwin->sw_curwin = curwin;
-    if (win == curwin)
+    ถ้า (win == curwin)
 	switchwin->sw_same_win = TRUE;
-    else
+    มิฉะนั้น
     {
 	// Disable Visual selection, because redrawing may fail.
 	switchwin->sw_visual_active = VIsual_active;
 	VIsual_active = FALSE;
     }
 
-    if (tp != NULL)
+    ถ้า (tp != NULL)
     {
 	switchwin->sw_curtab = curtab;
-	if (no_display)
+	ถ้า (no_display)
 	{
 	    unuse_tabpage(curtab);
 	    use_tabpage(tp);
 	}
-	else
+	มิฉะนั้น
 	    goto_tabpage_tp(tp, FALSE, FALSE);
     }
-    if (!win_valid(win))
-	return FAIL;
+    ถ้า (!win_valid(win))
+	คืน FAIL;
     curwin = win;
     curbuf = curwin->w_buffer;
-    return OK;
+    คืน OK;
 }
 
 /*
@@ -1401,7 +1401,7 @@ switch_win_noblock(
     void
 restore_win(
 	switchwin_T *switchwin,
-	int	    no_display)
+	จำนวนเต็ม	    no_display)
 {
     restore_win_noblock(switchwin, no_display);
     unblock_autocmds();
@@ -1413,11 +1413,11 @@ restore_win(
     void
 restore_win_noblock(
 	switchwin_T *switchwin,
-	int	    no_display)
+	จำนวนเต็ม	    no_display)
 {
-    if (switchwin->sw_curtab != NULL && valid_tabpage(switchwin->sw_curtab))
+    ถ้า (switchwin->sw_curtab != NULL && valid_tabpage(switchwin->sw_curtab))
     {
-	if (no_display)
+	ถ้า (no_display)
 	{
 	    win_T	*old_tp_curwin = curtab->tp_curwin;
 
@@ -1426,20 +1426,20 @@ restore_win_noblock(
 	    curtab->tp_curwin = old_tp_curwin;
 	    use_tabpage(switchwin->sw_curtab);
 	}
-	else
+	มิฉะนั้น
 	    goto_tabpage_tp(switchwin->sw_curtab, FALSE, FALSE);
     }
 
-    if (!switchwin->sw_same_win)
+    ถ้า (!switchwin->sw_same_win)
 	VIsual_active = switchwin->sw_visual_active;
 
-    if (win_valid(switchwin->sw_curwin))
+    ถ้า (win_valid(switchwin->sw_curwin))
     {
 	curwin = switchwin->sw_curwin;
 	curbuf = curwin->w_buffer;
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    มิฉะนั้น ถ้า (WIN_IS_POPUP(curwin))
 	// original window was closed and now we're in a popup window: Go
 	// to the first valid window.
 	win_goto(firstwin);

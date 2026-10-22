@@ -32,7 +32,7 @@
 
 #ifdef HAVE_SELINUX
 # include <selinux/selinux.h>
-static int selinux_enabled = -1;
+static จำนวนเต็ม selinux_enabled = -1;
 #endif
 
 #ifdef FEAT_XATTR
@@ -69,11 +69,11 @@ static int selinux_enabled = -1;
 #  define gpm_flag     (dll_gpm_flag != NULL ? *dll_gpm_flag :  0)
 #  define gpm_fd       (dll_gpm_fd   != NULL ? *dll_gpm_fd   : -1)
 
-static int (*dll_Gpm_Open)     (Gpm_Connect *, int);
-static int (*dll_Gpm_Close)    (void);
-static int (*dll_Gpm_GetEvent) (Gpm_Event *);
-static int *dll_gpm_flag;
-static int *dll_gpm_fd;
+static จำนวนเต็ม (*dll_Gpm_Open)     (Gpm_Connect *, จำนวนเต็ม);
+static จำนวนเต็ม (*dll_Gpm_Close)    (void);
+static จำนวนเต็ม (*dll_Gpm_GetEvent) (Gpm_Event *);
+static จำนวนเต็ม *dll_gpm_flag;
+static จำนวนเต็ม *dll_gpm_fd;
 
 static void *libgpm_hinst;
 # endif
@@ -93,15 +93,15 @@ static void *libgpm_hinst;
 # define KG_CAPSSHIFT	8
 
 static void gpm_close(void);
-static int gpm_open(void);
-static int mch_gpm_process(void);
+static จำนวนเต็ม gpm_open(void);
+static จำนวนเต็ม mch_gpm_process(void);
 #endif
 
 #ifdef FEAT_SYSMOUSE
 # include <sys/consio.h>
 # include <sys/fbio.h>
 
-static int sysmouse_open(void);
+static จำนวนเต็ม sysmouse_open(void);
 static void sysmouse_close(void);
 static void sig_sysmouse SIGPROTOARG;
 #endif
@@ -112,7 +112,7 @@ static void sig_sysmouse SIGPROTOARG;
 
 // Are the following #ifdefs still required? And why? Is that for X11?
 
-#if defined(ESIX) || defined(M_UNIX) && !defined(SCO)
+#ถ้า defined(ESIX) || defined(M_UNIX) && !defined(SCO)
 # ifdef SIGWINCH
 #  undef SIGWINCH
 # endif
@@ -121,7 +121,7 @@ static void sig_sysmouse SIGPROTOARG;
 # endif
 #endif
 
-#if defined(SIGWINDOW) && !defined(SIGWINCH)	// hpux 9.01 has it
+#ถ้า defined(SIGWINDOW) && !defined(SIGWINCH)	// hpux 9.01 has it
 # define SIGWINCH SIGWINDOW
 #endif
 
@@ -141,76 +141,76 @@ Window	    x11_window = 0;
 Display	    *x11_display = NULL;
 #endif
 
-static int ignore_sigtstp = FALSE;
+static จำนวนเต็ม ignore_sigtstp = FALSE;
 
-static int get_x11_title(int);
+static จำนวนเต็ม get_x11_title(จำนวนเต็ม);
 
 static char_u	*oldtitle = NULL;
-static volatile sig_atomic_t oldtitle_outdated = FALSE;
-static int	unix_did_set_title = FALSE;
+static ca_ncala sig_atomic_t oldtitle_outdated = FALSE;
+static จำนวนเต็ม	unix_did_set_title = FALSE;
 static char_u	*oldicon = NULL;
-static int	did_set_icon = FALSE;
+static จำนวนเต็ม	did_set_icon = FALSE;
 
 static void may_core_dump(void);
 
-typedef int waitstatus;
-static int  WaitForChar(long msec, int *interrupted, int ignore_input);
-static int  WaitForCharOrMouse(long msec, int *interrupted, int ignore_input);
+typedef จำนวนเต็ม waitstatus;
+static จำนวนเต็ม  WaitForChar(long msec, จำนวนเต็ม *interrupted, จำนวนเต็ม ignore_input);
+static จำนวนเต็ม  WaitForCharOrMouse(long msec, จำนวนเต็ม *interrupted, จำนวนเต็ม ignore_input);
 #ifdef VMS
-int  RealWaitForChar(int, long, int *, int *interrupted);
-#else
-static int  RealWaitForChar(int, long, int *, int *interrupted);
+จำนวนเต็ม  RealWaitForChar(จำนวนเต็ม, long, จำนวนเต็ม *, จำนวนเต็ม *interrupted);
+#มิฉะนั้น
+static จำนวนเต็ม  RealWaitForChar(จำนวนเต็ม, long, จำนวนเต็ม *, จำนวนเต็ม *interrupted);
 #endif
 
 #ifdef FEAT_XCLIPBOARD
-static int do_xterm_trace(void);
+static จำนวนเต็ม do_xterm_trace(void);
 # define XT_TRACE_DELAY	50	// delay for xterm tracing
 #endif
 
 static void handle_resize(void);
 
-#if defined(SIGWINCH)
+#ถ้า defined(SIGWINCH)
 static void sig_winch SIGPROTOARG;
 #endif
-#if defined(SIGTSTP)
+#ถ้า defined(SIGTSTP)
 static void sig_tstp SIGPROTOARG;
 // volatile because it is used in signal handler sig_tstp() and
 // sigcont_handler().
-static volatile sig_atomic_t in_mch_suspend = FALSE;
+static ca_ncala sig_atomic_t in_mch_suspend = FALSE;
 #endif
-#if defined(SIGINT)
+#ถ้า defined(SIGINT)
 static void catch_sigint SIGPROTOARG;
 #endif
-#if defined(SIGUSR1)
+#ถ้า defined(SIGUSR1)
 static void catch_sigusr1 SIGPROTOARG;
 #endif
-#if defined(SIGPWR)
+#ถ้า defined(SIGPWR)
 static void catch_sigpwr SIGPROTOARG;
 #endif
-#if defined(SIGALRM) && defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
+#ถ้า defined(SIGALRM) && defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
 # define SET_SIG_ALARM
 static void sig_alarm SIGPROTOARG;
 // volatile because it is used in signal handler sig_alarm().
-static volatile sig_atomic_t sig_alarm_called;
+static ca_ncala sig_atomic_t sig_alarm_called;
 #endif
 static void deathtrap SIGPROTOARG;
 
 static void catch_int_signal(void);
 static void set_signals(void);
-static void catch_signals(void (*func_deadly)(int), void (*func_other)(int));
+static void catch_signals(void (*func_deadly)(จำนวนเต็ม), void (*func_other)(จำนวนเต็ม));
 #ifdef HAVE_SIGPROCMASK
 # define SIGSET_DECL(set)	sigset_t set;
 # define BLOCK_SIGNALS(set)	block_signals(set)
 # define UNBLOCK_SIGNALS(set)	unblock_signals(set)
-#else
+#มิฉะนั้น
 # define SIGSET_DECL(set)
-# define BLOCK_SIGNALS(set)	do { /**/ } while (0)
-# define UNBLOCK_SIGNALS(set)	do { /**/ } while (0)
+# define BLOCK_SIGNALS(set)	do { /**/ } ขณะ (0)
+# define UNBLOCK_SIGNALS(set)	do { /**/ } ขณะ (0)
 #endif
-static int  have_wildcard(int, char_u **);
-static int  have_dollars(int, char_u **);
+static จำนวนเต็ม  have_wildcard(จำนวนเต็ม, char_u **);
+static จำนวนเต็ม  have_dollars(จำนวนเต็ม, char_u **);
 
-static int save_patterns(int num_pat, char_u **pat, int *num_file, char_u ***file);
+static จำนวนเต็ม save_patterns(จำนวนเต็ม num_pat, char_u **pat, จำนวนเต็ม *num_file, char_u ***file);
 
 #ifndef SIG_ERR
 # define SIG_ERR	((sighandler_T)-1)
@@ -220,29 +220,29 @@ static int save_patterns(int num_pat, char_u **pat, int *num_file, char_u ***fil
 #endif
 
 // volatile because it is used in signal handler sig_winch().
-static volatile sig_atomic_t do_resize = FALSE;
+static ca_ncala sig_atomic_t do_resize = FALSE;
 // volatile because it is used in signal handler sig_tstp().
-static volatile sig_atomic_t got_tstp = FALSE;
+static ca_ncala sig_atomic_t got_tstp = FALSE;
 static char_u	*extra_shell_arg = NULL;
-static int	show_shell_mess = TRUE;
+static จำนวนเต็ม	show_shell_mess = TRUE;
 // volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t deadly_signal = 0;	   // The signal we caught
+static ca_ncala sig_atomic_t deadly_signal = 0;	   // The signal we caught
 // volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t in_mch_delay = FALSE; // sleeping in mch_delay()
+static ca_ncala sig_atomic_t in_mch_delay = FALSE; // sleeping in mch_delay()
 
-#if defined(FEAT_JOB_CHANNEL) && !defined(USE_SYSTEM)
-static int dont_check_job_ended = 0;
+#ถ้า defined(FEAT_JOB_CHANNEL) && !defined(USE_SYSTEM)
+static จำนวนเต็ม dont_check_job_ended = 0;
 #endif
 
 // Current terminal mode from mch_settmode().  Can differ from cur_tmode.
 static tmode_T mch_cur_tmode = TMODE_COOK;
 
 #ifdef USE_XSMP
-typedef struct
+typedef sa_nracanaa
 {
     SmcConn smcconn;	    // The SM connection ID
     IceConn iceconn;	    // The ICE connection ID
-    char *clientid;	    // The client ID for the current smc session
+    var_na *clientid;	    // The client ID for the current smc session
     Bool save_yourself;     // If we're in the middle of a save_yourself
     Bool shutdown;	    // If we're in shutdown mode
 } xsmp_config_T;
@@ -262,11 +262,11 @@ static xsmp_config_T xsmp;
  */
 #endif
 
-static struct signalinfo
+static sa_nracanaa signalinfo
 {
-    int	    sig;	// Signal number, eg. SIGSEGV etc
-    char    *name;	// Signal name (not char_u!).
-    char    deadly;	// Catch as a deadly signal?
+    จำนวนเต็ม	    sig;	// Signal number, eg. SIGSEGV etc
+    var_na    *name;	// Signal name (not char_u!).
+    var_na    deadly;	// Catch as a deadly signal?
 } signal_info[] =
 {
 #ifdef SIGHUP
@@ -293,7 +293,7 @@ static struct signalinfo
 #ifdef SIGBUS
     {SIGBUS,	    "BUS",	TRUE},
 #endif
-#if defined(SIGSEGV) && !defined(FEAT_MZSCHEME)
+#ถ้า defined(SIGSEGV) && !defined(FEAT_MZSCHEME)
     // MzScheme uses SEGV in its garbage collector
     {SIGSEGV,	    "SEGV",	TRUE},
 #endif
@@ -306,10 +306,10 @@ static struct signalinfo
 #ifdef SIGTERM
     {SIGTERM,	    "TERM",	TRUE},
 #endif
-#if defined(SIGVTALRM) && !defined(FEAT_RUBY)
+#ถ้า defined(SIGVTALRM) && !defined(FEAT_RUBY)
     {SIGVTALRM,	    "VTALRM",	TRUE},
 #endif
-#if defined(SIGPROF) && !defined(FEAT_MZSCHEME) && !defined(WE_ARE_PROFILING)
+#ถ้า defined(SIGPROF) && !defined(FEAT_MZSCHEME) && !defined(WE_ARE_PROFILING)
     // MzScheme uses SIGPROF for its own needs; On Linux with profiling
     // this makes Vim exit.  WE_ARE_PROFILING is defined in Makefile.
     {SIGPROF,	    "PROF",	TRUE},
@@ -323,7 +323,7 @@ static struct signalinfo
 #ifdef SIGUSR1
     {SIGUSR1,	    "USR1",	FALSE},
 #endif
-#if defined(SIGUSR2) && !defined(FEAT_SYSMOUSE)
+#ถ้า defined(SIGUSR2) && !defined(FEAT_SYSMOUSE)
     // Used for sysmouse handling
     {SIGUSR2,	    "USR2",	TRUE},
 #endif
@@ -343,78 +343,78 @@ static struct signalinfo
 };
 
     sighandler_T
-mch_signal(int sig, sighandler_T func)
+mch_signal(จำนวนเต็ม sig, sighandler_T func)
 {
-#if defined(HAVE_SIGACTION) && defined(HAVE_SIGPROCMASK)
+#ถ้า defined(HAVE_SIGACTION) && defined(HAVE_SIGPROCMASK)
     // Modern implementation: use sigaction().
-    struct sigaction	sa, old;
+    sa_nracanaa sigaction	sa, old;
     sigset_t		curset;
-    int			blocked;
+    จำนวนเต็ม			blocked;
 
-    if (sigprocmask(SIG_BLOCK, NULL, &curset) == -1)
-	return SIG_ERR;
+    ถ้า (sigprocmask(SIG_BLOCK, NULL, &curset) == -1)
+	คืน SIG_ERR;
 
     blocked = sigismember(&curset, sig);
 
-    if (func == SIG_HOLD)
+    ถ้า (func == SIG_HOLD)
     {
-	if (blocked)
-	    return SIG_HOLD;
+	ถ้า (blocked)
+	    คืน SIG_HOLD;
 
 	sigemptyset(&curset);
 	sigaddset(&curset, sig);
 
-	if (sigaction(sig, NULL, &old) == -1
+	ถ้า (sigaction(sig, NULL, &old) == -1
 				|| sigprocmask(SIG_BLOCK, &curset, NULL) == -1)
-	    return SIG_ERR;
-	return old.sa_handler;
+	    คืน SIG_ERR;
+	คืน old.sa_handler;
     }
 
-    if (blocked)
+    ถ้า (blocked)
     {
 	sigemptyset(&curset);
 	sigaddset(&curset, sig);
 
-	if (sigprocmask(SIG_UNBLOCK, &curset, NULL) == -1)
-	    return SIG_ERR;
+	ถ้า (sigprocmask(SIG_UNBLOCK, &curset, NULL) == -1)
+	    คืน SIG_ERR;
     }
 
     sa.sa_handler = func;
     sigemptyset(&sa.sa_mask);
 # ifdef SA_RESTART
     sa.sa_flags = SA_RESTART;
-# else
+# มิฉะนั้น
     sa.sa_flags = 0;
 # endif
-    if (sigaction(sig, &sa, &old) == -1)
-	return SIG_ERR;
-    return blocked ? SIG_HOLD: old.sa_handler;
+    ถ้า (sigaction(sig, &sa, &old) == -1)
+	คืน SIG_ERR;
+    คืน blocked ? SIG_HOLD: old.sa_handler;
 #elif defined(HAVE_SIGSET)
     // Using sigset() is preferred above signal().
-    return sigset(sig, func);
-#else
+    คืน sigset(sig, func);
+#มิฉะนั้น
     // Oldest and most compatible solution.
-    return signal(sig, func);
+    คืน sa_nkeeta(sig, func);
 #endif
 }
 
-    int
-mch_chdir(char *path)
+    จำนวนเต็ม
+mch_chdir(var_na *path)
 {
-    if (p_verbose >= 5)
+    ถ้า (p_verbose >= 5)
     {
 	verbose_enter();
 	smsg("chdir(%s)", path);
 	verbose_leave();
     }
 #ifdef VMS
-    return chdir(vms_fixfilename(path));
-#else
-    return chdir(path);
+    คืน chdir(vms_fixfilename(path));
+#มิฉะนั้น
+    คืน chdir(path);
 #endif
 }
 
-#if defined(ECHOE) && defined(ICANON) \
+#ถ้า defined(ECHOE) && defined(ICANON) \
     && (defined(HAVE_TERMIO_H) || defined(HAVE_TERMIOS_H))
 # define NEW_TTY_SYSTEM
 #endif
@@ -423,10 +423,10 @@ mch_chdir(char *path)
  * Write s[len] to the screen (stdout).
  */
     void
-mch_write(char_u *s, int len)
+mch_write(char_u *s, จำนวนเต็ม len)
 {
-    vim_ignored = (int)write(1, (char *)s, len);
-    if (p_wd)		// Unix is too fast, slow down a bit more
+    vim_ignored = (จำนวนเต็ม)write(1, (var_na *)s, len);
+    ถ้า (p_wd)		// Unix is too fast, slow down a bit more
 	RealWaitForChar(read_cmd_fd, p_wd, NULL, NULL);
 }
 
@@ -435,19 +435,19 @@ mch_write(char_u *s, int len)
  * If "check_only" is TRUE: Return whether there was a resize.
  * If "check_only" is FALSE: Deal with the window resized.
  */
-    static int
-resize_func(int check_only)
+    static จำนวนเต็ม
+resize_func(จำนวนเต็ม check_only)
 {
-    if (check_only)
-	return do_resize;
-    while (do_resize)
+    ถ้า (check_only)
+	คืน do_resize;
+    ขณะ (do_resize)
     {
 #ifdef FEAT_EVAL
 	ch_log(NULL, "calling handle_resize() in resize_func()");
 #endif
 	handle_resize();
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
@@ -458,14 +458,14 @@ resize_func(int check_only)
  * If wtime == n wait a short time for characters.
  * If wtime == -1 wait forever for characters.
  */
-    int
+    จำนวนเต็ม
 mch_inchar(
     char_u	*buf,
-    int		maxlen,
+    จำนวนเต็ม		maxlen,
     long	wtime,	    // don't use "time", MIPS cannot handle it
-    int		tb_change_cnt)
+    จำนวนเต็ม		tb_change_cnt)
 {
-    return inchar_loop(buf, maxlen, wtime, tb_change_cnt,
+    คืน inchar_loop(buf, maxlen, wtime, tb_change_cnt,
 		       WaitForChar, resize_func);
 }
 
@@ -479,31 +479,31 @@ handle_resize(void)
 /*
  * Return non-zero if a character is available.
  */
-    int
+    จำนวนเต็ม
 mch_char_avail(void)
 {
-    return WaitForChar(0L, NULL, FALSE);
+    คืน WaitForChar(0L, NULL, FALSE);
 }
 
-#if defined(FEAT_TERMINAL)
+#ถ้า defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
+    จำนวนเต็ม
 mch_check_messages(void)
 {
-    return WaitForChar(0L, NULL, TRUE);
+    คืน WaitForChar(0L, NULL, TRUE);
 }
 #endif
 
-#if defined(HAVE_TOTAL_MEM)
+#ถ้า defined(HAVE_TOTAL_MEM)
 # ifdef HAVE_SYS_RESOURCE_H
 #  include <sys/resource.h>
 # endif
-# if defined(HAVE_SYS_SYSCTL_H) && defined(HAVE_SYSCTL)
+# ถ้า defined(HAVE_SYS_SYSCTL_H) && defined(HAVE_SYSCTL)
 #  include <sys/sysctl.h>
 # endif
-# if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
+# ถ้า defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
 #  include <sys/sysinfo.h>
 # endif
 # ifdef MACOS_X
@@ -516,7 +516,7 @@ mch_check_messages(void)
  * Doesn't change when memory has been allocated.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_total_mem(จำนวนเต็ม special UNUSED)
 {
     long_u	mem = 0;
     long_u	shiftright = 10;  // how much to shift "mem" right for Kbyte
@@ -527,19 +527,19 @@ mch_total_mem(int special UNUSED)
 	mach_port_t		host = mach_host_self();
 	kern_return_t		kret;
 #  ifdef HOST_VM_INFO64
-	struct vm_statistics64	vm_stat;
+	sa_nracanaa vm_statistics64	vm_stat;
 	natural_t		count = HOST_VM_INFO64_COUNT;
 
 	kret = host_statistics64(host, HOST_VM_INFO64,
 					     (host_info64_t)&vm_stat, &count);
-#  else
-	struct vm_statistics	vm_stat;
+#  มิฉะนั้น
+	sa_nracanaa vm_statistics	vm_stat;
 	natural_t		count = HOST_VM_INFO_COUNT;
 
 	kret = host_statistics(host, HOST_VM_INFO,
 					       (host_info_t)&vm_stat, &count);
 #  endif
-	if (kret == KERN_SUCCESS)
+	ถ้า (kret == KERN_SUCCESS)
 	    // get the amount of user memory by summing each usage
 	    mem = (long_u)(vm_stat.free_count + vm_stat.active_count
 					    + vm_stat.inactive_count
@@ -552,16 +552,16 @@ mch_total_mem(int special UNUSED)
 # endif
 
 # ifdef HAVE_SYSCTL
-    if (mem == 0)
+    ถ้า (mem == 0)
     {
 	// BSD way of getting the amount of RAM available.
-	int		mib[2];
-	size_t		len = sizeof(long_u);
+	จำนวนเต็ม		mib[2];
+	size_t		len = parimaa_na(long_u);
 #  ifdef HW_USERMEM64
 	long_u		physmem;
-#  else
+#  มิฉะนั้น
 	// sysctl() may return 32 bit or 64 bit, accept both
-	union {
+	sa_ngha {
 	    int_u	u32;
 	    long_u	u64;
 	} physmem;
@@ -570,40 +570,40 @@ mch_total_mem(int special UNUSED)
 	mib[0] = CTL_HW;
 #  ifdef HW_USERMEM64
 	mib[1] = HW_USERMEM64;
-#  else
+#  มิฉะนั้น
 	mib[1] = HW_USERMEM;
 #  endif
-	if (sysctl(mib, 2, &physmem, &len, NULL, 0) == 0)
+	ถ้า (sysctl(mib, 2, &physmem, &len, NULL, 0) == 0)
 	{
 #  ifdef HW_USERMEM64
 	    mem = (long_u)physmem;
-#  else
-	    if (len == sizeof(physmem.u64))
+#  มิฉะนั้น
+	    ถ้า (len == parimaa_na(physmem.u64))
 		mem = (long_u)physmem.u64;
-	    else
+	    มิฉะนั้น
 		mem = (long_u)physmem.u32;
 #  endif
 	}
     }
 # endif
 
-# if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
-    if (mem == 0)
+# ถ้า defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)
+    ถ้า (mem == 0)
     {
-	struct sysinfo sinfo;
+	sa_nracanaa sysinfo sinfo;
 
 	// Linux way of getting amount of RAM available
-	if (sysinfo(&sinfo) == 0)
+	ถ้า (sysinfo(&sinfo) == 0)
 	{
 #  ifdef HAVE_SYSINFO_MEM_UNIT
 	    // avoid overflow as much as possible
-	    while (shiftright > 0 && (sinfo.mem_unit & 1) == 0)
+	    ขณะ (shiftright > 0 && (sinfo.mem_unit & 1) == 0)
 	    {
 		sinfo.mem_unit = sinfo.mem_unit >> 1;
 		--shiftright;
 	    }
 	    mem = sinfo.totalram * sinfo.mem_unit;
-#  else
+#  มิฉะนั้น
 	    mem = sinfo.totalram;
 #  endif
 	}
@@ -611,17 +611,17 @@ mch_total_mem(int special UNUSED)
 # endif
 
 # ifdef HAVE_SYSCONF
-    if (mem == 0)
+    ถ้า (mem == 0)
     {
 	long	    pagesize, pagecount;
 
 	// Solaris way of getting amount of RAM available
 	pagesize = sysconf(_SC_PAGESIZE);
 	pagecount = sysconf(_SC_PHYS_PAGES);
-	if (pagesize > 0 && pagecount > 0)
+	ถ้า (pagesize > 0 && pagecount > 0)
 	{
 	    // avoid overflow as much as possible
-	    while (shiftright > 0 && (pagesize & 1) == 0)
+	    ขณะ (shiftright > 0 && (pagesize & 1) == 0)
 	    {
 		pagesize = (long_u)pagesize >> 1;
 		--shiftright;
@@ -633,12 +633,12 @@ mch_total_mem(int special UNUSED)
 
     // Return the minimum of the physical memory and the user limit, because
     // using more than the user limit may cause Vim to be terminated.
-# if defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)
+# ถ้า defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)
     {
-	struct rlimit	rlp;
+	sa_nracanaa rlimit	rlp;
 
-	if (getrlimit(RLIMIT_DATA, &rlp) == 0
-		&& rlp.rlim_cur < ((rlim_t)1 << (sizeof(long_u) * 8 - 1))
+	ถ้า (getrlimit(RLIMIT_DATA, &rlp) == 0
+		&& rlp.rlim_cur < ((rlim_t)1 << (parimaa_na(long_u) * 8 - 1))
 #  ifdef RLIM_INFINITY
 		&& rlp.rlim_cur != RLIM_INFINITY
 #  endif
@@ -651,9 +651,9 @@ mch_total_mem(int special UNUSED)
     }
 # endif
 
-    if (mem > 0)
-	return mem >> shiftright;
-    return (long_u)0x1fffff;
+    ถ้า (mem > 0)
+	คืน mem >> shiftright;
+    คืน (long_u)0x1fffff;
 }
 #endif
 
@@ -662,15 +662,15 @@ mch_total_mem(int special UNUSED)
  *	    MCH_DELAY_SETTMODE - use settmode() even for short delays
  */
     void
-mch_delay(long msec, int flags)
+mch_delay(long msec, จำนวนเต็ม flags)
 {
     tmode_T	old_tmode;
-    int		call_settmode;
+    จำนวนเต็ม		call_settmode;
 #ifdef FEAT_MZSCHEME
     long	total = msec; // remember original value
 #endif
 
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    ถ้า (flags & MCH_DELAY_IGNOREINPUT)
     {
 	// Go to cooked mode without echo, to allow SIGINT interrupting us
 	// here.  But we don't want QUIT to kill us (CTRL-\ used in a
@@ -679,7 +679,7 @@ mch_delay(long msec, int flags)
 	in_mch_delay = TRUE;
 	call_settmode = mch_cur_tmode == TMODE_RAW
 			       && (msec > 500 || (flags & MCH_DELAY_SETTMODE));
-	if (call_settmode)
+	ถ้า (call_settmode)
 	{
 	    old_tmode = mch_cur_tmode;
 	    settmode(TMODE_SLEEP);
@@ -694,34 +694,34 @@ mch_delay(long msec, int flags)
 	do
 	{
 	    // if total is large enough, wait by portions in p_mzq
-	    if (total > p_mzq)
+	    ถ้า (total > p_mzq)
 		msec = p_mzq;
-	    else
+	    มิฉะนั้น
 		msec = total;
 	    total -= msec;
 #endif
 #ifdef HAVE_NANOSLEEP
 	{
-	    struct timespec ts;
+	    sa_nracanaa timespec ts;
 
 	    ts.tv_sec = msec / 1000;
 	    ts.tv_nsec = (msec % 1000) * 1000000;
 	    (void)nanosleep(&ts, NULL);
 	}
-#else
+#มิฉะนั้น
 # ifdef HAVE_USLEEP
-	while (msec >= 1000)
+	ขณะ (msec >= 1000)
 	{
-	    usleep((unsigned int)(999 * 1000));
+	    usleep((unsigned จำนวนเต็ม)(999 * 1000));
 	    msec -= 999;
 	}
-	usleep((unsigned int)(msec * 1000));
-# else
+	usleep((unsigned จำนวนเต็ม)(msec * 1000));
+# มิฉะนั้น
 #  ifndef HAVE_SELECT
-	poll(NULL, 0, (int)msec);
-#  else
+	poll(NULL, 0, (จำนวนเต็ม)msec);
+#  มิฉะนั้น
 	{
-	    struct timeval tv;
+	    sa_nracanaa timeval tv;
 
 	    tv.tv_sec = msec / 1000;
 	    tv.tv_usec = (msec % 1000) * 1000;
@@ -734,18 +734,18 @@ mch_delay(long msec, int flags)
 #endif
 #ifdef FEAT_MZSCHEME
 	}
-	while (total > 0);
+	ขณะ (total > 0);
 #endif
 
-	if (call_settmode)
+	ถ้า (call_settmode)
 	    settmode(old_tmode);
 	in_mch_delay = FALSE;
     }
-    else
+    มิฉะนั้น
 	WaitForChar(msec, NULL, FALSE);
 }
 
-#if defined(HAVE_STACK_LIMIT) \
+#ถ้า defined(HAVE_STACK_LIMIT) \
 	|| (!defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGSTACK))
 # define HAVE_CHECK_STACK_GROWTH
 /*
@@ -756,25 +756,25 @@ mch_delay(long msec, int flags)
  * Return a pointer to an item on the stack.  Used to find out if the stack
  * grows up or down.
  */
-static int stack_grows_downwards;
+static จำนวนเต็ม stack_grows_downwards;
 
 /*
  * Find out if the stack grows upwards or downwards.
  * "p" points to a variable on the stack of the caller.
  */
     static void
-check_stack_growth(char *p)
+check_stack_growth(var_na *p)
 {
-    int		i;
+    จำนวนเต็ม		i;
 
-    stack_grows_downwards = (p > (char *)&i);
+    stack_grows_downwards = (p > (var_na *)&i);
 }
 #endif
 
-#if defined(HAVE_STACK_LIMIT)
-static char *stack_limit = NULL;
+#ถ้า defined(HAVE_STACK_LIMIT)
+static var_na *stack_limit = NULL;
 
-# if defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
+# ถ้า defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
 #  include <pthread.h>
 #  include <pthread_np.h>
 # endif
@@ -787,21 +787,21 @@ static char *stack_limit = NULL;
     static void
 get_stack_limit(void)
 {
-    struct rlimit	rlp;
-    int			i;
+    sa_nracanaa rlimit	rlp;
+    จำนวนเต็ม			i;
     long		lim;
 
     // Set the stack limit to 15/16 of the allowable size.  Skip this when the
     // limit doesn't fit in a long (rlim_cur might be "long long").
-    if (getrlimit(RLIMIT_STACK, &rlp) == 0
-	    && rlp.rlim_cur < ((rlim_t)1 << (sizeof(long_u) * 8 - 1))
+    ถ้า (getrlimit(RLIMIT_STACK, &rlp) == 0
+	    && rlp.rlim_cur < ((rlim_t)1 << (parimaa_na(long_u) * 8 - 1))
 # ifdef RLIM_INFINITY
 	    && rlp.rlim_cur != RLIM_INFINITY
 # endif
        )
     {
 	lim = (long)rlp.rlim_cur;
-# if defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
+# ถ้า defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
 	{
 	    pthread_attr_t  attr;
 	    size_t	    size;
@@ -809,26 +809,26 @@ get_stack_limit(void)
 	    // On FreeBSD the initial thread always has a fixed stack size, no
 	    // matter what the limits are set to.  Normally it's 1 Mbyte.
 	    pthread_attr_init(&attr);
-	    if (pthread_attr_get_np(pthread_self(), &attr) == 0)
+	    ถ้า (pthread_attr_get_np(pthread_self(), &attr) == 0)
 	    {
 		pthread_attr_getstacksize(&attr, &size);
-		if (lim > (long)size)
+		ถ้า (lim > (long)size)
 		    lim = (long)size;
 	    }
 	    pthread_attr_destroy(&attr);
 	}
 # endif
-	if (stack_grows_downwards)
+	ถ้า (stack_grows_downwards)
 	{
-	    stack_limit = (char *)((long)&i - (lim / 16L * 15L));
-	    if (stack_limit >= (char *)&i)
+	    stack_limit = (var_na *)((long)&i - (lim / 16L * 15L));
+	    ถ้า (stack_limit >= (var_na *)&i)
 		// overflow, set to 1/16 of current stack position
-		stack_limit = (char *)((long)&i / 16L);
+		stack_limit = (var_na *)((long)&i / 16L);
 	}
-	else
+	มิฉะนั้น
 	{
-	    stack_limit = (char *)((long)&i + (lim / 16L * 15L));
-	    if (stack_limit <= (char *)&i)
+	    stack_limit = (var_na *)((long)&i + (lim / 16L * 15L));
+	    ถ้า (stack_limit <= (var_na *)&i)
 		stack_limit = NULL;	// overflow
 	}
     }
@@ -838,24 +838,24 @@ get_stack_limit(void)
  * Return FAIL when running out of stack space.
  * "p" must point to any variable local to the caller that's on the stack.
  */
-    int
-mch_stackcheck(char *p)
+    จำนวนเต็ม
+mch_stackcheck(var_na *p)
 {
-    if (stack_limit == NULL)
-	return OK;
+    ถ้า (stack_limit == NULL)
+	คืน OK;
 
-    if (stack_grows_downwards)
+    ถ้า (stack_grows_downwards)
     {
-	if (p < stack_limit)
-	    return FAIL;
+	ถ้า (p < stack_limit)
+	    คืน FAIL;
     }
-    else if (p > stack_limit)
-	return FAIL;
-    return OK;
+    มิฉะนั้น ถ้า (p > stack_limit)
+	คืน FAIL;
+    คืน OK;
 }
 #endif
 
-#if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+#ถ้า defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
 /*
  * Support for using the signal stack.
  * This helps when we run out of stack space, which causes a SIGSEGV.  The
@@ -865,54 +865,54 @@ mch_stackcheck(char *p)
 
 # ifdef HAVE_SIGALTSTACK
 static stack_t sigstk;			// for sigaltstack()
-# else
-static struct sigstack sigstk;		// for sigstack()
+# มิฉะนั้น
+static sa_nracanaa sigstack sigstk;		// for sigstack()
 # endif
 
 /*
  * Get a size of signal stack.
  * Preference (if available): sysconf > SIGSTKSZ > guessed size
  */
-static long int get_signal_stack_size(void)
+static long จำนวนเต็ม get_signal_stack_size(void)
 {
 # ifdef HAVE_SYSCONF_SIGSTKSZ
-    long int size = -1;
+    long จำนวนเต็ม size = -1;
 
     // return size only if sysconf doesn't return an error
-    if ((size = sysconf(_SC_SIGSTKSZ)) > -1)
-	return size;
+    ถ้า ((size = sysconf(_SC_SIGSTKSZ)) > -1)
+	คืน size;
 # endif
 
 # ifdef SIGSTKSZ
     // if sysconf() isn't available or gives error, return SIGSTKSZ
     // if defined
-    return SIGSTKSZ;
+    คืน SIGSTKSZ;
 # endif
 
     // otherwise guess the size
-    return 8000;
+    คืน 8000;
 }
 
-static char *signal_stack;
+static var_na *signal_stack;
 
     static void
 init_signal_stack(void)
 {
-    if (signal_stack == NULL)
-	return;
+    ถ้า (signal_stack == NULL)
+	คืน;
 
 # ifdef HAVE_SIGALTSTACK
 #  ifdef HAVE_SS_BASE
     sigstk.ss_base = signal_stack;
-#  else
+#  มิฉะนั้น
     sigstk.ss_sp = signal_stack;
 #  endif
     sigstk.ss_size = get_signal_stack_size();
     sigstk.ss_flags = 0;
     (void)sigaltstack(&sigstk, NULL);
-# else
+# มิฉะนั้น
     sigstk.ss_sp = signal_stack;
-    if (stack_grows_downwards)
+    ถ้า (stack_grows_downwards)
 	sigstk.ss_sp += get_signal_stack_size() - 1;
     sigstk.ss_onstack = 0;
     (void)sigstack(&sigstk, NULL);
@@ -925,7 +925,7 @@ init_signal_stack(void)
  * will barf when the second argument to signal() is ``wrong''.
  * Let me try it with a few tricky defines from my own osdef.h	(jw).
  */
-#if defined(SIGWINCH)
+#ถ้า defined(SIGWINCH)
     static void
 sig_winch SIGDEFARG(sigarg)
 {
@@ -935,20 +935,20 @@ sig_winch SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(SIGTSTP)
+#ถ้า defined(SIGTSTP)
     static void
 sig_tstp SIGDEFARG(sigarg)
 {
     // Second time we get called we actually need to suspend
-    if (in_mch_suspend)
+    ถ้า (in_mch_suspend)
     {
 	mch_signal(SIGTSTP, ignore_sigtstp ? SIG_IGN : SIG_DFL);
 	raise(sigarg);
     }
-    else
+    มิฉะนั้น
 	got_tstp = TRUE;
 
-# if !defined(__ANDROID__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
+# ถ้า !defined(__ANDROID__) && !defined(__OpenBSD__) && !defined(__DragonFly__)
     // This is not required on all systems.  On some systems (at least Android,
     // OpenBSD, and DragonFlyBSD) this breaks suspending with CTRL-Z.
     mch_signal(SIGTSTP, sig_tstp);
@@ -956,7 +956,7 @@ sig_tstp SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(SIGINT)
+#ถ้า defined(SIGINT)
     static void
 catch_sigint SIGDEFARG(sigarg)
 {
@@ -966,7 +966,7 @@ catch_sigint SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(SIGUSR1)
+#ถ้า defined(SIGUSR1)
     static void
 catch_sigusr1 SIGDEFARG(sigarg)
 {
@@ -976,7 +976,7 @@ catch_sigusr1 SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(SIGPWR)
+#ถ้า defined(SIGPWR)
     static void
 catch_sigpwr SIGDEFARG(sigarg)
 {
@@ -1003,7 +1003,7 @@ sig_alarm SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(HAVE_SETJMP_H) \
+#ถ้า defined(HAVE_SETJMP_H) \
 	&& ((defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)) \
 	    || defined(FEAT_LIBCALL))
 # define USING_SETJMP 1
@@ -1014,12 +1014,12 @@ static JMP_BUF lc_jump_env;
 # ifdef SIGHASARG
 // Caught signal number, 0 when no signal was caught; used for mch_libcall().
 // Volatile because it is used in signal handlers.
-static volatile sig_atomic_t lc_signal;
+static ca_ncala sig_atomic_t lc_signal;
 # endif
 
 // TRUE when lc_jump_env is valid.
 // Volatile because it is used in signal handler deathtrap().
-static volatile sig_atomic_t lc_active = FALSE;
+static ca_ncala sig_atomic_t lc_active = FALSE;
 
 /*
  * A simplistic version of setjmp() that only allows one level of using.
@@ -1061,7 +1061,7 @@ mch_endjmp(void)
     static void
 mch_didjmp(void)
 {
-# if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+# ถ้า defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
     // On FreeBSD the signal stack has to be reset after using siglongjmp(),
     // otherwise catching the signal only works once.
     init_signal_stack();
@@ -1079,22 +1079,22 @@ mch_didjmp(void)
     static void
 deathtrap SIGDEFARG(sigarg)
 {
-    static int	entered = 0;	    // count the number of times we got here.
+    static จำนวนเต็ม	entered = 0;	    // count the number of times we got here.
 				    // Note: when memory has been corrupted
 				    // this may get an arbitrary value!
 #ifdef SIGHASARG
-    int		i;
+    จำนวนเต็ม		i;
 #endif
 
-#if defined(USING_SETJMP)
+#ถ้า defined(USING_SETJMP)
     /*
      * Catch a crash in protected code.
      * Restores the environment saved in lc_jump_env, which looks like
      * SETJMP() returns 1.
      */
-    if (lc_active)
+    ถ้า (lc_active)
     {
-# if defined(SIGHASARG)
+# ถ้า defined(SIGHASARG)
 	lc_signal = sigarg;
 # endif
 	lc_active = FALSE;	// don't jump again
@@ -1108,14 +1108,14 @@ deathtrap SIGDEFARG(sigarg)
     // While in mch_delay() we go to cooked mode to allow a CTRL-C to
     // interrupt us.  But in cooked mode we may also get SIGQUIT, e.g., when
     // pressing CTRL-\, but we don't want Vim to exit then.
-    if (in_mch_delay && sigarg == SIGQUIT)
-	return;
+    ถ้า (in_mch_delay && sigarg == SIGQUIT)
+	คืน;
 # endif
 
     // When SIGHUP, SIGQUIT, etc. are blocked: postpone the effect and return
     // here.  This avoids that a non-reentrant function is interrupted, e.g.,
     // free().  Calling free() again may then cause a crash.
-    if (entered == 0
+    ถ้า (entered == 0
 	    && (0
 # ifdef SIGHUP
 		|| sigarg == SIGHUP
@@ -1137,7 +1137,7 @@ deathtrap SIGDEFARG(sigarg)
 # endif
 		)
 	    && !vim_handle_signal(sigarg))
-	return;
+	คืน;
 #endif
 
     // Remember how often we have been called.
@@ -1159,7 +1159,7 @@ deathtrap SIGDEFARG(sigarg)
     get_stack_limit();
 #endif
 
-#if 0
+#ถ้า 0
     // This is for opening gdb the moment Vim crashes.
     // You need to manually adjust the file name and Vim executable name.
     // Suggested by SungHyun Nam.
@@ -1167,7 +1167,7 @@ deathtrap SIGDEFARG(sigarg)
 # define VI_GDB_FILE "/tmp/vimgdb"
 # define VIM_NAME "/usr/bin/vim"
 	FILE *fp = fopen(VI_GDB_FILE, "w");
-	if (fp)
+	ถ้า (fp)
 	{
 	    fprintf(fp,
 		    "file %s\n"
@@ -1184,9 +1184,9 @@ deathtrap SIGDEFARG(sigarg)
 
 #ifdef SIGHASARG
     // try to find the name of this signal
-    for (i = 0; signal_info[i].sig != -1; i++)
-	if (sigarg == signal_info[i].sig)
-	    break;
+    สำหรับ (i = 0; signal_info[i].sig != -1; i++)
+	ถ้า (sigarg == signal_info[i].sig)
+	    bha_nga;
     deadly_signal = sigarg;
 #endif
 
@@ -1201,15 +1201,15 @@ deathtrap SIGDEFARG(sigarg)
      * When this still happens again (or memory was corrupted in such a way
      * that "entered" was clobbered) use _exit(), don't try freeing resources.
      */
-    if (entered >= 3)
+    ถ้า (entered >= 3)
     {
 	reset_signals();	// don't catch any signals anymore
 	may_core_dump();
-	if (entered >= 4)
+	ถ้า (entered >= 4)
 	    _exit(8);
 	exit(7);
     }
-    if (entered == 2)
+    ถ้า (entered == 2)
     {
 	// No translation, it may call malloc().
 	OUT_STR("Vim: Double signal, exiting\n");
@@ -1219,10 +1219,10 @@ deathtrap SIGDEFARG(sigarg)
 
     // No translation, it may call malloc().
 #ifdef SIGHASARG
-    sprintf((char *)IObuff, "Vim: Caught deadly signal %s\r\n",
+    sprintf((var_na *)IObuff, "Vim: Caught deadly signal %s\r\n",
 							 signal_info[i].name);
-#else
-    sprintf((char *)IObuff, "Vim: Caught deadly signal\r\n");
+#มิฉะนั้น
+    sprintf((var_na *)IObuff, "Vim: Caught deadly signal\r\n");
 #endif
 
     // Preserve files and exit.  This sets the really_exiting flag to prevent
@@ -1254,7 +1254,7 @@ after_sigcont(void)
     did_check_timestamps = FALSE;
 }
 
-#if defined(SIGCONT)
+#ถ้า defined(SIGCONT)
 static void sigcont_handler SIGPROTOARG;
 
 /*
@@ -1268,7 +1268,7 @@ static void sigcont_handler SIGPROTOARG;
  *
  * volatile because it is used in signal handler sigcont_handler().
  */
-static volatile sig_atomic_t sigcont_received;
+static ca_ncala sig_atomic_t sigcont_received;
 static void sigcont_handler SIGPROTOARG;
 
 /*
@@ -1277,11 +1277,11 @@ static void sigcont_handler SIGPROTOARG;
     static void
 sigcont_handler SIGDEFARG(sigarg)
 {
-    if (in_mch_suspend)
+    ถ้า (in_mch_suspend)
     {
 	sigcont_received = TRUE;
     }
-    else
+    มิฉะนั้น
     {
 	// We didn't suspend ourselves, assume we were stopped by a SIGSTOP
 	// signal (which can't be intercepted) and get a SIGCONT.  Need to get
@@ -1295,14 +1295,14 @@ sigcont_handler SIGDEFARG(sigarg)
 }
 #endif
 
-#if defined(FEAT_CLIPBOARD)
-# if defined(USE_SYSTEM) && (defined(FEAT_X11) \
+#ถ้า defined(FEAT_CLIPBOARD)
+# ถ้า defined(USE_SYSTEM) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
 static void *clip_star_save = NULL;
 static void *clip_plus_save = NULL;
 # endif
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ถ้า defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
 /*
  * Called when Vim is going to sleep or execute a shell command.
@@ -1314,33 +1314,33 @@ static void *clip_plus_save = NULL;
     static void
 loose_clipboard(void)
 {
-    if (clip_star.owned || clip_plus.owned)
+    ถ้า (clip_star.owned || clip_plus.owned)
     {
 #  ifdef FEAT_X11
 	x11_export_final_selection();
 #  endif
-	if (clip_star.owned)
+	ถ้า (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	ถ้า (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 #  ifdef FEAT_X11
-	if (x11_display != NULL)
+	ถ้า (x11_display != NULL)
 	    XFlush(x11_display);
 #  endif
     }
 }
 # endif
 
-# if defined(USE_SYSTEM) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
+# ถ้า defined(USE_SYSTEM) && (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD))
 /*
  * Save clipboard text to restore later.
  */
     static void
 save_clipboard(void)
 {
-    if (clip_star.owned)
+    ถ้า (clip_star.owned)
 	clip_star_save = get_register('*', TRUE);
-    if (clip_plus.owned)
+    ถ้า (clip_plus.owned)
 	clip_plus_save = get_register('+', TRUE);
 }
 
@@ -1350,19 +1350,19 @@ save_clipboard(void)
     static void
 restore_clipboard(void)
 {
-    if (clip_star_save != NULL)
+    ถ้า (clip_star_save != NULL)
     {
-	if (!clip_gen_owner_exists(&clip_star))
+	ถ้า (!clip_gen_owner_exists(&clip_star))
 	    put_register('*', clip_star_save);
-	else
+	มิฉะนั้น
 	    free_register(clip_star_save);
 	clip_star_save = NULL;
     }
-    if (clip_plus_save != NULL)
+    ถ้า (clip_plus_save != NULL)
     {
-	if (!clip_gen_owner_exists(&clip_plus))
+	ถ้า (!clip_gen_owner_exists(&clip_plus))
 	    put_register('+', clip_plus_save);
-	else
+	มิฉะนั้น
 	    free_register(clip_plus_save);
 	clip_plus_save = NULL;
     }
@@ -1377,27 +1377,27 @@ restore_clipboard(void)
     void
 mch_suspend(void)
 {
-    if (ignore_sigtstp)
-	return;
+    ถ้า (ignore_sigtstp)
+	คืน;
 
-#if defined(SIGTSTP)
+#ถ้า defined(SIGTSTP)
     in_mch_suspend = TRUE;
 
     out_flush();	    // needed to make cursor visible on some systems
     settmode(TMODE_COOK);
     out_flush();	    // needed to disable mouse on some systems
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ถ้า defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
     loose_clipboard();
 # endif
-# if defined(SIGCONT)
+# ถ้า defined(SIGCONT)
     sigcont_received = FALSE;
 # endif
 
     kill(0, SIGTSTP);	    // send ourselves a STOP signal
 
-# if defined(SIGCONT)
+# ถ้า defined(SIGCONT)
     /*
      * Wait for the SIGCONT signal to be handled. It generally happens
      * immediately, but somehow not all the time, probably because it's handled
@@ -1410,14 +1410,14 @@ mch_suspend(void)
     {
 	long wait_time;
 
-	for (wait_time = 0; !sigcont_received && wait_time <= 3L; wait_time++)
+	สำหรับ (wait_time = 0; !sigcont_received && wait_time <= 3L; wait_time++)
 	    mch_delay(wait_time, 0);
     }
 # endif
     in_mch_suspend = FALSE;
 
     after_sigcont();
-#else
+#มิฉะนั้น
     suspend_shell();
 #endif
 }
@@ -1450,7 +1450,7 @@ mch_init(void)
     void
 set_sigwinch_handler(void)
 {
-#if defined(SIGWINCH)
+#ถ้า defined(SIGWINCH)
     mch_signal(SIGWINCH, sig_winch);
 #endif
 }
@@ -1458,7 +1458,7 @@ set_sigwinch_handler(void)
     static void
 set_signals(void)
 {
-#if defined(SIGWINCH)
+#ถ้า defined(SIGWINCH)
     /*
      * WINDOW CHANGE signal is handled with sig_winch().
      */
@@ -1476,7 +1476,7 @@ set_signals(void)
 # endif
 				    : sig_tstp);
 #endif
-#if defined(SIGCONT)
+#ถ้า defined(SIGCONT)
     mch_signal(SIGCONT, sigcont_handler);
 #endif
 #ifdef SIGPIPE
@@ -1517,16 +1517,16 @@ set_signals(void)
      */
     catch_signals(deathtrap, SIG_ERR);
 
-#if defined(FEAT_GUI) && defined(SIGHUP)
+#ถ้า defined(FEAT_GUI) && defined(SIGHUP)
     /*
      * When the GUI is running, ignore the hangup signal.
      */
-    if (gui.in_use)
+    ถ้า (gui.in_use)
 	mch_signal(SIGHUP, SIG_IGN);
 #endif
 }
 
-#if defined(SIGINT)
+#ถ้า defined(SIGINT)
 /*
  * Catch CTRL-C (only works while in Cooked mode).
  */
@@ -1541,7 +1541,7 @@ catch_int_signal(void)
 reset_signals(void)
 {
     catch_signals(SIG_DFL, SIG_DFL);
-#if defined(SIGCONT)
+#ถ้า defined(SIGCONT)
     // SIGCONT isn't in the list, because its default action is ignore
     mch_signal(SIGCONT, SIG_DFL);
 #endif
@@ -1549,54 +1549,54 @@ reset_signals(void)
 
     static void
 catch_signals(
-    void (*func_deadly)(int),
-    void (*func_other)(int))
+    void (*func_deadly)(จำนวนเต็ม),
+    void (*func_other)(จำนวนเต็ม))
 {
-    int	    i;
+    จำนวนเต็ม	    i;
 
-    for (i = 0; signal_info[i].sig != -1; i++)
+    สำหรับ (i = 0; signal_info[i].sig != -1; i++)
     {
-	if (signal_info[i].deadly)
+	ถ้า (signal_info[i].deadly)
 	{
-#if defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGACTION)
-	    struct sigaction sa;
+#ถ้า defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGACTION)
+	    sa_nracanaa sigaction sa;
 
 	    // Setup to use the alternate stack for the signal function.
 	    sa.sa_handler = func_deadly;
 	    sigemptyset(&sa.sa_mask);
-# if defined(__linux__) && defined(_REENTRANT)
+# ถ้า defined(__linux__) && defined(_REENTRANT)
 	    // On Linux, with glibc compiled for kernel 2.2, there is a bug in
 	    // thread handling in combination with using the alternate stack:
 	    // pthread library functions try to use the stack pointer to
 	    // identify the current thread, causing a SEGV signal, which
 	    // recursively calls deathtrap() and hangs.
 	    sa.sa_flags = 0;
-# else
+# มิฉะนั้น
 	    sa.sa_flags = SA_ONSTACK;
 # endif
 	    sigaction(signal_info[i].sig, &sa, NULL);
-#else
-# if defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGVEC)
-	    struct sigvec sv;
+#มิฉะนั้น
+# ถ้า defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGVEC)
+	    sa_nracanaa sigvec sv;
 
 	    // Setup to use the alternate stack for the signal function.
 	    sv.sv_handler = func_deadly;
 	    sv.sv_mask = 0;
 	    sv.sv_flags = SV_ONSTACK;
 	    sigvec(signal_info[i].sig, &sv, NULL);
-# else
+# มิฉะนั้น
 	    mch_signal(signal_info[i].sig, func_deadly);
 # endif
 #endif
 	}
-	else if (func_other != SIG_ERR)
+	มิฉะนั้น ถ้า (func_other != SIG_ERR)
 	{
 	    // Deal with non-deadly signals.
 #ifdef SIGTSTP
 	    mch_signal(signal_info[i].sig,
 		    signal_info[i].sig == SIGTSTP && ignore_sigtstp
 						       ? SIG_IGN : func_other);
-#else
+#มิฉะนั้น
 	    mch_signal(signal_info[i].sig, func_other);
 #endif
 	}
@@ -1608,14 +1608,14 @@ catch_signals(
 block_signals(sigset_t *set)
 {
     sigset_t	newset;
-    int		i;
+    จำนวนเต็ม		i;
 
     sigemptyset(&newset);
 
-    for (i = 0; signal_info[i].sig != -1; i++)
+    สำหรับ (i = 0; signal_info[i].sig != -1; i++)
 	sigaddset(&newset, signal_info[i].sig);
 
-# if defined(SIGCONT)
+# ถ้า defined(SIGCONT)
     // SIGCONT isn't in the list, because its default action is ignore
     sigaddset(&newset, SIGCONT);
 # endif
@@ -1639,62 +1639,62 @@ unblock_signals(sigset_t *set)
  *			     signal
  * Returns TRUE when Vim should exit.
  */
-    int
-vim_handle_signal(int sig)
+    จำนวนเต็ม
+vim_handle_signal(จำนวนเต็ม sig)
 {
-    static int got_signal = 0;
-    static int blocked = TRUE;
+    static จำนวนเต็ม got_signal = 0;
+    static จำนวนเต็ม blocked = TRUE;
 
     switch (sig)
     {
-	case SIGNAL_BLOCK:   blocked = TRUE;
-			     break;
+	pak_sa SIGNAL_BLOCK:   blocked = TRUE;
+			     bha_nga;
 
-	case SIGNAL_UNBLOCK: blocked = FALSE;
-			     if (got_signal != 0)
+	pak_sa SIGNAL_UNBLOCK: blocked = FALSE;
+			     ถ้า (got_signal != 0)
 			     {
 				 kill(getpid(), got_signal);
 				 got_signal = 0;
 			     }
-			     break;
+			     bha_nga;
 
-	default:	     if (!blocked)
-				 return TRUE;	// exit!
+	default:	     ถ้า (!blocked)
+				 คืน TRUE;	// exit!
 			     got_signal = sig;
 #ifdef SIGPWR
-			     if (sig != SIGPWR)
+			     ถ้า (sig != SIGPWR)
 #endif
 				 got_int = TRUE;    // break any loops
-			     break;
+			     bha_nga;
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Check_win checks whether we have an interactive stdout.
  */
-    int
-mch_check_win(int argc UNUSED, char **argv UNUSED)
+    จำนวนเต็ม
+mch_check_win(จำนวนเต็ม argc UNUSED, var_na **argv UNUSED)
 {
-    if (isatty(1))
-	return OK;
-    return FAIL;
+    ถ้า (isatty(1))
+	คืน OK;
+    คืน FAIL;
 }
 
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
+    จำนวนเต็ม
 mch_input_isatty(void)
 {
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
+    ถ้า (isatty(read_cmd_fd))
+	คืน TRUE;
+    คืน FALSE;
 }
 
 #ifdef FEAT_X11
 
-# if defined(ELAPSED_TIMEVAL)
+# ถ้า defined(ELAPSED_TIMEVAL)
 
 /*
  * Give a message about the elapsed time for opening the X window.
@@ -1707,20 +1707,20 @@ xopen_message(long elapsed_msec)
 # endif
 #endif
 
-#if defined(FEAT_X11)
+#ถ้า defined(FEAT_X11)
 /*
  * A few functions shared by X11 title and clipboard code.
  */
 
-static int	got_x_error = FALSE;
+static จำนวนเต็ม	got_x_error = FALSE;
 
 /*
  * X Error handler, otherwise X just exits!  (very rude) -- webb
  */
-    static int
+    static จำนวนเต็ม
 x_error_handler(Display *dpy, XErrorEvent *error_event)
 {
-    XGetErrorText(dpy, error_event->error_code, (char *)IObuff, IOSIZE);
+    XGetErrorText(dpy, error_event->error_code, (var_na *)IObuff, IOSIZE);
     STRCAT(IObuff, _("\nVim: Got X error\n"));
 
     // In the GUI we cannot print a message and continue, because no X calls
@@ -1729,67 +1729,67 @@ x_error_handler(Display *dpy, XErrorEvent *error_event)
     ml_sync_all(FALSE, FALSE);
 
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    ถ้า (!gui.in_use)
 # endif
-	msg((char *)IObuff);
+	msg((var_na *)IObuff);
 
-    return 0;		// NOTREACHED
+    คืน 0;		// NOTREACHED
 }
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
+    static จำนวนเต็ม
 x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
 {
     got_x_error = TRUE;
-    return 0;
+    คืน 0;
 }
 
 /*
  * Return TRUE when connection to the X server is desired.
  */
-    static int
+    static จำนวนเต็ม
 x_connect_to_server(void)
 {
     // No point in connecting if we are exiting or dying.
-    if (exiting || v_dying)
-	return FALSE;
+    ถ้า (exiting || v_dying)
+	คืน FALSE;
 
-# if defined(FEAT_CLIENTSERVER)
-    if (x_force_connect)
-	return TRUE;
+# ถ้า defined(FEAT_CLIENTSERVER)
+    ถ้า (x_force_connect)
+	คืน TRUE;
 # endif
-    if (x_no_connect)
-	return FALSE;
+    ถ้า (x_no_connect)
+	คืน FALSE;
 
     // Check for a match with "exclude:" from 'clipboard'.
-    if (clip_exclude_prog != NULL)
+    ถ้า (clip_exclude_prog != NULL)
     {
 	// Just in case we get called recursively, return FALSE.  This could
 	// happen if vpeekc() is used while executing the prog and it causes a
 	// related callback to be invoked.
-	if (regprog_in_use(clip_exclude_prog))
-	    return FALSE;
+	ถ้า (regprog_in_use(clip_exclude_prog))
+	    คืน FALSE;
 
-	if (vim_regexec_prog(&clip_exclude_prog, FALSE, T_NAME, (colnr_T)0))
-	    return FALSE;
+	ถ้า (vim_regexec_prog(&clip_exclude_prog, FALSE, T_NAME, (colnr_T)0))
+	    คืน FALSE;
     }
-    return TRUE;
+    คืน TRUE;
 }
 
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-#  if defined(USING_SETJMP)
+# ถ้า defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+#  ถ้า defined(USING_SETJMP)
 /*
  * An X IO Error handler, used to catch error while opening the display.
  */
-    static int
+    static จำนวนเต็ม
 x_IOerror_check(Display *dpy UNUSED)
 {
     // This function should not return, it causes exit().  Longjump instead.
     LONGJMP(lc_jump_env, 1);
-#   if defined(VMS) || defined(__CYGWIN__)
-    return 0;  // avoid the compiler complains about missing return value
+#   ถ้า defined(VMS) || defined(__CYGWIN__)
+    คืน 0;  // avoid the compiler complains about missing return value
 #   endif
 }
 #  endif
@@ -1797,9 +1797,9 @@ x_IOerror_check(Display *dpy UNUSED)
 /*
  * An X IO Error handler, used to catch terminal errors.
  */
-static int xterm_dpy_retry_count = 0;
+static จำนวนเต็ม xterm_dpy_retry_count = 0;
 
-    static int
+    static จำนวนเต็ม
 x_IOerror_handler(Display *dpy UNUSED)
 {
     xterm_dpy = NULL;
@@ -1810,8 +1810,8 @@ x_IOerror_handler(Display *dpy UNUSED)
 
     // This function should not return, it causes exit().  Longjump instead.
     LONGJMP(x_jump_env, 1);
-#  if defined(VMS) || defined(__CYGWIN__)
-    return 0;  // avoid the compiler complains about missing return value
+#  ถ้า defined(VMS) || defined(__CYGWIN__)
+    คืน 0;  // avoid the compiler complains about missing return value
 #  endif
 }
 
@@ -1824,13 +1824,13 @@ x_IOerror_handler(Display *dpy UNUSED)
 may_restore_x11_clipboard(void)
 {
     // No point in restoring the connecting if we are exiting or dying.
-    if (!exiting && !v_dying && xterm_dpy_retry_count > 0)
+    ถ้า (!exiting && !v_dying && xterm_dpy_retry_count > 0)
     {
 	--xterm_dpy_retry_count;
 
 #  ifndef LESSTIF_VERSION
 	// This has been reported to avoid Vim getting stuck.
-	if (app_context != (XtAppContext)NULL)
+	ถ้า (app_context != (XtAppContext)NULL)
 	{
 	    XtDestroyApplicationContext(app_context);
 	    app_context = (XtAppContext)NULL;
@@ -1848,15 +1848,15 @@ ex_xrestore(exarg_T *eap)
 {
     size_t  arglen;
 
-    if (eap->arg != NULL && (arglen = STRLEN(eap->arg)) > 0)
+    ถ้า (eap->arg != NULL && (arglen = STRLEN(eap->arg)) > 0)
     {
-	if (xterm_display_allocated)
+	ถ้า (xterm_display_allocated)
 	    vim_free(xterm_display);
-	xterm_display = (char *)vim_strnsave(eap->arg, arglen);
+	xterm_display = (var_na *)vim_strnsave(eap->arg, arglen);
 	xterm_display_allocated = TRUE;
     }
     smsg(_("restoring X11 display %s"), xterm_display == NULL
-		    ? (char *)mch_getenv((char_u *)"DISPLAY") : xterm_display);
+		    ? (var_na *)mch_getenv((char_u *)"DISPLAY") : xterm_display);
 
     clear_xterm_clip();
     x11_window = 0;
@@ -1873,76 +1873,76 @@ ex_xrestore(exarg_T *eap)
  * is wrong, such as the window pointer being invalid (as can happen when the
  * user changes his DISPLAY, but not his WINDOWID) -- webb
  */
-    static int
+    static จำนวนเต็ม
 test_x11_window(Display *dpy)
 {
-    int			(*old_handler)(Display*, XErrorEvent*);
+    จำนวนเต็ม			(*old_handler)(Display*, XErrorEvent*);
     XTextProperty	text_prop;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    if (XGetWMName(dpy, x11_window, &text_prop))
+    ถ้า (XGetWMName(dpy, x11_window, &text_prop))
 	XFree((void *)text_prop.value);
     XSync(dpy, False);
     (void)XSetErrorHandler(old_handler);
 
-    if (p_verbose > 0 && got_x_error)
+    ถ้า (p_verbose > 0 && got_x_error)
 	verb_msg(_("Testing the X display failed"));
 
-    return (got_x_error ? FAIL : OK);
+    คืน (got_x_error ? FAIL : OK);
 }
 #endif
 
 
 #ifdef FEAT_X11
 
-static int get_x11_thing(int get_title, int test_only);
+static จำนวนเต็ม get_x11_thing(จำนวนเต็ม get_title, จำนวนเต็ม test_only);
 
 /*
  * try to get x11 window and display
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
+    static จำนวนเต็ม
 get_x11_windis(void)
 {
-    char	    *winid;
-    static int	    result = -1;
+    var_na	    *winid;
+    static จำนวนเต็ม	    result = -1;
 # define XD_NONE	 0	// x11_display not set here
 # define XD_HERE	 1	// x11_display opened here
 # define XD_GUI	 2	// x11_display used from gui.dpy
 # define XD_XTERM 3	// x11_display used from xterm_dpy
-    static int	    x11_display_from = XD_NONE;
-    static int	    did_set_error_handler = FALSE;
+    static จำนวนเต็ม	    x11_display_from = XD_NONE;
+    static จำนวนเต็ม	    did_set_error_handler = FALSE;
 
-    if (!did_set_error_handler)
+    ถ้า (!did_set_error_handler)
     {
 	// X just exits if it finds an error otherwise!
 	(void)XSetErrorHandler(x_error_handler);
 	did_set_error_handler = TRUE;
     }
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
-    if (gui.in_use)
+# ถ้า defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+    ถ้า (gui.in_use)
     {
 	/*
 	 * If the X11 display was opened here before, for the window where Vim
 	 * was started, close that one now to avoid a memory leak.
 	 */
-	if (x11_display_from == XD_HERE && x11_display != NULL)
+	ถ้า (x11_display_from == XD_HERE && x11_display != NULL)
 	{
 	    XCloseDisplay(x11_display);
 	    x11_display_from = XD_NONE;
 	}
-	if (gui_get_x11_windis(&x11_window, &x11_display) == OK)
+	ถ้า (gui_get_x11_windis(&x11_window, &x11_display) == OK)
 	{
 	    x11_display_from = XD_GUI;
-	    return OK;
+	    คืน OK;
 	}
 	x11_display = NULL;
-	return FAIL;
+	คืน FAIL;
     }
-    else if (x11_display_from == XD_GUI)
+    มิฉะนั้น ถ้า (x11_display_from == XD_GUI)
     {
 	// GUI must have stopped somehow, clear x11_display
 	x11_window = 0;
@@ -1952,8 +1952,8 @@ get_x11_windis(void)
 # endif
 
     // When started with the "-X" argument, don't try connecting.
-    if (!x_connect_to_server())
-	return FAIL;
+    ถ้า (!x_connect_to_server())
+	คืน FAIL;
 
     /*
      * If WINDOWID not set, should try another method to find out
@@ -1961,48 +1961,48 @@ get_x11_windis(void)
      * this is very complicated.
      * We assume that zero is invalid for WINDOWID.
      */
-    if (x11_window == 0 && (winid = getenv("WINDOWID")) != NULL)
+    ถ้า (x11_window == 0 && (winid = getenv("WINDOWID")) != NULL)
 	x11_window = (Window)atol(winid);
 
 # ifdef FEAT_XCLIPBOARD
-    if (xterm_dpy == x11_display)
+    ถ้า (xterm_dpy == x11_display)
 	// x11_display may have been set to xterm_dpy elsewhere
 	x11_display_from = XD_XTERM;
 
-    if (xterm_dpy != NULL && x11_window != 0)
+    ถ้า (xterm_dpy != NULL && x11_window != 0)
     {
 	// We may have checked it already, but Gnome terminal can move us to
 	// another window, so we need to check every time.
-	if (x11_display_from != XD_XTERM)
+	ถ้า (x11_display_from != XD_XTERM)
 	{
 	    /*
 	     * If the X11 display was opened here before, for the window where
 	     * Vim was started, close that one now to avoid a memory leak.
 	     */
-	    if (x11_display_from == XD_HERE && x11_display != NULL)
+	    ถ้า (x11_display_from == XD_HERE && x11_display != NULL)
 		XCloseDisplay(x11_display);
 	    x11_display = xterm_dpy;
 	    x11_display_from = XD_XTERM;
 	}
-	if (test_x11_window(x11_display) == FAIL)
+	ถ้า (test_x11_window(x11_display) == FAIL)
 	{
 	    // probably bad $WINDOWID
 	    x11_window = 0;
 	    x11_display = NULL;
 	    x11_display_from = XD_NONE;
-	    return FAIL;
+	    คืน FAIL;
 	}
-	return OK;
+	คืน OK;
     }
 # endif
 
-    if (x11_window == 0 || x11_display == NULL)
+    ถ้า (x11_window == 0 || x11_display == NULL)
 	result = -1;
 
-    if (result != -1)	    // Have already been here and set this
-	return result;	    // Don't do all these X calls again
+    ถ้า (result != -1)	    // Have already been here and set this
+	คืน result;	    // Don't do all these X calls again
 
-    if (x11_window != 0 && x11_display == NULL)
+    ถ้า (x11_window != 0 && x11_display == NULL)
     {
 # ifdef SET_SIG_ALARM
 	sighandler_T sig_save;
@@ -2010,7 +2010,7 @@ get_x11_windis(void)
 # ifdef ELAPSED_FUNC
 	elapsed_T start_tv;
 
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	    ELAPSED_INIT(start_tv);
 # endif
 
@@ -2028,87 +2028,87 @@ get_x11_windis(void)
 # ifdef SET_SIG_ALARM
 	alarm(0);
 	mch_signal(SIGALRM, sig_save);
-	if (p_verbose > 0 && sig_alarm_called)
+	ถ้า (p_verbose > 0 && sig_alarm_called)
 	    verb_msg(_("Opening the X display timed out"));
 # endif
-	if (x11_display != NULL)
+	ถ้า (x11_display != NULL)
 	{
 # ifdef ELAPSED_FUNC
-	    if (p_verbose > 0)
+	    ถ้า (p_verbose > 0)
 	    {
 		verbose_enter();
 		xopen_message(ELAPSED_FUNC(start_tv));
 		verbose_leave();
 	    }
 # endif
-	    if (test_x11_window(x11_display) == FAIL)
+	    ถ้า (test_x11_window(x11_display) == FAIL)
 	    {
 		// Maybe window id is bad
 		x11_window = 0;
 		XCloseDisplay(x11_display);
 		x11_display = NULL;
 	    }
-	    else
+	    มิฉะนั้น
 		x11_display_from = XD_HERE;
 	}
     }
-    if (x11_window == 0 || x11_display == NULL)
-	return (result = FAIL);
+    ถ้า (x11_window == 0 || x11_display == NULL)
+	คืน (result = FAIL);
 
 # ifdef FEAT_EVAL
     set_vim_var_nr(VV_WINDOWID, (long)x11_window);
 # endif
 
-    return (result = OK);
+    คืน (result = OK);
 }
 
 /*
  * Determine original x11 Window Title
  */
-    static int
-get_x11_title(int test_only)
+    static จำนวนเต็ม
+get_x11_title(จำนวนเต็ม test_only)
 {
-    return get_x11_thing(TRUE, test_only);
+    คืน get_x11_thing(TRUE, test_only);
 }
 
 /*
  * Determine original x11 Window icon
  */
-    static int
-get_x11_icon(int test_only)
+    static จำนวนเต็ม
+get_x11_icon(จำนวนเต็ม test_only)
 {
-    int		retval = FALSE;
+    จำนวนเต็ม		retval = FALSE;
 
     retval = get_x11_thing(FALSE, test_only);
 
     // could not get old icon, use terminal name
-    if (oldicon == NULL && !test_only)
+    ถ้า (oldicon == NULL && !test_only)
     {
-	if (STRNCMP(T_NAME, "builtin_", 8) == 0)
+	ถ้า (STRNCMP(T_NAME, "builtin_", 8) == 0)
 	    oldicon = vim_strsave(T_NAME + 8);
-	else
+	มิฉะนั้น
 	    oldicon = vim_strsave(T_NAME);
     }
 
-    return retval;
+    คืน retval;
 }
 
-    static int
+    static จำนวนเต็ม
 get_x11_thing(
-    int		get_title,	// get title string
-    int		test_only)
+    จำนวนเต็ม		get_title,	// get title string
+    จำนวนเต็ม		test_only)
 {
     XTextProperty	text_prop;
-    int			retval = FALSE;
+    จำนวนเต็ม			retval = FALSE;
     Status		status;
 
-    if (get_x11_windis() != OK)
-	return FALSE;
+    ถ้า (get_x11_windis() != OK)
+	คืน FALSE;
 
     // Get window/icon name if any
-    if (get_title)
+    ถ้า (get_title)
 	status = XGetWMName(x11_display, x11_window, &text_prop);
-    else
+    มิฉะนั้น
 	status = XGetWMIconName(x11_display, x11_window, &text_prop);
 
     /*
@@ -2124,78 +2124,78 @@ get_x11_thing(
     Window	    parent;
     Window	    win = x11_window;
     Window	   *children;
-    unsigned int    num_children;
+    unsigned จำนวนเต็ม    num_children;
 
-    while (!status || text_prop.value == NULL)
+    ขณะ (!status || text_prop.value == NULL)
     {
-	if (!XQueryTree(x11_display, win, &root, &parent, &children,
+	ถ้า (!XQueryTree(x11_display, win, &root, &parent, &children,
 		    &num_children))
-	    break;
-	if (children)
+	    bha_nga;
+	ถ้า (children)
 	    XFree((void *)children);
-	if (parent == root || parent == 0)
-	    break;
+	ถ้า (parent == root || parent == 0)
+	    bha_nga;
 
 	win = parent;
-	if (get_title)
+	ถ้า (get_title)
 	    status = XGetWMName(x11_display, win, &text_prop);
-	else
+	มิฉะนั้น
 	    status = XGetWMIconName(x11_display, win, &text_prop);
     }
 
-    if (status && text_prop.value != NULL)
+    ถ้า (status && text_prop.value != NULL)
     {
 	retval = TRUE;
-	if (!test_only)
+	ถ้า (!test_only)
 	{
-	    if (get_title)
+	    ถ้า (get_title)
 		vim_free(oldtitle);
-	    else
+	    มิฉะนั้น
 		vim_free(oldicon);
-	    if (text_prop.encoding == XA_STRING && !has_mbyte)
+	    ถ้า (text_prop.encoding == XA_STRING && !has_mbyte)
 	    {
-		if (get_title)
+		ถ้า (get_title)
 		    oldtitle = vim_strsave((char_u *)text_prop.value);
-		else
+		มิฉะนั้น
 		    oldicon = vim_strsave((char_u *)text_prop.value);
 	    }
-	    else
+	    มิฉะนั้น
 	    {
-		char    **cl;
+		var_na    **cl;
 		Status  transform_status;
-		int	    n = 0;
+		จำนวนเต็ม	    n = 0;
 
 		transform_status = XmbTextPropertyToTextList(x11_display,
 			&text_prop,
 			&cl, &n);
-		if (transform_status >= Success && n > 0 && cl[0])
+		ถ้า (transform_status >= Success && n > 0 && cl[0])
 		{
-		    if (get_title)
+		    ถ้า (get_title)
 			oldtitle = vim_strsave((char_u *) cl[0]);
-		    else
+		    มิฉะนั้น
 			oldicon = vim_strsave((char_u *) cl[0]);
 		    XFreeStringList(cl);
 		}
-		else
+		มิฉะนั้น
 		{
-		    if (get_title)
+		    ถ้า (get_title)
 			oldtitle = vim_strsave((char_u *)text_prop.value);
-		    else
+		    มิฉะนั้น
 			oldicon = vim_strsave((char_u *)text_prop.value);
 		}
 	    }
 	}
 	XFree((void *)text_prop.value);
     }
-    return retval;
+    คืน retval;
 }
 
 // Xutf8 functions are not available on older systems. Note that on some
 // systems X_HAVE_UTF8_STRING may be defined in a header file but
 // Xutf8SetWMProperties() is not in the X11 library.  Configure checks for
 // that and defines HAVE_XUTF8SETWMPROPERTIES.
-# if defined(X_HAVE_UTF8_STRING)
-#  if X_HAVE_UTF8_STRING && HAVE_XUTF8SETWMPROPERTIES
+# ถ้า defined(X_HAVE_UTF8_STRING)
+#  ถ้า X_HAVE_UTF8_STRING && HAVE_XUTF8SETWMPROPERTIES
 #   define USE_UTF8_STRING
 #  endif
 # endif
@@ -2212,27 +2212,27 @@ set_x11_title(char_u *title)
 	// when possible, COMPOUND_TEXT otherwise.  COMPOUND_TEXT isn't
 	// supported everywhere and STRING doesn't work for multi-byte titles.
 # ifdef USE_UTF8_STRING
-    if (enc_utf8)
-	Xutf8SetWMProperties(x11_display, x11_window, (const char *)title,
+    ถ้า (enc_utf8)
+	Xutf8SetWMProperties(x11_display, x11_window, (const var_na *)title,
 					     NULL, NULL, 0, NULL, NULL, NULL);
-    else
+    มิฉะนั้น
 # endif
     {
-# if XtSpecificationRelease >= 4
+# ถ้า XtSpecificationRelease >= 4
 #  ifdef FEAT_XFONTSET
-	XmbSetWMProperties(x11_display, x11_window, (const char *)title,
+	XmbSetWMProperties(x11_display, x11_window, (const var_na *)title,
 					     NULL, NULL, 0, NULL, NULL, NULL);
-#  else
+#  มิฉะนั้น
 	XTextProperty	text_prop;
-	char		*c_title = (char *)title;
+	var_na		*c_title = (var_na *)title;
 
 	// directly from example 3-18 "basicwin" of Xlib Programming Manual
 	(void)XStringListToTextProperty(&c_title, 1, &text_prop);
 	XSetWMProperties(x11_display, x11_window, &text_prop,
 					     NULL, NULL, 0, NULL, NULL, NULL);
 #  endif
-# else
-	XStoreName(x11_display, x11_window, (char *)title);
+# มิฉะนั้น
+	XStoreName(x11_display, x11_window, (var_na *)title);
 # endif
     }
     XFlush(x11_display);
@@ -2248,64 +2248,64 @@ set_x11_icon(char_u *icon)
 {
     // See above for comments about using X*SetWMProperties().
 # ifdef USE_UTF8_STRING
-    if (enc_utf8)
-	Xutf8SetWMProperties(x11_display, x11_window, NULL, (const char *)icon,
+    ถ้า (enc_utf8)
+	Xutf8SetWMProperties(x11_display, x11_window, NULL, (const var_na *)icon,
 						   NULL, 0, NULL, NULL, NULL);
-    else
+    มิฉะนั้น
 # endif
     {
-# if XtSpecificationRelease >= 4
+# ถ้า XtSpecificationRelease >= 4
 #  ifdef FEAT_XFONTSET
-	XmbSetWMProperties(x11_display, x11_window, NULL, (const char *)icon,
+	XmbSetWMProperties(x11_display, x11_window, NULL, (const var_na *)icon,
 						   NULL, 0, NULL, NULL, NULL);
-#  else
+#  มิฉะนั้น
 	XTextProperty	text_prop;
-	char		*c_icon = (char *)icon;
+	var_na		*c_icon = (var_na *)icon;
 
 	(void)XStringListToTextProperty(&c_icon, 1, &text_prop);
 	XSetWMProperties(x11_display, x11_window, NULL, &text_prop,
 						   NULL, 0, NULL, NULL, NULL);
 #  endif
-# else
-	XSetIconName(x11_display, x11_window, (char *)icon);
+# มิฉะนั้น
+	XSetIconName(x11_display, x11_window, (var_na *)icon);
 # endif
     }
     XFlush(x11_display);
 }
 
-#else  // FEAT_X11
+#มิฉะนั้น  // FEAT_X11
 
-    static int
-get_x11_title(int test_only UNUSED)
+    static จำนวนเต็ม
+get_x11_title(จำนวนเต็ม test_only UNUSED)
 {
-    return FALSE;
+    คืน FALSE;
 }
 
-    static int
-get_x11_icon(int test_only)
+    static จำนวนเต็ม
+get_x11_icon(จำนวนเต็ม test_only)
 {
-    if (!test_only)
+    ถ้า (!test_only)
     {
-	if (STRNCMP(T_NAME, "builtin_", 8) == 0)
+	ถ้า (STRNCMP(T_NAME, "builtin_", 8) == 0)
 	    oldicon = vim_strsave(T_NAME + 8);
-	else
+	มิฉะนั้น
 	    oldicon = vim_strsave(T_NAME);
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 #endif // FEAT_X11
 
-    int
+    จำนวนเต็ม
 mch_can_restore_title(void)
 {
-    return get_x11_title(TRUE);
+    คืน get_x11_title(TRUE);
 }
 
-    int
+    จำนวนเต็ม
 mch_can_restore_icon(void)
 {
-    return get_x11_icon(TRUE);
+    คืน get_x11_icon(TRUE);
 }
 
 /*
@@ -2314,30 +2314,30 @@ mch_can_restore_icon(void)
     void
 mch_settitle(char_u *title, char_u *icon)
 {
-    int		type = 0;
-    static int	recursive = 0;
+    จำนวนเต็ม		type = 0;
+    static จำนวนเต็ม	recursive = 0;
 
-    if (T_NAME == NULL)	    // no terminal name (yet)
-	return;
-    if (title == NULL && icon == NULL)	    // nothing to do
-	return;
+    ถ้า (T_NAME == NULL)	    // no terminal name (yet)
+	คืน;
+    ถ้า (title == NULL && icon == NULL)	    // nothing to do
+	คืน;
 
     // When one of the X11 functions causes a deadly signal, we get here again
     // recursively.  Avoid hanging then (something is probably locked).
-    if (recursive)
-	return;
+    ถ้า (recursive)
+	คืน;
     ++recursive;
 
     /*
      * if the window ID and the display is known, we may use X11 calls
      */
 #ifdef FEAT_X11
-    if (get_x11_windis() == OK)
+    ถ้า (get_x11_windis() == OK)
 	type = 1;
 #endif
-#if defined(FEAT_GUI_PHOTON) \
+#ถ้า defined(FEAT_GUI_PHOTON) \
     || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU)
-    if (gui.in_use)
+    ถ้า (gui.in_use)
 	type = 1;
 #endif
 
@@ -2345,47 +2345,47 @@ mch_settitle(char_u *title, char_u *icon)
      * Note: if "t_ts" is set, title is set with escape sequence rather
      *	     than x11 calls, because the x11 calls don't always work
      */
-    if ((type || *T_TS != NUL) && title != NULL)
+    ถ้า ((type || *T_TS != NUL) && title != NULL)
     {
-	if (oldtitle_outdated)
+	ถ้า (oldtitle_outdated)
 	{
 	    oldtitle_outdated = FALSE;
 	    VIM_CLEAR(oldtitle);
 	}
-	if (oldtitle == NULL
+	ถ้า (oldtitle == NULL
 #ifdef FEAT_GUI
 		&& !gui.in_use
 #endif
 		)		// first call but not in GUI, save title
 	    (void)get_x11_title(FALSE);
 
-	if (*T_TS != NUL)		// it's OK if t_fs is empty
+	ถ้า (*T_TS != NUL)		// it's OK if t_fs is empty
 	    term_settitle(title);
 #ifdef FEAT_X11
-	else
+	มิฉะนั้น
 # ifdef FEAT_GUI_GTK
-	if (!gui.in_use)		// don't do this if GTK+ is running
+	ถ้า (!gui.in_use)		// don't do this if GTK+ is running
 # endif
 	    set_x11_title(title);		// x11
 #endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) \
+#ถ้า defined(FEAT_GUI_GTK) || defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_GUI_PHOTON)
-	else
+	มิฉะนั้น
 	    gui_mch_settitle(title, icon);
 #endif
 	unix_did_set_title = TRUE;
     }
 
-    if ((type || *T_CIS != NUL) && icon != NULL)
+    ถ้า ((type || *T_CIS != NUL) && icon != NULL)
     {
-	if (oldicon == NULL
+	ถ้า (oldicon == NULL
 #ifdef FEAT_GUI
 		&& !gui.in_use
 #endif
 		)		// first call, save icon
 	    get_x11_icon(FALSE);
 
-	if (*T_CIS != NUL)
+	ถ้า (*T_CIS != NUL)
 	{
 	    out_str(T_CIS);			// set icon start
 	    out_str_nf(icon);
@@ -2393,9 +2393,9 @@ mch_settitle(char_u *title, char_u *icon)
 	    out_flush();
 	}
 #ifdef FEAT_X11
-	else
+	มิฉะนั้น
 # ifdef FEAT_GUI_GTK
-	if (!gui.in_use)		// don't do this if GTK+ is running
+	ถ้า (!gui.in_use)		// don't do this if GTK+ is running
 # endif
 	    set_x11_icon(icon);			// x11
 #endif
@@ -2412,26 +2412,26 @@ mch_settitle(char_u *title, char_u *icon)
  *  SAVE_RESTORE_BOTH  restore title and icon
  */
     void
-mch_restore_title(int which)
+mch_restore_title(จำนวนเต็ม which)
 {
-    int	do_push_pop = unix_did_set_title || did_set_icon;
+    จำนวนเต็ม	do_push_pop = unix_did_set_title || did_set_icon;
 
     // Only restore the title or icon when it has been set.
     // When using "oldtitle" make a copy, it might be freed halfway.
     char_u *title = ((which & SAVE_RESTORE_TITLE) && unix_did_set_title)
 			? (oldtitle ? oldtitle : p_titleold) : NULL;
     char_u *tofree = NULL;
-    if (title == oldtitle && oldtitle != NULL)
+    ถ้า (title == oldtitle && oldtitle != NULL)
     {
 	tofree = vim_strsave(title);
-	if (tofree != NULL)
+	ถ้า (tofree != NULL)
 	    title = tofree;
     }
     mch_settitle(title,
 	       ((which & SAVE_RESTORE_ICON) && did_set_icon) ? oldicon : NULL);
     vim_free(tofree);
 
-    if (do_push_pop)
+    ถ้า (do_push_pop)
     {
 	// pop and push from/to the stack
 	term_pop_title(which);
@@ -2447,12 +2447,12 @@ mch_restore_title(int which)
  * using the "xterm-kitty" terminfo entry should work better.
  * Seiichi Sato mentioned that "mlterm" works like xterm.
  */
-    int
+    จำนวนเต็ม
 vim_is_xterm(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
-    return ((STRNICMP(name, "xterm", 5) == 0
+    ถ้า (name == NULL)
+	คืน FALSE;
+    คืน ((STRNICMP(name, "xterm", 5) == 0
 				     && STRNICMP(name, "xterm-kitty", 11) != 0)
 		|| STRNICMP(name, "nxterm", 6) == 0
 		|| STRNICMP(name, "kterm", 5) == 0
@@ -2462,16 +2462,16 @@ vim_is_xterm(char_u *name)
 		|| STRCMP(name, "builtin_xterm") == 0);
 }
 
-#if defined(FEAT_MOUSE_XTERM)
+#ถ้า defined(FEAT_MOUSE_XTERM)
 /*
  * Return TRUE if "name" appears to be that of a terminal
  * known to support the xterm-style mouse protocol.
  * Relies on term_is_xterm having been set to its correct value.
  */
-    int
+    จำนวนเต็ม
 use_xterm_like_mouse(char_u *name)
 {
-    return (name != NULL
+    คืน (name != NULL
 	    && (term_is_xterm
 		|| STRNICMP(name, "screen", 6) == 0
 		|| STRNICMP(name, "tmux", 4) == 0
@@ -2489,44 +2489,44 @@ use_xterm_like_mouse(char_u *name)
  * Return 3 for "urxvt".
  * Return 4 for "sgr".
  */
-    int
+    จำนวนเต็ม
 use_xterm_mouse(void)
 {
-    if (ttym_flags == TTYM_SGR)
-	return 4;
-    if (ttym_flags == TTYM_URXVT)
-	return 3;
-    if (ttym_flags == TTYM_XTERM2)
-	return 2;
-    if (ttym_flags == TTYM_XTERM)
-	return 1;
-    return 0;
+    ถ้า (ttym_flags == TTYM_SGR)
+	คืน 4;
+    ถ้า (ttym_flags == TTYM_URXVT)
+	คืน 3;
+    ถ้า (ttym_flags == TTYM_XTERM2)
+	คืน 2;
+    ถ้า (ttym_flags == TTYM_XTERM)
+	คืน 1;
+    คืน 0;
 }
 
 /*
  * Return TRUE if "name" is an iris-ansi terminal name.
  */
-    int
+    จำนวนเต็ม
 vim_is_iris(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
-    return (STRNICMP(name, "iris-ansi", 9) == 0
+    ถ้า (name == NULL)
+	คืน FALSE;
+    คืน (STRNICMP(name, "iris-ansi", 9) == 0
 	    || STRCMP(name, "builtin_iris-ansi") == 0);
 }
 
-#if defined(VMS)
+#ถ้า defined(VMS)
 /*
  * Return TRUE if "name" is a vt300-like terminal name.
  */
-    int
+    จำนวนเต็ม
 vim_is_vt300(char_u *name)
 {
-    if (name == NULL)
-	return FALSE;
+    ถ้า (name == NULL)
+	คืน FALSE;
     // Actually all ANSI compatible terminals should be here.
     // Catch at least VT1xx - VT5xx
-    return ((STRNICMP(name, "vt", 2) == 0
+    คืน ((STRNICMP(name, "vt", 2) == 0
 			     && vim_strchr((char_u *)"12345", name[2]) != NULL)
 	    || STRCMP(name, "builtin_vt320") == 0);
 }
@@ -2536,14 +2536,14 @@ vim_is_vt300(char_u *name)
  * Insert user name in s[len].
  * Return OK if a name found.
  */
-    int
-mch_get_user_name(char_u *s, int len)
+    จำนวนเต็ม
+mch_get_user_name(char_u *s, จำนวนเต็ม len)
 {
 #ifdef VMS
     vim_strncpy(s, (char_u *)cuserid(NULL), len - 1);
-    return OK;
-#else
-    return mch_get_uname(getuid(), s, len);
+    คืน OK;
+#มิฉะนั้น
+    คืน mch_get_uname(getuid(), s, len);
 #endif
 }
 
@@ -2551,21 +2551,21 @@ mch_get_user_name(char_u *s, int len)
  * Insert user name for "uid" in s[len].
  * Return OK if a name found.
  */
-    int
-mch_get_uname(uid_t uid, char_u *s, int len)
+    จำนวนเต็ม
+mch_get_uname(uid_t uid, char_u *s, จำนวนเต็ม len)
 {
-#if defined(HAVE_PWD_H) && defined(HAVE_GETPWUID)
-    struct passwd   *pw;
+#ถ้า defined(HAVE_PWD_H) && defined(HAVE_GETPWUID)
+    sa_nracanaa passwd   *pw;
 
-    if ((pw = getpwuid(uid)) != NULL
+    ถ้า ((pw = getpwuid(uid)) != NULL
 	    && pw->pw_name != NULL && *(pw->pw_name) != NUL)
     {
 	vim_strncpy(s, (char_u *)pw->pw_name, len - 1);
-	return OK;
+	คืน OK;
     }
 #endif
-    sprintf((char *)s, "%d", (int)uid);	    // assumes s is long enough
-    return FAIL;			    // a number is not a name
+    sprintf((var_na *)s, "%d", (จำนวนเต็ม)uid);	    // assumes s is long enough
+    คืน FAIL;			    // a number is not a name
 }
 
 /*
@@ -2574,28 +2574,28 @@ mch_get_uname(uid_t uid, char_u *s, int len)
 
 #ifdef HAVE_SYS_UTSNAME_H
     void
-mch_get_host_name(char_u *s, int len)
+mch_get_host_name(char_u *s, จำนวนเต็ม len)
 {
-    struct utsname vutsname;
+    sa_nracanaa utsname vutsname;
 
-    if (uname(&vutsname) < 0)
+    ถ้า (uname(&vutsname) < 0)
 	*s = NUL;
-    else
+    มิฉะนั้น
 	vim_strncpy(s, (char_u *)vutsname.nodename, len - 1);
 }
-#else // HAVE_SYS_UTSNAME_H
+#มิฉะนั้น // HAVE_SYS_UTSNAME_H
 
 # ifdef HAVE_SYS_SYSTEMINFO_H
 #  define gethostname(nam, len) sysinfo(SI_HOSTNAME, nam, len)
 # endif
 
     void
-mch_get_host_name(char_u *s, int len)
+mch_get_host_name(char_u *s, จำนวนเต็ม len)
 {
 # ifdef VAXC
-    vaxc$gethostname((char *)s, len);
-# else
-    gethostname((char *)s, len);
+    vaxc$gethostname((var_na *)s, len);
+# มิฉะนั้น
+    gethostname((var_na *)s, len);
 # endif
     s[len - 1] = NUL;	// make sure it's terminated
 }
@@ -2607,40 +2607,40 @@ mch_get_host_name(char_u *s, int len)
     long
 mch_get_pid(void)
 {
-    return (long)getpid();
+    คืน (long)getpid();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
+    จำนวนเต็ม
 mch_process_running(long pid)
 {
     // If there is no error the process must be running.
-    if (kill(pid, 0) == 0)
-	return TRUE;
+    ถ้า (kill(pid, 0) == 0)
+	คืน TRUE;
 #ifdef ESRCH
     // If the error is ESRCH then the process is not running.
-    if (errno == ESRCH)
-	return FALSE;
+    ถ้า (errno == ESRCH)
+	คืน FALSE;
 #endif
     // If the process is running and owned by another user we get EPERM.  With
     // other errors the process might be running, assuming it is then.
-    return TRUE;
+    คืน TRUE;
 }
 
-#if !defined(HAVE_STRERROR) && defined(USE_GETCWD)
-    static char *
-strerror(int err)
+#ถ้า !defined(HAVE_STRERROR) && defined(USE_GETCWD)
+    static var_na *
+strerror(จำนวนเต็ม err)
 {
-    extern int	    sys_nerr;
-    extern char	    *sys_errlist[];
-    static char	    er[20];
+    extern จำนวนเต็ม	    sys_nerr;
+    extern var_na	    *sys_errlist[];
+    static var_na	    er[20];
 
-    if (err > 0 && err < sys_nerr)
-	return (sys_errlist[err]);
-    snprintf(er, sizeof(er), "Error %d", err);
-    return er;
+    ถ้า (err > 0 && err < sys_nerr)
+	คืน (sys_errlist[err]);
+    snprintf(er, parimaa_na(er), "Error %d", err);
+    คืน er;
 }
 #endif
 
@@ -2649,18 +2649,18 @@ strerror(int err)
  * "len" must be at least PATH_MAX.
  * Return OK for success, FAIL for failure.
  */
-    int
-mch_dirname(char_u *buf, int len)
+    จำนวนเต็ม
+mch_dirname(char_u *buf, จำนวนเต็ม len)
 {
-#if defined(USE_GETCWD)
-    if (getcwd((char *)buf, len) == NULL)
+#ถ้า defined(USE_GETCWD)
+    ถ้า (getcwd((var_na *)buf, len) == NULL)
     {
 	STRCPY(buf, strerror(errno));
-	return FAIL;
+	คืน FAIL;
     }
-    return OK;
-#else
-    return (getwd((char *)buf) != NULL ? OK : FAIL);
+    คืน OK;
+#มิฉะนั้น
+    คืน (getwd((var_na *)buf) != NULL ? OK : FAIL);
 #endif
 }
 
@@ -2669,21 +2669,21 @@ mch_dirname(char_u *buf, int len)
  *
  * return FAIL for failure, OK for success
  */
-    int
+    จำนวนเต็ม
 mch_FullName(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)		// also expand when already absolute path
+    จำนวนเต็ม		len,
+    จำนวนเต็ม		force)		// also expand when already absolute path
 {
-    int		buflen = 0;
+    จำนวนเต็ม		buflen = 0;
 #ifdef HAVE_FCHDIR
-    int		fd = -1;
-    static int	dont_fchdir = FALSE;	// TRUE when fchdir() doesn't work
+    จำนวนเต็ม		fd = -1;
+    static จำนวนเต็ม	dont_fchdir = FALSE;	// TRUE when fchdir() doesn't work
 #endif
     char_u	olddir[MAXPATHL];
     char_u	*p;
-    int		retval = OK;
+    จำนวนเต็ม		retval = OK;
 #ifdef __CYGWIN__
     char_u	posix_fname[MAXPATHL];	// Cygwin docs mention MAX_PATH, but
 					// it's not always defined
@@ -2697,12 +2697,12 @@ mch_FullName(
     /*
      * This helps for when "/etc/hosts" is a symlink to "c:/something/hosts".
      */
-# if CYGWIN_VERSION_DLL_MAJOR >= 1007
+# ถ้า CYGWIN_VERSION_DLL_MAJOR >= 1007
     // Use CCP_RELATIVE to avoid that it sometimes returns a path that ends in
     // a forward slash.
     cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE,
 		     fname, posix_fname, MAXPATHL);
-# else
+# มิฉะนั้น
     cygwin_conv_to_posix_path(fname, posix_fname);
 # endif
     fname = posix_fname;
@@ -2710,10 +2710,10 @@ mch_FullName(
 
     // Expand it if forced or not an absolute path.
     // Do not do it for "/file", the result is always "/".
-    if ((force || !mch_isFullName(fname))
+    ถ้า ((force || !mch_isFullName(fname))
 	    && ((p = vim_strrchr(fname, '/')) == NULL || p != fname))
     {
-	if (p == NULL && STRCMP(fname, "..") == 0)
+	ถ้า (p == NULL && STRCMP(fname, "..") == 0)
 	    // Handle ".." without path separators.
 	    p = fname + 2;
 	/*
@@ -2721,9 +2721,9 @@ mch_FullName(
 	 * and then get the directory (and get back to where we were).
 	 * This will get the correct path name with "../" things.
 	 */
-	if (p != NULL)
+	ถ้า (p != NULL)
 	{
-	    if (STRCMP(p, "/..") == 0)
+	    ถ้า (STRCMP(p, "/..") == 0)
 		// For "/path/dir/.." include the "/..".
 		p += 3;
 
@@ -2733,10 +2733,10 @@ mch_FullName(
 	     * reliable.  But on SunOS 4 it might not work.  Check this by
 	     * doing a fchdir() right now.
 	     */
-	    if (!dont_fchdir)
+	    ถ้า (!dont_fchdir)
 	    {
 		fd = open(".", O_RDONLY | O_EXTRA, 0);
-		if (fd >= 0 && fchdir(fd) < 0)
+		ถ้า (fd >= 0 && fchdir(fd) < 0)
 		{
 		    close(fd);
 		    fd = -1;
@@ -2747,57 +2747,57 @@ mch_FullName(
 
 	    // Only change directory when we are sure we can return to where
 	    // we are now.  After doing "su" chdir(".") might not work.
-	    if (
+	    ถ้า (
 #ifdef HAVE_FCHDIR
 		fd < 0 &&
 #endif
 			(mch_dirname(olddir, MAXPATHL) == FAIL
-					   || mch_chdir((char *)olddir) != 0))
+					   || mch_chdir((var_na *)olddir) != 0))
 	    {
 		p = NULL;	// can't get current dir: don't chdir
 		retval = FAIL;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		// The directory is copied into buf[], to be able to remove
 		// the file name without changing it (could be a string in
 		// read-only memory)
-		if (p - fname >= len)
+		ถ้า (p - fname >= len)
 		    retval = FAIL;
-		else
+		มิฉะนั้น
 		{
 		    vim_strncpy(buf, fname, p - fname);
-		    if (mch_chdir((char *)buf))
+		    ถ้า (mch_chdir((var_na *)buf))
 		    {
 			// Path does not exist (yet).  For a full path fail,
 			// will use the path as-is.  For a relative path use
 			// the current directory and append the file name.
-			if (mch_isFullName(fname))
+			ถ้า (mch_isFullName(fname))
 			    retval = FAIL;
-			else
+			มิฉะนั้น
 			    p = NULL;
 		    }
-		    else if (*p == '/')
+		    มิฉะนั้น ถ้า (*p == '/')
 			fname = p + 1;
-		    else
+		    มิฉะนั้น
 			fname = p;
 		    *buf = NUL;
 		}
 	    }
 	}
-	if (mch_dirname(buf, len) == FAIL)
+	ถ้า (mch_dirname(buf, len) == FAIL)
 	{
 	    retval = FAIL;
 	    *buf = NUL;
 	}
-	if (p != NULL)
+	ถ้า (p != NULL)
 	{
-	    int	l;
+	    จำนวนเต็ม	l;
 
 #ifdef HAVE_FCHDIR
-	    if (fd >= 0)
+	    ถ้า (fd >= 0)
 	    {
-		if (p_verbose >= 5)
+		ถ้า (p_verbose >= 5)
 		{
 		    verbose_enter();
 		    msg("fchdir() to previous dir");
@@ -2805,61 +2805,61 @@ mch_FullName(
 		}
 		l = fchdir(fd);
 	    }
-	    else
+	    มิฉะนั้น
 #endif
-		l = mch_chdir((char *)olddir);
-	    if (l != 0)
+		l = mch_chdir((var_na *)olddir);
+	    ถ้า (l != 0)
 		emsg(_(e_cannot_go_back_to_previous_directory));
 	}
 #ifdef HAVE_FCHDIR
-	if (fd >= 0)
+	ถ้า (fd >= 0)
 	    close(fd);
 #endif
 
-	buflen = (int)STRLEN(buf);
-	if (buflen >= len - 1)
+	buflen = (จำนวนเต็ม)STRLEN(buf);
+	ถ้า (buflen >= len - 1)
 	    retval = FAIL; // no space for trailing "/"
 #ifndef VMS
-	else if (buflen > 0 && buf[buflen - 1] != PATHSEP && *fname != NUL
+	มิฉะนั้น ถ้า (buflen > 0 && buf[buflen - 1] != PATHSEP && *fname != NUL
 						   && STRCMP(fname, ".") != 0)
 	{
 	    STRCPY(buf + buflen, PATHSEPSTR);
-	    buflen += sizeof(PATHSEP);
+	    buflen += parimaa_na(PATHSEP);
 	}
 #endif
     }
 
-    if (buflen == 0)
-	buflen = (int)STRLEN(buf);
+    ถ้า (buflen == 0)
+	buflen = (จำนวนเต็ม)STRLEN(buf);
 
     // Catch file names which are too long.
-    if (retval == FAIL || (int)(buflen + STRLEN(fname)) >= len)
-	return FAIL;
+    ถ้า (retval == FAIL || (จำนวนเต็ม)(buflen + STRLEN(fname)) >= len)
+	คืน FAIL;
 
     // Do not append ".", "/dir/." is equal to "/dir".
-    if (STRCMP(fname, ".") != 0)
+    ถ้า (STRCMP(fname, ".") != 0)
 	STRCPY(buf + buflen, fname);
 
-    return OK;
+    คืน OK;
 }
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
+    จำนวนเต็ม
 mch_isFullName(char_u *fname)
 {
 #ifdef VMS
-    return ( fname[0] == '/'	       || fname[0] == '.'	    ||
-	     strchr((char *)fname,':') || strchr((char *)fname,'"') ||
-	    (strchr((char *)fname,'[') && strchr((char *)fname,']'))||
-	    (strchr((char *)fname,'<') && strchr((char *)fname,'>'))   );
-#else
-    return (*fname == '/' || *fname == '~');
+    คืน ( fname[0] == '/'	       || fname[0] == '.'	    ||
+	     strchr((var_na *)fname,':') || strchr((var_na *)fname,'"') ||
+	    (strchr((var_na *)fname,'[') && strchr((var_na *)fname,']'))||
+	    (strchr((var_na *)fname,'<') && strchr((var_na *)fname,'>'))   );
+#มิฉะนั้น
+    คืน (*fname == '/' || *fname == '~');
 #endif
 }
 
-#if defined(USE_FNAME_CASE)
+#ถ้า defined(USE_FNAME_CASE)
 /*
  * Set the case of the file name, if it already exists.  This will cause the
  * file name to remain exactly the same.
@@ -2868,56 +2868,56 @@ mch_isFullName(char_u *fname)
     void
 fname_case(
     char_u	*name,
-    int		len UNUSED)  // buffer size, only used when name gets longer
+    จำนวนเต็ม		len UNUSED)  // buffer size, only used when name gets longer
 {
-    struct stat st;
+    sa_nracanaa stat st;
     char_u	*slash, *tail;
     size_t	taillen;
     DIR		*dirp;
-    struct dirent *dp;
+    sa_nracanaa dirent *dp;
 
-    if (mch_lstat((char *)name, &st) < 0)
-	return;
+    ถ้า (mch_lstat((var_na *)name, &st) < 0)
+	คืน;
 
     // Open the directory where the file is located.
     slash = vim_strrchr(name, '/');
-    if (slash == NULL)
+    ถ้า (slash == NULL)
     {
 	dirp = opendir(".");
 	tail = name;
     }
-    else
+    มิฉะนั้น
     {
 	*slash = NUL;
-	dirp = opendir((char *)name);
+	dirp = opendir((var_na *)name);
 	*slash = '/';
 	tail = slash + 1;
     }
 
-    if (dirp == NULL)
-	return;
+    ถ้า (dirp == NULL)
+	คืน;
 
     taillen = STRLEN(tail);
-    while ((dp = readdir(dirp)) != NULL)
+    ขณะ ((dp = readdir(dirp)) != NULL)
     {
 	// Only accept names that differ in case and are the same byte
 	// length. TODO: accept different length name.
-	if (STRICMP(tail, dp->d_name) == 0
+	ถ้า (STRICMP(tail, dp->d_name) == 0
 		&& taillen == STRLEN(dp->d_name))
 	{
 	    char_u	newname[MAXPATHL + 1];
-	    struct stat st2;
+	    sa_nracanaa stat st2;
 
 	    // Verify the inode is equal.
 	    vim_strncpy(newname, name, MAXPATHL);
 	    vim_strncpy(newname + (tail - name), (char_u *)dp->d_name,
 		    MAXPATHL - (tail - name));
-	    if (mch_lstat((char *)newname, &st2) >= 0
+	    ถ้า (mch_lstat((var_na *)newname, &st2) >= 0
 		    && st.st_ino == st2.st_ino
 		    && st.st_dev == st2.st_dev)
 	    {
 		STRCPY(tail, dp->d_name);
-		break;
+		bha_nga;
 	    }
 	}
     }
@@ -2933,21 +2933,21 @@ fname_case(
     long
 mch_getperm(char_u *name)
 {
-    struct stat statb;
+    sa_nracanaa stat statb;
 
     // Keep the #ifdef outside of stat(), it may be a macro.
 #ifdef VMS
-    if (stat((char *)vms_fixfilename(name), &statb))
-#else
-    if (stat((char *)name, &statb))
+    ถ้า (stat((var_na *)vms_fixfilename(name), &statb))
+#มิฉะนั้น
+    ถ้า (stat((var_na *)name, &statb))
 #endif
-	return -1;
+	คืน -1;
 #ifdef __INTERIX
     // The top bit makes the value negative, which means the file doesn't
     // exist.  Remove the bit, we don't use it.
-    return statb.st_mode & ~S_ADDACE;
-#else
-    return statb.st_mode;
+    คืน statb.st_mode & ~S_ADDACE;
+#มิฉะนั้น
+    คืน statb.st_mode;
 #endif
 }
 
@@ -2955,31 +2955,31 @@ mch_getperm(char_u *name)
  * Set file permission for "name" to "perm".
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    จำนวนเต็ม
 mch_setperm(char_u *name, long perm)
 {
-    return (chmod((char *)
+    คืน (chmod((var_na *)
 #ifdef VMS
 		    vms_fixfilename(name),
-#else
+#มิฉะนั้น
 		    name,
 #endif
 		    (mode_t)perm) == 0 ? OK : FAIL);
 }
 
-#if defined(HAVE_FCHMOD)
+#ถ้า defined(HAVE_FCHMOD)
 /*
  * Set file permission for open file "fd" to "perm".
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_fsetperm(int fd, long perm)
+    จำนวนเต็ม
+mch_fsetperm(จำนวนเต็ม fd, long perm)
 {
-    return (fchmod(fd, (mode_t)perm) == 0 ? OK : FAIL);
+    คืน (fchmod(fd, (mode_t)perm) == 0 ? OK : FAIL);
 }
 #endif
 
-#if defined(HAVE_ACL)
+#ถ้า defined(HAVE_ACL)
 # ifdef HAVE_SYS_ACL_H
 #  include <sys/acl.h>
 # endif
@@ -2988,57 +2988,57 @@ mch_fsetperm(int fd, long perm)
 # endif
 
 # ifdef HAVE_SOLARIS_ACL
-typedef struct vim_acl_solaris_T {
-    int acl_cnt;
+typedef sa_nracanaa vim_acl_solaris_T {
+    จำนวนเต็ม acl_cnt;
     aclent_t *acl_entry;
 } vim_acl_solaris_T;
 # endif
 
-# if defined(HAVE_SELINUX)
+# ถ้า defined(HAVE_SELINUX)
 /*
  * Copy security info from "from_file" to "to_file".
  */
     void
 mch_copy_sec(char_u *from_file, char_u *to_file)
 {
-    if (from_file == NULL)
-	return;
+    ถ้า (from_file == NULL)
+	คืน;
 
-    if (selinux_enabled == -1)
+    ถ้า (selinux_enabled == -1)
 	selinux_enabled = is_selinux_enabled();
 
-    if (selinux_enabled <= 0)
-	return;
+    ถ้า (selinux_enabled <= 0)
+	คืน;
 
     // Use "char *" instead of "security_context_t" to avoid a deprecation
     // warning.
-    char *from_context = NULL;
-    char *to_context = NULL;
+    var_na *from_context = NULL;
+    var_na *to_context = NULL;
 
-    if (getfilecon((char *)from_file, &from_context) < 0)
+    ถ้า (getfilecon((var_na *)from_file, &from_context) < 0)
     {
 	// If the filesystem doesn't support extended attributes,
 	// the original had no special security context and the
 	// target cannot have one either.
-	if (errno == EOPNOTSUPP)
-	    return;
+	ถ้า (errno == EOPNOTSUPP)
+	    คืน;
 
 	msg_puts(_("\nCould not get security context for "));
 	msg_outtrans(from_file);
 	msg_putchar('\n');
-	return;
+	คืน;
     }
-    if (getfilecon((char *)to_file, &to_context) < 0)
+    ถ้า (getfilecon((var_na *)to_file, &to_context) < 0)
     {
 	msg_puts(_("\nCould not get security context for "));
 	msg_outtrans(to_file);
 	msg_putchar('\n');
 	freecon (from_context);
-	return ;
+	คืน ;
     }
-    if (strcmp(from_context, to_context) != 0)
+    ถ้า (strcmp(from_context, to_context) != 0)
     {
-	if (setfilecon((char *)to_file, from_context) < 0)
+	ถ้า (setfilecon((var_na *)to_file, from_context) < 0)
 	{
 	    msg_puts(_("\nCould not set security context for "));
 	    msg_outtrans(to_file);
@@ -3050,144 +3050,144 @@ mch_copy_sec(char_u *from_file, char_u *to_file)
 }
 # endif // HAVE_SELINUX
 
-# if defined(HAVE_SMACK) && !defined(PROTO)
+# ถ้า defined(HAVE_SMACK) && !defined(PROTO)
 /*
  * Copy security info from "from_file" to "to_file".
  */
     void
 mch_copy_sec(char_u *from_file, char_u *to_file)
 {
-    static const char * const smack_copied_attributes[] =
+    static const var_na * const smack_copied_attributes[] =
 	{
 	    XATTR_NAME_SMACK,
 	    XATTR_NAME_SMACKEXEC,
 	    XATTR_NAME_SMACKMMAP
 	};
 
-    char	buffer[SMACK_LABEL_LEN];
-    const char	*name;
-    int		index;
-    int		ret;
+    var_na	buffer[SMACK_LABEL_LEN];
+    const var_na	*name;
+    จำนวนเต็ม		index;
+    จำนวนเต็ม		ret;
     ssize_t	size;
 
-    if (from_file == NULL)
-	return;
+    ถ้า (from_file == NULL)
+	คืน;
 
-    size = listxattr((char *)from_file, NULL, 0);
+    size = listxattr((var_na *)from_file, NULL, 0);
     // not supported or no attributes to copy
-    if (size <= 0)
-	return;
+    ถ้า (size <= 0)
+	คืน;
 
-    for (index = 0 ; index < (int)ARRAY_LENGTH(smack_copied_attributes); index++)
+    สำหรับ (index = 0 ; index < (จำนวนเต็ม)ARRAY_LENGTH(smack_copied_attributes); index++)
     {
 	// get the name of the attribute to copy
 	name = smack_copied_attributes[index];
 
 	// get the value of the attribute in buffer
-	size = getxattr((char*)from_file, name, buffer, sizeof(buffer));
-	if (size >= 0)
+	size = getxattr((var_na*)from_file, name, buffer, parimaa_na(buffer));
+	ถ้า (size >= 0)
 	{
 	    // copy the attribute value of buffer
-	    ret = setxattr((char*)to_file, name, buffer, (size_t)size, 0);
-	    if (ret < 0)
+	    ret = setxattr((var_na*)to_file, name, buffer, (size_t)size, 0);
+	    ถ้า (ret < 0)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE,
+		vim_snprintf((var_na *)IObuff, IOSIZE,
 			_("Could not set security context %s for %s"),
 			name, to_file);
 		msg_outtrans(IObuff);
 		msg_putchar('\n');
 	    }
 	}
-	else
+	มิฉะนั้น
 	{
 	    // what reason of not having the attribute value?
 	    switch (errno)
 	    {
-		case ENOTSUP:
+		pak_sa ENOTSUP:
 		    // extended attributes aren't supported or enabled
 		    // should a message be echoed? not sure...
-		    return; // leave because it isn't useful to continue
+		    คืน; // leave because it isn't useful to continue
 
-		case ERANGE:
+		pak_sa ERANGE:
 		default:
 		    // no enough size OR unexpected error
-		     vim_snprintf((char *)IObuff, IOSIZE,
+		     vim_snprintf((var_na *)IObuff, IOSIZE,
 			    _("Could not get security context %s for %s. Removing it!"),
 			    name, from_file);
-		    msg_puts((char *)IObuff);
+		    msg_puts((var_na *)IObuff);
 		    msg_putchar('\n');
 		    // FALLTHROUGH to remove the attribute
 
-		case ENODATA:
+		pak_sa ENODATA:
 		    // no attribute of this name
-		    ret = removexattr((char*)to_file, name);
+		    ret = removexattr((var_na*)to_file, name);
 		    // Silently ignore errors, apparently this happens when
 		    // smack is not actually being used.
-		    break;
+		    bha_nga;
 	    }
 	}
     }
 }
 # endif // HAVE_SMACK
 
-# if defined(FEAT_XATTR)
+# ถ้า defined(FEAT_XATTR)
 /*
  * Copy extended attributes from_file to to_file
  */
     void
 mch_copy_xattr(char_u *from_file, char_u *to_file)
 {
-    char	*xattr_buf;
+    var_na	*xattr_buf;
     ssize_t	size;
     ssize_t	tsize;
     ssize_t	keylen, vallen, max_vallen = 0;
-    char	*key;
-    char	*val = NULL;
-    char	*errmsg = NULL;
+    var_na	*key;
+    var_na	*val = NULL;
+    var_na	*errmsg = NULL;
 
-    if (from_file == NULL)
-	return;
+    ถ้า (from_file == NULL)
+	คืน;
 
     // get the length of the extended attributes
-    size = listxattr((char *)from_file, NULL, 0);
+    size = listxattr((var_na *)from_file, NULL, 0);
     // not supported or no attributes to copy
-    if (size <= 0)
-	return;
-    xattr_buf = (char*)alloc(size);
-    if (xattr_buf == NULL)
-	return;
-    size = listxattr((char *)from_file, xattr_buf, size);
+    ถ้า (size <= 0)
+	คืน;
+    xattr_buf = (var_na*)alloc(size);
+    ถ้า (xattr_buf == NULL)
+	คืน;
+    size = listxattr((var_na *)from_file, xattr_buf, size);
     tsize = size;
 
     errno = 0;
 
-    for (int round = 0; round < 2; round++)
+    สำหรับ (จำนวนเต็ม round = 0; round < 2; round++)
     {
 
 	key = xattr_buf;
-	if (round == 1)
+	ถ้า (round == 1)
 	    size = tsize;
 
-	while (size > 0)
+	ขณะ (size > 0)
 	{
-	    vallen = getxattr((char *)from_file, key,
+	    vallen = getxattr((var_na *)from_file, key,
 		    val, round ? max_vallen : 0);
 	    // only set the attribute in the second round
-	    if (vallen >= 0 && round &&
-		setxattr((char *)to_file, key, val, vallen, 0) == 0)
+	    ถ้า (vallen >= 0 && round &&
+		setxattr((var_na *)to_file, key, val, vallen, 0) == 0)
 		;
-	    else if (errno)
+	    มิฉะนั้น ถ้า (errno)
 	    {
 		switch (errno)
 		{
-		    case E2BIG:
+		    pak_sa E2BIG:
 			errmsg = e_xattr_e2big;
 			goto error_exit;
-		    case ENOTSUP:
-		    case EACCES:
-		    case EPERM:
-			break;
-		    case ERANGE:
+		    pak_sa ENOTSUP:
+		    pak_sa EACCES:
+		    pak_sa EPERM:
+			bha_nga;
+		    pak_sa ERANGE:
 			errmsg = e_xattr_erange;
 			goto error_exit;
 		    default:
@@ -3196,7 +3196,7 @@ mch_copy_xattr(char_u *from_file, char_u *to_file)
 		}
 	    }
 
-	    if (round == 0 && vallen > max_vallen)
+	    ถ้า (round == 0 && vallen > max_vallen)
 		max_vallen = vallen;
 
 	    // add one for terminating null
@@ -3204,11 +3204,11 @@ mch_copy_xattr(char_u *from_file, char_u *to_file)
 	    size -= keylen;
 	    key += keylen;
 	}
-	if (round)
-	    break;
+	ถ้า (round)
+	    bha_nga;
 
-	val = (char*)alloc(max_vallen + 1);
-	if (val == NULL)
+	val = (var_na*)alloc(max_vallen + 1);
+	ถ้า (val == NULL)
 	    goto error_exit;
 
     }
@@ -3216,7 +3216,7 @@ error_exit:
     vim_free(xattr_buf);
     vim_free(val);
 
-    if (errmsg != NULL)
+    ถ้า (errmsg != NULL)
 	emsg(_(errmsg));
 }
 # endif
@@ -3230,64 +3230,64 @@ mch_get_acl(char_u *fname UNUSED)
 {
     vim_acl_T	ret = NULL;
 # ifdef HAVE_POSIX_ACL
-    ret = (vim_acl_T)acl_get_file((char *)fname, ACL_TYPE_ACCESS);
-# else
+    ret = (vim_acl_T)acl_get_file((var_na *)fname, ACL_TYPE_ACCESS);
+# มิฉะนั้น
 #  ifdef HAVE_SOLARIS_ZFS_ACL
     acl_t *aclent;
 
-    if (acl_get((char *)fname, 0, &aclent) < 0)
-	return NULL;
+    ถ้า (acl_get((var_na *)fname, 0, &aclent) < 0)
+	คืน NULL;
     ret = (vim_acl_T)aclent;
-#  else
+#  มิฉะนั้น
 #   ifdef HAVE_SOLARIS_ACL
     vim_acl_solaris_T   *aclent;
 
-    aclent = malloc(sizeof(vim_acl_solaris_T));
-    if (aclent == NULL)
-	return NULL;
-    if ((aclent->acl_cnt = acl((char *)fname, GETACLCNT, 0, NULL)) < 0)
+    aclent = malloc(parimaa_na(vim_acl_solaris_T));
+    ถ้า (aclent == NULL)
+	คืน NULL;
+    ถ้า ((aclent->acl_cnt = acl((var_na *)fname, GETACLCNT, 0, NULL)) < 0)
     {
 	free(aclent);
-	return NULL;
+	คืน NULL;
     }
-    aclent->acl_entry = malloc(aclent->acl_cnt * sizeof(aclent_t));
-    if (aclent->acl_entry == NULL)
+    aclent->acl_entry = malloc(aclent->acl_cnt * parimaa_na(aclent_t));
+    ถ้า (aclent->acl_entry == NULL)
     {
 	free(aclent);
-	return NULL;
+	คืน NULL;
     }
-    if (acl((char *)fname, GETACL, aclent->acl_cnt, aclent->acl_entry) < 0)
+    ถ้า (acl((var_na *)fname, GETACL, aclent->acl_cnt, aclent->acl_entry) < 0)
     {
 	free(aclent->acl_entry);
 	free(aclent);
-	return NULL;
+	คืน NULL;
     }
     ret = (vim_acl_T)aclent;
-#   else
-#    if defined(HAVE_AIX_ACL)
-    int		aclsize;
-    struct acl *aclent;
+#   มิฉะนั้น
+#    ถ้า defined(HAVE_AIX_ACL)
+    จำนวนเต็ม		aclsize;
+    sa_nracanaa acl *aclent;
 
-    aclsize = sizeof(struct acl);
+    aclsize = parimaa_na(sa_nracanaa acl);
     aclent = malloc(aclsize);
-    if (aclent == NULL)
-	return NULL;
-    if (statacl((char *)fname, STX_NORMAL, aclent, aclsize) < 0)
+    ถ้า (aclent == NULL)
+	คืน NULL;
+    ถ้า (statacl((var_na *)fname, STX_NORMAL, aclent, aclsize) < 0)
     {
-	if (errno == ENOSPC)
+	ถ้า (errno == ENOSPC)
 	{
 	    aclsize = aclent->acl_len;
 	    aclent = realloc(aclent, aclsize);
-	    if (aclent == NULL || statacl((char *)fname, STX_NORMAL, aclent, aclsize) < 0)
+	    ถ้า (aclent == NULL || statacl((var_na *)fname, STX_NORMAL, aclent, aclsize) < 0)
 	    {
 		free(aclent);
-		return NULL;
+		คืน NULL;
 	    }
 	}
-	else
+	มิฉะนั้น
 	{
 	    free(aclent);
-	    return NULL;
+	    คืน NULL;
 	}
     }
     ret = (vim_acl_T)aclent;
@@ -3295,7 +3295,7 @@ mch_get_acl(char_u *fname UNUSED)
 #   endif // HAVE_SOLARIS_ACL
 #  endif // HAVE_SOLARIS_ZFS_ACL
 # endif // HAVE_POSIX_ACL
-    return ret;
+    คืน ret;
 }
 
 /*
@@ -3304,20 +3304,20 @@ mch_get_acl(char_u *fname UNUSED)
     void
 mch_set_acl(char_u *fname UNUSED, vim_acl_T aclent)
 {
-    if (aclent == NULL)
-	return;
+    ถ้า (aclent == NULL)
+	คืน;
 # ifdef HAVE_POSIX_ACL
-    acl_set_file((char *)fname, ACL_TYPE_ACCESS, (acl_t)aclent);
-# else
+    acl_set_file((var_na *)fname, ACL_TYPE_ACCESS, (acl_t)aclent);
+# มิฉะนั้น
 #  ifdef HAVE_SOLARIS_ZFS_ACL
-    acl_set((char *)fname, (acl_t *)aclent);
-#  else
+    acl_set((var_na *)fname, (acl_t *)aclent);
+#  มิฉะนั้น
 #   ifdef HAVE_SOLARIS_ACL
-    acl((char *)fname, SETACL, ((vim_acl_solaris_T *)aclent)->acl_cnt,
+    acl((var_na *)fname, SETACL, ((vim_acl_solaris_T *)aclent)->acl_cnt,
 	    ((vim_acl_solaris_T *)aclent)->acl_entry);
-#   else
+#   มิฉะนั้น
 #    ifdef HAVE_AIX_ACL
-    chacl((char *)fname, aclent, ((struct acl *)aclent)->acl_len);
+    chacl((var_na *)fname, aclent, ((sa_nracanaa acl *)aclent)->acl_len);
 #    endif // HAVE_AIX_ACL
 #   endif // HAVE_SOLARIS_ACL
 #  endif // HAVE_SOLARIS_ZFS_ACL
@@ -3327,18 +3327,18 @@ mch_set_acl(char_u *fname UNUSED, vim_acl_T aclent)
     void
 mch_free_acl(vim_acl_T aclent)
 {
-    if (aclent == NULL)
-	return;
+    ถ้า (aclent == NULL)
+	คืน;
 # ifdef HAVE_POSIX_ACL
     acl_free((acl_t)aclent);
-# else
+# มิฉะนั้น
 #  ifdef HAVE_SOLARIS_ZFS_ACL
     acl_free((acl_t *)aclent);
-#  else
+#  มิฉะนั้น
 #   ifdef HAVE_SOLARIS_ACL
     free(((vim_acl_solaris_T *)aclent)->acl_entry);
     free(aclent);
-#   else
+#   มิฉะนั้น
 #    ifdef HAVE_AIX_ACL
     free(aclent);
 #    endif // HAVE_AIX_ACL
@@ -3362,16 +3362,16 @@ mch_hide(char_u *name UNUSED)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    จำนวนเต็ม
 mch_isdir(char_u *name)
 {
-    struct stat statb;
+    sa_nracanaa stat statb;
 
-    if (*name == NUL)	    // Some stat()s don't flag "" as an error.
-	return FALSE;
-    if (stat((char *)name, &statb))
-	return FALSE;
-    return (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
+    ถ้า (*name == NUL)	    // Some stat()s don't flag "" as an error.
+	คืน FALSE;
+    ถ้า (stat((var_na *)name, &statb))
+	คืน FALSE;
+    คืน (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
 }
 
 /*
@@ -3379,28 +3379,28 @@ mch_isdir(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    จำนวนเต็ม
 mch_isrealdir(char_u *name)
 {
-    struct stat statb;
+    sa_nracanaa stat statb;
 
-    if (*name == NUL)	    // Some stat()s don't flag "" as an error.
-	return FALSE;
-    if (mch_lstat((char *)name, &statb))
-	return FALSE;
-    return (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
+    ถ้า (*name == NUL)	    // Some stat()s don't flag "" as an error.
+	คืน FALSE;
+    ถ้า (mch_lstat((var_na *)name, &statb))
+	คืน FALSE;
+    คืน (S_ISDIR(statb.st_mode) ? TRUE : FALSE);
 }
 
 /*
  * Return 1 if "name" is an executable file, 0 if not or it doesn't exist.
  */
-    static int
+    static จำนวนเต็ม
 executable_file(char_u *name)
 {
-    struct stat	st;
+    sa_nracanaa stat	st;
 
-    if (stat((char *)name, &st))
-	return 0;
+    ถ้า (stat((var_na *)name, &st))
+	คืน 0;
 #ifdef VMS
     // Like on Unix system file can have executable rights but not necessarily
     // be an executable, but on Unix is not a default for an ordinary file to
@@ -3409,16 +3409,16 @@ executable_file(char_u *name)
     // conventions instead:
     // *.COM and *.EXE files are the executables - the rest are not. This is
     // not ideal but better than it was.
-    int vms_executable = 0;
-    if (S_ISREG(st.st_mode) && mch_access((char *)name, X_OK) == 0)
+    จำนวนเต็ม vms_executable = 0;
+    ถ้า (S_ISREG(st.st_mode) && mch_access((var_na *)name, X_OK) == 0)
     {
-	if (strstr(vms_tolower((char*)name),".exe") != NULL
-		|| strstr(vms_tolower((char*)name),".com")!= NULL)
+	ถ้า (strstr(vms_tolower((var_na*)name),".exe") != NULL
+		|| strstr(vms_tolower((var_na*)name),".com")!= NULL)
 	    vms_executable = 1;
     }
-    return vms_executable;
-#else
-    return S_ISREG(st.st_mode) && mch_access((char *)name, X_OK) == 0;
+    คืน vms_executable;
+#มิฉะนั้น
+    คืน S_ISREG(st.st_mode) && mch_access((var_na *)name, X_OK) == 0;
 #endif
 }
 
@@ -3427,8 +3427,8 @@ executable_file(char_u *name)
  * If "use_path" is FALSE only check if "name" is executable.
  * Return -1 if unknown.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path)
+    จำนวนเต็ม
+mch_can_exe(char_u *name, char_u **path, จำนวนเต็ม use_path)
 {
     char_u	*buf;
     size_t	bufsize;
@@ -3436,77 +3436,77 @@ mch_can_exe(char_u *name, char_u **path, int use_path)
     char_u	*p, *e;
     char_u	*p_end;
     size_t	elen;
-    int		retval;
+    จำนวนเต็ม		retval;
 
     // When "use_path" is false and if it's an absolute or relative path don't
     // need to use $PATH.
-    if (!use_path || gettail(name) != name)
+    ถ้า (!use_path || gettail(name) != name)
     {
 	// There must be a path separator, files in the current directory
 	// can't be executed.
-	if ((use_path || gettail(name) != name) && executable_file(name))
+	ถ้า ((use_path || gettail(name) != name) && executable_file(name))
 	{
-	    if (path != NULL)
+	    ถ้า (path != NULL)
 	    {
-		if (name[0] != '/')
+		ถ้า (name[0] != '/')
 		    *path = FullName_save(name, TRUE);
-		else
+		มิฉะนั้น
 		    *path = vim_strsave(name);
 	    }
-	    return TRUE;
+	    คืน TRUE;
 	}
-	return FALSE;
+	คืน FALSE;
     }
 
     p = (char_u *)getenv("PATH");
-    if (p == NULL || *p == NUL)
-	return -1;
+    ถ้า (p == NULL || *p == NUL)
+	คืน -1;
     p_end = p + STRLEN(p);
     bufsize = STRLEN(name) + (size_t)(p_end - p) + 2;
     buf = alloc(bufsize);
-    if (buf == NULL)
-	return -1;
+    ถ้า (buf == NULL)
+	คืน -1;
 
     /*
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    for (;;)
+    สำหรับ (;;)
     {
-	e = (char_u *)strchr((char *)p, ':');
-	if (e == NULL)
+	e = (char_u *)strchr((var_na *)p, ':');
+	ถ้า (e == NULL)
 	    e = p_end;
 	elen = (size_t)(e - p);
-	if (elen <= 1)		// empty entry means current dir
+	ถ้า (elen <= 1)		// empty entry means current dir
 	{
 	    p = (char_u *)"./";
 	    elen = STRLEN_LITERAL("./");
 	}
-	buflen = vim_snprintf((char *)buf, bufsize, "%.*s%s%s",
-		(int)elen,
+	buflen = vim_snprintf((var_na *)buf, bufsize, "%.*s%s%s",
+		(จำนวนเต็ม)elen,
 		p,
 		(after_pathsep(p, p + elen)) ? "" : PATHSEPSTR,
 		name);
 	retval = executable_file(buf);
-	if (retval == 1)
+	ถ้า (retval == 1)
 	{
-	    if (path != NULL)
+	    ถ้า (path != NULL)
 	    {
-		if (buf[0] != '/')
+		ถ้า (buf[0] != '/')
 		    *path = FullName_save(buf, TRUE);
-		else
+		มิฉะนั้น
 		    *path = vim_strnsave(buf, buflen);
 	    }
-	    break;
+	    bha_nga;
 	}
 
-	if (*e != ':')
-	    break;
+	ถ้า (*e != ':')
+	    bha_nga;
 	p = e + 1;
     }
 
     vim_free(buf);
-    return retval;
+    คืน retval;
 }
 
 /*
@@ -3515,28 +3515,28 @@ mch_can_exe(char_u *name, char_u **path, int use_path)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    จำนวนเต็ม
 mch_nodetype(char_u *name)
 {
-    struct stat	st;
+    sa_nracanaa stat	st;
 
-    if (stat((char *)name, &st))
-	return NODE_NORMAL;
-    if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))
-	return NODE_NORMAL;
-    if (S_ISBLK(st.st_mode))	// block device isn't writable
-	return NODE_OTHER;
+    ถ้า (stat((var_na *)name, &st))
+	คืน NODE_NORMAL;
+    ถ้า (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))
+	คืน NODE_NORMAL;
+    ถ้า (S_ISBLK(st.st_mode))	// block device isn't writable
+	คืน NODE_OTHER;
     // Everything else is writable?
-    return NODE_WRITABLE;
+    คืน NODE_WRITABLE;
 }
 
     void
 mch_early_init(void)
 {
 #ifdef HAVE_CHECK_STACK_GROWTH
-    int			i;
+    จำนวนเต็ม			i;
 
-    check_stack_growth((char *)&i);
+    check_stack_growth((var_na *)&i);
 
 # ifdef HAVE_STACK_LIMIT
     get_stack_limit();
@@ -3550,7 +3550,7 @@ mch_early_init(void)
      * Use of sigaltstack() is preferred, it's more portable.
      * Ignore any errors.
      */
-#if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+#ถ้า defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
     signal_stack = alloc(get_signal_stack_size());
     init_signal_stack();
 #endif
@@ -3567,24 +3567,24 @@ mch_early_init(void)
 #endif
 }
 
-#if defined(EXITFREE)
+#ถ้า defined(EXITFREE)
     void
 mch_free_mem(void)
 {
-# if defined(FEAT_CLIPBOARD) && defined(FEAT_X11)
-    if (clip_star.owned)
+# ถ้า defined(FEAT_CLIPBOARD) && defined(FEAT_X11)
+    ถ้า (clip_star.owned)
 	clip_lose_selection(&clip_star);
-    if (clip_plus.owned)
+    ถ้า (clip_plus.owned)
 	clip_lose_selection(&clip_plus);
 # endif
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    if (xterm_Shell != (Widget)0)
+# ถ้า defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    ถ้า (xterm_Shell != (Widget)0)
 	XtDestroyWidget(xterm_Shell);
 #  ifndef LESSTIF_VERSION
     // Lesstif crashes here, lose some memory
-    if (xterm_dpy != NULL)
+    ถ้า (xterm_dpy != NULL)
 	XtCloseDisplay(xterm_dpy);
-    if (app_context != (XtAppContext)NULL)
+    ถ้า (app_context != (XtAppContext)NULL)
     {
 	XtDestroyApplicationContext(app_context);
 #   ifdef FEAT_X11
@@ -3593,15 +3593,15 @@ mch_free_mem(void)
     }
 #  endif
 # endif
-# if defined(FEAT_X11)
-    if (x11_display != NULL
+# ถ้า defined(FEAT_X11)
+    ถ้า (x11_display != NULL
 #  ifdef FEAT_XCLIPBOARD
 	    && x11_display != xterm_dpy
 #  endif
 	    )
 	XCloseDisplay(x11_display);
 # endif
-# if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
+# ถ้า defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
     VIM_CLEAR(signal_stack);
 # endif
     vim_free(oldtitle);
@@ -3616,55 +3616,55 @@ mch_free_mem(void)
     static void
 exit_scroll(void)
 {
-    if (silent_mode)
-	return;
-    if (newline_on_exit || msg_didout)
+    ถ้า (silent_mode)
+	คืน;
+    ถ้า (newline_on_exit || msg_didout)
     {
-	if (msg_use_printf())
+	ถ้า (msg_use_printf())
 	{
-	    if (info_message)
+	    ถ้า (info_message)
 		mch_msg("\n");
-	    else
+	    มิฉะนั้น
 		mch_errmsg("\r\n");
 	}
-	else
+	มิฉะนั้น
 	    out_char('\n');
     }
-    else if (!is_not_a_term())
+    มิฉะนั้น ถ้า (!is_not_a_term())
     {
 	restore_cterm_colors();		// get original colors back
 	msg_clr_eos_force();		// clear the rest of the display
-	windgoto((int)Rows - 1, cmdline_col_off); // may have moved the cursor
+	windgoto((จำนวนเต็ม)Rows - 1, cmdline_col_off); // may have moved the cursor
     }
 }
 
 #ifdef USE_GCOV_FLUSH
-# if (defined(__GNUC__) \
+# ถ้า (defined(__GNUC__) \
 	    && ((__GNUC__ == 11 && __GNUC_MINOR__ >= 1) || (__GNUC__ >= 12))) \
 	|| (defined(__clang__) && (__clang_major__ >= 12))
 extern void __gcov_dump(void);
 extern void __gcov_reset(void);
-#  define __gcov_flush() do { __gcov_dump(); __gcov_reset(); } while (0)
-# else
+#  define __gcov_flush() do { __gcov_dump(); __gcov_reset(); } ขณะ (0)
+# มิฉะนั้น
 extern void __gcov_flush(void);
 # endif
 #endif
 
     void
-mch_exit(int r)
+mch_exit(จำนวนเต็ม r)
 {
     exiting = TRUE;
 
-#if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+#ถ้า defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
     x11_export_final_selection();
 #endif
 
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    ถ้า (!gui.in_use)
 #endif
     {
 	settmode(TMODE_COOK);
-	if (!is_not_a_term())
+	ถ้า (!is_not_a_term())
 	{
 	    // restore xterm title and icon name
 	    mch_restore_title(SAVE_RESTORE_BOTH);
@@ -3677,7 +3677,7 @@ mch_exit(int r)
 	 * t_ti does swap pages it should not go to the shell page.  Do this
 	 * before stoptermcap().
 	 */
-	if (swapping_screen() && !newline_on_exit)
+	ถ้า (swapping_screen() && !newline_on_exit)
 	    exit_scroll();
 
 	// Stop termcap: May need to check for T_CRV response, which
@@ -3688,12 +3688,12 @@ mch_exit(int r)
 	 * A newline is only required after a message in the alternate screen.
 	 * This is set to TRUE by wait_return().
 	 */
-	if (!swapping_screen() || newline_on_exit)
+	ถ้า (!swapping_screen() || newline_on_exit)
 	    exit_scroll();
 
 	// Cursor may have been switched off without calling starttermcap()
 	// when doing "vim -u vimrc" and vimrc contains ":q".
-	if (full_screen)
+	ถ้า (full_screen)
 	    cursor_on();
     }
     out_flush();
@@ -3706,7 +3706,7 @@ mch_exit(int r)
 
     may_core_dump();
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    ถ้า (gui.in_use)
 	gui_exit(r);
 #endif
 
@@ -3717,8 +3717,8 @@ mch_exit(int r)
 #ifdef __QNX__
     // A core dump won't be created if the signal handler
     // doesn't return, so we can't call exit()
-    if (deadly_signal != 0)
-	return;
+    ถ้า (deadly_signal != 0)
+	คืน;
 #endif
 
 #ifdef FEAT_NETBEANS_INTG
@@ -3735,7 +3735,7 @@ mch_exit(int r)
     static void
 may_core_dump(void)
 {
-    if (deadly_signal != 0)
+    ถ้า (deadly_signal != 0)
     {
 	mch_signal(deadly_signal, SIG_DFL);
 	kill(getpid(), deadly_signal);	// Die using the signal we caught
@@ -3747,84 +3747,84 @@ may_core_dump(void)
 /*
  * Get the file descriptor to use for tty operations.
  */
-    static int
-get_tty_fd(int fd)
+    static จำนวนเต็ม
+get_tty_fd(จำนวนเต็ม fd)
 {
-    int		tty_fd = fd;
+    จำนวนเต็ม		tty_fd = fd;
 
-# if defined(HAVE_SVR4_PTYS) && defined(SUN_SYSTEM)
+# ถ้า defined(HAVE_SVR4_PTYS) && defined(SUN_SYSTEM)
     // On SunOS: Get the terminal parameters from "fd", or the slave device of
     // "fd" when it is a master device.
-    if (mch_isatty(fd) > 1)
+    ถ้า (mch_isatty(fd) > 1)
     {
-	char *name;
+	var_na *name;
 
 	name = ptsname(fd);
-	if (name == NULL)
-	    return -1;
+	ถ้า (name == NULL)
+	    คืน -1;
 
 	tty_fd = open(name, O_RDONLY | O_NOCTTY | O_EXTRA, 0);
-	if (tty_fd < 0)
-	    return -1;
+	ถ้า (tty_fd < 0)
+	    คืน -1;
     }
 # endif
-    return tty_fd;
+    คืน tty_fd;
 }
 
-    static int
-mch_tcgetattr(int fd, void *term)
+    static จำนวนเต็ม
+mch_tcgetattr(จำนวนเต็ม fd, void *term)
 {
-    int		tty_fd;
-    int		retval = -1;
+    จำนวนเต็ม		tty_fd;
+    จำนวนเต็ม		retval = -1;
 
     tty_fd = get_tty_fd(fd);
-    if (tty_fd < 0)
-	return -1;
+    ถ้า (tty_fd < 0)
+	คืน -1;
 
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    retval = tcgetattr(tty_fd, (struct termios *)term);
-#  else
-    retval = ioctl(tty_fd, TCGETA, (struct termio *)term);
+    retval = tcgetattr(tty_fd, (sa_nracanaa termios *)term);
+#  มิฉะนั้น
+    retval = ioctl(tty_fd, TCGETA, (sa_nracanaa termio *)term);
 #  endif
-# else
+# มิฉะนั้น
     // for "old" tty systems
-    retval = ioctl(tty_fd, TIOCGETP, (struct sgttyb *)term);
+    retval = ioctl(tty_fd, TIOCGETP, (sa_nracanaa sgttyb *)term);
 # endif
-    if (tty_fd != fd)
+    ถ้า (tty_fd != fd)
 	close(tty_fd);
-    return retval;
+    คืน retval;
 }
 
     void
 mch_settmode(tmode_T tmode)
 {
-    static int first = TRUE;
+    static จำนวนเต็ม first = TRUE;
 
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    static struct termios told;
-	   struct termios tnew;
-#  else
-    static struct termio told;
-	   struct termio tnew;
+    static sa_nracanaa termios told;
+	   sa_nracanaa termios tnew;
+#  มิฉะนั้น
+    static sa_nracanaa termio told;
+	   sa_nracanaa termio tnew;
 #  endif
 
-    if (first)
+    ถ้า (first)
     {
 	first = FALSE;
 	mch_tcgetattr(read_cmd_fd, &told);
     }
 
     tnew = told;
-    if (tmode == TMODE_RAW)
+    ถ้า (tmode == TMODE_RAW)
     {
 	// ~ICRNL enables typing ^V^M
 	// ~IXON disables CTRL-S stopping output, so that it can be mapped.
 	tnew.c_iflag &= ~(ICRNL |
 		(T_XON == NULL || *T_XON == NUL ? IXON : 0));
 	tnew.c_lflag &= ~(ICANON | ECHO | ISIG | ECHOE
-#  if defined(IEXTEN)
+#  ถ้า defined(IEXTEN)
 		    | IEXTEN	    // IEXTEN enables typing ^V on SOLARIS
 #  endif
 				);
@@ -3833,10 +3833,10 @@ mch_settmode(tmode_T tmode)
 	// Also disable expanding tabs if possible.
 #   ifdef XTABS
 	tnew.c_oflag &= ~(ONLCR | XTABS);
-#   else
+#   มิฉะนั้น
 #    ifdef TAB3
 	tnew.c_oflag &= ~(ONLCR | TAB3);
-#    else
+#    มิฉะนั้น
 	tnew.c_oflag &= ~ONLCR;
 #    endif
 #   endif
@@ -3844,7 +3844,7 @@ mch_settmode(tmode_T tmode)
 	tnew.c_cc[VMIN] = 1;		// return after 1 char
 	tnew.c_cc[VTIME] = 0;		// don't wait
     }
-    else if (tmode == TMODE_SLEEP)
+    มิฉะนั้น ถ้า (tmode == TMODE_SLEEP)
     {
 	// Also reset ICANON here, otherwise on Solaris select() won't see
 	// typeahead characters.
@@ -3853,43 +3853,43 @@ mch_settmode(tmode_T tmode)
 	tnew.c_cc[VTIME] = 0;		// don't wait
     }
 
-#  if defined(HAVE_TERMIOS_H)
+#  ถ้า defined(HAVE_TERMIOS_H)
     {
-	int	n = 10;
+	จำนวนเต็ม	n = 10;
 
 	// A signal may cause tcsetattr() to fail (e.g., SIGCONT).  Retry a
 	// few times.
-	while (tcsetattr(read_cmd_fd, TCSANOW, &tnew) == -1
+	ขณะ (tcsetattr(read_cmd_fd, TCSANOW, &tnew) == -1
 						   && errno == EINTR && n > 0)
 	    --n;
     }
-#  else
+#  มิฉะนั้น
     ioctl(read_cmd_fd, TCSETA, &tnew);
 #  endif
 
-# else
+# มิฉะนั้น
     /*
      * for "old" tty systems
      */
 #  ifndef TIOCSETN
 #   define TIOCSETN TIOCSETP	// for hpux 9.0
 #  endif
-    static struct sgttyb ttybold;
-	   struct sgttyb ttybnew;
+    static sa_nracanaa sgttyb ttybold;
+	   sa_nracanaa sgttyb ttybnew;
 
-    if (first)
+    ถ้า (first)
     {
 	first = FALSE;
 	mch_tcgetattr(read_cmd_fd, &ttybold);
     }
 
     ttybnew = ttybold;
-    if (tmode == TMODE_RAW)
+    ถ้า (tmode == TMODE_RAW)
     {
 	ttybnew.sg_flags &= ~(CRMOD | ECHO);
 	ttybnew.sg_flags |= RAW;
     }
-    else if (tmode == TMODE_SLEEP)
+    มิฉะนั้น ถ้า (tmode == TMODE_SLEEP)
 	ttybnew.sg_flags &= ~(ECHO);
     ioctl(read_cmd_fd, TIOCSETN, &ttybnew);
 # endif
@@ -3912,8 +3912,8 @@ get_stty(void)
     char_u	buf[2];
     char_u	*p;
 
-    if (get_tty_info(read_cmd_fd, &info) != OK)
-	return;
+    ถ้า (get_tty_info(read_cmd_fd, &info) != OK)
+	คืน;
 
     intr_char = info.interrupt;
     buf[0] = info.backspace;
@@ -3922,7 +3922,7 @@ get_stty(void)
 
     // If <BS> and <DEL> are now the same, redefine <DEL>.
     p = find_termcode((char_u *)"kD");
-    if (p != NULL && p[0] == buf[0] && p[1] == buf[1])
+    ถ้า (p != NULL && p[0] == buf[0] && p[1] == buf[1])
 	do_fixdel(NULL);
 }
 
@@ -3930,91 +3930,91 @@ get_stty(void)
  * Obtain the characters that Backspace and Enter produce on "fd".
  * Returns OK or FAIL.
  */
-    int
-get_tty_info(int fd, ttyinfo_T *info)
+    จำนวนเต็ม
+get_tty_info(จำนวนเต็ม fd, ttyinfo_T *info)
 {
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    struct termios keys;
-#  else
-    struct termio keys;
+    sa_nracanaa termios keys;
+#  มิฉะนั้น
+    sa_nracanaa termio keys;
 #  endif
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    ถ้า (mch_tcgetattr(fd, &keys) != -1)
     {
 	info->backspace = keys.c_cc[VERASE];
 	info->interrupt = keys.c_cc[VINTR];
-	if (keys.c_iflag & ICRNL)
+	ถ้า (keys.c_iflag & ICRNL)
 	    info->enter = NL;
-	else
+	มิฉะนั้น
 	    info->enter = CAR;
-	if (keys.c_oflag & ONLCR)
+	ถ้า (keys.c_oflag & ONLCR)
 	    info->nl_does_cr = TRUE;
-	else
+	มิฉะนั้น
 	    info->nl_does_cr = FALSE;
-	return OK;
+	คืน OK;
     }
-# else
+# มิฉะนั้น
     // for "old" tty systems
-    struct sgttyb keys;
+    sa_nracanaa sgttyb keys;
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    ถ้า (mch_tcgetattr(fd, &keys) != -1)
     {
 	info->backspace = keys.sg_erase;
 	info->interrupt = keys.sg_kill;
 	info->enter = CAR;
 	info->nl_does_cr = TRUE;
-	return OK;
+	คืน OK;
     }
 # endif
-    return FAIL;
+    คืน FAIL;
 }
 
 #endif // VMS
 
-static int	mouse_ison = FALSE;
+static จำนวนเต็ม	mouse_ison = FALSE;
 
 /*
  * Set mouse clicks on or off and possible enable mouse movement events.
  */
     void
-mch_setmouse(int on)
+mch_setmouse(จำนวนเต็ม on)
 {
 #ifdef FEAT_BEVAL_TERM
-    static int	bevalterm_ison = FALSE;
+    static จำนวนเต็ม	bevalterm_ison = FALSE;
 #endif
-    int		xterm_mouse_vers;
+    จำนวนเต็ม		xterm_mouse_vers;
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    if (!on)
+#ถ้า defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    ถ้า (!on)
 	// Make sure not tracing mouse movements.  Important when a button-down
 	// was received but no release yet.
 	stop_xterm_trace();
 #endif
 
-    if (on == mouse_ison
+    ถ้า (on == mouse_ison
 #ifdef FEAT_BEVAL_TERM
 	    && p_bevalterm == bevalterm_ison
 #endif
 	    )
 	// return quickly if nothing to do
-	return;
+	คืน;
 
     xterm_mouse_vers = use_xterm_mouse();
 
 #ifdef FEAT_MOUSE_URXVT
-    if (ttym_flags == TTYM_URXVT)
+    ถ้า (ttym_flags == TTYM_URXVT)
     {
 	out_str_nf((char_u *)(on ? "\033[?1015h" : "\033[?1015l"));
 	mouse_ison = on;
     }
 #endif
 
-    if (T_CXM != NULL && *T_CXM != NUL)
+    ถ้า (T_CXM != NULL && *T_CXM != NUL)
     {
 	term_enable_mouse(on);
     }
-    else if (ttym_flags == TTYM_SGR)
+    มิฉะนั้น ถ้า (ttym_flags == TTYM_SGR)
     {
 	// SGR mode supports columns above 223
 	out_str_nf((char_u *)(on ? "\033[?1006h" : "\033[?1006l"));
@@ -4022,18 +4022,18 @@ mch_setmouse(int on)
     }
 
 #ifdef FEAT_BEVAL_TERM
-    if (bevalterm_ison != (p_bevalterm && on))
+    ถ้า (bevalterm_ison != (p_bevalterm && on))
     {
 	bevalterm_ison = (p_bevalterm && on);
-	if (xterm_mouse_vers > 1 && !bevalterm_ison)
+	ถ้า (xterm_mouse_vers > 1 && !bevalterm_ison)
 	    // disable mouse movement events, enabling is below
 	    out_str_nf((char_u *)("\033[?1003l"));
     }
 #endif
 
-    if (xterm_mouse_vers > 0)
+    ถ้า (xterm_mouse_vers > 0)
     {
-	if (on)	// enable mouse events, use mouse tracking if available
+	ถ้า (on)	// enable mouse events, use mouse tracking if available
 	    out_str_nf((char_u *)
 		       (xterm_mouse_vers > 1
 			? (
@@ -4042,32 +4042,32 @@ mch_setmouse(int on)
 #endif
 			      "\033[?1002h")
 			: "\033[?1000h"));
-	else	// disable mouse events, could probably always send the same
+	มิฉะนั้น	// disable mouse events, could probably always send the same
 	    out_str_nf((char_u *)
 		       (xterm_mouse_vers > 1 ? "\033[?1002l" : "\033[?1000l"));
 	mouse_ison = on;
     }
 
 #ifdef FEAT_MOUSE_DEC
-    else if (ttym_flags == TTYM_DEC)
+    มิฉะนั้น ถ้า (ttym_flags == TTYM_DEC)
     {
-	if (on)	// enable mouse events
+	ถ้า (on)	// enable mouse events
 	    out_str_nf((char_u *)"\033[1;2'z\033[1;3'{");
-	else	// disable mouse events
+	มิฉะนั้น	// disable mouse events
 	    out_str_nf((char_u *)"\033['z");
 	mouse_ison = on;
     }
 #endif
 
 #ifdef FEAT_MOUSE_GPM
-    else
+    มิฉะนั้น
     {
-	if (on)
+	ถ้า (on)
 	{
-	    if (gpm_open())
+	    ถ้า (gpm_open())
 		mouse_ison = TRUE;
 	}
-	else
+	มิฉะนั้น
 	{
 	    gpm_close();
 	    mouse_ison = FALSE;
@@ -4076,14 +4076,14 @@ mch_setmouse(int on)
 #endif
 
 #ifdef FEAT_SYSMOUSE
-    else
+    มิฉะนั้น
     {
-	if (on)
+	ถ้า (on)
 	{
-	    if (sysmouse_open() == OK)
+	    ถ้า (sysmouse_open() == OK)
 		mouse_ison = TRUE;
 	}
-	else
+	มิฉะนั้น
 	{
 	    sysmouse_close();
 	    mouse_ison = FALSE;
@@ -4092,9 +4092,9 @@ mch_setmouse(int on)
 #endif
 
 #ifdef FEAT_MOUSE_JSB
-    else
+    มิฉะนั้น
     {
-	if (on)
+	ถ้า (on)
 	{
 	    // D - Enable Mouse up/down messages
 	    // L - Enable Left Button Reporting
@@ -4113,12 +4113,12 @@ mch_setmouse(int on)
 # ifdef JSBTERM_MOUSE_NONADVANCED
 	    // Disables full feedback of pointer movements
 	    out_str_nf((char_u *)"\033[0~ZwLMRK1Q\033\\");
-# else
+# มิฉะนั้น
 	    out_str_nf((char_u *)"\033[0~ZwLMRK+1Q\033\\");
 # endif
 	    mouse_ison = TRUE;
 	}
-	else
+	มิฉะนั้น
 	{
 	    out_str_nf((char_u *)"\033[0~ZwQ\033\\");
 	    mouse_ison = FALSE;
@@ -4126,19 +4126,19 @@ mch_setmouse(int on)
     }
 #endif
 #ifdef FEAT_MOUSE_PTERM
-    else
+    มิฉะนั้น
     {
 	// 1 = button press, 6 = release, 7 = drag, 1h...9l = right button
-	if (on)
+	ถ้า (on)
 	    out_str_nf("\033[>1h\033[>6h\033[>7h\033[>1h\033[>9l");
-	else
+	มิฉะนั้น
 	    out_str_nf("\033[>1l\033[>6l\033[>7l\033[>1l\033[>9h");
 	mouse_ison = on;
     }
 #endif
 }
 
-#if defined(FEAT_BEVAL_TERM)
+#ถ้า defined(FEAT_BEVAL_TERM)
 /*
  * Called when 'balloonevalterm' changed.
  */
@@ -4156,7 +4156,7 @@ mch_bevalterm_changed(void)
 check_mouse_termcode(void)
 {
 #ifdef FEAT_MOUSE_XTERM
-    if (use_xterm_mouse()
+    ถ้า (use_xterm_mouse()
 # ifdef FEAT_MOUSE_URXVT
 	    && use_xterm_mouse() != 3
 # endif
@@ -4167,7 +4167,7 @@ check_mouse_termcode(void)
     {
 	set_mouse_termcode(KS_MOUSE, (char_u *)(term_is_8bit(T_NAME)
 							? "\233M" : "\033[M"));
-	if (*p_mouse != NUL)
+	ถ้า (*p_mouse != NUL)
 	{
 	    // force mouse off and maybe on to send possibly new mouse
 	    // activation sequence to the xterm, with(out) drag tracing.
@@ -4175,23 +4175,23 @@ check_mouse_termcode(void)
 	    setmouse();
 	}
     }
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_MOUSE);
 #endif
 
 #ifdef FEAT_MOUSE_GPM
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
 	    )
 	set_mouse_termcode(KS_GPM_MOUSE, (char_u *)"\033MG");
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_GPM_MOUSE);
 #endif
 
 #ifdef FEAT_SYSMOUSE
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
@@ -4201,54 +4201,54 @@ check_mouse_termcode(void)
 
 #ifdef FEAT_MOUSE_JSB
     // Conflicts with xterm mouse: "\033[" and "\033[M" ???
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
 	    )
 	set_mouse_termcode(KS_JSBTERM_MOUSE, (char_u *)"\033[0~zw");
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_JSBTERM_MOUSE);
 #endif
 
 #ifdef FEAT_MOUSE_NET
     // There is no conflict, but one may type "ESC }" from Insert mode.  Don't
     // define it in the GUI or when using an xterm.
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
 	    )
 	set_mouse_termcode(KS_NETTERM_MOUSE, (char_u *)"\033}");
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_NETTERM_MOUSE);
 #endif
 
 #ifdef FEAT_MOUSE_DEC
     // Conflicts with xterm mouse: "\033[" and "\033[M"
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
 	    )
 	set_mouse_termcode(KS_DEC_MOUSE, (char_u *)(term_is_8bit(T_NAME)
 							  ? "\233" : "\033["));
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_DEC_MOUSE);
 #endif
 #ifdef FEAT_MOUSE_PTERM
     // same conflict as the dec mouse
-    if (!use_xterm_mouse()
+    ถ้า (!use_xterm_mouse()
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
 	    )
 	set_mouse_termcode(KS_PTERM_MOUSE, (char_u *)"\033[");
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_PTERM_MOUSE);
 #endif
 #ifdef FEAT_MOUSE_URXVT
-    if (use_xterm_mouse() == 3
+    ถ้า (use_xterm_mouse() == 3
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
@@ -4257,16 +4257,16 @@ check_mouse_termcode(void)
 	set_mouse_termcode(KS_URXVT_MOUSE, (char_u *)(term_is_8bit(T_NAME)
 						      ? "\233*M" : "\033[*M"));
 
-	if (*p_mouse != NUL)
+	ถ้า (*p_mouse != NUL)
 	{
 	    mch_setmouse(FALSE);
 	    setmouse();
 	}
     }
-    else
+    มิฉะนั้น
 	del_mouse_termcode(KS_URXVT_MOUSE);
 #endif
-    if (use_xterm_mouse() == 4
+    ถ้า (use_xterm_mouse() == 4
 #ifdef FEAT_GUI
 	    && !gui.in_use
 #endif
@@ -4278,13 +4278,13 @@ check_mouse_termcode(void)
 	set_mouse_termcode(KS_SGR_MOUSE_RELEASE, (char_u *)(term_is_8bit(T_NAME)
 						    ? "\233<*m" : "\033[<*m"));
 
-	if (*p_mouse != NUL)
+	ถ้า (*p_mouse != NUL)
 	{
 	    mch_setmouse(FALSE);
 	    setmouse();
 	}
     }
-    else
+    มิฉะนั้น
     {
 	del_mouse_termcode(KS_SGR_MOUSE);
 	del_mouse_termcode(KS_SGR_MOUSE_RELEASE);
@@ -4301,7 +4301,7 @@ check_mouse_termcode(void)
  * 4. keep using the old values
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
+    จำนวนเต็ม
 mch_get_shellsize(void)
 {
     long	rows = 0;
@@ -4316,13 +4316,13 @@ mch_get_shellsize(void)
      */
 # ifdef TIOCGWINSZ
     {
-	struct winsize	ws;
-	int fd = 1;
+	sa_nracanaa winsize	ws;
+	จำนวนเต็ม fd = 1;
 
 	// When stdout is not a tty, use stdin for the ioctl().
-	if (!isatty(fd) && isatty(read_cmd_fd))
+	ถ้า (!isatty(fd) && isatty(read_cmd_fd))
 	    fd = read_cmd_fd;
-	if (ioctl(fd, TIOCGWINSZ, &ws) == 0)
+	ถ้า (ioctl(fd, TIOCGWINSZ, &ws) == 0)
 	{
 	    columns = ws.ws_col;
 	    rows = ws.ws_row;
@@ -4331,16 +4331,16 @@ mch_get_shellsize(void)
 #  endif
 	}
     }
-# else // TIOCGWINSZ
+# มิฉะนั้น // TIOCGWINSZ
 #  ifdef TIOCGSIZE
     {
-	struct ttysize	ts;
-	int fd = 1;
+	sa_nracanaa ttysize	ts;
+	จำนวนเต็ม fd = 1;
 
 	// When stdout is not a tty, use stdin for the ioctl().
-	if (!isatty(fd) && isatty(read_cmd_fd))
+	ถ้า (!isatty(fd) && isatty(read_cmd_fd))
 	    fd = read_cmd_fd;
-	if (ioctl(fd, TIOCGSIZE, &ts) == 0)
+	ถ้า (ioctl(fd, TIOCGSIZE, &ts) == 0)
 	{
 	    columns = ts.ts_cols;
 	    rows = ts.ts_lines;
@@ -4357,18 +4357,18 @@ mch_get_shellsize(void)
      *    When being POSIX compliant ('|' flag in 'cpoptions') this overrules
      *    the ioctl() values!
      */
-    if (columns == 0 || rows == 0 || vim_strchr(p_cpo, CPO_TSIZE) != NULL)
+    ถ้า (columns == 0 || rows == 0 || vim_strchr(p_cpo, CPO_TSIZE) != NULL)
     {
-	if ((p = (char_u *)getenv("LINES")))
+	ถ้า ((p = (char_u *)getenv("LINES")))
 	{
-	    rows = atoi((char *)p);
+	    rows = atoi((var_na *)p);
 # ifdef FEAT_EVAL
 	    ch_log(NULL, "Got 'lines' from $LINES: %ld", rows);
 # endif
 	}
-	if ((p = (char_u *)getenv("COLUMNS")))
+	ถ้า ((p = (char_u *)getenv("COLUMNS")))
 	{
-	    columns = atoi((char *)p);
+	    columns = atoi((var_na *)p);
 # ifdef FEAT_EVAL
 	    ch_log(NULL, "Got 'columns' from $COLUMNS: %ld", columns);
 # endif
@@ -4379,7 +4379,7 @@ mch_get_shellsize(void)
     /*
      * 3. try reading "co" and "li" entries from termcap
      */
-    if (columns == 0 || rows == 0)
+    ถ้า (columns == 0 || rows == 0)
     {
 	getlinecol(&columns, &rows);
 #  ifdef FEAT_EVAL
@@ -4391,26 +4391,26 @@ mch_get_shellsize(void)
     /*
      * 4. If everything fails, use the old values
      */
-    if (columns <= 0 || rows <= 0)
-	return FAIL;
+    ถ้า (columns <= 0 || rows <= 0)
+	คืน FAIL;
 
     Rows = rows;
     Columns = columns;
     limit_screen_size();
-    return OK;
+    คืน OK;
 }
 
-# if defined(FEAT_EVAL) || defined(FEAT_IMAGE)
+# ถ้า defined(FEAT_EVAL) || defined(FEAT_IMAGE)
 /*
  * Try to get the current terminal cell size. May return -1 x -1.
  */
     void
-mch_calc_cell_size(struct cellsize *cs_out)
+mch_calc_cell_size(sa_nracanaa cellsize *cs_out)
 {
-   struct winsize   ws;
-   int		    retval;
-   int		    x_cell_size;
-   int		    y_cell_size;
+   sa_nracanaa winsize   ws;
+   จำนวนเต็ม		    retval;
+   จำนวนเต็ม		    x_cell_size;
+   จำนวนเต็ม		    y_cell_size;
 
    // If fd is not a terminal, then -1 is returned
    retval = ioctl(read_cmd_fd, TIOCGWINSZ, &ws);
@@ -4419,11 +4419,11 @@ mch_calc_cell_size(struct cellsize *cs_out)
    ch_log(NULL, "ioctl(TIOCGWINSZ) %s", retval == 0 ? "success" : "failed");
 #  endif
 
-   if (retval == -1 || ws.ws_col == 0 || ws.ws_row == 0)
+   ถ้า (retval == -1 || ws.ws_col == 0 || ws.ws_row == 0)
    {
 	cs_out->cs_xpixel = -1;
 	cs_out->cs_ypixel = -1;
-	return;
+	คืน;
    }
 
    // Calculate parent tty's pixel per cell.
@@ -4436,7 +4436,7 @@ mch_calc_cell_size(struct cellsize *cs_out)
    // Some terminals do not handle TIOCGWINSZ, send CSI 14 t (query terminal
    // size in pixels), and CSI 16 t (less common, gets cell size in pixels
    // directly).
-   if (x_cell_size <= 0 || y_cell_size <= 0)
+   ถ้า (x_cell_size <= 0 || y_cell_size <= 0)
    {
        // Default to 8x16 pixels for now until we receive a response.
        OUT_STR("\033[14t");
@@ -4446,22 +4446,22 @@ mch_calc_cell_size(struct cellsize *cs_out)
 }
 # endif
 
-# if defined(FEAT_TERMINAL)
+# ถ้า defined(FEAT_TERMINAL)
 /*
  * Report the windows size "rows" and "cols" to tty "fd".
  */
-    int
-mch_report_winsize(int fd, int rows, int cols)
+    จำนวนเต็ม
+mch_report_winsize(จำนวนเต็ม fd, จำนวนเต็ม rows, จำนวนเต็ม cols)
 {
-    int		tty_fd;
-    int		retval = -1;
+    จำนวนเต็ม		tty_fd;
+    จำนวนเต็ม		retval = -1;
 
     tty_fd = get_tty_fd(fd);
-    if (tty_fd < 0)
-	return FAIL;
+    ถ้า (tty_fd < 0)
+	คืน FAIL;
 
-#  if defined(TIOCSWINSZ)
-    struct winsize ws;
+#  ถ้า defined(TIOCSWINSZ)
+    sa_nracanaa winsize ws;
 
     ws.ws_col = cols;
     ws.ws_row = rows;
@@ -4479,16 +4479,16 @@ mch_report_winsize(int fd, int rows, int cols)
     retval = ioctl(tty_fd, TIOCSWINSZ, &ws);
     ch_log(NULL, "ioctl(TIOCSWINSZ) %s", retval == 0 ? "success" : "failed");
 #  elif defined(TIOCSSIZE)
-    struct ttysize ts;
+    sa_nracanaa ttysize ts;
 
     ts.ts_cols = cols;
     ts.ts_lines = rows;
     retval = ioctl(tty_fd, TIOCSSIZE, &ts);
     ch_log(NULL, "ioctl(TIOCSSIZE) %s", retval == 0 ? "success" : "failed");
 #  endif
-    if (tty_fd != fd)
+    ถ้า (tty_fd != fd)
 	close(tty_fd);
-    return retval == 0 ? OK : FAIL;
+    คืน retval == 0 ? OK : FAIL;
 }
 # endif
 
@@ -4498,14 +4498,14 @@ mch_report_winsize(int fd, int rows, int cols)
     void
 mch_set_shellsize(void)
 {
-    if (*T_CWS)
+    ถ้า (*T_CWS)
     {
 	/*
 	 * NOTE: if you get an error here that term_set_winsize() is
 	 * undefined, check the output of configure.  It could probably not
 	 * find a ncurses, termcap or termlib library.
 	 */
-	term_set_winsize((int)Rows, (int)Columns);
+	term_set_winsize((จำนวนเต็ม)Rows, (จำนวนเต็ม)Columns);
 	out_flush();
 	screen_start();			// don't know where cursor is now
     }
@@ -4532,32 +4532,32 @@ wait4pid(pid_t child, waitstatus *status)
     pid_t wait_pid = 0;
     long delay_msec = 1;
 
-    while (wait_pid != child)
+    ขณะ (wait_pid != child)
     {
 	// When compiled with Python threads are probably used, in which case
 	// wait() sometimes hangs for no obvious reason.  Use waitpid()
 	// instead and loop (like the GUI). Also needed for other interfaces,
 	// they might call system().
 	wait_pid = waitpid(child, status, WNOHANG);
-	if (wait_pid == 0)
+	ถ้า (wait_pid == 0)
 	{
 	    // Wait for 1 to 10 msec before trying again.
 	    mch_delay(delay_msec, MCH_DELAY_IGNOREINPUT | MCH_DELAY_SETTMODE);
-	    if (++delay_msec > 10)
+	    ถ้า (++delay_msec > 10)
 		delay_msec = 10;
 	    continue;
 	}
-	if (wait_pid <= 0
+	ถ้า (wait_pid <= 0
 #ifdef ECHILD
 		&& errno == ECHILD
 #endif
 	   )
-	    break;
+	    bha_nga;
     }
-    return wait_pid;
+    คืน wait_pid;
 }
 
-#if !defined(USE_SYSTEM) || defined(FEAT_JOB_CHANNEL)
+#ถ้า !defined(USE_SYSTEM) || defined(FEAT_JOB_CHANNEL)
 /*
  * Set the environment for a child process.
  */
@@ -4565,86 +4565,86 @@ wait4pid(pid_t child, waitstatus *status)
 set_child_environment(
 	long	rows,
 	long	columns,
-	char	*term,
-	int	is_terminal UNUSED)
+	var_na	*term,
+	จำนวนเต็ม	is_terminal UNUSED)
 {
 # ifdef HAVE_SETENV
-    char	envbuf[50];
-# else
-    static char	envbuf_Term[30];
-    static char	envbuf_Rows[20];
-    static char	envbuf_Lines[20];
-    static char	envbuf_Columns[20];
-    static char	envbuf_Colors[20];
+    var_na	envbuf[50];
+# มิฉะนั้น
+    static var_na	envbuf_Term[30];
+    static var_na	envbuf_Rows[20];
+    static var_na	envbuf_Lines[20];
+    static var_na	envbuf_Columns[20];
+    static var_na	envbuf_Colors[20];
 #  ifdef FEAT_TERMINAL
-    static char	envbuf_Version[20];
+    static var_na	envbuf_Version[20];
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    static char	envbuf_Servername[60];
+    static var_na	envbuf_Servername[60];
 #  endif
 # endif
 
 # ifdef HAVE_SETENV
     setenv("TERM", term, 1);
-    sprintf((char *)envbuf, "%ld", rows);
-    setenv("ROWS", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%ld", rows);
-    setenv("LINES", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%ld", columns);
-    setenv("COLUMNS", (char *)envbuf, 1);
-    sprintf((char *)envbuf, "%d", t_colors);
-    setenv("COLORS", (char *)envbuf, 1);
+    sprintf((var_na *)envbuf, "%ld", rows);
+    setenv("ROWS", (var_na *)envbuf, 1);
+    sprintf((var_na *)envbuf, "%ld", rows);
+    setenv("LINES", (var_na *)envbuf, 1);
+    sprintf((var_na *)envbuf, "%ld", columns);
+    setenv("COLUMNS", (var_na *)envbuf, 1);
+    sprintf((var_na *)envbuf, "%d", t_colors);
+    setenv("COLORS", (var_na *)envbuf, 1);
 #  ifdef FEAT_TERMINAL
-    if (is_terminal)
+    ถ้า (is_terminal)
     {
-	sprintf((char *)envbuf, "%ld",  (long)get_vim_var_nr(VV_VERSION));
-	setenv("VIM_TERMINAL", (char *)envbuf, 1);
+	sprintf((var_na *)envbuf, "%ld",  (long)get_vim_var_nr(VV_VERSION));
+	setenv("VIM_TERMINAL", (var_na *)envbuf, 1);
     }
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    setenv("VIM_SERVERNAME", serverName == NULL ? "" : (char *)serverName, 1);
+    setenv("VIM_SERVERNAME", serverName == NULL ? "" : (var_na *)serverName, 1);
 #  endif
-# else
+# มิฉะนั้น
     /*
      * Putenv does not copy the string, it has to remain valid.
      * Use a static array to avoid losing allocated memory.
      * This won't work well when running multiple children...
      */
-    vim_snprintf(envbuf_Term, sizeof(envbuf_Term), "TERM=%s", term);
+    vim_snprintf(envbuf_Term, parimaa_na(envbuf_Term), "TERM=%s", term);
     putenv(envbuf_Term);
-    vim_snprintf(envbuf_Rows, sizeof(envbuf_Rows), "ROWS=%ld", rows);
+    vim_snprintf(envbuf_Rows, parimaa_na(envbuf_Rows), "ROWS=%ld", rows);
     putenv(envbuf_Rows);
-    vim_snprintf(envbuf_Lines, sizeof(envbuf_Lines), "LINES=%ld", rows);
+    vim_snprintf(envbuf_Lines, parimaa_na(envbuf_Lines), "LINES=%ld", rows);
     putenv(envbuf_Lines);
-    vim_snprintf(envbuf_Columns, sizeof(envbuf_Columns),
+    vim_snprintf(envbuf_Columns, parimaa_na(envbuf_Columns),
 						       "COLUMNS=%ld", columns);
     putenv(envbuf_Columns);
-    vim_snprintf(envbuf_Colors, sizeof(envbuf_Colors), "COLORS=%ld", t_colors);
+    vim_snprintf(envbuf_Colors, parimaa_na(envbuf_Colors), "COLORS=%ld", t_colors);
     putenv(envbuf_Colors);
 #  ifdef FEAT_TERMINAL
-    if (is_terminal)
+    ถ้า (is_terminal)
     {
-	vim_snprintf(envbuf_Version, sizeof(envbuf_Version),
+	vim_snprintf(envbuf_Version, parimaa_na(envbuf_Version),
 			 "VIM_TERMINAL=%ld", (long)get_vim_var_nr(VV_VERSION));
 	putenv(envbuf_Version);
     }
 #  endif
 #  ifdef FEAT_CLIENTSERVER
-    vim_snprintf(envbuf_Servername, sizeof(envbuf_Servername),
-	    "VIM_SERVERNAME=%s", serverName == NULL ? "" : (char *)serverName);
+    vim_snprintf(envbuf_Servername, parimaa_na(envbuf_Servername),
+	    "VIM_SERVERNAME=%s", serverName == NULL ? "" : (var_na *)serverName);
     putenv(envbuf_Servername);
 #  endif
 # endif
 }
 
     static void
-set_default_child_environment(int is_terminal)
+set_default_child_environment(จำนวนเต็ม is_terminal)
 {
     set_child_environment(Rows, Columns, "dumb", is_terminal);
 }
 #endif
 
-#if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#ถ้า defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
 /*
  * Open a PTY, with FD for the master and slave side.
  * When failing "pty_master_fd" and "pty_slave_fd" are -1.
@@ -4652,37 +4652,37 @@ set_default_child_environment(int is_terminal)
  * is stored in both "*name1" and "*name2".
  */
     static void
-open_pty(int *pty_master_fd, int *pty_slave_fd, char_u **name1, char_u **name2)
+open_pty(จำนวนเต็ม *pty_master_fd, จำนวนเต็ม *pty_slave_fd, char_u **name1, char_u **name2)
 {
-    char	*tty_name;
+    var_na	*tty_name;
 
-    if (name1 != NULL)
+    ถ้า (name1 != NULL)
 	*name1 = NULL;
-    if (name2 != NULL)
+    ถ้า (name2 != NULL)
 	*name2 = NULL;
 
     *pty_master_fd = mch_openpty(&tty_name);	    // open pty
-    if (*pty_master_fd < 0)
-	return;
+    ถ้า (*pty_master_fd < 0)
+	คืน;
 
     // Leaving out O_NOCTTY may lead to waitpid() always returning
     // 0 on Mac OS X 10.7 thereby causing freezes. Let's assume
     // adding O_NOCTTY always works when defined.
 # ifdef O_NOCTTY
     *pty_slave_fd = open(tty_name, O_RDWR | O_NOCTTY | O_EXTRA, 0);
-# else
+# มิฉะนั้น
     *pty_slave_fd = open(tty_name, O_RDWR | O_EXTRA, 0);
 # endif
-    if (*pty_slave_fd < 0)
+    ถ้า (*pty_slave_fd < 0)
     {
 	close(*pty_master_fd);
 	*pty_master_fd = -1;
     }
-    else
+    มิฉะนั้น
     {
-	if (name1 != NULL)
+	ถ้า (name1 != NULL)
 	    *name1 = vim_strsave((char_u *)tty_name);
-	if (name2 != NULL)
+	ถ้า (name2 != NULL)
 	    *name2 = vim_strsave((char_u *)tty_name);
     }
 }
@@ -4692,104 +4692,104 @@ open_pty(int *pty_master_fd, int *pty_slave_fd, char_u **name1, char_u **name2)
  * Send SIGINT to a child process if "c" is an interrupt character.
  */
     static void
-may_send_sigint(int c UNUSED, pid_t pid UNUSED, pid_t wpid UNUSED)
+may_send_sigint(จำนวนเต็ม c UNUSED, pid_t pid UNUSED, pid_t wpid UNUSED)
 {
 #ifdef SIGINT
-    if (c == Ctrl_C || c == intr_char)
+    ถ้า (c == Ctrl_C || c == intr_char)
     {
 # ifdef HAVE_SETSID
 	kill(-pid, SIGINT);
-# else
+# มิฉะนั้น
 	kill(0, SIGINT);
 # endif
-	if (wpid > 0)
+	ถ้า (wpid > 0)
 	    kill(wpid, SIGINT);
     }
 #endif
 }
 
-#if !defined(USE_SYSTEM) || defined(FEAT_TERMINAL)
+#ถ้า !defined(USE_SYSTEM) || defined(FEAT_TERMINAL)
 
 /*
  * Parse "cmd" and return the result in "argvp" which is an allocated array of
  * pointers, the last one is NULL.
  * The "sh_tofree" and "shcf_tofree" must be later freed by the caller.
  */
-    int
+    จำนวนเต็ม
 unix_build_argv(
 	char_u *cmd,
-	char ***argvp,
+	var_na ***argvp,
 	char_u **sh_tofree,
 	char_u **shcf_tofree)
 {
-    char	**argv = NULL;
-    int		argc;
+    var_na	**argv = NULL;
+    จำนวนเต็ม		argc;
 
     *sh_tofree = vim_strsave(p_sh);
-    if (*sh_tofree == NULL)		// out of memory
-	return FAIL;
+    ถ้า (*sh_tofree == NULL)		// out of memory
+	คืน FAIL;
 
-    if (mch_parse_cmd(*sh_tofree, TRUE, &argv, &argc) == FAIL)
-	return FAIL;
+    ถ้า (mch_parse_cmd(*sh_tofree, TRUE, &argv, &argc) == FAIL)
+	คืน FAIL;
     *argvp = argv;
 
-    if (cmd != NULL)
+    ถ้า (cmd != NULL)
     {
 	char_u	*s;
 	char_u	*p;
 
-	if (extra_shell_arg != NULL)
-	    argv[argc++] = (char *)extra_shell_arg;
+	ถ้า (extra_shell_arg != NULL)
+	    argv[argc++] = (var_na *)extra_shell_arg;
 
 	// Break 'shellcmdflag' into white separated parts.  This doesn't
 	// handle quoted strings, they are very unlikely to appear.
 	*shcf_tofree = alloc(STRLEN(p_shcf) + 1);
-	if (*shcf_tofree == NULL)    // out of memory
-	    return FAIL;
+	ถ้า (*shcf_tofree == NULL)    // out of memory
+	    คืน FAIL;
 	s = *shcf_tofree;
 	p = p_shcf;
-	while (*p != NUL)
+	ขณะ (*p != NUL)
 	{
-	    argv[argc++] = (char *)s;
-	    while (*p && *p != ' ' && *p != TAB)
+	    argv[argc++] = (var_na *)s;
+	    ขณะ (*p && *p != ' ' && *p != TAB)
 		*s++ = *p++;
 	    *s++ = NUL;
 	    p = skipwhite(p);
 	}
 
-	argv[argc++] = (char *)cmd;
+	argv[argc++] = (var_na *)cmd;
     }
     argv[argc] = NULL;
-    return OK;
+    คืน OK;
 }
 #endif
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#ถ้า defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    static จำนวนเต็ม
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    จำนวนเต็ม		options UNUSED)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char	**argv = NULL;
+    var_na	**argv = NULL;
     char_u	*tofree1 = NULL;
     char_u	*tofree2 = NULL;
-    int		retval = -1;
+    จำนวนเต็ม		retval = -1;
     buf_T	*buf;
     job_T	*job;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
+    ถ้า (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
 	goto theend;
 
     init_job_options(&opt);
     ch_log(NULL, "starting terminal for system command '%s'", cmd);
     buf = term_start(NULL, argv, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    ถ้า (buf == NULL)
 	goto theend;
 
     job = term_getjob(buf->b_term);
@@ -4797,20 +4797,20 @@ mch_call_shell_terminal(
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    ถ้า (curbuf == buf)
     {
 	// Only when managed to find a window for "buf",
 	clear_oparg(&oa);
-	while (term_use_loop())
+	ขณะ (term_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    ถ้า (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
+		ถ้า (terminal_loop(TRUE) == OK)
 		    normal_cmd(&oa, TRUE);
 	    }
-	    else
+	    มิฉะนั้น
 		normal_cmd(&oa, TRUE);
 	}
 	retval = job->jv_exitval;
@@ -4824,7 +4824,7 @@ mch_call_shell_terminal(
 
     // Only require pressing Enter when redrawing, to avoid that system() gets
     // the hit-enter prompt even though it didn't output anything.
-    if (RedrawingDisabled == 0)
+    ถ้า (RedrawingDisabled == 0)
 	wait_return(TRUE);
     do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
 
@@ -4832,7 +4832,7 @@ theend:
     vim_free(argv);
     vim_free(tofree1);
     vim_free(tofree2);
-    return retval;
+    คืน retval;
 }
 #endif
 
@@ -4840,65 +4840,65 @@ theend:
 /*
  * Use system() to start the shell: simple but slow.
  */
-    static int
+    static จำนวนเต็ม
 mch_call_shell_system(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    จำนวนเต็ม		options)	// SHELL_*, see vim.h
 {
 # ifdef VMS
-    char	*ifn = NULL;
-    char	*ofn = NULL;
+    var_na	*ifn = NULL;
+    var_na	*ofn = NULL;
 # endif
     tmode_T	tmode = cur_tmode;
     char_u	*newcmd;	// only needed for unix
-    int		x;
+    จำนวนเต็ม		x;
 
     out_flush();
 
-    if (options & SHELL_COOKED)
+    ถ้า (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	    // set to normal mode
 
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ถ้า defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
-#  if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  ถ้า defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     save_clipboard();
 #  endif
     loose_clipboard();
 # endif
 
-    if (cmd == NULL)
-	x = system((char *)p_sh);
-    else
+    ถ้า (cmd == NULL)
+	x = system((var_na *)p_sh);
+    มิฉะนั้น
     {
 # ifdef VMS
-	if (ofn = strchr((char *)cmd, '>'))
+	ถ้า (ofn = strchr((var_na *)cmd, '>'))
 	    *ofn++ = '\0';
-	if (ifn = strchr((char *)cmd, '<'))
+	ถ้า (ifn = strchr((var_na *)cmd, '<'))
 	{
-	    char *p;
+	    var_na *p;
 
 	    *ifn++ = '\0';
 	    p = strchr(ifn,' '); // chop off any trailing spaces
-	    if (p)
+	    ถ้า (p)
 		*p = '\0';
 	}
-	if (ofn)
-	    x = vms_sys((char *)cmd, ofn, ifn);
-	else
-	    x = system((char *)cmd);
-# else
+	ถ้า (ofn)
+	    x = vms_sys((var_na *)cmd, ofn, ifn);
+	มิฉะนั้น
+	    x = system((var_na *)cmd);
+# มิฉะนั้น
 	newcmd = alloc(STRLEN(p_sh)
 		+ (extra_shell_arg == NULL ? 0 : STRLEN(extra_shell_arg))
 		+ STRLEN(p_shcf) + STRLEN(cmd) + 4);
-	if (newcmd == NULL)
+	ถ้า (newcmd == NULL)
 	    x = 0;
-	else
+	มิฉะนั้น
 	{
-	    sprintf((char *)newcmd, "%s %s %s %s", p_sh,
-		    extra_shell_arg == NULL ? "" : (char *)extra_shell_arg,
-		    (char *)p_shcf,
-		    (char *)cmd);
-	    x = system((char *)newcmd);
+	    sprintf((var_na *)newcmd, "%s %s %s %s", p_sh,
+		    extra_shell_arg == NULL ? "" : (var_na *)extra_shell_arg,
+		    (var_na *)p_shcf,
+		    (var_na *)cmd);
+	    x = system((var_na *)newcmd);
 	    vim_free(newcmd);
 	}
 # endif
@@ -4906,32 +4906,32 @@ mch_call_shell_system(
 # ifdef VMS
     x = vms_sys_status(x);
 # endif
-    if (emsg_silent)
+    ถ้า (emsg_silent)
 	;
-    else if (x == 127)
+    มิฉะนั้น ถ้า (x == 127)
 	msg_puts(_("\nCannot execute shell sh\n"));
-    else if (x && !(options & SHELL_SILENT))
+    มิฉะนั้น ถ้า (x && !(options & SHELL_SILENT))
     {
 	msg_puts(_("\nshell returned "));
 	msg_outnum((long)x);
 	msg_putchar('\n');
     }
 
-    if (tmode == TMODE_RAW)
+    ถ้า (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
 	settmode(TMODE_RAW);	// set to raw mode
     }
     resettitle();
-# if defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
+# ถ้า defined(FEAT_CLIPBOARD) && (defined(FEAT_X11) \
 	|| defined(FEAT_WAYLAND_CLIPBOARD))
     restore_clipboard();
 # endif
-    return x;
+    คืน x;
 }
 
-#else // USE_SYSTEM
+#มิฉะนั้น // USE_SYSTEM
 
 # define EXEC_FAILED 122    // Exit code when shell didn't execute.  Don't use
 			    // 127, some shells use that already
@@ -4940,38 +4940,38 @@ mch_call_shell_system(
 /*
  * Don't use system(), use fork()/exec().
  */
-    static int
+    static จำนวนเต็ม
 mch_call_shell_fork(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    จำนวนเต็ม		options)	// SHELL_*, see vim.h
 {
     tmode_T	tmode = cur_tmode;
     pid_t	pid;
     pid_t	wpid = 0;
     pid_t	wait_pid = 0;
-    int		status = -1;
-    int		retval = -1;
-    char	**argv = NULL;
+    จำนวนเต็ม		status = -1;
+    จำนวนเต็ม		retval = -1;
+    var_na	**argv = NULL;
     char_u	*tofree1 = NULL;
     char_u	*tofree2 = NULL;
-    int		i;
-    int		pty_master_fd = -1;	    // for pty's
+    จำนวนเต็ม		i;
+    จำนวนเต็ม		pty_master_fd = -1;	    // for pty's
 # ifdef FEAT_GUI
-    int		pty_slave_fd = -1;
+    จำนวนเต็ม		pty_slave_fd = -1;
 # endif
-    int		fd_toshell[2];		// for pipes
-    int		fd_fromshell[2];
-    int		pipe_error = FALSE;
-    int		did_settmode = FALSE;	// settmode(TMODE_RAW) called
+    จำนวนเต็ม		fd_toshell[2];		// for pipes
+    จำนวนเต็ม		fd_fromshell[2];
+    จำนวนเต็ม		pipe_error = FALSE;
+    จำนวนเต็ม		did_settmode = FALSE;	// settmode(TMODE_RAW) called
 
     out_flush();
-    if (options & SHELL_COOKED)
+    ถ้า (options & SHELL_COOKED)
 	settmode(TMODE_COOK);		// set to normal mode
-    if (tmode == TMODE_RAW)
+    ถ้า (tmode == TMODE_RAW)
 	// The shell may have messed with the mode, always set it later.
 	cur_tmode = TMODE_UNKNOWN;
 
-    if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
+    ถ้า (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == FAIL)
 	goto error;
 
     /*
@@ -4979,7 +4979,7 @@ mch_call_shell_fork(
      * input from the buffer: Try using a pseudo-tty to get the stdin/stdout
      * of the executed command into the Vim window.  Or use a pipe.
      */
-    if ((options & (SHELL_READ|SHELL_WRITE))
+    ถ้า ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 	    || (gui.in_use && show_shell_mess)
 # endif
@@ -4991,25 +4991,25 @@ mch_call_shell_fork(
 	 * If this works, open the slave pty.
 	 * If the slave can't be opened, close the master pty.
 	 */
-	if (p_guipty && !(options & (SHELL_READ|SHELL_WRITE)))
+	ถ้า (p_guipty && !(options & (SHELL_READ|SHELL_WRITE)))
 	    open_pty(&pty_master_fd, &pty_slave_fd, NULL, NULL);
 	/*
 	 * If not opening a pty or it didn't work, try using pipes.
 	 */
-	if (pty_master_fd < 0)
+	ถ้า (pty_master_fd < 0)
 # endif
 	{
 	    pipe_error = (pipe(fd_toshell) < 0);
-	    if (!pipe_error)			    // pipe create OK
+	    ถ้า (!pipe_error)			    // pipe create OK
 	    {
 		pipe_error = (pipe(fd_fromshell) < 0);
-		if (pipe_error)			    // pipe create failed
+		ถ้า (pipe_error)			    // pipe create failed
 		{
 		    close(fd_toshell[0]);
 		    close(fd_toshell[1]);
 		}
 	    }
-	    if (pipe_error)
+	    ถ้า (pipe_error)
 	    {
 		msg_puts(_("\nCannot create pipes\n"));
 		out_flush();
@@ -5017,29 +5017,29 @@ mch_call_shell_fork(
 	}
     }
 
-    if (!pipe_error)			// pty or pipe opened or not used
+    ถ้า (!pipe_error)			// pty or pipe opened or not used
     {
 	SIGSET_DECL(curset)
 	BLOCK_SIGNALS(&curset);
 	pid = fork();	// maybe we should use vfork()
-	if (pid == -1)
+	ถ้า (pid == -1)
 	{
 	    UNBLOCK_SIGNALS(&curset);
 
 	    msg_puts(_("\nCannot fork\n"));
-	    if ((options & (SHELL_READ|SHELL_WRITE))
+	    ถ้า ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		|| (gui.in_use && show_shell_mess)
 # endif
 		    )
 	    {
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)		// close the pseudo tty
+		ถ้า (pty_master_fd >= 0)		// close the pseudo tty
 		{
 		    close(pty_master_fd);
 		    close(pty_slave_fd);
 		}
-		else				// close the pipes
+		มิฉะนั้น				// close the pipes
 # endif
 		{
 		    close(fd_toshell[0]);
@@ -5049,22 +5049,22 @@ mch_call_shell_fork(
 		}
 	    }
 	}
-	else if (pid == 0)	// child
+	มิฉะนั้น ถ้า (pid == 0)	// child
 	{
 	    reset_signals();		// handle signals normally
 	    UNBLOCK_SIGNALS(&curset);
 
 # ifdef FEAT_EVAL
-	    if (ch_log_active())
+	    ถ้า (ch_log_active())
 	    {
 		ch_log(NULL, "closing channel log in the child process");
 		ch_logfile((char_u *)"", (char_u *)"");
 	    }
 # endif
 
-	    if (!show_shell_mess || (options & SHELL_EXPAND))
+	    ถ้า (!show_shell_mess || (options & SHELL_EXPAND))
 	    {
-		int fd;
+		จำนวนเต็ม fd;
 
 		/*
 		 * Don't want to show any message from the shell.  Can't just
@@ -5088,7 +5088,7 @@ mch_call_shell_fork(
 		 * or dup() failed we'd just do the same thing ourselves
 		 * anyway -- webb
 		 */
-		if (fd >= 0)
+		ถ้า (fd >= 0)
 		{
 		    vim_ignored = dup(fd); // To replace stdin  (fd 0)
 		    vim_ignored = dup(fd); // To replace stdout (fd 1)
@@ -5098,7 +5098,7 @@ mch_call_shell_fork(
 		    close(fd);
 		}
 	    }
-	    else if ((options & (SHELL_READ|SHELL_WRITE))
+	    มิฉะนั้น ถ้า ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		    || gui.in_use
 # endif
@@ -5109,10 +5109,10 @@ mch_call_shell_fork(
 		// Create our own process group, so that the child and all its
 		// children can be kill()ed.  Don't do this when using pipes,
 		// because stdin is not a tty, we would lose /dev/tty.
-		if (p_stmp)
+		ถ้า (p_stmp)
 		{
 		    (void)setsid();
-#  if defined(SIGHUP)
+#  ถ้า defined(SIGHUP)
 		    // When doing "!xterm&" and 'shell' is bash: the shell
 		    // will exit and send SIGHUP to all processes in its
 		    // group, killing the just started process.  Ignore SIGHUP
@@ -5122,15 +5122,15 @@ mch_call_shell_fork(
 		}
 # endif
 # ifdef FEAT_GUI
-		if (pty_slave_fd >= 0)
+		ถ้า (pty_slave_fd >= 0)
 		{
 		    // push stream discipline modules
-		    if (options & SHELL_COOKED)
+		    ถ้า (options & SHELL_COOKED)
 			setup_slavepty(pty_slave_fd);
 #  ifdef TIOCSCTTY
 		    // Try to become controlling tty (probably doesn't work,
 		    // unless run by root)
-		    ioctl(pty_slave_fd, TIOCSCTTY, (char *)NULL);
+		    ioctl(pty_slave_fd, TIOCSCTTY, (var_na *)NULL);
 #  endif
 		}
 # endif
@@ -5142,7 +5142,7 @@ mch_call_shell_fork(
 		 * passphrase using stderr.
 		 */
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)
+		ถ้า (pty_master_fd >= 0)
 		{
 		    close(pty_master_fd);   // close master side of pty
 
@@ -5151,7 +5151,7 @@ mch_call_shell_fork(
 		    vim_ignored = dup(pty_slave_fd);
 		    close(1);
 		    vim_ignored = dup(pty_slave_fd);
-		    if (gui.in_use)
+		    ถ้า (gui.in_use)
 		    {
 			close(2);
 			vim_ignored = dup(pty_slave_fd);
@@ -5159,7 +5159,7 @@ mch_call_shell_fork(
 
 		    close(pty_slave_fd);    // has been dupped, close it now
 		}
-		else
+		มิฉะนั้น
 # endif
 		{
 		    // set up stdin for the child
@@ -5175,7 +5175,7 @@ mch_call_shell_fork(
 		    close(fd_fromshell[1]);
 
 # ifdef FEAT_GUI
-		    if (gui.in_use)
+		    ถ้า (gui.in_use)
 		    {
 			// set up stderr for the child
 			close(2);
@@ -5195,7 +5195,7 @@ mch_call_shell_fork(
 	    execvp(argv[0], argv);
 	    _exit(EXEC_FAILED);	    // exec failed, return failure code
 	}
-	else			// parent
+	มิฉะนั้น			// parent
 	{
 	    /*
 	     * While child is running, ignore terminating signals.
@@ -5212,7 +5212,7 @@ mch_call_shell_fork(
 	     * This is also used to pipe stdin/stdout to/from the external
 	     * command.
 	     */
-	    if ((options & (SHELL_READ|SHELL_WRITE))
+	    ถ้า ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		    || (gui.in_use && show_shell_mess)
 # endif
@@ -5220,28 +5220,28 @@ mch_call_shell_fork(
 	    {
 # define BUFLEN 100		// length for buffer, pseudo tty limit is 128
 		char_u	    buffer[BUFLEN + 1];
-		int	    buffer_off = 0;	// valid bytes in buffer[]
+		จำนวนเต็ม	    buffer_off = 0;	// valid bytes in buffer[]
 		char_u	    ta_buf[BUFLEN + 1];	// TypeAHead
-		int	    ta_len = 0;		// valid bytes in ta_buf[]
-		int	    len;
-		int	    p_more_save;
-		int	    old_State;
-		int	    c;
-		int	    toshell_fd;
-		int	    fromshell_fd;
+		จำนวนเต็ม	    ta_len = 0;		// valid bytes in ta_buf[]
+		จำนวนเต็ม	    len;
+		จำนวนเต็ม	    p_more_save;
+		จำนวนเต็ม	    old_State;
+		จำนวนเต็ม	    c;
+		จำนวนเต็ม	    toshell_fd;
+		จำนวนเต็ม	    fromshell_fd;
 		garray_T    ga;
-		int	    noread_cnt;
+		จำนวนเต็ม	    noread_cnt;
 # ifdef ELAPSED_FUNC
 		elapsed_T   start_tv;
 # endif
 
 # ifdef FEAT_GUI
-		if (pty_master_fd >= 0)
+		ถ้า (pty_master_fd >= 0)
 		{
 		    fromshell_fd = pty_master_fd;
 		    toshell_fd = dup(pty_master_fd);
 		}
-		else
+		มิฉะนั้น
 # endif
 		{
 		    close(fd_toshell[0]);
@@ -5271,15 +5271,15 @@ mch_call_shell_fork(
 		old_State = State;
 		State = MODE_EXTERNCMD;	// don't redraw at window resize
 
-		if ((options & SHELL_WRITE) && toshell_fd >= 0)
+		ถ้า ((options & SHELL_WRITE) && toshell_fd >= 0)
 		{
 		    // Fork a process that will write the lines to the
 		    // external program.
-		    if ((wpid = fork()) == -1)
+		    ถ้า ((wpid = fork()) == -1)
 		    {
 			msg_puts(_("\nCannot fork\n"));
 		    }
-		    else if (wpid == 0) // child
+		    มิฉะนั้น ถ้า (wpid == 0) // child
 		    {
 			linenr_T    lnum = curbuf->b_op_start.lnum;
 			size_t	    written = 0;
@@ -5287,26 +5287,26 @@ mch_call_shell_fork(
 			size_t	    lplen = (size_t)ml_get_len(lnum);
 
 			close(fromshell_fd);
-			for (;;)
+			สำหรับ (;;)
 			{
-			    if (lplen == 0)
+			    ถ้า (lplen == 0)
 				len = 0;
-			    else if (lp[written] == NL)
+			    มิฉะนั้น ถ้า (lp[written] == NL)
 				// NL -> NUL translation
 				len = write(toshell_fd, "", (size_t)1);
-			    else
+			    มิฉะนั้น
 			    {
 				char_u	*s = vim_strchr(lp + written, NL);
 
-				len = write(toshell_fd, (char *)lp + written,
+				len = write(toshell_fd, (var_na *)lp + written,
 					   s == NULL ? lplen - written
 					      : (size_t)(s - (lp + written)));
 			    }
-			    if (len == (int)(lplen - written))
+			    ถ้า (len == (จำนวนเต็ม)(lplen - written))
 			    {
 				// Finished a line, add a NL, unless this line
 				// should not have one.
-				if (lnum != curbuf->b_op_end.lnum
+				ถ้า (lnum != curbuf->b_op_end.lnum
 					|| (!curbuf->b_p_bin
 					    && curbuf->b_p_fixeol)
 					|| (lnum != curbuf->b_no_eol_lnum
@@ -5315,36 +5315,36 @@ mch_call_shell_fork(
 				    vim_ignored = write(toshell_fd, "\n",
 								   (size_t)1);
 				++lnum;
-				if (lnum > curbuf->b_op_end.lnum)
+				ถ้า (lnum > curbuf->b_op_end.lnum)
 				{
 				    // finished all the lines, close pipe
 				    close(toshell_fd);
-				    break;
+				    bha_nga;
 				}
 				lp = ml_get(lnum);
 				lplen = ml_get_len(lnum);
 				written = 0;
 			    }
-			    else if (len > 0)
+			    มิฉะนั้น ถ้า (len > 0)
 				written += (size_t)len;
 			}
 			_exit(0);
 		    }
-		    else // parent
+		    มิฉะนั้น // parent
 		    {
 			close(toshell_fd);
 			toshell_fd = -1;
 		    }
 		}
 
-		if (options & SHELL_READ)
+		ถ้า (options & SHELL_READ)
 		    ga_init2(&ga, 1, BUFLEN);
 
 		noread_cnt = 0;
 # ifdef ELAPSED_FUNC
 		ELAPSED_INIT(start_tv);
 # endif
-		for (;;)
+		สำหรับ (;;)
 		{
 		    /*
 		     * Check if keys have been typed, write them to the child
@@ -5361,7 +5361,7 @@ mch_call_shell_fork(
 		     * typeahead.
 		     */
 		    len = 0;
-		    if (!(options & SHELL_EXPAND)
+		    ถ้า (!(options & SHELL_EXPAND)
 			    && ((options &
 					 (SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 				      != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
@@ -5372,7 +5372,7 @@ mch_call_shell_fork(
 			    && wait_pid == 0
 			    && (ta_len > 0 || noread_cnt > 4))
 		    {
-		      if (ta_len == 0)
+		      ถ้า (ta_len == 0)
 		      {
 			  // Get extra characters when we don't have any.
 			  // Reset the counter and timer.
@@ -5382,14 +5382,14 @@ mch_call_shell_fork(
 # endif
 			  len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		      }
-		      if (ta_len > 0 || len > 0)
+		      ถ้า (ta_len > 0 || len > 0)
 		      {
 			/*
 			 * For pipes:
 			 * Check for CTRL-C: send interrupt signal to child.
 			 * Check for CTRL-D: EOF, close pipe to child.
 			 */
-			if (len == 1 && (pty_master_fd < 0 || cmd != NULL))
+			ถ้า (len == 1 && (pty_master_fd < 0 || cmd != NULL))
 			{
 			    /*
 			     * Send SIGINT to the child's group or all
@@ -5397,7 +5397,7 @@ mch_call_shell_fork(
 			     */
 			    may_send_sigint(ta_buf[ta_len], pid, wpid);
 
-			    if (pty_master_fd < 0 && toshell_fd >= 0
+			    ถ้า (pty_master_fd < 0 && toshell_fd >= 0
 					       && ta_buf[ta_len] == Ctrl_D)
 			    {
 				close(toshell_fd);
@@ -5412,20 +5412,20 @@ mch_call_shell_fork(
 			 * For pipes: echo the typed characters.
 			 * For a pty this does not seem to work.
 			 */
-			if (pty_master_fd < 0)
+			ถ้า (pty_master_fd < 0)
 			{
-			    for (i = ta_len; i < ta_len + len; ++i)
+			    สำหรับ (i = ta_len; i < ta_len + len; ++i)
 			    {
-				if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+				ถ้า (ta_buf[i] == '\n' || ta_buf[i] == '\b')
 				    msg_putchar(ta_buf[i]);
-				else if (has_mbyte)
+				มิฉะนั้น ถ้า (has_mbyte)
 				{
-				    int l = (*mb_ptr2len)(ta_buf + i);
+				    จำนวนเต็ม l = (*mb_ptr2len)(ta_buf + i);
 
 				    msg_outtrans_len(ta_buf + i, l);
 				    i += l - 1;
 				}
-				else
+				มิฉะนั้น
 				    msg_outtrans_len(ta_buf + i, 1);
 			    }
 			    windgoto(msg_row, cmdline_col_off + msg_col);
@@ -5441,12 +5441,12 @@ mch_call_shell_fork(
 			 * When writing buffer lines, drop the typed
 			 * characters (only check for CTRL-C).
 			 */
-			if (options & SHELL_WRITE)
+			ถ้า (options & SHELL_WRITE)
 			    ta_len = 0;
-			else if (toshell_fd >= 0)
+			มิฉะนั้น ถ้า (toshell_fd >= 0)
 			{
-			    len = write(toshell_fd, (char *)ta_buf, (size_t)1);
-			    if (len > 0)
+			    len = write(toshell_fd, (var_na *)ta_buf, (size_t)1);
+			    ถ้า (len > 0)
 			    {
 				ta_len -= len;
 				mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5455,16 +5455,16 @@ mch_call_shell_fork(
 		      }
 		    }
 
-		    if (got_int)
+		    ถ้า (got_int)
 		    {
 			// CTRL-C sends a signal to the child, we ignore it
 			// ourselves
 # ifdef HAVE_SETSID
 			kill(-pid, SIGINT);
-# else
+# มิฉะนั้น
 			kill(0, SIGINT);
 # endif
-			if (wpid > 0)
+			ถ้า (wpid > 0)
 			    kill(wpid, SIGINT);
 			got_int = FALSE;
 		    }
@@ -5479,32 +5479,32 @@ mch_call_shell_fork(
 		     * to some terminal (vt52?).
 		     */
 		    ++noread_cnt;
-		    while (RealWaitForChar(fromshell_fd, 10L, NULL, NULL))
+		    ขณะ (RealWaitForChar(fromshell_fd, 10L, NULL, NULL))
 		    {
 			len = read_eintr(fromshell_fd, buffer
 				+ buffer_off, (size_t)(BUFLEN - buffer_off)
 				);
-			if (len <= 0)		    // end of file or error
+			ถ้า (len <= 0)		    // end of file or error
 			    goto finished;
 
 			noread_cnt = 0;
-			if (options & SHELL_READ)
+			ถ้า (options & SHELL_READ)
 			{
 			    // Do NUL -> NL translation, append NL separated
 			    // lines to the current buffer.
-			    for (i = 0; i < len; ++i)
+			    สำหรับ (i = 0; i < len; ++i)
 			    {
-				if (buffer[i] == NL)
+				ถ้า (buffer[i] == NL)
 				    append_ga_line(&ga);
-				else if (buffer[i] == NUL)
+				มิฉะนั้น ถ้า (buffer[i] == NUL)
 				    ga_append(&ga, NL);
-				else
+				มิฉะนั้น
 				    ga_append(&ga, buffer[i]);
 			    }
 			}
-			else if (has_mbyte)
+			มิฉะนั้น ถ้า (has_mbyte)
 			{
-			    int		l;
+			    จำนวนเต็ม		l;
 			    char_u	*p;
 
 			    len += buffer_off;
@@ -5513,20 +5513,20 @@ mch_call_shell_fork(
 			    // Check if the last character in buffer[] is
 			    // incomplete, keep these bytes for the next
 			    // round.
-			    for (p = buffer; p < buffer + len; p += l)
+			    สำหรับ (p = buffer; p < buffer + len; p += l)
 			    {
 				l = MB_CPTR2LEN(p);
-				if (l == 0)
+				ถ้า (l == 0)
 				    l = 1;  // NUL byte?
-				else if (MB_BYTE2LEN(*p) != l)
-				    break;
+				มิฉะนั้น ถ้า (MB_BYTE2LEN(*p) != l)
+				    bha_nga;
 			    }
-			    if (p == buffer)	// no complete character
+			    ถ้า (p == buffer)	// no complete character
 			    {
 				// avoid getting stuck at an illegal byte
-				if (len >= 12)
+				ถ้า (len >= 12)
 				    ++p;
-				else
+				มิฉะนั้น
 				{
 				    buffer_off = len;
 				    continue;
@@ -5534,8 +5534,8 @@ mch_call_shell_fork(
 			    }
 			    c = *p;
 			    *p = NUL;
-			    msg_puts((char *)buffer);
-			    if (p < buffer + len)
+			    msg_puts((var_na *)buffer);
+			    ถ้า (p < buffer + len)
 			    {
 				*p = c;
 				buffer_off = (buffer + len) - p;
@@ -5544,30 +5544,30 @@ mch_call_shell_fork(
 			    }
 			    buffer_off = 0;
 			}
-			else
+			มิฉะนั้น
 			{
 			    buffer[len] = NUL;
-			    msg_puts((char *)buffer);
+			    msg_puts((var_na *)buffer);
 			}
 
 			windgoto(msg_row, cmdline_col_off + msg_col);
 			cursor_on();
 			out_flush();
-			if (got_int)
-			    break;
+			ถ้า (got_int)
+			    bha_nga;
 
 # ifdef ELAPSED_FUNC
-			if (wait_pid == 0)
+			ถ้า (wait_pid == 0)
 			{
 			    long	msec = ELAPSED_FUNC(start_tv);
 
 			    // Avoid that we keep looping here without
 			    // checking for a CTRL-C for a long time.  Don't
 			    // break out too often to avoid losing typeahead.
-			    if (msec > 2000)
+			    ถ้า (msec > 2000)
 			    {
 				noread_cnt = 5;
-				break;
+				bha_nga;
 			    }
 			}
 # endif
@@ -5576,11 +5576,11 @@ mch_call_shell_fork(
 		    // If we already detected the child has finished, continue
 		    // reading output for a short while.  Some text may be
 		    // buffered.
-		    if (wait_pid == pid)
+		    ถ้า (wait_pid == pid)
 		    {
-			if (noread_cnt < 5)
+			ถ้า (noread_cnt < 5)
 			    continue;
-			break;
+			bha_nga;
 		    }
 
 		    /*
@@ -5588,7 +5588,7 @@ mch_call_shell_fork(
 		     * typed characters (otherwise we would lose typeahead).
 		     */
 		    wait_pid = waitpid(pid, &status, WNOHANG);
-		    if ((wait_pid == (pid_t)-1 && errno == ECHILD)
+		    ถ้า ((wait_pid == (pid_t)-1 && errno == ECHILD)
 			    || (wait_pid == pid && WIFEXITED(status)))
 		    {
 			// Don't break the loop yet, try reading more
@@ -5597,10 +5597,10 @@ mch_call_shell_fork(
 			// then we'll break the loop at the "break" above.
 			wait_pid = pid;
 		    }
-		    else
+		    มิฉะนั้น
 			wait_pid = 0;
 
-# if defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
+# ถ้า defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
 		    // Handle any X events, e.g. serving the clipboard.
 		    clip_update();
 # endif
@@ -5612,15 +5612,15 @@ mch_call_shell_fork(
 		}
 finished:
 		p_more = p_more_save;
-		if (options & SHELL_READ)
+		ถ้า (options & SHELL_READ)
 		{
-		    if (ga.ga_len > 0)
+		    ถ้า (ga.ga_len > 0)
 		    {
 			append_ga_line(&ga);
 			// remember that the NL was missing
 			curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 		    }
-		    else
+		    มิฉะนั้น
 			curbuf->b_no_eol_lnum = 0;
 		    ga_clear(&ga);
 		}
@@ -5628,19 +5628,19 @@ finished:
 		/*
 		 * Give all typeahead that wasn't used back to ui_inchar().
 		 */
-		if (ta_len)
+		ถ้า (ta_len)
 		    ui_inchar_undo(ta_buf, ta_len);
 		State = old_State;
-		if (toshell_fd >= 0)
+		ถ้า (toshell_fd >= 0)
 		    close(toshell_fd);
 		close(fromshell_fd);
 	    }
-# if (defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)) || defined(FEAT_WAYLAND)
-	    else
+# ถ้า (defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)) || defined(FEAT_WAYLAND)
+	    มิฉะนั้น
 	    {
 		long delay_msec = 1;
 
-		if (tmode == TMODE_RAW)
+		ถ้า (tmode == TMODE_RAW)
 		    // Possibly disables modifyOtherKeys, so that the system
 		    // can recognize CTRL-C.
 		    out_str_t_TE();
@@ -5649,28 +5649,28 @@ finished:
 		 * Similar to the loop above, but only handle X and Wayland
 		 * events, no I/O.
 		 */
-		for (;;)
+		สำหรับ (;;)
 		{
-		    if (got_int)
+		    ถ้า (got_int)
 		    {
 			// CTRL-C sends a signal to the child, we ignore it
 			// ourselves
 #  ifdef HAVE_SETSID
 			kill(-pid, SIGINT);
-#  else
+#  มิฉะนั้น
 			kill(0, SIGINT);
 #  endif
 			got_int = FALSE;
 		    }
 		    wait_pid = waitpid(pid, &status, WNOHANG);
-		    if ((wait_pid == (pid_t)-1 && errno == ECHILD)
+		    ถ้า ((wait_pid == (pid_t)-1 && errno == ECHILD)
 			    || (wait_pid == pid && WIFEXITED(status)))
 		    {
 			wait_pid = pid;
-			break;
+			bha_nga;
 		    }
 
-#  if defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
+#  ถ้า defined(FEAT_XCLIPBOARD) && defined(FEAT_X11)
 		    // Handle any X events, e.g. serving the clipboard.
 		    clip_update();
 #  endif
@@ -5684,11 +5684,11 @@ finished:
 		    // less time, gradually wait longer.
 		    mch_delay(delay_msec,
 				   MCH_DELAY_IGNOREINPUT | MCH_DELAY_SETTMODE);
-		    if (++delay_msec > 10)
+		    ถ้า (++delay_msec > 10)
 			delay_msec = 10;
 		}
 
-		if (tmode == TMODE_RAW)
+		ถ้า (tmode == TMODE_RAW)
 		    // possibly enables modifyOtherKeys again
 		    out_str_t_TI();
 	    }
@@ -5701,20 +5701,20 @@ finished:
 	     * Don't wait if wait_pid was already set above, indicating the
 	     * child already exited.
 	     */
-	    if (wait_pid != pid)
+	    ถ้า (wait_pid != pid)
 		(void)wait4pid(pid, &status);
 
 # ifdef FEAT_GUI
 	    // Close slave side of pty.  Only do this after the child has
 	    // exited, otherwise the child may hang when it tries to write on
 	    // the pty.
-	    if (pty_master_fd >= 0)
+	    ถ้า (pty_master_fd >= 0)
 		close(pty_slave_fd);
 # endif
 
 	    // Make sure the child that writes to the external program is
 	    // dead.
-	    if (wpid > 0)
+	    ถ้า (wpid > 0)
 	    {
 		kill(wpid, SIGKILL);
 		wait4pid(wpid, NULL);
@@ -5728,24 +5728,24 @@ finished:
 	     * Set to raw mode right now, otherwise a CTRL-C after
 	     * catch_signals() will kill Vim.
 	     */
-	    if (tmode == TMODE_RAW)
+	    ถ้า (tmode == TMODE_RAW)
 		settmode(TMODE_RAW);
 	    did_settmode = TRUE;
 	    set_signals();
 
-	    if (WIFEXITED(status))
+	    ถ้า (WIFEXITED(status))
 	    {
 		// LINTED avoid "bitwise operation on signed value"
 		retval = WEXITSTATUS(status);
-		if (retval != 0 && !emsg_silent)
+		ถ้า (retval != 0 && !emsg_silent)
 		{
-		    if (retval == EXEC_FAILED)
+		    ถ้า (retval == EXEC_FAILED)
 		    {
 			msg_puts(_("\nCannot execute shell "));
 			msg_outtrans(p_sh);
 			msg_putchar('\n');
 		    }
-		    else if (!(options & SHELL_SILENT))
+		    มิฉะนั้น ถ้า (!(options & SHELL_SILENT))
 		    {
 			msg_puts(_("\nshell returned "));
 			msg_outnum((long)retval);
@@ -5753,45 +5753,45 @@ finished:
 		    }
 		}
 	    }
-	    else
+	    มิฉะนั้น
 		msg_puts(_("\nCommand terminated\n"));
 	}
     }
 
 error:
-    if (!did_settmode)
-	if (tmode == TMODE_RAW)
+    ถ้า (!did_settmode)
+	ถ้า (tmode == TMODE_RAW)
 	    settmode(TMODE_RAW);	// set to raw mode
     resettitle();
     vim_free(argv);
     vim_free(tofree1);
     vim_free(tofree2);
 
-    return retval;
+    คืน retval;
 }
 #endif // USE_SYSTEM
 
-    int
+    จำนวนเต็ม
 mch_call_shell(
     char_u	*cmd,
-    int		options)	// SHELL_*, see vim.h
+    จำนวนเต็ม		options)	// SHELL_*, see vim.h
 {
 #ifdef FEAT_EVAL
     ch_log(NULL, "executing shell command: %s", cmd);
 #endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
-    if (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL
+#ถ้า defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+    ถ้า (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL
 					      && (options & SHELL_SILENT) == 0)
-	return mch_call_shell_terminal(cmd, options);
+	คืน mch_call_shell_terminal(cmd, options);
 #endif
 #ifdef USE_SYSTEM
-    return mch_call_shell_system(cmd, options);
-#else
-    return mch_call_shell_fork(cmd, options);
+    คืน mch_call_shell_system(cmd, options);
+#มิฉะนั้น
+    คืน mch_call_shell_fork(cmd, options);
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -5803,14 +5803,14 @@ mch_call_shell(
  */
     char_u *
 mch_get_cmd_output_direct(
-    char	**argv,
+    var_na	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    จำนวนเต็ม		flags UNUSED,
+    จำนวนเต็ม		*ret_len)
 {
     pid_t	pid;
-    int		fd_out[2] = {-1, -1};
-    int		status = -1;
+    จำนวนเต็ม		fd_out[2] = {-1, -1};
+    จำนวนเต็ม		status = -1;
     char_u	*buffer = NULL;
     garray_T	ga;
     SIGSET_DECL(curset)
@@ -5819,54 +5819,54 @@ mch_get_cmd_output_direct(
 
     ch_log(NULL, "directly executing: %s", argv[0]);
 
-    if (pipe(fd_out) < 0)
+    ถ้า (pipe(fd_out) < 0)
     {
 	emsg(_(e_cannot_create_pipes));
-	return NULL;
+	คืน NULL;
     }
 
     BLOCK_SIGNALS(&curset);
 # ifdef VMS
     pid = 0; // VMS does not have fork
-# else
+# มิฉะนั้น
     pid = fork();
 # endif
-    if (pid == -1)
+    ถ้า (pid == -1)
     {
 	UNBLOCK_SIGNALS(&curset);
 	close(fd_out[0]);
 	close(fd_out[1]);
 	emsg(_("\nCannot fork\n"));
-	return NULL;
+	คืน NULL;
     }
 
-    if (pid == 0)
+    ถ้า (pid == 0)
     {
 	// child process
 	reset_signals();
 	UNBLOCK_SIGNALS(&curset);
 
-	if (ch_log_active())
+	ถ้า (ch_log_active())
 	{
 	    ch_log(NULL, "closing channel log in the child process");
 	    ch_logfile((char_u *)"", (char_u *)"");
 	}
 
 	// Set up stdin.
-	if (infile != NULL)
+	ถ้า (infile != NULL)
 	{
-	    int fd_in = open((char *)infile, O_RDONLY);
-	    if (fd_in >= 0)
+	    จำนวนเต็ม fd_in = open((var_na *)infile, O_RDONLY);
+	    ถ้า (fd_in >= 0)
 	    {
 		close(0);
 		vim_ignored = dup(fd_in);
 		close(fd_in);
 	    }
 	}
-	else
+	มิฉะนั้น
 	{
-	    int nullfd = open("/dev/null", O_RDONLY);
-	    if (nullfd >= 0)
+	    จำนวนเต็ม nullfd = open("/dev/null", O_RDONLY);
+	    ถ้า (nullfd >= 0)
 	    {
 		close(0);
 		vim_ignored = dup(nullfd);
@@ -5893,85 +5893,85 @@ mch_get_cmd_output_direct(
     close(fd_out[1]);
 
     // Read output from child.
-    for (;;)
+    สำหรับ (;;)
     {
-	char	buf[4096];
-	int	n;
+	var_na	buf[4096];
+	จำนวนเต็ม	n;
 
-	n = (int)read(fd_out[0], buf, sizeof(buf));
-	if (n <= 0)
-	    break;
-	if (ga_grow(&ga, n) == FAIL)
-	    break;
-	mch_memmove((char *)ga.ga_data + ga.ga_len, buf, n);
+	n = (จำนวนเต็ม)read(fd_out[0], buf, parimaa_na(buf));
+	ถ้า (n <= 0)
+	    bha_nga;
+	ถ้า (ga_grow(&ga, n) == FAIL)
+	    bha_nga;
+	mch_memmove((var_na *)ga.ga_data + ga.ga_len, buf, n);
 	ga.ga_len += n;
     }
     close(fd_out[0]);
 
     // Wait for child to finish.
     (void)waitpid(pid, &status, 0);
-    if (WIFEXITED(status))
+    ถ้า (WIFEXITED(status))
 	status = WEXITSTATUS(status);
-    else
+    มิฉะนั้น
 	status = -1;
     set_vim_var_nr(VV_SHELL_ERROR, (long)status);
 
-    if (ga.ga_len > 0)
+    ถ้า (ga.ga_len > 0)
     {
 	buffer = alloc(ga.ga_len + 1);
-	if (buffer != NULL)
+	ถ้า (buffer != NULL)
 	{
 	    mch_memmove(buffer, ga.ga_data, ga.ga_len);
-	    if (ret_len == NULL)
+	    ถ้า (ret_len == NULL)
 	    {
-		int	i;
+		จำนวนเต็ม	i;
 
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
+		สำหรับ (i = 0; i < ga.ga_len; ++i)
+		    ถ้า (buffer[i] == NUL)
 			buffer[i] = 1;
 		buffer[ga.ga_len] = NUL;
 	    }
-	    else
+	    มิฉะนั้น
 		*ret_len = ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    มิฉะนั้น ถ้า (ret_len != NULL)
 	*ret_len = 0;
 
     ga_clear(&ga);
-    return buffer;
+    คืน buffer;
 }
 #endif
 
-#if defined(FEAT_JOB_CHANNEL)
+#ถ้า defined(FEAT_JOB_CHANNEL)
     void
-mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
+mch_job_start(var_na **argv, job_T *job, jobopt_T *options, จำนวนเต็ม is_terminal)
 {
     pid_t	pid;
-    int		fd_in[2] = {-1, -1};	// for stdin
-    int		fd_out[2] = {-1, -1};	// for stdout
-    int		fd_err[2] = {-1, -1};	// for stderr
-    int		pty_master_fd = -1;
-    int		pty_slave_fd = -1;
+    จำนวนเต็ม		fd_in[2] = {-1, -1};	// for stdin
+    จำนวนเต็ม		fd_out[2] = {-1, -1};	// for stdout
+    จำนวนเต็ม		fd_err[2] = {-1, -1};	// for stderr
+    จำนวนเต็ม		pty_master_fd = -1;
+    จำนวนเต็ม		pty_slave_fd = -1;
     channel_T	*channel = NULL;
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_buffer_for_in = options->jo_io[PART_IN] == JIO_BUFFER;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    จำนวนเต็ม		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
+    จำนวนเต็ม		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
+    จำนวนเต็ม		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    จำนวนเต็ม		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
+    จำนวนเต็ม		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
+    จำนวนเต็ม		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    จำนวนเต็ม		use_buffer_for_in = options->jo_io[PART_IN] == JIO_BUFFER;
+    จำนวนเต็ม		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
     SIGSET_DECL(curset)
 
-    if (use_out_for_err && use_null_for_out)
+    ถ้า (use_out_for_err && use_null_for_out)
 	use_null_for_err = TRUE;
 
     // default is to fail
     job->jv_status = JOB_FAILED;
 
-    if (options->jo_pty
+    ถ้า (options->jo_pty
 	    && (!(use_file_for_in || use_null_for_in)
 		|| !(use_file_for_out || use_null_for_out)
 		|| !(use_out_for_err || use_file_for_err || use_null_for_err)))
@@ -5980,44 +5980,44 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 
     // TODO: without the channel feature connect the child to /dev/null?
     // Open pipes for stdin, stdout, stderr.
-    if (use_file_for_in)
+    ถ้า (use_file_for_in)
     {
 	char_u *fname = options->jo_io_name[PART_IN];
 
-	fd_in[0] = mch_open((char *)fname, O_RDONLY, 0);
-	if (fd_in[0] < 0)
+	fd_in[0] = mch_open((var_na *)fname, O_RDONLY, 0);
+	ถ้า (fd_in[0] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
 	}
     }
-    else
+    มิฉะนั้น
 	// When writing buffer lines to the input don't use the pty, so that
 	// the pipe can be closed when all lines were written.
-	if (!use_null_for_in && (pty_master_fd < 0 || use_buffer_for_in)
+	ถ้า (!use_null_for_in && (pty_master_fd < 0 || use_buffer_for_in)
 							    && pipe(fd_in) < 0)
 	    goto failed;
 
-    if (use_file_for_out)
+    ถ้า (use_file_for_out)
     {
 	char_u *fname = options->jo_io_name[PART_OUT];
 
-	fd_out[1] = mch_open((char *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd_out[1] < 0)
+	fd_out[1] = mch_open((var_na *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	ถ้า (fd_out[1] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
 	}
     }
-    else if (!use_null_for_out && pty_master_fd < 0 && pipe(fd_out) < 0)
+    มิฉะนั้น ถ้า (!use_null_for_out && pty_master_fd < 0 && pipe(fd_out) < 0)
 	goto failed;
 
-    if (use_file_for_err)
+    ถ้า (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
-	fd_err[1] = mch_open((char *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (fd_err[1] < 0)
+	fd_err[1] = mch_open((var_na *)fname, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	ถ้า (fd_err[1] < 0)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
@@ -6025,47 +6025,47 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
     }
     // only create a pipe for the error fd, when either a callback has been setup
     // or pty is not used (e.g. terminal uses pty by default)
-    else if (!use_out_for_err && !use_null_for_err
+    มิฉะนั้น ถ้า (!use_out_for_err && !use_null_for_err
 		&& (pty_master_fd < 0 || (options->jo_set & JO_ERR_CALLBACK))
 			    && pipe(fd_err) < 0)
 	goto failed;
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    ถ้า (!use_null_for_in || !use_null_for_out || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	ถ้า (options->jo_set & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    ถ้า (channel != NULL)
 		++channel->ch_refcount;
 	}
-	else
+	มิฉะนั้น
 	    channel = add_channel();
-	if (channel == NULL)
+	ถ้า (channel == NULL)
 	    goto failed;
-	if (job->jv_tty_out != NULL)
+	ถ้า (job->jv_tty_out != NULL)
 	    ch_log(channel, "using pty %s on fd %d",
 					       job->jv_tty_out, pty_master_fd);
     }
 
     BLOCK_SIGNALS(&curset);
     pid = fork();	// maybe we should use vfork()
-    if (pid == -1)
+    ถ้า (pid == -1)
     {
 	// failed to fork
 	UNBLOCK_SIGNALS(&curset);
 	goto failed;
     }
-    if (pid == 0)
+    ถ้า (pid == 0)
     {
-	int	null_fd = -1;
-	int	stderr_works = TRUE;
+	จำนวนเต็ม	null_fd = -1;
+	จำนวนเต็ม	stderr_works = TRUE;
 
 	// child
 	reset_signals();		// handle signals normally
 	UNBLOCK_SIGNALS(&curset);
 
 # ifdef FEAT_EVAL
-	if (ch_log_active())
+	ถ้า (ch_log_active())
 	    // close the log file in the child
 	    ch_logfile((char_u *)"", (char_u *)"");
 # endif
@@ -6078,25 +6078,25 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 # endif
 
 # ifdef FEAT_TERMINAL
-	if (options->jo_term_rows > 0)
+	ถ้า (options->jo_term_rows > 0)
 	{
-	    char *term = (char *)T_NAME;
+	    var_na *term = (var_na *)T_NAME;
 
 #  ifdef FEAT_GUI
-	    if (term_is_gui(T_NAME))
+	    ถ้า (term_is_gui(T_NAME))
 		// In the GUI 'term' is not what we want, use $TERM.
 		term = getenv("TERM");
 #  endif
 	    // Use 'term' or $TERM if it starts with "xterm", otherwise fall
 	    // back to "xterm" or "xterm-color".
-	    if (term == NULL || *term == NUL || STRNCMP(term, "xterm", 5) != 0)
+	    ถ้า (term == NULL || *term == NUL || STRNCMP(term, "xterm", 5) != 0)
 	    {
-		if (t_colors >= 256)
+		ถ้า (t_colors >= 256)
 		    // TODO: should we check this name is supported?
 		    term = "xterm-256color";
-		else if (t_colors > 16)
+		มิฉะนั้น ถ้า (t_colors > 16)
 		    term = "xterm-color";
-		else
+		มิฉะนั้น
 		    term = "xterm";
 	    }
 	    set_child_environment(
@@ -6105,18 +6105,18 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 		    term,
 		    is_terminal);
 	}
-	else
+	มิฉะนั้น
 # endif
 	    set_default_child_environment(is_terminal);
 
-	if (options->jo_env != NULL)
+	ถ้า (options->jo_env != NULL)
 	{
 	    dict_T	*dict = options->jo_env;
 	    hashitem_T	*hi;
-	    int		todo = (int)dict->dv_hashtab.ht_used;
+	    จำนวนเต็ม		todo = (จำนวนเต็ม)dict->dv_hashtab.ht_used;
 
 	    FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+		ถ้า (!HASHITEM_EMPTY(hi))
 		{
 		    typval_T *item = &dict_lookup(hi)->di_tv;
 
@@ -6125,87 +6125,87 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 		}
 	}
 
-	if (use_null_for_in || use_null_for_out || use_null_for_err)
+	ถ้า (use_null_for_in || use_null_for_out || use_null_for_err)
 	{
 	    null_fd = open("/dev/null", O_RDWR | O_EXTRA, 0);
-	    if (null_fd < 0)
+	    ถ้า (null_fd < 0)
 	    {
 		perror("opening /dev/null failed");
 		_exit(OPEN_NULL_FAILED);
 	    }
 	}
 
-	if (pty_slave_fd >= 0)
+	ถ้า (pty_slave_fd >= 0)
 	{
 	    // push stream discipline modules
 	    setup_slavepty(pty_slave_fd);
 # ifdef TIOCSCTTY
 	    // Try to become controlling tty (probably doesn't work,
 	    // unless run by root)
-	    ioctl(pty_slave_fd, TIOCSCTTY, (char *)NULL);
+	    ioctl(pty_slave_fd, TIOCSCTTY, (var_na *)NULL);
 # endif
 	}
 
 	// set up stdin for the child
 	close(0);
-	if (use_null_for_in && null_fd >= 0)
+	ถ้า (use_null_for_in && null_fd >= 0)
 	    vim_ignored = dup(null_fd);
-	else if (fd_in[0] < 0)
+	มิฉะนั้น ถ้า (fd_in[0] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
+	มิฉะนั้น
 	    vim_ignored = dup(fd_in[0]);
 
 	// set up stderr for the child
 	close(2);
-	if (use_null_for_err && null_fd >= 0)
+	ถ้า (use_null_for_err && null_fd >= 0)
 	{
 	    vim_ignored = dup(null_fd);
 	    stderr_works = FALSE;
 	}
-	else if (use_out_for_err)
+	มิฉะนั้น ถ้า (use_out_for_err)
 	    vim_ignored = dup(fd_out[1]);
-	else if (fd_err[1] < 0)
+	มิฉะนั้น ถ้า (fd_err[1] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
+	มิฉะนั้น
 	    vim_ignored = dup(fd_err[1]);
 
 	// set up stdout for the child
 	close(1);
-	if (use_null_for_out && null_fd >= 0)
+	ถ้า (use_null_for_out && null_fd >= 0)
 	    vim_ignored = dup(null_fd);
-	else if (fd_out[1] < 0)
+	มิฉะนั้น ถ้า (fd_out[1] < 0)
 	    vim_ignored = dup(pty_slave_fd);
-	else
+	มิฉะนั้น
 	    vim_ignored = dup(fd_out[1]);
 
-	if (fd_in[0] >= 0)
+	ถ้า (fd_in[0] >= 0)
 	    close(fd_in[0]);
-	if (fd_in[1] >= 0)
+	ถ้า (fd_in[1] >= 0)
 	    close(fd_in[1]);
-	if (fd_out[0] >= 0)
+	ถ้า (fd_out[0] >= 0)
 	    close(fd_out[0]);
-	if (fd_out[1] >= 0)
+	ถ้า (fd_out[1] >= 0)
 	    close(fd_out[1]);
-	if (fd_err[0] >= 0)
+	ถ้า (fd_err[0] >= 0)
 	    close(fd_err[0]);
-	if (fd_err[1] >= 0)
+	ถ้า (fd_err[1] >= 0)
 	    close(fd_err[1]);
-	if (pty_master_fd >= 0)
+	ถ้า (pty_master_fd >= 0)
 	{
 	    close(pty_master_fd); // not used in the child
 	    close(pty_slave_fd);  // was duped above
 	}
 
-	if (null_fd >= 0)
+	ถ้า (null_fd >= 0)
 	    close(null_fd);
 
-	if (options->jo_cwd != NULL && mch_chdir((char *)options->jo_cwd) != 0)
+	ถ้า (options->jo_cwd != NULL && mch_chdir((var_na *)options->jo_cwd) != 0)
 	    _exit(EXEC_FAILED);
 
 	// See above for type of argv.
 	execvp(argv[0], argv);
 
-	if (stderr_works)
+	ถ้า (stderr_works)
 	    perror("executing job failed");
 # ifdef EXITFREE
 	// calling free_all_mem() here causes problems. Ignore valgrind
@@ -6221,145 +6221,145 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
     job->jv_status = JOB_STARTED;
     job->jv_channel = channel;  // ch_refcount was set above
 
-    if (pty_master_fd >= 0)
+    ถ้า (pty_master_fd >= 0)
 	close(pty_slave_fd); // not used in the parent
     // close child stdin, stdout and stderr
-    if (fd_in[0] >= 0)
+    ถ้า (fd_in[0] >= 0)
 	close(fd_in[0]);
-    if (fd_out[1] >= 0)
+    ถ้า (fd_out[1] >= 0)
 	close(fd_out[1]);
-    if (fd_err[1] >= 0)
+    ถ้า (fd_err[1] >= 0)
 	close(fd_err[1]);
-    if (channel != NULL)
+    ถ้า (channel != NULL)
     {
-	int in_fd = INVALID_FD;
-	int out_fd = INVALID_FD;
-	int err_fd = INVALID_FD;
+	จำนวนเต็ม in_fd = INVALID_FD;
+	จำนวนเต็ม out_fd = INVALID_FD;
+	จำนวนเต็ม err_fd = INVALID_FD;
 
-	if (!(use_file_for_in || use_null_for_in))
+	ถ้า (!(use_file_for_in || use_null_for_in))
 	    in_fd = fd_in[1] >= 0 ? fd_in[1] : pty_master_fd;
 
-	if (!(use_file_for_out || use_null_for_out))
+	ถ้า (!(use_file_for_out || use_null_for_out))
 	    out_fd = fd_out[0] >= 0 ? fd_out[0] : pty_master_fd;
 
 	// When using pty_master_fd only set it for stdout, do not duplicate
 	// it for stderr, it only needs to be read once.
-	if (!(use_out_for_err || use_file_for_err || use_null_for_err))
+	ถ้า (!(use_out_for_err || use_file_for_err || use_null_for_err))
 	{
-	    if (fd_err[0] >= 0)
+	    ถ้า (fd_err[0] >= 0)
 		err_fd = fd_err[0];
-	    else if (out_fd != pty_master_fd)
+	    มิฉะนั้น ถ้า (out_fd != pty_master_fd)
 		err_fd = pty_master_fd;
 	}
 
 	channel_set_pipes(channel, in_fd, out_fd, err_fd);
 	channel_set_job(channel, job, options);
     }
-    else
+    มิฉะนั้น
     {
-	if (fd_in[1] >= 0)
+	ถ้า (fd_in[1] >= 0)
 	    close(fd_in[1]);
-	if (fd_out[0] >= 0)
+	ถ้า (fd_out[0] >= 0)
 	    close(fd_out[0]);
-	if (fd_err[0] >= 0)
+	ถ้า (fd_err[0] >= 0)
 	    close(fd_err[0]);
-	if (pty_master_fd >= 0)
+	ถ้า (pty_master_fd >= 0)
 	    close(pty_master_fd);
     }
 
     // success!
-    return;
+    คืน;
 
 failed:
     channel_unref(channel);
-    if (fd_in[0] >= 0)
+    ถ้า (fd_in[0] >= 0)
 	close(fd_in[0]);
-    if (fd_in[1] >= 0)
+    ถ้า (fd_in[1] >= 0)
 	close(fd_in[1]);
-    if (fd_out[0] >= 0)
+    ถ้า (fd_out[0] >= 0)
 	close(fd_out[0]);
-    if (fd_out[1] >= 0)
+    ถ้า (fd_out[1] >= 0)
 	close(fd_out[1]);
-    if (fd_err[0] >= 0)
+    ถ้า (fd_err[0] >= 0)
 	close(fd_err[0]);
-    if (fd_err[1] >= 0)
+    ถ้า (fd_err[1] >= 0)
 	close(fd_err[1]);
-    if (pty_master_fd >= 0)
+    ถ้า (pty_master_fd >= 0)
 	close(pty_master_fd);
-    if (pty_slave_fd >= 0)
+    ถ้า (pty_slave_fd >= 0)
 	close(pty_slave_fd);
 }
 
     static char_u *
-get_signal_name(int sig)
+get_signal_name(จำนวนเต็ม sig)
 {
-    int		i;
+    จำนวนเต็ม		i;
     char_u	numbuf[NUMBUFLEN];
 
-    if (sig == SIGKILL)
-	return vim_strnsave((char_u *)"kill", STRLEN_LITERAL("kill"));
+    ถ้า (sig == SIGKILL)
+	คืน vim_strnsave((char_u *)"kill", STRLEN_LITERAL("kill"));
 
-    for (i = 0; signal_info[i].sig != -1; i++)
-	if (sig == signal_info[i].sig)
-	    return strlow_save((char_u *)signal_info[i].name);
+    สำหรับ (i = 0; signal_info[i].sig != -1; i++)
+	ถ้า (sig == signal_info[i].sig)
+	    คืน strlow_save((char_u *)signal_info[i].name);
 
-    i = vim_snprintf((char *)numbuf, NUMBUFLEN, "%d", sig);
-    return vim_strnsave(numbuf, i);
+    i = vim_snprintf((var_na *)numbuf, NUMBUFLEN, "%d", sig);
+    คืน vim_strnsave(numbuf, i);
 }
 
-    char *
+    var_na *
 mch_job_status(job_T *job)
 {
-    int		status = -1;
+    จำนวนเต็ม		status = -1;
     pid_t	wait_pid = 0;
 
     wait_pid = waitpid(job->jv_pid, &status, WNOHANG);
-    if (wait_pid == -1)
+    ถ้า (wait_pid == -1)
     {
-	int waitpid_errno = errno;
-	if (waitpid_errno == ECHILD && mch_process_running(job->jv_pid))
+	จำนวนเต็ม waitpid_errno = errno;
+	ถ้า (waitpid_errno == ECHILD && mch_process_running(job->jv_pid))
 	    // The process is alive, but it was probably reparented (for
 	    // example by ptrace called by a debugger like lldb or gdb).
 	    // Note: This assumes that process IDs are not reused.
-	    return "run";
+	    คืน "run";
 
 	// process must have exited
-	if (job->jv_status < JOB_ENDED)
+	ถ้า (job->jv_status < JOB_ENDED)
 	    ch_log(job->jv_channel, "Job no longer exists: %s",
 						      strerror(waitpid_errno));
 	goto return_dead;
     }
-    if (wait_pid == 0)
-	return "run";
-    if (WIFEXITED(status))
+    ถ้า (wait_pid == 0)
+	คืน "run";
+    ถ้า (WIFEXITED(status))
     {
 	// LINTED avoid "bitwise operation on signed value"
 	job->jv_exitval = WEXITSTATUS(status);
-	if (job->jv_status < JOB_ENDED)
+	ถ้า (job->jv_status < JOB_ENDED)
 	    ch_log(job->jv_channel, "Job exited with %d", job->jv_exitval);
 	goto return_dead;
     }
-    if (WIFSIGNALED(status))
+    ถ้า (WIFSIGNALED(status))
     {
 	job->jv_exitval = -1;
 	job->jv_termsig = get_signal_name(WTERMSIG(status));
-	if (job->jv_status < JOB_ENDED && job->jv_termsig != NULL)
+	ถ้า (job->jv_status < JOB_ENDED && job->jv_termsig != NULL)
 	    ch_log(job->jv_channel, "Job terminated by signal \"%s\"",
 							      job->jv_termsig);
 	goto return_dead;
     }
-    return "run";
+    คืน "run";
 
 return_dead:
-    if (job->jv_status < JOB_ENDED)
+    ถ้า (job->jv_status < JOB_ENDED)
 	job->jv_status = JOB_ENDED;
-    return "dead";
+    คืน "dead";
 }
 
     job_T *
 mch_detect_ended_job(job_T *job_list)
 {
-    int		status = -1;
+    จำนวนเต็ม		status = -1;
     pid_t	wait_pid = 0;
     job_T	*job;
 
@@ -6367,74 +6367,74 @@ mch_detect_ended_job(job_T *job_list)
     // Do not do this when waiting for a shell command to finish, we would get
     // the exit value here (and discard it), the exit value obtained there
     // would then be wrong.
-    if (dont_check_job_ended > 0)
-	return NULL;
+    ถ้า (dont_check_job_ended > 0)
+	คืน NULL;
 # endif
 
     wait_pid = waitpid(-1, &status, WNOHANG);
-    if (wait_pid <= 0)
+    ถ้า (wait_pid <= 0)
 	// no process ended
-	return NULL;
-    for (job = job_list; job != NULL; job = job->jv_next)
+	คืน NULL;
+    สำหรับ (job = job_list; job != NULL; job = job->jv_next)
     {
-	if (job->jv_pid == wait_pid)
+	ถ้า (job->jv_pid == wait_pid)
 	{
-	    if (WIFEXITED(status))
+	    ถ้า (WIFEXITED(status))
 		// LINTED avoid "bitwise operation on signed value"
 		job->jv_exitval = WEXITSTATUS(status);
-	    else if (WIFSIGNALED(status))
+	    มิฉะนั้น ถ้า (WIFSIGNALED(status))
 	    {
 		job->jv_exitval = -1;
 		job->jv_termsig = get_signal_name(WTERMSIG(status));
 	    }
-	    if (job->jv_status < JOB_ENDED)
+	    ถ้า (job->jv_status < JOB_ENDED)
 	    {
 		ch_log(job->jv_channel, "Job ended");
 		job->jv_status = JOB_ENDED;
 	    }
-	    return job;
+	    คืน job;
 	}
     }
-    return NULL;
+    คืน NULL;
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if "how" is not a valid name.
  */
-    int
+    จำนวนเต็ม
 mch_signal_job(job_T *job, char_u *how)
 {
-    int	    sig = -1;
+    จำนวนเต็ม	    sig = -1;
 
-    if (*how == NUL || STRCMP(how, "term") == 0)
+    ถ้า (*how == NUL || STRCMP(how, "term") == 0)
 	sig = SIGTERM;
-    else if (STRCMP(how, "hup") == 0)
+    มิฉะนั้น ถ้า (STRCMP(how, "hup") == 0)
 	sig = SIGHUP;
-    else if (STRCMP(how, "quit") == 0)
+    มิฉะนั้น ถ้า (STRCMP(how, "quit") == 0)
 	sig = SIGQUIT;
-    else if (STRCMP(how, "int") == 0)
+    มิฉะนั้น ถ้า (STRCMP(how, "int") == 0)
 	sig = SIGINT;
-    else if (STRCMP(how, "kill") == 0)
+    มิฉะนั้น ถ้า (STRCMP(how, "kill") == 0)
 	sig = SIGKILL;
 # ifdef SIGWINCH
-    else if (STRCMP(how, "winch") == 0)
+    มิฉะนั้น ถ้า (STRCMP(how, "winch") == 0)
 	sig = SIGWINCH;
 # endif
-    else if (SAFE_isdigit(*how))
-	sig = atoi((char *)how);
-    else
-	return FAIL;
+    มิฉะนั้น ถ้า (SAFE_isdigit(*how))
+	sig = atoi((var_na *)how);
+    มิฉะนั้น
+	คืน FAIL;
 
     // Never kill ourselves!
-    if (job->jv_pid != 0)
+    ถ้า (job->jv_pid != 0)
     {
 	// TODO: have an option to only kill the process, not the group?
 	kill(-job->jv_pid, sig);
 	kill(job->jv_pid, sig);
     }
 
-    return OK;
+    คืน OK;
 }
 
 /*
@@ -6448,26 +6448,26 @@ mch_clear_job(job_T *job)
 }
 #endif
 
-#if defined(FEAT_TERMINAL)
-    int
+#ถ้า defined(FEAT_TERMINAL)
+    จำนวนเต็ม
 mch_create_pty_channel(job_T *job, jobopt_T *options)
 {
-    int		pty_master_fd = -1;
-    int		pty_slave_fd = -1;
+    จำนวนเต็ม		pty_master_fd = -1;
+    จำนวนเต็ม		pty_slave_fd = -1;
     channel_T	*channel;
 
     open_pty(&pty_master_fd, &pty_slave_fd, &job->jv_tty_out, &job->jv_tty_in);
-    if (pty_master_fd < 0 || pty_slave_fd < 0)
-	return FAIL;
+    ถ้า (pty_master_fd < 0 || pty_slave_fd < 0)
+	คืน FAIL;
     close(pty_slave_fd);
 
     channel = add_channel();
-    if (channel == NULL)
+    ถ้า (channel == NULL)
     {
 	close(pty_master_fd);
-	return FAIL;
+	คืน FAIL;
     }
-    if (job->jv_tty_out != NULL)
+    ถ้า (job->jv_tty_out != NULL)
 	ch_log(channel, "using pty %s on fd %d",
 					       job->jv_tty_out, pty_master_fd);
     job->jv_channel = channel;  // ch_refcount was set by add_channel()
@@ -6477,7 +6477,7 @@ mch_create_pty_channel(job_T *job, jobopt_T *options)
     // it only needs to be read once.
     channel_set_pipes(channel, pty_master_fd, pty_master_fd, INVALID_FD);
     channel_set_job(channel, job, options);
-    return OK;
+    คืน OK;
 }
 #endif
 
@@ -6486,9 +6486,9 @@ mch_create_pty_channel(job_T *job, jobopt_T *options)
  * In cooked mode we should get SIGINT, no need to check.
  */
     void
-mch_breakcheck(int force)
+mch_breakcheck(จำนวนเต็ม force)
 {
-    if ((mch_cur_tmode == TMODE_RAW || force)
+    ถ้า ((mch_cur_tmode == TMODE_RAW || force)
 			       && RealWaitForChar(read_cmd_fd, 0L, NULL, NULL))
 	fill_input_buf(FALSE);
 }
@@ -6505,14 +6505,14 @@ mch_breakcheck(int force)
  * Returns TRUE when a character is available.
  * When a GUI is being used, this will never get called -- webb
  */
-    static int
-WaitForChar(long msec, int *interrupted, int ignore_input)
+    static จำนวนเต็ม
+WaitForChar(long msec, จำนวนเต็ม *interrupted, จำนวนเต็ม ignore_input)
 {
 #ifdef FEAT_TIMERS
-    return ui_wait_for_chars_or_timer(
+    คืน ui_wait_for_chars_or_timer(
 		    msec, WaitForCharOrMouse, interrupted, ignore_input) == OK;
-#else
-    return WaitForCharOrMouse(msec, interrupted, ignore_input);
+#มิฉะนั้น
+    คืน WaitForCharOrMouse(msec, interrupted, ignore_input);
 #endif
 }
 
@@ -6525,26 +6525,26 @@ WaitForChar(long msec, int *interrupted, int ignore_input)
  * but something else needs to be done.
  * When a GUI is being used, this will never get called -- webb
  */
-    static int
-WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
+    static จำนวนเต็ม
+WaitForCharOrMouse(long msec, จำนวนเต็ม *interrupted, จำนวนเต็ม ignore_input)
 {
 #ifdef FEAT_MOUSE_GPM
-    int		gpm_process_wanted;
+    จำนวนเต็ม		gpm_process_wanted;
 #endif
 #ifdef FEAT_XCLIPBOARD
-    int		rest;
+    จำนวนเต็ม		rest;
 #endif
-    int		avail;
+    จำนวนเต็ม		avail;
 
-    if (!ignore_input && input_available())	    // something in inbuf[]
-	return 1;
+    ถ้า (!ignore_input && input_available())	    // something in inbuf[]
+	คืน 1;
 
-#if defined(FEAT_MOUSE_DEC)
+#ถ้า defined(FEAT_MOUSE_DEC)
     // May need to query the mouse position.
-    if (WantQueryMouse)
+    ถ้า (WantQueryMouse)
     {
 	WantQueryMouse = FALSE;
-	if (!no_query_mouse_for_testing)
+	ถ้า (!no_query_mouse_for_testing)
 	    mch_write((char_u *)"\033[1'|", 5);
     }
 #endif
@@ -6553,21 +6553,21 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
      * For FEAT_MOUSE_GPM and FEAT_XCLIPBOARD we loop here to process mouse
      * events.  This is a bit complicated, because they might both be defined.
      */
-#if defined(FEAT_MOUSE_GPM) || defined(FEAT_XCLIPBOARD)
+#ถ้า defined(FEAT_MOUSE_GPM) || defined(FEAT_XCLIPBOARD)
 # ifdef FEAT_XCLIPBOARD
     rest = 0;
-    if (do_xterm_trace())
+    ถ้า (do_xterm_trace())
 	rest = msec;
 # endif
     do
     {
 # ifdef FEAT_XCLIPBOARD
-	if (rest != 0)
+	ถ้า (rest != 0)
 	{
 	    msec = XT_TRACE_DELAY;
-	    if (rest >= 0 && rest < XT_TRACE_DELAY)
+	    ถ้า (rest >= 0 && rest < XT_TRACE_DELAY)
 		msec = rest;
-	    if (rest >= 0)
+	    ถ้า (rest >= 0)
 		rest -= msec;
 	}
 # endif
@@ -6577,28 +6577,28 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 # endif
 # ifdef FEAT_SOUND_CANBERRA
 	// Invoke any pending sound callbacks.
-	if (has_sound_callback_in_queue())
+	ถ้า (has_sound_callback_in_queue())
 	    invoke_sound_callback();
 # endif
 # ifdef FEAT_MOUSE_GPM
 	gpm_process_wanted = 0;
 	avail = RealWaitForChar(read_cmd_fd, msec,
 					     &gpm_process_wanted, interrupted);
-	if (!avail && !gpm_process_wanted)
-# else
+	ถ้า (!avail && !gpm_process_wanted)
+# มิฉะนั้น
 	avail = RealWaitForChar(read_cmd_fd, msec, NULL, interrupted);
-	if (!avail)
+	ถ้า (!avail)
 # endif
 	{
-	    if (!ignore_input && input_available())
-		return 1;
+	    ถ้า (!ignore_input && input_available())
+		คืน 1;
 # ifdef FEAT_XCLIPBOARD
-	    if (rest == 0 || !do_xterm_trace())
+	    ถ้า (rest == 0 || !do_xterm_trace())
 # endif
-		break;
+		bha_nga;
 	}
     }
-    while (FALSE
+    ขณะ (FALSE
 # ifdef FEAT_MOUSE_GPM
 	   || (gpm_process_wanted && mch_gpm_process() == 0)
 # endif
@@ -6608,10 +6608,10 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 	  )
 	;
 
-#else
+#มิฉะนั้น
     avail = RealWaitForChar(read_cmd_fd, msec, NULL, interrupted);
 #endif
-    return avail;
+    คืน avail;
 }
 
 #ifndef VMS
@@ -6625,13 +6625,13 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
  * "interrupted" (if not NULL) is set to TRUE when no character is available
  * but something else needs to be done.
  */
-    static int
-RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
+    static จำนวนเต็ม
+RealWaitForChar(จำนวนเต็ม fd, long msec, จำนวนเต็ม *check_for_gpm UNUSED, จำนวนเต็ม *interrupted)
 {
-    int		ret;
-    int		result;
-# if defined(FEAT_XCLIPBOARD) || defined(USE_XSMP) || defined(FEAT_MZSCHEME)
-    static int	busy = FALSE;
+    จำนวนเต็ม		ret;
+    จำนวนเต็ม		result;
+# ถ้า defined(FEAT_XCLIPBOARD) || defined(USE_XSMP) || defined(FEAT_MZSCHEME)
+    static จำนวนเต็ม	busy = FALSE;
 
     // May retry getting characters after an event was handled.
 #  define MAY_LOOP
@@ -6642,52 +6642,52 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
     long	start_msec = msec;
     elapsed_T	start_tv;
 
-    if (msec > 0)
+    ถ้า (msec > 0)
 	ELAPSED_INIT(start_tv);
 #  endif
 
     // Handle being called recursively.  This may happen for the session
     // manager stuff, it may save the file, which does a breakcheck.
-    if (busy)
-	return 0;
+    ถ้า (busy)
+	คืน 0;
 # endif
 
 # ifdef MAY_LOOP
-    for (;;)
+    สำหรับ (;;)
 # endif
     {
 # ifdef MAY_LOOP
-	int		finished = TRUE; // default is to 'loop' just once
+	จำนวนเต็ม		finished = TRUE; // default is to 'loop' just once
 #  ifdef FEAT_MZSCHEME
-	int		mzquantum_used = FALSE;
+	จำนวนเต็ม		mzquantum_used = FALSE;
 #  endif
 # endif
 # ifdef FEAT_WAYLAND
-	int		wayland_fd = -1;
+	จำนวนเต็ม		wayland_fd = -1;
 # endif
 # ifndef HAVE_SELECT
 			// each channel may use in, out and err
-	struct pollfd   fds[7 + 3 * MAX_OPEN_CHANNELS + 2 * MAX_CLIENT_CHANNELS];
-	int		nfd;
+	sa_nracanaa pollfd   fds[7 + 3 * MAX_OPEN_CHANNELS + 2 * MAX_CLIENT_CHANNELS];
+	จำนวนเต็ม		nfd;
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	int             wayland_idx = -1;
+	จำนวนเต็ม             wayland_idx = -1;
 #  endif
 #  ifdef FEAT_XCLIPBOARD
-	int		xterm_idx = -1;
+	จำนวนเต็ม		xterm_idx = -1;
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	int		gpm_idx = -1;
+	จำนวนเต็ม		gpm_idx = -1;
 #  endif
 #  ifdef USE_XSMP
-	int		xsmp_idx = -1;
+	จำนวนเต็ม		xsmp_idx = -1;
 #  endif
-	int		towait = (int)msec;
+	จำนวนเต็ม		towait = (จำนวนเต็ม)msec;
 
 #  ifdef FEAT_MZSCHEME
 	mzvim_check_threads();
-	if (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
+	ถ้า (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
 	{
-	    towait = (int)p_mzq;    // don't wait longer than 'mzquantum'
+	    towait = (จำนวนเต็ม)p_mzq;    // don't wait longer than 'mzquantum'
 	    mzquantum_used = TRUE;
 	}
 #  endif
@@ -6696,7 +6696,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	nfd = 1;
 
 #  ifdef FEAT_WAYLAND
-	if ((wayland_fd = wayland_prepare_read()) >= 0)
+	ถ้า ((wayland_fd = wayland_prepare_read()) >= 0)
 	{
 	    wayland_idx = nfd;
 	    fds[nfd].fd = wayland_fd;
@@ -6706,7 +6706,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	may_restore_clipboard();
-	if (xterm_Shell != (Widget)0)
+	ถ้า (xterm_Shell != (Widget)0)
 	{
 	    xterm_idx = nfd;
 	    fds[nfd].fd = ConnectionNumber(xterm_dpy);
@@ -6715,7 +6715,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ถ้า (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
 	{
 	    gpm_idx = nfd;
 	    fds[nfd].fd = gpm_fd;
@@ -6724,7 +6724,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_icefd != -1)
+	ถ้า (xsmp_icefd != -1)
 	{
 	    xsmp_idx = nfd;
 	    fds[nfd].fd = xsmp_icefd;
@@ -6735,90 +6735,90 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 #  ifdef FEAT_JOB_CHANNEL
 	nfd = channel_poll_setup(nfd, &fds, &towait);
 #  endif
-	if (interrupted != NULL)
+	ถ้า (interrupted != NULL)
 	    *interrupted = FALSE;
 
 	ret = poll(fds, nfd, towait);
 
 	result = ret > 0 && (fds[0].revents & POLLIN);
-	if (result == 0 && interrupted != NULL && ret > 0)
+	ถ้า (result == 0 && interrupted != NULL && ret > 0)
 	    *interrupted = TRUE;
 
 #  ifdef FEAT_MZSCHEME
-	if (ret == 0 && mzquantum_used)
+	ถ้า (ret == 0 && mzquantum_used)
 	    // MzThreads scheduling is required and timeout occurred
 	    finished = FALSE;
 #  endif
 
 #  ifdef FEAT_WAYLAND
-	if (wayland_idx >= 0)
+	ถ้า (wayland_idx >= 0)
 	    wayland_poll_check(fds[wayland_idx].revents);
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
-	if (xterm_Shell != (Widget)0 && (fds[xterm_idx].revents & POLLIN))
+	ถ้า (xterm_Shell != (Widget)0 && (fds[xterm_idx].revents & POLLIN))
 	{
 	    xterm_update();      // Maybe we should hand out clipboard
-	    if (--ret == 0 && !input_available())
+	    ถ้า (--ret == 0 && !input_available())
 		// Try again
 		finished = FALSE;
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (gpm_idx >= 0 && (fds[gpm_idx].revents & POLLIN))
+	ถ้า (gpm_idx >= 0 && (fds[gpm_idx].revents & POLLIN))
 	    *check_for_gpm = 1;
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_idx >= 0 && (fds[xsmp_idx].revents & (POLLIN | POLLHUP)))
+	ถ้า (xsmp_idx >= 0 && (fds[xsmp_idx].revents & (POLLIN | POLLHUP)))
 	{
-	    if (fds[xsmp_idx].revents & POLLIN)
+	    ถ้า (fds[xsmp_idx].revents & POLLIN)
 	    {
 		busy = TRUE;
 		xsmp_handle_requests();
 		busy = FALSE;
 	    }
-	    else if (fds[xsmp_idx].revents & POLLHUP)
+	    มิฉะนั้น ถ้า (fds[xsmp_idx].revents & POLLHUP)
 	    {
-		if (p_verbose > 0)
+		ถ้า (p_verbose > 0)
 		    verb_msg(_("XSMP lost ICE connection"));
 		xsmp_close();
 	    }
-	    if (--ret == 0)
+	    ถ้า (--ret == 0)
 		finished = FALSE;	// Try again
 	}
 #  endif
 #  ifdef FEAT_JOB_CHANNEL
 	// also call when ret == 0, we may be polling a keep-open channel
-	if (ret >= 0)
+	ถ้า (ret >= 0)
 	    channel_poll_check(ret, &fds);
 #  endif
 
-# else // HAVE_SELECT
+# มิฉะนั้น // HAVE_SELECT
 
-	struct timeval  tv;
-	struct timeval	*tvp;
+	sa_nracanaa timeval  tv;
+	sa_nracanaa timeval	*tvp;
 	// These are static because they can take 8 Kbyte each and cause the
 	// signal stack to run out with -O3.
 	static fd_set	rfds, wfds, efds;
-	int		maxfd;
+	จำนวนเต็ม		maxfd;
 	long		towait = msec;
 
 #  ifdef FEAT_MZSCHEME
 	mzvim_check_threads();
-	if (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
+	ถ้า (mzthreads_allowed() && p_mzq > 0 && (msec < 0 || msec > p_mzq))
 	{
 	    towait = p_mzq;	// don't wait longer than 'mzquantum'
 	    mzquantum_used = TRUE;
 	}
 #  endif
 
-	if (towait >= 0)
+	ถ้า (towait >= 0)
 	{
 	    tv.tv_sec = towait / 1000;
 	    tv.tv_usec = (towait % 1000) * (1000000/1000);
 	    tvp = &tv;
 	}
-	else
+	มิฉะนั้น
 	    tvp = NULL;
 
 	/*
@@ -6836,21 +6836,21 @@ select_eintr:
 	maxfd = fd;
 
 #  ifdef FEAT_WAYLAND
-	if ((wayland_fd = wayland_prepare_read()) >= 0)
+	ถ้า ((wayland_fd = wayland_prepare_read()) >= 0)
 	{
 	    FD_SET(wayland_fd, &rfds);
 
-	    if (maxfd < wayland_fd)
+	    ถ้า (maxfd < wayland_fd)
 		maxfd = wayland_fd;
 	}
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
 	may_restore_x11_clipboard();
-	if (xterm_Shell != (Widget)0)
+	ถ้า (xterm_Shell != (Widget)0)
 	{
 	    FD_SET(ConnectionNumber(xterm_dpy), &rfds);
-	    if (maxfd < ConnectionNumber(xterm_dpy))
+	    ถ้า (maxfd < ConnectionNumber(xterm_dpy))
 		maxfd = ConnectionNumber(xterm_dpy);
 
 	    // An event may have already been read but not handled.  In
@@ -6859,42 +6859,42 @@ select_eintr:
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ถ้า (check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
 	{
 	    FD_SET(gpm_fd, &rfds);
 	    FD_SET(gpm_fd, &efds);
-	    if (maxfd < gpm_fd)
+	    ถ้า (maxfd < gpm_fd)
 		maxfd = gpm_fd;
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (xsmp_icefd != -1)
+	ถ้า (xsmp_icefd != -1)
 	{
 	    FD_SET(xsmp_icefd, &rfds);
 	    FD_SET(xsmp_icefd, &efds);
-	    if (maxfd < xsmp_icefd)
+	    ถ้า (maxfd < xsmp_icefd)
 		maxfd = xsmp_icefd;
 	}
 #  endif
 #  ifdef FEAT_JOB_CHANNEL
 	maxfd = channel_select_setup(maxfd, &rfds, &wfds, &tv, &tvp);
 #  endif
-	if (interrupted != NULL)
+	ถ้า (interrupted != NULL)
 	    *interrupted = FALSE;
 
 	ret = select(maxfd + 1, SELECT_TYPE_ARG234 &rfds,
 		      SELECT_TYPE_ARG234 &wfds, SELECT_TYPE_ARG234 &efds, tvp);
 	result = ret > 0 && FD_ISSET(fd, &rfds);
-	if (result)
+	ถ้า (result)
 	    --ret;
-	else if (interrupted != NULL && ret > 0)
+	มิฉะนั้น ถ้า (interrupted != NULL && ret > 0)
 	    *interrupted = TRUE;
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	ถ้า (ret == -1 && errno == EINTR)
 	{
 	    // Check whether the EINTR is caused by SIGTSTP
-	    if (got_tstp && !in_mch_suspend)
+	    ถ้า (got_tstp && !in_mch_suspend)
 	    {
 		exarg_T ea;
 
@@ -6905,7 +6905,7 @@ select_eintr:
 
 	    // Check whether window has been resized, EINTR may be caused by
 	    // SIGWINCH.
-	    if (do_resize)
+	    ถ้า (do_resize)
 	    {
 #   ifdef FEAT_EVAL
 		ch_log(NULL, "calling handle_resize() in RealWaitForChar()");
@@ -6921,7 +6921,7 @@ select_eintr:
 	}
 #  endif
 #  ifdef __TANDEM
-	if (ret == -1 && errno == ENOTSUP)
+	ถ้า (ret == -1 && errno == ENOTSUP)
 	{
 	    FD_ZERO(&rfds);
 	    FD_ZERO(&efds);
@@ -6929,24 +6929,24 @@ select_eintr:
 	}
 #  endif
 #  ifdef FEAT_MZSCHEME
-	if (ret == 0 && mzquantum_used)
+	ถ้า (ret == 0 && mzquantum_used)
 	    // loop if MzThreads must be scheduled and timeout occurred
 	    finished = FALSE;
 #  endif
 
 #  ifdef FEAT_WAYLAND
-	if (wayland_fd != -1)
+	ถ้า (wayland_fd != -1)
 	    wayland_select_check(ret > 0 && FD_ISSET(wayland_fd, &rfds));
 #  endif
 
 #  ifdef FEAT_XCLIPBOARD
-	if (ret > 0 && xterm_Shell != (Widget)0
+	ถ้า (ret > 0 && xterm_Shell != (Widget)0
 		&& FD_ISSET(ConnectionNumber(xterm_dpy), &rfds))
 	{
 	    xterm_update();	      // Maybe we should hand out clipboard
 	    // continue looping when we only got the X event and the input
 	    // buffer is empty
-	    if (--ret == 0 && !input_available())
+	    ถ้า (--ret == 0 && !input_available())
 	    {
 		// Try again
 		finished = FALSE;
@@ -6954,69 +6954,69 @@ select_eintr:
 	}
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-	if (ret > 0 && check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
+	ถ้า (ret > 0 && check_for_gpm != NULL && gpm_flag && gpm_fd >= 0)
 	{
-	    if (FD_ISSET(gpm_fd, &efds))
+	    ถ้า (FD_ISSET(gpm_fd, &efds))
 		gpm_close();
-	    else if (FD_ISSET(gpm_fd, &rfds))
+	    มิฉะนั้น ถ้า (FD_ISSET(gpm_fd, &rfds))
 		*check_for_gpm = 1;
 	}
 #  endif
 #  ifdef USE_XSMP
-	if (ret > 0 && xsmp_icefd != -1)
+	ถ้า (ret > 0 && xsmp_icefd != -1)
 	{
-	    if (FD_ISSET(xsmp_icefd, &efds))
+	    ถ้า (FD_ISSET(xsmp_icefd, &efds))
 	    {
-		if (p_verbose > 0)
+		ถ้า (p_verbose > 0)
 		    verb_msg(_("XSMP lost ICE connection"));
 		xsmp_close();
-		if (--ret == 0)
+		ถ้า (--ret == 0)
 		    finished = FALSE;   // keep going if event was only one
 	    }
-	    else if (FD_ISSET(xsmp_icefd, &rfds))
+	    มิฉะนั้น ถ้า (FD_ISSET(xsmp_icefd, &rfds))
 	    {
 		busy = TRUE;
 		xsmp_handle_requests();
 		busy = FALSE;
-		if (--ret == 0)
+		ถ้า (--ret == 0)
 		    finished = FALSE;   // keep going if event was only one
 	    }
 	}
 #  endif
 #  ifdef FEAT_JOB_CHANNEL
 	// also call when ret == 0, we may be polling a keep-open channel
-	if (ret >= 0)
+	ถ้า (ret >= 0)
 	    (void)channel_select_check(ret, &rfds, &wfds);
 #  endif
 
 # endif // HAVE_SELECT
 
 # ifdef MAY_LOOP
-	if (finished || msec == 0)
-	    break;
+	ถ้า (finished || msec == 0)
+	    bha_nga;
 
-#  if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
-	if (clientserver_method == CLIENTSERVER_METHOD_X11 && server_waiting())
-	    break;
+#  ถ้า defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+	ถ้า (clientserver_method == CLIENTSERVER_METHOD_X11 && server_waiting())
+	    bha_nga;
 #  endif
 
 	// We're going to loop around again, find out for how long
-	if (msec > 0)
+	ถ้า (msec > 0)
 	{
 #  ifdef ELAPSED_FUNC
 	    // Compute remaining wait time.
 	    msec = start_msec - ELAPSED_FUNC(start_tv);
-#  else
+#  มิฉะนั้น
 	    // Guess we got interrupted halfway.
 	    msec = msec / 2;
 #  endif
-	    if (msec <= 0)
-		break;	// waited long enough
+	    ถ้า (msec <= 0)
+		bha_nga;	// waited long enough
 	}
 # endif
     }
 
-    return result;
+    คืน result;
 }
 
 /*
@@ -7025,13 +7025,13 @@ select_eintr:
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    จำนวนเต็ม
 mch_expandpath(
     garray_T	*gap,
     char_u	*path,
-    int		flags)		// EW_* flags
+    จำนวนเต็ม		flags)		// EW_* flags
 {
-    return unix_expandpath(gap, path, 0, flags, FALSE);
+    คืน unix_expandpath(gap, path, 0, flags, FALSE);
 }
 
 /*
@@ -7056,24 +7056,24 @@ mch_expandpath(
 
 # define SHELL_SPECIAL (char_u *)"\t \"&'$;<>()\\|\n"
 
-    int
+    จำนวนเต็ม
 mch_expand_wildcards(
-    int		   num_pat,
+    จำนวนเต็ม		   num_pat,
     char_u	 **pat,
-    int		  *num_file,
+    จำนวนเต็ม		  *num_file,
     char_u	***file,
-    int		   flags)	// EW_* flags
+    จำนวนเต็ม		   flags)	// EW_* flags
 {
-    int		i;
+    จำนวนเต็ม		i;
     size_t	len;
     long	llen;
     char_u	*p;
-    int		dir;
+    จำนวนเต็ม		dir;
 
     /*
      * This is the non-OS/2 implementation (really Unix).
      */
-    int		j;
+    จำนวนเต็ม		j;
     char_u	*tempname;
     size_t	tempnamelen;
     char_u	*command;
@@ -7087,10 +7087,10 @@ mch_expand_wildcards(
 # define STYLE_BT	4	// `cmd` expansion, execute the pattern directly
 # define STYLE_GLOBSTAR	5	// use extended shell glob for bash (this uses extended
 				// globbing functionality using globstar, needs bash > 4)
-    int		shell_style = STYLE_ECHO;
-    int		check_spaces;
-    static int	did_find_nul = FALSE;
-    int		ampersand = FALSE;
+    จำนวนเต็ม		shell_style = STYLE_ECHO;
+    จำนวนเต็ม		check_spaces;
+    static จำนวนเต็ม	did_find_nul = FALSE;
+    จำนวนเต็ม		ampersand = FALSE;
 				// vimglob() function to define for Posix shell
     static string_T sh_vimglob_func = STR_LITERAL_INIT("vimglob() { while [ $# -ge 1 ]; do echo \"$1\"; shift; done }; vimglob >");
 				// vimglob() function with globstar setting enabled, only for bash >= 4.X
@@ -7104,31 +7104,31 @@ mch_expand_wildcards(
      * If there are no wildcards, just copy the names to allocated memory.
      * Saves a lot of time, because we don't have to start a new shell.
      */
-    if (!have_wildcard(num_pat, pat))
-	return save_patterns(num_pat, pat, num_file, file);
+    ถ้า (!have_wildcard(num_pat, pat))
+	คืน save_patterns(num_pat, pat, num_file, file);
 
 # ifdef HAVE_SANDBOX
     // Don't allow any shell command in the sandbox.
-    if (sandbox != 0 && check_secure())
-	return FAIL;
+    ถ้า (sandbox != 0 && check_secure())
+	คืน FAIL;
 # endif
 
     /*
      * Don't allow the use of backticks in secure and restricted mode.
      */
-    if (secure || restricted)
-	for (i = 0; i < num_pat; ++i)
-	    if (vim_strchr(pat[i], '`') != NULL
+    ถ้า (secure || restricted)
+	สำหรับ (i = 0; i < num_pat; ++i)
+	    ถ้า (vim_strchr(pat[i], '`') != NULL
 		    && (check_restricted() || check_secure()))
-		return FAIL;
+		คืน FAIL;
 
     /*
      * get a name for the temp file
      */
-    if ((tempname = vim_tempname('o', FALSE)) == NULL)
+    ถ้า ((tempname = vim_tempname('o', FALSE)) == NULL)
     {
 	emsg(_(e_cant_get_temp_file_name));
-	return FAIL;
+	คืน FAIL;
     }
 
     /*
@@ -7147,22 +7147,22 @@ mch_expand_wildcards(
      * STYLE_ECHO:	space separated.
      *	    A shell we don't know, stay safe and use "echo".
      */
-    if (num_pat == 1 && *pat[0] == '`'
+    ถ้า (num_pat == 1 && *pat[0] == '`'
 	    && (len = STRLEN(pat[0])) > 2
 	    && *(pat[0] + len - 1) == '`')
 	shell_style = STYLE_BT;
-    else if ((len = STRLEN(p_sh)) >= 3)
+    มิฉะนั้น ถ้า ((len = STRLEN(p_sh)) >= 3)
     {
-	if (STRCMP(p_sh + len - 3, "csh") == 0)
+	ถ้า (STRCMP(p_sh + len - 3, "csh") == 0)
 	    shell_style = STYLE_GLOB;
-	else if (STRCMP(p_sh + len - 3, "zsh") == 0)
+	มิฉะนั้น ถ้า (STRCMP(p_sh + len - 3, "zsh") == 0)
 	    shell_style = STYLE_PRINT;
     }
-    if (shell_style == STYLE_ECHO)
+    ถ้า (shell_style == STYLE_ECHO)
     {
-	if (strstr((char *)gettail(p_sh), "bash") != NULL)
+	ถ้า (strstr((var_na *)gettail(p_sh), "bash") != NULL)
 	    shell_style = STYLE_GLOBSTAR;
-	else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+	มิฉะนั้น ถ้า (strstr((var_na *)gettail(p_sh), "sh") != NULL)
 	    shell_style = STYLE_VIMGLOB;
     }
 
@@ -7171,33 +7171,33 @@ mch_expand_wildcards(
     // Worst case: "unset nonomatch; print -N >" plus two is 29
     tempnamelen = STRLEN(tempname);
     len = tempnamelen + 29;
-    if (shell_style == STYLE_VIMGLOB)
+    ถ้า (shell_style == STYLE_VIMGLOB)
 	len += sh_vimglob_func.length;
-    else if (shell_style == STYLE_GLOBSTAR)
+    มิฉะนั้น ถ้า (shell_style == STYLE_GLOBSTAR)
 	len += sh_vimglob_func.length + sh_globstar_opt.length;
 
-    for (i = 0; i < num_pat; ++i)
+    สำหรับ (i = 0; i < num_pat; ++i)
     {
 	// Count the length of the patterns in the same way as they are put in
 	// "command" below.
 # ifdef USE_SYSTEM
 	len += STRLEN(pat[i]) + 3;	// add space and two quotes
-# else
+# มิฉะนั้น
 	++len;				// add space
-	for (j = 0; pat[i][j] != NUL; ++j)
+	สำหรับ (j = 0; pat[i][j] != NUL; ++j)
 	{
-	    if (vim_strchr(SHELL_SPECIAL, pat[i][j]) != NULL)
+	    ถ้า (vim_strchr(SHELL_SPECIAL, pat[i][j]) != NULL)
 		++len;		// may add a backslash
 	    ++len;
 	}
 # endif
     }
     command = alloc(len);
-    if (command == NULL)
+    ถ้า (command == NULL)
     {
 	// out of memory
 	vim_free(tempname);
-	return FAIL;
+	คืน FAIL;
     }
 
     /*
@@ -7208,82 +7208,82 @@ mch_expand_wildcards(
      * - Add the temp file name.
      * - Add the file name patterns.
      */
-    if (shell_style == STYLE_BT)
+    ถ้า (shell_style == STYLE_BT)
     {
 	// change `command; command& ` to (command; command )
-	commandlen = vim_snprintf((char *)command, len, "(%s)>%s", pat[0] + 1, tempname);   // +1 to exclude first backtick
+	commandlen = vim_snprintf((var_na *)command, len, "(%s)>%s", pat[0] + 1, tempname);   // +1 to exclude first backtick
 
-	p = (char_u *)strstr((char *)command, ")>");
-	if (p == NULL)
+	p = (char_u *)strstr((var_na *)command, ")>");
+	ถ้า (p == NULL)
 	{
 	    ;					    // can't happen ;-)
 	}
-	else
+	มิฉะนั้น
 	{
 	    --p;
-	    while (p > command && VIM_ISWHITE(*p))
+	    ขณะ (p > command && VIM_ISWHITE(*p))
 		--p;
-	    if (*p == '`')			    // remove backtick
+	    ถ้า (*p == '`')			    // remove backtick
 		*p = ' ';
 
 	    --p;
-	    while (p > command && VIM_ISWHITE(*p))
+	    ขณะ (p > command && VIM_ISWHITE(*p))
 		--p;
-	    if (*p == '&')			    // remove ampersand
+	    ถ้า (*p == '&')			    // remove ampersand
 	    {
 		ampersand = TRUE;
 		*p = ' ';
 	    }
 	}
     }
-    else
+    มิฉะนั้น
     {
-	if (shell_style == STYLE_GLOB)
+	ถ้า (shell_style == STYLE_GLOB)
 	{
 	    // Assume the nonomatch option is valid only for csh like shells,
 	    // otherwise, this may set the positional parameters for the shell,
 	    // e.g. "$*".
-	    commandlen = vim_snprintf((char *)command, len, "%sset nonomatch; glob >%s",
+	    commandlen = vim_snprintf((var_na *)command, len, "%sset nonomatch; glob >%s",
 				(flags & EW_NOTFOUND) ? "" : "un", tempname);
 	}
-	else if (shell_style == STYLE_PRINT)
-	    commandlen = vim_snprintf((char *)command, len, "print -N >%s", tempname);
-	else if (shell_style == STYLE_VIMGLOB)
-	    commandlen = vim_snprintf((char *)command, len, "%s%s", sh_vimglob_func.string, tempname);
-	else if (shell_style == STYLE_GLOBSTAR)
-	    commandlen = vim_snprintf((char *)command, len, "%s%s%s", sh_globstar_opt.string,
+	มิฉะนั้น ถ้า (shell_style == STYLE_PRINT)
+	    commandlen = vim_snprintf((var_na *)command, len, "print -N >%s", tempname);
+	มิฉะนั้น ถ้า (shell_style == STYLE_VIMGLOB)
+	    commandlen = vim_snprintf((var_na *)command, len, "%s%s", sh_vimglob_func.string, tempname);
+	มิฉะนั้น ถ้า (shell_style == STYLE_GLOBSTAR)
+	    commandlen = vim_snprintf((var_na *)command, len, "%s%s%s", sh_globstar_opt.string,
 				sh_vimglob_func.string, tempname);
-	else
-	    commandlen = vim_snprintf((char *)command, len, "echo >%s", tempname);
+	มิฉะนั้น
+	    commandlen = vim_snprintf((var_na *)command, len, "echo >%s", tempname);
 
-	for (i = 0; i < num_pat; ++i)
+	สำหรับ (i = 0; i < num_pat; ++i)
 	{
 	    // When using system() always add extra quotes, because the shell
 	    // is started twice.  Otherwise put a backslash before special
 	    // characters, except inside ``.
 # ifdef USE_SYSTEM
-	    commandlen += vim_snprintf((char *)command + commandlen, len, " \"%s\"", pat[i]);
-# else
-	    int intick = FALSE;
+	    commandlen += vim_snprintf((var_na *)command + commandlen, len, " \"%s\"", pat[i]);
+# มิฉะนั้น
+	    จำนวนเต็ม intick = FALSE;
 
 	    p = command + commandlen;
 	    *p++ = ' ';
-	    for (j = 0; pat[i][j] != NUL; ++j)
+	    สำหรับ (j = 0; pat[i][j] != NUL; ++j)
 	    {
-		if (pat[i][j] == '`')
+		ถ้า (pat[i][j] == '`')
 		    intick = !intick;
-		else if (pat[i][j] == '\\' && pat[i][j + 1] != NUL)
+		มิฉะนั้น ถ้า (pat[i][j] == '\\' && pat[i][j + 1] != NUL)
 		{
 		    // Remove a backslash, take char literally.  But keep
 		    // backslash inside backticks, before a special character
 		    // and before a backtick.
-		    if (intick
+		    ถ้า (intick
 			  || vim_strchr(SHELL_SPECIAL, pat[i][j + 1]) != NULL
 			  || pat[i][j + 1] == '`')
 			*p++ = '\\';
 		    ++j;
 		}
-		else if (!intick
+		มิฉะนั้น ถ้า (!intick
 			 && ((flags & EW_KEEPDOLLAR) == 0 || pat[i][j] != '$')
 			      && vim_strchr(SHELL_SPECIAL, pat[i][j]) != NULL)
 		    // Put a backslash before a special character, but not
@@ -7299,9 +7299,9 @@ mch_expand_wildcards(
 # endif
 	}
     }
-    if (flags & EW_SILENT)
+    ถ้า (flags & EW_SILENT)
 	show_shell_mess = FALSE;
-    if (ampersand)
+    ถ้า (ampersand)
 	STRCPY(command + commandlen, "&");		// put the '&' after the redirection
 
     /*
@@ -7309,7 +7309,7 @@ mch_expand_wildcards(
      * the argument list, otherwise zsh gives an error message and doesn't
      * expand any other pattern.
      */
-    if (shell_style == STYLE_PRINT)
+    ถ้า (shell_style == STYLE_PRINT)
 	extra_shell_arg = (char_u *)"-G";   // Use zsh NULL_GLOB option
 
     /*
@@ -7317,7 +7317,7 @@ mch_expand_wildcards(
      * vi can do it, so we will too, but it is only necessary if there is a "$"
      * in one of the patterns, otherwise we can still use the fast option.
      */
-    else if (shell_style == STYLE_GLOB && !have_dollars(num_pat, pat))
+    มิฉะนั้น ถ้า (shell_style == STYLE_GLOB && !have_dollars(num_pat, pat))
 	extra_shell_arg = (char_u *)"-f";	// Use csh fast option
 
     /*
@@ -7327,14 +7327,14 @@ mch_expand_wildcards(
 
     // When running in the background, give it some time to create the temp
     // file, but don't wait for it to finish.
-    if (ampersand)
+    ถ้า (ampersand)
 	mch_delay(10L, MCH_DELAY_IGNOREINPUT);
 
     extra_shell_arg = NULL;		// cleanup
     show_shell_mess = TRUE;
     vim_free(command);
 
-    if (i != 0)				// mch_call_shell() failed
+    ถ้า (i != 0)				// mch_call_shell() failed
     {
 	mch_remove(tempname);
 	vim_free(tempname);
@@ -7344,14 +7344,14 @@ mch_expand_wildcards(
 	 * from the shell, so screen may still get messed up -- webb.
 	 */
 # ifndef USE_SYSTEM
-	if (!(flags & EW_SILENT))
+	ถ้า (!(flags & EW_SILENT))
 # endif
 	{
 	    redraw_later_clear();	// probably messed up screen
 	    msg_putchar('\n');		// clear bottom line quickly
 	    cmdline_row = Rows - 1;	// continue on last line
 # ifdef USE_SYSTEM
-	    if (!(flags & EW_SILENT))
+	    ถ้า (!(flags & EW_SILENT))
 # endif
 	    {
 		msg(_(e_cannot_expand_wildcards));
@@ -7360,19 +7360,19 @@ mch_expand_wildcards(
 	}
 	// If a `cmd` expansion failed, don't list `cmd` as a match, even when
 	// EW_NOTFOUND is given
-	if (shell_style == STYLE_BT)
-	    return FAIL;
+	ถ้า (shell_style == STYLE_BT)
+	    คืน FAIL;
 	goto notfound;
     }
 
     /*
      * read the names from the file into memory
      */
-    fd = fopen((char *)tempname, READBIN);
-    if (fd == NULL)
+    fd = fopen((var_na *)tempname, READBIN);
+    ถ้า (fd == NULL)
     {
 	// Something went wrong, perhaps a file name with a special char.
-	if (!(flags & EW_SILENT))
+	ถ้า (!(flags & EW_SILENT))
 	{
 	    msg(_(e_cannot_expand_wildcards));
 	    msg_start();		// don't overwrite this message
@@ -7383,73 +7383,73 @@ mch_expand_wildcards(
     fseek(fd, 0L, SEEK_END);
     llen = ftell(fd);			// get size of temp file
     fseek(fd, 0L, SEEK_SET);
-    if (llen < 0)
+    ถ้า (llen < 0)
 	// just in case ftell() would fail
 	buffer = NULL;
-    else
+    มิฉะนั้น
 	buffer = alloc(llen + 1);
-    if (buffer == NULL)
+    ถ้า (buffer == NULL)
     {
 	// out of memory
 	mch_remove(tempname);
 	vim_free(tempname);
 	fclose(fd);
-	return FAIL;
+	คืน FAIL;
     }
     len = llen;
-    i = fread((char *)buffer, 1, len, fd);
+    i = fread((var_na *)buffer, 1, len, fd);
     fclose(fd);
     mch_remove(tempname);
-    if (i != (int)len)
+    ถ้า (i != (จำนวนเต็ม)len)
     {
 	// unexpected read error
 	semsg(_(e_cant_read_file_str), tempname);
 	vim_free(tempname);
 	vim_free(buffer);
-	return FAIL;
+	คืน FAIL;
     }
     vim_free(tempname);
 
 # ifdef __CYGWIN__
     // Translate <CR><NL> into <NL>.  Caution, buffer may contain NUL.
     p = buffer;
-    for (i = 0; i < (int)len; ++i)
-	if (!(buffer[i] == CAR && buffer[i + 1] == NL))
+    สำหรับ (i = 0; i < (จำนวนเต็ม)len; ++i)
+	ถ้า (!(buffer[i] == CAR && buffer[i + 1] == NL))
 	    *p++ = buffer[i];
     len = p - buffer;
 # endif
 
 
     // file names are separated with Space
-    if (shell_style == STYLE_ECHO)
+    ถ้า (shell_style == STYLE_ECHO)
     {
 	buffer[len] = '\n';		// make sure the buffer ends in NL
 	p = buffer;
-	for (i = 0; *p != '\n'; ++i)	// count number of entries
+	สำหรับ (i = 0; *p != '\n'; ++i)	// count number of entries
 	{
-	    while (*p != ' ' && *p != '\n')
+	    ขณะ (*p != ' ' && *p != '\n')
 		++p;
 	    p = skipwhite(p);		// skip to next entry
 	}
     }
     // file names are separated with NL
-    else if (shell_style == STYLE_BT ||
+    มิฉะนั้น ถ้า (shell_style == STYLE_BT ||
 	    shell_style == STYLE_VIMGLOB ||
 	    shell_style == STYLE_GLOBSTAR)
     {
 	buffer[len] = NUL;		// make sure the buffer ends in NUL
 	p = buffer;
-	for (i = 0; *p != NUL; ++i)	// count number of entries
+	สำหรับ (i = 0; *p != NUL; ++i)	// count number of entries
 	{
-	    while (*p != '\n' && *p != NUL)
+	    ขณะ (*p != '\n' && *p != NUL)
 		++p;
-	    if (*p != NUL)
+	    ถ้า (*p != NUL)
 		++p;
 	    p = skipwhite(p);		// skip leading white space
 	}
     }
     // file names are separated with NUL
-    else
+    มิฉะนั้น
     {
 	/*
 	 * Some versions of zsh use spaces instead of NULs to separate
@@ -7460,13 +7460,13 @@ mch_expand_wildcards(
 	 * don't check for spaces again.
 	 */
 	check_spaces = FALSE;
-	if (shell_style == STYLE_PRINT && !did_find_nul)
+	ถ้า (shell_style == STYLE_PRINT && !did_find_nul)
 	{
 	    // If there is a NUL, set did_find_nul, else set check_spaces
 	    buffer[len] = NUL;
-	    if (len && (int)STRLEN(buffer) < (int)len)
+	    ถ้า (len && (จำนวนเต็ม)STRLEN(buffer) < (จำนวนเต็ม)len)
 		did_find_nul = TRUE;
-	    else
+	    มิฉะนั้น
 		check_spaces = TRUE;
 	}
 
@@ -7474,21 +7474,21 @@ mch_expand_wildcards(
 	 * Make sure the buffer ends with a NUL.  For STYLE_PRINT there
 	 * already is one, for STYLE_GLOB it needs to be added.
 	 */
-	if (len && buffer[len - 1] == NUL)
+	ถ้า (len && buffer[len - 1] == NUL)
 	    --len;
-	else
+	มิฉะนั้น
 	    buffer[len] = NUL;
 	i = 0;
-	for (p = buffer; p < buffer + len; ++p)
-	    if (*p == NUL || (*p == ' ' && check_spaces))   // count entry
+	สำหรับ (p = buffer; p < buffer + len; ++p)
+	    ถ้า (*p == NUL || (*p == ' ' && check_spaces))   // count entry
 	    {
 		++i;
 		*p = NUL;
 	    }
-	if (len)
+	ถ้า (len)
 	    ++i;			// count last entry
     }
-    if (i == 0)
+    ถ้า (i == 0)
     {
 	/*
 	 * Can happen when using /bin/sh and typing ":e $NO_SUCH_VAR^I".
@@ -7500,38 +7500,38 @@ mch_expand_wildcards(
     }
     *num_file = i;
     *file = ALLOC_MULT(char_u *, i);
-    if (*file == NULL)
+    ถ้า (*file == NULL)
     {
 	// out of memory
 	vim_free(buffer);
-	return FAIL;
+	คืน FAIL;
     }
 
     /*
      * Isolate the individual file names.
      */
     p = buffer;
-    for (i = 0; i < *num_file; ++i)
+    สำหรับ (i = 0; i < *num_file; ++i)
     {
 	(*file)[i] = p;
 	// Space or NL separates
-	if (shell_style == STYLE_ECHO || shell_style == STYLE_BT
+	ถ้า (shell_style == STYLE_ECHO || shell_style == STYLE_BT
 		|| shell_style == STYLE_VIMGLOB || shell_style == STYLE_GLOBSTAR)
 	{
-	    while (!(shell_style == STYLE_ECHO && *p == ' ')
+	    ขณะ (!(shell_style == STYLE_ECHO && *p == ' ')
 						   && *p != '\n' && *p != NUL)
 		++p;
-	    if (p == buffer + len)		// last entry
+	    ถ้า (p == buffer + len)		// last entry
 		*p = NUL;
-	    else
+	    มิฉะนั้น
 	    {
 		*p++ = NUL;
 		p = skipwhite(p);		// skip to next entry
 	    }
 	}
-	else		// NUL separates
+	มิฉะนั้น		// NUL separates
 	{
-	    while (*p && p < buffer + len)	// skip entry
+	    ขณะ (*p && p < buffer + len)	// skip entry
 		++p;
 	    ++p;				// skip NUL
 	}
@@ -7540,27 +7540,27 @@ mch_expand_wildcards(
     /*
      * Move the file names to allocated memory.
      */
-    for (j = 0, i = 0; i < *num_file; ++i)
+    สำหรับ (j = 0, i = 0; i < *num_file; ++i)
     {
 	// Require the files to exist.	Helps when using /bin/sh
-	if (!(flags & EW_NOTFOUND) && mch_getperm((*file)[i]) < 0)
+	ถ้า (!(flags & EW_NOTFOUND) && mch_getperm((*file)[i]) < 0)
 	    continue;
 
 	// check if this entry should be included
 	dir = (mch_isdir((*file)[i]));
-	if ((dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+	ถ้า ((dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
 	    continue;
 
 	// Skip files that are not executable if we check for that.
-	if (!dir && (flags & EW_EXEC)
+	ถ้า (!dir && (flags & EW_EXEC)
 		    && !mch_can_exe((*file)[i], NULL, !(flags & EW_SHELLCMD)))
 	    continue;
 
 	p = alloc(STRLEN((*file)[i]) + 1 + dir);
-	if (p)
+	ถ้า (p)
 	{
 	    STRCPY(p, (*file)[i]);
-	    if (dir)
+	    ถ้า (dir)
 		add_pathsep(p);	    // add '/' to a directory name
 	    (*file)[j++] = p;
 	}
@@ -7568,160 +7568,160 @@ mch_expand_wildcards(
     vim_free(buffer);
     *num_file = j;
 
-    if (*num_file == 0)	    // rejected all entries
+    ถ้า (*num_file == 0)	    // rejected all entries
     {
 	VIM_CLEAR(*file);
 	goto notfound;
     }
 
-    return OK;
+    คืน OK;
 
 notfound:
-    if (flags & EW_NOTFOUND)
-	return save_patterns(num_pat, pat, num_file, file);
-    return FAIL;
+    ถ้า (flags & EW_NOTFOUND)
+	คืน save_patterns(num_pat, pat, num_file, file);
+    คืน FAIL;
 }
 
 #endif // VMS
 
-    static int
+    static จำนวนเต็ม
 save_patterns(
-    int		num_pat,
+    จำนวนเต็ม		num_pat,
     char_u	**pat,
-    int		*num_file,
+    จำนวนเต็ม		*num_file,
     char_u	***file)
 {
-    int		i;
+    จำนวนเต็ม		i;
     char_u	*s;
 
     *file = ALLOC_MULT(char_u *, num_pat);
-    if (*file == NULL)
-	return FAIL;
-    for (i = 0; i < num_pat; i++)
+    ถ้า (*file == NULL)
+	คืน FAIL;
+    สำหรับ (i = 0; i < num_pat; i++)
     {
 	s = vim_strsave(pat[i]);
-	if (s != NULL)
+	ถ้า (s != NULL)
 	    // Be compatible with expand_filename(): halve the number of
 	    // backslashes.
 	    backslash_halve(s);
 	(*file)[i] = s;
     }
     *num_file = num_pat;
-    return OK;
+    คืน OK;
 }
 
 /*
  * Return TRUE if the string "p" contains a wildcard that mch_expandpath() can
  * expand.
  */
-    int
+    จำนวนเต็ม
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    สำหรับ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ถ้า (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)
+	มิฉะนั้น
+	    ถ้า (vim_strchr((char_u *)
 #ifdef VMS
 				    "*?%"
-#else
+#มิฉะนั้น
 				    "*?[{'"
 #endif
 						, *p) != NULL)
-	    return TRUE;
+	    คืน TRUE;
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Return TRUE if the string "p" contains a wildcard.
  * Don't recognize '~' at the end as a wildcard.
  */
-    int
+    จำนวนเต็ม
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    สำหรับ ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	ถ้า (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else
-	    if (vim_strchr((char_u *)
+	มิฉะนั้น
+	    ถ้า (vim_strchr((char_u *)
 #ifdef VMS
 				    "*?%$"
-#else
+#มิฉะนั้น
 				    "*?[{`'$"
 #endif
 						, *p) != NULL
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    คืน TRUE;
     }
-    return FALSE;
+    คืน FALSE;
 }
 
-    static int
-have_wildcard(int num, char_u **file)
+    static จำนวนเต็ม
+have_wildcard(จำนวนเต็ม num, char_u **file)
 {
-    int	    i;
+    จำนวนเต็ม	    i;
 
-    for (i = 0; i < num; i++)
-	if (mch_has_wildcard(file[i]))
-	    return 1;
-    return 0;
+    สำหรับ (i = 0; i < num; i++)
+	ถ้า (mch_has_wildcard(file[i]))
+	    คืน 1;
+    คืน 0;
 }
 
-    static int
-have_dollars(int num, char_u **file)
+    static จำนวนเต็ม
+have_dollars(จำนวนเต็ม num, char_u **file)
 {
-    int	    i;
+    จำนวนเต็ม	    i;
 
-    for (i = 0; i < num; i++)
-	if (vim_strchr(file[i], '$') != NULL)
-	    return TRUE;
-    return FALSE;
+    สำหรับ (i = 0; i < num; i++)
+	ถ้า (vim_strchr(file[i], '$') != NULL)
+	    คืน TRUE;
+    คืน FALSE;
 }
 
-#if !defined(HAVE_RENAME)
+#ถ้า !defined(HAVE_RENAME)
 /*
  * Scaled-down version of rename(), which is missing in Xenix.
  * This version can only move regular files and will fail if the
  * destination exists.
  */
-    int
-mch_rename(const char *src, const char *dest)
+    จำนวนเต็ม
+mch_rename(const var_na *src, const var_na *dest)
 {
-    struct stat	    st;
+    sa_nracanaa stat	    st;
 
-    if (stat(dest, &st) >= 0)	    // fail if destination exists
-	return -1;
-    if (link(src, dest) != 0)	    // link file to new name
-	return -1;
-    if (mch_remove(src) == 0)	    // delete link to old name
-	return 0;
-    return -1;
+    ถ้า (stat(dest, &st) >= 0)	    // fail if destination exists
+	คืน -1;
+    ถ้า (link(src, dest) != 0)	    // link file to new name
+	คืน -1;
+    ถ้า (mch_remove(src) == 0)	    // delete link to old name
+	คืน 0;
+    คืน -1;
 }
 #endif // !HAVE_RENAME
 
-#if defined(FEAT_MOUSE_GPM)
-# if defined(DYNAMIC_GPM)
+#ถ้า defined(FEAT_MOUSE_GPM)
+# ถ้า defined(DYNAMIC_GPM)
 /*
  * Initialize Gpm's symbols for dynamic linking.
  * Must be called only if libgpm_hinst is NULL.
  */
-    static int
+    static จำนวนเต็ม
 load_libgpm(void)
 {
     libgpm_hinst = dlopen("libgpm.so", RTLD_LAZY|RTLD_GLOBAL);
 
-    if (libgpm_hinst == NULL)
+    ถ้า (libgpm_hinst == NULL)
     {
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	    smsg_attr(HL_ATTR(HLF_W),
 			       _("Could not load gpm library: %s"), dlerror());
-	return FAIL;
+	คืน FAIL;
     }
 
-    if (
+    ถ้า (
 	    (dll_Gpm_Open     = dlsym(libgpm_hinst, "Gpm_Open"))     == NULL
 	||  (dll_Gpm_Close    = dlsym(libgpm_hinst, "Gpm_Close"))    == NULL
 	||  (dll_Gpm_GetEvent = dlsym(libgpm_hinst, "Gpm_GetEvent")) == NULL
@@ -7734,15 +7734,15 @@ load_libgpm(void)
 	libgpm_hinst = NULL;
 	dll_gpm_flag = NULL;
 	dll_gpm_fd   = NULL;
-	return FAIL;
+	คืน FAIL;
     }
-    return OK;
+    คืน OK;
 }
 
-    int
+    จำนวนเต็ม
 gpm_available(void)
 {
-    return libgpm_hinst != NULL || load_libgpm() == OK;
+    คืน libgpm_hinst != NULL || load_libgpm() == OK;
 }
 # endif // DYNAMIC_GPM
 
@@ -7750,25 +7750,25 @@ gpm_available(void)
  * Initializes connection with gpm (if it isn't already opened)
  * Return 1 if succeeded (or connection already opened), 0 if failed
  */
-    static int
+    static จำนวนเต็ม
 gpm_open(void)
 {
     static Gpm_Connect gpm_connect; // Must it be kept till closing ?
 
 # ifdef DYNAMIC_GPM
-    if (!gpm_available())
-	return 0;
+    ถ้า (!gpm_available())
+	คืน 0;
 # endif
 
-    if (gpm_flag)
-	return 1; // already open
+    ถ้า (gpm_flag)
+	คืน 1; // already open
 
     gpm_connect.eventMask = (GPM_UP | GPM_DRAG | GPM_DOWN);
     gpm_connect.defaultMask = ~GPM_HARD;
     // Default handling for mouse move
     gpm_connect.minMod = 0; // Handle any modifier keys
     gpm_connect.maxMod = 0xffff;
-    if (Gpm_Open(&gpm_connect, 0) > 0)
+    ถ้า (Gpm_Open(&gpm_connect, 0) > 0)
     {
 	// gpm library tries to handling TSTP causes
 	// problems. Anyways, we close connection to Gpm whenever
@@ -7777,9 +7777,9 @@ gpm_open(void)
 # ifdef SIGTSTP
 	mch_signal(SIGTSTP, restricted ? SIG_IGN : sig_tstp);
 # endif
-	return 1; // succeed
+	คืน 1; // succeed
     }
-    if (gpm_fd == -2)
+    ถ้า (gpm_fd == -2)
     {
 	Gpm_Close(); // We don't want to talk to xterm via gpm
 
@@ -7793,16 +7793,16 @@ gpm_open(void)
 	mch_signal(SIGTSTP, restricted ? SIG_IGN : sig_tstp);
 # endif
     }
-    return 0;
+    คืน 0;
 }
 
 /*
  * Returns TRUE if the GPM mouse is enabled.
  */
-    int
+    จำนวนเต็ม
 gpm_enabled(void)
 {
-    return gpm_flag && gpm_fd >= 0;
+    คืน gpm_flag && gpm_fd >= 0;
 }
 
 /*
@@ -7811,7 +7811,7 @@ gpm_enabled(void)
     static void
 gpm_close(void)
 {
-    if (gpm_enabled())
+    ถ้า (gpm_enabled())
 	Gpm_Close();
 }
 
@@ -7820,24 +7820,24 @@ gpm_close(void)
  * generated key sequence.
  * This function is styled after gui_send_mouse_event().
  */
-    static int
+    static จำนวนเต็ม
 mch_gpm_process(void)
 {
-    int			button;
+    จำนวนเต็ม			button;
     static Gpm_Event	gpm_event;
     char_u		string[6];
     int_u		vim_modifiers;
-    int			row,col;
-    unsigned char	buttons_mask;
-    unsigned char	gpm_modifiers;
-    static unsigned char old_buttons = 0;
+    จำนวนเต็ม			row,col;
+    unsigned var_na	buttons_mask;
+    unsigned var_na	gpm_modifiers;
+    static unsigned var_na old_buttons = 0;
 
     Gpm_GetEvent(&gpm_event);
 
 # ifdef FEAT_GUI
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return 0;
+    ถ้า (hold_gui_events)
+	คืน 0;
 # endif
 
     row = gpm_event.y - 1;
@@ -7848,37 +7848,37 @@ mch_gpm_process(void)
     string[2] = 'G';
     switch (GPM_BARE_EVENTS(gpm_event.type))
     {
-	case GPM_DRAG:
+	pak_sa GPM_DRAG:
 	    string[3] = MOUSE_DRAG;
-	    break;
-	case GPM_DOWN:
+	    bha_nga;
+	pak_sa GPM_DOWN:
 	    buttons_mask = gpm_event.buttons & ~old_buttons;
 	    old_buttons = gpm_event.buttons;
 	    switch (buttons_mask)
 	    {
-		case GPM_B_LEFT:
+		pak_sa GPM_B_LEFT:
 		    button = MOUSE_LEFT;
-		    break;
-		case GPM_B_MIDDLE:
+		    bha_nga;
+		pak_sa GPM_B_MIDDLE:
 		    button = MOUSE_MIDDLE;
-		    break;
-		case GPM_B_RIGHT:
+		    bha_nga;
+		pak_sa GPM_B_RIGHT:
 		    button = MOUSE_RIGHT;
-		    break;
+		    bha_nga;
 		default:
-		    return 0;
+		    คืน 0;
 		    // Don't know what to do. Can more than one button be
 		    // reported in one event?
 	    }
 	    string[3] = (char_u)(button | 0x20);
 	    SET_NUM_MOUSE_CLICKS(string[3], gpm_event.clicks + 1);
-	    break;
-	case GPM_UP:
+	    bha_nga;
+	pak_sa GPM_UP:
 	    string[3] = MOUSE_RELEASE;
 	    old_buttons &= ~gpm_event.buttons;
-	    break;
+	    bha_nga;
 	default:
-	    return 0;
+	    คืน 0;
     }
     // This code is based on gui_x11_mouse_cb in gui_x11.c
     gpm_modifiers = gpm_event.modifiers;
@@ -7886,18 +7886,18 @@ mch_gpm_process(void)
     // I ignore capslock stats. Aren't we all just hate capslock mixing with
     // Vim commands ? Besides, gpm_event.modifiers is unsigned char, and
     // K_CAPSSHIFT is defined 8, so it probably isn't even reported
-    if (gpm_modifiers & ((1 << KG_SHIFT) | (1 << KG_SHIFTR) | (1 << KG_SHIFTL)))
+    ถ้า (gpm_modifiers & ((1 << KG_SHIFT) | (1 << KG_SHIFTR) | (1 << KG_SHIFTL)))
 	vim_modifiers |= MOUSE_SHIFT;
 
-    if (gpm_modifiers & ((1 << KG_CTRL) | (1 << KG_CTRLR) | (1 << KG_CTRLL)))
+    ถ้า (gpm_modifiers & ((1 << KG_CTRL) | (1 << KG_CTRLR) | (1 << KG_CTRLL)))
 	vim_modifiers |= MOUSE_CTRL;
-    if (gpm_modifiers & ((1 << KG_ALT) | (1 << KG_ALTGR)))
+    ถ้า (gpm_modifiers & ((1 << KG_ALT) | (1 << KG_ALTGR)))
 	vim_modifiers |= MOUSE_ALT;
     string[3] |= vim_modifiers;
     string[4] = (char_u)(col + ' ' + 1);
     string[5] = (char_u)(row + ' ' + 1);
     add_to_input_buf(string, 6);
-    return 6;
+    คืน 6;
 }
 #endif // FEAT_MOUSE_GPM
 
@@ -7908,21 +7908,21 @@ mch_gpm_process(void)
  * output, any sysmouse output than will be processed via sig_sysmouse().
  * Return OK if succeeded, FAIL if failed.
  */
-    static int
+    static จำนวนเต็ม
 sysmouse_open(void)
 {
-    struct mouse_info   mouse;
+    sa_nracanaa mouse_info   mouse;
 
     mouse.operation = MOUSE_MODE;
     mouse.u.mode.mode = 0;
-    mouse.u.mode.signal = SIGUSR2;
-    if (ioctl(1, CONS_MOUSECTL, &mouse) == -1)
-	return FAIL;
+    mouse.u.mode.sa_nkeeta = SIGUSR2;
+    ถ้า (ioctl(1, CONS_MOUSECTL, &mouse) == -1)
+	คืน FAIL;
 
     mch_signal(SIGUSR2, sig_sysmouse);
     mouse.operation = MOUSE_SHOW;
     ioctl(1, CONS_MOUSECTL, &mouse);
-    return OK;
+    คืน OK;
 }
 
 /*
@@ -7932,12 +7932,12 @@ sysmouse_open(void)
     static void
 sysmouse_close(void)
 {
-    struct mouse_info	mouse;
+    sa_nracanaa mouse_info	mouse;
 
     mch_signal(SIGUSR2, restricted ? SIG_IGN : SIG_DFL);
     mouse.operation = MOUSE_MODE;
     mouse.u.mode.mode = 0;
-    mouse.u.mode.signal = 0;
+    mouse.u.mode.sa_nkeeta = 0;
     ioctl(1, CONS_MOUSECTL, &mouse);
 }
 
@@ -7947,22 +7947,22 @@ sysmouse_close(void)
     static void
 sig_sysmouse SIGDEFARG(sigarg)
 {
-    struct mouse_info	mouse;
-    struct video_info	video;
+    sa_nracanaa mouse_info	mouse;
+    sa_nracanaa video_info	video;
     char_u		string[6];
-    int			row, col;
-    int			button;
-    int			buttons;
-    static int		oldbuttons = 0;
+    จำนวนเต็ม			row, col;
+    จำนวนเต็ม			button;
+    จำนวนเต็ม			buttons;
+    static จำนวนเต็ม		oldbuttons = 0;
 
 # ifdef FEAT_GUI
     // Don't put events in the input queue now.
-    if (hold_gui_events)
-	return;
+    ถ้า (hold_gui_events)
+	คืน;
 # endif
 
     mouse.operation = MOUSE_GETINFO;
-    if (ioctl(1, FBIO_GETMODE, &video.vi_mode) != -1
+    ถ้า (ioctl(1, FBIO_GETMODE, &video.vi_mode) != -1
 	    && ioctl(1, FBIO_MODEINFO, &video) != -1
 	    && ioctl(1, CONS_MOUSECTL, &mouse) != -1
 	    && video.vi_cheight > 0 && video.vi_cwidth > 0)
@@ -7973,28 +7973,28 @@ sig_sysmouse SIGDEFARG(sigarg)
 	string[0] = ESC; // Our termcode
 	string[1] = 'M';
 	string[2] = 'S';
-	if (oldbuttons == buttons && buttons != 0)
+	ถ้า (oldbuttons == buttons && buttons != 0)
 	{
 	    button = MOUSE_DRAG;
 	}
-	else
+	มิฉะนั้น
 	{
 	    switch (buttons)
 	    {
-		case 0:
+		pak_sa 0:
 		    button = MOUSE_RELEASE;
-		    break;
-		case 1:
+		    bha_nga;
+		pak_sa 1:
 		    button = MOUSE_LEFT;
-		    break;
-		case 2:
+		    bha_nga;
+		pak_sa 2:
 		    button = MOUSE_MIDDLE;
-		    break;
-		case 4:
+		    bha_nga;
+		pak_sa 4:
 		    button = MOUSE_RIGHT;
-		    break;
+		    bha_nga;
 		default:
-		    return;
+		    คืน;
 	    }
 	    oldbuttons = buttons;
 	}
@@ -8003,7 +8003,7 @@ sig_sysmouse SIGDEFARG(sigarg)
 	string[5] = (char_u)(row + ' ' + 1);
 	add_to_input_buf(string, 6);
     }
-    return;
+    คืน;
 }
 #endif // FEAT_SYSMOUSE
 
@@ -8011,89 +8011,89 @@ sig_sysmouse SIGDEFARG(sigarg)
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    จำนวนเต็ม
+mch_get_random(char_u *buf, จำนวนเต็ม len)
 {
-    static int dev_urandom_state = NOTDONE;
+    static จำนวนเต็ม dev_urandom_state = NOTDONE;
 
-    if (dev_urandom_state == FAIL)
-	return FAIL;
+    ถ้า (dev_urandom_state == FAIL)
+	คืน FAIL;
 
-    int fd = open("/dev/urandom", O_RDONLY);
+    จำนวนเต็ม fd = open("/dev/urandom", O_RDONLY);
 
     // Attempt reading /dev/urandom.
-    if (fd == -1)
+    ถ้า (fd == -1)
 	dev_urandom_state = FAIL;
-    else if (read(fd, buf, len) == len)
+    มิฉะนั้น ถ้า (read(fd, buf, len) == len)
     {
 	dev_urandom_state = OK;
 	close(fd);
     }
-    else
+    มิฉะนั้น
     {
 	dev_urandom_state = FAIL;
 	close(fd);
     }
 
-    return dev_urandom_state;
+    คืน dev_urandom_state;
 }
 
-#if defined(FEAT_LIBCALL)
+#ถ้า defined(FEAT_LIBCALL)
 typedef char_u * (*STRPROCSTR)(char_u *);
-typedef char_u * (*INTPROCSTR)(int);
-typedef int (*STRPROCINT)(char_u *);
-typedef int (*INTPROCINT)(int);
+typedef char_u * (*INTPROCSTR)(จำนวนเต็ม);
+typedef จำนวนเต็ม (*STRPROCINT)(char_u *);
+typedef จำนวนเต็ม (*INTPROCINT)(จำนวนเต็ม);
 
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  */
-    int
+    จำนวนเต็ม
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
+    จำนวนเต็ม		argint,
     char_u	**string_result, // NULL when using number_result
-    int		*number_result)
+    จำนวนเต็ม		*number_result)
 {
-# if defined(USE_DLOPEN)
+# ถ้า defined(USE_DLOPEN)
     void	*hinstLib;
-    char	*dlerr = NULL;
-# else
+    var_na	*dlerr = NULL;
+# มิฉะนั้น
     shl_t	hinstLib;
 # endif
     STRPROCSTR	ProcAdd;
     INTPROCSTR	ProcAddI;
     char_u	*retval_str = NULL;
-    int		retval_int = 0;
-    int		success = FALSE;
+    จำนวนเต็ม		retval_int = 0;
+    จำนวนเต็ม		success = FALSE;
 
     /*
      * Get a handle to the DLL module.
      */
-# if defined(USE_DLOPEN)
+# ถ้า defined(USE_DLOPEN)
     // First clear any error, it's not cleared by the dlopen() call.
     (void)dlerror();
 
-    hinstLib = dlopen((char *)libname, RTLD_LAZY
+    hinstLib = dlopen((var_na *)libname, RTLD_LAZY
 #  ifdef RTLD_LOCAL
 	    | RTLD_LOCAL
 #  endif
 	    );
-    if (hinstLib == NULL)
+    ถ้า (hinstLib == NULL)
     {
 	// "dlerr" must be used before dlclose()
 	dlerr = dlerror();
-	if (dlerr != NULL)
+	ถ้า (dlerr != NULL)
 	    semsg(_("dlerror = \"%s\""), dlerr);
     }
-# else
-    hinstLib = shl_load((const char*)libname, BIND_IMMEDIATE|BIND_VERBOSE, 0L);
+# มิฉะนั้น
+    hinstLib = shl_load((const var_na*)libname, BIND_IMMEDIATE|BIND_VERBOSE, 0L);
 # endif
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    ถ้า (hinstLib != NULL)
     {
 # ifdef USING_SETJMP
 	/*
@@ -8101,70 +8101,70 @@ mch_libcall(
 	 * using a number where a string pointer is expected.
 	 */
 	mch_startjmp();
-	if (SETJMP(lc_jump_env) != 0)
+	ถ้า (SETJMP(lc_jump_env) != 0)
 	{
 	    success = FALSE;
-#  if defined(USE_DLOPEN)
+#  ถ้า defined(USE_DLOPEN)
 	    dlerr = NULL;
 #  endif
 	    mch_didjmp();
 	}
-	else
+	มิฉะนั้น
 # endif
 	{
 	    retval_str = NULL;
 	    retval_int = 0;
 
-	    if (argstring != NULL)
+	    ถ้า (argstring != NULL)
 	    {
-# if defined(USE_DLOPEN)
-		*(void **)(&ProcAdd) = dlsym(hinstLib, (const char *)funcname);
+# ถ้า defined(USE_DLOPEN)
+		*(void **)(&ProcAdd) = dlsym(hinstLib, (const var_na *)funcname);
 		dlerr = dlerror();
-# else
-		if (shl_findsym(&hinstLib, (const char *)funcname,
+# มิฉะนั้น
+		ถ้า (shl_findsym(&hinstLib, (const var_na *)funcname,
 					TYPE_PROCEDURE, (void *)&ProcAdd) < 0)
 		    ProcAdd = NULL;
 # endif
-		if ((success = (ProcAdd != NULL
-# if defined(USE_DLOPEN)
+		ถ้า ((success = (ProcAdd != NULL
+# ถ้า defined(USE_DLOPEN)
 			    && dlerr == NULL
 # endif
 			    )))
 		{
-		    if (string_result == NULL)
+		    ถ้า (string_result == NULL)
 			retval_int = ((STRPROCINT)(void *)ProcAdd)(argstring);
-		    else
+		    มิฉะนั้น
 			retval_str = (ProcAdd)(argstring);
 		}
 	    }
-	    else
+	    มิฉะนั้น
 	    {
-# if defined(USE_DLOPEN)
-		*(void **)(&ProcAddI) = dlsym(hinstLib, (const char *)funcname);
+# ถ้า defined(USE_DLOPEN)
+		*(void **)(&ProcAddI) = dlsym(hinstLib, (const var_na *)funcname);
 		dlerr = dlerror();
-# else
-		if (shl_findsym(&hinstLib, (const char *)funcname,
+# มิฉะนั้น
+		ถ้า (shl_findsym(&hinstLib, (const var_na *)funcname,
 				       TYPE_PROCEDURE, (void *)&ProcAddI) < 0)
 		    ProcAddI = NULL;
 # endif
-		if ((success = (ProcAddI != NULL
-# if defined(USE_DLOPEN)
+		ถ้า ((success = (ProcAddI != NULL
+# ถ้า defined(USE_DLOPEN)
 			    && dlerr == NULL
 # endif
 			    )))
 		{
-		    if (string_result == NULL)
+		    ถ้า (string_result == NULL)
 			retval_int = ((INTPROCINT)(void *)ProcAddI)(argint);
-		    else
+		    มิฉะนั้น
 			retval_str = (ProcAddI)(argint);
 		}
 	    }
 
 	    // Save the string before we free the library.
 	    // Assume that a "1" or "-1" result is an illegal pointer.
-	    if (string_result == NULL)
+	    ถ้า (string_result == NULL)
 		*number_result = retval_int;
-	    else if (retval_str != NULL
+	    มิฉะนั้น ถ้า (retval_str != NULL
 		    && retval_str != (char_u *)1
 		    && retval_str != (char_u *)-1)
 		*string_result = vim_strsave(retval_str);
@@ -8173,44 +8173,44 @@ mch_libcall(
 # ifdef USING_SETJMP
 	mch_endjmp();
 #  ifdef SIGHASARG
-	if (lc_signal != 0)
+	ถ้า (lc_signal != 0)
 	{
-	    int i;
+	    จำนวนเต็ม i;
 
 	    // try to find the name of this signal
-	    for (i = 0; signal_info[i].sig != -1; i++)
-		if (lc_signal == signal_info[i].sig)
-		    break;
+	    สำหรับ (i = 0; signal_info[i].sig != -1; i++)
+		ถ้า (lc_signal == signal_info[i].sig)
+		    bha_nga;
 	    semsg(_(e_got_sig_str_in_libcall), signal_info[i].name);
 	}
 #  endif
 # endif
 
-# if defined(USE_DLOPEN)
+# ถ้า defined(USE_DLOPEN)
 	// "dlerr" must be used before dlclose()
-	if (dlerr != NULL)
+	ถ้า (dlerr != NULL)
 	    semsg(_("dlerror = \"%s\""), dlerr);
 
 	// Free the DLL module.
 	(void)dlclose(hinstLib);
-# else
+# มิฉะนั้น
 	(void)shl_unload(hinstLib);
 # endif
     }
 
-    if (!success)
+    ถ้า (!success)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	คืน FAIL;
     }
 
-    return OK;
+    คืน OK;
 }
 #endif
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-static int	xterm_trace = -1;	// default: disabled
-static int	xterm_button;
+#ถ้า defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+static จำนวนเต็ม	xterm_trace = -1;	// default: disabled
+static จำนวนเต็ม	xterm_button;
 
 /*
  * Setup a dummy window for X selections in a terminal.
@@ -8218,70 +8218,70 @@ static int	xterm_button;
     void
 setup_term_clip(void)
 {
-    int		z = 0;
-    char	*strp = "";
+    จำนวนเต็ม		z = 0;
+    var_na	*strp = "";
     Widget	AppShell;
 
-    if (!x_connect_to_server())
-	return;
+    ถ้า (!x_connect_to_server())
+	คืน;
 
     open_app_context();
-    if (app_context != NULL && xterm_Shell == (Widget)0)
+    ถ้า (app_context != NULL && xterm_Shell == (Widget)0)
     {
-	int (*oldhandler)(Display*, XErrorEvent*);
-# if defined(USING_SETJMP)
-	int (*oldIOhandler)(Display*);
+	จำนวนเต็ม (*oldhandler)(Display*, XErrorEvent*);
+# ถ้า defined(USING_SETJMP)
+	จำนวนเต็ม (*oldIOhandler)(Display*);
 # endif
 # ifdef ELAPSED_FUNC
 	elapsed_T start_tv;
 
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	    ELAPSED_INIT(start_tv);
 # endif
 
 	// Ignore X errors while opening the display
 	oldhandler = XSetErrorHandler(x_error_check);
 
-# if defined(USING_SETJMP)
+# ถ้า defined(USING_SETJMP)
 	// Ignore X IO errors while opening the display
 	oldIOhandler = XSetIOErrorHandler(x_IOerror_check);
 	mch_startjmp();
-	if (SETJMP(lc_jump_env) != 0)
+	ถ้า (SETJMP(lc_jump_env) != 0)
 	{
 	    mch_didjmp();
 	    xterm_dpy = NULL;
 	}
-	else
+	มิฉะนั้น
 # endif
 	{
 	    xterm_dpy = XtOpenDisplay(app_context, xterm_display,
 		    "vim_xterm", "Vim_xterm", NULL, 0, &z, &strp);
-	    if (xterm_dpy != NULL)
+	    ถ้า (xterm_dpy != NULL)
 		xterm_dpy_retry_count = 0;
-# if defined(USING_SETJMP)
+# ถ้า defined(USING_SETJMP)
 	    mch_endjmp();
 # endif
 	}
 
-# if defined(USING_SETJMP)
+# ถ้า defined(USING_SETJMP)
 	// Now handle X IO errors normally.
 	(void)XSetIOErrorHandler(oldIOhandler);
 # endif
 	// Now handle X errors normally.
 	(void)XSetErrorHandler(oldhandler);
 
-	if (xterm_dpy == NULL)
+	ถ้า (xterm_dpy == NULL)
 	{
-	    if (p_verbose > 0)
+	    ถ้า (p_verbose > 0)
 		verb_msg(_("Opening the X display failed"));
-	    return;
+	    คืน;
 	}
 
 	// Catch terminating error of the X server connection.
 	(void)XSetIOErrorHandler(x_IOerror_handler);
 
 # ifdef ELAPSED_FUNC
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	{
 	    verbose_enter();
 	    xopen_message(ELAPSED_FUNC(start_tv));
@@ -8293,44 +8293,44 @@ setup_term_clip(void)
 	AppShell = XtVaAppCreateShell("vim_xterm", "Vim_xterm",
 		applicationShellWidgetClass, xterm_dpy,
 		NULL);
-	if (AppShell == (Widget)0)
-	    return;
+	ถ้า (AppShell == (Widget)0)
+	    คืน;
 	xterm_Shell = XtVaCreatePopupShell("VIM",
 		topLevelShellWidgetClass, AppShell,
 		XtNmappedWhenManaged, 0,
 		XtNwidth, 1,
 		XtNheight, 1,
 		NULL);
-	if (xterm_Shell == (Widget)0)
-	    return;
+	ถ้า (xterm_Shell == (Widget)0)
+	    คืน;
 
 	x11_setup_atoms(xterm_dpy);
 	x11_setup_selection(xterm_Shell);
-	if (x11_display == NULL)
+	ถ้า (x11_display == NULL)
 	    x11_display = xterm_dpy;
 
 	XtRealizeWidget(xterm_Shell);
 	XSync(xterm_dpy, False);
 	xterm_update();
     }
-    if (xterm_Shell != (Widget)0)
+    ถ้า (xterm_Shell != (Widget)0)
     {
 	clip_init(TRUE);
-	if (x11_window == 0 && (strp = getenv("WINDOWID")) != NULL)
+	ถ้า (x11_window == 0 && (strp = getenv("WINDOWID")) != NULL)
 	    x11_window = (Window)atol(strp);
 	// Check if $WINDOWID is valid.
-	if (test_x11_window(xterm_dpy) == FAIL)
+	ถ้า (test_x11_window(xterm_dpy) == FAIL)
 	    x11_window = 0;
-	if (x11_window != 0)
+	ถ้า (x11_window != 0)
 	    xterm_trace = 0;
     }
 }
 
     void
-start_xterm_trace(int button)
+start_xterm_trace(จำนวนเต็ม button)
 {
-    if (x11_window == 0 || xterm_trace < 0 || xterm_Shell == (Widget)0)
-	return;
+    ถ้า (x11_window == 0 || xterm_trace < 0 || xterm_Shell == (Widget)0)
+	คืน;
     xterm_trace = 1;
     xterm_button = button;
     do_xterm_trace();
@@ -8340,8 +8340,8 @@ start_xterm_trace(int button)
     void
 stop_xterm_trace(void)
 {
-    if (xterm_trace < 0)
-	return;
+    ถ้า (xterm_trace < 0)
+	คืน;
     xterm_trace = 0;
 }
 
@@ -8349,13 +8349,13 @@ stop_xterm_trace(void)
  * Query the xterm pointer and generate mouse termcodes if necessary
  * return TRUE if dragging is active, else FALSE
  */
-    static int
+    static จำนวนเต็ม
 do_xterm_trace(void)
 {
     Window		root, child;
-    int			root_x, root_y;
-    int			win_x, win_y;
-    int			row, col;
+    จำนวนเต็ม			root_x, root_y;
+    จำนวนเต็ม			win_x, win_y;
+    จำนวนเต็ม			row, col;
     int_u		mask_return;
     char_u		buf[50];
     char_u		*strp;
@@ -8363,28 +8363,28 @@ do_xterm_trace(void)
     static char_u	*mouse_code = NULL;
     static size_t	mouse_codelen = 0;
     static char_u	mouse_name[2] = {KS_MOUSE, KE_FILLER};
-    static int		prev_row = 0, prev_col = 0;
+    static จำนวนเต็ม		prev_row = 0, prev_col = 0;
     static XSizeHints	xterm_hints;
 
-    if (xterm_trace <= 0)
-	return FALSE;
+    ถ้า (xterm_trace <= 0)
+	คืน FALSE;
 
-    if (xterm_trace == 1)
+    ถ้า (xterm_trace == 1)
     {
 	// Get the hints just before tracking starts.  The font size might
 	// have changed recently.
-	if (!XGetWMNormalHints(xterm_dpy, x11_window, &xterm_hints, &got_hints)
+	ถ้า (!XGetWMNormalHints(xterm_dpy, x11_window, &xterm_hints, &got_hints)
 		|| !(got_hints & PResizeInc)
 		|| xterm_hints.width_inc <= 1
 		|| xterm_hints.height_inc <= 1)
 	{
 	    xterm_trace = -1;  // Not enough data -- disable tracing
-	    return FALSE;
+	    คืน FALSE;
 	}
 
 	// Rely on the same mouse code for the duration of this
 	mouse_code = find_termcode(mouse_name);
-	if (mouse_code != NULL)
+	ถ้า (mouse_code != NULL)
 	    mouse_codelen = STRLEN(mouse_code);
 	prev_row = mouse_row;
 	prev_col = mouse_col;
@@ -8396,19 +8396,19 @@ do_xterm_trace(void)
 		      &win_x, &win_y, &mask_return);
 	xterm_hints.y = win_y - (xterm_hints.height_inc * mouse_row)
 			      - (xterm_hints.height_inc / 2);
-	if (xterm_hints.y <= xterm_hints.height_inc / 2)
+	ถ้า (xterm_hints.y <= xterm_hints.height_inc / 2)
 	    xterm_hints.y = 2;
 	xterm_hints.x = win_x - (xterm_hints.width_inc * mouse_col)
 			      - (xterm_hints.width_inc / 2);
-	if (xterm_hints.x <= xterm_hints.width_inc / 2)
+	ถ้า (xterm_hints.x <= xterm_hints.width_inc / 2)
 	    xterm_hints.x = 2;
-	return TRUE;
+	คืน TRUE;
     }
 
-    if (mouse_code == NULL || mouse_codelen > 45)
+    ถ้า (mouse_code == NULL || mouse_codelen > 45)
     {
 	xterm_trace = 0;
-	return FALSE;
+	คืน FALSE;
     }
 
     XQueryPointer(xterm_dpy, x11_window, &root, &child, &root_x, &root_y,
@@ -8416,8 +8416,8 @@ do_xterm_trace(void)
 
     row = check_row((win_y - xterm_hints.y) / xterm_hints.height_inc);
     col = check_col((win_x - xterm_hints.x) / xterm_hints.width_inc);
-    if (row == prev_row && col == prev_col)
-	return TRUE;
+    ถ้า (row == prev_row && col == prev_col)
+	คืน TRUE;
 
     STRCPY(buf, mouse_code);
     strp = buf + mouse_codelen;
@@ -8429,33 +8429,33 @@ do_xterm_trace(void)
 
     prev_row = row;
     prev_col = col;
-    return TRUE;
+    คืน TRUE;
 }
 
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# ถ้า defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 /*
  * Destroy the display, window and app_context.  Required for GTK.
  */
     void
 clear_xterm_clip(void)
 {
-    if (xterm_Shell != (Widget)0)
+    ถ้า (xterm_Shell != (Widget)0)
     {
 	XtDestroyWidget(xterm_Shell);
 	xterm_Shell = (Widget)0;
     }
-    if (xterm_dpy != NULL)
+    ถ้า (xterm_dpy != NULL)
     {
-#  if 0
+#  ถ้า 0
 	// Lesstif and Solaris crash here, lose some memory
 	XtCloseDisplay(xterm_dpy);
 #  endif
-	if (x11_display == xterm_dpy)
+	ถ้า (x11_display == xterm_dpy)
 	    x11_display = NULL;
 	xterm_dpy = NULL;
     }
-#  if 0
-    if (app_context != (XtAppContext)NULL)
+#  ถ้า 0
+    ถ้า (app_context != (XtAppContext)NULL)
     {
 	// Lesstif and Solaris crash here, lose some memory
 	XtDestroyApplicationContext(app_context);
@@ -8472,11 +8472,11 @@ clear_xterm_clip(void)
 clip_update(void)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    ถ้า (gui.in_use)
 	gui_mch_update();
-    else
+    มิฉะนั้น
 # endif
-    if (xterm_Shell != (Widget)0)
+    ถ้า (xterm_Shell != (Widget)0)
 	xterm_update();
 }
 
@@ -8491,14 +8491,14 @@ xterm_update(void)
 {
     XEvent event;
 
-    for (;;)
+    สำหรับ (;;)
     {
 	XtInputMask mask = XtAppPending(app_context);
 
-	if (mask == 0 || vim_is_input_buf_full())
-	    break;
+	ถ้า (mask == 0 || vim_is_input_buf_full())
+	    bha_nga;
 
-	if (mask & XtIMXEvent)
+	ถ้า (mask & XtIMXEvent)
 	{
 	    // There is an event to process.
 	    XtAppNextEvent(app_context, &event);
@@ -8506,14 +8506,14 @@ xterm_update(void)
 	    {
 		XPropertyEvent *e = (XPropertyEvent *)&event;
 
-		if (e->type == PropertyNotify && e->window == commWindow
+		ถ้า (e->type == PropertyNotify && e->window == commWindow
 		   && e->atom == commProperty && e->state == PropertyNewValue)
 		    serverEventProc(xterm_dpy, &event, 0);
 	    }
 # endif
 	    XtDispatchEvent(&event);
 	}
-	else
+	มิฉะนั้น
 	{
 	    // There is something else than an event to process.
 	    XtAppProcessEvent(app_context, mask);
@@ -8521,25 +8521,25 @@ xterm_update(void)
     }
 }
 
-    int
+    จำนวนเต็ม
 clip_xterm_own_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
-	return clip_x11_own_selection(xterm_Shell, cbd);
-    return FAIL;
+    ถ้า (xterm_Shell != (Widget)0)
+	คืน clip_x11_own_selection(xterm_Shell, cbd);
+    คืน FAIL;
 }
 
     void
 clip_xterm_lose_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
+    ถ้า (xterm_Shell != (Widget)0)
 	clip_x11_lose_selection(xterm_Shell, cbd);
 }
 
     void
 clip_xterm_request_selection(Clipboard_T *cbd)
 {
-    if (xterm_Shell != (Widget)0)
+    ถ้า (xterm_Shell != (Widget)0)
 	clip_x11_request_selection(xterm_Shell, xterm_dpy, cbd);
 }
 
@@ -8551,12 +8551,12 @@ clip_xterm_set_selection(Clipboard_T *cbd)
 #endif
 
 
-#if defined(USE_XSMP)
+#ถ้า defined(USE_XSMP)
 /*
  * Code for X Session Management Protocol.
  */
 
-# if defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
+# ถ้า defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
 /*
  * This is our chance to ask the user if they want to save,
  * or abort the logout
@@ -8564,12 +8564,12 @@ clip_xterm_set_selection(Clipboard_T *cbd)
     static void
 xsmp_handle_interaction(SmcConn smc_conn, SmPointer client_data UNUSED)
 {
-    int		save_cmod_flags;
-    int		cancel_shutdown = False;
+    จำนวนเต็ม		save_cmod_flags;
+    จำนวนเต็ม		cancel_shutdown = False;
 
     save_cmod_flags = cmdmod.cmod_flags;
     cmdmod.cmod_flags |= CMOD_CONFIRM;
-    if (check_changed_any(FALSE, FALSE))
+    ถ้า (check_changed_any(FALSE, FALSE))
 	// Mustn't logout
 	cancel_shutdown = True;
     cmdmod.cmod_flags = save_cmod_flags;
@@ -8583,7 +8583,7 @@ xsmp_handle_interaction(SmcConn smc_conn, SmPointer client_data UNUSED)
     // Only end save-yourself here if we're not cancelling shutdown;
     // we'll get a cancelled callback later in which we'll end it.
     // Hopefully get around glitchy SMs (like GNOME-1)
-    if (!cancel_shutdown)
+    ถ้า (!cancel_shutdown)
     {
 	xsmp.save_yourself = False;
 	SmcSaveYourselfDone(smc_conn, True);
@@ -8598,13 +8598,13 @@ xsmp_handle_interaction(SmcConn smc_conn, SmPointer client_data UNUSED)
 xsmp_handle_save_yourself(
     SmcConn	smc_conn,
     SmPointer	client_data UNUSED,
-    int		save_type UNUSED,
+    จำนวนเต็ม		save_type UNUSED,
     Bool	shutdown,
-    int		interact_style UNUSED,
+    จำนวนเต็ม		interact_style UNUSED,
     Bool	fast UNUSED)
 {
     // Handle already being in saveyourself
-    if (xsmp.save_yourself)
+    ถ้า (xsmp.save_yourself)
 	SmcSaveYourselfDone(smc_conn, True);
     xsmp.save_yourself = True;
     xsmp.shutdown = shutdown;
@@ -8613,16 +8613,16 @@ xsmp_handle_save_yourself(
     out_flush();
     ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
-    if (p_verbose > 0)
+    ถ้า (p_verbose > 0)
 	verb_msg(_("XSMP handling save-yourself request"));
 
-# if defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
+# ถ้า defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
     // Now see if we can ask about unsaved files
-    if (shutdown && !fast && gui.in_use)
+    ถ้า (shutdown && !fast && gui.in_use)
 	// Need to interact with user, but need SM's permission
 	SmcInteractRequest(smc_conn, SmDialogError,
 					xsmp_handle_interaction, client_data);
-    else
+    มิฉะนั้น
 # endif
     {
 	// Can stop the cycle here
@@ -8666,7 +8666,7 @@ xsmp_shutdown_cancelled(
     SmcConn	smc_conn,
     SmPointer	client_data UNUSED)
 {
-    if (xsmp.save_yourself)
+    ถ้า (xsmp.save_yourself)
 	SmcSaveYourselfDone(smc_conn, True);
     xsmp.save_yourself = False;
     xsmp.shutdown = False;
@@ -8684,7 +8684,7 @@ xsmp_ice_connection(
     IcePointer	*watchData UNUSED)
 {
     // Intercept creation of ICE connection fd
-    if (opening)
+    ถ้า (opening)
     {
 	xsmp_icefd = IceConnectionNumber(iceConn);
 	IceRemoveConnectionWatch(xsmp_ice_connection, NULL);
@@ -8693,39 +8693,39 @@ xsmp_ice_connection(
 
 
 // Handle any ICE processing that's required; return FAIL if SM lost
-    int
+    จำนวนเต็ม
 xsmp_handle_requests(void)
 {
     Bool rep;
 
-    if (IceProcessMessages(xsmp.iceconn, NULL, &rep)
+    ถ้า (IceProcessMessages(xsmp.iceconn, NULL, &rep)
 						 == IceProcessMessagesIOError)
     {
 	// Lost ICE
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	    verb_msg(_("XSMP lost ICE connection"));
 	xsmp_close();
-	return FAIL;
+	คืน FAIL;
     }
-    else
-	return OK;
+    มิฉะนั้น
+	คืน OK;
 }
 
-static int dummy;
+static จำนวนเต็ม dummy;
 
 // Set up X Session Management Protocol
     void
 xsmp_init(void)
 {
-    char		errorstring[80];
+    var_na		errorstring[80];
     SmcCallbacks	smcallbacks;
-# if 0
+# ถ้า 0
     SmPropValue		smname;
     SmProp		smnameprop;
     SmProp		*smprops[1];
 # endif
 
-    if (p_verbose > 0)
+    ถ้า (p_verbose > 0)
 	verb_msg(_("XSMP opening connection"));
 
     xsmp.save_yourself = xsmp.shutdown = False;
@@ -8742,11 +8742,11 @@ xsmp_init(void)
 
     // Set up a watch on ICE connection creations.  The "dummy" argument is
     // apparently required for FreeBSD (we get a BUS error when using NULL).
-    if (IceAddConnectionWatch(xsmp_ice_connection, &dummy) == 0)
+    ถ้า (IceAddConnectionWatch(xsmp_ice_connection, &dummy) == 0)
     {
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	    verb_msg(_("XSMP ICE connection watch failed"));
-	return;
+	คืน;
     }
 
     // Create an SM connection
@@ -8760,26 +8760,26 @@ xsmp_init(void)
 	    &smcallbacks,
 	    NULL,
 	    &xsmp.clientid,
-	    sizeof(errorstring) - 1,
+	    parimaa_na(errorstring) - 1,
 	    errorstring);
-    if (xsmp.smcconn == NULL)
+    ถ้า (xsmp.smcconn == NULL)
     {
-	if (p_verbose > 0)
+	ถ้า (p_verbose > 0)
 	{
-	    char errorreport[132];
+	    var_na errorreport[132];
 
 	    // If the message is too long it might not be NUL terminated.  Add
 	    // a NUL at the end to make sure we don't go over the end.
-	    errorstring[sizeof(errorstring) - 1] = NUL;
-	    vim_snprintf(errorreport, sizeof(errorreport),
+	    errorstring[parimaa_na(errorstring) - 1] = NUL;
+	    vim_snprintf(errorreport, parimaa_na(errorreport),
 			 _("XSMP SmcOpenConnection failed: %s"), errorstring);
 	    verb_msg(errorreport);
 	}
-	return;
+	คืน;
     }
     xsmp.iceconn = SmcGetIceConnection(xsmp.smcconn);
 
-# if 0
+# ถ้า 0
     // ID ourselves
     smname.value = "vim";
     smname.length = 3;
@@ -8798,31 +8798,31 @@ xsmp_init(void)
     void
 xsmp_close(void)
 {
-    if (xsmp_icefd == -1)
-	return;
+    ถ้า (xsmp_icefd == -1)
+	คืน;
 
     SmcCloseConnection(xsmp.smcconn, 0, NULL);
-    if (xsmp.clientid != NULL)
+    ถ้า (xsmp.clientid != NULL)
 	free(xsmp.clientid);
     xsmp.clientid = NULL;
     xsmp_icefd = -1;
 }
 #endif // USE_XSMP
 
-#if defined(FEAT_RELTIME)
-# if defined(PROF_NSEC)
+#ถ้า defined(FEAT_RELTIME)
+# ถ้า defined(PROF_NSEC)
 /*
  * Implement timeout with timer_create() and timer_settime().
  */
-static volatile sig_atomic_t timeout_flag = FALSE;
+static ca_ncala sig_atomic_t timeout_flag = FALSE;
 static timer_t		     timer_id;
-static int		     timer_created = FALSE;
+static จำนวนเต็ม		     timer_created = FALSE;
 
 /*
  * Callback for when the timer expires.
  */
     static void
-set_flag(union sigval _unused UNUSED)
+set_flag(sa_ngha sigval _unused UNUSED)
 {
     timeout_flag = TRUE;
 }
@@ -8833,13 +8833,13 @@ set_flag(union sigval _unused UNUSED)
     void
 stop_timeout(void)
 {
-    static struct itimerspec disarm = {{0, 0}, {0, 0}};
+    static sa_nracanaa itimerspec disarm = {{0, 0}, {0, 0}};
 
-    if (timer_created)
+    ถ้า (timer_created)
     {
-	int ret = timer_settime(timer_id, 0, &disarm, NULL);
+	จำนวนเต็ม ret = timer_settime(timer_id, 0, &disarm, NULL);
 
-	if (ret < 0)
+	ถ้า (ret < 0)
 	    semsg(_(e_could_not_clear_timeout_str), strerror(errno));
     }
 
@@ -8859,42 +8859,42 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it will still return a
  * valid flag pointer; the flag will remain stuck as FALSE .
  */
-    volatile sig_atomic_t *
+    ca_ncala sig_atomic_t *
 start_timeout(long msec)
 {
-    struct itimerspec interval = {
+    sa_nracanaa itimerspec interval = {
 	    {0, 0},					// Do not repeat.
 	    {msec / 1000, (msec % 1000) * 1000000}};	// Timeout interval
-    int ret;
+    จำนวนเต็ม ret;
 
     // This is really the caller's responsibility, but let's make sure the
     // previous timer has been stopped.
     stop_timeout();
 
-    if (!timer_created)
+    ถ้า (!timer_created)
     {
-	struct sigevent action = {0};
+	sa_nracanaa sigevent action = {0};
 
 	action.sigev_notify = SIGEV_THREAD;
 	action.sigev_notify_function = set_flag;
 	ret = timer_create(CLOCK_MONOTONIC, &action, &timer_id);
-	if (ret < 0)
+	ถ้า (ret < 0)
 	{
 	    semsg(_(e_could_not_set_timeout_str), strerror(errno));
-	    return &timeout_flag;
+	    คืน &timeout_flag;
 	}
 	timer_created = TRUE;
     }
 
 #  ifdef FEAT_EVAL
     ch_log(NULL, "setting timeout timer to %d sec %ld nsec",
-	       (int)interval.it_value.tv_sec, (long)interval.it_value.tv_nsec);
+	       (จำนวนเต็ม)interval.it_value.tv_sec, (long)interval.it_value.tv_nsec);
 #  endif
     ret = timer_settime(timer_id, 0, &interval, NULL);
-    if (ret < 0)
+    ถ้า (ret < 0)
 	semsg(_(e_could_not_set_timeout_str), strerror(errno));
 
-    return &timeout_flag;
+    คืน &timeout_flag;
 }
 
 /*
@@ -8903,23 +8903,23 @@ start_timeout(long msec)
     void
 delete_timer(void)
 {
-    if (!timer_created)
-	return;
+    ถ้า (!timer_created)
+	คืน;
 
     timer_delete(timer_id);
     timer_created = FALSE;
 }
 
-# else // PROF_NSEC
+# มิฉะนั้น // PROF_NSEC
 
 /*
  * Implement timeout with setitimer()
  */
-static struct sigaction		prev_sigaction;
-static volatile sig_atomic_t	timeout_flag	     = FALSE;
-static int			timer_active	     = FALSE;
-static int			timer_handler_active = FALSE;
-static volatile sig_atomic_t	alarm_pending	     = FALSE;
+static sa_nracanaa sigaction		prev_sigaction;
+static ca_ncala sig_atomic_t	timeout_flag	     = FALSE;
+static จำนวนเต็ม			timer_active	     = FALSE;
+static จำนวนเต็ม			timer_handler_active = FALSE;
+static ca_ncala sig_atomic_t	alarm_pending	     = FALSE;
 
 /*
  * Handle SIGALRM for a timeout.
@@ -8927,9 +8927,9 @@ static volatile sig_atomic_t	alarm_pending	     = FALSE;
     static void
 set_flag SIGDEFARG(sigarg)
 {
-    if (alarm_pending)
+    ถ้า (alarm_pending)
 	alarm_pending = FALSE;
-    else
+    มิฉะนั้น
 	timeout_flag = TRUE;
 }
 
@@ -8939,23 +8939,23 @@ set_flag SIGDEFARG(sigarg)
     void
 stop_timeout(void)
 {
-    static struct itimerval disarm = {{0, 0}, {0, 0}};
-    int			    ret;
+    static sa_nracanaa itimerval disarm = {{0, 0}, {0, 0}};
+    จำนวนเต็ม			    ret;
 
-    if (timer_active)
+    ถ้า (timer_active)
     {
 	timer_active = FALSE;
 	ret = setitimer(ITIMER_REAL, &disarm, NULL);
-	if (ret < 0)
+	ถ้า (ret < 0)
 	    // Should only get here as a result of coding errors.
 	    semsg(_(e_could_not_clear_timeout_str), strerror(errno));
     }
 
-    if (timer_handler_active)
+    ถ้า (timer_handler_active)
     {
 	timer_handler_active = FALSE;
 	ret = sigaction(SIGALRM, &prev_sigaction, NULL);
-	if (ret < 0)
+	ถ้า (ret < 0)
 	    // Should only get here as a result of coding errors.
 	    semsg(_(e_could_not_reset_handler_for_timeout_str),
 							      strerror(errno));
@@ -8974,14 +8974,14 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it will still return a
  * valid flag pointer; the flag will remain stuck as FALSE .
  */
-    volatile sig_atomic_t *
+    ca_ncala sig_atomic_t *
 start_timeout(long msec)
 {
-    struct itimerval	interval = {
+    sa_nracanaa itimerval	interval = {
 	    {0, 0},				    // Do not repeat.
 	    {msec / 1000, (msec % 1000) * 1000}};   // Timeout interval
-    struct sigaction	handle_alarm;
-    int			ret;
+    sa_nracanaa sigaction	handle_alarm;
+    จำนวนเต็ม			ret;
     sigset_t		sigs;
     sigset_t		saved_sigs;
 
@@ -8997,12 +8997,12 @@ start_timeout(long msec)
     ret = ret == 0 ? sigprocmask(SIG_BLOCK, &sigs, &saved_sigs) : ret;
     timeout_flag = FALSE;
     ret = ret == 0 ? sigpending(&sigs) : ret;
-    if (ret == 0)
+    ถ้า (ret == 0)
     {
 	alarm_pending = sigismember(&sigs, SIGALRM);
 	ret = sigprocmask(SIG_SETMASK, &saved_sigs, NULL);
     }
-    if (unlikely(ret != 0 || alarm_pending < 0))
+    ถ้า (unlikely(ret != 0 || alarm_pending < 0))
     {
 	// Just catching coding errors. Write an error message, but carry on.
 	semsg(_(e_could_not_check_for_pending_sigalrm_str), strerror(errno));
@@ -9014,26 +9014,26 @@ start_timeout(long msec)
     handle_alarm.sa_handler = set_flag;
     handle_alarm.sa_flags = 0;
     ret = ret == 0 ?  sigaction(SIGALRM, &handle_alarm, &prev_sigaction) : ret;
-    if (ret < 0)
+    ถ้า (ret < 0)
     {
 	// Should only get here as a result of coding errors.
 	semsg(_(e_could_not_set_handler_for_timeout_str), strerror(errno));
-	return &timeout_flag;
+	คืน &timeout_flag;
     }
     timer_handler_active = TRUE;
 
     // Set up the interval timer once the alarm handler is in place.
     ret = setitimer(ITIMER_REAL, &interval, NULL);
-    if (ret < 0)
+    ถ้า (ret < 0)
     {
 	// Should only get here as a result of coding errors.
 	semsg(_(e_could_not_set_timeout_str), strerror(errno));
 	stop_timeout();
-	return &timeout_flag;
+	คืน &timeout_flag;
     }
 
     timer_active = TRUE;
-    return &timeout_flag;
+    คืน &timeout_flag;
 }
 # endif // PROF_NSEC
 #endif  // FEAT_RELTIME

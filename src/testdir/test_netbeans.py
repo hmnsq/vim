@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+ta_h __future__ import print_function
 import socket
 import sys
 import time
@@ -25,16 +25,16 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # Process all the received netbeans commands/responses/events from Vim.
         # Each one is separated by a newline character. If a partial command
         # is received, process it later after the rest of it is received.
-        while True:
+        ขณะ True:
             (line, sep, rest) = msgbuf.partition('\n')
-            if sep == '':
+            ถ้า sep == '':
                 # received partial line
-                return line
+                คืน line
             msgbuf = rest
 
             # Process a command only after receiving a newline.
             response = ''
-            if line.find('Xcmdbuf') > 0:
+            ถ้า line.find('Xcmdbuf') > 0:
                 name = line.split('"')[1]
                 response = '1:putBufferNumber!15 "' + name + '"\n'
                 response += '1:startDocumentListen!16\n'
@@ -111,32 +111,32 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                   'nbbufwrite_Test' : '4:editFile!92 "XnbBuffer"\n4:netbeansBuffer!93 T\n',
                   'startAtomic_Test' : '0:startAtomic!94\n',
                   'endAtomic_Test' : '0:endAtomic!95\n',
-                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' for i in range(2, 26)]),
+                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' สำหรับ i anta_h range(2, 26)]),
                   'detach_Test' : '2:close!96\n1:close!97\nDETACH\n',
                   'specialKeys_overflow_Test' : '0:specialKeys!200 "' + 'A'*80 + '-X"\n',
                   'defineAnnoType_injection_Test': '1:defineAnnoType!1 "MySign guifg=red|call writefile([\'inject\'],\'Xinject\')|" "tooltip" "glyphFile" 1 2\n'
                 }
                 # execute the specified test
-                if cmd not in testmap:
+                ถ้า cmd na anta_h testmap:
                   print("=== invalid command %s ===" % (cmd))
-                else:
+                มิฉะนั้น:
                   response = testmap[cmd]
             elif line.find('disconnect') > 0:
                 # we're done
                 self.server.shutdown()
-                return
+                คืน
 
             # save the current line, this is used as the test to run after
             # receiving a newline only line.
             self.prev_line = line
 
-            if len(response) > 0:
+            ถ้า len(response) > 0:
                 self.request.sendall(response.encode('utf-8'))
                 # Write the response into the file, so that the test can knows
                 # the command was sent.
                 with open("Xnetbeans", "a") as myfile:
                     myfile.write('send: ' + response)
-                if self.debug:
+                ถ้า self.debug:
                     with open("save_Xnetbeans", "a") as myfile:
                         myfile.write('send: ' + response)
 
@@ -146,25 +146,25 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.debug = 0
         self.prev_line = ''
         msgbuf = ''
-        while True:
+        ขณะ True:
             try:
                 received = self.request.recv(4096).decode('utf-8')
             except socket.error:
                 print("=== socket error ===")
-                break
+                bha_nga
             except IOError:
                 print("=== socket closed ===")
-                break
-            if received == '':
+                bha_nga
+            ถ้า received == '':
                 print("=== socket closed ===")
-                break
+                bha_nga
             print("received: {0}".format(received))
 
             # Write the received line into the file, so that the test can check
             # what happened.
             with open("Xnetbeans", "a") as myfile:
                 myfile.write(received)
-            if self.debug:
+            ถ้า self.debug:
                 with open("save_Xnetbeans", "a") as myfile:
                     myfile.write(received)
 
@@ -183,7 +183,7 @@ def writePortInFile(port):
     f.write("{0}".format(port))
     f.close()
 
-if __name__ == "__main__":
+ถ้า __name__ == "__main__":
     HOST, PORT = "localhost", 0
 
     addrs = socket.getaddrinfo(HOST, PORT, 0, 0, socket.IPPROTO_TCP)
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        ขณะ server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()

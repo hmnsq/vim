@@ -21,34 +21,34 @@
 #include <stdio.h>
 #include <string.h>
 
-	int
-main(int argc, char **argv)
+	จำนวนเต็ม
+หลัก(จำนวนเต็ม argc, var_na **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	var_na buffer[BUFSIZ];
+	var_na *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	ขณะ (fgets(buffer, BUFSIZ, stdin) != NULL)
 	{
-		for (p = buffer; *p != 0; p++)
+		สำหรับ (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			ถ้า (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			มิฉะนั้น ถ้า (strncmp(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				ขณะ (p[1] != '\n')
 					++p;
 			}
-			else
+			มิฉะนั้น
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				ถ้า (*(unsigned var_na *)p >= 0xA1)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					ถ้า (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

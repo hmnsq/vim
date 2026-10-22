@@ -14,34 +14,34 @@
 
 #ifdef FEAT_EVAL
 static void set_vv_searchforward(void);
-static int first_submatch(regmmatch_T *rp);
+static จำนวนเต็ม first_submatch(regmmatch_T *rp);
 #endif
 #ifdef FEAT_FIND_ID
 static char_u *get_line_and_copy(linenr_T lnum, char_u *buf);
-static void show_pat_in_path(char_u *, int, int, int, FILE *, linenr_T *, long);
+static void show_pat_in_path(char_u *, จำนวนเต็ม, จำนวนเต็ม, จำนวนเต็ม, FILE *, linenr_T *, long);
 #endif
 
-typedef struct searchstat
+typedef sa_nracanaa searchstat
 {
-    int	    cur;	    // current position of found words
-    int	    cnt;	    // total count of found words
-    int	    exact_match;    // TRUE if matched exactly on specified position
-    int	    incomplete;	    // 0: search was fully completed
+    จำนวนเต็ม	    cur;	    // current position of found words
+    จำนวนเต็ม	    cnt;	    // total count of found words
+    จำนวนเต็ม	    exact_match;    // TRUE if matched exactly on specified position
+    จำนวนเต็ม	    incomplete;	    // 0: search was fully completed
 			    // 1: recomputing was timed out
 			    // 2: max count exceeded
-    int	    last_maxcount;  // the max count of the last search
+    จำนวนเต็ม	    last_maxcount;  // the max count of the last search
 } searchstat_T;
 
 #ifdef FEAT_SEARCH_EXTRA
 static void save_incsearch_state(void);
 static void restore_incsearch_state(void);
 #endif
-static int check_prevcol(char_u *linep, int col, int ch, int *prevcol);
-static int find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
-static void find_mps_values(int *initc, int *findc, int *backwards, int switchit);
-static int is_zero_width(char_u *pattern, size_t patternlen, int move, pos_T *cur, int direction);
-static void cmdline_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
-static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
+static จำนวนเต็ม check_prevcol(char_u *linep, จำนวนเต็ม col, จำนวนเต็ม ch, จำนวนเต็ม *prevcol);
+static จำนวนเต็ม find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
+static void find_mps_values(จำนวนเต็ม *initc, จำนวนเต็ม *findc, จำนวนเต็ม *backwards, จำนวนเต็ม switchit);
+static จำนวนเต็ม is_zero_width(char_u *pattern, size_t patternlen, จำนวนเต็ม move, pos_T *cur, จำนวนเต็ม direction);
+static void cmdline_search_stat(จำนวนเต็ม dirc, pos_T *pos, pos_T *cursor_pos, จำนวนเต็ม show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, จำนวนเต็ม recompute, จำนวนเต็ม maxcount, long timeout);
+static void update_search_stat(จำนวนเต็ม dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, จำนวนเต็ม recompute, จำนวนเต็ม maxcount, long timeout);
 
 #define SEARCH_STAT_DEF_TIMEOUT 40L
 // 'W ':  2 +
@@ -82,21 +82,21 @@ static spat_T spats[2] =
     {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
 };
 
-static int last_idx = 0;	// index in spats[] for RE_LAST
+static จำนวนเต็ม last_idx = 0;	// index in spats[] for RE_LAST
 
 static char_u lastc[2] = {NUL, NUL};	// last character searched for
-static int lastcdir = FORWARD;		// last direction of character search
-static int last_t_cmd = TRUE;		// last search t_cmd
+static จำนวนเต็ม lastcdir = FORWARD;		// last direction of character search
+static จำนวนเต็ม last_t_cmd = TRUE;		// last search t_cmd
 static char_u	lastc_bytes[MB_MAXBYTES + 1];
-static int	lastc_bytelen = 1;	// >1 for multi-byte char
+static จำนวนเต็ม	lastc_bytelen = 1;	// >1 for multi-byte char
 
 // copy of spats[], for keeping the search patterns while executing autocmds
 static spat_T	    saved_spats[ARRAY_LENGTH(spats)];
 static char_u	    *saved_mr_pattern = NULL;
 static size_t	    saved_mr_patternlen = 0;
 #ifdef FEAT_SEARCH_EXTRA
-static int	    saved_spats_last_idx = 0;
-static int	    saved_spats_no_hlsearch = 0;
+static จำนวนเต็ม	    saved_spats_last_idx = 0;
+static จำนวนเต็ม	    saved_spats_no_hlsearch = 0;
 #endif
 
 // allocated copy of pattern used by search_regcomp()
@@ -108,12 +108,12 @@ static size_t	    mr_patternlen = 0;
  * Type used by find_pattern_in_path() to remember which included files have
  * been searched already.
  */
-typedef struct SearchedFile
+typedef sa_nracanaa SearchedFile
 {
     FILE	*fp;		// File pointer
     char_u	*name;		// Full name of file
     linenr_T	lnum;		// Line we were up to in file
-    int		matched;	// Found a match in this file
+    จำนวนเต็ม		matched;	// Found a match in this file
 } SearchedFile;
 #endif
 
@@ -131,17 +131,17 @@ typedef struct SearchedFile
  *
  * returns FAIL if failed, OK otherwise.
  */
-    int
+    จำนวนเต็ม
 search_regcomp(
     char_u	*pat,
     size_t	patlen,
     char_u	**used_pat,
-    int		pat_save,
-    int		pat_use,
-    int		options,
+    จำนวนเต็ม		pat_save,
+    จำนวนเต็ม		pat_use,
+    จำนวนเต็ม		options,
     regmmatch_T	*regmatch)	// return: pattern and ignore-case flag
 {
-    int		magic;
+    จำนวนเต็ม		magic;
 
     rc_did_emsg = FALSE;
     magic = magic_isset();
@@ -149,67 +149,67 @@ search_regcomp(
     /*
      * If no pattern given, use a previously defined pattern.
      */
-    if (pat == NULL || *pat == NUL)
+    ถ้า (pat == NULL || *pat == NUL)
     {
-	int i;
+	จำนวนเต็ม i;
 
-	if (pat_use == RE_LAST)
+	ถ้า (pat_use == RE_LAST)
 	    i = last_idx;
-	else
+	มิฉะนั้น
 	    i = pat_use;
-	if (spats[i].pat == NULL)	// pattern was never defined
+	ถ้า (spats[i].pat == NULL)	// pattern was never defined
 	{
-	    if (pat_use == RE_SUBST)
+	    ถ้า (pat_use == RE_SUBST)
 		emsg(_(e_no_previous_substitute_regular_expression));
-	    else
+	    มิฉะนั้น
 		emsg(_(e_no_previous_regular_expression));
 	    rc_did_emsg = TRUE;
-	    return FAIL;
+	    คืน FAIL;
 	}
 	pat = spats[i].pat;
 	patlen = spats[i].patlen;
 	magic = spats[i].magic;
 	no_smartcase = spats[i].no_scs;
     }
-    else if (options & SEARCH_HIS)	// put new pattern in history
+    มิฉะนั้น ถ้า (options & SEARCH_HIS)	// put new pattern in history
 	add_to_history(HIST_SEARCH, pat, patlen, TRUE, NUL);
 
-    if (used_pat)
+    ถ้า (used_pat)
 	*used_pat = pat;
 
     vim_free(mr_pattern);
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+    ถ้า (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 	mr_pattern = reverse_text(pat);
-    else
+    มิฉะนั้น
 #endif
 	mr_pattern = vim_strnsave(pat, patlen);
-    if (mr_pattern == NULL)
+    ถ้า (mr_pattern == NULL)
 	mr_patternlen = 0;
-    else
+    มิฉะนั้น
 	mr_patternlen = patlen;
 
     /*
      * Save the currently used pattern in the appropriate place,
      * unless the pattern should not be remembered.
      */
-    if (!(options & SEARCH_KEEP)
+    ถ้า (!(options & SEARCH_KEEP)
 			       && (cmdmod.cmod_flags & CMOD_KEEPPATTERNS) == 0)
     {
 	// search or global command
-	if (pat_save == RE_SEARCH || pat_save == RE_BOTH)
+	ถ้า (pat_save == RE_SEARCH || pat_save == RE_BOTH)
 	    save_re_pat(RE_SEARCH, pat, patlen, magic);
 	// substitute or global command
-	if (pat_save == RE_SUBST || pat_save == RE_BOTH)
+	ถ้า (pat_save == RE_SUBST || pat_save == RE_BOTH)
 	    save_re_pat(RE_SUBST, pat, patlen, magic);
     }
 
     regmatch->rmm_ic = ignorecase(pat);
     regmatch->rmm_maxcol = 0;
     regmatch->regprog = vim_regcomp(pat, magic ? RE_MAGIC : 0);
-    if (regmatch->regprog == NULL)
-	return FAIL;
-    return OK;
+    ถ้า (regmatch->regprog == NULL)
+	คืน FAIL;
+    คืน OK;
 }
 
 /*
@@ -218,27 +218,27 @@ search_regcomp(
     char_u *
 get_search_pat(void)
 {
-    return mr_pattern;
+    คืน mr_pattern;
 }
 
     void
-save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
+save_re_pat(จำนวนเต็ม idx, char_u *pat, size_t patlen, จำนวนเต็ม magic)
 {
-    if (spats[idx].pat == pat)
-	return;
+    ถ้า (spats[idx].pat == pat)
+	คืน;
 
     vim_free(spats[idx].pat);
     spats[idx].pat = vim_strnsave(pat, patlen);
-    if (spats[idx].pat == NULL)
+    ถ้า (spats[idx].pat == NULL)
 	spats[idx].patlen = 0;
-    else
+    มิฉะนั้น
 	spats[idx].patlen = patlen;
     spats[idx].magic = magic;
     spats[idx].no_scs = no_smartcase;
     last_idx = idx;
 #ifdef FEAT_SEARCH_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls)
+    ถ้า (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
     set_no_hlsearch(FALSE);
 #endif
@@ -248,35 +248,35 @@ save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
  * Save the search patterns, so they can be restored later.
  * Used before/after executing autocommands and user functions.
  */
-static int save_level = 0;
+static จำนวนเต็ม save_level = 0;
 
     void
 save_search_patterns(void)
 {
-    int i;
+    จำนวนเต็ม i;
 
-    if (save_level++ != 0)
-	return;
+    ถ้า (save_level++ != 0)
+	คืน;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    สำหรับ (i = 0; i < (จำนวนเต็ม)ARRAY_LENGTH(spats); ++i)
     {
 	saved_spats[i] = spats[i];
-	if (spats[i].pat != NULL)
+	ถ้า (spats[i].pat != NULL)
 	{
 	    saved_spats[i].pat = vim_strnsave(spats[i].pat, spats[i].patlen);
-	    if (saved_spats[i].pat == NULL)
+	    ถ้า (saved_spats[i].pat == NULL)
 		saved_spats[i].patlen = 0;
-	    else
+	    มิฉะนั้น
 		saved_spats[i].patlen = spats[i].patlen;
 	}
     }
-    if (mr_pattern == NULL)
+    ถ้า (mr_pattern == NULL)
 	saved_mr_pattern = NULL;
-    else
+    มิฉะนั้น
 	saved_mr_pattern = vim_strnsave(mr_pattern, mr_patternlen);
-    if (saved_mr_pattern == NULL)
+    ถ้า (saved_mr_pattern == NULL)
 	saved_mr_patternlen = 0;
-    else
+    มิฉะนั้น
 	saved_mr_patternlen = mr_patternlen;
 #ifdef FEAT_SEARCH_EXTRA
     saved_spats_last_idx = last_idx;
@@ -287,17 +287,17 @@ save_search_patterns(void)
     void
 restore_search_patterns(void)
 {
-    int i;
+    จำนวนเต็ม i;
 
-    if (--save_level != 0)
-	return;
+    ถ้า (--save_level != 0)
+	คืน;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    สำหรับ (i = 0; i < (จำนวนเต็ม)ARRAY_LENGTH(spats); ++i)
     {
 	vim_free(spats[i].pat);
 	spats[i] = saved_spats[i];
     }
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
     set_vv_searchforward();
 #endif
     vim_free(mr_pattern);
@@ -309,13 +309,13 @@ restore_search_patterns(void)
 #endif
 }
 
-#if defined(EXITFREE)
+#ถ้า defined(EXITFREE)
     void
 free_search_patterns(void)
 {
-    int i;
+    จำนวนเต็ม i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    สำหรับ (i = 0; i < (จำนวนเต็ม)ARRAY_LENGTH(spats); ++i)
     {
 	VIM_CLEAR(spats[i].pat);
 	spats[i].patlen = 0;
@@ -329,11 +329,11 @@ free_search_patterns(void)
 // copy of spats[RE_SEARCH], for keeping the search patterns while incremental
 // searching
 static spat_T	    saved_last_search_spat;
-static int	    did_save_last_search_spat = 0;
-static int	    saved_last_idx = 0;
-static int	    saved_no_hlsearch = 0;
-static int	    saved_search_match_endcol;
-static int	    saved_search_match_lines;
+static จำนวนเต็ม	    did_save_last_search_spat = 0;
+static จำนวนเต็ม	    saved_last_idx = 0;
+static จำนวนเต็ม	    saved_no_hlsearch = 0;
+static จำนวนเต็ม	    saved_search_match_endcol;
+static จำนวนเต็ม	    saved_search_match_lines;
 
 /*
  * Save and restore the search pattern for incremental highlight search
@@ -346,17 +346,17 @@ static int	    saved_search_match_lines;
     void
 save_last_search_pattern(void)
 {
-    if (++did_save_last_search_spat != 1)
+    ถ้า (++did_save_last_search_spat != 1)
 	// nested call, nothing to do
-	return;
+	คืน;
 
     saved_last_search_spat = spats[RE_SEARCH];
-    if (spats[RE_SEARCH].pat != NULL)
+    ถ้า (spats[RE_SEARCH].pat != NULL)
     {
 	saved_last_search_spat.pat = vim_strnsave(spats[RE_SEARCH].pat, spats[RE_SEARCH].patlen);
-	if (saved_last_search_spat.pat == NULL)
+	ถ้า (saved_last_search_spat.pat == NULL)
 	    saved_last_search_spat.patlen = 0;
-	else
+	มิฉะนั้น
 	    saved_last_search_spat.patlen = spats[RE_SEARCH].patlen;
     }
     saved_last_idx = last_idx;
@@ -366,20 +366,20 @@ save_last_search_pattern(void)
     void
 restore_last_search_pattern(void)
 {
-    if (--did_save_last_search_spat > 0)
+    ถ้า (--did_save_last_search_spat > 0)
 	// nested call, nothing to do
-	return;
-    if (did_save_last_search_spat != 0)
+	คืน;
+    ถ้า (did_save_last_search_spat != 0)
     {
 	iemsg("restore_last_search_pattern() called more often than save_last_search_pattern()");
-	return;
+	คืน;
     }
 
     vim_free(spats[RE_SEARCH].pat);
     spats[RE_SEARCH] = saved_last_search_spat;
     saved_last_search_spat.pat = NULL;
     saved_last_search_spat.patlen = 0;
-# if defined(FEAT_EVAL)
+# ถ้า defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
     last_idx = saved_last_idx;
@@ -408,13 +408,13 @@ restore_incsearch_state(void)
     char_u *
 last_search_pattern(void)
 {
-    return spats[RE_SEARCH].pat;
+    คืน spats[RE_SEARCH].pat;
 }
 
     size_t
 last_search_pattern_len(void)
 {
-    return spats[RE_SEARCH].patlen;
+    คืน spats[RE_SEARCH].patlen;
 }
 #endif
 
@@ -422,32 +422,32 @@ last_search_pattern_len(void)
  * Return TRUE when case should be ignored for search pattern "pat".
  * Uses the 'ignorecase' and 'smartcase' options.
  */
-    int
+    จำนวนเต็ม
 ignorecase(char_u *pat)
 {
-    return ignorecase_opt(pat, p_ic, p_scs);
+    คืน ignorecase_opt(pat, p_ic, p_scs);
 }
 
 /*
  * As ignorecase() but pass the "ic" and "scs" flags.
  */
-    int
-ignorecase_opt(char_u *pat, int ic_in, int scs)
+    จำนวนเต็ม
+ignorecase_opt(char_u *pat, จำนวนเต็ม ic_in, จำนวนเต็ม scs)
 {
-    int		ic = ic_in;
+    จำนวนเต็ม		ic = ic_in;
 
-    if (ic && !no_smartcase && scs
+    ถ้า (ic && !no_smartcase && scs
 			    && !(ctrl_x_mode_not_default() && curbuf->b_p_inf))
 	ic = !pat_has_uppercase(pat);
     no_smartcase = FALSE;
 
-    return ic;
+    คืน ic;
 }
 
 /*
  * Return TRUE if pattern "pat" has an uppercase character.
  */
-    int
+    จำนวนเต็ม
 pat_has_uppercase(char_u *pat)
 {
     char_u *p = pat;
@@ -456,81 +456,81 @@ pat_has_uppercase(char_u *pat)
     // get the magicness of the pattern
     (void)skip_regexp_ex(pat, NUL, magic_isset(), NULL, NULL, &magic_val);
 
-    while (*p != NUL)
+    ขณะ (*p != NUL)
     {
-	int		l;
+	จำนวนเต็ม		l;
 
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	ถ้า (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    if (enc_utf8 && utf_isupper(utf_ptr2char(p)))
-		return TRUE;
+	    ถ้า (enc_utf8 && utf_isupper(utf_ptr2char(p)))
+		คืน TRUE;
 	    p += l;
 	}
-	else if (*p == '\\' && magic_val <= MAGIC_ON)
+	มิฉะนั้น ถ้า (*p == '\\' && magic_val <= MAGIC_ON)
 	{
-	    if (p[1] == '_' && p[2] != NUL)  // skip "\_X"
+	    ถ้า (p[1] == '_' && p[2] != NUL)  // skip "\_X"
 		p += 3;
-	    else if (p[1] == '%' && p[2] != NUL)  // skip "\%X"
+	    มิฉะนั้น ถ้า (p[1] == '%' && p[2] != NUL)  // skip "\%X"
 		p += 3;
-	    else if (p[1] != NUL)  // skip "\X"
+	    มิฉะนั้น ถ้า (p[1] != NUL)  // skip "\X"
 		p += 2;
-	    else
+	    มิฉะนั้น
 		p += 1;
 	}
-	else if ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
+	มิฉะนั้น ถ้า ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
 	{
-	    if (p[1] != NUL)  // skip "_X" and %X
+	    ถ้า (p[1] != NUL)  // skip "_X" and %X
 		p += 2;
-	    else
+	    มิฉะนั้น
 		p++;
 	}
-	else if (MB_ISUPPER(*p))
-	    return TRUE;
-	else
+	มิฉะนั้น ถ้า (MB_ISUPPER(*p))
+	    คืน TRUE;
+	มิฉะนั้น
 	    ++p;
     }
-    return FALSE;
+    คืน FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
     char_u *
 last_csearch(void)
 {
-    return lastc_bytes;
+    คืน lastc_bytes;
 }
 
-    int
+    จำนวนเต็ม
 last_csearch_forward(void)
 {
-    return lastcdir == FORWARD;
+    คืน lastcdir == FORWARD;
 }
 
-    int
+    จำนวนเต็ม
 last_csearch_until(void)
 {
-    return last_t_cmd == TRUE;
+    คืน last_t_cmd == TRUE;
 }
 
     void
-set_last_csearch(int c, char_u *s, int len)
+set_last_csearch(จำนวนเต็ม c, char_u *s, จำนวนเต็ม len)
 {
     *lastc = c;
     lastc_bytelen = len;
-    if (len)
+    ถ้า (len)
 	memcpy(lastc_bytes, s, len);
-    else
+    มิฉะนั้น
 	CLEAR_FIELD(lastc_bytes);
 }
 #endif
 
     void
-set_csearch_direction(int cdir)
+set_csearch_direction(จำนวนเต็ม cdir)
 {
     lastcdir = cdir;
 }
 
     void
-set_csearch_until(int t_cmd)
+set_csearch_until(จำนวนเต็ม t_cmd)
 {
     last_t_cmd = t_cmd;
 }
@@ -538,7 +538,7 @@ set_csearch_until(int t_cmd)
     char_u *
 last_search_pat(void)
 {
-    return spats[last_idx].pat;
+    คืน spats[last_idx].pat;
 }
 
 /*
@@ -548,12 +548,12 @@ last_search_pat(void)
 reset_search_dir(void)
 {
     spats[0].off.dir = '/';
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
     set_vv_searchforward();
 #endif
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
+#ถ้า defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
 /*
  * Set the last search pattern.  For ":let @/ =" and viminfo.
  * Also set the saved search pattern, so that this works in an autocommand.
@@ -561,43 +561,43 @@ reset_search_dir(void)
     void
 set_last_search_pat(
     char_u	*s,
-    int		idx,
-    int		magic,
-    int		setlast)
+    จำนวนเต็ม		idx,
+    จำนวนเต็ม		magic,
+    จำนวนเต็ม		setlast)
 {
     vim_free(spats[idx].pat);
     // An empty string means that nothing should be matched.
-    if (*s == NUL)
+    ถ้า (*s == NUL)
 	spats[idx].pat = NULL;
-    else
+    มิฉะนั้น
     {
 	spats[idx].patlen = STRLEN(s);
 	spats[idx].pat = vim_strnsave(s, spats[idx].patlen);
     }
-    if (spats[idx].pat == NULL)
+    ถ้า (spats[idx].pat == NULL)
 	spats[idx].patlen = 0;
     spats[idx].magic = magic;
     spats[idx].no_scs = FALSE;
     spats[idx].off.dir = '/';
-# if defined(FEAT_EVAL)
+# ถ้า defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
     spats[idx].off.line = FALSE;
     spats[idx].off.end = FALSE;
     spats[idx].off.off = 0;
-    if (setlast)
+    ถ้า (setlast)
 	last_idx = idx;
-    if (save_level)
+    ถ้า (save_level)
     {
 	vim_free(saved_spats[idx].pat);
 	saved_spats[idx] = spats[0];
-	if (spats[idx].pat == NULL)
+	ถ้า (spats[idx].pat == NULL)
 	    saved_spats[idx].pat = NULL;
-	else
+	มิฉะนั้น
 	    saved_spats[idx].pat = vim_strnsave(spats[idx].pat, spats[idx].patlen);
-	if (saved_spats[idx].pat == NULL)
+	ถ้า (saved_spats[idx].pat == NULL)
 	    saved_spats[idx].patlen = 0;
-	else
+	มิฉะนั้น
 	    saved_spats[idx].patlen = spats[idx].patlen;
 # ifdef FEAT_SEARCH_EXTRA
 	saved_spats_last_idx = last_idx;
@@ -605,7 +605,7 @@ set_last_search_pat(
     }
 # ifdef FEAT_SEARCH_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls && idx == last_idx && !no_hlsearch)
+    ถ้า (p_hls && idx == last_idx && !no_hlsearch)
 	redraw_all_later(UPD_SOME_VALID);
 # endif
 }
@@ -620,10 +620,10 @@ set_last_search_pat(
     void
 last_pat_prog(regmmatch_T *regmatch)
 {
-    if (spats[last_idx].pat == NULL)
+    ถ้า (spats[last_idx].pat == NULL)
     {
 	regmatch->regprog = NULL;
-	return;
+	คืน;
     }
     ++emsg_off;		// So it doesn't beep if bad expr
     (void)search_regcomp((char_u *)"", 0, NULL, 0, last_idx, SEARCH_KEEP, regmatch);
@@ -651,22 +651,22 @@ last_pat_prog(regmmatch_T *regmatch)
  * When FEAT_EVAL is defined, returns the index of the first matching
  * subpattern plus one; one if there was none.
  */
-    int
+    จำนวนเต็ม
 searchit(
     win_T	*win,		// window to search in; can be NULL for a
 				// buffer without a window!
     buf_T	*buf,
     pos_T	*pos,
     pos_T	*end_pos,	// set to end of the match, unless NULL
-    int		dir,
+    จำนวนเต็ม		dir,
     char_u	*pat,
     size_t	patlen,
     long	count,
-    int		options,
-    int		pat_use,	// which pattern to use when "pat" is empty
+    จำนวนเต็ม		options,
+    จำนวนเต็ม		pat_use,	// which pattern to use when "pat" is empty
     searchit_arg_T *extra_arg)	// optional extra arguments, can be NULL
 {
-    int		found;
+    จำนวนเต็ม		found;
     linenr_T	lnum;		// no init to shut up Apollo cc
     colnr_T	col;
     regmmatch_T	regmatch;
@@ -674,39 +674,39 @@ searchit(
     colnr_T	matchcol;
     lpos_T	endpos;
     lpos_T	matchpos;
-    int		loop;
+    จำนวนเต็ม		loop;
     pos_T	start_pos;
-    int		at_first_line;
-    int		extra_col;
-    int		start_char_len;
-    int		match_ok;
+    จำนวนเต็ม		at_first_line;
+    จำนวนเต็ม		extra_col;
+    จำนวนเต็ม		start_char_len;
+    จำนวนเต็ม		match_ok;
     long	nmatched;
-    int		submatch = 0;
-    int		first_match = TRUE;
-    int		called_emsg_before = called_emsg;
+    จำนวนเต็ม		submatch = 0;
+    จำนวนเต็ม		first_match = TRUE;
+    จำนวนเต็ม		called_emsg_before = called_emsg;
 #ifdef FEAT_SEARCH_EXTRA
-    int		break_loop = FALSE;
+    จำนวนเต็ม		break_loop = FALSE;
 #endif
     linenr_T	stop_lnum = 0;	// stop after this line number when != 0
-    int		unused_timeout_flag = FALSE;
-    int		*timed_out = &unused_timeout_flag;  // set when timed out.
-    int		search_from_match_end;		    // vi-compatible search?
+    จำนวนเต็ม		unused_timeout_flag = FALSE;
+    จำนวนเต็ม		*timed_out = &unused_timeout_flag;  // set when timed out.
+    จำนวนเต็ม		search_from_match_end;		    // vi-compatible search?
 
-    if (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
+    ถ้า (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
 		   (options & (SEARCH_HIS + SEARCH_KEEP)), &regmatch) == FAIL)
     {
-	if ((options & SEARCH_MSG) && !rc_did_emsg)
+	ถ้า ((options & SEARCH_MSG) && !rc_did_emsg)
 	    semsg(_(e_invalid_search_string_str), mr_pattern);
-	return FAIL;
+	คืน FAIL;
     }
 
     search_from_match_end = vim_strchr(p_cpo, CPO_SEARCH) != NULL;
 
-    if (extra_arg != NULL)
+    ถ้า (extra_arg != NULL)
     {
 	stop_lnum = extra_arg->sa_stop_lnum;
 #ifdef FEAT_RELTIME
-	if (extra_arg->sa_tm > 0)
+	ถ้า (extra_arg->sa_tm > 0)
 	    init_regexp_timeout(extra_arg->sa_tm);
 	// Also set the pointer when sa_tm is zero, the caller may have set the
 	// timeout.
@@ -722,40 +722,40 @@ searchit(
 	// When not accepting a match at the start position set "extra_col" to
 	// a non-zero value.  Don't do that when starting at MAXCOL, since
 	// MAXCOL + 1 is zero.
-	if (pos->col == MAXCOL)
+	ถ้า (pos->col == MAXCOL)
 	    start_char_len = 0;
 	// Watch out for the "col" being MAXCOL - 2, used in a closed fold.
-	else if (has_mbyte
+	มิฉะนั้น ถ้า (has_mbyte
 		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_line_count
 						    && pos->col < MAXCOL - 2)
 	{
 	    ptr = ml_get_buf(buf, pos->lnum, FALSE);
-	    if (ml_get_buf_len(buf, pos->lnum) <= pos->col)
+	    ถ้า (ml_get_buf_len(buf, pos->lnum) <= pos->col)
 		start_char_len = 1;
-	    else
+	    มิฉะนั้น
 		start_char_len = (*mb_ptr2len)(ptr + pos->col);
 	}
-	else
+	มิฉะนั้น
 	    start_char_len = 1;
-	if (dir == FORWARD)
+	ถ้า (dir == FORWARD)
 	{
-	    if (options & SEARCH_START)
+	    ถ้า (options & SEARCH_START)
 		extra_col = 0;
-	    else
+	    มิฉะนั้น
 		extra_col = start_char_len;
 	}
-	else
+	มิฉะนั้น
 	{
-	    if (options & SEARCH_START)
+	    ถ้า (options & SEARCH_START)
 		extra_col = start_char_len;
-	    else
+	    มิฉะนั้น
 		extra_col = 0;
 	}
 
 	start_pos = *pos;	// remember start pos for detecting no match
 	found = 0;		// default: not found
 	at_first_line = TRUE;	// default: start in first line
-	if (pos->lnum == 0)	// correct lnum for when starting in line 0
+	ถ้า (pos->lnum == 0)	// correct lnum for when starting in line 0
 	{
 	    pos->lnum = 1;
 	    pos->col = 0;
@@ -769,27 +769,27 @@ searchit(
 	 * current position, gain some efficiency by skipping back a line.
 	 * Otherwise begin the search in the current line.
 	 */
-	if (dir == BACKWARD && start_pos.col == 0
+	ถ้า (dir == BACKWARD && start_pos.col == 0
 					     && (options & SEARCH_START) == 0)
 	{
 	    lnum = pos->lnum - 1;
 	    at_first_line = FALSE;
 	}
-	else
+	มิฉะนั้น
 	    lnum = pos->lnum;
 
-	for (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
+	สำหรับ (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
 	{
-	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
+	    สำหรับ ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
 					   lnum += dir, at_first_line = FALSE)
 	    {
 		// Stop after checking "stop_lnum", if it's set.
-		if (stop_lnum != 0 && (dir == FORWARD
+		ถ้า (stop_lnum != 0 && (dir == FORWARD
 				       ? lnum > stop_lnum : lnum < stop_lnum))
-		    break;
+		    bha_nga;
 		// Stop after passing the time limit.
-		if (*timed_out)
-		    break;
+		ถ้า (*timed_out)
+		    bha_nga;
 
 		/*
 		 * Look for a match somewhere in line "lnum".
@@ -799,12 +799,12 @@ searchit(
 		nmatched = vim_regexec_multi(&regmatch, win, buf,
 							 lnum, col, timed_out);
 		// vim_regexec_multi() may clear "regprog"
-		if (regmatch.regprog == NULL)
-		    break;
+		ถ้า (regmatch.regprog == NULL)
+		    bha_nga;
 		// Abort searching on an error (e.g., out of stack).
-		if (called_emsg > called_emsg_before || *timed_out)
-		    break;
-		if (nmatched > 0)
+		ถ้า (called_emsg > called_emsg_before || *timed_out)
+		    bha_nga;
+		ถ้า (nmatched > 0)
 		{
 		    // match may actually be in another line when using \zs
 		    matchpos = regmatch.startpos[0];
@@ -813,9 +813,9 @@ searchit(
 		    submatch = first_submatch(&regmatch);
 #endif
 		    // "lnum" may be past end of buffer for "\n\zs".
-		    if (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
+		    ถ้า (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
 			ptr = (char_u *)"";
-		    else
+		    มิฉะนั้น
 			ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 
 		    /*
@@ -823,7 +823,7 @@ searchit(
 		     * the start position. If not, continue at the end of the
 		     * match (this is vi compatible) or on the next char.
 		     */
-		    if (dir == FORWARD && at_first_line)
+		    ถ้า (dir == FORWARD && at_first_line)
 		    {
 			match_ok = TRUE;
 
@@ -834,69 +834,69 @@ searchit(
 			 * one back afterwards, compare with that position,
 			 * otherwise "/$" will get stuck on end of line.
 			 */
-			while (matchpos.lnum == 0
+			ขณะ (matchpos.lnum == 0
 				&& ((options & SEARCH_END) && first_match
 				    ?  (nmatched == 1
-					&& (int)endpos.col - 1
-					     < (int)start_pos.col + extra_col)
-				    : ((int)matchpos.col
+					&& (จำนวนเต็ม)endpos.col - 1
+					     < (จำนวนเต็ม)start_pos.col + extra_col)
+				    : ((จำนวนเต็ม)matchpos.col
 						  - (ptr[matchpos.col] == NUL)
-					    < (int)start_pos.col + extra_col)))
+					    < (จำนวนเต็ม)start_pos.col + extra_col)))
 			{
 			    /*
 			     * If vi-compatible searching, continue at the end
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ถ้า (search_from_match_end)
 			    {
-				if (nmatched > 1)
+				ถ้า (nmatched > 1)
 				{
 				    // end is in next line, thus no match in
 				    // this line
 				    match_ok = FALSE;
-				    break;
+				    bha_nga;
 				}
 				matchcol = endpos.col;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ถ้า (matchcol == matchpos.col
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ถ้า (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    มิฉะนั้น
 					++matchcol;
 				}
 			    }
-			    else
+			    มิฉะนั้น
 			    {
 				// Advance "matchcol" to the next character.
 				// This uses rmm_matchcol, the actual start of
 				// the match, ignoring "\zs".
 				matchcol = regmatch.rmm_matchcol;
-				if (ptr[matchcol] != NUL)
+				ถ้า (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ถ้า (has_mbyte)
 					matchcol += (*mb_ptr2len)(ptr
 								  + matchcol);
-				    else
+				    มิฉะนั้น
 					++matchcol;
 				}
 			    }
-			    if (matchcol == 0 && (options & SEARCH_START))
-				break;
-			    if (ptr[matchcol] == NUL
+			    ถ้า (matchcol == 0 && (options & SEARCH_START))
+				bha_nga;
+			    ถ้า (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
 					      matchcol, timed_out)) == 0)
 			    {
 				match_ok = FALSE;
-				break;
+				bha_nga;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ถ้า (regmatch.regprog == NULL)
+				bha_nga;
 			    matchpos = regmatch.startpos[0];
 			    endpos = regmatch.endpos[0];
 #ifdef FEAT_EVAL
@@ -907,10 +907,10 @@ searchit(
 			    // multi-line search may have made it invalid.
 			    ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 			}
-			if (!match_ok)
+			ถ้า (!match_ok)
 			    continue;
 		    }
-		    if (dir == BACKWARD)
+		    ถ้า (dir == BACKWARD)
 		    {
 			/*
 			 * Now, if there are multiple matches on this line,
@@ -920,27 +920,27 @@ searchit(
 			 * relative to the end of the match.
 			 */
 			match_ok = FALSE;
-			for (;;)
+			สำหรับ (;;)
 			{
 			    // Remember a position that is before the start
 			    // position, we use it if it's the last match in
 			    // the line.  Always accept a position after
 			    // wrapping around.
-			    if (loop
+			    ถ้า (loop
 				|| ((options & SEARCH_END)
 				    ? (lnum + regmatch.endpos[0].lnum
 							      < start_pos.lnum
 					|| (lnum + regmatch.endpos[0].lnum
 							     == start_pos.lnum
-					     && (int)regmatch.endpos[0].col - 1
-							< (int)start_pos.col
+					     && (จำนวนเต็ม)regmatch.endpos[0].col - 1
+							< (จำนวนเต็ม)start_pos.col
 								+ extra_col))
 				    : (lnum + regmatch.startpos[0].lnum
 							      < start_pos.lnum
 					|| (lnum + regmatch.startpos[0].lnum
 							     == start_pos.lnum
-					     && (int)regmatch.startpos[0].col
-						      < (int)start_pos.col
+					     && (จำนวนเต็ม)regmatch.startpos[0].col
+						      < (จำนวนเต็ม)start_pos.col
 							      + extra_col))))
 			    {
 				match_ok = TRUE;
@@ -950,8 +950,8 @@ searchit(
 				submatch = first_submatch(&regmatch);
 #endif
 			    }
-			    else
-				break;
+			    มิฉะนั้น
+				bha_nga;
 
 			    /*
 			     * We found a valid match, now check if there is
@@ -960,38 +960,38 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    ถ้า (search_from_match_end)
 			    {
-				if (nmatched > 1)
-				    break;
+				ถ้า (nmatched > 1)
+				    bha_nga;
 				matchcol = endpos.col;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				ถ้า (matchcol == matchpos.col
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ถ้า (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    มิฉะนั้น
 					++matchcol;
 				}
 			    }
-			    else
+			    มิฉะนั้น
 			    {
 				// Stop when the match is in a next line.
-				if (matchpos.lnum > 0)
-				    break;
+				ถ้า (matchpos.lnum > 0)
+				    bha_nga;
 				matchcol = matchpos.col;
-				if (ptr[matchcol] != NUL)
+				ถ้า (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    ถ้า (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    มิฉะนั้น
 					++matchcol;
 				}
 			    }
-			    if (ptr[matchcol] == NUL
+			    ถ้า (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
 					      matchcol, timed_out)) == 0)
@@ -999,13 +999,13 @@ searchit(
 				// If the search timed out, we did find a match
 				// but it might be the wrong one, so that's not
 				// OK.
-				if (*timed_out)
+				ถ้า (*timed_out)
 				    match_ok = FALSE;
-				break;
+				bha_nga;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    ถ้า (regmatch.regprog == NULL)
+				bha_nga;
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
@@ -1016,14 +1016,14 @@ searchit(
 			 * If there is only a match after the cursor, skip
 			 * this match.
 			 */
-			if (!match_ok)
+			ถ้า (!match_ok)
 			    continue;
 		    }
 
 		    // With the SEARCH_END option move to the last character
 		    // of the match.  Don't do it for an empty match, end
 		    // should be same as start then.
-		    if ((options & SEARCH_END) && !(options & SEARCH_NOOF)
+		    ถ้า ((options & SEARCH_END) && !(options & SEARCH_NOOF)
 			    && !(matchpos.lnum == endpos.lnum
 				&& matchpos.col == endpos.col))
 		    {
@@ -1031,42 +1031,42 @@ searchit(
 			// on the NUL in the previous line.
 			pos->lnum = lnum + endpos.lnum;
 			pos->col = endpos.col;
-			if (endpos.col == 0)
+			ถ้า (endpos.col == 0)
 			{
-			    if (pos->lnum > 1)  // just in case
+			    ถ้า (pos->lnum > 1)  // just in case
 			    {
 				--pos->lnum;
 				pos->col = ml_get_buf_len(buf, pos->lnum);
 			    }
 			}
-			else
+			มิฉะนั้น
 			{
 			    --pos->col;
-			    if (has_mbyte
+			    ถ้า (has_mbyte
 				    && pos->lnum <= buf->b_ml.ml_line_count)
 			    {
 				ptr = ml_get_buf(buf, pos->lnum, FALSE);
 				pos->col -= (*mb_head_off)(ptr, ptr + pos->col);
 			    }
 			}
-			if (end_pos != NULL)
+			ถ้า (end_pos != NULL)
 			{
 			    end_pos->lnum = lnum + matchpos.lnum;
 			    end_pos->col = matchpos.col;
 			}
 		    }
-		    else
+		    มิฉะนั้น
 		    {
 			pos->lnum = lnum + matchpos.lnum;
 			pos->col = matchpos.col;
-			if (end_pos != NULL)
+			ถ้า (end_pos != NULL)
 			{
 			    end_pos->lnum = lnum + endpos.lnum;
 			    end_pos->col = endpos.col;
 			}
 		    }
 		    pos->coladd = 0;
-		    if (end_pos != NULL)
+		    ถ้า (end_pos != NULL)
 			end_pos->coladd = 0;
 		    found = 1;
 		    first_match = FALSE;
@@ -1074,46 +1074,46 @@ searchit(
 		    // Set variables used for 'incsearch' highlighting.
 		    search_match_lines = endpos.lnum - matchpos.lnum;
 		    search_match_endcol = endpos.col;
-		    break;
+		    bha_nga;
 		}
 		line_breakcheck();	// stop if ctrl-C typed
-		if (got_int)
-		    break;
+		ถ้า (got_int)
+		    bha_nga;
 
 #ifdef FEAT_SEARCH_EXTRA
 		// Cancel searching if a character was typed.  Used for
 		// 'incsearch'.  Don't check too often, that would slowdown
 		// searching too much.
-		if ((options & SEARCH_PEEK)
+		ถ้า ((options & SEARCH_PEEK)
 			&& ((lnum - pos->lnum) & 0x3f) == 0
 			&& char_avail())
 		{
 		    break_loop = TRUE;
-		    break;
+		    bha_nga;
 		}
 #endif
 
-		if (loop && lnum == start_pos.lnum)
-		    break;	    // if second loop, stop where started
+		ถ้า (loop && lnum == start_pos.lnum)
+		    bha_nga;	    // if second loop, stop where started
 	    }
 	    at_first_line = FALSE;
 
 	    // vim_regexec_multi() may clear "regprog"
-	    if (regmatch.regprog == NULL)
-		break;
+	    ถ้า (regmatch.regprog == NULL)
+		bha_nga;
 
 	    /*
 	     * Stop the search if wrapscan isn't set, "stop_lnum" is
 	     * specified, after an interrupt, after a match and after looping
 	     * twice.
 	     */
-	    if (!p_ws || stop_lnum != 0 || got_int
+	    ถ้า (!p_ws || stop_lnum != 0 || got_int
 			      || called_emsg > called_emsg_before || *timed_out
 #ifdef FEAT_SEARCH_EXTRA
 			      || break_loop
 #endif
 			      || found || loop)
-		break;
+		bha_nga;
 
 	    /*
 	     * If 'wrapscan' is set we continue at the other end of the file.
@@ -1124,64 +1124,64 @@ searchit(
 	     * is redrawn. The keep_msg is cleared whenever another message is
 	     * written.
 	     */
-	    if (dir == BACKWARD)    // start second loop at the other end
+	    ถ้า (dir == BACKWARD)    // start second loop at the other end
 		lnum = buf->b_ml.ml_line_count;
-	    else
+	    มิฉะนั้น
 		lnum = 1;
-	    if (!shortmess(SHM_SEARCH)
+	    ถ้า (!shortmess(SHM_SEARCH)
 		    && shortmess(SHM_SEARCHCOUNT)
 		    && (options & SEARCH_MSG))
 		give_warning((char_u *)_(dir == BACKWARD
 					  ? top_bot_msg : bot_top_msg), TRUE);
-	    if (extra_arg != NULL)
+	    ถ้า (extra_arg != NULL)
 		extra_arg->sa_wrapped = TRUE;
 	}
-	if (got_int || called_emsg > called_emsg_before || *timed_out
+	ถ้า (got_int || called_emsg > called_emsg_before || *timed_out
 #ifdef FEAT_SEARCH_EXTRA
 		|| break_loop
 #endif
 		)
-	    break;
+	    bha_nga;
     }
-    while (--count > 0 && found);   // stop after count matches or no match
+    ขณะ (--count > 0 && found);   // stop after count matches or no match
 
 #ifdef FEAT_RELTIME
-    if (extra_arg != NULL && extra_arg->sa_tm > 0)
+    ถ้า (extra_arg != NULL && extra_arg->sa_tm > 0)
 	disable_regexp_timeout();
 #endif
     vim_regfree(regmatch.regprog);
 
-    if (!found)		    // did not find it
+    ถ้า (!found)		    // did not find it
     {
-	if (got_int)
+	ถ้า (got_int)
 	    emsg(_(e_interrupted));
-	else if ((options & SEARCH_MSG) == SEARCH_MSG)
+	มิฉะนั้น ถ้า ((options & SEARCH_MSG) == SEARCH_MSG)
 	{
-	    if (p_ws)
+	    ถ้า (p_ws)
 		semsg(_(e_pattern_not_found_str), mr_pattern);
-	    else if (lnum == 0)
+	    มิฉะนั้น ถ้า (lnum == 0)
 		semsg(_(e_search_hit_top_without_match_for_str), mr_pattern);
-	    else
+	    มิฉะนั้น
 		semsg(_(e_search_hit_bottom_without_match_for_str), mr_pattern);
 	}
-	return FAIL;
+	คืน FAIL;
     }
 
     // A pattern like "\n\zs" may go past the last line.
-    if (pos->lnum > buf->b_ml.ml_line_count)
+    ถ้า (pos->lnum > buf->b_ml.ml_line_count)
     {
 	pos->lnum = buf->b_ml.ml_line_count;
 	pos->col = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > 0)
+	ถ้า (pos->col > 0)
 	    --pos->col;
     }
 
-    return submatch + 1;
+    คืน submatch + 1;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#ถ้า defined(FEAT_EVAL) || defined(FEAT_PROTO)
     void
-set_search_direction(int cdir)
+set_search_direction(จำนวนเต็ม cdir)
 {
     spats[0].off.dir = cdir;
 }
@@ -1196,22 +1196,22 @@ set_vv_searchforward(void)
  * Return the number of the first subpat that matched.
  * Return zero if none of them matched.
  */
-    static int
+    static จำนวนเต็ม
 first_submatch(regmmatch_T *rp)
 {
-    int		submatch;
+    จำนวนเต็ม		submatch;
 
-    for (submatch = 1; ; ++submatch)
+    สำหรับ (submatch = 1; ; ++submatch)
     {
-	if (rp->startpos[submatch].lnum >= 0)
-	    break;
-	if (submatch == 9)
+	ถ้า (rp->startpos[submatch].lnum >= 0)
+	    bha_nga;
+	ถ้า (submatch == 9)
 	{
 	    submatch = 0;
-	    break;
+	    bha_nga;
 	}
     }
-    return submatch;
+    คืน submatch;
 }
 #endif
 
@@ -1231,24 +1231,24 @@ first_submatch(regmmatch_T *rp)
  * Returns the length of the parsed pattern + offset (used by get_address()
  * to know how much of the command line was consumed).
  */
-    int
+    จำนวนเต็ม
 parse_search_pattern_offset(
     char_u	**pat,
     size_t	*patlen,
-    int		search_delim,
-    int		options,
+    จำนวนเต็ม		search_delim,
+    จำนวนเต็ม		options,
     char_u	**strcopy,
     char_u	**searchstr,
     size_t	*searchstrlen,
     char_u	**dircp,
     soffset_T	*offset)
 {
-    int		cmdlen = 0;
+    จำนวนเต็ม		cmdlen = 0;
     char_u	*p;
     char_u	*ps;
 
-    if (*pat == NULL || **pat == NUL)
-	return 0;
+    ถ้า (*pat == NULL || **pat == NUL)
+	คืน 0;
 
     ps = *strcopy;
     *searchstr = *pat;
@@ -1261,17 +1261,17 @@ parse_search_pattern_offset(
      */
     p = skip_regexp_ex(*pat, search_delim, magic_isset(),
 						    strcopy, NULL, NULL);
-    if (*strcopy != ps)
+    ถ้า (*strcopy != ps)
     {
 	size_t len = STRLEN(*strcopy);
 	// made a copy of "pat" to change "\?" to "?"
-	cmdlen += (int)(*patlen - len);
+	cmdlen += (จำนวนเต็ม)(*patlen - len);
 	*pat = *strcopy;
 	*patlen = len;
 	*searchstr = *strcopy;
 	*searchstrlen = len;
     }
-    if (*p == search_delim)
+    ถ้า (*p == search_delim)
     {
 	*searchstrlen = p - *pat;
 	*dircp = p;	// remember where we put the NUL
@@ -1287,35 +1287,35 @@ parse_search_pattern_offset(
      * offset, because it is meaningless and the 's' could be a
      * substitute command.
      */
-    if (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
+    ถ้า (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
 	offset->line = TRUE;
-    else if ((options & SEARCH_OPT)
+    มิฉะนั้น ถ้า ((options & SEARCH_OPT)
 				  && (*p == 'e' || *p == 's' || *p == 'b'))
     {
-	if (*p == 'e')		// end
+	ถ้า (*p == 'e')		// end
 	    offset->end = SEARCH_END;
 	++p;
     }
-    if (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
+    ถ้า (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
     {
 				    // 'nr' or '+nr' or '-nr'
-	if (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
-	    offset->off = atol((char *)p);
-	else if (*p == '-')	    // single '-'
+	ถ้า (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
+	    offset->off = atol((var_na *)p);
+	มิฉะนั้น ถ้า (*p == '-')	    // single '-'
 	    offset->off = -1;
-	else			    // single '+'
+	มิฉะนั้น			    // single '+'
 	    offset->off = 1;
 	++p;
-	while (VIM_ISDIGIT(*p))	    // skip number
+	ขณะ (VIM_ISDIGIT(*p))	    // skip number
 	    ++p;
     }
 
     // compute length of search command for get_address()
-    cmdlen += (int)(p - *pat);
+    cmdlen += (จำนวนเต็ม)(p - *pat);
     *patlen -= p - *pat;
     *pat = p;			    // put pat after search command
 
-    return cmdlen;
+    คืน cmdlen;
 }
 
 /*
@@ -1339,38 +1339,38 @@ parse_search_pattern_offset(
  *
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    int
+    จำนวนเต็ม
 do_search(
     oparg_T	    *oap,	// can be NULL
-    int		    dirc,	// '/' or '?'
-    int		    search_delim, // the delimiter for the search, e.g. '%' in
+    จำนวนเต็ม		    dirc,	// '/' or '?'
+    จำนวนเต็ม		    search_delim, // the delimiter for the search, e.g. '%' in
 				  // s%regex%replacement%
     char_u	    *pat,
     size_t	    patlen,
     long	    count,
-    int		    options,
+    จำนวนเต็ม		    options,
     searchit_arg_T  *sia)	// optional arguments or NULL
 {
     pos_T	    pos;	// position of the last match
     char_u	    *searchstr;
     size_t	    searchstrlen;
     soffset_T	    old_off;
-    int		    retval;	// Return value
+    จำนวนเต็ม		    retval;	// Return value
     char_u	    *p;
     long	    c;
     char_u	    *dircp;
     char_u	    *strcopy = NULL;
-    int		    show_search_stats;
+    จำนวนเต็ม		    show_search_stats;
     char_u	    *msgbuf = NULL;
     size_t	    msgbuflen = 0;
-    int		    has_offset = FALSE;
+    จำนวนเต็ม		    has_offset = FALSE;
 
     searchcmdlen = 0;
 
     /*
      * A line offset is not remembered, this is vi compatible.
      */
-    if (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
+    ถ้า (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
     {
 	spats[0].off.line = FALSE;
 	spats[0].off.off = 0;
@@ -1387,25 +1387,25 @@ do_search(
     /*
      * Find out the direction of the search.
      */
-    if (dirc == 0)
+    ถ้า (dirc == 0)
 	dirc = spats[0].off.dir;
-    else
+    มิฉะนั้น
     {
 	spats[0].off.dir = dirc;
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
 	set_vv_searchforward();
 #endif
     }
-    if (options & SEARCH_REV)
+    ถ้า (options & SEARCH_REV)
     {
 #ifdef MSWIN
 	// There is a bug in the Visual C++ 2.2 compiler which means that
 	// dirc always ends up being '/'
 	dirc = (dirc == '/')  ?  '?'  :  '/';
-#else
-	if (dirc == '/')
+#มิฉะนั้น
+	ถ้า (dirc == '/')
 	    dirc = '?';
-	else
+	มิฉะนั้น
 	    dirc = '/';
 #endif
     }
@@ -1413,14 +1413,14 @@ do_search(
 #ifdef FEAT_FOLDING
     // If the cursor is in a closed fold, don't find another match in the same
     // fold.
-    if (dirc == '/')
+    ถ้า (dirc == '/')
     {
-	if (hasFolding(pos.lnum, NULL, &pos.lnum))
+	ถ้า (hasFolding(pos.lnum, NULL, &pos.lnum))
 	    pos.col = MAXCOL - 2;	// avoid overflow when adding 1
     }
-    else
+    มิฉะนั้น
     {
-	if (hasFolding(pos.lnum, &pos.lnum, NULL))
+	ถ้า (hasFolding(pos.lnum, &pos.lnum, NULL))
 	    pos.col = 0;
     }
 #endif
@@ -1429,7 +1429,7 @@ do_search(
     /*
      * Turn 'hlsearch' highlighting back on.
      */
-    if (no_hlsearch && !(options & SEARCH_KEEP))
+    ถ้า (no_hlsearch && !(options & SEARCH_KEEP))
     {
 	redraw_all_later(UPD_SOME_VALID);
 	set_no_hlsearch(FALSE);
@@ -1439,20 +1439,20 @@ do_search(
     /*
      * Repeat the search when pattern followed by ';', e.g. "/foo/;?bar".
      */
-    for (;;)
+    สำหรับ (;;)
     {
-	int		show_top_bot_msg = FALSE;
+	จำนวนเต็ม		show_top_bot_msg = FALSE;
 
 	searchstr = pat;
 	searchstrlen = patlen;
 
 	dircp = NULL;
 					    // use previous pattern
-	if (pat == NULL || *pat == NUL || *pat == search_delim)
+	ถ้า (pat == NULL || *pat == NUL || *pat == search_delim)
 	{
-	    if (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
+	    ถ้า (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
 	    {
-		if (spats[RE_SUBST].pat == NULL)
+		ถ้า (spats[RE_SUBST].pat == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    retval = 0;
@@ -1461,7 +1461,7 @@ do_search(
 		searchstr = spats[RE_SUBST].pat;
 		searchstrlen = spats[RE_SUBST].patlen;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		// make search_regcomp() use spats[RE_SEARCH].pat
 		searchstr = (char_u *)"";
@@ -1469,7 +1469,7 @@ do_search(
 	    }
 	}
 
-	if (pat != NULL && *pat != NUL)	// look for (new) offset
+	ถ้า (pat != NULL && *pat != NUL)	// look for (new) offset
 	{
 	    char_u	*prev_searchstr = searchstr;
 	    size_t	prev_searchstrlen = searchstrlen;
@@ -1479,7 +1479,7 @@ do_search(
 				&searchstrlen, &dircp, &spats[0].off);
 	    // An empty pattern (e.g. "//e") uses the previous pattern selected
 	    // above.
-	    if (*searchstr == NUL)
+	    ถ้า (*searchstr == NUL)
 	    {
 		searchstr = prev_searchstr;
 		searchstrlen = prev_searchstrlen;
@@ -1487,7 +1487,7 @@ do_search(
 	}
 
 	show_search_stats = FALSE;
-	if ((options & SEARCH_ECHO) && messaging()
+	ถ้า ((options & SEARCH_ECHO) && messaging()
 		&& !msg_silent
 		&& (!cmd_silent || !shortmess(SHM_SEARCHCOUNT)))
 	{
@@ -1500,83 +1500,83 @@ do_search(
 	    msg_start();
 
 	    // Get the offset, so we know how long it is.
-	    if (!cmd_silent &&
+	    ถ้า (!cmd_silent &&
 		    (spats[0].off.line || spats[0].off.end || spats[0].off.off))
 	    {
 		off_buf[off_len++] = dirc;
-		if (spats[0].off.end)
+		ถ้า (spats[0].off.end)
 		    off_buf[off_len++] = 'e';
-		else if (!spats[0].off.line)
+		มิฉะนั้น ถ้า (!spats[0].off.line)
 		    off_buf[off_len++] = 's';
 		off_buf[off_len] = NUL;
-		if (spats[0].off.off != 0 || spats[0].off.line)
-		    off_len += vim_snprintf((char *)off_buf + off_len,
-			   sizeof(off_buf) - off_len, "%+ld", spats[0].off.off);
+		ถ้า (spats[0].off.off != 0 || spats[0].off.line)
+		    off_len += vim_snprintf((var_na *)off_buf + off_len,
+			   parimaa_na(off_buf) - off_len, "%+ld", spats[0].off.off);
 	    }
 
-	    if (*searchstr == NUL)
+	    ถ้า (*searchstr == NUL)
 	    {
 		p = spats[0].pat;
 		plen = spats[0].patlen;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		p = searchstr;
 		plen = searchstrlen;
 	    }
 
-	    if (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
+	    ถ้า (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
 	    {
 		// Reserve enough space for the search pattern + offset +
 		// search stat.  Use all the space available, so that the
 		// search state is right aligned.  If there is not enough space
 		// msg_strtrunc() will shorten in the middle.
-		if (msg_scrolled != 0 && !cmd_silent)
+		ถ้า (msg_scrolled != 0 && !cmd_silent)
 		    // Use all the columns.
-		    msgbufsize = (int)(Rows - msg_row) * cmdline_width - 1;
-		else
+		    msgbufsize = (จำนวนเต็ม)(Rows - msg_row) * cmdline_width - 1;
+		มิฉะนั้น
 		    // Use up to 'showcmd' column.
-		    msgbufsize = (int)(Rows - msg_row - 1) * cmdline_width
+		    msgbufsize = (จำนวนเต็ม)(Rows - msg_row - 1) * cmdline_width
 			+ sc_col - 1;
-		if (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
+		ถ้า (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
 		    msgbufsize = plen + off_len + SEARCH_STAT_BUF_LEN + 3;
 	    }
-	    else
+	    มิฉะนั้น
 		// Reserve enough space for the search pattern + offset.
 		msgbufsize = plen + off_len + 3;
 
 	    vim_free(msgbuf);
 	    msgbuf = alloc(msgbufsize);
-	    if (msgbuf == NULL)
+	    ถ้า (msgbuf == NULL)
 	    {
 		msgbuflen = 0;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		vim_memset(msgbuf, ' ', msgbufsize);
 		msgbuflen = msgbufsize - 1;
 		msgbuf[msgbuflen] = NUL;
 		// do not fill the msgbuf buffer, if cmd_silent is set, leave it
 		// empty for the search_stat feature.
-		if (!cmd_silent)
+		ถ้า (!cmd_silent)
 		{
 		    char_u	*trunc;
 
 		    msgbuf[0] = dirc;
 
-		    if (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
+		    ถ้า (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
 		    {
 			// Use a space to draw the composing char on.
 			msgbuf[1] = ' ';
 			mch_memmove(msgbuf + 2, p, plen);
 		    }
-		    else
+		    มิฉะนั้น
 			mch_memmove(msgbuf + 1, p, plen);
-		    if (off_len > 0)
+		    ถ้า (off_len > 0)
 			mch_memmove(msgbuf + plen + 1, off_buf, off_len);
 
 		    trunc = msg_strtrunc(msgbuf, TRUE);
-		    if (trunc != NULL)
+		    ถ้า (trunc != NULL)
 		    {
 			vim_free(msgbuf);
 			msgbuf = trunc;
@@ -1588,26 +1588,26 @@ do_search(
 		    // rightleft mode, but the 'ruler' and 'showcmd' area use
 		    // it too, thus it would be blanked out again very soon.
 		    // Show it on the left, but do reverse the text.
-		    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+		    ถ้า (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 		    {
 			char_u *r;
 			size_t pat_len;
 
 			r = reverse_text(msgbuf);
-			if (r != NULL)
+			ถ้า (r != NULL)
 			{
 			    vim_free(msgbuf);
 			    msgbuf = r;
 			    msgbuflen = STRLEN(msgbuf);
 			    // move reversed text to beginning of buffer
-			    while (*r != NUL && *r == ' ')
+			    ขณะ (*r != NUL && *r == ' ')
 				r++;
 			    pat_len = msgbuf + msgbuflen - r;
 			    mch_memmove(msgbuf, r, pat_len);
 			    // overwrite old text
-			    if ((size_t)(r - msgbuf) >= pat_len)
+			    ถ้า ((size_t)(r - msgbuf) >= pat_len)
 				vim_memset(r, ' ', pat_len);
-			    else
+			    มิฉะนั้น
 				vim_memset(msgbuf + pat_len, ' ', r - msgbuf);
 			}
 		    }
@@ -1621,7 +1621,7 @@ do_search(
 		    msg_nowait = TRUE;	    // don't wait for this message
 		}
 
-		if (!shortmess(SHM_SEARCHCOUNT))
+		ถ้า (!shortmess(SHM_SEARCHCOUNT))
 		    show_search_stats = TRUE;
 	    }	// msgbuf != NULL
 	}
@@ -1633,25 +1633,25 @@ do_search(
 	 * This is not done for a line offset, because then we would not be vi
 	 * compatible.
 	 */
-	if (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
+	ถ้า (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
 	{
-	    if (spats[0].off.off > 0)
+	    ถ้า (spats[0].off.off > 0)
 	    {
-		for (c = spats[0].off.off; c; --c)
-		    if (decl(&pos) == -1)
-			break;
-		if (c)			// at start of buffer
+		สำหรับ (c = spats[0].off.off; c; --c)
+		    ถ้า (decl(&pos) == -1)
+			bha_nga;
+		ถ้า (c)			// at start of buffer
 		{
 		    pos.lnum = 0;	// allow lnum == 0 here
 		    pos.col = MAXCOL;
 		}
 	    }
-	    else
+	    มิฉะนั้น
 	    {
-		for (c = spats[0].off.off; c; ++c)
-		    if (incl(&pos) == -1)
-			break;
-		if (c)			// at end of buffer
+		สำหรับ (c = spats[0].off.off; c; ++c)
+		    ถ้า (incl(&pos) == -1)
+			bha_nga;
+		ถ้า (c)			// at end of buffer
 		{
 		    pos.lnum = curbuf->b_ml.ml_line_count + 1;
 		    pos.col = 0;
@@ -1670,18 +1670,18 @@ do_search(
 			+ ((pat != NULL && *pat == ';') ? 0 : SEARCH_NOOF))),
 		RE_LAST, sia);
 
-	if (dircp != NULL)
+	ถ้า (dircp != NULL)
 	    *dircp = search_delim; // restore second '/' or '?' for normal_cmd()
 
-	if (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
+	ถ้า (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
 	    show_top_bot_msg = TRUE;
 
-	if (c == FAIL)
+	ถ้า (c == FAIL)
 	{
 	    retval = 0;
 	    goto end_do_search;
 	}
-	if (spats[0].off.end && oap != NULL)
+	ถ้า (spats[0].off.end && oap != NULL)
 	    oap->inclusive = TRUE;  // 'e' includes last character
 
 	retval = 1;		    // pattern found
@@ -1689,47 +1689,47 @@ do_search(
 	/*
 	 * Add character and/or line offset
 	 */
-	if (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
+	ถ้า (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
 	{
 	    pos_T org_pos = pos;
 
-	    if (spats[0].off.line)	// Add the offset to the line number.
+	    ถ้า (spats[0].off.line)	// Add the offset to the line number.
 	    {
 		c = pos.lnum + spats[0].off.off;
-		if (c < 1)
+		ถ้า (c < 1)
 		    pos.lnum = 1;
-		else if (c > curbuf->b_ml.ml_line_count)
+		มิฉะนั้น ถ้า (c > curbuf->b_ml.ml_line_count)
 		    pos.lnum = curbuf->b_ml.ml_line_count;
-		else
+		มิฉะนั้น
 		    pos.lnum = c;
 		pos.col = 0;
 
 		retval = 2;	    // pattern found, line offset added
 	    }
-	    else if (pos.col < MAXCOL - 2)	// just in case
+	    มิฉะนั้น ถ้า (pos.col < MAXCOL - 2)	// just in case
 	    {
 		// to the right, check for end of file
 		c = spats[0].off.off;
-		if (c > 0)
+		ถ้า (c > 0)
 		{
-		    while (c-- > 0)
-			if (incl(&pos) == -1)
-			    break;
+		    ขณะ (c-- > 0)
+			ถ้า (incl(&pos) == -1)
+			    bha_nga;
 		}
 		// to the left, check for start of file
-		else
+		มิฉะนั้น
 		{
-		    while (c++ < 0)
-			if (decl(&pos) == -1)
-			    break;
+		    ขณะ (c++ < 0)
+			ถ้า (decl(&pos) == -1)
+			    bha_nga;
 		}
 	    }
-	    if (!EQUAL_POS(pos, org_pos))
+	    ถ้า (!EQUAL_POS(pos, org_pos))
 		has_offset = TRUE;
 	}
 
 	// Show [1/15] if 'S' is not in 'shortmess'.
-	if (show_search_stats)
+	ถ้า (show_search_stats)
 	     cmdline_search_stat(dirc, &pos, &curwin->w_cursor,
 				show_top_bot_msg, msgbuf, msgbuflen,
 				(count != 1 || has_offset
@@ -1750,13 +1750,13 @@ do_search(
 	 * - When an error happens the cursor isn't moved at all.
 	 * Don't do this when called by get_address() (it handles ';' itself).
 	 */
-	if (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
-	    break;
+	ถ้า (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
+	    bha_nga;
 
 	dirc = *++pat;
 	--patlen;
 	search_delim = dirc;
-	if (dirc != '?' && dirc != '/')
+	ถ้า (dirc != '?' && dirc != '/')
 	{
 	    retval = 0;
 	    emsg(_(e_expected_question_or_slash_after_semicolon));
@@ -1766,18 +1766,18 @@ do_search(
 	--patlen;
     }
 
-    if (options & SEARCH_MARK)
+    ถ้า (options & SEARCH_MARK)
 	setpcmark();
     curwin->w_cursor = pos;
     curwin->w_set_curswant = true;
 
 end_do_search:
-    if ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
+    ถ้า ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
 	spats[0].off = old_off;
     vim_free(strcopy);
     vim_free(msgbuf);
 
-    return retval;
+    คืน retval;
 }
 
 /*
@@ -1789,54 +1789,54 @@ end_do_search:
  * ADDING is set.  If p_ic is set then the pattern must be in lowercase.
  * Return OK for success, or FAIL if no line found.
  */
-    int
+    จำนวนเต็ม
 search_for_exact_line(
     buf_T	*buf,
     pos_T	*pos,
-    int		dir,
+    จำนวนเต็ม		dir,
     char_u	*pat)
 {
     linenr_T	start = 0;
     char_u	*ptr;
     char_u	*p;
-    int		compl_len = ins_compl_len();
+    จำนวนเต็ม		compl_len = ins_compl_len();
 
-    if (buf->b_ml.ml_line_count == 0)
-	return FAIL;
-    for (;;)
+    ถ้า (buf->b_ml.ml_line_count == 0)
+	คืน FAIL;
+    สำหรับ (;;)
     {
 	pos->lnum += dir;
-	if (pos->lnum < 1)
+	ถ้า (pos->lnum < 1)
 	{
-	    if (p_ws)
+	    ถ้า (p_ws)
 	    {
 		pos->lnum = buf->b_ml.ml_line_count;
-		if (!shortmess(SHM_SEARCH))
+		ถ้า (!shortmess(SHM_SEARCH))
 		    give_warning((char_u *)_(top_bot_msg), TRUE);
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		pos->lnum = 1;
-		break;
+		bha_nga;
 	    }
 	}
-	else if (pos->lnum > buf->b_ml.ml_line_count)
+	มิฉะนั้น ถ้า (pos->lnum > buf->b_ml.ml_line_count)
 	{
-	    if (p_ws)
+	    ถ้า (p_ws)
 	    {
 		pos->lnum = 1;
-		if (!shortmess(SHM_SEARCH))
+		ถ้า (!shortmess(SHM_SEARCH))
 		    give_warning((char_u *)_(bot_top_msg), TRUE);
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		pos->lnum = 1;
-		break;
+		bha_nga;
 	    }
 	}
-	if (pos->lnum == start)
-	    break;
-	if (start == 0)
+	ถ้า (pos->lnum == start)
+	    bha_nga;
+	ถ้า (start == 0)
 	    start = pos->lnum;
 	ptr = ml_get_buf(buf, pos->lnum, FALSE);
 	p = skipwhite(ptr);
@@ -1844,19 +1844,19 @@ search_for_exact_line(
 
 	// when adding lines the matching line may be empty but it is not
 	// ignored because we are interested in the next line -- Acevedo
-	if (compl_status_adding() && !compl_status_sol())
+	ถ้า (compl_status_adding() && !compl_status_sol())
 	{
-	    if ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
-		return OK;
+	    ถ้า ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
+		คืน OK;
 	}
-	else if (*p != NUL)	// ignore empty lines
+	มิฉะนั้น ถ้า (*p != NUL)	// ignore empty lines
 	{	// expanding lines or words
-	    if ((p_ic ? MB_STRNICMP(p, pat, compl_len)
+	    ถ้า ((p_ic ? MB_STRNICMP(p, pat, compl_len)
 				   : STRNCMP(p, pat, compl_len)) == 0)
-		return OK;
+		คืน OK;
 	}
     }
-    return FAIL;
+    คืน FAIL;
 }
 
 /*
@@ -1869,42 +1869,42 @@ search_for_exact_line(
  * Do this "cap->count1" times.
  * Return FAIL or OK.
  */
-    int
-searchc(cmdarg_T *cap, int t_cmd)
+    จำนวนเต็ม
+searchc(cmdarg_T *cap, จำนวนเต็ม t_cmd)
 {
-    int			c = cap->nchar;	// char to search for
-    int			dir = cap->arg;	// TRUE for searching forward
+    จำนวนเต็ม			c = cap->nchar;	// char to search for
+    จำนวนเต็ม			dir = cap->arg;	// TRUE for searching forward
     long		count = cap->count1;	// repeat count
-    int			col;
+    จำนวนเต็ม			col;
     char_u		*p;
-    int			len;
-    int			stop = TRUE;
+    จำนวนเต็ม			len;
+    จำนวนเต็ม			stop = TRUE;
 
-    if (c != NUL)	// normal search: remember args for repeat
+    ถ้า (c != NUL)	// normal search: remember args for repeat
     {
-	if (!KeyStuffed)    // don't remember when redoing
+	ถ้า (!KeyStuffed)    // don't remember when redoing
 	{
 	    *lastc = c;
 	    set_csearch_direction(dir);
 	    set_csearch_until(t_cmd);
 	    lastc_bytelen = (*mb_char2bytes)(c, lastc_bytes);
-	    if (cap->ncharC1 != 0)
+	    ถ้า (cap->ncharC1 != 0)
 	    {
 		lastc_bytelen += (*mb_char2bytes)(cap->ncharC1,
 			lastc_bytes + lastc_bytelen);
-		if (cap->ncharC2 != 0)
+		ถ้า (cap->ncharC2 != 0)
 		    lastc_bytelen += (*mb_char2bytes)(cap->ncharC2,
 			    lastc_bytes + lastc_bytelen);
 	    }
 	}
     }
-    else		// repeat previous search
+    มิฉะนั้น		// repeat previous search
     {
-	if (*lastc == NUL && lastc_bytelen <= 1)
-	    return FAIL;
-	if (dir)	// repeat in opposite direction
+	ถ้า (*lastc == NUL && lastc_bytelen <= 1)
+	    คืน FAIL;
+	ถ้า (dir)	// repeat in opposite direction
 	    dir = -lastcdir;
-	else
+	มิฉะนั้น
 	    dir = lastcdir;
 	t_cmd = last_t_cmd;
 	c = *lastc;
@@ -1913,78 +1913,78 @@ searchc(cmdarg_T *cap, int t_cmd)
 	// Force a move of at least one char, so ";" and "," will move the
 	// cursor, even if the cursor is right in front of char we are looking
 	// at.
-	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
+	ถ้า (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
 	    stop = FALSE;
     }
 
-    if (dir == BACKWARD)
+    ถ้า (dir == BACKWARD)
 	cap->oap->inclusive = FALSE;
-    else
+    มิฉะนั้น
 	cap->oap->inclusive = TRUE;
 
     p = ml_get_curline();
     col = curwin->w_cursor.col;
     len = ml_get_curline_len();
 
-    while (count--)
+    ขณะ (count--)
     {
-	if (has_mbyte)
+	ถ้า (has_mbyte)
 	{
-	    for (;;)
+	    สำหรับ (;;)
 	    {
-		if (dir > 0)
+		ถ้า (dir > 0)
 		{
 		    col += (*mb_ptr2len)(p + col);
-		    if (col >= len)
-			return FAIL;
+		    ถ้า (col >= len)
+			คืน FAIL;
 		}
-		else
+		มิฉะนั้น
 		{
-		    if (col == 0)
-			return FAIL;
+		    ถ้า (col == 0)
+			คืน FAIL;
 		    col -= (*mb_head_off)(p, p + col - 1) + 1;
 		}
-		if (lastc_bytelen <= 1)
+		ถ้า (lastc_bytelen <= 1)
 		{
-		    if (p[col] == c && stop)
-			break;
+		    ถ้า (p[col] == c && stop)
+			bha_nga;
 		}
-		else if (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
+		มิฉะนั้น ถ้า (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
 								       && stop)
-		    break;
+		    bha_nga;
 		stop = TRUE;
 	    }
 	}
-	else
+	มิฉะนั้น
 	{
-	    for (;;)
+	    สำหรับ (;;)
 	    {
-		if ((col += dir) < 0 || col >= len)
-		    return FAIL;
-		if (p[col] == c && stop)
-		    break;
+		ถ้า ((col += dir) < 0 || col >= len)
+		    คืน FAIL;
+		ถ้า (p[col] == c && stop)
+		    bha_nga;
 		stop = TRUE;
 	    }
 	}
     }
 
-    if (t_cmd)
+    ถ้า (t_cmd)
     {
 	// backup to before the character (possibly double-byte)
 	col -= dir;
-	if (has_mbyte)
+	ถ้า (has_mbyte)
 	{
-	    if (dir < 0)
+	    ถ้า (dir < 0)
 		// Landed on the search char which is lastc_bytelen long
 		col += lastc_bytelen - 1;
-	    else
+	    มิฉะนั้น
 		// To previous char, which may be multi-byte.
 		col -= (*mb_head_off)(p, p + col);
 	}
     }
     curwin->w_cursor.col = col;
 
-    return OK;
+    คืน OK;
 }
 
 /*
@@ -1997,9 +1997,9 @@ searchc(cmdarg_T *cap, int t_cmd)
  * Improvement over vi: Braces inside quotes are ignored.
  */
     pos_T *
-findmatch(oparg_T *oap, int initc)
+findmatch(oparg_T *oap, จำนวนเต็ม initc)
 {
-    return findmatchlimit(oap, initc, 0, 0);
+    คืน findmatchlimit(oap, initc, 0, 0);
 }
 
 /*
@@ -2009,61 +2009,61 @@ findmatch(oparg_T *oap, int initc)
  * is NULL.
  * Handles multibyte string correctly.
  */
-    static int
+    static จำนวนเต็ม
 check_prevcol(
     char_u	*linep,
-    int		col,
-    int		ch,
-    int		*prevcol)
+    จำนวนเต็ม		col,
+    จำนวนเต็ม		ch,
+    จำนวนเต็ม		*prevcol)
 {
     --col;
-    if (col > 0 && has_mbyte)
+    ถ้า (col > 0 && has_mbyte)
 	col -= (*mb_head_off)(linep, linep + col);
-    if (prevcol)
+    ถ้า (prevcol)
 	*prevcol = col;
-    return (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
+    คืน (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
 }
 
 /*
  * Raw string start is found at linep[startpos.col - 1].
  * Return TRUE if the matching end can be found between startpos and endpos.
  */
-    static int
+    static จำนวนเต็ม
 find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
 {
     char_u	*p;
     char_u	*delim_copy;
     size_t	delim_len;
     linenr_T	lnum;
-    int		found = FALSE;
+    จำนวนเต็ม		found = FALSE;
 
-    for (p = linep + startpos->col + 1; *p && *p != '('; ++p)
+    สำหรับ (p = linep + startpos->col + 1; *p && *p != '('; ++p)
 	;
     delim_len = (p - linep) - startpos->col - 1;
     delim_copy = vim_strnsave(linep + startpos->col + 1, delim_len);
-    if (delim_copy == NULL)
-	return FALSE;
-    for (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
+    ถ้า (delim_copy == NULL)
+	คืน FALSE;
+    สำหรับ (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
     {
 	char_u *line = ml_get(lnum);
 
-	for (p = line + (lnum == startpos->lnum
+	สำหรับ (p = line + (lnum == startpos->lnum
 					    ? startpos->col + 1 : 0); *p; ++p)
 	{
-	    if (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
-		break;
-	    if (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
+	    ถ้า (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
+		bha_nga;
+	    ถ้า (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
 			  && p[delim_len + 1] == '"')
 	    {
 		found = TRUE;
-		break;
+		bha_nga;
 	    }
 	}
-	if (found)
-	    break;
+	ถ้า (found)
+	    bha_nga;
     }
     vim_free(delim_copy);
-    return found;
+    คืน found;
 }
 
 /*
@@ -2074,90 +2074,90 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
  */
     static void
 find_mps_values(
-    int	    *initc,
-    int	    *findc,
-    int	    *backwards,
-    int	    switchit)
+    จำนวนเต็ม	    *initc,
+    จำนวนเต็ม	    *findc,
+    จำนวนเต็ม	    *backwards,
+    จำนวนเต็ม	    switchit)
 {
     char_u	*ptr;
 
     ptr = curbuf->b_p_mps;
-    while (*ptr != NUL)
+    ขณะ (*ptr != NUL)
     {
-	if (has_mbyte)
+	ถ้า (has_mbyte)
 	{
 	    char_u *prev;
 
-	    if (mb_ptr2char(ptr) == *initc)
+	    ถ้า (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ถ้า (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = TRUE;
 		}
-		else
+		มิฉะนั้น
 		{
 		    *findc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = FALSE;
 		}
-		return;
+		คืน;
 	    }
 	    prev = ptr;
 	    ptr += mb_ptr2len(ptr) + 1;
-	    if (mb_ptr2char(ptr) == *initc)
+	    ถ้า (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		ถ้า (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(prev);
 		    *backwards = FALSE;
 		}
-		else
+		มิฉะนั้น
 		{
 		    *findc = mb_ptr2char(prev);
 		    *backwards = TRUE;
 		}
-		return;
+		คืน;
 	    }
 	    ptr += mb_ptr2len(ptr);
 	}
-	else
+	มิฉะนั้น
 	{
-	    if (*ptr == *initc)
+	    ถ้า (*ptr == *initc)
 	    {
-		if (switchit)
+		ถ้า (switchit)
 		{
 		    *backwards = TRUE;
 		    *findc = *initc;
 		    *initc = ptr[2];
 		}
-		else
+		มิฉะนั้น
 		{
 		    *backwards = FALSE;
 		    *findc = ptr[2];
 		}
-		return;
+		คืน;
 	    }
 	    ptr += 2;
-	    if (*ptr == *initc)
+	    ถ้า (*ptr == *initc)
 	    {
-		if (switchit)
+		ถ้า (switchit)
 		{
 		    *backwards = FALSE;
 		    *findc = *initc;
 		    *initc = ptr[-2];
 		}
-		else
+		มิฉะนั้น
 		{
 		    *backwards = TRUE;
 		    *findc =  ptr[-2];
 		}
-		return;
+		คืน;
 	    }
 	    ++ptr;
 	}
-	if (*ptr == ',')
+	ถ้า (*ptr == ',')
 	    ++ptr;
     }
 }
@@ -2185,36 +2185,36 @@ find_mps_values(
     pos_T *
 findmatchlimit(
     oparg_T	*oap,
-    int		initc,
-    int		flags,
-    int		maxtravel)
+    จำนวนเต็ม		initc,
+    จำนวนเต็ม		flags,
+    จำนวนเต็ม		maxtravel)
 {
     static pos_T pos;			// current search position
-    int		findc = 0;		// matching brace
-    int		c;
-    int		count = 0;		// cumulative number of braces
-    int		backwards = FALSE;	// init for gcc
-    int		raw_string = FALSE;	// search for raw string
-    int		inquote = FALSE;	// TRUE when inside quotes
+    จำนวนเต็ม		findc = 0;		// matching brace
+    จำนวนเต็ม		c;
+    จำนวนเต็ม		count = 0;		// cumulative number of braces
+    จำนวนเต็ม		backwards = FALSE;	// init for gcc
+    จำนวนเต็ม		raw_string = FALSE;	// search for raw string
+    จำนวนเต็ม		inquote = FALSE;	// TRUE when inside quotes
     char_u	*linep;			// pointer to current line
     char_u	*ptr;
-    int		do_quotes;		// check for quotes in current line
-    int		at_start;		// do_quotes value at start position
-    int		hash_dir = 0;		// Direction searched for # things
-    int		comment_dir = 0;	// Direction searched for comments
+    จำนวนเต็ม		do_quotes;		// check for quotes in current line
+    จำนวนเต็ม		at_start;		// do_quotes value at start position
+    จำนวนเต็ม		hash_dir = 0;		// Direction searched for # things
+    จำนวนเต็ม		comment_dir = 0;	// Direction searched for comments
     pos_T	match_pos;		// Where last slash-star was found
-    int		start_in_quotes;	// start position is in quotes
-    int		traveled = 0;		// how far we've searched so far
-    int		ignore_cend = FALSE;    // ignore comment end
-    int		cpo_match;		// vi compatible matching
-    int		cpo_bsl;		// don't recognize backslashes
-    int		match_escaped = 0;	// search for escaped match
-    int		dir;			// Direction to search
-    int		comment_col = MAXCOL;   // start of / / comment
-    int		lispcomm = FALSE;	// inside of Lisp-style comment
-    int		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
-    int		skip_comments = (flags & FM_SKIPCOMM) != 0;
-    int		in_block_comment = FALSE; // inside /* */ block comment
+    จำนวนเต็ม		start_in_quotes;	// start position is in quotes
+    จำนวนเต็ม		traveled = 0;		// how far we've searched so far
+    จำนวนเต็ม		ignore_cend = FALSE;    // ignore comment end
+    จำนวนเต็ม		cpo_match;		// vi compatible matching
+    จำนวนเต็ม		cpo_bsl;		// don't recognize backslashes
+    จำนวนเต็ม		match_escaped = 0;	// search for escaped match
+    จำนวนเต็ม		dir;			// Direction to search
+    จำนวนเต็ม		comment_col = MAXCOL;   // start of / / comment
+    จำนวนเต็ม		lispcomm = FALSE;	// inside of Lisp-style comment
+    จำนวนเต็ม		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
+    จำนวนเต็ม		skip_comments = (flags & FM_SKIPCOMM) != 0;
+    จำนวนเต็ม		in_block_comment = FALSE; // inside /* */ block comment
 
     pos = curwin->w_cursor;
     pos.coladd = 0;
@@ -2224,11 +2224,11 @@ findmatchlimit(
     cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != NULL);
 
     // Direction to search when initc is '/', '*' or '#'
-    if (flags & FM_BACKWARD)
+    ถ้า (flags & FM_BACKWARD)
 	dir = BACKWARD;
-    else if (flags & FM_FORWARD)
+    มิฉะนั้น ถ้า (flags & FM_FORWARD)
 	dir = FORWARD;
-    else
+    มิฉะนั้น
 	dir = 0;
 
     /*
@@ -2237,77 +2237,77 @@ findmatchlimit(
      * When '/' is used, we ignore running backwards into an star-slash, for
      * "[*" command, we just want to find any comment.
      */
-    if (initc == '/' || initc == '*' || initc == 'R')
+    ถ้า (initc == '/' || initc == '*' || initc == 'R')
     {
 	comment_dir = dir;
-	if (initc == '/')
+	ถ้า (initc == '/')
 	    ignore_cend = TRUE;
 	backwards = (dir == FORWARD) ? FALSE : TRUE;
 	raw_string = (initc == 'R');
 	initc = NUL;
     }
-    else if (initc != '#' && initc != NUL)
+    มิฉะนั้น ถ้า (initc != '#' && initc != NUL)
     {
 	find_mps_values(&initc, &findc, &backwards, TRUE);
-	if (dir)
+	ถ้า (dir)
 	    backwards = (dir == FORWARD) ? FALSE : TRUE;
-	if (findc == NUL)
-	    return NULL;
+	ถ้า (findc == NUL)
+	    คืน NULL;
     }
-    else
+    มิฉะนั้น
     {
 	/*
 	 * Either initc is '#', or no initc was given and we need to look
 	 * under the cursor.
 	 */
-	if (initc == '#')
+	ถ้า (initc == '#')
 	{
 	    hash_dir = dir;
 	}
-	else
+	มิฉะนั้น
 	{
 	    /*
 	     * initc was not given, must look for something to match under
 	     * or near the cursor.
 	     * Only check for special things when 'cpo' doesn't have '%'.
 	     */
-	    if (!cpo_match)
+	    ถ้า (!cpo_match)
 	    {
 		// Are we before or at #if, #else etc.?
 		ptr = skipwhite(linep);
-		if (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
+		ถ้า (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
 		{
 		    ptr = skipwhite(ptr + 1);
-		    if (   STRNCMP(ptr, "if", 2) == 0
+		    ถ้า (   STRNCMP(ptr, "if", 2) == 0
 			|| STRNCMP(ptr, "endif", 5) == 0
 			|| STRNCMP(ptr, "el", 2) == 0)
 			hash_dir = 1;
 		}
 
 		// Are we on a comment?
-		else if (linep[pos.col] == '/')
+		มิฉะนั้น ถ้า (linep[pos.col] == '/')
 		{
-		    if (linep[pos.col + 1] == '*')
+		    ถ้า (linep[pos.col + 1] == '*')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
 			pos.col++;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '*')
+		    มิฉะนั้น ถ้า (pos.col > 0 && linep[pos.col - 1] == '*')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 			pos.col--;
 		    }
 		}
-		else if (linep[pos.col] == '*')
+		มิฉะนั้น ถ้า (linep[pos.col] == '*')
 		{
-		    if (linep[pos.col + 1] == '/')
+		    ถ้า (linep[pos.col + 1] == '/')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '/')
+		    มิฉะนั้น ถ้า (pos.col > 0 && linep[pos.col - 1] == '/')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
@@ -2319,122 +2319,122 @@ findmatchlimit(
 	     * If we are not on a comment or the # at the start of a line, then
 	     * look for brace anywhere on this line after the cursor.
 	     */
-	    if (!hash_dir && !comment_dir)
+	    ถ้า (!hash_dir && !comment_dir)
 	    {
 		/*
 		 * Find the brace under or after the cursor.
 		 * If beyond the end of the line, use the last character in
 		 * the line.
 		 */
-		if (linep[pos.col] == NUL && pos.col)
+		ถ้า (linep[pos.col] == NUL && pos.col)
 		    --pos.col;
-		for (;;)
+		สำหรับ (;;)
 		{
 		    initc = PTR2CHAR(linep + pos.col);
-		    if (initc == NUL)
-			break;
+		    ถ้า (initc == NUL)
+			bha_nga;
 
 		    find_mps_values(&initc, &findc, &backwards, FALSE);
-		    if (findc)
-			break;
+		    ถ้า (findc)
+			bha_nga;
 		    pos.col += mb_ptr2len(linep + pos.col);
 		}
-		if (!findc)
+		ถ้า (!findc)
 		{
 		    // no brace in the line, maybe use "  #if" then
-		    if (!cpo_match && *skipwhite(linep) == '#')
+		    ถ้า (!cpo_match && *skipwhite(linep) == '#')
 			hash_dir = 1;
-		    else
-			return NULL;
+		    มิฉะนั้น
+			คืน NULL;
 		}
-		else if (!cpo_bsl)
+		มิฉะนั้น ถ้า (!cpo_bsl)
 		{
-		    int col, bslcnt = 0;
+		    จำนวนเต็ม col, bslcnt = 0;
 
 		    // Set "match_escaped" if there are an odd number of
 		    // backslashes.
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    สำหรับ (col = pos.col; check_prevcol(linep, col, '\\', &col);)
 			bslcnt++;
 		    match_escaped = (bslcnt & 1);
 		}
 	    }
 	}
-	if (hash_dir)
+	ถ้า (hash_dir)
 	{
 	    /*
 	     * Look for matching #if, #else, #elif, or #endif
 	     */
-	    if (oap != NULL)
+	    ถ้า (oap != NULL)
 		oap->motion_type = MLINE;   // Linewise for this case only
-	    if (initc != '#')
+	    ถ้า (initc != '#')
 	    {
 		ptr = skipwhite(skipwhite(linep) + 1);
-		if (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
+		ถ้า (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
 		    hash_dir = 1;
-		else if (STRNCMP(ptr, "endif", 5) == 0)
+		มิฉะนั้น ถ้า (STRNCMP(ptr, "endif", 5) == 0)
 		    hash_dir = -1;
-		else
-		    return NULL;
+		มิฉะนั้น
+		    คืน NULL;
 	    }
 	    pos.col = 0;
-	    while (!got_int)
+	    ขณะ (!got_int)
 	    {
-		if (hash_dir > 0)
+		ถ้า (hash_dir > 0)
 		{
-		    if (pos.lnum == curbuf->b_ml.ml_line_count)
-			break;
+		    ถ้า (pos.lnum == curbuf->b_ml.ml_line_count)
+			bha_nga;
 		}
-		else if (pos.lnum == 1)
-		    break;
+		มิฉะนั้น ถ้า (pos.lnum == 1)
+		    bha_nga;
 		pos.lnum += hash_dir;
 		linep = ml_get(pos.lnum);
 		line_breakcheck();	// check for CTRL-C typed
 		ptr = skipwhite(linep);
-		if (*ptr != '#')
+		ถ้า (*ptr != '#')
 		    continue;
 		pos.col = (colnr_T) (ptr - linep);
 		ptr = skipwhite(ptr + 1);
-		if (hash_dir > 0)
+		ถ้า (hash_dir > 0)
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
+		    ถ้า (STRNCMP(ptr, "if", 2) == 0)
 			count++;
-		    else if (STRNCMP(ptr, "el", 2) == 0)
+		    มิฉะนั้น ถ้า (STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ถ้า (count == 0)
+			    คืน &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
+		    มิฉะนั้น ถ้า (STRNCMP(ptr, "endif", 5) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ถ้า (count == 0)
+			    คืน &pos;
 			count--;
 		    }
 		}
-		else
+		มิฉะนั้น
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
+		    ถ้า (STRNCMP(ptr, "if", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ถ้า (count == 0)
+			    คืน &pos;
 			count--;
 		    }
-		    else if (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
+		    มิฉะนั้น ถ้า (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			ถ้า (count == 0)
+			    คืน &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
+		    มิฉะนั้น ถ้า (STRNCMP(ptr, "endif", 5) == 0)
 			count++;
 		}
 	    }
-	    return NULL;
+	    คืน NULL;
 	}
     }
 
 #ifdef FEAT_RIGHTLEFT
     // This is just guessing: when 'rightleft' is set, search for a matching
     // paren/brace in the other direction.
-    if (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != NULL)
+    ถ้า (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != NULL)
 	backwards = !backwards;
 #endif
 
@@ -2443,34 +2443,34 @@ findmatchlimit(
     CLEAR_POS(&match_pos);
 
     // backward search: Check if this line contains a single-line comment
-    if ((backwards && comment_dir) || lisp || skip_comments)
+    ถ้า ((backwards && comment_dir) || lisp || skip_comments)
 	comment_col = check_linecomment(linep);
-    if (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
+    ถ้า (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
 	lispcomm = TRUE;    // find match inside this comment
     // skip // comment portion at starting position
-    if (skip_comments && !in_block_comment && comment_col != MAXCOL
+    ถ้า (skip_comments && !in_block_comment && comment_col != MAXCOL
 	    && backwards && pos.col > (colnr_T)comment_col)
 	pos.col = comment_col;
 
-    while (!got_int)
+    ขณะ (!got_int)
     {
 	/*
 	 * Go to the next position, forward or backward. We could use
 	 * inc() and dec() here, but that is much slower
 	 */
-	if (backwards)
+	ถ้า (backwards)
 	{
 	    // char to match is inside of comment, don't search outside
-	    if (lispcomm && pos.col < (colnr_T)comment_col)
-		break;
-	    if (pos.col == 0)		// at start of line, go to prev. one
+	    ถ้า (lispcomm && pos.col < (colnr_T)comment_col)
+		bha_nga;
+	    ถ้า (pos.col == 0)		// at start of line, go to prev. one
 	    {
-		if (pos.lnum == 1)	// start of file
-		    break;
+		ถ้า (pos.lnum == 1)	// start of file
+		    bha_nga;
 		--pos.lnum;
 
-		if (maxtravel > 0 && ++traveled > maxtravel)
-		    break;
+		ถ้า (maxtravel > 0 && ++traveled > maxtravel)
+		    bha_nga;
 
 		linep = ml_get(pos.lnum);
 		pos.col = ml_get_len(pos.lnum); // pos.col on trailing NUL
@@ -2478,53 +2478,53 @@ findmatchlimit(
 		line_breakcheck();
 
 		// Check if this line contains a single-line comment
-		if (comment_dir || lisp || skip_comments)
+		ถ้า (comment_dir || lisp || skip_comments)
 		    comment_col = check_linecomment(linep);
 		// skip comment
-		if (lisp && comment_col != MAXCOL)
+		ถ้า (lisp && comment_col != MAXCOL)
 		    pos.col = comment_col;
-		else if (skip_comments && !in_block_comment
+		มิฉะนั้น ถ้า (skip_comments && !in_block_comment
 			&& comment_col != MAXCOL
 			&& pos.col > (colnr_T)comment_col)
 		    pos.col = comment_col;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		--pos.col;
-		if (has_mbyte)
+		ถ้า (has_mbyte)
 		    pos.col -= (*mb_head_off)(linep, linep + pos.col);
 	    }
 	}
-	else				// forward search
+	มิฉะนั้น				// forward search
 	{
-	    if (linep[pos.col] == NUL
+	    ถ้า (linep[pos.col] == NUL
 		    // at end of line, go to next one
 		    // For lisp don't search for match in comment
 		    || (lisp && comment_col != MAXCOL
 					   && pos.col == (colnr_T)comment_col))
 	    {
-		if (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
+		ถ้า (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
 			// line is exhausted and comment with it,
 			// don't search for match in code
 			 || lispcomm)
-		    break;
+		    bha_nga;
 		++pos.lnum;
 
-		if (maxtravel && traveled++ > maxtravel)
-		    break;
+		ถ้า (maxtravel && traveled++ > maxtravel)
+		    bha_nga;
 
 		linep = ml_get(pos.lnum);
 		pos.col = 0;
 		do_quotes = -1;
 		line_breakcheck();
-		if (lisp || skip_comments)   // find comment pos in new line
+		ถ้า (lisp || skip_comments)   // find comment pos in new line
 		    comment_col = check_linecomment(linep);
 	    }
-	    else
+	    มิฉะนั้น
 	    {
-		if (has_mbyte)
+		ถ้า (has_mbyte)
 		    pos.col += (*mb_ptr2len)(linep + pos.col);
-		else
+		มิฉะนั้น
 		    ++pos.col;
 	    }
 	}
@@ -2533,29 +2533,29 @@ findmatchlimit(
 	// string are not comments, so skip them while "inquote" is set.
 	// Backward: '/' of end-marker enters comment; '*' of start-marker exits.
 	// Forward:  '/' of start-marker enters comment; '/' of end-marker exits.
-	if (skip_comments && !comment_dir && !inquote)
+	ถ้า (skip_comments && !comment_dir && !inquote)
 	{
-	    if (backwards)
+	    ถ้า (backwards)
 	    {
 		// Guard pos.col < comment_col: don't misread '*/' at the '//'
 		// position as a block-comment end-marker.
-		if (!in_block_comment && pos.col > 0
+		ถ้า (!in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
+			&& (comment_col == MAXCOL || (จำนวนเต็ม)pos.col < comment_col))
 		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
+		มิฉะนั้น ถ้า (in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '/' && linep[pos.col] == '*')
 		    in_block_comment = FALSE;
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		// Guard pos.col < comment_col: don't treat '/*' inside a '//'
 		// comment as a block-comment start-marker.
-		if (!in_block_comment && linep[pos.col] == '/'
+		ถ้า (!in_block_comment && linep[pos.col] == '/'
 			&& linep[pos.col + 1] == '*'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
+			&& (comment_col == MAXCOL || (จำนวนเต็ม)pos.col < comment_col))
 		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
+		มิฉะนั้น ถ้า (in_block_comment && pos.col > 0
 			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/')
 		    in_block_comment = FALSE;
 	    }
@@ -2564,37 +2564,37 @@ findmatchlimit(
 	/*
 	 * If FM_BLOCKSTOP given, stop at a '{' or '}' in column 0.
 	 */
-	if (pos.col == 0 && (flags & FM_BLOCKSTOP)
+	ถ้า (pos.col == 0 && (flags & FM_BLOCKSTOP)
 				       && (linep[0] == '{' || linep[0] == '}'))
 	{
-	    if (linep[0] == findc && count == 0)	// match!
-		return &pos;
-	    break;					// out of scope
+	    ถ้า (linep[0] == findc && count == 0)	// match!
+		คืน &pos;
+	    bha_nga;					// out of scope
 	}
 
-	if (comment_dir)
+	ถ้า (comment_dir)
 	{
 	    // Note: comments do not nest, and we ignore quotes in them
 	    // TODO: ignore comment brackets inside strings
-	    if (comment_dir == FORWARD)
+	    ถ้า (comment_dir == FORWARD)
 	    {
-		if (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
+		ถ้า (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
 		{
 		    pos.col++;
-		    return &pos;
+		    คืน &pos;
 		}
 	    }
-	    else    // Searching backwards
+	    มิฉะนั้น    // Searching backwards
 	    {
 		/*
 		 * A comment may contain / * or / /, it may also start or end
 		 * with / * /.	Ignore a / * after / / and after *.
 		 */
-		if (pos.col == 0)
+		ถ้า (pos.col == 0)
 		    continue;
-		else if (raw_string)
+		มิฉะนั้น ถ้า (raw_string)
 		{
-		    if (linep[pos.col - 1] == 'R'
+		    ถ้า (linep[pos.col - 1] == 'R'
 			&& linep[pos.col] == '"'
 			&& vim_strchr(linep + pos.col + 1, '(') != NULL)
 		    {
@@ -2602,7 +2602,7 @@ findmatchlimit(
 			// delimiter we can check if it ends before where we
 			// started searching, or before the previously found
 			// raw string start.
-			if (!find_rawstring_end(linep, &pos,
+			ถ้า (!find_rawstring_end(linep, &pos,
 				  count > 0 ? &match_pos : &curwin->w_cursor))
 			{
 			    count++;
@@ -2612,27 +2612,27 @@ findmatchlimit(
 			linep = ml_get(pos.lnum); // may have been released
 		    }
 		}
-		else if (  linep[pos.col - 1] == '/'
+		มิฉะนั้น ถ้า (  linep[pos.col - 1] == '/'
 			&& linep[pos.col] == '*'
 			&& (pos.col == 1 || linep[pos.col - 2] != '*')
-			&& (int)pos.col < comment_col)
+			&& (จำนวนเต็ม)pos.col < comment_col)
 		{
 		    count++;
 		    match_pos = pos;
 		    match_pos.col--;
 		}
-		else if (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
+		มิฉะนั้น ถ้า (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
 		{
-		    if (count > 0)
+		    ถ้า (count > 0)
 			pos = match_pos;
-		    else if (pos.col > 1 && linep[pos.col - 2] == '/'
-					       && (int)pos.col <= comment_col)
+		    มิฉะนั้น ถ้า (pos.col > 1 && linep[pos.col - 2] == '/'
+					       && (จำนวนเต็ม)pos.col <= comment_col)
 			pos.col -= 2;
-		    else if (ignore_cend)
+		    มิฉะนั้น ถ้า (ignore_cend)
 			continue;
-		    else
-			return NULL;
-		    return &pos;
+		    มิฉะนั้น
+			คืน NULL;
+		    คืน &pos;
 		}
 	    }
 	    continue;
@@ -2643,23 +2643,23 @@ findmatchlimit(
 	 * of quotes are ignored, but only if there is an even number of
 	 * quotes in the line.
 	 */
-	if (cpo_match)
+	ถ้า (cpo_match)
 	    do_quotes = 0;
-	else if (do_quotes == -1)
+	มิฉะนั้น ถ้า (do_quotes == -1)
 	{
 	    /*
 	     * Count the number of quotes in the line, skipping \" and '"'.
 	     * Watch out for "\\".
 	     */
 	    at_start = do_quotes;
-	    for (ptr = linep; *ptr; ++ptr)
+	    สำหรับ (ptr = linep; *ptr; ++ptr)
 	    {
-		if (ptr == linep + pos.col + backwards)
+		ถ้า (ptr == linep + pos.col + backwards)
 		    at_start = (do_quotes & 1);
-		if (*ptr == '"'
+		ถ้า (*ptr == '"'
 			&& (ptr == linep || ptr[-1] != '\'' || ptr[1] != '\''))
 		    ++do_quotes;
-		if (*ptr == '\\' && ptr[1] != NUL)
+		ถ้า (*ptr == '\\' && ptr[1] != NUL)
 		    ++ptr;
 	    }
 	    do_quotes &= 1;	    // result is 1 with even number of quotes
@@ -2668,34 +2668,34 @@ findmatchlimit(
 	     * If we find an uneven count, check current line and previous
 	     * one for a '\' at the end.
 	     */
-	    if (!do_quotes)
+	    ถ้า (!do_quotes)
 	    {
 		inquote = FALSE;
-		if (ptr[-1] == '\\')
+		ถ้า (ptr[-1] == '\\')
 		{
 		    do_quotes = 1;
-		    if (start_in_quotes == MAYBE)
+		    ถ้า (start_in_quotes == MAYBE)
 		    {
 			inquote = at_start;
-			if (inquote)
+			ถ้า (inquote)
 			    start_in_quotes = TRUE;
 		    }
-		    else if (backwards)
+		    มิฉะนั้น ถ้า (backwards)
 			inquote = TRUE;
 		}
-		if (pos.lnum > 1)
+		ถ้า (pos.lnum > 1)
 		{
 		    ptr = ml_get(pos.lnum - 1);
-		    if (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
+		    ถ้า (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
 		    {
 			do_quotes = 1;
-			if (start_in_quotes == MAYBE)
+			ถ้า (start_in_quotes == MAYBE)
 			{
 			    inquote = at_start;
-			    if (inquote)
+			    ถ้า (inquote)
 				start_in_quotes = TRUE;
 			}
-			else if (!backwards)
+			มิฉะนั้น ถ้า (!backwards)
 			    inquote = TRUE;
 		    }
 
@@ -2704,7 +2704,7 @@ findmatchlimit(
 		}
 	    }
 	}
-	if (start_in_quotes == MAYBE)
+	ถ้า (start_in_quotes == MAYBE)
 	    start_in_quotes = FALSE;
 
 	/*
@@ -2721,32 +2721,32 @@ findmatchlimit(
 	c = PTR2CHAR(linep + pos.col);
 	switch (c)
 	{
-	case NUL:
+	pak_sa NUL:
 	    // at end of line without trailing backslash, reset inquote
-	    if (pos.col == 0 || linep[pos.col - 1] != '\\')
+	    ถ้า (pos.col == 0 || linep[pos.col - 1] != '\\')
 	    {
 		inquote = FALSE;
 		start_in_quotes = FALSE;
 	    }
-	    break;
+	    bha_nga;
 
-	case '"':
+	pak_sa '"':
 	    // a quote that is preceded with an odd number of backslashes is
 	    // ignored
-	    if (do_quotes)
+	    ถ้า (do_quotes)
 	    {
-		int col;
+		จำนวนเต็ม col;
 
-		for (col = pos.col - 1; col >= 0; --col)
-		    if (linep[col] != '\\')
-			break;
-		if ((((int)pos.col - 1 - col) & 1) == 0)
+		สำหรับ (col = pos.col - 1; col >= 0; --col)
+		    ถ้า (linep[col] != '\\')
+			bha_nga;
+		ถ้า ((((จำนวนเต็ม)pos.col - 1 - col) & 1) == 0)
 		{
 		    inquote = !inquote;
 		    start_in_quotes = FALSE;
 		}
 	    }
-	    break;
+	    bha_nga;
 
 	/*
 	 * If smart matching ('cpoptions' does not contain '%'):
@@ -2755,38 +2755,38 @@ findmatchlimit(
 	 *   skipped, there is never a brace in them.
 	 *   Ignore this when finding matches for `'.
 	 */
-	case '\'':
-	    if (!cpo_match && initc != '\'' && findc != '\'')
+	pak_sa '\'':
+	    ถ้า (!cpo_match && initc != '\'' && findc != '\'')
 	    {
-		if (backwards)
+		ถ้า (backwards)
 		{
-		    if (pos.col > 1)
+		    ถ้า (pos.col > 1)
 		    {
-			if (linep[pos.col - 2] == '\'')
+			ถ้า (linep[pos.col - 2] == '\'')
 			{
 			    pos.col -= 2;
-			    break;
+			    bha_nga;
 			}
-			else if (linep[pos.col - 2] == '\\'
+			มิฉะนั้น ถ้า (linep[pos.col - 2] == '\\'
 				  && pos.col > 2 && linep[pos.col - 3] == '\'')
 			{
 			    pos.col -= 3;
-			    break;
+			    bha_nga;
 			}
 		    }
 		}
-		else if (linep[pos.col + 1])	// forward search
+		มิฉะนั้น ถ้า (linep[pos.col + 1])	// forward search
 		{
-		    if (linep[pos.col + 1] == '\\'
+		    ถ้า (linep[pos.col + 1] == '\\'
 			   && linep[pos.col + 2] && linep[pos.col + 3] == '\'')
 		    {
 			pos.col += 3;
-			break;
+			bha_nga;
 		    }
-		    else if (linep[pos.col + 2] == '\'')
+		    มิฉะนั้น ถ้า (linep[pos.col + 2] == '\'')
 		    {
 			pos.col += 2;
-			break;
+			bha_nga;
 		    }
 		}
 	    }
@@ -2797,40 +2797,40 @@ findmatchlimit(
 	     * For Lisp skip over backslashed (), {} and [].
 	     * (actually, we skip #\( et al)
 	     */
-	    if (curbuf->b_p_lisp
+	    ถ้า (curbuf->b_p_lisp
 		    && vim_strchr((char_u *)"{}()[]", c) != NULL
 		    && pos.col > 1
 		    && check_prevcol(linep, pos.col, '\\', NULL)
 		    && check_prevcol(linep, pos.col - 1, '#', NULL))
-		break;
+		bha_nga;
 
 	    // Skip matches inside comments when FM_SKIPCOMM is set.
-	    if (skip_comments && (in_block_comment
-		    || (comment_col != MAXCOL && (int)pos.col >= comment_col)))
-		break;
+	    ถ้า (skip_comments && (in_block_comment
+		    || (comment_col != MAXCOL && (จำนวนเต็ม)pos.col >= comment_col)))
+		bha_nga;
 
 	    // Check for match outside of quotes, and inside of
 	    // quotes when the start is also inside of quotes.
-	    if ((!inquote || start_in_quotes == TRUE)
+	    ถ้า ((!inquote || start_in_quotes == TRUE)
 		    && (c == initc || c == findc))
 	    {
-		int	col, bslcnt = 0;
+		จำนวนเต็ม	col, bslcnt = 0;
 
-		if (!cpo_bsl)
+		ถ้า (!cpo_bsl)
 		{
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    สำหรับ (col = pos.col; check_prevcol(linep, col, '\\', &col);)
 			bslcnt++;
 		}
 		// Only accept a match when 'M' is in 'cpo' or when escaping
 		// is what we expect.
-		if (cpo_bsl || (bslcnt & 1) == match_escaped)
+		ถ้า (cpo_bsl || (bslcnt & 1) == match_escaped)
 		{
-		    if (c == initc)
+		    ถ้า (c == initc)
 			count++;
-		    else
+		    มิฉะนั้น
 		    {
-			if (count == 0)
-			    return &pos;
+			ถ้า (count == 0)
+			    คืน &pos;
 			count--;
 		    }
 		}
@@ -2838,12 +2838,12 @@ findmatchlimit(
 	}
     }
 
-    if (comment_dir == BACKWARD && count > 0)
+    ถ้า (comment_dir == BACKWARD && count > 0)
     {
 	pos = match_pos;
-	return &pos;
+	คืน &pos;
     }
-    return (pos_T *)NULL;	// never found it
+    คืน (pos_T *)NULL;	// never found it
 }
 
 /*
@@ -2854,7 +2854,7 @@ findmatchlimit(
  */
     void
 showmatch(
-    int		c)	    // char to show match for
+    จำนวนเต็ม		c)	    // char to show match for
 {
     pos_T	*lpos, save_cursor;
     pos_T	mpos;
@@ -2862,7 +2862,7 @@ showmatch(
     long	save_so;
     long	save_siso;
 #ifdef CURSOR_SHAPE
-    int		save_state;
+    จำนวนเต็ม		save_state;
 #endif
     colnr_T	save_dollar_vcol;
     char_u	*p;
@@ -2873,43 +2873,43 @@ showmatch(
      * Only show match for chars in the 'matchpairs' option.
      */
     // 'matchpairs' is "x:y,x:y"
-    for (p = curbuf->b_p_mps; *p != NUL; ++p)
+    สำหรับ (p = curbuf->b_p_mps; *p != NUL; ++p)
     {
 #ifdef FEAT_RIGHTLEFT
-	if (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
-	    break;
+	ถ้า (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
+	    bha_nga;
 #endif
 	p += mb_ptr2len(p) + 1;
-	if (PTR2CHAR(p) == c
+	ถ้า (PTR2CHAR(p) == c
 #ifdef FEAT_RIGHTLEFT
 		&& !(curwin->w_p_rl ^ p_ri)
 #endif
 	   )
-	    break;
+	    bha_nga;
 	p += mb_ptr2len(p);
-	if (*p == NUL)
-	    return;
+	ถ้า (*p == NUL)
+	    คืน;
     }
-    if (*p == NUL)
-	return;
+    ถ้า (*p == NUL)
+	คืน;
 
-    if ((lpos = findmatch(NULL, NUL)) == NULL)	    // no match, so beep
+    ถ้า ((lpos = findmatch(NULL, NUL)) == NULL)	    // no match, so beep
     {
 	vim_beep(BO_MATCH);
-	return;
+	คืน;
     }
 
-    if (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
-	return;
+    ถ้า (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
+	คืน;
 
-    if (!curwin->w_p_wrap)
+    ถ้า (!curwin->w_p_wrap)
 	getvcol(curwin, lpos, NULL, &vcol, NULL, 0);
 
-    int col_visible = (curwin->w_p_wrap
+    จำนวนเต็ม col_visible = (curwin->w_p_wrap
 	    || (vcol >= curwin->w_leftcol
 		&& vcol < curwin->w_leftcol + curwin->w_width));
-    if (!col_visible)
-	return;
+    ถ้า (!col_visible)
+	คืน;
 
     mpos = *lpos;    // save the pos, update_screen() may change it
     save_cursor = curwin->w_cursor;
@@ -2917,7 +2917,7 @@ showmatch(
     save_siso = *siso;
     // Handle "$" in 'cpo': If the ')' is typed on top of the "$",
     // stop displaying the "$".
-    if (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
+    ถ้า (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
 	dollar_vcol = -1;
     ++curwin->w_virtcol;	// do display ')' just before "$"
     update_screen(UPD_VALID);	// show the new char first
@@ -2945,9 +2945,9 @@ showmatch(
      * brief pause, unless 'm' is present in 'cpo' and a character is
      * available.
      */
-    if (vim_strchr(p_cpo, CPO_SHOWMATCH) != NULL)
+    ถ้า (vim_strchr(p_cpo, CPO_SHOWMATCH) != NULL)
 	ui_delay(p_mat * 100L + 8, TRUE);
-    else if (!char_avail())
+    มิฉะนั้น ถ้า (!char_avail())
 	ui_delay(p_mat * 100L + 9, FALSE);
     curwin->w_cursor = save_cursor;	// restore cursor position
     *so = save_so;
@@ -2965,46 +2965,46 @@ showmatch(
  * "direction" is FORWARD or BACKWARD.
  * Returns TRUE, FALSE or -1 for failure.
  */
-    static int
+    static จำนวนเต็ม
 is_zero_width(
     char_u	*pattern,
     size_t	patternlen,
-    int		move,
+    จำนวนเต็ม		move,
     pos_T	*cur,
-    int		direction)
+    จำนวนเต็ม		direction)
 {
     regmmatch_T	regmatch;
-    int		nmatched = 0;
-    int		result = -1;
+    จำนวนเต็ม		nmatched = 0;
+    จำนวนเต็ม		result = -1;
     pos_T	pos;
-    int		called_emsg_before = called_emsg;
-    int		flag = 0;
+    จำนวนเต็ม		called_emsg_before = called_emsg;
+    จำนวนเต็ม		flag = 0;
 
-    if (pattern == NULL)
+    ถ้า (pattern == NULL)
     {
 	pattern = spats[last_idx].pat;
 	patternlen = spats[last_idx].patlen;
     }
 
-    if (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
+    ถ้า (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
 					      SEARCH_KEEP, &regmatch) == FAIL)
-	return -1;
+	คืน -1;
 
     // init startcol correctly
     regmatch.startpos[0].col = -1;
     // move to match
-    if (move)
+    ถ้า (move)
     {
 	CLEAR_POS(&pos);
     }
-    else
+    มิฉะนั้น
     {
 	pos = *cur;
 	// accept a match at the cursor position
 	flag = SEARCH_START;
     }
 
-    if (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
+    ถ้า (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
 				  SEARCH_KEEP + flag, RE_SEARCH, NULL) != FAIL)
     {
 	// Zero-width pattern should match somewhere, then we can check if
@@ -3014,13 +3014,13 @@ is_zero_width(
 	    regmatch.startpos[0].col++;
 	    nmatched = vim_regexec_multi(&regmatch, curwin, curbuf,
 			       pos.lnum, regmatch.startpos[0].col, NULL);
-	    if (nmatched != 0)
-		break;
-	} while (regmatch.regprog != NULL
+	    ถ้า (nmatched != 0)
+		bha_nga;
+	} ขณะ (regmatch.regprog != NULL
 		&& (direction == FORWARD ? regmatch.startpos[0].col < pos.col
 				      : regmatch.startpos[0].col > pos.col));
 
-	if (called_emsg == called_emsg_before)
+	ถ้า (called_emsg == called_emsg_before)
 	{
 	    result = (nmatched != 0
 		&& regmatch.startpos[0].lnum == regmatch.endpos[0].lnum
@@ -3029,7 +3029,7 @@ is_zero_width(
     }
 
     vim_regfree(regmatch.regprog);
-    return result;
+    คืน result;
 }
 
 
@@ -3037,26 +3037,26 @@ is_zero_width(
  * Find next search match under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
+    จำนวนเต็ม
 current_search(
     long	count,
-    int		forward)	// TRUE for forward, FALSE for backward
+    จำนวนเต็ม		forward)	// TRUE for forward, FALSE for backward
 {
     pos_T	start_pos;	// start position of the pattern match
     pos_T	end_pos;	// end position of the pattern match
     pos_T	orig_pos;	// position of the cursor at beginning
     pos_T	pos;		// position after the pattern
-    int		i;
-    int		dir;
-    int		result;		// result of various function calls
+    จำนวนเต็ม		i;
+    จำนวนเต็ม		dir;
+    จำนวนเต็ม		result;		// result of various function calls
     char_u	old_p_ws = p_ws;
-    int		flags = 0;
+    จำนวนเต็ม		flags = 0;
     pos_T	save_VIsual = VIsual;
-    int		zero_width;
-    int		skip_first_backward;
+    จำนวนเต็ม		zero_width;
+    จำนวนเต็ม		skip_first_backward;
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    ถ้า (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     // When searching forward and the cursor is at the start of the Visual
@@ -3065,43 +3065,43 @@ current_search(
 					   && LT_POS(curwin->w_cursor, VIsual);
 
     orig_pos = pos = curwin->w_cursor;
-    if (VIsual_active)
+    ถ้า (VIsual_active)
     {
-	if (forward)
+	ถ้า (forward)
 	    incl(&pos);
-	else
+	มิฉะนั้น
 	    decl(&pos);
     }
 
     // Is the pattern is zero-width?, this time, don't care about the direction
     zero_width = is_zero_width(spats[last_idx].pat, spats[last_idx].patlen,
 						TRUE, &curwin->w_cursor, FORWARD);
-    if (zero_width == -1)
-	return FAIL;  // pattern not found
+    ถ้า (zero_width == -1)
+	คืน FAIL;  // pattern not found
 
     /*
      * The trick is to first search backwards and then search forward again,
      * so that a match at the current cursor position will be correctly
      * captured.  When "forward" is false do it the other way around.
      */
-    for (i = 0; i < 2; i++)
+    สำหรับ (i = 0; i < 2; i++)
     {
-	if (forward)
+	ถ้า (forward)
 	{
-	    if (i == 0 && skip_first_backward)
+	    ถ้า (i == 0 && skip_first_backward)
 		continue;
 	    dir = i;
 	}
-	else
+	มิฉะนั้น
 	    dir = !i;
 
 	flags = 0;
-	if (!dir && !zero_width)
+	ถ้า (!dir && !zero_width)
 	    flags = SEARCH_END;
 	end_pos = pos;
 
 	// wrapping should not occur in the first round
-	if (i == 0)
+	ถ้า (i == 0)
 	    p_ws = FALSE;
 
 	result = searchit(curwin, curbuf, &pos, &end_pos,
@@ -3115,21 +3115,21 @@ current_search(
 	// beginning of the file (cursor might be on the search match)
 	// except when Visual mode is active, so that extending the visual
 	// selection works.
-	if (i == 1 && !result) // not found, abort
+	ถ้า (i == 1 && !result) // not found, abort
 	{
 	    curwin->w_cursor = orig_pos;
-	    if (VIsual_active)
+	    ถ้า (VIsual_active)
 		VIsual = save_VIsual;
-	    return FAIL;
+	    คืน FAIL;
 	}
-	else if (i == 0 && !result)
+	มิฉะนั้น ถ้า (i == 0 && !result)
 	{
-	    if (forward)
+	    ถ้า (forward)
 	    {
 		// try again from start of buffer
 		CLEAR_POS(&pos);
 	    }
-	    else
+	    มิฉะนั้น
 	    {
 		// try again from end of buffer
 		// searching backwards, so set pos to last line and col
@@ -3141,36 +3141,36 @@ current_search(
 
     start_pos = pos;
 
-    if (!VIsual_active)
+    ถ้า (!VIsual_active)
 	VIsual = start_pos;
 
     // put the cursor after the match
     curwin->w_cursor = end_pos;
-    if (LT_POS(VIsual, end_pos) && forward)
+    ถ้า (LT_POS(VIsual, end_pos) && forward)
     {
-	if (skip_first_backward)
+	ถ้า (skip_first_backward)
 	    // put the cursor on the start of the match
 	    curwin->w_cursor = pos;
-	else
+	มิฉะนั้น
 	    // put the cursor on last character of match
 	    dec_cursor();
     }
-    else if (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
+    มิฉะนั้น ถ้า (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
 	curwin->w_cursor = pos;   // put the cursor on the start of the match
     VIsual_active = TRUE;
     VIsual_mode = 'v';
 
-    if (*p_sel == 'e')
+    ถ้า (*p_sel == 'e')
     {
 	// Correction for exclusive selection depends on the direction.
-	if (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
+	ถ้า (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	else if (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
+	มิฉะนั้น ถ้า (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
 	    inc(&VIsual);
     }
 
 #ifdef FEAT_FOLDING
-    if (fdo_flags & FDO_SEARCH && KeyTyped)
+    ถ้า (fdo_flags & FDO_SEARCH && KeyTyped)
 	foldOpenCursor();
 #endif
 
@@ -3184,19 +3184,19 @@ current_search(
     redraw_curbuf_later(UPD_INVERTED);
     showmode();
 
-    return OK;
+    คืน OK;
 }
 
 /*
  * return TRUE if line 'lnum' is empty or has white chars only.
  */
-    int
+    จำนวนเต็ม
 linewhite(linenr_T lnum)
 {
     char_u  *p;
 
     p = skipwhite(ml_get(lnum));
-    return (*p == NUL);
+    คืน (*p == NUL);
 }
 
 /*
@@ -3205,58 +3205,58 @@ linewhite(linenr_T lnum)
  */
     static void
 cmdline_search_stat(
-    int		dirc,
+    จำนวนเต็ม		dirc,
     pos_T	*pos,
     pos_T	*cursor_pos,
-    int		show_top_bot_msg,
+    จำนวนเต็ม		show_top_bot_msg,
     char_u	*msgbuf,
     size_t	msgbuflen,
-    int		recompute,
-    int		maxcount,
+    จำนวนเต็ม		recompute,
+    จำนวนเต็ม		maxcount,
     long	timeout)
 {
     searchstat_T stat;
 
     update_search_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
 								      timeout);
-    if (stat.cur <= 0)
-	return;
+    ถ้า (stat.cur <= 0)
+	คืน;
 
-    char	t[SEARCH_STAT_BUF_LEN];
+    var_na	t[SEARCH_STAT_BUF_LEN];
     size_t	len;
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+    ถ้า (curwin->w_p_rl && *curwin->w_p_rlc == 's')
     {
-	if (stat.incomplete == 1)
+	ถ้า (stat.incomplete == 1)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
+	มิฉะนั้น ถ้า (stat.cnt > maxcount && stat.cur > maxcount)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
+	มิฉะนั้น ถ้า (stat.cnt > maxcount)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/%d]",
 		    maxcount, stat.cur);
-	else
+	มิฉะนั้น
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cnt, stat.cur);
     }
-    else
+    มิฉะนั้น
 #endif
     {
-	if (stat.incomplete == 1)
+	ถ้า (stat.incomplete == 1)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
+	มิฉะนั้น ถ้า (stat.cnt > maxcount && stat.cur > maxcount)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
+	มิฉะนั้น ถ้า (stat.cnt > maxcount)
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/>%d]",
 		    stat.cur, maxcount);
-	else
+	มิฉะนั้น
 	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cur, stat.cnt);
     }
 
-    if (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
+    ถ้า (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
     {
 	mch_memmove(t + 2, t, len);
 	t[0] = 'W';
@@ -3264,11 +3264,11 @@ cmdline_search_stat(
 	len += 2;
     }
 
-    if (len > msgbuflen)
+    ถ้า (len > msgbuflen)
 	len = msgbuflen;
     mch_memmove(msgbuf + msgbuflen - len, t, len);
 
-    if (dirc == '?' && stat.cur == maxcount + 1)
+    ถ้า (dirc == '?' && stat.cur == maxcount + 1)
 	stat.cur = -1;
 
     // keep the message even after redraw, but don't put in history
@@ -3287,24 +3287,24 @@ cmdline_search_stat(
  */
     static void
 update_search_stat(
-    int			dirc,
+    จำนวนเต็ม			dirc,
     pos_T		*pos,
     pos_T		*cursor_pos,
     searchstat_T	*stat,
-    int			recompute,
-    int			maxcount,
+    จำนวนเต็ม			recompute,
+    จำนวนเต็ม			maxcount,
     long		timeout UNUSED)
 {
-    int		    save_ws = p_ws;
-    int		    wraparound = FALSE;
+    จำนวนเต็ม		    save_ws = p_ws;
+    จำนวนเต็ม		    wraparound = FALSE;
     pos_T	    p = (*pos);
     static pos_T    lastpos = {0, 0, 0};
-    static int	    cur = 0;
-    static int	    cnt = 0;
-    static int	    exact_match = FALSE;
-    static int	    incomplete = 0;
-    static int	    last_maxcount = 0;
-    static int	    chgtick = 0;
+    static จำนวนเต็ม	    cur = 0;
+    static จำนวนเต็ม	    cnt = 0;
+    static จำนวนเต็ม	    exact_match = FALSE;
+    static จำนวนเต็ม	    incomplete = 0;
+    static จำนวนเต็ม	    last_maxcount = 0;
+    static จำนวนเต็ม	    chgtick = 0;
     static char_u   *lastpat = NULL;
     static size_t   lastpatlen = 0;
     static buf_T    *lbuf = NULL;
@@ -3314,14 +3314,14 @@ update_search_stat(
 
     CLEAR_POINTER(stat);
 
-    if (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
+    ถ้า (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
     {
 	stat->cur = cur;
 	stat->cnt = cnt;
 	stat->exact_match = exact_match;
 	stat->incomplete = incomplete;
 	stat->last_maxcount = last_maxcount;
-	return;
+	คืน;
     }
     last_maxcount = maxcount;
 
@@ -3329,7 +3329,7 @@ update_search_stat(
 	       || (dirc == '/' && LT_POS(p, lastpos)));
 
     // If anything relevant changed the count has to be recomputed.
-    if (!(chgtick == CHANGEDTICK(curbuf)
+    ถ้า (!(chgtick == CHANGEDTICK(curbuf)
 	&& (lastpat != NULL
 	    && STRNCMP(lastpat, spats[last_idx].pat, lastpatlen) == 0
 	    && lastpatlen == spats[last_idx].patlen
@@ -3348,54 +3348,54 @@ update_search_stat(
 
     // when searching backwards and having jumped to the first occurrence,
     // cur must remain greater than 1
-    if (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
+    ถ้า (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
 		&& (dirc == 0 || dirc == '/' ? cur < cnt : cur > 1))
 	cur += dirc == 0 ? 0 : dirc == '/' ? 1 : -1;
-    else
+    มิฉะนั้น
     {
-	int	done_search = FALSE;
+	จำนวนเต็ม	done_search = FALSE;
 	pos_T	endpos = {0, 0, 0};
 
 	p_ws = FALSE;
 #ifdef FEAT_RELTIME
-	if (timeout > 0)
+	ถ้า (timeout > 0)
 	    profile_setlimit(timeout, &start);
 #endif
-	while (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
+	ขณะ (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
 			 FORWARD, NULL, 0, 1, SEARCH_KEEP, RE_LAST, NULL) != FAIL)
 	{
 	    done_search = TRUE;
 #ifdef FEAT_RELTIME
 	    // Stop after passing the time limit.
-	    if (timeout > 0 && profile_passed_limit(&start))
+	    ถ้า (timeout > 0 && profile_passed_limit(&start))
 	    {
 		incomplete = 1;
-		break;
+		bha_nga;
 	    }
 #endif
 	    cnt++;
-	    if (LTOREQ_POS(lastpos, p))
+	    ถ้า (LTOREQ_POS(lastpos, p))
 	    {
 		cur = cnt;
-		if (LT_POS(p, endpos))
+		ถ้า (LT_POS(p, endpos))
 		    exact_match = TRUE;
 	    }
 	    fast_breakcheck();
-	    if (maxcount > 0 && cnt > maxcount)
+	    ถ้า (maxcount > 0 && cnt > maxcount)
 	    {
 		incomplete = 2;    // max count exceeded
-		break;
+		bha_nga;
 	    }
 	}
-	if (got_int)
+	ถ้า (got_int)
 	    cur = -1; // abort
-	if (done_search)
+	ถ้า (done_search)
 	{
 	    vim_free(lastpat);
 	    lastpat = vim_strnsave(spats[last_idx].pat, spats[last_idx].patlen);
-	    if (lastpat == NULL)
+	    ถ้า (lastpat == NULL)
 		lastpatlen = 0;
-	    else
+	    มิฉะนั้น
 		lastpatlen = spats[last_idx].patlen;
 	    chgtick = CHANGEDTICK(curbuf);
 	    lbuf = curbuf;
@@ -3410,7 +3410,7 @@ update_search_stat(
     p_ws = save_ws;
 }
 
-#if defined(FEAT_FIND_ID)
+#ถ้า defined(FEAT_FIND_ID)
 
 /*
  * Get line "lnum" and copy it into "buf[LSIZE]".
@@ -3423,7 +3423,7 @@ get_line_and_copy(linenr_T lnum, char_u *buf)
     char_u *line = ml_get(lnum);
 
     vim_strncpy(buf, line, LSIZE - 1);
-    return buf;
+    คืน buf;
 }
 
 /*
@@ -3433,22 +3433,22 @@ get_line_and_copy(linenr_T lnum, char_u *buf)
     void
 find_pattern_in_path(
     char_u	*ptr,		// pointer to search pattern
-    int		dir UNUSED,	// direction of expansion
-    int		len,		// length of search pattern
-    int		whole,		// match whole words only
-    int		skip_comments,	// don't match inside comments
-    int		type,		// Type of search; are we looking for a type?
+    จำนวนเต็ม		dir UNUSED,	// direction of expansion
+    จำนวนเต็ม		len,		// length of search pattern
+    จำนวนเต็ม		whole,		// match whole words only
+    จำนวนเต็ม		skip_comments,	// don't match inside comments
+    จำนวนเต็ม		type,		// Type of search; are we looking for a type?
 				// a macro?
     long	count,
-    int		action,		// What to do when we find it
+    จำนวนเต็ม		action,		// What to do when we find it
     linenr_T	start_lnum,	// first line to start searching
     linenr_T	end_lnum,	// last line for searching
-    int		forceit,	// If true, always switch to the found path
-    int		silent)		// Do not print messages when ACTION_EXPAND
+    จำนวนเต็ม		forceit,	// If true, always switch to the found path
+    จำนวนเต็ม		silent)		// Do not print messages when ACTION_EXPAND
 {
     SearchedFile *files;		// Stack of included files
     SearchedFile *bigger;		// When we need more space
-    int		max_path_depth = 50;
+    จำนวนเต็ม		max_path_depth = 50;
     long	match_count = 1;
 
     char_u	*pat;
@@ -3456,26 +3456,26 @@ find_pattern_in_path(
     char_u	*curr_fname = curbuf->b_fname;
     char_u	*prev_fname = NULL;
     linenr_T	lnum;
-    int		depth;
-    int		depth_displayed;	// For type==CHECK_PATH
-    int		old_files;
-    int		already_searched;
+    จำนวนเต็ม		depth;
+    จำนวนเต็ม		depth_displayed;	// For type==CHECK_PATH
+    จำนวนเต็ม		old_files;
+    จำนวนเต็ม		already_searched;
     char_u	*file_line;
     char_u	*line;
     char_u	*p;
     char_u	save_char;
-    int		define_matched;
+    จำนวนเต็ม		define_matched;
     regmatch_T	regmatch;
     regmatch_T	incl_regmatch;
     regmatch_T	def_regmatch;
-    int		matched = FALSE;
-    int		did_show = FALSE;
-    int		found = FALSE;
-    int		i;
+    จำนวนเต็ม		matched = FALSE;
+    จำนวนเต็ม		did_show = FALSE;
+    จำนวนเต็ม		found = FALSE;
+    จำนวนเต็ม		i;
     char_u	*already = NULL;
     char_u	*startp = NULL;
     char_u	*inc_opt = NULL;
-# if defined(FEAT_QUICKFIX)
+# ถ้า defined(FEAT_QUICKFIX)
     win_T	*curwin_save = NULL;
 # endif
 
@@ -3484,91 +3484,91 @@ find_pattern_in_path(
     def_regmatch.regprog = NULL;
 
     file_line = alloc(LSIZE);
-    if (file_line == NULL)
-	return;
+    ถ้า (file_line == NULL)
+	คืน;
 
-    if (type != CHECK_PATH && type != FIND_DEFINE
+    ถ้า (type != CHECK_PATH && type != FIND_DEFINE
 	    // when CONT_SOL is set compare "ptr" with the beginning of the
 	    // line is faster than quote_meta/regcomp/regexec "ptr" -- Acevedo
 	    && !compl_status_sol())
     {
 	pat = alloc(len + 5);
-	if (pat == NULL)
+	ถ้า (pat == NULL)
 	    goto fpip_end;
-	vim_snprintf((char *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
+	vim_snprintf((var_na *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
 	// ignore case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
 	vim_free(pat);
-	if (regmatch.regprog == NULL)
+	ถ้า (regmatch.regprog == NULL)
 	    goto fpip_end;
     }
     inc_opt = (*curbuf->b_p_inc == NUL) ? p_inc : curbuf->b_p_inc;
-    if (*inc_opt != NUL)
+    ถ้า (*inc_opt != NUL)
     {
 	incl_regmatch.regprog = vim_regcomp(inc_opt,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (incl_regmatch.regprog == NULL)
+	ถ้า (incl_regmatch.regprog == NULL)
 	    goto fpip_end;
 	incl_regmatch.rm_ic = FALSE;	// don't ignore case in incl. pat.
     }
-    if (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
+    ถ้า (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
     {
 	def_regmatch.regprog = vim_regcomp(*curbuf->b_p_def == NUL ? p_def : curbuf->b_p_def,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (def_regmatch.regprog == NULL)
+	ถ้า (def_regmatch.regprog == NULL)
 	    goto fpip_end;
 	def_regmatch.rm_ic = FALSE;	// don't ignore case in define pat.
     }
-    files = lalloc_clear(max_path_depth * sizeof(SearchedFile), TRUE);
-    if (files == NULL)
+    files = lalloc_clear(max_path_depth * parimaa_na(SearchedFile), TRUE);
+    ถ้า (files == NULL)
 	goto fpip_end;
     old_files = max_path_depth;
     depth = depth_displayed = -1;
 
     lnum = start_lnum;
-    if (end_lnum > curbuf->b_ml.ml_line_count)
+    ถ้า (end_lnum > curbuf->b_ml.ml_line_count)
 	end_lnum = curbuf->b_ml.ml_line_count;
-    if (lnum > end_lnum)		// do at least one line
+    ถ้า (lnum > end_lnum)		// do at least one line
 	lnum = end_lnum;
     line = get_line_and_copy(lnum, file_line);
 
-    for (;;)
+    สำหรับ (;;)
     {
-	if (incl_regmatch.regprog != NULL
+	ถ้า (incl_regmatch.regprog != NULL
 		&& vim_regexec(&incl_regmatch, line, (colnr_T)0))
 	{
 	    char_u *p_fname = (curr_fname == curbuf->b_fname)
 					      ? curbuf->b_ffname : curr_fname;
 
-	    if (strstr((char *)inc_opt, "\\zs") != NULL)
+	    ถ้า (strstr((var_na *)inc_opt, "\\zs") != NULL)
 		// Use text from '\zs' to '\ze' (or end) of 'include'.
 		new_fname = find_file_name_in_path(incl_regmatch.startp[0],
-		       (int)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
+		       (จำนวนเต็ม)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
 				 FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname);
-	    else
+	    มิฉะนั้น
 		// Use text after match with 'include'.
 		new_fname = file_name_in_line(incl_regmatch.endp[0], 0,
 			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, NULL);
 	    already_searched = FALSE;
-	    if (new_fname != NULL)
+	    ถ้า (new_fname != NULL)
 	    {
 		// Check whether we have already searched in this file
-		for (i = 0;; i++)
+		สำหรับ (i = 0;; i++)
 		{
-		    if (i == depth + 1)
+		    ถ้า (i == depth + 1)
 			i = old_files;
-		    if (i == max_path_depth)
-			break;
-		    if (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
+		    ถ้า (i == max_path_depth)
+			bha_nga;
+		    ถ้า (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
 								    & FPC_SAME)
 		    {
-			if (type != CHECK_PATH
+			ถ้า (type != CHECK_PATH
 				&& action == ACTION_SHOW_ALL
 				&& files[i].matched)
 			{
 			    msg_putchar('\n');	    // cursor below last one
-			    if (!got_int)	    // don't display if 'q'
+			    ถ้า (!got_int)	    // don't display if 'q'
 						    // typed at "--more--"
 						    // message
 			    {
@@ -3579,83 +3579,83 @@ find_pattern_in_path(
 			}
 			VIM_CLEAR(new_fname);
 			already_searched = TRUE;
-			break;
+			bha_nga;
 		    }
 		}
 	    }
 
-	    if (type == CHECK_PATH && (action == ACTION_SHOW_ALL
+	    ถ้า (type == CHECK_PATH && (action == ACTION_SHOW_ALL
 				 || (new_fname == NULL && !already_searched)))
 	    {
-		if (did_show)
+		ถ้า (did_show)
 		    msg_putchar('\n');	    // cursor below last one
-		else
+		มิฉะนั้น
 		{
 		    gotocmdline(TRUE);	    // cursor at status line
 		    msg_puts_title(_("--- Included files "));
-		    if (action != ACTION_SHOW_ALL)
+		    ถ้า (action != ACTION_SHOW_ALL)
 			msg_puts_title(_("not found "));
 		    msg_puts_title(_("in path ---\n"));
 		}
 		did_show = TRUE;
-		while (depth_displayed < depth && !got_int)
+		ขณะ (depth_displayed < depth && !got_int)
 		{
 		    ++depth_displayed;
-		    for (i = 0; i < depth_displayed; i++)
+		    สำหรับ (i = 0; i < depth_displayed; i++)
 			msg_puts("  ");
 		    msg_home_replace(files[depth_displayed].name);
 		    msg_puts(" -->\n");
 		}
-		if (!got_int)		    // don't display if 'q' typed
+		ถ้า (!got_int)		    // don't display if 'q' typed
 					    // for "--more--" message
 		{
-		    for (i = 0; i <= depth_displayed; i++)
+		    สำหรับ (i = 0; i <= depth_displayed; i++)
 			msg_puts("  ");
-		    if (new_fname != NULL)
+		    ถ้า (new_fname != NULL)
 		    {
 			// using "new_fname" is more reliable, e.g., when
 			// 'includeexpr' is set.
 			msg_outtrans_attr(new_fname, HL_ATTR(HLF_D));
 		    }
-		    else
+		    มิฉะนั้น
 		    {
 			/*
 			 * Isolate the file name.
 			 * Include the surrounding "" or <> if present.
 			 */
-			if (strstr((char *)inc_opt, "\\zs") != NULL)
+			ถ้า (strstr((var_na *)inc_opt, "\\zs") != NULL)
 			{
 			    // pattern contains \zs, use the match
 			    p = incl_regmatch.startp[0];
-			    i = (int)(incl_regmatch.endp[0]
+			    i = (จำนวนเต็ม)(incl_regmatch.endp[0]
 						   - incl_regmatch.startp[0]);
 			}
-			else
+			มิฉะนั้น
 			{
 			    // find the file name after the end of the match
-			    for (p = incl_regmatch.endp[0];
+			    สำหรับ (p = incl_regmatch.endp[0];
 						  *p && !vim_isfilec(*p); p++)
 				;
-			    for (i = 0; vim_isfilec(p[i]); i++)
+			    สำหรับ (i = 0; vim_isfilec(p[i]); i++)
 				;
 			}
 
-			if (i == 0)
+			ถ้า (i == 0)
 			{
 			    // Nothing found, use the rest of the line.
 			    p = incl_regmatch.endp[0];
-			    i = (int)STRLEN(p);
+			    i = (จำนวนเต็ม)STRLEN(p);
 			}
 			// Avoid checking before the start of the line, can
 			// happen if \zs appears in the regexp.
-			else if (p > line)
+			มิฉะนั้น ถ้า (p > line)
 			{
-			    if (p[-1] == '"' || p[-1] == '<')
+			    ถ้า (p[-1] == '"' || p[-1] == '<')
 			    {
 				--p;
 				++i;
 			    }
-			    if (p[i] == '"' || p[i] == '>')
+			    ถ้า (p[i] == '"' || p[i] == '>')
 				++i;
 			}
 			save_char = p[i];
@@ -3664,35 +3664,35 @@ find_pattern_in_path(
 			p[i] = save_char;
 		    }
 
-		    if (new_fname == NULL && action == ACTION_SHOW_ALL)
+		    ถ้า (new_fname == NULL && action == ACTION_SHOW_ALL)
 		    {
-			if (already_searched)
+			ถ้า (already_searched)
 			    msg_puts(_("  (Already listed)"));
-			else
+			มิฉะนั้น
 			    msg_puts(_("  NOT FOUND"));
 		    }
 		}
 		out_flush();	    // output each line directly
 	    }
 
-	    if (new_fname != NULL)
+	    ถ้า (new_fname != NULL)
 	    {
 		// Push the new file onto the file stack
-		if (depth + 1 == old_files)
+		ถ้า (depth + 1 == old_files)
 		{
 		    bigger = ALLOC_MULT(SearchedFile, max_path_depth * 2);
-		    if (bigger != NULL)
+		    ถ้า (bigger != NULL)
 		    {
-			for (i = 0; i <= depth; i++)
+			สำหรับ (i = 0; i <= depth; i++)
 			    bigger[i] = files[i];
-			for (i = depth + 1; i < old_files + max_path_depth; i++)
+			สำหรับ (i = depth + 1; i < old_files + max_path_depth; i++)
 			{
 			    bigger[i].fp = NULL;
 			    bigger[i].name = NULL;
 			    bigger[i].lnum = 0;
 			    bigger[i].matched = FALSE;
 			}
-			for (i = old_files; i < max_path_depth; i++)
+			สำหรับ (i = old_files; i < max_path_depth; i++)
 			    bigger[i + max_path_depth] = files[i];
 			old_files += max_path_depth;
 			max_path_depth *= 2;
@@ -3700,12 +3700,12 @@ find_pattern_in_path(
 			files = bigger;
 		    }
 		}
-		if ((files[depth + 1].fp = mch_fopen((char *)new_fname, "r"))
+		ถ้า ((files[depth + 1].fp = mch_fopen((var_na *)new_fname, "r"))
 								    == NULL)
 		    vim_free(new_fname);
-		else
+		มิฉะนั้น
 		{
-		    if (++depth == old_files)
+		    ถ้า (++depth == old_files)
 		    {
 			/*
 			 * lalloc() for 'bigger' must have failed above.  We
@@ -3717,27 +3717,27 @@ find_pattern_in_path(
 		    files[depth].name = curr_fname = new_fname;
 		    files[depth].lnum = 0;
 		    files[depth].matched = FALSE;
-		    if (action == ACTION_EXPAND
+		    ถ้า (action == ACTION_EXPAND
 			    && !shortmess(SHM_COMPLETIONSCAN) && !silent)
 		    {
 			msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-			vim_snprintf((char*)IObuff, IOSIZE,
+			vim_snprintf((var_na*)IObuff, IOSIZE,
 				_("Scanning included file: %s"),
-				(char *)new_fname);
-			msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+				(var_na *)new_fname);
+			msg_trunc_attr((var_na *)IObuff, TRUE, HL_ATTR(HLF_R));
 		    }
-		    else if (p_verbose >= 5)
+		    มิฉะนั้น ถ้า (p_verbose >= 5)
 		    {
 			verbose_enter();
 			smsg(_("Searching included file %s"),
-							   (char *)new_fname);
+							   (var_na *)new_fname);
 			verbose_leave();
 		    }
 
 		}
 	    }
 	}
-	else
+	มิฉะนั้น
 	{
 	    /*
 	     * Check if the line is a define (type == FIND_DEFINE)
@@ -3745,7 +3745,7 @@ find_pattern_in_path(
 	    p = line;
 search_line:
 	    define_matched = FALSE;
-	    if (def_regmatch.regprog != NULL
+	    ถ้า (def_regmatch.regprog != NULL
 			      && vim_regexec(&def_regmatch, line, (colnr_T)0))
 	    {
 		/*
@@ -3754,7 +3754,7 @@ search_line:
 		 * don't let it match beyond the end of this identifier.
 		 */
 		p = def_regmatch.endp[0];
-		while (*p && !vim_iswordc(*p))
+		ขณะ (*p && !vim_iswordc(*p))
 		    p++;
 		define_matched = TRUE;
 	    }
@@ -3763,21 +3763,21 @@ search_line:
 	     * Look for a match.  Don't do this if we are looking for a
 	     * define and this line didn't match define_prog above.
 	     */
-	    if (def_regmatch.regprog == NULL || define_matched)
+	    ถ้า (def_regmatch.regprog == NULL || define_matched)
 	    {
-		if (define_matched || compl_status_sol())
+		ถ้า (define_matched || compl_status_sol())
 		{
 		    // compare the first "len" chars from "ptr"
 		    startp = skipwhite(p);
-		    if (p_ic)
+		    ถ้า (p_ic)
 			matched = MB_STRNICMP(startp, ptr, len) == 0;
-		    else
+		    มิฉะนั้น
 			matched = STRNCMP(startp, ptr, len) == 0;
-		    if (matched && define_matched && whole
+		    ถ้า (matched && define_matched && whole
 						  && vim_iswordc(startp[len]))
 			matched = FALSE;
 		}
-		else if (regmatch.regprog != NULL
+		มิฉะนั้น ถ้า (regmatch.regprog != NULL
 			 && vim_regexec(&regmatch, line, (colnr_T)(p - line)))
 		{
 		    matched = TRUE;
@@ -3787,9 +3787,9 @@ search_line:
 		     * looking for a define).  A line starting with "# define"
 		     * is not considered to be a comment line.
 		     */
-		    if (!define_matched && skip_comments)
+		    ถ้า (!define_matched && skip_comments)
 		    {
-			if ((*line != '#' ||
+			ถ้า ((*line != '#' ||
 				STRNCMP(skipwhite(line + 1), "define", 6) != 0)
 				&& get_leader_len(line, NULL, FALSE, TRUE))
 			    matched = FALSE;
@@ -3801,21 +3801,21 @@ search_line:
 			 * Note: Doesn't skip "/ *" in comments.
 			 */
 			p = skipwhite(line);
-			if (matched
+			ถ้า (matched
 				|| (p[0] == '/' && p[1] == '*') || p[0] == '*')
-			    for (p = line; *p && p < startp; ++p)
+			    สำหรับ (p = line; *p && p < startp; ++p)
 			    {
-				if (matched
+				ถ้า (matched
 					&& p[0] == '/'
 					&& (p[1] == '*' || p[1] == '/'))
 				{
 				    matched = FALSE;
 				    // After "//" all text is comment
-				    if (p[1] == '/')
-					break;
+				    ถ้า (p[1] == '/')
+					bha_nga;
 				    ++p;
 				}
-				else if (!matched && p[0] == '*' && p[1] == '/')
+				มิฉะนั้น ถ้า (!matched && p[0] == '*' && p[1] == '/')
 				{
 				    // Can find match after "* /".
 				    matched = TRUE;
@@ -3826,29 +3826,29 @@ search_line:
 		}
 	    }
 	}
-	if (matched)
+	ถ้า (matched)
 	{
-	    if (action == ACTION_EXPAND)
+	    ถ้า (action == ACTION_EXPAND)
 	    {
-		int	cont_s_ipos = FALSE;
-		int	add_r;
+		จำนวนเต็ม	cont_s_ipos = FALSE;
+		จำนวนเต็ม	add_r;
 		char_u	*aux;
 
-		if (depth == -1 && lnum == curwin->w_cursor.lnum)
-		    break;
+		ถ้า (depth == -1 && lnum == curwin->w_cursor.lnum)
+		    bha_nga;
 		found = TRUE;
 		aux = p = startp;
-		if (compl_status_adding() && (int)STRLEN(p) >= ins_compl_len())
+		ถ้า (compl_status_adding() && (จำนวนเต็ม)STRLEN(p) >= ins_compl_len())
 		{
 		    p += ins_compl_len();
-		    if (vim_iswordp(p))
+		    ถ้า (vim_iswordp(p))
 			goto exit_matched;
 		    p = find_word_start(p);
 		}
 		p = find_word_end(p);
-		i = (int)(p - aux);
+		i = (จำนวนเต็ม)(p - aux);
 
-		if (compl_status_adding() && i == ins_compl_len())
+		ถ้า (compl_status_adding() && i == ins_compl_len())
 		{
 		    // IOSIZE > compl_length, so the STRNCPY works
 		    STRNCPY(IObuff, aux, i);
@@ -3856,13 +3856,13 @@ search_line:
 		    // Get the next line: when "depth" < 0  from the current
 		    // buffer, otherwise from the included file.  Jump to
 		    // exit_matched when past the last line.
-		    if (depth < 0)
+		    ถ้า (depth < 0)
 		    {
-			if (lnum >= end_lnum)
+			ถ้า (lnum >= end_lnum)
 			    goto exit_matched;
 			line = get_line_and_copy(++lnum, file_line);
 		    }
-		    else if (vim_fgets(line = file_line,
+		    มิฉะนั้น ถ้า (vim_fgets(line = file_line,
 						      LSIZE, files[depth].fp))
 			goto exit_matched;
 
@@ -3872,14 +3872,14 @@ search_line:
 		    already = aux = p = skipwhite(line);
 		    p = find_word_start(p);
 		    p = find_word_end(p);
-		    if (p > aux)
+		    ถ้า (p > aux)
 		    {
-			if (*aux != ')' && IObuff[i-1] != TAB)
+			ถ้า (*aux != ')' && IObuff[i-1] != TAB)
 			{
-			    if (IObuff[i-1] != ' ')
+			    ถ้า (IObuff[i-1] != ' ')
 				IObuff[i++] = ' ';
 			    // IObuf =~ "\(\k\|\i\).* ", thus i >= 2
-			    if (p_js
+			    ถ้า (p_js
 				&& (IObuff[i-2] == '.'
 				    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
 					&& (IObuff[i-2] == '?'
@@ -3887,16 +3887,16 @@ search_line:
 				IObuff[i++] = ' ';
 			}
 			// copy as much as possible of the new word
-			if (p - aux >= IOSIZE - i)
+			ถ้า (p - aux >= IOSIZE - i)
 			    p = aux + IOSIZE - i - 1;
 			STRNCPY(IObuff + i, aux, p - aux);
-			i += (int)(p - aux);
+			i += (จำนวนเต็ม)(p - aux);
 			cont_s_ipos = TRUE;
 		    }
 		    IObuff[i] = NUL;
 		    aux = IObuff;
 
-		    if (i == ins_compl_len())
+		    ถ้า (i == ins_compl_len())
 			goto exit_matched;
 		}
 
@@ -3904,28 +3904,28 @@ search_line:
 			curr_fname == curbuf->b_fname ? NULL
 						  : shorten_fname1(curr_fname),
 			dir, cont_s_ipos, 0);
-		if (add_r == OK)
+		ถ้า (add_r == OK)
 		    // if dir was BACKWARD then honor it just once
 		    dir = FORWARD;
-		else if (add_r == FAIL)
-		    break;
+		มิฉะนั้น ถ้า (add_r == FAIL)
+		    bha_nga;
 	    }
-	    else if (action == ACTION_SHOW_ALL)
+	    มิฉะนั้น ถ้า (action == ACTION_SHOW_ALL)
 	    {
 		found = TRUE;
-		if (!did_show)
+		ถ้า (!did_show)
 		    gotocmdline(TRUE);		// cursor at status line
-		if (curr_fname != prev_fname)
+		ถ้า (curr_fname != prev_fname)
 		{
-		    if (did_show)
+		    ถ้า (did_show)
 			msg_putchar('\n');	// cursor below last one
-		    if (!got_int)		// don't display if 'q' typed
+		    ถ้า (!got_int)		// don't display if 'q' typed
 						// at "--more--" message
 			msg_home_replace_hl(curr_fname);
 		    prev_fname = curr_fname;
 		}
 		did_show = TRUE;
-		if (!got_int)
+		ถ้า (!got_int)
 		    show_pat_in_path(line, type, TRUE, action,
 			    (depth == -1) ? NULL : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum,
@@ -3933,82 +3933,82 @@ search_line:
 
 		// Set matched flag for this file and all the ones that
 		// include it
-		for (i = 0; i <= depth; ++i)
+		สำหรับ (i = 0; i <= depth; ++i)
 		    files[i].matched = TRUE;
 	    }
-	    else if (--count <= 0)
+	    มิฉะนั้น ถ้า (--count <= 0)
 	    {
 		found = TRUE;
-		if (depth == -1 && lnum == curwin->w_cursor.lnum
-# if defined(FEAT_QUICKFIX)
+		ถ้า (depth == -1 && lnum == curwin->w_cursor.lnum
+# ถ้า defined(FEAT_QUICKFIX)
 						      && g_do_tagpreview == 0
 # endif
 						      )
 		    emsg(_(e_match_is_on_current_line));
-		else if (action == ACTION_SHOW)
+		มิฉะนั้น ถ้า (action == ACTION_SHOW)
 		{
 		    show_pat_in_path(line, type, did_show, action,
 			    (depth == -1) ? NULL : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum, 1L);
 		    did_show = TRUE;
 		}
-		else
+		มิฉะนั้น
 		{
 # ifdef FEAT_GUI
 		    need_mouse_correct = TRUE;
 # endif
-# if defined(FEAT_QUICKFIX)
+# ถ้า defined(FEAT_QUICKFIX)
 		    // ":psearch" uses the preview window
-		    if (g_do_tagpreview != 0)
+		    ถ้า (g_do_tagpreview != 0)
 		    {
 			curwin_save = curwin;
 			prepare_tagpreview(TRUE, TRUE, FALSE);
 		    }
 # endif
-		    if (action == ACTION_SPLIT)
+		    ถ้า (action == ACTION_SPLIT)
 		    {
-			if (win_split(0, 0) == FAIL)
-			    break;
+			ถ้า (win_split(0, 0) == FAIL)
+			    bha_nga;
 			RESET_BINDING(curwin);
 		    }
-		    if (depth == -1)
+		    ถ้า (depth == -1)
 		    {
 			// match in current file
-# if defined(FEAT_QUICKFIX)
-			if (g_do_tagpreview != 0)
+# ถ้า defined(FEAT_QUICKFIX)
+			ถ้า (g_do_tagpreview != 0)
 			{
-			    if (!win_valid(curwin_save))
-				break;
-			    if (!GETFILE_SUCCESS(getfile(
+			    ถ้า (!win_valid(curwin_save))
+				bha_nga;
+			    ถ้า (!GETFILE_SUCCESS(getfile(
 					   curwin_save->w_buffer->b_fnum, NULL,
 						     NULL, TRUE, lnum, forceit)))
-				break;	// failed to jump to file
+				bha_nga;	// failed to jump to file
 			}
-			else
+			มิฉะนั้น
 # endif
 			    setpcmark();
 			curwin->w_cursor.lnum = lnum;
 			check_cursor();
 		    }
-		    else
+		    มิฉะนั้น
 		    {
-			if (!GETFILE_SUCCESS(getfile(
+			ถ้า (!GETFILE_SUCCESS(getfile(
 					0, files[depth].name, NULL, TRUE,
 						    files[depth].lnum, forceit)))
-			    break;	// failed to jump to file
+			    bha_nga;	// failed to jump to file
 			// autocommands may have changed the lnum, we don't
 			// want that here
 			curwin->w_cursor.lnum = files[depth].lnum;
 		    }
 		}
-		if (action != ACTION_SHOW)
+		ถ้า (action != ACTION_SHOW)
 		{
 		    curwin->w_cursor.col = (colnr_T)(startp - line);
 		    curwin->w_set_curswant = true;
 		}
 
-# if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0
+# ถ้า defined(FEAT_QUICKFIX)
+		ถ้า (g_do_tagpreview != 0
 			   && curwin != curwin_save && win_valid(curwin_save))
 		{
 		    // Return cursor to where we were
@@ -4017,18 +4017,18 @@ search_line:
 		    win_enter(curwin_save, TRUE);
 		}
 #  ifdef FEAT_PROP_POPUP
-		else if (WIN_IS_POPUP(curwin))
+		มิฉะนั้น ถ้า (WIN_IS_POPUP(curwin))
 		    // can't keep focus in popup window
 		    win_enter(firstwin, TRUE);
 #  endif
 # endif
-		break;
+		bha_nga;
 	    }
 exit_matched:
 	    matched = FALSE;
 	    // look for other matches in the rest of the line if we
 	    // are not at the end of it already
-	    if (def_regmatch.regprog == NULL
+	    ถ้า (def_regmatch.regprog == NULL
 		    && action == ACTION_EXPAND
 		    && !compl_status_sol()
 		    && *startp != NUL
@@ -4036,17 +4036,17 @@ exit_matched:
 		goto search_line;
 	}
 	line_breakcheck();
-	if (action == ACTION_EXPAND)
+	ถ้า (action == ACTION_EXPAND)
 	    ins_compl_check_keys(30, FALSE);
-	if (got_int || ins_compl_interrupted())
-	    break;
+	ถ้า (got_int || ins_compl_interrupted())
+	    bha_nga;
 
 	/*
 	 * Read the next line.  When reading an included file and encountering
 	 * end-of-file, close the file and continue in the file that included
 	 * it.
 	 */
-	while (depth >= 0 && !already
+	ขณะ (depth >= 0 && !already
 		&& vim_fgets(line = file_line, LSIZE, files[depth].fp))
 	{
 	    fclose(files[depth].fp);
@@ -4056,23 +4056,23 @@ exit_matched:
 	    --depth;
 	    curr_fname = (depth == -1) ? curbuf->b_fname
 				       : files[depth].name;
-	    if (depth < depth_displayed)
+	    ถ้า (depth < depth_displayed)
 		depth_displayed = depth;
 	}
-	if (depth >= 0)		// we could read the line
+	ถ้า (depth >= 0)		// we could read the line
 	{
 	    files[depth].lnum++;
 	    // Remove any CR and LF from the line.
-	    i = (int)STRLEN(line);
-	    if (i > 0 && line[i - 1] == '\n')
+	    i = (จำนวนเต็ม)STRLEN(line);
+	    ถ้า (i > 0 && line[i - 1] == '\n')
 		line[--i] = NUL;
-	    if (i > 0 && line[i - 1] == '\r')
+	    ถ้า (i > 0 && line[i - 1] == '\r')
 		line[--i] = NUL;
 	}
-	else if (!already)
+	มิฉะนั้น ถ้า (!already)
 	{
-	    if (++lnum > end_lnum)
-		break;
+	    ถ้า (++lnum > end_lnum)
+		bha_nga;
 	    line = get_line_and_copy(lnum, file_line);
 	}
 	already = NULL;
@@ -4080,35 +4080,35 @@ exit_matched:
     // End of big for (;;) loop.
 
     // Close any files that are still open.
-    for (i = 0; i <= depth; i++)
+    สำหรับ (i = 0; i <= depth; i++)
     {
 	fclose(files[i].fp);
 	vim_free(files[i].name);
     }
-    for (i = old_files; i < max_path_depth; i++)
+    สำหรับ (i = old_files; i < max_path_depth; i++)
 	vim_free(files[i].name);
     vim_free(files);
 
-    if (type == CHECK_PATH)
+    ถ้า (type == CHECK_PATH)
     {
-	if (!did_show)
+	ถ้า (!did_show)
 	{
-	    if (action != ACTION_SHOW_ALL)
+	    ถ้า (action != ACTION_SHOW_ALL)
 		msg(_("All included files were found"));
-	    else
+	    มิฉะนั้น
 		msg(_("No included files"));
 	}
     }
-    else if (!found && action != ACTION_EXPAND && !silent)
+    มิฉะนั้น ถ้า (!found && action != ACTION_EXPAND && !silent)
     {
-	if (got_int || ins_compl_interrupted())
+	ถ้า (got_int || ins_compl_interrupted())
 	    emsg(_(e_interrupted));
-	else if (type == FIND_DEFINE)
+	มิฉะนั้น ถ้า (type == FIND_DEFINE)
 	    emsg(_(e_couldnt_find_definition));
-	else
+	มิฉะนั้น
 	    emsg(_(e_couldnt_find_pattern));
     }
-    if (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
+    ถ้า (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
 	msg_end();
 
 fpip_end:
@@ -4121,9 +4121,9 @@ fpip_end:
     static void
 show_pat_in_path(
     char_u  *line,
-    int	    type,
-    int	    did_show,
-    int	    action,
+    จำนวนเต็ม	    type,
+    จำนวนเต็ม	    did_show,
+    จำนวนเต็ม	    action,
     FILE    *fp,
     linenr_T *lnum,
     long    count)
@@ -4131,52 +4131,52 @@ show_pat_in_path(
     char_u  *p;
     size_t  linelen;
 
-    if (did_show)
+    ถ้า (did_show)
 	msg_putchar('\n');	// cursor below last one
-    else if (!msg_silent)
+    มิฉะนั้น ถ้า (!msg_silent)
 	gotocmdline(TRUE);	// cursor at status line
-    if (got_int)		// 'q' typed at "--more--" message
-	return;
+    ถ้า (got_int)		// 'q' typed at "--more--" message
+	คืน;
     linelen = STRLEN(line);
-    for (;;)
+    สำหรับ (;;)
     {
 	p = line + linelen - 1;
-	if (fp != NULL)
+	ถ้า (fp != NULL)
 	{
 	    // We used fgets(), so get rid of newline at end
-	    if (p >= line && *p == '\n')
+	    ถ้า (p >= line && *p == '\n')
 		--p;
-	    if (p >= line && *p == '\r')
+	    ถ้า (p >= line && *p == '\r')
 		--p;
 	    *(p + 1) = NUL;
 	}
-	if (action == ACTION_SHOW_ALL)
+	ถ้า (action == ACTION_SHOW_ALL)
 	{
-	    sprintf((char *)IObuff, "%3ld: ", count);	// show match nr
-	    msg_puts((char *)IObuff);
-	    sprintf((char *)IObuff, "%4ld", *lnum);	// show line nr
+	    sprintf((var_na *)IObuff, "%3ld: ", count);	// show match nr
+	    msg_puts((var_na *)IObuff);
+	    sprintf((var_na *)IObuff, "%4ld", *lnum);	// show line nr
 						// Highlight line numbers
-	    msg_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
+	    msg_puts_attr((var_na *)IObuff, HL_ATTR(HLF_N));
 	    msg_puts(" ");
 	}
 	msg_prt_line(line, FALSE);
 	out_flush();			// show one line at a time
 
 	// Definition continues until line that doesn't end with '\'
-	if (got_int || type != FIND_DEFINE || p < line || *p != '\\')
-	    break;
+	ถ้า (got_int || type != FIND_DEFINE || p < line || *p != '\\')
+	    bha_nga;
 
-	if (fp != NULL)
+	ถ้า (fp != NULL)
 	{
-	    if (vim_fgets(line, LSIZE, fp)) // end of file
-		break;
+	    ถ้า (vim_fgets(line, LSIZE, fp)) // end of file
+		bha_nga;
 	    linelen = STRLEN(line);
 	    ++*lnum;
 	}
-	else
+	มิฉะนั้น
 	{
-	    if (++*lnum > curbuf->b_ml.ml_line_count)
-		break;
+	    ถ้า (++*lnum > curbuf->b_ml.ml_line_count)
+		bha_nga;
 	    line = ml_get(*lnum);
 	    linelen = ml_get_len(*lnum);
 	}
@@ -4190,22 +4190,22 @@ show_pat_in_path(
  * Return the last used search pattern at "idx".
  */
     spat_T *
-get_spat(int idx)
+get_spat(จำนวนเต็ม idx)
 {
-    return &spats[idx];
+    คืน &spats[idx];
 }
 
 /*
  * Return the last used search pattern index.
  */
-    int
+    จำนวนเต็ม
 get_spat_last_idx(void)
 {
-    return last_idx;
+    คืน last_idx;
 }
 #endif
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#ถ้า defined(FEAT_EVAL) || defined(FEAT_PROTO)
 /*
  * "searchcount()" function
  */
@@ -4214,85 +4214,85 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
 {
     pos_T		pos = curwin->w_cursor;
     char_u		*pattern = NULL;
-    int			maxcount = p_msc;
+    จำนวนเต็ม			maxcount = p_msc;
     long		timeout = SEARCH_STAT_DEF_TIMEOUT;
-    int			recompute = TRUE;
+    จำนวนเต็ม			recompute = TRUE;
     searchstat_T	stat;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ถ้า (rettv_dict_alloc(rettv) == FAIL)
+	คืน;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    ถ้า (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	คืน;
 
-    if (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
+    ถ้า (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
 	recompute = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ถ้า (argvars[0].v_type != VAR_UNKNOWN)
     {
 	dict_T		*dict;
 	dictitem_T	*di;
 	listitem_T	*li;
-	int		error = FALSE;
+	จำนวนเต็ม		error = FALSE;
 
-	if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	    return;
+	ถ้า (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	    คืน;
 	dict = argvars[0].vval.v_dict;
 	di = dict_find(dict, (char_u *)"timeout", -1);
-	if (di != NULL)
+	ถ้า (di != NULL)
 	{
 	    timeout = (long)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    ถ้า (error)
+		คืน;
 	}
 	di = dict_find(dict, (char_u *)"maxcount", -1);
-	if (di != NULL)
+	ถ้า (di != NULL)
 	{
-	    maxcount = (int)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    maxcount = (จำนวนเต็ม)tv_get_number_chk(&di->di_tv, &error);
+	    ถ้า (error)
+		คืน;
 	}
 	recompute = dict_get_bool(dict, "recompute", recompute);
 	di = dict_find(dict, (char_u *)"pattern", -1);
-	if (di != NULL)
+	ถ้า (di != NULL)
 	{
 	    pattern = tv_get_string_chk(&di->di_tv);
-	    if (pattern == NULL)
-		return;
+	    ถ้า (pattern == NULL)
+		คืน;
 	}
 	di = dict_find(dict, (char_u *)"pos", -1);
-	if (di != NULL)
+	ถ้า (di != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    ถ้า (di->di_tv.v_type != VAR_LIST)
 	    {
 		semsg(_(e_invalid_argument_str), "pos");
-		return;
+		คืน;
 	    }
-	    if (list_len(di->di_tv.vval.v_list) != 3)
+	    ถ้า (list_len(di->di_tv.vval.v_list) != 3)
 	    {
 		semsg(_(e_invalid_argument_str), "List format should be [lnum, col, off]");
-		return;
+		คืน;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 0L);
-	    if (li != NULL)
+	    ถ้า (li != NULL)
 	    {
 		pos.lnum = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		ถ้า (error)
+		    คืน;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 1L);
-	    if (li != NULL)
+	    ถ้า (li != NULL)
 	    {
 		pos.col = tv_get_number_chk(&li->li_tv, &error) - 1;
-		if (error)
-		    return;
+		ถ้า (error)
+		    คืน;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 2L);
-	    if (li != NULL)
+	    ถ้า (li != NULL)
 	    {
 		pos.coladd = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		ถ้า (error)
+		    คืน;
 	    }
 	}
     }
@@ -4301,17 +4301,17 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
 # ifdef FEAT_SEARCH_EXTRA
     save_incsearch_state();
 # endif
-    if (pattern != NULL)
+    ถ้า (pattern != NULL)
     {
-	if (*pattern == NUL)
+	ถ้า (*pattern == NUL)
 	    goto the_end;
 	vim_free(spats[last_idx].pat);
 	spats[last_idx].patlen = STRLEN(pattern);
 	spats[last_idx].pat = vim_strnsave(pattern, spats[last_idx].patlen);
-	if (spats[last_idx].pat == NULL)
+	ถ้า (spats[last_idx].pat == NULL)
 	    spats[last_idx].patlen = 0;
     }
-    if (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
+    ถ้า (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
 	goto the_end;	// the previous pattern was never defined
 
     update_search_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);

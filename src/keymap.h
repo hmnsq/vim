@@ -125,7 +125,7 @@
 /*
  * translation of three byte code "K_SPECIAL a b" into int "K_xxx" and back
  */
-#define TERMCAP2KEY(a, b)	(-((a) + ((int)(b) << 8)))
+#define TERMCAP2KEY(a, b)	(-((a) + ((จำนวนเต็ม)(b) << 8)))
 #define KEY2TERMCAP0(x)		((-(x)) & 0xff)
 #define KEY2TERMCAP1(x)		(((unsigned)(-(x)) >> 8) & 0xff)
 
@@ -148,7 +148,7 @@
  *
  * K_SPECIAL KS_EXTRA KE_xxx
  */
-enum key_extra
+ga_nanaa key_extra
 {
       KE_S_UP = 4		// shift-up
     , KE_S_DOWN = 5		// shift-down
@@ -507,7 +507,7 @@ enum key_extra
 #define MOD_MASK_2CLICK	    0x20	// use MOD_MASK_MULTI_CLICK
 #define MOD_MASK_3CLICK	    0x40	// use MOD_MASK_MULTI_CLICK
 #define MOD_MASK_4CLICK	    0x60	// use MOD_MASK_MULTI_CLICK
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
+#ถ้า defined(MACOS_X) || defined(FEAT_GUI_GTK)
 # define MOD_MASK_CMD	    0x80        // aka SUPER
 #endif
 

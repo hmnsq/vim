@@ -2,29 +2,29 @@
 
 #include "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+static void output_mouse(VTermState *state, จำนวนเต็ม code, จำนวนเต็ม pressed, จำนวนเต็ม modifiers, จำนวนเต็ม col, จำนวนเต็ม row)
 {
   modifiers <<= 2;
 
   switch(state->mouse_protocol) {
-  case MOUSE_X10:
-    if(col + 0x21 > 0xff)
+  pak_sa MOUSE_X10:
+    ถ้า(col + 0x21 > 0xff)
       col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
+    ถ้า(row + 0x21 > 0xff)
       row = 0xff - 0x21;
 
-    if(!pressed)
+    ถ้า(!pressed)
       code = 3;
 
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
         (code | modifiers) + 0x20, col + 0x21, row + 0x21);
-    break;
+    bha_nga;
 
-  case MOUSE_UTF8:
+  pak_sa MOUSE_UTF8:
     {
-      char utf8[18]; size_t len = 0;
+      var_na utf8[18]; size_t len = 0;
 
-      if(!pressed)
+      ถ้า(!pressed)
         code = 3;
 
       len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
@@ -34,68 +34,68 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
 
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
-    break;
+    bha_nga;
 
-  case MOUSE_SGR:
+  pak_sa MOUSE_SGR:
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
         code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
-    break;
+    bha_nga;
 
-  case MOUSE_RXVT:
-    if(!pressed)
+  pak_sa MOUSE_RXVT:
+    ถ้า(!pressed)
       code = 3;
 
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
         code | modifiers, col + 1, row + 1);
-    break;
+    bha_nga;
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+void vterm_mouse_move(VTerm *vt, จำนวนเต็ม row, จำนวนเต็ม col, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  ถ้า(col == state->mouse_col && row == state->mouse_row)
+    คืน;
 
   state->mouse_col = col;
   state->mouse_row = row;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  ถ้า((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
+    จำนวนเต็ม button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
                  state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
                  state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
     output_mouse(state, button-1 + 0x20, 1, mod, col, row);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+void vterm_mouse_button(VTerm *vt, จำนวนเต็ม button, จำนวนเต็ม pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  จำนวนเต็ม old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  ถ้า(button > 0 && button <= 3) {
+    ถ้า(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    มิฉะนั้น
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  ถ้า(state->mouse_buttons == old_buttons && button < 4)
+    คืน;
+  ถ้า (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    คืน;
 
-  if(!state->mouse_flags)
-    return;
+  ถ้า(!state->mouse_flags)
+    คืน;
 
-  if(button < 4) {
+  ถ้า(button < 4) {
     output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
   }
-  else if(button < 8) {
+  มิฉะนั้น ถ้า(button < 8) {
     output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
   }
 }

@@ -28,7 +28,7 @@
 test_isword_funcs_utf8(void)
 {
     buf_T buf;
-    int c;
+    จำนวนเต็ม c;
 
     CLEAR_FIELD(buf);
     p_enc = (char_u *)"utf-8";
@@ -40,16 +40,16 @@ test_isword_funcs_utf8(void)
     curbuf = &buf;
     mb_init(); // calls init_chartab()
 
-    for (c = 0; c < 0x10000; ++c)
+    สำหรับ (c = 0; c < 0x10000; ++c)
     {
 	char_u p[4] = {0};
-	int c1;
-	int retc;
-	int retp;
+	จำนวนเต็ม c1;
+	จำนวนเต็ม retc;
+	จำนวนเต็ม retp;
 
 	utf_char2bytes(c, p);
 	c1 = utf_ptr2char(p);
-	if (c != c1)
+	ถ้า (c != c1)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -60,7 +60,7 @@ test_isword_funcs_utf8(void)
 	}
 	retc = vim_iswordc_buf(c, &buf);
 	retp = vim_iswordp_buf(p, &buf);
-	if (retc != retp)
+	ถ้า (retc != retp)
 	{
 	    fprintf(stderr, "Failed: ");
 	    fprintf(stderr,
@@ -73,10 +73,10 @@ test_isword_funcs_utf8(void)
     }
 }
 
-    int
-main(void)
+    จำนวนเต็ม
+หลัก(void)
 {
     estack_init();
     test_isword_funcs_utf8();
-    return 0;
+    คืน 0;
 }

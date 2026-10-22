@@ -30,7 +30,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_ARABIC)
+#ถ้า defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,7 +98,7 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
+static sa_nracanaa achar {
     unsigned c;
     unsigned isolated;
     unsigned initial;
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    static sa_nracanaa achar *
+find_achar(จำนวนเต็ม c)
 {
-    int h, m, l;
+    จำนวนเต็ม h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    ขณะ (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	ถ้า (achars[m].c == (unsigned)c)
+	    คืน &achars[m];
+	ถ้า ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	มิฉะนั้น
 	    l = m + 1;
     }
-    return NULL;
+    คืน NULL;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    static จำนวนเต็ม
+chg_c_laa2i(จำนวนเต็ม hid_c)
 {
-    int tempc;
+    จำนวนเต็ม tempc;
 
     switch (hid_c)
     {
-	case a_ALEF_MADDA:
+	pak_sa a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    bha_nga;
+	pak_sa a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
+	    bha_nga;
 	default:
 	    tempc = 0;
     }
 
-    return tempc;
+    คืน tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    static จำนวนเต็ม
+chg_c_laa2f(จำนวนเต็ม hid_c)
 {
-    int tempc;
+    จำนวนเต็ม tempc;
 
     switch (hid_c)
     {
-	case a_ALEF_MADDA:
+	pak_sa a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    bha_nga;
+	pak_sa a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    bha_nga;
+	pak_sa a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
+	    bha_nga;
 	default:
 	    tempc = 0;
     }
 
-    return tempc;
+    คืน tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    static จำนวนเต็ม
+can_join(จำนวนเต็ม c1, จำนวนเต็ม c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    sa_nracanaa achar *a1 = find_achar(c1);
+    sa_nracanaa achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    คืน a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    จำนวนเต็ม
+arabic_maycombine(จำนวนเต็ม two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    ถ้า (p_arshape && !p_tbidi)
+	คืน (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    จำนวนเต็ม
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    จำนวนเต็ม		one,	    // first character
+    จำนวนเต็ม		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    ถ้า (one == a_LAM)
+	คืน arabic_maycombine(two);
+    คืน FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    static จำนวนเต็ม
+A_is_iso(จำนวนเต็ม c)
 {
-    return find_achar(c) != NULL;
+    คืน find_achar(c) != NULL;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    static จำนวนเต็ม
+A_is_ok(จำนวนเต็ม c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    คืน (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    static จำนวนเต็ม
+A_is_valid(จำนวนเต็ม c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    คืน (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    จำนวนเต็ม
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    จำนวนเต็ม		c,
+    จำนวนเต็ม		*ccp,
+    จำนวนเต็ม		*c1p,
+    จำนวนเต็ม		prev_c,
+    จำนวนเต็ม		prev_c1,
+    จำนวนเต็ม		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    จำนวนเต็ม		curr_c;
+    จำนวนเต็ม		curr_laa;
+    จำนวนเต็ม		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    ถ้า (!A_is_ok(c))
+	คืน c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    ถ้า (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	ถ้า (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	มิฉะนั้น
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    มิฉะนั้น
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	sa_nracanaa achar *curr_a = find_achar(c);
+	จำนวนเต็ม backward_combine = !prev_laa && can_join(prev_c, c);
+	จำนวนเต็ม forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	ถ้า (backward_combine)
 	{
-	    if (forward_combine)
+	    ถ้า (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    มิฉะนั้น
 		curr_c = curr_a->final;
 	}
-	else
+	มิฉะนั้น
 	{
-	    if (forward_combine)
+	    ถ้า (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    มิฉะนั้น
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    ถ้า (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    ถ้า (curr_c != c && ccp != NULL)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    คืน curr_c;
 }
 #endif // FEAT_ARABIC

@@ -27,14 +27,14 @@
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_MZSCHEME)
+#ถ้า defined(FEAT_MZSCHEME)
 
 /*
  * scheme_register_tls_space is only available on 32-bit Windows until
  * racket-6.3.  See
  * http://docs.racket-lang.org/inside/im_memoryalloc.html?q=scheme_register_tls_space
  */
-#if MZSCHEME_VERSION_MAJOR >= 500 && defined(MSWIN) \
+#ถ้า MZSCHEME_VERSION_MAJOR >= 500 && defined(MSWIN) \
 	&& defined(USE_THREAD_LOCAL) \
 	&& (!defined(_WIN64) || MZSCHEME_VERSION_MAJOR >= 603)
 # define HAVE_TLS_SPACE 1
@@ -44,7 +44,7 @@
  * Since version 4.x precise GC requires trampolined startup.
  * Futures and places in version 5.x need it too.
  */
-#if defined(MZ_PRECISE_GC) && MZSCHEME_VERSION_MAJOR >= 400 \
+#ถ้า defined(MZ_PRECISE_GC) && MZSCHEME_VERSION_MAJOR >= 400 \
     || MZSCHEME_VERSION_MAJOR >= 500 \
 	&& (defined(MZ_USE_FUTURES) || defined(MZ_USE_PLACES))
 # define TRAMPOLINED_MZVIM_STARTUP
@@ -54,7 +54,7 @@
 #define SCHEME_VIMBUFFERP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_buffer_type)
 #define SCHEME_VIMWINDOWP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_window_type)
 
-typedef struct
+typedef sa_nracanaa
 {
     Scheme_Object   so;
     buf_T	    *buf;
@@ -62,7 +62,7 @@ typedef struct
 
 #define INVALID_BUFFER_VALUE ((buf_T *)(-1))
 
-typedef struct
+typedef sa_nracanaa
 {
     Scheme_Object   so;
     win_T	    *win;
@@ -73,17 +73,17 @@ typedef struct
 /*
  * Prims that form MzScheme Vim interface
  */
-typedef struct
+typedef sa_nracanaa
 {
     Scheme_Closed_Prim	*prim;
-    char	*name;
-    int		mina;	// arity information
-    int		maxa;
+    var_na	*name;
+    จำนวนเต็ม		mina;	// arity information
+    จำนวนเต็ม		maxa;
 } Vim_Prim;
 
-typedef struct
+typedef sa_nracanaa
 {
-    char	    *name;
+    var_na	    *name;
     Scheme_Object   *port;
 } Port_Info;
 
@@ -98,13 +98,13 @@ typedef struct
  *========================================================================
  */
 #ifdef HAVE_SANDBOX
-static Scheme_Object *sandbox_file_guard(int, Scheme_Object **);
-static Scheme_Object *sandbox_network_guard(int, Scheme_Object **);
+static Scheme_Object *sandbox_file_guard(จำนวนเต็ม, Scheme_Object **);
+static Scheme_Object *sandbox_network_guard(จำนวนเต็ม, Scheme_Object **);
 static void sandbox_check(void);
 #endif
 //  Buffer-related commands
 static Scheme_Object *buffer_new(buf_T *buf);
-static Scheme_Object *get_buffer_by_num(void *, int, Scheme_Object **);
+static Scheme_Object *get_buffer_by_num(void *, จำนวนเต็ม, Scheme_Object **);
 static vim_mz_buffer *get_vim_curr_buffer(void);
 
 //  Window-related commands
@@ -116,94 +116,94 @@ static vim_mz_window *get_vim_curr_window(void);
  *  Internal Function Prototypes
  *========================================================================
  */
-static int vim_error_check(void);
-static int do_mzscheme_command(exarg_T *, void *, Scheme_Closed_Prim *what);
-static int startup_mzscheme(void);
-static char *string_to_line(Scheme_Object *obj);
-#if MZSCHEME_VERSION_MAJOR >= 501
+static จำนวนเต็ม vim_error_check(void);
+static จำนวนเต็ม do_mzscheme_command(exarg_T *, void *, Scheme_Closed_Prim *what);
+static จำนวนเต็ม startup_mzscheme(void);
+static var_na *string_to_line(Scheme_Object *obj);
+#ถ้า MZSCHEME_VERSION_MAJOR >= 501
 # define OUTPUT_LEN_TYPE intptr_t
-#else
+#มิฉะนั้น
 # define OUTPUT_LEN_TYPE long
 #endif
-static void do_output(char *mesg, OUTPUT_LEN_TYPE len);
-static void do_printf(char *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+static void do_output(var_na *mesg, OUTPUT_LEN_TYPE len);
+static void do_printf(var_na *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 static void do_flush(void);
 static Scheme_Object *_apply_thunk_catch_exceptions(
 	Scheme_Object *, Scheme_Object **);
 static Scheme_Object *extract_exn_message(Scheme_Object *v);
-static Scheme_Object *do_eval(void *, int noargc, Scheme_Object **noargv);
-static Scheme_Object *do_load(void *, int noargc, Scheme_Object **noargv);
+static Scheme_Object *do_eval(void *, จำนวนเต็ม noargc, Scheme_Object **noargv);
+static Scheme_Object *do_load(void *, จำนวนเต็ม noargc, Scheme_Object **noargv);
 static void register_vim_exn(void);
-static vim_mz_buffer *get_buffer_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static vim_mz_window *get_window_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static int line_in_range(linenr_T, buf_T *);
+static vim_mz_buffer *get_buffer_arg(const var_na *fname, จำนวนเต็ม argnum,
+	จำนวนเต็ม argc, Scheme_Object **argv);
+static vim_mz_window *get_window_arg(const var_na *fname, จำนวนเต็ม argnum,
+	จำนวนเต็ม argc, Scheme_Object **argv);
+static จำนวนเต็ม line_in_range(linenr_T, buf_T *);
 static void check_line_range(linenr_T, buf_T *);
-static void mz_fix_cursor(int lo, int hi, int extra);
+static void mz_fix_cursor(จำนวนเต็ม lo, จำนวนเต็ม hi, จำนวนเต็ม extra);
 
-static int eval_with_exn_handling(void *, Scheme_Closed_Prim *,
+static จำนวนเต็ม eval_with_exn_handling(void *, Scheme_Closed_Prim *,
 	    Scheme_Object **ret);
 static void make_modules(void);
 static void init_exn_catching_apply(void);
-static int mzscheme_env_main(Scheme_Env *env, int argc, char **argv);
-static int mzscheme_init(void);
+static จำนวนเต็ม mzscheme_env_main(Scheme_Env *env, จำนวนเต็ม argc, var_na **argv);
+static จำนวนเต็ม mzscheme_init(void);
 #ifdef FEAT_EVAL
 static Scheme_Object *vim_to_mzscheme(typval_T *vim_value);
-static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, int depth,
+static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, จำนวนเต็ม depth,
 	Scheme_Hash_Table *visited);
-static int mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
-static int mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
+static จำนวนเต็ม mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
+static จำนวนเต็ม mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, จำนวนเต็ม depth,
 	Scheme_Hash_Table *visited);
-static Scheme_Object *vim_funcref(void *data, int argc, Scheme_Object **argv);
+static Scheme_Object *vim_funcref(void *data, จำนวนเต็ม argc, Scheme_Object **argv);
 #endif
 
 #ifdef MZ_PRECISE_GC
-static int buffer_size_proc(void *obj UNUSED)
+static จำนวนเต็ม buffer_size_proc(void *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_buffer));
+    คืน gcBYTES_TO_WORDS(parimaa_na(vim_mz_buffer));
 }
-static int buffer_mark_proc(void *obj)
+static จำนวนเต็ม buffer_mark_proc(void *obj)
 {
-    return buffer_size_proc(obj);
+    คืน buffer_size_proc(obj);
 }
-static int buffer_fixup_proc(void *obj)
+static จำนวนเต็ม buffer_fixup_proc(void *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the buffer is alive
     // vim_mz_buffer* buf = (vim_mz_buffer*) obj;
     // buf->buf->b_mzscheme_ref = GC_fixup_self(obj);
 
-    return buffer_size_proc(obj);
+    คืน buffer_size_proc(obj);
 }
-static int window_size_proc(void *obj UNUSED)
+static จำนวนเต็ม window_size_proc(void *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_window));
+    คืน gcBYTES_TO_WORDS(parimaa_na(vim_mz_window));
 }
-static int window_mark_proc(void *obj)
+static จำนวนเต็ม window_mark_proc(void *obj)
 {
-    return window_size_proc(obj);
+    คืน window_size_proc(obj);
 }
-static int window_fixup_proc(void *obj)
+static จำนวนเต็ม window_fixup_proc(void *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the window is alive
     // vim_mz_window* win = (vim_mz_window*) obj;
     // win->win->w_mzscheme_ref = GC_fixup_self(obj);
     //
-    return window_size_proc(obj);
+    คืน window_size_proc(obj);
 }
 // with precise GC, w_mzscheme_ref and b_mzscheme_ref are immobile boxes
 // containing pointers to a window/buffer
 // with conservative GC these are simply pointers
 # define WINDOW_REF(win) *(vim_mz_window **)((win)->w_mzscheme_ref)
 # define BUFFER_REF(buf) *(vim_mz_buffer **)((buf)->b_mzscheme_ref)
-#else
+#มิฉะนั้น
 # define WINDOW_REF(win) (vim_mz_window *)((win)->w_mzscheme_ref)
 # define BUFFER_REF(buf) (vim_mz_buffer *)((buf)->b_mzscheme_ref)
 #endif
 
-#if defined(DYNAMIC_MZSCHEME)
+#ถ้า defined(DYNAMIC_MZSCHEME)
 static Scheme_Object *dll_scheme_eof;
 static Scheme_Object *dll_scheme_false;
 static Scheme_Object *dll_scheme_void;
@@ -212,111 +212,111 @@ static Scheme_Object *dll_scheme_true;
 
 static Scheme_Thread **dll_scheme_current_thread_ptr;
 
-static void (**dll_scheme_console_printf_ptr)(char *str, ...);
-static void (**dll_scheme_console_output_ptr)(char *str, OUTPUT_LEN_TYPE len);
-static void (**dll_scheme_notify_multithread_ptr)(int on);
+static void (**dll_scheme_console_printf_ptr)(var_na *str, ...);
+static void (**dll_scheme_console_output_ptr)(var_na *str, OUTPUT_LEN_TYPE len);
+static void (**dll_scheme_notify_multithread_ptr)(จำนวนเต็ม on);
 
 static void *(*dll_GC_malloc)(size_t size_in_bytes);
 static void *(*dll_GC_malloc_atomic)(size_t size_in_bytes);
 static Scheme_Env *(*dll_scheme_basic_env)(void);
 static void (*dll_scheme_check_threads)(void);
 static void (*dll_scheme_register_static)(void *ptr, long size);
-static void (*dll_scheme_set_stack_base)(void *base, int no_auto_statics);
-static void (*dll_scheme_add_global)(const char *name, Scheme_Object *val,
+static void (*dll_scheme_set_stack_base)(void *base, จำนวนเต็ม no_auto_statics);
+static void (*dll_scheme_add_global)(const var_na *name, Scheme_Object *val,
 	Scheme_Env *env);
 static void (*dll_scheme_add_global_symbol)(Scheme_Object *name,
 	Scheme_Object *val, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, int num_rands,
+static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, จำนวนเต็ม num_rands,
 	Scheme_Object **rands);
-static Scheme_Object *(*dll_scheme_builtin_value)(const char *name);
-# if MZSCHEME_VERSION_MAJOR >= 299
+static Scheme_Object *(*dll_scheme_builtin_value)(const var_na *name);
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
 static Scheme_Object *(*dll_scheme_byte_string_to_char_string)(Scheme_Object *s);
-static Scheme_Object *(*dll_scheme_make_path)(const char *chars);
+static Scheme_Object *(*dll_scheme_make_path)(const var_na *chars);
 # endif
 static void (*dll_scheme_close_input_port)(Scheme_Object *port);
 static void (*dll_scheme_count_lines)(Scheme_Object *port);
-# if MZSCHEME_VERSION_MAJOR < 360
+# ถ้า MZSCHEME_VERSION_MAJOR < 360
 static Scheme_Object *(*dll_scheme_current_continuation_marks)(void);
-# else
+# มิฉะนั้น
 static Scheme_Object *(*dll_scheme_current_continuation_marks)(Scheme_Object *prompt_tag);
 # endif
 static void (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *port);
-static char *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
-static int (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
+static var_na *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
+static จำนวนเต็ม (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
 static Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
-	int _num_rands, Scheme_Object **rands, int val);
+	จำนวนเต็ม _num_rands, Scheme_Object **rands, จำนวนเต็ม val);
 static void (*dll_scheme_dont_gc_ptr)(void *p);
 static Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string)(const char *str,
+static Scheme_Object *(*dll_scheme_eval_string)(const var_na *str,
 	Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string_all)(const char *str,
-	Scheme_Env *env, int all);
+static Scheme_Object *(*dll_scheme_eval_string_all)(const var_na *str,
+	Scheme_Env *env, จำนวนเต็ม all);
 static void (*dll_scheme_finish_primitive_module)(Scheme_Env *env);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_format)(char *format, int flen, int argc,
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
+static var_na *(*dll_scheme_format)(var_na *format, จำนวนเต็ม flen, จำนวนเต็ม argc,
 	Scheme_Object **argv, long *rlen);
-# else
-static char *(*dll_scheme_format_utf8)(char *format, int flen, int argc,
+# มิฉะนั้น
+static var_na *(*dll_scheme_format_utf8)(var_na *format, จำนวนเต็ม flen, จำนวนเต็ม argc,
 	Scheme_Object **argv, OUTPUT_LEN_TYPE *rlen);
-static Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, int pos);
+static Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, จำนวนเต็ม pos);
 # endif
 static void (*dll_scheme_gc_ptr_ok)(void *p);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
+static var_na *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
 	long *len);
-# else
-static char *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
+# มิฉะนั้น
+static var_na *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
 	OUTPUT_LEN_TYPE *len);
 # endif
-static Scheme_Object *(*dll_scheme_intern_symbol)(const char *name);
+static Scheme_Object *(*dll_scheme_intern_symbol)(const var_na *name);
 static Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *symbol,
 	Scheme_Env *env);
 static Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
-    (Scheme_Closed_Prim *prim, void *data, const char *name, mzshort mina,
+    (Scheme_Closed_Prim *prim, void *data, const var_na *name, mzshort mina,
      mzshort maxa);
 static Scheme_Object *(*dll_scheme_make_integer_value)(long i);
 static Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
 	Scheme_Object *cdr);
 static Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
-	const char *name, mzshort mina, mzshort maxa);
-# if MZSCHEME_VERSION_MAJOR < 299
-static Scheme_Object *(*dll_scheme_make_string)(const char *chars);
+	const var_na *name, mzshort mina, mzshort maxa);
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
+static Scheme_Object *(*dll_scheme_make_string)(const var_na *chars);
 static Scheme_Object *(*dll_scheme_make_string_output_port)();
-# else
-static Scheme_Object *(*dll_scheme_make_byte_string)(const char *chars);
+# มิฉะนั้น
+static Scheme_Object *(*dll_scheme_make_byte_string)(const var_na *chars);
 static Scheme_Object *(*dll_scheme_make_byte_string_output_port)();
 # endif
 static Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
-	int argc, Scheme_Object **argv);
+	จำนวนเต็ม argc, Scheme_Object **argv);
 static Scheme_Object **(*dll_scheme_make_struct_names)(Scheme_Object *base,
-	Scheme_Object *field_names, int flags, int *count_out);
+	Scheme_Object *field_names, จำนวนเต็ม flags, จำนวนเต็ม *count_out);
 static Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *base,
-	Scheme_Object *parent, Scheme_Object *inspector, int num_fields,
-	int num_uninit_fields, Scheme_Object *uninit_val,
+	Scheme_Object *parent, Scheme_Object *inspector, จำนวนเต็ม num_fields,
+	จำนวนเต็ม num_uninit_fields, Scheme_Object *uninit_val,
 	Scheme_Object *properties
-# if MZSCHEME_VERSION_MAJOR >= 299
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
 	, Scheme_Object *guard
 # endif
 	);
 static Scheme_Object **(*dll_scheme_make_struct_values)(
-	Scheme_Object *struct_type, Scheme_Object **names, int count,
-	int flags);
-static Scheme_Type (*dll_scheme_make_type)(const char *name);
-static Scheme_Object *(*dll_scheme_make_vector)(int size,
+	Scheme_Object *struct_type, Scheme_Object **names, จำนวนเต็ม count,
+	จำนวนเต็ม flags);
+static Scheme_Type (*dll_scheme_make_type)(const var_na *name);
+static Scheme_Object *(*dll_scheme_make_vector)(จำนวนเต็ม size,
 	Scheme_Object *fill);
 static void *(*dll_scheme_malloc_fail_ok)(void *(*f)(size_t), size_t);
-static Scheme_Object *(*dll_scheme_open_input_file)(const char *name,
-	const char *who);
+static Scheme_Object *(*dll_scheme_open_input_file)(const var_na *name,
+	const var_na *who);
 static Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
 	Scheme_Env *for_env);
-static int (*dll_scheme_proper_list_length)(Scheme_Object *list);
+static จำนวนเต็ม (*dll_scheme_proper_list_length)(Scheme_Object *list);
 static void (*dll_scheme_raise)(Scheme_Object *exn);
 static Scheme_Object *(*dll_scheme_read)(Scheme_Object *port);
-static void (*dll_scheme_signal_error)(const char *msg, ...);
-static void (*dll_scheme_wrong_type)(const char *name, const char *expected,
-	int which, int argc, Scheme_Object **argv);
-# if MZSCHEME_VERSION_MAJOR >= 299
-static void (*dll_scheme_set_param)(Scheme_Config *c, int pos,
+static void (*dll_scheme_signal_error)(const var_na *msg, ...);
+static void (*dll_scheme_wrong_type)(const var_na *name, const var_na *expected,
+	จำนวนเต็ม which, จำนวนเต็ม argc, Scheme_Object **argv);
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
+static void (*dll_scheme_set_param)(Scheme_Config *c, จำนวนเต็ม pos,
 	Scheme_Object *o);
 static Scheme_Config *(*dll_scheme_current_config)(void);
 static Scheme_Object *(*dll_scheme_char_string_to_byte_string)
@@ -325,43 +325,43 @@ static Scheme_Object *(*dll_scheme_char_string_to_path)
     (Scheme_Object *s);
 static void *(*dll_scheme_set_collects_path)(Scheme_Object *p);
 # endif
-static Scheme_Hash_Table *(*dll_scheme_make_hash_table)(int type);
+static Scheme_Hash_Table *(*dll_scheme_make_hash_table)(จำนวนเต็ม type);
 static void (*dll_scheme_hash_set)(Scheme_Hash_Table *table,
 	Scheme_Object *key, Scheme_Object *value);
 static Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_Table *table,
 	Scheme_Object *key);
-static Scheme_Object *(*dll_scheme_make_double)(double d);
-static Scheme_Object *(*dll_scheme_make_sized_byte_string)(char *chars,
-	long len, int copy);
+static Scheme_Object *(*dll_scheme_make_double)(dviguu_na d);
+static Scheme_Object *(*dll_scheme_make_sized_byte_string)(var_na *chars,
+	long len, จำนวนเต็ม copy);
 static Scheme_Object *(*dll_scheme_namespace_require)(Scheme_Object *req);
-static Scheme_Object *(*dll_scheme_dynamic_wind)(void (*pre)(void *), Scheme_Object *(* volatile act)(void *), void (* volatile post)(void *), Scheme_Object *(*jmp_handler)(void *), void * volatile data);
+static Scheme_Object *(*dll_scheme_dynamic_wind)(void (*pre)(void *), Scheme_Object *(* ca_ncala act)(void *), void (* ca_ncala post)(void *), Scheme_Object *(*jmp_handler)(void *), void * ca_ncala data);
 # ifdef MZ_PRECISE_GC
 static void *(*dll_GC_malloc_one_tagged)(size_t size_in_bytes);
-static void (*dll_GC_register_traversers)(short tag, Size_Proc size, Mark_Proc mark, Fixup_Proc fixup, int is_constant_size, int is_atomic);
+static void (*dll_GC_register_traversers)(short tag, Size_Proc size, Mark_Proc mark, Fixup_Proc fixup, จำนวนเต็ม is_constant_size, จำนวนเต็ม is_atomic);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
+# ถ้า MZSCHEME_VERSION_MAJOR >= 400
 static void (*dll_scheme_init_collection_paths)(Scheme_Env *global_env, Scheme_Object *extra_dirs);
 static void **(*dll_scheme_malloc_immobile_box)(void *p);
 static void (*dll_scheme_free_immobile_box)(void **b);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
+# ถ้า MZSCHEME_VERSION_MAJOR >= 500
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
-static int (*dll_scheme_main_setup)(int no_auto_statics, Scheme_Env_Main _main, int argc, char **argv);
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-static void (*dll_scheme_register_tls_space)(void *tls_space, int _tls_index);
+static จำนวนเต็ม (*dll_scheme_main_setup)(จำนวนเต็ม no_auto_statics, Scheme_Env_Main _main, จำนวนเต็ม argc, var_na **argv);
+#   ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+static void (*dll_scheme_register_tls_space)(void *tls_space, จำนวนเต็ม _tls_index);
 #   endif
 #  endif
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+#  ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
 static Thread_Local_Variables *(*dll_scheme_external_get_thread_local_variables)(void);
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
-static void (*dll_scheme_embedded_load)(intptr_t len, const char *s, int predefined);
-static void (*dll_scheme_register_embedded_load)(intptr_t len, const char *s);
+# ถ้า MZSCHEME_VERSION_MAJOR >= 600
+static void (*dll_scheme_embedded_load)(intptr_t len, const var_na *s, จำนวนเต็ม predefined);
+static void (*dll_scheme_register_embedded_load)(intptr_t len, const var_na *s);
 static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 # endif
 
-# if defined(DYNAMIC_MZSCHEME)
+# ถ้า defined(DYNAMIC_MZSCHEME)
 
 // arrays are imported directly
 #  define scheme_eof dll_scheme_eof
@@ -371,7 +371,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_true dll_scheme_true
 
 // pointers are GetProcAddress'ed as pointers to pointer
-#  if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
+#  ถ้า !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
 #   define scheme_current_thread (*dll_scheme_current_thread_ptr)
 #  endif
 #  define scheme_console_printf (*dll_scheme_console_printf_ptr)
@@ -387,7 +387,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_apply dll_scheme_apply
 #  define scheme_basic_env dll_scheme_basic_env
 #  define scheme_builtin_value dll_scheme_builtin_value
-#  if MZSCHEME_VERSION_MAJOR >= 299
+#  ถ้า MZSCHEME_VERSION_MAJOR >= 299
 #   define scheme_byte_string_to_char_string dll_scheme_byte_string_to_char_string
 #   define scheme_make_path dll_scheme_make_path
 #  endif
@@ -405,15 +405,15 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_eval_string dll_scheme_eval_string
 #  define scheme_eval_string_all dll_scheme_eval_string_all
 #  define scheme_finish_primitive_module dll_scheme_finish_primitive_module
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  ถ้า MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_format dll_scheme_format
-#  else
+#  มิฉะนั้น
 #   define scheme_format_utf8 dll_scheme_format_utf8
 #  endif
 #  define scheme_gc_ptr_ok dll_scheme_gc_ptr_ok
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  ถ้า MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_get_sized_byte_string_output dll_scheme_get_sized_string_output
-#  else
+#  มิฉะนั้น
 #   define scheme_get_sized_byte_string_output \
     dll_scheme_get_sized_byte_string_output
 #   define scheme_get_param dll_scheme_get_param
@@ -424,10 +424,10 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_make_integer_value dll_scheme_make_integer_value
 #  define scheme_make_pair dll_scheme_make_pair
 #  define scheme_make_prim_w_arity dll_scheme_make_prim_w_arity
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  ถ้า MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_make_byte_string dll_scheme_make_string
 #   define scheme_make_byte_string_output_port dll_scheme_make_string_output_port
-#  else
+#  มิฉะนั้น
 #   define scheme_make_byte_string dll_scheme_make_byte_string
 #   define scheme_make_byte_string_output_port \
     dll_scheme_make_byte_string_output_port
@@ -448,7 +448,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_set_stack_base dll_scheme_set_stack_base
 #  define scheme_signal_error dll_scheme_signal_error
 #  define scheme_wrong_type dll_scheme_wrong_type
-#  if MZSCHEME_VERSION_MAJOR >= 299
+#  ถ้า MZSCHEME_VERSION_MAJOR >= 299
 #   define scheme_set_param dll_scheme_set_param
 #   define scheme_current_config dll_scheme_current_config
 #   define scheme_char_string_to_byte_string \
@@ -468,10 +468,10 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #   define GC_malloc_one_tagged dll_GC_malloc_one_tagged
 #   define GC_register_traversers dll_GC_register_traversers
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 400
+#  ถ้า MZSCHEME_VERSION_MAJOR >= 400
 #   ifdef TRAMPOLINED_MZVIM_STARTUP
 #    define scheme_main_setup dll_scheme_main_setup
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+#    ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
 #     define scheme_register_tls_space dll_scheme_register_tls_space
 #    endif
 #   endif
@@ -479,20 +479,20 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #   define scheme_malloc_immobile_box dll_scheme_malloc_immobile_box
 #   define scheme_free_immobile_box dll_scheme_free_immobile_box
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 600
+#  ถ้า MZSCHEME_VERSION_MAJOR >= 600
 #   define scheme_embedded_load dll_scheme_embedded_load
 #   define scheme_register_embedded_load dll_scheme_register_embedded_load
 #   define scheme_set_config_path dll_scheme_set_config_path
 #  endif
 
 #  ifndef PROTO
-#   if MZSCHEME_VERSION_MAJOR >= 500
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+#   ถ้า MZSCHEME_VERSION_MAJOR >= 500
+#    ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
 // define as function for macro in schthread.h
 Thread_Local_Variables *
 scheme_external_get_thread_local_variables(void)
 {
-    return dll_scheme_external_get_thread_local_variables();
+    คืน dll_scheme_external_get_thread_local_variables();
 }
 #    endif
 #   endif
@@ -500,9 +500,9 @@ scheme_external_get_thread_local_variables(void)
 
 # endif
 
-typedef struct
+typedef sa_nracanaa
 {
-    char    *name;
+    var_na    *name;
     void    **ptr;
 } Thunk_Info;
 
@@ -517,7 +517,7 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_void", (void **)&dll_scheme_void},
     {"scheme_null", (void **)&dll_scheme_null},
     {"scheme_true", (void **)&dll_scheme_true},
-# if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
+# ถ้า !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
     {"scheme_current_thread", (void **)&dll_scheme_current_thread_ptr},
 # endif
     {"scheme_console_printf", (void **)&dll_scheme_console_printf_ptr},
@@ -528,7 +528,7 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_add_global_symbol", (void **)&dll_scheme_add_global_symbol},
     {"scheme_apply", (void **)&dll_scheme_apply},
     {"scheme_basic_env", (void **)&dll_scheme_basic_env},
-# if MZSCHEME_VERSION_MAJOR >= 299
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
     {"scheme_byte_string_to_char_string", (void **)&dll_scheme_byte_string_to_char_string},
     {"scheme_make_path", (void **)&dll_scheme_make_path},
 # endif
@@ -548,17 +548,17 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_eval_string_all", (void **)&dll_scheme_eval_string_all},
     {"scheme_finish_primitive_module",
 	(void **)&dll_scheme_finish_primitive_module},
-# if MZSCHEME_VERSION_MAJOR < 299
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
     {"scheme_format", (void **)&dll_scheme_format},
-# else
+# มิฉะนั้น
     {"scheme_format_utf8", (void **)&dll_scheme_format_utf8},
     {"scheme_get_param", (void **)&dll_scheme_get_param},
 # endif
     {"scheme_gc_ptr_ok", (void **)&dll_scheme_gc_ptr_ok},
-# if MZSCHEME_VERSION_MAJOR < 299
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
     {"scheme_get_sized_string_output",
 	(void **)&dll_scheme_get_sized_string_output},
-# else
+# มิฉะนั้น
     {"scheme_get_sized_byte_string_output",
 	(void **)&dll_scheme_get_sized_byte_string_output},
 # endif
@@ -569,11 +569,11 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_make_integer_value", (void **)&dll_scheme_make_integer_value},
     {"scheme_make_pair", (void **)&dll_scheme_make_pair},
     {"scheme_make_prim_w_arity", (void **)&dll_scheme_make_prim_w_arity},
-# if MZSCHEME_VERSION_MAJOR < 299
+# ถ้า MZSCHEME_VERSION_MAJOR < 299
     {"scheme_make_string", (void **)&dll_scheme_make_string},
     {"scheme_make_string_output_port",
 	(void **)&dll_scheme_make_string_output_port},
-# else
+# มิฉะนั้น
     {"scheme_make_byte_string", (void **)&dll_scheme_make_byte_string},
     {"scheme_make_byte_string_output_port",
 	(void **)&dll_scheme_make_byte_string_output_port},
@@ -595,7 +595,7 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_set_stack_base", (void **)&dll_scheme_set_stack_base},
     {"scheme_signal_error", (void **)&dll_scheme_signal_error},
     {"scheme_wrong_type", (void **)&dll_scheme_wrong_type},
-# if MZSCHEME_VERSION_MAJOR >= 299
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
     {"scheme_set_param", (void **)&dll_scheme_set_param},
     {"scheme_current_config", (void **)&dll_scheme_current_config},
     {"scheme_char_string_to_byte_string",
@@ -614,10 +614,10 @@ static Thunk_Info mzsch_imports[] = {
     {"GC_malloc_one_tagged", (void **)&dll_GC_malloc_one_tagged},
     {"GC_register_traversers", (void **)&dll_GC_register_traversers},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
+# ถ้า MZSCHEME_VERSION_MAJOR >= 400
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
     {"scheme_main_setup", (void **)&dll_scheme_main_setup},
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+#   ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
     {"scheme_register_tls_space", (void **)&dll_scheme_register_tls_space},
 #   endif
 #  endif
@@ -625,12 +625,12 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_malloc_immobile_box", (void **)&dll_scheme_malloc_immobile_box},
     {"scheme_free_immobile_box", (void **)&dll_scheme_free_immobile_box},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+# ถ้า MZSCHEME_VERSION_MAJOR >= 500
+#  ถ้า defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
     {"scheme_external_get_thread_local_variables", (void **)&dll_scheme_external_get_thread_local_variables},
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
+# ถ้า MZSCHEME_VERSION_MAJOR >= 600
     {"scheme_embedded_load", (void **)&dll_scheme_embedded_load},
     {"scheme_register_embedded_load", (void **)&dll_scheme_register_embedded_load},
     {"scheme_set_config_path", (void **)&dll_scheme_set_config_path},
@@ -641,80 +641,80 @@ static HINSTANCE hMzGC = 0;
 static HINSTANCE hMzSch = 0;
 
 static void dynamic_mzscheme_end(void);
-static int mzscheme_runtime_link_init(char *sch_dll, char *gc_dll,
-	int verbose);
+static จำนวนเต็ม mzscheme_runtime_link_init(var_na *sch_dll, var_na *gc_dll,
+	จำนวนเต็ม verbose);
 
-    static int
-mzscheme_runtime_link_init(char *sch_dll, char *gc_dll, int verbose)
+    static จำนวนเต็ม
+mzscheme_runtime_link_init(var_na *sch_dll, var_na *gc_dll, จำนวนเต็ม verbose)
 {
     Thunk_Info *thunk = NULL;
 
-    if (hMzGC && hMzSch)
-	return OK;
+    ถ้า (hMzGC && hMzSch)
+	คืน OK;
     hMzSch = vimLoadLib(sch_dll);
     hMzGC = vimLoadLib(gc_dll);
 
-    if (!hMzGC)
+    ถ้า (!hMzGC)
     {
-	if (verbose)
+	ถ้า (verbose)
 	    semsg(_(e_could_not_load_library_str_str), gc_dll, GetWin32Error());
-	return FAIL;
+	คืน FAIL;
     }
 
-    if (!hMzSch)
+    ถ้า (!hMzSch)
     {
-	if (verbose)
+	ถ้า (verbose)
 	    semsg(_(e_could_not_load_library_str_str), sch_dll, GetWin32Error());
-	return FAIL;
+	คืน FAIL;
     }
 
-    for (thunk = mzsch_imports; thunk->name; thunk++)
+    สำหรับ (thunk = mzsch_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
+	ถ้า ((*thunk->ptr =
 		    (void *)GetProcAddress(hMzSch, thunk->name)) == NULL)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
+	    ถ้า (verbose)
 		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    คืน FAIL;
 	}
     }
-    for (thunk = mzgc_imports; thunk->name; thunk++)
+    สำหรับ (thunk = mzgc_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
+	ถ้า ((*thunk->ptr =
 		    (void *)GetProcAddress(hMzGC, thunk->name)) == NULL)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
+	    ถ้า (verbose)
 		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    คืน FAIL;
 	}
     }
-    return OK;
+    คืน OK;
 }
 
-    int
-mzscheme_enabled(int verbose)
+    จำนวนเต็ม
+mzscheme_enabled(จำนวนเต็ม verbose)
 {
-    return mzscheme_runtime_link_init(
-	    (char *)p_mzschemedll, (char *)p_mzschemegcdll, verbose) == OK;
+    คืน mzscheme_runtime_link_init(
+	    (var_na *)p_mzschemedll, (var_na *)p_mzschemegcdll, verbose) == OK;
 }
 
     static void
 dynamic_mzscheme_end(void)
 {
-    if (hMzSch)
+    ถ้า (hMzSch)
     {
 	FreeLibrary(hMzSch);
 	hMzSch = 0;
     }
-    if (hMzGC)
+    ถ้า (hMzGC)
     {
 	FreeLibrary(hMzGC);
 	hMzGC = 0;
@@ -722,17 +722,17 @@ dynamic_mzscheme_end(void)
 }
 #endif // DYNAMIC_MZSCHEME
 
-#if MZSCHEME_VERSION_MAJOR < 299
+#ถ้า MZSCHEME_VERSION_MAJOR < 299
 # define GUARANTEED_STRING_ARG(proc, num) GUARANTEE_STRING(proc, num)
-#else
+#มิฉะนั้น
     static Scheme_Object *
-guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
+guaranteed_byte_string_arg(var_na *proc, จำนวนเต็ม num, จำนวนเต็ม argc, Scheme_Object **argv)
 {
-    if (SCHEME_BYTE_STRINGP(argv[num]))
+    ถ้า (SCHEME_BYTE_STRINGP(argv[num]))
     {
-	return argv[num];
+	คืน argv[num];
     }
-    else if (SCHEME_CHAR_STRINGP(argv[num]))
+    มิฉะนั้น ถ้า (SCHEME_CHAR_STRINGP(argv[num]))
     {
 	Scheme_Object *tmp = NULL;
 	MZ_GC_DECL_REG(2);
@@ -741,18 +741,18 @@ guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
 	MZ_GC_REG();
 	tmp = scheme_char_string_to_byte_string(argv[num]);
 	MZ_GC_UNREG();
-	return tmp;
+	คืน tmp;
     }
-    else
+    มิฉะนั้น
 	scheme_wrong_type(proc, "string", num, argc, argv);
     // unreachable
-    return scheme_void;
+    คืน scheme_void;
 }
 # define GUARANTEED_STRING_ARG(proc, num) guaranteed_byte_string_arg(proc, num, argc, argv)
 #endif
 
 // need to put it here for dynamic stuff to work
-#if defined(INCLUDE_MZSCHEME_BASE)
+#ถ้า defined(INCLUDE_MZSCHEME_BASE)
 # include "mzscheme_base.c"
 #endif
 
@@ -765,11 +765,11 @@ guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
 static Scheme_Type mz_buffer_type;
 static Scheme_Type mz_window_type;
 
-static int initialized = FALSE;
+static จำนวนเต็ม initialized = FALSE;
 #ifdef DYNAMIC_MZSCHEME
-static int disabled = FALSE;
+static จำนวนเต็ม disabled = FALSE;
 #endif
-static int load_base_module_failed = FALSE;
+static จำนวนเต็ม load_base_module_failed = FALSE;
 
 // global environment
 static Scheme_Env    *environment = NULL;
@@ -782,7 +782,7 @@ static Scheme_Object *exn_p = NULL;
 static Scheme_Object *exn_message = NULL;
 static Scheme_Object *vim_exn = NULL; // Vim Error exception
 
-#if !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
+#ถ้า !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
 static void *stack_base = NULL;
 #endif
 
@@ -790,9 +790,9 @@ static long range_start;
 static long range_end;
 
 // MzScheme threads scheduling stuff
-static int mz_threads_allow = 0;
+static จำนวนเต็ม mz_threads_allow = 0;
 
-#if defined(FEAT_GUI_MSWIN)
+#ถ้า defined(FEAT_GUI_MSWIN)
 static void CALLBACK timer_proc(HWND, UINT, UINT_PTR, DWORD);
 static UINT timer_id = 0;
 #elif defined(FEAT_GUI_GTK)
@@ -803,18 +803,18 @@ static void timer_proc(XtPointer, XtIntervalId *);
 static XtIntervalId timer_id = (XtIntervalId)0;
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
+#ถ้า !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
     void
 mzvim_check_threads(void)
 {
     // Last time MzScheme threads were scheduled
     static time_t mz_last_time = 0;
 
-    if (mz_threads_allow && p_mzq > 0)
+    ถ้า (mz_threads_allow && p_mzq > 0)
     {
 	time_t now = time(NULL);
 
-	if ((now - mz_last_time) * 1000 > p_mzq)
+	ถ้า ((now - mz_last_time) * 1000 > p_mzq)
 	{
 	    mz_last_time = now;
 	    scheme_check_threads();
@@ -823,12 +823,12 @@ mzvim_check_threads(void)
 }
 #endif
 
-#if defined(MZSCHEME_GUI_THREADS)
+#ถ้า defined(MZSCHEME_GUI_THREADS)
 static void setup_timer(void);
 static void remove_timer(void);
 
 // timers are presented in GUI only
-# if defined(FEAT_GUI_MSWIN)
+# ถ้า defined(FEAT_GUI_MSWIN)
     static void CALLBACK
 timer_proc(
     HWND	hwnd UNUSED,
@@ -844,11 +844,11 @@ timer_proc(XtPointer timed_out UNUSED, XtIntervalId *interval_id UNUSED)
 # endif
 {
     scheme_check_threads();
-# if defined(FEAT_GUI_GTK)
-    return TRUE; // continue receiving notifications
+# ถ้า defined(FEAT_GUI_GTK)
+    คืน TRUE; // continue receiving notifications
 # elif defined(FEAT_GUI_MOTIF)
     // renew timeout
-    if (mz_threads_allow && p_mzq > 0)
+    ถ้า (mz_threads_allow && p_mzq > 0)
 	timer_id = XtAppAddTimeOut(app_context, p_mzq,
 		timer_proc, NULL);
 # endif
@@ -857,7 +857,7 @@ timer_proc(XtPointer timed_out UNUSED, XtIntervalId *interval_id UNUSED)
     static void
 setup_timer(void)
 {
-# if defined(FEAT_GUI_MSWIN)
+# ถ้า defined(FEAT_GUI_MSWIN)
     timer_id = SetTimer(NULL, 0, p_mzq, timer_proc);
 # elif defined(FEAT_GUI_GTK)
     timer_id = g_timeout_add((guint)p_mzq, (GSourceFunc)timer_proc, NULL);
@@ -869,7 +869,7 @@ setup_timer(void)
     static void
 remove_timer(void)
 {
-# if defined(FEAT_GUI_MSWIN)
+# ถ้า defined(FEAT_GUI_MSWIN)
     KillTimer(NULL, timer_id);
 # elif defined(FEAT_GUI_GTK)
     g_source_remove(timer_id);
@@ -881,27 +881,27 @@ remove_timer(void)
 
 #endif // MZSCHEME_GUI_THREADS
 
-    char *
+    var_na *
 did_set_mzquantum(optset_T *args UNUSED)
 {
-#if defined(MZSCHEME_GUI_THREADS)
+#ถ้า defined(MZSCHEME_GUI_THREADS)
     // reset timer
-    if (timer_id != 0)
+    ถ้า (timer_id != 0)
 	remove_timer();
-    if (mz_threads_allow && p_mzq > 0 && gui.in_use)
+    ถ้า (mz_threads_allow && p_mzq > 0 && gui.in_use)
 	setup_timer();
 #endif
-    return NULL;
+    คืน NULL;
 }
 
     static void
-notify_multithread(int on)
+notify_multithread(จำนวนเต็ม on)
 {
     mz_threads_allow = on;
 #ifdef MZSCHEME_GUI_THREADS
-    if (on && timer_id == 0 && p_mzq > 0 && gui.in_use)
+    ถ้า (on && timer_id == 0 && p_mzq > 0 && gui.in_use)
 	setup_timer();
-    if (!on && timer_id != 0)
+    ถ้า (!on && timer_id != 0)
 	remove_timer();
 #endif
 }
@@ -910,21 +910,21 @@ notify_multithread(int on)
 mzscheme_end(void)
 {
     // We can not unload the DLL.  Racket's thread might be still alive.
-#if 0
+#ถ้า 0
 # ifdef DYNAMIC_MZSCHEME
     dynamic_mzscheme_end();
 # endif
 #endif
 }
 
-#if HAVE_TLS_SPACE && !defined(VIMDLL)
-# if defined(_MSC_VER)
+#ถ้า HAVE_TLS_SPACE && !defined(VIMDLL)
+# ถ้า defined(_MSC_VER)
 static __declspec(thread) void *tls_space;
 extern intptr_t _tls_index;
 # elif defined(__MINGW32__)
 static __thread void *tls_space;
 extern intptr_t _tls_index;
-# else
+# มิฉะนั้น
 static THREAD_LOCAL void *tls_space;
 static intptr_t _tls_index = 0;
 # endif
@@ -935,21 +935,21 @@ static intptr_t _tls_index = 0;
  * We may call scheme_main_setup() which calls mzscheme_env_main() which then
  * trampolines into vim_main2(), which never returns.
  */
-    int
+    จำนวนเต็ม
 mzscheme_main(void)
 {
-    int	    argc = 0;
-    char    *argv = NULL;
+    จำนวนเต็ม	    argc = 0;
+    var_na    *argv = NULL;
 
 #ifdef DYNAMIC_MZSCHEME
     /*
      * Racket requires trampolined startup.  We can not load it later.
      * If dynamic dll loading is failed, disable it.
      */
-    if (!mzscheme_enabled(FALSE))
+    ถ้า (!mzscheme_enabled(FALSE))
     {
 	disabled = TRUE;
-	return vim_main2();
+	คืน vim_main2();
     }
 #endif
 #ifdef HAVE_TLS_SPACE
@@ -961,39 +961,39 @@ mzscheme_main(void)
     // Get the address of get_tls_info() from (g)vim.exe.
     pget_tls_info = (void *)GetProcAddress(
 				GetModuleHandle(NULL), "get_tls_info");
-    if (pget_tls_info == NULL)
+    ถ้า (pget_tls_info == NULL)
     {
 	disabled = TRUE;
-	return vim_main2();
+	คืน vim_main2();
     }
     pget_tls_info(&ptls_space, &tls_index);
     scheme_register_tls_space(ptls_space, tls_index);
-# else
+# มิฉะนั้น
     scheme_register_tls_space(&tls_space, _tls_index);
 # endif
 #endif
 #ifdef TRAMPOLINED_MZVIM_STARTUP
-    return scheme_main_setup(TRUE, mzscheme_env_main, argc, &argv);
-#else
-    return mzscheme_env_main(NULL, argc, &argv);
+    คืน scheme_main_setup(TRUE, mzscheme_env_main, argc, &argv);
+#มิฉะนั้น
+    คืน mzscheme_env_main(NULL, argc, &argv);
 #endif
 }
 
-    static int
-mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
+    static จำนวนเต็ม
+mzscheme_env_main(Scheme_Env *env, จำนวนเต็ม argc UNUSED, var_na **argv UNUSED)
 {
 #ifdef TRAMPOLINED_MZVIM_STARTUP
     // Scheme has created the environment for us
     environment = env;
-#else
+#มิฉะนั้น
 # ifdef MZ_PRECISE_GC
     Scheme_Object   *dummy = NULL;
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, dummy);
 
     stack_base = &__gc_var_stack__;
-# else
-    int dummy = 0;
+# มิฉะนั้น
+    จำนวนเต็ม dummy = 0;
     stack_base = (void *)&dummy;
 # endif
 #endif
@@ -1001,24 +1001,24 @@ mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
     vim_main2();
     // not reached, vim_main2() will loop until exit()
 
-    return 0;
+    คืน 0;
 }
 
     static Scheme_Object*
 load_base_module(void *data)
 {
-    scheme_namespace_require(scheme_intern_symbol((char *)data));
-    return scheme_null;
+    scheme_namespace_require(scheme_intern_symbol((var_na *)data));
+    คืน scheme_null;
 }
 
     static Scheme_Object *
 load_base_module_on_error(void *data UNUSED)
 {
     load_base_module_failed = TRUE;
-    return scheme_null;
+    คืน scheme_null;
 }
 
-    static int
+    static จำนวนเต็ม
 startup_mzscheme(void)
 {
 #ifndef TRAMPOLINED_MZVIM_STARTUP
@@ -1046,10 +1046,10 @@ startup_mzscheme(void)
 #endif
 
     // setup 'current-library-collection-paths' parameter
-#if MZSCHEME_VERSION_MAJOR >= 299
+#ถ้า MZSCHEME_VERSION_MAJOR >= 299
     {
 	Scheme_Object *coll_path = NULL;
-	int mustfree = FALSE;
+	จำนวนเต็ม mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
@@ -1057,28 +1057,28 @@ startup_mzscheme(void)
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCOLLECTS", &mustfree);
-	if (s != NULL)
+	ถ้า (s != NULL)
 	{
-	    coll_path = scheme_make_path((char *)s);
+	    coll_path = scheme_make_path((var_na *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    ถ้า (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_COLLECTS
-	if (coll_path == NULL)
+	ถ้า (coll_path == NULL)
 	{
 	    coll_path = scheme_make_path(MZSCHEME_COLLECTS);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (coll_path != NULL)
+	ถ้า (coll_path != NULL)
 	{
 	    scheme_set_collects_path(coll_path);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
     }
-#else
+#มิฉะนั้น
 # ifdef MZSCHEME_COLLECTS
     {
 	Scheme_Object	*coll_string = NULL;
@@ -1103,10 +1103,10 @@ startup_mzscheme(void)
 # endif
 #endif
 
-#if MZSCHEME_VERSION_MAJOR >= 600
+#ถ้า MZSCHEME_VERSION_MAJOR >= 600
     {
 	Scheme_Object *config_path = NULL;
-	int mustfree = FALSE;
+	จำนวนเต็ม mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
@@ -1114,21 +1114,21 @@ startup_mzscheme(void)
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCONFIGDIR", &mustfree);
-	if (s != NULL)
+	ถ้า (s != NULL)
 	{
-	    config_path = scheme_make_path((char *)s);
+	    config_path = scheme_make_path((var_na *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    ถ้า (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_CONFIGDIR
-	if (config_path == NULL)
+	ถ้า (config_path == NULL)
 	{
 	    config_path = scheme_make_path(MZSCHEME_CONFIGDIR);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (config_path != NULL)
+	ถ้า (config_path != NULL)
 	{
 	    scheme_set_config_path(config_path);
 	    MZ_GC_CHECK();
@@ -1137,7 +1137,7 @@ startup_mzscheme(void)
     }
 #endif
 
-#if MZSCHEME_VERSION_MAJOR >= 400
+#ถ้า MZSCHEME_VERSION_MAJOR >= 400
     scheme_init_collection_paths(environment, scheme_null);
 #endif
 
@@ -1149,13 +1149,13 @@ startup_mzscheme(void)
 	// use error handler to avoid abort
 	scheme_dynamic_wind(NULL, load_base_module, NULL,
 				    load_base_module_on_error, "racket/base");
-	if (load_base_module_failed)
+	ถ้า (load_base_module_failed)
 	{
 	    load_base_module_failed = FALSE;
 	    scheme_dynamic_wind(NULL, load_base_module, NULL,
 				    load_base_module_on_error, "scheme/base");
-	    if (load_base_module_failed)
-		return -1;
+	    ถ้า (load_base_module_failed)
+		คืน -1;
 	}
     }
 
@@ -1174,7 +1174,7 @@ startup_mzscheme(void)
 	MZ_GC_VAR_IN_REG(0, make_security_guard);
 	MZ_GC_REG();
 
-# if MZSCHEME_VERSION_MAJOR < 400
+# ถ้า MZSCHEME_VERSION_MAJOR < 400
 	{
 	    Scheme_Object	*make_security_guard_symbol = NULL;
 	    MZ_GC_DECL_REG(1);
@@ -1186,13 +1186,13 @@ startup_mzscheme(void)
 		    make_security_guard_symbol, environment);
 	    MZ_GC_UNREG();
 	}
-# else
+# มิฉะนั้น
 	make_security_guard = scheme_builtin_value("make-security-guard");
 	MZ_GC_CHECK();
 # endif
 
 	// setup sandbox guards
-	if (make_security_guard != NULL)
+	ถ้า (make_security_guard != NULL)
 	{
 	    Scheme_Object   *args[3] = {NULL, NULL, NULL};
 	    Scheme_Object   *guard = NULL;
@@ -1241,29 +1241,29 @@ startup_mzscheme(void)
      */
     scheme_notify_multithread = notify_multithread;
 
-    return 0;
+    คืน 0;
 }
 
 /*
  * This routine is called for each new invocation of MzScheme
  * to make sure things are properly initialized.
  */
-    static int
+    static จำนวนเต็ม
 mzscheme_init(void)
 {
-    if (!initialized)
+    ถ้า (!initialized)
     {
 #ifdef DYNAMIC_MZSCHEME
-	if (disabled || !mzscheme_enabled(TRUE))
+	ถ้า (disabled || !mzscheme_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_libraries_could_not_be_loaded));
-	    return -1;
+	    คืน -1;
 	}
 #endif
-	if (load_base_module_failed || startup_mzscheme())
+	ถ้า (load_base_module_failed || startup_mzscheme())
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_racket_base_module_could_not_be_loaded));
-	    return -1;
+	    คืน -1;
 	}
 	initialized = TRUE;
     }
@@ -1286,7 +1286,7 @@ mzscheme_init(void)
 	MZ_GC_UNREG();
     }
 
-    return 0;
+    คืน 0;
 }
 
 /*
@@ -1298,7 +1298,7 @@ mzscheme_init(void)
 /*
  * Evaluate command with exception handling
  */
-    static int
+    static จำนวนเต็ม
 eval_with_exn_handling(
     void		*data,
     Scheme_Closed_Prim	*what,
@@ -1319,11 +1319,11 @@ eval_with_exn_handling(
     value = _apply_thunk_catch_exceptions(prim, &exn);
     MZ_GC_CHECK();
 
-    if (!value)
+    ถ้า (!value)
     {
 	value = extract_exn_message(exn);
 	// Got an exn?
-	if (value)
+	ถ้า (value)
 	{
 	    scheme_display(value, curerr);   //  Send to stderr-vim
 	    MZ_GC_CHECK();
@@ -1331,13 +1331,13 @@ eval_with_exn_handling(
 	}
 	MZ_GC_UNREG();
 	// `raise' was called on some arbitrary value
-	return FAIL;
+	คืน FAIL;
     }
 
-    if (ret != NULL)	// if pointer to retval supported give it up
+    ถ้า (ret != NULL)	// if pointer to retval supported give it up
 	*ret = value;
     // Print any result, as long as it's not a void
-    else if (!SCHEME_VOIDP(value))
+    มิฉะนั้น ถ้า (!SCHEME_VOIDP(value))
     {
 	scheme_display(value, curout);  // Send to stdout-vim
 	MZ_GC_CHECK();
@@ -1345,22 +1345,22 @@ eval_with_exn_handling(
 
     do_flush();
     MZ_GC_UNREG();
-    return OK;
+    คืน OK;
 }
 
 /*
  * :mzscheme
  */
-    static int
+    static จำนวนเต็ม
 do_mzscheme_command(exarg_T *eap, void *data, Scheme_Closed_Prim *what)
 {
-    if (mzscheme_init())
-	return FAIL;
+    ถ้า (mzscheme_init())
+	คืน FAIL;
 
     range_start = eap->line1;
     range_end = eap->line2;
 
-    return eval_with_exn_handling(data, what, NULL);
+    คืน eval_with_exn_handling(data, what, NULL);
 }
 
 /*
@@ -1369,8 +1369,8 @@ do_mzscheme_command(exarg_T *eap, void *data, Scheme_Closed_Prim *what)
     void
 mzscheme_buffer_free(buf_T *buf)
 {
-    if (buf->b_mzscheme_ref == NULL)
-	return;
+    ถ้า (buf->b_mzscheme_ref == NULL)
+	คืน;
 
     vim_mz_buffer *bp = NULL;
     MZ_GC_DECL_REG(1);
@@ -1381,7 +1381,7 @@ mzscheme_buffer_free(buf_T *buf)
     bp->buf = INVALID_BUFFER_VALUE;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(buf->b_mzscheme_ref);
-#else
+#มิฉะนั้น
     scheme_gc_ptr_ok(bp);
 #endif
     buf->b_mzscheme_ref = NULL;
@@ -1395,8 +1395,8 @@ mzscheme_buffer_free(buf_T *buf)
     void
 mzscheme_window_free(win_T *win)
 {
-    if (win->w_mzscheme_ref == NULL)
-	return;
+    ถ้า (win->w_mzscheme_ref == NULL)
+	คืน;
 
     vim_mz_window *wp = NULL;
     MZ_GC_DECL_REG(1);
@@ -1406,7 +1406,7 @@ mzscheme_window_free(win_T *win)
     wp->win = INVALID_WINDOW_VALUE;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(win->w_mzscheme_ref);
-#else
+#มิฉะนั้น
     scheme_gc_ptr_ok(wp);
 #endif
     win->w_mzscheme_ref = NULL;
@@ -1423,12 +1423,12 @@ ex_mzscheme(exarg_T *eap)
     char_u	*script;
 
     script = script_get(eap, eap->arg);
-    if (eap->skip)
-	return;
+    ถ้า (eap->skip)
+	คืน;
 
-    if (script == NULL)
+    ถ้า (script == NULL)
 	do_mzscheme_command(eap, eap->arg, do_eval);
-    else
+    มิฉะนั้น
     {
 	do_mzscheme_command(eap, script, do_eval);
 	vim_free(script);
@@ -1436,11 +1436,11 @@ ex_mzscheme(exarg_T *eap)
 }
 
     static Scheme_Object *
-do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+do_load(void *data, จำนวนเต็ม noargc UNUSED, Scheme_Object **noargv UNUSED)
 {
     Scheme_Object   *expr = NULL;
     Scheme_Object   *result = NULL;
-    char	    *file = NULL;
+    var_na	    *file = NULL;
     Port_Info	    *pinfo = (Port_Info *)data;
 
     MZ_GC_DECL_REG(3);
@@ -1449,7 +1449,7 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     MZ_GC_VAR_IN_REG(2, file);
     MZ_GC_REG();
 
-    file = (char *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
+    file = (var_na *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
     MZ_GC_CHECK();
 
     // make Vim expansion
@@ -1460,7 +1460,7 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     MZ_GC_CHECK();
 
     // Like REPL but print only last result
-    while (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
+    ขณะ (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
     {
 	result = scheme_eval(expr, environment);
 	MZ_GC_CHECK();
@@ -1471,7 +1471,7 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     MZ_GC_CHECK();
     pinfo->port = NULL;
     MZ_GC_UNREG();
-    return result;
+    คืน result;
 }
 
 /*
@@ -1486,8 +1486,8 @@ ex_mzfile(exarg_T *eap)
     MZ_GC_VAR_IN_REG(0, pinfo.port);
     MZ_GC_REG();
 
-    pinfo.name = (char *)eap->arg;
-    if (do_mzscheme_command(eap, &pinfo, do_load) != OK
+    pinfo.name = (var_na *)eap->arg;
+    ถ้า (do_mzscheme_command(eap, &pinfo, do_load) != OK
 	    && pinfo.port != NULL)	// looks like port was not closed
     {
 	scheme_close_input_port(pinfo.port);
@@ -1506,10 +1506,10 @@ ex_mzfile(exarg_T *eap)
     static void
 init_exn_catching_apply(void)
 {
-    if (exn_catching_apply)
-	return;
+    ถ้า (exn_catching_apply)
+	คืน;
 
-    char *e =
+    var_na *e =
 	"(lambda (thunk) "
 	"(with-handlers ([void (lambda (exn) (cons #f exn))]) "
 	"(cons #t (thunk))))";
@@ -1535,28 +1535,28 @@ _apply_thunk_catch_exceptions(Scheme_Object *f, Scheme_Object **exn)
     v = _scheme_apply(exn_catching_apply, 1, &f);
     // v is a pair: (cons #t value) or (cons #f exn)
 
-    if (SCHEME_TRUEP(SCHEME_CAR(v)))
-	return SCHEME_CDR(v);
-    else
+    ถ้า (SCHEME_TRUEP(SCHEME_CAR(v)))
+	คืน SCHEME_CDR(v);
+    มิฉะนั้น
     {
 	*exn = SCHEME_CDR(v);
-	return NULL;
+	คืน NULL;
     }
 }
 
     static Scheme_Object *
 extract_exn_message(Scheme_Object *v)
 {
-    if (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
-	return _scheme_apply(exn_message, 1, &v);
-    else
-	return NULL; // Not an exn structure
+    ถ้า (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
+	คืน _scheme_apply(exn_message, 1, &v);
+    มิฉะนั้น
+	คืน NULL; // Not an exn structure
 }
 
     static Scheme_Object *
-do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+do_eval(void *s, จำนวนเต็ม noargc UNUSED, Scheme_Object **noargv UNUSED)
 {
-    return scheme_eval_string_all((char *)s, environment, TRUE);
+    คืน scheme_eval_string_all((var_na *)s, environment, TRUE);
 }
 
 /*
@@ -1565,44 +1565,44 @@ do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
  *========================================================================
  */
     static void
-do_intrnl_output(char *mesg, int error)
+do_intrnl_output(var_na *mesg, จำนวนเต็ม error)
 {
-    char *p, *prev;
+    var_na *p, *prev;
 
     prev = mesg;
     p = strchr(prev, '\n');
-    while (p)
+    ขณะ (p)
     {
 	*p = '\0';
-	if (error)
+	ถ้า (error)
 	    emsg(prev);
-	else
+	มิฉะนั้น
 	    msg(prev);
 	prev = p + 1;
 	p = strchr(prev, '\n');
     }
 
-    if (error)
+    ถ้า (error)
 	emsg(prev);
-    else
+    มิฉะนั้น
 	msg(prev);
 }
 
     static void
-do_output(char *mesg, OUTPUT_LEN_TYPE len UNUSED)
+do_output(var_na *mesg, OUTPUT_LEN_TYPE len UNUSED)
 {
     // TODO: use len, the string may not be NUL terminated
     do_intrnl_output(mesg, 0);
 }
 
     static void
-do_err_output(char *mesg)
+do_err_output(var_na *mesg)
 {
     do_intrnl_output(mesg, 1);
 }
 
     static void
-do_printf(char *format, ...)
+do_printf(var_na *format, ...)
 {
     do_intrnl_output(format, 1);
 }
@@ -1610,20 +1610,20 @@ do_printf(char *format, ...)
     static void
 do_flush(void)
 {
-    char *buff;
+    var_na *buff;
     OUTPUT_LEN_TYPE length;
 
     buff = scheme_get_sized_byte_string_output(curerr, &length);
     MZ_GC_CHECK();
-    if (length)
+    ถ้า (length)
     {
 	do_err_output(buff);
-	return;
+	คืน;
     }
 
     buff = scheme_get_sized_byte_string_output(curout, &length);
     MZ_GC_CHECK();
-    if (length)
+    ถ้า (length)
 	do_output(buff, length);
 }
 
@@ -1637,7 +1637,7 @@ do_flush(void)
  * (command {command-string})
  */
     static Scheme_Object *
-vim_command(void *data, int argc, Scheme_Object **argv)
+vim_command(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     Scheme_Object *cmd = NULL;
@@ -1652,14 +1652,14 @@ vim_command(void *data, int argc, Scheme_Object **argv)
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
  * (eval {expr-string})
  */
     static Scheme_Object *
-vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+vim_eval(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
 #ifdef FEAT_EVAL
     Vim_Prim		*prim = (Vim_Prim *)data;
@@ -1674,7 +1674,7 @@ vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
 
     vim_result = eval_expr(BYTE_STRING_VALUE(expr), NULL);
 
-    if (vim_result == NULL)
+    ถ้า (vim_result == NULL)
 	raise_vim_exn(_("invalid expression"));
 
     result = vim_to_mzscheme(vim_result);
@@ -1682,11 +1682,11 @@ vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
     free_tv(vim_result);
 
     MZ_GC_UNREG();
-    return result;
-#else
+    คืน result;
+#มิฉะนั้น
     raise_vim_exn(_("expressions disabled at compile time"));
     // unreachable
-    return scheme_false;
+    คืน scheme_false;
 #endif
 }
 
@@ -1696,29 +1696,29 @@ vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
     static Scheme_Object *
 get_range_start(
     void		*data UNUSED,
-    int			argc UNUSED,
+    จำนวนเต็ม			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    return scheme_make_integer(range_start);
+    คืน scheme_make_integer(range_start);
 }
 
 /*
  * (range-end)
  */
     static Scheme_Object *
-get_range_end(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+get_range_end(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return scheme_make_integer(range_end);
+    คืน scheme_make_integer(range_end);
 }
 
 /*
  * (beep)
  */
     static Scheme_Object *
-mzscheme_beep(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+mzscheme_beep(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
     vim_beep(BO_LANG);
-    return scheme_void;
+    คืน scheme_void;
 }
 
 static Scheme_Object *M_global = NULL;
@@ -1727,15 +1727,15 @@ static Scheme_Object *M_global = NULL;
  * (get-option {option-name}) [buffer/window]
  */
     static Scheme_Object *
-get_option(void *data, int argc, Scheme_Object **argv)
+get_option(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     long	    value;
-    char	    *strval;
+    var_na	    *strval;
     getoption_T	    rc;
     Scheme_Object   *rval = NULL;
     Scheme_Object   *name = NULL;
-    int		    scope = 0;
+    จำนวนเต็ม		    scope = 0;
     buf_T	    *save_curb = curbuf;
     win_T	    *save_curw = curwin;
 
@@ -1746,23 +1746,23 @@ get_option(void *data, int argc, Scheme_Object **argv)
 
     name = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    ถ้า (argc > 1)
     {
-	if (M_global == NULL)
+	ถ้า (M_global == NULL)
 	{
 	    MZ_REGISTER_STATIC(M_global);
 	    M_global = scheme_intern_symbol("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	ถ้า (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	มิฉะนั้น ถ้า (SCHEME_VIMBUFFERP(argv[1]))
 	{
 	    curbuf = get_valid_buffer(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	มิฉะนั้น ถ้า (SCHEME_VIMWINDOWP(argv[1]))
 	{
 	    win_T *win = get_valid_window(argv[1]);
 
@@ -1770,7 +1770,7 @@ get_option(void *data, int argc, Scheme_Object **argv)
 	    curbuf = win->w_buffer;
 	    scope = OPT_LOCAL;
 	}
-	else
+	มิฉะนั้น
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
@@ -1781,39 +1781,39 @@ get_option(void *data, int argc, Scheme_Object **argv)
 
     switch (rc)
     {
-    case gov_bool:
-    case gov_number:
+    pak_sa gov_bool:
+    pak_sa gov_number:
 	MZ_GC_UNREG();
-	return scheme_make_integer_value(value);
-    case gov_string:
+	คืน scheme_make_integer_value(value);
+    pak_sa gov_string:
 	rval = scheme_make_byte_string(strval);
 	MZ_GC_CHECK();
 	vim_free(strval);
 	MZ_GC_UNREG();
-	return rval;
-    case gov_hidden_bool:
-    case gov_hidden_number:
-    case gov_hidden_string:
+	คืน rval;
+    pak_sa gov_hidden_bool:
+    pak_sa gov_hidden_number:
+    pak_sa gov_hidden_string:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("hidden option"));
 	//NOTREACHED
-    case gov_unknown:
+    pak_sa gov_unknown:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("unknown option"));
 	//NOTREACHED
     }
     // unreachable
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
  * (set-option {option-changing-string} [buffer/window])
  */
     static Scheme_Object *
-set_option(void *data, int argc, Scheme_Object **argv)
+set_option(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     char_u	*command = NULL;
-    int		scope = 0;
+    จำนวนเต็ม		scope = 0;
     buf_T	*save_curb = curbuf;
     win_T	*save_curw = curwin;
     Vim_Prim	*prim = (Vim_Prim *)data;
@@ -1824,30 +1824,30 @@ set_option(void *data, int argc, Scheme_Object **argv)
     MZ_GC_REG();
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    ถ้า (argc > 1)
     {
-	if (M_global == NULL)
+	ถ้า (M_global == NULL)
 	{
 	    MZ_REGISTER_STATIC(M_global);
 	    M_global = scheme_intern_symbol("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	ถ้า (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	มิฉะนั้น ถ้า (SCHEME_VIMBUFFERP(argv[1]))
 	{
 	    curbuf = get_valid_buffer(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	มิฉะนั้น ถ้า (SCHEME_VIMWINDOWP(argv[1]))
 	{
 	    win_T *win = get_valid_window(argv[1]);
 	    curwin = win;
 	    curbuf = win->w_buffer;
 	    scope = OPT_LOCAL;
 	}
-	else
+	มิฉะนั้น
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
@@ -1860,7 +1860,7 @@ set_option(void *data, int argc, Scheme_Object **argv)
     curbuf = save_curb;
     curwin = save_curw;
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
@@ -1873,9 +1873,9 @@ set_option(void *data, int argc, Scheme_Object **argv)
  * (curr-win)
  */
     static Scheme_Object *
-get_curr_win(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+get_curr_win(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return (Scheme_Object *)get_vim_curr_window();
+    คืน (Scheme_Object *)get_vim_curr_window();
 }
 
 /*
@@ -1884,22 +1884,22 @@ get_curr_win(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
     static Scheme_Object *
 get_window_count(
     void		*data UNUSED,
-    int			argc UNUSED,
+    จำนวนเต็ม			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    int	    n = 0;
+    จำนวนเต็ม	    n = 0;
     win_T   *w;
 
     FOR_ALL_WINDOWS(w)
 	++n;
-    return scheme_make_integer(n);
+    คืน scheme_make_integer(n);
 }
 
 /*
  * (get-win-list [buffer])
  */
     static Scheme_Object *
-get_window_list(void *data, int argc, Scheme_Object **argv)
+get_window_list(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
@@ -1909,14 +1909,14 @@ get_window_list(void *data, int argc, Scheme_Object **argv)
     buf = get_buffer_arg(prim->name, 0, argc, argv);
     list = scheme_null;
 
-    for ( ; w != NULL; w = w->w_next)
-	if (w->w_buffer == buf->buf)
+    สำหรับ ( ; w != NULL; w = w->w_next)
+	ถ้า (w->w_buffer == buf->buf)
 	{
 	    list = scheme_make_pair(window_new(w), list);
 	    MZ_GC_CHECK();
 	}
 
-    return list;
+    คืน list;
 }
 
     static Scheme_Object *
@@ -1934,15 +1934,15 @@ window_new(win_T *win)
     // On a win_free() we set the Scheme object's win_T *field
     // to an invalid value. We trap all uses of a window
     // object, and reject them if the win_T *field is invalid.
-    if (win->w_mzscheme_ref != NULL)
-	return (Scheme_Object *)WINDOW_REF(win);
+    ถ้า (win->w_mzscheme_ref != NULL)
+	คืน (Scheme_Object *)WINDOW_REF(win);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_window));
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, parimaa_na(vim_mz_window));
     CLEAR_POINTER(self);
 #ifdef MZ_PRECISE_GC
     win->w_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+#มิฉะนั้น
     scheme_dont_gc_ptr(self);	// because win isn't visible to GC
 #endif
     MZ_GC_CHECK();
@@ -1952,81 +1952,81 @@ window_new(win_T *win)
     self->so.type = mz_window_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    คืน (Scheme_Object *)self;
 }
 
 /*
  * (get-win-num [window])
  */
     static Scheme_Object *
-get_window_num(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+get_window_num(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    int		nr = 1;
+    จำนวนเต็ม		nr = 1;
     Vim_Prim	*prim = (Vim_Prim *)data;
     win_T	*win = get_window_arg(prim->name, 0, argc, argv)->win;
     win_T	*wp;
 
-    for (wp = firstwin; wp != win; wp = wp->w_next)
+    สำหรับ (wp = firstwin; wp != win; wp = wp->w_next)
 	++nr;
 
-    return scheme_make_integer(nr);
+    คืน scheme_make_integer(nr);
 }
 
 /*
  * (get-win-by-num {windownum})
  */
     static Scheme_Object *
-get_window_by_num(void *data, int argc, Scheme_Object **argv)
+get_window_by_num(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     win_T	*win = firstwin;
-    int		fnum;
+    จำนวนเต็ม		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (fnum < 1)
+    ถ้า (fnum < 1)
 	scheme_signal_error(_("window index is out of range"));
 
-    for ( ; win != NULL; win = win->w_next, --fnum)
-	if (fnum == 1)	    // to be 1-based
-	    return window_new(win);
+    สำหรับ ( ; win != NULL; win = win->w_next, --fnum)
+	ถ้า (fnum == 1)	    // to be 1-based
+	    คืน window_new(win);
 
-    return scheme_false;
+    คืน scheme_false;
 }
 
 /*
  * (get-win-buffer [window])
  */
     static Scheme_Object *
-get_window_buffer(void *data, int argc, Scheme_Object **argv)
+get_window_buffer(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return buffer_new(win->win->w_buffer);
+    คืน buffer_new(win->win->w_buffer);
 }
 
 /*
  * (get-win-height [window])
  */
     static Scheme_Object *
-get_window_height(void *data, int argc, Scheme_Object **argv)
+get_window_height(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_height);
+    คืน scheme_make_integer(win->win->w_height);
 }
 
 /*
  * (set-win-height {height} [window])
  */
     static Scheme_Object *
-set_window_height(void *data, int argc, Scheme_Object **argv)
+set_window_height(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
     win_T	    *savewin;
-    int		    height;
+    จำนวนเต็ม		    height;
 
     win = get_window_arg(prim->name, 1, argc, argv);
     height = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
@@ -2041,31 +2041,31 @@ set_window_height(void *data, int argc, Scheme_Object **argv)
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
  * (get-win-width [window])
  */
     static Scheme_Object *
-get_window_width(void *data, int argc, Scheme_Object **argv)
+get_window_width(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_width);
+    คืน scheme_make_integer(win->win->w_width);
 }
 
 /*
  * (set-win-width {width} [window])
  */
     static Scheme_Object *
-set_window_width(void *data, int argc, Scheme_Object **argv)
+set_window_width(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
     win_T	    *savewin;
-    int		    width = 0;
+    จำนวนเต็ม		    width = 0;
 
     win = get_window_arg(prim->name, 1, argc, argv);
     width = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
@@ -2080,14 +2080,14 @@ set_window_width(void *data, int argc, Scheme_Object **argv)
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
  * (get-cursor [window]) -> (line . col)
  */
     static Scheme_Object *
-get_cursor(void *data, int argc, Scheme_Object **argv)
+get_cursor(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
@@ -2095,7 +2095,7 @@ get_cursor(void *data, int argc, Scheme_Object **argv)
 
     win = get_window_arg(prim->name, 0, argc, argv);
     pos = win->win->w_cursor;
-    return scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
+    คืน scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
 		    scheme_make_integer_value((long)pos.col + 1));
 }
 
@@ -2103,7 +2103,7 @@ get_cursor(void *data, int argc, Scheme_Object **argv)
  * (set-cursor (line . col) [window])
  */
     static Scheme_Object *
-set_cursor(void *data, int argc, Scheme_Object **argv)
+set_cursor(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
@@ -2116,7 +2116,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
     win = get_window_arg(prim->name, 1, argc, argv);
     GUARANTEE_PAIR(prim->name, 0);
 
-    if (!SCHEME_INTP(SCHEME_CAR(argv[0]))
+    ถ้า (!SCHEME_INTP(SCHEME_CAR(argv[0]))
 	    || !SCHEME_INTP(SCHEME_CDR(argv[0])))
 	scheme_wrong_type(prim->name, "integer pair", 0, argc, argv);
 
@@ -2132,7 +2132,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
     update_screen(UPD_VALID);
 
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 /*
  *===========================================================================
@@ -2144,10 +2144,10 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
  * (open-buff {filename})
  */
     static Scheme_Object *
-mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
+mzscheme_open_buffer(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    int		    num = 0;
+    จำนวนเต็ม		    num = 0;
     Scheme_Object   *onum = NULL;
     Scheme_Object   *buf = NULL;
     Scheme_Object   *fname;
@@ -2165,39 +2165,39 @@ mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
     // TODO make open existing file
     num = buflist_add(BYTE_STRING_VALUE(fname), BLN_LISTED | BLN_CURBUF);
 
-    if (num == 0)
+    ถ้า (num == 0)
 	raise_vim_exn(_("couldn't open buffer"));
 
     onum = scheme_make_integer(num);
     buf = get_buffer_by_num(data, 1, &onum);
     MZ_GC_UNREG();
-    return buf;
+    คืน buf;
 }
 
 /*
  * (get-buff-by-num {buffernum})
  */
     static Scheme_Object *
-get_buffer_by_num(void *data, int argc, Scheme_Object **argv)
+get_buffer_by_num(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf;
-    int		fnum;
+    จำนวนเต็ม		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
 
     FOR_ALL_BUFFERS(buf)
-	if (buf->b_fnum == fnum)
-	    return buffer_new(buf);
+	ถ้า (buf->b_fnum == fnum)
+	    คืน buffer_new(buf);
 
-    return scheme_false;
+    คืน scheme_false;
 }
 
 /*
  * (get-buff-by-name {buffername})
  */
     static Scheme_Object *
-get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
+get_buffer_by_name(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf;
@@ -2213,13 +2213,13 @@ get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+	ถ้า (buf->b_ffname == NULL || buf->b_sfname == NULL)
 	    // empty string
 	{
-	    if (BYTE_STRING_VALUE(fname)[0] == NUL)
+	    ถ้า (BYTE_STRING_VALUE(fname)[0] == NUL)
 		buffer = buffer_new(buf);
 	}
-	else if (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
+	มิฉะนั้น ถ้า (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
 		|| !fnamecmp(buf->b_sfname, BYTE_STRING_VALUE(fname)))
 	{
 	    // either short or long filename matches
@@ -2228,49 +2228,49 @@ get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
     }
 
     MZ_GC_UNREG();
-    return buffer;
+    คืน buffer;
 }
 
 /*
  * (get-next-buff [buffer])
  */
     static Scheme_Object *
-get_next_buffer(void *data, int argc, Scheme_Object **argv)
+get_next_buffer(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_next == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_next);
+    ถ้า (buf->b_next == NULL)
+	คืน scheme_false;
+    มิฉะนั้น
+	คืน buffer_new(buf->b_next);
 }
 
 /*
  * (get-prev-buff [buffer])
  */
     static Scheme_Object *
-get_prev_buffer(void *data, int argc, Scheme_Object **argv)
+get_prev_buffer(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_prev == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_prev);
+    ถ้า (buf->b_prev == NULL)
+	คืน scheme_false;
+    มิฉะนั้น
+	คืน buffer_new(buf->b_prev);
 }
 
 /*
  * (get-buff-num [buffer])
  */
     static Scheme_Object *
-get_buffer_num(void *data, int argc, Scheme_Object **argv)
+get_buffer_num(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_fnum);
+    คืน scheme_make_integer(buf->buf->b_fnum);
 }
 
 /*
@@ -2279,26 +2279,26 @@ get_buffer_num(void *data, int argc, Scheme_Object **argv)
     static Scheme_Object *
 get_buffer_count(
     void		*data UNUSED,
-    int			argc UNUSED,
+    จำนวนเต็ม			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
     buf_T   *b;
-    int	    n = 0;
+    จำนวนเต็ม	    n = 0;
 
     FOR_ALL_BUFFERS(b) ++n;
-    return scheme_make_integer(n);
+    คืน scheme_make_integer(n);
 }
 
 /*
  * (get-buff-name [buffer])
  */
     static Scheme_Object *
-get_buffer_name(void *data, int argc, Scheme_Object **argv)
+get_buffer_name(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_byte_string((char *)buf->buf->b_ffname);
+    คืน scheme_make_byte_string((var_na *)buf->buf->b_ffname);
 }
 
 /*
@@ -2307,10 +2307,10 @@ get_buffer_name(void *data, int argc, Scheme_Object **argv)
     static Scheme_Object *
 get_curr_buffer(
     void		*data UNUSED,
-    int			argc UNUSED,
+    จำนวนเต็ม			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    return (Scheme_Object *)get_vim_curr_buffer();
+    คืน (Scheme_Object *)get_vim_curr_buffer();
 }
 
     static Scheme_Object *
@@ -2324,15 +2324,15 @@ buffer_new(buf_T *buf)
     // We need to handle deletion of buffers underneath us.
     // If we add a "b_mzscheme_ref" field to the buf_T structure,
     // then we can get at it in buf_freeall() in vim.
-    if (buf->b_mzscheme_ref)
-	return (Scheme_Object *)BUFFER_REF(buf);
+    ถ้า (buf->b_mzscheme_ref)
+	คืน (Scheme_Object *)BUFFER_REF(buf);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_buffer));
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, parimaa_na(vim_mz_buffer));
     CLEAR_POINTER(self);
 #ifdef MZ_PRECISE_GC
     buf->b_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+#มิฉะนั้น
     scheme_dont_gc_ptr(self);	// because buf isn't visible to GC
 #endif
     MZ_GC_CHECK();
@@ -2342,7 +2342,7 @@ buffer_new(buf_T *buf)
     self->so.type = mz_buffer_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    คืน (Scheme_Object *)self;
 }
 
 /*
@@ -2351,12 +2351,12 @@ buffer_new(buf_T *buf)
  * Get the size (number of lines) in the current buffer.
  */
     static Scheme_Object *
-get_buffer_size(void *data, int argc, Scheme_Object **argv)
+get_buffer_size(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_ml.ml_line_count);
+    คืน scheme_make_integer(buf->buf->b_ml.ml_line_count);
 }
 
 /*
@@ -2367,11 +2367,11 @@ get_buffer_size(void *data, int argc, Scheme_Object **argv)
  * string object.
  */
     static Scheme_Object *
-get_buffer_line(void *data, int argc, Scheme_Object **argv)
+get_buffer_line(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    int		    linenr;
+    จำนวนเต็ม		    linenr;
     char_u	    *line;
 
     buf = get_buffer_arg(prim->name, 1, argc, argv);
@@ -2379,7 +2379,7 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
     line = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
 
     raise_if_error();
-    return scheme_make_byte_string((char *)line);
+    คืน scheme_make_byte_string((var_na *)line);
 }
 
 
@@ -2391,11 +2391,11 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
  * including, hi. The list is returned as a list of string objects.
  */
     static Scheme_Object *
-get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+get_buffer_line_list(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    int		    i, hi, lo, n;
+    จำนวนเต็ม		    i, hi, lo, n;
     Scheme_Object   *list = NULL;
 
     MZ_GC_DECL_REG(1);
@@ -2410,20 +2410,20 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     /*
      * Handle some error conditions
      */
-    if (lo < 0)
+    ถ้า (lo < 0)
 	lo = 0;
 
-    if (hi < 0)
+    ถ้า (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    ถ้า (hi < lo)
 	hi = lo;
 
     n = hi - lo;
 
-    for (i = n; i >= 0; --i)
+    สำหรับ (i = n; i >= 0; --i)
     {
 	Scheme_Object *str = scheme_make_byte_string(
-		       (char *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
+		       (var_na *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
 	raise_if_error();
 
 	// Set the list item
@@ -2431,7 +2431,7 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return list;
+    คืน list;
 }
 
 /*
@@ -2447,7 +2447,7 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * string changed.
  */
     static Scheme_Object *
-set_buffer_line(void *data, int argc, Scheme_Object **argv)
+set_buffer_line(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     // First of all, we check the value of the supplied MzScheme object.
     // There are three cases:
@@ -2457,8 +2457,8 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
     Scheme_Object   *line = NULL;
-    char	    *save;
-    int		    n;
+    var_na	    *save;
+    จำนวนเต็ม		    n;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, line);
@@ -2468,30 +2468,30 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     sandbox_check();
 #endif
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
+    ถ้า (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
 	scheme_wrong_type(prim->name, "string or #f", 1, argc, argv);
     line = argv[1];
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
     check_line_range(n, buf->buf);
 
-    if (SCHEME_FALSEP(line))
+    ถ้า (SCHEME_FALSEP(line))
     {
 	buf_T	    *savebuf = curbuf;
 
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	ถ้า (u_savedel((linenr_T)n, 1L) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_delete((linenr_T)n) == FAIL)
+	มิฉะนั้น ถ้า (ml_delete((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot delete line"));
 	}
-	if (buf->buf == curwin->w_buffer)
+	ถ้า (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(n, n + 1, -1);
 	deleted_lines_mark((linenr_T)n, 1L);
 
@@ -2499,9 +2499,9 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	คืน scheme_void;
     }
-    else
+    มิฉะนั้น
     {
 	// Otherwise it's a line
 	buf_T	    *savebuf = curbuf;
@@ -2510,19 +2510,19 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 
 	curbuf = buf->buf;
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	ถ้า (u_savesub((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
+	มิฉะนั้น ถ้า (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot replace line"));
 	}
-	else
+	มิฉะนั้น
 	{
 	    vim_free(save);
 	    changed_bytes((linenr_T)n, 0);
@@ -2531,20 +2531,20 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 	curbuf = savebuf;
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf->buf == curwin->w_buffer)
+	ถ้า (buf->buf == curwin->w_buffer)
 	    check_cursor_col();
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	คืน scheme_void;
     }
 }
 
     static void
-free_array(char **array)
+free_array(var_na **array)
 {
-    char **curr = array;
-    while (*curr != NULL)
+    var_na **curr = array;
+    ขณะ (*curr != NULL)
 	vim_free(*curr++);
     vim_free(array);
 }
@@ -2562,7 +2562,7 @@ free_array(char **array)
  * change in the buffer length.
  */
     static Scheme_Object *
-set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+set_buffer_line_list(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     // First of all, we check the type of the supplied MzScheme object.
     // There are three cases:
@@ -2572,7 +2572,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = NULL;
     Scheme_Object   *line_list = NULL;
-    int		    i, old_len, new_len, hi, lo;
+    จำนวนเต็ม		    i, old_len, new_len, hi, lo;
     long	    extra;
 
     MZ_GC_DECL_REG(1);
@@ -2584,13 +2584,13 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 #endif
     lo = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     hi = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 1));
-    if (!SCHEME_PAIRP(argv[2])
+    ถ้า (!SCHEME_PAIRP(argv[2])
 	    && !SCHEME_FALSEP(argv[2]) && !SCHEME_NULLP(argv[2]))
 	scheme_wrong_type(prim->name, "list or #f", 2, argc, argv);
     line_list = argv[2];
     buf = get_buffer_arg(prim->name, 3, argc, argv);
     old_len = hi - lo;
-    if (old_len < 0) // process inverse values wisely
+    ถ้า (old_len < 0) // process inverse values wisely
     {
 	i = lo;
 	lo = hi;
@@ -2602,25 +2602,25 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     check_line_range(lo, buf->buf);	    // inclusive
     check_line_range(hi - 1, buf->buf);	    // exclusive
 
-    if (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
+    ถ้า (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
     {
 	buf_T	*savebuf = curbuf;
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)lo, (long)old_len) == FAIL)
+	ถ้า (u_savedel((linenr_T)lo, (long)old_len) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	มิฉะนั้น
 	{
-	    for (i = 0; i < old_len; i++)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    สำหรับ (i = 0; i < old_len; i++)
+		ถ้า (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    raise_vim_exn(_("cannot delete line"));
 		}
-	    if (buf->buf == curwin->w_buffer)
+	    ถ้า (buf->buf == curwin->w_buffer)
 		mz_fix_cursor(lo, hi, -old_len);
 	    deleted_lines_mark((linenr_T)lo, (long)old_len);
 	}
@@ -2629,21 +2629,21 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	คืน scheme_void;
     }
-    else
+    มิฉะนั้น
     {
 	buf_T	*savebuf = curbuf;
 
 	// List
 	new_len = scheme_proper_list_length(line_list);
 	MZ_GC_CHECK();
-	if (new_len < 0)	// improper or cyclic list
+	ถ้า (new_len < 0)	// improper or cyclic list
 	    scheme_wrong_type(prim->name, "proper list",
 		    2, argc, argv);
-	else
+	มิฉะนั้น
 	{
-	    char		**array = NULL;
+	    var_na		**array = NULL;
 	    Scheme_Object   *line = NULL;
 	    Scheme_Object   *rest = NULL;
 
@@ -2652,14 +2652,14 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	    MZ_GC_VAR_IN_REG(1, rest);
 	    MZ_GC_REG();
 
-	    array = ALLOC_CLEAR_MULT(char *, new_len + 1);
+	    array = ALLOC_CLEAR_MULT(var_na *, new_len + 1);
 
 	    rest = line_list;
-	    for (i = 0; i < new_len; ++i)
+	    สำหรับ (i = 0; i < new_len; ++i)
 	    {
 		line = SCHEME_CAR(rest);
 		rest = SCHEME_CDR(rest);
-		if (!SCHEME_STRINGP(line))
+		ถ้า (!SCHEME_STRINGP(line))
 		{
 		    free_array(array);
 		    scheme_wrong_type(prim->name, "string-list", 2, argc, argv);
@@ -2669,7 +2669,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	    curbuf = buf->buf;
 
-	    if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	    ถ้า (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    {
 		curbuf = savebuf;
 		free_array(array);
@@ -2681,9 +2681,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * need to delete some old_len. We do this at the start, by
 	     * repeatedly deleting line "lo".
 	     */
-	    for (i = 0; i < old_len - new_len; ++i)
+	    สำหรับ (i = 0; i < old_len - new_len; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		ถ้า (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2697,8 +2697,8 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * new old_len. This is a more efficient operation, as it requires
 	     * less memory allocation and freeing.
 	     */
-	    for (i = 0; i < old_len && i < new_len; i++)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
+	    สำหรับ (i = 0; i < old_len && i < new_len; i++)
+		ถ้า (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2710,9 +2710,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * free the string passed back because MzScheme has control of that
 	     * memory.
 	     */
-	    while (i < new_len)
+	    ขณะ (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		ถ้า (ml_append((linenr_T)(lo + i - 1),
 			    (char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2734,13 +2734,13 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 						  (long)MAXLNUM, (long)extra);
 	changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 
-	if (buf->buf == curwin->w_buffer)
+	ถ้า (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(lo, hi, extra);
 	curbuf = savebuf;
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	คืน scheme_void;
     }
 }
 
@@ -2756,13 +2756,13 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * is set to the change in the buffer length.
  */
     static Scheme_Object *
-insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+insert_buffer_line_list(void *data, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = NULL;
     Scheme_Object   *list = NULL;
-    char	    *str = NULL;
-    int		    i, n, size;
+    var_na	    *str = NULL;
+    จำนวนเต็ม		    i, n, size;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, list);
@@ -2778,32 +2778,32 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     list = argv[1];
 
-    if (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
+    ถ้า (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
 	scheme_wrong_type(prim->name, "string or list", 1, argc, argv);
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
-    if (n != 0)	    // 0 can be used in insert
+    ถ้า (n != 0)	    // 0 can be used in insert
 	check_line_range(n, buf->buf);
-    if (SCHEME_STRINGP(list))
+    ถ้า (SCHEME_STRINGP(list))
     {
 	buf_T	    *savebuf = curbuf;
 
 	str = string_to_line(list);
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
+	ถ้า (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	มิฉะนั้น ถ้า (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot insert line"));
 	}
-	else
+	มิฉะนั้น
 	{
 	    vim_free(str);
 	    appended_lines_mark((linenr_T)n, 1L);
@@ -2814,20 +2814,20 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	คืน scheme_void;
     }
 
     // List
     size = scheme_proper_list_length(list);
     MZ_GC_CHECK();
-    if (size < 0)	// improper or cyclic list
+    ถ้า (size < 0)	// improper or cyclic list
 	scheme_wrong_type(prim->name, "proper list",
 		2, argc, argv);
-    else
+    มิฉะนั้น
     {
 	Scheme_Object   *line = NULL;
 	Scheme_Object   *rest = NULL;
-	char		**array;
+	var_na		**array;
 	buf_T		*savebuf = curbuf;
 
 	MZ_GC_DECL_REG(2);
@@ -2835,10 +2835,10 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_VAR_IN_REG(1, rest);
 	MZ_GC_REG();
 
-	array = ALLOC_CLEAR_MULT(char *, size + 1);
+	array = ALLOC_CLEAR_MULT(var_na *, size + 1);
 
 	rest = list;
-	for (i = 0; i < size; ++i)
+	สำหรับ (i = 0; i < size; ++i)
 	{
 	    line = SCHEME_CAR(rest);
 	    rest = SCHEME_CDR(rest);
@@ -2847,16 +2847,16 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	ถ้า (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    free_array(array);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	มิฉะนั้น
 	{
-	    for (i = 0; i < size; ++i)
-		if (ml_append((linenr_T)(n + i), (char_u *)array[i],
+	    สำหรับ (i = 0; i < size; ++i)
+		ถ้า (ml_append((linenr_T)(n + i), (char_u *)array[i],
 			    0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2864,7 +2864,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		    raise_vim_exn(_("cannot insert line"));
 		}
 
-	    if (i > 0)
+	    ถ้า (i > 0)
 		appended_lines_mark((linenr_T)n, (long)i);
 	}
 	free_array(array);
@@ -2875,7 +2875,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    คืน scheme_void;
 }
 
 /*
@@ -2885,50 +2885,50 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * (buff? obj)
  */
     static Scheme_Object *
-vim_bufferp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+vim_bufferp(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    ถ้า (SCHEME_VIMBUFFERP(argv[0]))
+	คืน scheme_true;
+    มิฉะนั้น
+	คืน scheme_false;
 }
 
 /*
  * (win? obj)
  */
     static Scheme_Object *
-vim_windowp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+vim_windowp(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    ถ้า (SCHEME_VIMWINDOWP(argv[0]))
+	คืน scheme_true;
+    มิฉะนั้น
+	คืน scheme_false;
 }
 
 /*
  * (buff-valid? obj)
  */
     static Scheme_Object *
-vim_buffer_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+vim_buffer_validp(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0])
+    ถ้า (SCHEME_VIMBUFFERP(argv[0])
 	    && ((vim_mz_buffer *)argv[0])->buf != INVALID_BUFFER_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+	คืน scheme_true;
+    มิฉะนั้น
+	คืน scheme_false;
 }
 
 /*
  * (win-valid? obj)
  */
     static Scheme_Object *
-vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+vim_window_validp(void *data UNUSED, จำนวนเต็ม argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0])
+    ถ้า (SCHEME_VIMWINDOWP(argv[0])
 	    && ((vim_mz_window *)argv[0])->win != INVALID_WINDOW_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+	คืน scheme_true;
+    มิฉะนั้น
+	คืน scheme_false;
 }
 
 /*
@@ -2945,38 +2945,38 @@ vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
  *
  * Returns pointer to Vim allocated memory
  */
-    static char *
+    static var_na *
 string_to_line(Scheme_Object *obj)
 {
-    char	*scheme_str = NULL;
-    char	*vim_str = NULL;
+    var_na	*scheme_str = NULL;
+    var_na	*vim_str = NULL;
     OUTPUT_LEN_TYPE	len;
-    int		i;
+    จำนวนเต็ม		i;
 
     scheme_str = scheme_display_to_string(obj, &len);
 
     // Error checking: String must not contain newlines, as we
     // are replacing a single line, and we must replace it with
     // a single line.
-    if (memchr(scheme_str, '\n', len))
+    ถ้า (memchr(scheme_str, '\n', len))
 	scheme_signal_error(_("string cannot contain newlines"));
 
     vim_str = alloc(len + 1);
 
     // Create a copy of the string, with internal nulls replaced by
     // newline characters, as is the vim convention.
-    for (i = 0; i < len; ++i)
+    สำหรับ (i = 0; i < len; ++i)
     {
-	if (scheme_str[i] == '\0')
+	ถ้า (scheme_str[i] == '\0')
 	    vim_str[i] = '\n';
-	else
+	มิฉะนั้น
 	    vim_str[i] = scheme_str[i];
     }
 
     vim_str[i] = '\0';
 
     MZ_GC_CHECK();
-    return vim_str;
+    คืน vim_str;
 }
 
 #ifdef FEAT_EVAL
@@ -3001,17 +3001,17 @@ vim_to_mzscheme(typval_T *vim_value)
     result = vim_to_mzscheme_impl(vim_value, 1, visited);
 
     MZ_GC_UNREG();
-    return result;
+    คืน result;
 }
 
     static Scheme_Object *
 vim_to_mzscheme_impl(
     typval_T		*vim_value,
-    int			depth,
+    จำนวนเต็ม			depth,
     Scheme_Hash_Table	*visited)
 {
     Scheme_Object   *result = NULL;
-    int		    new_value = TRUE;
+    จำนวนเต็ม		    new_value = TRUE;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
@@ -3019,41 +3019,41 @@ vim_to_mzscheme_impl(
     MZ_GC_REG();
 
     // Avoid infinite recursion
-    if (depth > 100)
+    ถ้า (depth > 100)
     {
 	MZ_GC_UNREG();
-	return scheme_void;
+	คืน scheme_void;
     }
 
     // Check if we run into a recursive loop.  The item must be in visited
     // then and we can use it again.
     result = scheme_hash_get(visited, (Scheme_Object *)vim_value);
     MZ_GC_CHECK();
-    if (result != NULL) // found, do nothing
+    ถ้า (result != NULL) // found, do nothing
 	new_value = FALSE;
-    else if (vim_value->v_type == VAR_STRING)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_STRING)
     {
-	result = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	result = scheme_make_byte_string((var_na *)vim_value->vval.v_string);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_NUMBER)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_NUMBER)
     {
 	result = scheme_make_integer((long)vim_value->vval.v_number);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_FLOAT)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_FLOAT)
     {
-	result = scheme_make_double((double)vim_value->vval.v_float);
+	result = scheme_make_double((dviguu_na)vim_value->vval.v_float);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_LIST)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_LIST)
     {
 	list_T		*list = vim_value->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL || list->lv_first == NULL)
+	ถ้า (list == NULL || list->lv_first == NULL)
 	    result = scheme_null;
-	else
+	มิฉะนั้น
 	{
 	    Scheme_Object   *obj = NULL;
 
@@ -3066,7 +3066,7 @@ vim_to_mzscheme_impl(
 	    result = scheme_make_pair(obj, scheme_null);
 	    MZ_GC_CHECK();
 
-	    while (curr != list->lv_first)
+	    ขณะ (curr != list->lv_first)
 	    {
 		curr = curr->li_prev;
 		obj = vim_to_mzscheme_impl(&curr->li_tv, depth + 1, visited);
@@ -3076,7 +3076,7 @@ vim_to_mzscheme_impl(
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_DICT)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_DICT)
     {
 	Scheme_Object	  *key = NULL;
 	Scheme_Object	  *obj = NULL;
@@ -3088,7 +3088,7 @@ vim_to_mzscheme_impl(
 
 	result = (Scheme_Object *)scheme_make_hash_table(SCHEME_hash_ptr);
 	MZ_GC_CHECK();
-	if (vim_value->vval.v_dict != NULL)
+	ถ้า (vim_value->vval.v_dict != NULL)
 	{
 	    hashtab_T	*ht = &vim_value->vval.v_dict->dv_hashtab;
 	    long_u	todo = ht->ht_used;
@@ -3097,13 +3097,13 @@ vim_to_mzscheme_impl(
 
 	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		ถ้า (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
 		    obj = vim_to_mzscheme_impl(&di->di_tv, depth + 1, visited);
-		    key = scheme_make_byte_string((char *)hi->hi_key);
+		    key = scheme_make_byte_string((var_na *)hi->hi_key);
 		    MZ_GC_CHECK();
 		    scheme_hash_set((Scheme_Hash_Table *)result, key, obj);
 		    MZ_GC_CHECK();
@@ -3112,7 +3112,7 @@ vim_to_mzscheme_impl(
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_FUNC)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_FUNC)
     {
 	Scheme_Object *funcname = NULL;
 
@@ -3121,19 +3121,19 @@ vim_to_mzscheme_impl(
 	MZ_GC_REG();
 
 	// FIXME: func_ref() and func_unref() are needed.
-	funcname = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	funcname = scheme_make_byte_string((var_na *)vim_value->vval.v_string);
 	MZ_GC_CHECK();
 	result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		(const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		(const var_na *)BYTE_STRING_VALUE(funcname), 0, -1);
 	MZ_GC_CHECK();
 
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_PARTIAL)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_PARTIAL)
     {
-	if (vim_value->vval.v_partial == NULL)
+	ถ้า (vim_value->vval.v_partial == NULL)
 	    result = scheme_null;
-	else
+	มิฉะนั้น
 	{
 	    Scheme_Object *funcname = NULL;
 
@@ -3144,41 +3144,41 @@ vim_to_mzscheme_impl(
 	    // FIXME: func_ref() and func_unref() are needed.
 	    // TODO: Support pt_dict and pt_argv.
 	    funcname = scheme_make_byte_string(
-			      (char *)partial_name(vim_value->vval.v_partial));
+			      (var_na *)partial_name(vim_value->vval.v_partial));
 	    MZ_GC_CHECK();
 	    result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		    (const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		    (const var_na *)BYTE_STRING_VALUE(funcname), 0, -1);
 	    MZ_GC_CHECK();
 
 	    MZ_GC_UNREG();
 	}
     }
-    else if (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
+    มิฉะนั้น ถ้า (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
     {
-	if (vim_value->vval.v_number <= VVAL_TRUE)
+	ถ้า (vim_value->vval.v_number <= VVAL_TRUE)
 	    result = scheme_make_integer((long)vim_value->vval.v_number);
-	else
+	มิฉะนั้น
 	    result = scheme_null;
 	MZ_GC_CHECK();
     }
-    else
+    มิฉะนั้น
     {
 	result = scheme_void;
 	new_value = FALSE;
     }
-    if (new_value)
+    ถ้า (new_value)
     {
 	scheme_hash_set(visited, (Scheme_Object *)vim_value, result);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return result;
+    คืน result;
 }
 
-    static int
+    static จำนวนเต็ม
 mzscheme_to_vim(Scheme_Object *obj, typval_T *tv)
 {
-    int i, status;
+    จำนวนเต็ม i, status;
     Scheme_Hash_Table	*visited = NULL;
 
     MZ_GC_DECL_REG(2);
@@ -3190,21 +3190,21 @@ mzscheme_to_vim(Scheme_Object *obj, typval_T *tv)
     MZ_GC_CHECK();
 
     status = mzscheme_to_vim_impl(obj, tv, 1, visited);
-    for (i = 0; i < visited->size; ++i)
+    สำหรับ (i = 0; i < visited->size; ++i)
     {
 	// free up remembered objects
-	if (visited->vals[i] != NULL)
+	ถ้า (visited->vals[i] != NULL)
 	    free_tv((typval_T *)visited->vals[i]);
     }
 
     MZ_GC_UNREG();
-    return status;
+    คืน status;
 }
-    static int
-mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
+    static จำนวนเต็ม
+mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, จำนวนเต็ม depth,
 	Scheme_Hash_Table *visited)
 {
-    int		status = OK;
+    จำนวนเต็ม		status = OK;
     typval_T	*found;
 
     MZ_GC_DECL_REG(2);
@@ -3213,43 +3213,43 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     MZ_GC_REG();
 
     MZ_GC_CHECK();
-    if (depth > 100) // limit the deepest recursion level
+    ถ้า (depth > 100) // limit the deepest recursion level
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = 0;
-	return FAIL;
+	คืน FAIL;
     }
 
     found = (typval_T *)scheme_hash_get(visited, obj);
-    if (found != NULL)
+    ถ้า (found != NULL)
 	copy_tv(found, tv);
-    else if (SCHEME_VOIDP(obj))
+    มิฉะนั้น ถ้า (SCHEME_VOIDP(obj))
     {
 	tv->v_type = VAR_SPECIAL;
 	tv->vval.v_number = VVAL_NULL;
     }
-    else if (SCHEME_INTP(obj))
+    มิฉะนั้น ถ้า (SCHEME_INTP(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = SCHEME_INT_VAL(obj);
     }
-    else if (SCHEME_BOOLP(obj))
+    มิฉะนั้น ถ้า (SCHEME_BOOLP(obj))
     {
 	tv->v_type = VAR_BOOL;
 	tv->vval.v_number = SCHEME_TRUEP(obj);
     }
-    else if (SCHEME_DBLP(obj))
+    มิฉะนั้น ถ้า (SCHEME_DBLP(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = SCHEME_DBL_VAL(obj);
     }
-    else if (SCHEME_BYTE_STRINGP(obj))
+    มิฉะนั้น ถ้า (SCHEME_BYTE_STRINGP(obj))
     {
 	tv->v_type = VAR_STRING;
 	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(obj));
     }
-# if MZSCHEME_VERSION_MAJOR >= 299
-    else if (SCHEME_CHAR_STRINGP(obj))
+# ถ้า MZSCHEME_VERSION_MAJOR >= 299
+    มิฉะนั้น ถ้า (SCHEME_CHAR_STRINGP(obj))
     {
 	Scheme_Object *tmp = NULL;
 	MZ_GC_DECL_REG(1);
@@ -3262,15 +3262,15 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	MZ_GC_UNREG();
     }
 # endif
-    else if (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
+    มิฉะนั้น ถ้า (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
 	    || SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
     {
 	list_T  *list = list_alloc();
-	if (list == NULL)
+	ถ้า (list == NULL)
 	    status = FAIL;
-	else
+	มิฉะนั้น
 	{
-	    int		    i;
+	    จำนวนเต็ม		    i;
 	    Scheme_Object   *curr = NULL;
 	    Scheme_Object   *cval = NULL;
 	    // temporary var to hold current element of vectors and pairs
@@ -3286,9 +3286,9 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    ++list->lv_refcount;
 
 	    v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
+	    ถ้า (v == NULL)
 		status = FAIL;
-	    else
+	    มิฉะนั้น
 	    {
 		// add the value in advance to allow handling of self-referential
 		// data structures
@@ -3296,41 +3296,41 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 		copy_tv(tv, visited_tv);
 		scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
 
-		if (SCHEME_VECTORP(obj))
+		ถ้า (SCHEME_VECTORP(obj))
 		{
-		    for (i = 0; i < SCHEME_VEC_SIZE(obj); ++i)
+		    สำหรับ (i = 0; i < SCHEME_VEC_SIZE(obj); ++i)
 		    {
 			cval = SCHEME_VEC_ELS(obj)[i];
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
+			ถ้า (status == FAIL)
+			    bha_nga;
 			status = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			ถ้า (status == FAIL)
+			    bha_nga;
 		    }
 		}
-		else if (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
+		มิฉะนั้น ถ้า (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
 		{
-		    for (curr = obj;
+		    สำหรับ (curr = obj;
 			    SCHEME_PAIRP(curr) || SCHEME_MUTABLE_PAIRP(curr);
 			    curr = SCHEME_CDR(curr))
 		    {
 			cval = SCHEME_CAR(curr);
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
+			ถ้า (status == FAIL)
+			    bha_nga;
 			status = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			ถ้า (status == FAIL)
+			    bha_nga;
 		    }
 		    // improper list not terminated with null
 		    // need to handle the last element
-		    if (status == OK && !SCHEME_NULLP(curr))
+		    ถ้า (status == OK && !SCHEME_NULLP(curr))
 		    {
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == OK)
+			ถ้า (status == OK)
 			{
 			    status = list_append_tv(list, v);
 			    clear_tv(v);
@@ -3343,9 +3343,9 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    MZ_GC_UNREG();
 	}
     }
-    else if (SCHEME_HASHTP(obj))
+    มิฉะนั้น ถ้า (SCHEME_HASHTP(obj))
     {
-	int		i;
+	จำนวนเต็ม		i;
 	dict_T		*dict;
 	Scheme_Object   *key = NULL;
 	Scheme_Object   *val = NULL;
@@ -3356,9 +3356,9 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	MZ_GC_REG();
 
 	dict = dict_alloc();
-	if (dict == NULL)
+	ถ้า (dict == NULL)
 	    status = FAIL;
-	else
+	มิฉะนั้น
 	{
 	    typval_T    *visited_tv = ALLOC_ONE(typval_T);
 
@@ -3369,21 +3369,21 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    copy_tv(tv, visited_tv);
 	    scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
 
-	    for (i = 0; i < ((Scheme_Hash_Table *)obj)->size; ++i)
+	    สำหรับ (i = 0; i < ((Scheme_Hash_Table *)obj)->size; ++i)
 	    {
-		if (((Scheme_Hash_Table *) obj)->vals[i] != NULL)
+		ถ้า (((Scheme_Hash_Table *) obj)->vals[i] != NULL)
 		{
 		    // generate item for `display'ed Scheme key
 		    dictitem_T  *item = dictitem_alloc((char_u *)string_to_line(
 				((Scheme_Hash_Table *) obj)->keys[i]));
 		    // convert Scheme val to Vim and add it to the dict
-		    if (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
+		    ถ้า (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
 				    &item->di_tv, depth + 1, visited) == FAIL
 			    || dict_add(dict, item) == FAIL)
 		    {
 			dictitem_free(item);
 			status = FAIL;
-			break;
+			bha_nga;
 		    }
 		}
 
@@ -3391,25 +3391,25 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	}
 	MZ_GC_UNREG();
     }
-    else
+    มิฉะนั้น
     {
 	// `display' any other value to string
 	tv->v_type = VAR_STRING;
 	tv->vval.v_string = (char_u *)string_to_line(obj);
     }
     MZ_GC_UNREG();
-    return status;
+    คืน status;
 }
 
 /*
  * Scheme prim procedure wrapping Vim funcref
  */
     static Scheme_Object *
-vim_funcref(void *name, int argc, Scheme_Object **argv)
+vim_funcref(void *name, จำนวนเต็ม argc, Scheme_Object **argv)
 {
-    int i;
+    จำนวนเต็ม i;
     typval_T args;
-    int status = OK;
+    จำนวนเต็ม status = OK;
     Scheme_Object *result = NULL;
     list_T *list = list_alloc();
 
@@ -3418,22 +3418,22 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
     MZ_GC_REG();
 
     result = scheme_void;
-    if (list == NULL)
+    ถ้า (list == NULL)
 	status = FAIL;
-    else
+    มิฉะนั้น
     {
 	args.v_type = VAR_LIST;
 	args.vval.v_list = list;
 	++list->lv_refcount;
-	for (i = 0; status == OK && i < argc; ++i)
+	สำหรับ (i = 0; status == OK && i < argc; ++i)
 	{
 	    typval_T *v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
+	    ถ้า (v == NULL)
 		status = FAIL;
-	    else
+	    มิฉะนั้น
 	    {
 		status = mzscheme_to_vim(argv[i], v);
-		if (status == OK)
+		ถ้า (status == OK)
 		{
 		    status = list_append_tv(list, v);
 		    clear_tv(v);
@@ -3441,7 +3441,7 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
 		vim_free(v);
 	    }
 	}
-	if (status == OK)
+	ถ้า (status == OK)
 	{
 	    typval_T ret;
 	    ret.v_type = VAR_UNKNOWN;
@@ -3455,11 +3455,11 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
     }
     clear_tv(&args);
     MZ_GC_UNREG();
-    if (status != OK)
+    ถ้า (status != OK)
 	raise_vim_exn(_("error converting Scheme values to Vim"));
-    else
+    มิฉะนั้น
 	raise_if_error();
-    return result;
+    คืน result;
 }
 
     void
@@ -3471,14 +3471,14 @@ do_mzeval(char_u *str, typval_T *rettv)
     MZ_GC_VAR_IN_REG(0, ret);
     MZ_GC_REG();
 
-    if (mzscheme_init())
+    ถ้า (mzscheme_init())
     {
 	MZ_GC_UNREG();
-	return;
+	คืน;
     }
 
     MZ_GC_CHECK();
-    if (eval_with_exn_handling(str, do_eval, &ret) == OK)
+    ถ้า (eval_with_exn_handling(str, do_eval, &ret) == OK)
 	mzscheme_to_vim(ret, rettv);
 
     MZ_GC_UNREG();
@@ -3489,10 +3489,10 @@ do_mzeval(char_u *str, typval_T *rettv)
  * Check to see whether a Vim error has been reported, or a keyboard
  * interrupt (from vim --> got_int) has been detected.
  */
-    static int
+    static จำนวนเต็ม
 vim_error_check(void)
 {
-    return (got_int || did_emsg);
+    คืน (got_int || did_emsg);
 }
 
 /*
@@ -3501,8 +3501,8 @@ vim_error_check(void)
     static void
 register_vim_exn(void)
 {
-    int	nc = 0;
-    int i;
+    จำนวนเต็ม	nc = 0;
+    จำนวนเต็ม i;
     Scheme_Object   *struct_exn = NULL;
     Scheme_Object   *exn_name = NULL;
 
@@ -3516,10 +3516,10 @@ register_vim_exn(void)
     struct_exn = scheme_builtin_value("struct:exn");
     MZ_GC_CHECK();
 
-    if (vim_exn == NULL)
+    ถ้า (vim_exn == NULL)
 	vim_exn = scheme_make_struct_type(exn_name,
 		struct_exn, NULL, 0, 0, NULL, NULL
-#if MZSCHEME_VERSION_MAJOR >= 299
+#ถ้า MZSCHEME_VERSION_MAJOR >= 299
 		, NULL
 #endif
 		);
@@ -3535,14 +3535,14 @@ register_vim_exn(void)
 	MZ_GC_REG();
 
 	tmp = scheme_make_struct_names(exn_name, scheme_null, 0, &nc);
-	mch_memmove(exn_names, tmp, nc * sizeof(Scheme_Object *));
+	mch_memmove(exn_names, tmp, nc * parimaa_na(Scheme_Object *));
 	MZ_GC_CHECK();
 
 	tmp = scheme_make_struct_values(vim_exn, exn_names, nc, 0);
-	mch_memmove(exn_values, tmp, nc * sizeof(Scheme_Object *));
+	mch_memmove(exn_values, tmp, nc * parimaa_na(Scheme_Object *));
 	MZ_GC_CHECK();
 
-	for (i = 0; i < nc; i++)
+	สำหรับ (i = 0; i < nc; i++)
 	{
 	    scheme_add_global_symbol(exn_names[i],
 		    exn_values[i], environment);
@@ -3557,9 +3557,9 @@ register_vim_exn(void)
  * raise exn:vim, may be with additional info string
  */
     void
-raise_vim_exn(const char *add_info)
+raise_vim_exn(const var_na *add_info)
 {
-    char	    *fmt = _("Vim error: ~a");
+    var_na	    *fmt = _("Vim error: ~a");
     Scheme_Object   *argv[2] = {NULL, NULL};
     Scheme_Object   *exn = NULL;
     Scheme_Object   *byte_string = NULL;
@@ -3570,9 +3570,9 @@ raise_vim_exn(const char *add_info)
     MZ_GC_VAR_IN_REG(4, byte_string);
     MZ_GC_REG();
 
-    if (add_info != NULL)
+    ถ้า (add_info != NULL)
     {
-	char		*c_string = NULL;
+	var_na		*c_string = NULL;
 	Scheme_Object   *info = NULL;
 
 	MZ_GC_DECL_REG(3);
@@ -3582,7 +3582,7 @@ raise_vim_exn(const char *add_info)
 
 	info = scheme_make_byte_string(add_info);
 	MZ_GC_CHECK();
-	c_string = scheme_format_utf8(fmt, (int)STRLEN(fmt), 1, &info, NULL);
+	c_string = scheme_format_utf8(fmt, (จำนวนเต็ม)STRLEN(fmt), 1, &info, NULL);
 	MZ_GC_CHECK();
 	byte_string = scheme_make_byte_string(c_string);
 	MZ_GC_CHECK();
@@ -3590,7 +3590,7 @@ raise_vim_exn(const char *add_info)
 	SCHEME_SET_IMMUTABLE(argv[0]);
 	MZ_GC_UNREG();
     }
-    else
+    มิฉะนั้น
     {
 	byte_string = scheme_make_byte_string(_("Vim error"));
 	MZ_GC_CHECK();
@@ -3599,10 +3599,10 @@ raise_vim_exn(const char *add_info)
     }
     MZ_GC_CHECK();
 
-#if MZSCHEME_VERSION_MAJOR < 360
+#ถ้า MZSCHEME_VERSION_MAJOR < 360
     argv[1] = scheme_current_continuation_marks();
     MZ_GC_CHECK();
-#else
+#มิฉะนั้น
     argv[1] = scheme_current_continuation_marks(NULL);
     MZ_GC_CHECK();
 #endif
@@ -3616,7 +3616,7 @@ raise_vim_exn(const char *add_info)
     void
 raise_if_error(void)
 {
-    if (vim_error_check())
+    ถ้า (vim_error_check())
 	raise_vim_exn(NULL);
 }
 
@@ -3626,17 +3626,17 @@ raise_if_error(void)
  * or passed as argv[argnum] with checks
  */
     static vim_mz_buffer *
-get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+get_buffer_arg(const var_na *fname, จำนวนเต็ม argnum, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     vim_mz_buffer *b;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_buffer();
-    if (!SCHEME_VIMBUFFERP(argv[argnum]))
+    ถ้า (argc < argnum + 1)
+	คืน get_vim_curr_buffer();
+    ถ้า (!SCHEME_VIMBUFFERP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-buffer", argnum, argc, argv);
     b = (vim_mz_buffer *)argv[argnum];
     (void)get_valid_buffer(argv[argnum]);
-    return b;
+    คืน b;
 }
 
 /*
@@ -3645,17 +3645,17 @@ get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
  * or passed as argv[argnum] with checks
  */
     static vim_mz_window *
-get_window_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+get_window_arg(const var_na *fname, จำนวนเต็ม argnum, จำนวนเต็ม argc, Scheme_Object **argv)
 {
     vim_mz_window *w;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_window();
+    ถ้า (argc < argnum + 1)
+	คืน get_vim_curr_window();
     w = (vim_mz_window *)argv[argnum];
-    if (!SCHEME_VIMWINDOWP(argv[argnum]))
+    ถ้า (!SCHEME_VIMWINDOWP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-window", argnum, argc, argv);
     (void)get_valid_window(argv[argnum]);
-    return w;
+    คืน w;
 }
 
 /*
@@ -3665,9 +3665,9 @@ buf_T *get_valid_buffer(void *obj)
 {
     buf_T *buf = ((vim_mz_buffer *)obj)->buf;
 
-    if (buf == INVALID_BUFFER_VALUE)
+    ถ้า (buf == INVALID_BUFFER_VALUE)
 	scheme_signal_error(_("buffer is invalid"));
-    return buf;
+    คืน buf;
 }
 
 /*
@@ -3676,27 +3676,27 @@ buf_T *get_valid_buffer(void *obj)
 win_T *get_valid_window(void *obj)
 {
     win_T *win = ((vim_mz_window *)obj)->win;
-    if (win == INVALID_WINDOW_VALUE)
+    ถ้า (win == INVALID_WINDOW_VALUE)
 	scheme_signal_error(_("window is invalid"));
-    return win;
+    คืน win;
 }
 
-    int
+    จำนวนเต็ม
 mzthreads_allowed(void)
 {
-    return mz_threads_allow;
+    คืน mz_threads_allow;
 }
 
-    static int
+    static จำนวนเต็ม
 line_in_range(linenr_T lnum, buf_T *buf)
 {
-    return (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
+    คืน (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
 }
 
     static void
 check_line_range(linenr_T lnum, buf_T *buf)
 {
-    if (!line_in_range(lnum, buf))
+    ถ้า (!line_in_range(lnum, buf))
 	scheme_signal_error(_("linenr out of range"));
 }
 
@@ -3707,23 +3707,23 @@ check_line_range(linenr_T lnum, buf_T *buf)
  * deleted). Got from if_python.c
  */
     static void
-mz_fix_cursor(int lo, int hi, int extra)
+mz_fix_cursor(จำนวนเต็ม lo, จำนวนเต็ม hi, จำนวนเต็ม extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    ถ้า (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	ถ้า (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
 	    check_cursor_col();
 	}
-	else if (extra < 0)
+	มิฉะนั้น ถ้า (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
+	มิฉะนั้น
 	    check_cursor_col();
 	changed_cline_bef_curs();
     }
@@ -3790,10 +3790,10 @@ static Vim_Prim prims[]=
     static vim_mz_buffer *
 get_vim_curr_buffer(void)
 {
-    if (curbuf->b_mzscheme_ref == NULL)
-	return (vim_mz_buffer *)buffer_new(curbuf);
-    else
-	return BUFFER_REF(curbuf);
+    ถ้า (curbuf->b_mzscheme_ref == NULL)
+	คืน (vim_mz_buffer *)buffer_new(curbuf);
+    มิฉะนั้น
+	คืน BUFFER_REF(curbuf);
 }
 
 /*
@@ -3802,16 +3802,16 @@ get_vim_curr_buffer(void)
     static vim_mz_window *
 get_vim_curr_window(void)
 {
-    if (curwin->w_mzscheme_ref == NULL)
-	return (vim_mz_window *)window_new(curwin);
-    else
-	return WINDOW_REF(curwin);
+    ถ้า (curwin->w_mzscheme_ref == NULL)
+	คืน (vim_mz_window *)window_new(curwin);
+    มิฉะนั้น
+	คืน WINDOW_REF(curwin);
 }
 
     static void
 make_modules(void)
 {
-    int		    i;
+    จำนวนเต็ม		    i;
     Scheme_Env	    *mod = NULL;
     Scheme_Object   *vimext_symbol = NULL;
     Scheme_Object   *closed_prim = NULL;
@@ -3827,7 +3827,7 @@ make_modules(void)
     mod = scheme_primitive_module(vimext_symbol, environment);
     MZ_GC_CHECK();
     // all prims made closed so they can access their own names
-    for (i = 0; i < (int)ARRAY_LENGTH(prims); i++)
+    สำหรับ (i = 0; i < (จำนวนเต็ม)ARRAY_LENGTH(prims); i++)
     {
 	Vim_Prim *prim = prims + i;
 	closed_prim = scheme_make_closed_prim_w_arity(prim->prim, prim, prim->name,
@@ -3849,7 +3849,7 @@ static Scheme_Object *M_delete = NULL;
     static void
 sandbox_check(void)
 {
-    if (sandbox)
+    ถ้า (sandbox)
 	raise_vim_exn(_("not allowed in the Vim sandbox"));
 }
 
@@ -3857,54 +3857,54 @@ sandbox_check(void)
  * security guards to force Vim's sandbox restrictions on MzScheme level
  */
     static Scheme_Object *
-sandbox_file_guard(int argc UNUSED, Scheme_Object **argv)
+sandbox_file_guard(จำนวนเต็ม argc UNUSED, Scheme_Object **argv)
 {
-    if (!sandbox)
-	return scheme_void;
+    ถ้า (!sandbox)
+	คืน scheme_void;
 
     Scheme_Object *requested_access = argv[2];
 
-    if (M_write == NULL)
+    ถ้า (M_write == NULL)
     {
 	MZ_REGISTER_STATIC(M_write);
 	M_write = scheme_intern_symbol("write");
 	MZ_GC_CHECK();
     }
-    if (M_read == NULL)
+    ถ้า (M_read == NULL)
     {
 	MZ_REGISTER_STATIC(M_read);
 	M_read = scheme_intern_symbol("read");
 	MZ_GC_CHECK();
     }
-    if (M_execute == NULL)
+    ถ้า (M_execute == NULL)
     {
 	MZ_REGISTER_STATIC(M_execute);
 	M_execute = scheme_intern_symbol("execute");
 	MZ_GC_CHECK();
     }
-    if (M_delete == NULL)
+    ถ้า (M_delete == NULL)
     {
 	MZ_REGISTER_STATIC(M_delete);
 	M_delete = scheme_intern_symbol("delete");
 	MZ_GC_CHECK();
     }
 
-    while (!SCHEME_NULLP(requested_access))
+    ขณะ (!SCHEME_NULLP(requested_access))
     {
 	Scheme_Object *item = SCHEME_CAR(requested_access);
-	if (scheme_eq(item, M_write) || scheme_eq(item, M_read)
+	ถ้า (scheme_eq(item, M_write) || scheme_eq(item, M_read)
 		|| scheme_eq(item, M_execute) || scheme_eq(item, M_delete))
 	    raise_vim_exn(_("not allowed in the Vim sandbox"));
 	requested_access = SCHEME_CDR(requested_access);
     }
 
-    return scheme_void;
+    คืน scheme_void;
 }
 
     static Scheme_Object *
-sandbox_network_guard(int argc UNUSED, Scheme_Object **argv UNUSED)
+sandbox_network_guard(จำนวนเต็ม argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return scheme_void;
+    คืน scheme_void;
 }
 #endif
 

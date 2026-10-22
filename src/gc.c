@@ -13,26 +13,26 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#ถ้า defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+static จำนวนเต็ม current_copyID = 0;
 
-static int free_unref_items(int copyID);
+static จำนวนเต็ม free_unref_items(จำนวนเต็ม copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
+    จำนวนเต็ม
 get_copyID(void)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    คืน current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    จำนวนเต็ม
+garbage_collect(จำนวนเต็ม testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    จำนวนเต็ม		copyID;
+    จำนวนเต็ม		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    จำนวนเต็ม		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    ถ้า (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    ถ้า (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	จำนวนเต็ม	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	ถ้า (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	ถ้า (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    ถ้า (pp == NULL)
+		คืน FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -132,8 +132,8 @@ garbage_collect(int testing)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
 							NULL, NULL, NULL);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    สำหรับ (จำนวนเต็ม i = 0; i < AUCMD_WIN_COUNT; ++i)
+	ถ้า (aucmd_win[i].auc_win != NULL)
 	    abort = abort || set_ref_in_item(
 		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
 #ifdef FEAT_PROP_POPUP
@@ -230,7 +230,7 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    ถ้า (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
@@ -243,21 +243,21 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    มิฉะนั้น ถ้า (p_verbose > 0)
     {
 	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    คืน did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    static จำนวนเต็ม
+free_unref_items(จำนวนเต็ม copyID)
 {
-    int		did_free = FALSE;
+    จำนวนเต็ม		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
@@ -314,7 +314,7 @@ free_unref_items(int copyID)
 
     in_free_unref_items = FALSE;
 
-    return did_free;
+    คืน did_free;
 }
 
 /*
@@ -323,31 +323,31 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    จำนวนเต็ม
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int		todo;
-    int		abort = FALSE;
+    จำนวนเต็ม		todo;
+    จำนวนเต็ม		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
     ht_stack_T	*ht_stack = NULL;
     ht_stack_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    สำหรับ (;;)
     {
-	if (!abort)
+	ถ้า (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
+	    todo = (จำนวนเต็ม)cur_ht->ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+		ถ้า (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
@@ -356,8 +356,8 @@ set_ref_in_ht(
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	ถ้า (ht_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_ht = ht_stack->ht;
@@ -366,23 +366,23 @@ set_ref_in_ht(
 	free(tempitem);
     }
 
-    return abort;
+    คืน abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#ถ้า defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    จำนวนเต็ม
+set_ref_in_dict(dict_T *d, จำนวนเต็ม copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    ถ้า (d != NULL && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	คืน set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
     }
-    return FALSE;
+    คืน FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    จำนวนเต็ม
+set_ref_in_list(list_T *ll, จำนวนเต็ม copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    ถ้า (ll != NULL && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	คืน set_ref_in_list_items(ll, copyID, NULL, NULL);
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
@@ -407,31 +407,31 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    จำนวนเต็ม
 set_ref_in_list_items(
     list_T		*l,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     tuple_stack_T	**tuple_stack)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    จำนวนเต็ม		 abort = FALSE;
     list_T	 *cur_l;
     list_stack_T *list_stack = NULL;
     list_stack_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    สำหรับ (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	ถ้า (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    สำหรับ (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
 				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+	ถ้า (list_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_l = list_stack->list;
@@ -440,22 +440,22 @@ set_ref_in_list_items(
 	free(tempitem);
     }
 
-    return abort;
+    คืน abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    จำนวนเต็ม
+set_ref_in_tuple(tuple_T *tuple, จำนวนเต็ม copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    ถ้า (tuple != NULL && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	คืน set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
     }
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
@@ -464,33 +464,33 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    จำนวนเต็ม
 set_ref_in_tuple_items(
     tuple_T		*tuple,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack)
 {
-    int			abort = FALSE;
+    จำนวนเต็ม			abort = FALSE;
     tuple_T		*cur_t;
     tuple_stack_T	*tuple_stack = NULL;
     tuple_stack_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    สำหรับ (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	สำหรับ (จำนวนเต็ม i = 0; i < cur_t->tv_items.ga_len; i++)
 	{
 	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
 			ht_stack, list_stack, &tuple_stack);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	ถ้า (tuple_stack == NULL)
+	    bha_nga;
 
 	// take an item from the stack
 	cur_t = tuple_stack->tuple;
@@ -499,139 +499,139 @@ set_ref_in_tuple_items(
 	free(tempitem);
     }
 
-    return abort;
+    คืน abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    จำนวนเต็ม
+set_ref_in_callback(callback_T *cb, จำนวนเต็ม copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    ถ้า (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
+	คืน FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    คืน set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    ถ้า (dd == NULL || dd->dv_copyID == copyID)
+	คืน FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    ถ้า (ht_stack == NULL)
+	คืน set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
 
     ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ถ้า (newitem == NULL)
+	คืน TRUE;
 
     newitem->ht = &dd->dv_hashtab;
     newitem->prev = *ht_stack;
     *ht_stack = newitem;
 
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    ถ้า (ll == NULL || ll->lv_copyID == copyID)
+	คืน FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    ถ้า (list_stack == NULL)
+	คืน set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
 
     list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ถ้า (newitem == NULL)
+	คืน TRUE;
 
     newitem->list = ll;
     newitem->prev = *list_stack;
     *list_stack = newitem;
 
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    ถ้า (tt == NULL || tt->tv_copyID == copyID)
+	คืน FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    ถ้า (tuple_stack == NULL)
+	คืน set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
 
     tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ถ้า (newitem == NULL)
+	คืน TRUE;
 
     newitem->tuple = tt;
     newitem->prev = *tuple_stack;
     *tuple_stack = newitem;
 
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    ถ้า (pt == NULL || pt->pt_copyID == copyID)
+	คืน FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    จำนวนเต็ม abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    ถ้า (pt->pt_dict != NULL)
     {
 	typval_T dtv;
 
@@ -640,7 +640,7 @@ set_ref_in_item_partial(
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    if (pt->pt_obj != NULL)
+    ถ้า (pt->pt_obj != NULL)
     {
 	typval_T objtv;
 
@@ -649,13 +649,13 @@ set_ref_in_item_partial(
 	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    สำหรับ (จำนวนเต็ม i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
 		ht_stack, list_stack, tuple_stack);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    คืน abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    ถ้า (job == NULL || job->jv_copyID == copyID)
+	คืน FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    ถ้า (job->jv_channel != NULL)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    ถ้า (job->jv_exit_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    คืน FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    ถ้า (ch == NULL || ch->ch_copyID == copyID)
+	คืน FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    สำหรับ (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+	สำหรับ (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
 		jq != NULL; jq = jq->jq_next)
 	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	สำหรับ (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    ถ้า (cq->cq_callback.cb_partial != NULL)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
 		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	ถ้า (ch->ch_part[part].ch_callback.cb_partial != NULL)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
 	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    ถ้า (ch->ch_callback.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    ถ้า (ch->ch_close_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    คืน FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    จำนวนเต็ม
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    จำนวนเต็ม abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    ถ้า (cl == NULL || cl->class_copyID == copyID)
+	คืน FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    ถ้า (cl->class_members_tv != NULL)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	สำหรับ (จำนวนเต็ม i = 0; !abort && i < cl->class_class_member_count; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
 		    copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
+    สำหรับ (จำนวนเต็ม i = 0; !abort && i < cl->class_class_function_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
+    สำหรับ (จำนวนเต็ม i = 0; !abort && i < cl->class_obj_method_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    คืน abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static จำนวนเต็ม
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
+    จำนวนเต็ม			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    จำนวนเต็ม abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    ถ้า (obj == NULL || obj->obj_copyID == copyID)
+	คืน FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
+    สำหรับ (จำนวนเต็ม i = 0; !abort
 	    && i < obj->obj_class->class_obj_member_count; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
 		ht_stack, list_stack, tuple_stack);
 
-    return abort;
+    คืน abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    จำนวนเต็ม
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
+    จำนวนเต็ม		    copyID,
     ht_stack_T	    **ht_stack,
     list_stack_T    **list_stack,
     tuple_stack_T   **tuple_stack)
 {
-    int		abort = FALSE;
+    จำนวนเต็ม		abort = FALSE;
 
     switch (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
+	pak_sa VAR_DICT:
+	    คืน set_ref_in_item_dict(tv->vval.v_dict, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
+	pak_sa VAR_LIST:
+	    คืน set_ref_in_item_list(tv->vval.v_list, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+	pak_sa VAR_TUPLE:
+	    คืน set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
 					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	pak_sa VAR_FUNC:
 	{
 	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    bha_nga;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
+	pak_sa VAR_PARTIAL:
+	    คืน set_ref_in_item_partial(tv->vval.v_partial, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_JOB:
+	pak_sa VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
+	    คืน set_ref_in_item_job(tv->vval.v_job, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+#มิฉะนั้น
+	    bha_nga;
 #endif
 
-	case VAR_CHANNEL:
+	pak_sa VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
+	    คืน set_ref_in_item_channel(tv->vval.v_channel, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+#มิฉะนั้น
+	    bha_nga;
 #endif
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
+	pak_sa VAR_CLASS:
+	    คืน set_ref_in_item_class(tv->vval.v_class, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
+	pak_sa VAR_OBJECT:
+	    คืน set_ref_in_item_object(tv->vval.v_object, copyID,
 					ht_stack, list_stack, tuple_stack);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	pak_sa VAR_UNKNOWN:
+	pak_sa VAR_ANY:
+	pak_sa VAR_VOID:
+	pak_sa VAR_BOOL:
+	pak_sa VAR_SPECIAL:
+	pak_sa VAR_NUMBER:
+	pak_sa VAR_FLOAT:
+	pak_sa VAR_STRING:
+	pak_sa VAR_BLOB:
+	pak_sa VAR_TYPEALIAS:
+	pak_sa VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    bha_nga;
     }
 
-    return abort;
+    คืน abort;
 }
 
 #endif
