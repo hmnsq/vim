@@ -10,27 +10,27 @@
 
 // TERMLIB: Terminal independent database.
 
-#include "vim.h"
-#include "termlib.pro"
+#ضمن "vim.h"
+#ضمن "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#إذا !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
-#endif
+#جے_انت
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+ساكن صحيح  getent(حرف *, حرف *, FILE *, صحيح);
+ساكن صحيح  nextent(حرف *, FILE *, صحيح);
+ساكن صحيح  میل_3(حرف *, حرف *);
+ساكن حرف *_addfmt(حرف *, حرف *, صحيح);
+ساكن حرف *لبھو_3(حرف *, حرف *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
-short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
+حرف	*tent;		      // Pointer to terminal entry, set by tgetent
+حرف	PC = 0;		      // Pad character, default NULL
+حرف	*اتے_2 = 0, *BC = 0;     // Pointers to UP and BC strings from database
+چھوٹا	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
  * Module: tgetent
@@ -53,154 +53,154 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
  * - This could be simplified considerably for non-UNIX systems.
  */
 
-#ifndef TERMCAPFILE
+#جے_بنا_تعریف TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# وإلا
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  وإلا
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
-#endif
+#جے_انت
 
-    int
+    صحيح
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    حرف    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    حرف    *رکن)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    حرف    tcbuf[32];		// Temp buffer to handle
+    حرف    *tcptr = tcbuf;	// extended entries
+    حرف    *tcap = TERMCAPFILE; // Default termcap file
+    حرف    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    صحيح	    retval = 0;
+    صحيح	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    إذا ((tmp = (حرف *)mch_getenv((char_u *)"TERMCAP")) != عدم)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	إذا (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#إذا defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    إذا (tmp)
 		*tmp = ':';
-#endif
+#جے_انت
 	}
-	else				// TERMCAP = termcap entry itself
+	وإلا				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    صحيح tlen = لڑی_لمبائی(رکن);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    طالما (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		حرف *nexttmp;
 
-		while (*tmp == '|')
+		طالما (*tmp == '|')
 		    tmp++;
-		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		nexttmp  = لبھو_3(tmp, ":|");	// Rhialto
+		إذا (tmp+tlen == nexttmp && میل_3(tmp, رکن) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    أرجع 1;
 		}
-		else
+		وإلا
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    إذا (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	أرجع -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    طالما (getent(tbuf + len, رکن, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	إذا ((رکن = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
-	    len = strlen(tbuf);
+	    len = لڑی_لمبائی(tbuf);
 	}
-	else
+	وإلا
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    اكسر;
 	}
     }
     fclose(termcap);
-    return retval;
+    أرجع retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    ساكن صحيح
+getent(حرف *tbuf, حرف *رکن, FILE *termcap, صحيح buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    حرف    *tptr;
+    صحيح	    tlen = لڑی_لمبائی(رکن);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    طالما (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	طالما (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    حرف    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    طالما (*tptr == '|')		// | separates names
 		tptr++;
-	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
-		_match(tptr, term) == tlen)	// FOUND!
+	    nexttptr = لبھو_3(tptr, ":|");	// Rhialto
+	    إذا (tptr + tlen == nexttptr &&
+		میل_3(tptr, رکن) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		أرجع 1;
 	    }
-	    else				// Look for next name
+	    وإلا				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    ساكن صحيح
+nextent(حرف *tbuf, FILE *termcap, صحيح buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    حرف *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    طالما (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (صحيح)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	صحيح llen = لڑی_لمبائی(lbuf);
 
-	if (*lbuf == '#')			// eat comments
-	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	إذا (*lbuf == '#')			// eat comments
+	    استمر;
+	إذا (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	إذا (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	وإلا
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    أرجع 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    أرجع 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    صحيح
+tgetflag(حرف *id)
 {
-    char    buf[256], *ptr = buf;
+    حرف    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    أرجع tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    صحيح
+tgetnum(حرف *id)
 {
-    char *ptr, buf[256];
+    حرف *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    إذا (tgetstr(id, &ptr))
+	أرجع atoi(buf);
+    وإلا
+	أرجع 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    حرف *
+tgetstr(حرف *id, حرف **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    صحيح		len = لڑی_لمبائی(id);
+    حرف	*tmp=tent;
+    حرف	*hold;
+    صحيح		i;
 
-    do
+    افعل
     {
-	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	tmp = لبھو_3(tmp, ":");			// For each field
+	طالما (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	إذا (!*tmp)
+	    اكسر;
 
-	if (_match(id, tmp) == len)
+	إذا (میل_3(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    إذا (*tmp == '@')			// :xx@: entry for tc
+		أرجع 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    طالما (*++tmp && *tmp != ':')	// not at end of field
 		{
-		switch(*tmp)
+		بدل(*tmp)
 		{
-		case '\\':			// Expand escapes here
-		    switch(*++tmp)
+		حالة '\\':			// Expand escapes here
+		    بدل(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    حالة 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			اكسر;			// shouldn't happen
+		    حالة 'e':
+		    حالة 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			اكسر;
+		    حالة 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			اكسر;
+		    حالة 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			اكسر;
+		    حالة 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			اكسر;
+		    حالة 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			اكسر;
+		    حالة 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			اكسر;
+		    حالة '0':			// \nnn
+		    حالة '1':
+		    حالة '2':
+		    حالة '3':
+		    حالة '4':
+		    حالة '5':
+		    حالة '6':
+		    حالة '7':
+		    حالة '8':
+		    حالة '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			لكل (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
-		    default:			// \x, for all other x
+			اكسر;
+		    افتراضي:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    اكسر;
+		حالة '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
-		default:
+		    اكسر;
+		افتراضي:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    أرجع hold;
 	}
-    } while (*tmp);
+    } طالما (*tmp);
 
-    return 0;
+    أرجع 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    حرف *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    حرف    *cm,				// cm string, from termcap
+    صحيح	    خانہ,				// column, x position
+    صحيح	    سطر)				// line, y position
 {
-    char    gx, gy,				// x, y
+    حرف    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
-	reverse = 0,				// reverse flag
+	الٹ = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    ساكن حرف بفر[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    إذا (!cm)
+	أرجع "OOPS";				// Kludge, but standard
 
-    bufp = buffer;
+    bufp = بفر;
     ptr = cm;
 
-    while (*ptr)
+    طالما (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	إذا ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	وإلا
 	{				// % escape
-	    switch(c = *ptr++)
+	    بدل(c = *ptr++)
 	    {
-	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
-		break;
-	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
-		break;
-	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+	    حالة 'd':				// decimal
+		bufp = _addfmt(bufp, "%d", سطر);
+		سطر = خانہ;
+		اكسر;
+	    حالة '2':				// 2 digit decimal
+		bufp = _addfmt(bufp, "%02d", سطر);
+		سطر = خانہ;
+		اكسر;
+	    حالة '3':				// 3 digit decimal
+		bufp = _addfmt(bufp, "%03d", سطر);
+		سطر = خانہ;
+		اكسر;
+	    حالة '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
-		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		إذا (خانہ>gx) خانہ += gy;
+		إذا (سطر>gx) سطر += gy;
+		اكسر;
+	    حالة '+':				// %+c: add c
+		سطر += *ptr++;
+	    حالة '.':				// print x/y
+		إذا (سطر == '\t' ||		// these are
+		   سطر == '\n' ||		// chars that
+		   سطر == '\004' ||		// UNIX hates
+		   سطر == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    سطر++;			// so go to next pos
+		    إذا (الٹ == (سطر == خانہ))
 			addup=1;		// and mark UP
-		    else
+		    وإلا
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
-		break;
-	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
-		col = gx;
-		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
-		col++;
-		line++;
-		break;
-	    case '%':				// %%=% literally
+		*bufp++=سطر;
+		سطر = خانہ;
+		اكسر;
+	    حالة 'r':				// r: reverse
+		gx = سطر;
+		سطر = خانہ;
+		خانہ = gx;
+		الٹ = 1;
+		اكسر;
+	    حالة 'i':			// increment (1-origin screen)
+		خانہ++;
+		سطر++;
+		اكسر;
+	    حالة '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
-		line ^= 0140;
-		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
-		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
-		col = col-2*(col&15);
-		break;
-	    default:				// Unknown escape
-		return "OOPS";
+		اكسر;
+	    حالة 'n':				// magic DM2500 code
+		سطر ^= 0140;
+		خانہ ^= 0140;
+		اكسر;
+	    حالة 'B':				// bcd encoding
+		سطر = سطر/10<<4+سطر%10;
+		خانہ = خانہ/10<<4+خانہ%10;
+		اكسر;
+	    حالة 'D':				// magic Delta Data code
+		سطر = سطر-2*(سطر&15);
+		خانہ = خانہ-2*(خانہ&15);
+		اكسر;
+	    افتراضي:				// Unknown escape
+		أرجع "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    إذا (addup)					// add upline
+	إذا (اتے_2)
 	{
-	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ptr=اتے_2;
+	    طالما (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    إذا (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    طالما (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    إذا (addbak)					// add backspace
+	إذا (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    طالما (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    إذا (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    طالما (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	وإلا
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    أرجع(بفر);
 }
 
 /*
@@ -533,55 +533,55 @@ tgoto(
  *
  */
 
-long _bauds[16]={
+لما _bauds[16]={
     0,	50, 75,	110,
     134,    150,    200,    300,
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    صحيح
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    حرف *cp,				// string to print
+    صحيح affcnt,				// Number of lines affected
+    فراغ (*outc)(بنانشانی صحيح))		// routine to output 1 character
 {
-    long    frac,			// 10^(#digits after decimal point)
+    لما    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(ثابت حرف *);
 
-    if (VIM_ISDIGIT(*cp))
+    إذا (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
-	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	طالما (VIM_ISDIGIT(*cp))
+	    counter = counter * 10L + (لما)(*cp++ - '0');
+	إذا (*cp == '.')
+	    طالما (VIM_ISDIGIT(*++cp))
 	    {
-		counter = counter * 10L + (long)(*cp++ - '0');
+		counter = counter * 10L + (لما)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	إذا (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    إذا (affcnt>1) affcnt = 1;
 	}
-	else
+	وإلا
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
-	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
+	إذا (ospeed)
+	    counter = (counter * _bauds[ospeed] * (لما)affcnt) / frac;
 
-	while (*cp)			// output string
+	طالما (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	إذا (ospeed)
+	    طالما (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    وإلا
+	طالما (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    أرجع 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    ساكن صحيح
+میل_3(حرف *s1, حرف *s2)
 {
-    int i = 0;
+    صحيح i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    طالما (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    أرجع i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    ساكن حرف *
+لبھو_3(حرف *s, حرف *سیٹ_2)
 {
-    for (; *s; s++)
+    لكل (; *s; s++)
     {
-	char	*ptr = set;
+	حرف	*ptr = سیٹ_2;
 
-	while (*ptr && *s != *ptr)
+	طالما (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	إذا (*ptr)
+	    أرجع s;
     }
 
-    return s;
+    أرجع s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    ساكن حرف *
+_addfmt(حرف *buf, حرف *fmt, صحيح val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    طالما (*buf)
 	buf++;
-    return buf;
+    أرجع buf;
 }

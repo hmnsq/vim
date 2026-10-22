@@ -7,13 +7,13 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifdef FEAT_IMAGE
+#جے_تعریف_شدہ FEAT_IMAGE
 
-#include <pixman.h>
+#ضمن <pixman.h>
 
-#define PLACEMENT_ID_INC 1000
+#تعریف_کرو PLACEMENT_ID_INC 1000
 
-typedef enum
+تعريفنوع تعداد
 {
     IMAGE_BACKEND_NONE = -1,
     IMAGE_BACKEND_GUI = 0,
@@ -24,16 +24,16 @@ typedef enum
 /*
  * Enum value is the number of bytes a pixel takes up
  */
-typedef enum
+تعريفنوع تعداد
 {
     IMAGE_FORMAT_RGB = 3,
     IMAGE_FORMAT_RGBA = 4
 } image_format_T;
 
-typedef enum
+تعريفنوع تعداد
 {
-    IMAGE_STATE_PUBLIC,
-    IMAGE_STATE_PRIVATE
+    IMAGE_STATE_عوامی,
+    IMAGE_STATE_نجی
 } image_state_T;
 
 /*
@@ -41,7 +41,7 @@ typedef enum
  * higher values will always be on top of other image placements with a lower
  * use that have the same zindex as the higher use image.
  */
-typedef enum
+تعريفنوع تعداد
 {
     // See find_next_popup() for why (global popups are always drawn first,
     // meaning they should be below local tab popups).
@@ -55,46 +55,46 @@ typedef enum
  * Represents image data, that can be referenced by multiple image placements,
  * each with a different view.
  */
-typedef struct image_S image_T;
-struct image_S
+تعريفنوع بنية image_S image_T;
+بنية image_S
 {
     int_u id;
-    int refcount;
+    صحيح refcount;
 
     // If image state is public, then it can be modified using the builtin
     // functions.
     image_state_T state;
 
-    uint8_t	    *data; // If NULL, then image is invalid and should not be
+    uint8_t	    *انکڑے; // If NULL, then image is invalid and should not be
 			   // used.
-    int		    width;  // In physical pixels
-    int		    height; // In physical pixels
+    صحيح		    چوڑائی;  // In physical pixels
+    صحيح		    اچائی; // In physical pixels
     image_format_T  fmt;
 
     // Incremented every time the image data changes.
     int_u	    ver;
 
     image_backend_T backend;
-    void	    *backend_data;
+    فراغ	    *backend_انکڑے;
 
-    image_T *next;
+    image_T *اگلا;
     image_T *prev;
 };
 
-#define IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
-#define IMAGEPF_HIDDEN 2    // If image should not be drawn
-#define IMAGEPF_FORCE 4     // If image backend should not use its cache
+#تعریف_کرو IMAGEPF_DIRTY 1	    // If image positioning/geometry has been modified
+#تعریف_کرو IMAGEPF_HIDDEN 2    // If image should not be drawn
+#تعریف_کرو IMAGEPF_FORCE 4     // If image backend should not use its cache
 			    // (if any)
 
-#define IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
-#define IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
+#تعریف_کرو IMAGEPF_VISIBLE_INIT 8  // If "visible" is valid
+#تعریف_کرو IMAGEPF_ENABLED 16	// If image should be drawn (not reset across
 				// redraws).
 
 /*
  * Represents an image placement, which is a visible view of an image.
  */
-typedef struct image_placement_S image_placement_T;
-struct image_placement_S
+تعريفنوع بنية image_placement_S image_placement_T;
+بنية image_placement_S
 {
     int_u   id;
     int_u   gen;    // See image_placement_new(), note that "use" is prioritized
@@ -103,12 +103,12 @@ struct image_placement_S
 		    // (and the position + zindex).
 
     image_backend_T backend;
-    void	    *backend_data;
+    فراغ	    *backend_انکڑے;
 
     // Note that positioning uses the top left of the final cropped image
-    linenr_T	row;
-    colnr_T	col;
-    int		zindex;
+    linenr_T	صف;
+    colnr_T	خانہ;
+    صحيح		zindex;
 
     int_u flags;
 
@@ -130,28 +130,28 @@ struct image_placement_S
     int_u img_ver; // Current image version, if it is different from the image,
 		   // then must redraw the image.
 
-    int cell_width; // Cell dimensions used to draw this placement
-    int cell_height;
+    صحيح cell_چوڑائی; // Cell dimensions used to draw this placement
+    صحيح cell_اچائی;
 
-    int row_off;
+    صحيح صف_off;
 
     image_placement_use_T use;
 
-    image_placement_T *next;
+    image_placement_T *اگلا;
     image_placement_T *prev;
 };
 
-#else
+#وإلا
 
 // Dummy structs for .pro files when GUI Vim is compiled without image support
-typedef struct
+تعريفنوع بنية
 {
-    int dummy;
+    صحيح dummy;
 } image_T;
 
-typedef struct
+تعريفنوع بنية
 {
-    int dummy;
+    صحيح dummy;
 } image_placement_T;
 
-#endif // FEAT_IMAGE
+#جے_انت // FEAT_IMAGE

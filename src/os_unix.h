@@ -6,43 +6,43 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#include <stdio.h>
-#include <ctype.h>
+#ضمن <stdio.h>
+#ضمن <ctype.h>
 
-#ifdef VAXC
+#جے_تعریف_شدہ VAXC
 # include <types.h>
 # include <stat.h>
-#else
+#وإلا
 # include <sys/types.h>
 # include <sys/stat.h>
-#endif
+#جے_انت
 
-#ifdef HAVE_STDLIB_H
+#جے_تعریف_شدہ HAVE_STDLIB_H
 # include <stdlib.h>
-#endif
+#جے_انت
 
-#ifdef __CYGWIN__
+#جے_تعریف_شدہ __CYGWIN__
 # define WIN32UNIX	// Compiling for Win32 using Unix files.
-# define BINARY_FILE_IO
+# define ثنائی_FILE_IO
 
 # define CASE_INSENSITIVE_FILENAME
 # define USE_FNAME_CASE	// Fix filename case differences.
-#endif
+#جے_انت
 
 // On AIX 4.2 there is a conflicting prototype for ioctl() in stropts.h and
 // unistd.h.  This hack should fix that (suggested by Jeff George).
 // But on AIX 4.3 it's alright (suggested by Jake Hamby).
-#if defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
+#إذا defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
 # define _NO_PROTO
-#endif
+#جے_انت
 
-#ifdef HAVE_UNISTD_H
+#جے_تعریف_شدہ HAVE_UNISTD_H
 # include <unistd.h>
-#endif
+#جے_انت
 
-#ifdef HAVE_SYS_PARAM_H
+#جے_تعریف_شدہ HAVE_SYS_PARAM_H
 # include <sys/param.h>	    // defines BSD, if it's a BSD system
-#endif
+#جے_انت
 
 /*
  * Using getcwd() is preferred, because it checks for a buffer overflow.
@@ -50,105 +50,105 @@
  * autoconf check for this.
  * Use getcwd() anyway if getwd() isn't present.
  */
-#if defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
+#إذا defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
 # define USE_GETCWD
-#endif
+#جے_انت
 
 // always use unlink() to remove files
-#ifndef PROTO
+#جے_بنا_تعریف PROTO
 # ifdef VMS
-#  define vim_mkdir(x, y) mkdir((char *)vms_fixfilename(x), y)
-#  define mch_rmdir(x)  delete((char *)vms_fixfilename(x))
-#  define mch_remove(x) delete((char *)vms_fixfilename(x))
-# else
-#  define vim_mkdir(x, y) mkdir((char *)(x), y)
-#  define mch_rmdir(x) rmdir((char *)(x))
-#  define mch_remove(x) unlink((char *)(x))
+#  define vim_mkdir(x, y) mkdir((حرف *)vms_fixfilename(x), y)
+#  define mch_rmdir(x)  delete((حرف *)vms_fixfilename(x))
+#  define mch_remove(x) delete((حرف *)vms_fixfilename(x))
+# وإلا
+#  define vim_mkdir(x, y) mkdir((حرف *)(x), y)
+#  define mch_rmdir(x) rmdir((حرف *)(x))
+#  define mch_remove(x) unlink((حرف *)(x))
 # endif
-#endif
+#جے_انت
 
 // The number of arguments to a signal handler is configured here.
 // It used to be a long list of almost all systems. Any system that doesn't
 // have an argument???
-#define SIGHASARG
+#تعریف_کرو SIGHASARG
 
-#ifdef SIGHASARG
-# define SIGPROTOARG	(int)
-# define SIGDEFARG(s)	(int s UNUSED)
+#جے_تعریف_شدہ SIGHASARG
+# define SIGPROTOARG	(صحيح)
+# define SIGDEFARG(s)	(صحيح s بن_ورتیا)
 # define SIGDUMMYARG	0
-#else
-# define SIGPROTOARG   (void)
+#وإلا
+# define SIGPROTOARG   (فراغ)
 # define SIGDEFARG(s)  ()
 # define SIGDUMMYARG
-#endif
+#جے_انت
 
-typedef void (*sighandler_T) SIGPROTOARG;
+تعريفنوع فراغ (*sighandler_T) SIGPROTOARG;
 
-#ifdef HAVE_DIRENT_H
+#جے_تعریف_شدہ HAVE_DIRENT_H
 # include <dirent.h>
 # ifndef NAMLEN
-#  define NAMLEN(dirent) strlen((dirent)->d_name)
+#  define NAMLEN(dirent) لڑی_لمبائی((dirent)->d_name)
 # endif
-#else
-# define dirent direct
+#وإلا
+# define dirent سدھا
 # define NAMLEN(dirent) (dirent)->d_namlen
-# if HAVE_SYS_NDIR_H
+# إذا HAVE_SYS_NDIR_H
 #  include <sys/ndir.h>
 # endif
-# if HAVE_SYS_DIR_H
+# إذا HAVE_SYS_DIR_H
 #  include <sys/dir.h>
 # endif
-# if HAVE_NDIR_H
+# إذا HAVE_NDIR_H
 #  include <ndir.h>
 # endif
-#endif
+#جے_انت
 
-#include <time.h>
-#ifdef HAVE_SYS_TIME_H
+#ضمن <time.h>
+#جے_تعریف_شدہ HAVE_SYS_ویلا_H
 # include <sys/time.h>
-#endif
+#جے_انت
 
-#include <signal.h>
+#ضمن <signal.h>
 
-#if defined(DIRSIZ) && !defined(MAXNAMLEN)
+#إذا defined(DIRSIZ) && !defined(MAXNAMLEN)
 # define MAXNAMLEN DIRSIZ
-#endif
+#جے_انت
 
-#if defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
+#إذا defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
 # define MAXNAMLEN UFS_MAXNAMLEN    // for dynix/ptx
-#endif
+#جے_انت
 
-#if defined(NAME_MAX) && !defined(MAXNAMLEN)
+#إذا defined(NAME_MAX) && !defined(MAXNAMLEN)
 # define MAXNAMLEN NAME_MAX	    // for Linux before .99p3
-#endif
+#جے_انت
 
-#if defined(__sun)
+#إذا defined(__sun)
 # undef MAXNAMLEN
 # define MAXNAMLEN 255
-#endif
+#جے_انت
 
 /*
  * Note: if MAXNAMLEN has the wrong value, you will get error messages
  *	 for not being able to open the swap file.
  */
-#if !defined(MAXNAMLEN)
+#إذا !defined(MAXNAMLEN)
 # define MAXNAMLEN 512		    // for all other Unix
-#endif
+#جے_انت
 
-#define BASENAMELEN	(MAXNAMLEN - 5)
+#تعریف_کرو BASENAMELEN	(MAXNAMLEN - 5)
 
-#ifdef HAVE_PWD_H
+#جے_تعریف_شدہ HAVE_PWD_H
 # include <pwd.h>
-#endif
+#جے_انت
 
-#if (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
+#إذا (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
 	|| (defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)) \
 	|| defined(HAVE_SYSCTL) || defined(HAVE_SYSCONF)
-# define HAVE_TOTAL_MEM
-#endif
+# define HAVE_کل_MEM
+#جے_انت
 
 
-#ifdef VMS
+#جے_تعریف_شدہ VMS
 # include <unixio.h>
 # include <unixlib.h>
 # include <signal.h>
@@ -175,189 +175,189 @@ typedef void (*sighandler_T) SIGPROTOARG;
 # include <libdef.h>
 # include <libdtdef.h>
 
-# if defined(FEAT_GUI_MOTIF)
+# إذا defined(FEAT_GUI_MOTIF)
 #  define XFree XFREE
 #  define XmRepTypeInstallTearOffModelCon XMREPTYPEINSTALLTEAROFFMODELCON
 # endif
-#endif // VMS
+#جے_انت // VMS
 
-#ifdef HAVE_FLOCK
+#جے_تعریف_شدہ HAVE_FLOCK
 # include <sys/file.h>
-#endif
+#جے_انت
 
-#ifdef VMS
-typedef struct dsc$descriptor   DESC;
-#endif
+#جے_تعریف_شدہ VMS
+تعريفنوع بنية dsc$descriptor   DESC;
+#جے_انت
 
 /*
  * Unix system-dependent file names
  */
-#ifndef SYS_VIMRC_FILE
+#جے_بنا_تعریف SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE "$VIM/vimrc"
-#endif
-#ifndef SYS_GVIMRC_FILE
+#جے_انت
+#جے_بنا_تعریف SYS_GVIMRC_FILE
 # define SYS_GVIMRC_FILE "$VIM/gvimrc"
-#endif
-#ifndef DFLT_HELPFILE
+#جے_انت
+#جے_بنا_تعریف DFLT_HELPFILE
 # define DFLT_HELPFILE	"$VIMRUNTIME/doc/help.txt"
-#endif
-#ifndef SYS_MENU_FILE
+#جے_انت
+#جے_بنا_تعریف SYS_MENU_FILE
 # define SYS_MENU_FILE	"$VIMRUNTIME/menu.vim"
-#endif
+#جے_انت
 
-#ifndef USR_EXRC_FILE
+#جے_بنا_تعریف USR_EXRC_FILE
 # ifdef VMS
 #  define USR_EXRC_FILE "sys$login:.exrc"
-# else
+# وإلا
 #  define USR_EXRC_FILE "$HOME/.exrc"
 # endif
-#endif
+#جے_انت
 
-#if !defined(USR_EXRC_FILE2) && defined(VMS)
+#إذا !defined(USR_EXRC_FILE2) && defined(VMS)
 # define USR_EXRC_FILE2 "sys$login:_exrc"
-#endif
+#جے_انت
 
-#ifndef USR_VIMRC_FILE
+#جے_بنا_تعریف USR_VIMRC_FILE
 # ifdef VMS
 #  define USR_VIMRC_FILE  "sys$login:.vimrc"
-# else
+# وإلا
 #  define USR_VIMRC_FILE "$HOME/.vimrc"
 # endif
-#endif
+#جے_انت
 
 
-#if !defined(USR_VIMRC_FILE2)
+#إذا !defined(USR_VIMRC_FILE2)
 # ifdef VMS
 #  define USR_VIMRC_FILE2	"sys$login:vimfiles/vimrc"
-# else
+# وإلا
 #  define USR_VIMRC_FILE2	"~/.vim/vimrc"
 # endif
-#endif
+#جے_انت
 
-#ifndef XDG_VIMRC_FILE
+#جے_بنا_تعریف XDG_VIMRC_FILE
 # define XDG_VIMRC_FILE (mch_getenv((char_u *)"XDG_CONFIG_HOME") \
 	? "$XDG_CONFIG_HOME/vim/vimrc" \
 	: "~/.config/vim/vimrc")
-#endif
+#جے_انت
 
-#if !defined(USR_VIMRC_FILE3) && defined(VMS)
+#إذا !defined(USR_VIMRC_FILE3) && defined(VMS)
 # define USR_VIMRC_FILE3 "sys$login:_vimrc"
-#endif
+#جے_انت
 
-#ifndef USR_GVIMRC_FILE
+#جے_بنا_تعریف USR_GVIMRC_FILE
 # ifdef VMS
 #  define USR_GVIMRC_FILE "sys$login:.gvimrc"
-# else
+# وإلا
 #  define USR_GVIMRC_FILE "$HOME/.gvimrc"
 # endif
-#endif
+#جے_انت
 
-#ifndef USR_GVIMRC_FILE2
+#جے_بنا_تعریف USR_GVIMRC_FILE2
 # ifdef VMS
 #  define USR_GVIMRC_FILE2	"sys$login:vimfiles/gvimrc"
-# else
+# وإلا
 #  define USR_GVIMRC_FILE2	"~/.vim/gvimrc"
 # endif
-#endif
+#جے_انت
 
-#ifdef VMS
+#جے_تعریف_شدہ VMS
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3  "sys$login:_gvimrc"
 # endif
-#else
+#وإلا
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3 (mch_getenv("XDG_CONFIG_HOME") \
 	? "$XDG_CONFIG_HOME/vim/gvimrc" \
 	: "~/.config/vim/gvimrc")
 # endif
-#endif
+#جے_انت
 
-#ifndef VIM_DEFAULTS_FILE
+#جے_بنا_تعریف VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE "$VIMRUNTIME/defaults.vim"
-#endif
+#جے_انت
 
-#ifndef EVIM_FILE
+#جے_بنا_تعریف EVIM_FILE
 # define EVIM_FILE	"$VIMRUNTIME/evim.vim"
-#endif
+#جے_انت
 
-#ifdef FEAT_VIMINFO
+#جے_تعریف_شدہ FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  ifdef VMS
 #   define VIMINFO_FILE  "sys$login:.viminfo"
-#  else
+#  وإلا
 #   define VIMINFO_FILE "$HOME/.viminfo"
 #  endif
 # endif
-# if !defined(VIMINFO_FILE2) && defined(VMS)
+# إذا !defined(VIMINFO_FILE2) && defined(VMS)
 #  define VIMINFO_FILE2 "sys$login:_viminfo"
 # endif
-#endif
+#جے_انت
 
-#ifndef EXRC_FILE
+#جے_بنا_تعریف EXRC_FILE
 # define EXRC_FILE	".exrc"
-#endif
+#جے_انت
 
-#ifndef VIMRC_FILE
+#جے_بنا_تعریف VIMRC_FILE
 # define VIMRC_FILE	".vimrc"
-#endif
+#جے_انت
 
-#ifdef FEAT_GUI
+#جے_تعریف_شدہ FEAT_GUI
 # ifndef GVIMRC_FILE
 #  define GVIMRC_FILE	".gvimrc"
 # endif
-#endif
+#جے_انت
 
-#ifndef SYNTAX_FNAME
+#جے_بنا_تعریف SYNTAX_FNAME
 # define SYNTAX_FNAME	"$VIMRUNTIME/syntax/%s.vim"
-#endif
+#جے_انت
 
-#ifndef DFLT_BDIR
+#جے_بنا_تعریف DFLT_BDIR
 # ifdef VMS
 #  define DFLT_BDIR    "./,sys$login:,tmp:"
-# else
+# وإلا
 #  define DFLT_BDIR    ".,~/tmp,~/"    // default for 'backupdir'
 # endif
-#endif
+#جے_انت
 
-#ifndef DFLT_DIR
+#جے_بنا_تعریف DFLT_DIR
 # ifdef VMS
 #  define DFLT_DIR     "./,sys$login:,tmp:"
-# else
+# وإلا
 #  define DFLT_DIR     ".,~/tmp,/var/tmp,/tmp" // default for 'directory'
 # endif
-#endif
+#جے_انت
 
-#ifndef DFLT_VDIR
+#جے_بنا_تعریف DFLT_VDIR
 # ifdef VMS
 #  define DFLT_VDIR    "sys$login:vimfiles/view"
-# else
+# وإلا
 #  define DFLT_VDIR    "$HOME/.vim/view"       // default for 'viewdir'
 #  define XDG_VDIR     (mch_getenv("XDG_CONFIG_HOME") ? \
 	"$XDG_CONFIG_HOME/vim/view" : "~/.config/vim/view")
 # endif
-#endif
+#جے_انت
 
-#define DFLT_ERRORFILE		"errors.err"
+#تعریف_کرو DFLT_ERRORFILE		"errors.err"
 
-#ifndef DFLT_RUNTIMEPATH
+#جے_بنا_تعریف DFLT_RUNTIMEPATH
 
 # ifdef VMS
 #  define DFLT_RUNTIMEPATH      "sys$login:vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,sys$login:vimfiles/after"
 #  define CLEAN_RUNTIMEPATH      "$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
-# else
+# وإلا
 #  ifdef RUNTIME_GLOBAL
 #   ifdef RUNTIME_GLOBAL_AFTER
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER
-#   else
+#   وإلا
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after"
 #   endif
-#  else
+#  وإلا
 #   define DFLT_RUNTIMEPATH	"~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"
 #   define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$XDG_CONFIG_HOME/vim/after"
 #   define XDG_RUNTIMEPATH_FB	"~/.config/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.config/vim/after"
@@ -365,112 +365,112 @@ typedef struct dsc$descriptor   DESC;
 #  endif
 # endif
 
-#endif
+#جے_انت
 
-#ifdef VMS
+#جے_تعریف_شدہ VMS
 # ifndef VAX
 #  define VMS_TEMPNAM    // to fix default .LIS extension
 # endif
 # define TEMPNAME       "TMP:v?XXXXXX.txt"
 # define TEMPNAMELEN    28
-#else
+#وإلا
 // Try several directories to put the temp files.
 # define TEMPDIRNAMES  "$TMPDIR", "/tmp", ".", "$HOME"
 # define TEMPNAMELEN    256
-#endif
+#جے_انت
 
 // Special wildcards that need to be handled by the shell
-#define SPECIAL_WILDCHAR    "`'{"
+#تعریف_کرو SPECIAL_WILDCHAR    "`'{"
 
 /*
  * Unix has plenty of memory, use large buffers
  */
-#define CMDBUFFSIZE 1024	// size of the command processing buffer
+#تعریف_کرو CMDBUFFSIZE 1024	// size of the command processing buffer
 
 // Use the system path length if it makes sense.
-#if defined(PATH_MAX) && (PATH_MAX > 1000)
+#إذا defined(PATH_MAX) && (PATH_MAX > 1000)
 # define MAXPATHL	PATH_MAX
-#else
+#وإلا
 # define MAXPATHL	1024
-#endif
+#جے_انت
 
-#define CHECK_INODE		// used when checking if a swap file already
+#تعریف_کرو CHECK_INODE		// used when checking if a swap file already
 				// exists for a file
-#ifdef VMS  // Use less memory because of older systems
+#جے_تعریف_شدہ VMS  // Use less memory because of older systems
 # ifndef DFLT_MAXMEM
 #  define DFLT_MAXMEM (2*1024)
 # endif
 # ifndef DFLT_MAXMEMTOT
 #  define DFLT_MAXMEMTOT (5*1024)
 # endif
-#else
+#وإلا
 # ifndef DFLT_MAXMEM
 #  define DFLT_MAXMEM	(5*1024)	 // use up to 5 Mbyte for a buffer
 # endif
 # ifndef DFLT_MAXMEMTOT
 #  define DFLT_MAXMEMTOT	(10*1024)    // use up to 10 Mbyte for Vim
 # endif
-#endif
+#جے_انت
 
 // memmove() is not present on all systems, use memmove, bcopy or memcpy.
 // Some systems have (void *) arguments, some (char *). If we use (char *) it
 // works for all
-#if defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
-# define mch_memmove(to, from, len) memmove((char *)(to), (char *)(from), len)
-#else
+#إذا defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
+# define mch_memmove(منزل, from, len) memmove((حرف *)(منزل), (حرف *)(from), len)
+#وإلا
 # ifdef USEBCOPY
-#  define mch_memmove(to, from, len) bcopy((char *)(from), (char *)(to), len)
-# else
+#  define mch_memmove(منزل, from, len) bcopy((حرف *)(from), (حرف *)(منزل), len)
+# وإلا
     // ifdef USEMEMCPY
-#  define mch_memmove(to, from, len) memcpy((char *)(to), (char *)(from), len)
+#  define mch_memmove(منزل, from, len) حافظہ_نقل((حرف *)(منزل), (حرف *)(from), len)
 # endif
-#endif
+#جے_انت
 
-#ifndef PROTO
+#جے_بنا_تعریف PROTO
 # ifdef HAVE_RENAME
 #  define mch_rename(src, dst) rename(src, dst)
-# else
-int mch_rename(const char *src, const char *dest);
+# وإلا
+صحيح mch_rename(ثابت حرف *src, ثابت حرف *dest);
 # endif
 # ifndef VMS
 #  ifdef __MVS__
   // on OS390 Unix getenv() doesn't return a pointer to persistent
   // storage -> use __getenv()
-#   define mch_getenv(x) (char_u *)__getenv((char *)(x))
-#  else
-#   define mch_getenv(x) (char_u *)getenv((char *)(x))
+#   define mch_getenv(x) (char_u *)__getenv((حرف *)(x))
+#  وإلا
+#   define mch_getenv(x) (char_u *)getenv((حرف *)(x))
 #  endif
 #  define mch_setenv(name, val, x) setenv(name, val, x)
 # endif
-#endif
+#جے_انت
 
 // Note: Some systems need both string.h and strings.h (Savage).  However,
 // some systems can't handle both, only use string.h in that case.
-#ifdef HAVE_STRING_H
+#جے_تعریف_شدہ HAVE_STRING_H
 # include <string.h>
-#endif
-#if defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
+#جے_انت
+#إذا defined(HAVE_لڑیاں_H) && !defined(NO_لڑیاں_WITH_STRING_H)
 # include <strings.h>
-#endif
+#جے_انت
 
-#if defined(HAVE_SETJMP_H)
+#إذا defined(HAVE_SETJMP_H)
 # include <setjmp.h>
 # ifdef HAVE_SIGSETJMP
 #  define JMP_BUF sigjmp_buf
 #  define SETJMP(x) sigsetjmp((x), 1)
 #  define LONGJMP siglongjmp
-# else
+# وإلا
 #  define JMP_BUF jmp_buf
 #  define SETJMP(x) setjmp(x)
 #  define LONGJMP longjmp
 # endif
-#endif
+#جے_انت
 
-#ifndef HAVE_DUP
+#جے_بنا_تعریف HAVE_DUP
 # define HAVE_DUP		// have dup()
-#endif
-#define HAVE_ST_MODE		// have stat.st_mode
+#جے_انت
+#تعریف_کرو HAVE_ST_منوال		// have stat.st_mode
 
 // We have three kinds of ACL support.
-#define HAVE_ACL (HAVE_POSIX_ACL || HAVE_SOLARIS_ACL || HAVE_AIX_ACL)
+#تعریف_کرو HAVE_ACL (HAVE_POSIX_ACL || HAVE_SOLARIS_ACL || HAVE_AIX_ACL)
 

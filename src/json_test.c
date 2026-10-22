@@ -11,194 +11,194 @@
  * json_test.c: Unittests for json.c
  */
 
-#undef NDEBUG
-#include <assert.h>
+#تعریف_رد NDEBUG
+#ضمن <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#تعریف_کرو NO_VIM_MAIN
+#ضمن "main.c"
 
 // This file has to be included because the tested functions are static
-#include "json.c"
+#ضمن "json.c"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Test json_find_end() with incomplete items.
  */
-    static void
-test_decode_find_end(void)
+    ساكن فراغ
+test_decode_لبھو_سرا(فراغ)
 {
     js_read_T reader;
 
-    reader.js_fill = NULL;
-    reader.js_used = 0;
+    reader.js_fill = عدم;
+    reader.js_ورتیا = 0;
 
     // string and incomplete string
     reader.js_buf = (char_u *)"\"hello\"";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  \"hello\" ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"\"hello";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // number and dash (incomplete number)
     reader.js_buf = (char_u *)"123";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"-";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // false, true and null, also incomplete
     reader.js_buf = (char_u *)"false";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"f";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fa";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fal";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"fals";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     reader.js_buf = (char_u *)"true";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"t";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"tr";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"tru";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     reader.js_buf = (char_u *)"null";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"n";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"nu";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"nul";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // object without white space
     reader.js_buf = (char_u *)"{\"a\":123}";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"{\"a\":123";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a\":";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"a";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"{";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // object with white space
     reader.js_buf = (char_u *)"  {  \"a\"  :  123  }  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  {  \"a\"  :  123  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a\"  :  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a\"  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {  \"a  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  {   ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // JS object with white space
     reader.js_buf = (char_u *)"  {  a  :  123  }  ";
-    assert(json_find_end(&reader, JSON_JS) == OK);
+    أكد(json_لبھو_سرا(&reader, JSON_JS) == OK);
     reader.js_buf = (char_u *)"  {  a  :   ";
-    assert(json_find_end(&reader, JSON_JS) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, JSON_JS) == MAYBE);
 
     // array without white space
     reader.js_buf = (char_u *)"[\"a\",123]";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"[\"a\",123";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a\",";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"a";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[\"";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"[";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 
     // array with white space
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ]  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a\"  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  \"a  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
     reader.js_buf = (char_u *)"  [  ";
-    assert(json_find_end(&reader, 0) == MAYBE);
+    أكد(json_لبھو_سرا(&reader, 0) == MAYBE);
 }
 
-    static int
+    ساكن صحيح
 fill_from_cookie(js_read_T *reader)
 {
     reader->js_buf = reader->js_cookie;
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Test json_find_end with an incomplete array, calling the fill function.
  */
-    static void
-test_fill_called_on_find_end(void)
+    ساكن فراغ
+test_fill_called_on_لبھو_سرا(فراغ)
 {
     js_read_T reader;
 
     reader.js_fill = fill_from_cookie;
-    reader.js_used = 0;
+    reader.js_ورتیا = 0;
     reader.js_buf = (char_u *)"  [  \"a\"  ,  123  ";
     reader.js_cookie =	      "  [  \"a\"  ,  123  ]  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ,  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a\"  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  \"a";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
     reader.js_buf = (char_u *)"  [  ";
-    assert(json_find_end(&reader, 0) == OK);
+    أكد(json_لبھو_سرا(&reader, 0) == OK);
 }
 
 /*
  * Test json_find_end with an incomplete string, calling the fill function.
  */
-    static void
-test_fill_called_on_string(void)
+    ساكن فراغ
+test_fill_called_on_string(فراغ)
 {
     js_read_T reader;
 
     reader.js_fill = fill_from_cookie;
-    reader.js_used = 0;
+    reader.js_ورتیا = 0;
     reader.js_buf = (char_u *)" \"foo";
-    reader.js_end = reader.js_buf + STRLEN(reader.js_buf);
+    reader.js_سرا = reader.js_buf + STRLEN(reader.js_buf);
     reader.js_cookie =	      " \"foobar\"  ";
-    assert(json_decode_string(&reader, NULL, '"') == OK);
+    أكد(json_decode_string(&reader, عدم, '"') == OK);
 }
-#endif
+#جے_انت
 
-    int
-main(void)
+    صحيح
+مکھ(فراغ)
 {
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     p_mfd = 100;
-    test_decode_find_end();
-    test_fill_called_on_find_end();
+    test_decode_لبھو_سرا();
+    test_fill_called_on_لبھو_سرا();
     test_fill_called_on_string();
-#endif
-    return 0;
+#جے_انت
+    أرجع 0;
 }

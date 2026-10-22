@@ -9,17 +9,17 @@
  * (original link, now dead: iamphet.nm.ru/vim/index.html)
  */
 
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
+#جے_بنا_تعریف WIN32_LEAN_AND_اوسط
+# define WIN32_LEAN_AND_اوسط
+#جے_انت
+#ضمن <windows.h>
 
-#include "xpm_w32.h"
+#ضمن "xpm_w32.h"
 
 // Engage Windows support in libXpm
-#define FOR_MSW
+#تعریف_کرو FOR_MSW
 
-#include "xpm.h"
+#ضمن "xpm.h"
 
 /*
  * Tries to load an Xpm image from the file "filename".
@@ -27,30 +27,30 @@
  * Returns 0 on success and stores image and mask BITMAPS in "hImage" and
  * "hShape".
  */
-    int
-LoadXpmImage(
-    char    *filename,
+    صحيح
+لدو_Xpm_Image(
+    حرف    *filename,
     HBITMAP *hImage,
     HBITMAP *hShape)
 {
     XImage	    *img;  // loaded image
     XImage	    *shp;  // shapeimage
-    XpmAttributes   attr;
-    int		    res;
-    HDC		    hdc = CreateCompatibleDC(NULL);
+    Xpm_گن   attr;
+    صحيح		    res;
+    HDC		    hdc = CreateCompatibleDC(عدم);
 
     attr.valuemask = 0;
-    res = XpmReadFileToImage(&hdc, filename, &img, &shp, &attr);
+    res = Xpm_Read_File_منزل_Image(&hdc, filename, &img, &shp, &attr);
     DeleteDC(hdc);
-    if (res < 0)
-	return -1;
-    if (shp == NULL)
+    إذا (res < 0)
+	أرجع -1;
+    إذا (shp == عدم)
     {
-	if (img)
+	إذا (img)
 	    XDestroyImage(img);
-	return -1;
+	أرجع -1;
     }
     *hImage = img->bitmap;
     *hShape = shp->bitmap;
-    return 0;
+    أرجع 0;
 }

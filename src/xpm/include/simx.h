@@ -34,12 +34,12 @@
 \*****************************************************************************/
 
 
-#ifndef _SIMX_H
-#define _SIMX_H
+#جے_بنا_تعریف _SIMX_H
+#تعریف_کرو _SIMX_H
 
-#ifdef FOR_MSW
+#جے_تعریف_شدہ FOR_MSW
 
-#include "windows.h"			/* MS windows GDI types */
+#ضمن "windows.h"			/* MS windows GDI types */
 
 /*
  * minimal portability layer between ansi and KR C
@@ -47,93 +47,93 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#إذا __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else /* k&R */
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
-#endif
+#تعریف_کرو FUNC(f, t, p) خارجي t f p
+#تعریف_کرو LFUNC(f, t, p) ساكن t f p
+#وإلا /* k&R */
+#تعریف_کرو FUNC(f, t, p) خارجي t f()
+#تعریف_کرو LFUNC(f, t, p) ساكن t f()
+#جے_انت
 
 
-FUNC(boundCheckingMalloc, void *, (long s));
-FUNC(boundCheckingCalloc, void *, (long num, long s));
-FUNC(boundCheckingRealloc, void *, (void *p, long s));
+FUNC(boundCheckingMalloc, فراغ *, (لما s));
+FUNC(boundCheckingCalloc, فراغ *, (لما عدد, لما s));
+FUNC(boundCheckingRealloc, فراغ *, (فراغ *p, لما s));
 
 /* define MSW types for X window types,
    I don't know much about MSW, but the following defines do the job */
 
-typedef HDC Display;			/* this should be similar */
-typedef void *Screen;			/* not used */
-typedef void *Visual;			/* not used yet, is for GRAY, COLOR,
+تعريفنوع HDC Display;			/* this should be similar */
+تعريفنوع فراغ *Screen;			/* not used */
+تعريفنوع فراغ *Visual;			/* not used yet, is for GRAY, COLOR,
 					 * MONO */
 
-typedef void *Colormap;			/* should be COLORPALETTE, not done
+تعريفنوع فراغ *Colormap;			/* should be COLORPALETTE, not done
 					 * yet */
 
-typedef COLORREF Pixel;
+تعريفنوع COLORREF Pixel;
 
-#define PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
+#تعریف_کرو PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
 
-typedef struct {
+تعريفنوع بنية {
     Pixel pixel;
     BYTE red, green, blue;
 }      XColor;
 
-typedef struct {
+تعريفنوع بنية {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    بنانشانی صحيح چوڑائی;
+    بنانشانی صحيح اچائی;
+    بنانشانی صحيح ڈونگھائی;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
-extern "C" {
-#endif
+#إذا defined(__cplusplus) || defined(c_plusplus)
+خارجي "C" {
+#جے_انت
 /* some replacements for X... functions */
 
 /* XDefaultXXX */
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefault_ڈونگھائی, صحيح, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
-    FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
-			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+    FUNC(XParseColor, صحيح, (Display *, Colormap *, حرف *, XColor *));
+    FUNC(XAllocColor, صحيح, (Display *, Colormap *, XColor *));
+    FUNC(XQueryColors, فراغ, (Display *display, Colormap *colormap,
+			      XColor *xcolors, صحيح ncolors));
+    FUNC(XFreeColors, صحيح, (Display *d, Colormap cmap,
+			    بنانشانی لما pixels[],
+			    صحيح npixels, بنانشانی لما planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, صحيح ڈونگھائی, صحيح format,
+				  صحيح x, صحيح y, صحيح چوڑائی, صحيح اچائی,
+				  صحيح pad, صحيح foo));
 
 /* free and destroy bitmap */
-    FUNC(XDestroyImage, void /* ? */ , (XImage *));
+    FUNC(XDestroyImage, فراغ /* ? */ , (XImage *));
 /* free only, bitmap remains */
-    FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+    FUNC(XImageFree, فراغ, (XImage *));
+#إذا defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
-#endif /* cplusplus */
+#جے_انت /* cplusplus */
 
-#define ZPixmap 1			/* not really used */
-#define XYBitmap 1			/* not really used */
+#تعریف_کرو ZPixmap 1			/* not really used */
+#تعریف_کرو XYBitmap 1			/* not really used */
 
-#ifndef True
-#define True 1
-#define False 0
-#endif
-#ifndef Bool
-typedef BOOL Bool;		/* take MSW bool */
-#endif
+#جے_بنا_تعریف True
+#تعریف_کرو True 1
+#تعریف_کرو False 0
+#جے_انت
+#جے_بنا_تعریف Bool
+تعريفنوع BOOL Bool;		/* take MSW bool */
+#جے_انت
 /* make these local here, simx.c gets the same from xpm.h */
-#undef LFUNC
-#undef FUNC
+#تعریف_رد LFUNC
+#تعریف_رد FUNC
 
-#endif /* def FOR_MSW */
+#جے_انت /* def FOR_MSW */
 
-#endif /* _SIMX_H */
+#جے_انت /* _SIMX_H */

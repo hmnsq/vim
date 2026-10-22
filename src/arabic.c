@@ -28,88 +28,88 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_ARABIC)
+#إذا defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
-#define a_HAMZA				0x0621
-#define a_ALEF_MADDA			0x0622
-#define a_ALEF_HAMZA_ABOVE		0x0623
-#define a_WAW_HAMZA			0x0624
-#define a_ALEF_HAMZA_BELOW		0x0625
-#define a_YEH_HAMZA			0x0626
-#define a_ALEF				0x0627
-#define a_BEH				0x0628
-#define a_TEH_MARBUTA			0x0629
-#define a_TEH				0x062a
-#define a_THEH				0x062b
-#define a_JEEM				0x062c
-#define a_HAH				0x062d
-#define a_KHAH				0x062e
-#define a_DAL				0x062f
-#define a_THAL				0x0630
-#define a_REH				0x0631
-#define a_ZAIN				0x0632
-#define a_SEEN				0x0633
-#define a_SHEEN				0x0634
-#define a_SAD				0x0635
-#define a_DAD				0x0636
-#define a_TAH				0x0637
-#define a_ZAH				0x0638
-#define a_AIN				0x0639
-#define a_GHAIN				0x063a
-#define a_TATWEEL			0x0640
-#define a_FEH				0x0641
-#define a_QAF				0x0642
-#define a_KAF				0x0643
-#define a_LAM				0x0644
-#define a_MEEM				0x0645
-#define a_NOON				0x0646
-#define a_HEH				0x0647
-#define a_WAW				0x0648
-#define a_ALEF_MAKSURA			0x0649
-#define a_YEH				0x064a
-#define a_FATHATAN			0x064b
-#define a_DAMMATAN			0x064c
-#define a_KASRATAN			0x064d
-#define a_FATHA				0x064e
-#define a_DAMMA				0x064f
-#define a_KASRA				0x0650
-#define a_SHADDA			0x0651
-#define a_SUKUN				0x0652
-#define a_MADDA_ABOVE			0x0653
-#define a_HAMZA_ABOVE			0x0654
-#define a_HAMZA_BELOW			0x0655
+#تعریف_کرو a_HAMZA				0x0621
+#تعریف_کرو a_ALEF_MADDA			0x0622
+#تعریف_کرو a_ALEF_HAMZA_ABOVE		0x0623
+#تعریف_کرو a_WAW_HAMZA			0x0624
+#تعریف_کرو a_ALEF_HAMZA_ہیٹھاں		0x0625
+#تعریف_کرو a_YEH_HAMZA			0x0626
+#تعریف_کرو a_ALEF				0x0627
+#تعریف_کرو a_BEH				0x0628
+#تعریف_کرو a_TEH_MARBUTA			0x0629
+#تعریف_کرو a_TEH				0x062a
+#تعریف_کرو a_THEH				0x062b
+#تعریف_کرو a_JEEM				0x062c
+#تعریف_کرو a_HAH				0x062d
+#تعریف_کرو a_KHAH				0x062e
+#تعریف_کرو a_DAL				0x062f
+#تعریف_کرو a_THAL				0x0630
+#تعریف_کرو a_REH				0x0631
+#تعریف_کرو a_ZAIN				0x0632
+#تعریف_کرو a_تکیا				0x0633
+#تعریف_کرو a_SHEEN				0x0634
+#تعریف_کرو a_SAD				0x0635
+#تعریف_کرو a_DAD				0x0636
+#تعریف_کرو a_TAH				0x0637
+#تعریف_کرو a_ZAH				0x0638
+#تعریف_کرو a_AIN				0x0639
+#تعریف_کرو a_GHAIN				0x063a
+#تعریف_کرو a_TATWEEL			0x0640
+#تعریف_کرو a_FEH				0x0641
+#تعریف_کرو a_QAF				0x0642
+#تعریف_کرو a_KAF				0x0643
+#تعریف_کرو a_LAM				0x0644
+#تعریف_کرو a_MEEM				0x0645
+#تعریف_کرو a_NOON				0x0646
+#تعریف_کرو a_HEH				0x0647
+#تعریف_کرو a_WAW				0x0648
+#تعریف_کرو a_ALEF_MAKSURA			0x0649
+#تعریف_کرو a_YEH				0x064a
+#تعریف_کرو a_FATHATAN			0x064b
+#تعریف_کرو a_DAMMATAN			0x064c
+#تعریف_کرو a_KASRATAN			0x064d
+#تعریف_کرو a_FATHA				0x064e
+#تعریف_کرو a_DAMMA				0x064f
+#تعریف_کرو a_KASRA				0x0650
+#تعریف_کرو a_SHADDA			0x0651
+#تعریف_کرو a_SUKUN				0x0652
+#تعریف_کرو a_MADDA_ABOVE			0x0653
+#تعریف_کرو a_HAMZA_ABOVE			0x0654
+#تعریف_کرو a_HAMZA_ہیٹھاں			0x0655
 
-#define a_PEH				0x067e
-#define a_TCHEH				0x0686
-#define a_JEH				0x0698
-#define a_FKAF				0x06a9
-#define a_GAF				0x06af
-#define a_FYEH				0x06cc
+#تعریف_کرو a_PEH				0x067e
+#تعریف_کرو a_TCHEH				0x0686
+#تعریف_کرو a_JEH				0x0698
+#تعریف_کرو a_FKAF				0x06a9
+#تعریف_کرو a_GAF				0x06af
+#تعریف_کرو a_FYEH				0x06cc
 
-#define a_s_LAM_ALEF_MADDA_ABOVE	0xfef5
-#define a_f_LAM_ALEF_MADDA_ABOVE	0xfef6
-#define a_s_LAM_ALEF_HAMZA_ABOVE	0xfef7
-#define a_f_LAM_ALEF_HAMZA_ABOVE	0xfef8
-#define a_s_LAM_ALEF_HAMZA_BELOW	0xfef9
-#define a_f_LAM_ALEF_HAMZA_BELOW	0xfefa
-#define a_s_LAM_ALEF			0xfefb
-#define a_f_LAM_ALEF			0xfefc
+#تعریف_کرو a_s_LAM_ALEF_MADDA_ABOVE	0xfef5
+#تعریف_کرو a_f_LAM_ALEF_MADDA_ABOVE	0xfef6
+#تعریف_کرو a_s_LAM_ALEF_HAMZA_ABOVE	0xfef7
+#تعریف_کرو a_f_LAM_ALEF_HAMZA_ABOVE	0xfef8
+#تعریف_کرو a_s_LAM_ALEF_HAMZA_ہیٹھاں	0xfef9
+#تعریف_کرو a_f_LAM_ALEF_HAMZA_ہیٹھاں	0xfefa
+#تعریف_کرو a_s_LAM_ALEF			0xfefb
+#تعریف_کرو a_f_LAM_ALEF			0xfefc
 
-static struct achar {
-    unsigned c;
-    unsigned isolated;
-    unsigned initial;
-    unsigned medial;
-    unsigned final;
+ساكن بنية achar {
+    بنانشانی c;
+    بنانشانی isolated;
+    بنانشانی initial;
+    بنانشانی medial;
+    بنانشانی final;
 } achars[] = {
     {a_HAMZA, 0xfe80, 0, 0, 0},
     {a_ALEF_MADDA, 0xfe81, 0, 0, 0xfe82},
     {a_ALEF_HAMZA_ABOVE, 0xfe83, 0, 0, 0xfe84},
     {a_WAW_HAMZA, 0xfe85, 0, 0, 0xfe86},
-    {a_ALEF_HAMZA_BELOW, 0xfe87, 0, 0, 0xfe88},
+    {a_ALEF_HAMZA_ہیٹھاں, 0xfe87, 0, 0, 0xfe88},
     {a_YEH_HAMZA, 0xfe89, 0xfe8b, 0xfe8c, 0xfe8a},
     {a_ALEF, 0xfe8d, 0, 0, 0xfe8e},
     {a_BEH, 0xfe8f, 0xfe91, 0xfe92, 0xfe90},
@@ -123,7 +123,7 @@ static struct achar {
     {a_THAL, 0xfeab, 0, 0, 0xfeac},
     {a_REH, 0xfead, 0, 0, 0xfeae},
     {a_ZAIN, 0xfeaf, 0, 0, 0xfeb0},
-    {a_SEEN, 0xfeb1, 0xfeb3, 0xfeb4, 0xfeb2},
+    {a_تکیا, 0xfeb1, 0xfeb3, 0xfeb4, 0xfeb2},
     {a_SHEEN, 0xfeb5, 0xfeb7, 0xfeb8, 0xfeb6},
     {a_SAD, 0xfeb9, 0xfebb, 0xfebc, 0xfeba},
     {a_DAD, 0xfebd, 0xfebf, 0xfec0, 0xfebe},
@@ -152,7 +152,7 @@ static struct achar {
     {a_SUKUN, 0xfe7e, 0, 0xfe7f, 0},
     {a_MADDA_ABOVE, 0, 0, 0, 0},
     {a_HAMZA_ABOVE, 0, 0, 0, 0},
-    {a_HAMZA_BELOW, 0, 0, 0, 0},
+    {a_HAMZA_ہیٹھاں, 0, 0, 0, 0},
     {a_PEH, 0xfb56, 0xfb58, 0xfb59, 0xfb57},
     {a_TCHEH, 0xfb7a, 0xfb7c, 0xfb7d, 0xfb7b},
     {a_JEH, 0xfb8a, 0, 0, 0xfb8b},
@@ -161,159 +161,159 @@ static struct achar {
     {a_FYEH, 0xfbfc, 0xfbfe, 0xfbff, 0xfbfd},
 };
 
-#define a_BYTE_ORDER_MARK		0xfeff
+#تعریف_کرو a_BYTE_ترتیب_MARK		0xfeff
 
 /*
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    ساكن بنية achar *
+لبھو_achar(صحيح c)
 {
-    int h, m, l;
+    صحيح h, m, l;
 
     // using binary search to find c
-    h = ARRAY_LENGTH(achars);
+    h = ARRAY_لمائی(achars);
     l = 0;
-    while (l < h)
+    طالما (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	إذا (achars[m].c == (بنانشانی)c)
+	    أرجع &achars[m];
+	إذا ((بنانشانی)c < achars[m].c)
 	    h = m;
-	else
+	وإلا
 	    l = m + 1;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    ساكن صحيح
+chg_c_laa2i(صحيح hid_c)
 {
-    int tempc;
+    صحيح tempc;
 
-    switch (hid_c)
+    بدل (hid_c)
     {
-	case a_ALEF_MADDA:
+	حالة a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    اكسر;
+	حالة a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
-	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    اكسر;
+	حالة a_ALEF_HAMZA_ہیٹھاں:
+	    tempc = a_s_LAM_ALEF_HAMZA_ہیٹھاں;
+	    اكسر;
+	حالة a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    tempc = 0;
     }
 
-    return tempc;
+    أرجع tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    ساكن صحيح
+chg_c_laa2f(صحيح hid_c)
 {
-    int tempc;
+    صحيح tempc;
 
-    switch (hid_c)
+    بدل (hid_c)
     {
-	case a_ALEF_MADDA:
+	حالة a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    اكسر;
+	حالة a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
-	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    اكسر;
+	حالة a_ALEF_HAMZA_ہیٹھاں:
+	    tempc = a_f_LAM_ALEF_HAMZA_ہیٹھاں;
+	    اكسر;
+	حالة a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    tempc = 0;
     }
 
-    return tempc;
+    أرجع tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    ساكن صحيح
+can_join(صحيح c1, صحيح c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    بنية achar *a1 = لبھو_achar(c1);
+    بنية achar *a2 = لبھو_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    أرجع a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    صحيح
+arabic_maycombine(صحيح two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    إذا (p_arshape && !p_tbidi)
+	أرجع (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
-		    || two == a_ALEF_HAMZA_BELOW
+		    || two == a_ALEF_HAMZA_ہیٹھاں
 		    || two == a_ALEF);
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    صحيح
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    صحيح		one,	    // first character
+    صحيح		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    إذا (one == a_LAM)
+	أرجع arabic_maycombine(two);
+    أرجع FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    ساكن صحيح
+A_is_iso(صحيح c)
 {
-    return find_achar(c) != NULL;
+    أرجع لبھو_achar(c) != عدم;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    ساكن صحيح
+A_is_ok(صحيح c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    أرجع (A_is_iso(c) || c == a_BYTE_ترتیب_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    ساكن صحيح
+A_is_valid(صحيح c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    أرجع (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    صحيح
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    صحيح		c,
+    صحيح		*ccp,
+    صحيح		*c1p,
+    صحيح		prev_c,
+    صحيح		prev_c1,
+    صحيح		اگلا_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    صحيح		curr_c;
+    صحيح		curr_laa;
+    صحيح		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    إذا (!A_is_ok(c))
+	أرجع c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    إذا (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	إذا (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	وإلا
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    وإلا
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	بنية achar *curr_a = لبھو_achar(c);
+	صحيح backward_combine = !prev_laa && can_join(prev_c, c);
+	صحيح forward_combine = can_join(c, اگلا_c);
 
-	if (backward_combine)
+	إذا (backward_combine)
 	{
-	    if (forward_combine)
+	    إذا (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    وإلا
 		curr_c = curr_a->final;
 	}
-	else
+	وإلا
 	{
-	    if (forward_combine)
+	    إذا (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    وإلا
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    إذا (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    إذا (curr_c != c && ccp != عدم)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    أرجع curr_c;
 }
-#endif // FEAT_ARABIC
+#جے_انت // FEAT_ARABIC

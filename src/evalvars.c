@@ -11,19 +11,19 @@
  * evalvars.c: functions for dealing with variables
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
-static dictitem_T	globvars_var;		// variable used for g:
-static dict_T		globvardict;		// Dictionary with g: variables
-#define globvarht globvardict.dv_hashtab
+ساكن dictitem_T	globvars_var;		// variable used for g:
+ساكن dict_T		globvardict;		// Dictionary with g: variables
+#تعریف_کرو globvarht globvardict.dv_hashtab
 
 /*
  * Old Vim variables such as "v:version" are also available without the "v:".
  * Also in functions.  We need a special hashtable for them.
  */
-static hashtab_T	compat_hashtab;
+ساكن hashtab_T	compat_hashtab;
 
 /*
  * Array to hold the value of v: variables.
@@ -33,277 +33,277 @@ static hashtab_T	compat_hashtab;
  */
 
 // values for vv_flags:
-#define VV_COMPAT	1	// compatible, also used without "v:"
-#define VV_RO		2	// read-only
-#define VV_RO_SBX	4	// read-only in the sandbox
+#تعریف_کرو VV_COMPAT	1	// compatible, also used without "v:"
+#تعریف_کرو VV_RO		2	// read-only
+#تعریف_کرو VV_RO_SBX	4	// read-only in the sandbox
 
-#define VV_NAME(s, t)	s, {{t, 0, {0}}, 0, {s}}
+#تعریف_کرو VV_NAME(s, t)	s, {{t, 0, {0}}, 0, {s}}
 
-typedef struct vimvar vimvar_T;
+تعريفنوع بنية vimvar vimvar_T;
 
-static struct vimvar
+ساكن بنية vimvar
 {
-    char	*vv_name;	// name of variable, without v:
+    حرف	*vv_name;	// name of variable, without v:
     dictitem16_T vv_di;		// value and name for key (max 16 chars!)
     type_T	*vv_type;	// type or NULL
-    char	vv_flags;	// VV_COMPAT, VV_RO, VV_RO_SBX
+    حرف	vv_flags;	// VV_COMPAT, VV_RO, VV_RO_SBX
 } vimvars[VV_LEN] =
 {
     // The order here must match the VV_ defines in vim.h!
     // Initializing a union does not work, leave tv.vval empty to get zero's.
-    {VV_NAME("count",		 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
-    {VV_NAME("count1",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("prevcount",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("errmsg",		 VAR_STRING), NULL, VV_COMPAT},
-    {VV_NAME("warningmsg",	 VAR_STRING), NULL, 0},
-    {VV_NAME("statusmsg",	 VAR_STRING), NULL, 0},
-    {VV_NAME("shell_error",	 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
-    {VV_NAME("this_session",	 VAR_STRING), NULL, VV_COMPAT},
-    {VV_NAME("version",		 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
-    {VV_NAME("lnum",		 VAR_NUMBER), NULL, VV_RO_SBX},
-    {VV_NAME("termresponse",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fname",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("lang",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("lc_time",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("ctype",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("charconvert_from", VAR_STRING), NULL, VV_RO},
-    {VV_NAME("charconvert_to",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fname_in",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fname_out",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fname_new",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fname_diff",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("cmdarg",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("foldstart",	 VAR_NUMBER), NULL, VV_RO_SBX},
-    {VV_NAME("foldend",		 VAR_NUMBER), NULL, VV_RO_SBX},
-    {VV_NAME("folddashes",	 VAR_STRING), NULL, VV_RO_SBX},
-    {VV_NAME("foldlevel",	 VAR_NUMBER), NULL, VV_RO_SBX},
-    {VV_NAME("progname",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("servername",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("dying",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("exception",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("throwpoint",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("register",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("cmdbang",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("insertmode",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("val",		 VAR_UNKNOWN), NULL, VV_RO},
-    {VV_NAME("key",		 VAR_UNKNOWN), NULL, VV_RO},
-    {VV_NAME("profiling",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("fcs_reason",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("fcs_choice",	 VAR_STRING), NULL, 0},
-    {VV_NAME("beval_bufnr",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_winnr",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_winid",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_lnum",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_col",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_text",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("scrollstart",	 VAR_STRING), NULL, 0},
-    {VV_NAME("swapname",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("swapchoice",	 VAR_STRING), NULL, 0},
-    {VV_NAME("swapcommand",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("char",		 VAR_STRING), NULL, 0},
-    {VV_NAME("mouse_win",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_winid",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_lnum",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_col",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("operator",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("searchforward",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("hlsearch",	 VAR_NUMBER), NULL, 0},
+    {VV_NAME("count",		 VAR_نمبر), عدم, VV_COMPAT+VV_RO},
+    {VV_NAME("count1",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("prevcount",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("errmsg",		 VAR_STRING), عدم, VV_COMPAT},
+    {VV_NAME("warningmsg",	 VAR_STRING), عدم, 0},
+    {VV_NAME("statusmsg",	 VAR_STRING), عدم, 0},
+    {VV_NAME("shell_error",	 VAR_نمبر), عدم, VV_COMPAT+VV_RO},
+    {VV_NAME("this_session",	 VAR_STRING), عدم, VV_COMPAT},
+    {VV_NAME("version",		 VAR_نمبر), عدم, VV_COMPAT+VV_RO},
+    {VV_NAME("lnum",		 VAR_نمبر), عدم, VV_RO_SBX},
+    {VV_NAME("termresponse",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fname",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("lang",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("lc_time",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("ctype",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("charconvert_from", VAR_STRING), عدم, VV_RO},
+    {VV_NAME("charconvert_to",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fname_in",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fname_out",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fname_new",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fname_diff",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("cmdarg",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("foldstart",	 VAR_نمبر), عدم, VV_RO_SBX},
+    {VV_NAME("foldend",		 VAR_نمبر), عدم, VV_RO_SBX},
+    {VV_NAME("folddashes",	 VAR_STRING), عدم, VV_RO_SBX},
+    {VV_NAME("foldlevel",	 VAR_نمبر), عدم, VV_RO_SBX},
+    {VV_NAME("progname",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("servername",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("dying",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("exception",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("throwpoint",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("register",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("cmdbang",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("insertmode",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("val",		 VAR_UNKNOWN), عدم, VV_RO},
+    {VV_NAME("key",		 VAR_UNKNOWN), عدم, VV_RO},
+    {VV_NAME("profiling",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("fcs_reason",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("fcs_choice",	 VAR_STRING), عدم, 0},
+    {VV_NAME("beval_bufnr",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("beval_winnr",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("beval_winid",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("beval_lnum",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("beval_col",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("beval_text",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("scrollstart",	 VAR_STRING), عدم, 0},
+    {VV_NAME("swapname",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("swapchoice",	 VAR_STRING), عدم, 0},
+    {VV_NAME("swapcommand",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("char",		 VAR_STRING), عدم, 0},
+    {VV_NAME("mouse_win",	 VAR_نمبر), عدم, 0},
+    {VV_NAME("mouse_winid",	 VAR_نمبر), عدم, 0},
+    {VV_NAME("mouse_lnum",	 VAR_نمبر), عدم, 0},
+    {VV_NAME("mouse_col",	 VAR_نمبر), عدم, 0},
+    {VV_NAME("operator",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("searchforward",	 VAR_نمبر), عدم, 0},
+    {VV_NAME("hlsearch",	 VAR_نمبر), عدم, 0},
     {VV_NAME("oldfiles",	 VAR_LIST), &t_list_string, 0},
-    {VV_NAME("windowid",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("progpath",	 VAR_STRING), NULL, VV_RO},
+    {VV_NAME("windowid",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("progpath",	 VAR_STRING), عدم, VV_RO},
     {VV_NAME("completed_item",	 VAR_DICT), &t_dict_string, 0},
-    {VV_NAME("option_new",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("option_old",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("option_oldlocal",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("option_oldglobal", VAR_STRING), NULL, VV_RO},
-    {VV_NAME("option_command",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("option_type",	 VAR_STRING), NULL, VV_RO},
+    {VV_NAME("option_new",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("option_old",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("option_oldlocal",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("option_oldglobal", VAR_STRING), عدم, VV_RO},
+    {VV_NAME("option_command",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("option_type",	 VAR_STRING), عدم, VV_RO},
     {VV_NAME("errors",		 VAR_LIST), &t_list_string, 0},
-    {VV_NAME("false",		 VAR_BOOL), NULL, VV_RO},
-    {VV_NAME("true",		 VAR_BOOL), NULL, VV_RO},
-    {VV_NAME("none",		 VAR_SPECIAL), NULL, VV_RO},
-    {VV_NAME("null",		 VAR_SPECIAL), NULL, VV_RO},
-    {VV_NAME("numbermax",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("numbermin",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("numbersize",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("vim_did_enter",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("testing",		 VAR_NUMBER), NULL, 0},
-    {VV_NAME("t_number",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_string",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_func",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_list",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_dict",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_float",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_bool",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_none",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_job",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_channel",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_blob",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_class",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_object",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("termrfgresp",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termrbgresp",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termu7resp",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termstyleresp",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termblinkresp",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("event",		 VAR_DICT), NULL, VV_RO},
-    {VV_NAME("versionlong",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("echospace",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("false",		 VAR_BOOL), عدم, VV_RO},
+    {VV_NAME("true",		 VAR_BOOL), عدم, VV_RO},
+    {VV_NAME("none",		 VAR_SPECIAL), عدم, VV_RO},
+    {VV_NAME("null",		 VAR_SPECIAL), عدم, VV_RO},
+    {VV_NAME("numbermax",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("numbermin",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("numbersize",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("vim_did_enter",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("testing",		 VAR_نمبر), عدم, 0},
+    {VV_NAME("t_number",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_string",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_func",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_list",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_dict",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_float",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_bool",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_none",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_job",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_channel",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_blob",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_class",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_object",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("termrfgresp",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termrbgresp",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termu7resp",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termstyleresp",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termblinkresp",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("event",		 VAR_DICT), عدم, VV_RO},
+    {VV_NAME("versionlong",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("echospace",	 VAR_نمبر), عدم, VV_RO},
     {VV_NAME("argv",		 VAR_LIST), &t_list_string, VV_RO},
-    {VV_NAME("collate",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("exiting",		 VAR_SPECIAL), NULL, VV_RO},
+    {VV_NAME("collate",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("exiting",		 VAR_SPECIAL), عدم, VV_RO},
     {VV_NAME("colornames",       VAR_DICT), &t_dict_string, VV_RO},
-    {VV_NAME("sizeofint",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("sizeoflong",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("sizeofpointer",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("maxcol",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("python3_version",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_typealias",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_enum",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_enumvalue",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("sizeofint",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("sizeoflong",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("sizeofpointer",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("maxcol",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("python3_version",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_typealias",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_enum",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("t_enumvalue",	 VAR_نمبر), عدم, VV_RO},
     {VV_NAME("stacktrace",	 VAR_LIST), &t_list_dict_any, VV_RO},
-    {VV_NAME("t_tuple",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("wayland_display",  VAR_STRING), NULL, VV_RO},
-    {VV_NAME("clipmethod",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termda1",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("termosc",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("vim_did_init",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("clipproviders",	 VAR_DICT), NULL, VV_RO},
-    {VV_NAME("imagebackend",	 VAR_STRING), NULL, VV_RO}
+    {VV_NAME("t_tuple",		 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("wayland_display",  VAR_STRING), عدم, VV_RO},
+    {VV_NAME("clipmethod",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termda1",		 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("termosc",	 VAR_STRING), عدم, VV_RO},
+    {VV_NAME("vim_did_init",	 VAR_نمبر), عدم, VV_RO},
+    {VV_NAME("clipproviders",	 VAR_DICT), عدم, VV_RO},
+    {VV_NAME("imagebackend",	 VAR_STRING), عدم, VV_RO}
 };
 
 // shorthand
-#define vv_tv_type	vv_di.di_tv.v_type
-#define vv_nr		vv_di.di_tv.vval.v_number
-#define vv_float	vv_di.di_tv.vval.v_float
-#define vv_str		vv_di.di_tv.vval.v_string
-#define vv_list		vv_di.di_tv.vval.v_list
-#define vv_dict		vv_di.di_tv.vval.v_dict
-#define vv_blob		vv_di.di_tv.vval.v_blob
-#define vv_tv		vv_di.di_tv
+#تعریف_کرو vv_tv_type	vv_di.di_tv.v_type
+#تعریف_کرو vv_nr		vv_di.di_tv.vval.v_نمبر
+#تعریف_کرو vv_float	vv_di.di_tv.vval.v_float
+#تعریف_کرو vv_str		vv_di.di_tv.vval.v_string
+#تعریف_کرو vv_list		vv_di.di_tv.vval.v_list
+#تعریف_کرو vv_dict		vv_di.di_tv.vval.v_dict
+#تعریف_کرو vv_blob		vv_di.di_tv.vval.v_blob
+#تعریف_کرو vv_tv		vv_di.di_tv
 
-static dictitem_T	vimvars_var;		// variable used for v:
-static dict_T		vimvardict;		// Dictionary with v: variables
-#define vimvarht  vimvardict.dv_hashtab
+ساكن dictitem_T	vimvars_var;		// variable used for v:
+ساكن dict_T		vimvardict;		// Dictionary with v: variables
+#تعریف_کرو vimvarht  vimvardict.dv_hashtab
 
 // for VIM_VERSION_ defines
-#include "version.h"
+#ضمن "version.h"
 
-static void list_glob_vars(int *first);
-static void list_buf_vars(int *first);
-static void list_win_vars(int *first);
-static void list_tab_vars(int *first);
-static char_u *list_arg_vars(exarg_T *eap, char_u *arg, int *first);
-static char_u *ex_let_one(char_u *arg, typval_T *tv, int copy, int flags, char_u *endchars, char_u *op, int var_idx);
-static int do_unlet_var(lval_T *lp, char_u *name_end, exarg_T *eap, int deep, void *cookie);
-static int do_lock_var(lval_T *lp, char_u *name_end, exarg_T *eap, int deep, void *cookie);
-static void list_one_var(dictitem_T *v, char *prefix, int *first);
-static void list_one_var_a(char *prefix, char_u *name, int type, char_u *string, int *first);
+ساكن فراغ list_glob_vars(صحيح *پہلا);
+ساكن فراغ list_buf_vars(صحيح *پہلا);
+ساكن فراغ list_win_vars(صحيح *پہلا);
+ساكن فراغ list_tab_vars(صحيح *پہلا);
+ساكن char_u *list_arg_vars(exarg_T *eap, char_u *arg, صحيح *پہلا);
+ساكن char_u *ex_let_one(char_u *arg, typval_T *tv, صحيح copy, صحيح flags, char_u *endchars, char_u *op, صحيح var_idx);
+ساكن صحيح do_unlet_var(lval_T *lp, char_u *name_سرا, exarg_T *eap, صحيح deep, فراغ *cookie);
+ساكن صحيح do_جندرا_var(lval_T *lp, char_u *name_سرا, exarg_T *eap, صحيح deep, فراغ *cookie);
+ساكن فراغ list_one_var(dictitem_T *v, حرف *اگیتر, صحيح *پہلا);
+ساكن فراغ list_one_var_a(حرف *اگیتر, char_u *name, صحيح type, char_u *string, صحيح *پہلا);
 
 /*
  * Initialize global and vim special variables
  */
-    void
-evalvars_init(void)
+    فراغ
+evalvars_init(فراغ)
 {
-    int		    i;
-    struct vimvar   *p;
+    صحيح		    i;
+    بنية vimvar   *p;
 
     init_var_dict(&globvardict, &globvars_var, VAR_DEF_SCOPE);
     init_var_dict(&vimvardict, &vimvars_var, VAR_SCOPE);
-    vimvardict.dv_lock = VAR_FIXED;
+    vimvardict.dv_جندرا = VAR_FIXED;
     hash_init(&compat_hashtab);
 
-    for (i = 0; i < VV_LEN; ++i)
+    لكل (i = 0; i < VV_LEN; ++i)
     {
 	p = &vimvars[i];
-	if (p->vv_flags & VV_RO)
+	إذا (p->vv_flags & VV_RO)
 	    p->vv_di.di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
-	else if (p->vv_flags & VV_RO_SBX)
+	وإلا إذا (p->vv_flags & VV_RO_SBX)
 	    p->vv_di.di_flags = DI_FLAGS_RO_SBX | DI_FLAGS_FIX;
-	else
+	وإلا
 	    p->vv_di.di_flags = DI_FLAGS_FIX;
 
 	// add to v: scope dict, unless the value is not always available
-	if (p->vv_tv_type != VAR_UNKNOWN)
-	    hash_add(&vimvarht, p->vv_di.di_key, "initialization");
-	if (p->vv_flags & VV_COMPAT)
+	إذا (p->vv_tv_type != VAR_UNKNOWN)
+	    hash_جوڑو(&vimvarht, p->vv_di.di_کلید, "initialization");
+	إذا (p->vv_flags & VV_COMPAT)
 	    // add to compat scope dict
-	    hash_add(&compat_hashtab, p->vv_di.di_key, "initialization");
+	    hash_جوڑو(&compat_hashtab, p->vv_di.di_کلید, "initialization");
     }
-    set_vim_var_nr(VV_VERSION, VIM_VERSION_100);
-    set_vim_var_nr(VV_VERSIONLONG, VIM_VERSION_100 * 10000 + highest_patch());
+    سیٹ_vim_var_nr(VV_نسخہ, VIM_نسخہ_100);
+    سیٹ_vim_var_nr(VV_VERSIONLONG, VIM_نسخہ_100 * 10000 + highest_patch());
 
-    set_vim_var_nr(VV_SEARCHFORWARD, 1L);
-    set_vim_var_nr(VV_HLSEARCH, 1L);
-    set_vim_var_nr(VV_EXITING, VVAL_NULL);
-    set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
-    set_vim_var_list(VV_ERRORS, list_alloc());
-    set_vim_var_dict(VV_EVENT, dict_alloc_lock(VAR_FIXED));
+    سیٹ_vim_var_nr(VV_SEARCHFORWARD, 1L);
+    سیٹ_vim_var_nr(VV_HLSEARCH, 1L);
+    سیٹ_vim_var_nr(VV_EXITING, VVAL_NULL);
+    سیٹ_vim_var_dict(VV_COMPLETED_شے, dict_alloc_جندرا(VAR_FIXED));
+    سیٹ_vim_var_list(VV_ERRORS, list_alloc());
+    سیٹ_vim_var_dict(VV_EVENT, dict_alloc_جندرا(VAR_FIXED));
 
-    set_vim_var_nr(VV_FALSE, VVAL_FALSE);
-    set_vim_var_nr(VV_TRUE, VVAL_TRUE);
-    set_vim_var_nr(VV_NONE, VVAL_NONE);
-    set_vim_var_nr(VV_NULL, VVAL_NULL);
-    set_vim_var_nr(VV_NUMBERMAX, VARNUM_MAX);
-    set_vim_var_nr(VV_NUMBERMIN, VARNUM_MIN);
-    set_vim_var_nr(VV_NUMBERSIZE, sizeof(varnumber_T) * 8);
-    set_vim_var_nr(VV_SIZEOFINT, sizeof(int));
-    set_vim_var_nr(VV_SIZEOFLONG, sizeof(long));
-    set_vim_var_nr(VV_SIZEOFPOINTER, sizeof(char *));
-    set_vim_var_nr(VV_MAXCOL, MAXCOL);
+    سیٹ_vim_var_nr(VV_FALSE, VVAL_FALSE);
+    سیٹ_vim_var_nr(VV_TRUE, VVAL_TRUE);
+    سیٹ_vim_var_nr(VV_NONE, VVAL_NONE);
+    سیٹ_vim_var_nr(VV_NULL, VVAL_NULL);
+    سیٹ_vim_var_nr(VV_NUMBERMAX, VARNUM_MAX);
+    سیٹ_vim_var_nr(VV_NUMBERMIN, VARNUM_MIN);
+    سیٹ_vim_var_nr(VV_NUMBERSIZE, حجم(varnumber_T) * 8);
+    سیٹ_vim_var_nr(VV_SIZEOFINT, حجم(صحيح));
+    سیٹ_vim_var_nr(VV_SIZEOFLONG, حجم(لما));
+    سیٹ_vim_var_nr(VV_SIZEOFPOINTER, حجم(حرف *));
+    سیٹ_vim_var_nr(VV_MAXCOL, MAXCOL);
 
-    set_vim_var_nr(VV_TYPE_NUMBER,  VAR_TYPE_NUMBER);
-    set_vim_var_nr(VV_TYPE_STRING,  VAR_TYPE_STRING);
-    set_vim_var_nr(VV_TYPE_FUNC,    VAR_TYPE_FUNC);
-    set_vim_var_nr(VV_TYPE_LIST,    VAR_TYPE_LIST);
-    set_vim_var_nr(VV_TYPE_DICT,    VAR_TYPE_DICT);
-    set_vim_var_nr(VV_TYPE_FLOAT,   VAR_TYPE_FLOAT);
-    set_vim_var_nr(VV_TYPE_BOOL,    VAR_TYPE_BOOL);
-    set_vim_var_nr(VV_TYPE_NONE,    VAR_TYPE_NONE);
-    set_vim_var_nr(VV_TYPE_JOB,     VAR_TYPE_JOB);
-    set_vim_var_nr(VV_TYPE_CHANNEL, VAR_TYPE_CHANNEL);
-    set_vim_var_nr(VV_TYPE_BLOB,    VAR_TYPE_BLOB);
-    set_vim_var_nr(VV_TYPE_CLASS,   VAR_TYPE_CLASS);
-    set_vim_var_nr(VV_TYPE_OBJECT,  VAR_TYPE_OBJECT);
-    set_vim_var_nr(VV_TYPE_TYPEALIAS,  VAR_TYPE_TYPEALIAS);
-    set_vim_var_nr(VV_TYPE_ENUM,    VAR_TYPE_ENUM);
-    set_vim_var_nr(VV_TYPE_ENUMVALUE,  VAR_TYPE_ENUMVALUE);
-    set_vim_var_nr(VV_TYPE_TUPLE,   VAR_TYPE_TUPLE);
+    سیٹ_vim_var_nr(VV_TYPE_نمبر,  VAR_TYPE_نمبر);
+    سیٹ_vim_var_nr(VV_TYPE_STRING,  VAR_TYPE_STRING);
+    سیٹ_vim_var_nr(VV_TYPE_FUNC,    VAR_TYPE_FUNC);
+    سیٹ_vim_var_nr(VV_TYPE_LIST,    VAR_TYPE_LIST);
+    سیٹ_vim_var_nr(VV_TYPE_DICT,    VAR_TYPE_DICT);
+    سیٹ_vim_var_nr(VV_TYPE_FLOAT,   VAR_TYPE_FLOAT);
+    سیٹ_vim_var_nr(VV_TYPE_BOOL,    VAR_TYPE_BOOL);
+    سیٹ_vim_var_nr(VV_TYPE_NONE,    VAR_TYPE_NONE);
+    سیٹ_vim_var_nr(VV_TYPE_کم,     VAR_TYPE_کم);
+    سیٹ_vim_var_nr(VV_TYPE_CHANNEL, VAR_TYPE_CHANNEL);
+    سیٹ_vim_var_nr(VV_TYPE_BLOB,    VAR_TYPE_BLOB);
+    سیٹ_vim_var_nr(VV_TYPE_CLASS,   VAR_TYPE_CLASS);
+    سیٹ_vim_var_nr(VV_TYPE_OBJECT,  VAR_TYPE_OBJECT);
+    سیٹ_vim_var_nr(VV_TYPE_TYPEALIAS,  VAR_TYPE_TYPEALIAS);
+    سیٹ_vim_var_nr(VV_TYPE_ENUM,    VAR_TYPE_ENUM);
+    سیٹ_vim_var_nr(VV_TYPE_ENUMVALUE,  VAR_TYPE_ENUMVALUE);
+    سیٹ_vim_var_nr(VV_TYPE_TUPLE,   VAR_TYPE_TUPLE);
 
-    set_vim_var_nr(VV_ECHOSPACE,    sc_col - 1);
+    سیٹ_vim_var_nr(VV_ECHOSPACE,    sc_خانہ - 1);
 
-    set_vim_var_dict(VV_COLORNAMES, dict_alloc());
-    set_vim_var_dict(VV_CLIPPROVIDERS, dict_alloc());
+    سیٹ_vim_var_dict(VV_COLORNAMES, dict_alloc());
+    سیٹ_vim_var_dict(VV_CLIPPROVIDERS, dict_alloc());
 
-#ifdef FEAT_PYTHON3
-    set_vim_var_nr(VV_PYTHON3_VERSION, python3_version());
-#endif
+#جے_تعریف_شدہ FEAT_PYTHON3
+    سیٹ_vim_var_nr(VV_PYTHON3_نسخہ, python3_نسخہ());
+#جے_انت
 
     // Default for v:register is not 0 but '"'.  This is adjusted once the
     // clipboard has been setup by calling reset_reg_var().
-    set_reg_var(0);
+    سیٹ_reg_var(0);
 }
 
-#if defined(EXITFREE)
+#إذا defined(EXITFREE)
 /*
  * Free all vim variables information on exit
  */
-    void
-evalvars_clear(void)
+    فراغ
+evalvars_clear(فراغ)
 {
-    int		    i;
-    struct vimvar   *p;
+    صحيح		    i;
+    بنية vimvar   *p;
 
-    for (i = 0; i < VV_LEN; ++i)
+    لكل (i = 0; i < VV_LEN; ++i)
     {
 	p = &vimvars[i];
-	if (p->vv_di.di_tv.v_type == VAR_STRING)
+	إذا (p->vv_di.di_tv.v_type == VAR_STRING)
 	    VIM_CLEAR(p->vv_str);
-	else if (p->vv_di.di_tv.v_type == VAR_LIST)
+	وإلا إذا (p->vv_di.di_tv.v_type == VAR_LIST)
 	{
 	    list_unref(p->vv_list);
-	    p->vv_list = NULL;
+	    p->vv_list = عدم;
 	}
     }
     hash_clear(&vimvarht);
@@ -317,135 +317,135 @@ evalvars_clear(void)
     // The scriptvar_T is cleared later in free_scriptnames(), because a
     // variable in one script might hold a reference to the whole scope of
     // another script.
-    for (i = 1; i <= script_items.ga_len; ++i)
+    لكل (i = 1; i <= script_اشیاء.ga_len; ++i)
 	vars_clear(&SCRIPT_VARS(i));
 }
-#endif
+#جے_انت
 
-    int
-garbage_collect_globvars(int copyID)
+    صحيح
+garbage_collect_globvars(صحيح copyID)
 {
-    return set_ref_in_ht(&globvarht, copyID, NULL, NULL);
+    أرجع سیٹ_ref_وچ_ht(&globvarht, copyID, عدم, عدم);
 }
 
-    int
-garbage_collect_vimvars(int copyID)
+    صحيح
+garbage_collect_vimvars(صحيح copyID)
 {
-    return set_ref_in_ht(&vimvarht, copyID, NULL, NULL);
+    أرجع سیٹ_ref_وچ_ht(&vimvarht, copyID, عدم, عدم);
 }
 
-    int
-garbage_collect_scriptvars(int copyID)
+    صحيح
+garbage_collect_scriptvars(صحيح copyID)
 {
-    int		    i;
-    int		    idx;
-    int		    abort = FALSE;
+    صحيح		    i;
+    صحيح		    idx;
+    صحيح		    abort = FALSE;
     scriptitem_T    *si;
 
-    for (i = 1; i <= script_items.ga_len; ++i)
+    لكل (i = 1; i <= script_اشیاء.ga_len; ++i)
     {
-	abort = abort || set_ref_in_ht(&SCRIPT_VARS(i), copyID, NULL, NULL);
+	abort = abort || سیٹ_ref_وچ_ht(&SCRIPT_VARS(i), copyID, عدم, عدم);
 
-	si = SCRIPT_ITEM(i);
-	for (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
+	si = SCRIPT_شے(i);
+	لكل (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
 	{
-	    svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
+	    svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_انکڑے) + idx;
 
-	    if (sv->sv_name != NULL)
-		abort = abort || set_ref_in_item(sv->sv_tv, copyID, NULL, NULL, NULL);
+	    إذا (sv->sv_name != عدم)
+		abort = abort || سیٹ_ref_وچ_شے(sv->sv_tv, copyID, عدم, عدم, عدم);
 	}
     }
 
-    return abort;
+    أرجع abort;
 }
 
 /*
  * Set an internal variable to a string value. Creates the variable if it does
  * not already exist.
  */
-    void
-set_internal_string_var(char_u *name, char_u *value)
+    فراغ
+سیٹ_اندرونی_string_var(char_u *name, char_u *قدر)
 {
     char_u	*val;
     typval_T	*tvp;
 
-    val = vim_strsave(value);
-    if (val == NULL)
-	return;
+    val = vim_strsave(قدر);
+    إذا (val == عدم)
+	أرجع;
 
     tvp = alloc_string_tv(val);
-    if (tvp == NULL)
-	return;
+    إذا (tvp == عدم)
+	أرجع;
 
-    set_var(name, tvp, FALSE);
+    سیٹ_var(name, tvp, FALSE);
     free_tv(tvp);
 }
 
-    int
+    صحيح
 eval_charconvert(
     char_u	*enc_from,
-    char_u	*enc_to,
+    char_u	*enc_منزل,
     char_u	*fname_from,
-    char_u	*fname_to)
+    char_u	*fname_منزل)
 {
-    int		err = FALSE;
+    صحيح		err = FALSE;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
-    set_vim_var_string(VV_CC_FROM, enc_from, -1);
-    set_vim_var_string(VV_CC_TO, enc_to, -1);
-    set_vim_var_string(VV_FNAME_IN, fname_from, -1);
-    set_vim_var_string(VV_FNAME_OUT, fname_to, -1);
+    سیٹ_vim_var_string(VV_CC_FROM, enc_from, -1);
+    سیٹ_vim_var_string(VV_CC_منزل, enc_منزل, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, fname_from, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, fname_منزل, -1);
     ctx = get_option_sctx("charconvert");
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	current_sctx = *ctx;
 
-    if (eval_to_bool(p_ccv, &err, NULL, FALSE, TRUE))
+    إذا (eval_منزل_bool(p_ccv, &err, عدم, FALSE, TRUE))
 	err = TRUE;
 
-    set_vim_var_string(VV_CC_FROM, NULL, -1);
-    set_vim_var_string(VV_CC_TO, NULL, -1);
-    set_vim_var_string(VV_FNAME_IN, NULL, -1);
-    set_vim_var_string(VV_FNAME_OUT, NULL, -1);
+    سیٹ_vim_var_string(VV_CC_FROM, عدم, -1);
+    سیٹ_vim_var_string(VV_CC_منزل, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, عدم, -1);
     current_sctx = saved_sctx;
 
-    if (err)
-	return FAIL;
-    return OK;
+    إذا (err)
+	أرجع FAIL;
+    أرجع OK;
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    int
-eval_printexpr(char_u *fname, char_u *args)
+#إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    صحيح
+eval_printexpr(char_u *fname, char_u *دلیلاں)
 {
-    int		err = FALSE;
+    صحيح		err = FALSE;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
-    set_vim_var_string(VV_FNAME_IN, fname, -1);
-    set_vim_var_string(VV_CMDARG, args, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, fname, -1);
+    سیٹ_vim_var_string(VV_CMDARG, دلیلاں, -1);
     ctx = get_option_sctx("printexpr");
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	current_sctx = *ctx;
 
-    if (eval_to_bool(p_pexpr, &err, NULL, FALSE, TRUE))
+    إذا (eval_منزل_bool(p_pexpr, &err, عدم, FALSE, TRUE))
 	err = TRUE;
 
-    set_vim_var_string(VV_FNAME_IN, NULL, -1);
-    set_vim_var_string(VV_CMDARG, NULL, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, عدم, -1);
+    سیٹ_vim_var_string(VV_CMDARG, عدم, -1);
     current_sctx = saved_sctx;
 
-    if (err)
+    إذا (err)
     {
 	mch_remove(fname);
-	return FAIL;
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
-#endif
+#جے_انت
 
-#if defined(FEAT_DIFF)
-    void
+#إذا defined(FEAT_DIFF)
+    فراغ
 eval_diff(
     char_u	*origfile,
     char_u	*newfile,
@@ -455,25 +455,25 @@ eval_diff(
     sctx_T	*ctx;
     typval_T	*tv;
 
-    set_vim_var_string(VV_FNAME_IN, origfile, -1);
-    set_vim_var_string(VV_FNAME_NEW, newfile, -1);
-    set_vim_var_string(VV_FNAME_OUT, outfile, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, origfile, -1);
+    سیٹ_vim_var_string(VV_FNAME_NEW, newfile, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, outfile, -1);
 
     ctx = get_option_sctx("diffexpr");
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	current_sctx = *ctx;
 
     // errors are ignored
-    tv = eval_expr_ext(p_dex, NULL, TRUE);
+    tv = eval_اظہاریہ_ext(p_dex, عدم, TRUE);
     free_tv(tv);
 
-    set_vim_var_string(VV_FNAME_IN, NULL, -1);
-    set_vim_var_string(VV_FNAME_NEW, NULL, -1);
-    set_vim_var_string(VV_FNAME_OUT, NULL, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_NEW, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, عدم, -1);
     current_sctx = saved_sctx;
 }
 
-    void
+    فراغ
 eval_patch(
     char_u	*origfile,
     char_u	*difffile,
@@ -483,69 +483,69 @@ eval_patch(
     sctx_T	*ctx;
     typval_T	*tv;
 
-    set_vim_var_string(VV_FNAME_IN, origfile, -1);
-    set_vim_var_string(VV_FNAME_DIFF, difffile, -1);
-    set_vim_var_string(VV_FNAME_OUT, outfile, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, origfile, -1);
+    سیٹ_vim_var_string(VV_FNAME_DIFF, difffile, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, outfile, -1);
 
     ctx = get_option_sctx("patchexpr");
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	current_sctx = *ctx;
 
     // errors are ignored
-    tv = eval_expr_ext(p_pex, NULL, TRUE);
+    tv = eval_اظہاریہ_ext(p_pex, عدم, TRUE);
     free_tv(tv);
 
-    set_vim_var_string(VV_FNAME_IN, NULL, -1);
-    set_vim_var_string(VV_FNAME_DIFF, NULL, -1);
-    set_vim_var_string(VV_FNAME_OUT, NULL, -1);
+    سیٹ_vim_var_string(VV_FNAME_وچ, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_DIFF, عدم, -1);
+    سیٹ_vim_var_string(VV_FNAME_باہرلا, عدم, -1);
     current_sctx = saved_sctx;
 }
-#endif
+#جے_انت
 
-#if defined(FEAT_SPELL)
+#إذا defined(FEAT_SPELL)
 /*
  * Evaluate an expression to a list with suggestions.
  * For the "expr:" part of 'spellsuggest'.
  * Returns NULL when there is an error.
  */
     list_T *
-eval_spell_expr(char_u *badword, char_u *expr)
+eval_spell_اظہاریہ(char_u *badword, char_u *اظہاریہ)
 {
     typval_T	save_val;
     typval_T	rettv;
-    list_T	*list = NULL;
-    char_u	*p = skipwhite(expr);
+    list_T	*list = عدم;
+    char_u	*p = skipwhite(اظہاریہ);
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
-    int		r;
+    صحيح		r;
 
     // Set "v:val" to the bad word.
     prepare_vimvar(VV_VAL, &save_val);
-    set_vim_var_string(VV_VAL, badword, -1);
-    if (p_verbose == 0)
+    سیٹ_vim_var_string(VV_VAL, badword, -1);
+    إذا (p_verbose == 0)
 	++emsg_off;
     ctx = get_option_sctx("spellsuggest");
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	current_sctx = *ctx;
 
     r = may_call_simple_func(p, &rettv);
-    if (r == NOTDONE)
+    إذا (r == NOTDONE)
 	r = eval1(&p, &rettv, &EVALARG_EVALUATE);
-    if (r == OK)
+    إذا (r == OK)
     {
-	if (rettv.v_type != VAR_LIST)
+	إذا (rettv.v_type != VAR_LIST)
 	    clear_tv(&rettv);
-	else
+	وإلا
 	    list = rettv.vval.v_list;
     }
 
-    if (p_verbose == 0)
+    إذا (p_verbose == 0)
 	--emsg_off;
     clear_tv(get_vim_var_tv(VV_VAL));
     restore_vimvar(VV_VAL, &save_val);
     current_sctx = saved_sctx;
 
-    return list;
+    أرجع list;
 }
 
 /*
@@ -554,35 +554,35 @@ eval_spell_expr(char_u *badword, char_u *expr)
  * Return -1 if anything isn't right.
  * Used to get the good word and score from the eval_spell_expr() result.
  */
-    int
+    صحيح
 get_spellword(list_T *list, char_u **pp)
 {
     listitem_T	*li;
 
-    li = list->lv_first;
-    if (li == NULL)
-	return -1;
+    li = list->lv_پہلا;
+    إذا (li == عدم)
+	أرجع -1;
     *pp = tv_get_string(&li->li_tv);
 
-    li = li->li_next;
-    if (li == NULL)
-	return -1;
-    return (int)tv_get_number(&li->li_tv);
+    li = li->li_اگلا;
+    إذا (li == عدم)
+	أرجع -1;
+    أرجع (صحيح)tv_get_نمبر(&li->li_tv);
 }
-#endif
+#جے_انت
 
 /*
  * Prepare v: variable "idx" to be used.
  * Save the current typeval in "save_tv" and clear it.
  * When not used yet add the variable to the v: hashtable.
  */
-    void
-prepare_vimvar(int idx, typval_T *save_tv)
+    فراغ
+prepare_vimvar(صحيح idx, typval_T *save_tv)
 {
     *save_tv = vimvars[idx].vv_tv;
-    vimvars[idx].vv_str = NULL;  // don't free it now
-    if (vimvars[idx].vv_tv_type == VAR_UNKNOWN)
-	hash_add(&vimvarht, vimvars[idx].vv_di.di_key, "prepare vimvar");
+    vimvars[idx].vv_str = عدم;  // don't free it now
+    إذا (vimvars[idx].vv_tv_type == VAR_UNKNOWN)
+	hash_جوڑو(&vimvarht, vimvars[idx].vv_di.di_کلید, "prepare vimvar");
 }
 
 /*
@@ -590,50 +590,50 @@ prepare_vimvar(int idx, typval_T *save_tv)
  * Note that the v: variable must have been cleared already.
  * When no longer defined, remove the variable from the v: hashtable.
  */
-    void
-restore_vimvar(int idx, typval_T *save_tv)
+    فراغ
+restore_vimvar(صحيح idx, typval_T *save_tv)
 {
     hashitem_T	*hi;
 
     vimvars[idx].vv_tv = *save_tv;
-    if (vimvars[idx].vv_tv_type != VAR_UNKNOWN)
-	return;
+    إذا (vimvars[idx].vv_tv_type != VAR_UNKNOWN)
+	أرجع;
 
-    hi = hash_find(&vimvarht, vimvars[idx].vv_di.di_key);
-    if (HASHITEM_EMPTY(hi))
-	internal_error("restore_vimvar()");
-    else
+    hi = hash_لبھو(&vimvarht, vimvars[idx].vv_di.di_کلید);
+    إذا (HASHITEM_خالی_تھاواں(hi))
+	اندرونی_error("restore_vimvar()");
+    وإلا
 	hash_remove(&vimvarht, hi, "restore vimvar");
 }
 
 /*
  * List Vim variables.
  */
-    static void
-list_vim_vars(int *first)
+    ساكن فراغ
+list_vim_vars(صحيح *پہلا)
 {
-    list_hashtable_vars(&vimvarht, "v:", FALSE, first);
+    list_hashtable_vars(&vimvarht, "v:", FALSE, پہلا);
 }
 
 /*
  * List script-local variables, if there is a script.
  */
-    static void
-list_script_vars(int *first)
+    ساكن فراغ
+list_script_vars(صحيح *پہلا)
 {
-    if (SCRIPT_ID_VALID(current_sctx.sc_sid))
+    إذا (SCRIPT_ID_VALID(current_sctx.sc_sid))
 	list_hashtable_vars(&SCRIPT_VARS(current_sctx.sc_sid),
-							   "s:", FALSE, first);
+							   "s:", FALSE, پہلا);
 }
 
 /*
  * Return TRUE if "name" starts with "g:", "w:", "t:" or "b:".
  * But only when an identifier character follows.
  */
-    int
+    صحيح
 is_scoped_variable(char_u *name)
 {
-    return vim_strchr((char_u *)"gwbt", name[0]) != NULL
+    أرجع vim_strchr((char_u *)"gwbt", name[0]) != عدم
 	&& name[1] == ':'
 	&& eval_isnamec(name[2]);
 }
@@ -645,37 +645,37 @@ is_scoped_variable(char_u *name)
  * Return a pointer to the character after "}", NULL for an error.
  */
     char_u *
-eval_one_expr_in_str(char_u *p, garray_T *gap, int evaluate)
+eval_one_اظہاریہ_وچ_str(char_u *p, garray_T *gap, صحيح evaluate)
 {
-    char_u	*block_start = skipwhite(p + 1);  // skip the opening {
-    char_u	*block_end = block_start;
-    char_u	*expr_val;
+    char_u	*بلاک_شروع = skipwhite(p + 1);  // skip the opening {
+    char_u	*بلاک_سرا = بلاک_شروع;
+    char_u	*اظہاریہ_val;
 
-    if (*block_start == NUL)
+    إذا (*بلاک_شروع == NUL)
     {
 	semsg(_(e_missing_close_curly_str), p);
-	return NULL;
+	أرجع عدم;
     }
-    if (skip_expr(&block_end, NULL) == FAIL)
-	return NULL;
-    block_end = skipwhite(block_end);
-    if (*block_end != '}')
+    إذا (skip_اظہاریہ(&بلاک_سرا, عدم) == FAIL)
+	أرجع عدم;
+    بلاک_سرا = skipwhite(بلاک_سرا);
+    إذا (*بلاک_سرا != '}')
     {
 	semsg(_(e_missing_close_curly_str), p);
-	return NULL;
+	أرجع عدم;
     }
-    if (evaluate)
+    إذا (evaluate)
     {
-	*block_end = NUL;
-	expr_val = eval_to_string(block_start, FALSE, FALSE);
-	*block_end = '}';
-	if (expr_val == NULL)
-	    return NULL;
-	ga_concat(gap, expr_val);
-	vim_free(expr_val);
+	*بلاک_سرا = NUL;
+	اظہاریہ_val = eval_منزل_string(بلاک_شروع, FALSE, FALSE);
+	*بلاک_سرا = '}';
+	إذا (اظہاریہ_val == عدم)
+	    أرجع عدم;
+	ga_concat(gap, اظہاریہ_val);
+	vim_free(اظہاریہ_val);
     }
 
-    return block_end + 1;
+    أرجع بلاک_سرا + 1;
 }
 
 /*
@@ -684,8 +684,8 @@ eval_one_expr_in_str(char_u *p, garray_T *gap, int evaluate)
  * Used for a heredoc assignment.
  * Returns NULL for an error.
  */
-    static char_u *
-eval_all_expr_in_str(char_u *str)
+    ساكن char_u *
+eval_all_اظہاریہ_وچ_str(char_u *str)
 {
     garray_T	ga;
     char_u	*p;
@@ -693,54 +693,54 @@ eval_all_expr_in_str(char_u *str)
     ga_init2(&ga, 1, 80);
     p = str;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
-	char_u	*lit_start;
-	int	escaped_brace = FALSE;
+	char_u	*lit_شروع;
+	صحيح	escaped_brace = FALSE;
 
 	// Look for a block start.
-	lit_start = p;
-	while (*p != '{' && *p != '}' && *p != NUL)
+	lit_شروع = p;
+	طالما (*p != '{' && *p != '}' && *p != NUL)
 	    ++p;
 
-	if (*p != NUL && *p == p[1])
+	إذا (*p != NUL && *p == p[1])
 	{
 	    // Escaped brace, unescape and continue.
 	    // Include the brace in the literal string.
 	    ++p;
 	    escaped_brace = TRUE;
 	}
-	else if (*p == '}')
+	وإلا إذا (*p == '}')
 	{
 	    semsg(_(e_stray_closing_curly_str), str);
 	    ga_clear(&ga);
-	    return NULL;
+	    أرجع عدم;
 	}
 
 	// Append the literal part.
-	ga_concat_len(&ga, lit_start, (size_t)(p - lit_start));
+	ga_concat_len(&ga, lit_شروع, (size_t)(p - lit_شروع));
 
-	if (*p == NUL)
-	    break;
+	إذا (*p == NUL)
+	    اكسر;
 
-	if (escaped_brace)
+	إذا (escaped_brace)
 	{
 	    // Skip the second brace.
 	    ++p;
-	    continue;
+	    استمر;
 	}
 
 	// Evaluate the expression and append the result.
-	p = eval_one_expr_in_str(p, &ga, TRUE);
-	if (p == NULL)
+	p = eval_one_اظہاریہ_وچ_str(p, &ga, TRUE);
+	إذا (p == عدم)
 	{
 	    ga_clear(&ga);
-	    return NULL;
+	    أرجع عدم;
 	}
     }
     ga_append(&ga, NUL);
 
-    return ga.ga_data;
+    أرجع ga.ga_انکڑے;
 }
 
 /*
@@ -768,44 +768,44 @@ eval_all_expr_in_str(char_u *str)
  * Returns a List with {lines} or NULL on failure.
  */
     list_T *
-heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
+heredoc_get(exarg_T *eap, char_u *cmd, صحيح script_get, صحيح vim9compile)
 {
-    char_u	*theline = NULL;
+    char_u	*theline = عدم;
     char_u	*marker;
     list_T	*l;
     char_u	*p;
     char_u	*str;
-    int		marker_indent_len = 0;
-    int		text_indent_len = 0;
-    char_u	*text_indent = NULL;
+    صحيح		marker_indent_len = 0;
+    صحيح		متن_indent_len = 0;
+    char_u	*متن_indent = عدم;
     char_u	dot[] = ".";
-    int		comment_char = in_vim9script() ? '#' : '"';
-    int		evalstr = FALSE;
-    int		eval_failed = FALSE;
-    cctx_T	*cctx = vim9compile ? eap->cookie : NULL;
-    int		count = 0;
-    int		heredoc_in_string = FALSE;
-    char_u	*line_arg = NULL;
+    صحيح		comment_char = وچ_vim9script() ? '#' : '"';
+    صحيح		evalstr = FALSE;
+    صحيح		eval_failed = FALSE;
+    cctx_T	*cctx = vim9compile ? eap->cookie : عدم;
+    صحيح		گنتی = 0;
+    صحيح		heredoc_وچ_string = FALSE;
+    char_u	*سطر_arg = عدم;
     char_u	*nl_ptr = vim_strchr(cmd, '\n');
 
-    if (nl_ptr != NULL)
+    إذا (nl_ptr != عدم)
     {
-	heredoc_in_string = TRUE;
-	line_arg = nl_ptr + 1;
+	heredoc_وچ_string = TRUE;
+	سطر_arg = nl_ptr + 1;
 	*nl_ptr = NUL;
     }
-    else if (eap->ea_getline == NULL)
+    وإلا إذا (eap->ea_getline == عدم)
     {
-	emsg(_(e_cannot_use_heredoc_here));
-	return NULL;
+	emsg(_(e_cannot_use_heredoc_ایتھے));
+	أرجع عدم;
     }
 
     // Check for the optional 'trim' word before the marker
     cmd = skipwhite(cmd);
 
-    while (TRUE)
+    طالما (TRUE)
     {
-	if (STRNCMP(cmd, "trim", 4) == 0
+	إذا (STRNCMP(cmd, "trim", 4) == 0
 		&& (cmd[4] == NUL || VIM_ISWHITE(cmd[4])))
 	{
 	    cmd = skipwhite(cmd + 4);
@@ -815,184 +815,184 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
 	    // of the first line after the :let command line.  To find the end
 	    // marker the indent of the :let command line is trimmed.
 	    p = *eap->cmdlinep;
-	    while (VIM_ISWHITE(*p))
+	    طالما (VIM_ISWHITE(*p))
 	    {
 		p++;
 		marker_indent_len++;
 	    }
-	    text_indent_len = -1;
+	    متن_indent_len = -1;
 
-	    continue;
+	    استمر;
 	}
-	if (STRNCMP(cmd, "eval", 4) == 0
+	إذا (STRNCMP(cmd, "eval", 4) == 0
 		&& (cmd[4] == NUL || VIM_ISWHITE(cmd[4])))
 	{
 	    cmd = skipwhite(cmd + 4);
 	    evalstr = TRUE;
-	    continue;
+	    استمر;
 	}
-	break;
+	اكسر;
     }
 
     // The marker is the next word.
-    if (*cmd != NUL && *cmd != comment_char)
+    إذا (*cmd != NUL && *cmd != comment_char)
     {
 	marker = skipwhite(cmd);
 	p = skiptowhite(marker);
-	if (*skipwhite(p) != NUL && *skipwhite(p) != comment_char)
+	إذا (*skipwhite(p) != NUL && *skipwhite(p) != comment_char)
 	{
 	    semsg(_(e_trailing_characters_str), p);
-	    return NULL;
+	    أرجع عدم;
 	}
 	*p = NUL;
-	if (!script_get && vim_islower(*marker))
+	إذا (!script_get && vim_islower(*marker))
 	{
-	    emsg(_(e_marker_cannot_start_with_lower_case_letter));
-	    return NULL;
+	    emsg(_(e_marker_cannot_شروع_with_ہیٹھلا_case_letter));
+	    أرجع عدم;
 	}
     }
-    else
+    وإلا
     {
 	// When getting lines for an embedded script, if the marker is missing,
 	// accept '.' as the marker.
-	if (script_get)
+	إذا (script_get)
 	    marker = dot;
-	else
+	وإلا
 	{
 	    emsg(_(e_missing_marker));
-	    return NULL;
+	    أرجع عدم;
 	}
     }
 
     l = list_alloc();
-    if (l == NULL)
-	return NULL;
+    إذا (l == عدم)
+	أرجع عدم;
 
-    for (;;)
+    لكل (;;)
     {
-	int	mi = 0;
-	int	ti = 0;
+	صحيح	mi = 0;
+	صحيح	ti = 0;
 
-	if (heredoc_in_string)
+	إذا (heredoc_وچ_string)
 	{
-	    char_u	*next_line;
+	    char_u	*اگلا_سطر;
 
 	    // heredoc in a string separated by newlines.  Get the next line
 	    // from the string.
 
-	    if (*line_arg == NUL)
+	    إذا (*سطر_arg == NUL)
 	    {
-		semsg(_(e_missing_end_marker_str), marker);
-		break;
+		semsg(_(e_missing_سرا_marker_str), marker);
+		اكسر;
 	    }
 
-	    theline = line_arg;
-	    next_line = vim_strchr(theline, '\n');
-	    if (next_line == NULL)
-		line_arg += STRLEN(line_arg);
-	    else
+	    theline = سطر_arg;
+	    اگلا_سطر = vim_strchr(theline, '\n');
+	    إذا (اگلا_سطر == عدم)
+		سطر_arg += STRLEN(سطر_arg);
+	    وإلا
 	    {
-		*next_line = NUL;
-		line_arg = next_line + 1;
+		*اگلا_سطر = NUL;
+		سطر_arg = اگلا_سطر + 1;
 	    }
 	}
-	else
+	وإلا
 	{
 	    vim_free(theline);
 	    theline = eap->ea_getline(NUL, eap->cookie, 0, FALSE);
-	    if (theline == NULL)
+	    إذا (theline == عدم)
 	    {
-		semsg(_(e_missing_end_marker_str), marker);
-		break;
+		semsg(_(e_missing_سرا_marker_str), marker);
+		اكسر;
 	    }
 	}
 
 	// with "trim": skip the indent matching the :let line to find the
 	// marker
-	if (marker_indent_len > 0
+	إذا (marker_indent_len > 0
 		&& STRNCMP(theline, *eap->cmdlinep, marker_indent_len) == 0)
 	    mi = marker_indent_len;
-	if (STRCMP(marker, theline + mi) == 0)
-	    break;
+	إذا (STRCMP(marker, theline + mi) == 0)
+	    اكسر;
 
 	// If expression evaluation failed in the heredoc, then skip till the
 	// end marker.
-	if (eval_failed)
-	    continue;
+	إذا (eval_failed)
+	    استمر;
 
-	if (text_indent_len == -1 && *theline != NUL)
+	إذا (متن_indent_len == -1 && *theline != NUL)
 	{
 	    // set the text indent from the first line.
 	    p = theline;
-	    text_indent_len = 0;
-	    while (VIM_ISWHITE(*p))
+	    متن_indent_len = 0;
+	    طالما (VIM_ISWHITE(*p))
 	    {
 		p++;
-		text_indent_len++;
+		متن_indent_len++;
 	    }
-	    text_indent = vim_strnsave(theline, text_indent_len);
+	    متن_indent = vim_strnsave(theline, متن_indent_len);
 	}
 	// with "trim": skip the indent matching the first line
-	if (text_indent != NULL)
-	    for (ti = 0; ti < text_indent_len; ++ti)
-		if (theline[ti] != text_indent[ti])
-		    break;
+	إذا (متن_indent != عدم)
+	    لكل (ti = 0; ti < متن_indent_len; ++ti)
+		إذا (theline[ti] != متن_indent[ti])
+		    اكسر;
 
 	str = theline + ti;
-	if (vim9compile)
+	إذا (vim9compile)
 	{
-	    if (compile_all_expr_in_str(str, evalstr, cctx) == FAIL)
+	    إذا (compile_all_اظہاریہ_وچ_str(str, evalstr, cctx) == FAIL)
 	    {
 		vim_free(theline);
-		vim_free(text_indent);
+		vim_free(متن_indent);
 		list_free(l);
-		return FAIL;
+		أرجع FAIL;
 	    }
-	    count++;
+	    گنتی++;
 	}
-	else
+	وإلا
 	{
-	    int	    free_str = FALSE;
+	    صحيح	    free_str = FALSE;
 
-	    if (evalstr && !eap->skip)
+	    إذا (evalstr && !eap->skip)
 	    {
-		str = eval_all_expr_in_str(str);
-		if (str == NULL)
+		str = eval_all_اظہاریہ_وچ_str(str);
+		إذا (str == عدم)
 		{
 		    // expression evaluation failed
 		    eval_failed = TRUE;
-		    continue;
+		    استمر;
 		}
 		free_str = TRUE;
 	    }
 
-	    if (list_append_string(l, str, -1) == FAIL)
+	    إذا (list_append_string(l, str, -1) == FAIL)
 	    {
-		if (free_str)
+		إذا (free_str)
 		    vim_free(str);
-		break;
+		اكسر;
 	    }
-	    if (free_str)
+	    إذا (free_str)
 		vim_free(str);
 	}
     }
-    if (heredoc_in_string)
+    إذا (heredoc_وچ_string)
 	// Next command follows the heredoc in the string.
-	eap->nextcmd = line_arg;
-    else
+	eap->nextcmd = سطر_arg;
+    وإلا
 	vim_free(theline);
-    vim_free(text_indent);
+    vim_free(متن_indent);
 
-    if (vim9compile && cctx->ctx_skip != SKIP_YES && !eval_failed)
-	generate_NEWLIST(cctx, count, FALSE);
+    إذا (vim9compile && cctx->ctx_skip != SKIP_YES && !eval_failed)
+	generate_NEWLIST(cctx, گنتی, FALSE);
 
-    if (eval_failed)
+    إذا (eval_failed)
     {
 	// expression evaluation in the heredoc failed
 	list_free(l);
-	return NULL;
+	أرجع عدم;
     }
-    return l;
+    أرجع l;
 }
 
 /*
@@ -1003,22 +1003,22 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
  * ":var name: type = expr"
  * etc.
  */
-    void
+    فراغ
 ex_var(exarg_T *eap)
 {
     char_u *p = eap->cmd;
-    int	    has_var;
+    صحيح	    has_var;
 
-    if (!in_vim9script())
+    إذا (!وچ_vim9script())
     {
-	semsg(_(e_str_cannot_be_used_in_legacy_vim_script), ":var");
-	return;
+	semsg(_(e_str_cannot_be_ورتیا_وچ_legacy_vim_script), ":var");
+	أرجع;
     }
     has_var = checkforcmd_noparen(&p, "var", 3);
-    if (current_sctx.sc_sid == 0 && has_var)
+    إذا (current_sctx.sc_sid == 0 && has_var)
     {
-	emsg(_(e_cannot_declare_variable_on_command_line));
-	return;
+	emsg(_(e_cannot_declare_variable_on_command_سطر));
+	أرجع;
     }
     ex_let(eap);
 }
@@ -1046,167 +1046,167 @@ ex_var(exarg_T *eap)
  * ":const var = expr"		assignment command.
  * ":const [var1, var2] = expr"	unpack list.
  */
-    void
+    فراغ
 ex_let(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    char_u	*expr = NULL;
+    char_u	*اظہاریہ = عدم;
     typval_T	rettv;
-    int		var_count = 0;
-    int		semicolon = 0;
+    صحيح		var_گنتی = 0;
+    صحيح		semicolon = 0;
     char_u	op[4];
     char_u	*argend;
-    int		first = TRUE;
-    int		concat;
-    int		has_assign;
-    int		flags = 0;
-    int		vim9script = in_vim9script();
+    صحيح		پہلا = TRUE;
+    صحيح		concat;
+    صحيح		has_سونپو;
+    صحيح		flags = 0;
+    صحيح		vim9script = وچ_vim9script();
 
-    if (eap->cmdidx == CMD_final && !vim9script)
+    إذا (eap->cmdidx == CMD_final && !vim9script)
     {
 	// In legacy Vim script ":final" is short for ":finally".
 	ex_finally(eap);
-	return;
+	أرجع;
     }
-    if (eap->cmdidx == CMD_let && vim9script)
+    إذا (eap->cmdidx == CMD_let && vim9script)
     {
-	emsg(_(e_cannot_use_let_in_vim9_script));
-	return;
+	emsg(_(e_cannot_use_let_وچ_vim9_script));
+	أرجع;
     }
 
-    if (eap->cmdidx == CMD_const)
-	flags |= ASSIGN_CONST;
-    else if (eap->cmdidx == CMD_final)
-	flags |= ASSIGN_FINAL;
+    إذا (eap->cmdidx == CMD_const)
+	flags |= سونپو_CONST;
+    وإلا إذا (eap->cmdidx == CMD_final)
+	flags |= سونپو_FINAL;
 
     // Vim9 assignment without ":let", ":const" or ":final"
-    if (eap->arg == eap->cmd)
-	flags |= ASSIGN_NO_DECL;
+    إذا (eap->arg == eap->cmd)
+	flags |= سونپو_NO_DECL;
 
-    argend = skip_var_list(arg, TRUE, &var_count, &semicolon, FALSE);
-    if (argend == NULL)
-	return;
-    expr = skipwhite(argend);
-    concat = expr[0] == '.'
-	&& ((expr[1] == '=' && in_old_script(2))
-		|| (expr[1] == '.' && expr[2] == '='));
-    has_assign =  *expr == '=' || (vim_strchr((char_u *)"+-*/%", *expr) != NULL
-							    && expr[1] == '=');
-    if (!has_assign && !concat)
+    argend = skip_var_list(arg, TRUE, &var_گنتی, &semicolon, FALSE);
+    إذا (argend == عدم)
+	أرجع;
+    اظہاریہ = skipwhite(argend);
+    concat = اظہاریہ[0] == '.'
+	&& ((اظہاریہ[1] == '=' && وچ_old_script(2))
+		|| (اظہاریہ[1] == '.' && اظہاریہ[2] == '='));
+    has_سونپو =  *اظہاریہ == '=' || (vim_strchr((char_u *)"+-*/%", *اظہاریہ) != عدم
+							    && اظہاریہ[1] == '=');
+    إذا (!has_سونپو && !concat)
     {
 	// ":let" without "=": list variables
-	if (*arg == '[')
-	    emsg(_(e_invalid_argument));
-	else if (expr[0] == '.' && expr[1] == '=')
-	    emsg(_(e_dot_equal_not_supported_with_script_version_two));
-	else if (!ends_excmd2(eap->cmd, arg))
+	إذا (*arg == '[')
+	    emsg(_(e_invalid_دلیل));
+	وإلا إذا (اظہاریہ[0] == '.' && اظہاریہ[1] == '=')
+	    emsg(_(e_dot_equal_not_supported_with_script_نسخہ_two));
+	وإلا إذا (!سرے_excmd2(eap->cmd, arg))
 	{
-	    if (vim9script)
+	    إذا (vim9script)
 	    {
-		if (!ends_excmd2(eap->cmd, skipwhite(argend)))
+		إذا (!سرے_excmd2(eap->cmd, skipwhite(argend)))
 		    semsg(_(e_trailing_characters_str), argend);
-		else
+		وإلا
 		    // Vim9 declaration ":var name: type"
 		    arg = vim9_declare_scriptvar(eap, arg);
 	    }
-	    else
+	    وإلا
 	    {
 		// ":let var1 var2" - list values
-		arg = list_arg_vars(eap, arg, &first);
+		arg = list_arg_vars(eap, arg, &پہلا);
 	    }
 	}
-	else if (!eap->skip)
+	وإلا إذا (!eap->skip)
 	{
 	    // ":let"
-	    list_glob_vars(&first);
-	    list_buf_vars(&first);
-	    list_win_vars(&first);
-	    list_tab_vars(&first);
-	    list_script_vars(&first);
-	    list_func_vars(&first);
-	    list_vim_vars(&first);
+	    list_glob_vars(&پہلا);
+	    list_buf_vars(&پہلا);
+	    list_win_vars(&پہلا);
+	    list_tab_vars(&پہلا);
+	    list_script_vars(&پہلا);
+	    list_func_vars(&پہلا);
+	    list_vim_vars(&پہلا);
 	}
-	set_nextcmd(eap, arg);
-	return;
+	سیٹ_nextcmd(eap, arg);
+	أرجع;
     }
 
-    if (expr[0] == '=' && expr[1] == '<' && expr[2] == '<')
+    إذا (اظہاریہ[0] == '=' && اظہاریہ[1] == '<' && اظہاریہ[2] == '<')
     {
-	list_T	*l = NULL;
-	long	cur_lnum = SOURCING_LNUM;
+	list_T	*l = عدم;
+	لما	cur_lnum = SOURCING_LNUM;
 
 	// :let text =<< [trim] [eval] END
 	// :var text =<< [trim] [eval] END
-	if (vim9script && !eap->skip && (!VIM_ISWHITE(expr[-1])
-						 || !IS_WHITE_OR_NUL(expr[3])))
+	إذا (vim9script && !eap->skip && (!VIM_ISWHITE(اظہاریہ[-1])
+						 || !IS_WHITE_OR_NUL(اظہاریہ[3])))
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
-								  "=<<", expr);
-	else
-	    l = heredoc_get(eap, expr + 3, FALSE, FALSE);
+								  "=<<", اظہاریہ);
+	وإلا
+	    l = heredoc_get(eap, اظہاریہ + 3, FALSE, FALSE);
 
-	if (l != NULL)
+	إذا (l != عدم)
 	{
-	    rettv_list_set(&rettv, l);
-	    if (!eap->skip)
+	    rettv_list_سیٹ(&rettv, l);
+	    إذا (!eap->skip)
 	    {
 		// errors are for the assignment, not the end marker
 		SOURCING_LNUM = cur_lnum;
 		op[0] = '=';
 		op[1] = NUL;
-		(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_count,
+		(فراغ)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_گنتی,
 								flags, op);
 	    }
 	    clear_tv(&rettv);
 	}
-	return;
+	أرجع;
     }
 
     evalarg_T   evalarg;
-    int	    len = 1;
+    صحيح	    len = 1;
 
-    CLEAR_FIELD(rettv);
+    CLEAR_میدان(rettv);
 
-    int cur_lnum;
+    صحيح cur_lnum;
 
     op[0] = '=';
     op[1] = NUL;
-    if (*expr != '=')
+    إذا (*اظہاریہ != '=')
     {
-	if (vim9script && (flags & ASSIGN_NO_DECL) == 0)
+	إذا (vim9script && (flags & سونپو_NO_DECL) == 0)
 	{
 	    // +=, /=, etc. require an existing variable
 	    semsg(_(e_cannot_use_operator_on_new_variable_str), eap->arg);
 	}
-	else if (vim_strchr((char_u *)"+-*/%.", *expr) != NULL)
+	وإلا إذا (vim_strchr((char_u *)"+-*/%.", *اظہاریہ) != عدم)
 	{
-	    op[0] = *expr;   // +=, -=, *=, /=, %= or .=
+	    op[0] = *اظہاریہ;   // +=, -=, *=, /=, %= or .=
 	    ++len;
-	    if (expr[0] == '.' && expr[1] == '.') // ..=
+	    إذا (اظہاریہ[0] == '.' && اظہاریہ[1] == '.') // ..=
 	    {
-		++expr;
+		++اظہاریہ;
 		++len;
 	    }
 	}
-	expr += 2;
+	اظہاریہ += 2;
     }
-    else
-	++expr;
+    وإلا
+	++اظہاریہ;
 
-    if (vim9script && !eap->skip && (!VIM_ISWHITE(*argend)
-					       || !IS_WHITE_OR_NUL(*expr)))
+    إذا (vim9script && !eap->skip && (!VIM_ISWHITE(*argend)
+					       || !IS_WHITE_OR_NUL(*اظہاریہ)))
     {
-	vim_strncpy(op, expr - len, len);
+	vim_strncpy(op, اظہاریہ - len, len);
 	semsg(_(e_white_space_required_before_and_after_str_at_str),
 							       op, argend);
     }
 
-    if (eap->skip)
+    إذا (eap->skip)
 	++emsg_skip;
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
-    expr = skipwhite_and_linebreak(expr, &evalarg);
+    اظہاریہ = skipwhite_and_linebreak(اظہاریہ, &evalarg);
     cur_lnum = SOURCING_LNUM;
-    int eval_res = eval0(expr, &rettv, eap, &evalarg);
-    if (eap->skip)
+    صحيح eval_res = eval0(اظہاریہ, &rettv, eap, &evalarg);
+    إذا (eap->skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
@@ -1214,10 +1214,10 @@ ex_let(exarg_T *eap)
     // declaration, not the expression.
     SOURCING_LNUM = cur_lnum;
 
-    if (!eap->skip && eval_res != FAIL)
-	(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_count,
+    إذا (!eap->skip && eval_res != FAIL)
+	(فراغ)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_گنتی,
 								    flags, op);
-    if (eval_res != FAIL)
+    إذا (eval_res != FAIL)
 	clear_tv(&rettv);
 }
 
@@ -1229,172 +1229,172 @@ ex_let(exarg_T *eap)
  * or concatenate.
  * Returns OK or FAIL;
  */
-    int
+    صحيح
 ex_let_vars(
-    char_u	*arg_start,
+    char_u	*arg_شروع,
     typval_T	*tv,
-    int		copy,		// copy values from "tv", don't move
-    int		semicolon,	// from skip_var_list()
-    int		var_count,	// from skip_var_list()
-    int		flags,		// ASSIGN_FINAL, ASSIGN_CONST, etc.
+    صحيح		copy,		// copy values from "tv", don't move
+    صحيح		semicolon,	// from skip_var_list()
+    صحيح		var_گنتی,	// from skip_var_list()
+    صحيح		flags,		// ASSIGN_FINAL, ASSIGN_CONST, etc.
     char_u	*op)
 {
-    char_u	*arg = arg_start;
+    char_u	*arg = arg_شروع;
     list_T	*l;
-    tuple_T	*tuple = NULL;
-    int		i;
-    int		var_idx = 0;
-    listitem_T	*item = NULL;
+    tuple_T	*tuple = عدم;
+    صحيح		i;
+    صحيح		var_idx = 0;
+    listitem_T	*شے = عدم;
     typval_T	ltv;
-    int		is_list = tv->v_type == VAR_LIST;
-    int		idx;
+    صحيح		is_list = tv->v_type == VAR_LIST;
+    صحيح		idx;
 
-    if (tv->v_type == VAR_VOID)
+    إذا (tv->v_type == VAR_VOID)
     {
-	emsg(_(e_cannot_use_void_value));
-	return FAIL;
+	emsg(_(e_cannot_use_void_قدر));
+	أرجع FAIL;
     }
-    if (*arg != '[')
+    إذا (*arg != '[')
     {
 	// ":let var = expr" or ":for var in list"
-	if (ex_let_one(arg, tv, copy, flags, op, op, var_idx) == NULL)
-	    return FAIL;
-	return OK;
+	إذا (ex_let_one(arg, tv, copy, flags, op, op, var_idx) == عدم)
+	    أرجع FAIL;
+	أرجع OK;
     }
 
     // ":let [v1, v2] = list" or ":for [v1, v2] in listlist"
     // or
     // ":let [v1, v2] = tuple" or ":for [v1, v2] in tupletuple"
-    if (tv->v_type != VAR_LIST && tv->v_type != VAR_TUPLE)
+    إذا (tv->v_type != VAR_LIST && tv->v_type != VAR_TUPLE)
     {
 	emsg(_(e_list_or_tuple_required));
-	return FAIL;
+	أرجع FAIL;
     }
-    if (is_list)
+    إذا (is_list)
     {
 	l = tv->vval.v_list;
-	if (l == NULL)
+	إذا (l == عدم)
 	{
 	    emsg(_(e_list_required));
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	i = list_len(l);
     }
-    else
+    وإلا
     {
 	tuple = tv->vval.v_tuple;
-	if (tuple == NULL)
+	إذا (tuple == عدم)
 	{
 	    emsg(_(e_tuple_required));
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	i = tuple_len(tuple);
     }
 
-    if (semicolon == 0 && var_count < i)
+    إذا (semicolon == 0 && var_گنتی < i)
     {
-	emsg(_(is_list ? e_less_targets_than_list_items
-					: e_less_targets_than_tuple_items));
-	return FAIL;
+	emsg(_(is_list ? e_less_targets_than_list_اشیاء
+					: e_less_targets_than_tuple_اشیاء));
+	أرجع FAIL;
     }
-    if (var_count - semicolon > i)
+    إذا (var_گنتی - semicolon > i)
     {
-	emsg(_(is_list ? e_more_targets_than_list_items
-					: e_more_targets_than_tuple_items));
-	return FAIL;
+	emsg(_(is_list ? e_ہور_targets_than_list_اشیاء
+					: e_ہور_targets_than_tuple_اشیاء));
+	أرجع FAIL;
     }
 
-    if (is_list)
+    إذا (is_list)
     {
 	CHECK_LIST_MATERIALIZE(l);
-	item = l->lv_first;
+	شے = l->lv_پہلا;
     }
-    else
+    وإلا
 	idx = 0;
 
-    while (*arg != ']')
+    طالما (*arg != ']')
     {
 	arg = skipwhite(arg + 1);
 	++var_idx;
-	arg = ex_let_one(arg, is_list ? &item->li_tv : TUPLE_ITEM(tuple, idx),
-			 TRUE, flags | ASSIGN_UNPACK, (char_u *)",;]", op,
+	arg = ex_let_one(arg, is_list ? &شے->li_tv : TUPLE_شے(tuple, idx),
+			 TRUE, flags | سونپو_UNPACK, (char_u *)",;]", op,
 			 var_idx);
-	if (is_list)
-	    item = item->li_next;
-	else
+	إذا (is_list)
+	    شے = شے->li_اگلا;
+	وإلا
 	    idx++;
-	if (arg == NULL)
-	    return FAIL;
+	إذا (arg == عدم)
+	    أرجع FAIL;
 
 	arg = skipwhite(arg);
-	if (*arg == ';')
+	إذا (*arg == ';')
 	{
 	    // Put the rest of the list or tuple (may be empty) in the var
 	    // after ';'.  Create a new list or tuple for this.
-	    if (is_list)
+	    إذا (is_list)
 	    {
 		// Put the rest of the list (may be empty) in the var
 		// after ';'.  Create a new list for this.
 		l = list_alloc();
-		if (l == NULL)
-		    return FAIL;
+		إذا (l == عدم)
+		    أرجع FAIL;
 
 		// list
-		while (item != NULL)
+		طالما (شے != عدم)
 		{
-		    list_append_tv(l, &item->li_tv);
-		    item = item->li_next;
+		    list_append_tv(l, &شے->li_tv);
+		    شے = شے->li_اگلا;
 		}
 
 		ltv.v_type = VAR_LIST;
-		ltv.v_lock = 0;
+		ltv.v_جندرا = 0;
 		ltv.vval.v_list = l;
 		l->lv_refcount = 1;
 	    }
-	    else
+	    وإلا
 	    {
 		tuple_T	*new_tuple = tuple_alloc();
-		if (new_tuple == NULL)
-		    return FAIL;
+		إذا (new_tuple == عدم)
+		    أرجع FAIL;
 
 		// Put the rest of the tuple (may be empty) in the var
 		// after ';'.  Create a new tuple for this.
-		while (idx < TUPLE_LEN(tuple))
+		طالما (idx < TUPLE_LEN(tuple))
 		{
 		    typval_T    new_tv;
 
-		    copy_tv(TUPLE_ITEM(tuple, idx), &new_tv);
-		    if (tuple_append_tv(new_tuple, &new_tv) == FAIL)
+		    copy_tv(TUPLE_شے(tuple, idx), &new_tv);
+		    إذا (tuple_append_tv(new_tuple, &new_tv) == FAIL)
 		    {
 			clear_tv(&new_tv);
 			tuple_unref(new_tuple);
-			return FAIL;
+			أرجع FAIL;
 		    }
 		    idx++;
 		}
 
 		ltv.v_type = VAR_TUPLE;
-		ltv.v_lock = 0;
+		ltv.v_جندرا = 0;
 		ltv.vval.v_tuple = new_tuple;
 		new_tuple->tv_refcount = 1;
 	    }
 
 	    ++var_idx;
 	    arg = ex_let_one(skipwhite(arg + 1), &ltv, FALSE,
-			flags | ASSIGN_UNPACK, (char_u *)"]", op, var_idx);
+			flags | سونپو_UNPACK, (char_u *)"]", op, var_idx);
 	    clear_tv(&ltv);
-	    if (arg == NULL)
-		return FAIL;
-	    break;
+	    إذا (arg == عدم)
+		أرجع FAIL;
+	    اكسر;
 	}
-	else if (*arg != ',' && *arg != ']')
+	وإلا إذا (*arg != ',' && *arg != ']')
 	{
-	    internal_error("ex_let_vars()");
-	    return FAIL;
+	    اندرونی_error("ex_let_vars()");
+	    أرجع FAIL;
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1408,53 +1408,53 @@ ex_let_vars(
     char_u *
 skip_var_list(
     char_u	*arg,
-    int		include_type,
-    int		*var_count,
-    int		*semicolon,
-    int		silent)
+    صحيح		include_type,
+    صحيح		*var_گنتی,
+    صحيح		*semicolon,
+    صحيح		silent)
 {
     char_u	*p, *s;
 
-    if (*arg == '[')
+    إذا (*arg == '[')
     {
 	// "[var, var]": find the matching ']'.
 	p = arg;
-	for (;;)
+	لكل (;;)
 	{
 	    p = skipwhite(p + 1);	// skip whites after '[', ';' or ','
 	    s = skip_var_one(p, include_type);
-	    if (s == p)
+	    إذا (s == p)
 	    {
-		if (!silent)
-		    semsg(_(e_invalid_argument_str), p);
-		return NULL;
+		إذا (!silent)
+		    semsg(_(e_invalid_دلیل_str), p);
+		أرجع عدم;
 	    }
-	    ++*var_count;
+	    ++*var_گنتی;
 
 	    p = skipwhite(s);
-	    if (*p == ']')
-		break;
-	    else if (*p == ';')
+	    إذا (*p == ']')
+		اكسر;
+	    وإلا إذا (*p == ';')
 	    {
-		if (*semicolon == 1)
+		إذا (*semicolon == 1)
 		{
-		    if (!silent)
-			emsg(_(e_double_semicolon_in_list_of_variables));
-		    return NULL;
+		    إذا (!silent)
+			emsg(_(e_double_semicolon_وچ_list_دا_variables));
+		    أرجع عدم;
 		}
 		*semicolon = 1;
 	    }
-	    else if (*p != ',')
+	    وإلا إذا (*p != ',')
 	    {
-		if (!silent)
-		    semsg(_(e_invalid_argument_str), p);
-		return NULL;
+		إذا (!silent)
+		    semsg(_(e_invalid_دلیل_str), p);
+		أرجع عدم;
 	    }
 	}
-	return p + 1;
+	أرجع p + 1;
     }
 
-    return skip_var_one(arg, include_type);
+    أرجع skip_var_one(arg, include_type);
 }
 
 /*
@@ -1463,70 +1463,70 @@ skip_var_list(
  * In Vim9 script also skip over ": type" if "include_type" is TRUE.
  */
     char_u *
-skip_var_one(char_u *arg, int include_type)
+skip_var_one(char_u *arg, صحيح include_type)
 {
-    char_u	*end;
-    int		vim9 = in_vim9script();
+    char_u	*سرا;
+    صحيح		vim9 = وچ_vim9script();
 
-    if (*arg == '@' && arg[1] != NUL)
-	return arg + 2;
+    إذا (*arg == '@' && arg[1] != NUL)
+	أرجع arg + 2;
 
     // termcap option name may have non-alpha characters
-    if (STRNCMP(arg, "&t_", 3) == 0 && arg[3] != NUL && arg[4] != NUL)
-	return arg + 5;
+    إذا (STRNCMP(arg, "&t_", 3) == 0 && arg[3] != NUL && arg[4] != NUL)
+	أرجع arg + 5;
 
-    end = find_name_end(*arg == '$' || *arg == '&' ? arg + 1 : arg,
-				   NULL, NULL, FNE_INCL_BR | FNE_CHECK_START);
+    سرا = لبھو_name_سرا(*arg == '$' || *arg == '&' ? arg + 1 : arg,
+				   عدم, عدم, FNE_INCL_BR | FNE_CHECK_شروع);
 
     // "a: type" is declaring variable "a" with a type, not "a:".
     // Same for "s: type".
-    if (vim9 && end == arg + 2 && end[-1] == ':')
-	--end;
+    إذا (vim9 && سرا == arg + 2 && سرا[-1] == ':')
+	--سرا;
 
-    if (include_type && vim9)
+    إذا (include_type && vim9)
     {
-	if (*skipwhite(end) == ':')
-	    end = skip_type(skipwhite(skipwhite(end) + 1), FALSE);
+	إذا (*skipwhite(سرا) == ':')
+	    سرا = skip_type(skipwhite(skipwhite(سرا) + 1), FALSE);
     }
-    return end;
+    أرجع سرا;
 }
 
 /*
  * List variables for hashtab "ht" with prefix "prefix".
  * If "empty" is TRUE also list NULL strings as empty strings.
  */
-    void
+    فراغ
 list_hashtable_vars(
     hashtab_T	*ht,
-    char	*prefix,
-    int		empty,
-    int		*first)
+    حرف	*اگیتر,
+    صحيح		خالی_تھاواں_2,
+    صحيح		*پہلا)
 {
     hashitem_T	*hi;
     dictitem_T	*di;
-    int		todo;
+    صحيح		todo;
     char_u	buf[IOSIZE];
 
-    int save_ht_flags = ht->ht_flags;
+    صحيح save_ht_flags = ht->ht_flags;
     ht->ht_flags |= HTFLAGS_FROZEN;
 
-    todo = (int)ht->ht_used;
-    for (hi = ht->ht_array; todo > 0 && !got_int; ++hi)
+    todo = (صحيح)ht->ht_ورتیا;
+    لكل (hi = ht->ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالی_تھاواں(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
 
 	    // apply :filter /pat/ to variable name
-	    vim_strncpy((char_u *)buf, (char_u *)prefix, IOSIZE - 1);
-	    vim_strcat((char_u *)buf, di->di_key, IOSIZE);
-	    if (message_filtered(buf))
-		continue;
+	    vim_strncpy((char_u *)buf, (char_u *)اگیتر, IOSIZE - 1);
+	    vim_strcat((char_u *)buf, di->di_کلید, IOSIZE);
+	    إذا (سنیہا_filtered(buf))
+		استمر;
 
-	    if (empty || di->di_tv.v_type != VAR_STRING
-					   || di->di_tv.vval.v_string != NULL)
-		list_one_var(di, prefix, first);
+	    إذا (خالی_تھاواں_2 || di->di_tv.v_type != VAR_STRING
+					   || di->di_tv.vval.v_string != عدم)
+		list_one_var(di, اگیتر, پہلا);
 	}
     }
 
@@ -1536,130 +1536,130 @@ list_hashtable_vars(
 /*
  * List global variables.
  */
-    static void
-list_glob_vars(int *first)
+    ساكن فراغ
+list_glob_vars(صحيح *پہلا)
 {
-    list_hashtable_vars(&globvarht, "", TRUE, first);
+    list_hashtable_vars(&globvarht, "", TRUE, پہلا);
 }
 
 /*
  * List buffer variables.
  */
-    static void
-list_buf_vars(int *first)
+    ساكن فراغ
+list_buf_vars(صحيح *پہلا)
 {
-    list_hashtable_vars(&curbuf->b_vars->dv_hashtab, "b:", TRUE, first);
+    list_hashtable_vars(&curbuf->b_vars->dv_hashtab, "b:", TRUE, پہلا);
 }
 
 /*
  * List window variables.
  */
-    static void
-list_win_vars(int *first)
+    ساكن فراغ
+list_win_vars(صحيح *پہلا)
 {
-    list_hashtable_vars(&curwin->w_vars->dv_hashtab, "w:", TRUE, first);
+    list_hashtable_vars(&curwin->w_vars->dv_hashtab, "w:", TRUE, پہلا);
 }
 
 /*
  * List tab page variables.
  */
-    static void
-list_tab_vars(int *first)
+    ساكن فراغ
+list_tab_vars(صحيح *پہلا)
 {
-    list_hashtable_vars(&curtab->tp_vars->dv_hashtab, "t:", TRUE, first);
+    list_hashtable_vars(&curtab->tp_vars->dv_hashtab, "t:", TRUE, پہلا);
 }
 
 /*
  * List variables in "arg".
  */
-    static char_u *
-list_arg_vars(exarg_T *eap, char_u *arg, int *first)
+    ساكن char_u *
+list_arg_vars(exarg_T *eap, char_u *arg, صحيح *پہلا)
 {
-    int		error = FALSE;
-    int		len;
+    صحيح		error = FALSE;
+    صحيح		len;
     char_u	*name;
-    char_u	*name_start;
+    char_u	*name_شروع;
     char_u	*arg_subsc;
     char_u	*tofree;
     typval_T    tv;
 
-    while (!ends_excmd2(eap->cmd, arg) && !got_int)
+    طالما (!سرے_excmd2(eap->cmd, arg) && !got_int)
     {
-	if (error || eap->skip)
+	إذا (error || eap->skip)
 	{
-	    arg = find_name_end(arg, NULL, NULL, FNE_INCL_BR | FNE_CHECK_START);
-	    if (!VIM_ISWHITE(*arg) && !ends_excmd(*arg))
+	    arg = لبھو_name_سرا(arg, عدم, عدم, FNE_INCL_BR | FNE_CHECK_شروع);
+	    إذا (!VIM_ISWHITE(*arg) && !سرے_excmd(*arg))
 	    {
 		emsg_severe = TRUE;
-		if (!did_emsg)
+		إذا (!did_emsg)
 		    semsg(_(e_trailing_characters_str), arg);
-		break;
+		اكسر;
 	    }
 	}
-	else
+	وإلا
 	{
 	    // get_name_len() takes care of expanding curly braces
-	    name_start = name = arg;
+	    name_شروع = name = arg;
 	    len = get_name_len(&arg, &tofree, TRUE, TRUE);
-	    if (len <= 0)
+	    إذا (len <= 0)
 	    {
 		// This is mainly to keep test 49 working: when expanding
 		// curly braces fails overrule the exception error message.
-		if (len < 0 && !aborting())
+		إذا (len < 0 && !aborting())
 		{
 		    emsg_severe = TRUE;
-		    semsg(_(e_invalid_argument_str), arg);
-		    break;
+		    semsg(_(e_invalid_دلیل_str), arg);
+		    اكسر;
 		}
 		error = TRUE;
 	    }
-	    else
+	    وإلا
 	    {
 		arg = skipwhite(arg);
-		if (tofree != NULL)
+		إذا (tofree != عدم)
 		    name = tofree;
-		if (eval_variable(name, len, 0, &tv, NULL,
+		إذا (eval_variable(name, len, 0, &tv, عدم,
 						     EVAL_VAR_VERBOSE) == FAIL)
 		    error = TRUE;
-		else
+		وإلا
 		{
 		    // handle d.key, l[idx], f(expr)
 		    arg_subsc = arg;
-		    if (handle_subscript(&arg, name_start, &tv,
+		    إذا (handle_subscript(&arg, name_شروع, &tv,
 					      &EVALARG_EVALUATE, TRUE) == FAIL)
 			error = TRUE;
-		    else
+		    وإلا
 		    {
-			if (arg == arg_subsc && len == 2 && name[1] == ':')
+			إذا (arg == arg_subsc && len == 2 && name[1] == ':')
 			{
-			    switch (*name)
+			    بدل (*name)
 			    {
-				case 'g': list_glob_vars(first); break;
-				case 'b': list_buf_vars(first); break;
-				case 'w': list_win_vars(first); break;
-				case 't': list_tab_vars(first); break;
-				case 'v': list_vim_vars(first); break;
-				case 's': list_script_vars(first); break;
-				case 'l': list_func_vars(first); break;
-				default:
+				حالة 'g': list_glob_vars(پہلا); اكسر;
+				حالة 'b': list_buf_vars(پہلا); اكسر;
+				حالة 'w': list_win_vars(پہلا); اكسر;
+				حالة 't': list_tab_vars(پہلا); اكسر;
+				حالة 'v': list_vim_vars(پہلا); اكسر;
+				حالة 's': list_script_vars(پہلا); اكسر;
+				حالة 'l': list_func_vars(پہلا); اكسر;
+				افتراضي:
 					  semsg(_(e_cant_list_variables_for_str), name);
 			    }
 			}
-			else
+			وإلا
 			{
 			    char_u	numbuf[NUMBUFLEN];
 			    char_u	*tf;
-			    int		c;
+			    صحيح		c;
 			    char_u	*s;
 
 			    s = echo_string(&tv, &tf, numbuf, 0);
 			    c = *arg;
 			    *arg = NUL;
 			    list_one_var_a("",
-				    arg == arg_subsc ? name : name_start,
+				    arg == arg_subsc ? name : name_شروع,
 				    tv.v_type,
-				    s == NULL ? (char_u *)"" : s,
-				    first);
+				    s == عدم ? (char_u *)"" : s,
+				    پہلا);
 			    *arg = c;
 			    vim_free(tf);
 			}
@@ -1674,195 +1674,195 @@ list_arg_vars(exarg_T *eap, char_u *arg, int *first)
 	arg = skipwhite(arg);
     }
 
-    return arg;
+    أرجع arg;
 }
 
 /*
  * Set an environment variable, part of ex_let_one().
  */
-    static char_u *
+    ساكن char_u *
 ex_let_env(
     char_u	*arg,
     typval_T	*tv,
-    int		flags,
+    صحيح		flags,
     char_u	*endchars,
     char_u	*op)
 {
-    char_u	*arg_end = NULL;
+    char_u	*arg_سرا = عدم;
     char_u	*name;
-    int		len;
+    صحيح		len;
 
-    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					 && (flags & ASSIGN_FOR_LOOP) == 0)
+    إذا ((flags & (سونپو_CONST | سونپو_FINAL))
+					 && (flags & سونپو_FOR_LOOP) == 0)
     {
-	emsg(_(e_cannot_lock_environment_variable));
-	return NULL;
+	emsg(_(e_cannot_جندرا_environment_variable));
+	أرجع عدم;
     }
 
     // Find the end of the name.
     ++arg;
     name = arg;
     len = get_env_len(&arg);
-    if (len == 0)
-	semsg(_(e_invalid_argument_str), name - 1);
-    else
+    إذا (len == 0)
+	semsg(_(e_invalid_دلیل_str), name - 1);
+    وإلا
     {
-	if (op != NULL && vim_strchr((char_u *)"+-*/%", *op) != NULL)
+	إذا (op != عدم && vim_strchr((char_u *)"+-*/%", *op) != عدم)
 	    semsg(_(e_wrong_variable_type_for_str_equal), op);
-	else if (endchars != NULL
-			      && vim_strchr(endchars, *skipwhite(arg)) == NULL)
-	    emsg(_(e_unexpected_characters_in_let));
-	else if (!check_secure() && !check_restricted())
+	وإلا إذا (endchars != عدم
+			      && vim_strchr(endchars, *skipwhite(arg)) == عدم)
+	    emsg(_(e_unexpected_characters_وچ_let));
+	وإلا إذا (!check_secure() && !check_restricted())
 	{
-	    char_u	*tofree = NULL;
-	    int		c1 = name[len];
+	    char_u	*tofree = عدم;
+	    صحيح		c1 = name[len];
 	    char_u	*p;
 
 	    name[len] = NUL;
 	    p = tv_get_string_chk(tv);
-	    if (p != NULL && op != NULL && *op == '.')
+	    إذا (p != عدم && op != عدم && *op == '.')
 	    {
-		int	mustfree = FALSE;
+		صحيح	mustfree = FALSE;
 		char_u  *s = vim_getenv(name, &mustfree);
 
-		if (s != NULL)
+		إذا (s != عدم)
 		{
 		    p = tofree = concat_str(s, p);
-		    if (mustfree)
+		    إذا (mustfree)
 			vim_free(s);
 		}
 	    }
-	    if (p != NULL)
+	    إذا (p != عدم)
 	    {
 		vim_setenv_ext(name, p);
-		arg_end = arg;
+		arg_سرا = arg;
 	    }
 	    name[len] = c1;
 	    vim_free(tofree);
 	}
     }
-    return arg_end;
+    أرجع arg_سرا;
 }
 
 /*
  * Set an option, part of ex_let_one().
  */
-    static char_u *
+    ساكن char_u *
 ex_let_option(
     char_u	*arg,
     typval_T	*tv,
-    int		flags,
+    صحيح		flags,
     char_u	*endchars,
     char_u	*op)
 {
     char_u	*p;
-    int		scope;
-    char_u	*arg_end = NULL;
+    صحيح		scope;
+    char_u	*arg_سرا = عدم;
 
-    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					 && (flags & ASSIGN_FOR_LOOP) == 0)
+    إذا ((flags & (سونپو_CONST | سونپو_FINAL))
+					 && (flags & سونپو_FOR_LOOP) == 0)
     {
-	emsg(_(e_cannot_lock_option));
-	return NULL;
+	emsg(_(e_cannot_جندرا_option));
+	أرجع عدم;
     }
 
     // Find the end of the name.
-    p = find_option_end(&arg, &scope);
-    if (p == NULL || (endchars != NULL
-			       && vim_strchr(endchars, *skipwhite(p)) == NULL))
+    p = لبھو_option_سرا(&arg, &scope);
+    إذا (p == عدم || (endchars != عدم
+			       && vim_strchr(endchars, *skipwhite(p)) == عدم))
     {
-	emsg(_(e_unexpected_characters_in_let));
-	return NULL;
+	emsg(_(e_unexpected_characters_وچ_let));
+	أرجع عدم;
     }
 
-    int		c1;
-    long	n = 0;
+    صحيح		c1;
+    لما	n = 0;
     getoption_T	opt_type;
-    long	numval;
-    char_u	*stringval = NULL;
-    char_u	*s = NULL;
-    int		failed = FALSE;
-    int		opt_p_flags;
-    char_u	*tofree = NULL;
+    لما	numval;
+    char_u	*stringval = عدم;
+    char_u	*s = عدم;
+    صحيح		failed = FALSE;
+    صحيح		opt_p_flags;
+    char_u	*tofree = عدم;
     char_u	numbuf[NUMBUFLEN];
 
     c1 = *p;
     *p = NUL;
 
-    opt_type = get_option_value(arg, &numval, &stringval, &opt_p_flags, scope);
-    if (opt_type == gov_unknown && arg[0] != 't' && arg[1] != '_')
+    opt_type = get_option_قدر(arg, &numval, &stringval, &opt_p_flags, scope);
+    إذا (opt_type == gov_unknown && arg[0] != 't' && arg[1] != '_')
     {
 	semsg(_(e_unknown_option_str_2), arg);
-	goto theend;
+	اذهب theend;
     }
-    if (op != NULL && *op != '='
-	&& (((opt_type == gov_bool || opt_type == gov_number) && *op == '.')
+    إذا (op != عدم && *op != '='
+	&& (((opt_type == gov_bool || opt_type == gov_نمبر) && *op == '.')
 	    || (opt_type == gov_string && *op != '.')))
     {
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
-	goto theend;
+	اذهب theend;
     }
 
-    if ((opt_type == gov_bool
-		|| opt_type == gov_number
+    إذا ((opt_type == gov_bool
+		|| opt_type == gov_نمبر
 		|| opt_type == gov_hidden_bool
-		|| opt_type == gov_hidden_number)
-		     && (tv->v_type != VAR_STRING || !in_vim9script()))
+		|| opt_type == gov_hidden_نمبر)
+		     && (tv->v_type != VAR_STRING || !وچ_vim9script()))
     {
-	if (opt_type == gov_bool || opt_type == gov_hidden_bool)
+	إذا (opt_type == gov_bool || opt_type == gov_hidden_bool)
 	    // bool, possibly hidden
-	    n = (long)tv_get_bool_chk(tv, &failed);
-	else
+	    n = (لما)tv_get_bool_chk(tv, &failed);
+	وإلا
 	    // number, possibly hidden
-	    n = (long)tv_get_number_chk(tv, &failed);
-	if (failed)
-	    goto theend;
+	    n = (لما)tv_get_نمبر_chk(tv, &failed);
+	إذا (failed)
+	    اذهب theend;
     }
 
-    if ((opt_p_flags & P_FUNC) && (tv->v_type == VAR_PARTIAL
+    إذا ((opt_p_flags & P_FUNC) && (tv->v_type == VAR_PARTIAL
 						    || tv->v_type == VAR_FUNC))
     {
 	// If the option can be set to a function reference or a lambda
 	// and the passed value is a function reference, then convert it to
 	// the name (string) of the function reference.
 	s = tv2string(tv, &tofree, numbuf, 0);
-	if (s == NULL)
-	    goto theend;
+	إذا (s == عدم)
+	    اذهب theend;
     }
     // Avoid setting a string option to the text "v:false" or similar.
     // In Vim9 script also don't convert a number to string.
-    else if (tv->v_type != VAR_BOOL && tv->v_type != VAR_SPECIAL
-		     && (!in_vim9script() || tv->v_type != VAR_NUMBER))
+    وإلا إذا (tv->v_type != VAR_BOOL && tv->v_type != VAR_SPECIAL
+		     && (!وچ_vim9script() || tv->v_type != VAR_نمبر))
     {
 	s = tv_get_string_chk(tv);
-	if (s == NULL)
-	    goto theend;
+	إذا (s == عدم)
+	    اذهب theend;
     }
-    else if (opt_type == gov_string || opt_type == gov_hidden_string)
+    وإلا إذا (opt_type == gov_string || opt_type == gov_hidden_string)
     {
 	emsg(_(e_string_required));
-	goto theend;
+	اذهب theend;
     }
 
-    if (op != NULL && *op != '=')
+    إذا (op != عدم && *op != '=')
     {
 	// number, in legacy script also bool
-	if (opt_type == gov_number
-				 || (opt_type == gov_bool && !in_vim9script()))
+	إذا (opt_type == gov_نمبر
+				 || (opt_type == gov_bool && !وچ_vim9script()))
 	{
-	    switch (*op)
+	    بدل (*op)
 	    {
-		case '+': n = numval + n; break;
-		case '-': n = numval - n; break;
-		case '*': n = numval * n; break;
-		case '/': n = (long)num_divide(numval, n, &failed); break;
-		case '%': n = (long)num_modulus(numval, n, &failed); break;
+		حالة '+': n = numval + n; اكسر;
+		حالة '-': n = numval - n; اكسر;
+		حالة '*': n = numval * n; اكسر;
+		حالة '/': n = (لما)عدد_divide(numval, n, &failed); اكسر;
+		حالة '%': n = (لما)عدد_modulus(numval, n, &failed); اكسر;
 	    }
-	    s = NULL;
-	    if (failed)
-		goto theend;
+	    s = عدم;
+	    إذا (failed)
+		اذهب theend;
 	}
-	else if (opt_type == gov_string && stringval != NULL && s != NULL)
+	وإلا إذا (opt_type == gov_string && stringval != عدم && s != عدم)
 	{
 	    // string
 	    s = concat_str(stringval, s);
@@ -1871,68 +1871,68 @@ ex_let_option(
 	}
     }
 
-    char *err = set_option_value(arg, n, s, scope);
-    arg_end = p;
-    if (err != NULL)
+    حرف *err = سیٹ_option_قدر(arg, n, s, scope);
+    arg_سرا = p;
+    إذا (err != عدم)
 	emsg(_(err));
 
 theend:
     *p = c1;
     vim_free(stringval);
     vim_free(tofree);
-    return arg_end;
+    أرجع arg_سرا;
 }
 
 /*
  * Set a register, part of ex_let_one().
  */
-    static char_u *
-ex_let_register(
+    ساكن char_u *
+ex_let_رجسٹر(
     char_u	*arg,
     typval_T	*tv,
-    int		flags,
+    صحيح		flags,
     char_u	*endchars,
     char_u	*op)
 {
-    char_u	*arg_end = NULL;
+    char_u	*arg_سرا = عدم;
 
-    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					 && (flags & ASSIGN_FOR_LOOP) == 0)
+    إذا ((flags & (سونپو_CONST | سونپو_FINAL))
+					 && (flags & سونپو_FOR_LOOP) == 0)
     {
-	emsg(_(e_cannot_lock_register));
-	return NULL;
+	emsg(_(e_cannot_جندرا_رجسٹر));
+	أرجع عدم;
     }
     ++arg;
-    if (op != NULL && vim_strchr((char_u *)"+-*/%", *op) != NULL)
+    إذا (op != عدم && vim_strchr((char_u *)"+-*/%", *op) != عدم)
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
-    else if (endchars != NULL
-			  && vim_strchr(endchars, *skipwhite(arg + 1)) == NULL)
-	emsg(_(e_unexpected_characters_in_let));
-    else
+    وإلا إذا (endchars != عدم
+			  && vim_strchr(endchars, *skipwhite(arg + 1)) == عدم)
+	emsg(_(e_unexpected_characters_وچ_let));
+    وإلا
     {
-	char_u	*ptofree = NULL;
+	char_u	*ptofree = عدم;
 	char_u	*p;
 
 	p = tv_get_string_chk(tv);
-	if (p != NULL && op != NULL && *op == '.')
+	إذا (p != عدم && op != عدم && *op == '.')
 	{
 	    char_u  *s = get_reg_contents(*arg == '@'
-						  ? '"' : *arg, GREG_EXPR_SRC);
+						  ? '"' : *arg, GREG_اظہاریہ_SRC);
 
-	    if (s != NULL)
+	    إذا (s != عدم)
 	    {
 		p = ptofree = concat_str(s, p);
 		vim_free(s);
 	    }
 	}
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    write_reg_contents(*arg == '@' ? '"' : *arg, p, -1, FALSE);
-	    arg_end = arg + 1;
+	    arg_سرا = arg + 1;
 	}
 	vim_free(ptofree);
     }
-    return arg_end;
+    أرجع arg_سرا;
 }
 
 /*
@@ -1940,121 +1940,121 @@ ex_let_register(
  * Returns a pointer to the char just after the var name.
  * Returns NULL if there is an error.
  */
-    static char_u *
+    ساكن char_u *
 ex_let_one(
     char_u	*arg,		// points to variable name
     typval_T	*tv,		// value to assign to variable
-    int		copy,		// copy value from "tv"
-    int		flags,		// ASSIGN_CONST, ASSIGN_FINAL, etc.
+    صحيح		copy,		// copy value from "tv"
+    صحيح		flags,		// ASSIGN_CONST, ASSIGN_FINAL, etc.
     char_u	*endchars,	// valid chars after variable name  or NULL
     char_u	*op,		// "+", "-", "."  or NULL
-    int		var_idx)	// variable index for "let [a, b] = list"
+    صحيح		var_idx)	// variable index for "let [a, b] = list"
 {
-    char_u	*arg_end = NULL;
+    char_u	*arg_سرا = عدم;
 
-    if (in_vim9script() && (flags & (ASSIGN_NO_DECL | ASSIGN_DECL)) == 0
-			&& (flags & (ASSIGN_CONST | ASSIGN_FINAL)) == 0
-				  && vim_strchr((char_u *)"$@&", *arg) != NULL)
+    إذا (وچ_vim9script() && (flags & (سونپو_NO_DECL | سونپو_DECL)) == 0
+			&& (flags & (سونپو_CONST | سونپو_FINAL)) == 0
+				  && vim_strchr((char_u *)"$@&", *arg) != عدم)
     {
 	vim9_declare_error(arg);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (check_typval_is_value(tv) == FAIL)
-	return NULL;
+    إذا (check_typval_is_قدر(tv) == FAIL)
+	أرجع عدم;
 
     // In Vim9 script an environment variable and a register only take a
     // String.  "@#" also takes a buffer number.
-    if (in_vim9script() && (*arg == '$' || *arg == '@')
-	    && !(*arg == '@' && arg[1] == '#' && tv->v_type == VAR_NUMBER
-					       && (op == NULL || *op == '=')))
+    إذا (وچ_vim9script() && (*arg == '$' || *arg == '@')
+	    && !(*arg == '@' && arg[1] == '#' && tv->v_type == VAR_نمبر
+					       && (op == عدم || *op == '=')))
     {
 	where_T	where = WHERE_INIT;
 
-	if (check_typval_type(&t_string, tv, where) == FAIL)
-	    return NULL;
+	إذا (check_typval_type(&t_string, tv, where) == FAIL)
+	    أرجع عدم;
     }
 
-    if (*arg == '$')
+    إذا (*arg == '$')
     {
 	// ":let $VAR = expr": Set environment variable.
-	return ex_let_env(arg, tv, flags, endchars, op);
+	أرجع ex_let_env(arg, tv, flags, endchars, op);
     }
-    else if (*arg == '&')
+    وإلا إذا (*arg == '&')
     {
 	// ":let &option = expr": Set option value.
 	// ":let &l:option = expr": Set local option value.
 	// ":let &g:option = expr": Set global option value.
 	// ":for &ts in range(8)": Set option value for for loop
-	return ex_let_option(arg, tv, flags, endchars, op);
+	أرجع ex_let_option(arg, tv, flags, endchars, op);
     }
-    else if (*arg == '@')
+    وإلا إذا (*arg == '@')
     {
 	// ":let @r = expr": Set register contents.
-	return ex_let_register(arg, tv, flags, endchars, op);
+	أرجع ex_let_رجسٹر(arg, tv, flags, endchars, op);
     }
-    else if (eval_isnamec1(*arg) || *arg == '{')
+    وإلا إذا (eval_isnamec1(*arg) || *arg == '{')
     {
 	lval_T	lv;
 	char_u	*p;
-	int	lval_flags = (flags & (ASSIGN_NO_DECL | ASSIGN_DECL))
+	صحيح	lval_flags = (flags & (سونپو_NO_DECL | سونپو_DECL))
 							     ? GLV_NO_DECL : 0;
-	lval_flags |= (flags & ASSIGN_FOR_LOOP) ? GLV_FOR_LOOP : 0;
-	if (op != NULL && *op != '=')
-	    lval_flags |= GLV_ASSIGN_WITH_OP;
+	lval_flags |= (flags & سونپو_FOR_LOOP) ? GLV_FOR_LOOP : 0;
+	إذا (op != عدم && *op != '=')
+	    lval_flags |= GLV_سونپو_WITH_OP;
 
 	// ":let var = expr": Set internal variable.
 	// ":let var: type = expr": Set internal variable with type.
 	// ":let {expr} = expr": Idem, name made with curly braces
-	p = get_lval(arg, tv, &lv, FALSE, FALSE, lval_flags, FNE_CHECK_START);
-	if (p != NULL && lv.ll_name != NULL)
+	p = get_lval(arg, tv, &lv, FALSE, FALSE, lval_flags, FNE_CHECK_شروع);
+	إذا (p != عدم && lv.ll_name != عدم)
 	{
-	    if (endchars != NULL && vim_strchr(endchars,
-					   *skipwhite(lv.ll_name_end)) == NULL)
+	    إذا (endchars != عدم && vim_strchr(endchars,
+					   *skipwhite(lv.ll_name_سرا)) == عدم)
 	    {
-		emsg(_(e_unexpected_characters_in_let));
+		emsg(_(e_unexpected_characters_وچ_let));
 	    }
-	    else
+	    وإلا
 	    {
-		set_var_lval(&lv, p, tv, copy, flags, op, var_idx);
-		arg_end = lv.ll_name_end;
+		سیٹ_var_lval(&lv, p, tv, copy, flags, op, var_idx);
+		arg_سرا = lv.ll_name_سرا;
 	    }
 	}
 	clear_lval(&lv);
     }
-    else
-	semsg(_(e_invalid_argument_str), arg);
+    وإلا
+	semsg(_(e_invalid_دلیل_str), arg);
 
-    return arg_end;
+    أرجع arg_سرا;
 }
 
 /*
  * ":unlet[!] var1 ... " command.
  */
-    void
+    فراغ
 ex_unlet(exarg_T *eap)
 {
-    ex_unletlock(eap, eap->arg, 0, eap->forceit ? GLV_QUIET : 0, do_unlet_var, NULL);
+    ex_unletlock(eap, eap->arg, 0, eap->forceit ? GLV_QUIET : 0, do_unlet_var, عدم);
 }
 
 /*
  * ":lockvar" and ":unlockvar" commands
  */
-    void
+    فراغ
 ex_lockvar(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		deep = 2;
+    صحيح		deep = 2;
 
-    if (eap->forceit)
+    إذا (eap->forceit)
 	deep = -1;
-    else if (vim_isdigit(*arg))
+    وإلا إذا (vim_isdigit(*arg))
     {
 	deep = getdigits(&arg);
 	arg = skipwhite(arg);
     }
 
-    ex_unletlock(eap, arg, deep, 0, do_lock_var, NULL);
+    ex_unletlock(eap, arg, deep, 0, do_جندرا_var, عدم);
 }
 
 /*
@@ -2062,142 +2062,142 @@ ex_lockvar(exarg_T *eap)
  * Also used for Vim9 script.  "callback" is invoked as:
  *	callback(&lv, name_end, eap, deep, cookie)
  */
-    void
+    فراغ
 ex_unletlock(
     exarg_T	*eap,
     char_u	*argstart,
-    int		deep,
-    int		glv_flags,
-    int		(*callback)(lval_T *, char_u *, exarg_T *, int, void *),
-    void	*cookie)
+    صحيح		deep,
+    صحيح		glv_flags,
+    صحيح		(*callback)(lval_T *, char_u *, exarg_T *, صحيح, فراغ *),
+    فراغ	*cookie)
 {
     char_u	*arg = argstart;
-    char_u	*name_end;
-    int		error = FALSE;
+    char_u	*name_سرا;
+    صحيح		error = FALSE;
     lval_T	lv;
 
-    do
+    افعل
     {
-	if (*arg == '$')
+	إذا (*arg == '$')
 	{
 	    lv.ll_name = arg;
-	    lv.ll_tv = NULL;
+	    lv.ll_tv = عدم;
 	    ++arg;
-	    if (get_env_len(&arg) == 0)
+	    إذا (get_env_len(&arg) == 0)
 	    {
-		semsg(_(e_invalid_argument_str), arg - 1);
-		return;
+		semsg(_(e_invalid_دلیل_str), arg - 1);
+		أرجع;
 	    }
-	    if (!error && !eap->skip
+	    إذا (!error && !eap->skip
 			      && callback(&lv, arg, eap, deep, cookie) == FAIL)
 		error = TRUE;
-	    name_end = arg;
+	    name_سرا = arg;
 	}
-	else
+	وإلا
 	{
 	    // Parse the name and find the end.
-	    name_end = get_lval(arg, NULL, &lv, TRUE, eap->skip || error,
-				     glv_flags | GLV_NO_DECL, FNE_CHECK_START);
-	    if (lv.ll_name == NULL)
+	    name_سرا = get_lval(arg, عدم, &lv, TRUE, eap->skip || error,
+				     glv_flags | GLV_NO_DECL, FNE_CHECK_شروع);
+	    إذا (lv.ll_name == عدم)
 		error = TRUE;	    // error but continue parsing
-	    if (name_end == NULL || (!VIM_ISWHITE(*name_end)
-						    && !ends_excmd(*name_end)))
+	    إذا (name_سرا == عدم || (!VIM_ISWHITE(*name_سرا)
+						    && !سرے_excmd(*name_سرا)))
 	    {
-		if (name_end != NULL)
+		إذا (name_سرا != عدم)
 		{
 		    emsg_severe = TRUE;
-		    semsg(_(e_trailing_characters_str), name_end);
+		    semsg(_(e_trailing_characters_str), name_سرا);
 		}
-		if (!(eap->skip || error))
+		إذا (!(eap->skip || error))
 		    clear_lval(&lv);
-		break;
+		اكسر;
 	    }
 
-	    if (!error && !eap->skip
-			 && callback(&lv, name_end, eap, deep, cookie) == FAIL)
+	    إذا (!error && !eap->skip
+			 && callback(&lv, name_سرا, eap, deep, cookie) == FAIL)
 		error = TRUE;
 
-	    if (!eap->skip)
+	    إذا (!eap->skip)
 		clear_lval(&lv);
 	}
 
-	arg = skipwhite(name_end);
-    } while (!ends_excmd2(name_end, arg));
+	arg = skipwhite(name_سرا);
+    } طالما (!سرے_excmd2(name_سرا, arg));
 
-    set_nextcmd(eap, arg);
+    سیٹ_nextcmd(eap, arg);
 }
 
-    static int
+    ساكن صحيح
 do_unlet_var(
     lval_T	*lp,
-    char_u	*name_end,
+    char_u	*name_سرا,
     exarg_T	*eap,
-    int		deep UNUSED,
-    void	*cookie UNUSED)
+    صحيح		deep بن_ورتیا,
+    فراغ	*cookie بن_ورتیا)
 {
-    int		forceit = eap->forceit;
-    int		ret = OK;
-    int		cc;
+    صحيح		forceit = eap->forceit;
+    صحيح		ret = OK;
+    صحيح		cc;
 
-    if (lp->ll_tv == NULL)
+    إذا (lp->ll_tv == عدم)
     {
-	cc = *name_end;
-	*name_end = NUL;
+	cc = *name_سرا;
+	*name_سرا = NUL;
 
 	// Environment variable, normal name or expanded name.
-	if (*lp->ll_name == '$')
+	إذا (*lp->ll_name == '$')
 	    vim_unsetenv_ext(lp->ll_name + 1);
-	else if (do_unlet(lp->ll_name, forceit) == FAIL)
+	وإلا إذا (do_unlet(lp->ll_name, forceit) == FAIL)
 	    ret = FAIL;
-	*name_end = cc;
+	*name_سرا = cc;
     }
-    else if ((lp->ll_list != NULL
-		 && value_check_lock(lp->ll_list->lv_lock, lp->ll_name, FALSE))
-	    || (lp->ll_dict != NULL
-		&& value_check_lock(lp->ll_dict->dv_lock, lp->ll_name, FALSE)))
-	return FAIL;
-    else if (lp->ll_range)
+    وإلا إذا ((lp->ll_list != عدم
+		 && قدر_check_جندرا(lp->ll_list->lv_جندرا, lp->ll_name, FALSE))
+	    || (lp->ll_dict != عدم
+		&& قدر_check_جندرا(lp->ll_dict->dv_جندرا, lp->ll_name, FALSE)))
+	أرجع FAIL;
+    وإلا إذا (lp->ll_range)
 	list_unlet_range(lp->ll_list, lp->ll_li, lp->ll_n1,
 						    !lp->ll_empty2, lp->ll_n2);
-    else if (lp->ll_list != NULL)
+    وإلا إذا (lp->ll_list != عدم)
 	// unlet a List item.
 	listitem_remove(lp->ll_list, lp->ll_li);
-    else if (lp->ll_dict != NULL)
+    وإلا إذا (lp->ll_dict != عدم)
 	// unlet a Dictionary item.
 	dictitem_remove(lp->ll_dict, lp->ll_di, "unlet");
-    else
+    وإلا
     {
-	semsg(_(e_cannot_unlet_imported_item_str), lp->ll_name);
-	return FAIL;
+	semsg(_(e_cannot_unlet_imported_شے_str), lp->ll_name);
+	أرجع FAIL;
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Unlet one item or a range of items from a list.
  * Return OK or FAIL.
  */
-    void
+    فراغ
 list_unlet_range(
 	list_T	    *l,
-	listitem_T  *li_first,
-	long	    n1_arg,
-	int	    has_n2,
-	long	    n2)
+	listitem_T  *li_پہلا,
+	لما	    n1_arg,
+	صحيح	    has_n2,
+	لما	    n2)
 {
-    listitem_T  *li = li_first;
-    int		n1 = n1_arg;
+    listitem_T  *li = li_پہلا;
+    صحيح		n1 = n1_arg;
 
     // Delete a range of List items.
-    li = li_first;
+    li = li_پہلا;
     n1 = n1_arg;
-    while (li != NULL && (!has_n2 || n2 >= n1))
+    طالما (li != عدم && (!has_n2 || n2 >= n1))
     {
-	listitem_T *next = li->li_next;
+	listitem_T *اگلا = li->li_اگلا;
 
 	listitem_remove(l, li);
-	li = next;
+	li = اگلا;
 	++n1;
     }
 }
@@ -2205,92 +2205,92 @@ list_unlet_range(
  * "unlet" a variable.  Return OK if it existed, FAIL if not.
  * When "forceit" is TRUE don't complain if the variable doesn't exist.
  */
-    int
-do_unlet(char_u *name, int forceit)
+    صحيح
+do_unlet(char_u *name, صحيح forceit)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
-    char_u	*varname = NULL;  // init to shut up gcc
+    char_u	*varname = عدم;  // init to shut up gcc
     dict_T	*d;
     dictitem_T	*di;
 
     // can't :unlet a script variable in Vim9 script
-    if (in_vim9script() && check_vim9_unlet(name) == FAIL)
-	return FAIL;
+    إذا (وچ_vim9script() && check_vim9_unlet(name) == FAIL)
+	أرجع FAIL;
 
-    ht = find_var_ht(name, &varname);
+    ht = لبھو_var_ht(name, &varname);
 
     // can't :unlet a script variable in Vim9 script from a function
-    if (ht == get_script_local_ht()
+    إذا (ht == get_script_local_ht()
 	    && SCRIPT_ID_VALID(current_sctx.sc_sid)
-	    && SCRIPT_ITEM(current_sctx.sc_sid)->sn_version
-							 == SCRIPT_VERSION_VIM9
+	    && SCRIPT_شے(current_sctx.sc_sid)->sn_نسخہ
+							 == SCRIPT_نسخہ_VIM9
 	    && check_vim9_unlet(name) == FAIL)
-	return FAIL;
+	أرجع FAIL;
 
-    if (ht != NULL && *varname != NUL)
+    إذا (ht != عدم && *varname != NUL)
     {
 	d = get_current_funccal_dict(ht);
-	if (d == NULL)
+	إذا (d == عدم)
 	{
-	    if (ht == &globvarht)
+	    إذا (ht == &globvarht)
 		d = &globvardict;
-	    else if (ht == &compat_hashtab)
+	    وإلا إذا (ht == &compat_hashtab)
 		d = &vimvardict;
-	    else
+	    وإلا
 	    {
-		di = find_var_in_ht(ht, *name, (char_u *)"", FALSE);
-		d = di == NULL ? NULL : di->di_tv.vval.v_dict;
+		di = لبھو_var_وچ_ht(ht, *name, (char_u *)"", FALSE);
+		d = di == عدم ? عدم : di->di_tv.vval.v_dict;
 	    }
-	    if (d == NULL)
+	    إذا (d == عدم)
 	    {
-		internal_error("do_unlet()");
-		return FAIL;
+		اندرونی_error("do_unlet()");
+		أرجع FAIL;
 	    }
 	}
-	hi = hash_find(ht, varname);
-	if (HASHITEM_EMPTY(hi))
-	    hi = find_hi_in_scoped_ht(name, &ht);
-	if (hi != NULL && !HASHITEM_EMPTY(hi))
+	hi = hash_لبھو(ht, varname);
+	إذا (HASHITEM_خالی_تھاواں(hi))
+	    hi = لبھو_hi_وچ_scoped_ht(name, &ht);
+	إذا (hi != عدم && !HASHITEM_خالی_تھاواں(hi))
 	{
 	    di = HI2DI(hi);
-	    if (var_check_fixed(di->di_flags, name, FALSE)
+	    إذا (var_check_fixed(di->di_flags, name, FALSE)
 		    || var_check_ro(di->di_flags, name, FALSE)
-		    || value_check_lock(d->dv_lock, name, FALSE)
+		    || قدر_check_جندرا(d->dv_جندرا, name, FALSE)
 		    || check_hashtab_frozen(ht, "unlet"))
-		return FAIL;
+		أرجع FAIL;
 
 	    delete_var(ht, hi);
-	    return OK;
+	    أرجع OK;
 	}
     }
-    if (forceit)
-	return OK;
+    إذا (forceit)
+	أرجع OK;
     semsg(_(e_no_such_variable_str), name);
-    return FAIL;
+    أرجع FAIL;
 }
 
-    static void
-report_lockvar_member(char *msg, lval_T *lp)
+    ساكن فراغ
+report_lockvar_member(حرف *پیغام, lval_T *lp)
 {
-    int did_alloc = FALSE;
+    صحيح did_alloc = FALSE;
     char_u *vname = (char_u *)"";
-    char_u *class_name = lp->ll_class != NULL
+    char_u *class_name = lp->ll_class != عدم
 				    ? lp->ll_class->class_name.string : (char_u *)"";
-    if (lp->ll_name != NULL)
+    إذا (lp->ll_name != عدم)
     {
-	if (lp->ll_name_end == NULL)
+	إذا (lp->ll_name_سرا == عدم)
 	    vname = lp->ll_name;
-	else
+	وإلا
 	{
-	    vname = vim_strnsave(lp->ll_name, lp->ll_name_end - lp->ll_name);
-	    if (vname == NULL)
-		return;
+	    vname = vim_strnsave(lp->ll_name, lp->ll_name_سرا - lp->ll_name);
+	    إذا (vname == عدم)
+		أرجع;
 	    did_alloc = TRUE;
 	}
     }
-    semsg(_(msg), vname, class_name);
-    if (did_alloc)
+    semsg(_(پیغام), vname, class_name);
+    إذا (did_alloc)
 	vim_free(vname);
 }
 
@@ -2299,62 +2299,62 @@ report_lockvar_member(char *msg, lval_T *lp)
  * "deep" is the levels to go (-1 for unlimited);
  * "lock" is TRUE for ":lockvar", FALSE for ":unlockvar".
  */
-    static int
-do_lock_var(
+    ساكن صحيح
+do_جندرا_var(
     lval_T	*lp,
-    char_u	*name_end,
+    char_u	*name_سرا,
     exarg_T	*eap,
-    int		deep,
-    void	*cookie UNUSED)
+    صحيح		deep,
+    فراغ	*cookie بن_ورتیا)
 {
-    int		lock = eap->cmdidx == CMD_lockvar;
-    int		ret = OK;
-    int		cc;
+    صحيح		جندرا = eap->cmdidx == CMD_lockvar;
+    صحيح		ret = OK;
+    صحيح		cc;
     dictitem_T	*di;
 
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: do_lock_var(): name %s, is_root %d", lp->ll_name, lp->ll_is_root);
-#endif
+#جے_تعریف_شدہ LOG_LOCKVAR
+    ch_log(عدم, "LKVAR: do_lock_var(): name %s, is_root %d", lp->ll_name, lp->ll_is_جڑ);
+#جے_انت
 
-    if (lp->ll_tv == NULL)
+    إذا (lp->ll_tv == عدم)
     {
-	cc = *name_end;
-	*name_end = NUL;
-	if (*lp->ll_name == '$')
+	cc = *name_سرا;
+	*name_سرا = NUL;
+	إذا (*lp->ll_name == '$')
 	{
-	    semsg(_(e_cannot_lock_or_unlock_variable_str), lp->ll_name);
+	    semsg(_(e_cannot_جندرا_or_unlock_variable_str), lp->ll_name);
 	    ret = FAIL;
 	}
-	else
+	وإلا
 	{
 	    // Normal name or expanded name.
-	    di = find_var(lp->ll_name, NULL, TRUE);
-	    if (di == NULL)
+	    di = لبھو_var(lp->ll_name, عدم, TRUE);
+	    إذا (di == عدم)
 	    {
-		if (in_vim9script())
-		    semsg(_(e_cannot_find_variable_to_unlock_str),
+		إذا (وچ_vim9script())
+		    semsg(_(e_cannot_لبھو_variable_منزل_unlock_str),
 								  lp->ll_name);
 		ret = FAIL;
 	    }
-	    else
+	    وإلا
 	    {
-		if ((di->di_flags & DI_FLAGS_FIX)
+		إذا ((di->di_flags & DI_FLAGS_FIX)
 			    && di->di_tv.v_type != VAR_DICT
 			    && di->di_tv.v_type != VAR_LIST)
 		{
 		    // For historic reasons this error is not given for a list
 		    // or dict.  E.g., the b: dict could be locked/unlocked.
-		    semsg(_(e_cannot_lock_or_unlock_variable_str), lp->ll_name);
+		    semsg(_(e_cannot_جندرا_or_unlock_variable_str), lp->ll_name);
 		    ret = FAIL;
 		}
-		else
+		وإلا
 		{
-		    if (in_vim9script())
+		    إذا (وچ_vim9script())
 		    {
-			svar_T  *sv = find_typval_in_script(&di->di_tv,
+			svar_T  *sv = لبھو_typval_وچ_script(&di->di_tv,
 								     0, FALSE);
 
-			if (sv != NULL && sv->sv_const != 0)
+			إذا (sv != عدم && sv->sv_const != 0)
 			{
 			    semsg(_(e_cannot_change_readonly_variable_str),
 								  lp->ll_name);
@@ -2362,67 +2362,67 @@ do_lock_var(
 			}
 		    }
 
-		    if (ret == OK)
+		    إذا (ret == OK)
 		    {
-			if (lock)
-			    di->di_flags |= DI_FLAGS_LOCK;
-			else
-			    di->di_flags &= ~DI_FLAGS_LOCK;
-			if (deep != 0)
-			    item_lock(&di->di_tv, deep, lock, FALSE);
+			إذا (جندرا)
+			    di->di_flags |= DI_FLAGS_جندرا;
+			وإلا
+			    di->di_flags &= ~DI_FLAGS_جندرا;
+			إذا (deep != 0)
+			    شے_جندرا(&di->di_tv, deep, جندرا, FALSE);
 		    }
 		}
 	    }
 	}
-	*name_end = cc;
+	*name_سرا = cc;
     }
-    else if (deep == 0 && lp->ll_object == NULL && lp->ll_class == NULL)
+    وإلا إذا (deep == 0 && lp->ll_object == عدم && lp->ll_class == عدم)
     {
 	// nothing to do
     }
-    else if (lp->ll_is_root)
+    وإلا إذا (lp->ll_is_جڑ)
 	// (un)lock the item.
-	item_lock(lp->ll_tv, deep, lock, FALSE);
-    else if (lp->ll_range)
+	شے_جندرا(lp->ll_tv, deep, جندرا, FALSE);
+    وإلا إذا (lp->ll_range)
     {
 	listitem_T    *li = lp->ll_li;
 
 	// (un)lock a range of List items.
-	while (li != NULL && (lp->ll_empty2 || lp->ll_n2 >= lp->ll_n1))
+	طالما (li != عدم && (lp->ll_empty2 || lp->ll_n2 >= lp->ll_n1))
 	{
-	    item_lock(&li->li_tv, deep, lock, FALSE);
-	    li = li->li_next;
+	    شے_جندرا(&li->li_tv, deep, جندرا, FALSE);
+	    li = li->li_اگلا;
 	    ++lp->ll_n1;
 	}
     }
-    else if (lp->ll_list != NULL)
+    وإلا إذا (lp->ll_list != عدم)
 	// (un)lock a List item.
-	item_lock(&lp->ll_li->li_tv, deep, lock, FALSE);
-    else if (lp->ll_object != NULL)  // This check must be before ll_class.
+	شے_جندرا(&lp->ll_li->li_tv, deep, جندرا, FALSE);
+    وإلا إذا (lp->ll_object != عدم)  // This check must be before ll_class.
     {
 	// (un)lock an object variable.
-	report_lockvar_member(e_cannot_lock_object_variable_str, lp);
+	report_lockvar_member(e_cannot_جندرا_object_variable_str, lp);
 	ret = FAIL;
     }
-    else if (lp->ll_class != NULL)
+    وإلا إذا (lp->ll_class != عدم)
     {
 	// (un)lock a class variable.
-	report_lockvar_member(e_cannot_lock_class_variable_str, lp);
+	report_lockvar_member(e_cannot_جندرا_class_variable_str, lp);
 	ret = FAIL;
     }
-    else
+    وإلا
     {
 	// (un)lock a Dictionary item.
-	if (lp->ll_di == NULL)
+	إذا (lp->ll_di == عدم)
 	{
 	    emsg(_(e_dictionary_required));
 	    ret = FAIL;
 	}
-	else
-	    item_lock(&lp->ll_di->di_tv, deep, lock, FALSE);
+	وإلا
+	    شے_جندرا(&lp->ll_di->di_tv, deep, جندرا, FALSE);
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -2430,109 +2430,109 @@ do_lock_var(
  * When "check_refcount" is TRUE do not lock a list or dict with a reference
  * count larger than 1.
  */
-    void
-item_lock(typval_T *tv, int deep, int lock, int check_refcount)
+    فراغ
+شے_جندرا(typval_T *tv, صحيح deep, صحيح جندرا, صحيح check_refcount)
 {
-    static int	recurse = 0;
+    ساكن صحيح	recurse = 0;
     list_T	*l;
     listitem_T	*li;
     dict_T	*d;
     blob_T	*b;
     hashitem_T	*hi;
-    int		todo;
+    صحيح		todo;
 
-#ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: item_lock(): type %s", vartype_name(tv->v_type));
-#endif
+#جے_تعریف_شدہ LOG_LOCKVAR
+    ch_log(عدم, "LKVAR: item_lock(): type %s", vartype_name(tv->v_type));
+#جے_انت
 
-    if (recurse >= DICT_MAXNEST)
+    إذا (recurse >= DICT_MAXNEST)
     {
 	emsg(_(e_variable_nested_too_deep_for_unlock));
-	return;
+	أرجع;
     }
-    if (deep == 0)
-	return;
+    إذا (deep == 0)
+	أرجع;
     ++recurse;
 
     // lock/unlock the item itself
-    if (lock)
-	tv->v_lock |= VAR_LOCKED;
-    else
-	tv->v_lock &= ~VAR_LOCKED;
+    إذا (جندرا)
+	tv->v_جندرا |= VAR_LOCKED;
+    وإلا
+	tv->v_جندرا &= ~VAR_LOCKED;
 
-    switch (tv->v_type)
+    بدل (tv->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_STRING:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_FLOAT:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    break;
+	حالة VAR_UNKNOWN:
+	حالة VAR_ANY:
+	حالة VAR_VOID:
+	حالة VAR_نمبر:
+	حالة VAR_BOOL:
+	حالة VAR_STRING:
+	حالة VAR_FUNC:
+	حالة VAR_PARTIAL:
+	حالة VAR_FLOAT:
+	حالة VAR_SPECIAL:
+	حالة VAR_کم:
+	حالة VAR_CHANNEL:
+	حالة VAR_INSTR:
+	حالة VAR_CLASS:
+	حالة VAR_OBJECT:
+	حالة VAR_TYPEALIAS:
+	    اكسر;
 
-	case VAR_BLOB:
-	    if ((b = tv->vval.v_blob) != NULL
+	حالة VAR_BLOB:
+	    إذا ((b = tv->vval.v_blob) != عدم
 				    && !(check_refcount && b->bv_refcount > 1))
 	    {
-		if (lock)
-		    b->bv_lock |= VAR_LOCKED;
-		else
-		    b->bv_lock &= ~VAR_LOCKED;
+		إذا (جندرا)
+		    b->bv_جندرا |= VAR_LOCKED;
+		وإلا
+		    b->bv_جندرا &= ~VAR_LOCKED;
 	    }
-	    break;
-	case VAR_LIST:
-	    if ((l = tv->vval.v_list) != NULL
+	    اكسر;
+	حالة VAR_LIST:
+	    إذا ((l = tv->vval.v_list) != عدم
 				    && !(check_refcount && l->lv_refcount > 1))
 	    {
-		if (lock)
-		    l->lv_lock |= VAR_LOCKED;
-		else
-		    l->lv_lock &= ~VAR_LOCKED;
-		if (deep < 0 || deep > 1)
+		إذا (جندرا)
+		    l->lv_جندرا |= VAR_LOCKED;
+		وإلا
+		    l->lv_جندرا &= ~VAR_LOCKED;
+		إذا (deep < 0 || deep > 1)
 		{
-		    if (l->lv_first == &range_list_item)
-			l->lv_lock |= VAR_ITEMS_LOCKED;
-		    else
+		    إذا (l->lv_پہلا == &range_list_شے)
+			l->lv_جندرا |= VAR_اشیاء_LOCKED;
+		    وإلا
 		    {
 			// recursive: lock/unlock the items the List contains
 			CHECK_LIST_MATERIALIZE(l);
-			FOR_ALL_LIST_ITEMS(l, li) item_lock(&li->li_tv,
-					       deep - 1, lock, check_refcount);
+			FOR_ALL_LIST_اشیاء(l, li) شے_جندرا(&li->li_tv,
+					       deep - 1, جندرا, check_refcount);
 		    }
 		}
 	    }
-	    break;
-	case VAR_TUPLE:
-	    tuple_lock(tv->vval.v_tuple, deep, lock, check_refcount);
-	    break;
-	case VAR_DICT:
-	    if ((d = tv->vval.v_dict) != NULL
+	    اكسر;
+	حالة VAR_TUPLE:
+	    tuple_جندرا(tv->vval.v_tuple, deep, جندرا, check_refcount);
+	    اكسر;
+	حالة VAR_DICT:
+	    إذا ((d = tv->vval.v_dict) != عدم
 				    && !(check_refcount && d->dv_refcount > 1))
 	    {
-		if (lock)
-		    d->dv_lock |= VAR_LOCKED;
-		else
-		    d->dv_lock &= ~VAR_LOCKED;
-		if (deep < 0 || deep > 1)
+		إذا (جندرا)
+		    d->dv_جندرا |= VAR_LOCKED;
+		وإلا
+		    d->dv_جندرا &= ~VAR_LOCKED;
+		إذا (deep < 0 || deep > 1)
 		{
 		    // recursive: lock/unlock the items the List contains
-		    todo = (int)d->dv_hashtab.ht_used;
-		    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+		    todo = (صحيح)d->dv_hashtab.ht_ورتیا;
+		    FOR_ALL_HASHTAB_اشیاء(&d->dv_hashtab, hi, todo)
 		    {
-			if (!HASHITEM_EMPTY(hi))
+			إذا (!HASHITEM_خالی_تھاواں(hi))
 			{
 			    --todo;
-			    item_lock(&HI2DI(hi)->di_tv, deep - 1, lock,
+			    شے_جندرا(&HI2DI(hi)->di_tv, deep - 1, جندرا,
 							       check_refcount);
 			}
 		    }
@@ -2542,30 +2542,30 @@ item_lock(typval_T *tv, int deep, int lock, int check_refcount)
     --recurse;
 }
 
-#if defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
+#إذا defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
 /*
  * Delete all "menutrans_" variables.
  */
-    void
-del_menutrans_vars(void)
+    فراغ
+del_menutrans_vars(فراغ)
 {
     hashitem_T	*hi;
-    int		todo;
+    صحيح		todo;
 
-    hash_lock(&globvarht);
-    todo = (int)globvarht.ht_used;
-    for (hi = globvarht.ht_array; todo > 0 && !got_int; ++hi)
+    hash_جندرا(&globvarht);
+    todo = (صحيح)globvarht.ht_ورتیا;
+    لكل (hi = globvarht.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالی_تھاواں(hi))
 	{
 	    --todo;
-	    if (STRNCMP(HI2DI(hi)->di_key, "menutrans_", 10) == 0)
+	    إذا (STRNCMP(HI2DI(hi)->di_کلید, "menutrans_", 10) == 0)
 		delete_var(&globvarht, hi);
 	}
     }
     hash_unlock(&globvarht);
 }
-#endif
+#جے_انت
 
 /*
  * Local string buffer for the next two functions to store a variable name
@@ -2573,34 +2573,34 @@ del_menutrans_vars(void)
  * get_user_var_name().
  */
 
-static char_u	*varnamebuf = NULL;
-static int	varnamebuflen = 0;
+ساكن char_u	*varnamebuf = عدم;
+ساكن صحيح	varnamebuflen = 0;
 
 /*
  * Function to concatenate a prefix and a variable name.
  */
     char_u *
-cat_prefix_varname(int prefix, char_u *name)
+cat_اگیتر_varname(صحيح اگیتر, char_u *name)
 {
-    int		len;
+    صحيح		len;
 
-    len = (int)STRLEN(name) + 3;
-    if (len > varnamebuflen)
+    len = (صحيح)STRLEN(name) + 3;
+    إذا (len > varnamebuflen)
     {
 	vim_free(varnamebuf);
 	len += 10;			// some additional space
 	varnamebuf = alloc(len);
-	if (varnamebuf == NULL)
+	إذا (varnamebuf == عدم)
 	{
 	    varnamebuflen = 0;
-	    return NULL;
+	    أرجع عدم;
 	}
 	varnamebuflen = len;
     }
-    *varnamebuf = prefix;
+    *varnamebuf = اگیتر;
     varnamebuf[1] = ':';
     STRCPY(varnamebuf + 2, name);
-    return varnamebuf;
+    أرجع varnamebuf;
 }
 
 /*
@@ -2608,148 +2608,148 @@ cat_prefix_varname(int prefix, char_u *name)
  * (global/buffer/window/built-in) variable names.
  */
     char_u *
-get_user_var_name(expand_T *xp, int idx)
+get_user_var_name(expand_T *xp, صحيح idx)
 {
-    static long_u	gdone;
-    static long_u	bdone;
-    static long_u	wdone;
-    static long_u	tdone;
-    static int		vidx;
-    static hashitem_T	*hi;
+    ساكن long_u	gdone;
+    ساكن long_u	bdone;
+    ساكن long_u	wdone;
+    ساكن long_u	tdone;
+    ساكن صحيح		vidx;
+    ساكن hashitem_T	*hi;
     hashtab_T		*ht;
 
-    if (idx == 0)
+    إذا (idx == 0)
     {
 	gdone = bdone = wdone = vidx = 0;
 	tdone = 0;
     }
 
     // Global variables
-    if (gdone < globvarht.ht_used)
+    إذا (gdone < globvarht.ht_ورتیا)
     {
-	if (gdone++ == 0)
+	إذا (gdone++ == 0)
 	    hi = globvarht.ht_array;
-	else
+	وإلا
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	طالما (HASHITEM_خالی_تھاواں(hi))
 	    ++hi;
-	if (STRNCMP("g:", xp->xp_pattern, 2) == 0)
-	    return cat_prefix_varname('g', hi->hi_key);
-	return hi->hi_key;
+	إذا (STRNCMP("g:", xp->xp_نمونہ, 2) == 0)
+	    أرجع cat_اگیتر_varname('g', hi->hi_کلید);
+	أرجع hi->hi_کلید;
     }
 
     // b: variables
-    ht = &prevwin_curwin()->w_buffer->b_vars->dv_hashtab;
-    if (bdone < ht->ht_used)
+    ht = &prevwin_curwin()->w_بفر->b_vars->dv_hashtab;
+    إذا (bdone < ht->ht_ورتیا)
     {
-	if (bdone++ == 0)
+	إذا (bdone++ == 0)
 	    hi = ht->ht_array;
-	else
+	وإلا
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	طالما (HASHITEM_خالی_تھاواں(hi))
 	    ++hi;
-	return cat_prefix_varname('b', hi->hi_key);
+	أرجع cat_اگیتر_varname('b', hi->hi_کلید);
     }
 
     // w: variables
     ht = &prevwin_curwin()->w_vars->dv_hashtab;
-    if (wdone < ht->ht_used)
+    إذا (wdone < ht->ht_ورتیا)
     {
-	if (wdone++ == 0)
+	إذا (wdone++ == 0)
 	    hi = ht->ht_array;
-	else
+	وإلا
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	طالما (HASHITEM_خالی_تھاواں(hi))
 	    ++hi;
-	return cat_prefix_varname('w', hi->hi_key);
+	أرجع cat_اگیتر_varname('w', hi->hi_کلید);
     }
 
     // t: variables
     ht = &curtab->tp_vars->dv_hashtab;
-    if (tdone < ht->ht_used)
+    إذا (tdone < ht->ht_ورتیا)
     {
-	if (tdone++ == 0)
+	إذا (tdone++ == 0)
 	    hi = ht->ht_array;
-	else
+	وإلا
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	طالما (HASHITEM_خالی_تھاواں(hi))
 	    ++hi;
-	return cat_prefix_varname('t', hi->hi_key);
+	أرجع cat_اگیتر_varname('t', hi->hi_کلید);
     }
 
     // v: variables
-    if (vidx < VV_LEN)
-	return cat_prefix_varname('v', (char_u *)vimvars[vidx++].vv_name);
+    إذا (vidx < VV_LEN)
+	أرجع cat_اگیتر_varname('v', (char_u *)vimvars[vidx++].vv_name);
 
     VIM_CLEAR(varnamebuf);
     varnamebuflen = 0;
-    return NULL;
+    أرجع عدم;
 }
 
-    char *
-get_var_special_name(int nr)
+    حرف *
+get_var_special_name(صحيح nr)
 {
-    switch (nr)
+    بدل (nr)
     {
-	case VVAL_FALSE: return in_vim9script() ? "false" : "v:false";
-	case VVAL_TRUE:  return in_vim9script() ? "true" : "v:true";
-	case VVAL_NULL:  return in_vim9script() ? "null" : "v:null";
-	case VVAL_NONE:  return "v:none";
+	حالة VVAL_FALSE: أرجع وچ_vim9script() ? "false" : "v:false";
+	حالة VVAL_TRUE:  أرجع وچ_vim9script() ? "true" : "v:true";
+	حالة VVAL_NULL:  أرجع وچ_vim9script() ? "null" : "v:null";
+	حالة VVAL_NONE:  أرجع "v:none";
     }
-    internal_error("get_var_special_name()");
-    return "42";
+    اندرونی_error("get_var_special_name()");
+    أرجع "42";
 }
 
 /*
  * Returns the global variable dictionary
  */
     dict_T *
-get_globvar_dict(void)
+get_globvar_dict(فراغ)
 {
-    return &globvardict;
+    أرجع &globvardict;
 }
 
 /*
  * Returns the global variable hash table
  */
     hashtab_T *
-get_globvar_ht(void)
+get_globvar_ht(فراغ)
 {
-    return &globvarht;
+    أرجع &globvarht;
 }
 
 /*
  * Returns the v: variable dictionary
  */
     dict_T *
-get_vimvar_dict(void)
+get_vimvar_dict(فراغ)
 {
-    return &vimvardict;
+    أرجع &vimvardict;
 }
 
 /*
  * Returns the index of a v:variable.  Negative if not found.
  * Returns DI_ flags in "di_flags".
  */
-    int
-find_vim_var(char_u *name, int *di_flags)
+    صحيح
+لبھو_vim_var(char_u *name, صحيح *di_flags)
 {
-    dictitem_T	    *di = find_var_in_ht(&vimvarht, 0, name, TRUE);
-    struct vimvar   *vv;
+    dictitem_T	    *di = لبھو_var_وچ_ht(&vimvarht, 0, name, TRUE);
+    بنية vimvar   *vv;
 
-    if (di == NULL)
-	return -1;
+    إذا (di == عدم)
+	أرجع -1;
     *di_flags = di->di_flags;
-    vv = (struct vimvar *)((char *)di - offsetof(vimvar_T, vv_di));
-    return (int)(vv - vimvars);
+    vv = (بنية vimvar *)((حرف *)di - offsetof(vimvar_T, vv_di));
+    أرجع (صحيح)(vv - vimvars);
 }
 
 
 /*
  * Set type of v: variable to "type".
  */
-    void
-set_vim_var_type(int idx, vartype_T type)
+    فراغ
+سیٹ_vim_var_type(صحيح idx, vartype_T type)
 {
     vimvars[idx].vv_tv_type = type;
 }
@@ -2758,98 +2758,98 @@ set_vim_var_type(int idx, vartype_T type)
  * Set number v: variable to "val".
  * Note that this does not set the type, use set_vim_var_type() for that.
  */
-    void
-set_vim_var_nr(int idx, varnumber_T val)
+    فراغ
+سیٹ_vim_var_nr(صحيح idx, varnumber_T val)
 {
     vimvars[idx].vv_nr = val;
 }
 
-    char *
-get_vim_var_name(int idx)
+    حرف *
+get_vim_var_name(صحيح idx)
 {
-    return vimvars[idx].vv_name;
+    أرجع vimvars[idx].vv_name;
 }
 
 /*
  * Get typval_T v: variable value.
  */
     typval_T *
-get_vim_var_tv(int idx)
+get_vim_var_tv(صحيح idx)
 {
-    return &vimvars[idx].vv_tv;
+    أرجع &vimvars[idx].vv_tv;
 }
 
     type_T *
-get_vim_var_type(int idx, garray_T *type_list)
+get_vim_var_type(صحيح idx, garray_T *type_list)
 {
-    if (vimvars[idx].vv_type != NULL)
-	return vimvars[idx].vv_type;
-    return typval2type_vimvar(&vimvars[idx].vv_tv, type_list);
+    إذا (vimvars[idx].vv_type != عدم)
+	أرجع vimvars[idx].vv_type;
+    أرجع typval2type_vimvar(&vimvars[idx].vv_tv, type_list);
 }
 
 /*
  * Add what getinfo() reports for the v: variable "name", without the "v:", to
  * "d".  Returns FAIL when there is no such variable.
  */
-    int
+    صحيح
 vim_var_info(char_u *name, dict_T *d)
 {
-    int		di_flags;
-    int		idx = find_vim_var(name, &di_flags);
+    صحيح		di_flags;
+    صحيح		idx = لبھو_vim_var(name, &di_flags);
     garray_T	type_list;
-    char	*tofree;
+    حرف	*tofree;
 
-    if (idx < 0)
-	return FAIL;
-    vim_snprintf((char *)IObuff, IOSIZE, "v:%s", vimvars[idx].vv_name);
-    dict_add_string(d, "name", IObuff);
-    dict_add_bool(d, "available", TRUE);
-    ga_init2(&type_list, sizeof(type_T *), 10);
-    char *type = type_name(get_vim_var_type(idx, &type_list), &tofree);
-    dict_add_string(d, "type", (char_u *)type);
+    إذا (idx < 0)
+	أرجع FAIL;
+    vim_snprintf((حرف *)IObuff, IOSIZE, "v:%s", vimvars[idx].vv_name);
+    dict_جوڑو_string(d, "name", IObuff);
+    dict_جوڑو_bool(d, "available", TRUE);
+    ga_init2(&type_list, حجم(type_T *), 10);
+    حرف *type = type_name(get_vim_var_type(idx, &type_list), &tofree);
+    dict_جوڑو_string(d, "type", (char_u *)type);
     vim_free(tofree);
     clear_type_list(&type_list);
-    dict_add_bool(d, "readonly", (vimvars[idx].vv_flags & VV_RO) != 0);
-    dict_add_bool(d, "compat", (vimvars[idx].vv_flags & VV_COMPAT) != 0);
-    return OK;
+    dict_جوڑو_bool(d, "readonly", (vimvars[idx].vv_flags & VV_RO) != 0);
+    dict_جوڑو_bool(d, "compat", (vimvars[idx].vv_flags & VV_COMPAT) != 0);
+    أرجع OK;
 }
 
 /*
  * Set v: variable to "tv".  Only accepts the same type.
  * Takes over the value of "tv".
  */
-    int
-set_vim_var_tv(int idx, typval_T *tv)
+    صحيح
+سیٹ_vim_var_tv(صحيح idx, typval_T *tv)
 {
-    if (vimvars[idx].vv_tv_type != tv->v_type)
+    إذا (vimvars[idx].vv_tv_type != tv->v_type)
     {
 	emsg(_(e_type_mismatch_for_v_variable));
 	clear_tv(tv);
-	return FAIL;
+	أرجع FAIL;
     }
     // VV_RO is also checked when compiling, but let's check here as well.
-    if (vimvars[idx].vv_flags & VV_RO)
+    إذا (vimvars[idx].vv_flags & VV_RO)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), vimvars[idx].vv_name);
-	return FAIL;
+	أرجع FAIL;
     }
-    if (sandbox && (vimvars[idx].vv_flags & VV_RO_SBX))
+    إذا (sandbox && (vimvars[idx].vv_flags & VV_RO_SBX))
     {
-	semsg(_(e_cannot_set_variable_in_sandbox_str), vimvars[idx].vv_name);
-	return FAIL;
+	semsg(_(e_cannot_سیٹ_variable_وچ_sandbox_str), vimvars[idx].vv_name);
+	أرجع FAIL;
     }
     clear_tv(&vimvars[idx].vv_di.di_tv);
     vimvars[idx].vv_di.di_tv = *tv;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get number v: variable value.
  */
     varnumber_T
-get_vim_var_nr(int idx)
+get_vim_var_nr(صحيح idx)
 {
-    return vimvars[idx].vv_nr;
+    أرجع vimvars[idx].vv_nr;
 }
 
 /*
@@ -2858,9 +2858,9 @@ get_vim_var_nr(int idx)
  * Never returns NULL;
  */
     char_u *
-get_vim_var_str(int idx)
+get_vim_var_str(صحيح idx)
 {
-    return tv_get_string(&vimvars[idx].vv_tv);
+    أرجع tv_get_string(&vimvars[idx].vv_tv);
 }
 
 /*
@@ -2868,9 +2868,9 @@ get_vim_var_str(int idx)
  * needed.
  */
     list_T *
-get_vim_var_list(int idx)
+get_vim_var_list(صحيح idx)
 {
-    return vimvars[idx].vv_list;
+    أرجع vimvars[idx].vv_list;
 }
 
 /*
@@ -2878,45 +2878,45 @@ get_vim_var_list(int idx)
  * needed.
  */
     dict_T *
-get_vim_var_dict(int idx)
+get_vim_var_dict(صحيح idx)
 {
-    return vimvars[idx].vv_dict;
+    أرجع vimvars[idx].vv_dict;
 }
 
 /*
  * Set v:char to character "c".
  */
-    void
-set_vim_var_char(int c)
+    فراغ
+سیٹ_vim_var_char(صحيح c)
 {
     char_u  buf[MB_MAXBYTES + 1];
     size_t  buflen;
 
-    if (has_mbyte)
+    إذا (has_mbyte)
 	buflen = (*mb_char2bytes)(c, buf);
-    else
+    وإلا
     {
 	buf[0] = c;
 	buflen = 1;
     }
     buf[buflen] = NUL;
 
-    set_vim_var_string(VV_CHAR, buf, (int)buflen);
+    سیٹ_vim_var_string(VV_CHAR, buf, (صحيح)buflen);
 }
 
 /*
  * Set v:count to "count" and v:count1 to "count1".
  * When "set_prevcount" is TRUE first set v:prevcount from v:count.
  */
-    void
-set_vcount(
-    long	count,
-    long	count1,
-    int		set_prevcount)
+    فراغ
+سیٹ_vcount(
+    لما	گنتی,
+    لما	count1,
+    صحيح		سیٹ_prevcount)
 {
-    if (set_prevcount)
-	vimvars[VV_PREVCOUNT].vv_nr = vimvars[VV_COUNT].vv_nr;
-    vimvars[VV_COUNT].vv_nr = count;
+    إذا (سیٹ_prevcount)
+	vimvars[VV_PREVCOUNT].vv_nr = vimvars[VV_گنتی].vv_nr;
+    vimvars[VV_گنتی].vv_nr = گنتی;
     vimvars[VV_COUNT1].vv_nr = count1;
 }
 
@@ -2924,22 +2924,22 @@ set_vcount(
  * Save variables that might be changed as a side effect.  Used when executing
  * a timer callback.
  */
-    void
+    فراغ
 save_vimvars(vimvars_save_T *vvsave)
 {
     vvsave->vv_prevcount = vimvars[VV_PREVCOUNT].vv_nr;
-    vvsave->vv_count = vimvars[VV_COUNT].vv_nr;
+    vvsave->vv_گنتی = vimvars[VV_گنتی].vv_nr;
     vvsave->vv_count1 = vimvars[VV_COUNT1].vv_nr;
 }
 
 /*
  * Restore variables saved by save_vimvars().
  */
-    void
+    فراغ
 restore_vimvars(vimvars_save_T *vvsave)
 {
     vimvars[VV_PREVCOUNT].vv_nr = vvsave->vv_prevcount;
-    vimvars[VV_COUNT].vv_nr = vvsave->vv_count;
+    vimvars[VV_گنتی].vv_nr = vvsave->vv_گنتی;
     vimvars[VV_COUNT1].vv_nr = vvsave->vv_count1;
 }
 
@@ -2947,25 +2947,25 @@ restore_vimvars(vimvars_save_T *vvsave)
  * Set string v: variable to a copy of "val". If 'copy' is FALSE, then set the
  * value.
  */
-    void
-set_vim_var_string(
-    int		idx,
+    فراغ
+سیٹ_vim_var_string(
+    صحيح		idx,
     char_u	*val,
-    int		len)	    // length of "val" to use or -1 (whole string)
+    صحيح		len)	    // length of "val" to use or -1 (whole string)
 {
     clear_tv(&vimvars[idx].vv_di.di_tv);
     vimvars[idx].vv_tv_type = VAR_STRING;
-    if (val == NULL)
-	vimvars[idx].vv_str = NULL;
-    else if (len == -1)
+    إذا (val == عدم)
+	vimvars[idx].vv_str = عدم;
+    وإلا إذا (len == -1)
 	vimvars[idx].vv_str = vim_strsave(val);
-    else
+    وإلا
 	vimvars[idx].vv_str = vim_strnsave(val, len);
 }
 
-    void
-set_vim_var_string_direct(
-    int		idx,
+    فراغ
+سیٹ_vim_var_string_سدھا(
+    صحيح		idx,
     char_u	*val)
 {
     clear_tv(&vimvars[idx].vv_di.di_tv);
@@ -2977,85 +2977,85 @@ set_vim_var_string_direct(
 /*
  * Set List v: variable to "val".
  */
-    void
-set_vim_var_list(int idx, list_T *val)
+    فراغ
+سیٹ_vim_var_list(صحيح idx, list_T *val)
 {
     clear_tv(&vimvars[idx].vv_di.di_tv);
     vimvars[idx].vv_tv_type = VAR_LIST;
     vimvars[idx].vv_list = val;
-    if (val != NULL)
+    إذا (val != عدم)
 	++val->lv_refcount;
 }
 
 /*
  * Set Dictionary v: variable to "val".
  */
-    void
-set_vim_var_dict(int idx, dict_T *val)
+    فراغ
+سیٹ_vim_var_dict(صحيح idx, dict_T *val)
 {
     clear_tv(&vimvars[idx].vv_di.di_tv);
     vimvars[idx].vv_tv_type = VAR_DICT;
     vimvars[idx].vv_dict = val;
-    if (val == NULL)
-	return;
+    إذا (val == عدم)
+	أرجع;
 
     ++val->dv_refcount;
-    dict_set_items_ro(val);
+    dict_سیٹ_اشیاء_ro(val);
 }
 
 /*
  * Set the v:argv list.
  */
-    void
-set_argv_var(char **argv, int argc)
+    فراغ
+سیٹ_argv_var(حرف **argv, صحيح argc)
 {
     list_T	*l = list_alloc();
-    int		i;
+    صحيح		i;
 
-    if (l == NULL)
+    إذا (l == عدم)
 	getout(1);
-    l->lv_lock = VAR_FIXED;
-    for (i = 0; i < argc; ++i)
+    l->lv_جندرا = VAR_FIXED;
+    لكل (i = 0; i < argc; ++i)
     {
-	if (list_append_string(l, (char_u *)argv[i], -1) == FAIL)
+	إذا (list_append_string(l, (char_u *)argv[i], -1) == FAIL)
 	    getout(1);
-	l->lv_u.mat.lv_last->li_tv.v_lock = VAR_FIXED;
+	l->lv_u.mat.lv_آخری->li_tv.v_جندرا = VAR_FIXED;
     }
-    set_vim_var_list(VV_ARGV, l);
+    سیٹ_vim_var_list(VV_ARGV, l);
 }
 
 /*
  * Reset v:register, taking the 'clipboard' setting into account.
  */
-    void
-reset_reg_var(void)
+    فراغ
+reset_reg_var(فراغ)
 {
-    int regname = 0;
+    صحيح regname = 0;
 
     // Adjust the register according to 'clipboard', so that when
     // "unnamed" is present it becomes '*' or '+' instead of '"'.
-#ifdef HAVE_CLIPMETHOD
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
     adjust_clip_reg(&regname);
-#endif
-    set_reg_var(regname);
+#جے_انت
+    سیٹ_reg_var(regname);
 }
 
 /*
  * Set v:register if needed.
  */
-    void
-set_reg_var(int c)
+    فراغ
+سیٹ_reg_var(صحيح c)
 {
     char_u  regname[2];
 
-    if (c == 0 || c == ' ')
+    إذا (c == 0 || c == ' ')
 	regname[0] = '"';
-    else
+    وإلا
 	regname[0] = c;
     regname[1] = NUL;
     // Avoid free/alloc when the value is already right.
-    if (vimvars[VV_REG].vv_str == NULL || vimvars[VV_REG].vv_str[0] != c)
-	set_vim_var_string(VV_REG, regname, 1);
+    إذا (vimvars[VV_REG].vv_str == عدم || vimvars[VV_REG].vv_str[0] != c)
+	سیٹ_vim_var_string(VV_REG, regname, 1);
 }
 
 /*
@@ -3067,11 +3067,11 @@ set_reg_var(int c)
     char_u *
 v_exception(char_u *oldval)
 {
-    if (oldval == NULL)
-	return vimvars[VV_EXCEPTION].vv_str;
+    إذا (oldval == عدم)
+	أرجع vimvars[VV_EXCEPTION].vv_str;
 
     vimvars[VV_EXCEPTION].vv_str = oldval;
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -3083,11 +3083,11 @@ v_exception(char_u *oldval)
     char_u *
 v_throwpoint(char_u *oldval)
 {
-    if (oldval == NULL)
-	return vimvars[VV_THROWPOINT].vv_str;
+    إذا (oldval == عدم)
+	أرجع vimvars[VV_THROWPOINT].vv_str;
 
     vimvars[VV_THROWPOINT].vv_str = oldval;
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -3097,67 +3097,67 @@ v_throwpoint(char_u *oldval)
  * Must always be called in pairs!
  */
     char_u *
-set_cmdarg(exarg_T *eap, char_u *oldarg)
+سیٹ_cmdarg(exarg_T *eap, char_u *oldarg)
 {
     char_u	*oldval;
     char_u	*newval;
-    unsigned	len;
+    بنانشانی	len;
 
     oldval = vimvars[VV_CMDARG].vv_str;
-    if (eap == NULL)
+    إذا (eap == عدم)
     {
 	vim_free(oldval);
 	vimvars[VV_CMDARG].vv_str = oldarg;
-	return NULL;
+	أرجع عدم;
     }
 
-    if (eap->force_bin == FORCE_BIN)
+    إذا (eap->force_bin == FORCE_BIN)
 	len = 6;
-    else if (eap->force_bin == FORCE_NOBIN)
+    وإلا إذا (eap->force_bin == FORCE_NOBIN)
 	len = 8;
-    else
+    وإلا
 	len = 0;
 
-    if (eap->read_edit)
+    إذا (eap->read_edit)
 	len += 7;
 
-    if (eap->force_ff != 0)
+    إذا (eap->force_ff != 0)
 	len += 10; // " ++ff=unix"
-    if (eap->force_enc != 0)
-	len += (unsigned)STRLEN(eap->cmd + eap->force_enc) + 7;
-    if (eap->bad_char != 0)
+    إذا (eap->force_enc != 0)
+	len += (بنانشانی)STRLEN(eap->cmd + eap->force_enc) + 7;
+    إذا (eap->bad_char != 0)
 	len += 7 + 4;  // " ++bad=" + "keep" or "drop"
 
     newval = alloc(len + 1);
-    if (newval == NULL)
-	return NULL;
+    إذا (newval == عدم)
+	أرجع عدم;
 
-    if (eap->force_bin == FORCE_BIN)
-	sprintf((char *)newval, " ++bin");
-    else if (eap->force_bin == FORCE_NOBIN)
-	sprintf((char *)newval, " ++nobin");
-    else
+    إذا (eap->force_bin == FORCE_BIN)
+	sprintf((حرف *)newval, " ++bin");
+    وإلا إذا (eap->force_bin == FORCE_NOBIN)
+	sprintf((حرف *)newval, " ++nobin");
+    وإلا
 	*newval = NUL;
 
-    if (eap->read_edit)
+    إذا (eap->read_edit)
 	STRCAT(newval, " ++edit");
 
-    if (eap->force_ff != 0)
-	sprintf((char *)newval + STRLEN(newval), " ++ff=%s",
+    إذا (eap->force_ff != 0)
+	sprintf((حرف *)newval + STRLEN(newval), " ++ff=%s",
 						eap->force_ff == 'u' ? "unix"
 						: eap->force_ff == 'd' ? "dos"
 						: "mac");
-    if (eap->force_enc != 0)
-	sprintf((char *)newval + STRLEN(newval), " ++enc=%s",
+    إذا (eap->force_enc != 0)
+	sprintf((حرف *)newval + STRLEN(newval), " ++enc=%s",
 					       eap->cmd + eap->force_enc);
-    if (eap->bad_char == BAD_KEEP)
+    إذا (eap->bad_char == BAD_KEEP)
 	STRCPY(newval + STRLEN(newval), " ++bad=keep");
-    else if (eap->bad_char == BAD_DROP)
+    وإلا إذا (eap->bad_char == BAD_DROP)
 	STRCPY(newval + STRLEN(newval), " ++bad=drop");
-    else if (eap->bad_char != 0)
-	sprintf((char *)newval + STRLEN(newval), " ++bad=%c", eap->bad_char);
+    وإلا إذا (eap->bad_char != 0)
+	sprintf((حرف *)newval + STRLEN(newval), " ++bad=%c", eap->bad_char);
     vimvars[VV_CMDARG].vv_str = newval;
-    return oldval;
+    أرجع oldval;
 }
 
 /*
@@ -3166,23 +3166,23 @@ set_cmdarg(exarg_T *eap, char_u *oldarg)
  * imported script ID.
  * Return OK or FAIL.  If OK is returned "rettv" must be cleared.
  */
-    int
+    صحيح
 eval_variable(
     char_u	*name,
-    int		len,		// length of "name" or zero
+    صحيح		len,		// length of "name" or zero
     scid_T	sid,		// script ID for imported item or zero
     typval_T	*rettv,		// NULL when only checking existence
     dictitem_T	**dip,		// non-NULL when typval's dict item is needed
-    int		flags)		// EVAL_VAR_ flags
+    صحيح		flags)		// EVAL_VAR_ flags
 {
-    int		ret = OK;
-    typval_T	*tv = NULL;
-    int		found = FALSE;
-    hashtab_T	*ht = NULL;
-    int		cc = 0;
-    type_T	*type = NULL;
+    صحيح		ret = OK;
+    typval_T	*tv = عدم;
+    صحيح		لبھیا = FALSE;
+    hashtab_T	*ht = عدم;
+    صحيح		cc = 0;
+    type_T	*type = عدم;
 
-    if (len > 0)
+    إذا (len > 0)
     {
 	// truncate the name, so that we can use strcmp()
 	cc = name[len];
@@ -3190,224 +3190,224 @@ eval_variable(
     }
 
     // Check for local variable when debugging.
-    if ((sid == 0) && (tv = lookup_debug_var(name)) == NULL)
+    إذا ((sid == 0) && (tv = lookup_debug_var(name)) == عدم)
     {
 	// Check for user-defined variables.
-	dictitem_T	*v = find_var(name, &ht, flags & EVAL_VAR_NOAUTOLOAD);
+	dictitem_T	*v = لبھو_var(name, &ht, flags & EVAL_VAR_NOAUTOLOAD);
 
-	if (v != NULL)
+	إذا (v != عدم)
 	{
 	    tv = &v->di_tv;
-	    if (dip != NULL)
+	    إذا (dip != عدم)
 		*dip = v;
 	}
-	else
-	    ht = NULL;
+	وإلا
+	    ht = عدم;
     }
 
-    if (tv == NULL && (in_vim9script() || STRNCMP(name, "s:", 2) == 0))
+    إذا (tv == عدم && (وچ_vim9script() || STRNCMP(name, "s:", 2) == 0))
     {
-	imported_T  *import = NULL;
+	imported_T  *import = عدم;
 	char_u	    *p = STRNCMP(name, "s:", 2) == 0 ? name + 2 : name;
 
-	if (sid == 0)
-	    import = find_imported(p, 0, TRUE);
+	إذا (sid == 0)
+	    import = لبھو_imported(p, 0, TRUE);
 
 	// imported variable from another script
-	if (import != NULL || sid != 0)
+	إذا (import != عدم || sid != 0)
 	{
-	    if ((flags & EVAL_VAR_IMPORT) == 0)
+	    إذا ((flags & EVAL_VAR_IMPORT) == 0)
 	    {
-		if (SCRIPT_ID_VALID(sid))
+		إذا (SCRIPT_ID_VALID(sid))
 		{
 		    ht = &SCRIPT_VARS(sid);
-		    if (ht != NULL)
+		    إذا (ht != عدم)
 		    {
-			dictitem_T *v = find_var_in_ht(ht, 0, name,
+			dictitem_T *v = لبھو_var_وچ_ht(ht, 0, name,
 						  flags & EVAL_VAR_NOAUTOLOAD);
 
-			if (v == NULL)
-			    v = find_var_autoload_prefix(name, sid, NULL, NULL);
+			إذا (v == عدم)
+			    v = لبھو_var_autoload_اگیتر(name, sid, عدم, عدم);
 
-			if (v != NULL)
+			إذا (v != عدم)
 			{
 			    tv = &v->di_tv;
-			    if (dip != NULL)
+			    إذا (dip != عدم)
 				*dip = v;
 			}
-			else
-			    ht = NULL;
+			وإلا
+			    ht = عدم;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (flags & EVAL_VAR_VERBOSE)
+		    إذا (flags & EVAL_VAR_VERBOSE)
 			semsg(_(e_expected_dot_after_name_str), name);
 		    ret = FAIL;
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		if (rettv != NULL)
+		إذا (rettv != عدم)
 		{
 		    // special value that is used in handle_subscript()
 		    rettv->v_type = VAR_ANY;
-		    rettv->vval.v_number = sid != 0 ? sid : import->imp_sid;
+		    rettv->vval.v_نمبر = sid != 0 ? sid : import->imp_sid;
 		}
-		found = TRUE;
+		لبھیا = TRUE;
 	    }
 	}
-	else if (in_vim9script() && (flags & EVAL_VAR_NO_FUNC) == 0)
+	وإلا إذا (وچ_vim9script() && (flags & EVAL_VAR_NO_FUNC) == 0)
 	{
-	    int	    has_g_prefix = STRNCMP(name, "g:", 2) == 0;
-	    ufunc_T *ufunc = find_func(name, FALSE);
+	    صحيح	    has_g_اگیتر = STRNCMP(name, "g:", 2) == 0;
+	    ufunc_T *ufunc = لبھو_func(name, FALSE);
 
-	    if (ufunc != NULL && cc == '<')
+	    إذا (ufunc != عدم && cc == '<')
 	    {
 		// handle generic function
 		char_u	*argp = name + len;
 		name[len] = cc;
 		ufunc = eval_generic_func(ufunc, name, &argp);
 		name[len] = NUL;
-		if (ufunc == NULL)
+		إذا (ufunc == عدم)
 		{
 		    ret = FAIL;
-		    goto done;
+		    اذهب پورا;
 		}
 	    }
 
 	    // In Vim9 script we can get a function reference by using the
 	    // function name.  For a global non-autoload function "g:" is
 	    // required.
-	    if (ufunc != NULL && (has_g_prefix
-					    || !func_requires_g_prefix(ufunc)))
+	    إذا (ufunc != عدم && (has_g_اگیتر
+					    || !func_requires_g_اگیتر(ufunc)))
 	    {
-		found = TRUE;
-		if (rettv != NULL)
+		لبھیا = TRUE;
+		إذا (rettv != عدم)
 		{
 		    rettv->v_type = VAR_FUNC;
-		    if (has_g_prefix)
+		    إذا (has_g_اگیتر)
 		    {
 			// Keep the "g:", otherwise script-local may be
 			// assumed.
-			if (cc != '<')
+			إذا (cc != '<')
 			    rettv->vval.v_string = vim_strsave(name);
-			else
+			وإلا
 			{
 			    // append the generic function arguments
 			    char_u	*argp = name + len;
 			    name[len] = cc;
 			    rettv->vval.v_string =
-				append_generic_func_type_args(name, len,
+				append_generic_func_type_دلیلاں(name, len,
 									&argp);
 			    name[len] = NUL;
 			}
 		    }
-		    else
+		    وإلا
 			rettv->vval.v_string = vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
-		    if (rettv->vval.v_string != NULL)
+		    إذا (rettv->vval.v_string != عدم)
 			func_ref(ufunc->uf_name);
 		}
 	    }
 	}
     }
 
-    if (!found)
+    إذا (!لبھیا)
     {
-	if (tv == NULL)
+	إذا (tv == عدم)
 	{
-	    if (rettv != NULL && (flags & EVAL_VAR_VERBOSE))
+	    إذا (rettv != عدم && (flags & EVAL_VAR_VERBOSE))
 		semsg(_(e_undefined_variable_str), name);
 	    ret = FAIL;
 	}
-	else if (rettv != NULL)
+	وإلا إذا (rettv != عدم)
 	{
-	    svar_T  *sv = NULL;
-	    int	    was_assigned = FALSE;
+	    svar_T  *sv = عدم;
+	    صحيح	    was_assigned = FALSE;
 
-	    if (ht != NULL && ht == get_script_local_ht()
+	    إذا (ht != عدم && ht == get_script_local_ht()
 		    && tv != &SCRIPT_SV(current_sctx.sc_sid)->sv_var.di_tv)
 	    {
-		sv = find_typval_in_script(tv, 0, TRUE);
-		if (sv != NULL)
+		sv = لبھو_typval_وچ_script(tv, 0, TRUE);
+		إذا (sv != عدم)
 		{
 		    type = sv->sv_type;
 		    was_assigned = sv->sv_flags & SVFLAG_ASSIGNED;
 		}
 	    }
 
-	    if ((tv->v_type == VAR_TYPEALIAS || tv->v_type == VAR_CLASS)
+	    إذا ((tv->v_type == VAR_TYPEALIAS || tv->v_type == VAR_CLASS)
 		    && sid != 0)
 	    {
 		// type alias or class imported from another script.  Check
 		// whether it is exported from the other script.
-		sv = find_typval_in_script(tv, sid, TRUE);
-		if (sv == NULL)
+		sv = لبھو_typval_وچ_script(tv, sid, TRUE);
+		إذا (sv == عدم)
 		{
 		    ret = FAIL;
-		    goto done;
+		    اذهب پورا;
 		}
-		if ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
+		إذا ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
 		{
-		    semsg(_(e_item_not_exported_in_script_str), name);
+		    semsg(_(e_شے_not_exported_وچ_script_str), name);
 		    ret = FAIL;
-		    goto done;
+		    اذهب پورا;
 		}
 	    }
 
 	    // If a list or tuple or dict variable wasn't initialized and has
 	    // meaningful type, do it now.  Not for global variables, they are
 	    // not declared.
-	    if (ht != &globvarht)
+	    إذا (ht != &globvarht)
 	    {
-		if (tv->v_type == VAR_DICT && tv->vval.v_dict == NULL
-					    && ((type != NULL && !was_assigned)
-							  || !in_vim9script()))
+		إذا (tv->v_type == VAR_DICT && tv->vval.v_dict == عدم
+					    && ((type != عدم && !was_assigned)
+							  || !وچ_vim9script()))
 		{
 		    tv->vval.v_dict = dict_alloc();
-		    if (tv->vval.v_dict != NULL)
+		    إذا (tv->vval.v_dict != عدم)
 		    {
 			++tv->vval.v_dict->dv_refcount;
 			tv->vval.v_dict->dv_type = alloc_type(type);
-			if (sv != NULL)
+			إذا (sv != عدم)
 			    sv->sv_flags |= SVFLAG_ASSIGNED;
 		    }
 		}
-		else if (tv->v_type == VAR_LIST && tv->vval.v_list == NULL
-					    && ((type != NULL && !was_assigned)
-							  || !in_vim9script()))
+		وإلا إذا (tv->v_type == VAR_LIST && tv->vval.v_list == عدم
+					    && ((type != عدم && !was_assigned)
+							  || !وچ_vim9script()))
 		{
 		    tv->vval.v_list = list_alloc();
-		    if (tv->vval.v_list != NULL)
+		    إذا (tv->vval.v_list != عدم)
 		    {
 			++tv->vval.v_list->lv_refcount;
 			tv->vval.v_list->lv_type = alloc_type(type);
-			if (sv != NULL)
+			إذا (sv != عدم)
 			    sv->sv_flags |= SVFLAG_ASSIGNED;
 		    }
 		}
-		else if (tv->v_type == VAR_TUPLE && tv->vval.v_tuple == NULL
-					    && ((type != NULL && !was_assigned)
-							  || !in_vim9script()))
+		وإلا إذا (tv->v_type == VAR_TUPLE && tv->vval.v_tuple == عدم
+					    && ((type != عدم && !was_assigned)
+							  || !وچ_vim9script()))
 		{
 		    tv->vval.v_tuple = tuple_alloc();
-		    if (tv->vval.v_tuple != NULL)
+		    إذا (tv->vval.v_tuple != عدم)
 		    {
 			++tv->vval.v_tuple->tv_refcount;
 			tv->vval.v_tuple->tv_type = alloc_type(type);
-			if (sv != NULL)
+			إذا (sv != عدم)
 			    sv->sv_flags |= SVFLAG_ASSIGNED;
 		    }
 		}
-		else if (tv->v_type == VAR_BLOB && tv->vval.v_blob == NULL
-					    && ((type != NULL && !was_assigned)
-							  || !in_vim9script()))
+		وإلا إذا (tv->v_type == VAR_BLOB && tv->vval.v_blob == عدم
+					    && ((type != عدم && !was_assigned)
+							  || !وچ_vim9script()))
 		{
 		    tv->vval.v_blob = blob_alloc();
-		    if (tv->vval.v_blob != NULL)
+		    إذا (tv->vval.v_blob != عدم)
 		    {
 			++tv->vval.v_blob->bv_refcount;
-			if (sv != NULL)
+			إذا (sv != عدم)
 			    sv->sv_flags |= SVFLAG_ASSIGNED;
 		    }
 		}
@@ -3416,39 +3416,39 @@ eval_variable(
 	}
     }
 
-done:
-    if (len > 0)
+پورا:
+    إذا (len > 0)
 	name[len] = cc;
 
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Get the value of internal variable "name", also handling "import.name".
  * Return OK or FAIL.  If OK is returned "rettv" must be cleared.
  */
-    int
+    صحيح
 eval_variable_import(
     char_u	*name,
     typval_T	*rettv)
 {
     char_u  *s = name;
-    while (ASCII_ISALNUM(*s) || *s == '_')
+    طالما (ASCII_ISALNUM(*s) || *s == '_')
 	++s;
-    int	    len = (int)(s - name);
+    صحيح	    len = (صحيح)(s - name);
 
-    if (eval_variable(name, len, 0, rettv, NULL, EVAL_VAR_IMPORT) == FAIL)
-	return FAIL;
-    if (rettv->v_type == VAR_ANY && *s == '.')
+    إذا (eval_variable(name, len, 0, rettv, عدم, EVAL_VAR_IMPORT) == FAIL)
+	أرجع FAIL;
+    إذا (rettv->v_type == VAR_ANY && *s == '.')
     {
 	char_u *ns = s + 1;
 	s = ns;
-	while (ASCII_ISALNUM(*s) || *s == '_')
+	طالما (ASCII_ISALNUM(*s) || *s == '_')
 	    ++s;
-	int sid = rettv->vval.v_number;
-	return eval_variable(ns, (int)(s - ns), sid, rettv, NULL, 0);
+	صحيح sid = rettv->vval.v_نمبر;
+	أرجع eval_variable(ns, (صحيح)(s - ns), sid, rettv, عدم, 0);
     }
-    return OK;
+    أرجع OK;
 }
 
 
@@ -3456,25 +3456,25 @@ eval_variable_import(
  * Check if variable "name[len]" is a local variable or an argument.
  * If so, "*eval_lavars_used" is set to TRUE.
  */
-    void
-check_vars(char_u *name, int len)
+    فراغ
+check_vars(char_u *name, صحيح len)
 {
-    int		cc;
+    صحيح		cc;
     char_u	*varname;
     hashtab_T	*ht;
 
-    if (eval_lavars_used == NULL)
-	return;
+    إذا (eval_lavars_ورتیا == عدم)
+	أرجع;
 
     // truncate the name, so that we can use strcmp()
     cc = name[len];
     name[len] = NUL;
 
-    ht = find_var_ht(name, &varname);
-    if (ht == get_funccal_local_ht() || ht == get_funccal_args_ht())
+    ht = لبھو_var_ht(name, &varname);
+    إذا (ht == get_funccal_local_ht() || ht == get_funccal_دلیلاں_ht())
     {
-	if (find_var(name, NULL, TRUE) != NULL)
-	    *eval_lavars_used = TRUE;
+	إذا (لبھو_var(name, عدم, TRUE) != عدم)
+	    *eval_lavars_ورتیا = TRUE;
     }
 
     name[len] = cc;
@@ -3487,44 +3487,44 @@ check_vars(char_u *name, int len)
  * When "htp" is not NULL  set "htp" to the hashtab_T used.
  */
     dictitem_T *
-find_var(char_u *name, hashtab_T **htp, int no_autoload)
+لبھو_var(char_u *name, hashtab_T **htp, صحيح no_autoload)
 {
     char_u	*varname;
     hashtab_T	*ht;
-    dictitem_T	*ret = NULL;
+    dictitem_T	*ret = عدم;
 
-    ht = find_var_ht(name, &varname);
-    if (htp != NULL)
+    ht = لبھو_var_ht(name, &varname);
+    إذا (htp != عدم)
 	*htp = ht;
-    if (ht == NULL)
-	return NULL;
-    ret = find_var_in_ht(ht, *name, varname, no_autoload);
-    if (ret != NULL)
-	return ret;
+    إذا (ht == عدم)
+	أرجع عدم;
+    ret = لبھو_var_وچ_ht(ht, *name, varname, no_autoload);
+    إذا (ret != عدم)
+	أرجع ret;
 
     // Search in parent scope for lambda
-    ret = find_var_in_scoped_ht(name, no_autoload);
-    if (ret != NULL)
-	return ret;
+    ret = لبھو_var_وچ_scoped_ht(name, no_autoload);
+    إذا (ret != عدم)
+	أرجع ret;
 
     // in Vim9 script items without a scope can be script-local
-    if (in_vim9script() && name[0] != NUL && name[1] != ':')
+    إذا (وچ_vim9script() && name[0] != NUL && name[1] != ':')
     {
 	ht = get_script_local_ht();
-	if (ht != NULL)
+	إذا (ht != عدم)
 	{
-	    ret = find_var_in_ht(ht, *name, varname, no_autoload);
-	    if (ret != NULL)
+	    ret = لبھو_var_وچ_ht(ht, *name, varname, no_autoload);
+	    إذا (ret != عدم)
 	    {
-		if (htp != NULL)
+		إذا (htp != عدم)
 		    *htp = ht;
-		return ret;
+		أرجع ret;
 	    }
 	}
     }
 
     // and finally try
-    return find_var_autoload_prefix(name, 0, htp, NULL);
+    أرجع لبھو_var_autoload_اگیتر(name, 0, htp, عدم);
 }
 
 /*
@@ -3536,47 +3536,47 @@ find_var(char_u *name, hashtab_T **htp, int no_autoload)
  * then the caller gets ownership and is responsible for freeing the name.
  */
     dictitem_T *
-find_var_autoload_prefix(char_u *name, int sid, hashtab_T **htp,
+لبھو_var_autoload_اگیتر(char_u *name, صحيح sid, hashtab_T **htp,
 							    char_u **namep)
 {
     hashtab_T	*ht;
-    dictitem_T	*ret = NULL;
+    dictitem_T	*ret = عدم;
     // When using "vim9script autoload" script-local items are prefixed but can
     // be used with s:name.
-    int check_sid = sid > 0 ? sid : current_sctx.sc_sid;
-    if (SCRIPT_ID_VALID(check_sid)
-		   && (in_vim9script() || (name[0] == 's' && name[1] == ':')))
+    صحيح check_sid = sid > 0 ? sid : current_sctx.sc_sid;
+    إذا (SCRIPT_ID_VALID(check_sid)
+		   && (وچ_vim9script() || (name[0] == 's' && name[1] == ':')))
     {
-	scriptitem_T *si = SCRIPT_ITEM(check_sid);
+	scriptitem_T *si = SCRIPT_شے(check_sid);
 
-	if (si->sn_autoload_prefix != NULL)
+	إذا (si->sn_autoload_اگیتر != عدم)
 	{
-	    char_u *base_name = (name[0] == 's' && name[1] == ':')
+	    char_u *ادھار_name = (name[0] == 's' && name[1] == ':')
 							     ? name + 2 : name;
-	    char_u *auto_name = concat_str(si->sn_autoload_prefix, base_name);
+	    char_u *auto_name = concat_str(si->sn_autoload_اگیتر, ادھار_name);
 
-	    if (auto_name != NULL)
+	    إذا (auto_name != عدم)
 	    {
-		int free_auto_name = TRUE;
+		صحيح free_auto_name = TRUE;
 		ht = &globvarht;
-		ret = find_var_in_ht(ht, 'g', auto_name, TRUE);
-		if (ret != NULL)
+		ret = لبھو_var_وچ_ht(ht, 'g', auto_name, TRUE);
+		إذا (ret != عدم)
 		{
-		    if (htp != NULL)
+		    إذا (htp != عدم)
 			*htp = ht;
-		    if (namep != NULL)
+		    إذا (namep != عدم)
 		    {
 			free_auto_name = FALSE;
 			*namep = auto_name;
 		    }
 		}
-		if (free_auto_name)
+		إذا (free_auto_name)
 		    vim_free(auto_name);
 	    }
 	}
     }
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -3584,32 +3584,32 @@ find_var_autoload_prefix(char_u *name, int sid, hashtab_T **htp,
  * referenced script (used for a funcref).
  */
     dictitem_T *
-find_var_also_in_script(char_u *name, hashtab_T **htp, int no_autoload)
+لبھو_var_also_وچ_script(char_u *name, hashtab_T **htp, صحيح no_autoload)
 {
-    if (STRNCMP(name, "<SNR>", 5) == 0 && SAFE_isdigit(name[5]))
+    إذا (STRNCMP(name, "<SNR>", 5) == 0 && محفوظ_isdigit(name[5]))
     {
 	char_u	    *p = name + 5;
-	int	    sid = getdigits(&p);
+	صحيح	    sid = getdigits(&p);
 
-	if (SCRIPT_ID_VALID(sid) && *p == '_')
+	إذا (SCRIPT_ID_VALID(sid) && *p == '_')
 	{
 	    hashtab_T	*ht = &SCRIPT_VARS(sid);
 
-	    if (ht != NULL)
+	    إذا (ht != عدم)
 	    {
-		dictitem_T *di = find_var_in_ht(ht, 0, p + 1, no_autoload);
+		dictitem_T *di = لبھو_var_وچ_ht(ht, 0, p + 1, no_autoload);
 
-		if (di != NULL)
+		إذا (di != عدم)
 		{
-		    if (htp != NULL)
+		    إذا (htp != عدم)
 			*htp = ht;
-		    return di;
+		    أرجع di;
 		}
 	    }
 	}
     }
 
-    return find_var(name, htp, no_autoload);
+    أرجع لبھو_var(name, htp, no_autoload);
 }
 
 /*
@@ -3618,63 +3618,63 @@ find_var_also_in_script(char_u *name, hashtab_T **htp, int no_autoload)
  * Returns NULL if not found.
  */
     dictitem_T *
-find_var_in_ht(
+لبھو_var_وچ_ht(
     hashtab_T	*ht,
-    int		htname,
+    صحيح		htname,
     char_u	*varname,
-    int		no_autoload)
+    صحيح		no_autoload)
 {
     hashitem_T	*hi;
 
-    if (*varname == NUL)
+    إذا (*varname == NUL)
     {
 	// Must be something like "s:", otherwise "ht" would be NULL.
-	switch (htname)
+	بدل (htname)
 	{
-	    case 's': return &SCRIPT_SV(current_sctx.sc_sid)->sv_var;
-	    case 'g': return &globvars_var;
-	    case 'v': return &vimvars_var;
-	    case 'b': return &curbuf->b_bufvar;
-	    case 'w': return &curwin->w_winvar;
-	    case 't': return &curtab->tp_winvar;
-	    case 'l': return get_funccal_local_var();
-	    case 'a': return get_funccal_args_var();
+	    حالة 's': أرجع &SCRIPT_SV(current_sctx.sc_sid)->sv_var;
+	    حالة 'g': أرجع &globvars_var;
+	    حالة 'v': أرجع &vimvars_var;
+	    حالة 'b': أرجع &curbuf->b_bufvar;
+	    حالة 'w': أرجع &curwin->w_winvar;
+	    حالة 't': أرجع &curtab->tp_winvar;
+	    حالة 'l': أرجع get_funccal_local_var();
+	    حالة 'a': أرجع get_funccal_دلیلاں_var();
 	}
-	return NULL;
+	أرجع عدم;
     }
 
-    hi = hash_find(ht, varname);
-    if (HASHITEM_EMPTY(hi))
+    hi = hash_لبھو(ht, varname);
+    إذا (HASHITEM_خالی_تھاواں(hi))
     {
 	// For global variables we may try auto-loading the script.  If it
 	// worked find the variable again.  Don't auto-load a script if it was
 	// loaded already, otherwise it would be loaded every time when
 	// checking if a function name is a Funcref variable.
-	if (ht == &globvarht && !no_autoload)
+	إذا (ht == &globvarht && !no_autoload)
 	{
 	    // Note: script_autoload() may make "hi" invalid. It must either
 	    // be obtained again or not used.
-	    if (!script_autoload(varname, FALSE) || aborting())
-		return NULL;
-	    hi = hash_find(ht, varname);
+	    إذا (!script_autoload(varname, FALSE) || aborting())
+		أرجع عدم;
+	    hi = hash_لبھو(ht, varname);
 	}
-	if (HASHITEM_EMPTY(hi))
-	    return NULL;
+	إذا (HASHITEM_خالی_تھاواں(hi))
+	    أرجع عدم;
     }
-    return HI2DI(hi);
+    أرجع HI2DI(hi);
 }
 
 /*
  * Get the script-local hashtab.  NULL if not in a script context.
  */
     hashtab_T *
-get_script_local_ht(void)
+get_script_local_ht(فراغ)
 {
     scid_T sid = current_sctx.sc_sid;
 
-    if (SCRIPT_ID_VALID(sid))
-	return &SCRIPT_VARS(sid);
-    return NULL;
+    إذا (SCRIPT_ID_VALID(sid))
+	أرجع &SCRIPT_VARS(sid);
+    أرجع عدم;
 }
 
 /*
@@ -3683,72 +3683,72 @@ get_script_local_ht(void)
  * by "(" or "->".
  * Return OK when found, FAIL when not found.
  */
-    int
+    صحيح
 lookup_scriptitem(
 	char_u	*name,
 	size_t	len,
-	int	cmd,
-	cctx_T	*dummy UNUSED)
+	صحيح	cmd,
+	cctx_T	*dummy بن_ورتیا)
 {
     hashtab_T	*ht = get_script_local_ht();
-    char_u	buffer[30];
+    char_u	بفر[30];
     char_u	*p;
-    int		res;
+    صحيح		res;
     hashitem_T	*hi;
-    int		is_global = FALSE;
+    صحيح		is_global = FALSE;
     char_u	*fname = name;
 
-    if (ht == NULL)
-	return FAIL;
-    if (len < sizeof(buffer) - 1)
+    إذا (ht == عدم)
+	أرجع FAIL;
+    إذا (len < حجم(بفر) - 1)
     {
 	// avoid an alloc/free for short names
-	vim_strncpy(buffer, name, len);
-	p = buffer;
+	vim_strncpy(بفر, name, len);
+	p = بفر;
     }
-    else
+    وإلا
     {
 	p = vim_strnsave(name, len);
-	if (p == NULL)
-	    return FAIL;
+	إذا (p == عدم)
+	    أرجع FAIL;
     }
 
-    hi = hash_find(ht, p);
-    res = HASHITEM_EMPTY(hi) ? FAIL : OK;
+    hi = hash_لبھو(ht, p);
+    res = HASHITEM_خالی_تھاواں(hi) ? FAIL : OK;
 
     // if not script-local, then perhaps autoload-exported
-    if (res == FAIL && find_var_autoload_prefix(p, 0, NULL, NULL) != NULL)
+    إذا (res == FAIL && لبھو_var_autoload_اگیتر(p, 0, عدم, عدم) != عدم)
 	res = OK;
 
     // if not script-local or autoload, then perhaps imported
-    if (res == FAIL && find_imported(p, 0, FALSE) != NULL)
+    إذا (res == FAIL && لبھو_imported(p, 0, FALSE) != عدم)
 	res = OK;
-    if (p != buffer)
+    إذا (p != بفر)
 	vim_free(p);
 
     // Find a function, so that a following "->" works.
     // When used as a command require "(" or "->" to follow, "Cmd" is a user
     // command while "Cmd()" is a function call.
-    if (res != OK)
+    إذا (res != OK)
     {
 	p = skipwhite(name + len);
 
-	if (!cmd || name[len] == '(' || (p[0] == '-' && p[1] == '>'))
+	إذا (!cmd || name[len] == '(' || (p[0] == '-' && p[1] == '>'))
 	{
 	    // Do not check for an internal function, since it might also be a
 	    // valid command, such as ":split" versus "split()".
 	    // Skip "g:" before a function name.
-	    if (name[0] == 'g' && name[1] == ':')
+	    إذا (name[0] == 'g' && name[1] == ':')
 	    {
 		is_global = TRUE;
 		fname = name + 2;
 	    }
-	    if (find_func(fname, is_global) != NULL)
+	    إذا (لبھو_func(fname, is_global) != عدم)
 		res = OK;
 	}
     }
 
-    return res;
+    أرجع res;
 }
 
 /*
@@ -3757,76 +3757,76 @@ lookup_scriptitem(
  * Set "varname" to the start of name without ':'.
  */
     hashtab_T *
-find_var_ht(char_u *name, char_u **varname)
+لبھو_var_ht(char_u *name, char_u **varname)
 {
     hashitem_T	*hi;
     hashtab_T	*ht;
 
-    if (name[0] == NUL)
-	return NULL;
-    if (name[1] != ':')
+    إذا (name[0] == NUL)
+	أرجع عدم;
+    إذا (name[1] != ':')
     {
 	// The name must not start with a colon or #.
-	if (name[0] == ':' || name[0] == AUTOLOAD_CHAR)
-	    return NULL;
+	إذا (name[0] == ':' || name[0] == AUTOLOAD_CHAR)
+	    أرجع عدم;
 	*varname = name;
 
 	// "version" is "v:version" in all scopes if scriptversion < 3.
 	// Same for a few other variables marked with VV_COMPAT.
-	if (in_old_script(3))
+	إذا (وچ_old_script(3))
 	{
-	    hi = hash_find(&compat_hashtab, name);
-	    if (!HASHITEM_EMPTY(hi))
-		return &compat_hashtab;
+	    hi = hash_لبھو(&compat_hashtab, name);
+	    إذا (!HASHITEM_خالی_تھاواں(hi))
+		أرجع &compat_hashtab;
 	}
 
 	ht = get_funccal_local_ht();
-	if (ht != NULL)
-	    return ht;				// local variable
+	إذا (ht != عدم)
+	    أرجع ht;				// local variable
 
 	// In Vim9 script items at the script level are script-local, except
 	// for autoload names.
-	if (in_vim9script() && vim_strchr(name, AUTOLOAD_CHAR) == NULL)
+	إذا (وچ_vim9script() && vim_strchr(name, AUTOLOAD_CHAR) == عدم)
 	{
 	    ht = get_script_local_ht();
-	    if (ht != NULL)
-		return ht;
+	    إذا (ht != عدم)
+		أرجع ht;
 	}
 
-	return &globvarht;			// global variable
+	أرجع &globvarht;			// global variable
     }
     *varname = name + 2;
-    if (*name == 'g')				// global variable
-	return &globvarht;
+    إذا (*name == 'g')				// global variable
+	أرجع &globvarht;
     // There must be no ':' or '#' in the rest of the name, unless g: is used
-    if (vim_strchr(name + 2, ':') != NULL
-			       || vim_strchr(name + 2, AUTOLOAD_CHAR) != NULL)
-	return NULL;
-    if (*name == 'b')				// buffer variable
-	return &curbuf->b_vars->dv_hashtab;
-    if (*name == 'w')				// window variable
-	return &curwin->w_vars->dv_hashtab;
-    if (*name == 't')				// tab page variable
-	return &curtab->tp_vars->dv_hashtab;
-    if (*name == 'v')				// v: variable
-	return &vimvarht;
-    if (get_current_funccal() != NULL
-	       && get_current_funccal()->fc_func->uf_def_status
+    إذا (vim_strchr(name + 2, ':') != عدم
+			       || vim_strchr(name + 2, AUTOLOAD_CHAR) != عدم)
+	أرجع عدم;
+    إذا (*name == 'b')				// buffer variable
+	أرجع &curbuf->b_vars->dv_hashtab;
+    إذا (*name == 'w')				// window variable
+	أرجع &curwin->w_vars->dv_hashtab;
+    إذا (*name == 't')				// tab page variable
+	أرجع &curtab->tp_vars->dv_hashtab;
+    إذا (*name == 'v')				// v: variable
+	أرجع &vimvarht;
+    إذا (get_current_funccal() != عدم
+	       && get_current_funccal()->fc_func->uf_def_حالت
 							    == UF_NOT_COMPILED)
     {
 	// a: and l: are only used in functions defined with ":function"
-	if (*name == 'a')			// a: function argument
-	    return get_funccal_args_ht();
-	if (*name == 'l')			// l: local function variable
-	    return get_funccal_local_ht();
+	إذا (*name == 'a')			// a: function argument
+	    أرجع get_funccal_دلیلاں_ht();
+	إذا (*name == 'l')			// l: local function variable
+	    أرجع get_funccal_local_ht();
     }
-    if (*name == 's')				// script variable
+    إذا (*name == 's')				// script variable
     {
 	ht = get_script_local_ht();
-	if (ht != NULL)
-	    return ht;
+	إذا (ht != عدم)
+	    أرجع ht;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -3835,55 +3835,55 @@ find_var_ht(char_u *name, char_u **varname)
  * Returns NULL when it doesn't exist.
  */
     char_u *
-get_var_value(char_u *name)
+get_var_قدر(char_u *name)
 {
     dictitem_T	*v;
 
-    v = find_var(name, NULL, FALSE);
-    if (v == NULL)
-	return NULL;
-    return tv_get_string(&v->di_tv);
+    v = لبھو_var(name, عدم, FALSE);
+    إذا (v == عدم)
+	أرجع عدم;
+    أرجع tv_get_string(&v->di_tv);
 }
 
 /*
  * Allocate a new hashtab for a sourced script.  It will be used while
  * sourcing this script and when executing functions defined in the script.
  */
-    void
+    فراغ
 new_script_vars(scid_T id)
 {
     scriptvar_T *sv;
 
     sv = ALLOC_CLEAR_ONE(scriptvar_T);
-    if (sv == NULL)
-	return;
+    إذا (sv == عدم)
+	أرجع;
     init_var_dict(&sv->sv_dict, &sv->sv_var, VAR_SCOPE);
-    SCRIPT_ITEM(id)->sn_vars = sv;
+    SCRIPT_شے(id)->sn_vars = sv;
 }
 
 /*
  * Initialize dictionary "dict" as a scope and set variable "dict_var" to
  * point to it.
  */
-    void
-init_var_dict(dict_T *dict, dictitem_T *dict_var, int scope)
+    فراغ
+init_var_dict(dict_T *dict, dictitem_T *dict_var, صحيح scope)
 {
     hash_init(&dict->dv_hashtab);
-    dict->dv_lock = 0;
+    dict->dv_جندرا = 0;
     dict->dv_scope = scope;
     dict->dv_refcount = DO_NOT_FREE_CNT;
     dict->dv_copyID = 0;
     dict_var->di_tv.vval.v_dict = dict;
     dict_var->di_tv.v_type = VAR_DICT;
-    dict_var->di_tv.v_lock = VAR_FIXED;
+    dict_var->di_tv.v_جندرا = VAR_FIXED;
     dict_var->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
-    dict_var->di_key[0] = NUL;
+    dict_var->di_کلید[0] = NUL;
 }
 
 /*
  * Unreference a dictionary initialized by init_var_dict().
  */
-    void
+    فراغ
 unref_var_dict(dict_T *dict)
 {
     // Now the dict needs to be freed if no one else is using it, go back to
@@ -3897,7 +3897,7 @@ unref_var_dict(dict_T *dict)
  * Frees all allocated variables and the value they contain.
  * Clears hashtab "ht", does not free it.
  */
-    void
+    فراغ
 vars_clear(hashtab_T *ht)
 {
     vars_clear_ext(ht, TRUE);
@@ -3906,18 +3906,18 @@ vars_clear(hashtab_T *ht)
 /*
  * Like vars_clear(), but only free the value if "free_val" is TRUE.
  */
-    void
-vars_clear_ext(hashtab_T *ht, int free_val)
+    فراغ
+vars_clear_ext(hashtab_T *ht, صحيح free_val)
 {
-    int		todo;
+    صحيح		todo;
     hashitem_T	*hi;
     dictitem_T	*v;
 
-    hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    hash_جندرا(ht);
+    todo = (صحيح)ht->ht_ورتیا;
+    FOR_ALL_HASHTAB_اشیاء(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_خالی_تھاواں(hi))
 	{
 	    --todo;
 
@@ -3925,9 +3925,9 @@ vars_clear_ext(hashtab_T *ht, int free_val)
 	    // ht_array might change then.  hash_clear() takes care of it
 	    // later.
 	    v = HI2DI(hi);
-	    if (free_val)
+	    إذا (free_val)
 		clear_tv(&v->di_tv);
-	    if (v->di_flags & DI_FLAGS_ALLOC)
+	    إذا (v->di_flags & DI_FLAGS_ALLOC)
 		vim_free(v);
 	}
     }
@@ -3939,13 +3939,13 @@ vars_clear_ext(hashtab_T *ht, int free_val)
  * Delete a variable from hashtab "ht" at item "hi".
  * Clear the variable value and free the dictitem.
  */
-    void
+    فراغ
 delete_var(hashtab_T *ht, hashitem_T *hi)
 {
     dictitem_T	*di = HI2DI(hi);
 
-    if (hash_remove(ht, hi, "delete variable") != OK)
-	return;
+    إذا (hash_remove(ht, hi, "delete variable") != OK)
+	أرجع;
 
     clear_tv(&di->di_tv);
     vim_free(di);
@@ -3956,25 +3956,25 @@ delete_var(hashtab_T *ht, hashitem_T *hi)
  * in the global namespace with the autoload prefix (e.g. "foo#bar") and are
  * recreated when the script body runs again.
  */
-    void
-delete_autoload_export_vars(char_u *prefix)
+    فراغ
+delete_autoload_export_vars(char_u *اگیتر)
 {
-    if (prefix == NULL)
-	return;
-    size_t  prefixlen = STRLEN(prefix);
+    إذا (اگیتر == عدم)
+	أرجع;
+    size_t  prefixlen = STRLEN(اگیتر);
 
-    hash_lock(&globvarht);
-    int	todo = (int)globvarht.ht_used;
+    hash_جندرا(&globvarht);
+    صحيح	todo = (صحيح)globvarht.ht_ورتیا;
 
-    for (hashitem_T *hi = globvarht.ht_array; todo > 0; ++hi)
-	if (!HASHITEM_EMPTY(hi))
+    لكل (hashitem_T *hi = globvarht.ht_array; todo > 0; ++hi)
+	إذا (!HASHITEM_خالی_تھاواں(hi))
 	{
 	    dictitem_T	*di = HI2DI(hi);
 
 	    --todo;
 	    // Keep a class or enum: existing objects still refer to it.
-	    if (di->di_tv.v_type != VAR_CLASS
-		    && STRNCMP(di->di_key, prefix, prefixlen) == 0)
+	    إذا (di->di_tv.v_type != VAR_CLASS
+		    && STRNCMP(di->di_کلید, اگیتر, prefixlen) == 0)
 		delete_var(&globvarht, hi);
 	}
     hash_unlock(&globvarht);
@@ -3983,61 +3983,61 @@ delete_autoload_export_vars(char_u *prefix)
 /*
  * List the value of one internal variable.
  */
-    static void
-list_one_var(dictitem_T *v, char *prefix, int *first)
+    ساكن فراغ
+list_one_var(dictitem_T *v, حرف *اگیتر, صحيح *پہلا)
 {
     char_u	*tofree;
     char_u	*s;
     char_u	numbuf[NUMBUFLEN];
 
     s = echo_string(&v->di_tv, &tofree, numbuf, get_copyID());
-    list_one_var_a(prefix, v->di_key, v->di_tv.v_type,
-					 s == NULL ? (char_u *)"" : s, first);
+    list_one_var_a(اگیتر, v->di_کلید, v->di_tv.v_type,
+					 s == عدم ? (char_u *)"" : s, پہلا);
     vim_free(tofree);
 }
 
-    static void
+    ساكن فراغ
 list_one_var_a(
-    char	*prefix,
+    حرف	*اگیتر,
     char_u	*name,
-    int		type,
+    صحيح		type,
     char_u	*string,
-    int		*first)  // when TRUE clear rest of screen and set to FALSE
+    صحيح		*پہلا)  // when TRUE clear rest of screen and set to FALSE
 {
     // don't use msg() or msg_attr() to avoid overwriting "v:statusmsg"
-    msg_start();
-    msg_puts(prefix);
-    if (name != NULL)	// "a:" vars don't have a name stored
-	msg_puts((char *)name);
-    msg_putchar(' ');
-    msg_advance(22);
-    if (type == VAR_NUMBER)
-	msg_putchar('#');
-    else if (type == VAR_FUNC || type == VAR_PARTIAL)
-	msg_putchar('*');
-    else if (type == VAR_LIST)
+    پیغام_شروع();
+    پیغام_puts(اگیتر);
+    إذا (name != عدم)	// "a:" vars don't have a name stored
+	پیغام_puts((حرف *)name);
+    پیغام_putchar(' ');
+    پیغام_advance(22);
+    إذا (type == VAR_نمبر)
+	پیغام_putchar('#');
+    وإلا إذا (type == VAR_FUNC || type == VAR_PARTIAL)
+	پیغام_putchar('*');
+    وإلا إذا (type == VAR_LIST)
     {
-	msg_putchar('[');
-	if (*string == '[')
+	پیغام_putchar('[');
+	إذا (*string == '[')
 	    ++string;
     }
-    else if (type == VAR_DICT)
+    وإلا إذا (type == VAR_DICT)
     {
-	msg_putchar('{');
-	if (*string == '{')
+	پیغام_putchar('{');
+	إذا (*string == '{')
 	    ++string;
     }
-    else
-	msg_putchar(' ');
+    وإلا
+	پیغام_putchar(' ');
 
-    msg_outtrans(string);
+    پیغام_outtrans(string);
 
-    if (type == VAR_FUNC || type == VAR_PARTIAL)
-	msg_puts("()");
-    if (*first)
+    إذا (type == VAR_FUNC || type == VAR_PARTIAL)
+	پیغام_puts("()");
+    إذا (*پہلا)
     {
-	msg_clr_eos();
-	*first = FALSE;
+	پیغام_clr_eos();
+	*پہلا = FALSE;
     }
 }
 
@@ -4046,55 +4046,55 @@ list_one_var_a(
  * Return TRUE if the variable should be set normally,
  *        FALSE if nothing else needs to be done.
  */
-    int
-before_set_vvar(
+    صحيح
+before_سیٹ_vvar(
     char_u	*varname,
     dictitem_T	*di,
     typval_T	*tv,
-    int		copy,
-    int		*type_error)
+    صحيح		copy,
+    صحيح		*type_error)
 {
-    if (di->di_tv.v_type == VAR_STRING)
+    إذا (di->di_tv.v_type == VAR_STRING)
     {
 	VIM_CLEAR(di->di_tv.vval.v_string);
-	if (copy || tv->v_type != VAR_STRING)
+	إذا (copy || tv->v_type != VAR_STRING)
 	{
 	    char_u *val = tv_get_string(tv);
 
 	    // Careful: when assigning to v:errmsg and
 	    // tv_get_string() causes an error message the variable
 	    // will already be set.
-	    if (di->di_tv.vval.v_string == NULL)
+	    إذا (di->di_tv.vval.v_string == عدم)
 		di->di_tv.vval.v_string = vim_strsave(val);
 	}
-	else
+	وإلا
 	{
 	    // Take over the string to avoid an extra alloc/free.
 	    di->di_tv.vval.v_string = tv->vval.v_string;
-	    tv->vval.v_string = NULL;
+	    tv->vval.v_string = عدم;
 	}
-	return FALSE;
+	أرجع FALSE;
     }
-    else if (di->di_tv.v_type == VAR_NUMBER)
+    وإلا إذا (di->di_tv.v_type == VAR_نمبر)
     {
-	di->di_tv.vval.v_number = tv_get_number(tv);
-	if (STRCMP(varname, "searchforward") == 0)
-	    set_search_direction(di->di_tv.vval.v_number ? '/' : '?');
-#ifdef FEAT_SEARCH_EXTRA
-	else if (STRCMP(varname, "hlsearch") == 0)
+	di->di_tv.vval.v_نمبر = tv_get_نمبر(tv);
+	إذا (STRCMP(varname, "searchforward") == 0)
+	    سیٹ_تلاش_direction(di->di_tv.vval.v_نمبر ? '/' : '?');
+#جے_تعریف_شدہ FEAT_تلاش_EXTRA
+	وإلا إذا (STRCMP(varname, "hlsearch") == 0)
 	{
-	    no_hlsearch = !di->di_tv.vval.v_number;
+	    no_hlsearch = !di->di_tv.vval.v_نمبر;
 	    redraw_all_later(UPD_SOME_VALID);
 	}
-#endif
-	return FALSE;
+#جے_انت
+	أرجع FALSE;
     }
-    else if (di->di_tv.v_type != tv->v_type)
+    وإلا إذا (di->di_tv.v_type != tv->v_type)
     {
 	*type_error = TRUE;
-	return FALSE;
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -4102,13 +4102,13 @@ before_set_vvar(
  * If the variable already exists, the value is updated.
  * Otherwise the variable is created.
  */
-    void
-set_var(
+    فراغ
+سیٹ_var(
     char_u	*name,
     typval_T	*tv,
-    int		copy)	    // make copy of value in "tv"
+    صحيح		copy)	    // make copy of value in "tv"
 {
-    set_var_const(name, 0, NULL, tv, copy, ASSIGN_DECL, 0);
+    سیٹ_var_const(name, 0, عدم, tv, copy, سونپو_DECL, 0);
 }
 
 /*
@@ -4117,15 +4117,15 @@ set_var(
  * If the variable already exists and "is_const" is FALSE the value is updated.
  * Otherwise the variable is created.
  */
-    int
-set_var_const(
+    صحيح
+سیٹ_var_const(
     char_u	*name,
     scid_T	sid,
     type_T	*type_arg,
     typval_T	*tv_arg,
-    int		copy,	    // make copy of value in "tv"
-    int		flags_arg,  // ASSIGN_CONST, ASSIGN_FINAL, etc.
-    int		var_idx)    // index for ":let [a, b] = list"
+    صحيح		copy,	    // make copy of value in "tv"
+    صحيح		flags_arg,  // ASSIGN_CONST, ASSIGN_FINAL, etc.
+    صحيح		var_idx)    // index for ":let [a, b] = list"
 {
     typval_T	*tv = tv_arg;
     type_T	*type = type_arg;
@@ -4133,178 +4133,178 @@ set_var_const(
     dictitem_T	*di;
     typval_T	*dest_tv;
     char_u	*varname;
-    char_u	*name_tofree = NULL;
-    hashtab_T	*ht = NULL;
-    int		is_script_local;
-    int		vim9script = in_vim9script();
-    int		var_in_vim9script;
-    int		var_in_autoload = FALSE;
-    int		flags = flags_arg;
-    int		free_tv_arg = !copy;  // free tv_arg if not used
-    int		rc = FAIL;
+    char_u	*name_tofree = عدم;
+    hashtab_T	*ht = عدم;
+    صحيح		is_script_local;
+    صحيح		vim9script = وچ_vim9script();
+    صحيح		var_وچ_vim9script;
+    صحيح		var_وچ_autoload = FALSE;
+    صحيح		flags = flags_arg;
+    صحيح		free_tv_arg = !copy;  // free tv_arg if not used
+    صحيح		rc = FAIL;
 
-    if (sid != 0)
+    إذا (sid != 0)
     {
-	varname = NULL;
-	if (SCRIPT_ID_VALID(sid))
+	varname = عدم;
+	إذا (SCRIPT_ID_VALID(sid))
 	{
-	    char_u	*auto_name = NULL;
-	    if (find_var_autoload_prefix(name, sid, &ht, &auto_name) != NULL)
+	    char_u	*auto_name = عدم;
+	    إذا (لبھو_var_autoload_اگیتر(name, sid, &ht, &auto_name) != عدم)
 	    {
-		var_in_autoload = TRUE;
+		var_وچ_autoload = TRUE;
 		varname = auto_name;
 		name_tofree = varname;
 	    }
-	    else
+	    وإلا
 		ht = &SCRIPT_VARS(sid);
 	}
-	if (varname == NULL)
+	إذا (varname == عدم)
 	    varname = name;
     }
-    else
+    وإلا
     {
 	scriptitem_T	*si;
-	char_u		*auto_name = NULL;
+	char_u		*auto_name = عدم;
 
-	if (in_vim9script()
+	إذا (وچ_vim9script()
 	    && SCRIPT_ID_VALID(current_sctx.sc_sid)
-	    && (si = SCRIPT_ITEM(current_sctx.sc_sid))
-					      ->sn_autoload_prefix != NULL
+	    && (si = SCRIPT_شے(current_sctx.sc_sid))
+					      ->sn_autoload_اگیتر != عدم
 	    && (is_export
-		|| find_var_autoload_prefix(name, 0, NULL, &auto_name)
-								    != NULL))
+		|| لبھو_var_autoload_اگیتر(name, 0, عدم, &auto_name)
+								    != عدم))
 	{
 	    // In a vim9 autoload script an exported variable is put in the
 	    // global namespace with the autoload prefix.
-	    var_in_autoload = TRUE;
-	    varname = auto_name != NULL ? auto_name
-		      : concat_str(si->sn_autoload_prefix, name);
-	    if (varname == NULL)
-		goto failed;
+	    var_وچ_autoload = TRUE;
+	    varname = auto_name != عدم ? auto_name
+		      : concat_str(si->sn_autoload_اگیتر, name);
+	    إذا (varname == عدم)
+		اذهب failed;
 	    name_tofree = varname;
 	    ht = &globvarht;
 	}
-	else
-	    ht = find_var_ht(name, &varname);
+	وإلا
+	    ht = لبھو_var_ht(name, &varname);
     }
-    if (ht == NULL || *varname == NUL)
+    إذا (ht == عدم || *varname == NUL)
     {
 	semsg(_(e_illegal_variable_name_str), name);
-	goto failed;
+	اذهب failed;
     }
     is_script_local = ht == get_script_local_ht() || sid != 0
-							    || var_in_autoload;
+							    || var_وچ_autoload;
 
-    if (vim9script
+    إذا (vim9script
 	    && !is_script_local
-	    && (flags & (ASSIGN_NO_DECL | ASSIGN_DECL)) == 0
-	    && (flags & (ASSIGN_CONST | ASSIGN_FINAL)) == 0
+	    && (flags & (سونپو_NO_DECL | سونپو_DECL)) == 0
+	    && (flags & (سونپو_CONST | سونپو_FINAL)) == 0
 	    && name[1] == ':')
     {
 	vim9_declare_error(name);
-	goto failed;
+	اذهب failed;
     }
-    if ((flags & ASSIGN_FOR_LOOP) && is_scoped_variable(name))
+    إذا ((flags & سونپو_FOR_LOOP) && is_scoped_variable(name))
 	// Do not make g:var, w:var, b:var or t:var final.
-	flags &= ~ASSIGN_FINAL;
+	flags &= ~سونپو_FINAL;
 
-    var_in_vim9script = is_script_local && current_script_is_vim9();
-    if (var_in_vim9script && name[0] == '_' && name[1] == NUL)
+    var_وچ_vim9script = is_script_local && current_script_is_vim9();
+    إذا (var_وچ_vim9script && name[0] == '_' && name[1] == NUL)
     {
 	// For "[a, _] = list" the underscore is ignored.
-	if ((flags & ASSIGN_UNPACK) == 0)
-	    emsg(_(e_cannot_use_underscore_here));
-	goto failed;
+	إذا ((flags & سونپو_UNPACK) == 0)
+	    emsg(_(e_cannot_use_underscore_ایتھے));
+	اذهب failed;
     }
 
-    di = find_var_in_ht(ht, 0, varname, TRUE);
+    di = لبھو_var_وچ_ht(ht, 0, varname, TRUE);
 
-    if (di == NULL && var_in_vim9script)
+    إذا (di == عدم && var_وچ_vim9script)
     {
-	imported_T  *import = find_imported(varname, 0, FALSE);
+	imported_T  *import = لبھو_imported(varname, 0, FALSE);
 
-	if (import != NULL)
+	إذا (import != عدم)
 	{
 	    // imported name space cannot be used
-	    if ((flags & ASSIGN_NO_DECL) == 0)
+	    إذا ((flags & سونپو_NO_DECL) == 0)
 	    {
-		semsg(_(e_redefining_imported_item_str), name);
-		goto failed;
+		semsg(_(e_redefining_imported_شے_str), name);
+		اذهب failed;
 	    }
 	    semsg(_(e_cannot_use_str_itself_it_is_imported), name);
-	    goto failed;
+	    اذهب failed;
 	}
-	if (!in_vim9script())
+	إذا (!وچ_vim9script())
 	{
-	    semsg(_(e_cannot_create_vim9_script_variable_in_function_str),
+	    semsg(_(e_cannot_create_vim9_script_variable_وچ_function_str),
 									 name);
-	    goto failed;
+	    اذهب failed;
 	}
     }
 
     // Search in parent scope which is possible to reference from lambda
-    if (di == NULL)
-	di = find_var_in_scoped_ht(name, TRUE);
+    إذا (di == عدم)
+	di = لبھو_var_وچ_scoped_ht(name, TRUE);
 
-    if ((tv->v_type == VAR_FUNC || tv->v_type == VAR_PARTIAL)
-				  && var_wrong_func_name(name, di == NULL))
-	goto failed;
+    إذا ((tv->v_type == VAR_FUNC || tv->v_type == VAR_PARTIAL)
+				  && var_wrong_func_name(name, di == عدم))
+	اذهب failed;
 
-    if (need_convert_to_bool(type, tv))
+    إذا (need_convert_منزل_bool(type, tv))
     {
 	// Destination is a bool and the value is not, but it can be
 	// converted.
-	CLEAR_FIELD(bool_tv);
+	CLEAR_میدان(bool_tv);
 	bool_tv.v_type = VAR_BOOL;
-	bool_tv.vval.v_number = tv2bool(tv) ? VVAL_TRUE : VVAL_FALSE;
+	bool_tv.vval.v_نمبر = tv2bool(tv) ? VVAL_TRUE : VVAL_FALSE;
 	tv = &bool_tv;
     }
 
-    if (di != NULL)
+    إذا (di != عدم)
     {
 	// Item already exists.  Allowed to replace when reloading.
-	if ((di->di_flags & DI_FLAGS_RELOAD) == 0)
+	إذا ((di->di_flags & DI_FLAGS_RELOAD) == 0)
 	{
-	    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
-					 && (flags & ASSIGN_FOR_LOOP) == 0)
+	    إذا ((flags & (سونپو_CONST | سونپو_FINAL))
+					 && (flags & سونپو_FOR_LOOP) == 0)
 	    {
 		emsg(_(e_cannot_modify_existing_variable));
-		goto failed;
+		اذهب failed;
 	    }
 
-	    if (is_script_local && vim9script
-			  && (flags & (ASSIGN_NO_DECL | ASSIGN_DECL)) == 0)
+	    إذا (is_script_local && vim9script
+			  && (flags & (سونپو_NO_DECL | سونپو_DECL)) == 0)
 	    {
-		semsg(_(e_redefining_script_item_str), name);
-		goto failed;
+		semsg(_(e_redefining_script_شے_str), name);
+		اذهب failed;
 	    }
 
-	    if (check_typval_is_value(&di->di_tv) == FAIL)
-		goto failed;
+	    إذا (check_typval_is_قدر(&di->di_tv) == FAIL)
+		اذهب failed;
 
 	    // List and Blob types can be modified in-place using the "+="
 	    // compound operator.  For other types, this is not allowed.
-	    int type_inplace_modifiable =
+	    صحيح type_inplace_modifiable =
 		(di->di_tv.v_type == VAR_LIST || di->di_tv.v_type == VAR_BLOB);
 
-	    if (var_in_vim9script && (flags & ASSIGN_FOR_LOOP) == 0
-		    && ((flags & ASSIGN_COMPOUND_OP) == 0
+	    إذا (var_وچ_vim9script && (flags & سونپو_FOR_LOOP) == 0
+		    && ((flags & سونپو_COMPOUND_OP) == 0
 			|| !type_inplace_modifiable))
 	    {
 		where_T where = WHERE_INIT;
-		svar_T  *sv = find_typval_in_script(&di->di_tv, sid, TRUE);
+		svar_T  *sv = لبھو_typval_وچ_script(&di->di_tv, sid, TRUE);
 
-		if (sv != NULL)
+		إذا (sv != عدم)
 		{
 		    // check the type and adjust to bool if needed
-		    if (var_idx > 0)
+		    إذا (var_idx > 0)
 		    {
-			where.wt_index = var_idx;
-			where.wt_kind = WT_VARIABLE;
+			where.wt_اشاریہ = var_idx;
+			where.wt_قسم = WT_VARIABLE;
 		    }
-		    if (check_script_var_type(sv, tv, name, where) == FAIL)
-			goto failed;
-		    if (type == NULL)
+		    إذا (check_script_var_type(sv, tv, name, where) == FAIL)
+			اذهب failed;
+		    إذا (type == عدم)
 			type = sv->sv_type;
 		    sv->sv_flags |= SVFLAG_ASSIGNED;
 		}
@@ -4312,144 +4312,144 @@ set_var_const(
 
 	    // Modifying a final variable with a List value using the "+="
 	    // operator is allowed.  For other types, it is not allowed.
-	    if ((((flags & ASSIGN_FOR_LOOP) == 0 || (flags & ASSIGN_DECL) == 0)
-			&& ((flags & ASSIGN_COMPOUND_OP) == 0
+	    إذا ((((flags & سونپو_FOR_LOOP) == 0 || (flags & سونپو_DECL) == 0)
+			&& ((flags & سونپو_COMPOUND_OP) == 0
 			    || !type_inplace_modifiable))
 				 ? var_check_permission(di, name) == FAIL
 				 : var_check_ro(di->di_flags, name, FALSE))
-		goto failed;
+		اذهب failed;
 	}
-	else
+	وإلا
 	{
 	    // can only redefine once
 	    di->di_flags &= ~DI_FLAGS_RELOAD;
 
 	    // A Vim9 script-local variable is also present in sn_all_vars
 	    // and sn_var_vals.  It may set "type" from "tv".
-	    if (var_in_vim9script || var_in_autoload)
+	    إذا (var_وچ_vim9script || var_وچ_autoload)
 		update_vim9_script_var(FALSE, di,
-			var_in_autoload ? name : di->di_key, flags,
-			tv, &type, (flags & ASSIGN_NO_MEMBER_TYPE) == 0);
+			var_وچ_autoload ? name : di->di_کلید, flags,
+			tv, &type, (flags & سونپو_NO_MEMBER_TYPE) == 0);
 	}
 
 	// existing variable, need to clear the value
 
 	// In Vim9 script a String v: variable only takes a String.
-	if (ht == &vimvarht && di->di_tv.v_type == VAR_STRING
-							    && in_vim9script())
+	إذا (ht == &vimvarht && di->di_tv.v_type == VAR_STRING
+							    && وچ_vim9script())
 	{
 	    where_T	where = WHERE_INIT;
 
-	    if (check_typval_type(&t_string, tv, where) == FAIL)
-		goto failed;
+	    إذا (check_typval_type(&t_string, tv, where) == FAIL)
+		اذهب failed;
 	}
 
 	// Handle setting internal v: variables separately where needed to
 	// prevent changing the type.
-	int type_error = FALSE;
-	if (ht == &vimvarht
-		&& !before_set_vvar(varname, di, tv, copy, &type_error))
+	صحيح type_error = FALSE;
+	إذا (ht == &vimvarht
+		&& !before_سیٹ_vvar(varname, di, tv, copy, &type_error))
 	{
-	    if (type_error)
-		semsg(_(e_setting_v_str_to_value_with_wrong_type), varname);
-	    goto failed;
+	    إذا (type_error)
+		semsg(_(e_setting_v_str_منزل_قدر_with_wrong_type), varname);
+	    اذهب failed;
 	}
 
 	clear_tv(&di->di_tv);
 
-	if ((flags & ASSIGN_UPDATE_BLOCK_ID)
+	إذا ((flags & سونپو_UPDATE_بلاک_ID)
 				       && SCRIPT_ID_VALID(current_sctx.sc_sid))
 	{
-	    scriptitem_T *si = SCRIPT_ITEM(current_sctx.sc_sid);
+	    scriptitem_T *si = SCRIPT_شے(current_sctx.sc_sid);
 
-	    update_script_var_block_id(name, si->sn_current_block_id);
+	    update_script_var_بلاک_id(name, si->sn_current_بلاک_id);
 	}
     }
-    else
+    وإلا
     {
 	// Item not found, check if a function already exists.
-	if (is_script_local && (flags & (ASSIGN_NO_DECL | ASSIGN_DECL)) == 0
-	       && lookup_scriptitem(name, STRLEN(name), FALSE, NULL) == OK)
+	إذا (is_script_local && (flags & (سونپو_NO_DECL | سونپو_DECL)) == 0
+	       && lookup_scriptitem(name, STRLEN(name), FALSE, عدم) == OK)
 	{
-	    semsg(_(e_redefining_script_item_str), name);
-	    goto failed;
+	    semsg(_(e_redefining_script_شے_str), name);
+	    اذهب failed;
 	}
 
 	// add a new variable
-	if (var_in_vim9script && (flags & ASSIGN_NO_DECL))
+	إذا (var_وچ_vim9script && (flags & سونپو_NO_DECL))
 	{
 	    semsg(_(e_unknown_variable_str), name);
-	    goto failed;
+	    اذهب failed;
 	}
 
-	if (check_hashtab_frozen(ht, "add variable"))
-	    goto failed;
+	إذا (check_hashtab_frozen(ht, "add variable"))
+	    اذهب failed;
 
 	// Can't add "v:" or "a:" variable.
-	if (ht == &vimvarht || ht == get_funccal_args_ht())
+	إذا (ht == &vimvarht || ht == get_funccal_دلیلاں_ht())
 	{
 	    semsg(_(e_illegal_variable_name_str), name);
-	    goto failed;
+	    اذهب failed;
 	}
 
 	// Make sure the variable name is valid.  In Vim9 script an
 	// autoload variable must be prefixed with "g:" unless in an
 	// autoload script.
-	if (!valid_varname(varname, -1, !vim9script
-			|| STRNCMP(name, "g:", 2) == 0 || var_in_autoload))
-	    goto failed;
+	إذا (!valid_varname(varname, -1, !vim9script
+			|| STRNCMP(name, "g:", 2) == 0 || var_وچ_autoload))
+	    اذهب failed;
 
-	di = alloc(offsetof(dictitem_T, di_key) + STRLEN(varname) + 1);
-	if (di == NULL)
-	    goto failed;
-	STRCPY(di->di_key, varname);
-	if (hash_add(ht, DI2HIKEY(di), "add variable") == FAIL)
+	di = alloc(offsetof(dictitem_T, di_کلید) + STRLEN(varname) + 1);
+	إذا (di == عدم)
+	    اذهب failed;
+	STRCPY(di->di_کلید, varname);
+	إذا (hash_جوڑو(ht, DI2HIKEY(di), "add variable") == FAIL)
 	{
 	    vim_free(di);
-	    goto failed;
+	    اذهب failed;
 	}
 	di->di_flags = DI_FLAGS_ALLOC;
-	if (flags & (ASSIGN_CONST | ASSIGN_FINAL))
-	    di->di_flags |= DI_FLAGS_LOCK;
+	إذا (flags & (سونپو_CONST | سونپو_FINAL))
+	    di->di_flags |= DI_FLAGS_جندرا;
 
 	// A Vim9 script-local variable is also added to sn_all_vars and
 	// sn_var_vals. It may set "type" from "tv".
-	if (var_in_vim9script || var_in_autoload)
+	إذا (var_وچ_vim9script || var_وچ_autoload)
 	    update_vim9_script_var(TRUE, di,
-		    var_in_autoload ? name : di->di_key, flags,
-			  tv, &type, (flags & ASSIGN_NO_MEMBER_TYPE) == 0);
+		    var_وچ_autoload ? name : di->di_کلید, flags,
+			  tv, &type, (flags & سونپو_NO_MEMBER_TYPE) == 0);
     }
 
     dest_tv = &di->di_tv;
-    if (copy || tv->v_type == VAR_NUMBER || tv->v_type == VAR_FLOAT)
+    إذا (copy || tv->v_type == VAR_نمبر || tv->v_type == VAR_FLOAT)
 	copy_tv(tv, dest_tv);
-    else
+    وإلا
     {
 	*dest_tv = *tv;
-	dest_tv->v_lock = 0;
+	dest_tv->v_جندرا = 0;
 	init_tv(tv);
     }
     free_tv_arg = FALSE;
 
-    if (vim9script && type != NULL)
-	set_tv_type(dest_tv, type);
+    إذا (vim9script && type != عدم)
+	سیٹ_tv_type(dest_tv, type);
 
     // ":const var = value" locks the value
     // ":final var = value" locks "var"
-    if (flags & ASSIGN_CONST)
+    إذا (flags & سونپو_CONST)
 	// Like :lockvar! name: lock the value and what it contains, but only
 	// if the reference count is up to one.  That locks only literal
 	// values.
-	item_lock(dest_tv, DICT_MAXNEST, TRUE, TRUE);
+	شے_جندرا(dest_tv, DICT_MAXNEST, TRUE, TRUE);
 
     rc = OK;
 
 failed:
     vim_free(name_tofree);
-    if (free_tv_arg)
+    إذا (free_tv_arg)
 	clear_tv(tv_arg);
 
-    return rc;
+    أرجع rc;
 }
 
 /*
@@ -4459,110 +4459,110 @@ failed:
  * - Whether the variable is locked
  * NOTE: "name" is only used for error messages.
  */
-    int
+    صحيح
 var_check_permission(dictitem_T *di, char_u *name)
 {
-    if (var_check_ro(di->di_flags, name, FALSE)
-		    || value_check_lock(di->di_tv.v_lock, name, FALSE)
-		    || var_check_lock(di->di_flags, name, FALSE))
-	return FAIL;
-    return OK;
+    إذا (var_check_ro(di->di_flags, name, FALSE)
+		    || قدر_check_جندرا(di->di_tv.v_جندرا, name, FALSE)
+		    || var_check_جندرا(di->di_flags, name, FALSE))
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Return TRUE if di_flags "flags" indicates variable "name" is read-only.
  * Also give an error message.
  */
-    int
-var_check_ro(int flags, char_u *name, int use_gettext)
+    صحيح
+var_check_ro(صحيح flags, char_u *name, صحيح use_gettext)
 {
-    if (flags & DI_FLAGS_RO)
+    إذا (flags & DI_FLAGS_RO)
     {
-	if (name == NULL)
+	إذا (name == عدم)
 	    emsg(_(e_cannot_change_readonly_variable));
-	else
+	وإلا
 	    semsg(_(e_cannot_change_readonly_variable_str),
 				       use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    if ((flags & DI_FLAGS_RO_SBX) && sandbox)
+    إذا ((flags & DI_FLAGS_RO_SBX) && sandbox)
     {
-	if (name == NULL)
-	    emsg(_(e_cannot_set_variable_in_sandbox));
-	else
-	    semsg(_(e_cannot_set_variable_in_sandbox_str),
+	إذا (name == عدم)
+	    emsg(_(e_cannot_سیٹ_variable_وچ_sandbox));
+	وإلا
+	    semsg(_(e_cannot_سیٹ_variable_وچ_sandbox_str),
 				       use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE if di_flags "flags" indicates variable "name" is locked.
  * Also give an error message.
  */
-    int
-var_check_lock(int flags, char_u *name, int use_gettext)
+    صحيح
+var_check_جندرا(صحيح flags, char_u *name, صحيح use_gettext)
 {
-    if (flags & DI_FLAGS_LOCK)
+    إذا (flags & DI_FLAGS_جندرا)
     {
 	semsg(_(e_variable_is_locked_str),
 				       use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE if di_flags "flags" indicates variable "name" is fixed.
  * Also give an error message.
  */
-    int
-var_check_fixed(int flags, char_u *name, int use_gettext)
+    صحيح
+var_check_fixed(صحيح flags, char_u *name, صحيح use_gettext)
 {
-    if (flags & DI_FLAGS_FIX)
+    إذا (flags & DI_FLAGS_FIX)
     {
-	if (name == NULL)
+	إذا (name == عدم)
 	    emsg(_(e_cannot_delete_variable));
-	else
+	وإلا
 	    semsg(_(e_cannot_delete_variable_str),
 				      use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Check if a funcref is assigned to a valid variable name.
  * Return TRUE and give an error if not.
  */
-    int
+    صحيح
 var_wrong_func_name(
     char_u *name,    // points to start of variable name
-    int    new_var)  // TRUE when creating the variable
+    صحيح    new_var)  // TRUE when creating the variable
 {
     // Allow for w: b: s: and t:.  In Vim9 script s: is not allowed, because
     // the name can be used without the s: prefix.
     // Allow autoload variable.
-    if (!((vim_strchr((char_u *)"wbt", name[0]) != NULL
-		    || (!in_vim9script() && name[0] == 's')) && name[1] == ':')
+    إذا (!((vim_strchr((char_u *)"wbt", name[0]) != عدم
+		    || (!وچ_vim9script() && name[0] == 's')) && name[1] == ':')
 	    && !ASCII_ISUPPER((name[0] != NUL && name[1] == ':')
 						     ? name[2] : name[0])
-	    && vim_strchr(name, '#') == NULL)
+	    && vim_strchr(name, '#') == عدم)
     {
-	semsg(_(e_funcref_variable_name_must_start_with_capital_str), name);
-	return TRUE;
+	semsg(_(e_funcref_variable_name_must_شروع_with_capital_str), name);
+	أرجع TRUE;
     }
     // Don't allow hiding a function.  When "v" is not NULL we might be
     // assigning another function to the same var, the type is checked
     // below.
-    if (new_var && function_exists(name, FALSE))
+    إذا (new_var && function_exists(name, FALSE))
     {
 	semsg(_(e_variable_name_conflicts_with_existing_function_str),
 								    name);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -4570,28 +4570,28 @@ var_wrong_func_name(
  * value.  Also give an error message, using "name" or _("name") when
  * "use_gettext" is TRUE.
  */
-    int
-value_check_lock(int lock, char_u *name, int use_gettext)
+    صحيح
+قدر_check_جندرا(صحيح جندرا, char_u *name, صحيح use_gettext)
 {
-    if (lock & VAR_LOCKED)
+    إذا (جندرا & VAR_LOCKED)
     {
-	if (name == NULL)
-	    emsg(_(e_value_is_locked));
-	else
-	    semsg(_(e_value_is_locked_str),
+	إذا (name == عدم)
+	    emsg(_(e_قدر_is_locked));
+	وإلا
+	    semsg(_(e_قدر_is_locked_str),
 				       use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    if (lock & VAR_FIXED)
+    إذا (جندرا & VAR_FIXED)
     {
-	if (name == NULL)
-	    emsg(_(e_cannot_change_value));
-	else
-	    semsg(_(e_cannot_change_value_of_str),
+	إذا (name == عدم)
+	    emsg(_(e_cannot_change_قدر));
+	وإلا
+	    semsg(_(e_cannot_change_قدر_دا_str),
 				       use_gettext ? (char_u *)_(name) : name);
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -4599,48 +4599,48 @@ value_check_lock(int lock, char_u *name, int use_gettext)
  * If "len" is -1 use all of "varname", otherwise up to "varname[len]".
  * Return FALSE and give an error if not.
  */
-    int
-valid_varname(char_u *varname, int len, int autoload)
+    صحيح
+valid_varname(char_u *varname, صحيح len, صحيح autoload)
 {
     char_u *p;
 
-    for (p = varname; len < 0 ? *p != NUL : p < varname + len; ++p)
-	if (!eval_isnamec1(*p) && (p == varname || !VIM_ISDIGIT(*p))
+    لكل (p = varname; len < 0 ? *p != NUL : p < varname + len; ++p)
+	إذا (!eval_isnamec1(*p) && (p == varname || !VIM_ISDIGIT(*p))
 					 && !(autoload && *p == AUTOLOAD_CHAR))
 	{
 	    semsg(_(e_illegal_variable_name_str), varname);
-	    return FALSE;
+	    أرجع FALSE;
 	}
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Implements the logic to retrieve local variable and option values.
  * Used by "getwinvar()" "gettabvar()" "gettabwinvar()" "getbufvar()".
  */
-    static void
+    ساكن فراغ
 get_var_from(
     char_u	*varname,
     typval_T	*rettv,
     typval_T	*deftv,	    // Default value if not found.
-    int		htname,	    // 't'ab, 'w'indow or 'b'uffer local.
+    صحيح		htname,	    // 't'ab, 'w'indow or 'b'uffer local.
     tabpage_T	*tp,	    // can be NULL
     win_T	*win,
     buf_T	*buf)	    // Ignored if htname is not 'b'.
 {
     dictitem_T	*v;
-    int		done = FALSE;
+    صحيح		پورا = FALSE;
     switchwin_T	switchwin;
-    int		need_switch_win;
-    int		do_change_curbuf = buf != NULL && htname == 'b';
+    صحيح		need_switch_win;
+    صحيح		do_change_curbuf = buf != عدم && htname == 'b';
 
     ++emsg_off;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (varname != NULL && tp != NULL && win != NULL
-	    && (htname != 'b' || buf != NULL))
+    إذا (varname != عدم && tp != عدم && win != عدم
+	    && (htname != 'b' || buf != عدم))
     {
 	// Set curwin to be our win, temporarily.  Also set the tabpage,
 	// otherwise the window is not valid. Only do this when needed,
@@ -4648,73 +4648,73 @@ get_var_from(
 	// If we have a buffer reference avoid the switching, we're saving and
 	// restoring curbuf directly.
 	need_switch_win = !(tp == curtab && win == curwin) && !do_change_curbuf;
-	if (!need_switch_win || switch_win(&switchwin, win, tp, TRUE) == OK)
+	إذا (!need_switch_win || switch_win(&switchwin, win, tp, TRUE) == OK)
 	{
 	    // Handle options. There are no tab-local options.
-	    if (*varname == '&' && htname != 't')
+	    إذا (*varname == '&' && htname != 't')
 	    {
 		buf_T	*save_curbuf = curbuf;
 
 		// Change curbuf so the option is read from the correct buffer.
-		if (do_change_curbuf)
+		إذا (do_change_curbuf)
 		    curbuf = buf;
 
-		if (varname[1] == NUL)
+		إذا (varname[1] == NUL)
 		{
 		    // get all window-local or buffer-local options in a dict
 		    dict_T	*opts = get_winbuf_options(htname == 'b');
 
-		    if (opts != NULL)
+		    إذا (opts != عدم)
 		    {
-			rettv_dict_set(rettv, opts);
-			done = TRUE;
+			rettv_dict_سیٹ(rettv, opts);
+			پورا = TRUE;
 		    }
 		}
-		else if (eval_option(&varname, rettv, TRUE) == OK)
+		وإلا إذا (eval_option(&varname, rettv, TRUE) == OK)
 		    // Local option
-		    done = TRUE;
+		    پورا = TRUE;
 
 		curbuf = save_curbuf;
 	    }
-	    else if (*varname == NUL)
+	    وإلا إذا (*varname == NUL)
 	    {
 		// Empty string: return a dict with all the local variables.
-		if (htname == 'b')
+		إذا (htname == 'b')
 		    v = &buf->b_bufvar;
-		else if (htname == 'w')
+		وإلا إذا (htname == 'w')
 		    v = &win->w_winvar;
-		else
+		وإلا
 		    v = &tp->tp_winvar;
 		copy_tv(&v->di_tv, rettv);
-		done = TRUE;
+		پورا = TRUE;
 	    }
-	    else
+	    وإلا
 	    {
 		hashtab_T	*ht;
 
-		if (htname == 'b')
+		إذا (htname == 'b')
 		    ht = &buf->b_vars->dv_hashtab;
-		else if (htname == 'w')
+		وإلا إذا (htname == 'w')
 		    ht = &win->w_vars->dv_hashtab;
-		else
+		وإلا
 		    ht = &tp->tp_vars->dv_hashtab;
 
 		// Look up the variable.
-		v = find_var_in_ht(ht, htname, varname, FALSE);
-		if (v != NULL)
+		v = لبھو_var_وچ_ht(ht, htname, varname, FALSE);
+		إذا (v != عدم)
 		{
 		    copy_tv(&v->di_tv, rettv);
-		    done = TRUE;
+		    پورا = TRUE;
 		}
 	    }
 	}
 
-	if (need_switch_win)
+	إذا (need_switch_win)
 	    // restore previous notion of curwin
 	    restore_win(&switchwin, TRUE);
     }
 
-    if (!done && deftv->v_type != VAR_UNKNOWN)
+    إذا (!پورا && deftv->v_type != VAR_UNKNOWN)
 	// use the default value
 	copy_tv(deftv, rettv);
 
@@ -4724,113 +4724,113 @@ get_var_from(
 /*
  * getwinvar() and gettabwinvar()
  */
-    static void
+    ساكن فراغ
 getwinvar(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		off)	    // 1 for gettabwinvar()
+    صحيح		off)	    // 1 for gettabwinvar()
 {
     char_u	*varname;
     tabpage_T	*tp;
     win_T	*win;
 
-    if (off == 1)
-	tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-    else
+    إذا (off == 1)
+	tp = لبھو_tabpage((صحيح)tv_get_نمبر_chk(&argvars[0], عدم));
+    وإلا
 	tp = curtab;
-    win = find_win_by_nr(&argvars[off], tp);
+    win = لبھو_win_by_nr(&argvars[off], tp);
     varname = tv_get_string_chk(&argvars[off + 1]);
 
-    get_var_from(varname, rettv, &argvars[off + 2], 'w', tp, win, NULL);
+    get_var_from(varname, rettv, &argvars[off + 2], 'w', tp, win, عدم);
 }
 
 /*
  * Set option "varname" to the value of "varp" for the current buffer/window.
  */
-    static void
-set_option_from_tv(char_u *varname, typval_T *varp)
+    ساكن فراغ
+سیٹ_option_from_tv(char_u *varname, typval_T *varp)
 {
-    long	numval = 0;
+    لما	numval = 0;
     char_u	*strval;
     char_u	nbuf[NUMBUFLEN];
-    int		error = FALSE;
+    صحيح		error = FALSE;
 
-    int		opt_idx = findoption(varname);
-    if (opt_idx < 0)
+    صحيح		opt_idx = findoption(varname);
+    إذا (opt_idx < 0)
     {
 	semsg(_(e_unknown_option_str_2), varname);
-	return;
+	أرجع;
     }
-    int		opt_p_flags = get_option_flags(opt_idx);
+    صحيح		opt_p_flags = get_option_flags(opt_idx);
 
-    if (varp->v_type == VAR_BOOL)
+    إذا (varp->v_type == VAR_BOOL)
     {
-	if (opt_p_flags & P_STRING)
+	إذا (opt_p_flags & P_STRING)
 	{
 	    emsg(_(e_string_required));
-	    return;
+	    أرجع;
 	}
-	numval = (long)varp->vval.v_number;
+	numval = (لما)varp->vval.v_نمبر;
 	strval = (char_u *)"0";  // avoid using "false"
     }
-    else
+    وإلا
     {
-	if ((opt_p_flags & (P_NUM|P_BOOL))
-		&& (!in_vim9script() || varp->v_type != VAR_STRING))
-	    numval = (long)tv_get_number_chk(varp, &error);
-	if (!error)
+	إذا ((opt_p_flags & (P_عدد|P_BOOL))
+		&& (!وچ_vim9script() || varp->v_type != VAR_STRING))
+	    numval = (لما)tv_get_نمبر_chk(varp, &error);
+	إذا (!error)
 	    strval = tv_get_string_buf_chk(varp, nbuf);
     }
-    if (!error && strval != NULL)
-	set_option_value_give_err(varname, numval, strval, OPT_LOCAL);
+    إذا (!error && strval != عدم)
+	سیٹ_option_قدر_give_err(varname, numval, strval, OPT_LOCAL);
 }
 
 /*
  * "setwinvar()" and "settabwinvar()" functions
  */
-    static void
-setwinvar(typval_T *argvars, int off)
+    ساكن فراغ
+setwinvar(typval_T *argvars, صحيح off)
 {
     win_T	*win;
     switchwin_T	switchwin;
-    int		need_switch_win;
+    صحيح		need_switch_win;
     char_u	*varname, *winvarname;
     typval_T	*varp;
-    tabpage_T	*tp = NULL;
+    tabpage_T	*tp = عدم;
 
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (off == 1)
-	tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-    else
+    إذا (off == 1)
+	tp = لبھو_tabpage((صحيح)tv_get_نمبر_chk(&argvars[0], عدم));
+    وإلا
 	tp = curtab;
-    win = find_win_by_nr(&argvars[off], tp);
+    win = لبھو_win_by_nr(&argvars[off], tp);
     varname = tv_get_string_chk(&argvars[off + 1]);
     varp = &argvars[off + 2];
 
-    if (win == NULL || varname == NULL)
-	return;
+    إذا (win == عدم || varname == عدم)
+	أرجع;
 
     need_switch_win = !(tp == curtab && win == curwin);
-    if (!need_switch_win
+    إذا (!need_switch_win
 	    || switch_win(&switchwin, win, tp, TRUE) == OK)
     {
-	if (*varname == '&')
-	    set_option_from_tv(varname + 1, varp);
-	else
+	إذا (*varname == '&')
+	    سیٹ_option_from_tv(varname + 1, varp);
+	وإلا
 	{
 	    winvarname = alloc(STRLEN(varname) + 3);
-	    if (winvarname != NULL)
+	    إذا (winvarname != عدم)
 	    {
 		STRCPY(winvarname, "w:");
 		STRCPY(winvarname + 2, varname);
-		set_var(winvarname, varp, TRUE);
+		سیٹ_var(winvarname, varp, TRUE);
 		vim_free(winvarname);
 	    }
 	}
     }
-    if (need_switch_win)
+    إذا (need_switch_win)
 	restore_win(&switchwin, TRUE);
 }
 
@@ -4838,92 +4838,92 @@ setwinvar(typval_T *argvars, int off)
  * reset v:option_new, v:option_old, v:option_oldlocal, v:option_oldglobal,
  * v:option_type, and v:option_command.
  */
-    void
-reset_v_option_vars(void)
+    فراغ
+reset_v_option_vars(فراغ)
 {
-    set_vim_var_string(VV_OPTION_NEW, NULL, -1);
-    set_vim_var_string(VV_OPTION_OLD, NULL, -1);
-    set_vim_var_string(VV_OPTION_OLDLOCAL, NULL, -1);
-    set_vim_var_string(VV_OPTION_OLDGLOBAL, NULL, -1);
-    set_vim_var_string(VV_OPTION_TYPE, NULL, -1);
-    set_vim_var_string(VV_OPTION_COMMAND, NULL, -1);
+    سیٹ_vim_var_string(VV_OPTION_NEW, عدم, -1);
+    سیٹ_vim_var_string(VV_OPTION_OLD, عدم, -1);
+    سیٹ_vim_var_string(VV_OPTION_OLDLOCAL, عدم, -1);
+    سیٹ_vim_var_string(VV_OPTION_OLDGLOBAL, عدم, -1);
+    سیٹ_vim_var_string(VV_OPTION_TYPE, عدم, -1);
+    سیٹ_vim_var_string(VV_OPTION_COMMAND, عدم, -1);
 }
 
 /*
  * Add an assert error to v:errors.
  */
-    void
+    فراغ
 assert_error(garray_T *gap)
 {
-    struct vimvar   *vp = &vimvars[VV_ERRORS];
+    بنية vimvar   *vp = &vimvars[VV_ERRORS];
 
-    if (vp->vv_tv_type != VAR_LIST || vimvars[VV_ERRORS].vv_list == NULL)
+    إذا (vp->vv_tv_type != VAR_LIST || vimvars[VV_ERRORS].vv_list == عدم)
 	// Make sure v:errors is a list.
-	set_vim_var_list(VV_ERRORS, list_alloc());
-    list_append_string(vimvars[VV_ERRORS].vv_list, gap->ga_data, gap->ga_len);
+	سیٹ_vim_var_list(VV_ERRORS, list_alloc());
+    list_append_string(vimvars[VV_ERRORS].vv_list, gap->ga_انکڑے, gap->ga_len);
 }
 
-    int
+    صحيح
 var_exists(char_u *var)
 {
     char_u	*arg = var;
     char_u	*name;
     char_u	*tofree;
     typval_T    tv;
-    int		len = 0;
-    int		n = FALSE;
+    صحيح		len = 0;
+    صحيح		n = FALSE;
 
     // get_name_len() takes care of expanding curly braces
     name = var;
     len = get_name_len(&arg, &tofree, TRUE, FALSE);
-    if (len > 0)
+    إذا (len > 0)
     {
-	if (tofree != NULL)
+	إذا (tofree != عدم)
 	    name = tofree;
-	n = (eval_variable(name, len, 0, &tv, NULL,
+	n = (eval_variable(name, len, 0, &tv, عدم,
 				 EVAL_VAR_NOAUTOLOAD + EVAL_VAR_IMPORT) == OK);
-	if (n)
+	إذا (n)
 	{
 	    // handle d.key, l[idx], f(expr)
 	    arg = skipwhite(arg);
 	    n = (handle_subscript(&arg, name, &tv, &EVALARG_EVALUATE,
 								 FALSE) == OK);
-	    if (n)
+	    إذا (n)
 		clear_tv(&tv);
 	}
     }
-    if (*arg != NUL)
+    إذا (*arg != NUL)
 	n = FALSE;
 
     vim_free(tofree);
-    return n;
+    أرجع n;
 }
 
-static lval_T	*redir_lval = NULL;
-#define EVALCMD_BUSY (redir_lval == (lval_T *)&redir_lval)
-static garray_T redir_ga;	// only valid when redir_lval is not NULL
-static char_u	*redir_endp = NULL;
-static char_u	*redir_varname = NULL;
+ساكن lval_T	*redir_lval = عدم;
+#تعریف_کرو EVALCMD_BUSY (redir_lval == (lval_T *)&redir_lval)
+ساكن garray_T redir_ga;	// only valid when redir_lval is not NULL
+ساكن char_u	*redir_endp = عدم;
+ساكن char_u	*redir_varname = عدم;
 
-    int
-alloc_redir_lval(void)
+    صحيح
+alloc_redir_lval(فراغ)
 {
     redir_lval = ALLOC_CLEAR_ONE(lval_T);
-    if (redir_lval == NULL)
-	return FAIL;
-    return OK;
+    إذا (redir_lval == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
-    void
-clear_redir_lval(void)
+    فراغ
+clear_redir_lval(فراغ)
 {
     VIM_CLEAR(redir_lval);
 }
 
-    void
-init_redir_ga(void)
+    فراغ
+init_redir_ga(فراغ)
 {
-    ga_init2(&redir_ga, sizeof(char), 500);
+    ga_init2(&redir_ga, حجم(حرف), 500);
 }
 
 /*
@@ -4931,47 +4931,47 @@ init_redir_ga(void)
  * When "append" is TRUE append to an existing variable.
  * Returns OK if successfully completed the setup.  FAIL otherwise.
  */
-    int
-var_redir_start(char_u *name, int append)
+    صحيح
+var_redir_شروع(char_u *name, صحيح append)
 {
-    int		called_emsg_before;
+    صحيح		called_emsg_before;
     typval_T	tv;
 
     // Catch a bad name early.
-    if (!eval_isnamec1(*name))
+    إذا (!eval_isnamec1(*name))
     {
-	emsg(_(e_invalid_argument));
-	return FAIL;
+	emsg(_(e_invalid_دلیل));
+	أرجع FAIL;
     }
 
     // Make a copy of the name, it is used in redir_lval until redir ends.
     redir_varname = vim_strsave(name);
-    if (redir_varname == NULL)
-	return FAIL;
+    إذا (redir_varname == عدم)
+	أرجع FAIL;
 
-    if (alloc_redir_lval() == FAIL)
+    إذا (alloc_redir_lval() == FAIL)
     {
 	var_redir_stop();
-	return FAIL;
+	أرجع FAIL;
     }
 
     // The output is stored in growarray "redir_ga" until redirection ends.
     init_redir_ga();
 
     // Parse the variable name (can be a dict or list entry).
-    redir_endp = get_lval(redir_varname, NULL, redir_lval, FALSE, FALSE, 0,
-							     FNE_CHECK_START);
-    if (redir_endp == NULL || redir_lval->ll_name == NULL || *redir_endp != NUL)
+    redir_endp = get_lval(redir_varname, عدم, redir_lval, FALSE, FALSE, 0,
+							     FNE_CHECK_شروع);
+    إذا (redir_endp == عدم || redir_lval->ll_name == عدم || *redir_endp != NUL)
     {
 	clear_lval(redir_lval);
-	if (redir_endp != NULL && *redir_endp != NUL)
+	إذا (redir_endp != عدم && *redir_endp != NUL)
 	    // Trailing characters are present after the variable name
 	    semsg(_(e_trailing_characters_str), redir_endp);
-	else
-	    semsg(_(e_invalid_argument_str), name);
-	redir_endp = NULL;  // don't store a value, only cleanup
+	وإلا
+	    semsg(_(e_invalid_دلیل_str), name);
+	redir_endp = عدم;  // don't store a value, only cleanup
 	var_redir_stop();
-	return FAIL;
+	أرجع FAIL;
     }
 
     // check if we can write to the variable: set it to or append an empty
@@ -4979,21 +4979,21 @@ var_redir_start(char_u *name, int append)
     called_emsg_before = called_emsg;
     tv.v_type = VAR_STRING;
     tv.vval.v_string = (char_u *)"";
-    if (append)
-	set_var_lval(redir_lval, redir_endp, &tv, TRUE,
-					     ASSIGN_NO_DECL, (char_u *)".", 0);
-    else
-	set_var_lval(redir_lval, redir_endp, &tv, TRUE,
-					     ASSIGN_NO_DECL, (char_u *)"=", 0);
+    إذا (append)
+	سیٹ_var_lval(redir_lval, redir_endp, &tv, TRUE,
+					     سونپو_NO_DECL, (char_u *)".", 0);
+    وإلا
+	سیٹ_var_lval(redir_lval, redir_endp, &tv, TRUE,
+					     سونپو_NO_DECL, (char_u *)"=", 0);
     clear_lval(redir_lval);
-    if (called_emsg > called_emsg_before)
+    إذا (called_emsg > called_emsg_before)
     {
-	redir_endp = NULL;  // don't store a value, only cleanup
+	redir_endp = عدم;  // don't store a value, only cleanup
 	var_redir_stop();
-	return FAIL;
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -5005,25 +5005,25 @@ var_redir_start(char_u *name, int append)
  *   :let foo
  *   :redir END
  */
-    void
-var_redir_str(char_u *value, int value_len)
+    فراغ
+var_redir_str(char_u *قدر, صحيح قدر_len)
 {
-    int		len;
+    صحيح		len;
 
-    if (redir_lval == NULL)
-	return;
+    إذا (redir_lval == عدم)
+	أرجع;
 
-    if (value_len == -1)
-	len = (int)STRLEN(value);	// Append the entire string
-    else
-	len = value_len;		// Append only "value_len" characters
+    إذا (قدر_len == -1)
+	len = (صحيح)STRLEN(قدر);	// Append the entire string
+    وإلا
+	len = قدر_len;		// Append only "value_len" characters
 
-    if (ga_grow(&redir_ga, len) == OK)
+    إذا (ga_grow(&redir_ga, len) == OK)
     {
-	mch_memmove((char *)redir_ga.ga_data + redir_ga.ga_len, value, len);
+	mch_memmove((حرف *)redir_ga.ga_انکڑے + redir_ga.ga_len, قدر, len);
 	redir_ga.ga_len += len;
     }
-    else
+    وإلا
 	var_redir_stop();
 }
 
@@ -5031,37 +5031,37 @@ var_redir_str(char_u *value, int value_len)
  * Stop redirecting command output to a variable.
  * Frees the allocated memory.
  */
-    void
-var_redir_stop(void)
+    فراغ
+var_redir_stop(فراغ)
 {
     typval_T	tv;
 
-    if (EVALCMD_BUSY)
+    إذا (EVALCMD_BUSY)
     {
-	redir_lval = NULL;
-	return;
+	redir_lval = عدم;
+	أرجع;
     }
 
-    if (redir_lval != NULL)
+    إذا (redir_lval != عدم)
     {
 	// If there was no error: assign the text to the variable.
-	if (redir_endp != NULL)
+	إذا (redir_endp != عدم)
 	{
 	    ga_append(&redir_ga, NUL);  // Append the trailing NUL.
 	    tv.v_type = VAR_STRING;
-	    tv.vval.v_string = redir_ga.ga_data;
+	    tv.vval.v_string = redir_ga.ga_انکڑے;
 	    // Call get_lval() again, if it's inside a Dict or List it may
 	    // have changed.
-	    redir_endp = get_lval(redir_varname, NULL, redir_lval,
-					FALSE, FALSE, 0, FNE_CHECK_START);
-	    if (redir_endp != NULL && redir_lval->ll_name != NULL)
-		set_var_lval(redir_lval, redir_endp, &tv, FALSE, 0,
+	    redir_endp = get_lval(redir_varname, عدم, redir_lval,
+					FALSE, FALSE, 0, FNE_CHECK_شروع);
+	    إذا (redir_endp != عدم && redir_lval->ll_name != عدم)
+		سیٹ_var_lval(redir_lval, redir_endp, &tv, FALSE, 0,
 							     (char_u *)".", 0);
 	    clear_lval(redir_lval);
 	}
 
 	// free the collected output
-	VIM_CLEAR(redir_ga.ga_data);
+	VIM_CLEAR(redir_ga.ga_انکڑے);
 
 	VIM_CLEAR(redir_lval);
     }
@@ -5072,51 +5072,51 @@ var_redir_stop(void)
  * Get the collected redirected text and clear redir_ga.
  */
     char_u *
-get_clear_redir_ga(void)
+get_clear_redir_ga(فراغ)
 {
     char_u *res;
 
     ga_append(&redir_ga, NUL);  // Append the trailing NUL.
-    res = redir_ga.ga_data;
-    redir_ga.ga_data = NULL;
-    return res;
+    res = redir_ga.ga_انکڑے;
+    redir_ga.ga_انکڑے = عدم;
+    أرجع res;
 }
 
 /*
  * "gettabvar()" function
  */
-    void
+    فراغ
 f_gettabvar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*varname;
     tabpage_T	*tp;
-    win_T	*win = NULL;
+    win_T	*win = عدم;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     varname = tv_get_string_chk(&argvars[1]);
-    tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-    if (tp != NULL)
-	win = tp == curtab || tp->tp_firstwin == NULL ? firstwin
+    tp = لبھو_tabpage((صحيح)tv_get_نمبر_chk(&argvars[0], عدم));
+    إذا (tp != عدم)
+	win = tp == curtab || tp->tp_firstwin == عدم ? firstwin
 		: tp->tp_firstwin;
 
-    get_var_from(varname, rettv, &argvars[2], 't', tp, win, NULL);
+    get_var_from(varname, rettv, &argvars[2], 't', tp, win, عدم);
 }
 
 /*
  * "gettabwinvar()" function
  */
-    void
+    فراغ
 f_gettabwinvar(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
     getwinvar(argvars, rettv, 1);
 }
@@ -5124,13 +5124,13 @@ f_gettabwinvar(typval_T *argvars, typval_T *rettv)
 /*
  * "getwinvar()" function
  */
-    void
+    فراغ
 f_getwinvar(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     getwinvar(argvars, rettv, 0);
 }
@@ -5138,16 +5138,16 @@ f_getwinvar(typval_T *argvars, typval_T *rettv)
 /*
  * "getbufvar()" function
  */
-    void
+    فراغ
 f_getbufvar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*varname;
     buf_T	*buf;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     varname = tv_get_string_chk(&argvars[1]);
     buf = tv_get_buf_from_arg(&argvars[0]);
@@ -5158,8 +5158,8 @@ f_getbufvar(typval_T *argvars, typval_T *rettv)
 /*
  * "settabvar()" function
  */
-    void
-f_settabvar(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_settabvar(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     tabpage_T	*save_curtab;
     tabpage_T	*tp;
@@ -5167,39 +5167,39 @@ f_settabvar(typval_T *argvars, typval_T *rettv UNUSED)
     char_u	*varname, *tabvarname;
     typval_T	*varp;
 
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
+    tp = لبھو_tabpage((صحيح)tv_get_نمبر_chk(&argvars[0], عدم));
     varname = tv_get_string_chk(&argvars[1]);
     varp = &argvars[2];
 
-    if (varname == NULL || tp == NULL)
-	return;
+    إذا (varname == عدم || tp == عدم)
+	أرجع;
 
     save_curtab = curtab;
     save_lu_tp = lastused_tabpage;
     goto_tabpage_tp(tp, FALSE, FALSE);
 
     tabvarname = alloc(STRLEN(varname) + 3);
-    if (tabvarname != NULL)
+    إذا (tabvarname != عدم)
     {
 	STRCPY(tabvarname, "t:");
 	STRCPY(tabvarname + 2, varname);
-	set_var(tabvarname, varp, TRUE);
+	سیٹ_var(tabvarname, varp, TRUE);
 	vim_free(tabvarname);
     }
 
     // Restore current tabpage and last accessed tabpage.
-    if (valid_tabpage(save_curtab))
+    إذا (valid_tabpage(save_curtab))
     {
 	goto_tabpage_tp(save_curtab, FALSE, FALSE);
-	if (valid_tabpage(save_lu_tp))
+	إذا (valid_tabpage(save_lu_tp))
 	    lastused_tabpage = save_lu_tp;
     }
 }
@@ -5207,14 +5207,14 @@ f_settabvar(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "settabwinvar()" function
  */
-    void
-f_settabwinvar(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_settabwinvar(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
     setwinvar(argvars, 1);
 }
@@ -5222,13 +5222,13 @@ f_settabwinvar(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "setwinvar()" function
  */
-    void
-f_setwinvar(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_setwinvar(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     setwinvar(argvars, 0);
 }
@@ -5236,29 +5236,29 @@ f_setwinvar(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "setbufvar()" function
  */
-    void
-f_setbufvar(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_setbufvar(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
     char_u	*varname, *bufvarname;
     typval_T	*varp;
 
-    if (check_secure())
-	return;
+    إذا (check_secure())
+	أرجع;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     varname = tv_get_string_chk(&argvars[1]);
     buf = tv_get_buf_from_arg(&argvars[0]);
     varp = &argvars[2];
 
-    if (buf == NULL || varname == NULL)
-	return;
+    إذا (buf == عدم || varname == عدم)
+	أرجع;
 
-    if (*varname == '&')
+    إذا (*varname == '&')
     {
 	aco_save_T	aco;
 	// safe the current window position, it could
@@ -5268,27 +5268,27 @@ f_setbufvar(typval_T *argvars, typval_T *rettv UNUSED)
 
 	// Set curbuf to be our buf, temporarily.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	إذا (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    set_option_from_tv(varname + 1, varp);
+	    سیٹ_option_from_tv(varname + 1, varp);
 
 	    // reset notion of buffer
 	    aucmd_restbuf(&aco);
 	}
 	curwin->w_topline = old_topline;
     }
-    else
+    وإلا
     {
 	bufvarname = alloc(STRLEN(varname) + 3);
-	if (bufvarname != NULL)
+	إذا (bufvarname != عدم)
 	{
 	    buf_T *save_curbuf = curbuf;
 
 	    curbuf = buf;
 	    STRCPY(bufvarname, "b:");
 	    STRCPY(bufvarname + 2, varname);
-	    set_var(bufvarname, varp, TRUE);
+	    سیٹ_var(bufvarname, varp, TRUE);
 	    vim_free(bufvarname);
 	    curbuf = save_curbuf;
 	}
@@ -5305,27 +5305,27 @@ f_setbufvar(typval_T *argvars, typval_T *rettv UNUSED)
 get_callback(typval_T *arg)
 {
     callback_T  res;
-    int		r = OK;
+    صحيح		r = OK;
 
-    CLEAR_FIELD(res);
-    if (arg->v_type == VAR_PARTIAL && arg->vval.v_partial != NULL)
+    CLEAR_میدان(res);
+    إذا (arg->v_type == VAR_PARTIAL && arg->vval.v_partial != عدم)
     {
 	res.cb_partial = arg->vval.v_partial;
 	++res.cb_partial->pt_refcount;
 	res.cb_name = partial_name(res.cb_partial);
     }
-    else
+    وإلا
     {
-	if (arg->v_type == VAR_STRING && arg->vval.v_string != NULL
-					       && SAFE_isdigit(*arg->vval.v_string))
+	إذا (arg->v_type == VAR_STRING && arg->vval.v_string != عدم
+					       && محفوظ_isdigit(*arg->vval.v_string))
 	    r = FAIL;
-	else if (arg->v_type == VAR_FUNC || arg->v_type == VAR_STRING)
+	وإلا إذا (arg->v_type == VAR_FUNC || arg->v_type == VAR_STRING)
 	{
 	    res.cb_name = arg->vval.v_string;
-	    if (arg->v_type == VAR_STRING)
+	    إذا (arg->v_type == VAR_STRING)
 	    {
 		char_u *name = get_scriptlocal_funcname(arg->vval.v_string);
-		if (name != NULL)
+		إذا (name != عدم)
 		{
 		    res.cb_name = name;
 		    res.cb_free_name = TRUE;
@@ -5333,33 +5333,33 @@ get_callback(typval_T *arg)
 	    }
 	    func_ref(res.cb_name);
 	}
-	else if (arg->v_type == VAR_NUMBER && arg->vval.v_number == 0)
+	وإلا إذا (arg->v_type == VAR_نمبر && arg->vval.v_نمبر == 0)
 	    res.cb_name = (char_u *)"";
-	else
+	وإلا
 	    r = FAIL;
 
-	if (r == FAIL)
+	إذا (r == FAIL)
 	{
-	    emsg(_(e_invalid_callback_argument));
-	    res.cb_name = NULL;
+	    emsg(_(e_invalid_callback_دلیل));
+	    res.cb_name = عدم;
 	}
     }
-    return res;
+    أرجع res;
 }
 
 /*
  * Copy a callback into a typval_T.
  */
-    void
+    فراغ
 put_callback(callback_T *cb, typval_T *tv)
 {
-    if (cb->cb_partial != NULL)
+    إذا (cb->cb_partial != عدم)
     {
 	tv->v_type = VAR_PARTIAL;
 	tv->vval.v_partial = cb->cb_partial;
 	++tv->vval.v_partial->pt_refcount;
     }
-    else
+    وإلا
     {
 	tv->v_type = VAR_FUNC;
 	tv->vval.v_string = vim_strsave(cb->cb_name);
@@ -5367,22 +5367,22 @@ put_callback(callback_T *cb, typval_T *tv)
     }
 }
 
-    static bool
+    ساكن bool
 does_callback_own_cb_name(callback_T *cb)
 {
     // If cb_partial != NULL then *cb->cb_name is owned by the partial.
-    return cb->cb_partial || cb->cb_free_name;
+    أرجع cb->cb_partial || cb->cb_free_name;
 }
 
 /*
  * Make a copy of "src" into "dest", allocating the function name if needed,
  * without incrementing the refcount.
  */
-    void
-set_callback(callback_T *dest, callback_T *src)
+    فراغ
+سیٹ_callback(callback_T *dest, callback_T *src)
 {
     *dest = *src;
-    if (!does_callback_own_cb_name(src))
+    إذا (!does_callback_own_cb_name(src))
     {
 	dest->cb_name = vim_strsave(src->cb_name);
 	dest->cb_free_name = TRUE;
@@ -5393,17 +5393,17 @@ set_callback(callback_T *dest, callback_T *src)
 /*
  * Copy callback from "src" to "dest", incrementing the refcounts.
  */
-    void
+    فراغ
 copy_callback(callback_T *dest, callback_T *src)
 {
     dest->cb_partial = src->cb_partial;
-    if (dest->cb_partial != NULL)
+    إذا (dest->cb_partial != عدم)
     {
 	dest->cb_name = src->cb_name;
 	dest->cb_free_name = FALSE;
 	++dest->cb_partial->pt_refcount;
     }
-    else
+    وإلا
     {
 	dest->cb_name = vim_strsave(src->cb_name);
 	dest->cb_free_name = TRUE;
@@ -5416,45 +5416,45 @@ copy_callback(callback_T *dest, callback_T *src)
  * the "path#name" form.  Uses the current script context.
  * Only works when the name is allocated.
  */
-    void
+    فراغ
 expand_autload_callback(callback_T *cb)
 {
     char_u	*name;
     char_u	*p;
     imported_T	*import;
 
-    if (!in_vim9script() || cb->cb_name == NULL
+    إذا (!وچ_vim9script() || cb->cb_name == عدم
 	    || (!cb->cb_free_name
-	       && (cb->cb_partial == NULL || cb->cb_partial->pt_name == NULL)))
-	return;
-    if (cb->cb_partial != NULL)
+	       && (cb->cb_partial == عدم || cb->cb_partial->pt_name == عدم)))
+	أرجع;
+    إذا (cb->cb_partial != عدم)
 	name = cb->cb_partial->pt_name;
-    else
+    وإلا
 	name = cb->cb_name;
     p = vim_strchr(name, '.');
-    if (p == NULL)
-	return;
+    إذا (p == عدم)
+	أرجع;
 
-    import = find_imported(name, p - name, FALSE);
-    if (import == NULL || !SCRIPT_ID_VALID(import->imp_sid))
-	return;
+    import = لبھو_imported(name, p - name, FALSE);
+    إذا (import == عدم || !SCRIPT_ID_VALID(import->imp_sid))
+	أرجع;
 
-    scriptitem_T *si = SCRIPT_ITEM(import->imp_sid);
-    if (si->sn_autoload_prefix == NULL)
-	return;
+    scriptitem_T *si = SCRIPT_شے(import->imp_sid);
+    إذا (si->sn_autoload_اگیتر == عدم)
+	أرجع;
 
-    char_u *newname = concat_str(si->sn_autoload_prefix, p + 1);
-    if (newname == NULL)
-	return;
+    char_u *newname = concat_str(si->sn_autoload_اگیتر, p + 1);
+    إذا (newname == عدم)
+	أرجع;
 
-    if (cb->cb_partial != NULL)
+    إذا (cb->cb_partial != عدم)
     {
-	if (cb->cb_name == cb->cb_partial->pt_name)
+	إذا (cb->cb_name == cb->cb_partial->pt_name)
 	    cb->cb_name = newname;
 	vim_free(cb->cb_partial->pt_name);
 	cb->cb_partial->pt_name = newname;
     }
-    else
+    وإلا
     {
 	vim_free(cb->cb_name);
 	cb->cb_name = newname;
@@ -5464,22 +5464,22 @@ expand_autload_callback(callback_T *cb)
 /*
  * Unref/free "callback" returned by get_callback() or set_callback().
  */
-    void
+    فراغ
 free_callback(callback_T *callback)
 {
-    if (callback->cb_partial != NULL)
+    إذا (callback->cb_partial != عدم)
     {
 	partial_unref(callback->cb_partial);
-	callback->cb_partial = NULL;
+	callback->cb_partial = عدم;
     }
-    else if (callback->cb_name != NULL)
+    وإلا إذا (callback->cb_name != عدم)
 	func_unref(callback->cb_name);
-    if (callback->cb_free_name)
+    إذا (callback->cb_free_name)
     {
 	vim_free(callback->cb_name);
 	callback->cb_free_name = FALSE;
     }
-    callback->cb_name = NULL;
+    callback->cb_name = عدم;
 }
 
-#endif // FEAT_EVAL
+#جے_انت // FEAT_EVAL

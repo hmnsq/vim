@@ -20,7 +20,7 @@
  *
  */
 
-#include "xinclude.h"
+#ضمن "xinclude.h"
 
 /*
  * The basic idea of patience diff is to find lines that are unique in
@@ -39,58 +39,58 @@
  * are handled by the well-known Myers algorithm.
  */
 
-#define NON_UNIQUE ULONG_MAX
+#تعریف_کرو NON_UNIQUE ULONG_MAX
 
 /*
  * This is a hash mapping from line hash to line numbers in the first and
  * second file.
  */
-struct hashmap {
-	int nr, alloc;
-	struct entry {
-		unsigned long hash;
+بنية hashmap {
+	صحيح nr, alloc;
+	بنية اندراج {
+		بنانشانی لما hash;
 		/*
 		 * 0 = unused entry, 1 = first line, 2 = second, etc.
 		 * line2 is NON_UNIQUE if the line is not unique
 		 * in either the first or the second file.
 		 */
-		unsigned long line1, line2;
+		بنانشانی لما line1, line2;
 		/*
 		 * "next" & "previous" are used for the longest common
 		 * sequence;
 		 * initially, "next" reflects only the order in file1.
 		 */
-		struct entry *next, *previous;
+		بنية اندراج *اگلا, *پچھلا;
 
 		/*
 		 * If 1, this entry can serve as an anchor. See
 		 * Documentation/diff-options.adoc for more information.
 		 */
-		unsigned anchor : 1;
-	} *entries, *first, *last;
+		بنانشانی anchor : 1;
+	} *entries, *پہلا, *آخری;
 	/* were common records found? */
-	unsigned long has_matches;
+	بنانشانی لما has_matches;
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ثابت *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+ساكن صحيح is_anchor(xpparam_t ثابت *xpp, ثابت حرف *سطر)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	لكل (i = 0; i < xpp->anchors_nr; i++) {
+		إذا (!لڑی_مقابلہ(سطر, xpp->anchors[i], لڑی_لمبائی(xpp->anchors[i])))
+			أرجع 1;
 	}
-	return 0;
+	أرجع 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+ساكن فراغ داخل_کرو_ریکارڈ(xpparam_t ثابت *xpp, صحيح سطر, بنية hashmap *map,
+			  صحيح pass)
 {
-	xrecord_t *records = pass == 1 ?
+	xrecord_t *ریکارڈاں = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
-	xrecord_t *record = &records[line - 1];
+	xrecord_t *ریکارڈ = &ریکارڈاں[سطر - 1];
 	/*
 	 * After xdl_prepare_env() (or more precisely, due to
 	 * xdl_classify_record()), the "ha" member of the records (AKA lines)
@@ -101,34 +101,34 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	صحيح اشاریہ = (صحيح)((ریکارڈ->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
-				index = 0;
-			continue;
+	طالما (map->entries[اشاریہ].line1) {
+		إذا (map->entries[اشاریہ].hash != ریکارڈ->ha) {
+			إذا (++اشاریہ >= map->alloc)
+				اشاریہ = 0;
+			استمر;
 		}
-		if (pass == 2)
+		إذا (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
-			map->entries[index].line2 = NON_UNIQUE;
-		else
-			map->entries[index].line2 = line;
-		return;
+		إذا (pass == 1 || map->entries[اشاریہ].line2)
+			map->entries[اشاریہ].line2 = NON_UNIQUE;
+		وإلا
+			map->entries[اشاریہ].line2 = سطر;
+		أرجع;
 	}
-	if (pass == 2)
-		return;
-	map->entries[index].line1 = line;
-	map->entries[index].hash = record->ha;
-	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
-		map->first = map->entries + index;
-	if (map->last) {
-		map->last->next = map->entries + index;
-		map->entries[index].previous = map->last;
+	إذا (pass == 2)
+		أرجع;
+	map->entries[اشاریہ].line1 = سطر;
+	map->entries[اشاریہ].hash = ریکارڈ->ha;
+	map->entries[اشاریہ].anchor = is_anchor(xpp, map->env->xdf1.recs[سطر - 1].ptr);
+	إذا (!map->پہلا)
+		map->پہلا = map->entries + اشاریہ;
+	إذا (map->آخری) {
+		map->آخری->اگلا = map->entries + اشاریہ;
+		map->entries[اشاریہ].پچھلا = map->آخری;
 	}
-	map->last = map->entries + index;
+	map->آخری = map->entries + اشاریہ;
 	map->nr++;
 }
 
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
-		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+ساكن صحيح fill_hashmap(xpparam_t ثابت *xpp, xdfenv_t *env,
+		بنية hashmap *نتیجہ,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	result->xpp = xpp;
-	result->env = env;
+	نتیجہ->xpp = xpp;
+	نتیجہ->env = env;
 
 	/* We know exactly how large we want the hash map */
-	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	نتیجہ->alloc = count1 * 2;
+	إذا (!XDL_CALLOC_ARRAY(نتیجہ->entries, نتیجہ->alloc))
+		أرجع -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
-		insert_record(xpp, line1++, result, 1);
+	طالما (count1--)
+		داخل_کرو_ریکارڈ(xpp, line1++, نتیجہ, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
-		insert_record(xpp, line2++, result, 2);
+	طالما (count2--)
+		داخل_کرو_ریکارڈ(xpp, line2++, نتیجہ, 2);
 
-	return 0;
+	أرجع 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry)
+ساكن صحيح ثنائی_تلاش(بنية اندراج **sequence, صحيح longest,
+		بنية اندراج *اندراج)
 {
-	int left = -1, right = longest;
+	صحيح بایاں = -1, دایاں = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	طالما (بایاں + 1 < دایاں) {
+		صحيح درمیان_2 = بایاں + (دایاں - بایاں) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
-			right = middle;
-		else
-			left = middle;
+		إذا (sequence[درمیان_2]->line2 > اندراج->line2)
+			دایاں = درمیان_2;
+		وإلا
+			بایاں = درمیان_2;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	أرجع بایاں;
 }
 
 /*
@@ -192,126 +192,126 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+ساكن صحيح لبھو_longest_common_sequence(بنية hashmap *map, بنية اندراج **res)
 {
-	struct entry **sequence;
-	int longest = 0, i;
-	struct entry *entry;
+	بنية اندراج **sequence;
+	صحيح longest = 0, i;
+	بنية اندراج *اندراج;
 
 	/*
 	 * If not -1, this entry in sequence must never be overridden.
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	صحيح anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	إذا (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		أرجع -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
-			continue;
-		i = binary_search(sequence, longest, entry);
-		entry->previous = i < 0 ? NULL : sequence[i];
+	لكل (اندراج = map->پہلا; اندراج; اندراج = اندراج->اگلا) {
+		إذا (!اندراج->line2 || اندراج->line2 == NON_UNIQUE)
+			استمر;
+		i = ثنائی_تلاش(sequence, longest, اندراج);
+		اندراج->پچھلا = i < 0 ? عدم : sequence[i];
 		++i;
-		if (i <= anchor_i)
-			continue;
-		sequence[i] = entry;
-		if (entry->anchor) {
+		إذا (i <= anchor_i)
+			استمر;
+		sequence[i] = اندراج;
+		إذا (اندراج->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} وإلا إذا (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
-		*res = NULL;
+	إذا (!longest) {
+		*res = عدم;
 		xdl_free(sequence);
-		return 0;
+		أرجع 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
-	entry = sequence[longest - 1];
-	entry->next = NULL;
-	while (entry->previous) {
-		entry->previous->next = entry;
-		entry = entry->previous;
+	اندراج = sequence[longest - 1];
+	اندراج->اگلا = عدم;
+	طالما (اندراج->پچھلا) {
+		اندراج->پچھلا->اگلا = اندراج;
+		اندراج = اندراج->پچھلا;
 	}
-	*res = entry;
+	*res = اندراج;
 	xdl_free(sequence);
-	return 0;
+	أرجع 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+ساكن صحيح میل(بنية hashmap *map, صحيح line1, صحيح line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	أرجع record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+ساكن صحيح patience_diff(xpparam_t ثابت *xpp, xdfenv_t *env,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+ساكن صحيح walk_common_sequence(بنية hashmap *map, بنية اندراج *پہلا,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	صحيح end1 = line1 + count1, end2 = line2 + count2;
+	صحيح next1, next2;
 
-	for (;;) {
+	لكل (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
-			next1 = first->line1;
-			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
-					match(map, next1 - 1, next2 - 1)) {
+		إذا (پہلا) {
+			next1 = پہلا->line1;
+			next2 = پہلا->line2;
+			طالما (next1 > line1 && next2 > line2 &&
+					میل(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} وإلا {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
-				match(map, line1, line2)) {
+		طالما (line1 < next1 && line2 < next2 &&
+				میل(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		إذا (next1 > line1 || next2 > line2) {
+			إذا (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				أرجع -1;
 		}
 
-		if (!first)
-			return 0;
+		إذا (!پہلا)
+			أرجع 0;
 
-		while (first->next &&
-				first->next->line1 == first->line1 + 1 &&
-				first->next->line2 == first->line2 + 1)
-			first = first->next;
+		طالما (پہلا->اگلا &&
+				پہلا->اگلا->line1 == پہلا->line1 + 1 &&
+				پہلا->اگلا->line2 == پہلا->line2 + 1)
+			پہلا = پہلا->اگلا;
 
-		line1 = first->line1 + 1;
-		line2 = first->line2 + 1;
+		line1 = پہلا->line1 + 1;
+		line2 = پہلا->line2 + 1;
 
-		first = first->next;
+		پہلا = پہلا->اگلا;
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+ساكن صحيح fall_پٹھ_منزل_classic_diff(بنية hashmap *map,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
 	xpparam_t xpp;
 
-	memset(&xpp, 0, sizeof(xpp));
-	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
+	memset(&xpp, 0, حجم(xpp));
+	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_نقاب;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	أرجع xdl_fall_پٹھ_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+ساكن صحيح patience_diff(xpparam_t ثابت *xpp, xdfenv_t *env,
+		صحيح line1, صحيح count1, صحيح line2, صحيح count2)
 {
-	struct hashmap map;
-	struct entry *first;
-	int result = 0;
+	بنية hashmap map;
+	بنية اندراج *پہلا;
+	صحيح نتیجہ = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
-			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
-			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+	إذا (!count1) {
+		طالما(count2--)
+			env->xdf2.بدلیا[line2++ - 1] = true;
+		أرجع 0;
+	} وإلا إذا (!count2) {
+		طالما(count1--)
+			env->xdf1.بدلیا[line1++ - 1] = true;
+		أرجع 0;
 	}
 
-	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	memset(&map, 0, حجم(map));
+	إذا (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		أرجع -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
-			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
-			env->xdf2.changed[line2++ - 1] = true;
+	إذا (!map.has_matches) {
+		طالما(count1--)
+			env->xdf1.بدلیا[line1++ - 1] = true;
+		طالما(count2--)
+			env->xdf2.بدلیا[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		أرجع 0;
 	}
 
-	result = find_longest_common_sequence(&map, &first);
-	if (result)
-		goto out;
-	if (first)
-		result = walk_common_sequence(&map, first,
+	نتیجہ = لبھو_longest_common_sequence(&map, &پہلا);
+	إذا (نتیجہ)
+		اذهب باہرلا;
+	إذا (پہلا)
+		نتیجہ = walk_common_sequence(&map, پہلا,
 			line1, count1, line2, count2);
-	else
-		result = fall_back_to_classic_diff(&map,
+	وإلا
+		نتیجہ = fall_پٹھ_منزل_classic_diff(&map,
 			line1, count1, line2, count2);
- out:
+ باہرلا:
 	xdl_free(map.entries);
-	return result;
+	أرجع نتیجہ;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+صحيح xdl_do_patience_diff(xpparam_t ثابت *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	أرجع patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

@@ -7,55 +7,55 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#ifndef GUI_GTK4_MENU_H
-#define GUI_GTK4_MENU_H
+#جے_بنا_تعریف GUI_GTK4_MENU_H
+#تعریف_کرو GUI_GTK4_MENU_H
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_MENU
+#جے_تعریف_شدہ FEAT_MENU
 
 # include <gtk/gtk.h>
 
-# define VIM_TYPE_MENU_BAR_ITEM (vim_menu_bar_item_get_type())
-G_DECLARE_FINAL_TYPE(VimMenuBarItem, vim_menu_bar_item, VIM, MENU_BAR_ITEM, GtkButton)
+# define VIM_TYPE_MENU_BAR_شے (vim_menu_bar_شے_get_type())
+G_DECLARE_FINAL_TYPE(Vim_Menu_Bar_شے_2, vim_menu_bar_شے, VIM, MENU_BAR_شے, GtkButton)
 
 # define VIM_TYPE_MENU_BAR (vim_menu_bar_get_type())
 G_DECLARE_FINAL_TYPE(VimMenuBar, vim_menu_bar, VIM, MENU_BAR, GtkWidget)
 
-# define VIM_TYPE_MENU_ITEM (vim_menu_item_get_type())
-G_DECLARE_FINAL_TYPE(VimMenuItem, vim_menu_item, VIM, MENU_ITEM, GtkButton)
+# define VIM_TYPE_MENU_شے (vim_menu_شے_get_type())
+G_DECLARE_FINAL_TYPE(Vim_Menu_شے, vim_menu_شے, VIM, MENU_شے, GtkButton)
 
 # define VIM_TYPE_MENU (vim_menu_get_type())
 G_DECLARE_FINAL_TYPE(VimMenu, vim_menu, VIM, MENU, GtkPopover)
 
-typedef enum
+تعريفنوع تعداد
 {
-    VIM_MENU_ITEM_CLICKED,
-    VIM_MENU_ITEM_SELECTED
-} VimMenuItemEvent;
+    VIM_MENU_شے_CLICKED,
+    VIM_MENU_شے_SELECTED
+} Vim_Menu_شے_Event;
 
-typedef void (*VimMenuItemFunc)(VimMenuItem *item, VimMenuItemEvent event, void *udata);
+تعريفنوع فراغ (*Vim_Menu_شے_Func)(Vim_Menu_شے *شے, Vim_Menu_شے_Event event, فراغ *udata);
 
-GtkWidget *vim_menu_bar_item_new(const char *text, VimMenu *menu);
-void vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text);
+GtkWidget *vim_menu_bar_شے_new(ثابت حرف *متن, VimMenu *menu);
+فراغ vim_menu_bar_شے_سیٹ_متن(Vim_Menu_Bar_شے_2 *self, ثابت حرف *متن);
 
-GtkWidget *vim_menu_bar_new(void);
-GtkWidget *vim_menu_bar_to_menu(VimMenuBar *self);
-void vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx);
-void vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item);
-void vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item);
+GtkWidget *vim_menu_bar_new(فراغ);
+GtkWidget *vim_menu_bar_منزل_menu(VimMenuBar *self);
+فراغ vim_menu_bar_داخل_کرو_شے(VimMenuBar *self, Vim_Menu_Bar_شے_2 *شے, صحيح idx);
+فراغ vim_menu_bar_remove(VimMenuBar *self, GtkWidget *شے);
+فراغ vim_menu_bar_show(VimMenuBar *self, Vim_Menu_Bar_شے_2 *شے);
 
-GtkWidget *vim_menu_item_new(const char *text, VimMenuItemFunc func, void *udata);
-void vim_menu_item_set_text(VimMenuItem *self, const char *text);
-void vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text);
-void vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu);
+GtkWidget *vim_menu_شے_new(ثابت حرف *متن, Vim_Menu_شے_Func func, فراغ *udata);
+فراغ vim_menu_شے_سیٹ_متن(Vim_Menu_شے *self, ثابت حرف *متن);
+فراغ vim_menu_شے_سیٹ_accel(Vim_Menu_شے *self, ثابت حرف *accel_متن);
+فراغ vim_menu_شے_سیٹ_submenu(Vim_Menu_شے *self, VimMenu *submenu);
 
-GtkWidget *vim_menu_new(void);
-void vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx);
-GtkWidget *vim_menu_insert_separator(VimMenu *self, int idx);
-void vim_menu_remove(VimMenu *self, GtkWidget *item);
+GtkWidget *vim_menu_new(فراغ);
+فراغ vim_menu_داخل_کرو_شے(VimMenu *self, Vim_Menu_شے *شے, صحيح idx);
+GtkWidget *vim_menu_داخل_کرو_separator(VimMenu *self, صحيح idx);
+فراغ vim_menu_remove(VimMenu *self, GtkWidget *شے);
 GtkWidget *vim_menu_copy(VimMenu *self);
 
-#endif
+#جے_انت
 
-#endif
+#جے_انت

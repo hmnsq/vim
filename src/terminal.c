@@ -38,37 +38,37 @@
  * in tl_scrollback are no longer used.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_TERMINAL)
+#إذا defined(FEAT_TERMINAL)
 
-#ifndef MIN
+#جے_بنا_تعریف MIN
 # define MIN(x,y) ((x) < (y) ? (x) : (y))
-#endif
-#ifndef MAX
+#جے_انت
+#جے_بنا_تعریف MAX
 # define MAX(x,y) ((x) > (y) ? (x) : (y))
-#endif
+#جے_انت
 
-#include "libvterm/include/vterm.h"
+#ضمن "libvterm/include/vterm.h"
 
 // This is VTermScreenCell without the characters, thus much smaller.
-typedef struct {
+تعريفنوع بنية {
     VTermScreenCellAttrs	attrs;
-    char			width;
+    حرف			چوڑائی;
     VTermColor			fg;
     VTermColor			bg;
 } cellattr_T;
 
-typedef struct sb_line_S {
-    int		sb_cols;	// can differ per line
-    int		sb_bytes;	// length in bytes of text
+تعريفنوع بنية sb_سطر_S {
+    صحيح		sb_خانے_گنتی;	// can differ per line
+    صحيح		sb_بائٹاں;	// length in bytes of text
     cellattr_T	*sb_cells;	// allocated
     cellattr_T	sb_fill_attr;	// for short line
-    char_u	*sb_text;	// for tl_scrollback_postponed
+    char_u	*sb_متن;	// for tl_scrollback_postponed
     char_u	continuation;
-} sb_line_T;
+} sb_سطر_T;
 
-#ifdef MSWIN
+#جے_تعریف_شدہ MSWIN
 # ifndef HPCON
 #  define HPCON VOID*
 # endif
@@ -78,174 +78,174 @@ typedef struct sb_line_S {
 # ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
 #  define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 # endif
-typedef struct _DYN_STARTUPINFOEXW
+تعريفنوع بنية _DYN_STARTUPINFOEXW
 {
     STARTUPINFOW StartupInfo;
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList;
 } DYN_STARTUPINFOEXW, *PDYN_STARTUPINFOEXW;
-#endif
+#جے_انت
 
 // typedef term_T in structs.h
-struct terminal_S {
-    term_T	*tl_next;
+بنية terminal_S {
+    رکن_T	*tl_اگلا;
 
     VTerm	*tl_vterm;
-    job_T	*tl_job;
-    buf_T	*tl_buffer;
-#if defined(FEAT_GUI)
-    int		tl_system;	// when non-zero used for :!cmd output
-    int		tl_toprow;	// row with first line of system terminal
-#endif
+    کم_T	*tl_کم;
+    buf_T	*tl_بفر;
+#إذا defined(FEAT_GUI)
+    صحيح		tl_system;	// when non-zero used for :!cmd output
+    صحيح		tl_toprow;	// row with first line of system terminal
+#جے_انت
 
     // Set when setting the size of a vterm, reset after redrawing.
-    int		tl_vterm_size_changed;
+    صحيح		tl_vterm_ناپ_بدلیا;
 
-    int		tl_normal_mode; // TRUE: Terminal-Normal mode
-    int		tl_channel_closing;
-    int		tl_channel_closed;
-    int		tl_channel_recently_closed; // still need to handle tl_finish
+    صحيح		tl_عام_منوال; // TRUE: Terminal-Normal mode
+    صحيح		tl_channel_closing;
+    صحيح		tl_channel_closed;
+    صحيح		tl_channel_recently_closed; // still need to handle tl_finish
 
-    int		tl_finish;
-#define TL_FINISH_UNSET	    NUL
-#define TL_FINISH_CLOSE	    'c'	// ++close or :terminal without argument
-#define TL_FINISH_NOCLOSE   'n'	// ++noclose
-#define TL_FINISH_OPEN	    'o'	// ++open
+    صحيح		tl_انت;
+#تعریف_کرو TL_انت_UNSET	    NUL
+#تعریف_کرو TL_انت_CLOSE	    'c'	// ++close or :terminal without argument
+#تعریف_کرو TL_انت_NOCLOSE   'n'	// ++noclose
+#تعریف_کرو TL_انت_OPEN	    'o'	// ++open
     char_u	*tl_opencmd;
     char_u	*tl_eof_chars;
     char_u	*tl_api;	// prefix for terminal API function
 
     char_u	*tl_arg0_cmd;	// To format the status bar
 
-#ifdef MSWIN
-    void	*tl_winpty_config;
-    void	*tl_winpty;
+#جے_تعریف_شدہ MSWIN
+    فراغ	*tl_winpty_config;
+    فراغ	*tl_winpty;
 
     HPCON	tl_conpty;
     DYN_STARTUPINFOEXW tl_siex;	// Structure that always needs to be hold
 
-    FILE	*tl_out_fd;
-#endif
-#if defined(FEAT_SESSION)
+    FILE	*tl_باہرلا_fd;
+#جے_انت
+#إذا defined(FEAT_SESSION)
     char_u	*tl_command;
-#endif
+#جے_انت
     char_u	*tl_kill;
 
     // last known vterm size
-    int		tl_rows;
-    int		tl_cols;
+    صحيح		tl_صفاں;
+    صحيح		tl_خانے_گنتی;
 
     char_u	*tl_title; // NULL or allocated
-    char_u	*tl_status_text; // NULL or allocated
+    char_u	*tl_حالت_متن; // NULL or allocated
 
     // Range of screen rows to update.  Zero based.
-    int		tl_dirty_row_start; // MAX_ROW if nothing dirty
-    int		tl_dirty_row_end;   // row below last one to update
-    int		tl_dirty_snapshot;  // text updated after making snapshot
-#ifdef FEAT_TIMERS
-    int		tl_timer_set;
+    صحيح		tl_dirty_صف_شروع; // MAX_ROW if nothing dirty
+    صحيح		tl_dirty_صف_سرا;   // row below last one to update
+    صحيح		tl_dirty_snapshot;  // text updated after making snapshot
+#جے_تعریف_شدہ FEAT_TIMERS
+    صحيح		tl_timer_سیٹ;
     proftime_T	tl_timer_due;
-#endif
-    int		tl_postponed_scroll;	// to be scrolled up
+#جے_انت
+    صحيح		tl_postponed_scroll;	// to be scrolled up
 
     garray_T	tl_scrollback;
-    int		tl_scrollback_scrolled;
+    صحيح		tl_scrollback_scrolled;
     garray_T	tl_scrollback_postponed;
-    int		tl_scrollback_snapshot;
-    int		tl_buffer_scrolled;
+    صحيح		tl_scrollback_snapshot;
+    صحيح		tl_بفر_scrolled;
 
     char_u	*tl_highlight_name; // replaces "Terminal"; allocated
 
     cellattr_T	tl_default_color;
 
-    linenr_T	tl_top_diff_rows;   // rows of top diff file or zero
-    linenr_T	tl_bot_diff_rows;   // rows of bottom diff file
+    linenr_T	tl_چوٹی_diff_صفاں;   // rows of top diff file or zero
+    linenr_T	tl_bot_diff_صفاں;   // rows of bottom diff file
 
     VTermPos	tl_cursor_pos;
-    int		tl_cursor_visible;
-    int		tl_cursor_blink;
-    int		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
+    صحيح		tl_cursor_visible;
+    صحيح		tl_cursor_blink;
+    صحيح		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
     char_u	*tl_cursor_color; // NULL or allocated
 
     long_u	*tl_palette; // array of 16 colors specified by term_start, can
 			     // be NULL
-    int		tl_using_altscreen;
+    صحيح		tl_using_altscreen;
     garray_T	tl_osc_buf;	    // incomplete OSC string
 };
 
-#define TMODE_ONCE 1	    // CTRL-\ CTRL-N used
-#define TMODE_LOOP 2	    // CTRL-W N used
+#تعریف_کرو TMODE_ONCE 1	    // CTRL-\ CTRL-N used
+#تعریف_کرو TMODE_LOOP 2	    // CTRL-W N used
 
 /*
  * List of all active terminals.
  */
-static term_T *first_term = NULL;
+ساكن رکن_T *پہلا_رکن = عدم;
 
 // Terminal active in terminal_loop().
-static term_T *in_terminal_loop = NULL;
+ساكن رکن_T *وچ_terminal_loop = عدم;
 
-#ifdef MSWIN
-static BOOL has_winpty = FALSE;
-static BOOL has_conpty = FALSE;
-#endif
+#جے_تعریف_شدہ MSWIN
+ساكن BOOL has_winpty = FALSE;
+ساكن BOOL has_conpty = FALSE;
+#جے_انت
 
-#define MAX_ROW 999999	    // used for tl_dirty_row_end to update all rows
-#define KEY_BUF_LEN 200
+#تعریف_کرو MAX_صف 999999	    // used for tl_dirty_row_end to update all rows
+#تعریف_کرو کلید_BUF_LEN 200
 
-#define FOR_ALL_TERMS(term)	\
-    for ((term) = first_term; (term) != NULL; (term) = (term)->tl_next)
+#تعریف_کرو FOR_ALL_TERMS(رکن)	\
+    لكل ((رکن) = پہلا_رکن; (رکن) != عدم; (رکن) = (رکن)->tl_اگلا)
 
 /*
  * Functions with separate implementation for MS-Windows and Unix-like systems.
  */
-static int term_and_job_init(term_T *term, typval_T *argvar, char **argv, jobopt_T *opt, jobopt_T *orig_opt);
-static int create_pty_only(term_T *term, jobopt_T *opt);
-static void term_report_winsize(term_T *term, int rows, int cols);
-static void term_free_vterm(term_T *term);
-#ifdef FEAT_GUI
-static void update_system_term(term_T *term);
-#endif
+ساكن صحيح رکن_and_کم_init(رکن_T *رکن, typval_T *argvar, حرف **argv, jobopt_T *opt, jobopt_T *orig_opt);
+ساكن صحيح create_pty_only(رکن_T *رکن, jobopt_T *opt);
+ساكن فراغ رکن_report_winsize(رکن_T *رکن, صحيح صفاں_2, صحيح خانے_گنتی);
+ساكن فراغ رکن_free_vterm(رکن_T *رکن);
+#جے_تعریف_شدہ FEAT_GUI
+ساكن فراغ update_system_رکن(رکن_T *رکن);
+#جے_انت
 
-static void handle_postponed_scrollback(term_T *term);
+ساكن فراغ handle_postponed_scrollback(رکن_T *رکن);
 
 // The character that we know (or assume) that the terminal expects for the
 // backspace key.
-static int term_backspace_char = BS;
+ساكن صحيح رکن_backspace_char = BS;
 
 // Store the last set and the desired cursor properties, so that we only update
 // them when needed.  Doing it unnecessary may result in flicker.
-static char_u	*last_set_cursor_color = NULL;
-static char_u	*desired_cursor_color = NULL;
-static int	last_set_cursor_shape = -1;
-static int	desired_cursor_shape = -1;
-static int	last_set_cursor_blink = -1;
-static int	desired_cursor_blink = -1;
+ساكن char_u	*آخری_سیٹ_cursor_color = عدم;
+ساكن char_u	*desired_cursor_color = عدم;
+ساكن صحيح	آخری_سیٹ_cursor_shape = -1;
+ساكن صحيح	desired_cursor_shape = -1;
+ساكن صحيح	آخری_سیٹ_cursor_blink = -1;
+ساكن صحيح	desired_cursor_blink = -1;
 
 
 ///////////////////////////////////////
 // 1. Generic code for all systems.
 
-    static int
+    ساكن صحيح
 cursor_color_equal(char_u *lhs_color, char_u *rhs_color)
 {
-    if (lhs_color != NULL && rhs_color != NULL)
-	return STRCMP(lhs_color, rhs_color) == 0;
-    return lhs_color == NULL && rhs_color == NULL;
+    إذا (lhs_color != عدم && rhs_color != عدم)
+	أرجع STRCMP(lhs_color, rhs_color) == 0;
+    أرجع lhs_color == عدم && rhs_color == عدم;
 }
 
-    static void
-cursor_color_copy(char_u **to_color, char_u *from_color)
+    ساكن فراغ
+cursor_color_copy(char_u **منزل_color, char_u *from_color)
 {
     // Avoid a free & alloc if the value is already right.
-    if (cursor_color_equal(*to_color, from_color))
-	return;
-    vim_free(*to_color);
-    *to_color = (from_color == NULL) ? NULL : vim_strsave(from_color);
+    إذا (cursor_color_equal(*منزل_color, from_color))
+	أرجع;
+    vim_free(*منزل_color);
+    *منزل_color = (from_color == عدم) ? عدم : vim_strsave(from_color);
 }
 
-    static char_u *
+    ساكن char_u *
 cursor_color_get(char_u *color)
 {
-    return (color == NULL) ? (char_u *)"" : color;
+    أرجع (color == عدم) ? (char_u *)"" : color;
 }
 
 
@@ -255,89 +255,89 @@ cursor_color_get(char_u *color)
  * Sets "rows" and/or "cols" to zero when it should follow the window size.
  * Return TRUE if the size is the minimum size: "24*80".
  */
-    static int
-parse_termwinsize(win_T *wp, int *rows, int *cols)
+    ساكن صحيح
+parse_termwinsize(win_T *wp, صحيح *صفاں_2, صحيح *خانے_گنتی)
 {
-    int	minsize = FALSE;
+    صحيح	minsize = FALSE;
 
-    *rows = 0;
-    *cols = 0;
+    *صفاں_2 = 0;
+    *خانے_گنتی = 0;
 
-    if (*wp->w_p_tws == NUL)
-	return FALSE;
+    إذا (*wp->w_p_tws == NUL)
+	أرجع FALSE;
 
     char_u *p = vim_strchr(wp->w_p_tws, 'x');
 
     // Syntax of value was already checked when it's set.
-    if (p == NULL)
+    إذا (p == عدم)
     {
 	minsize = TRUE;
 	p = vim_strchr(wp->w_p_tws, '*');
     }
-    *rows = atoi((char *)wp->w_p_tws);
-    *cols = atoi((char *)p + 1);
-    if (*rows > VTERM_MAX_ROWS)
-	*rows = VTERM_MAX_ROWS;
-    if (*cols > VTERM_MAX_COLS)
-	*cols = VTERM_MAX_COLS;
-    return minsize;
+    *صفاں_2 = atoi((حرف *)wp->w_p_tws);
+    *خانے_گنتی = atoi((حرف *)p + 1);
+    إذا (*صفاں_2 > VTERM_MAX_صفاں)
+	*صفاں_2 = VTERM_MAX_صفاں;
+    إذا (*خانے_گنتی > VTERM_MAX_خانے_گنتی)
+	*خانے_گنتی = VTERM_MAX_خانے_گنتی;
+    أرجع minsize;
 }
 
 /*
  * Determine the terminal size from 'termwinsize' and the current window.
  */
-    static void
-set_term_and_win_size(term_T *term, jobopt_T *opt)
+    ساكن فراغ
+سیٹ_رکن_and_win_ناپ(رکن_T *رکن, jobopt_T *opt)
 {
-    int rows, cols;
-    int	minsize;
+    صحيح صفاں_2, خانے_گنتی;
+    صحيح	minsize;
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#جے_تعریف_شدہ FEAT_GUI
+    إذا (رکن->tl_system)
     {
 	// Use the entire screen (excluding the tabpanel area) for the system
 	// commands.  However, it will start at the command line and scroll up
 	// as needed, using tl_toprow.
-	term->tl_rows = Rows;
-	term->tl_cols = topframe->fr_width;
-	return;
+	رکن->tl_صفاں = صفاں;
+	رکن->tl_خانے_گنتی = topframe->fr_چوڑائی;
+	أرجع;
     }
-#endif
-    term->tl_rows = curwin->w_height;
-    term->tl_cols = curwin->w_width;
+#جے_انت
+    رکن->tl_صفاں = curwin->w_اچائی;
+    رکن->tl_خانے_گنتی = curwin->w_چوڑائی;
 
-    minsize = parse_termwinsize(curwin, &rows, &cols);
-    if (minsize)
+    minsize = parse_termwinsize(curwin, &صفاں_2, &خانے_گنتی);
+    إذا (minsize)
     {
-	if (term->tl_rows < rows)
-	    term->tl_rows = rows;
-	if (term->tl_cols < cols)
-	    term->tl_cols = cols;
+	إذا (رکن->tl_صفاں < صفاں_2)
+	    رکن->tl_صفاں = صفاں_2;
+	إذا (رکن->tl_خانے_گنتی < خانے_گنتی)
+	    رکن->tl_خانے_گنتی = خانے_گنتی;
     }
-    if ((opt->jo_set2 & JO2_TERM_ROWS))
-	term->tl_rows = opt->jo_term_rows;
-    else if (rows != 0)
-	term->tl_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS))
-	term->tl_cols = opt->jo_term_cols;
-    else if (cols != 0)
-	term->tl_cols = cols;
+    إذا ((opt->jo_set2 & JO2_رکن_صفاں))
+	رکن->tl_صفاں = opt->jo_رکن_صفاں;
+    وإلا إذا (صفاں_2 != 0)
+	رکن->tl_صفاں = صفاں_2;
+    إذا ((opt->jo_set2 & JO2_رکن_خانے_گنتی))
+	رکن->tl_خانے_گنتی = opt->jo_رکن_خانے_گنتی;
+    وإلا إذا (خانے_گنتی != 0)
+	رکن->tl_خانے_گنتی = خانے_گنتی;
 
-    if (!opt->jo_hidden)
+    إذا (!opt->jo_hidden)
     {
-	if (term->tl_rows != curwin->w_height)
-	    win_setheight_win(term->tl_rows, curwin);
-	if (term->tl_cols != curwin->w_width)
-	    win_setwidth_win(term->tl_cols, curwin);
+	إذا (رکن->tl_صفاں != curwin->w_اچائی)
+	    win_setheight_win(رکن->tl_صفاں, curwin);
+	إذا (رکن->tl_خانے_گنتی != curwin->w_چوڑائی)
+	    win_setwidth_win(رکن->tl_خانے_گنتی, curwin);
 
 	// Set 'winsize' now to avoid a resize at the next redraw.
-	if (!minsize && *curwin->w_p_tws != NUL)
+	إذا (!minsize && *curwin->w_p_tws != NUL)
 	{
 	    char_u buf[100];
 
-	    vim_snprintf((char *)buf, 100, "%dx%d",
-						 term->tl_rows, term->tl_cols);
-	    set_option_value_give_err((char_u *)"termwinsize",
+	    vim_snprintf((حرف *)buf, 100, "%dx%d",
+						 رکن->tl_صفاں, رکن->tl_خانے_گنتی);
+	    سیٹ_option_قدر_give_err((char_u *)"termwinsize",
 							   0L, buf, OPT_LOCAL);
 	}
     }
@@ -347,61 +347,61 @@ set_term_and_win_size(term_T *term, jobopt_T *opt)
  * Initialize job options for a terminal job.
  * Caller may overrule some of them.
  */
-    void
-init_job_options(jobopt_T *opt)
+    فراغ
+init_کم_options(jobopt_T *opt)
 {
-    clear_job_options(opt);
+    clear_کم_options(opt);
 
-    opt->jo_mode = CH_MODE_RAW;
-    opt->jo_out_mode = CH_MODE_RAW;
-    opt->jo_err_mode = CH_MODE_RAW;
-    opt->jo_set = JO_MODE | JO_OUT_MODE | JO_ERR_MODE;
+    opt->jo_منوال = CH_منوال_RAW;
+    opt->jo_باہرلا_منوال = CH_منوال_RAW;
+    opt->jo_err_منوال = CH_منوال_RAW;
+    opt->jo_سیٹ = JO_منوال | JO_باہرلا_منوال | JO_ERR_منوال;
 }
 
 /*
  * Set job options mandatory for a terminal job.
  */
-    static void
-setup_job_options(jobopt_T *opt, int rows, int cols)
+    ساكن فراغ
+تیاری_کم_options(jobopt_T *opt, صحيح صفاں_2, صحيح خانے_گنتی)
 {
-#ifndef MSWIN
+#جے_بنا_تعریف MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stdout
     // here.
-    if (!(opt->jo_set & JO_OUT_IO))
-#endif
+    إذا (!(opt->jo_سیٹ & JO_باہرلا_IO))
+#جے_انت
     {
 	// Connect stdout to the terminal.
-	opt->jo_io[PART_OUT] = JIO_BUFFER;
-	opt->jo_io_buf[PART_OUT] = curbuf->b_fnum;
-	opt->jo_modifiable[PART_OUT] = 0;
-	opt->jo_set |= JO_OUT_IO + JO_OUT_BUF + JO_OUT_MODIFIABLE;
+	opt->jo_io[PART_باہرلا] = JIO_بفر;
+	opt->jo_io_buf[PART_باہرلا] = curbuf->b_fnum;
+	opt->jo_modifiable[PART_باہرلا] = 0;
+	opt->jo_سیٹ |= JO_باہرلا_IO + JO_باہرلا_BUF + JO_باہرلا_MODIFIABLE;
     }
 
-#ifndef MSWIN
+#جے_بنا_تعریف MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stderr
     // here.
-    if (!(opt->jo_set & JO_ERR_IO))
-#endif
+    إذا (!(opt->jo_سیٹ & JO_ERR_IO))
+#جے_انت
     {
 	// Connect stderr to the terminal.
-	opt->jo_io[PART_ERR] = JIO_BUFFER;
+	opt->jo_io[PART_ERR] = JIO_بفر;
 	opt->jo_io_buf[PART_ERR] = curbuf->b_fnum;
 	opt->jo_modifiable[PART_ERR] = 0;
-	opt->jo_set |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
+	opt->jo_سیٹ |= JO_ERR_IO + JO_ERR_BUF + JO_ERR_MODIFIABLE;
     }
 
     opt->jo_pty = TRUE;
-    if ((opt->jo_set2 & JO2_TERM_ROWS) == 0)
-	opt->jo_term_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS) == 0)
-	opt->jo_term_cols = cols;
+    إذا ((opt->jo_set2 & JO2_رکن_صفاں) == 0)
+	opt->jo_رکن_صفاں = صفاں_2;
+    إذا ((opt->jo_set2 & JO2_رکن_خانے_گنتی) == 0)
+	opt->jo_رکن_خانے_گنتی = خانے_گنتی;
 }
 
 /*
  * Flush messages on channels.
  */
-    static void
-term_flush_messages(void)
+    ساكن فراغ
+رکن_flush_messages(فراغ)
 {
     mch_check_messages();
     parse_queued_messages();
@@ -411,22 +411,22 @@ term_flush_messages(void)
  * Close a terminal buffer (and its window).  Used when creating the terminal
  * fails.
  */
-    static void
-term_close_buffer(buf_T *buf, buf_T *old_curbuf)
+    ساكن فراغ
+رکن_close_بفر(buf_T *buf, buf_T *old_curbuf)
 {
     free_terminal(buf);
-    if (old_curbuf != NULL)
+    إذا (old_curbuf != عدم)
     {
 	--curbuf->b_nwindows;
 	curbuf = old_curbuf;
-	curwin->w_buffer = curbuf;
+	curwin->w_بفر = curbuf;
 	++curbuf->b_nwindows;
     }
     CHECK_CURBUF;
 
     // Wiping out the buffer will also close the window and call
     // free_terminal().
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_بفر(DOBUF_WIPE, DOBUF_پہلا, FORWARD, buf->b_fnum, TRUE);
 }
 
 /*
@@ -437,197 +437,197 @@ term_close_buffer(buf_T *buf, buf_T *old_curbuf)
  * Returns NULL when failed.
  */
     buf_T *
-term_start(
+رکن_شروع(
 	typval_T    *argvar,
-	char	    **argv,
+	حرف	    **argv,
 	jobopt_T    *opt,
-	int	    flags)
+	صحيح	    flags)
 {
-    exarg_T	split_ea;
+    exarg_T	ونڈو_ea;
     win_T	*old_curwin = curwin;
-    term_T	*term;
-    buf_T	*old_curbuf = NULL;
-    int		res;
+    رکن_T	*رکن;
+    buf_T	*old_curbuf = عدم;
+    صحيح		res;
     buf_T	*newbuf;
-    int		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
+    صحيح		vertical = opt->jo_vertical || (cmdmod.cmod_ونڈو & WSP_VERT);
     jobopt_T	orig_opt;  // only partly filled
     pos_T	save_cursor;
 
-    if (check_restricted() || check_secure())
-	return NULL;
-    if (cmdwin_type != 0)
+    إذا (check_restricted() || check_secure())
+	أرجع عدم;
+    إذا (cmdwin_type != 0)
     {
-	emsg(_(e_cannot_open_terminal_from_command_line_window));
-	return NULL;
+	emsg(_(e_cannot_open_terminal_from_command_سطر_کھڑکی));
+	أرجع عدم;
     }
 
-    if ((opt->jo_set & (JO_IN_IO + JO_OUT_IO + JO_ERR_IO))
-					 == (JO_IN_IO + JO_OUT_IO + JO_ERR_IO)
-	|| (!(opt->jo_set & JO_OUT_IO) && (opt->jo_set & JO_OUT_BUF))
-	|| (!(opt->jo_set & JO_ERR_IO) && (opt->jo_set & JO_ERR_BUF))
-	|| (argvar != NULL
+    إذا ((opt->jo_سیٹ & (JO_وچ_IO + JO_باہرلا_IO + JO_ERR_IO))
+					 == (JO_وچ_IO + JO_باہرلا_IO + JO_ERR_IO)
+	|| (!(opt->jo_سیٹ & JO_باہرلا_IO) && (opt->jo_سیٹ & JO_باہرلا_BUF))
+	|| (!(opt->jo_سیٹ & JO_ERR_IO) && (opt->jo_سیٹ & JO_ERR_BUF))
+	|| (argvar != عدم
 	    && argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
-	    && argvar->vval.v_list->lv_first == &range_list_item))
+	    && argvar->vval.v_list != عدم
+	    && argvar->vval.v_list->lv_پہلا == &range_list_شے))
     {
-	emsg(_(e_invalid_argument));
-	return NULL;
+	emsg(_(e_invalid_دلیل));
+	أرجع عدم;
     }
 
-    term = ALLOC_CLEAR_ONE(term_T);
-    if (term == NULL)
-	return NULL;
-    term->tl_dirty_row_end = MAX_ROW;
-    term->tl_cursor_visible = TRUE;
-    term->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_BLOCK;
-    term->tl_finish = opt->jo_term_finish;
-#ifdef FEAT_GUI
-    term->tl_system = (flags & TERM_START_SYSTEM);
-#endif
-    ga_init2(&term->tl_scrollback, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_scrollback_postponed, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_osc_buf, sizeof(char), 300);
+    رکن = ALLOC_CLEAR_ONE(رکن_T);
+    إذا (رکن == عدم)
+	أرجع عدم;
+    رکن->tl_dirty_صف_سرا = MAX_صف;
+    رکن->tl_cursor_visible = TRUE;
+    رکن->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_بلاک;
+    رکن->tl_انت = opt->jo_رکن_انت;
+#جے_تعریف_شدہ FEAT_GUI
+    رکن->tl_system = (flags & رکن_شروع_SYSTEM);
+#جے_انت
+    ga_init2(&رکن->tl_scrollback, حجم(sb_سطر_T), 300);
+    ga_init2(&رکن->tl_scrollback_postponed, حجم(sb_سطر_T), 300);
+    ga_init2(&رکن->tl_osc_buf, حجم(حرف), 300);
 
     setpcmark();
-    CLEAR_FIELD(split_ea);
-    if (opt->jo_curwin)
+    CLEAR_میدان(ونڈو_ea);
+    إذا (opt->jo_curwin)
     {
 	// Create a new buffer in the current window.
-	if (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
+	إذا (!can_abandon(curbuf, flags & رکن_شروع_FORCEIT))
 	{
-	    no_write_message();
-	    vim_free(term);
-	    return NULL;
+	    no_write_سنیہا();
+	    vim_free(رکن);
+	    أرجع عدم;
 	}
-	if (do_ecmd(0, NULL, NULL, &split_ea, ECMD_ONE,
-		      (buf_hide(curwin->w_buffer) ? ECMD_HIDE : 0)
-			  + ((flags & TERM_START_FORCEIT) ? ECMD_FORCEIT : 0),
+	إذا (do_ecmd(0, عدم, عدم, &ونڈو_ea, ECMD_ONE,
+		      (buf_hide(curwin->w_بفر) ? ECMD_HIDE : 0)
+			  + ((flags & رکن_شروع_FORCEIT) ? ECMD_FORCEIT : 0),
 							       curwin) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(رکن);
+	    أرجع عدم;
 	}
     }
-    else if (opt->jo_hidden || (flags & TERM_START_SYSTEM))
+    وإلا إذا (opt->jo_hidden || (flags & رکن_شروع_SYSTEM))
     {
 	buf_T *buf;
 
 	// Create a new buffer without a window. Make it the current buffer for
 	// a moment to be able to do the initializations.
-	buf = buflist_new((char_u *)"", NULL, (linenr_T)0,
+	buf = buflist_new((char_u *)"", عدم, (linenr_T)0,
 							 BLN_NEW | BLN_LISTED);
-	if (buf == NULL || ml_open(buf) == FAIL)
+	إذا (buf == عدم || ml_open(buf) == FAIL)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(رکن);
+	    أرجع عدم;
 	}
 	old_curbuf = curbuf;
 	--curbuf->b_nwindows;
 	curbuf = buf;
 	save_cursor = curwin->w_cursor;
-	curwin->w_buffer = buf;
+	curwin->w_بفر = buf;
 	++curbuf->b_nwindows;
     }
-    else
+    وإلا
     {
 	// Open a new window or tab.
-	split_ea.cmdidx = CMD_new;
-	split_ea.cmd = (char_u *)"new";
-	split_ea.arg = (char_u *)"";
-	if (opt->jo_term_rows > 0 && !vertical)
+	ونڈو_ea.cmdidx = CMD_new;
+	ونڈو_ea.cmd = (char_u *)"new";
+	ونڈو_ea.arg = (char_u *)"";
+	إذا (opt->jo_رکن_صفاں > 0 && !vertical)
 	{
-	    split_ea.line2 = opt->jo_term_rows;
-	    split_ea.addr_count = 1;
+	    ونڈو_ea.line2 = opt->jo_رکن_صفاں;
+	    ونڈو_ea.addr_گنتی = 1;
 	}
-	if (opt->jo_term_cols > 0 && vertical)
+	إذا (opt->jo_رکن_خانے_گنتی > 0 && vertical)
 	{
-	    split_ea.line2 = opt->jo_term_cols;
-	    split_ea.addr_count = 1;
+	    ونڈو_ea.line2 = opt->jo_رکن_خانے_گنتی;
+	    ونڈو_ea.addr_گنتی = 1;
 	}
 
-	int cmod_split_modified = FALSE;
-	if (vertical)
+	صحيح cmod_ونڈو_modified = FALSE;
+	إذا (vertical)
 	{
-	    if (!(cmdmod.cmod_split & WSP_VERT))
-		cmod_split_modified = TRUE;
-	    cmdmod.cmod_split |= WSP_VERT;
+	    إذا (!(cmdmod.cmod_ونڈو & WSP_VERT))
+		cmod_ونڈو_modified = TRUE;
+	    cmdmod.cmod_ونڈو |= WSP_VERT;
 	}
-	ex_splitview(&split_ea);
-	if (cmod_split_modified)
-	    cmdmod.cmod_split &= ~WSP_VERT;
-	if (curwin == old_curwin)
+	ex_splitview(&ونڈو_ea);
+	إذا (cmod_ونڈو_modified)
+	    cmdmod.cmod_ونڈو &= ~WSP_VERT;
+	إذا (curwin == old_curwin)
 	{
 	    // split failed
-	    vim_free(term);
-	    return NULL;
+	    vim_free(رکن);
+	    أرجع عدم;
 	}
     }
-    term->tl_buffer = curbuf;
-    curbuf->b_term = term;
+    رکن->tl_بفر = curbuf;
+    curbuf->b_رکن = رکن;
 
-    if (!opt->jo_hidden)
+    إذا (!opt->jo_hidden)
     {
 	// Only one size was taken care of with :new, do the other one.  With
 	// "curwin" both need to be done.
-	if (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
-	    win_setheight(opt->jo_term_rows);
-	if (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
-	    win_setwidth(opt->jo_term_cols);
+	إذا (opt->jo_رکن_صفاں > 0 && (opt->jo_curwin || vertical))
+	    win_setheight(opt->jo_رکن_صفاں);
+	إذا (opt->jo_رکن_خانے_گنتی > 0 && (opt->jo_curwin || !vertical))
+	    win_setwidth(opt->jo_رکن_خانے_گنتی);
     }
 
     // Link the new terminal in the list of active terminals.
-    term->tl_next = first_term;
-    first_term = term;
+    رکن->tl_اگلا = پہلا_رکن;
+    پہلا_رکن = رکن;
 
-    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPRE, عدم, عدم, FALSE, curbuf);
 
-    if (opt->jo_term_name != NULL)
+    إذا (opt->jo_رکن_name != عدم)
     {
 	vim_free(curbuf->b_ffname);
-	curbuf->b_ffname = vim_strsave(opt->jo_term_name);
+	curbuf->b_ffname = vim_strsave(opt->jo_رکن_name);
     }
-    else if (argv != NULL)
+    وإلا إذا (argv != عدم)
     {
 	vim_free(curbuf->b_ffname);
 	curbuf->b_ffname = vim_strsave((char_u *)"!system");
     }
-    else
+    وإلا
     {
-	int	i;
+	صحيح	i;
 	size_t	len;
 	char_u	*cmd, *p;
 
-	if (argvar->v_type == VAR_STRING)
+	إذا (argvar->v_type == VAR_STRING)
 	{
 	    cmd = argvar->vval.v_string;
-	    if (cmd == NULL)
+	    إذا (cmd == عدم)
 		cmd = (char_u *)"";
-	    else if (STRCMP(cmd, "NONE") == 0)
+	    وإلا إذا (STRCMP(cmd, "NONE") == 0)
 		cmd = (char_u *)"pty";
 	}
-	else if (argvar->v_type != VAR_LIST
-		|| argvar->vval.v_list == NULL
+	وإلا إذا (argvar->v_type != VAR_LIST
+		|| argvar->vval.v_list == عدم
 		|| argvar->vval.v_list->lv_len == 0
 		|| (cmd = tv_get_string_chk(
-			       &argvar->vval.v_list->lv_first->li_tv)) == NULL)
+			       &argvar->vval.v_list->lv_پہلا->li_tv)) == عدم)
 	    cmd = (char_u*)"";
 
 	len = STRLEN(cmd) + 10;
 	p = alloc(len);
 
-	for (i = 0; p != NULL; ++i)
+	لكل (i = 0; p != عدم; ++i)
 	{
 	    // Prepend a ! to the command name to avoid the buffer name equals
 	    // the executable, otherwise ":w!" would overwrite it.
-	    if (i == 0)
-		vim_snprintf((char *)p, len, "!%s", cmd);
-	    else
-		vim_snprintf((char *)p, len, "!%s (%d)", cmd, i);
-	    if (buflist_findname(p) == NULL)
+	    إذا (i == 0)
+		vim_snprintf((حرف *)p, len, "!%s", cmd);
+	    وإلا
+		vim_snprintf((حرف *)p, len, "!%s (%d)", cmd, i);
+	    إذا (buflist_findname(p) == عدم)
 	    {
 		vim_free(curbuf->b_ffname);
 		curbuf->b_ffname = p;
-		break;
+		اكسر;
 	    }
 	}
     }
@@ -635,15 +635,15 @@ term_start(
     curbuf->b_sfname = vim_strsave(curbuf->b_ffname);
     curbuf->b_fname = curbuf->b_ffname;
 
-    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPOST, عدم, عدم, FALSE, curbuf);
 
-    if (opt->jo_term_opencmd != NULL)
-	term->tl_opencmd = vim_strsave(opt->jo_term_opencmd);
+    إذا (opt->jo_رکن_opencmd != عدم)
+	رکن->tl_opencmd = vim_strsave(opt->jo_رکن_opencmd);
 
-    if (opt->jo_eof_chars != NULL)
-	term->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
+    إذا (opt->jo_eof_chars != عدم)
+	رکن->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
 
-    set_string_option_direct((char_u *)"buftype", -1,
+    سیٹ_string_option_سدھا((char_u *)"buftype", -1,
 				  (char_u *)"terminal", OPT_FREE|OPT_LOCAL, 0);
     // Avoid that 'buftype' is reset when this buffer is entered.
     curbuf->b_p_initialized = true;
@@ -652,132 +652,132 @@ term_start(
     // the job finished.
     curbuf->b_p_ma = FALSE;
 
-    set_term_and_win_size(term, opt);
-#ifdef MSWIN
-    mch_memmove(orig_opt.jo_io, opt->jo_io, sizeof(orig_opt.jo_io));
-#endif
-    setup_job_options(opt, term->tl_rows, term->tl_cols);
+    سیٹ_رکن_and_win_ناپ(رکن, opt);
+#جے_تعریف_شدہ MSWIN
+    mch_memmove(orig_opt.jo_io, opt->jo_io, حجم(orig_opt.jo_io));
+#جے_انت
+    تیاری_کم_options(opt, رکن->tl_صفاں, رکن->tl_خانے_گنتی);
 
-    if (flags & TERM_START_NOJOB)
-	return curbuf;
+    إذا (flags & رکن_شروع_NOJOB)
+	أرجع curbuf;
 
-#if defined(FEAT_SESSION)
+#إذا defined(FEAT_SESSION)
     // Remember the command for the session file.
-    if (opt->jo_term_norestore || argv != NULL)
-	term->tl_command = vim_strsave((char_u *)"NONE");
-    else if (argvar->v_type == VAR_STRING)
+    إذا (opt->jo_رکن_norestore || argv != عدم)
+	رکن->tl_command = vim_strsave((char_u *)"NONE");
+    وإلا إذا (argvar->v_type == VAR_STRING)
     {
 	char_u	*cmd = argvar->vval.v_string;
 
-	if (cmd != NULL && STRCMP(cmd, p_sh) != 0)
-	    term->tl_command = vim_strsave(cmd);
+	إذا (cmd != عدم && STRCMP(cmd, p_sh) != 0)
+	    رکن->tl_command = vim_strsave(cmd);
     }
-    else if (argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
+    وإلا إذا (argvar->v_type == VAR_LIST
+	    && argvar->vval.v_list != عدم
 	    && argvar->vval.v_list->lv_len > 0)
     {
 	garray_T	ga;
-	listitem_T	*item;
+	listitem_T	*شے;
 
 	ga_init2(&ga, 1, 100);
-	FOR_ALL_LIST_ITEMS(argvar->vval.v_list, item)
+	FOR_ALL_LIST_اشیاء(argvar->vval.v_list, شے)
 	{
-	    char_u *s = tv_get_string_chk(&item->li_tv);
+	    char_u *s = tv_get_string_chk(&شے->li_tv);
 	    char_u *p;
 
-	    if (s == NULL)
-		break;
+	    إذا (s == عدم)
+		اكسر;
 	    p = vim_strsave_fnameescape(s, VSE_NONE);
-	    if (p == NULL)
-		break;
+	    إذا (p == عدم)
+		اكسر;
 	    ga_concat(&ga, p);
 	    vim_free(p);
 	    ga_append(&ga, ' ');
 	}
-	if (item == NULL)
+	إذا (شے == عدم)
 	{
 	    ga_append(&ga, NUL);
-	    term->tl_command = ga.ga_data;
+	    رکن->tl_command = ga.ga_انکڑے;
 	}
-	else
+	وإلا
 	    ga_clear(&ga);
     }
-#endif
+#جے_انت
 
-    if (opt->jo_term_kill != NULL)
+    إذا (opt->jo_رکن_kill != عدم)
     {
-	char_u *p = skiptowhite(opt->jo_term_kill);
+	char_u *p = skiptowhite(opt->jo_رکن_kill);
 
-	term->tl_kill = vim_strnsave(opt->jo_term_kill, p - opt->jo_term_kill);
+	رکن->tl_kill = vim_strnsave(opt->jo_رکن_kill, p - opt->jo_رکن_kill);
     }
 
-    if (opt->jo_term_api != NULL)
+    إذا (opt->jo_رکن_api != عدم)
     {
-	char_u *p = skiptowhite(opt->jo_term_api);
+	char_u *p = skiptowhite(opt->jo_رکن_api);
 
-	term->tl_api = vim_strnsave(opt->jo_term_api, p - opt->jo_term_api);
+	رکن->tl_api = vim_strnsave(opt->jo_رکن_api, p - opt->jo_رکن_api);
     }
-    else
-	term->tl_api = vim_strsave((char_u *)"Tapi_");
+    وإلا
+	رکن->tl_api = vim_strsave((char_u *)"Tapi_");
 
-    if (opt->jo_set2 & JO2_TERM_HIGHLIGHT)
-	term->tl_highlight_name = vim_strsave(opt->jo_term_highlight);
+    إذا (opt->jo_set2 & JO2_رکن_HIGHLIGHT)
+	رکن->tl_highlight_name = vim_strsave(opt->jo_رکن_highlight);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Save the user-defined palette, it is only used in GUI (or 'tgc' is on).
-    if (opt->jo_set2 & JO2_ANSI_COLORS)
+    إذا (opt->jo_set2 & JO2_ANSI_COLORS)
     {
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-	if (term->tl_palette == NULL)
+	رکن->tl_palette = ALLOC_MULT(long_u, 16);
+	إذا (رکن->tl_palette == عدم)
 	{
-	    vim_free(term);
-	    return NULL;
+	    vim_free(رکن);
+	    أرجع عدم;
 	}
-	memcpy(term->tl_palette, opt->jo_ansi_colors, sizeof(long_u) * 16);
+	حافظہ_نقل(رکن->tl_palette, opt->jo_ansi_colors, حجم(long_u) * 16);
     }
-#endif
+#جے_انت
 
     // System dependent: setup the vterm and maybe start the job in it.
-    if (argv == NULL
+    إذا (argv == عدم
 	    && argvar->v_type == VAR_STRING
-	    && argvar->vval.v_string != NULL
+	    && argvar->vval.v_string != عدم
 	    && STRCMP(argvar->vval.v_string, "NONE") == 0)
-	res = create_pty_only(term, opt);
-    else
-	res = term_and_job_init(term, argvar, argv, opt, &orig_opt);
+	res = create_pty_only(رکن, opt);
+    وإلا
+	res = رکن_and_کم_init(رکن, argvar, argv, opt, &orig_opt);
 
     newbuf = curbuf;
-    if (res == OK)
+    إذا (res == OK)
     {
 	// Get and remember the size we ended up with.  Update the pty.
-	vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-	term_report_winsize(term, term->tl_rows, term->tl_cols);
-#ifdef FEAT_GUI
-	if (term->tl_system)
+	vterm_get_ناپ(رکن->tl_vterm, &رکن->tl_صفاں, &رکن->tl_خانے_گنتی);
+	رکن_report_winsize(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی);
+#جے_تعریف_شدہ FEAT_GUI
+	إذا (رکن->tl_system)
 	{
 	    // display first line below typed command
-	    term->tl_toprow = msg_row + 1;
-	    term->tl_dirty_row_end = 0;
+	    رکن->tl_toprow = پیغام_صف + 1;
+	    رکن->tl_dirty_صف_سرا = 0;
 	}
-#endif
+#جے_انت
 
 	// Make sure we don't get stuck on sending keys to the job, it leads to
 	// a deadlock if the job is waiting for Vim to read.
-	channel_set_nonblock(term->tl_job->jv_channel, PART_IN);
+	channel_سیٹ_nonblock(رکن->tl_کم->jv_channel, PART_وچ);
 
-	if (old_curbuf != NULL)
+	إذا (old_curbuf != عدم)
 	{
 	    --curbuf->b_nwindows;
 	    curbuf = old_curbuf;
-	    curwin->w_buffer = curbuf;
+	    curwin->w_بفر = curbuf;
 	    curwin->w_cursor = save_cursor;
 	    ++curbuf->b_nwindows;
 	}
-	else if (vgetc_busy
-#ifdef FEAT_TIMERS
+	وإلا إذا (vgetc_busy
+#جے_تعریف_شدہ FEAT_TIMERS
 		|| timer_busy
-#endif
-		|| input_busy)
+#جے_انت
+		|| داخلہ_busy)
 	{
 	    char_u ignore[4];
 
@@ -791,211 +791,211 @@ term_start(
 	    typebuf_was_filled = TRUE;
 	}
     }
-    else
+    وإلا
     {
-	term_close_buffer(curbuf, old_curbuf);
-	return NULL;
+	رکن_close_بفر(curbuf, old_curbuf);
+	أرجع عدم;
     }
 
-    apply_autocmds(EVENT_TERMINALOPEN, NULL, NULL, FALSE, newbuf);
-    if (!opt->jo_hidden && !(flags & TERM_START_SYSTEM))
-	apply_autocmds(EVENT_TERMINALWINOPEN, NULL, NULL, FALSE, newbuf);
-    return newbuf;
+    apply_autocmds(EVENT_TERMINALOPEN, عدم, عدم, FALSE, newbuf);
+    إذا (!opt->jo_hidden && !(flags & رکن_شروع_SYSTEM))
+	apply_autocmds(EVENT_TERMINALWINOPEN, عدم, عدم, FALSE, newbuf);
+    أرجع newbuf;
 }
 
 /*
  * ":terminal": open a terminal window and execute a job in it.
  */
-    void
+    فراغ
 ex_terminal(exarg_T *eap)
 {
     typval_T	argvar[2];
     jobopt_T	opt;
-    int		opt_shell = FALSE;
+    صحيح		opt_shell = FALSE;
     char_u	*cmd;
-    char_u	*tofree = NULL;
-    int		scroll_save = msg_scroll;
+    char_u	*tofree = عدم;
+    صحيح		scroll_save = پیغام_scroll;
 
-    msg_scroll = FALSE;		// don't scroll here
+    پیغام_scroll = FALSE;		// don't scroll here
     autowrite_all();
-    msg_scroll = scroll_save;
+    پیغام_scroll = scroll_save;
 
-    init_job_options(&opt);
+    init_کم_options(&opt);
 
     cmd = eap->arg;
-    while (*cmd == '+' && *(cmd + 1) == '+')
+    طالما (*cmd == '+' && *(cmd + 1) == '+')
     {
 	char_u  *p, *ep;
 
 	cmd += 2;
 	p = skiptowhite(cmd);
 	ep = vim_strchr(cmd, '=');
-	if (ep != NULL)
+	إذا (ep != عدم)
 	{
-	    if (ep < p)
+	    إذا (ep < p)
 		p = ep;
-	    else
-		ep = NULL;
+	    وإلا
+		ep = عدم;
 	}
 
 	// Note: Keep this in sync with get_terminalopt_name.
 
-#define OPTARG_HAS(name) ((int)(p - cmd) == sizeof(name) - 1 \
-				 && STRNICMP(cmd, name, sizeof(name) - 1) == 0)
-	if (OPTARG_HAS("close"))
-	    opt.jo_term_finish = 'c';
-	else if (OPTARG_HAS("noclose"))
-	    opt.jo_term_finish = 'n';
-	else if (OPTARG_HAS("open"))
-	    opt.jo_term_finish = 'o';
-	else if (OPTARG_HAS("curwin"))
+#تعریف_کرو OPTARG_HAS(name) ((صحيح)(p - cmd) == حجم(name) - 1 \
+				 && STRNICMP(cmd, name, حجم(name) - 1) == 0)
+	إذا (OPTARG_HAS("close"))
+	    opt.jo_رکن_انت = 'c';
+	وإلا إذا (OPTARG_HAS("noclose"))
+	    opt.jo_رکن_انت = 'n';
+	وإلا إذا (OPTARG_HAS("open"))
+	    opt.jo_رکن_انت = 'o';
+	وإلا إذا (OPTARG_HAS("curwin"))
 	    opt.jo_curwin = 1;
-	else if (OPTARG_HAS("hidden"))
+	وإلا إذا (OPTARG_HAS("hidden"))
 	    opt.jo_hidden = 1;
-	else if (OPTARG_HAS("norestore"))
-	    opt.jo_term_norestore = 1;
-	else if (OPTARG_HAS("shell"))
+	وإلا إذا (OPTARG_HAS("norestore"))
+	    opt.jo_رکن_norestore = 1;
+	وإلا إذا (OPTARG_HAS("shell"))
 	    opt_shell = TRUE;
-	else if (OPTARG_HAS("kill") && ep != NULL)
+	وإلا إذا (OPTARG_HAS("kill") && ep != عدم)
 	{
-	    opt.jo_set2 |= JO2_TERM_KILL;
-	    opt.jo_term_kill = ep + 1;
+	    opt.jo_set2 |= JO2_رکن_KILL;
+	    opt.jo_رکن_kill = ep + 1;
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("api"))
+	وإلا إذا (OPTARG_HAS("api"))
 	{
-	    opt.jo_set2 |= JO2_TERM_API;
-	    if (ep != NULL)
+	    opt.jo_set2 |= JO2_رکن_API;
+	    إذا (ep != عدم)
 	    {
-		opt.jo_term_api = ep + 1;
+		opt.jo_رکن_api = ep + 1;
 		p = skiptowhite(cmd);
 	    }
-	    else
-		opt.jo_term_api = NULL;
+	    وإلا
+		opt.jo_رکن_api = عدم;
 	}
-	else if (OPTARG_HAS("rows") && ep != NULL && SAFE_isdigit(ep[1]))
+	وإلا إذا (OPTARG_HAS("rows") && ep != عدم && محفوظ_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_ROWS;
-	    opt.jo_term_rows = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_رکن_صفاں;
+	    opt.jo_رکن_صفاں = atoi((حرف *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("cols") && ep != NULL && SAFE_isdigit(ep[1]))
+	وإلا إذا (OPTARG_HAS("cols") && ep != عدم && محفوظ_isdigit(ep[1]))
 	{
-	    opt.jo_set2 |= JO2_TERM_COLS;
-	    opt.jo_term_cols = atoi((char *)ep + 1);
+	    opt.jo_set2 |= JO2_رکن_خانے_گنتی;
+	    opt.jo_رکن_خانے_گنتی = atoi((حرف *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("eof") && ep != NULL)
+	وإلا إذا (OPTARG_HAS("eof") && ep != عدم)
 	{
-	    char_u *buf = NULL;
-	    char_u *keys;
+	    char_u *buf = عدم;
+	    char_u *کلیدیں;
 
 	    vim_free(opt.jo_eof_chars);
 	    p = skiptowhite(cmd);
 	    *p = NUL;
-	    keys = replace_termcodes(ep + 1, &buf, 0,
-		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, NULL);
+	    کلیدیں = replace_termcodes(ep + 1, &buf, 0,
+		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, عدم);
 	    opt.jo_set2 |= JO2_EOF_CHARS;
-	    opt.jo_eof_chars = vim_strsave(keys);
+	    opt.jo_eof_chars = vim_strsave(کلیدیں);
 	    vim_free(buf);
 	    *p = ' ';
 	}
-#ifdef MSWIN
-	else if ((int)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
-								 && ep != NULL)
+#جے_تعریف_شدہ MSWIN
+	وإلا إذا ((صحيح)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
+								 && ep != عدم)
 	{
-	    int tty_type = NUL;
+	    صحيح tty_type = NUL;
 
 	    p = skiptowhite(cmd);
-	    if (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
+	    إذا (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
 		tty_type = 'w';
-	    else if (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
+	    وإلا إذا (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
 		tty_type = 'c';
-	    else
+	    وإلا
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "type");
-		goto theend;
+		semsg(_(e_invalid_قدر_for_دلیل_str), "type");
+		اذهب theend;
 	    }
 	    opt.jo_set2 |= JO2_TTY_TYPE;
 	    opt.jo_tty_type = tty_type;
 	}
-#endif
-	else
+#جے_انت
+	وإلا
 	{
-	    if (*p)
+	    إذا (*p)
 		*p = NUL;
 	    semsg(_(e_invalid_attribute_str), cmd);
-	    goto theend;
+	    اذهب theend;
 	}
-#undef OPTARG_HAS
+#تعریف_رد OPTARG_HAS
 	cmd = skipwhite(p);
     }
-    if (*cmd == NUL)
+    إذا (*cmd == NUL)
     {
 	// Make a copy of 'shell', an autocommand may change the option.
 	tofree = cmd = vim_strsave(p_sh);
 
 	// default to close when the shell exits
-	if (opt.jo_term_finish == NUL)
-	    opt.jo_term_finish = TL_FINISH_CLOSE;
+	إذا (opt.jo_رکن_انت == NUL)
+	    opt.jo_رکن_انت = TL_انت_CLOSE;
     }
 
-    if (eap->addr_count > 0)
+    إذا (eap->addr_گنتی > 0)
     {
 	// Write lines from current buffer to the job.
-	opt.jo_set |= JO_IN_IO | JO_IN_BUF | JO_IN_TOP | JO_IN_BOT;
-	opt.jo_io[PART_IN] = JIO_BUFFER;
-	opt.jo_io_buf[PART_IN] = curbuf->b_fnum;
-	opt.jo_in_top = eap->line1;
-	opt.jo_in_bot = eap->line2;
+	opt.jo_سیٹ |= JO_وچ_IO | JO_وچ_BUF | JO_وچ_چوٹی | JO_وچ_BOT;
+	opt.jo_io[PART_وچ] = JIO_بفر;
+	opt.jo_io_buf[PART_وچ] = curbuf->b_fnum;
+	opt.jo_وچ_چوٹی = eap->line1;
+	opt.jo_وچ_bot = eap->line2;
     }
 
-    if (opt_shell && tofree == NULL)
+    إذا (opt_shell && tofree == عدم)
     {
-#ifdef UNIX
-	char	**argv = NULL;
-	char_u	*tofree1 = NULL;
-	char_u	*tofree2 = NULL;
+#جے_تعریف_شدہ UNIX
+	حرف	**argv = عدم;
+	char_u	*tofree1 = عدم;
+	char_u	*tofree2 = عدم;
 
 	// :term ++shell command
-	if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
-	    term_start(NULL, argv, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+	إذا (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
+	    رکن_شروع(عدم, argv, &opt, eap->forceit ? رکن_شروع_FORCEIT : 0);
 	vim_free(argv);
 	vim_free(tofree1);
 	vim_free(tofree2);
-	goto theend;
-#else
+	اذهب theend;
+#وإلا
 # ifdef MSWIN
 	long_u	    cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 	char_u	    *newcmd;
 
 	newcmd = alloc(cmdlen);
-	if (newcmd == NULL)
-	    goto theend;
+	إذا (newcmd == عدم)
+	    اذهب theend;
 	tofree = newcmd;
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	vim_snprintf((حرف *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
 	cmd = newcmd;
-# else
+# وإلا
 	emsg(_(e_sorry_plusplusshell_not_supported_on_this_system));
-	goto theend;
+	اذهب theend;
 # endif
-#endif
+#جے_انت
     }
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = cmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    term_start(argvar, NULL, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+    رکن_شروع(argvar, عدم, &opt, eap->forceit ? رکن_شروع_FORCEIT : 0);
 
 theend:
     vim_free(tofree);
     vim_free(opt.jo_eof_chars);
 }
 
-    static char_u *
-get_terminalopt_name(expand_T *xp UNUSED, int idx)
+    ساكن char_u *
+get_terminalopt_name(expand_T *xp بن_ورتیا, صحيح idx)
 {
     // Note: Keep this in sync with ex_terminal.
-    static char *(p_termopt_values[]) =
+    ساكن حرف *(p_termopt_اقدار[]) =
     {
 	"close",
 	"noclose",
@@ -1012,18 +1012,18 @@ get_terminalopt_name(expand_T *xp UNUSED, int idx)
 	"api=",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termopt_values))
-	return (char_u*)p_termopt_values[idx];
-    return NULL;
+    إذا (idx < (صحيح)ARRAY_لمائی(p_termopt_اقدار))
+	أرجع (char_u*)p_termopt_اقدار[idx];
+    أرجع عدم;
 }
 
-    static char_u *
-get_termkill_name(expand_T *xp UNUSED, int idx)
+    ساكن char_u *
+get_termkill_name(expand_T *xp بن_ورتیا, صحيح idx)
 {
     // These are platform-specific values used for job_stop(). They are defined
     // in each platform's mch_signal_job(). Just use a unified auto-complete
     // list for simplicity.
-    static char *(p_termkill_values[]) =
+    ساكن حرف *(p_termkill_اقدار[]) =
     {
 	"term",
 	"hup",
@@ -1033,160 +1033,160 @@ get_termkill_name(expand_T *xp UNUSED, int idx)
 	"winch",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termkill_values))
-	return (char_u*)p_termkill_values[idx];
-    return NULL;
+    إذا (idx < (صحيح)ARRAY_لمائی(p_termkill_اقدار))
+	أرجع (char_u*)p_termkill_اقدار[idx];
+    أرجع عدم;
 }
 
 /*
  * Command-line expansion for :terminal [options]
  */
-    int
+    صحيح
 expand_terminal_opt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	صحيح	    *عدد_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    إذا (xp->xp_نمونہ > xp->xp_سطر && *(xp->xp_نمونہ-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, صحيح) = عدم;
 
-	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 4
-		&& STRNCMP(name_end - 4, "kill", 4) == 0)
+	char_u *name_سرا = xp->xp_نمونہ - 1;
+	إذا (name_سرا - xp->xp_سطر >= 4
+		&& STRNCMP(name_سرا - 4, "kill", 4) == 0)
 	    cb = get_termkill_name;
 
-	if (cb != NULL)
+	إذا (cb != عدم)
 	{
-	    return ExpandGeneric(
+	    أرجع ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    عدد_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	أرجع FAIL;
     }
-    return ExpandGeneric(
+    أرجع ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    عدد_Matches,
 	    get_terminalopt_name,
 	    FALSE);
 }
 
-#if defined(FEAT_SESSION)
+#إذا defined(FEAT_SESSION)
 /*
  * Write a :terminal command to the session file to restore the terminal in
  * window "wp".
  * Return FAIL if writing fails.
  */
-    int
-term_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
+    صحيح
+رکن_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
 {
-    const int	bufnr = wp->w_buffer->b_fnum;
-    term_T	*term = wp->w_buffer->b_term;
+    ثابت صحيح	bufnr = wp->w_بفر->b_fnum;
+    رکن_T	*رکن = wp->w_بفر->b_رکن;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    إذا (terminal_bufs != عدم && wp->w_بفر->b_nwindows > 1)
     {
 	// There are multiple views into this terminal buffer. We don't want to
 	// create the terminal multiple times. If it's the first time, create,
 	// otherwise link to the first buffer.
-	char	    id_as_str[NUMBUFLEN];
-	hashitem_T  *entry;
+	حرف	    id_as_str[NUMBUFLEN];
+	hashitem_T  *اندراج;
 
-	vim_snprintf(id_as_str, sizeof(id_as_str), "%d", bufnr);
+	vim_snprintf(id_as_str, حجم(id_as_str), "%d", bufnr);
 
-	entry = hash_find(terminal_bufs, (char_u *)id_as_str);
-	if (!HASHITEM_EMPTY(entry))
+	اندراج = hash_لبھو(terminal_bufs, (char_u *)id_as_str);
+	إذا (!HASHITEM_خالی_تھاواں(اندراج))
 	{
 	    // we've already opened this terminal buffer
-	    if (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
-		return FAIL;
-	    return put_eol(fd);
+	    إذا (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
+		أرجع FAIL;
+	    أرجع put_eol(fd);
 	}
     }
 
     // Create the terminal and run the command.  This is not without
     // risk, but let's assume the user only creates a session when this
     // will be OK.
-    if (fprintf(fd, "exe ':terminal ++curwin"
+    إذا (fprintf(fd, "exe ':terminal ++curwin"
 		" ++cols=' .. ((&columns * %d + %ld) / %ld)"
 		" .. ' ++rows=' .. ((&lines * %d + %ld) / %ld) ",
-		term->tl_cols, Columns / 2, Columns,
-		term->tl_rows, Rows / 2, Rows) < 0)
-	return FAIL;
+		رکن->tl_خانے_گنتی, Columns / 2, Columns,
+		رکن->tl_صفاں, صفاں / 2, صفاں) < 0)
+	أرجع FAIL;
 # ifdef MSWIN
-    if (fprintf(fd, ".. ' ++type=%s' ", term->tl_job->jv_tty_type) < 0)
-	return FAIL;
+    إذا (fprintf(fd, ".. ' ++type=%s' ", رکن->tl_کم->jv_tty_type) < 0)
+	أرجع FAIL;
 # endif
-    if (term->tl_command != NULL)
+    إذا (رکن->tl_command != عدم)
     {
-	char_u *quoted_command = string_quote(term->tl_command, FALSE);
-	if (quoted_command == NULL)
-	    return FAIL;
+	char_u *quoted_command = string_quote(رکن->tl_command, FALSE);
+	إذا (quoted_command == عدم)
+	    أرجع FAIL;
 
-	int ret = fputs(".. ' ' .. ", fd) < 0
-		    || fputs((char *)quoted_command, fd) < 0;
+	صحيح ret = fputs(".. ' ' .. ", fd) < 0
+		    || fputs((حرف *)quoted_command, fd) < 0;
 	vim_free(quoted_command);
-	if (ret)
-	    return FAIL;
+	إذا (ret)
+	    أرجع FAIL;
     }
-    if (put_eol(fd) != OK)
-	return FAIL;
+    إذا (put_eol(fd) != OK)
+	أرجع FAIL;
 
-    if (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
-	return FAIL;
+    إذا (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
+	أرجع FAIL;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    إذا (terminal_bufs != عدم && wp->w_بفر->b_nwindows > 1)
     {
-	char *hash_key = alloc(NUMBUFLEN);
+	حرف *hash_کلید = alloc(NUMBUFLEN);
 
-	vim_snprintf(hash_key, NUMBUFLEN, "%d", bufnr);
-	hash_add(terminal_bufs, (char_u *)hash_key, "terminal session");
+	vim_snprintf(hash_کلید, NUMBUFLEN, "%d", bufnr);
+	hash_جوڑو(terminal_bufs, (char_u *)hash_کلید, "terminal session");
     }
 
-    return put_eol(fd);
+    أرجع put_eol(fd);
 }
 
 /*
  * Return TRUE if "buf" has a terminal that should be restored.
  */
-    int
-term_should_restore(buf_T *buf)
+    صحيح
+رکن_should_restore(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
+    رکن_T	*رکن = buf->b_رکن;
 
-    return term != NULL && (term->tl_command == NULL
-				     || STRCMP(term->tl_command, "NONE") != 0);
+    أرجع رکن != عدم && (رکن->tl_command == عدم
+				     || STRCMP(رکن->tl_command, "NONE") != 0);
 }
-#endif
+#جے_انت
 
 /*
  * Free the scrollback buffer for "term".
  */
-    static void
-free_scrollback(term_T *term)
+    ساكن فراغ
+free_scrollback(رکن_T *رکن)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; i < term->tl_scrollback.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback);
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback_postponed.ga_data + i)->sb_cells);
-    ga_clear(&term->tl_scrollback_postponed);
+    لكل (i = 0; i < رکن->tl_scrollback.ga_len; ++i)
+	vim_free(((sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے + i)->sb_cells);
+    ga_clear(&رکن->tl_scrollback);
+    لكل (i = 0; i < رکن->tl_scrollback_postponed.ga_len; ++i)
+	vim_free(((sb_سطر_T *)رکن->tl_scrollback_postponed.ga_انکڑے + i)->sb_cells);
+    ga_clear(&رکن->tl_scrollback_postponed);
 }
 
 
 // Terminals that need to be freed soon.
-static term_T	*terminals_to_free = NULL;
+ساكن رکن_T	*terminals_منزل_free = عدم;
 
 /*
  * Free a terminal and everything it refers to.
@@ -1196,73 +1196,73 @@ static term_T	*terminals_to_free = NULL;
  * because callbacks may wipe out a buffer while the terminal is still
  * referenced.
  */
-    void
+    فراغ
 free_terminal(buf_T *buf)
 {
-    term_T	*term = buf->b_term;
-    term_T	*tp;
+    رکن_T	*رکن = buf->b_رکن;
+    رکن_T	*tp;
 
-    if (term == NULL)
-	return;
+    إذا (رکن == عدم)
+	أرجع;
 
     // Unlink the terminal form the list of terminals.
-    if (first_term == term)
-	first_term = term->tl_next;
-    else
-	for (tp = first_term; tp->tl_next != NULL; tp = tp->tl_next)
-	    if (tp->tl_next == term)
+    إذا (پہلا_رکن == رکن)
+	پہلا_رکن = رکن->tl_اگلا;
+    وإلا
+	لكل (tp = پہلا_رکن; tp->tl_اگلا != عدم; tp = tp->tl_اگلا)
+	    إذا (tp->tl_اگلا == رکن)
 	    {
-		tp->tl_next = term->tl_next;
-		break;
+		tp->tl_اگلا = رکن->tl_اگلا;
+		اكسر;
 	    }
 
-    if (term->tl_job != NULL)
+    إذا (رکن->tl_کم != عدم)
     {
-	if (term->tl_job->jv_status != JOB_ENDED
-		&& term->tl_job->jv_status != JOB_FINISHED
-		&& term->tl_job->jv_status != JOB_FAILED)
-	    job_stop(term->tl_job, NULL, "kill");
-	job_unref(term->tl_job);
+	إذا (رکن->tl_کم->jv_حالت != کم_ENDED
+		&& رکن->tl_کم->jv_حالت != کم_مکمل
+		&& رکن->tl_کم->jv_حالت != کم_FAILED)
+	    کم_stop(رکن->tl_کم, عدم, "kill");
+	کم_unref(رکن->tl_کم);
     }
-    term->tl_next = terminals_to_free;
-    terminals_to_free = term;
+    رکن->tl_اگلا = terminals_منزل_free;
+    terminals_منزل_free = رکن;
 
-    buf->b_term = NULL;
-    if (in_terminal_loop == term)
-	in_terminal_loop = NULL;
+    buf->b_رکن = عدم;
+    إذا (وچ_terminal_loop == رکن)
+	وچ_terminal_loop = عدم;
 }
 
-    void
-free_unused_terminals(void)
+    فراغ
+free_بن_ورتیا_terminals(فراغ)
 {
-    while (terminals_to_free != NULL)
+    طالما (terminals_منزل_free != عدم)
     {
-	term_T	    *term = terminals_to_free;
+	رکن_T	    *رکن = terminals_منزل_free;
 
-	terminals_to_free = term->tl_next;
+	terminals_منزل_free = رکن->tl_اگلا;
 
-	free_scrollback(term);
-	ga_clear(&term->tl_osc_buf);
+	free_scrollback(رکن);
+	ga_clear(&رکن->tl_osc_buf);
 
-	term_free_vterm(term);
-	vim_free(term->tl_api);
-	vim_free(term->tl_title);
-#ifdef FEAT_SESSION
-	vim_free(term->tl_command);
-#endif
-	vim_free(term->tl_kill);
-	vim_free(term->tl_status_text);
-	vim_free(term->tl_opencmd);
-	vim_free(term->tl_eof_chars);
-	vim_free(term->tl_arg0_cmd);
-#ifdef MSWIN
-	if (term->tl_out_fd != NULL)
-	    fclose(term->tl_out_fd);
-#endif
-	vim_free(term->tl_highlight_name);
-	vim_free(term->tl_cursor_color);
-	vim_free(term->tl_palette);
-	vim_free(term);
+	رکن_free_vterm(رکن);
+	vim_free(رکن->tl_api);
+	vim_free(رکن->tl_title);
+#جے_تعریف_شدہ FEAT_SESSION
+	vim_free(رکن->tl_command);
+#جے_انت
+	vim_free(رکن->tl_kill);
+	vim_free(رکن->tl_حالت_متن);
+	vim_free(رکن->tl_opencmd);
+	vim_free(رکن->tl_eof_chars);
+	vim_free(رکن->tl_arg0_cmd);
+#جے_تعریف_شدہ MSWIN
+	إذا (رکن->tl_باہرلا_fd != عدم)
+	    fclose(رکن->tl_باہرلا_fd);
+#جے_انت
+	vim_free(رکن->tl_highlight_name);
+	vim_free(رکن->tl_cursor_color);
+	vim_free(رکن->tl_palette);
+	vim_free(رکن);
     }
 }
 
@@ -1271,304 +1271,304 @@ free_unused_terminals(void)
  * when writing buffer lines to the job it can be another.  This makes it
  * possible to do "1,5term vim -".
  */
-    static ch_part_T
-get_tty_part(term_T *term UNUSED)
+    ساكن ch_part_T
+get_tty_part(رکن_T *رکن بن_ورتیا)
 {
-#ifdef UNIX
-    ch_part_T	parts[3] = {PART_IN, PART_OUT, PART_ERR};
-    int		i;
+#جے_تعریف_شدہ UNIX
+    ch_part_T	parts[3] = {PART_وچ, PART_باہرلا, PART_ERR};
+    صحيح		i;
 
-    for (i = 0; i < 3; ++i)
+    لكل (i = 0; i < 3; ++i)
     {
-	int fd = term->tl_job->jv_channel->ch_part[parts[i]].ch_fd;
+	صحيح fd = رکن->tl_کم->jv_channel->ch_part[parts[i]].ch_fd;
 
-	if (mch_isatty(fd))
-	    return parts[i];
+	إذا (mch_isatty(fd))
+	    أرجع parts[i];
     }
-#endif
-    return PART_IN;
+#جے_انت
+    أرجع PART_وچ;
 }
 
 /*
  * Read any vterm output and send it on the channel.
  */
-    static void
-term_forward_output(term_T *term)
+    ساكن فراغ
+رکن_forward_output(رکن_T *رکن)
 {
-    VTerm *vterm = term->tl_vterm;
-    char   buf[KEY_BUF_LEN];
-    size_t curlen = vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    VTerm *vterm = رکن->tl_vterm;
+    حرف   buf[کلید_BUF_LEN];
+    size_t curlen = vterm_output_read(vterm, buf, کلید_BUF_LEN);
 
-    if (curlen > 0)
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-					     (char_u *)buf, (int)curlen, NULL);
+    إذا (curlen > 0)
+	channel_send(رکن->tl_کم->jv_channel, get_tty_part(رکن),
+					     (char_u *)buf, (صحيح)curlen, عدم);
 }
 
 /*
  * Write job output "msg[len]" to the vterm.
  */
-    static void
-term_write_job_output(term_T *term, char_u *msg_arg, size_t len_arg)
+    ساكن فراغ
+رکن_write_کم_output(رکن_T *رکن, char_u *پیغام_arg, size_t len_arg)
 {
-    char_u	*msg = msg_arg;
+    char_u	*پیغام = پیغام_arg;
     size_t	len = len_arg;
-    VTerm	*vterm = term->tl_vterm;
-    size_t	prevlen = vterm_output_get_buffer_current(vterm);
-    size_t	limit = term->tl_buffer->b_p_twsl * term->tl_cols * 3;
+    VTerm	*vterm = رکن->tl_vterm;
+    size_t	prevlen = vterm_output_get_بفر_current(vterm);
+    size_t	حد_بندی = رکن->tl_بفر->b_p_twsl * رکن->tl_خانے_گنتی * 3;
 
     // Limit the length to 'termwinscroll' * cols * 3 bytes.  Keep the text at
     // the end.
-    if (len > limit)
+    إذا (len > حد_بندی)
     {
-	char_u *p = msg + len - limit;
+	char_u *p = پیغام + len - حد_بندی;
 
-	p -= (*mb_head_off)(msg, p);
-	len -= p - msg;
-	msg = p;
+	p -= (*mb_سر_off)(پیغام, p);
+	len -= p - پیغام;
+	پیغام = p;
     }
 
-    vterm_input_write(vterm, (char *)msg, len);
+    vterm_داخلہ_write(vterm, (حرف *)پیغام, len);
 
     // flush vterm buffer when vterm responded to control sequence
-    if (prevlen != vterm_output_get_buffer_current(vterm))
-	term_forward_output(term);
+    إذا (prevlen != vterm_output_get_بفر_current(vterm))
+	رکن_forward_output(رکن);
 
     // this invokes the damage callbacks
     vterm_screen_flush_damage(vterm_obtain_screen(vterm));
 }
 
-    static void
+    ساكن فراغ
 position_cursor(win_T *wp, VTermPos *pos)
 {
-    wp->w_wrow = MIN(pos->row, MAX(0, wp->w_height - 1));
-    wp->w_wcol = MIN(pos->col, MAX(0, wp->w_width - 1));
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    wp->w_wrow = MIN(pos->صف, MAX(0, wp->w_اچائی - 1));
+    wp->w_wcol = MIN(pos->خانہ, MAX(0, wp->w_چوڑائی - 1));
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+    إذا (popup_is_popup(wp))
     {
-	wp->w_wrow += popup_top_extra(wp);
-	wp->w_wcol += popup_left_extra(wp);
+	wp->w_wrow += popup_چوٹی_extra(wp);
+	wp->w_wcol += popup_بایاں_extra(wp);
 	wp->w_flags |= WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED;
     }
-    else
+    وإلا
 	wp->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
-#endif
+#جے_انت
     wp->w_valid |= (VALID_WCOL|VALID_WROW);
 }
 
-    static void
-update_cursor(term_T *term, int redraw)
+    ساكن فراغ
+update_cursor(رکن_T *رکن, صحيح redraw)
 {
-    if (term->tl_normal_mode)
-	return;
-#ifdef FEAT_GUI
-    if (term->tl_system)
-	windgoto(term->tl_cursor_pos.row + term->tl_toprow,
-		firstwin->w_wincol + term->tl_cursor_pos.col);
-    else
-#endif
-    if (!term_job_running(term))
+    إذا (رکن->tl_عام_منوال)
+	أرجع;
+#جے_تعریف_شدہ FEAT_GUI
+    إذا (رکن->tl_system)
+	windgoto(رکن->tl_cursor_pos.صف + رکن->tl_toprow,
+		firstwin->w_wincol + رکن->tl_cursor_pos.خانہ);
+    وإلا
+#جے_انت
+    إذا (!رکن_کم_running(رکن))
 	// avoid the cursor positioned below the last used line
 	setcursor();
-    else
+    وإلا
     {
 	// do not use the window cursor position
-	position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
+	position_cursor(curwin, &curbuf->b_رکن->tl_cursor_pos);
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
 		 curwin->w_wincol + curwin->w_wcol);
     }
-    if (redraw)
+    إذا (redraw)
     {
 	aco_save_T	aco;
 
-	if (term->tl_buffer == curbuf && term->tl_cursor_visible)
+	إذا (رکن->tl_بفر == curbuf && رکن->tl_cursor_visible)
 	    cursor_on();
-	out_flush();
-#ifdef FEAT_GUI
-	if (gui.in_use)
+	باہرلا_flush();
+#جے_تعریف_شدہ FEAT_GUI
+	إذا (gui.وچ_use)
 	{
 	    gui_update_cursor(FALSE, FALSE);
 	    gui_mch_flush();
 	}
-#endif
+#جے_انت
 	// Make sure an invoked autocmd doesn't delete the buffer (and the
 	// terminal) under our fingers.
-	++term->tl_buffer->b_locked;
+	++رکن->tl_بفر->b_locked;
 
 	// save and restore curwin and curbuf, in case the autocmd changes them
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDT, NULL, NULL, FALSE, term->tl_buffer);
+	apply_autocmds(EVENT_TEXTCHANGEDT, عدم, عدم, FALSE, رکن->tl_بفر);
 	aucmd_restbuf(&aco);
 
-	--term->tl_buffer->b_locked;
+	--رکن->tl_بفر->b_locked;
     }
 }
 
 /*
  * Find the location of a scrollbackline in the buffer
  */
-    static void
-scrollbackline_pos_in_buf(term_T *term, int row, linenr_T *lnum, int *start_col, size_t *start_pos)
+    ساكن فراغ
+scrollbackline_pos_وچ_buf(رکن_T *رکن, صحيح صف, linenr_T *lnum, صحيح *شروع_خانہ, size_t *شروع_pos)
 {
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_lnum = term->tl_buffer_scrolled;
+    sb_سطر_T	*سطریں = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے;
+    linenr_T    calc_lnum = رکن->tl_بفر_scrolled;
     size_t      calc_pos = 0;
-    int         calc_col = 0;
-    int         i;
+    صحيح         calc_خانہ = 0;
+    صحيح         i;
 
-    if (row < 0 || row >= term->tl_scrollback.ga_len)
-	return;
+    إذا (صف < 0 || صف >= رکن->tl_scrollback.ga_len)
+	أرجع;
 
-    if (row > term->tl_scrollback_scrolled)
+    إذا (صف > رکن->tl_scrollback_scrolled)
     {
 	// Lookback how far along in the top line we are
-	for (i = term->tl_scrollback_scrolled + 1; i > 0 && lines[i].continuation; --i)
+	لكل (i = رکن->tl_scrollback_scrolled + 1; i > 0 && سطریں[i].continuation; --i)
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += سطریں[i - 1].sb_بائٹاں;
+	    calc_خانہ += سطریں[i - 1].sb_خانے_گنتی;
 	}
-	i = term->tl_scrollback_scrolled + 1;
-	calc_lnum = term->tl_buffer_scrolled + 1;
+	i = رکن->tl_scrollback_scrolled + 1;
+	calc_lnum = رکن->tl_بفر_scrolled + 1;
 	// Do not count this line's bytes/cols twice
-	if (lines[i].continuation)
+	إذا (سطریں[i].continuation)
 	    ++i;
     }
-    else
+    وإلا
     {
 	i = 1;
 	calc_lnum = 1;
     }
 
-    for (; i <= row; ++i)
+    لكل (; i <= صف; ++i)
     {
-	if (!lines[i].continuation)
+	إذا (!سطریں[i].continuation)
 	{
 	    ++calc_lnum;
 	    calc_pos = 0;
-	    calc_col = 0;
+	    calc_خانہ = 0;
 	}
-	else
+	وإلا
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += سطریں[i - 1].sb_بائٹاں;
+	    calc_خانہ += سطریں[i - 1].sb_خانے_گنتی;
 	}
     }
 
     *lnum = calc_lnum;
-    if (start_col)
-	*start_col = calc_col;
-    if (start_pos)
-	*start_pos = calc_pos;
+    إذا (شروع_خانہ)
+	*شروع_خانہ = calc_خانہ;
+    إذا (شروع_pos)
+	*شروع_pos = calc_pos;
 }
 
 /*
  * Find the location of a buffer line in the scrollback
  */
-    static void
-bufline_pos_in_scrollback(term_T *term, linenr_T lnum, int col, int *row, int *wrapped_col)
+    ساكن فراغ
+bufline_pos_وچ_scrollback(رکن_T *رکن, linenr_T lnum, صحيح خانہ, صحيح *صف, صحيح *wrapped_خانہ)
 {
-    buf_T	*buf = term->tl_buffer;
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
-    linenr_T    calc_row = term->tl_scrollback_scrolled;
-    int         calc_col = col;
+    buf_T	*buf = رکن->tl_بفر;
+    sb_سطر_T	*سطریں = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے;
+    linenr_T    calc_صف = رکن->tl_scrollback_scrolled;
+    صحيح         calc_خانہ = خانہ;
     linenr_T    l;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	return;
+    إذا (lnum > buf->b_ml.ml_سطر_گنتی)
+	أرجع;
 
-    if (lnum > term->tl_buffer_scrolled)
+    إذا (lnum > رکن->tl_بفر_scrolled)
     {
-	calc_row = term->tl_scrollback_scrolled;
-	l = term->tl_buffer_scrolled + 1;
+	calc_صف = رکن->tl_scrollback_scrolled;
+	l = رکن->tl_بفر_scrolled + 1;
 
-	while (calc_row < term->tl_scrollback.ga_len && lines[calc_row].continuation)
-	    ++calc_row;
+	طالما (calc_صف < رکن->tl_scrollback.ga_len && سطریں[calc_صف].continuation)
+	    ++calc_صف;
     }
-    else
+    وإلا
     {
-	calc_row = 0;
+	calc_صف = 0;
 	l = 1;
     }
 
-    while (calc_row < term->tl_scrollback.ga_len && l < lnum)
+    طالما (calc_صف < رکن->tl_scrollback.ga_len && l < lnum)
     {
-	++calc_row;
-	if (!lines[calc_row].continuation)
+	++calc_صف;
+	إذا (!سطریں[calc_صف].continuation)
 	    ++l;
     }
 
-    while (calc_row + 1 < term->tl_scrollback.ga_len && lines[calc_row + 1].continuation
-	    && calc_col >= lines[calc_row].sb_cols)
+    طالما (calc_صف + 1 < رکن->tl_scrollback.ga_len && سطریں[calc_صف + 1].continuation
+	    && calc_خانہ >= سطریں[calc_صف].sb_خانے_گنتی)
     {
-	calc_col -= lines[calc_row].sb_cols;
-	++calc_row;
+	calc_خانہ -= سطریں[calc_صف].sb_خانے_گنتی;
+	++calc_صف;
     }
 
-    if (row)
-	*row = calc_row;
-    if (wrapped_col)
-	*wrapped_col = calc_col;
+    إذا (صف)
+	*صف = calc_صف;
+    إذا (wrapped_خانہ)
+	*wrapped_خانہ = calc_خانہ;
 }
 
 /*
  * Invoked when "msg" output from a job was received.  Write it to the terminal
  * of "buffer".
  */
-    void
-write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
+    فراغ
+write_منزل_رکن(buf_T *بفر, char_u *پیغام, channel_T *channel)
 {
-    size_t	len = STRLEN(msg);
-    term_T	*term = buffer->b_term;
+    size_t	len = STRLEN(پیغام);
+    رکن_T	*رکن = بفر->b_رکن;
 
-#ifdef MSWIN
+#جے_تعریف_شدہ MSWIN
     // Win32: Cannot redirect output of the job, intercept it here and write to
     // the file.
-    if (term->tl_out_fd != NULL)
+    إذا (رکن->tl_باہرلا_fd != عدم)
     {
-	ch_log(channel, "Writing %d bytes to output file", (int)len);
-	fwrite(msg, len, 1, term->tl_out_fd);
-	return;
+	ch_log(channel, "Writing %d bytes to output file", (صحيح)len);
+	fwrite(پیغام, len, 1, رکن->tl_باہرلا_fd);
+	أرجع;
     }
-#endif
+#جے_انت
 
-    if (term->tl_vterm == NULL)
+    إذا (رکن->tl_vterm == عدم)
     {
-	ch_log(channel, "NOT writing %d bytes to terminal", (int)len);
-	return;
+	ch_log(channel, "NOT writing %d bytes to terminal", (صحيح)len);
+	أرجع;
     }
-    ch_log(channel, "writing %d bytes to terminal", (int)len);
+    ch_log(channel, "writing %d bytes to terminal", (صحيح)len);
     cursor_off();
-    term_write_job_output(term, msg, len);
+    رکن_write_کم_output(رکن, پیغام, len);
 
-#ifdef FEAT_GUI
-    if (term->tl_system)
+#جے_تعریف_شدہ FEAT_GUI
+    إذا (رکن->tl_system)
     {
 	// show system output, scrolling up the screen as needed
-	update_system_term(term);
-	update_cursor(term, TRUE);
+	update_system_رکن(رکن);
+	update_cursor(رکن, TRUE);
     }
-    else
-#endif
+    وإلا
+#جے_انت
     // In Terminal-Normal mode we are displaying the buffer, not the terminal
     // contents, thus no screen update is needed.
-    if (!term->tl_normal_mode)
+    إذا (!رکن->tl_عام_منوال)
     {
 	// Don't use update_screen() when editing the command line, it gets
 	// cleared.
 	// TODO: only update once in a while.
-	ch_log(term->tl_job->jv_channel, "updating screen");
-	if (buffer == curbuf && (State & MODE_CMDLINE) == 0)
+	ch_log(رکن->tl_کم->jv_channel, "updating screen");
+	إذا (بفر == curbuf && (State & منوال_CMDLINE) == 0)
 	{
 	    update_screen(UPD_VALID_NO_UPDATE);
-#if defined(FEAT_TABPANEL)
-	    if (redraw_tabpanel)
+#إذا defined(FEAT_TABPANEL)
+	    إذا (redraw_tabpanel)
 		draw_tabpanel();
-#endif
+#جے_انت
 	    // update_screen() can be slow, check the terminal wasn't closed
 	    // already
-	    if (buffer == curbuf && curbuf->b_term != NULL)
-		update_cursor(curbuf->b_term, TRUE);
+	    إذا (بفر == curbuf && curbuf->b_رکن != عدم)
+		update_cursor(curbuf->b_رکن, TRUE);
 	}
-	else
+	وإلا
 	    redraw_after_callback(TRUE, FALSE);
     }
 }
@@ -1576,129 +1576,129 @@ write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
 /*
  * Send a mouse position and click to the vterm
  */
-    static int
-term_send_mouse(VTerm *vterm, int button, int pressed)
+    ساكن صحيح
+رکن_send_mouse(VTerm *vterm, صحيح button, صحيح pressed)
 {
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    row = mouse_row - W_WINROW(curwin);
-    int		    col = mouse_col - curwin->w_wincol;
+    صحيح		    صف = mouse_صف - W_WINROW(curwin);
+    صحيح		    خانہ = mouse_خانہ - curwin->w_wincol;
 
-#ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(curwin))
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+    إذا (popup_is_popup(curwin))
     {
-	row -= popup_top_extra(curwin);
-	col -= popup_left_extra(curwin);
+	صف -= popup_چوٹی_extra(curwin);
+	خانہ -= popup_بایاں_extra(curwin);
     }
-#endif
-    vterm_mouse_move(vterm, row, col, mod);
-    if (button != 0)
+#جے_انت
+    vterm_mouse_move(vterm, صف, خانہ, mod);
+    إذا (button != 0)
 	vterm_mouse_button(vterm, button, pressed, mod);
-    return TRUE;
+    أرجع TRUE;
 }
 
-static int enter_mouse_col = -1;
-static int enter_mouse_row = -1;
+ساكن صحيح enter_mouse_خانہ = -1;
+ساكن صحيح enter_mouse_صف = -1;
 
 /*
  * Handle a mouse click, drag or release.
  * Return TRUE when a mouse event is sent to the terminal.
  */
-    static int
-term_mouse_click(VTerm *vterm, int key)
+    ساكن صحيح
+رکن_mouse_click(VTerm *vterm, صحيح کلید)
 {
-#if defined(FEAT_CLIPBOARD)
+#إذا defined(FEAT_CLIPBOARD)
     // For modeless selection mouse drag and release events are ignored, unless
     // they are preceded with a mouse down event
-    static int	    ignore_drag_release = TRUE;
+    ساكن صحيح	    ignore_drag_release = TRUE;
     VTermState	    *state;
     VTermMouseState mouse_state;
 
 
     state = vterm_obtain_state(vterm);
-    if (state == NULL)
-	return FALSE;
+    إذا (state == عدم)
+	أرجع FALSE;
 
     vterm_state_get_mousestate(state, &mouse_state);
-    if (mouse_state.flags == 0)
+    إذا (mouse_state.flags == 0)
     {
 	// Terminal is not using the mouse, use modeless selection.
-	switch (key)
+	بدل (کلید)
 	{
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	حالة K_LEFTDRAG:
+	حالة K_LEFTRELEASE:
+	حالة K_RIGHTDRAG:
+	حالة K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
+		إذا (ignore_drag_release)
 		{
-		    int save_mouse_col, save_mouse_row;
+		    صحيح save_mouse_خانہ, save_mouse_صف;
 
-		    if (enter_mouse_col < 0)
-			break;
+		    إذا (enter_mouse_خانہ < 0)
+			اكسر;
 
 		    // mouse click in the window gave us focus, handle that
 		    // click now
-		    save_mouse_col = mouse_col;
-		    save_mouse_row = mouse_row;
-		    mouse_col = enter_mouse_col;
-		    mouse_row = enter_mouse_row;
-		    clip_modeless(MOUSE_LEFT, TRUE, FALSE);
-		    mouse_col = save_mouse_col;
-		    mouse_row = save_mouse_row;
+		    save_mouse_خانہ = mouse_خانہ;
+		    save_mouse_صف = mouse_صف;
+		    mouse_خانہ = enter_mouse_خانہ;
+		    mouse_صف = enter_mouse_صف;
+		    clip_modeless(MOUSE_بایاں, TRUE, FALSE);
+		    mouse_خانہ = save_mouse_خانہ;
+		    mouse_صف = save_mouse_صف;
 		}
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
-		if (key == K_LEFTRELEASE || key == K_RIGHTRELEASE)
+	حالة K_LEFTMOUSE:
+	حالة K_RIGHTMOUSE:
+		إذا (کلید == K_LEFTRELEASE || کلید == K_RIGHTRELEASE)
 		    ignore_drag_release = TRUE;
-		else
+		وإلا
 		    ignore_drag_release = FALSE;
 		// Should we call mouse_has() here?
-		if (clip_star.available)
+		إذا (clip_تارا.دستیاب)
 		{
-		    int	    button, is_click, is_drag;
+		    صحيح	    button, is_click, is_drag;
 
-		    button = get_mouse_button(KEY2TERMCAP1(key),
+		    button = get_mouse_button(KEY2TERMCAP1(کلید),
 							 &is_click, &is_drag);
-		    if (mouse_model_popup() && button == MOUSE_LEFT
-					       && (mod_mask & MOD_MASK_SHIFT))
+		    إذا (mouse_model_popup() && button == MOUSE_بایاں
+					       && (mod_نقاب & MOD_نقاب_کھسکاؤ))
 		    {
 			// Translate shift-left to right button.
-			button = MOUSE_RIGHT;
-			mod_mask &= ~MOD_MASK_SHIFT;
+			button = MOUSE_دایاں;
+			mod_نقاب &= ~MOD_نقاب_کھسکاؤ;
 		    }
 		    clip_modeless(button, is_click, is_drag);
 		}
-		break;
+		اكسر;
 
-	case K_MIDDLEMOUSE:
-		if (clip_star.available)
-		    insert_reg('*', TRUE);
-		break;
+	حالة K_MIDDLEMOUSE:
+		إذا (clip_تارا.دستیاب)
+		    داخل_کرو_reg('*', TRUE);
+		اكسر;
 	}
-	enter_mouse_col = -1;
-	return FALSE;
+	enter_mouse_خانہ = -1;
+	أرجع FALSE;
     }
-#endif
-    enter_mouse_col = -1;
+#جے_انت
+    enter_mouse_خانہ = -1;
 
-    switch (key)
+    بدل (کلید)
     {
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTDRAG:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:	term_send_mouse(vterm, 1, 0); break;
-	case K_MOUSEMOVE:	term_send_mouse(vterm, 0, 0); break;
-	case K_MIDDLEMOUSE:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLEDRAG:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLERELEASE:	term_send_mouse(vterm, 2, 0); break;
-	case K_RIGHTMOUSE:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTDRAG:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTRELEASE:	term_send_mouse(vterm, 3, 0); break;
+	حالة K_LEFTMOUSE:
+	حالة K_LEFTMOUSE_NM:	رکن_send_mouse(vterm, 1, 1); اكسر;
+	حالة K_LEFTDRAG:	رکن_send_mouse(vterm, 1, 1); اكسر;
+	حالة K_LEFTRELEASE:
+	حالة K_LEFTRELEASE_NM:	رکن_send_mouse(vterm, 1, 0); اكسر;
+	حالة K_MOUSEMOVE:	رکن_send_mouse(vterm, 0, 0); اكسر;
+	حالة K_MIDDLEMOUSE:	رکن_send_mouse(vterm, 2, 1); اكسر;
+	حالة K_MIDDLEDRAG:	رکن_send_mouse(vterm, 2, 1); اكسر;
+	حالة K_MIDDLERELEASE:	رکن_send_mouse(vterm, 2, 0); اكسر;
+	حالة K_RIGHTMOUSE:	رکن_send_mouse(vterm, 3, 1); اكسر;
+	حالة K_RIGHTDRAG:	رکن_send_mouse(vterm, 3, 1); اكسر;
+	حالة K_RIGHTRELEASE:	رکن_send_mouse(vterm, 3, 0); اكسر;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -1706,181 +1706,181 @@ term_mouse_click(VTerm *vterm, int key)
  * job.
  * Return the number of bytes in "buf".
  */
-    static int
-term_convert_key(term_T *term, int c, int modmask, char *buf)
+    ساكن صحيح
+رکن_convert_کلید(رکن_T *رکن, صحيح c, صحيح modmask, حرف *buf)
 {
-    VTerm	    *vterm = term->tl_vterm;
-    VTermKey	    key = VTERM_KEY_NONE;
+    VTerm	    *vterm = رکن->tl_vterm;
+    VTerm_کلید	    کلید = VTERM_کلید_NONE;
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    other = FALSE;
+    صحيح		    other = FALSE;
 
-    switch (c)
+    بدل (c)
     {
 	// don't use VTERM_KEY_ENTER, it may do an unwanted conversion
 
-	case K_BS:
-#ifdef MSWIN
+	حالة K_BS:
+#جے_تعریف_شدہ MSWIN
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    else
-#endif
+	    إذا (رکن->tl_conpty)
+		کلید = VTERM_کلید_BACKSPACE;
+	    وإلا
+#جے_انت
 		// don't use VTERM_KEY_BACKSPACE, it always becomes 0x7f DEL
-		c = term_backspace_char;
-	    break;
+		c = رکن_backspace_char;
+	    اكسر;
 
-#ifdef MSWIN
-	case BS:
+#جے_تعریف_شدہ MSWIN
+	حالة BS:
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    break;
-#endif
+	    إذا (رکن->tl_conpty)
+		کلید = VTERM_کلید_BACKSPACE;
+	    اكسر;
+#جے_انت
 
-	case ESC:		key = VTERM_KEY_ESCAPE; break;
-	case K_DEL:		key = VTERM_KEY_DEL; break;
-	case K_DOWN:		key = VTERM_KEY_DOWN; break;
-	case K_S_DOWN:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_DOWN; break;
-	case K_END:		key = VTERM_KEY_END; break;
-	case K_S_END:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_END; break;
-	case K_C_END:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_END; break;
-	case K_F10:		key = VTERM_KEY_FUNCTION(10); break;
-	case K_F11:		key = VTERM_KEY_FUNCTION(11); break;
-	case K_F12:		key = VTERM_KEY_FUNCTION(12); break;
-	case K_F1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_F2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_F3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_F4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_F5:		key = VTERM_KEY_FUNCTION(5); break;
-	case K_F6:		key = VTERM_KEY_FUNCTION(6); break;
-	case K_F7:		key = VTERM_KEY_FUNCTION(7); break;
-	case K_F8:		key = VTERM_KEY_FUNCTION(8); break;
-	case K_F9:		key = VTERM_KEY_FUNCTION(9); break;
-	case K_HOME:		key = VTERM_KEY_HOME; break;
-	case K_S_HOME:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_HOME; break;
-	case K_C_HOME:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_HOME; break;
-	case K_INS:		key = VTERM_KEY_INS; break;
-	case K_K0:		key = VTERM_KEY_KP_0; break;
-	case K_K1:		key = VTERM_KEY_KP_1; break;
-	case K_K2:		key = VTERM_KEY_KP_2; break;
-	case K_K3:		key = VTERM_KEY_KP_3; break;
-	case K_K4:		key = VTERM_KEY_KP_4; break;
-	case K_K5:		key = VTERM_KEY_KP_5; break;
-	case K_K6:		key = VTERM_KEY_KP_6; break;
-	case K_K7:		key = VTERM_KEY_KP_7; break;
-	case K_K8:		key = VTERM_KEY_KP_8; break;
-	case K_K9:		key = VTERM_KEY_KP_9; break;
-	case K_KDEL:		key = VTERM_KEY_DEL; break; // TODO
-	case K_KDIVIDE:		key = VTERM_KEY_KP_DIVIDE; break;
-	case K_KEND:		key = VTERM_KEY_KP_1; break; // TODO
-	case K_KENTER:		key = VTERM_KEY_KP_ENTER; break;
-	case K_KHOME:		key = VTERM_KEY_KP_7; break; // TODO
-	case K_KINS:		key = VTERM_KEY_KP_0; break; // TODO
-	case K_KMINUS:		key = VTERM_KEY_KP_MINUS; break;
-	case K_KMULTIPLY:	key = VTERM_KEY_KP_MULT; break;
-	case K_KPAGEDOWN:	key = VTERM_KEY_KP_3; break; // TODO
-	case K_KPAGEUP:		key = VTERM_KEY_KP_9; break; // TODO
-	case K_KPLUS:		key = VTERM_KEY_KP_PLUS; break;
-	case K_KPOINT:		key = VTERM_KEY_KP_PERIOD; break;
-	case K_LEFT:		key = VTERM_KEY_LEFT; break;
-	case K_S_LEFT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_LEFT; break;
-	case K_C_LEFT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_LEFT; break;
-	case K_PAGEDOWN:	key = VTERM_KEY_PAGEDOWN; break;
-	case K_PAGEUP:		key = VTERM_KEY_PAGEUP; break;
-	case K_RIGHT:		key = VTERM_KEY_RIGHT; break;
-	case K_S_RIGHT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_RIGHT; break;
-	case K_C_RIGHT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_RIGHT; break;
-	case K_UP:		key = VTERM_KEY_UP; break;
-	case K_S_UP:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_UP; break;
-	case TAB:		key = VTERM_KEY_TAB; break;
-	case K_S_TAB:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_TAB; break;
+	حالة ESC:		کلید = VTERM_کلید_ESCAPE; اكسر;
+	حالة K_DEL:		کلید = VTERM_کلید_DEL; اكسر;
+	حالة K_تھلے:		کلید = VTERM_کلید_تھلے; اكسر;
+	حالة K_S_تھلے:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_تھلے; اكسر;
+	حالة K_سرا:		کلید = VTERM_کلید_سرا; اكسر;
+	حالة K_S_سرا:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_سرا; اكسر;
+	حالة K_C_سرا:		mod = VTERM_MOD_CTRL;
+				کلید = VTERM_کلید_سرا; اكسر;
+	حالة K_F10:		کلید = VTERM_کلید_FUNCTION(10); اكسر;
+	حالة K_F11:		کلید = VTERM_کلید_FUNCTION(11); اكسر;
+	حالة K_F12:		کلید = VTERM_کلید_FUNCTION(12); اكسر;
+	حالة K_F1:		کلید = VTERM_کلید_FUNCTION(1); اكسر;
+	حالة K_F2:		کلید = VTERM_کلید_FUNCTION(2); اكسر;
+	حالة K_F3:		کلید = VTERM_کلید_FUNCTION(3); اكسر;
+	حالة K_F4:		کلید = VTERM_کلید_FUNCTION(4); اكسر;
+	حالة K_F5:		کلید = VTERM_کلید_FUNCTION(5); اكسر;
+	حالة K_F6:		کلید = VTERM_کلید_FUNCTION(6); اكسر;
+	حالة K_F7:		کلید = VTERM_کلید_FUNCTION(7); اكسر;
+	حالة K_F8:		کلید = VTERM_کلید_FUNCTION(8); اكسر;
+	حالة K_F9:		کلید = VTERM_کلید_FUNCTION(9); اكسر;
+	حالة K_HOME:		کلید = VTERM_کلید_HOME; اكسر;
+	حالة K_S_HOME:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_HOME; اكسر;
+	حالة K_C_HOME:		mod = VTERM_MOD_CTRL;
+				کلید = VTERM_کلید_HOME; اكسر;
+	حالة K_INS:		کلید = VTERM_کلید_INS; اكسر;
+	حالة K_K0:		کلید = VTERM_کلید_KP_0; اكسر;
+	حالة K_K1:		کلید = VTERM_کلید_KP_1; اكسر;
+	حالة K_K2:		کلید = VTERM_کلید_KP_2; اكسر;
+	حالة K_K3:		کلید = VTERM_کلید_KP_3; اكسر;
+	حالة K_K4:		کلید = VTERM_کلید_KP_4; اكسر;
+	حالة K_K5:		کلید = VTERM_کلید_KP_5; اكسر;
+	حالة K_K6:		کلید = VTERM_کلید_KP_6; اكسر;
+	حالة K_K7:		کلید = VTERM_کلید_KP_7; اكسر;
+	حالة K_K8:		کلید = VTERM_کلید_KP_8; اكسر;
+	حالة K_K9:		کلید = VTERM_کلید_KP_9; اكسر;
+	حالة K_KDEL:		کلید = VTERM_کلید_DEL; اكسر; // TODO
+	حالة K_KDIVIDE:		کلید = VTERM_کلید_KP_DIVIDE; اكسر;
+	حالة K_KEND:		کلید = VTERM_کلید_KP_1; اكسر; // TODO
+	حالة K_KENTER:		کلید = VTERM_کلید_KP_ENTER; اكسر;
+	حالة K_KHOME:		کلید = VTERM_کلید_KP_7; اكسر; // TODO
+	حالة K_KINS:		کلید = VTERM_کلید_KP_0; اكسر; // TODO
+	حالة K_KMINUS:		کلید = VTERM_کلید_KP_MINUS; اكسر;
+	حالة K_KMULTIPLY:	کلید = VTERM_کلید_KP_MULT; اكسر;
+	حالة K_KPAGEDOWN:	کلید = VTERM_کلید_KP_3; اكسر; // TODO
+	حالة K_KPAGEUP:		کلید = VTERM_کلید_KP_9; اكسر; // TODO
+	حالة K_KPLUS:		کلید = VTERM_کلید_KP_PLUS; اكسر;
+	حالة K_KPOINT:		کلید = VTERM_کلید_KP_PERIOD; اكسر;
+	حالة K_بایاں:		کلید = VTERM_کلید_بایاں; اكسر;
+	حالة K_S_بایاں:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_بایاں; اكسر;
+	حالة K_C_بایاں:		mod = VTERM_MOD_CTRL;
+				کلید = VTERM_کلید_بایاں; اكسر;
+	حالة K_PAGEDOWN:	کلید = VTERM_کلید_PAGEDOWN; اكسر;
+	حالة K_PAGEUP:		کلید = VTERM_کلید_PAGEUP; اكسر;
+	حالة K_دایاں:		کلید = VTERM_کلید_دایاں; اكسر;
+	حالة K_S_دایاں:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_دایاں; اكسر;
+	حالة K_C_دایاں:		mod = VTERM_MOD_CTRL;
+				کلید = VTERM_کلید_دایاں; اكسر;
+	حالة K_اتے:		کلید = VTERM_کلید_اتے; اكسر;
+	حالة K_S_اتے:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_اتے; اكسر;
+	حالة TAB:		کلید = VTERM_کلید_TAB; اكسر;
+	حالة K_S_TAB:		mod = VTERM_MOD_کھسکاؤ;
+				کلید = VTERM_کلید_TAB; اكسر;
 
-	case K_MOUSEUP:		other = term_send_mouse(vterm, 5, 1); break;
-	case K_MOUSEDOWN:	other = term_send_mouse(vterm, 4, 1); break;
-	case K_MOUSELEFT:	other = term_send_mouse(vterm, 7, 1); break;
-	case K_MOUSERIGHT:	other = term_send_mouse(vterm, 6, 1); break;
+	حالة K_MOUSEUP:		other = رکن_send_mouse(vterm, 5, 1); اكسر;
+	حالة K_MOUSEDOWN:	other = رکن_send_mouse(vterm, 4, 1); اكسر;
+	حالة K_MOUSELEFT:	other = رکن_send_mouse(vterm, 7, 1); اكسر;
+	حالة K_MOUSERIGHT:	other = رکن_send_mouse(vterm, 6, 1); اكسر;
 
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:	if (!term_mouse_click(vterm, c))
-				    return 0;
+	حالة K_LEFTMOUSE:
+	حالة K_LEFTMOUSE_NM:
+	حالة K_LEFTDRAG:
+	حالة K_LEFTRELEASE:
+	حالة K_LEFTRELEASE_NM:
+	حالة K_MOUSEMOVE:
+	حالة K_MIDDLEMOUSE:
+	حالة K_MIDDLEDRAG:
+	حالة K_MIDDLERELEASE:
+	حالة K_RIGHTMOUSE:
+	حالة K_RIGHTDRAG:
+	حالة K_RIGHTRELEASE:	إذا (!رکن_mouse_click(vterm, c))
+				    أرجع 0;
 				other = TRUE;
-				break;
+				اكسر;
 
-	case K_X1MOUSE:		/* TODO */ return 0;
-	case K_X1DRAG:		/* TODO */ return 0;
-	case K_X1RELEASE:	/* TODO */ return 0;
-	case K_X2MOUSE:		/* TODO */ return 0;
-	case K_X2DRAG:		/* TODO */ return 0;
-	case K_X2RELEASE:	/* TODO */ return 0;
+	حالة K_X1MOUSE:		/* TODO */ أرجع 0;
+	حالة K_X1DRAG:		/* TODO */ أرجع 0;
+	حالة K_X1RELEASE:	/* TODO */ أرجع 0;
+	حالة K_X2MOUSE:		/* TODO */ أرجع 0;
+	حالة K_X2DRAG:		/* TODO */ أرجع 0;
+	حالة K_X2RELEASE:	/* TODO */ أرجع 0;
 
-	case K_IGNORE:		return 0;
-	case K_NOP:		return 0;
-	case K_UNDO:		return 0;
-	case K_HELP:		return 0;
-	case K_XF1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_XF2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_XF3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_XF4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_SELECT:		return 0;
-#ifdef FEAT_GUI
-	case K_VER_SCROLLBAR:	return 0;
-	case K_HOR_SCROLLBAR:	return 0;
-#endif
-#ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:		return 0;
-	case K_TABMENU:		return 0;
-#endif
-#ifdef FEAT_NETBEANS_INTG
-	case K_F21:		key = VTERM_KEY_FUNCTION(21); break;
-#endif
-#ifdef FEAT_DND
-	case K_DROP:		return 0;
-#endif
-	case K_CURSORHOLD:	return 0;
-	case K_PS:		vterm_keyboard_start_paste(vterm);
+	حالة K_IGNORE:		أرجع 0;
+	حالة K_NOP:		أرجع 0;
+	حالة K_UNDO:		أرجع 0;
+	حالة K_HELP:		أرجع 0;
+	حالة K_XF1:		کلید = VTERM_کلید_FUNCTION(1); اكسر;
+	حالة K_XF2:		کلید = VTERM_کلید_FUNCTION(2); اكسر;
+	حالة K_XF3:		کلید = VTERM_کلید_FUNCTION(3); اكسر;
+	حالة K_XF4:		کلید = VTERM_کلید_FUNCTION(4); اكسر;
+	حالة K_SELECT:		أرجع 0;
+#جے_تعریف_شدہ FEAT_GUI
+	حالة K_VER_SCROLLBAR:	أرجع 0;
+	حالة K_HOR_SCROLLBAR:	أرجع 0;
+#جے_انت
+#جے_تعریف_شدہ FEAT_GUI_TABLINE
+	حالة K_TABLINE:		أرجع 0;
+	حالة K_TABMENU:		أرجع 0;
+#جے_انت
+#جے_تعریف_شدہ FEAT_NETBEANS_INTG
+	حالة K_F21:		کلید = VTERM_کلید_FUNCTION(21); اكسر;
+#جے_انت
+#جے_تعریف_شدہ FEAT_DND
+	حالة K_DROP:		أرجع 0;
+#جے_انت
+	حالة K_CURSORHOLD:	أرجع 0;
+	حالة K_PS:		vterm_keyboard_شروع_paste(vterm);
 				other = TRUE;
-				break;
-	case K_PE:		vterm_keyboard_end_paste(vterm);
+				اكسر;
+	حالة K_PE:		vterm_keyboard_سرا_paste(vterm);
 				other = TRUE;
-				break;
+				اكسر;
     }
 
     // add modifiers for the typed key
-    if (modmask & MOD_MASK_SHIFT)
-	mod |= VTERM_MOD_SHIFT;
-    if (modmask & MOD_MASK_CTRL)
+    إذا (modmask & MOD_نقاب_کھسکاؤ)
+	mod |= VTERM_MOD_کھسکاؤ;
+    إذا (modmask & MOD_نقاب_CTRL)
 	mod |= VTERM_MOD_CTRL;
-    if (modmask & (MOD_MASK_ALT | MOD_MASK_META))
+    إذا (modmask & (MOD_نقاب_ALT | MOD_نقاب_META))
 	mod |= VTERM_MOD_ALT;
 
     // Ctrl-Shift-i may have the key "I" instead of "i", but for the kitty
     // keyboard protocol should use "i".  Applies to all ascii letters.
-    if (ASCII_ISUPPER(c)
+    إذا (ASCII_ISUPPER(c)
 	    && vterm_is_kitty_keyboard(vterm)
-	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_SHIFT))
+	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_کھسکاؤ))
 	c = TOLOWER_ASC(c);
 
     /*
@@ -1888,15 +1888,15 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
      * - Write keys to vterm: vterm_keyboard_key()
      * - Write output to channel.
      */
-    if (key != VTERM_KEY_NONE)
+    إذا (کلید != VTERM_کلید_NONE)
 	// Special key, let vterm convert it.
-	vterm_keyboard_key(vterm, key, mod);
-    else if (!other)
+	vterm_keyboard_کلید(vterm, کلید, mod);
+    وإلا إذا (!other)
 	// Normal character, let vterm convert it.
 	vterm_keyboard_unichar(vterm, c, mod);
 
     // Read back the converted escape sequence.
-    return (int)vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    أرجع (صحيح)vterm_output_read(vterm, buf, کلید_BUF_LEN);
 }
 
 /*
@@ -1904,58 +1904,58 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
  * If "check_job_status" is TRUE update the job status.
  * NOTE: "term" may be freed by callbacks.
  */
-    static int
-term_job_running_check(term_T *term, int check_job_status)
+    ساكن صحيح
+رکن_کم_running_check(رکن_T *رکن, صحيح check_کم_حالت)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    if (term == NULL
-	|| term->tl_job == NULL
-	|| !channel_is_open(term->tl_job->jv_channel))
-	return FALSE;
+    إذا (رکن == عدم
+	|| رکن->tl_کم == عدم
+	|| !channel_is_open(رکن->tl_کم->jv_channel))
+	أرجع FALSE;
 
-    job_T *job = term->tl_job;
+    کم_T *کم = رکن->tl_کم;
 
     // Careful: Checking the job status may invoke callbacks, which close
     // the buffer and terminate "term".  However, "job" will not be freed
     // yet.
-    if (check_job_status)
-	job_status(job);
-    return (job->jv_status == JOB_STARTED
-	    || (job->jv_channel != NULL && job->jv_channel->ch_keep_open));
+    إذا (check_کم_حالت)
+	کم_حالت(کم);
+    أرجع (کم->jv_حالت == کم_STARTED
+	    || (کم->jv_channel != عدم && کم->jv_channel->ch_keep_open));
 }
 
 /*
  * Return TRUE if the job for "term" is still running.
  */
-    int
-term_job_running(term_T *term)
+    صحيح
+رکن_کم_running(رکن_T *رکن)
 {
-    return term_job_running_check(term, FALSE);
+    أرجع رکن_کم_running_check(رکن, FALSE);
 }
 
 /*
  * Return TRUE if the job for "term" is still running, ignoring the job was
  * "NONE".
  */
-    int
-term_job_running_not_none(term_T *term)
+    صحيح
+رکن_کم_running_not_none(رکن_T *رکن)
 {
-    return term_job_running(term) && !term_none_open(term);
+    أرجع رکن_کم_running(رکن) && !رکن_none_open(رکن);
 }
 
 /*
  * Return TRUE if "term" has an active channel and used ":term NONE".
  */
-    int
-term_none_open(term_T *term)
+    صحيح
+رکن_none_open(رکن_T *رکن)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    return term != NULL
-	&& term->tl_job != NULL
-	&& channel_is_open(term->tl_job->jv_channel)
-	&& term->tl_job->jv_channel->ch_keep_open;
+    أرجع رکن != عدم
+	&& رکن->tl_کم != عدم
+	&& channel_is_open(رکن->tl_کم->jv_channel)
+	&& رکن->tl_کم->jv_channel->ch_keep_open;
 }
 
 //
@@ -1963,18 +1963,18 @@ term_none_open(term_T *term)
 // Return OK when the user confirms to kill it.
 // Return FAIL if the user selects otherwise.
 //
-    int
-term_confirm_stop(buf_T *buf)
+    صحيح
+رکن_confirm_stop(buf_T *buf)
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int	ret;
+    char_u	buff[DIALOG_پیغام_ناپ];
+    صحيح	ret;
 
-    dialog_msg(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
-    ret = vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1);
-    if (ret == VIM_YES)
-	return OK;
-    else
-	return FAIL;
+    dialog_پیغام(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
+    ret = vim_dialog_yesno(VIM_QUESTION, عدم, buff, 1);
+    إذا (ret == VIM_YES)
+	أرجع OK;
+    وإلا
+	أرجع FAIL;
 }
 
 /*
@@ -1982,125 +1982,125 @@ term_confirm_stop(buf_T *buf)
  * Return OK when the job finished.
  * Return FAIL when the job is still running.
  */
-    int
-term_try_stop_job(buf_T *buf)
+    صحيح
+رکن_try_stop_کم(buf_T *buf)
 {
-    int	    count;
-    char    *how = (char *)buf->b_term->tl_kill;
+    صحيح	    گنتی;
+    حرف    *how = (حرف *)buf->b_رکن->tl_kill;
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-    if ((how == NULL || *how == NUL)
+#إذا defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+    إذا ((how == عدم || *how == NUL)
 			  && (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
     {
-	if (term_confirm_stop(buf) == OK)
+	إذا (رکن_confirm_stop(buf) == OK)
 	    how = "kill";
-	else
-	    return FAIL;
+	وإلا
+	    أرجع FAIL;
     }
-#endif
-    if (how == NULL || *how == NUL)
-	return FAIL;
+#جے_انت
+    إذا (how == عدم || *how == NUL)
+	أرجع FAIL;
 
-    job_stop(buf->b_term->tl_job, NULL, how);
+    کم_stop(buf->b_رکن->tl_کم, عدم, how);
 
     // wait for up to a second for the job to die
-    for (count = 0; count < 100; ++count)
+    لكل (گنتی = 0; گنتی < 100; ++گنتی)
     {
-	job_T *job;
+	کم_T *کم;
 
 	// buffer, terminal and job may be cleaned up while waiting
-	if (!buf_valid(buf)
-		|| buf->b_term == NULL
-		|| buf->b_term->tl_job == NULL)
-	    return OK;
-	job = buf->b_term->tl_job;
+	إذا (!buf_valid(buf)
+		|| buf->b_رکن == عدم
+		|| buf->b_رکن->tl_کم == عدم)
+	    أرجع OK;
+	کم = buf->b_رکن->tl_کم;
 
 	// Call job_status() to update jv_status. It may cause the job to be
 	// cleaned up but it won't be freed.
-	job_status(job);
-	if (job->jv_status >= JOB_ENDED)
-	    return OK;
+	کم_حالت(کم);
+	إذا (کم->jv_حالت >= کم_ENDED)
+	    أرجع OK;
 
 	ui_delay(10L, TRUE);
-	term_flush_messages();
+	رکن_flush_messages();
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Add the last line of the scrollback buffer to the buffer in the window.
  */
-    static void
-add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
+    ساكن فراغ
+جوڑو_scrollback_سطر_منزل_بفر(رکن_T *رکن, char_u *متن, صحيح len, صحيح append)
 {
-    buf_T	*buf = term->tl_buffer;
-    int		empty = (buf->b_ml.ml_flags & ML_EMPTY);
-    linenr_T	lnum = buf->b_ml.ml_line_count;
+    buf_T	*buf = رکن->tl_بفر;
+    صحيح		خالی_تھاواں_2 = (buf->b_ml.ml_flags & ML_خالی_تھاواں);
+    linenr_T	lnum = buf->b_ml.ml_سطر_گنتی;
 
-#ifdef MSWIN
-    char_u *tmp = text;
-    if (!enc_utf8 && enc_codepage > 0)
+#جے_تعریف_شدہ MSWIN
+    char_u *tmp = متن;
+    إذا (!enc_utf8 && enc_codepage > 0)
     {
-	WCHAR   *ret = NULL;
-	int	length = 0;
+	WCHAR   *ret = عدم;
+	صحيح	لمائی = 0;
 
-	MultiByteToWideChar_alloc(CP_UTF8, 0, (char*)text, len + 1,
-							   &ret, &length);
-	if (ret != NULL)
+	Multi_Byte_منزل_Wide_Char_alloc(CP_UTF8, 0, (حرف*)متن, len + 1,
+							   &ret, &لمائی);
+	إذا (ret != عدم)
 	{
-	    WideCharToMultiByte_alloc(enc_codepage, 0,
-				      ret, length, (char **)&text, &len, 0, 0);
+	    Wide_Char_منزل_Multi_Byte_alloc(enc_codepage, 0,
+				      ret, لمائی, (حرف **)&متن, &len, 0, 0);
 	    vim_free(ret);
 	}
     }
-#endif
+#جے_انت
 
-    if (append)
+    إذا (append)
     {
-	char_u *prev_text = ml_get_buf(buf, lnum, FALSE);
-	size_t prev_len = STRLEN(prev_text);
+	char_u *prev_متن = ml_get_buf(buf, lnum, FALSE);
+	size_t prev_len = STRLEN(prev_متن);
 
 	char_u *both = alloc(len + prev_len + 2);
-	if (both == NULL)
-	    return;
-	vim_strncpy(both, prev_text, prev_len + 1);
-	vim_strncpy(both + prev_len, text, len + 1);
+	إذا (both == عدم)
+	    أرجع;
+	vim_strncpy(both, prev_متن, prev_len + 1);
+	vim_strncpy(both + prev_len, متن, len + 1);
 
 	curbuf = buf;
 	ml_replace(lnum, both, FALSE);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_بفر;
     }
-    else
-	ml_append_buf(buf, lnum, text, len + 1, FALSE);
+    وإلا
+	ml_append_buf(buf, lnum, متن, len + 1, FALSE);
 
-#ifdef MSWIN
-    if (tmp != text)
-	vim_free(text);
-#endif
-    if (empty)
+#جے_تعریف_شدہ MSWIN
+    إذا (tmp != متن)
+	vim_free(متن);
+#جے_انت
+    إذا (خالی_تھاواں_2)
     {
 	// Delete the empty line that was in the empty buffer.
 	curbuf = buf;
 	ml_delete(1);
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_بفر;
     }
 }
 
-    static void
-cell2cellattr(const VTermScreenCell *cell, cellattr_T *attr)
+    ساكن فراغ
+cell2cellattr(ثابت VTermScreenCell *cell, cellattr_T *attr)
 {
-    attr->width = cell->width;
+    attr->چوڑائی = cell->چوڑائی;
     attr->attrs = cell->attrs;
     attr->fg = cell->fg;
     attr->bg = cell->bg;
 }
 
-    static int
+    ساكن صحيح
 equal_celattr(cellattr_T *a, cellattr_T *b)
 {
     // We only compare the RGB colors, ignoring the ANSI index and type.
     // Thus black set explicitly is equal the background black.
-    return a->fg.red == b->fg.red
+    أرجع a->fg.red == b->fg.red
 	&& a->fg.green == b->fg.green
 	&& a->fg.blue == b->fg.blue
 	&& a->bg.red == b->bg.red
@@ -2112,31 +2112,31 @@ equal_celattr(cellattr_T *a, cellattr_T *b)
  * Add an empty scrollback line to "term".  When "lnum" is not zero, add the
  * line at this position.  Otherwise at the end.
  */
-    static int
-add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
+    ساكن صحيح
+جوڑو_خالی_تھاواں_scrollback(رکن_T *رکن, cellattr_T *fill_attr, صحيح lnum)
 {
-    if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	return FALSE;
+    إذا (ga_grow(&رکن->tl_scrollback, 1) == FAIL)
+	أرجع FALSE;
 
-    sb_line_T *line = (sb_line_T *)term->tl_scrollback.ga_data
-	+ term->tl_scrollback.ga_len;
+    sb_سطر_T *سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے
+	+ رکن->tl_scrollback.ga_len;
 
-    if (lnum > 0)
+    إذا (lnum > 0)
     {
-	int i;
+	صحيح i;
 
-	for (i = 0; i < term->tl_scrollback.ga_len - lnum; ++i)
+	لكل (i = 0; i < رکن->tl_scrollback.ga_len - lnum; ++i)
 	{
-	    *line = *(line - 1);
-	    --line;
+	    *سطر = *(سطر - 1);
+	    --سطر;
 	}
     }
-    line->sb_cols = 0;
-    line->sb_bytes = 0;
-    line->sb_cells = NULL;
-    line->sb_fill_attr = *fill_attr;
-    ++term->tl_scrollback.ga_len;
-    return OK;
+    سطر->sb_خانے_گنتی = 0;
+    سطر->sb_بائٹاں = 0;
+    سطر->sb_cells = عدم;
+    سطر->sb_fill_attr = *fill_attr;
+    ++رکن->tl_scrollback.ga_len;
+    أرجع OK;
 }
 
 /*
@@ -2144,187 +2144,187 @@ add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
  * Used before adding a new scrollback line or updating the buffer for lines
  * displayed in the terminal.
  */
-    static void
-cleanup_scrollback(term_T *term)
+    ساكن فراغ
+cleanup_scrollback(رکن_T *رکن)
 {
-    sb_line_T	*line;
+    sb_سطر_T	*سطر;
     garray_T	*gap;
     char_u	*bufline;
-    size_t      bufline_length;
+    size_t      bufline_لمائی;
 
-    curbuf = term->tl_buffer;
-    gap = &term->tl_scrollback;
-    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-    bufline_length = STRLEN(bufline);
-    while (term->tl_scrollback_snapshot && gap->ga_len > 0)
+    curbuf = رکن->tl_بفر;
+    gap = &رکن->tl_scrollback;
+    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_سطر_گنتی, FALSE);
+    bufline_لمائی = STRLEN(bufline);
+    طالما (رکن->tl_scrollback_snapshot && gap->ga_len > 0)
     {
-	line = (sb_line_T *)gap->ga_data + gap->ga_len - 1;
-	if (line->sb_bytes < 0 || (size_t)line->sb_bytes > bufline_length)
-	    break;
-	bufline_length -= line->sb_bytes;
-	if (!bufline_length)
+	سطر = (sb_سطر_T *)gap->ga_انکڑے + gap->ga_len - 1;
+	إذا (سطر->sb_بائٹاں < 0 || (size_t)سطر->sb_بائٹاں > bufline_لمائی)
+	    اكسر;
+	bufline_لمائی -= سطر->sb_بائٹاں;
+	إذا (!bufline_لمائی)
 	{
-	    ml_delete(curbuf->b_ml.ml_line_count);
-	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
-	    bufline_length = STRLEN(bufline);
+	    ml_delete(curbuf->b_ml.ml_سطر_گنتی);
+	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_سطر_گنتی, FALSE);
+	    bufline_لمائی = STRLEN(bufline);
 	}
-	vim_free(line->sb_cells);
+	vim_free(سطر->sb_cells);
 	--gap->ga_len;
-	--term->tl_scrollback_snapshot;
+	--رکن->tl_scrollback_snapshot;
     }
-    if (bufline_length < STRLEN(bufline))
+    إذا (bufline_لمائی < STRLEN(bufline))
     {
-	char_u *shortened = vim_strnsave(bufline, bufline_length);
-	ml_replace(curbuf->b_ml.ml_line_count, shortened, FALSE);
+	char_u *shortened = vim_strnsave(bufline, bufline_لمائی);
+	ml_replace(curbuf->b_ml.ml_سطر_گنتی, shortened, FALSE);
     }
-    curbuf = curwin->w_buffer;
-    if (curbuf == term->tl_buffer)
+    curbuf = curwin->w_بفر;
+    إذا (curbuf == رکن->tl_بفر)
 	check_cursor();
 }
 
 /*
  * Add the current lines of the terminal to scrollback and to the buffer.
  */
-    static void
-update_snapshot(term_T *term)
+    ساكن فراغ
+update_snapshot(رکن_T *رکن)
 {
     VTermScreen	    *screen;
     VTermState	    *state;
-    int		    len;
-    int		    lines_skipped = 0;
+    صحيح		    len;
+    صحيح		    سطریں_skipped = 0;
     VTermPos	    pos;
     VTermScreenCell cell;
     cellattr_T	    fill_attr, new_fill_attr;
     cellattr_T	    *p;
 
-    ch_log(term->tl_job == NULL ? NULL : term->tl_job->jv_channel,
+    ch_log(رکن->tl_کم == عدم ? عدم : رکن->tl_کم->jv_channel,
 				  "Adding terminal window snapshot to buffer");
 
     // First remove the lines that were appended before, they might be
     // outdated.
-    cleanup_scrollback(term);
+    cleanup_scrollback(رکن);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
-    fill_attr = new_fill_attr = term->tl_default_color;
-    for (pos.row = 0; pos.row < term->tl_rows; ++pos.row)
+    screen = vterm_obtain_screen(رکن->tl_vterm);
+    state = vterm_obtain_state(رکن->tl_vterm);
+    fill_attr = new_fill_attr = رکن->tl_default_color;
+    لكل (pos.صف = 0; pos.صف < رکن->tl_صفاں; ++pos.صف)
     {
 	len = 0;
-	for (pos.col = 0; pos.col < term->tl_cols; ++pos.col)
-	    if (vterm_screen_get_cell(screen, pos, &cell) != 0
+	لكل (pos.خانہ = 0; pos.خانہ < رکن->tl_خانے_گنتی; ++pos.خانہ)
+	    إذا (vterm_screen_get_cell(screen, pos, &cell) != 0
 						       && cell.chars[0] != NUL)
 	    {
-		len = pos.col + 1;
-		new_fill_attr = term->tl_default_color;
+		len = pos.خانہ + 1;
+		new_fill_attr = رکن->tl_default_color;
 	    }
-	    else
+	    وإلا
 		// Assume the last attr is the filler attr.
 		cell2cellattr(&cell, &new_fill_attr);
 
-	if (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
-	    ++lines_skipped;
-	else
+	إذا (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
+	    ++سطریں_skipped;
+	وإلا
 	{
-	    while (lines_skipped > 0)
+	    طالما (سطریں_skipped > 0)
 	    {
 		// Line was skipped, add an empty line.
-		--lines_skipped;
-		if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+		--سطریں_skipped;
+		إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &fill_attr, 0) == OK)
 		{
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		    ++term->tl_scrollback_snapshot;
+		    جوڑو_scrollback_سطر_منزل_بفر(رکن, (char_u *)"", 0, 0);
+		    ++رکن->tl_scrollback_snapshot;
 		}
 	    }
 
-	    if (len == 0)
-		p = NULL;
-	    else
+	    إذا (len == 0)
+		p = عدم;
+	    وإلا
 		p = ALLOC_MULT(cellattr_T, len);
-	    if ((p != NULL || len == 0)
-				     && ga_grow(&term->tl_scrollback, 1) == OK)
+	    إذا ((p != عدم || len == 0)
+				     && ga_grow(&رکن->tl_scrollback, 1) == OK)
 	    {
 		garray_T    ga;
-		int	    width;
-		const VTermLineInfo *lineinfo;
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		صحيح	    چوڑائی;
+		ثابت VTerm_سطر_Info *lineinfo;
+		sb_سطر_T   *سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے
+						  + رکن->tl_scrollback.ga_len;
 
-		lineinfo = vterm_state_get_lineinfo(state, pos.row);
+		lineinfo = vterm_state_get_lineinfo(state, pos.صف);
 
 		ga_init2(&ga, 1, 100);
-		for (pos.col = 0; pos.col < len; pos.col += width)
+		لكل (pos.خانہ = 0; pos.خانہ < len; pos.خانہ += چوڑائی)
 		{
-		    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		    إذا (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		    {
-			width = 1;
-			CLEAR_POINTER(p + pos.col);
-			if (ga_grow(&ga, 1) == OK)
+			چوڑائی = 1;
+			CLEAR_اشارہ_گر(p + pos.خانہ);
+			إذا (ga_grow(&ga, 1) == OK)
 			    ga.ga_len += utf_char2bytes(' ',
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_انکڑے + ga.ga_len);
 		    }
-		    else
+		    وإلا
 		    {
-			width = cell.width;
+			چوڑائی = cell.چوڑائی;
 
-			cell2cellattr(&cell, &p[pos.col]);
-			if (width == 2)
+			cell2cellattr(&cell, &p[pos.خانہ]);
+			إذا (چوڑائی == 2)
 			    // second cell of double-width character has the
 			    // same attributes.
-			    p[pos.col + 1] = p[pos.col];
+			    p[pos.خانہ + 1] = p[pos.خانہ];
 
 			// Each character can be up to 6 bytes.
-			if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 6) == OK)
+			إذا (ga_grow(&ga, VTERM_MAX_CHARS_فی_CELL * 6) == OK)
 			{
-			    int	    i;
-			    int	    c;
+			    صحيح	    i;
+			    صحيح	    c;
 
-			    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
+			    لكل (i = 0; i < VTERM_MAX_CHARS_فی_CELL &&
 				    ((c = cell.chars[i]) > 0 || i == 0); ++i)
 				ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-					     (char_u *)ga.ga_data + ga.ga_len);
+					     (char_u *)ga.ga_انکڑے + ga.ga_len);
 			}
 		    }
 		}
-		line->sb_cols = len;
-		line->sb_bytes = ga.ga_len;
-		line->sb_cells = p;
-		line->sb_fill_attr = new_fill_attr;
-		line->continuation = (char_u)lineinfo->continuation;
+		سطر->sb_خانے_گنتی = len;
+		سطر->sb_بائٹاں = ga.ga_len;
+		سطر->sb_cells = p;
+		سطر->sb_fill_attr = new_fill_attr;
+		سطر->continuation = (char_u)lineinfo->continuation;
 		fill_attr = new_fill_attr;
-		++term->tl_scrollback.ga_len;
-		++term->tl_scrollback_snapshot;
+		++رکن->tl_scrollback.ga_len;
+		++رکن->tl_scrollback_snapshot;
 
-		if (ga_grow(&ga, 1) == FAIL)
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		else
+		إذا (ga_grow(&ga, 1) == FAIL)
+		    جوڑو_scrollback_سطر_منزل_بفر(رکن, (char_u *)"", 0, 0);
+		وإلا
 		{
-		    *((char_u *)ga.ga_data + ga.ga_len) = NUL;
-		    add_scrollback_line_to_buffer(term, ga.ga_data, ga.ga_len,
+		    *((char_u *)ga.ga_انکڑے + ga.ga_len) = NUL;
+		    جوڑو_scrollback_سطر_منزل_بفر(رکن, ga.ga_انکڑے, ga.ga_len,
 						  lineinfo->continuation);
 		}
 		ga_clear(&ga);
 	    }
-	    else
+	    وإلا
 		vim_free(p);
 	}
     }
 
     // Add trailing empty lines.
-    for (pos.row = term->tl_scrollback.ga_len;
-	    pos.row < term->tl_scrollback_scrolled + term->tl_cursor_pos.row;
-	    ++pos.row)
+    لكل (pos.صف = رکن->tl_scrollback.ga_len;
+	    pos.صف < رکن->tl_scrollback_scrolled + رکن->tl_cursor_pos.صف;
+	    ++pos.صف)
     {
-	if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+	إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &fill_attr, 0) == OK)
 	{
-	    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-	    ++term->tl_scrollback_snapshot;
+	    جوڑو_scrollback_سطر_منزل_بفر(رکن, (char_u *)"", 0, 0);
+	    ++رکن->tl_scrollback_snapshot;
 	}
     }
 
-    term->tl_dirty_snapshot = FALSE;
-#ifdef FEAT_TIMERS
-    term->tl_timer_set = FALSE;
-#endif
+    رکن->tl_dirty_snapshot = FALSE;
+#جے_تعریف_شدہ FEAT_TIMERS
+    رکن->tl_timer_سیٹ = FALSE;
+#جے_انت
 }
 
 /*
@@ -2332,20 +2332,20 @@ update_snapshot(term_T *term)
  * encountered when using a terminal in a popup window.
  * Return TRUE if "*wp" was set to the next window.
  */
-    static int
-for_all_windows_and_curwin(win_T **wp, int *did_curwin)
+    ساكن صحيح
+for_all_windows_and_curwin(win_T **wp, صحيح *did_curwin)
 {
-    if (*wp == NULL)
+    إذا (*wp == عدم)
 	*wp = firstwin;
-    else if ((*wp)->w_next != NULL)
-	*wp = (*wp)->w_next;
-    else if (!*did_curwin)
+    وإلا إذا ((*wp)->w_اگلا != عدم)
+	*wp = (*wp)->w_اگلا;
+    وإلا إذا (!*did_curwin)
 	*wp = curwin;
-    else
-	return FALSE;
-    if (*wp == curwin)
+    وإلا
+	أرجع FALSE;
+    إذا (*wp == curwin)
 	*did_curwin = TRUE;
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -2354,35 +2354,35 @@ for_all_windows_and_curwin(win_T **wp, int *did_curwin)
  * Terminal-Normal mode.
  * When "redraw" is TRUE redraw the windows that show the terminal.
  */
-    void
-may_move_terminal_to_buffer(term_T *term, int redraw)
+    فراغ
+may_move_terminal_منزل_بفر(رکن_T *رکن, صحيح redraw)
 {
-    if (term->tl_vterm == NULL)
-	return;
+    إذا (رکن->tl_vterm == عدم)
+	أرجع;
 
     // Update the snapshot only if something changes or the buffer does not
     // have all the lines.
-    if (term->tl_dirty_snapshot || term->tl_buffer->b_ml.ml_line_count
-					       <= term->tl_buffer_scrolled)
-	update_snapshot(term);
+    إذا (رکن->tl_dirty_snapshot || رکن->tl_بفر->b_ml.ml_سطر_گنتی
+					       <= رکن->tl_بفر_scrolled)
+	update_snapshot(رکن);
 
-    if (redraw)
+    إذا (redraw)
     {
-	win_T	    *wp = NULL;
-	int	    did_curwin = FALSE;
+	win_T	    *wp = عدم;
+	صحيح	    did_curwin = FALSE;
 
-	while (for_all_windows_and_curwin(&wp, &did_curwin))
+	طالما (for_all_windows_and_curwin(&wp, &did_curwin))
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    إذا (wp->w_بفر == رکن->tl_بفر)
 	    {
-		wp->w_cursor.lnum = term->tl_buffer->b_ml.ml_line_count;
-		wp->w_cursor.col = 0;
+		wp->w_cursor.lnum = رکن->tl_بفر->b_ml.ml_سطر_گنتی;
+		wp->w_cursor.خانہ = 0;
 		wp->w_valid = 0;
-		if (wp->w_cursor.lnum >= wp->w_height)
+		إذا (wp->w_cursor.lnum >= wp->w_اچائی)
 		{
-		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_height + 1;
+		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_اچائی + 1;
 
-		    if (wp->w_topline < min_topline)
+		    إذا (wp->w_topline < min_topline)
 			wp->w_topline = min_topline;
 		}
 		redraw_win_later(wp, UPD_NOT_VALID);
@@ -2391,51 +2391,51 @@ may_move_terminal_to_buffer(term_T *term, int redraw)
     }
 }
 
-#if defined(FEAT_TIMERS)
+#إذا defined(FEAT_TIMERS)
 /*
  * Check if any terminal timer expired.  If so, copy text from the terminal to
  * the buffer.
  * Return the time until the next timer will expire.
  */
-    int
-term_check_timers(int next_due_arg, proftime_T *now)
+    صحيح
+رکن_check_timers(صحيح اگلا_due_arg, proftime_T *now)
 {
-    term_T  *term;
-    int	    next_due = next_due_arg;
+    رکن_T  *رکن;
+    صحيح	    اگلا_due = اگلا_due_arg;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(رکن)
     {
-	if (term->tl_timer_set && !term->tl_normal_mode)
+	إذا (رکن->tl_timer_سیٹ && !رکن->tl_عام_منوال)
 	{
-	    long    this_due = proftime_time_left(&term->tl_timer_due, now);
+	    لما    this_due = proftime_ویلا_بایاں(&رکن->tl_timer_due, now);
 
-	    if (this_due <= 1)
+	    إذا (this_due <= 1)
 	    {
-		term->tl_timer_set = FALSE;
-		may_move_terminal_to_buffer(term, FALSE);
+		رکن->tl_timer_سیٹ = FALSE;
+		may_move_terminal_منزل_بفر(رکن, FALSE);
 	    }
-	    else if (next_due == -1 || next_due > this_due)
-		next_due = this_due;
+	    وإلا إذا (اگلا_due == -1 || اگلا_due > this_due)
+		اگلا_due = this_due;
 	}
     }
 
-    return next_due;
+    أرجع اگلا_due;
 }
-#endif
+#جے_انت
 
 /*
  * When "normal_mode" is TRUE set the terminal to Terminal-Normal mode,
  * otherwise end it.
  */
-    static void
-set_terminal_mode(term_T *term, int normal_mode)
+    ساكن فراغ
+سیٹ_terminal_منوال(رکن_T *رکن, صحيح عام_منوال)
 {
-    term->tl_normal_mode = normal_mode;
+    رکن->tl_عام_منوال = عام_منوال;
     may_trigger_modechanged();
-    if (!normal_mode)
-	handle_postponed_scrollback(term);
-    VIM_CLEAR(term->tl_status_text);
-    if (term->tl_buffer == curbuf)
+    إذا (!عام_منوال)
+	handle_postponed_scrollback(رکن);
+    VIM_CLEAR(رکن->tl_حالت_متن);
+    إذا (رکن->tl_بفر == curbuf)
 	maketitle();
 }
 
@@ -2443,75 +2443,75 @@ set_terminal_mode(term_T *term, int normal_mode)
  * Called after the job is finished and Terminal mode is not active:
  * Move the vterm contents into the scrollback buffer and free the vterm.
  */
-    static void
-cleanup_vterm(term_T *term)
+    ساكن فراغ
+cleanup_vterm(رکن_T *رکن)
 {
-    set_terminal_mode(term, FALSE);
-    if (term->tl_finish != TL_FINISH_CLOSE)
-	may_move_terminal_to_buffer(term, TRUE);
-    term_free_vterm(term);
+    سیٹ_terminal_منوال(رکن, FALSE);
+    إذا (رکن->tl_انت != TL_انت_CLOSE)
+	may_move_terminal_منزل_بفر(رکن, TRUE);
+    رکن_free_vterm(رکن);
 }
 
 /*
  * Switch from Terminal-Job mode to Terminal-Normal mode.
  * Suspends updating the terminal window.
  */
-    static void
-term_enter_normal_mode(void)
+    ساكن فراغ
+رکن_enter_عام_منوال(فراغ)
 {
-    term_T     *term = curbuf->b_term;
+    رکن_T     *رکن = curbuf->b_رکن;
     linenr_T   lnum;
-    int        col;
+    صحيح        خانہ;
 
-    set_terminal_mode(term, TRUE);
+    سیٹ_terminal_منوال(رکن, TRUE);
 
     // Append the current terminal contents to the buffer.
-    may_move_terminal_to_buffer(term, TRUE);
+    may_move_terminal_منزل_بفر(رکن, TRUE);
 
     // Move the window cursor to the position of the cursor in the
     // terminal.
-    lnum = term->tl_buffer_scrolled + 1 + term->tl_cursor_pos.row;
-    col = term->tl_cursor_pos.col;
-    scrollbackline_pos_in_buf(term, term->tl_cursor_pos.row + term->tl_scrollback_scrolled, &lnum, &col, NULL);
+    lnum = رکن->tl_بفر_scrolled + 1 + رکن->tl_cursor_pos.صف;
+    خانہ = رکن->tl_cursor_pos.خانہ;
+    scrollbackline_pos_وچ_buf(رکن, رکن->tl_cursor_pos.صف + رکن->tl_scrollback_scrolled, &lnum, &خانہ, عدم);
 
     curwin->w_cursor.lnum = lnum;
     check_cursor();
-    if (coladvance(col) == FAIL)
+    إذا (coladvance(خانہ) == FAIL)
 	coladvance(MAXCOL);
-    curwin->w_set_curswant = true;
-    curwin->w_topline = term->tl_buffer_scrolled + 1;
+    curwin->w_سیٹ_curswant = true;
+    curwin->w_topline = رکن->tl_بفر_scrolled + 1;
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are in
  * Terminal-Normal mode.
  */
-    int
-term_in_normal_mode(buf_T *buf)
+    صحيح
+رکن_وچ_عام_منوال(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    رکن_T *رکن = buf->b_رکن;
 
-    return term != NULL && term->tl_normal_mode;
+    أرجع رکن != عدم && رکن->tl_عام_منوال;
 }
 
 /*
  * Switch from Terminal-Normal mode to Terminal-Job mode.
  * Restores updating the terminal window.
  */
-    void
-term_enter_job_mode(void)
+    فراغ
+رکن_enter_کم_منوال(فراغ)
 {
-    term_T	*term = curbuf->b_term;
+    رکن_T	*رکن = curbuf->b_رکن;
 
-    set_terminal_mode(term, FALSE);
+    سیٹ_terminal_منوال(رکن, FALSE);
 
-    if (term->tl_channel_closed)
-	cleanup_vterm(term);
-    redraw_buf_and_status_later(curbuf, UPD_NOT_VALID);
-#ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(curwin))
+    إذا (رکن->tl_channel_closed)
+	cleanup_vterm(رکن);
+    redraw_buf_and_حالت_later(curbuf, UPD_NOT_VALID);
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+    إذا (WIN_IS_POPUP(curwin))
 	redraw_later(UPD_NOT_VALID);
-#endif
+#جے_انت
 }
 
 /*
@@ -2520,43 +2520,43 @@ term_enter_job_mode(void)
  * vgetc().  Therefore vgetorpeek() will call check_no_reduce_keys() to update
  * "no_reduce_keys" before using it.
  */
-typedef enum {
+تعريفنوع تعداد {
     NRKS_NONE,	    // initial value
     NRKS_CHECK,	    // modify_other_keys was off before calling vgetc()
-    NRKS_SET,	    // no_reduce_keys was incremented in term_vgetc() or
+    NRKS_سیٹ,	    // no_reduce_keys was incremented in term_vgetc() or
 		    // check_no_reduce_keys(), must be decremented.
-} reduce_key_state_T;
+} reduce_کلید_state_T;
 
-static reduce_key_state_T  no_reduce_key_state = NRKS_NONE;
+ساكن reduce_کلید_state_T  no_reduce_کلید_state = NRKS_NONE;
 
 /*
  * Return TRUE if the term is using modifyOtherKeys level 2 or the kitty
  * keyboard protocol.
  */
-    static int
-vterm_using_key_protocol(void)
+    ساكن صحيح
+vterm_using_کلید_protocol(فراغ)
 {
-    return curbuf->b_term != NULL
-	&& curbuf->b_term->tl_vterm != NULL
-	&& (vterm_is_modify_other_keys(curbuf->b_term->tl_vterm)
-		|| vterm_is_kitty_keyboard(curbuf->b_term->tl_vterm));
+    أرجع curbuf->b_رکن != عدم
+	&& curbuf->b_رکن->tl_vterm != عدم
+	&& (vterm_is_modify_other_کلیدیں(curbuf->b_رکن->tl_vterm)
+		|| vterm_is_kitty_keyboard(curbuf->b_رکن->tl_vterm));
 }
 
-    void
-check_no_reduce_keys(void)
+    فراغ
+check_no_reduce_کلیدیں(فراغ)
 {
-    if (no_reduce_key_state != NRKS_CHECK
-	    || no_reduce_keys >= 1
-	    || curbuf->b_term == NULL
-	    || curbuf->b_term->tl_vterm == NULL)
-	return;
+    إذا (no_reduce_کلید_state != NRKS_CHECK
+	    || no_reduce_کلیدیں >= 1
+	    || curbuf->b_رکن == عدم
+	    || curbuf->b_رکن->tl_vterm == عدم)
+	أرجع;
 
-    if (vterm_using_key_protocol())
+    إذا (vterm_using_کلید_protocol())
     {
 	// "modify_other_keys" or kitty keyboard protocol was enabled while
 	// waiting.
-	no_reduce_key_state = NRKS_SET;
-	++no_reduce_keys;
+	no_reduce_کلید_state = NRKS_سیٹ;
+	++no_reduce_کلیدیں;
     }
 }
 
@@ -2565,207 +2565,207 @@ check_no_reduce_keys(void)
  * Note: while waiting a terminal may be closed and freed if the channel is
  * closed and ++close was used.  This may even happen before we get here.
  */
-    static int
-term_vgetc(void)
+    ساكن صحيح
+رکن_vgetc(فراغ)
 {
-    int c;
-    int save_State = State;
+    صحيح c;
+    صحيح save_State = State;
 
-    State = MODE_TERMINAL;
+    State = منوال_TERMINAL;
     got_int = FALSE;
-#ifdef MSWIN
+#جے_تعریف_شدہ MSWIN
     ctrl_break_was_pressed = FALSE;
-#endif
+#جے_انت
 
-    if (vterm_using_key_protocol())
+    إذا (vterm_using_کلید_protocol())
     {
-	++no_reduce_keys;
-	no_reduce_key_state = NRKS_SET;
+	++no_reduce_کلیدیں;
+	no_reduce_کلید_state = NRKS_سیٹ;
     }
-    else
+    وإلا
     {
-	no_reduce_key_state = NRKS_CHECK;
+	no_reduce_کلید_state = NRKS_CHECK;
     }
 
     c = vgetc();
     got_int = FALSE;
     State = save_State;
 
-    if (no_reduce_key_state == NRKS_SET)
-	--no_reduce_keys;
-    no_reduce_key_state = NRKS_NONE;
+    إذا (no_reduce_کلید_state == NRKS_سیٹ)
+	--no_reduce_کلیدیں;
+    no_reduce_کلید_state = NRKS_NONE;
 
-    return c;
+    أرجع c;
 }
 
-static int	mouse_was_outside = FALSE;
+ساكن صحيح	mouse_was_outside = FALSE;
 
 /*
  * Send key "c" with modifiers "modmask" to terminal.
  * Return FAIL when the key needs to be handled in Normal mode.
  * Return OK when the key was dropped or sent to the terminal.
  */
-    int
-send_keys_to_term(term_T *term, int c, int modmask, int typed)
+    صحيح
+send_کلیدیں_منزل_رکن(رکن_T *رکن, صحيح c, صحيح modmask, صحيح typed)
 {
-    char	msg[KEY_BUF_LEN];
+    حرف	پیغام[کلید_BUF_LEN];
     size_t	len;
-    int		dragging_outside = FALSE;
+    صحيح		dragging_outside = FALSE;
 
     // Catch keys that need to be handled as in Normal mode.
-    switch (c)
+    بدل (c)
     {
-	case NUL:
-	case K_ZERO:
-	    if (typed)
+	حالة NUL:
+	حالة K_ZERO:
+	    إذا (typed)
 		stuffcharReadbuff(c);
-	    return FAIL;
+	    أرجع FAIL;
 
-	case K_TABLINE:
+	حالة K_TABLINE:
 	    stuffcharReadbuff(c);
-	    return FAIL;
+	    أرجع FAIL;
 
-	case K_IGNORE:
-	case K_CANCEL:  // used for :normal when running out of chars
-	    return FAIL;
+	حالة K_IGNORE:
+	حالة K_CANCEL:  // used for :normal when running out of chars
+	    أرجع FAIL;
 
-	case K_LEFTDRAG:
-	case K_MIDDLEDRAG:
-	case K_RIGHTDRAG:
-	case K_X1DRAG:
-	case K_X2DRAG:
+	حالة K_LEFTDRAG:
+	حالة K_MIDDLEDRAG:
+	حالة K_RIGHTDRAG:
+	حالة K_X1DRAG:
+	حالة K_X2DRAG:
 	    dragging_outside = mouse_was_outside;
 	    // FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTRELEASE:
-	case K_X1MOUSE:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2RELEASE:
+	حالة K_LEFTMOUSE:
+	حالة K_LEFTMOUSE_NM:
+	حالة K_LEFTRELEASE:
+	حالة K_LEFTRELEASE_NM:
+	حالة K_MOUSEMOVE:
+	حالة K_MIDDLEMOUSE:
+	حالة K_MIDDLERELEASE:
+	حالة K_RIGHTMOUSE:
+	حالة K_RIGHTRELEASE:
+	حالة K_X1MOUSE:
+	حالة K_X1RELEASE:
+	حالة K_X2MOUSE:
+	حالة K_X2RELEASE:
 
-	case K_MOUSEUP:
-	case K_MOUSEDOWN:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
+	حالة K_MOUSEUP:
+	حالة K_MOUSEDOWN:
+	حالة K_MOUSELEFT:
+	حالة K_MOUSERIGHT:
 	    {
-		int	row = mouse_row;
-		int	col = mouse_col;
+		صحيح	صف = mouse_صف;
+		صحيح	خانہ = mouse_خانہ;
 
-#ifdef FEAT_PROP_POPUP
-		if (popup_is_popup(curwin))
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+		إذا (popup_is_popup(curwin))
 		{
-		    row -= popup_top_extra(curwin);
-		    col -= popup_left_extra(curwin);
+		    صف -= popup_چوٹی_extra(curwin);
+		    خانہ -= popup_بایاں_extra(curwin);
 		}
-#endif
-		if (row < W_WINROW(curwin)
-			|| row >= (W_WINROW(curwin) + curwin->w_height)
-			|| col < curwin->w_wincol
-			|| col >= W_ENDCOL(curwin)
+#جے_انت
+		إذا (صف < W_WINROW(curwin)
+			|| صف >= (W_WINROW(curwin) + curwin->w_اچائی)
+			|| خانہ < curwin->w_wincol
+			|| خانہ >= W_ENDCOL(curwin)
 			|| dragging_outside)
 		{
 		    // click or scroll outside the current window or on status
 		    // line or vertical separator
-		    if (typed)
+		    إذا (typed)
 		    {
 			stuffcharReadbuff(c);
 			mouse_was_outside = TRUE;
 		    }
-		    return FAIL;
+		    أرجع FAIL;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case K_COMMAND:
-	case K_SCRIPT_COMMAND:
-	    return do_cmdkey_command(c, 0);
+	حالة K_COMMAND:
+	حالة K_SCRIPT_COMMAND:
+	    أرجع do_cmdkey_command(c, 0);
     }
-    if (typed)
+    إذا (typed)
 	mouse_was_outside = FALSE;
 
     // Convert the typed key to a sequence of bytes for the job.
-    len = term_convert_key(term, c, modmask, msg);
-    if (len > 0)
+    len = رکن_convert_کلید(رکن, c, modmask, پیغام);
+    إذا (len > 0)
 	// TODO: if FAIL is returned, stop?
-	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						(char_u *)msg, (int)len, NULL);
+	channel_send(رکن->tl_کم->jv_channel, get_tty_part(رکن),
+						(char_u *)پیغام, (صحيح)len, عدم);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Handle CTRL-W "": send register contents to the job.
  */
-    static void
-term_paste_register(int prev_c UNUSED)
+    ساكن فراغ
+رکن_paste_رجسٹر(صحيح prev_c بن_ورتیا)
 {
-    int		c;
+    صحيح		c;
     list_T	*l;
-    listitem_T	*item;
-    long	reglen = 0;
-    int		type;
+    listitem_T	*شے;
+    لما	reglen = 0;
+    صحيح		type;
 
-    if (add_to_showcmd(prev_c))
-    if (add_to_showcmd('"'))
-	out_flush();
+    إذا (جوڑو_منزل_showcmd(prev_c))
+    إذا (جوڑو_منزل_showcmd('"'))
+	باہرلا_flush();
 
-    c = term_vgetc();
+    c = رکن_vgetc();
     clear_showcmd();
 
-    if (!term_use_loop())
+    إذا (!رکن_use_loop())
 	// job finished while waiting for a character
-	return;
+	أرجع;
 
     // CTRL-W "= prompt for expression to evaluate.
-    if (c == '=' && get_expr_register() != '=')
-	return;
-    if (!term_use_loop())
+    إذا (c == '=' && get_اظہاریہ_رجسٹر() != '=')
+	أرجع;
+    إذا (!رکن_use_loop())
 	// job finished while waiting for a character
-	return;
+	أرجع;
 
     l = (list_T *)get_reg_contents(c, GREG_LIST);
-    if (l == NULL)
-	return;
+    إذا (l == عدم)
+	أرجع;
 
     type = get_reg_type(c, &reglen);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_اشیاء(l, شے)
     {
-	char_u *s = tv_get_string(&item->li_tv);
-#ifdef MSWIN
+	char_u *s = tv_get_string(&شے->li_tv);
+#جے_تعریف_شدہ MSWIN
 	char_u *tmp = s;
 
-	if (!enc_utf8 && enc_codepage > 0)
+	إذا (!enc_utf8 && enc_codepage > 0)
 	{
-	    WCHAR   *ret = NULL;
-	    int	length = 0;
+	    WCHAR   *ret = عدم;
+	    صحيح	لمائی = 0;
 
-	    MultiByteToWideChar_alloc(enc_codepage, 0, (char *)s,
-		    (int)STRLEN(s), &ret, &length);
-	    if (ret != NULL)
+	    Multi_Byte_منزل_Wide_Char_alloc(enc_codepage, 0, (حرف *)s,
+		    (صحيح)STRLEN(s), &ret, &لمائی);
+	    إذا (ret != عدم)
 	    {
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-			ret, length, (char **)&s, &length, 0, 0);
+		Wide_Char_منزل_Multi_Byte_alloc(CP_UTF8, 0,
+			ret, لمائی, (حرف **)&s, &لمائی, 0, 0);
 		vim_free(ret);
 	    }
 	}
-#endif
-	channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		s, (int)STRLEN(s), NULL);
-#ifdef MSWIN
-	if (tmp != s)
+#جے_انت
+	channel_send(curbuf->b_رکن->tl_کم->jv_channel, PART_وچ,
+		s, (صحيح)STRLEN(s), عدم);
+#جے_تعریف_شدہ MSWIN
+	إذا (tmp != s)
 	    vim_free(s);
-#endif
+#جے_انت
 
-	if (item->li_next != NULL || type == MLINE)
-	    channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		    (char_u *)"\r", 1, NULL);
+	إذا (شے->li_اگلا != عدم || type == MLINE)
+	    channel_send(curbuf->b_رکن->tl_کم->jv_channel, PART_وچ,
+		    (char_u *)"\r", 1, عدم);
     }
     list_free(l);
 }
@@ -2774,114 +2774,114 @@ term_paste_register(int prev_c UNUSED)
  * Return TRUE when waiting for a character in the terminal, the cursor of the
  * terminal should be displayed.
  */
-    int
-terminal_is_active(void)
+    صحيح
+terminal_is_سرگرم(فراغ)
 {
-    return in_terminal_loop != NULL;
+    أرجع وچ_terminal_loop != عدم;
 }
 
 /*
  * Return the highlight group ID for the terminal and the window.
  */
-    static int
-term_get_highlight_id(term_T *term, win_T *wp)
+    ساكن صحيح
+رکن_get_highlight_id(رکن_T *رکن, win_T *wp)
 {
     char_u *name;
 
-    if (wp != NULL && wp->w_hlfwin_id != 0)
+    إذا (wp != عدم && wp->w_hlfwin_id != 0)
 	name = syn_id2name(wp->w_hlfwin_id);
-    else if (term->tl_highlight_name != NULL)
-	name = term->tl_highlight_name;
-    else
+    وإلا إذا (رکن->tl_highlight_name != عدم)
+	name = رکن->tl_highlight_name;
+    وإلا
 	name = (char_u*)"Terminal";
 
-    return syn_name2id(name);
+    أرجع syn_name2id(name);
 }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
     cursorentry_T *
-term_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
+رکن_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
 {
-    term_T		 *term = in_terminal_loop;
-    static cursorentry_T entry;
-    int			 id;
-    guicolor_T		 term_fg = INVALCOLOR;
-    guicolor_T		 term_bg = INVALCOLOR;
+    رکن_T		 *رکن = وچ_terminal_loop;
+    ساكن cursorentry_T اندراج;
+    صحيح			 id;
+    guicolor_T		 رکن_fg = INVALCOLOR;
+    guicolor_T		 رکن_bg = INVALCOLOR;
 
-    CLEAR_FIELD(entry);
-    entry.shape = entry.mshape =
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_LEFT ? SHAPE_VER :
-	SHAPE_BLOCK;
-    entry.percentage = 20;
-    if (term->tl_cursor_blink)
+    CLEAR_میدان(اندراج);
+    اندراج.shape = اندراج.mshape =
+	رکن->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
+	رکن->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_بایاں ? SHAPE_VER :
+	SHAPE_بلاک;
+    اندراج.percentage = 20;
+    إذا (رکن->tl_cursor_blink)
     {
-	entry.blinkwait = 700;
-	entry.blinkon = 400;
-	entry.blinkoff = 250;
+	اندراج.blinkwait = 700;
+	اندراج.blinkon = 400;
+	اندراج.blinkoff = 250;
     }
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, curwin);
-    if (id != 0)
-	syn_id2colors(id, &term_fg, &term_bg);
-    if (term_bg != INVALCOLOR)
-	*fg = term_bg;
-    else
-	*fg = gui.back_pixel;
+    id = رکن_get_highlight_id(رکن, curwin);
+    إذا (id != 0)
+	syn_id2colors(id, &رکن_fg, &رکن_bg);
+    إذا (رکن_bg != INVALCOLOR)
+	*fg = رکن_bg;
+    وإلا
+	*fg = gui.پٹھ_pixel;
 
-    if (term->tl_cursor_color == NULL)
+    إذا (رکن->tl_cursor_color == عدم)
     {
-	if (term_fg != INVALCOLOR)
-	    *bg = term_fg;
-	else
+	إذا (رکن_fg != INVALCOLOR)
+	    *bg = رکن_fg;
+	وإلا
 	    *bg = gui.norm_pixel;
     }
-    else
-	*bg = color_name2handle(term->tl_cursor_color);
-    entry.name = "n";
-    entry.used_for = SHAPE_CURSOR;
+    وإلا
+	*bg = color_name2handle(رکن->tl_cursor_color);
+    اندراج.name = "n";
+    اندراج.ورتیا_for = SHAPE_CURSOR;
 
-    return &entry;
+    أرجع &اندراج;
 }
-#endif
+#جے_انت
 
-    static void
-may_output_cursor_props(void)
+    ساكن فراغ
+may_output_cursor_props(فراغ)
 {
-    if (!cursor_color_equal(last_set_cursor_color, desired_cursor_color)
-	    || last_set_cursor_shape != desired_cursor_shape
-	    || last_set_cursor_blink != desired_cursor_blink)
+    إذا (!cursor_color_equal(آخری_سیٹ_cursor_color, desired_cursor_color)
+	    || آخری_سیٹ_cursor_shape != desired_cursor_shape
+	    || آخری_سیٹ_cursor_blink != desired_cursor_blink)
     {
-	cursor_color_copy(&last_set_cursor_color, desired_cursor_color);
-	last_set_cursor_shape = desired_cursor_shape;
-	last_set_cursor_blink = desired_cursor_blink;
-	term_cursor_color(cursor_color_get(desired_cursor_color));
-	if (desired_cursor_shape == -1 || desired_cursor_blink == -1)
+	cursor_color_copy(&آخری_سیٹ_cursor_color, desired_cursor_color);
+	آخری_سیٹ_cursor_shape = desired_cursor_shape;
+	آخری_سیٹ_cursor_blink = desired_cursor_blink;
+	رکن_cursor_color(cursor_color_get(desired_cursor_color));
+	إذا (desired_cursor_shape == -1 || desired_cursor_blink == -1)
 	    // this will restore the initial cursor style, if possible
 	    ui_cursor_shape_forced(TRUE);
-	else
-	    term_cursor_shape(desired_cursor_shape, desired_cursor_blink);
+	وإلا
+	    رکن_cursor_shape(desired_cursor_shape, desired_cursor_blink);
     }
 }
 
 /*
  * Set the cursor color and shape, if not last set to these.
  */
-    static void
-may_set_cursor_props(term_T *term)
+    ساكن فراغ
+may_سیٹ_cursor_props(رکن_T *رکن)
 {
-#ifdef FEAT_GUI
+#جے_تعریف_شدہ FEAT_GUI
     // For the GUI the cursor properties are obtained with
     // term_get_cursor_shape().
-    if (gui.in_use)
-	return;
-#endif
-    if (in_terminal_loop == term)
+    إذا (gui.وچ_use)
+	أرجع;
+#جے_انت
+    إذا (وچ_terminal_loop == رکن)
     {
-	cursor_color_copy(&desired_cursor_color, term->tl_cursor_color);
-	desired_cursor_shape = term->tl_cursor_shape;
-	desired_cursor_blink = term->tl_cursor_blink;
+	cursor_color_copy(&desired_cursor_color, رکن->tl_cursor_color);
+	desired_cursor_shape = رکن->tl_cursor_shape;
+	desired_cursor_blink = رکن->tl_cursor_blink;
 	may_output_cursor_props();
     }
 }
@@ -2889,14 +2889,14 @@ may_set_cursor_props(term_T *term)
 /*
  * Reset the desired cursor properties and restore them when needed.
  */
-    static void
-prepare_restore_cursor_props(void)
+    ساكن فراغ
+prepare_restore_cursor_props(فراغ)
 {
-#ifdef FEAT_GUI
-    if (gui.in_use)
-	return;
-#endif
-    cursor_color_copy(&desired_cursor_color, NULL);
+#جے_تعریف_شدہ FEAT_GUI
+    إذا (gui.وچ_use)
+	أرجع;
+#جے_انت
+    cursor_color_copy(&desired_cursor_color, عدم);
     desired_cursor_shape = -1;
     desired_cursor_blink = -1;
     may_output_cursor_props();
@@ -2907,78 +2907,78 @@ prepare_restore_cursor_props(void)
  * keys to the job.
  * If "check_job_status" is TRUE update the job status.
  */
-    static int
-term_use_loop_check(int check_job_status)
+    ساكن صحيح
+رکن_use_loop_check(صحيح check_کم_حالت)
 {
-    term_T *term = curbuf->b_term;
+    رکن_T *رکن = curbuf->b_رکن;
 
-    return term != NULL
-	&& !term->tl_normal_mode
-	&& term->tl_vterm != NULL
-	&& term_job_running_check(term, check_job_status);
+    أرجع رکن != عدم
+	&& !رکن->tl_عام_منوال
+	&& رکن->tl_vterm != عدم
+	&& رکن_کم_running_check(رکن, check_کم_حالت);
 }
 
 /*
  * Returns TRUE if the current window contains a terminal and we are sending
  * keys to the job.
  */
-    int
-term_use_loop(void)
+    صحيح
+رکن_use_loop(فراغ)
 {
-    return term_use_loop_check(FALSE);
+    أرجع رکن_use_loop_check(FALSE);
 }
 
 /*
  * Called when entering a window with the mouse.  If this is a terminal window
  * we may want to change state.
  */
-    void
-term_win_entered(void)
+    فراغ
+رکن_win_entered(فراغ)
 {
-    term_T *term = curbuf->b_term;
+    رکن_T *رکن = curbuf->b_رکن;
 
-    if (term == NULL)
-	return;
+    إذا (رکن == عدم)
+	أرجع;
 
-    if (term_use_loop_check(TRUE))
+    إذا (رکن_use_loop_check(TRUE))
     {
 	reset_VIsual_and_resel();
-	if (State & MODE_INSERT)
-	    stop_insert_mode = TRUE;
+	إذا (State & منوال_داخل_کرو)
+	    stop_داخل_کرو_منوال = TRUE;
     }
     mouse_was_outside = FALSE;
-    enter_mouse_col = mouse_col;
-    enter_mouse_row = mouse_row;
+    enter_mouse_خانہ = mouse_خانہ;
+    enter_mouse_صف = mouse_صف;
 }
 
-    void
-term_focus_change(int in_focus)
+    فراغ
+رکن_focus_change(صحيح وچ_focus)
 {
-    term_T *term = curbuf->b_term;
+    رکن_T *رکن = curbuf->b_رکن;
 
-    if (term == NULL || term->tl_vterm == NULL)
-	return;
+    إذا (رکن == عدم || رکن->tl_vterm == عدم)
+	أرجع;
 
-    VTermState	*state = vterm_obtain_state(term->tl_vterm);
+    VTermState	*state = vterm_obtain_state(رکن->tl_vterm);
 
-    if (in_focus)
-	vterm_state_focus_in(state);
-    else
-	vterm_state_focus_out(state);
-    term_forward_output(term);
+    إذا (وچ_focus)
+	vterm_state_focus_وچ(state);
+    وإلا
+	vterm_state_focus_باہرلا(state);
+    رکن_forward_output(رکن);
 }
 
 /*
  * vgetc() may not include CTRL in the key when modify_other_keys is set.
  * Return the Ctrl-key value in that case.
  */
-    static int
-raw_c_to_ctrl(int c)
+    ساكن صحيح
+raw_c_منزل_ctrl(صحيح c)
 {
-    if ((mod_mask & MOD_MASK_CTRL)
+    إذا ((mod_نقاب & MOD_نقاب_CTRL)
 	    && ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_')))
-	return c & 0x1f;
-    return c;
+	أرجع c & 0x1f;
+    أرجع c;
 }
 
 /*
@@ -2986,15 +2986,15 @@ raw_c_to_ctrl(int c)
  * Also when the Kitty keyboard protocol is used.
  * May set "mod_mask".
  */
-    static int
-ctrl_to_raw_c(int c)
+    ساكن صحيح
+ctrl_منزل_raw_c(صحيح c)
 {
-    if (c < 0x20 && vterm_using_key_protocol())
+    إذا (c < 0x20 && vterm_using_کلید_protocol())
     {
-	mod_mask |= MOD_MASK_CTRL;
-	return c + '@';
+	mod_نقاب |= MOD_نقاب_CTRL;
+	أرجع c + '@';
     }
-    return c;
+    أرجع c;
 }
 
 /*
@@ -3006,154 +3006,154 @@ ctrl_to_raw_c(int c)
  * Returns OK if a typed character is to be handled in Normal mode, FAIL if
  * the terminal was closed.
  */
-    int
-terminal_loop(int blocking)
+    صحيح
+terminal_loop(صحيح blocking)
 {
-    int		c;
-    int		raw_c;
-    int		termwinkey = 0;
-    int		ret;
-#ifdef UNIX
-    int		tty_fd = curbuf->b_term->tl_job->jv_channel
-				 ->ch_part[get_tty_part(curbuf->b_term)].ch_fd;
-#endif
-    int		restore_cursor = FALSE;
+    صحيح		c;
+    صحيح		raw_c;
+    صحيح		termwinkey = 0;
+    صحيح		ret;
+#جے_تعریف_شدہ UNIX
+    صحيح		tty_fd = curbuf->b_رکن->tl_کم->jv_channel
+				 ->ch_part[get_tty_part(curbuf->b_رکن)].ch_fd;
+#جے_انت
+    صحيح		restore_cursor = FALSE;
 
     // Remember the terminal we are sending keys to.  However, the terminal
     // might be closed while waiting for a character, e.g. typing "exit" in a
     // shell and ++close was used.  Therefore use curbuf->b_term instead of a
     // stored reference.
-    in_terminal_loop = curbuf->b_term;
+    وچ_terminal_loop = curbuf->b_رکن;
 
-    if (*curwin->w_p_twk != NUL)
+    إذا (*curwin->w_p_twk != NUL)
     {
-	termwinkey = string_to_key(curwin->w_p_twk, TRUE);
-	if (termwinkey == Ctrl_W)
+	termwinkey = string_منزل_کلید(curwin->w_p_twk, TRUE);
+	إذا (termwinkey == Ctrl_W)
 	    termwinkey = 0;
     }
-    position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
-    may_set_cursor_props(curbuf->b_term);
+    position_cursor(curwin, &curbuf->b_رکن->tl_cursor_pos);
+    may_سیٹ_cursor_props(curbuf->b_رکن);
 
-    while (blocking || vpeekc_nomap() != NUL)
+    طالما (blocking || vpeekc_nomap() != NUL)
     {
-#ifdef FEAT_GUI
-	if (curbuf->b_term != NULL && !curbuf->b_term->tl_system)
-#endif
+#جے_تعریف_شدہ FEAT_GUI
+	إذا (curbuf->b_رکن != عدم && !curbuf->b_رکن->tl_system)
+#جے_انت
 	    // TODO: skip screen update when handling a sequence of keys.
 	    // Repeat redrawing in case a message is received while redrawing.
-	    while (must_redraw != 0)
-		if (update_screen(0) == FAIL)
-		    break;
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	    طالما (must_redraw != 0)
+		إذا (update_screen(0) == FAIL)
+		    اكسر;
+	إذا (!رکن_use_loop_check(TRUE) || وچ_terminal_loop != curbuf->b_رکن)
 	    // job finished while redrawing
-	    break;
+	    اكسر;
 
-	update_cursor(curbuf->b_term, FALSE);
+	update_cursor(curbuf->b_رکن, FALSE);
 	restore_cursor = TRUE;
 
-	raw_c = term_vgetc();
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	raw_c = رکن_vgetc();
+	إذا (!رکن_use_loop_check(TRUE) || وچ_terminal_loop != curbuf->b_رکن)
 	{
 	    // Job finished while waiting for a character.  Push back the
 	    // received character.
-	    if (raw_c != K_IGNORE)
+	    إذا (raw_c != K_IGNORE)
 		vungetc(raw_c);
-	    break;
+	    اكسر;
 	}
-	if (raw_c == K_IGNORE)
-	    continue;
-	c = raw_c_to_ctrl(raw_c);
+	إذا (raw_c == K_IGNORE)
+	    استمر;
+	c = raw_c_منزل_ctrl(raw_c);
 
-#ifdef UNIX
+#جے_تعریف_شدہ UNIX
 	/*
 	 * The shell or another program may change the tty settings.  Getting
 	 * them for every typed character is a bit of overhead, but it's needed
 	 * for the first character typed, e.g. when Vim starts in a shell.
 	 */
-	if (mch_isatty(tty_fd))
+	إذا (mch_isatty(tty_fd))
 	{
 	    ttyinfo_T info;
 
 	    // Get the current backspace character of the pty.
-	    if (get_tty_info(tty_fd, &info) == OK)
-		term_backspace_char = info.backspace;
+	    إذا (get_tty_info(tty_fd, &info) == OK)
+		رکن_backspace_char = info.backspace;
 	}
-#endif
+#جے_انت
 
-#ifdef MSWIN
+#جے_تعریف_شدہ MSWIN
 	// On Windows winpty handles CTRL-C, don't send a CTRL_C_EVENT.
 	// Use CTRL-BREAK to kill the job.
-	if (ctrl_break_was_pressed)
-	    mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
-#endif
+	إذا (ctrl_break_was_pressed)
+	    mch_signal_کم(curbuf->b_رکن->tl_کم, (char_u *)"kill");
+#جے_انت
 	// Was either CTRL-W (termwinkey) or CTRL-\ pressed?
 	// Not in a system terminal.
-	if ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
-#ifdef FEAT_GUI
-		&& !curbuf->b_term->tl_system
-#endif
+	إذا ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
+#جے_تعریف_شدہ FEAT_GUI
+		&& !curbuf->b_رکن->tl_system
+#جے_انت
 		)
 	{
-	    int	    prev_c = c;
-	    int	    prev_raw_c = raw_c;
-	    int	    prev_mod_mask = mod_mask;
+	    صحيح	    prev_c = c;
+	    صحيح	    prev_raw_c = raw_c;
+	    صحيح	    prev_mod_نقاب = mod_نقاب;
 
-	    if (add_to_showcmd(c))
-		out_flush();
+	    إذا (جوڑو_منزل_showcmd(c))
+		باہرلا_flush();
 
-	    raw_c = term_vgetc();
-	    c = raw_c_to_ctrl(raw_c);
+	    raw_c = رکن_vgetc();
+	    c = raw_c_منزل_ctrl(raw_c);
 
 	    clear_showcmd();
 
-	    if (!term_use_loop_check(TRUE)
-					 || in_terminal_loop != curbuf->b_term)
+	    إذا (!رکن_use_loop_check(TRUE)
+					 || وچ_terminal_loop != curbuf->b_رکن)
 		// job finished while waiting for a character
-		break;
+		اكسر;
 
-	    if (prev_c == Ctrl_BSL)
+	    إذا (prev_c == Ctrl_BSL)
 	    {
-		if (c == Ctrl_N)
+		إذا (c == Ctrl_N)
 		{
 		    // CTRL-\ CTRL-N : go to Terminal-Normal mode.
-		    term_enter_normal_mode();
+		    رکن_enter_عام_منوال();
 		    ret = FAIL;
-		    goto theend;
+		    اذهب theend;
 		}
 		// Send both keys to the terminal, first one here, second one
 		// below.
-		send_keys_to_term(curbuf->b_term, prev_raw_c, prev_mod_mask,
+		send_کلیدیں_منزل_رکن(curbuf->b_رکن, prev_raw_c, prev_mod_نقاب,
 									 TRUE);
 	    }
-	    else if (c == Ctrl_C)
+	    وإلا إذا (c == Ctrl_C)
 	    {
 		// "CTRL-W CTRL-C" or 'termwinkey' CTRL-C: end the job
-		mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
+		mch_signal_کم(curbuf->b_رکن->tl_کم, (char_u *)"kill");
 	    }
-	    else if (c == '.')
+	    وإلا إذا (c == '.')
 	    {
 		// "CTRL-W .": send CTRL-W to the job
 		// "'termwinkey' .": send 'termwinkey' to the job
-		raw_c = ctrl_to_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
+		raw_c = ctrl_منزل_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
 	    }
-	    else if (c == Ctrl_BSL)
+	    وإلا إذا (c == Ctrl_BSL)
 	    {
 		// "CTRL-W CTRL-\": send CTRL-\ to the job
-		raw_c = ctrl_to_raw_c(Ctrl_BSL);
+		raw_c = ctrl_منزل_raw_c(Ctrl_BSL);
 	    }
-	    else if (c == 'N')
+	    وإلا إذا (c == 'N')
 	    {
 		// CTRL-W N : go to Terminal-Normal mode.
-		term_enter_normal_mode();
+		رکن_enter_عام_منوال();
 		ret = FAIL;
-		goto theend;
+		اذهب theend;
 	    }
-	    else if (c == '"')
+	    وإلا إذا (c == '"')
 	    {
-		term_paste_register(prev_c);
-		continue;
+		رکن_paste_رجسٹر(prev_c);
+		استمر;
 	    }
-	    else if (termwinkey == 0 || c != termwinkey)
+	    وإلا إذا (termwinkey == 0 || c != termwinkey)
 	    {
 		// space for CTRL-W, modifier, multi-byte char and NUL
 		char_u buf[1 + 3 + MB_MAXBYTES + 1];
@@ -3161,59 +3161,59 @@ terminal_loop(int blocking)
 		// Put the command into the typeahead buffer, when using the
 		// stuff buffer KeyStuffed is set and 'langmap' won't be used.
 		buf[0] = Ctrl_W;
-		buf[special_to_buf(c, mod_mask, FALSE, buf + 1) + 1] = NUL;
+		buf[special_منزل_buf(c, mod_نقاب, FALSE, buf + 1) + 1] = NUL;
 		ins_typebuf(buf, REMAP_NONE, 0, TRUE, FALSE);
 		ret = OK;
-		goto theend;
+		اذهب theend;
 	    }
 	}
-#ifdef MSWIN
-	if (!enc_utf8 && has_mbyte && raw_c >= 0x80)
+#جے_تعریف_شدہ MSWIN
+	إذا (!enc_utf8 && has_mbyte && raw_c >= 0x80)
 	{
 	    WCHAR   wc;
 	    char_u  mb[3];
 
-	    mb[0] = (unsigned)raw_c >> 8;
+	    mb[0] = (بنانشانی)raw_c >> 8;
 	    mb[1] = raw_c;
-	    if (MultiByteToWideChar(GetACP(), 0, (char*)mb, 2, &wc, 1) > 0)
+	    إذا (Multi_Byte_منزل_Wide_Char(GetACP(), 0, (حرف*)mb, 2, &wc, 1) > 0)
 		raw_c = wc;
 	}
-#endif
-	if (send_keys_to_term(curbuf->b_term, raw_c, mod_mask, TRUE) != OK)
+#جے_انت
+	إذا (send_کلیدیں_منزل_رکن(curbuf->b_رکن, raw_c, mod_نقاب, TRUE) != OK)
 	{
-	    if (raw_c == K_MOUSEMOVE)
+	    إذا (raw_c == K_MOUSEMOVE)
 		// We are sure to come back here, don't reset the cursor color
 		// and shape to avoid flickering.
 		restore_cursor = FALSE;
 
 	    ret = OK;
-	    goto theend;
+	    اذهب theend;
 	}
     }
     ret = FAIL;
 
 theend:
-    in_terminal_loop = NULL;
-    if (restore_cursor)
+    وچ_terminal_loop = عدم;
+    إذا (restore_cursor)
 	prepare_restore_cursor_props();
 
     // Move a snapshot of the screen contents to the buffer, so that completion
     // works in other buffers.
-    if (curbuf->b_term != NULL && !curbuf->b_term->tl_normal_mode)
-	may_move_terminal_to_buffer(curbuf->b_term, FALSE);
+    إذا (curbuf->b_رکن != عدم && !curbuf->b_رکن->tl_عام_منوال)
+	may_move_terminal_منزل_بفر(curbuf->b_رکن, FALSE);
 
-    return ret;
+    أرجع ret;
 }
 
-    static void
-may_toggle_cursor(term_T *term)
+    ساكن فراغ
+may_toggle_cursor(رکن_T *رکن)
 {
-    if (in_terminal_loop != term)
-	return;
+    إذا (وچ_terminal_loop != رکن)
+	أرجع;
 
-    if (term->tl_cursor_visible)
+    إذا (رکن->tl_cursor_visible)
 	cursor_on();
-    else
+    وإلا
 	cursor_off();
 }
 
@@ -3221,172 +3221,172 @@ may_toggle_cursor(term_T *term)
  * Reverse engineer the RGB value into a cterm color index.
  * First color is 1.  Return 0 if no match found (default color).
  */
-    static int
-color2index(VTermColor *color, int fg, int *boldp)
+    ساكن صحيح
+color2index(VTermColor *color, صحيح fg, صحيح *boldp)
 {
-    int red = color->red;
-    int blue = color->blue;
-    int green = color->green;
+    صحيح red = color->red;
+    صحيح blue = color->blue;
+    صحيح green = color->green;
 
     *boldp = FALSE;
 
-    if (VTERM_COLOR_IS_INVALID(color))
-	return 0;
+    إذا (VTERM_COLOR_IS_INVALID(color))
+	أرجع 0;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
+    إذا (VTERM_COLOR_IS_اشاریہ_دار(color))
     {
 	// Use the color as-is if possible, give up otherwise.
-	if (color->index < t_colors)
+	إذا (color->اشاریہ < t_colors)
 	{
-	    uint8_t index = color->index;
-#ifdef MSWIN
+	    uint8_t اشاریہ = color->اشاریہ;
+#جے_تعریف_شدہ MSWIN
 	    // Convert ANSI palette to cterm color index.
 	    // cterm_ansi_idx is a table for the reverse conversion from cterm
 	    // color index to ANSI palette. However, the current table can
 	    // be used for this conversion as well.
 	    // Note: If the contents of cterm_ansi_idx change in the future, a
 	    // different table may be needed for this purpose.
-	    if (index < 16)
-		index = cterm_ansi_idx[index];
-#endif
-	    return index + 1;
+	    إذا (اشاریہ < 16)
+		اشاریہ = cterm_ansi_idx[اشاریہ];
+#جے_انت
+	    أرجع اشاریہ + 1;
 	}
 	// 8-color terminals can actually display twice as many colors by
 	// setting the high-intensity/bold bit.
-	else if (t_colors == 8 && fg && color->index < 16)
+	وإلا إذا (t_colors == 8 && fg && color->اشاریہ < 16)
 	{
 	    *boldp = TRUE;
-	    return (color->index & 7) + 1;
+	    أرجع (color->اشاریہ & 7) + 1;
 	}
-	return 0;
+	أرجع 0;
     }
 
-    if (t_colors >= 256)
+    إذا (t_colors >= 256)
     {
-	if (red == blue && red == green)
+	إذا (red == blue && red == green)
 	{
 	    // 24-color greyscale plus white and black
-	    static int cutoff[23] = {
+	    ساكن صحيح cutoff[23] = {
 		    0x0D, 0x17, 0x21, 0x2B, 0x35, 0x3F, 0x49, 0x53, 0x5D, 0x67,
 		    0x71, 0x7B, 0x85, 0x8F, 0x99, 0xA3, 0xAD, 0xB7, 0xC1, 0xCB,
 		    0xD5, 0xDF, 0xE9};
-	    int i;
+	    صحيح i;
 
-	    if (red < 5)
-		return 17; // 00/00/00
-	    if (red > 245) // ff/ff/ff
-		return 232;
-	    for (i = 0; i < 23; ++i)
-		if (red < cutoff[i])
-		    return i + 233;
-	    return 256;
+	    إذا (red < 5)
+		أرجع 17; // 00/00/00
+	    إذا (red > 245) // ff/ff/ff
+		أرجع 232;
+	    لكل (i = 0; i < 23; ++i)
+		إذا (red < cutoff[i])
+		    أرجع i + 233;
+	    أرجع 256;
 	}
 	{
-	    static int cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
-	    int ri, gi, bi;
+	    ساكن صحيح cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
+	    صحيح ri, gi, bi;
 
 	    // 216-color cube
-	    for (ri = 0; ri < 5; ++ri)
-		if (red < cutoff[ri])
-		    break;
-	    for (gi = 0; gi < 5; ++gi)
-		if (green < cutoff[gi])
-		    break;
-	    for (bi = 0; bi < 5; ++bi)
-		if (blue < cutoff[bi])
-		    break;
-	    return 17 + ri * 36 + gi * 6 + bi;
+	    لكل (ri = 0; ri < 5; ++ri)
+		إذا (red < cutoff[ri])
+		    اكسر;
+	    لكل (gi = 0; gi < 5; ++gi)
+		إذا (green < cutoff[gi])
+		    اكسر;
+	    لكل (bi = 0; bi < 5; ++bi)
+		إذا (blue < cutoff[bi])
+		    اكسر;
+	    أرجع 17 + ri * 36 + gi * 6 + bi;
 	}
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Convert Vterm attributes to highlight flags.
  */
-    static int
+    ساكن صحيح
 vtermAttr2hl(VTermScreenCellAttrs *cellattrs)
 {
-    int attr = 0;
+    صحيح attr = 0;
 
-    if (cellattrs->bold)
+    إذا (cellattrs->bold)
 	attr |= HL_BOLD;
-    if (cellattrs->underline)
+    إذا (cellattrs->underline)
 	attr |= HL_UNDERLINE;
-    if (cellattrs->italic)
+    إذا (cellattrs->italic)
 	attr |= HL_ITALIC;
-    if (cellattrs->strike)
+    إذا (cellattrs->strike)
 	attr |= HL_STRIKETHROUGH;
-    if (cellattrs->reverse)
+    إذا (cellattrs->الٹ)
 	attr |= HL_INVERSE;
-    return attr;
+    أرجع attr;
 }
 
 /*
  * Store Vterm attributes in "cell" from highlight flags.
  */
-    static void
-hl2vtermAttr(int attr, cellattr_T *cell)
+    ساكن فراغ
+hl2vtermAttr(صحيح attr, cellattr_T *cell)
 {
-    CLEAR_FIELD(cell->attrs);
-    if (attr & HL_BOLD)
+    CLEAR_میدان(cell->attrs);
+    إذا (attr & HL_BOLD)
 	cell->attrs.bold = 1;
-    if (attr & HL_UNDERLINE)
+    إذا (attr & HL_UNDERLINE)
 	cell->attrs.underline = 1;
-    if (attr & HL_ITALIC)
+    إذا (attr & HL_ITALIC)
 	cell->attrs.italic = 1;
-    if (attr & HL_STRIKETHROUGH)
+    إذا (attr & HL_STRIKETHROUGH)
 	cell->attrs.strike = 1;
-    if (attr & HL_INVERSE)
-	cell->attrs.reverse = 1;
+    إذا (attr & HL_INVERSE)
+	cell->attrs.الٹ = 1;
 }
 
 /*
  * Convert the attributes of a vterm cell into an attribute index.
  */
-    static int
+    ساكن صحيح
 cell2attr(
-	term_T			*term,
+	رکن_T			*رکن,
 	win_T			*wp,
 	VTermScreenCellAttrs	*cellattrs,
 	VTermColor		*cellfg,
 	VTermColor		*cellbg)
 {
-    int attr = vtermAttr2hl(cellattrs);
+    صحيح attr = vtermAttr2hl(cellattrs);
     VTermColor *fg = cellfg;
     VTermColor *bg = cellbg;
-    int is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
-    int is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
+    صحيح is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
+    صحيح is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
 
-    if (is_default_fg || is_default_bg)
+    إذا (is_default_fg || is_default_bg)
     {
-	if (wp != NULL && wp->w_hlfwin_id != 0)
+	إذا (wp != عدم && wp->w_hlfwin_id != 0)
 	{
-	    if (is_default_fg)
-		fg = &wp->w_term_hlfwin.fg;
-	    if (is_default_bg)
-		bg = &wp->w_term_hlfwin.bg;
+	    إذا (is_default_fg)
+		fg = &wp->w_رکن_hlfwin.fg;
+	    إذا (is_default_bg)
+		bg = &wp->w_رکن_hlfwin.bg;
 	}
-	else
+	وإلا
 	{
-	    if (is_default_fg)
-		fg = &term->tl_default_color.fg;
-	    if (is_default_bg)
-		bg = &term->tl_default_color.bg;
+	    إذا (is_default_fg)
+		fg = &رکن->tl_default_color.fg;
+	    إذا (is_default_bg)
+		bg = &رکن->tl_default_color.bg;
 	}
     }
 
-#ifdef FEAT_GUI
-    if (gui.in_use)
+#جے_تعریف_شدہ FEAT_GUI
+    إذا (gui.وچ_use)
     {
 	guicolor_T guifg = gui_mch_get_rgb_color(fg->red, fg->green, fg->blue);
 	guicolor_T guibg = gui_mch_get_rgb_color(bg->red, bg->green, bg->blue);
-	return get_gui_attr_idx(attr, guifg, guibg);
+	أرجع get_gui_attr_idx(attr, guifg, guibg);
     }
-    else
-#endif
-#ifdef FEAT_TERMGUICOLORS
-    if (p_tgc)
+    وإلا
+#جے_انت
+#جے_تعریف_شدہ FEAT_TERMGUICOLORS
+    إذا (p_tgc)
     {
 	guicolor_T tgcfg = VTERM_COLOR_IS_INVALID(fg)
 	    ? INVALCOLOR
@@ -3394,258 +3394,258 @@ cell2attr(
 	guicolor_T tgcbg = VTERM_COLOR_IS_INVALID(bg)
 	    ? INVALCOLOR
 	    : gui_get_rgb_color_cmn(bg->red, bg->green, bg->blue);
-	return get_tgc_attr_idx(attr, tgcfg, tgcbg);
+	أرجع get_tgc_attr_idx(attr, tgcfg, tgcbg);
     }
-    else
-#endif
+    وإلا
+#جے_انت
     {
-	int bold = MAYBE;
-	int ctermfg = color2index(fg, TRUE, &bold);
-	int ctermbg = color2index(bg, FALSE, &bold);
+	صحيح bold = MAYBE;
+	صحيح ctermfg = color2index(fg, TRUE, &bold);
+	صحيح ctermbg = color2index(bg, FALSE, &bold);
 
 	// with 8 colors set the bold attribute to get a bright foreground
-	if (bold == TRUE)
+	إذا (bold == TRUE)
 	    attr |= HL_BOLD;
 
-	return get_cterm_attr_idx(attr, ctermfg, ctermbg);
+	أرجع get_cterm_attr_idx(attr, ctermfg, ctermbg);
     }
-    return 0;
+    أرجع 0;
 }
 
-    static void
-set_dirty_snapshot(term_T *term)
+    ساكن فراغ
+سیٹ_dirty_snapshot(رکن_T *رکن)
 {
-    term->tl_dirty_snapshot = TRUE;
-#ifdef FEAT_TIMERS
-    if (!term->tl_normal_mode)
+    رکن->tl_dirty_snapshot = TRUE;
+#جے_تعریف_شدہ FEAT_TIMERS
+    إذا (!رکن->tl_عام_منوال)
     {
 	// Update the snapshot after 100 msec of not getting updates.
-	profile_setlimit(100L, &term->tl_timer_due);
-	term->tl_timer_set = TRUE;
+	profile_setlimit(100L, &رکن->tl_timer_due);
+	رکن->tl_timer_سیٹ = TRUE;
     }
-#endif
+#جے_انت
 }
 
-    static int
-handle_damage(VTermRect rect, void *user)
+    ساكن صحيح
+handle_damage(VTermRect rect, فراغ *user)
 {
-    term_T *term = (term_T *)user;
+    رکن_T *رکن = (رکن_T *)user;
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, rect.start_row);
-    term->tl_dirty_row_end = MAX(term->tl_dirty_row_end, rect.end_row);
-    set_dirty_snapshot(term);
-    redraw_buf_later(term->tl_buffer, UPD_SOME_VALID);
-    return 1;
+    رکن->tl_dirty_صف_شروع = MIN(رکن->tl_dirty_صف_شروع, rect.شروع_صف);
+    رکن->tl_dirty_صف_سرا = MAX(رکن->tl_dirty_صف_سرا, rect.سرا_صف);
+    سیٹ_dirty_snapshot(رکن);
+    redraw_buf_later(رکن->tl_بفر, UPD_SOME_VALID);
+    أرجع 1;
 }
 
-    static void
-term_scroll_up(term_T *term, int start_row, int count)
+    ساكن فراغ
+رکن_scroll_اتے(رکن_T *رکن, صحيح شروع_صف, صحيح گنتی)
 {
-    win_T		 *wp = NULL;
-    int			 did_curwin = FALSE;
+    win_T		 *wp = عدم;
+    صحيح			 did_curwin = FALSE;
     VTermColor		 fg, bg;
     VTermScreenCellAttrs attr;
-    int			 clear_attr;
+    صحيح			 clear_attr;
 
-    CLEAR_FIELD(attr);
+    CLEAR_میدان(attr);
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    طالما (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	إذا (wp->w_بفر == رکن->tl_بفر)
 	{
 	    // Set the color to clear lines with.
-	    vterm_state_get_default_colors(vterm_obtain_state(term->tl_vterm),
+	    vterm_state_get_default_colors(vterm_obtain_state(رکن->tl_vterm),
 								     &fg, &bg);
-	    clear_attr = cell2attr(term, wp, &attr, &fg, &bg);
-	    win_del_lines(wp, start_row, count, FALSE, FALSE, clear_attr);
+	    clear_attr = cell2attr(رکن, wp, &attr, &fg, &bg);
+	    win_del_سطریں(wp, شروع_صف, گنتی, FALSE, FALSE, clear_attr);
 	}
     }
 }
 
-    static int
-handle_moverect(VTermRect dest, VTermRect src, void *user)
+    ساكن صحيح
+handle_moverect(VTermRect dest, VTermRect src, فراغ *user)
 {
-    term_T	*term = (term_T *)user;
-    int		count = src.start_row - dest.start_row;
+    رکن_T	*رکن = (رکن_T *)user;
+    صحيح		گنتی = src.شروع_صف - dest.شروع_صف;
 
     // Scrolling up is done much more efficiently by deleting lines instead of
     // redrawing the text. But avoid doing this multiple times, postpone until
     // the redraw happens.
-    if (dest.start_col == src.start_col
-	    && dest.end_col == src.end_col
-	    && dest.start_row < src.start_row)
+    إذا (dest.شروع_خانہ == src.شروع_خانہ
+	    && dest.سرا_خانہ == src.سرا_خانہ
+	    && dest.شروع_صف < src.شروع_صف)
     {
-	if (dest.start_row == 0)
-	    term->tl_postponed_scroll += count;
-	else
-	    term_scroll_up(term, dest.start_row, count);
+	إذا (dest.شروع_صف == 0)
+	    رکن->tl_postponed_scroll += گنتی;
+	وإلا
+	    رکن_scroll_اتے(رکن, dest.شروع_صف, گنتی);
     }
 
-    term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, dest.start_row);
-    term->tl_dirty_row_end = MIN(term->tl_dirty_row_end, dest.end_row);
-    set_dirty_snapshot(term);
+    رکن->tl_dirty_صف_شروع = MIN(رکن->tl_dirty_صف_شروع, dest.شروع_صف);
+    رکن->tl_dirty_صف_سرا = MIN(رکن->tl_dirty_صف_سرا, dest.سرا_صف);
+    سیٹ_dirty_snapshot(رکن);
 
     // Note sure if the scrolling will work correctly, let's do a complete
     // redraw later.
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
-    return 1;
+    redraw_buf_later(رکن->tl_بفر, UPD_NOT_VALID);
+    أرجع 1;
 }
 
-    static int
+    ساكن صحيح
 handle_movecursor(
 	VTermPos pos,
-	VTermPos oldpos UNUSED,
-	int visible,
-	void *user)
+	VTermPos oldpos بن_ورتیا,
+	صحيح visible,
+	فراغ *user)
 {
-    term_T	*term = (term_T *)user;
-    win_T	*wp = NULL;
-    int		did_curwin = FALSE;
+    رکن_T	*رکن = (رکن_T *)user;
+    win_T	*wp = عدم;
+    صحيح		did_curwin = FALSE;
 
-    term->tl_cursor_pos = pos;
-    term->tl_cursor_visible = visible;
+    رکن->tl_cursor_pos = pos;
+    رکن->tl_cursor_visible = visible;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    طالما (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	إذا (wp->w_بفر == رکن->tl_بفر)
 	    position_cursor(wp, &pos);
     }
-    if (term->tl_buffer == curbuf && !term->tl_normal_mode)
+    إذا (رکن->tl_بفر == curbuf && !رکن->tl_عام_منوال)
 	// Don't redraw here, it will be done after
 	// vterm_input_write() is finished.
-	update_cursor(term, FALSE);
+	update_cursor(رکن, FALSE);
 
-    return 1;
+    أرجع 1;
 }
 
-    static int
+    ساكن صحيح
 handle_settermprop(
 	VTermProp prop,
-	VTermValue *value,
-	void *user)
+	VTerm_قدر *قدر,
+	فراغ *user)
 {
-    term_T	*term = (term_T *)user;
-    char_u	*strval = NULL;
+    رکن_T	*رکن = (رکن_T *)user;
+    char_u	*strval = عدم;
 
-    switch (prop)
+    بدل (prop)
     {
-	case VTERM_PROP_TITLE:
-	    if (disable_vterm_title_for_testing)
-		break;
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    vim_free(term->tl_title);
+	حالة VTERM_PROP_TITLE:
+	    إذا (disable_vterm_title_for_testing)
+		اكسر;
+	    strval = vim_strnsave((char_u *)قدر->string.str,
+							    قدر->string.len);
+	    إذا (strval == عدم)
+		اكسر;
+	    vim_free(رکن->tl_title);
 	    // a blank title isn't useful, make it empty, so that "running" is
 	    // displayed
-	    if (*skipwhite(strval) == NUL)
-		term->tl_title = NULL;
+	    إذا (*skipwhite(strval) == NUL)
+		رکن->tl_title = عدم;
 	    // Same as blank
-	    else if (term->tl_arg0_cmd != NULL
-		    && STRNCMP(term->tl_arg0_cmd, strval,
-					  (int)STRLEN(term->tl_arg0_cmd)) == 0)
-		term->tl_title = NULL;
+	    وإلا إذا (رکن->tl_arg0_cmd != عدم
+		    && STRNCMP(رکن->tl_arg0_cmd, strval,
+					  (صحيح)STRLEN(رکن->tl_arg0_cmd)) == 0)
+		رکن->tl_title = عدم;
 	    // Empty corrupted data of winpty
-	    else if (STRNCMP("  - ", strval, 4) == 0)
-		term->tl_title = NULL;
-#ifdef MSWIN
-	    else if (!enc_utf8 && enc_codepage > 0)
+	    وإلا إذا (STRNCMP("  - ", strval, 4) == 0)
+		رکن->tl_title = عدم;
+#جے_تعریف_شدہ MSWIN
+	    وإلا إذا (!enc_utf8 && enc_codepage > 0)
 	    {
-		WCHAR   *ret = NULL;
-		int	length = 0;
+		WCHAR   *ret = عدم;
+		صحيح	لمائی = 0;
 
-		MultiByteToWideChar_alloc(CP_UTF8, 0,
-			(char*)value->string.str,
-					(int)value->string.len, &ret, &length);
-		if (ret != NULL)
+		Multi_Byte_منزل_Wide_Char_alloc(CP_UTF8, 0,
+			(حرف*)قدر->string.str,
+					(صحيح)قدر->string.len, &ret, &لمائی);
+		إذا (ret != عدم)
 		{
-		    WideCharToMultiByte_alloc(enc_codepage, 0,
-					ret, length, (char**)&term->tl_title,
-					&length, 0, 0);
+		    Wide_Char_منزل_Multi_Byte_alloc(enc_codepage, 0,
+					ret, لمائی, (حرف**)&رکن->tl_title,
+					&لمائی, 0, 0);
 		    vim_free(ret);
 		}
 	    }
-#endif
-	    else
+#جے_انت
+	    وإلا
 	    {
-		term->tl_title = strval;
-		strval = NULL;
+		رکن->tl_title = strval;
+		strval = عدم;
 	    }
-	    VIM_CLEAR(term->tl_status_text);
-	    if (term == curbuf->b_term)
+	    VIM_CLEAR(رکن->tl_حالت_متن);
+	    إذا (رکن == curbuf->b_رکن)
 	    {
 		maketitle();
-		curwin->w_redr_status = true;
+		curwin->w_redr_حالت = true;
 	    }
-	    break;
+	    اكسر;
 
-	case VTERM_PROP_CURSORVISIBLE:
-	    term->tl_cursor_visible = value->boolean;
-	    may_toggle_cursor(term);
-	    out_flush();
-	    break;
+	حالة VTERM_PROP_CURSORVISIBLE:
+	    رکن->tl_cursor_visible = قدر->boolean;
+	    may_toggle_cursor(رکن);
+	    باہرلا_flush();
+	    اكسر;
 
-	case VTERM_PROP_CURSORBLINK:
-	    term->tl_cursor_blink = value->boolean;
-	    may_set_cursor_props(term);
-	    break;
+	حالة VTERM_PROP_CURSORBLINK:
+	    رکن->tl_cursor_blink = قدر->boolean;
+	    may_سیٹ_cursor_props(رکن);
+	    اكسر;
 
-	case VTERM_PROP_CURSORSHAPE:
-	    term->tl_cursor_shape = value->number;
-	    may_set_cursor_props(term);
-	    break;
+	حالة VTERM_PROP_CURSORSHAPE:
+	    رکن->tl_cursor_shape = قدر->نمبر;
+	    may_سیٹ_cursor_props(رکن);
+	    اكسر;
 
-	case VTERM_PROP_CURSORCOLOR:
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
-	    cursor_color_copy(&term->tl_cursor_color, strval);
-	    may_set_cursor_props(term);
-	    break;
+	حالة VTERM_PROP_CURSORCOLOR:
+	    strval = vim_strnsave((char_u *)قدر->string.str,
+							    قدر->string.len);
+	    إذا (strval == عدم)
+		اكسر;
+	    cursor_color_copy(&رکن->tl_cursor_color, strval);
+	    may_سیٹ_cursor_props(رکن);
+	    اكسر;
 
-	case VTERM_PROP_ALTSCREEN:
+	حالة VTERM_PROP_ALTSCREEN:
 	    // TODO: do anything else?
-	    term->tl_using_altscreen = value->boolean;
-	    break;
+	    رکن->tl_using_altscreen = قدر->boolean;
+	    اكسر;
 
-	default:
-	    break;
+	افتراضي:
+	    اكسر;
     }
     vim_free(strval);
 
     // Always return 1, otherwise vterm doesn't store the value internally.
-    return 1;
+    أرجع 1;
 }
 
 /*
  * The job running in the terminal resized the terminal.
  */
-    static int
-handle_resize(int rows, int cols, void *user)
+    ساكن صحيح
+handle_resize(صحيح صفاں_2, صحيح خانے_گنتی, فراغ *user)
 {
-    term_T	*term = (term_T *)user;
+    رکن_T	*رکن = (رکن_T *)user;
     win_T	*wp;
 
-    term->tl_rows = rows;
-    term->tl_cols = cols;
-    if (term->tl_vterm_size_changed)
+    رکن->tl_صفاں = صفاں_2;
+    رکن->tl_خانے_گنتی = خانے_گنتی;
+    إذا (رکن->tl_vterm_ناپ_بدلیا)
 	// Size was set by vterm_set_size(), don't set the window size.
-	term->tl_vterm_size_changed = FALSE;
-    else
+	رکن->tl_vterm_ناپ_بدلیا = FALSE;
+    وإلا
     {
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    إذا (wp->w_بفر == رکن->tl_بفر)
 	    {
-		win_setheight_win(rows, wp);
-		win_setwidth_win(cols, wp);
+		win_setheight_win(صفاں_2, wp);
+		win_setwidth_win(خانے_گنتی, wp);
 	    }
 	}
-	redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+	redraw_buf_later(رکن->tl_بفر, UPD_NOT_VALID);
     }
-    return 1;
+    أرجع 1;
 }
 
 /*
@@ -3654,46 +3654,46 @@ handle_resize(int rows, int cols, void *user)
  * "gap" points to tl_scrollback or tl_scrollback_postponed.
  * "update_buffer" is TRUE when the buffer should be updated.
  */
-    static void
-limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
+    ساكن فراغ
+حد_بندی_scrollback(رکن_T *رکن, garray_T *gap, صحيح update_بفر)
 {
-    if (gap->ga_len < term->tl_buffer->b_p_twsl)
-	return;
+    إذا (gap->ga_len < رکن->tl_بفر->b_p_twsl)
+	أرجع;
 
-    int	todo = MAX(term->tl_buffer->b_p_twsl / 10,
-				     gap->ga_len - term->tl_buffer->b_p_twsl);
-    int	i;
-    sb_line_T *sb_lines = (sb_line_T *)gap->ga_data;
+    صحيح	todo = MAX(رکن->tl_بفر->b_p_twsl / 10,
+				     gap->ga_len - رکن->tl_بفر->b_p_twsl);
+    صحيح	i;
+    sb_سطر_T *sb_سطریں = (sb_سطر_T *)gap->ga_انکڑے;
 
-    curbuf = term->tl_buffer;
-    for (i = 0; i < todo; ++i)
+    curbuf = رکن->tl_بفر;
+    لكل (i = 0; i < todo; ++i)
     {
-	if (update_buffer && (!sb_lines[i].continuation || !i))
+	إذا (update_بفر && (!sb_سطریں[i].continuation || !i))
 	{
 	    ml_delete(1);
-	    --term->tl_buffer_scrolled;
+	    --رکن->tl_بفر_scrolled;
 	}
-	vim_free(sb_lines[i].sb_cells);
+	vim_free(sb_سطریں[i].sb_cells);
     }
     // Continue until end of wrapped line
-    for (; todo < gap->ga_len && sb_lines[todo].continuation; ++todo)
-	vim_free(sb_lines[todo].sb_cells);
-    curbuf = curwin->w_buffer;
+    لكل (; todo < gap->ga_len && sb_سطریں[todo].continuation; ++todo)
+	vim_free(sb_سطریں[todo].sb_cells);
+    curbuf = curwin->w_بفر;
 
     gap->ga_len -= todo;
-    mch_memmove(gap->ga_data,
-		(sb_line_T *)gap->ga_data + todo,
-		sizeof(sb_line_T) * gap->ga_len);
-    if (update_buffer)
+    mch_memmove(gap->ga_انکڑے,
+		(sb_سطر_T *)gap->ga_انکڑے + todo,
+		حجم(sb_سطر_T) * gap->ga_len);
+    إذا (update_بفر)
     {
 	win_T *curwin_save = curwin;
-	win_T *wp = NULL;
+	win_T *wp = عدم;
 
-	term->tl_scrollback_scrolled -= todo;
+	رکن->tl_scrollback_scrolled -= todo;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    إذا (wp->w_بفر == رکن->tl_بفر)
 	    {
 		curwin = wp;
 		check_cursor();
@@ -3707,181 +3707,181 @@ limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
 /*
  * Handle a line that is pushed off the top of the screen.
  */
-    static int
-handle_pushline(int cols, const VTermScreenCell *cells, int continuation, void *user)
+    ساكن صحيح
+handle_pushline(صحيح خانے_گنتی, ثابت VTermScreenCell *cells, صحيح continuation, فراغ *user)
 {
-    term_T	*term = (term_T *)user;
+    رکن_T	*رکن = (رکن_T *)user;
     garray_T	*gap;
-    int		update_buffer;
+    صحيح		update_بفر;
 
-    if (term->tl_normal_mode)
+    إذا (رکن->tl_عام_منوال)
     {
 	// In Terminal-Normal mode the user interacts with the buffer, thus we
 	// must not change it. Postpone adding the scrollback lines.
-	gap = &term->tl_scrollback_postponed;
-	update_buffer = FALSE;
+	gap = &رکن->tl_scrollback_postponed;
+	update_بفر = FALSE;
     }
-    else
+    وإلا
     {
 	// First remove the lines that were appended before, the pushed line
 	// goes above it.
-	cleanup_scrollback(term);
-	gap = &term->tl_scrollback;
-	update_buffer = TRUE;
+	cleanup_scrollback(رکن);
+	gap = &رکن->tl_scrollback;
+	update_بفر = TRUE;
     }
 
-    limit_scrollback(term, gap, update_buffer);
+    حد_بندی_scrollback(رکن, gap, update_بفر);
 
-    if (ga_grow(gap, 1) == FAIL)
-	return 0;
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع 0;
 
-    cellattr_T	*p = NULL;
-    int		len = 0;
-    int		i;
-    int		c;
-    int		col;
-    int		text_len;
-    char_u		*text;
-    sb_line_T	*line;
+    cellattr_T	*p = عدم;
+    صحيح		len = 0;
+    صحيح		i;
+    صحيح		c;
+    صحيح		خانہ;
+    صحيح		متن_len;
+    char_u		*متن;
+    sb_سطر_T	*سطر;
     garray_T	ga;
-    cellattr_T	fill_attr = term->tl_default_color;
+    cellattr_T	fill_attr = رکن->tl_default_color;
 
     // do not store empty cells at the end
-    for (i = 0; i < cols; ++i)
-	if (cells[i].chars[0] != 0)
+    لكل (i = 0; i < خانے_گنتی; ++i)
+	إذا (cells[i].chars[0] != 0)
 	    len = i + 1;
-	else
+	وإلا
 	    cell2cellattr(&cells[i], &fill_attr);
 
     ga_init2(&ga, 1, 100);
-    if (len > 0)
+    إذا (len > 0)
 	p = ALLOC_MULT(cellattr_T, len);
-    if (p != NULL)
+    إذا (p != عدم)
     {
-	for (col = 0; col < len; col += cells[col].width)
+	لكل (خانہ = 0; خانہ < len; خانہ += cells[خانہ].چوڑائی)
 	{
-	    if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 4) == FAIL)
+	    إذا (ga_grow(&ga, VTERM_MAX_CHARS_فی_CELL * 4) == FAIL)
 	    {
 		ga.ga_len = 0;
-		break;
+		اكسر;
 	    }
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
-		    ((c = cells[col].chars[i]) > 0 || i == 0); ++i)
+	    لكل (i = 0; i < VTERM_MAX_CHARS_فی_CELL &&
+		    ((c = cells[خانہ].chars[i]) > 0 || i == 0); ++i)
 		ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
-			(char_u *)ga.ga_data + ga.ga_len);
-	    cell2cellattr(&cells[col], &p[col]);
+			(char_u *)ga.ga_انکڑے + ga.ga_len);
+	    cell2cellattr(&cells[خانہ], &p[خانہ]);
 	}
     }
-    if (ga_grow(&ga, 1) == FAIL)
+    إذا (ga_grow(&ga, 1) == FAIL)
     {
-	if (update_buffer)
-	    text = (char_u *)"";
-	else
-	    text = vim_strsave((char_u *)"");
-	text_len = 0;
+	إذا (update_بفر)
+	    متن = (char_u *)"";
+	وإلا
+	    متن = vim_strsave((char_u *)"");
+	متن_len = 0;
     }
-    else
+    وإلا
     {
-	text = ga.ga_data;
-	text_len = ga.ga_len;
-	*(text + text_len) = NUL;
+	متن = ga.ga_انکڑے;
+	متن_len = ga.ga_len;
+	*(متن + متن_len) = NUL;
     }
-    if (update_buffer)
-	add_scrollback_line_to_buffer(term, text, text_len, continuation);
+    إذا (update_بفر)
+	جوڑو_scrollback_سطر_منزل_بفر(رکن, متن, متن_len, continuation);
 
-    line = (sb_line_T *)gap->ga_data + gap->ga_len;
-    line->sb_cols = len;
-    line->sb_bytes = text_len;
-    line->sb_cells = p;
-    line->sb_fill_attr = fill_attr;
-    line->continuation = (char_u)continuation;
-    if (update_buffer)
+    سطر = (sb_سطر_T *)gap->ga_انکڑے + gap->ga_len;
+    سطر->sb_خانے_گنتی = len;
+    سطر->sb_بائٹاں = متن_len;
+    سطر->sb_cells = p;
+    سطر->sb_fill_attr = fill_attr;
+    سطر->continuation = (char_u)continuation;
+    إذا (update_بفر)
     {
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	if (!continuation)
-	    ++term->tl_buffer_scrolled;
+	سطر->sb_متن = عدم;
+	++رکن->tl_scrollback_scrolled;
+	إذا (!continuation)
+	    ++رکن->tl_بفر_scrolled;
 	ga_clear(&ga);  // free the text
     }
-    else
+    وإلا
     {
-	line->sb_text = text;
+	سطر->sb_متن = متن;
 	ga_init(&ga);  // text is kept in tl_scrollback_postponed
     }
     ++gap->ga_len;
-    return 0; // ignored
+    أرجع 0; // ignored
 }
 
 /*
  * Called when leaving Terminal-Normal mode: deal with any scrollback that was
  * received and stored in tl_scrollback_postponed.
  */
-    static void
-handle_postponed_scrollback(term_T *term)
+    ساكن فراغ
+handle_postponed_scrollback(رکن_T *رکن)
 {
-    int i;
+    صحيح i;
 
-    if (term->tl_scrollback_postponed.ga_len == 0)
-	return;
-    ch_log(NULL, "Moving postponed scrollback to scrollback");
+    إذا (رکن->tl_scrollback_postponed.ga_len == 0)
+	أرجع;
+    ch_log(عدم, "Moving postponed scrollback to scrollback");
 
     // First remove the lines that were appended before, the pushed lines go
     // above it.
-    cleanup_scrollback(term);
+    cleanup_scrollback(رکن);
 
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
+    لكل (i = 0; i < رکن->tl_scrollback_postponed.ga_len; ++i)
     {
-	char_u		*text;
-	sb_line_T	*pp_line;
-	sb_line_T	*line;
+	char_u		*متن;
+	sb_سطر_T	*pp_سطر;
+	sb_سطر_T	*سطر;
 
-	if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	    break;
-	pp_line = (sb_line_T *)term->tl_scrollback_postponed.ga_data + i;
+	إذا (ga_grow(&رکن->tl_scrollback, 1) == FAIL)
+	    اكسر;
+	pp_سطر = (sb_سطر_T *)رکن->tl_scrollback_postponed.ga_انکڑے + i;
 
-	text = pp_line->sb_text;
-	if (text == NULL)
-	    text = (char_u *)"";
-	add_scrollback_line_to_buffer(term, text, (int)STRLEN(text), pp_line->continuation);
-	vim_free(pp_line->sb_text);
+	متن = pp_سطر->sb_متن;
+	إذا (متن == عدم)
+	    متن = (char_u *)"";
+	جوڑو_scrollback_سطر_منزل_بفر(رکن, متن, (صحيح)STRLEN(متن), pp_سطر->continuation);
+	vim_free(pp_سطر->sb_متن);
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data
-						 + term->tl_scrollback.ga_len;
-	line->sb_cols = pp_line->sb_cols;
-	line->sb_bytes = pp_line->sb_bytes;
-	line->sb_cells = pp_line->sb_cells;
-	line->sb_fill_attr = pp_line->sb_fill_attr;
-	line->sb_text = NULL;
-	++term->tl_scrollback_scrolled;
-	++term->tl_scrollback.ga_len;
-	if (!pp_line->continuation)
-	    ++term->tl_buffer_scrolled;
+	سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے
+						 + رکن->tl_scrollback.ga_len;
+	سطر->sb_خانے_گنتی = pp_سطر->sb_خانے_گنتی;
+	سطر->sb_بائٹاں = pp_سطر->sb_بائٹاں;
+	سطر->sb_cells = pp_سطر->sb_cells;
+	سطر->sb_fill_attr = pp_سطر->sb_fill_attr;
+	سطر->sb_متن = عدم;
+	++رکن->tl_scrollback_scrolled;
+	++رکن->tl_scrollback.ga_len;
+	إذا (!pp_سطر->continuation)
+	    ++رکن->tl_بفر_scrolled;
     }
 
-    ga_clear(&term->tl_scrollback_postponed);
-    limit_scrollback(term, &term->tl_scrollback, TRUE);
+    ga_clear(&رکن->tl_scrollback_postponed);
+    حد_بندی_scrollback(رکن, &رکن->tl_scrollback, TRUE);
 }
 
 /*
  * Called when the terminal wants to ring the system bell.
  */
-    static int
-handle_bell(void *user UNUSED)
+    ساكن صحيح
+handle_bell(فراغ *user بن_ورتیا)
 {
-    vim_beep(BO_TERM);
-    return 0;
+    vim_beep(BO_رکن);
+    أرجع 0;
 }
 
-static VTermScreenCallbacks screen_callbacks = {
+ساكن VTermScreenCallbacks screen_callbacks = {
     handle_damage,		// damage
     handle_moverect,		// moverect
     handle_movecursor,		// movecursor
     handle_settermprop,		// settermprop
     handle_bell,		// bell
     handle_resize,		// resize
-    NULL,			// sb_pushline
-    NULL,			// sb_popline
-    NULL,			// sb_clear
+    عدم,			// sb_pushline
+    عدم,			// sb_popline
+    عدم,			// sb_clear
     handle_pushline	// sb_pushline4
 };
 
@@ -3890,170 +3890,170 @@ static VTermScreenCallbacks screen_callbacks = {
  * Must be called only when updating_screen is FALSE.
  * Returns TRUE when a buffer was closed (list of terminals may have changed).
  */
-    static int
-term_after_channel_closed(term_T *term)
+    ساكن صحيح
+رکن_after_channel_closed(رکن_T *رکن)
 {
     // Unless in Terminal-Normal mode: clear the vterm.
-    if (!term->tl_normal_mode)
+    إذا (!رکن->tl_عام_منوال)
     {
-	int	fnum = term->tl_buffer->b_fnum;
+	صحيح	fnum = رکن->tl_بفر->b_fnum;
 
-	cleanup_vterm(term);
+	cleanup_vterm(رکن);
 
-	if (term->tl_finish == TL_FINISH_CLOSE)
+	إذا (رکن->tl_انت == TL_انت_CLOSE)
 	{
 	    aco_save_T	aco;
-	    int		do_set_w_locked = term->tl_buffer->b_nwindows == 0;
-#ifdef FEAT_PROP_POPUP
-	    win_T	*pwin = NULL;
+	    صحيح		do_سیٹ_w_locked = رکن->tl_بفر->b_nwindows == 0;
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+	    win_T	*pwin = عدم;
 
 	    // If this was a terminal in a popup window, go back to the
 	    // previous window.
-	    if (popup_is_popup(curwin) && curbuf == term->tl_buffer)
+	    إذا (popup_is_popup(curwin) && curbuf == رکن->tl_بفر)
 	    {
 		pwin = curwin;
-		if (win_valid(prevwin))
+		إذا (win_valid(prevwin))
 		    win_enter(prevwin, FALSE);
 	    }
-	    else
-#endif
+	    وإلا
+#جے_انت
 	    // If this is the last normal window: exit Vim.
-	    if (term->tl_buffer->b_nwindows > 0 && only_one_window())
+	    إذا (رکن->tl_بفر->b_nwindows > 0 && only_one_کھڑکی())
 	    {
 		exarg_T ea;
 
-		CLEAR_FIELD(ea);
+		CLEAR_میدان(ea);
 		ex_quit(&ea);
-		return TRUE;
+		أرجع TRUE;
 	    }
 
 	    // ++close or term_finish == "close"
-	    ch_log(NULL, "terminal job finished, closing window");
-	    aucmd_prepbuf(&aco, term->tl_buffer);
-	    if (curbuf == term->tl_buffer)
+	    ch_log(عدم, "terminal job finished, closing window");
+	    aucmd_prepbuf(&aco, رکن->tl_بفر);
+	    إذا (curbuf == رکن->tl_بفر)
 	    {
 		win_T	*wp = curwin;
 
 		// Avoid closing the window if we temporarily use it.
-		if (is_aucmd_win(wp))
-		    do_set_w_locked = TRUE;
-		if (do_set_w_locked)
+		إذا (is_aucmd_win(wp))
+		    do_سیٹ_w_locked = TRUE;
+		إذا (do_سیٹ_w_locked)
 		    ++wp->w_locked;
 		do_bufdel(DOBUF_WIPE, (char_u *)"", 1, fnum, fnum, FALSE);
-		if (do_set_w_locked)
+		إذا (do_سیٹ_w_locked)
 		    --wp->w_locked;
 		aucmd_restbuf(&aco);
 	    }
-#ifdef FEAT_PROP_POPUP
-	    if (pwin != NULL)
+#جے_تعریف_شدہ FEAT_PROP_POPUP
+	    إذا (pwin != عدم)
 		popup_close_with_retval(pwin, 0);
-#endif
-	    return TRUE;
+#جے_انت
+	    أرجع TRUE;
 	}
-	if (term->tl_finish == TL_FINISH_OPEN
-				   && term->tl_buffer->b_nwindows == 0)
+	إذا (رکن->tl_انت == TL_انت_OPEN
+				   && رکن->tl_بفر->b_nwindows == 0)
 	{
-	    char    *cmd = term->tl_opencmd == NULL
+	    حرف    *cmd = رکن->tl_opencmd == عدم
 				? "botright sbuf %d"
-				: (char *)term->tl_opencmd;
-	    size_t  len = strlen(cmd) + 50;
-	    char    *buf = alloc(len);
+				: (حرف *)رکن->tl_opencmd;
+	    size_t  len = لڑی_لمبائی(cmd) + 50;
+	    حرف    *buf = alloc(len);
 
-	    if (buf != NULL)
+	    إذا (buf != عدم)
 	    {
-		ch_log(NULL, "terminal job finished, opening window");
+		ch_log(عدم, "terminal job finished, opening window");
 		vim_snprintf(buf, len, cmd, fnum);
 		do_cmdline_cmd((char_u *)buf);
 		vim_free(buf);
 	    }
 	}
-	else
-	    ch_log(NULL, "terminal job finished");
+	وإلا
+	    ch_log(عدم, "terminal job finished");
     }
 
-    redraw_buf_and_status_later(term->tl_buffer, UPD_NOT_VALID);
-    return FALSE;
+    redraw_buf_and_حالت_later(رکن->tl_بفر, UPD_NOT_VALID);
+    أرجع FALSE;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#إذا defined(FEAT_PROP_POPUP)
 /*
  * If the current window is a terminal in a popup window and the job has
  * finished, close the popup window and to back to the previous window.
  * Otherwise return FAIL.
  */
-    int
-may_close_term_popup(void)
+    صحيح
+may_close_رکن_popup(فراغ)
 {
-    if (!popup_is_popup(curwin) || curbuf->b_term == NULL
-				 || term_job_running_not_none(curbuf->b_term))
-	return FAIL;
+    إذا (!popup_is_popup(curwin) || curbuf->b_رکن == عدم
+				 || رکن_کم_running_not_none(curbuf->b_رکن))
+	أرجع FAIL;
 
     win_T *pwin = curwin;
 
-    if (win_valid(prevwin))
+    إذا (win_valid(prevwin))
 	win_enter(prevwin, FALSE);
     popup_close_with_retval(pwin, 0);
-    return OK;
+    أرجع OK;
 }
-#endif
+#جے_انت
 
 /*
  * Called when a channel is going to be closed, before invoking the close
  * callback.
  */
-    void
-term_channel_closing(channel_T *ch)
+    فراغ
+رکن_channel_closing(channel_T *ch)
 {
-    term_T *term;
+    رکن_T *رکن;
 
-    for (term = first_term; term != NULL; term = term->tl_next)
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
-	    term->tl_channel_closing = TRUE;
+    لكل (رکن = پہلا_رکن; رکن != عدم; رکن = رکن->tl_اگلا)
+	إذا (رکن->tl_کم == ch->ch_کم && !رکن->tl_channel_closed)
+	    رکن->tl_channel_closing = TRUE;
 }
 
 /*
  * Called when a channel has been closed.
  * If this was a channel for a terminal window then finish it up.
  */
-    void
-term_channel_closed(channel_T *ch)
+    فراغ
+رکن_channel_closed(channel_T *ch)
 {
-    term_T *term;
-    term_T *next_term;
-    int	    did_one = FALSE;
+    رکن_T *رکن;
+    رکن_T *اگلا_رکن;
+    صحيح	    did_one = FALSE;
 
-    for (term = first_term; term != NULL; term = next_term)
+    لكل (رکن = پہلا_رکن; رکن != عدم; رکن = اگلا_رکن)
     {
-	next_term = term->tl_next;
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
+	اگلا_رکن = رکن->tl_اگلا;
+	إذا (رکن->tl_کم == ch->ch_کم && !رکن->tl_channel_closed)
 	{
-	    term->tl_channel_closed = TRUE;
+	    رکن->tl_channel_closed = TRUE;
 	    did_one = TRUE;
 
-	    VIM_CLEAR(term->tl_title);
-	    VIM_CLEAR(term->tl_status_text);
-#ifdef MSWIN
-	    if (term->tl_out_fd != NULL)
+	    VIM_CLEAR(رکن->tl_title);
+	    VIM_CLEAR(رکن->tl_حالت_متن);
+#جے_تعریف_شدہ MSWIN
+	    إذا (رکن->tl_باہرلا_fd != عدم)
 	    {
-		fclose(term->tl_out_fd);
-		term->tl_out_fd = NULL;
+		fclose(رکن->tl_باہرلا_fd);
+		رکن->tl_باہرلا_fd = عدم;
 	    }
-#endif
+#جے_انت
 
-	    if (updating_screen)
+	    إذا (updating_screen)
 	    {
 		// Cannot open or close windows now.  Can happen when
 		// 'lazyredraw' is set.
-		term->tl_channel_recently_closed = TRUE;
-		continue;
+		رکن->tl_channel_recently_closed = TRUE;
+		استمر;
 	    }
 
-	    if (term_after_channel_closed(term))
-		next_term = first_term;
+	    إذا (رکن_after_channel_closed(رکن))
+		اگلا_رکن = پہلا_رکن;
 	}
     }
 
-    if (did_one)
+    إذا (did_one)
     {
 	redraw_statuslines();
 
@@ -4061,12 +4061,12 @@ term_channel_closed(channel_T *ch)
 	ins_char_typebuf(K_IGNORE, 0);
 	typebuf_was_filled = TRUE;
 
-	term = curbuf->b_term;
-	if (term != NULL)
+	رکن = curbuf->b_رکن;
+	إذا (رکن != عدم)
 	{
-	    if (term->tl_job == ch->ch_job)
+	    إذا (رکن->tl_کم == ch->ch_کم)
 		maketitle();
-	    update_cursor(term, term->tl_cursor_visible);
+	    update_cursor(رکن, رکن->tl_cursor_visible);
 	}
     }
 }
@@ -4075,21 +4075,21 @@ term_channel_closed(channel_T *ch)
  * To be called after resetting updating_screen: handle any terminal where the
  * channel was closed.
  */
-    void
-term_check_channel_closed_recently(void)
+    فراغ
+رکن_check_channel_closed_recently(فراغ)
 {
-    term_T *term;
-    term_T *next_term;
+    رکن_T *رکن;
+    رکن_T *اگلا_رکن;
 
-    for (term = first_term; term != NULL; term = next_term)
+    لكل (رکن = پہلا_رکن; رکن != عدم; رکن = اگلا_رکن)
     {
-	next_term = term->tl_next;
-	if (term->tl_channel_recently_closed)
+	اگلا_رکن = رکن->tl_اگلا;
+	إذا (رکن->tl_channel_recently_closed)
 	{
-	    term->tl_channel_recently_closed = FALSE;
-	    if (term_after_channel_closed(term))
+	    رکن->tl_channel_recently_closed = FALSE;
+	    إذا (رکن_after_channel_closed(رکن))
 		// start over, the list may have changed
-		next_term = first_term;
+		اگلا_رکن = پہلا_رکن;
 	}
     }
 }
@@ -4098,273 +4098,273 @@ term_check_channel_closed_recently(void)
  * Fill one screen line from a line of the terminal.
  * Advances "pos" to past the last column.
  */
-    static void
-term_line2screenline(
-	term_T		*term,
+    ساكن فراغ
+رکن_line2screenline(
+	رکن_T		*رکن,
 	win_T		*wp,
 	VTermScreen	*screen,
 	VTermPos	*pos,
-	int		max_col)
+	صحيح		max_خانہ)
 {
-    int off = screen_get_current_line_off();
+    صحيح off = screen_get_current_سطر_off();
 
-    for (pos->col = 0; pos->col < max_col; )
+    لكل (pos->خانہ = 0; pos->خانہ < max_خانہ; )
     {
 	VTermScreenCell cell;
-	int		c;
+	صحيح		c;
 
-	if (vterm_screen_get_cell(screen, *pos, &cell) == 0)
-	    CLEAR_FIELD(cell);
+	إذا (vterm_screen_get_cell(screen, *pos, &cell) == 0)
+	    CLEAR_میدان(cell);
 
 	c = cell.chars[0];
-	if (c == NUL)
+	إذا (c == NUL)
 	{
-	    ScreenLines[off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = NUL;
+	    Screen_سطریں[off] = ' ';
+	    إذا (enc_utf8)
+		Screen_سطریں_UC[off] = NUL;
 	}
-	else
+	وإلا
 	{
-	    if (enc_utf8)
+	    إذا (enc_utf8)
 	    {
-		int i;
+		صحيح i;
 
 		// composing chars
-		for (i = 0; i < Screen_mco
-			      && i + 1 < VTERM_MAX_CHARS_PER_CELL; ++i)
+		لكل (i = 0; i < Screen_mco
+			      && i + 1 < VTERM_MAX_CHARS_فی_CELL; ++i)
 		{
-		    ScreenLinesC[i][off] = cell.chars[i + 1];
-		    if (cell.chars[i + 1] == 0)
-			break;
+		    Screen_سطریں_C[i][off] = cell.chars[i + 1];
+		    إذا (cell.chars[i + 1] == 0)
+			اكسر;
 		}
-		if (c >= 0x80 || (Screen_mco > 0
-					 && ScreenLinesC[0][off] != 0))
+		إذا (c >= 0x80 || (Screen_mco > 0
+					 && Screen_سطریں_C[0][off] != 0))
 		{
-		    ScreenLines[off] = ' ';
-		    ScreenLinesUC[off] = c;
+		    Screen_سطریں[off] = ' ';
+		    Screen_سطریں_UC[off] = c;
 		}
-		else
+		وإلا
 		{
-		    ScreenLines[off] = c;
-		    ScreenLinesUC[off] = NUL;
+		    Screen_سطریں[off] = c;
+		    Screen_سطریں_UC[off] = NUL;
 		}
 	    }
-#ifdef MSWIN
-	    else if (has_mbyte && c >= 0x80)
+#جے_تعریف_شدہ MSWIN
+	    وإلا إذا (has_mbyte && c >= 0x80)
 	    {
 		char_u	mb[MB_MAXBYTES+1];
 		WCHAR	wc = c;
 
-		if (WideCharToMultiByte(GetACP(), 0, &wc, 1,
-					       (char*)mb, 2, 0, 0) > 1)
+		إذا (Wide_Char_منزل_Multi_Byte(GetACP(), 0, &wc, 1,
+					       (حرف*)mb, 2, 0, 0) > 1)
 		{
-		    ScreenLines[off] = mb[0];
-		    ScreenLines[off + 1] = mb[1];
-		    cell.width = mb_ptr2cells(mb);
+		    Screen_سطریں[off] = mb[0];
+		    Screen_سطریں[off + 1] = mb[1];
+		    cell.چوڑائی = mb_ptr2cells(mb);
 		}
-		else
-		    ScreenLines[off] = c;
+		وإلا
+		    Screen_سطریں[off] = c;
 	    }
-#endif
-	    else
+#جے_انت
+	    وإلا
 		// This will only store the lower byte of "c".
-		ScreenLines[off] = c;
+		Screen_سطریں[off] = c;
 	}
-	ScreenAttrs[off] = cell2attr(term, wp, &cell.attrs, &cell.fg,
+	ScreenAttrs[off] = cell2attr(رکن, wp, &cell.attrs, &cell.fg,
 								     &cell.bg);
 
-	++pos->col;
+	++pos->خانہ;
 	++off;
-	if (cell.width == 2)
+	إذا (cell.چوڑائی == 2)
 	{
 	    // don't set the second byte to NUL for a DBCS encoding, it
 	    // has been set above
-	    if (enc_utf8)
+	    إذا (enc_utf8)
 	    {
-		ScreenLinesUC[off] = NUL;
-		ScreenLines[off] = NUL;
+		Screen_سطریں_UC[off] = NUL;
+		Screen_سطریں[off] = NUL;
 	    }
-	    else if (!has_mbyte)
+	    وإلا إذا (!has_mbyte)
 	    {
 		// Can't show a double-width character with a single-byte
 		// 'encoding', just use a space.
-		ScreenLines[off] = ' ';
+		Screen_سطریں[off] = ' ';
 		ScreenAttrs[off] = ScreenAttrs[off - 1];
 	    }
 
-	    ++pos->col;
+	    ++pos->خانہ;
 	    ++off;
 	}
     }
 }
 
-#if defined(FEAT_GUI)
-    static void
-update_system_term(term_T *term)
+#إذا defined(FEAT_GUI)
+    ساكن فراغ
+update_system_رکن(رکن_T *رکن)
 {
     VTermPos	    pos;
     VTermScreen	    *screen;
 
-    if (term->tl_vterm == NULL)
-	return;
-    screen = vterm_obtain_screen(term->tl_vterm);
+    إذا (رکن->tl_vterm == عدم)
+	أرجع;
+    screen = vterm_obtain_screen(رکن->tl_vterm);
 
     // Scroll up to make more room for terminal lines if needed.
     // Use the cursor position to determine how much to scroll, because
     // ConPTY may damage all rows on initialization even when most are
     // empty, which would cause unnecessary scrolling.
-    while (term->tl_toprow > 0
-		  && (Rows - term->tl_toprow) < term->tl_cursor_pos.row + 1)
+    طالما (رکن->tl_toprow > 0
+		  && (صفاں - رکن->tl_toprow) < رکن->tl_cursor_pos.صف + 1)
     {
-	int save_p_more = p_more;
+	صحيح save_p_ہور = p_ہور;
 
-	p_more = FALSE;
-	msg_row = Rows - 1;
-	msg_puts("\n");
-	p_more = save_p_more;
-	--term->tl_toprow;
+	p_ہور = FALSE;
+	پیغام_صف = صفاں - 1;
+	پیغام_puts("\n");
+	p_ہور = save_p_ہور;
+	--رکن->tl_toprow;
     }
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-						  && pos.row < Rows; ++pos.row)
+    لكل (pos.صف = رکن->tl_dirty_صف_شروع; pos.صف < رکن->tl_dirty_صف_سرا
+						  && pos.صف < صفاں; ++pos.صف)
     {
-	if (pos.row < term->tl_rows)
+	إذا (pos.صف < رکن->tl_صفاں)
 	{
-	    int max_col = MIN(topframe->fr_width, term->tl_cols);
+	    صحيح max_خانہ = MIN(topframe->fr_چوڑائی, رکن->tl_خانے_گنتی);
 
-	    term_line2screenline(term, NULL, screen, &pos, max_col);
+	    رکن_line2screenline(رکن, عدم, screen, &pos, max_خانہ);
 	}
-	else
-	    pos.col = 0;
+	وإلا
+	    pos.خانہ = 0;
 
-	screen_line(curwin, term->tl_toprow + pos.row,
-		firstwin->w_wincol, pos.col, topframe->fr_width, -1, 0);
+	screen_سطر(curwin, رکن->tl_toprow + pos.صف,
+		firstwin->w_wincol, pos.خانہ, topframe->fr_چوڑائی, -1, 0);
     }
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    رکن->tl_dirty_صف_شروع = MAX_صف;
+    رکن->tl_dirty_صف_سرا = 0;
 }
-#endif
+#جے_انت
 
 /*
  * Return TRUE if window "wp" is to be redrawn with term_update_window().
  * Returns FALSE when there is no terminal running in this window or it is in
  * Terminal-Normal mode.
  */
-    int
-term_do_update_window(win_T *wp)
+    صحيح
+رکن_do_update_کھڑکی(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    رکن_T	*رکن = wp->w_بفر->b_رکن;
 
-    return term != NULL && term->tl_vterm != NULL && !term->tl_normal_mode;
+    أرجع رکن != عدم && رکن->tl_vterm != عدم && !رکن->tl_عام_منوال;
 }
 
 /*
  * Called to update a window that contains an active terminal.
  */
-    void
-term_update_window(win_T *wp)
+    فراغ
+رکن_update_کھڑکی(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    رکن_T	*رکن = wp->w_بفر->b_رکن;
     VTerm	*vterm;
     VTermScreen *screen;
     VTermState	*state;
     VTermPos	pos;
-    int		rows, cols;
-    int		newrows, newcols;
-    int		minsize;
+    صحيح		صفاں_2, خانے_گنتی;
+    صحيح		newrows, newcols;
+    صحيح		minsize;
     win_T	*twp;
 
-    vterm = term->tl_vterm;
+    vterm = رکن->tl_vterm;
     screen = vterm_obtain_screen(vterm);
     state = vterm_obtain_state(vterm);
 
     // We use UPD_NOT_VALID on a resize or scroll, redraw everything then.
     // With UPD_SOME_VALID only redraw what was marked dirty.
-    if (wp->w_redr_type > UPD_SOME_VALID)
+    إذا (wp->w_redr_type > UPD_SOME_VALID)
     {
-	term->tl_dirty_row_start = 0;
-	term->tl_dirty_row_end = MAX_ROW;
+	رکن->tl_dirty_صف_شروع = 0;
+	رکن->tl_dirty_صف_سرا = MAX_صف;
 
-	if (term->tl_postponed_scroll > 0
-			      && term->tl_postponed_scroll < term->tl_rows / 3)
+	إذا (رکن->tl_postponed_scroll > 0
+			      && رکن->tl_postponed_scroll < رکن->tl_صفاں / 3)
 	    // Scrolling is usually faster than redrawing, when there are only
 	    // a few lines to scroll.
-	    term_scroll_up(term, 0, term->tl_postponed_scroll);
-	term->tl_postponed_scroll = 0;
+	    رکن_scroll_اتے(رکن, 0, رکن->tl_postponed_scroll);
+	رکن->tl_postponed_scroll = 0;
     }
 
     /*
      * If the window was resized a redraw will be triggered and we get here.
      * Adjust the size of the vterm unless 'termwinsize' specifies a fixed size.
      */
-    minsize = parse_termwinsize(wp, &rows, &cols);
+    minsize = parse_termwinsize(wp, &صفاں_2, &خانے_گنتی);
 
     newrows = 99999;
     newcols = 99999;
-    for (twp = firstwin; ; twp = twp->w_next)
+    لكل (twp = firstwin; ; twp = twp->w_اگلا)
     {
 	// Always use curwin, it may be a popup window.
-	win_T *wwp = twp == NULL ? curwin : twp;
+	win_T *wwp = twp == عدم ? curwin : twp;
 
 	// When more than one window shows the same terminal, use the
 	// smallest size.
-	if (wwp->w_buffer == term->tl_buffer)
+	إذا (wwp->w_بفر == رکن->tl_بفر)
 	{
-	    newrows = MIN(newrows, wwp->w_height);
-	    newcols = MIN(newcols, wwp->w_width);
+	    newrows = MIN(newrows, wwp->w_اچائی);
+	    newcols = MIN(newcols, wwp->w_چوڑائی);
 	}
-	if (twp == NULL)
-	    break;
+	إذا (twp == عدم)
+	    اكسر;
     }
-    if (newrows == 99999 || newcols == 99999)
-	return; // safety exit
-    newrows = rows == 0 ? newrows : minsize ? MAX(rows, newrows) : rows;
-    newcols = cols == 0 ? newcols : minsize ? MAX(cols, newcols) : cols;
+    إذا (newrows == 99999 || newcols == 99999)
+	أرجع; // safety exit
+    newrows = صفاں_2 == 0 ? newrows : minsize ? MAX(صفاں_2, newrows) : صفاں_2;
+    newcols = خانے_گنتی == 0 ? newcols : minsize ? MAX(خانے_گنتی, newcols) : خانے_گنتی;
 
     // If no cell is visible there is no point in resizing.  Also, vterm can't
     // handle a zero height.
-    if (newrows == 0 || newcols == 0)
-	return;
+    إذا (newrows == 0 || newcols == 0)
+	أرجع;
 
-    if (term->tl_rows != newrows || term->tl_cols != newcols)
+    إذا (رکن->tl_صفاں != newrows || رکن->tl_خانے_گنتی != newcols)
     {
-	term->tl_vterm_size_changed = TRUE;
-	vterm_set_size(vterm, newrows, newcols);
-	ch_log(term->tl_job->jv_channel, "Resizing terminal to %d lines",
+	رکن->tl_vterm_ناپ_بدلیا = TRUE;
+	vterm_سیٹ_ناپ(vterm, newrows, newcols);
+	ch_log(رکن->tl_کم->jv_channel, "Resizing terminal to %d lines",
 								      newrows);
-	term_report_winsize(term, newrows, newcols);
+	رکن_report_winsize(رکن, newrows, newcols);
 
 	// Updating the terminal size will cause the snapshot to be cleared.
 	// When not in terminal_loop() we need to restore it.
-	if (term != in_terminal_loop)
-	    may_move_terminal_to_buffer(term, FALSE);
+	إذا (رکن != وچ_terminal_loop)
+	    may_move_terminal_منزل_بفر(رکن, FALSE);
     }
 
     // The cursor may have been moved when resizing.
     vterm_state_get_cursorpos(state, &pos);
     position_cursor(wp, &pos);
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
-					  && pos.row < wp->w_height; ++pos.row)
+    لكل (pos.صف = رکن->tl_dirty_صف_شروع; pos.صف < رکن->tl_dirty_صف_سرا
+					  && pos.صف < wp->w_اچائی; ++pos.صف)
     {
-	if (pos.row < term->tl_rows)
+	إذا (pos.صف < رکن->tl_صفاں)
 	{
-	    int max_col = MIN(wp->w_width, term->tl_cols);
+	    صحيح max_خانہ = MIN(wp->w_چوڑائی, رکن->tl_خانے_گنتی);
 
-	    term_line2screenline(term, wp, screen, &pos, max_col);
+	    رکن_line2screenline(رکن, wp, screen, &pos, max_خانہ);
 	}
-	else
-	    pos.col = 0;
+	وإلا
+	    pos.خانہ = 0;
 
-	screen_line(wp, wp->w_winrow + pos.row
-#ifdef FEAT_MENU
-				+ winbar_height(wp)
-#endif
-				, wp->w_wincol, pos.col, wp->w_width, -1,
-#ifdef FEAT_PROP_POPUP
+	screen_سطر(wp, wp->w_winrow + pos.صف
+#جے_تعریف_شدہ FEAT_MENU
+				+ winbar_اچائی(wp)
+#جے_انت
+				, wp->w_wincol, pos.خانہ, wp->w_چوڑائی, -1,
+#جے_تعریف_شدہ FEAT_PROP_POPUP
 				popup_is_popup(wp) ? SLF_POPUP :
-#endif
+#جے_انت
 				0);
     }
 }
@@ -4372,58 +4372,58 @@ term_update_window(win_T *wp)
 /*
  * Called after updating all windows: may reset dirty rows.
  */
-    void
-term_did_update_window(win_T *wp)
+    فراغ
+رکن_did_update_کھڑکی(win_T *wp)
 {
-    term_T	*term = wp->w_buffer->b_term;
+    رکن_T	*رکن = wp->w_بفر->b_رکن;
 
-    if (term == NULL || term->tl_vterm == NULL || term->tl_normal_mode
+    إذا (رکن == عدم || رکن->tl_vterm == عدم || رکن->tl_عام_منوال
 						|| wp->w_redr_type != 0)
-	return;
+	أرجع;
 
-    term->tl_dirty_row_start = MAX_ROW;
-    term->tl_dirty_row_end = 0;
+    رکن->tl_dirty_صف_شروع = MAX_صف;
+    رکن->tl_dirty_صف_سرا = 0;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished.
  */
-    int
-term_is_finished(buf_T *buf)
+    صحيح
+رکن_is_مکمل(buf_T *buf)
 {
-    return buf->b_term != NULL && buf->b_term->tl_vterm == NULL;
+    أرجع buf->b_رکن != عدم && buf->b_رکن->tl_vterm == عدم;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished or we
  * are in Terminal-Normal mode, thus we show the buffer contents.
  */
-    int
-term_show_buffer(buf_T *buf)
+    صحيح
+رکن_show_بفر(buf_T *buf)
 {
-    term_T *term = buf->b_term;
+    رکن_T *رکن = buf->b_رکن;
 
-    return term != NULL && (term->tl_vterm == NULL || term->tl_normal_mode);
+    أرجع رکن != عدم && (رکن->tl_vterm == عدم || رکن->tl_عام_منوال);
 }
 
 /*
  * The current buffer is going to be changed.  If there is terminal
  * highlighting remove it now.
  */
-    void
-term_change_in_curbuf(void)
+    فراغ
+رکن_change_وچ_curbuf(فراغ)
 {
-    term_T *term = curbuf->b_term;
+    رکن_T *رکن = curbuf->b_رکن;
 
-    if (!term_is_finished(curbuf) || term->tl_scrollback.ga_len <= 0)
-	return;
+    إذا (!رکن_is_مکمل(curbuf) || رکن->tl_scrollback.ga_len <= 0)
+	أرجع;
 
-    free_scrollback(term);
-    redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
+    free_scrollback(رکن);
+    redraw_buf_later(رکن->tl_بفر, UPD_NOT_VALID);
 
     // The buffer is now like a normal buffer, it cannot be easily
     // abandoned when changed.
-    set_string_option_direct((char_u *)"buftype", -1,
+    سیٹ_string_option_سدھا((char_u *)"buftype", -1,
 	    (char_u *)"", OPT_FREE|OPT_LOCAL, 0);
 }
 
@@ -4431,46 +4431,46 @@ term_change_in_curbuf(void)
  * Get the screen attribute for a position in the buffer.
  * Use a negative "col" to get the filler background color.
  */
-    int
-term_get_attr(win_T *wp, linenr_T lnum, int col)
+    صحيح
+رکن_get_attr(win_T *wp, linenr_T lnum, صحيح خانہ)
 {
-    buf_T	*buf = wp->w_buffer;
-    term_T	*term = buf->b_term;
-    sb_line_T	*line;
+    buf_T	*buf = wp->w_بفر;
+    رکن_T	*رکن = buf->b_رکن;
+    sb_سطر_T	*سطر;
     cellattr_T	*cellattr;
-    int         sb_line = -1;
-    int         sb_col = col;
+    صحيح         sb_سطر = -1;
+    صحيح         sb_خانہ = خانہ;
 
-    if (term->tl_scrollback.ga_len)
-	bufline_pos_in_scrollback(term, lnum, col, &sb_line, &sb_col);
+    إذا (رکن->tl_scrollback.ga_len)
+	bufline_pos_وچ_scrollback(رکن, lnum, خانہ, &sb_سطر, &sb_خانہ);
 
-    if (sb_line < 0)
-	cellattr = &term->tl_default_color;
-    else
+    إذا (sb_سطر < 0)
+	cellattr = &رکن->tl_default_color;
+    وإلا
     {
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_line;
-	if (sb_col < 0 || sb_col >= line->sb_cols)
-	    cellattr = &line->sb_fill_attr;
-	else
-	    cellattr = line->sb_cells + sb_col;
+	سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے + sb_سطر;
+	إذا (sb_خانہ < 0 || sb_خانہ >= سطر->sb_خانے_گنتی)
+	    cellattr = &سطر->sb_fill_attr;
+	وإلا
+	    cellattr = سطر->sb_cells + sb_خانہ;
     }
-    return cell2attr(term, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
+    أرجع cell2attr(رکن, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
 }
 
 /*
  * Convert a cterm color number 0 - 255 to RGB.
  * This is compatible with xterm.
  */
-    static void
-cterm_color2vterm(int nr, VTermColor *rgb)
+    ساكن فراغ
+cterm_color2vterm(صحيح nr, VTermColor *rgb)
 {
-    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->index);
-    if (rgb->index == 0)
+    cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->اشاریہ);
+    إذا (rgb->اشاریہ == 0)
 	rgb->type = VTERM_COLOR_RGB;
-    else
+    وإلا
     {
-	rgb->type = VTERM_COLOR_INDEXED;
-	--rgb->index;
+	rgb->type = VTERM_COLOR_اشاریہ_دار;
+	--rgb->اشاریہ;
     }
 }
 
@@ -4479,14 +4479,14 @@ cterm_color2vterm(int nr, VTermColor *rgb)
  * Returns TRUE if color is set to "fg" and "bg".
  * Otherwise returns FALSE.
  */
-    static int
-get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
+    ساكن صحيح
+get_vterm_color_from_synid(صحيح id, VTermColor *fg, VTermColor *bg)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Use the actual color for the GUI and when 'termguicolors' is set.
-    if (0
+    إذا (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.وچ_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
@@ -4500,122 +4500,122 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	guicolor_T fg_rgb = INVALCOLOR;
 	guicolor_T bg_rgb = INVALCOLOR;
 
-	if (id > 0)
+	إذا (id > 0)
 	    syn_id2colors(id, &fg_rgb, &bg_rgb);
 
-	if (fg_rgb != INVALCOLOR)
+	إذا (fg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(fg_rgb);
-	    fg->red = (unsigned)(rgb >> 16);
-	    fg->green = (unsigned)(rgb >> 8) & 255;
-	    fg->blue = (unsigned)rgb & 255;
+	    fg->red = (بنانشانی)(rgb >> 16);
+	    fg->green = (بنانشانی)(rgb >> 8) & 255;
+	    fg->blue = (بنانشانی)rgb & 255;
 	    fg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	وإلا
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (bg_rgb != INVALCOLOR)
+	إذا (bg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(bg_rgb);
-	    bg->red = (unsigned)(rgb >> 16);
-	    bg->green = (unsigned)(rgb >> 8) & 255;
-	    bg->blue = (unsigned)rgb & 255;
+	    bg->red = (بنانشانی)(rgb >> 16);
+	    bg->green = (بنانشانی)(rgb >> 8) & 255;
+	    bg->blue = (بنانشانی)rgb & 255;
 	    bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	وإلا
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	أرجع TRUE;
     }
-    else
-#endif
-    if (t_colors >= 16)
+    وإلا
+#جے_انت
+    إذا (t_colors >= 16)
     {
-	int cterm_fg = -1;
-	int cterm_bg = -1;
+	صحيح cterm_fg = -1;
+	صحيح cterm_bg = -1;
 
-	if (id > 0)
+	إذا (id > 0)
 	    syn_id2cterm_bg(id, &cterm_fg, &cterm_bg);
 
-	if (cterm_fg >= 0)
+	إذا (cterm_fg >= 0)
 	{
 	    cterm_color2vterm(cterm_fg, fg);
 	    fg->type |= VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	وإلا
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (cterm_bg >= 0)
+	إذا (cterm_bg >= 0)
 	{
 	    cterm_color2vterm(cterm_bg, bg);
 	    bg->type |= VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	وإلا
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	أرجع TRUE;
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
 
-    void
-term_reset_hlfwin(win_T *wp)
+    فراغ
+رکن_reset_hlfwin(win_T *wp)
 {
-    wp->w_term_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
-    wp->w_term_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
+    wp->w_رکن_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
+    wp->w_رکن_hlfwin.bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
 /*
  * Cache the color of HLF_WIN.
  */
-    void
-term_update_hlfwin(win_T *wp)
+    فراغ
+رکن_update_hlfwin(win_T *wp)
 {
-    int id = wp->w_hlfwin_id;
+    صحيح id = wp->w_hlfwin_id;
 
-    if (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
-		&wp->w_term_hlfwin.fg, &wp->w_term_hlfwin.bg))
-	term_reset_hlfwin(wp);
+    إذا (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
+		&wp->w_رکن_hlfwin.fg, &wp->w_رکن_hlfwin.bg))
+	رکن_reset_hlfwin(wp);
 }
 
 /*
  * Called when option 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_hlfwin_all(void)
+    فراغ
+رکن_update_hlfwin_all(فراغ)
 {
-    win_T	 *wp = NULL;
-    int		 did_curwin = FALSE;
+    win_T	 *wp = عدم;
+    صحيح		 did_curwin = FALSE;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
-	term_update_hlfwin(wp);
+    طالما (for_all_windows_and_curwin(&wp, &did_curwin))
+	رکن_update_hlfwin(wp);
 }
 
 /*
  * Initialize term->tl_default_color from the environment.
  */
-    void
-term_init_default_colors(term_T *term)
+    فراغ
+رکن_init_default_colors(رکن_T *رکن)
 {
     VTermColor	    *fg, *bg;
-    int		    fgval, bgval;
-    int		    id;
+    صحيح		    fgval, bgval;
+    صحيح		    id;
 
-    CLEAR_FIELD(term->tl_default_color.attrs);
-    term->tl_default_color.width = 1;
-    fg = &term->tl_default_color.fg;
-    bg = &term->tl_default_color.bg;
+    CLEAR_میدان(رکن->tl_default_color.attrs);
+    رکن->tl_default_color.چوڑائی = 1;
+    fg = &رکن->tl_default_color.fg;
+    bg = &رکن->tl_default_color.bg;
 
     // Vterm uses a default black background.  Set it to white when
     // 'background' is "light".
-    if (*p_bg == 'l')
+    إذا (*p_bg == 'l')
     {
 	fgval = 0;
 	bgval = 255;
     }
-    else
+    وإلا
     {
 	fgval = 255;
 	bgval = 0;
@@ -4626,227 +4626,227 @@ term_init_default_colors(term_T *term)
     bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, NULL);
+    id = رکن_get_highlight_id(رکن, عدم);
 
-    if (!get_vterm_color_from_synid(id, fg, bg))
+    إذا (!get_vterm_color_from_synid(id, fg, bg))
     {
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	int tmp;
-#endif
+#إذا defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	صحيح tmp;
+#جے_انت
 
 	// In an MS-Windows console we know the normal colors.
-	if (cterm_normal_fg_color > 0)
+	إذا (cterm_عام_fg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_fg_color - 1, fg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_عام_fg_color - 1, fg);
+#إذا defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    إذا (!gui.وچ_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#جے_انت
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_fg_color(&fg->red, &fg->green, &fg->blue);
-#endif
+#جے_تعریف_شدہ FEAT_TERMRESPONSE
+	وإلا
+	    رکن_get_fg_color(&fg->red, &fg->green, &fg->blue);
+#جے_انت
 
-	if (cterm_normal_bg_color > 0)
+	إذا (cterm_عام_bg_color > 0)
 	{
-	    cterm_color2vterm(cterm_normal_bg_color - 1, bg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	    cterm_color2vterm(cterm_عام_bg_color - 1, bg);
+#إذا defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    إذا (!gui.وچ_use)
 # endif
 	    {
 		tmp = fg->red;
 		fg->red = fg->blue;
 		fg->blue = tmp;
 	    }
-#endif
+#جے_انت
 	}
-#ifdef FEAT_TERMRESPONSE
-	else
-	    term_get_bg_color(&bg->red, &bg->green, &bg->blue);
-#endif
+#جے_تعریف_شدہ FEAT_TERMRESPONSE
+	وإلا
+	    رکن_get_bg_color(&bg->red, &bg->green, &bg->blue);
+#جے_انت
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if the user-defined palette (either g:terminal_ansi_colors or the
  * "ansi_colors" argument in term_start()) shall be applied.
  */
-    static int
-term_use_palette(void)
+    ساكن صحيح
+رکن_use_palette(فراغ)
 {
-    if (0
+    إذا (0
 # ifdef FEAT_GUI
-	    || gui.in_use
+	    || gui.وچ_use
 # endif
 # ifdef FEAT_TERMGUICOLORS
 	    || p_tgc
 # endif
        )
-	return TRUE;
-    return FALSE;
+	أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
  * Set the 16 ANSI colors from array of RGB values
  */
-    static void
-set_vterm_palette(VTerm *vterm, long_u *rgb)
+    ساكن فراغ
+سیٹ_vterm_palette(VTerm *vterm, long_u *rgb)
 {
-    int		index = 0;
+    صحيح		اشاریہ = 0;
     VTermState	*state = vterm_obtain_state(vterm);
 
-    for (; index < 16; index++)
+    لكل (; اشاریہ < 16; اشاریہ++)
     {
 	VTermColor	color;
 
 	color.type = VTERM_COLOR_RGB;
-	color.red = (unsigned)(rgb[index] >> 16);
-	color.green = (unsigned)(rgb[index] >> 8) & 255;
-	color.blue = (unsigned)rgb[index] & 255;
-	color.index = 0;
-	vterm_state_set_palette_color(state, index, &color);
+	color.red = (بنانشانی)(rgb[اشاریہ] >> 16);
+	color.green = (بنانشانی)(rgb[اشاریہ] >> 8) & 255;
+	color.blue = (بنانشانی)rgb[اشاریہ] & 255;
+	color.اشاریہ = 0;
+	vterm_state_سیٹ_palette_color(state, اشاریہ, &color);
     }
 }
 
 /*
  * Set the ANSI color palette from a list of colors
  */
-    static int
-set_ansi_colors_list(VTerm *vterm, list_T *list)
+    ساكن صحيح
+سیٹ_ansi_colors_list(VTerm *vterm, list_T *list)
 {
-    int		n = 0;
+    صحيح		n = 0;
     long_u	rgb[16];
     listitem_T	*li;
 
-    for (li = list->lv_first; li != NULL && n < 16; li = li->li_next, n++)
+    لكل (li = list->lv_پہلا; li != عدم && n < 16; li = li->li_اگلا, n++)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return FAIL;
+	إذا (color_name == عدم)
+	    أرجع FAIL;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
-	    return FAIL;
+	إذا (guicolor == INVALCOLOR)
+	    أرجع FAIL;
 
 	rgb[n] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    if (n != 16 || li != NULL)
-	return FAIL;
+    إذا (n != 16 || li != عدم)
+	أرجع FAIL;
 
-    set_vterm_palette(vterm, rgb);
+    سیٹ_vterm_palette(vterm, rgb);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Initialize the ANSI color palette from g:terminal_ansi_colors[0:15]
  */
-    static void
+    ساكن فراغ
 init_vterm_ansi_colors(VTerm *vterm)
 {
-    dictitem_T	*var = find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE);
+    dictitem_T	*var = لبھو_var((char_u *)"g:terminal_ansi_colors", عدم, TRUE);
 
-    if (var == NULL)
-	return;
+    إذا (var == عدم)
+	أرجع;
 
-    if (var->di_tv.v_type != VAR_LIST
-	    || var->di_tv.vval.v_list == NULL
-	    || var->di_tv.vval.v_list->lv_first == &range_list_item
-	    || set_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
-	semsg(_(e_invalid_argument_str), "g:terminal_ansi_colors");
+    إذا (var->di_tv.v_type != VAR_LIST
+	    || var->di_tv.vval.v_list == عدم
+	    || var->di_tv.vval.v_list->lv_پہلا == &range_list_شے
+	    || سیٹ_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
+	semsg(_(e_invalid_دلیل_str), "g:terminal_ansi_colors");
 }
-#endif
+#جے_انت
 
 /*
  * Handles a "drop" command from the job in the terminal.
  * "item" is the file name, "item->li_next" may have options.
  */
-    static void
-handle_drop_command(listitem_T *item)
+    ساكن فراغ
+handle_drop_command(listitem_T *شے)
 {
-    char_u	*fname = tv_get_string(&item->li_tv);
-    listitem_T	*opt_item = item->li_next;
-    int		bufnr;
+    char_u	*fname = tv_get_string(&شے->li_tv);
+    listitem_T	*opt_شے = شے->li_اگلا;
+    صحيح		bufnr;
     win_T	*wp;
     tabpage_T   *tp;
     exarg_T	ea;
-    char_u	*tofree = NULL;
+    char_u	*tofree = عدم;
 
-    bufnr = buflist_add(fname, BLN_LISTED | BLN_NOOPT);
+    bufnr = buflist_جوڑو(fname, BLN_LISTED | BLN_NOOPT);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer->b_fnum == bufnr)
+	إذا (wp->w_بفر->b_fnum == bufnr)
 	{
 	    // buffer is in a window already, go there
 	    goto_tabpage_win(tp, wp);
-	    return;
+	    أرجع;
 	}
     }
 
-    CLEAR_FIELD(ea);
+    CLEAR_میدان(ea);
 
-    if (opt_item != NULL && opt_item->li_tv.v_type == VAR_DICT
-					&& opt_item->li_tv.vval.v_dict != NULL)
+    إذا (opt_شے != عدم && opt_شے->li_tv.v_type == VAR_DICT
+					&& opt_شے->li_tv.vval.v_dict != عدم)
     {
-	dict_T *dict = opt_item->li_tv.vval.v_dict;
+	dict_T *dict = opt_شے->li_tv.vval.v_dict;
 	char_u *p;
 
 	p = dict_get_string(dict, "ff", FALSE);
-	if (p == NULL)
+	إذا (p == عدم)
 	    p = dict_get_string(dict, "fileformat", FALSE);
-	if (p != NULL)
+	إذا (p != عدم)
 	{
-	    if (check_ff_value(p) == FAIL)
-		ch_log(NULL, "Invalid ff argument to drop: %s", p);
-	    else
+	    إذا (check_ff_قدر(p) == FAIL)
+		ch_log(عدم, "Invalid ff argument to drop: %s", p);
+	    وإلا
 		ea.force_ff = *p;
 	}
 	p = dict_get_string(dict, "enc", FALSE);
-	if (p == NULL)
+	إذا (p == عدم)
 	    p = dict_get_string(dict, "encoding", FALSE);
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    ea.cmd = alloc(STRLEN(p) + 12);
-	    if (ea.cmd != NULL)
+	    إذا (ea.cmd != عدم)
 	    {
-		sprintf((char *)ea.cmd, "sbuf ++enc=%s", p);
+		sprintf((حرف *)ea.cmd, "sbuf ++enc=%s", p);
 		ea.force_enc = 11;
 		tofree = ea.cmd;
 	    }
 	}
 
 	p = dict_get_string(dict, "bad", FALSE);
-	if (p != NULL)
+	إذا (p != عدم)
 	    get_bad_opt(p, &ea);
 
-	if (dict_has_key(dict, "bin"))
+	إذا (dict_has_کلید(dict, "bin"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "binary"))
+	إذا (dict_has_کلید(dict, "binary"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "nobin"))
+	إذا (dict_has_کلید(dict, "nobin"))
 	    ea.force_bin = FORCE_NOBIN;
-	if (dict_has_key(dict, "nobinary"))
+	إذا (dict_has_کلید(dict, "nobinary"))
 	    ea.force_bin = FORCE_NOBIN;
     }
 
     // open in new window, like ":split fname"
-    if (ea.cmd == NULL)
+    إذا (ea.cmd == عدم)
 	ea.cmd = (char_u *)"split";
     ea.arg = fname;
-    ea.cmdidx = CMD_split;
+    ea.cmdidx = CMD_ونڈو;
     ex_splitview(&ea);
 
     vim_free(tofree);
@@ -4855,50 +4855,50 @@ handle_drop_command(listitem_T *item)
 /*
  * Return TRUE if "func" starts with "pat" and "pat" isn't empty.
  */
-    static int
-is_permitted_term_api(char_u *func, char_u *pat)
+    ساكن صحيح
+is_permitted_رکن_api(char_u *func, char_u *pat)
 {
-    return pat != NULL && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
+    أرجع pat != عدم && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
 }
 
 /*
  * Handles a function call from the job running in a terminal.
  * "item" is the function name, "item->li_next" has the arguments.
  */
-    static void
-handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
+    ساكن فراغ
+handle_call_command(رکن_T *رکن, channel_T *channel, listitem_T *شے)
 {
     char_u	*func;
     typval_T	argvars[2];
     typval_T	rettv;
     funcexe_T	funcexe;
 
-    if (item->li_next == NULL)
+    إذا (شے->li_اگلا == عدم)
     {
 	ch_log(channel, "Missing function arguments for call");
-	return;
+	أرجع;
     }
-    func = tv_get_string(&item->li_tv);
+    func = tv_get_string(&شے->li_tv);
 
-    if (!is_permitted_term_api(func, term->tl_api))
+    إذا (!is_permitted_رکن_api(func, رکن->tl_api))
     {
 	ch_log(channel, "Unpermitted function: %s", func);
-	return;
+	أرجع;
     }
 
-    argvars[0].v_type = VAR_NUMBER;
-    argvars[0].vval.v_number = term->tl_buffer->b_fnum;
-    argvars[1] = item->li_next->li_tv;
-    CLEAR_FIELD(funcexe);
+    argvars[0].v_type = VAR_نمبر;
+    argvars[0].vval.v_نمبر = رکن->tl_بفر->b_fnum;
+    argvars[1] = شے->li_اگلا->li_tv;
+    CLEAR_میدان(funcexe);
     funcexe.fe_firstline = 1L;
     funcexe.fe_lastline = 1L;
     funcexe.fe_evaluate = TRUE;
-    if (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
+    إذا (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
     {
 	clear_tv(&rettv);
 	ch_log(channel, "Function %s called", func);
     }
-    else
+    وإلا
 	ch_log(channel, "Calling function %s failed", func);
 }
 
@@ -4910,20 +4910,20 @@ handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
  * UTF-8 bytes. Thus we don't need to deal with invalid UTF-8
  * encoding bytes like 0xfe, 0xff.
  */
-    static size_t
-url_decode(const char *src, const size_t len, char_u *dst)
+    ساكن size_t
+url_decode(ثابت حرف *src, ثابت size_t len, char_u *dst)
 {
     size_t i = 0, j = 0;
 
-    while (i < len)
+    طالما (i < len)
     {
-	if (src[i] == '%' && i + 2 < len)
+	إذا (src[i] == '%' && i + 2 < len)
 	{
 	    dst[j] = hexhex2nr((char_u *)&src[i + 1]);
 	    j++;
 	    i += 3;
 	}
-	else
+	وإلا
 	{
 	    dst[j] = src[i];
 	    i++;
@@ -4931,7 +4931,7 @@ url_decode(const char *src, const size_t len, char_u *dst)
 	}
     }
     dst[j] = '\0';
-    return j;
+    أرجع j;
 }
 
 /*
@@ -4942,30 +4942,30 @@ url_decode(const char *src, const size_t len, char_u *dst)
  * and what VTerm provides via VTermStringFragment is
  * "file://HOSTNAME/CURRENT/DIR"
  */
-    static void
+    ساكن فراغ
 sync_shell_dir(garray_T *gap)
 {
-    int       offset = 7;  // len of "file://" is 7
-    char      *pos = (char *)gap->ga_data + offset;
+    صحيح       وتھ = 7;  // len of "file://" is 7
+    حرف      *pos = (حرف *)gap->ga_انکڑے + وتھ;
     char_u    *new_dir;
 
     // remove HOSTNAME to get PWD
-    while (offset < (int)gap->ga_len && *pos != '/' )
+    طالما (وتھ < (صحيح)gap->ga_len && *pos != '/' )
     {
-	++offset;
+	++وتھ;
 	++pos;
     }
 
-    if (offset >= (int)gap->ga_len)
+    إذا (وتھ >= (صحيح)gap->ga_len)
     {
-	semsg(_(e_failed_to_extract_pwd_from_str_check_your_shell_config),
-								 gap->ga_data);
-	return;
+	semsg(_(e_failed_منزل_کڈھو_pwd_from_str_check_your_shell_config),
+								 gap->ga_انکڑے);
+	أرجع;
     }
 
-    new_dir = alloc(gap->ga_len - offset + 1);
-    url_decode(pos, gap->ga_len-offset, new_dir);
-    changedir_func(new_dir, TRUE, CDSCOPE_WINDOW);
+    new_dir = alloc(gap->ga_len - وتھ + 1);
+    url_decode(pos, gap->ga_len-وتھ, new_dir);
+    changedir_func(new_dir, TRUE, CDSCOPE_کھڑکی);
     vim_free(new_dir);
 }
 
@@ -4973,124 +4973,124 @@ sync_shell_dir(garray_T *gap)
  * Called by libvterm when it cannot recognize an OSC sequence.
  * We recognize a terminal API command.
  */
-    static int
-parse_osc(int command, VTermStringFragment frag, void *user)
+    ساكن صحيح
+parse_osc(صحيح command, VTermStringFragment frag, فراغ *user)
 {
-    term_T	*term = (term_T *)user;
+    رکن_T	*رکن = (رکن_T *)user;
     js_read_T	reader;
     typval_T	tv;
-    channel_T	*channel = term->tl_job == NULL ? NULL
-						    : term->tl_job->jv_channel;
-    garray_T	*gap = &term->tl_osc_buf;
+    channel_T	*channel = رکن->tl_کم == عدم ? عدم
+						    : رکن->tl_کم->jv_channel;
+    garray_T	*gap = &رکن->tl_osc_buf;
 
     // We recognize only OSC 5 1 ; {command} and OSC 7 ; {command}
-    if (command != 51 && (command != 7 || !p_asd))
-	return 0;
+    إذا (command != 51 && (command != 7 || !p_asd))
+	أرجع 0;
 
     // Concatenate what was received until the final piece is found.
-    if (ga_grow(gap, (int)frag.len + 1) == FAIL)
+    إذا (ga_grow(gap, (صحيح)frag.len + 1) == FAIL)
     {
 	ga_clear(gap);
-	return 1;
+	أرجع 1;
     }
-    mch_memmove((char *)gap->ga_data + gap->ga_len, frag.str, frag.len);
-    gap->ga_len += (int)frag.len;
-    if (!frag.final)
-	return 1;
+    mch_memmove((حرف *)gap->ga_انکڑے + gap->ga_len, frag.str, frag.len);
+    gap->ga_len += (صحيح)frag.len;
+    إذا (!frag.final)
+	أرجع 1;
 
-    ((char *)gap->ga_data)[gap->ga_len] = 0;
+    ((حرف *)gap->ga_انکڑے)[gap->ga_len] = 0;
 
-    if (command == 7)
+    إذا (command == 7)
     {
 	sync_shell_dir(gap);
 	ga_clear(gap);
-	return 1;
+	أرجع 1;
     }
 
-    reader.js_buf = gap->ga_data;
-    reader.js_fill = NULL;
-    reader.js_used = 0;
-    if (json_decode(&reader, &tv, 0) == OK
+    reader.js_buf = gap->ga_انکڑے;
+    reader.js_fill = عدم;
+    reader.js_ورتیا = 0;
+    إذا (json_decode(&reader, &tv, 0) == OK
 	    && tv.v_type == VAR_LIST
-	    && tv.vval.v_list != NULL)
+	    && tv.vval.v_list != عدم)
     {
-	listitem_T *item = tv.vval.v_list->lv_first;
+	listitem_T *شے = tv.vval.v_list->lv_پہلا;
 
-	if (item == NULL)
+	إذا (شے == عدم)
 	    ch_log(channel, "Missing command");
-	else
+	وإلا
 	{
-	    char_u	*cmd = tv_get_string(&item->li_tv);
+	    char_u	*cmd = tv_get_string(&شے->li_tv);
 
 	    // Make sure an invoked command doesn't delete the buffer (and the
 	    // terminal) under our fingers.
-	    ++term->tl_buffer->b_locked;
+	    ++رکن->tl_بفر->b_locked;
 
-	    item = item->li_next;
-	    if (item == NULL)
+	    شے = شے->li_اگلا;
+	    إذا (شے == عدم)
 		ch_log(channel, "Missing argument for %s", cmd);
-	    else if (STRCMP(cmd, "drop") == 0)
-		handle_drop_command(item);
-	    else if (STRCMP(cmd, "call") == 0)
-		handle_call_command(term, channel, item);
-	    else
+	    وإلا إذا (STRCMP(cmd, "drop") == 0)
+		handle_drop_command(شے);
+	    وإلا إذا (STRCMP(cmd, "call") == 0)
+		handle_call_command(رکن, channel, شے);
+	    وإلا
 		ch_log(channel, "Invalid command received: %s", cmd);
-	    --term->tl_buffer->b_locked;
+	    --رکن->tl_بفر->b_locked;
 	}
     }
-    else
+    وإلا
 	ch_log(channel, "Invalid JSON received");
 
     ga_clear(gap);
     clear_tv(&tv);
-    return 1;
+    أرجع 1;
 }
 
 /*
  * Called by libvterm when it cannot recognize a CSI sequence.
  * We recognize the window position report.
  */
-    static int
+    ساكن صحيح
 parse_csi(
-	const char  *leader UNUSED,
-	const long  args[],
-	int	    argcount,
-	const char  *intermed UNUSED,
-	char	    command,
-	void	    *user)
+	ثابت حرف  *leader بن_ورتیا,
+	ثابت لما  دلیلاں[],
+	صحيح	    argcount,
+	ثابت حرف  *intermed بن_ورتیا,
+	حرف	    command,
+	فراغ	    *user)
 {
-    term_T	*term = (term_T *)user;
-    char	buf[100];
-    int		len;
-    int		x = 0;
-    int		y = 0;
+    رکن_T	*رکن = (رکن_T *)user;
+    حرف	buf[100];
+    صحيح		len;
+    صحيح		x = 0;
+    صحيح		y = 0;
     win_T	*wp;
 
     // We recognize only CSI 13 t
-    if (command != 't' || argcount != 1 || args[0] != 13)
-	return 0; // not handled
+    إذا (command != 't' || argcount != 1 || دلیلاں[0] != 13)
+	أرجع 0; // not handled
 
     // When getting the window position is not possible or it fails it results
     // in zero/zero.
-#if defined(FEAT_GUI) \
+#إذا defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
-    (void)ui_get_winpos(&x, &y, (varnumber_T)100);
-#endif
+    (فراغ)ui_get_winpos(&x, &y, (varnumber_T)100);
+#جے_انت
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == term->tl_buffer)
-	    break;
-    if (wp != NULL)
+	إذا (wp->w_بفر == رکن->tl_بفر)
+	    اكسر;
+    إذا (wp != عدم)
     {
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#جے_تعریف_شدہ FEAT_GUI
+	إذا (gui.وچ_use)
 	{
-	    x += wp->w_wincol * gui.char_width;
-	    y += W_WINROW(wp) * gui.char_height;
+	    x += wp->w_wincol * gui.char_چوڑائی;
+	    y += W_WINROW(wp) * gui.char_اچائی;
 	}
-	else
-#endif
+	وإلا
+#جے_انت
 	{
 	    // We roughly estimate the position of the terminal window inside
 	    // the Vim window by assuming a 10 x 7 character cell.
@@ -5100,38 +5100,38 @@ parse_csi(
     }
 
     len = vim_snprintf(buf, 100, "\x1b[3;%d;%dt", x, y);
-    channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						     (char_u *)buf, len, NULL);
-    return 1;
+    channel_send(رکن->tl_کم->jv_channel, get_tty_part(رکن),
+						     (char_u *)buf, len, عدم);
+    أرجع 1;
 }
 
-static VTermStateFallbacks state_fallbacks = {
-    NULL,		// control
+ساكن VTermStateFallbacks state_fallbacks = {
+    عدم,		// control
     parse_csi,		// csi
     parse_osc,		// osc
-    NULL,		// dcs
-    NULL,		// apc
-    NULL,		// pm
-    NULL		// sos
+    عدم,		// dcs
+    عدم,		// apc
+    عدم,		// pm
+    عدم		// sos
 };
 
 /*
  * Use Vim's allocation functions for vterm so profiling works.
  */
-    static void *
-vterm_malloc(size_t size, void *data UNUSED)
+    ساكن فراغ *
+vterm_malloc(size_t ناپ, فراغ *انکڑے بن_ورتیا)
 {
     // make sure that the length is not zero
-    return alloc_clear(size == 0 ? 1L : size);
+    أرجع alloc_clear(ناپ == 0 ? 1L : ناپ);
 }
 
-    static void
-vterm_memfree(void *ptr, void *data UNUSED)
+    ساكن فراغ
+vterm_memfree(فراغ *ptr, فراغ *انکڑے بن_ورتیا)
 {
     vim_free(ptr);
 }
 
-static VTermAllocatorFunctions vterm_allocator = {
+ساكن VTermAllocatorFunctions vterm_allocator = {
   &vterm_malloc,
   &vterm_memfree
 };
@@ -5140,45 +5140,45 @@ static VTermAllocatorFunctions vterm_allocator = {
  * Create a new vterm and initialize it.
  * Return FAIL when out of memory.
  */
-    static int
-create_vterm(term_T *term, int rows, int cols)
+    ساكن صحيح
+create_vterm(رکن_T *رکن, صحيح صفاں_2, صحيح خانے_گنتی)
 {
     VTerm	    *vterm;
     VTermScreen	    *screen;
     VTermState	    *state;
-    VTermValue	    value;
+    VTerm_قدر	    قدر;
 
-    vterm = vterm_new_with_allocator(rows, cols, &vterm_allocator, NULL);
-    term->tl_vterm = vterm;
-    if (vterm == NULL)
-	return FAIL;
+    vterm = vterm_new_with_allocator(صفاں_2, خانے_گنتی, &vterm_allocator, عدم);
+    رکن->tl_vterm = vterm;
+    إذا (vterm == عدم)
+	أرجع FAIL;
 
     // Allocate screen and state here, so we can bail out if that fails.
     state = vterm_obtain_state(vterm);
     screen = vterm_obtain_screen(vterm);
-    if (state == NULL || screen == NULL)
+    إذا (state == عدم || screen == عدم)
     {
 	vterm_free(vterm);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    vterm_screen_set_callbacks(screen, &screen_callbacks, term);
-    vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
+    vterm_screen_سیٹ_callbacks(screen, &screen_callbacks, رکن);
+    vterm_screen_سیٹ_damage_ملاؤ(screen, VTERM_DAMAGE_SCROLL);
     vterm_screen_callbacks_has_pushline4(screen);
     // TODO: depends on 'encoding'.
-    vterm_set_utf8(vterm, 1);
+    vterm_سیٹ_utf8(vterm, 1);
 
-    term_init_default_colors(term);
+    رکن_init_default_colors(رکن);
 
-    vterm_state_set_default_colors(
+    vterm_state_سیٹ_default_colors(
 	    state,
-	    &term->tl_default_color.fg,
-	    &term->tl_default_color.bg);
+	    &رکن->tl_default_color.fg,
+	    &رکن->tl_default_color.bg);
 
-    if (t_colors < 16)
+    إذا (t_colors < 16)
 	// Less than 16 colors: assume that bold means using a bright color for
 	// the foreground color.
-	vterm_state_set_bold_highbright(vterm_obtain_state(vterm), 1);
+	vterm_state_سیٹ_bold_highbright(vterm_obtain_state(vterm), 1);
 
     // Required to initialize most things.
     vterm_screen_reset(screen, 1 /* hard */);
@@ -5189,75 +5189,75 @@ create_vterm(term_T *term, int rows, int cols)
     // For unix do not use a blinking cursor.  In an xterm this causes the
     // cursor to blink if it's blinking in the xterm.
     // For Windows we respect the system wide setting.
-#ifdef MSWIN
-    if (GetCaretBlinkTime() == INFINITE)
-	value.boolean = 0;
-    else
-	value.boolean = 1;
-#else
-    value.boolean = 0;
-#endif
-    vterm_state_set_termprop(state, VTERM_PROP_CURSORBLINK, &value);
-    vterm_state_set_unrecognised_fallbacks(state, &state_fallbacks, term);
+#جے_تعریف_شدہ MSWIN
+    إذا (Get_Caret_Blink_ویلا() == INFINITE)
+	قدر.boolean = 0;
+    وإلا
+	قدر.boolean = 1;
+#وإلا
+    قدر.boolean = 0;
+#جے_انت
+    vterm_state_سیٹ_termprop(state, VTERM_PROP_CURSORBLINK, &قدر);
+    vterm_state_سیٹ_unrecognised_fallbacks(state, &state_fallbacks, رکن);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Reset the terminal palette to its default value.
  */
-    static void
-term_reset_palette(VTerm *vterm)
+    ساكن فراغ
+رکن_reset_palette(VTerm *vterm)
 {
     VTermState	*state = vterm_obtain_state(vterm);
-    int		index;
+    صحيح		اشاریہ;
 
-    for (index = 0; index < 16; index++)
+    لكل (اشاریہ = 0; اشاریہ < 16; اشاریہ++)
     {
 	VTermColor	color;
 
-	color.type = VTERM_COLOR_INDEXED;
-	ansi_color2rgb(index, &color.red, &color.green, &color.blue,
-		&color.index);
+	color.type = VTERM_COLOR_اشاریہ_دار;
+	ansi_color2rgb(اشاریہ, &color.red, &color.green, &color.blue,
+		&color.اشاریہ);
 	// The first valid index starts at 1.
-	color.index -= 1;
+	color.اشاریہ -= 1;
 
-	vterm_state_set_palette_color(state, index, &color);
+	vterm_state_سیٹ_palette_color(state, اشاریہ, &color);
     }
 }
 
-    static void
-term_update_palette(term_T *term)
+    ساكن فراغ
+رکن_update_palette(رکن_T *رکن)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette()
-	    && (term->tl_palette != NULL
-		|| find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE)
-								      != NULL))
+#إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    إذا (رکن_use_palette()
+	    && (رکن->tl_palette != عدم
+		|| لبھو_var((char_u *)"g:terminal_ansi_colors", عدم, TRUE)
+								      != عدم))
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	إذا (رکن->tl_palette != عدم)
+	    سیٹ_vterm_palette(رکن->tl_vterm, رکن->tl_palette);
+	وإلا
+	    init_vterm_ansi_colors(رکن->tl_vterm);
     }
-    else
-#endif
-	term_reset_palette(term->tl_vterm);
+    وإلا
+#جے_انت
+	رکن_reset_palette(رکن->tl_vterm);
 }
 
 /*
  * Called when option 'termguicolors' is changed.
  */
-    void
-term_update_palette_all(void)
+    فراغ
+رکن_update_palette_all(فراغ)
 {
-    term_T *term;
+    رکن_T *رکن;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(رکن)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_update_palette(term);
+	إذا (رکن->tl_vterm == عدم)
+	    استمر;
+	رکن_update_palette(رکن);
     }
 }
 
@@ -5265,20 +5265,20 @@ term_update_palette_all(void)
  * Called when option 'background' or 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_colors_all(void)
+    فراغ
+رکن_update_colors_all(فراغ)
 {
-    term_T *term;
+    رکن_T *رکن;
 
-    FOR_ALL_TERMS(term)
+    FOR_ALL_TERMS(رکن)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
-	term_init_default_colors(term);
-	vterm_state_set_default_colors(
-		vterm_obtain_state(term->tl_vterm),
-		&term->tl_default_color.fg,
-		&term->tl_default_color.bg);
+	إذا (رکن->tl_vterm == عدم)
+	    استمر;
+	رکن_init_default_colors(رکن);
+	vterm_state_سیٹ_default_colors(
+		vterm_obtain_state(رکن->tl_vterm),
+		&رکن->tl_default_color.fg,
+		&رکن->tl_default_color.bg);
     }
 }
 
@@ -5286,66 +5286,66 @@ term_update_colors_all(void)
  * Return the text to show for the buffer name and status.
  */
     char_u *
-term_get_status_text(term_T *term)
+رکن_get_حالت_متن(رکن_T *رکن)
 {
-    if (term->tl_status_text != NULL)
-	return term->tl_status_text;
+    إذا (رکن->tl_حالت_متن != عدم)
+	أرجع رکن->tl_حالت_متن;
 
     char_u *txt;
     size_t len;
     char_u *fname;
 
-    if (term->tl_normal_mode)
+    إذا (رکن->tl_عام_منوال)
     {
-	if (term_job_running(term))
+	إذا (رکن_کم_running(رکن))
 	    txt = (char_u *)_("Terminal");
-	else
+	وإلا
 	    txt = (char_u *)_("Terminal-finished");
     }
-    else if (term->tl_title != NULL)
-	txt = term->tl_title;
-    else if (term_none_open(term))
+    وإلا إذا (رکن->tl_title != عدم)
+	txt = رکن->tl_title;
+    وإلا إذا (رکن_none_open(رکن))
 	txt = (char_u *)_("active");
-    else if (term_job_running(term))
+    وإلا إذا (رکن_کم_running(رکن))
 	txt = (char_u *)_("running");
-    else
+    وإلا
 	txt = (char_u *)_("finished");
-    fname = buf_get_fname(term->tl_buffer);
+    fname = buf_get_fname(رکن->tl_بفر);
     len = 9 + STRLEN(fname) + STRLEN(txt);
-    term->tl_status_text = alloc(len);
-    if (term->tl_status_text != NULL)
-	vim_snprintf((char *)term->tl_status_text, len, "%s [%s]",
+    رکن->tl_حالت_متن = alloc(len);
+    إذا (رکن->tl_حالت_متن != عدم)
+	vim_snprintf((حرف *)رکن->tl_حالت_متن, len, "%s [%s]",
 		fname, txt);
-    return term->tl_status_text;
+    أرجع رکن->tl_حالت_متن;
 }
 
 /*
  * Clear the cached value of the status text.
  */
-    void
-term_clear_status_text(term_T *term)
+    فراغ
+رکن_clear_حالت_متن(رکن_T *رکن)
 {
-    VIM_CLEAR(term->tl_status_text);
+    VIM_CLEAR(رکن->tl_حالت_متن);
 }
 
 /*
  * Mark references in jobs of terminals.
  */
-    int
-set_ref_in_term(int copyID)
+    صحيح
+سیٹ_ref_وچ_رکن(صحيح copyID)
 {
-    int		abort = FALSE;
-    term_T	*term;
+    صحيح		abort = FALSE;
+    رکن_T	*رکن;
     typval_T	tv;
 
-    for (term = first_term; !abort && term != NULL; term = term->tl_next)
-	if (term->tl_job != NULL)
+    لكل (رکن = پہلا_رکن; !abort && رکن != عدم; رکن = رکن->tl_اگلا)
+	إذا (رکن->tl_کم != عدم)
 	{
-	    tv.v_type = VAR_JOB;
-	    tv.vval.v_job = term->tl_job;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    tv.v_type = VAR_کم;
+	    tv.vval.v_کم = رکن->tl_کم;
+	    abort = abort || سیٹ_ref_وچ_شے(&tv, copyID, عدم, عدم, عدم);
 	}
-    return abort;
+    أرجع abort;
 }
 
 /*
@@ -5353,47 +5353,47 @@ set_ref_in_term(int copyID)
  * Returns NULL when the buffer is not for a terminal window and logs a message
  * with "where".
  */
-    static buf_T *
-term_get_buf(typval_T *argvars, char *where)
+    ساكن buf_T *
+رکن_get_buf(typval_T *argvars, حرف *where)
 {
     buf_T *buf;
 
     ++emsg_off;
     buf = tv_get_buf(&argvars[0], FALSE);
     --emsg_off;
-    if (buf == NULL || buf->b_term == NULL)
+    إذا (buf == عدم || buf->b_رکن == عدم)
     {
-	(void)tv_get_number(&argvars[0]);    // issue errmsg if type error
-	ch_log(NULL, "%s: invalid buffer argument", where);
-	return NULL;
+	(فراغ)tv_get_نمبر(&argvars[0]);    // issue errmsg if type error
+	ch_log(عدم, "%s: invalid buffer argument", where);
+	أرجع عدم;
     }
-    return buf;
+    أرجع buf;
 }
 
-    static void
+    ساكن فراغ
 clear_cell(VTermScreenCell *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_میدان(*cell);
     cell->fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
-    static void
-dump_term_color(FILE *fd, VTermColor *color)
+    ساكن فراغ
+dump_رکن_color(FILE *fd, VTermColor *color)
 {
-    int index;
+    صحيح اشاریہ;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
-	index = color->index + 1;
-    else if (color->type == 0)
+    إذا (VTERM_COLOR_IS_اشاریہ_دار(color))
+	اشاریہ = color->اشاریہ + 1;
+    وإلا إذا (color->type == 0)
 	// use RGB values
-	index = 255;
-    else
+	اشاریہ = 255;
+    وإلا
 	// default color
-	index = 0;
+	اشاریہ = 0;
     fprintf(fd, "%02x%02x%02x%d",
-	    (int)color->red, (int)color->green, (int)color->blue,
-	    index);
+	    (صحيح)color->red, (صحيح)color->green, (صحيح)color->blue,
+	    اشاریہ);
 }
 
 /*
@@ -5418,14 +5418,14 @@ dump_term_color(FILE *fd, VTermColor *color)
  * Repeating the previous screen cell:
  *    @{count}
  */
-    void
-f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_dumpwrite(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     char_u	*fname;
-    int		max_height = 0;
-    int		max_width = 0;
+    صحيح		max_اچائی_2 = 0;
+    صحيح		max_چوڑائی_2 = 0;
     stat_T	st;
     FILE	*fd;
     VTermPos	pos;
@@ -5434,121 +5434,121 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
     VTermState	*state;
     VTermPos	cursor_pos;
 
-    if (check_restricted() || check_secure())
-	return;
+    إذا (check_restricted() || check_secure())
+	أرجع;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_dumpwrite()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
+    buf = رکن_get_buf(argvars, "term_dumpwrite()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    إذا (رکن->tl_vterm == عدم)
     {
-	emsg(_(e_job_already_finished));
-	return;
+	emsg(_(e_کم_already_مکمل));
+	أرجع;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return;
+	إذا (check_for_dict_arg(argvars, 2) == FAIL)
+	    أرجع;
 	d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	إذا (d != عدم)
 	{
-	    max_height = dict_get_number(d, "rows");
-	    max_width = dict_get_number(d, "columns");
+	    max_اچائی_2 = dict_get_نمبر(d, "rows");
+	    max_چوڑائی_2 = dict_get_نمبر(d, "columns");
 	}
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
-    if (mch_stat((char *)fname, &st) >= 0)
+    إذا (fname == عدم)
+	أرجع;
+    إذا (mch_stat((حرف *)fname, &st) >= 0)
     {
 	semsg(_(e_file_exists_str), fname);
-	return;
+	أرجع;
     }
 
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, WRITEBIN)) == NULL)
+    إذا (*fname == NUL || (fd = mch_fopen((حرف *)fname, WRITEBIN)) == عدم)
     {
 	semsg(_(e_cant_create_file_str), *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	أرجع;
     }
 
     clear_cell(&prev_cell);
 
-    screen = vterm_obtain_screen(term->tl_vterm);
-    state = vterm_obtain_state(term->tl_vterm);
+    screen = vterm_obtain_screen(رکن->tl_vterm);
+    state = vterm_obtain_state(رکن->tl_vterm);
     vterm_state_get_cursorpos(state, &cursor_pos);
 
-    for (pos.row = 0; (max_height == 0 || pos.row < max_height)
-					 && pos.row < term->tl_rows; ++pos.row)
+    لكل (pos.صف = 0; (max_اچائی_2 == 0 || pos.صف < max_اچائی_2)
+					 && pos.صف < رکن->tl_صفاں; ++pos.صف)
     {
-	int		repeat = 0;
+	صحيح		repeat = 0;
 
-	for (pos.col = 0; (max_width == 0 || pos.col < max_width)
-					 && pos.col < term->tl_cols; ++pos.col)
+	لكل (pos.خانہ = 0; (max_چوڑائی_2 == 0 || pos.خانہ < max_چوڑائی_2)
+					 && pos.خانہ < رکن->tl_خانے_گنتی; ++pos.خانہ)
 	{
 	    VTermScreenCell cell;
-	    int		    same_attr;
-	    int		    same_chars = TRUE;
-	    int		    i;
-	    int		    is_cursor_pos = (pos.col == cursor_pos.col
-						 && pos.row == cursor_pos.row);
+	    صحيح		    same_attr;
+	    صحيح		    same_chars = TRUE;
+	    صحيح		    i;
+	    صحيح		    is_cursor_pos = (pos.خانہ == cursor_pos.خانہ
+						 && pos.صف == cursor_pos.صف);
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+	    إذا (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		clear_cell(&cell);
 
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    لكل (i = 0; i < VTERM_MAX_CHARS_فی_CELL; ++i)
 	    {
-		int c = cell.chars[i];
-		int pc = prev_cell.chars[i];
-		int should_break = c == NUL || pc == NUL;
+		صحيح c = cell.chars[i];
+		صحيح pc = prev_cell.chars[i];
+		صحيح should_break = c == NUL || pc == NUL;
 
 		// For the first character NUL is the same as space.
-		if (i == 0)
+		إذا (i == 0)
 		{
 		    c = (c == NUL) ? ' ' : c;
 		    pc = (pc == NUL) ? ' ' : pc;
 		}
-		if (c != pc)
+		إذا (c != pc)
 		    same_chars = FALSE;
-		if (should_break)
-		    break;
+		إذا (should_break)
+		    اكسر;
 	    }
 	    same_attr = vtermAttr2hl(&cell.attrs)
 					      == vtermAttr2hl(&prev_cell.attrs)
 			&& vterm_color_is_equal(&cell.fg, &prev_cell.fg)
 			&& vterm_color_is_equal(&cell.bg, &prev_cell.bg);
-	    if (same_chars && cell.width == prev_cell.width && same_attr
+	    إذا (same_chars && cell.چوڑائی == prev_cell.چوڑائی && same_attr
 							     && !is_cursor_pos)
 	    {
 		++repeat;
 	    }
-	    else
+	    وإلا
 	    {
-		if (repeat > 0)
+		إذا (repeat > 0)
 		{
 		    fprintf(fd, "@%d", repeat);
 		    repeat = 0;
 		}
 		fputs(is_cursor_pos ? ">" : "|", fd);
 
-		if (cell.chars[0] == NUL)
+		إذا (cell.chars[0] == NUL)
 		    fputs(" ", fd);
-		else
+		وإلا
 		{
 		    char_u	charbuf[10];
-		    int		len;
+		    صحيح		len;
 
-		    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL
+		    لكل (i = 0; i < VTERM_MAX_CHARS_فی_CELL
 						  && cell.chars[i] != NUL; ++i)
 		    {
 			len = utf_char2bytes(cell.chars[i], charbuf);
@@ -5559,33 +5559,33 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		// When only the characters differ we don't write anything, the
 		// following "|", "@" or NL will indicate using the same
 		// attributes.
-		if (cell.width != prev_cell.width || !same_attr)
+		إذا (cell.چوڑائی != prev_cell.چوڑائی || !same_attr)
 		{
-		    if (cell.width == 2)
+		    إذا (cell.چوڑائی == 2)
 			fputs("*", fd);
-		    else
+		    وإلا
 			fputs("+", fd);
 
-		    if (same_attr)
+		    إذا (same_attr)
 		    {
 			fputs("&", fd);
 		    }
-		    else
+		    وإلا
 		    {
 			fprintf(fd, "%d", vtermAttr2hl(&cell.attrs));
-			if (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
+			إذا (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
 			    fputs("&", fd);
-			else
+			وإلا
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.fg);
+			    dump_رکن_color(fd, &cell.fg);
 			}
-			if (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
+			إذا (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
 			    fputs("&", fd);
-			else
+			وإلا
 			{
 			    fputs("#", fd);
-			    dump_term_color(fd, &cell.bg);
+			    dump_رکن_color(fd, &cell.bg);
 			}
 		    }
 		}
@@ -5593,10 +5593,10 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		prev_cell = cell;
 	    }
 
-	    if (cell.width == 2)
-		++pos.col;
+	    إذا (cell.چوڑائی == 2)
+		++pos.خانہ;
 	}
-	if (repeat > 0)
+	إذا (repeat > 0)
 	    fprintf(fd, "@%d", repeat);
 	fputs("\n", fd);
     }
@@ -5607,26 +5607,26 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * Called when a dump is corrupted.  Put a breakpoint here when debugging.
  */
-    static void
+    ساكن فراغ
 dump_is_corrupt(garray_T *gap)
 {
     GA_CONCAT_LITERAL(gap, "CORRUPT");
 }
 
-    static void
+    ساكن فراغ
 append_cell(garray_T *gap, cellattr_T *cell)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع;
 
-    *(((cellattr_T *)gap->ga_data) + gap->ga_len) = *cell;
+    *(((cellattr_T *)gap->ga_انکڑے) + gap->ga_len) = *cell;
     ++gap->ga_len;
 }
 
-    static void
+    ساكن فراغ
 clear_cellattr(cellattr_T *cell)
 {
-    CLEAR_FIELD(*cell);
+    CLEAR_میدان(*cell);
     cell->fg.type = VTERM_COLOR_DEFAULT_FG;
     cell->bg.type = VTERM_COLOR_DEFAULT_BG;
 }
@@ -5635,125 +5635,125 @@ clear_cellattr(cellattr_T *cell)
  * Read the dump file from "fd" and append lines to the current buffer.
  * Return the cell width of the longest line.
  */
-    static int
+    ساكن صحيح
 read_dump_file(FILE *fd, VTermPos *cursor_pos)
 {
-    int		    c;
-    garray_T	    ga_text;
+    صحيح		    c;
+    garray_T	    ga_متن;
     garray_T	    ga_cell;
-    string_T	    prev_char = {NULL, 0};
-    int		    attr = 0;
+    string_T	    prev_char = {عدم, 0};
+    صحيح		    attr = 0;
     cellattr_T	    cell;
-    cellattr_T	    empty_cell;
-    term_T	    *term = curbuf->b_term;
-    int		    max_cells = 0;
-    int		    start_row = term->tl_scrollback.ga_len;
+    cellattr_T	    خالی_تھاواں_cell;
+    رکن_T	    *رکن = curbuf->b_رکن;
+    صحيح		    max_cells = 0;
+    صحيح		    شروع_صف = رکن->tl_scrollback.ga_len;
 
-    ga_init2(&ga_text, 1, 90);
-    ga_init2(&ga_cell, sizeof(cellattr_T), 90);
+    ga_init2(&ga_متن, 1, 90);
+    ga_init2(&ga_cell, حجم(cellattr_T), 90);
     clear_cellattr(&cell);
-    clear_cellattr(&empty_cell);
-    cursor_pos->row = -1;
-    cursor_pos->col = -1;
+    clear_cellattr(&خالی_تھاواں_cell);
+    cursor_pos->صف = -1;
+    cursor_pos->خانہ = -1;
 
     c = fgetc(fd);
-    for (;;)
+    لكل (;;)
     {
-	if (c == EOF)
-	    break;
-	if (c == '\r')
+	إذا (c == EOF)
+	    اكسر;
+	إذا (c == '\r')
 	{
 	    // DOS line endings?  Ignore.
 	    c = fgetc(fd);
 	}
-	else if (c == '\n')
+	وإلا إذا (c == '\n')
 	{
 	    // End of a line: append it to the buffer.
-	    if (ga_text.ga_data == NULL)
-		dump_is_corrupt(&ga_text);
-	    if (ga_grow(&term->tl_scrollback, 1) == OK)
+	    إذا (ga_متن.ga_انکڑے == عدم)
+		dump_is_corrupt(&ga_متن);
+	    إذا (ga_grow(&رکن->tl_scrollback, 1) == OK)
 	    {
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
-						  + term->tl_scrollback.ga_len;
+		sb_سطر_T   *سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے
+						  + رکن->tl_scrollback.ga_len;
 
-		if (max_cells < ga_cell.ga_len)
+		إذا (max_cells < ga_cell.ga_len)
 		    max_cells = ga_cell.ga_len;
-		line->sb_cols = ga_cell.ga_len;
-		line->sb_bytes = ga_text.ga_len;
-		line->sb_cells = ga_cell.ga_data;
-		line->sb_fill_attr = term->tl_default_color;
-		line->continuation = 0;
-		++term->tl_scrollback.ga_len;
+		سطر->sb_خانے_گنتی = ga_cell.ga_len;
+		سطر->sb_بائٹاں = ga_متن.ga_len;
+		سطر->sb_cells = ga_cell.ga_انکڑے;
+		سطر->sb_fill_attr = رکن->tl_default_color;
+		سطر->continuation = 0;
+		++رکن->tl_scrollback.ga_len;
 		ga_init(&ga_cell);
 
-		ga_append(&ga_text, NUL);
-		ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+		ga_append(&ga_متن, NUL);
+		ml_append(curbuf->b_ml.ml_سطر_گنتی, ga_متن.ga_انکڑے,
+							ga_متن.ga_len, FALSE);
 	    }
-	    else
+	    وإلا
 		ga_clear(&ga_cell);
-	    ga_text.ga_len = 0;
+	    ga_متن.ga_len = 0;
 
 	    c = fgetc(fd);
 	}
-	else if (c == '|' || c == '>')
+	وإلا إذا (c == '|' || c == '>')
 	{
-	    int prev_len = ga_text.ga_len;
+	    صحيح prev_len = ga_متن.ga_len;
 
-	    if (c == '>')
+	    إذا (c == '>')
 	    {
-		if (cursor_pos->row != -1)
-		    dump_is_corrupt(&ga_text);	// duplicate cursor
-		cursor_pos->row = term->tl_scrollback.ga_len - start_row;
-		cursor_pos->col = ga_cell.ga_len;
+		إذا (cursor_pos->صف != -1)
+		    dump_is_corrupt(&ga_متن);	// duplicate cursor
+		cursor_pos->صف = رکن->tl_scrollback.ga_len - شروع_صف;
+		cursor_pos->خانہ = ga_cell.ga_len;
 	    }
 
 	    // normal character(s) followed by "+", "*", "|", "@" or NL
 	    c = fgetc(fd);
-	    if (c != EOF)
-		ga_append(&ga_text, c);
-	    for (;;)
+	    إذا (c != EOF)
+		ga_append(&ga_متن, c);
+	    لكل (;;)
 	    {
 		c = fgetc(fd);
-		if (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
+		إذا (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
 						      || c == EOF || c == '\n')
-		    break;
-		ga_append(&ga_text, c);
+		    اكسر;
+		ga_append(&ga_متن, c);
 	    }
 
 	    // save the character for repeating it
 	    VIM_CLEAR_STRING(prev_char);
-	    if (ga_text.ga_data != NULL)
+	    إذا (ga_متن.ga_انکڑے != عدم)
 	    {
-		prev_char.length = (size_t)(ga_text.ga_len - prev_len);
+		prev_char.لمائی = (size_t)(ga_متن.ga_len - prev_len);
 		prev_char.string = vim_strnsave(
-		    ((char_u *)ga_text.ga_data) + prev_len,
-		    prev_char.length);
-		if (prev_char.string == NULL)
-		    prev_char.length = 0;
+		    ((char_u *)ga_متن.ga_انکڑے) + prev_len,
+		    prev_char.لمائی);
+		إذا (prev_char.string == عدم)
+		    prev_char.لمائی = 0;
 	    }
 
-	    if (c == '@' || c == '|' || c == '>' || c == '\n')
+	    إذا (c == '@' || c == '|' || c == '>' || c == '\n')
 	    {
 		// use all attributes from previous cell
 	    }
-	    else if (c == '+' || c == '*')
+	    وإلا إذا (c == '+' || c == '*')
 	    {
-		int is_bg;
+		صحيح is_bg;
 
-		cell.width = c == '+' ? 1 : 2;
+		cell.چوڑائی = c == '+' ? 1 : 2;
 
 		c = fgetc(fd);
-		if (c == '&')
+		إذا (c == '&')
 		{
 		    // use same attr as previous cell
 		    c = fgetc(fd);
 		}
-		else if (SAFE_isdigit(c))
+		وإلا إذا (محفوظ_isdigit(c))
 		{
 		    // get the decimal attribute
 		    attr = 0;
-		    while (SAFE_isdigit(c))
+		    طالما (محفوظ_isdigit(c))
 		    {
 			attr = attr * 10 + (c - '0');
 			c = fgetc(fd);
@@ -5761,16 +5761,16 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 		    hl2vtermAttr(attr, &cell);
 
 		    // is_bg == 0: fg, is_bg == 1: bg
-		    for (is_bg = 0; is_bg <= 1; ++is_bg)
+		    لكل (is_bg = 0; is_bg <= 1; ++is_bg)
 		    {
-			if (c == '&')
+			إذا (c == '&')
 			{
 			    // use same color as previous cell
 			    c = fgetc(fd);
 			}
-			else if (c == '#')
+			وإلا إذا (c == '#')
 			{
-			    int red, green, blue, index = 0, type;
+			    صحيح red, green, blue, اشاریہ = 0, type;
 
 			    c = fgetc(fd);
 			    red = hex2nr(c);
@@ -5785,409 +5785,409 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 			    c = fgetc(fd);
 			    blue = (blue << 4) + hex2nr(c);
 			    c = fgetc(fd);
-			    if (!SAFE_isdigit(c))
-				dump_is_corrupt(&ga_text);
-			    while (SAFE_isdigit(c))
+			    إذا (!محفوظ_isdigit(c))
+				dump_is_corrupt(&ga_متن);
+			    طالما (محفوظ_isdigit(c))
 			    {
-				index = index * 10 + (c - '0');
+				اشاریہ = اشاریہ * 10 + (c - '0');
 				c = fgetc(fd);
 			    }
-			    if (index == 0 || index == 255)
+			    إذا (اشاریہ == 0 || اشاریہ == 255)
 			    {
 				type = VTERM_COLOR_RGB;
-				if (index == 0)
+				إذا (اشاریہ == 0)
 				{
-				    if (is_bg)
+				    إذا (is_bg)
 					type |= VTERM_COLOR_DEFAULT_BG;
-				    else
+				    وإلا
 					type |= VTERM_COLOR_DEFAULT_FG;
 				}
 			    }
-			    else
+			    وإلا
 			    {
-				type = VTERM_COLOR_INDEXED;
-				index -= 1;
+				type = VTERM_COLOR_اشاریہ_دار;
+				اشاریہ -= 1;
 			    }
-			    if (is_bg)
+			    إذا (is_bg)
 			    {
 				cell.bg.type = type;
 				cell.bg.red = red;
 				cell.bg.green = green;
 				cell.bg.blue = blue;
-				cell.bg.index = index;
+				cell.bg.اشاریہ = اشاریہ;
 			    }
-			    else
+			    وإلا
 			    {
 				cell.fg.type = type;
 				cell.fg.red = red;
 				cell.fg.green = green;
 				cell.fg.blue = blue;
-				cell.fg.index = index;
+				cell.fg.اشاریہ = اشاریہ;
 			    }
 			}
-			else
-			    dump_is_corrupt(&ga_text);
+			وإلا
+			    dump_is_corrupt(&ga_متن);
 		    }
 		}
-		else
-		    dump_is_corrupt(&ga_text);
+		وإلا
+		    dump_is_corrupt(&ga_متن);
 	    }
-	    else
-		dump_is_corrupt(&ga_text);
+	    وإلا
+		dump_is_corrupt(&ga_متن);
 
 	    append_cell(&ga_cell, &cell);
-	    if (cell.width == 2)
-		append_cell(&ga_cell, &empty_cell);
+	    إذا (cell.چوڑائی == 2)
+		append_cell(&ga_cell, &خالی_تھاواں_cell);
 	}
-	else if (c == '@')
+	وإلا إذا (c == '@')
 	{
-	    if (prev_char.string == NULL)
-		dump_is_corrupt(&ga_text);
-	    else
+	    إذا (prev_char.string == عدم)
+		dump_is_corrupt(&ga_متن);
+	    وإلا
 	    {
-		int count = 0;
+		صحيح گنتی = 0;
 
 		// repeat previous character, get the count
-		for (;;)
+		لكل (;;)
 		{
 		    c = fgetc(fd);
-		    if (!SAFE_isdigit(c))
-			break;
-		    count = count * 10 + (c - '0');
+		    إذا (!محفوظ_isdigit(c))
+			اكسر;
+		    گنتی = گنتی * 10 + (c - '0');
 		}
 
-		while (count-- > 0)
+		طالما (گنتی-- > 0)
 		{
-		    ga_concat_len(&ga_text, prev_char.string, prev_char.length);
+		    ga_concat_len(&ga_متن, prev_char.string, prev_char.لمائی);
 		    append_cell(&ga_cell, &cell);
 		}
 	    }
 	}
-	else
+	وإلا
 	{
-	    dump_is_corrupt(&ga_text);
+	    dump_is_corrupt(&ga_متن);
 	    c = fgetc(fd);
 	}
     }
 
-    if (ga_text.ga_len > 0)
+    إذا (ga_متن.ga_len > 0)
     {
 	// trailing characters after last NL
-	dump_is_corrupt(&ga_text);
-	ga_append(&ga_text, NUL);
-	ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
-							ga_text.ga_len, FALSE);
+	dump_is_corrupt(&ga_متن);
+	ga_append(&ga_متن, NUL);
+	ml_append(curbuf->b_ml.ml_سطر_گنتی, ga_متن.ga_انکڑے,
+							ga_متن.ga_len, FALSE);
     }
 
-    ga_clear(&ga_text);
+    ga_clear(&ga_متن);
     ga_clear(&ga_cell);
     vim_free(prev_char.string);
 
-    return max_cells;
+    أرجع max_cells;
 }
 
 /*
  * Return an allocated string with at least "text_width" "=" characters and
  * "fname" inserted in the middle.
  */
-    static char_u *
-get_separator(int text_width, char_u *fname)
+    ساكن char_u *
+get_separator(صحيح متن_چوڑائی, char_u *fname)
 {
-    int	    width = MAX(text_width, curwin->w_width);
+    صحيح	    چوڑائی = MAX(متن_چوڑائی, curwin->w_چوڑائی);
     char_u  *textline;
-    int	    fname_size;
+    صحيح	    fname_ناپ;
     char_u  *p = fname;
-    int	    i;
+    صحيح	    i;
     size_t  off;
 
-    textline = alloc(width + STRLEN(fname) + 1);
-    if (textline == NULL)
-	return NULL;
+    textline = alloc(چوڑائی + STRLEN(fname) + 1);
+    إذا (textline == عدم)
+	أرجع عدم;
 
-    fname_size = vim_strsize(fname);
-    if (fname_size < width - 8)
+    fname_ناپ = vim_strsize(fname);
+    إذا (fname_ناپ < چوڑائی - 8)
     {
 	// enough room, don't use the full window width
-	width = MAX(text_width, fname_size + 8);
+	چوڑائی = MAX(متن_چوڑائی, fname_ناپ + 8);
     }
-    else if (fname_size > width - 8)
+    وإلا إذا (fname_ناپ > چوڑائی - 8)
     {
 	// full name doesn't fit, use only the tail
 	p = gettail(fname);
-	fname_size = vim_strsize(p);
+	fname_ناپ = vim_strsize(p);
     }
     // skip characters until the name fits
-    while (fname_size > width - 8)
+    طالما (fname_ناپ > چوڑائی - 8)
     {
 	p += (*mb_ptr2len)(p);
-	fname_size = vim_strsize(p);
+	fname_ناپ = vim_strsize(p);
     }
 
-    for (i = 0; i < (width - fname_size) / 2 - 1; ++i)
+    لكل (i = 0; i < (چوڑائی - fname_ناپ) / 2 - 1; ++i)
 	textline[i] = '=';
     textline[i++] = ' ';
 
     STRCPY(textline + i, p);
     off = STRLEN(textline);
     textline[off] = ' ';
-    for (i = 1; i < (width - fname_size) / 2; ++i)
+    لكل (i = 1; i < (چوڑائی - fname_ناپ) / 2; ++i)
 	textline[off + i] = '=';
     textline[off + i] = NUL;
 
-    return textline;
+    أرجع textline;
 }
 
 /*
  * Common for "term_dumpdiff()" and "term_dumpload()".
  */
-    static void
-term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
+    ساكن فراغ
+رکن_لدو_dump(typval_T *argvars, typval_T *rettv, صحيح do_diff)
 {
     jobopt_T	opt;
-    buf_T	*buf = NULL;
+    buf_T	*buf = عدم;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*fname1;
-    char_u	*fname2 = NULL;
-    char_u	*fname_tofree = NULL;
+    char_u	*fname2 = عدم;
+    char_u	*fname_tofree = عدم;
     FILE	*fd1;
-    FILE	*fd2 = NULL;
-    char_u	*textline = NULL;
+    FILE	*fd2 = عدم;
+    char_u	*textline = عدم;
 
     // First open the files.  If this fails bail out.
     fname1 = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (do_diff)
+    إذا (do_diff)
 	fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (fname1 == NULL || (do_diff && fname2 == NULL))
+    إذا (fname1 == عدم || (do_diff && fname2 == عدم))
     {
-	emsg(_(e_invalid_argument));
-	return;
+	emsg(_(e_invalid_دلیل));
+	أرجع;
     }
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((حرف *)fname1, READBIN);
+    إذا (fd1 == عدم)
     {
 	semsg(_(e_cant_read_file_str), fname1);
-	return;
+	أرجع;
     }
-    if (do_diff)
+    إذا (do_diff)
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((حرف *)fname2, READBIN);
+	إذا (fd2 == عدم)
 	{
 	    fclose(fd1);
 	    semsg(_(e_cant_read_file_str), fname2);
-	    return;
+	    أرجع;
 	}
     }
 
-    init_job_options(&opt);
-    if (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[do_diff ? 2 : 1], &opt, 0,
-		    JO2_TERM_NAME + JO2_TERM_COLS + JO2_TERM_ROWS
+    init_کم_options(&opt);
+    إذا (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
+	    && get_کم_options(&argvars[do_diff ? 2 : 1], &opt, 0,
+		    JO2_رکن_NAME + JO2_رکن_خانے_گنتی + JO2_رکن_صفاں
 		    + JO2_VERTICAL + JO2_CURWIN + JO2_NORESTORE) == FAIL)
-	goto theend;
+	اذهب theend;
 
-    if (opt.jo_term_name == NULL)
+    إذا (opt.jo_رکن_name == عدم)
     {
 	size_t len = STRLEN(fname1) + 12;
 
 	fname_tofree = alloc(len);
-	if (fname_tofree != NULL)
+	إذا (fname_tofree != عدم)
 	{
-	    vim_snprintf((char *)fname_tofree, len, "dump diff %s", fname1);
-	    opt.jo_term_name = fname_tofree;
+	    vim_snprintf((حرف *)fname_tofree, len, "dump diff %s", fname1);
+	    opt.jo_رکن_name = fname_tofree;
 	}
     }
 
-    if (opt.jo_bufnr_buf != NULL)
+    إذا (opt.jo_bufnr_buf != عدم)
     {
 	win_T *wp = buf_jump_open_win(opt.jo_bufnr_buf);
 
 	// With "bufnr" argument: enter the window with this buffer and make it
 	// empty.
-	if (wp == NULL)
-	    semsg(_(e_invalid_argument_str), "bufnr");
-	else
+	إذا (wp == عدم)
+	    semsg(_(e_invalid_دلیل_str), "bufnr");
+	وإلا
 	{
 	    buf = curbuf;
-	    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+	    طالما (!(curbuf->b_ml.ml_flags & ML_خالی_تھاواں))
 		ml_delete((linenr_T)1);
-	    free_scrollback(curbuf->b_term);
+	    free_scrollback(curbuf->b_رکن);
 	    redraw_later(UPD_NOT_VALID);
 	}
     }
-    else
+    وإلا
 	// Create a new terminal window.
-	buf = term_start(&argvars[0], NULL, &opt, TERM_START_NOJOB);
+	buf = رکن_شروع(&argvars[0], عدم, &opt, رکن_شروع_NOJOB);
 
-    if (buf != NULL && buf->b_term != NULL)
+    إذا (buf != عدم && buf->b_رکن != عدم)
     {
-	int		i;
+	صحيح		i;
 	linenr_T	bot_lnum;
 	linenr_T	lnum;
-	term_T		*term = buf->b_term;
-	int		width;
-	int		width2;
+	رکن_T		*رکن = buf->b_رکن;
+	صحيح		چوڑائی;
+	صحيح		width2;
 	VTermPos	cursor_pos1;
 	VTermPos	cursor_pos2;
 
-	term_init_default_colors(term);
+	رکن_init_default_colors(رکن);
 
-	rettv->vval.v_number = buf->b_fnum;
+	rettv->vval.v_نمبر = buf->b_fnum;
 
 	// read the files, fill the buffer with the diff
-	width = read_dump_file(fd1, &cursor_pos1);
+	چوڑائی = read_dump_file(fd1, &cursor_pos1);
 
 	// position the cursor
-	if (cursor_pos1.row >= 0)
+	إذا (cursor_pos1.صف >= 0)
 	{
-	    curwin->w_cursor.lnum = cursor_pos1.row + 1;
-	    coladvance(cursor_pos1.col);
+	    curwin->w_cursor.lnum = cursor_pos1.صف + 1;
+	    coladvance(cursor_pos1.خانہ);
 	}
 
 	// Delete the empty line that was in the empty buffer.
 	ml_delete(1);
 
 	// For term_dumpload() we are done here.
-	if (!do_diff)
-	    goto theend;
+	إذا (!do_diff)
+	    اذهب theend;
 
-	term->tl_top_diff_rows = curbuf->b_ml.ml_line_count;
+	رکن->tl_چوٹی_diff_صفاں = curbuf->b_ml.ml_سطر_گنتی;
 
-	textline = get_separator(width, fname1);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
+	textline = get_separator(چوڑائی, fname1);
+	إذا (textline == عدم)
+	    اذهب theend;
+	إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &رکن->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_سطر_گنتی, textline, 0, FALSE);
 	vim_free(textline);
 
-	textline = get_separator(width, fname2);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
-	textline[width] = NUL;
+	textline = get_separator(چوڑائی, fname2);
+	إذا (textline == عدم)
+	    اذهب theend;
+	إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &رکن->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_سطر_گنتی, textline, 0, FALSE);
+	textline[چوڑائی] = NUL;
 
-	bot_lnum = curbuf->b_ml.ml_line_count;
+	bot_lnum = curbuf->b_ml.ml_سطر_گنتی;
 	width2 = read_dump_file(fd2, &cursor_pos2);
-	if (width2 > width)
+	إذا (width2 > چوڑائی)
 	{
 	    vim_free(textline);
 	    textline = alloc(width2 + 1);
-	    if (textline == NULL)
-		goto theend;
-	    width = width2;
-	    textline[width] = NUL;
+	    إذا (textline == عدم)
+		اذهب theend;
+	    چوڑائی = width2;
+	    textline[چوڑائی] = NUL;
 	}
-	term->tl_bot_diff_rows = curbuf->b_ml.ml_line_count - bot_lnum;
+	رکن->tl_bot_diff_صفاں = curbuf->b_ml.ml_سطر_گنتی - bot_lnum;
 
-	for (lnum = 1; lnum <= term->tl_top_diff_rows; ++lnum)
+	لكل (lnum = 1; lnum <= رکن->tl_چوٹی_diff_صفاں; ++lnum)
 	{
-	    if (lnum + bot_lnum > curbuf->b_ml.ml_line_count)
+	    إذا (lnum + bot_lnum > curbuf->b_ml.ml_سطر_گنتی)
 	    {
 		// bottom part has fewer rows, fill with "-"
-		for (i = 0; i < width; ++i)
+		لكل (i = 0; i < چوڑائی; ++i)
 		    textline[i] = '-';
 	    }
-	    else
+	    وإلا
 	    {
 		char_u *line1;
 		char_u *line2;
 		char_u *p1;
 		char_u *p2;
-		int	col;
-		sb_line_T   *sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
-		cellattr_T *cellattr1 = (sb_line + lnum - 1)->sb_cells;
-		cellattr_T *cellattr2 = (sb_line + lnum + bot_lnum - 1)
+		صحيح	خانہ;
+		sb_سطر_T   *sb_سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے;
+		cellattr_T *cellattr1 = (sb_سطر + lnum - 1)->sb_cells;
+		cellattr_T *cellattr2 = (sb_سطر + lnum + bot_lnum - 1)
 								    ->sb_cells;
 
 		// Make a copy, getting the second line will invalidate it.
 		line1 = vim_strsave(ml_get(lnum));
-		if (line1 == NULL)
-		    break;
+		إذا (line1 == عدم)
+		    اكسر;
 		p1 = line1;
 
 		line2 = ml_get(lnum + bot_lnum);
 		p2 = line2;
-		for (col = 0; col < width && *p1 != NUL && *p2 != NUL; ++col)
+		لكل (خانہ = 0; خانہ < چوڑائی && *p1 != NUL && *p2 != NUL; ++خانہ)
 		{
-		    int len1 = utfc_ptr2len(p1);
-		    int len2 = utfc_ptr2len(p2);
+		    صحيح len1 = utfc_ptr2len(p1);
+		    صحيح len2 = utfc_ptr2len(p2);
 
-		    textline[col] = ' ';
-		    if (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
+		    textline[خانہ] = ' ';
+		    إذا (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
 			// text differs
-			textline[col] = 'X';
-		    else if (lnum == cursor_pos1.row + 1
-			    && col == cursor_pos1.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[خانہ] = 'X';
+		    وإلا إذا (lnum == cursor_pos1.صف + 1
+			    && خانہ == cursor_pos1.خانہ
+			    && (cursor_pos1.صف != cursor_pos2.صف
+					|| cursor_pos1.خانہ != cursor_pos2.خانہ))
 			// cursor in first but not in second
-			textline[col] = '>';
-		    else if (lnum == cursor_pos2.row + 1
-			    && col == cursor_pos2.col
-			    && (cursor_pos1.row != cursor_pos2.row
-					|| cursor_pos1.col != cursor_pos2.col))
+			textline[خانہ] = '>';
+		    وإلا إذا (lnum == cursor_pos2.صف + 1
+			    && خانہ == cursor_pos2.خانہ
+			    && (cursor_pos1.صف != cursor_pos2.صف
+					|| cursor_pos1.خانہ != cursor_pos2.خانہ))
 			// cursor in second but not in first
-			textline[col] = '<';
-		    else if (cellattr1 != NULL && cellattr2 != NULL)
+			textline[خانہ] = '<';
+		    وإلا إذا (cellattr1 != عدم && cellattr2 != عدم)
 		    {
-			if ((cellattr1 + col)->width
-						   != (cellattr2 + col)->width)
-			    textline[col] = 'w';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->fg,
-						   &(cellattr2 + col)->fg))
-			    textline[col] = 'f';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->bg,
-						   &(cellattr2 + col)->bg))
-			    textline[col] = 'b';
-			else if (vtermAttr2hl(&(cellattr1 + col)->attrs)
-				  != vtermAttr2hl(&((cellattr2 + col)->attrs)))
-			    textline[col] = 'a';
+			إذا ((cellattr1 + خانہ)->چوڑائی
+						   != (cellattr2 + خانہ)->چوڑائی)
+			    textline[خانہ] = 'w';
+			وإلا إذا (!vterm_color_is_equal(&(cellattr1 + خانہ)->fg,
+						   &(cellattr2 + خانہ)->fg))
+			    textline[خانہ] = 'f';
+			وإلا إذا (!vterm_color_is_equal(&(cellattr1 + خانہ)->bg,
+						   &(cellattr2 + خانہ)->bg))
+			    textline[خانہ] = 'b';
+			وإلا إذا (vtermAttr2hl(&(cellattr1 + خانہ)->attrs)
+				  != vtermAttr2hl(&((cellattr2 + خانہ)->attrs)))
+			    textline[خانہ] = 'a';
 		    }
 		    p1 += len1;
 		    p2 += len2;
 		    // TODO: handle different width
 		}
 
-		while (col < width)
+		طالما (خانہ < چوڑائی)
 		{
-		    if (*p1 == NUL && *p2 == NUL)
-			textline[col] = '?';
-		    else if (*p1 == NUL)
+		    إذا (*p1 == NUL && *p2 == NUL)
+			textline[خانہ] = '?';
+		    وإلا إذا (*p1 == NUL)
 		    {
-			textline[col] = '+';
+			textline[خانہ] = '+';
 			p2 += utfc_ptr2len(p2);
 		    }
-		    else
+		    وإلا
 		    {
-			textline[col] = '-';
+			textline[خانہ] = '-';
 			p1 += utfc_ptr2len(p1);
 		    }
-		    ++col;
+		    ++خانہ;
 		}
 
 		vim_free(line1);
 	    }
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &رکن->tl_default_color,
+						 رکن->tl_چوٹی_diff_صفاں) == OK)
+		ml_append(رکن->tl_چوٹی_diff_صفاں + lnum, textline, 0, FALSE);
 	    ++bot_lnum;
 	}
 
-	while (lnum + bot_lnum <= curbuf->b_ml.ml_line_count)
+	طالما (lnum + bot_lnum <= curbuf->b_ml.ml_سطر_گنتی)
 	{
 	    // bottom part has more rows, fill with "+"
-	    for (i = 0; i < width; ++i)
+	    لكل (i = 0; i < چوڑائی; ++i)
 		textline[i] = '+';
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    إذا (جوڑو_خالی_تھاواں_scrollback(رکن, &رکن->tl_default_color,
+						 رکن->tl_چوٹی_diff_صفاں) == OK)
+		ml_append(رکن->tl_چوٹی_diff_صفاں + lnum, textline, 0, FALSE);
 	    ++lnum;
 	    ++bot_lnum;
 	}
 
-	term->tl_cols = width;
+	رکن->tl_خانے_گنتی = چوڑائی;
 
 	// looks better without wrapping
 	curwin->w_p_wrap = 0;
@@ -6197,7 +6197,7 @@ theend:
     vim_free(textline);
     vim_free(fname_tofree);
     fclose(fd1);
-    if (fd2 != NULL)
+    إذا (fd2 != عدم)
 	fclose(fd2);
 }
 
@@ -6206,169 +6206,169 @@ theend:
  * bottom files.
  * Return FAIL when this is not possible.
  */
-    int
-term_swap_diff(void)
+    صحيح
+رکن_وٹاندرا_diff(فراغ)
 {
-    term_T	*term = curbuf->b_term;
-    linenr_T	line_count;
-    linenr_T	top_rows;
-    linenr_T	bot_rows;
-    linenr_T	bot_start;
+    رکن_T	*رکن = curbuf->b_رکن;
+    linenr_T	سطر_گنتی;
+    linenr_T	چوٹی_صفاں;
+    linenr_T	bot_صفاں;
+    linenr_T	bot_شروع;
     linenr_T	lnum;
     char_u	*p;
-    sb_line_T	*sb_line;
+    sb_سطر_T	*sb_سطر;
 
-    if (term == NULL
-	    || !term_is_finished(curbuf)
-	    || term->tl_top_diff_rows == 0
-	    || term->tl_scrollback.ga_len == 0)
-	return FAIL;
+    إذا (رکن == عدم
+	    || !رکن_is_مکمل(curbuf)
+	    || رکن->tl_چوٹی_diff_صفاں == 0
+	    || رکن->tl_scrollback.ga_len == 0)
+	أرجع FAIL;
 
-    line_count = curbuf->b_ml.ml_line_count;
-    top_rows = term->tl_top_diff_rows;
-    bot_rows = term->tl_bot_diff_rows;
-    bot_start = line_count - bot_rows;
-    sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
+    سطر_گنتی = curbuf->b_ml.ml_سطر_گنتی;
+    چوٹی_صفاں = رکن->tl_چوٹی_diff_صفاں;
+    bot_صفاں = رکن->tl_bot_diff_صفاں;
+    bot_شروع = سطر_گنتی - bot_صفاں;
+    sb_سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے;
 
     // move lines from top to above the bottom part
-    for (lnum = 1; lnum <= top_rows; ++lnum)
+    لكل (lnum = 1; lnum <= چوٹی_صفاں; ++lnum)
     {
 	p = vim_strsave(ml_get(1));
-	if (p == NULL)
-	    return OK;
-	ml_append(bot_start, p, 0, FALSE);
+	إذا (p == عدم)
+	    أرجع OK;
+	ml_append(bot_شروع, p, 0, FALSE);
 	ml_delete(1);
 	vim_free(p);
     }
 
     // move lines from bottom to the top
-    for (lnum = 1; lnum <= bot_rows; ++lnum)
+    لكل (lnum = 1; lnum <= bot_صفاں; ++lnum)
     {
-	p = vim_strsave(ml_get(bot_start + lnum));
-	if (p == NULL)
-	    return OK;
-	ml_delete(bot_start + lnum);
+	p = vim_strsave(ml_get(bot_شروع + lnum));
+	إذا (p == عدم)
+	    أرجع OK;
+	ml_delete(bot_شروع + lnum);
 	ml_append(lnum - 1, p, 0, FALSE);
 	vim_free(p);
     }
 
     // move top title to bottom
-    p = vim_strsave(ml_get(bot_rows + 1));
-    if (p == NULL)
-	return OK;
-    ml_append(line_count - top_rows - 1, p, 0, FALSE);
-    ml_delete(bot_rows + 1);
+    p = vim_strsave(ml_get(bot_صفاں + 1));
+    إذا (p == عدم)
+	أرجع OK;
+    ml_append(سطر_گنتی - چوٹی_صفاں - 1, p, 0, FALSE);
+    ml_delete(bot_صفاں + 1);
     vim_free(p);
 
     // move bottom title to top
-    p = vim_strsave(ml_get(line_count - top_rows));
-    if (p == NULL)
-	return OK;
-    ml_delete(line_count - top_rows);
-    ml_append(bot_rows, p, 0, FALSE);
+    p = vim_strsave(ml_get(سطر_گنتی - چوٹی_صفاں));
+    إذا (p == عدم)
+	أرجع OK;
+    ml_delete(سطر_گنتی - چوٹی_صفاں);
+    ml_append(bot_صفاں, p, 0, FALSE);
     vim_free(p);
 
-    if (top_rows == bot_rows)
+    إذا (چوٹی_صفاں == bot_صفاں)
     {
 	// rows counts are equal, can swap cell properties
-	for (lnum = 0; lnum < top_rows; ++lnum)
+	لكل (lnum = 0; lnum < چوٹی_صفاں; ++lnum)
 	{
-	    sb_line_T	temp;
+	    sb_سطر_T	عارضی;
 
-	    temp = *(sb_line + lnum);
-	    *(sb_line + lnum) = *(sb_line + bot_start + lnum);
-	    *(sb_line + bot_start + lnum) = temp;
+	    عارضی = *(sb_سطر + lnum);
+	    *(sb_سطر + lnum) = *(sb_سطر + bot_شروع + lnum);
+	    *(sb_سطر + bot_شروع + lnum) = عارضی;
 	}
     }
-    else
+    وإلا
     {
-	size_t		size = sizeof(sb_line_T) * term->tl_scrollback.ga_len;
-	sb_line_T	*temp = alloc(size);
+	size_t		ناپ = حجم(sb_سطر_T) * رکن->tl_scrollback.ga_len;
+	sb_سطر_T	*عارضی = alloc(ناپ);
 
 	// need to copy cell properties into temp memory
-	if (temp != NULL)
+	إذا (عارضی != عدم)
 	{
-	    mch_memmove(temp, term->tl_scrollback.ga_data, size);
-	    mch_memmove(term->tl_scrollback.ga_data,
-		    temp + bot_start,
-		    sizeof(sb_line_T) * bot_rows);
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data + bot_rows,
-		    temp + top_rows,
-		    sizeof(sb_line_T) * (line_count - top_rows - bot_rows));
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data
-						       + line_count - top_rows,
-		    temp,
-		    sizeof(sb_line_T) * top_rows);
-	    vim_free(temp);
+	    mch_memmove(عارضی, رکن->tl_scrollback.ga_انکڑے, ناپ);
+	    mch_memmove(رکن->tl_scrollback.ga_انکڑے,
+		    عارضی + bot_شروع,
+		    حجم(sb_سطر_T) * bot_صفاں);
+	    mch_memmove((sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے + bot_صفاں,
+		    عارضی + چوٹی_صفاں,
+		    حجم(sb_سطر_T) * (سطر_گنتی - چوٹی_صفاں - bot_صفاں));
+	    mch_memmove((sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے
+						       + سطر_گنتی - چوٹی_صفاں,
+		    عارضی,
+		    حجم(sb_سطر_T) * چوٹی_صفاں);
+	    vim_free(عارضی);
 	}
     }
 
-    term->tl_top_diff_rows = bot_rows;
-    term->tl_bot_diff_rows = top_rows;
+    رکن->tl_چوٹی_diff_صفاں = bot_صفاں;
+    رکن->tl_bot_diff_صفاں = چوٹی_صفاں;
 
     update_screen(UPD_NOT_VALID);
-    return OK;
+    أرجع OK;
 }
 
 /*
  * "term_dumpdiff(filename, filename, options)" function
  */
-    void
-f_term_dumpdiff(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_dumpdiff(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    إذا (وچ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
-    term_load_dump(argvars, rettv, TRUE);
+    رکن_لدو_dump(argvars, rettv, TRUE);
 }
 
 /*
  * "term_dumpload(filename, options)" function
  */
-    void
-f_term_dumpload(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_dumpload(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    إذا (وچ_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    term_load_dump(argvars, rettv, FALSE);
+    رکن_لدو_dump(argvars, rettv, FALSE);
 }
 
 /*
  * "term_getaltscreen(buf)" function
  */
-    void
-f_term_getaltscreen(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getaltscreen(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getaltscreen()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_using_altscreen;
+    buf = رکن_get_buf(argvars, "term_getaltscreen()");
+    إذا (buf == عدم)
+	أرجع;
+    rettv->vval.v_نمبر = buf->b_رکن->tl_using_altscreen;
 }
 
 /*
  * "term_getattr(attr, name)" function
  */
-    void
-f_term_getattr(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getattr(typval_T *argvars, typval_T *rettv)
 {
-    int	    attr;
+    صحيح	    attr;
     size_t  i;
     char_u  *name;
 
-    static struct {
-	char	    *name;
-	int	    attr;
+    ساكن بنية {
+	حرف	    *name;
+	صحيح	    attr;
     } attrs[] = {
 	{"bold",      HL_BOLD},
 	{"italic",    HL_ITALIC},
@@ -6377,278 +6377,278 @@ f_term_getattr(typval_T *argvars, typval_T *rettv)
 	{"reverse",   HL_INVERSE},
     };
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_نمبر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    attr = tv_get_number(&argvars[0]);
+    attr = tv_get_نمبر(&argvars[0]);
     name = tv_get_string_chk(&argvars[1]);
-    if (name == NULL)
-	return;
+    إذا (name == عدم)
+	أرجع;
 
-    if (attr > HL_ALL)
+    إذا (attr > HL_ALL)
 	attr = syn_attr2attr(attr);
-    for (i = 0; i < ARRAY_LENGTH(attrs); ++i)
-	if (STRCMP(name, attrs[i].name) == 0)
+    لكل (i = 0; i < ARRAY_لمائی(attrs); ++i)
+	إذا (STRCMP(name, attrs[i].name) == 0)
 	{
-	    rettv->vval.v_number = (attr & attrs[i].attr) != 0 ? 1 : 0;
-	    break;
+	    rettv->vval.v_نمبر = (attr & attrs[i].attr) != 0 ? 1 : 0;
+	    اكسر;
 	}
 }
 
 /*
  * "term_getcursor(buf)" function
  */
-    void
-f_term_getcursor(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getcursor(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getcursor()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = رکن_get_buf(argvars, "term_getcursor()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
 
     l = rettv->vval.v_list;
-    list_append_number(l, term->tl_cursor_pos.row + 1);
-    list_append_number(l, term->tl_cursor_pos.col + 1);
+    list_append_نمبر(l, رکن->tl_cursor_pos.صف + 1);
+    list_append_نمبر(l, رکن->tl_cursor_pos.خانہ + 1);
 
     d = dict_alloc();
-    if (d == NULL)
-	return;
+    إذا (d == عدم)
+	أرجع;
 
-    dict_add_number(d, "visible", term->tl_cursor_visible);
-    dict_add_number(d, "blink", blink_state_is_inverted()
-	    ? !term->tl_cursor_blink : term->tl_cursor_blink);
-    dict_add_number(d, "shape", term->tl_cursor_shape);
-    dict_add_string(d, "color", cursor_color_get(term->tl_cursor_color));
-    if (list_append_dict(l, d) == FAIL)
+    dict_جوڑو_نمبر(d, "visible", رکن->tl_cursor_visible);
+    dict_جوڑو_نمبر(d, "blink", blink_state_is_inverted()
+	    ? !رکن->tl_cursor_blink : رکن->tl_cursor_blink);
+    dict_جوڑو_نمبر(d, "shape", رکن->tl_cursor_shape);
+    dict_جوڑو_string(d, "color", cursor_color_get(رکن->tl_cursor_color));
+    إذا (list_append_dict(l, d) == FAIL)
 	dict_unref(d);
 }
 
 /*
  * "term_getjob(buf)" function
  */
-    void
-f_term_getjob(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getjob(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getjob()");
-    if (buf == NULL)
+    buf = رکن_get_buf(argvars, "term_getjob()");
+    إذا (buf == عدم)
     {
-	if (in_vim9script())
+	إذا (وچ_vim9script())
 	{
-	    rettv->v_type = VAR_JOB;
-	    rettv->vval.v_job = NULL;
+	    rettv->v_type = VAR_کم;
+	    rettv->vval.v_کم = عدم;
 	}
-	else
+	وإلا
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
+	    rettv->vval.v_نمبر = VVAL_NULL;
 	}
-	return;
+	أرجع;
     }
 
-    rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = buf->b_term->tl_job;
-    if (rettv->vval.v_job != NULL)
-	++rettv->vval.v_job->jv_refcount;
+    rettv->v_type = VAR_کم;
+    rettv->vval.v_کم = buf->b_رکن->tl_کم;
+    إذا (rettv->vval.v_کم != عدم)
+	++rettv->vval.v_کم->jv_refcount;
 }
 
-    static int
-get_row_number(typval_T *tv, term_T *term)
+    ساكن صحيح
+get_صف_نمبر(typval_T *tv, رکن_T *رکن)
 {
-    if (tv->v_type == VAR_STRING
-	    && tv->vval.v_string != NULL
+    إذا (tv->v_type == VAR_STRING
+	    && tv->vval.v_string != عدم
 	    && STRCMP(tv->vval.v_string, ".") == 0)
-	return term->tl_cursor_pos.row;
-    return (int)tv_get_number(tv) - 1;
+	أرجع رکن->tl_cursor_pos.صف;
+    أرجع (صحيح)tv_get_نمبر(tv) - 1;
 }
 
 /*
  * "term_getline(buf, row)" function
  */
-    void
-f_term_getline(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    term_T	    *term;
-    int		    row;
+    رکن_T	    *رکن;
+    صحيح		    صف;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getline()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    row = get_row_number(&argvars[1], term);
+    buf = رکن_get_buf(argvars, "term_getline()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    صف = get_صف_نمبر(&argvars[1], رکن);
 
-    if (term->tl_vterm == NULL)
+    إذا (رکن->tl_vterm == عدم)
     {
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
-	int	  sb_row = term->tl_scrollback_scrolled + row;
-	sb_line_T *line;
+	size_t	  وتھ = 0;
+	صحيح	  sb_صف = رکن->tl_scrollback_scrolled + صف;
+	sb_سطر_T *سطر;
 
-	if (sb_row < 0 || sb_row >= term->tl_scrollback.ga_len)
-	    return;
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	إذا (sb_صف < 0 || sb_صف >= رکن->tl_scrollback.ga_len)
+	    أرجع;
+	سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے + sb_صف;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_وچ_buf(رکن, sb_صف, &lnum, عدم, &وتھ);
 
 	// vterm is finished, get the text from the buffer
-	if (lnum > 0 && lnum <= buf->b_ml.ml_line_count)
+	إذا (lnum > 0 && lnum <= buf->b_ml.ml_سطر_گنتی)
 	{
 	    char_u *p = ml_get_buf(buf, lnum, FALSE);
-	    if (STRLEN(p) >= offset + line->sb_bytes)
-		rettv->vval.v_string = vim_strnsave(p + offset, line->sb_bytes);
+	    إذا (STRLEN(p) >= وتھ + سطر->sb_بائٹاں)
+		rettv->vval.v_string = vim_strnsave(p + وتھ, سطر->sb_بائٹاں);
 	}
     }
-    else
+    وإلا
     {
-	VTermScreen	*screen = vterm_obtain_screen(term->tl_vterm);
+	VTermScreen	*screen = vterm_obtain_screen(رکن->tl_vterm);
 	VTermRect	rect;
-	int		len;
+	صحيح		len;
 	char_u		*p;
 
-	if (row < 0 || row >= term->tl_rows)
-	    return;
-	len = term->tl_cols * MB_MAXBYTES + 1;
+	إذا (صف < 0 || صف >= رکن->tl_صفاں)
+	    أرجع;
+	len = رکن->tl_خانے_گنتی * MB_MAXBYTES + 1;
 	p = alloc(len);
-	if (p == NULL)
-	    return;
+	إذا (p == عدم)
+	    أرجع;
 	rettv->vval.v_string = p;
 
-	rect.start_col = 0;
-	rect.end_col = term->tl_cols;
-	rect.start_row = row;
-	rect.end_row = row + 1;
-	p[vterm_screen_get_text(screen, (char *)p, len, rect)] = NUL;
+	rect.شروع_خانہ = 0;
+	rect.سرا_خانہ = رکن->tl_خانے_گنتی;
+	rect.شروع_صف = صف;
+	rect.سرا_صف = صف + 1;
+	p[vterm_screen_get_متن(screen, (حرف *)p, len, rect)] = NUL;
     }
 }
 
 /*
  * "term_getscrolled(buf)" function
  */
-    void
-f_term_getscrolled(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getscrolled(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getscrolled()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_buffer_scrolled;
+    buf = رکن_get_buf(argvars, "term_getscrolled()");
+    إذا (buf == عدم)
+	أرجع;
+    rettv->vval.v_نمبر = buf->b_رکن->tl_بفر_scrolled;
 }
 
 /*
  * "term_getsize(buf)" function
  */
-    void
-f_term_getsize(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getsize(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getsize()");
-    if (buf == NULL)
-	return;
+    buf = رکن_get_buf(argvars, "term_getsize()");
+    إذا (buf == عدم)
+	أرجع;
 
     l = rettv->vval.v_list;
-    list_append_number(l, buf->b_term->tl_rows);
-    list_append_number(l, buf->b_term->tl_cols);
+    list_append_نمبر(l, buf->b_رکن->tl_صفاں);
+    list_append_نمبر(l, buf->b_رکن->tl_خانے_گنتی);
 }
 
 /*
  * "term_setsize(buf, rows, cols)" function
  */
-    void
-f_term_setsize(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_setsize(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    term_T	*term;
-    varnumber_T rows, cols;
+    رکن_T	*رکن;
+    varnumber_T صفاں_2, خانے_گنتی;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
+		|| check_for_نمبر_arg(argvars, 1) == FAIL
+		|| check_for_نمبر_arg(argvars, 2) == FAIL))
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_setsize()");
-    if (buf == NULL)
+    buf = رکن_get_buf(argvars, "term_setsize()");
+    إذا (buf == عدم)
     {
-	emsg(_(e_not_terminal_buffer));
-	return;
+	emsg(_(e_not_terminal_بفر));
+	أرجع;
     }
-    if (buf->b_term->tl_vterm == NULL)
-	return;
-    term = buf->b_term;
-    rows = tv_get_number(&argvars[1]);
-    rows = rows <= 0 ? term->tl_rows : rows;
-    cols = tv_get_number(&argvars[2]);
-    cols = cols <= 0 ? term->tl_cols : cols;
-    vterm_set_size(term->tl_vterm, rows, cols);
+    إذا (buf->b_رکن->tl_vterm == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    صفاں_2 = tv_get_نمبر(&argvars[1]);
+    صفاں_2 = صفاں_2 <= 0 ? رکن->tl_صفاں : صفاں_2;
+    خانے_گنتی = tv_get_نمبر(&argvars[2]);
+    خانے_گنتی = خانے_گنتی <= 0 ? رکن->tl_خانے_گنتی : خانے_گنتی;
+    vterm_سیٹ_ناپ(رکن->tl_vterm, صفاں_2, خانے_گنتی);
     // handle_resize() will resize the windows
 
     // Get and remember the size we ended up with.  Update the pty.
-    vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
-    term_report_winsize(term, term->tl_rows, term->tl_cols);
+    vterm_get_ناپ(رکن->tl_vterm, &رکن->tl_صفاں, &رکن->tl_خانے_گنتی);
+    رکن_report_winsize(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی);
 }
 
 /*
  * "term_getstatus(buf)" function
  */
-    void
-f_term_getstatus(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getstatus(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     char_u	val[100];
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getstatus()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = رکن_get_buf(argvars, "term_getstatus()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
 
-    if (term_job_running(term))
+    إذا (رکن_کم_running(رکن))
 	STRCPY(val, "running");
-    else
+    وإلا
 	STRCPY(val, "finished");
-    if (term->tl_normal_mode)
+    إذا (رکن->tl_عام_منوال)
 	STRCAT(val, ",normal");
     rettv->vval.v_string = vim_strsave(val);
 }
@@ -6656,163 +6656,163 @@ f_term_getstatus(typval_T *argvars, typval_T *rettv)
 /*
  * "term_gettitle(buf)" function
  */
-    void
-f_term_gettitle(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_gettitle(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_gettitle()");
-    if (buf == NULL)
-	return;
+    buf = رکن_get_buf(argvars, "term_gettitle()");
+    إذا (buf == عدم)
+	أرجع;
 
-    if (buf->b_term->tl_title != NULL)
-	rettv->vval.v_string = vim_strsave(buf->b_term->tl_title);
+    إذا (buf->b_رکن->tl_title != عدم)
+	rettv->vval.v_string = vim_strsave(buf->b_رکن->tl_title);
 }
 
 /*
  * "term_gettty(buf)" function
  */
-    void
-f_term_gettty(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_gettty(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    char_u	*p = NULL;
-    int		num = 0;
+    char_u	*p = عدم;
+    صحيح		عدد = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     rettv->v_type = VAR_STRING;
-    buf = term_get_buf(argvars, "term_gettty()");
-    if (buf == NULL)
-	return;
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	num = tv_get_bool(&argvars[1]);
+    buf = رکن_get_buf(argvars, "term_gettty()");
+    إذا (buf == عدم)
+	أرجع;
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
+	عدد = tv_get_bool(&argvars[1]);
 
-    switch (num)
+    بدل (عدد)
     {
-	case 0:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_out;
-	    break;
-	case 1:
-	    if (buf->b_term->tl_job != NULL)
-		p = buf->b_term->tl_job->jv_tty_in;
-	    break;
-	default:
-	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	    return;
+	حالة 0:
+	    إذا (buf->b_رکن->tl_کم != عدم)
+		p = buf->b_رکن->tl_کم->jv_tty_باہرلا;
+	    اكسر;
+	حالة 1:
+	    إذا (buf->b_رکن->tl_کم != عدم)
+		p = buf->b_رکن->tl_کم->jv_tty_وچ;
+	    اكسر;
+	افتراضي:
+	    semsg(_(e_invalid_دلیل_str), tv_get_string(&argvars[1]));
+	    أرجع;
     }
-    if (p != NULL)
+    إذا (p != عدم)
 	rettv->vval.v_string = vim_strsave(p);
 }
 
 /*
  * "term_list()" function
  */
-    void
-f_term_list(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_رکن_list(typval_T *argvars بن_ورتیا, typval_T *rettv)
 {
-    term_T	*tp;
+    رکن_T	*tp;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL || first_term == NULL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL || پہلا_رکن == عدم)
+	أرجع;
 
     l = rettv->vval.v_list;
     FOR_ALL_TERMS(tp)
-	if (tp->tl_buffer != NULL)
-	    if (list_append_number(l,
-				   (varnumber_T)tp->tl_buffer->b_fnum) == FAIL)
-		return;
+	إذا (tp->tl_بفر != عدم)
+	    إذا (list_append_نمبر(l,
+				   (varnumber_T)tp->tl_بفر->b_fnum) == FAIL)
+		أرجع;
 }
 
 /*
  * "term_scrape(buf, row)" function
  */
-    void
-f_term_scrape(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_scrape(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    VTermScreen	    *screen = NULL;
+    VTermScreen	    *screen = عدم;
     VTermPos	    pos;
     list_T	    *l;
-    term_T	    *term;
+    رکن_T	    *رکن;
     char_u	    *p;
-    sb_line_T	    *line;
+    sb_سطر_T	    *سطر;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_scrape()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
+    buf = رکن_get_buf(argvars, "term_scrape()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
 
     l = rettv->vval.v_list;
-    pos.row = get_row_number(&argvars[1], term);
+    pos.صف = get_صف_نمبر(&argvars[1], رکن);
 
-    if (term->tl_vterm != NULL)
+    إذا (رکن->tl_vterm != عدم)
     {
-	screen = vterm_obtain_screen(term->tl_vterm);
-	if (screen == NULL)  // can't really happen
-	    return;
-	p = NULL;
-	line = NULL;
+	screen = vterm_obtain_screen(رکن->tl_vterm);
+	إذا (screen == عدم)  // can't really happen
+	    أرجع;
+	p = عدم;
+	سطر = عدم;
     }
-    else
+    وإلا
     {
-	int	  sb_row = term->tl_scrollback_scrolled + pos.row;
+	صحيح	  sb_صف = رکن->tl_scrollback_scrolled + pos.صف;
 	linenr_T  lnum = 0;
-	size_t	  offset = 0;
+	size_t	  وتھ = 0;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_وچ_buf(رکن, sb_صف, &lnum, عدم, &وتھ);
 
-	if (sb_row >= term->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_line_count)
-	    return;
+	إذا (sb_صف >= رکن->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_سطر_گنتی)
+	    أرجع;
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	سطر = (sb_سطر_T *)رکن->tl_scrollback.ga_انکڑے + sb_صف;
 	p = ml_get_buf(buf, lnum, FALSE);
 
-	if (STRLEN(p) < offset + line->sb_bytes)
-	    return;
+	إذا (STRLEN(p) < وتھ + سطر->sb_بائٹاں)
+	    أرجع;
 
-	p += offset;
+	p += وتھ;
     }
 
-    for (pos.col = 0; pos.col < term->tl_cols; )
+    لكل (pos.خانہ = 0; pos.خانہ < رکن->tl_خانے_گنتی; )
     {
 	dict_T		*dcell;
-	int		width;
+	صحيح		چوڑائی;
 	VTermScreenCellAttrs attrs;
 	VTermColor	fg, bg;
 	char_u		rgb[8];
 	size_t		rgblen;
-	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_PER_CELL + 1];
+	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_فی_CELL + 1];
 	size_t		mbslen;
-	int		i;
+	صحيح		i;
 
-	if (screen == NULL)
+	إذا (screen == عدم)
 	{
 	    cellattr_T	*cellattr;
 
 	    // vterm has finished, get the cell from scrollback
-	    if (pos.col >= line->sb_cols)
-		break;
-	    cellattr = line->sb_cells + pos.col;
-	    width = cellattr->width;
+	    إذا (pos.خانہ >= سطر->sb_خانے_گنتی)
+		اكسر;
+	    cellattr = سطر->sb_cells + pos.خانہ;
+	    چوڑائی = cellattr->چوڑائی;
 	    attrs = cellattr->attrs;
 	    fg = cellattr->fg;
 	    bg = cellattr->bg;
@@ -6821,380 +6821,380 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 	    mbs[mbslen] = NUL;
 	    p += mbslen;
 	}
-	else
+	وإلا
 	{
 	    VTermScreenCell cell;
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
-		break;
+	    إذا (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		اكسر;
 
 	    mbslen = 0;
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    لكل (i = 0; i < VTERM_MAX_CHARS_فی_CELL; ++i)
 	    {
-		if (cell.chars[i] == 0)
-		    break;
-		mbslen += (*utf_char2bytes)((int)cell.chars[i], mbs + mbslen);
+		إذا (cell.chars[i] == 0)
+		    اكسر;
+		mbslen += (*utf_char2bytes)((صحيح)cell.chars[i], mbs + mbslen);
 	    }
 	    mbs[mbslen] = NUL;
-	    width = cell.width;
+	    چوڑائی = cell.چوڑائی;
 	    attrs = cell.attrs;
 	    fg = cell.fg;
 	    bg = cell.bg;
 	}
 	dcell = dict_alloc();
-	if (dcell == NULL)
-	    break;
-	if (list_append_dict(l, dcell) == FAIL)
+	إذا (dcell == عدم)
+	    اكسر;
+	إذا (list_append_dict(l, dcell) == FAIL)
 	{
 	    dict_unref(dcell);
-	    break;
+	    اكسر;
 	}
 
-	dict_add_string_len(dcell, "chars", mbs, (int)mbslen);
+	dict_جوڑو_string_len(dcell, "chars", mbs, (صحيح)mbslen);
 
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	rgblen = vim_snprintf_safelen((حرف *)rgb, حجم(rgb),
 	    "#%02x%02x%02x", fg.red, fg.green, fg.blue);
-	dict_add_string_len(dcell, "fg", rgb, (int)rgblen);
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	dict_جوڑو_string_len(dcell, "fg", rgb, (صحيح)rgblen);
+	rgblen = vim_snprintf_safelen((حرف *)rgb, حجم(rgb),
 	    "#%02x%02x%02x", bg.red, bg.green, bg.blue);
-	dict_add_string_len(dcell, "bg", rgb, (int)rgblen);
+	dict_جوڑو_string_len(dcell, "bg", rgb, (صحيح)rgblen);
 
-	dict_add_number(dcell, "attr",
-				      cell2attr(term, NULL, &attrs, &fg, &bg));
-	dict_add_number(dcell, "width", width);
+	dict_جوڑو_نمبر(dcell, "attr",
+				      cell2attr(رکن, عدم, &attrs, &fg, &bg));
+	dict_جوڑو_نمبر(dcell, "width", چوڑائی);
 
-	++pos.col;
-	if (width == 2)
-	    ++pos.col;
+	++pos.خانہ;
+	إذا (چوڑائی == 2)
+	    ++pos.خانہ;
     }
 }
 
 /*
  * "term_sendkeys(buf, keys)" function
  */
-    void
-f_term_sendkeys(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_sendkeys(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    char_u	*msg;
-    term_T	*term;
+    char_u	*پیغام;
+    رکن_T	*رکن;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_sendkeys()");
-    if (buf == NULL)
-	return;
+    buf = رکن_get_buf(argvars, "term_sendkeys()");
+    إذا (buf == عدم)
+	أرجع;
 
-    msg = tv_get_string_chk(&argvars[1]);
-    if (msg == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    پیغام = tv_get_string_chk(&argvars[1]);
+    إذا (پیغام == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    إذا (رکن->tl_vterm == عدم)
+	أرجع;
 
-    while (*msg != NUL)
+    طالما (*پیغام != NUL)
     {
-	int c;
+	صحيح c;
 
-	if (*msg == K_SPECIAL && msg[1] != NUL && msg[2] != NUL)
+	إذا (*پیغام == K_SPECIAL && پیغام[1] != NUL && پیغام[2] != NUL)
 	{
-	    c = TO_SPECIAL(msg[1], msg[2]);
-	    msg += 3;
+	    c = منزل_SPECIAL(پیغام[1], پیغام[2]);
+	    پیغام += 3;
 	}
-	else
+	وإلا
 	{
-	    c = PTR2CHAR(msg);
-	    msg += MB_CPTR2LEN(msg);
+	    c = PTR2CHAR(پیغام);
+	    پیغام += MB_CPTR2LEN(پیغام);
 	}
-	send_keys_to_term(term, c, 0, FALSE);
+	send_کلیدیں_منزل_رکن(رکن, c, 0, FALSE);
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * "term_getansicolors(buf)" function
  */
-    void
-f_term_getansicolors(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_getansicolors(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     VTermState	*state;
     VTermColor  color;
     char_u	hexbuf[10];
-    int		index;
+    صحيح		اشاریہ;
     list_T	*list;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_list_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    إذا (وچ_vim9script() && check_for_بفر_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_getansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = رکن_get_buf(argvars, "term_getansicolors()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    إذا (رکن->tl_vterm == عدم)
+	أرجع;
 
     list = rettv->vval.v_list;
-    state = vterm_obtain_state(term->tl_vterm);
-    for (index = 0; index < 16; index++)
+    state = vterm_obtain_state(رکن->tl_vterm);
+    لكل (اشاریہ = 0; اشاریہ < 16; اشاریہ++)
     {
 	size_t	hexbuflen;
 
-	vterm_state_get_palette_color(state, index, &color);
-	hexbuflen = vim_snprintf_safelen((char *)hexbuf, sizeof(hexbuf),
+	vterm_state_get_palette_color(state, اشاریہ, &color);
+	hexbuflen = vim_snprintf_safelen((حرف *)hexbuf, حجم(hexbuf),
 	    "#%02x%02x%02x", color.red, color.green, color.blue);
-	if (list_append_string(list, hexbuf, (int)hexbuflen) == FAIL)
-	    return;
+	إذا (list_append_string(list, hexbuf, (صحيح)hexbuflen) == FAIL)
+	    أرجع;
     }
 }
 
 /*
  * "term_setansicolors(buf, list)" function
  */
-    void
-f_term_setansicolors(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_setansicolors(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     listitem_T	*li;
-    int		n = 0;
+    صحيح		n = 0;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_setansicolors()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    buf = رکن_get_buf(argvars, "term_setansicolors()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    إذا (رکن->tl_vterm == عدم)
+	أرجع;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    إذا (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	أرجع;
 
-    if (argvars[1].vval.v_list->lv_first == &range_list_item
+    إذا (argvars[1].vval.v_list->lv_پہلا == &range_list_شے
 	    || argvars[1].vval.v_list->lv_len != 16)
     {
-	semsg(_(e_invalid_value_for_argument_str), "\"colors\"");
-	return;
+	semsg(_(e_invalid_قدر_for_دلیل_str), "\"colors\"");
+	أرجع;
     }
 
-    if (term->tl_palette == NULL)
-	term->tl_palette = ALLOC_MULT(long_u, 16);
-    if (term->tl_palette == NULL)
-	return;
+    إذا (رکن->tl_palette == عدم)
+	رکن->tl_palette = ALLOC_MULT(long_u, 16);
+    إذا (رکن->tl_palette == عدم)
+	أرجع;
 
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_اشیاء(argvars[1].vval.v_list, li)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return;
+	إذا (color_name == عدم)
+	    أرجع;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
+	إذا (guicolor == INVALCOLOR)
 	{
 	    semsg(_(e_cannot_allocate_color_str), color_name);
-	    return;
+	    أرجع;
 	}
 
-	term->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
+	رکن->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    term_update_palette(term);
+    رکن_update_palette(رکن);
 }
-#endif
+#جے_انت
 
 /*
  * "term_setapi(buf, api)" function
  */
-    void
-f_term_setapi(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_setapi(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     char_u	*api;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_setapi()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_api);
+    buf = رکن_get_buf(argvars, "term_setapi()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    vim_free(رکن->tl_api);
     api = tv_get_string_chk(&argvars[1]);
-    if (api != NULL)
-	term->tl_api = vim_strsave(api);
-    else
-	term->tl_api = NULL;
+    إذا (api != عدم)
+	رکن->tl_api = vim_strsave(api);
+    وإلا
+	رکن->tl_api = عدم;
 }
 
 /*
  * "term_setrestore(buf, command)" function
  */
-    void
-f_term_setrestore(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_setrestore(typval_T *argvars بن_ورتیا, typval_T *rettv بن_ورتیا)
 {
-#if defined(FEAT_SESSION)
+#إذا defined(FEAT_SESSION)
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     char_u	*cmd;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_setrestore()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_command);
+    buf = رکن_get_buf(argvars, "term_setrestore()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    vim_free(رکن->tl_command);
     cmd = tv_get_string_chk(&argvars[1]);
-    if (cmd != NULL)
-	term->tl_command = vim_strsave(cmd);
-    else
-	term->tl_command = NULL;
-#endif
+    إذا (cmd != عدم)
+	رکن->tl_command = vim_strsave(cmd);
+    وإلا
+	رکن->tl_command = عدم;
+#جے_انت
 }
 
 /*
  * "term_setkill(buf, how)" function
  */
-    void
-f_term_setkill(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_setkill(typval_T *argvars بن_ورتیا, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
-    term_T	*term;
+    رکن_T	*رکن;
     char_u	*how;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_setkill()");
-    if (buf == NULL)
-	return;
-    term = buf->b_term;
-    vim_free(term->tl_kill);
+    buf = رکن_get_buf(argvars, "term_setkill()");
+    إذا (buf == عدم)
+	أرجع;
+    رکن = buf->b_رکن;
+    vim_free(رکن->tl_kill);
     how = tv_get_string_chk(&argvars[1]);
-    if (how != NULL)
-	term->tl_kill = vim_strsave(how);
-    else
-	term->tl_kill = NULL;
+    إذا (how != عدم)
+	رکن->tl_kill = vim_strsave(how);
+    وإلا
+	رکن->tl_kill = عدم;
 }
 
 /*
  * "term_start(command, options)" function
  */
-    void
-f_term_start(typval_T *argvars, typval_T *rettv)
+    فراغ
+f_رکن_شروع(typval_T *argvars, typval_T *rettv)
 {
     jobopt_T	opt;
     buf_T	*buf;
 
-    if (in_vim9script()
+    إذا (وچ_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
-    init_job_options(&opt);
-    if (argvars[1].v_type != VAR_UNKNOWN
-	    && get_job_options(&argvars[1], &opt,
+    init_کم_options(&opt);
+    إذا (argvars[1].v_type != VAR_UNKNOWN
+	    && get_کم_options(&argvars[1], &opt,
 		JO_TIMEOUT_ALL + JO_STOPONEXIT
-		    + JO_CALLBACK + JO_OUT_CALLBACK + JO_ERR_CALLBACK
-		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_OUT_IO,
-		JO2_TERM_NAME + JO2_TERM_FINISH + JO2_HIDDEN + JO2_TERM_OPENCMD
-		    + JO2_TERM_COLS + JO2_TERM_ROWS + JO2_VERTICAL + JO2_CURWIN
+		    + JO_CALLBACK + JO_باہرلا_CALLBACK + JO_ERR_CALLBACK
+		    + JO_EXIT_CB + JO_CLOSE_CALLBACK + JO_باہرلا_IO,
+		JO2_رکن_NAME + JO2_رکن_انت + JO2_HIDDEN + JO2_رکن_OPENCMD
+		    + JO2_رکن_خانے_گنتی + JO2_رکن_صفاں + JO2_VERTICAL + JO2_CURWIN
 		    + JO2_CWD + JO2_ENV + JO2_EOF_CHARS
-		    + JO2_NORESTORE + JO2_TERM_KILL + JO2_TERM_HIGHLIGHT
-		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_TERM_API) == FAIL)
-	return;
+		    + JO2_NORESTORE + JO2_رکن_KILL + JO2_رکن_HIGHLIGHT
+		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_رکن_API) == FAIL)
+	أرجع;
 
-    buf = term_start(&argvars[0], NULL, &opt, 0);
+    buf = رکن_شروع(&argvars[0], عدم, &opt, 0);
 
-    if (buf != NULL && buf->b_term != NULL)
-	rettv->vval.v_number = buf->b_fnum;
+    إذا (buf != عدم && buf->b_رکن != عدم)
+	rettv->vval.v_نمبر = buf->b_fnum;
 }
 
 /*
  * "term_wait" function
  */
-    void
-f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
+    فراغ
+f_رکن_wait(typval_T *argvars, typval_T *rettv بن_ورتیا)
 {
     buf_T	*buf;
 
-    if (in_vim9script()
-	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+    إذا (وچ_vim9script()
+	    && (check_for_بفر_arg(argvars, 0) == FAIL
+		|| check_for_opt_نمبر_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    buf = term_get_buf(argvars, "term_wait()");
-    if (buf == NULL)
-	return;
-    if (buf->b_term->tl_job == NULL)
+    buf = رکن_get_buf(argvars, "term_wait()");
+    إذا (buf == عدم)
+	أرجع;
+    إذا (buf->b_رکن->tl_کم == عدم)
     {
-	ch_log(NULL, "term_wait(): no job to wait for");
-	return;
+	ch_log(عدم, "term_wait(): no job to wait for");
+	أرجع;
     }
-    if (buf->b_term->tl_job->jv_channel == NULL)
+    إذا (buf->b_رکن->tl_کم->jv_channel == عدم)
 	// channel is closed, nothing to do
-	return;
+	أرجع;
 
     // Get the job status, this will detect a job that finished.
-    if (!buf->b_term->tl_job->jv_channel->ch_keep_open
-	    && STRCMP(job_status(buf->b_term->tl_job), "dead") == 0)
+    إذا (!buf->b_رکن->tl_کم->jv_channel->ch_keep_open
+	    && STRCMP(کم_حالت(buf->b_رکن->tl_کم), "dead") == 0)
     {
 	// The job is dead, keep reading channel I/O until the channel is
 	// closed. buf->b_term may become NULL if the terminal was closed while
 	// waiting.
-	ch_log(NULL, "term_wait(): waiting for channel to close");
-	while (buf->b_term != NULL && !buf->b_term->tl_channel_closed)
+	ch_log(عدم, "term_wait(): waiting for channel to close");
+	طالما (buf->b_رکن != عدم && !buf->b_رکن->tl_channel_closed)
 	{
-	    term_flush_messages();
+	    رکن_flush_messages();
 
 	    ui_delay(10L, FALSE);
-	    if (!buf_valid(buf))
+	    إذا (!buf_valid(buf))
 		// If the terminal is closed when the channel is closed the
 		// buffer disappears.
-		break;
-	    if (buf->b_term == NULL || buf->b_term->tl_channel_closing)
+		اكسر;
+	    إذا (buf->b_رکن == عدم || buf->b_رکن->tl_channel_closing)
 		// came here from a close callback, only wait one time
-		break;
+		اكسر;
 	}
 
-	term_flush_messages();
+	رکن_flush_messages();
     }
-    else
+    وإلا
     {
-	long wait = 10L;
+	لما wait = 10L;
 
-	term_flush_messages();
+	رکن_flush_messages();
 
 	// Wait for some time for any channel I/O.
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    wait = tv_get_number(&argvars[1]);
+	إذا (argvars[1].v_type != VAR_UNKNOWN)
+	    wait = tv_get_نمبر(&argvars[1]);
 	ui_delay(wait, TRUE);
 
 	// Flushing messages on channels is hopefully sufficient.
 	// TODO: is there a better way?
-	term_flush_messages();
+	رکن_flush_messages();
     }
 }
 
@@ -7202,37 +7202,37 @@ f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
  * Called when a channel has sent all the lines to a terminal.
  * Send a CTRL-D to mark the end of the text.
  */
-    void
-term_send_eof(channel_T *ch)
+    فراغ
+رکن_send_eof(channel_T *ch)
 {
-    term_T	*term;
+    رکن_T	*رکن;
 
-    FOR_ALL_TERMS(term)
-	if (term->tl_job == ch->ch_job)
+    FOR_ALL_TERMS(رکن)
+	إذا (رکن->tl_کم == ch->ch_کم)
 	{
-	    if (term->tl_eof_chars != NULL)
+	    إذا (رکن->tl_eof_chars != عدم)
 	    {
-		channel_send(ch, PART_IN, term->tl_eof_chars,
-					(int)STRLEN(term->tl_eof_chars), NULL);
-		channel_send(ch, PART_IN, (char_u *)"\r", 1, NULL);
+		channel_send(ch, PART_وچ, رکن->tl_eof_chars,
+					(صحيح)STRLEN(رکن->tl_eof_chars), عدم);
+		channel_send(ch, PART_وچ, (char_u *)"\r", 1, عدم);
 	    }
-#ifdef MSWIN
-	    else
+#جے_تعریف_شدہ MSWIN
+	    وإلا
 		// Default: CTRL-D
-		channel_send(ch, PART_IN, (char_u *)"\004\r", 2, NULL);
-#endif
+		channel_send(ch, PART_وچ, (char_u *)"\004\r", 2, عدم);
+#جے_انت
 	}
 }
 
-#if defined(FEAT_GUI)
-    job_T *
-term_getjob(term_T *term)
+#إذا defined(FEAT_GUI)
+    کم_T *
+رکن_getjob(رکن_T *رکن)
 {
-    return term != NULL ? term->tl_job : NULL;
+    أرجع رکن != عدم ? رکن->tl_کم : عدم;
 }
-#endif
+#جے_انت
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
 
 ///////////////////////////////////////
 // 2. MS-Windows implementation.
@@ -7241,19 +7241,19 @@ HRESULT (WINAPI *pCreatePseudoConsole)(COORD, HANDLE, HANDLE, DWORD, HPCON*);
 HRESULT (WINAPI *pResizePseudoConsole)(HPCON, COORD);
 HRESULT (WINAPI *pClosePseudoConsole)(HPCON);
 BOOL (WINAPI *pInitializeProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD, PSIZE_T);
-BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, SIZE_T, PVOID, PSIZE_T);
-void (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
+BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, ناپ_T, PVOID, PSIZE_T);
+فراغ (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
 
-    static int
-dyn_conpty_init(int verbose)
+    ساكن صحيح
+dyn_conpty_init(صحيح verbose)
 {
-    static HMODULE	hKerneldll = NULL;
-    int			i;
-    static struct
+    ساكن HMODULE	hKerneldll = عدم;
+    صحيح			i;
+    ساكن بنية
     {
-	char	*name;
+	حرف	*name;
 	FARPROC	*ptr;
-    } conpty_entry[] =
+    } conpty_اندراج[] =
     {
 	{"CreatePseudoConsole", (FARPROC*)&pCreatePseudoConsole},
 	{"ResizePseudoConsole", (FARPROC*)&pResizePseudoConsole},
@@ -7264,88 +7264,88 @@ dyn_conpty_init(int verbose)
 				(FARPROC*)&pUpdateProcThreadAttribute},
 	{"DeleteProcThreadAttributeList",
 				(FARPROC*)&pDeleteProcThreadAttributeList},
-	{NULL, NULL}
+	{عدم, عدم}
     };
 
-    if (!has_conpty_working())
+    إذا (!has_conpty_working())
     {
-	if (verbose)
-	    emsg(_(e_conpty_is_not_available));
-	return FAIL;
+	إذا (verbose)
+	    emsg(_(e_conpty_is_not_دستیاب));
+	أرجع FAIL;
     }
 
     // No need to initialize twice.
-    if (hKerneldll)
-	return OK;
+    إذا (hKerneldll)
+	أرجع OK;
 
-    hKerneldll = vimLoadLib("kernel32.dll");
-    for (i = 0; conpty_entry[i].name != NULL
-					&& conpty_entry[i].ptr != NULL; ++i)
+    hKerneldll = vim_لدو_Lib("kernel32.dll");
+    لكل (i = 0; conpty_اندراج[i].name != عدم
+					&& conpty_اندراج[i].ptr != عدم; ++i)
     {
-	if ((*conpty_entry[i].ptr = (FARPROC)GetProcAddress(hKerneldll,
-						conpty_entry[i].name)) == NULL)
+	إذا ((*conpty_اندراج[i].ptr = (FARPROC)Get_Proc_پتہ(hKerneldll,
+						conpty_اندراج[i].name)) == عدم)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), conpty_entry[i].name);
-	    hKerneldll = NULL;
-	    return FAIL;
+	    إذا (verbose)
+		semsg(_(e_could_not_لدو_library_function_str), conpty_اندراج[i].name);
+	    hKerneldll = عدم;
+	    أرجع FAIL;
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
-    static int
-conpty_term_and_job_init(
-	term_T	    *term,
+    ساكن صحيح
+conpty_رکن_and_کم_init(
+	رکن_T	    *رکن,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	حرف	    **argv بن_ورتیا,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cmd_wchar_copy = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
-    HANDLE	    jo = NULL;
+    WCHAR	    *cmd_wchar = عدم;
+    WCHAR	    *cmd_wchar_copy = عدم;
+    WCHAR	    *cwd_wchar = عدم;
+    WCHAR	    *env_wchar = عدم;
+    channel_T	    *channel = عدم;
+    کم_T	    *کم = عدم;
+    HANDLE	    jo = عدم;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = عدم;
     HRESULT	    hr;
     COORD	    consize;
-    SIZE_T	    breq;
+    ناپ_T	    breq;
     PROCESS_INFORMATION proc_info;
-    HANDLE	    i_theirs = NULL;
-    HANDLE	    o_theirs = NULL;
-    HANDLE	    i_ours = NULL;
-    HANDLE	    o_ours = NULL;
-    char	    *errmsg = NULL;
+    HANDLE	    i_theirs = عدم;
+    HANDLE	    o_theirs = عدم;
+    HANDLE	    i_ours = عدم;
+    HANDLE	    o_ours = عدم;
+    حرف	    *errmsg = عدم;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, حجم(حرف*), 20);
+    ga_init2(&ga_env, حجم(حرف*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    إذا (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    وإلا إذا (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	إذا (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    اذهب failed;
+	cmd = ga_cmd.ga_انکڑے;
     }
-    if (cmd == NULL || *cmd == NUL)
+    إذا (cmd == عدم || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_دلیل));
+	اذهب failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    رکن->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_منزل_utf16(cmd, عدم);
 
-    if (cmd_wchar != NULL)
+    إذا (cmd_wchar != عدم)
     {
 	// Request by CreateProcessW
 	breq = wcslen(cmd_wchar) + 1 + 1;	// Addition of NUL by API
@@ -7354,113 +7354,113 @@ conpty_term_and_job_init(
     }
 
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    إذا (cmd_wchar == عدم)
+	اذهب failed;
+    إذا (opt->jo_cwd != عدم)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_منزل_utf16(opt->jo_cwd, عدم);
+	إذا (cwd_wchar == عدم)
+	    اذهب failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_انکڑے;
 
-    if (!CreatePipe(&i_theirs, &i_ours, NULL, 0))
-	goto failed;
-    if (!CreatePipe(&o_ours, &o_theirs, NULL, 0))
-	goto failed;
+    إذا (!CreatePipe(&i_theirs, &i_ours, عدم, 0))
+	اذهب failed;
+    إذا (!CreatePipe(&o_ours, &o_theirs, عدم, 0))
+	اذهب failed;
 
-    consize.X = term->tl_cols;
-    consize.Y = term->tl_rows;
+    consize.X = رکن->tl_خانے_گنتی;
+    consize.Y = رکن->tl_صفاں;
     hr = pCreatePseudoConsole(consize, i_theirs, o_theirs, 0,
-							     &term->tl_conpty);
-    if (FAILED(hr))
-	goto failed;
+							     &رکن->tl_conpty);
+    إذا (FAILED(hr))
+	اذهب failed;
 
-    term->tl_siex.StartupInfo.cb = sizeof(term->tl_siex);
+    رکن->tl_siex.StartupInfo.cb = حجم(رکن->tl_siex);
 
     // Explicitly invalidate std handles to prevent inheritance of
     // the debugger's stdout (e.g., in Visual Studio debugging sessions),
     // which could cause job output to go to the debugger instead of
     // the intended ConPTY, even with bInheritHandles set to FALSE in CreateProcess.
-    term->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-    term->tl_siex.StartupInfo.hStdInput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_VALUE;
+    رکن->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    رکن->tl_siex.StartupInfo.h_Std_داخلہ = INVALID_HANDLE_قدر;
+    رکن->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_قدر;
+    رکن->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_قدر;
 
     // Set up pipe inheritance safely: Vista or later.
-    pInitializeProcThreadAttributeList(NULL, 1, 0, &breq);
-    term->tl_siex.lpAttributeList = alloc(breq);
-    if (!term->tl_siex.lpAttributeList)
-	goto failed;
-    if (!pInitializeProcThreadAttributeList(term->tl_siex.lpAttributeList, 1,
+    pInitializeProcThreadAttributeList(عدم, 1, 0, &breq);
+    رکن->tl_siex.lpAttributeList = alloc(breq);
+    إذا (!رکن->tl_siex.lpAttributeList)
+	اذهب failed;
+    إذا (!pInitializeProcThreadAttributeList(رکن->tl_siex.lpAttributeList, 1,
 								     0, &breq))
-	goto failed;
-    if (!pUpdateProcThreadAttribute(
-	    term->tl_siex.lpAttributeList, 0,
-	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, term->tl_conpty,
-	    sizeof(HPCON), NULL, NULL))
-	goto failed;
+	اذهب failed;
+    إذا (!pUpdateProcThreadAttribute(
+	    رکن->tl_siex.lpAttributeList, 0,
+	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, رکن->tl_conpty,
+	    حجم(HPCON), عدم, عدم))
+	اذهب failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = جوڑو_channel();
+    إذا (channel == عدم)
+	اذهب failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    کم = کم_alloc();
+    إذا (کم == عدم)
+	اذهب failed;
+    إذا (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	صحيح argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &کم->jv_argv, &argc);
     }
-    else
+    وإلا
     {
-	int argc;
+	صحيح argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &کم->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    إذا (opt->jo_سیٹ & JO_وچ_BUF)
+	کم->jv_وچ_buf = buflist_findnr(opt->jo_io_buf[PART_وچ]);
 
-    if (!CreateProcessW(NULL, cmd_wchar_copy, NULL, NULL, FALSE,
+    إذا (!CreateProcessW(عدم, cmd_wchar_copy, عدم, عدم, FALSE,
 	    EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT
-	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_MODE,
+	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_منوال,
 	    env_wchar, cwd_wchar,
-	    &term->tl_siex.StartupInfo, &proc_info))
+	    &رکن->tl_siex.StartupInfo, &proc_info))
     {
 	errmsg = GetWin32Error();
-	goto failed;
+	اذهب failed;
     }
 
     CloseHandle(i_theirs);
     CloseHandle(o_theirs);
 
-    channel_set_pipes(channel,
+    channel_سیٹ_pipes(channel,
 	    (sock_T)i_ours,
 	    (sock_T)o_ours,
 	    (sock_T)o_ours);
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_متن_منوال = TRUE;
 
     // Use to explicitly delete anonymous pipe handle.
     // In addition, it is used to prevent the pipe from being closed when input
     // from a buffer etc. is finished.
     channel->ch_anonymous_pipe = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_کم_Object(عدم, عدم);
+    إذا (jo == عدم)
+	اذهب failed;
 
-    if (!AssignProcessToJobObject(jo, proc_info.hProcess))
+    إذا (!سونپو_Process_منزل_کم_Object(jo, proc_info.hProcess))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = عدم;
     }
 
     ResumeThread(proc_info.hThread);
@@ -7471,44 +7471,44 @@ conpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    إذا (create_vterm(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی) == FAIL)
+	اذهب failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    إذا (رکن_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	إذا (رکن->tl_palette != عدم)
+	    سیٹ_vterm_palette(رکن->tl_vterm, رکن->tl_palette);
+	وإلا
+	    init_vterm_ansi_colors(رکن->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_سیٹ_کم(channel, کم, opt);
+    کم_سیٹ_options(کم, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info = proc_info;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_type = vim_strsave((char_u *)"conpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    کم->jv_channel = channel;
+    کم->jv_proc_info = proc_info;
+    کم->jv_کم_object = jo;
+    کم->jv_حالت = کم_STARTED;
+    کم->jv_tty_type = vim_strsave((char_u *)"conpty");
+    ++کم->jv_refcount;
+    رکن->tl_کم = کم;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    إذا (orig_opt->jo_io[PART_باہرلا] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_باہرلا];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	رکن->tl_باہرلا_fd = mch_fopen((حرف *)fname, WRITEBIN);
+	إذا (رکن->tl_باہرلا_fd == عدم)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    أرجع OK;
 
 failed:
     ga_clear(&ga_cmd);
@@ -7516,112 +7516,112 @@ failed:
     vim_free(cmd_wchar);
     vim_free(cmd_wchar_copy);
     vim_free(cwd_wchar);
-    if (channel != NULL)
+    إذا (channel != عدم)
 	channel_clear(channel);
-    if (job != NULL)
+    إذا (کم != عدم)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	کم->jv_channel = عدم;
+	کم_cleanup(کم);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    رکن->tl_کم = عدم;
+    إذا (jo != عدم)
 	CloseHandle(jo);
 
-    if (term->tl_siex.lpAttributeList != NULL)
+    إذا (رکن->tl_siex.lpAttributeList != عدم)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(رکن->tl_siex.lpAttributeList);
+	vim_free(رکن->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (o_theirs != NULL)
+    رکن->tl_siex.lpAttributeList = عدم;
+    إذا (o_theirs != عدم)
 	CloseHandle(o_theirs);
-    if (o_ours != NULL)
+    إذا (o_ours != عدم)
 	CloseHandle(o_ours);
-    if (i_ours != NULL)
+    إذا (i_ours != عدم)
 	CloseHandle(i_ours);
-    if (i_theirs != NULL)
+    إذا (i_theirs != عدم)
 	CloseHandle(i_theirs);
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    إذا (رکن->tl_conpty != عدم)
+	pClosePseudoConsole(رکن->tl_conpty);
+    رکن->tl_conpty = عدم;
     // Propagate errors that occur in CreateProcess
-    if (errmsg)
+    إذا (errmsg)
 	semsg("CreateProcess failed: %s", errmsg);
-    return FAIL;
+    أرجع FAIL;
 }
 
-    static void
-conpty_term_report_winsize(term_T *term, int rows, int cols)
+    ساكن فراغ
+conpty_رکن_report_winsize(رکن_T *رکن, صحيح صفاں_2, صحيح خانے_گنتی)
 {
     COORD consize;
 
-    consize.X = cols;
-    consize.Y = rows;
-    pResizePseudoConsole(term->tl_conpty, consize);
+    consize.X = خانے_گنتی;
+    consize.Y = صفاں_2;
+    pResizePseudoConsole(رکن->tl_conpty, consize);
 }
 
-    static void
-term_free_conpty(term_T *term)
+    ساكن فراغ
+رکن_free_conpty(رکن_T *رکن)
 {
-    if (term->tl_siex.lpAttributeList != NULL)
+    إذا (رکن->tl_siex.lpAttributeList != عدم)
     {
-	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
-	vim_free(term->tl_siex.lpAttributeList);
+	pDeleteProcThreadAttributeList(رکن->tl_siex.lpAttributeList);
+	vim_free(رکن->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (term->tl_conpty != NULL)
-	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    رکن->tl_siex.lpAttributeList = عدم;
+    إذا (رکن->tl_conpty != عدم)
+	pClosePseudoConsole(رکن->tl_conpty);
+    رکن->tl_conpty = عدم;
 }
 
-    int
-use_conpty(void)
+    صحيح
+use_conpty(فراغ)
 {
-    return has_conpty;
+    أرجع has_conpty;
 }
 
 # define WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN 1ul
 # define WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN 2ull
-# define WINPTY_MOUSE_MODE_FORCE		2
+# define WINPTY_MOUSE_منوال_FORCE		2
 
-void* (*winpty_config_new)(UINT64, void*);
-void* (*winpty_open)(void*, void*);
-void* (*winpty_spawn_config_new)(UINT64, void*, LPCWSTR, void*, void*, void*);
-BOOL (*winpty_spawn)(void*, void*, HANDLE*, HANDLE*, DWORD*, void*);
-void (*winpty_config_set_mouse_mode)(void*, int);
-void (*winpty_config_set_initial_size)(void*, int, int);
-LPCWSTR (*winpty_conin_name)(void*);
-LPCWSTR (*winpty_conout_name)(void*);
-LPCWSTR (*winpty_conerr_name)(void*);
-void (*winpty_free)(void*);
-void (*winpty_config_free)(void*);
-void (*winpty_spawn_config_free)(void*);
-void (*winpty_error_free)(void*);
-LPCWSTR (*winpty_error_msg)(void*);
-BOOL (*winpty_set_size)(void*, int, int, void*);
-HANDLE (*winpty_agent_process)(void*);
+فراغ* (*winpty_config_new)(UINT64, فراغ*);
+فراغ* (*winpty_open)(فراغ*, فراغ*);
+فراغ* (*winpty_spawn_config_new)(UINT64, فراغ*, LPCWSTR, فراغ*, فراغ*, فراغ*);
+BOOL (*winpty_spawn)(فراغ*, فراغ*, HANDLE*, HANDLE*, DWORD*, فراغ*);
+فراغ (*winpty_config_سیٹ_mouse_منوال)(فراغ*, صحيح);
+فراغ (*winpty_config_سیٹ_initial_ناپ)(فراغ*, صحيح, صحيح);
+LPCWSTR (*winpty_conin_name)(فراغ*);
+LPCWSTR (*winpty_conout_name)(فراغ*);
+LPCWSTR (*winpty_conerr_name)(فراغ*);
+فراغ (*winpty_free)(فراغ*);
+فراغ (*winpty_config_free)(فراغ*);
+فراغ (*winpty_spawn_config_free)(فراغ*);
+فراغ (*winpty_error_free)(فراغ*);
+LPCWSTR (*winpty_error_پیغام)(فراغ*);
+BOOL (*winpty_سیٹ_ناپ)(فراغ*, صحيح, صحيح, فراغ*);
+HANDLE (*winpty_agent_process)(فراغ*);
 
 # define WINPTY_DLL "winpty.dll"
 
-static HINSTANCE hWinPtyDLL = NULL;
+ساكن HINSTANCE hWinPtyDLL = عدم;
 
-    static int
-dyn_winpty_init(int verbose)
+    ساكن صحيح
+dyn_winpty_init(صحيح verbose)
 {
-    int i;
-    static struct
+    صحيح i;
+    ساكن بنية
     {
-	char	    *name;
+	حرف	    *name;
 	FARPROC	    *ptr;
-    } winpty_entry[] =
+    } winpty_اندراج[] =
     {
 	{"winpty_conerr_name", (FARPROC*)&winpty_conerr_name},
 	{"winpty_config_free", (FARPROC*)&winpty_config_free},
 	{"winpty_config_new", (FARPROC*)&winpty_config_new},
 	{"winpty_config_set_mouse_mode",
-				      (FARPROC*)&winpty_config_set_mouse_mode},
+				      (FARPROC*)&winpty_config_سیٹ_mouse_منوال},
 	{"winpty_config_set_initial_size",
-				    (FARPROC*)&winpty_config_set_initial_size},
+				    (FARPROC*)&winpty_config_سیٹ_initial_ناپ},
 	{"winpty_conin_name", (FARPROC*)&winpty_conin_name},
 	{"winpty_conout_name", (FARPROC*)&winpty_conout_name},
 	{"winpty_error_free", (FARPROC*)&winpty_error_free},
@@ -7630,178 +7630,178 @@ dyn_winpty_init(int verbose)
 	{"winpty_spawn", (FARPROC*)&winpty_spawn},
 	{"winpty_spawn_config_free", (FARPROC*)&winpty_spawn_config_free},
 	{"winpty_spawn_config_new", (FARPROC*)&winpty_spawn_config_new},
-	{"winpty_error_msg", (FARPROC*)&winpty_error_msg},
-	{"winpty_set_size", (FARPROC*)&winpty_set_size},
+	{"winpty_error_msg", (FARPROC*)&winpty_error_پیغام},
+	{"winpty_set_size", (FARPROC*)&winpty_سیٹ_ناپ},
 	{"winpty_agent_process", (FARPROC*)&winpty_agent_process},
-	{NULL, NULL}
+	{عدم, عدم}
     };
 
     // No need to initialize twice.
-    if (hWinPtyDLL)
-	return OK;
+    إذا (hWinPtyDLL)
+	أرجع OK;
     // Load winpty.dll, prefer using the 'winptydll' option, fall back to just
     // winpty.dll.
-    if (*p_winptydll != NUL)
-	hWinPtyDLL = vimLoadLib((char *)p_winptydll);
-    if (!hWinPtyDLL)
-	hWinPtyDLL = vimLoadLib(WINPTY_DLL);
-    if (!hWinPtyDLL)
+    إذا (*p_winptydll != NUL)
+	hWinPtyDLL = vim_لدو_Lib((حرف *)p_winptydll);
+    إذا (!hWinPtyDLL)
+	hWinPtyDLL = vim_لدو_Lib(WINPTY_DLL);
+    إذا (!hWinPtyDLL)
     {
-	if (verbose)
-	    semsg(_(e_could_not_load_library_str_str),
+	إذا (verbose)
+	    semsg(_(e_could_not_لدو_library_str_str),
 		    (*p_winptydll != NUL ? p_winptydll : (char_u *)WINPTY_DLL),
 		    GetWin32Error());
-	return FAIL;
+	أرجع FAIL;
     }
-    for (i = 0; winpty_entry[i].name != NULL
-					 && winpty_entry[i].ptr != NULL; ++i)
+    لكل (i = 0; winpty_اندراج[i].name != عدم
+					 && winpty_اندراج[i].ptr != عدم; ++i)
     {
-	if ((*winpty_entry[i].ptr = (FARPROC)GetProcAddress(hWinPtyDLL,
-					      winpty_entry[i].name)) == NULL)
+	إذا ((*winpty_اندراج[i].ptr = (FARPROC)Get_Proc_پتہ(hWinPtyDLL,
+					      winpty_اندراج[i].name)) == عدم)
 	{
-	    if (verbose)
-		semsg(_(e_could_not_load_library_function_str), winpty_entry[i].name);
-	    hWinPtyDLL = NULL;
-	    return FAIL;
+	    إذا (verbose)
+		semsg(_(e_could_not_لدو_library_function_str), winpty_اندراج[i].name);
+	    hWinPtyDLL = عدم;
+	    أرجع FAIL;
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
-    static int
-winpty_term_and_job_init(
-	term_T	    *term,
+    ساكن صحيح
+winpty_رکن_and_کم_init(
+	رکن_T	    *رکن,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	حرف	    **argv بن_ورتیا,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
+    WCHAR	    *cmd_wchar = عدم;
+    WCHAR	    *cwd_wchar = عدم;
+    WCHAR	    *env_wchar = عدم;
+    channel_T	    *channel = عدم;
+    کم_T	    *کم = عدم;
     DWORD	    error;
-    HANDLE	    jo = NULL;
-    HANDLE	    child_process_handle;
-    HANDLE	    child_thread_handle;
-    void	    *winpty_err = NULL;
-    void	    *spawn_config = NULL;
+    HANDLE	    jo = عدم;
+    HANDLE	    بچہ_process_handle;
+    HANDLE	    بچہ_thread_handle;
+    فراغ	    *winpty_err = عدم;
+    فراغ	    *spawn_config = عدم;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = عدم;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, حجم(حرف*), 20);
+    ga_init2(&ga_env, حجم(حرف*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    إذا (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    وإلا إذا (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
-	cmd = ga_cmd.ga_data;
+	إذا (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    اذهب failed;
+	cmd = ga_cmd.ga_انکڑے;
     }
-    if (cmd == NULL || *cmd == NUL)
+    إذا (cmd == عدم || *cmd == NUL)
     {
-	emsg(_(e_invalid_argument));
-	goto failed;
+	emsg(_(e_invalid_دلیل));
+	اذهب failed;
     }
 
-    term->tl_arg0_cmd = vim_strsave(cmd);
+    رکن->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_منزل_utf16(cmd, عدم);
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    إذا (cmd_wchar == عدم)
+	اذهب failed;
+    إذا (opt->jo_cwd != عدم)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_منزل_utf16(opt->jo_cwd, عدم);
+	إذا (cwd_wchar == عدم)
+	    اذهب failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
-    env_wchar = ga_env.ga_data;
+    env_wchar = ga_env.ga_انکڑے;
 
-    term->tl_winpty_config = winpty_config_new(0, &winpty_err);
-    if (term->tl_winpty_config == NULL)
-	goto failed;
+    رکن->tl_winpty_config = winpty_config_new(0, &winpty_err);
+    إذا (رکن->tl_winpty_config == عدم)
+	اذهب failed;
 
-    winpty_config_set_mouse_mode(term->tl_winpty_config,
-						    WINPTY_MOUSE_MODE_FORCE);
-    winpty_config_set_initial_size(term->tl_winpty_config,
-						 term->tl_cols, term->tl_rows);
-    term->tl_winpty = winpty_open(term->tl_winpty_config, &winpty_err);
-    if (term->tl_winpty == NULL)
-	goto failed;
+    winpty_config_سیٹ_mouse_منوال(رکن->tl_winpty_config,
+						    WINPTY_MOUSE_منوال_FORCE);
+    winpty_config_سیٹ_initial_ناپ(رکن->tl_winpty_config,
+						 رکن->tl_خانے_گنتی, رکن->tl_صفاں);
+    رکن->tl_winpty = winpty_open(رکن->tl_winpty_config, &winpty_err);
+    إذا (رکن->tl_winpty == عدم)
+	اذهب failed;
 
     spawn_config = winpty_spawn_config_new(
 	    WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN |
 		WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN,
-	    NULL,
+	    عدم,
 	    cmd_wchar,
 	    cwd_wchar,
 	    env_wchar,
 	    &winpty_err);
-    if (spawn_config == NULL)
-	goto failed;
+    إذا (spawn_config == عدم)
+	اذهب failed;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    channel = جوڑو_channel();
+    إذا (channel == عدم)
+	اذهب failed;
 
-    job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    کم = کم_alloc();
+    إذا (کم == عدم)
+	اذهب failed;
+    إذا (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	صحيح argc;
 
-	build_argv_from_string(cmd, &job->jv_argv, &argc);
+	build_argv_from_string(cmd, &کم->jv_argv, &argc);
     }
-    else
+    وإلا
     {
-	int argc;
+	صحيح argc;
 
-	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
+	build_argv_from_list(argvar->vval.v_list, &کم->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
-	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
+    إذا (opt->jo_سیٹ & JO_وچ_BUF)
+	کم->jv_وچ_buf = buflist_findnr(opt->jo_io_buf[PART_وچ]);
 
-    if (!winpty_spawn(term->tl_winpty, spawn_config, &child_process_handle,
-	    &child_thread_handle, &error, &winpty_err))
-	goto failed;
+    إذا (!winpty_spawn(رکن->tl_winpty, spawn_config, &بچہ_process_handle,
+	    &بچہ_thread_handle, &error, &winpty_err))
+	اذهب failed;
 
-    channel_set_pipes(channel,
+    channel_سیٹ_pipes(channel,
 	(sock_T)CreateFileW(
-	    winpty_conin_name(term->tl_winpty),
-	    GENERIC_WRITE, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conin_name(رکن->tl_winpty),
+	    GENERIC_WRITE, 0, عدم,
+	    OPEN_EXISTING, 0, عدم),
 	(sock_T)CreateFileW(
-	    winpty_conout_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    winpty_conout_name(رکن->tl_winpty),
+	    GENERIC_READ, 0, عدم,
+	    OPEN_EXISTING, 0, عدم),
 	(sock_T)CreateFileW(
-	    winpty_conerr_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL));
+	    winpty_conerr_name(رکن->tl_winpty),
+	    GENERIC_READ, 0, عدم,
+	    OPEN_EXISTING, 0, عدم));
 
     // Write lines with CR instead of NL.
-    channel->ch_write_text_mode = TRUE;
+    channel->ch_write_متن_منوال = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = Create_کم_Object(عدم, عدم);
+    إذا (jo == عدم)
+	اذهب failed;
 
-    if (!AssignProcessToJobObject(jo, child_process_handle))
+    إذا (!سونپو_Process_منزل_کم_Object(jo, بچہ_process_handle))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = عدم;
     }
 
     winpty_spawn_config_free(spawn_config);
@@ -7809,86 +7809,86 @@ winpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    إذا (create_vterm(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی) == FAIL)
+	اذهب failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    إذا (رکن_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	إذا (رکن->tl_palette != عدم)
+	    سیٹ_vterm_palette(رکن->tl_vterm, رکن->tl_palette);
+	وإلا
+	    init_vterm_ansi_colors(رکن->tl_vterm);
     }
 # endif
 
-    channel_set_job(channel, job, opt);
-    job_set_options(job, opt);
+    channel_سیٹ_کم(channel, کم, opt);
+    کم_سیٹ_options(کم, opt);
 
-    job->jv_channel = channel;
-    job->jv_proc_info.hProcess = child_process_handle;
-    job->jv_proc_info.dwProcessId = GetProcessId(child_process_handle);
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
-    job->jv_tty_in = utf16_to_enc(
-	    (short_u *)winpty_conin_name(term->tl_winpty), NULL);
-    job->jv_tty_out = utf16_to_enc(
-	    (short_u *)winpty_conout_name(term->tl_winpty), NULL);
-    job->jv_tty_type = vim_strsave((char_u *)"winpty");
-    ++job->jv_refcount;
-    term->tl_job = job;
+    کم->jv_channel = channel;
+    کم->jv_proc_info.hProcess = بچہ_process_handle;
+    کم->jv_proc_info.dwProcessId = GetProcessId(بچہ_process_handle);
+    کم->jv_کم_object = jo;
+    کم->jv_حالت = کم_STARTED;
+    کم->jv_tty_وچ = utf16_منزل_enc(
+	    (short_u *)winpty_conin_name(رکن->tl_winpty), عدم);
+    کم->jv_tty_باہرلا = utf16_منزل_enc(
+	    (short_u *)winpty_conout_name(رکن->tl_winpty), عدم);
+    کم->jv_tty_type = vim_strsave((char_u *)"winpty");
+    ++کم->jv_refcount;
+    رکن->tl_کم = کم;
 
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    إذا (orig_opt->jo_io[PART_باہرلا] == JIO_FILE)
     {
-	char_u *fname = opt->jo_io_name[PART_OUT];
+	char_u *fname = opt->jo_io_name[PART_باہرلا];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	رکن->tl_باہرلا_fd = mch_fopen((حرف *)fname, WRITEBIN);
+	إذا (رکن->tl_باہرلا_fd == عدم)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    أرجع OK;
 
 failed:
     ga_clear(&ga_cmd);
     ga_clear(&ga_env);
     vim_free(cmd_wchar);
     vim_free(cwd_wchar);
-    if (spawn_config != NULL)
+    إذا (spawn_config != عدم)
 	winpty_spawn_config_free(spawn_config);
-    if (channel != NULL)
+    إذا (channel != عدم)
 	channel_clear(channel);
-    if (job != NULL)
+    إذا (کم != عدم)
     {
-	job->jv_channel = NULL;
-	job_cleanup(job);
+	کم->jv_channel = عدم;
+	کم_cleanup(کم);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    رکن->tl_کم = عدم;
+    إذا (jo != عدم)
 	CloseHandle(jo);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (winpty_err != NULL)
+    إذا (رکن->tl_winpty != عدم)
+	winpty_free(رکن->tl_winpty);
+    رکن->tl_winpty = عدم;
+    إذا (رکن->tl_winpty_config != عدم)
+	winpty_config_free(رکن->tl_winpty_config);
+    رکن->tl_winpty_config = عدم;
+    إذا (winpty_err != عدم)
     {
-	char *msg = (char *)utf16_to_enc(
-				(short_u *)winpty_error_msg(winpty_err), NULL);
+	حرف *پیغام = (حرف *)utf16_منزل_enc(
+				(short_u *)winpty_error_پیغام(winpty_err), عدم);
 
-	if (msg != NULL)
+	إذا (پیغام != عدم)
 	{
-	    emsg(msg);
-	    vim_free(msg);
+	    emsg(پیغام);
+	    vim_free(پیغام);
 	}
 	winpty_error_free(winpty_err);
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
@@ -7896,164 +7896,164 @@ failed:
  * Store a reference in "term".
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    ساكن صحيح
+رکن_and_کم_init(
+	رکن_T	    *رکن,
 	typval_T    *argvar,
-	char	    **argv,
+	حرف	    **argv,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    int		    use_winpty = FALSE;
-    int		    use_conpty = FALSE;
-    int		    tty_type = *p_twt;
+    صحيح		    use_winpty = FALSE;
+    صحيح		    use_conpty = FALSE;
+    صحيح		    tty_type = *p_twt;
 
     has_winpty = dyn_winpty_init(FALSE) != FAIL ? TRUE : FALSE;
     has_conpty = dyn_conpty_init(FALSE) != FAIL ? TRUE : FALSE;
 
-    if (!has_winpty && !has_conpty)
+    إذا (!has_winpty && !has_conpty)
 	// If neither is available give the errors for winpty, since when
 	// conpty is not available it can't be installed either.
-	return dyn_winpty_init(TRUE);
+	أرجع dyn_winpty_init(TRUE);
 
-    if (opt->jo_tty_type != NUL)
+    إذا (opt->jo_tty_type != NUL)
 	tty_type = opt->jo_tty_type;
 
-    if (tty_type == NUL)
+    إذا (tty_type == NUL)
     {
-	if (has_conpty && (is_conpty_stable() || !has_winpty))
+	إذا (has_conpty && (is_conpty_stable() || !has_winpty))
 	    use_conpty = TRUE;
-	else if (has_winpty)
+	وإلا إذا (has_winpty)
 	    use_winpty = TRUE;
 	// else: error
     }
-    else if (tty_type == 'w')	// winpty
+    وإلا إذا (tty_type == 'w')	// winpty
     {
-	if (has_winpty)
+	إذا (has_winpty)
 	    use_winpty = TRUE;
     }
-    else if (tty_type == 'c')	// conpty
+    وإلا إذا (tty_type == 'c')	// conpty
     {
-	if (has_conpty)
+	إذا (has_conpty)
 	    use_conpty = TRUE;
-	else
-	    return dyn_conpty_init(TRUE);
+	وإلا
+	    أرجع dyn_conpty_init(TRUE);
     }
 
-    if (use_conpty)
-	return conpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    إذا (use_conpty)
+	أرجع conpty_رکن_and_کم_init(رکن, argvar, argv, opt, orig_opt);
 
-    if (use_winpty)
-	return winpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    إذا (use_winpty)
+	أرجع winpty_رکن_and_کم_init(رکن, argvar, argv, opt, orig_opt);
 
     // error
-    return dyn_winpty_init(TRUE);
+    أرجع dyn_winpty_init(TRUE);
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *options)
+    ساكن صحيح
+create_pty_only(رکن_T *رکن, jobopt_T *options)
 {
-    HANDLE	    hPipeIn = INVALID_HANDLE_VALUE;
-    HANDLE	    hPipeOut = INVALID_HANDLE_VALUE;
-    char	    in_name[80], out_name[80];
-    channel_T	    *channel = NULL;
+    HANDLE	    h_Pipe_وچ = INVALID_HANDLE_قدر;
+    HANDLE	    h_Pipe_باہرلا = INVALID_HANDLE_قدر;
+    حرف	    وچ_name[80], باہرلا_name[80];
+    channel_T	    *channel = عدم;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    إذا (create_vterm(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی) == FAIL)
+	أرجع FAIL;
 
-    vim_snprintf(in_name, sizeof(in_name), "\\\\.\\pipe\\vim-%d-in-%d",
+    vim_snprintf(وچ_name, حجم(وچ_name), "\\\\.\\pipe\\vim-%d-in-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeIn = CreateNamedPipe(in_name, PIPE_ACCESS_OUTBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_وچ = CreateNamedPipe(وچ_name, PIPE_ACCESS_OUTBOUND,
+	    PIPE_TYPE_سنیہا | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, NMPWAIT_NOWAIT, NULL);
-    if (hPipeIn == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, NMPWAIT_NOWAIT, عدم);
+    إذا (h_Pipe_وچ == INVALID_HANDLE_قدر)
+	اذهب failed;
 
-    vim_snprintf(out_name, sizeof(out_name), "\\\\.\\pipe\\vim-%d-out-%d",
+    vim_snprintf(باہرلا_name, حجم(باہرلا_name), "\\\\.\\pipe\\vim-%d-out-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
-    hPipeOut = CreateNamedPipe(out_name, PIPE_ACCESS_INBOUND,
-	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
+    h_Pipe_باہرلا = CreateNamedPipe(باہرلا_name, PIPE_ACCESS_INBOUND,
+	    PIPE_TYPE_سنیہا | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, 0, NULL);
-    if (hPipeOut == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, 0, عدم);
+    إذا (h_Pipe_باہرلا == INVALID_HANDLE_قدر)
+	اذهب failed;
 
-    ConnectNamedPipe(hPipeIn, NULL);
-    ConnectNamedPipe(hPipeOut, NULL);
+    ConnectNamedPipe(h_Pipe_وچ, عدم);
+    ConnectNamedPipe(h_Pipe_باہرلا, عدم);
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	goto failed;
-    ++term->tl_job->jv_refcount;
+    رکن->tl_کم = کم_alloc();
+    إذا (رکن->tl_کم == عدم)
+	اذهب failed;
+    ++رکن->tl_کم->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    رکن->tl_کم->jv_حالت = کم_مکمل;
 
-    channel = add_channel();
-    if (channel == NULL)
-	goto failed;
-    term->tl_job->jv_channel = channel;
+    channel = جوڑو_channel();
+    إذا (channel == عدم)
+	اذهب failed;
+    رکن->tl_کم->jv_channel = channel;
     channel->ch_keep_open = TRUE;
     channel->ch_named_pipe = TRUE;
 
-    channel_set_pipes(channel,
-	(sock_T)hPipeIn,
-	(sock_T)hPipeOut,
-	(sock_T)hPipeOut);
-    channel_set_job(channel, term->tl_job, options);
-    term->tl_job->jv_tty_in = vim_strsave((char_u*)in_name);
-    term->tl_job->jv_tty_out = vim_strsave((char_u*)out_name);
+    channel_سیٹ_pipes(channel,
+	(sock_T)h_Pipe_وچ,
+	(sock_T)h_Pipe_باہرلا,
+	(sock_T)h_Pipe_باہرلا);
+    channel_سیٹ_کم(channel, رکن->tl_کم, options);
+    رکن->tl_کم->jv_tty_وچ = vim_strsave((char_u*)وچ_name);
+    رکن->tl_کم->jv_tty_باہرلا = vim_strsave((char_u*)باہرلا_name);
 
-    return OK;
+    أرجع OK;
 
 failed:
-    if (hPipeIn != NULL)
-	CloseHandle(hPipeIn);
-    if (hPipeOut != NULL)
-	CloseHandle(hPipeOut);
-    return FAIL;
+    إذا (h_Pipe_وچ != عدم)
+	CloseHandle(h_Pipe_وچ);
+    إذا (h_Pipe_باہرلا != عدم)
+	CloseHandle(h_Pipe_باہرلا);
+    أرجع FAIL;
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    ساكن فراغ
+رکن_free_vterm(رکن_T *رکن)
 {
-    term_free_conpty(term);
-    if (term->tl_winpty != NULL)
-	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
-	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    رکن_free_conpty(رکن);
+    إذا (رکن->tl_winpty != عدم)
+	winpty_free(رکن->tl_winpty);
+    رکن->tl_winpty = عدم;
+    إذا (رکن->tl_winpty_config != عدم)
+	winpty_config_free(رکن->tl_winpty_config);
+    رکن->tl_winpty_config = عدم;
+    إذا (رکن->tl_vterm != عدم)
+	vterm_free(رکن->tl_vterm);
+    رکن->tl_vterm = عدم;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    ساكن فراغ
+رکن_report_winsize(رکن_T *رکن, صحيح صفاں_2, صحيح خانے_گنتی)
 {
-    if (term->tl_conpty)
-	conpty_term_report_winsize(term, rows, cols);
-    if (term->tl_winpty)
-	winpty_set_size(term->tl_winpty, cols, rows, NULL);
+    إذا (رکن->tl_conpty)
+	conpty_رکن_report_winsize(رکن, صفاں_2, خانے_گنتی);
+    إذا (رکن->tl_winpty)
+	winpty_سیٹ_ناپ(رکن->tl_winpty, خانے_گنتی, صفاں_2, عدم);
 }
 
-    int
-terminal_enabled(void)
+    صحيح
+terminal_enabled(فراغ)
 {
-    return dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
+    أرجع dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
 }
 
-#else
+#وإلا
 
 ///////////////////////////////////////
 // 3. Unix-like implementation.
@@ -8065,90 +8065,90 @@ terminal_enabled(void)
  * When "argv" is not NULL then "argvar" is not used.
  * Return OK or FAIL.
  */
-    static int
-term_and_job_init(
-	term_T	    *term,
+    ساكن صحيح
+رکن_and_کم_init(
+	رکن_T	    *رکن,
 	typval_T    *argvar,
-	char	    **argv,
+	حرف	    **argv,
 	jobopt_T    *opt,
-	jobopt_T    *orig_opt UNUSED)
+	jobopt_T    *orig_opt بن_ورتیا)
 {
-    term->tl_arg0_cmd = NULL;
+    رکن->tl_arg0_cmd = عدم;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    إذا (create_vterm(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی) == FAIL)
+	أرجع FAIL;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# إذا defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    إذا (رکن_use_palette())
     {
-	if (term->tl_palette != NULL)
-	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
-	    init_vterm_ansi_colors(term->tl_vterm);
+	إذا (رکن->tl_palette != عدم)
+	    سیٹ_vterm_palette(رکن->tl_vterm, رکن->tl_palette);
+	وإلا
+	    init_vterm_ansi_colors(رکن->tl_vterm);
     }
 # endif
 
     // This may change a string in "argvar".
-    term->tl_job = job_start(argvar, argv, opt, &term->tl_job);
-    if (term->tl_job != NULL)
-	++term->tl_job->jv_refcount;
+    رکن->tl_کم = کم_شروع(argvar, argv, opt, &رکن->tl_کم);
+    إذا (رکن->tl_کم != عدم)
+	++رکن->tl_کم->jv_refcount;
 
-    return term->tl_job != NULL
-	&& term->tl_job->jv_channel != NULL
-	&& term->tl_job->jv_status != JOB_FAILED ? OK : FAIL;
+    أرجع رکن->tl_کم != عدم
+	&& رکن->tl_کم->jv_channel != عدم
+	&& رکن->tl_کم->jv_حالت != کم_FAILED ? OK : FAIL;
 }
 
-    static int
-create_pty_only(term_T *term, jobopt_T *opt)
+    ساكن صحيح
+create_pty_only(رکن_T *رکن, jobopt_T *opt)
 {
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    إذا (create_vterm(رکن, رکن->tl_صفاں, رکن->tl_خانے_گنتی) == FAIL)
+	أرجع FAIL;
 
-    term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	return FAIL;
-    ++term->tl_job->jv_refcount;
+    رکن->tl_کم = کم_alloc();
+    إذا (رکن->tl_کم == عدم)
+	أرجع FAIL;
+    ++رکن->tl_کم->jv_refcount;
 
     // behave like the job is already finished
-    term->tl_job->jv_status = JOB_FINISHED;
+    رکن->tl_کم->jv_حالت = کم_مکمل;
 
-    return mch_create_pty_channel(term->tl_job, opt);
+    أرجع mch_create_pty_channel(رکن->tl_کم, opt);
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
-term_free_vterm(term_T *term)
+    ساكن فراغ
+رکن_free_vterm(رکن_T *رکن)
 {
-    if (term->tl_vterm != NULL)
-	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    إذا (رکن->tl_vterm != عدم)
+	vterm_free(رکن->tl_vterm);
+    رکن->tl_vterm = عدم;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    ساكن فراغ
+رکن_report_winsize(رکن_T *رکن, صحيح صفاں_2, صحيح خانے_گنتی)
 {
     // Use an ioctl() to report the new window size to the job.
-    if (term->tl_job == NULL || term->tl_job->jv_channel == NULL)
-	return;
+    إذا (رکن->tl_کم == عدم || رکن->tl_کم->jv_channel == عدم)
+	أرجع;
 
-    int fd = -1;
-    int part;
+    صحيح fd = -1;
+    صحيح part;
 
-    for (part = PART_OUT; part < PART_COUNT; ++part)
+    لكل (part = PART_باہرلا; part < PART_گنتی; ++part)
     {
-	fd = term->tl_job->jv_channel->ch_part[part].ch_fd;
-	if (mch_isatty(fd))
-	    break;
+	fd = رکن->tl_کم->jv_channel->ch_part[part].ch_fd;
+	إذا (mch_isatty(fd))
+	    اكسر;
     }
-    if (part < PART_COUNT && mch_report_winsize(fd, rows, cols) == OK)
-	mch_signal_job(term->tl_job, (char_u *)"winch");
+    إذا (part < PART_گنتی && mch_report_winsize(fd, صفاں_2, خانے_گنتی) == OK)
+	mch_signal_کم(رکن->tl_کم, (char_u *)"winch");
 }
 
-#endif
+#جے_انت
 
-#endif // FEAT_TERMINAL
+#جے_انت // FEAT_TERMINAL

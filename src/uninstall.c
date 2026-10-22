@@ -18,328 +18,328 @@
  */
 
 // Include common code for dosinst.c and uninstall.c.
-#include "dosinst.h"
+#ضمن "dosinst.h"
 
 /*
  * Return TRUE if the user types a 'y' or 'Y', FALSE otherwise.
  */
-    static int
-confirm(void)
+    ساكن صحيح
+confirm(فراغ)
 {
-    char	answer[10];
+    حرف	answer[10];
 
     fflush(stdout);
-    return (scanf(" %c", answer) == 1 && toupper((unsigned char)answer[0]) == 'Y');
+    أرجع (scanf(" %c", answer) == 1 && وڈا_حرف((بنانشانی حرف)answer[0]) == 'Y');
 }
 
-    static int
-reg_delete_key(HKEY hRootKey, const char *key, DWORD flag)
+    ساكن صحيح
+reg_delete_کلید(HKEY h_جڑ_کلید, ثابت حرف *کلید, DWORD flag)
 {
-    static int did_load = FALSE;
-    static HANDLE advapi_lib = NULL;
-    static LONG (WINAPI *delete_key_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = NULL;
+    ساكن صحيح did_لدو = FALSE;
+    ساكن HANDLE advapi_lib = عدم;
+    ساكن LONG (WINAPI *delete_کلید_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = عدم;
 
-    if (!did_load)
+    إذا (!did_لدو)
     {
 	// The RegDeleteKeyEx() function is only available on new systems.  It
 	// is required for 64-bit registry access.  For other systems fall
 	// back to RegDeleteKey().
-	did_load = TRUE;
-	advapi_lib = LoadLibrary("ADVAPI32.DLL");
-	if (advapi_lib != NULL)
-	    delete_key_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))GetProcAddress(advapi_lib, "RegDeleteKeyExA");
+	did_لدو = TRUE;
+	advapi_lib = لدو_Library("ADVAPI32.DLL");
+	إذا (advapi_lib != عدم)
+	    delete_کلید_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))Get_Proc_پتہ(advapi_lib, "RegDeleteKeyExA");
     }
-    if (delete_key_ex != NULL)
+    إذا (delete_کلید_ex != عدم)
     {
-	return (*delete_key_ex)(hRootKey, key, flag, 0);
+	أرجع (*delete_کلید_ex)(h_جڑ_کلید, کلید, flag, 0);
     }
-    return RegDeleteKey(hRootKey, key);
+    أرجع Reg_Delete_کلید(h_جڑ_کلید, کلید);
 }
 
 /*
  * Check if the popup menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-popup_gvim_path(char *buf, DWORD bufsize)
+    ساكن صحيح
+popup_gvim_رستہ(حرف *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	کلید_handle;
+    DWORD	قدر_type;
+    صحيح		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_32KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	    return 0;
+    إذا (Reg_Open_کلید_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    کلید_WOW64_64_کلید | کلید_READ, &کلید_handle) != ERROR_SUCCESS)
+	إذا (Reg_Open_کلید_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    کلید_WOW64_32_کلید | کلید_READ, &کلید_handle) != ERROR_SUCCESS)
+	    أرجع 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "path", 0,
-					  &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_قدر_Ex(کلید_handle, "path", 0,
+					  &قدر_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_کلید(کلید_handle);
 
-    return (r == ERROR_SUCCESS);
+    أرجع (r == ERROR_SUCCESS);
 }
 
 /*
  * Check if the "Open With..." menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-openwith_gvim_path(char *buf, DWORD bufsize)
+    ساكن صحيح
+openwith_gvim_رستہ(حرف *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	کلید_handle;
+    DWORD	قدر_type;
+    صحيح		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_CLASSES_ROOT,
+    إذا (Reg_Open_کلید_Ex(HKEY_CLASSES_جڑ,
 		"Applications\\gvim.exe\\shell\\edit\\command", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	return 0;
+		    کلید_WOW64_64_کلید | کلید_READ, &کلید_handle) != ERROR_SUCCESS)
+	أرجع 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "", 0, &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_قدر_Ex(کلید_handle, "", 0, &قدر_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_کلید(کلید_handle);
 
-    return (r == ERROR_SUCCESS);
+    أرجع (r == ERROR_SUCCESS);
 }
 
-    static void
-remove_popup(void)
+    ساكن فراغ
+remove_popup(فراغ)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 6;
+    صحيح		fail = 0;
+    صحيح		i;
+    صحيح		loop = is_64bit_os() ? 2 : 1;
+    صحيح		maxfail = loop * 6;
     DWORD	flag;
     HKEY	kh;
 
-    for (i = 0; i < loop; i++)
+    لكل (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	إذا (i == 0)
+	    flag = کلید_WOW64_32_کلید;
+	وإلا
+	    flag = کلید_WOW64_64_کلید;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
-		    flag | KEY_ALL_ACCESS, &kh) != ERROR_SUCCESS)
+	إذا (Reg_Open_کلید_Ex(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
+		    flag | کلید_ALL_ACCESS, &kh) != ERROR_SUCCESS)
 	    ++fail;
-	else
+	وإلا
 	{
-	    if (RegDeleteValue(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
+	    إذا (Reg_Delete_قدر(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
 		++fail;
-	    RegCloseKey(kh);
+	    Reg_Close_کلید(kh);
 	}
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
-	printf("No Vim popup registry entries could be removed\n");
-    else if (fail > 0)
-	printf("Some Vim popup registry entries could not be removed\n");
-    else
-	printf("The Vim popup registry entries have been removed\n");
+    إذا (fail == maxfail)
+	لکھو("No Vim popup registry entries could be removed\n");
+    وإلا إذا (fail > 0)
+	لکھو("Some Vim popup registry entries could not be removed\n");
+    وإلا
+	لکھو("The Vim popup registry entries have been removed\n");
 }
 
-    static void
-remove_openwith(void)
+    ساكن فراغ
+remove_openwith(فراغ)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 7;
+    صحيح		fail = 0;
+    صحيح		i;
+    صحيح		loop = is_64bit_os() ? 2 : 1;
+    صحيح		maxfail = loop * 7;
     DWORD	flag;
 
-    for (i = 0; i < loop; i++)
+    لكل (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	إذا (i == 0)
+	    flag = کلید_WOW64_32_کلید;
+	وإلا
+	    flag = کلید_WOW64_64_کلید;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	إذا (reg_delete_کلید(HKEY_CLASSES_جڑ, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
-	printf("No Vim open-with registry entries could be removed\n");
-    else if (fail > 0)
-	printf("Some Vim open-with registry entries could not be removed\n");
-    else
-	printf("The Vim open-with registry entries have been removed\n");
+    إذا (fail == maxfail)
+	لکھو("No Vim open-with registry entries could be removed\n");
+    وإلا إذا (fail > 0)
+	لکھو("Some Vim open-with registry entries could not be removed\n");
+    وإلا
+	لکھو("The Vim open-with registry entries have been removed\n");
 }
 
 /*
  * Check if a batch file is really for the current version.  Don't delete a
  * batch file that was written for another (possibly newer) version.
  */
-    static int
-batfile_thisversion(char *path)
+    ساكن صحيح
+batfile_thisversion(حرف *رستہ)
 {
     FILE	*fd;
-    char	line[BUFSIZE];
-    int		key_len = strlen(VIMBAT_UNINSTKEY);
-    int		found = FALSE;
+    حرف	سطر[BUFSIZE];
+    صحيح		کلید_len = لڑی_لمبائی(VIMBAT_UNINSTKEY);
+    صحيح		لبھیا = FALSE;
 
-    fd = fopen(path, "r");
-    if (fd == NULL)
-	return FALSE;
+    fd = fopen(رستہ, "r");
+    إذا (fd == عدم)
+	أرجع FALSE;
 
-    while (fgets(line, sizeof(line), fd) != NULL)
+    طالما (fgets(سطر, حجم(سطر), fd) != عدم)
     {
-	if (strncmp(line, VIMBAT_UNINSTKEY, key_len) == 0)
+	إذا (لڑی_مقابلہ(سطر, VIMBAT_UNINSTKEY, کلید_len) == 0)
 	{
-	    found = TRUE;
-	    break;
+	    لبھیا = TRUE;
+	    اكسر;
 	}
     }
     fclose(fd);
-    return found;
+    أرجع لبھیا;
 }
 
-    static int
-remove_batfiles(int doit)
+    ساكن صحيح
+remove_batfiles(صحيح doit)
 {
-    char *batfile_path;
-    int	 i;
-    int	 found = 0;
+    حرف *batfile_رستہ;
+    صحيح	 i;
+    صحيح	 لبھیا = 0;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    لكل (i = 1; i < نشانہ_گنتی; ++i)
     {
-	batfile_path = searchpath_save(targets[i].batname);
-	if (batfile_path != NULL && batfile_thisversion(batfile_path))
+	batfile_رستہ = searchpath_save(targets[i].batname);
+	إذا (batfile_رستہ != عدم && batfile_thisversion(batfile_رستہ))
 	{
-	    ++found;
-	    if (doit)
+	    ++لبھیا;
+	    إذا (doit)
 	    {
-		printf("removing %s\n", batfile_path);
-		remove(batfile_path);
+		لکھو("removing %s\n", batfile_رستہ);
+		remove(batfile_رستہ);
 	    }
-	    else
-		printf(" - the batch file %s\n", batfile_path);
-	    free(batfile_path);
+	    وإلا
+		لکھو(" - the batch file %s\n", batfile_رستہ);
+	    حرر(batfile_رستہ);
 	}
     }
 
     mch_chdir(installdir);
-    return found;
+    أرجع لبھیا;
 }
 
-    static void
-remove_if_exists(char *path, char *filename)
+    ساكن فراغ
+remove_if_exists(حرف *رستہ, حرف *filename)
 {
-    char buf[BUFSIZE];
+    حرف buf[BUFSIZE];
     FILE *fd;
 
-    sprintf(buf, "%s\\%s", path, filename);
+    sprintf(buf, "%s\\%s", رستہ, filename);
 
     fd = fopen(buf, "r");
-    if (fd == NULL)
-	return;
+    إذا (fd == عدم)
+	أرجع;
 
     fclose(fd);
-    printf("removing %s\n", buf);
+    لکھو("removing %s\n", buf);
     remove(buf);
 }
 
-    static void
-remove_icons(void)
+    ساكن فراغ
+remove_icons(فراغ)
 {
-    char	path[BUFSIZE];
-    int		i;
+    حرف	رستہ[BUFSIZE];
+    صحيح		i;
 
-    if (get_shell_folder_path(path, "desktop"))
-	for (i = 0; i < ICON_COUNT; ++i)
-	    remove_if_exists(path, icon_link_names[i]);
+    إذا (get_shell_folder_رستہ(رستہ, "desktop"))
+	لكل (i = 0; i < ICON_گنتی; ++i)
+	    remove_if_exists(رستہ, icon_link_ناں[i]);
 }
 
-    static void
-remove_start_menu(void)
+    ساكن فراغ
+remove_شروع_menu(فراغ)
 {
-    char	path[BUFSIZE];
-    int		i;
-    struct stat st;
+    حرف	رستہ[BUFSIZE];
+    صحيح		i;
+    بنية stat st;
 
-    if (get_shell_folder_path(path, VIM_STARTMENU) == FAIL)
-	return;
+    إذا (get_shell_folder_رستہ(رستہ, VIM_STARTMENU) == FAIL)
+	أرجع;
 
-    for (i = 1; i < TARGET_COUNT; ++i)
-	remove_if_exists(path, targets[i].lnkname);
-    remove_if_exists(path, "uninstall.lnk");
-    remove_if_exists(path, "Help.lnk");
+    لكل (i = 1; i < نشانہ_گنتی; ++i)
+	remove_if_exists(رستہ, targets[i].lnkname);
+    remove_if_exists(رستہ, "uninstall.lnk");
+    remove_if_exists(رستہ, "Help.lnk");
     // Win95 uses .pif, WinNT uses .lnk
-    remove_if_exists(path, "Vim tutor.pif");
-    remove_if_exists(path, "Vim tutor.lnk");
-    remove_if_exists(path, "Vim online.url");
-    if (stat(path, &st) == 0)
+    remove_if_exists(رستہ, "Vim tutor.pif");
+    remove_if_exists(رستہ, "Vim tutor.lnk");
+    remove_if_exists(رستہ, "Vim online.url");
+    إذا (stat(رستہ, &st) == 0)
     {
-	printf("removing %s\n", path);
-	rmdir(path);
+	لکھو("removing %s\n", رستہ);
+	rmdir(رستہ);
     }
 }
 
-    static void
-delete_uninstall_key(void)
+    ساكن فراغ
+delete_uninstall_کلید(فراغ)
 {
-    reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT, KEY_WOW64_64KEY);
+    reg_delete_کلید(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_نسخہ_SHORT, کلید_WOW64_64_کلید);
 }
 
-    int
-main(int argc, char *argv[])
+    صحيح
+مکھ(صحيح argc, حرف *argv[])
 {
-    int		found = 0;
+    صحيح		لبھیا = 0;
     FILE	*fd;
-    int		i;
-    struct stat st;
-    char	icon[BUFSIZE];
-    char	path[MAX_PATH];
-    char	popup_path[MAX_PATH];
+    صحيح		i;
+    بنية stat st;
+    حرف	icon[BUFSIZE];
+    حرف	رستہ[MAX_رستہ];
+    حرف	popup_رستہ[MAX_رستہ];
 
     // The nsis uninstaller calls us with a "-nsis" argument.
-    if (argc == 2 && stricmp(argv[1], "-nsis") == 0)
+    إذا (argc == 2 && stricmp(argv[1], "-nsis") == 0)
 	interactive = FALSE;
-    else
+    وإلا
 	interactive = TRUE;
 
     // Initialize this program.
     do_inits(argv);
 
-    printf("This program will remove the following items:\n");
+    لکھو("This program will remove the following items:\n");
 
-    if (popup_gvim_path(popup_path, sizeof(popup_path)))
+    إذا (popup_gvim_رستہ(popup_رستہ, حجم(popup_رستہ)))
     {
-	printf(" - the \"Edit with Vim\" entry in the popup menu\n");
-	printf("   which uses \"%s\"\n", popup_path);
-	if (interactive)
-	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
+	لکھو(" - the \"Edit with Vim\" entry in the popup menu\n");
+	لکھو("   which uses \"%s\"\n", popup_رستہ);
+	إذا (interactive)
+	    لکھو("\nRemove it (y/n)? ");
+	إذا (!interactive || confirm())
 	{
 	    remove_popup();
 	    // Assume the "Open With" entry can be removed as well, don't
@@ -347,80 +347,80 @@ main(int argc, char *argv[])
 	    remove_openwith();
 	}
     }
-    else if (openwith_gvim_path(popup_path, sizeof(popup_path)))
+    وإلا إذا (openwith_gvim_رستہ(popup_رستہ, حجم(popup_رستہ)))
     {
-	printf(" - the Vim \"Open With...\" entry in the popup menu\n");
-	printf("   which uses \"%s\"\n", popup_path);
-	printf("\nRemove it (y/n)? ");
-	if (confirm())
+	لکھو(" - the Vim \"Open With...\" entry in the popup menu\n");
+	لکھو("   which uses \"%s\"\n", popup_رستہ);
+	لکھو("\nRemove it (y/n)? ");
+	إذا (confirm())
 	    remove_openwith();
     }
 
-    if (get_shell_folder_path(path, "desktop"))
+    إذا (get_shell_folder_رستہ(رستہ, "desktop"))
     {
-	printf("\n");
-	for (i = 0; i < ICON_COUNT; ++i)
+	لکھو("\n");
+	لكل (i = 0; i < ICON_گنتی; ++i)
 	{
-	    sprintf(icon, "%s\\%s", path, icon_link_names[i]);
-	    if (stat(icon, &st) == 0)
+	    sprintf(icon, "%s\\%s", رستہ, icon_link_ناں[i]);
+	    إذا (stat(icon, &st) == 0)
 	    {
-		printf(" - the \"%s\" icon on the desktop\n", icon_names[i]);
-		++found;
+		لکھو(" - the \"%s\" icon on the desktop\n", icon_ناں[i]);
+		++لبھیا;
 	    }
 	}
-	if (found > 0)
+	إذا (لبھیا > 0)
 	{
-	    if (interactive)
-		printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	    if (!interactive || confirm())
+	    إذا (interactive)
+		لکھو("\nRemove %s (y/n)? ", لبھیا > 1 ? "them" : "it");
+	    إذا (!interactive || confirm())
 		remove_icons();
 	}
     }
 
-    if (get_shell_folder_path(path, VIM_STARTMENU)
-	    && stat(path, &st) == 0)
+    إذا (get_shell_folder_رستہ(رستہ, VIM_STARTMENU)
+	    && stat(رستہ, &st) == 0)
     {
-	printf("\n - the \"%s\" entry in the Start Menu\n", VIM_STARTMENU);
-	if (interactive)
-	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
-	    remove_start_menu();
+	لکھو("\n - the \"%s\" entry in the Start Menu\n", VIM_STARTMENU);
+	إذا (interactive)
+	    لکھو("\nRemove it (y/n)? ");
+	إذا (!interactive || confirm())
+	    remove_شروع_menu();
     }
 
-    printf("\n");
-    found = remove_batfiles(0);
-    if (found > 0)
+    لکھو("\n");
+    لبھیا = remove_batfiles(0);
+    إذا (لبھیا > 0)
     {
-	if (interactive)
-	    printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	if (!interactive || confirm())
+	إذا (interactive)
+	    لکھو("\nRemove %s (y/n)? ", لبھیا > 1 ? "them" : "it");
+	إذا (!interactive || confirm())
 	    remove_batfiles(1);
     }
 
     fd = fopen("gvim.exe", "r");
-    if (fd != NULL)
+    إذا (fd != عدم)
     {
 	fclose(fd);
-	printf("gvim.exe detected.  Attempting to unregister gvim with OLE\n");
+	لکھو("gvim.exe detected.  Attempting to unregister gvim with OLE\n");
 	system("gvim.exe -silent -unregister");
     }
 
-    delete_uninstall_key();
+    delete_uninstall_کلید();
 
-    if (interactive)
+    إذا (interactive)
     {
-	printf("\nYou may now want to delete the Vim executables and runtime files.\n");
-	printf("(They are still where you unpacked them.)\n");
+	لکھو("\nYou may now want to delete the Vim executables and runtime files.\n");
+	لکھو("(They are still where you unpacked them.)\n");
     }
 
-    if (interactive)
+    إذا (interactive)
     {
 	rewind(stdin);
-	printf("\nPress Enter to exit...");
-	(void)getchar();
+	لکھو("\nPress Enter to exit...");
+	(فراغ)getchar();
     }
-    else
+    وإلا
 	sleep(3);
 
-    return 0;
+    أرجع 0;
 }

@@ -13,13 +13,13 @@
  *		clipboard code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_CYGWIN_WIN32_CLIPBOARD
-# define WIN32_LEAN_AND_MEAN
+#جے_تعریف_شدہ FEAT_CYGWIN_WIN32_CLIPBOARD
+# define WIN32_LEAN_AND_اوسط
 # include <windows.h>
 # include "winclip.pro"
-#endif
+#جے_انت
 
 // Functions for copying and pasting text between applications.
 // This is always included in a GUI version, but may also be included when the
@@ -32,36 +32,36 @@
 // for them.
 
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
-static int clip_provider_is_available(char_u *provider);
-#endif
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
+ساكن صحيح clip_provider_is_دستیاب(char_u *provider);
+#جے_انت
 
-#if defined(FEAT_CLIPBOARD)
+#إذا defined(FEAT_CLIPBOARD)
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_WAYLAND_CLIPBOARD)
 
 #  include "wayland.h"
 
 // Represents either the regular or primary selection
-typedef struct {
+تعريفنوع بنية {
     char_u		*contents;	// Non-null if we own selection,
 					// contains the data to send to other
 					// clients.
-    vwl_data_source_T	*source;	// Non-NULL if we own the selection,
+    vwl_انکڑے_سروت_T	*سروت;	// Non-NULL if we own the selection,
 					// else NULL if we don't.
-    vwl_data_offer_T	*offer;		// Current offer for the selection
+    vwl_انکڑے_offer_T	*offer;		// Current offer for the selection
 
     bool		own_success;	// Used by clip_wl_own_selection()
-    bool		available;	// If selection is ready to serve/use
+    bool		دستیاب;	// If selection is ready to serve/use
 
     // These may point to the same proxy as the other selection
-    vwl_data_device_manager_T	*manager;
-    vwl_data_device_T		*device;
+    vwl_انکڑے_device_manager_T	*manager;
+    vwl_انکڑے_device_T		*device;
 } clip_wl_selection_T;
 
 // Represents the clipboard for the global Wayland connection, for the chosen
 // seat (using the 'wl_seat' option)
-typedef struct {
+تعريفنوع بنية {
     vwl_seat_T *seat;
 
     clip_wl_selection_T regular;
@@ -71,7 +71,7 @@ typedef struct {
 // Mime types we support sending and receiving
 // Mimes with a lower index in the array are prioritized first when we are
 // receiving data.
-static const char *supported_mimes[] = {
+ساكن ثابت حرف *supported_mimes[] = {
     VIMENC_MIMETYPE_NAME,
     VIMENC_ATOM_NAME,
     VIM_MIMETYPE_NAME,
@@ -85,15 +85,15 @@ static const char *supported_mimes[] = {
 
 clip_wl_T clip_wl;
 
-static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd);
-static void clip_wl_request_selection(Clipboard_T *cbd);
-static int clip_wl_own_selection(Clipboard_T *cbd);
-static void clip_wl_lose_selection(Clipboard_T *cbd);
-static void clip_wl_set_selection(Clipboard_T *cbd);
+ساكن فراغ
+clip_wl_receive_انکڑے(Clipboard_T *cbd, ثابت حرف *mime_type, صحيح fd);
+ساكن فراغ clip_wl_request_selection(Clipboard_T *cbd);
+ساكن صحيح clip_wl_own_selection(Clipboard_T *cbd);
+ساكن فراغ clip_wl_lose_selection(Clipboard_T *cbd);
+ساكن فراغ clip_wl_سیٹ_selection(Clipboard_T *cbd);
 
-#  if defined(USE_SYSTEM)
-static bool clip_wl_owner_exists(Clipboard_T *cbd);
+#  إذا defined(USE_SYSTEM)
+ساكن bool clip_wl_owner_exists(Clipboard_T *cbd);
 #  endif
 
 # endif // FEAT_WAYLAND_CLIPBOARD
@@ -109,29 +109,29 @@ static bool clip_wl_owner_exists(Clipboard_T *cbd);
  * be used.  Eg unix may call this with FALSE, then call it again with TRUE if
  * the GUI starts.
  */
-    void
-clip_init(int can_use)
+    فراغ
+clip_init(صحيح can_use)
 {
     Clipboard_T *cb;
 
-    cb = &clip_star;
-    for (;;)
+    cb = &clip_تارا;
+    لكل (;;)
     {
 	// No need to init again if cbd is already available
-	if (can_use && cb->available)
-	    goto skip;
+	إذا (can_use && cb->دستیاب)
+	    اذهب skip;
 
-	cb->available  = can_use;
+	cb->دستیاب  = can_use;
 	cb->owned      = FALSE;
-	cb->start.lnum = 0;
-	cb->start.col  = 0;
-	cb->end.lnum   = 0;
-	cb->end.col    = 0;
+	cb->شروع.lnum = 0;
+	cb->شروع.خانہ  = 0;
+	cb->سرا.lnum   = 0;
+	cb->سرا.خانہ    = 0;
 	cb->state      = SELECT_CLEARED;
 
 skip:
-	if (cb == &clip_plus)
-	    break;
+	إذا (cb == &clip_plus)
+	    اكسر;
 	cb = &clip_plus;
     }
 }
@@ -143,184 +143,184 @@ skip:
  * selected so we can still give it to others.	Will probably have to make sure
  * this is called whenever VIsual mode is ended.
  */
-    void
+    فراغ
 clip_update_selection(Clipboard_T *clip)
 {
-    pos_T	    start, end;
+    pos_T	    شروع, سرا;
 
     // If visual mode is only due to a redo command ("."), then ignore it
-    if (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
+    إذا (!redo_VIsual_busy && VIsual_سرگرم && (State & منوال_عام))
     {
-	if (LT_POS(VIsual, curwin->w_cursor))
+	إذا (LT_POS(VIsual, curwin->w_cursor))
 	{
-	    start = VIsual;
-	    end = curwin->w_cursor;
-	    if (has_mbyte)
-		end.col += (*mb_ptr2len)(ml_get_cursor()) - 1;
+	    شروع = VIsual;
+	    سرا = curwin->w_cursor;
+	    إذا (has_mbyte)
+		سرا.خانہ += (*mb_ptr2len)(ml_get_cursor()) - 1;
 	}
-	else
+	وإلا
 	{
-	    start = curwin->w_cursor;
-	    end = VIsual;
+	    شروع = curwin->w_cursor;
+	    سرا = VIsual;
 	}
-	if (!EQUAL_POS(clip->start, start)
-		|| !EQUAL_POS(clip->end, end)
-		|| clip->vmode != VIsual_mode)
+	إذا (!EQUAL_POS(clip->شروع, شروع)
+		|| !EQUAL_POS(clip->سرا, سرا)
+		|| clip->vmode != VIsual_منوال)
 	{
 	    clip_clear_selection(clip);
-	    clip->start = start;
-	    clip->end = end;
-	    clip->vmode = VIsual_mode;
+	    clip->شروع = شروع;
+	    clip->سرا = سرا;
+	    clip->vmode = VIsual_منوال;
 	    clip_free_selection(clip);
 	    clip_own_selection(clip);
-	    clip_gen_set_selection(clip);
+	    clip_gen_سیٹ_selection(clip);
 	}
     }
 }
 
-    static int
+    ساكن صحيح
 clip_gen_own_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	return clip_mch_own_selection(cbd);
-    else
+    إذا (gui.وچ_use)
+	أرجع clip_mch_own_selection(cbd);
+    وإلا
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	إذا (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_own_selection(cbd);
+	    أرجع clip_wl_own_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	وإلا إذا (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    return clip_xterm_own_selection(cbd);
+	    أرجع clip_xterm_own_selection(cbd);
 #  endif
 	}
     }
-    return FAIL;
-# else
-    return clip_mch_own_selection(cbd);
+    أرجع FAIL;
+# وإلا
+    أرجع clip_mch_own_selection(cbd);
 # endif
 }
 
-    void
+    فراغ
 clip_own_selection(Clipboard_T *cbd)
 {
     /*
      * Also want to check somehow that we are reading from the keyboard rather
      * than a mapping etc.
      */
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     // Always own the selection, we might have lost it without being
     // notified, e.g. during a ":sh" command.
-    if (cbd->available)
+    إذا (cbd->دستیاب)
     {
-	int was_owned = cbd->owned;
+	صحيح was_owned = cbd->owned;
 
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
-	if (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
+	إذا (!was_owned && (cbd == &clip_تارا || cbd == &clip_plus))
 	{
 	    // May have to show a different kind of highlighting for the
 	    // selected area.  There is no specific redraw command for this,
 	    // just redraw all windows on the current buffer.
-	    if (cbd->owned
-		    && (get_real_state() == MODE_VISUAL
-					    || get_real_state() == MODE_SELECT)
-		    && (cbd == &clip_star ? clip_isautosel_star()
+	    إذا (cbd->owned
+		    && (get_real_state() == منوال_VISUAL
+					    || get_real_state() == منوال_SELECT)
+		    && (cbd == &clip_تارا ? clip_isautosel_تارا()
 						      : clip_isautosel_plus())
 		    && HL_ATTR(HLF_V) != HL_ATTR(HLF_VNC))
 		redraw_curbuf_later(UPD_INVERTED_ALL);
 	}
     }
-# else
+# وإلا
     // Only own the clipboard when we didn't own it yet.
-    if (!cbd->owned && cbd->available)
+    إذا (!cbd->owned && cbd->دستیاب)
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
 # endif
 }
 
-    static void
+    ساكن فراغ
 clip_gen_lose_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.وچ_use)
 	clip_mch_lose_selection(cbd);
-    else
+    وإلا
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	إذا (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_lose_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	وإلا إذا (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_lose_selection(cbd);
 #  endif
 	}
     }
-# else
+# وإلا
     clip_mch_lose_selection(cbd);
 # endif
 }
 
-    void
+    فراغ
 clip_lose_selection(Clipboard_T *cbd)
 {
 # ifdef FEAT_X11
-    int	    was_owned = cbd->owned;
+    صحيح	    was_owned = cbd->owned;
 # endif
-    int     visual_selection = FALSE;
+    صحيح     visual_selection = FALSE;
 
-    if (cbd == &clip_star || cbd == &clip_plus)
+    إذا (cbd == &clip_تارا || cbd == &clip_plus)
 	visual_selection = TRUE;
 
     clip_free_selection(cbd);
     cbd->owned = FALSE;
-    if (visual_selection)
+    إذا (visual_selection)
 	clip_clear_selection(cbd);
     clip_gen_lose_selection(cbd);
 # ifdef FEAT_X11
-    if (visual_selection)
+    إذا (visual_selection)
     {
 	// May have to show a different kind of highlighting for the selected
 	// area.  There is no specific redraw command for this, just redraw all
 	// windows on the current buffer.
-	if (was_owned
-		&& (get_real_state() == MODE_VISUAL
-		    || get_real_state() == MODE_SELECT)
-		&& (cbd == &clip_star ?
-		    clip_isautosel_star() : clip_isautosel_plus())
+	إذا (was_owned
+		&& (get_real_state() == منوال_VISUAL
+		    || get_real_state() == منوال_SELECT)
+		&& (cbd == &clip_تارا ?
+		    clip_isautosel_تارا() : clip_isautosel_plus())
 		&& HL_ATTR(HLF_V) != HL_ATTR(HLF_VNC)
 		&& !exiting)
 	{
 	    update_curbuf(UPD_INVERTED_ALL);
 	    setcursor();
 	    cursor_on();
-	    out_flush_cursor(TRUE, FALSE);
+	    باہرلا_flush_cursor(TRUE, FALSE);
 	}
     }
 # endif
 }
 
-    static void
+    ساكن فراغ
 clip_copy_selection(Clipboard_T *clip)
 {
-    if (VIsual_active && (State & MODE_NORMAL) && clip->available)
+    إذا (VIsual_سرگرم && (State & منوال_عام) && clip->دستیاب)
     {
 	clip_update_selection(clip);
 	clip_free_selection(clip);
 	clip_own_selection(clip);
-	if (clip->owned)
+	إذا (clip->owned)
 	    clip_get_selection(clip);
-	clip_gen_set_selection(clip);
+	clip_gen_سیٹ_selection(clip);
     }
 }
 
@@ -329,25 +329,25 @@ clip_copy_selection(Clipboard_T *clip)
  * prevents accessing the clipboard very often which might slow down Vim
  * considerably.
  */
-static int global_change_count = 0; // if set, inside a start_global_changes
-static int clipboard_needs_update = FALSE; // clipboard needs to be updated
-static int clip_did_set_selection = TRUE;
+ساكن صحيح global_change_گنتی = 0; // if set, inside a start_global_changes
+ساكن صحيح clipboard_needs_update = FALSE; // clipboard needs to be updated
+ساكن صحيح clip_did_سیٹ_selection = TRUE;
 
 /*
  * Save clip_unnamed and reset it.
  */
-    void
-start_global_changes(void)
+    فراغ
+شروع_global_changes(فراغ)
 {
-    if (++global_change_count > 1)
-	return;
+    إذا (++global_change_گنتی > 1)
+	أرجع;
     clip_unnamed_saved = clip_unnamed;
     clipboard_needs_update = FALSE;
 
-    if (clip_did_set_selection)
+    إذا (clip_did_سیٹ_selection)
     {
 	clip_unnamed = 0;
-	clip_did_set_selection = FALSE;
+	clip_did_سیٹ_selection = FALSE;
     }
 }
 
@@ -355,39 +355,39 @@ start_global_changes(void)
  * Return TRUE if setting the clipboard was postponed, it already contains the
  * right text.
  */
-    static int
-is_clipboard_needs_update(void)
+    ساكن صحيح
+is_clipboard_needs_update(فراغ)
 {
-    return clipboard_needs_update;
+    أرجع clipboard_needs_update;
 }
 
 /*
  * Restore clip_unnamed and set the selection when needed.
  */
-    void
-end_global_changes(void)
+    فراغ
+سرا_global_changes(فراغ)
 {
-    if (--global_change_count > 0)
+    إذا (--global_change_گنتی > 0)
 	// recursive
-	return;
-    if (!clip_did_set_selection)
+	أرجع;
+    إذا (!clip_did_سیٹ_selection)
     {
-	clip_did_set_selection = TRUE;
+	clip_did_سیٹ_selection = TRUE;
 	clip_unnamed = clip_unnamed_saved;
 	clip_unnamed_saved = 0;
-	if (clipboard_needs_update)
+	إذا (clipboard_needs_update)
 	{
 	    // only store something in the clipboard,
 	    // if we have yanked anything to it
-	    if (clip_unnamed & CLIP_UNNAMED)
+	    إذا (clip_unnamed & CLIP_UNNAMED)
 	    {
-		clip_own_selection(&clip_star);
-		clip_gen_set_selection(&clip_star);
+		clip_own_selection(&clip_تارا);
+		clip_gen_سیٹ_selection(&clip_تارا);
 	    }
-	    if (clip_unnamed & CLIP_UNNAMED_PLUS)
+	    إذا (clip_unnamed & CLIP_UNNAMED_PLUS)
 	    {
 		clip_own_selection(&clip_plus);
-		clip_gen_set_selection(&clip_plus);
+		clip_gen_سیٹ_selection(&clip_plus);
 	    }
 	}
     }
@@ -397,12 +397,12 @@ end_global_changes(void)
 /*
  * Called when Visual mode is ended: update the selection.
  */
-    void
-clip_auto_select(void)
+    فراغ
+clip_auto_select(فراغ)
 {
-    if (clip_isautosel_star())
-	clip_copy_selection(&clip_star);
-    if (clip_isautosel_plus())
+    إذا (clip_isautosel_تارا())
+	clip_copy_selection(&clip_تارا);
+    إذا (clip_isautosel_plus())
 	clip_copy_selection(&clip_plus);
 }
 
@@ -410,37 +410,37 @@ clip_auto_select(void)
  * Return TRUE if automatic selection of Visual area is desired for the *
  * register.
  */
-    int
-clip_isautosel_star(void)
+    صحيح
+clip_isautosel_تارا(فراغ)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    إذا (clipmethod == CLIPMETHOD_PROVIDER)
+	أرجع false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASEL) != NULL
-	    && vim_strchr(p_go, GO_ASELPLUS) == NULL;
+    إذا (gui.وچ_use)
+	أرجع vim_strchr(p_go, GO_ASEL) != عدم
+	    && vim_strchr(p_go, GO_ASELPLUS) == عدم;
 # endif
-    return clip_autoselect_star;
+    أرجع clip_autoselect_تارا;
 }
 
 /*
  * Return TRUE if automatic selection of Visual area is desired for the +
  * register.
  */
-    int
-clip_isautosel_plus(void)
+    صحيح
+clip_isautosel_plus(فراغ)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    إذا (clipmethod == CLIPMETHOD_PROVIDER)
+	أرجع false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASELPLUS) != NULL;
+    إذا (gui.وچ_use)
+	أرجع vim_strchr(p_go, GO_ASELPLUS) != عدم;
 # endif
-    return clip_autoselect_plus;
+    أرجع clip_autoselect_plus;
 }
 
 
@@ -451,68 +451,68 @@ clip_isautosel_plus(void)
 /*
  * Compare two screen positions ala strcmp()
  */
-    static int
+    ساكن صحيح
 clip_compare_pos(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    صحيح		row1,
+    صحيح		col1,
+    صحيح		row2,
+    صحيح		col2)
 {
-    if (row1 > row2) return(1);
-    if (row1 < row2) return(-1);
-    if (col1 > col2) return(1);
-    if (col1 < col2) return(-1);
-    return(0);
+    إذا (row1 > row2) أرجع(1);
+    إذا (row1 < row2) أرجع(-1);
+    إذا (col1 > col2) أرجع(1);
+    إذا (col1 < col2) أرجع(-1);
+    أرجع(0);
 }
 
 // "how" flags for clip_invert_area()
 # define CLIP_CLEAR	1
-# define CLIP_SET	2
+# define CLIP_سیٹ	2
 # define CLIP_TOGGLE	3
 
 /*
  * Invert or un-invert a rectangle of the screen.
  * "invert" is true if the result is inverted.
  */
-    static void
+    ساكن فراغ
 clip_invert_rectangle(
-	Clipboard_T	*cbd UNUSED,
-	int		row_arg,
-	int		col_arg,
-	int		height_arg,
-	int		width_arg,
-	int		invert)
+	Clipboard_T	*cbd بن_ورتیا,
+	صحيح		صف_arg,
+	صحيح		خانہ_arg,
+	صحيح		اچائی_arg,
+	صحيح		چوڑائی_arg,
+	صحيح		invert)
 {
-    int		row = row_arg;
-    int		col = col_arg;
-    int		height = height_arg;
-    int		width = width_arg;
+    صحيح		صف = صف_arg;
+    صحيح		خانہ = خانہ_arg;
+    صحيح		اچائی = اچائی_arg;
+    صحيح		چوڑائی = چوڑائی_arg;
 
 # ifdef FEAT_PROP_POPUP
     // this goes on top of all popup windows
     screen_zindex = CLIP_ZINDEX;
 
-    if (col < cbd->min_col)
+    إذا (خانہ < cbd->min_خانہ)
     {
-	width -= cbd->min_col - col;
-	col = cbd->min_col;
+	چوڑائی -= cbd->min_خانہ - خانہ;
+	خانہ = cbd->min_خانہ;
     }
-    if (width > cbd->max_col - col)
-	width = cbd->max_col - col;
-    if (row < cbd->min_row)
+    إذا (چوڑائی > cbd->max_خانہ - خانہ)
+	چوڑائی = cbd->max_خانہ - خانہ;
+    إذا (صف < cbd->min_صف)
     {
-	height -= cbd->min_row - row;
-	row = cbd->min_row;
+	اچائی -= cbd->min_صف - صف;
+	صف = cbd->min_صف;
     }
-    if (height > cbd->max_row - row + 1)
-	height = cbd->max_row - row + 1;
+    إذا (اچائی > cbd->max_صف - صف + 1)
+	اچائی = cbd->max_صف - صف + 1;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	gui_mch_invert_rectangle(row, col, height, width);
-    else
+    إذا (gui.وچ_use)
+	gui_mch_invert_rectangle(صف, خانہ, اچائی, چوڑائی);
+    وإلا
 # endif
-	screen_draw_rectangle(row, col, height, width, invert, FALSE);
+	screen_draw_rectangle(صف, خانہ, اچائی, چوڑائی, invert, FALSE);
 # ifdef FEAT_PROP_POPUP
     screen_zindex = 0;
 # endif
@@ -526,68 +526,68 @@ clip_invert_rectangle(
  * CLIP_TOGGLE: set inversion if pos1 < pos2, undo inversion otherwise.
  * 0: invert (GUI only).
  */
-    static void
+    ساكن فراغ
 clip_invert_area(
 	Clipboard_T	*cbd,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2,
-	int		how)
+	صحيح		row1,
+	صحيح		col1,
+	صحيح		row2,
+	صحيح		col2,
+	صحيح		how)
 {
-    int		invert = FALSE;
-    int		max_col;
+    صحيح		invert = FALSE;
+    صحيح		max_خانہ;
 
 # ifdef FEAT_PROP_POPUP
-    max_col = cbd->max_col - 1;
-# else
-    max_col = Columns - 1;
+    max_خانہ = cbd->max_خانہ - 1;
+# وإلا
+    max_خانہ = Columns - 1;
 # endif
 
-    if (how == CLIP_SET)
+    إذا (how == CLIP_سیٹ)
 	invert = TRUE;
 
     // Swap the from and to positions so the from is always before
-    if (clip_compare_pos(row1, col1, row2, col2) > 0)
+    إذا (clip_compare_pos(row1, col1, row2, col2) > 0)
     {
-	int tmp_row, tmp_col;
+	صحيح tmp_صف, tmp_خانہ;
 
-	tmp_row = row1;
-	tmp_col = col1;
+	tmp_صف = row1;
+	tmp_خانہ = col1;
 	row1	= row2;
 	col1	= col2;
-	row2	= tmp_row;
-	col2	= tmp_col;
+	row2	= tmp_صف;
+	col2	= tmp_خانہ;
     }
-    else if (how == CLIP_TOGGLE)
+    وإلا إذا (how == CLIP_TOGGLE)
 	invert = TRUE;
 
     // If all on the same line, do it the easy way
-    if (row1 == row2)
+    إذا (row1 == row2)
     {
 	clip_invert_rectangle(cbd, row1, col1, 1, col2 - col1, invert);
     }
-    else
+    وإلا
     {
 	// Handle a piece of the first line
-	if (col1 > 0)
+	إذا (col1 > 0)
 	{
 	    clip_invert_rectangle(cbd, row1, col1, 1,
-						  (int)Columns - col1, invert);
+						  (صحيح)Columns - col1, invert);
 	    row1++;
 	}
 
 	// Handle a piece of the last line
-	if (col2 < max_col)
+	إذا (col2 < max_خانہ)
 	{
 	    clip_invert_rectangle(cbd, row2, 0, 1, col2, invert);
 	    row2--;
 	}
 
 	// Handle the rectangle that's left
-	if (row2 >= row1)
+	إذا (row2 >= row1)
 	    clip_invert_rectangle(cbd, row1, 0, row2 - row1 + 1,
-							 (int)Columns, invert);
+							 (صحيح)Columns, invert);
     }
 }
 
@@ -595,65 +595,65 @@ clip_invert_area(
  * Start, continue or end a modeless selection.  Used when editing the
  * command-line, in the cmdline window and when the mouse is in a popup window.
  */
-    void
-clip_modeless(int button, int is_click, int is_drag)
+    فراغ
+clip_modeless(صحيح button, صحيح is_click, صحيح is_drag)
 {
-    int		repeat;
+    صحيح		repeat;
 
-    repeat = ((clip_star.mode == SELECT_MODE_CHAR
-		|| clip_star.mode == SELECT_MODE_LINE)
-					      && (mod_mask & MOD_MASK_2CLICK))
-	    || (clip_star.mode == SELECT_MODE_WORD
-					     && (mod_mask & MOD_MASK_3CLICK));
-    if (is_click && button == MOUSE_RIGHT)
+    repeat = ((clip_تارا.منوال == SELECT_منوال_CHAR
+		|| clip_تارا.منوال == SELECT_منوال_سطر)
+					      && (mod_نقاب & MOD_نقاب_2_CLICK))
+	    || (clip_تارا.منوال == SELECT_منوال_لفظ
+					     && (mod_نقاب & MOD_نقاب_3_CLICK));
+    إذا (is_click && button == MOUSE_دایاں)
     {
 	// Right mouse button: If there was no selection, start one.
 	// Otherwise extend the existing selection.
-	if (clip_star.state == SELECT_CLEARED)
-	    clip_start_selection(mouse_col, mouse_row, FALSE);
-	clip_process_selection(button, mouse_col, mouse_row, repeat);
+	إذا (clip_تارا.state == SELECT_CLEARED)
+	    clip_شروع_selection(mouse_خانہ, mouse_صف, FALSE);
+	clip_process_selection(button, mouse_خانہ, mouse_صف, repeat);
     }
-    else if (is_click)
-	clip_start_selection(mouse_col, mouse_row, repeat);
-    else if (is_drag)
+    وإلا إذا (is_click)
+	clip_شروع_selection(mouse_خانہ, mouse_صف, repeat);
+    وإلا إذا (is_drag)
     {
 	// Don't try extending a selection if there isn't one.  Happens when
 	// button-down is in the cmdline and them moving mouse upwards.
-	if (clip_star.state != SELECT_CLEARED)
-	    clip_process_selection(button, mouse_col, mouse_row, repeat);
+	إذا (clip_تارا.state != SELECT_CLEARED)
+	    clip_process_selection(button, mouse_خانہ, mouse_صف, repeat);
     }
-    else // release
-	clip_process_selection(MOUSE_RELEASE, mouse_col, mouse_row, FALSE);
+    وإلا // release
+	clip_process_selection(MOUSE_RELEASE, mouse_خانہ, mouse_صف, FALSE);
 }
 
 /*
  * Update the currently selected region by adding and/or subtracting from the
  * beginning or end and inverting the changed area(s).
  */
-    static void
+    ساكن فراغ
 clip_update_modeless_selection(
     Clipboard_T    *cb,
-    int		    row1,
-    int		    col1,
-    int		    row2,
-    int		    col2)
+    صحيح		    row1,
+    صحيح		    col1,
+    صحيح		    row2,
+    صحيح		    col2)
 {
     // See if we changed at the beginning of the selection
-    if (row1 != cb->start.lnum || col1 != (int)cb->start.col)
+    إذا (row1 != cb->شروع.lnum || col1 != (صحيح)cb->شروع.خانہ)
     {
-	clip_invert_area(cb, row1, col1, (int)cb->start.lnum, cb->start.col,
+	clip_invert_area(cb, row1, col1, (صحيح)cb->شروع.lnum, cb->شروع.خانہ,
 								 CLIP_TOGGLE);
-	cb->start.lnum = row1;
-	cb->start.col  = col1;
+	cb->شروع.lnum = row1;
+	cb->شروع.خانہ  = col1;
     }
 
     // See if we changed at the end of the selection
-    if (row2 != cb->end.lnum || col2 != (int)cb->end.col)
+    إذا (row2 != cb->سرا.lnum || col2 != (صحيح)cb->سرا.خانہ)
     {
-	clip_invert_area(cb, (int)cb->end.lnum, cb->end.col, row2, col2,
+	clip_invert_area(cb, (صحيح)cb->سرا.lnum, cb->سرا.خانہ, row2, col2,
 								 CLIP_TOGGLE);
-	cb->end.lnum = row2;
-	cb->end.col  = col2;
+	cb->سرا.lnum = row2;
+	cb->سرا.خانہ  = col2;
     }
 }
 
@@ -663,370 +663,370 @@ clip_update_modeless_selection(
  */
 # define CHAR_CLASS(c)	(c <= ' ' ? ' ' : vim_iswordc(c))
 
-    static void
-clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
+    ساكن فراغ
+clip_get_لفظ_boundaries(Clipboard_T *cb, صحيح صف, صحيح خانہ)
 {
-    int		start_class;
-    int		temp_col;
+    صحيح		شروع_class;
+    صحيح		عارضی_خانہ;
     char_u	*p;
-    int		mboff;
+    صحيح		mboff;
 
-    if (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
-	return;
+    إذا (صف >= screen_صفاں || خانہ >= screen_Columns || Screen_سطریں == عدم)
+	أرجع;
 
-    p = ScreenLines + LineOffset[row];
+    p = Screen_سطریں + سطر_وتھ[صف];
     // Correct for starting in the right half of a double-wide char
-    if (enc_dbcs != 0)
-	col -= dbcs_screen_head_off(p, p + col);
-    else if (enc_utf8 && p[col] == 0)
-	--col;
-    start_class = CHAR_CLASS(p[col]);
+    إذا (enc_dbcs != 0)
+	خانہ -= dbcs_screen_سر_off(p, p + خانہ);
+    وإلا إذا (enc_utf8 && p[خانہ] == 0)
+	--خانہ;
+    شروع_class = CHAR_CLASS(p[خانہ]);
 
-    temp_col = col;
-    for ( ; temp_col > 0; temp_col--)
-	if (enc_dbcs != 0
-		   && (mboff = dbcs_screen_head_off(p, p + temp_col - 1)) > 0)
-	    temp_col -= mboff;
-	else if (CHAR_CLASS(p[temp_col - 1]) != start_class
-		&& !(enc_utf8 && p[temp_col - 1] == 0))
-	    break;
-    cb->word_start_col = temp_col;
+    عارضی_خانہ = خانہ;
+    لكل ( ; عارضی_خانہ > 0; عارضی_خانہ--)
+	إذا (enc_dbcs != 0
+		   && (mboff = dbcs_screen_سر_off(p, p + عارضی_خانہ - 1)) > 0)
+	    عارضی_خانہ -= mboff;
+	وإلا إذا (CHAR_CLASS(p[عارضی_خانہ - 1]) != شروع_class
+		&& !(enc_utf8 && p[عارضی_خانہ - 1] == 0))
+	    اكسر;
+    cb->لفظ_شروع_خانہ = عارضی_خانہ;
 
-    temp_col = col;
-    for ( ; temp_col < screen_Columns; temp_col++)
-	if (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
-	    ++temp_col;
-	else if (CHAR_CLASS(p[temp_col]) != start_class
-		&& !(enc_utf8 && p[temp_col] == 0))
-	    break;
-    cb->word_end_col = temp_col;
+    عارضی_خانہ = خانہ;
+    لكل ( ; عارضی_خانہ < screen_Columns; عارضی_خانہ++)
+	إذا (enc_dbcs != 0 && dbcs_ptr2cells(p + عارضی_خانہ) == 2)
+	    ++عارضی_خانہ;
+	وإلا إذا (CHAR_CLASS(p[عارضی_خانہ]) != شروع_class
+		&& !(enc_utf8 && p[عارضی_خانہ] == 0))
+	    اكسر;
+    cb->لفظ_سرا_خانہ = عارضی_خانہ;
 }
 
 /*
  * Find the column position for the last non-whitespace character on the given
  * line at or before start_col.
  */
-    static int
-clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
+    ساكن صحيح
+clip_get_سطر_سرا(Clipboard_T *cbd بن_ورتیا, صحيح صف)
 {
-    int	    i;
+    صحيح	    i;
 
-    if (row >= screen_Rows || ScreenLines == NULL)
-	return 0;
-    for (i =
+    إذا (صف >= screen_صفاں || Screen_سطریں == عدم)
+	أرجع 0;
+    لكل (i =
 # ifdef FEAT_PROP_POPUP
-	    cbd->max_col;
-# else
+	    cbd->max_خانہ;
+# وإلا
 	    screen_Columns;
 # endif
 			    i > 0; i--)
-	if (ScreenLines[LineOffset[row] + i - 1] != ' ')
-	    break;
-    return i;
+	إذا (Screen_سطریں[سطر_وتھ[صف] + i - 1] != ' ')
+	    اكسر;
+    أرجع i;
 }
 
 /*
  * Start the selection
  */
-    void
-clip_start_selection(int col, int row, int repeated_click)
+    فراغ
+clip_شروع_selection(صحيح خانہ, صحيح صف, صحيح repeated_click)
 {
-    Clipboard_T	*cb = &clip_star;
+    Clipboard_T	*cb = &clip_تارا;
 # ifdef FEAT_PROP_POPUP
     win_T	*wp;
-    int		row_cp = row;
-    int		col_cp = col;
+    صحيح		صف_cp = صف;
+    صحيح		خانہ_cp = خانہ;
 
-    wp = mouse_find_win(&row_cp, &col_cp, FIND_POPUP);
-    if (wp != NULL && WIN_IS_POPUP(wp)
-				  && popup_is_in_scrollbar(wp, row_cp, col_cp))
+    wp = mouse_لبھو_win(&صف_cp, &خانہ_cp, لبھو_POPUP);
+    إذا (wp != عدم && WIN_IS_POPUP(wp)
+				  && popup_is_وچ_scrollbar(wp, صف_cp, خانہ_cp))
 	// click or double click in scrollbar does not start a selection
-	return;
+	أرجع;
 # endif
 
-    if (cb->state == SELECT_DONE)
+    إذا (cb->state == SELECT_پورا)
 	clip_clear_selection(cb);
 
-    row = check_row(row);
-    col = check_col(col);
-    col = mb_fix_col(col, row);
+    صف = check_صف(صف);
+    خانہ = check_خانہ(خانہ);
+    خانہ = mb_fix_خانہ(خانہ, صف);
 
-    cb->start.lnum  = row;
-    cb->start.col   = col;
-    cb->end	    = cb->start;
-    cb->origin_row  = (short_u)cb->start.lnum;
-    cb->state	    = SELECT_IN_PROGRESS;
+    cb->شروع.lnum  = صف;
+    cb->شروع.خانہ   = خانہ;
+    cb->سرا	    = cb->شروع;
+    cb->origin_صف  = (short_u)cb->شروع.lnum;
+    cb->state	    = SELECT_وچ_ترقی;
 # ifdef FEAT_PROP_POPUP
-    if (wp != NULL && WIN_IS_POPUP(wp))
+    إذا (wp != عدم && WIN_IS_POPUP(wp))
     {
 	// Click in a popup window restricts selection to that window,
 	// excluding the border.
-	cb->min_col = wp->w_wincol + wp->w_popup_border[3];
-	cb->max_col = wp->w_wincol + popup_width(wp)
+	cb->min_خانہ = wp->w_wincol + wp->w_popup_border[3];
+	cb->max_خانہ = wp->w_wincol + popup_چوڑائی(wp)
 				 - wp->w_popup_border[1] - wp->w_has_scrollbar;
-	if (cb->max_col > screen_Columns)
-	    cb->max_col = screen_Columns;
-	cb->min_row = wp->w_winrow + wp->w_popup_border[0];
-	cb->max_row = wp->w_winrow + popup_height(wp) - 1
+	إذا (cb->max_خانہ > screen_Columns)
+	    cb->max_خانہ = screen_Columns;
+	cb->min_صف = wp->w_winrow + wp->w_popup_border[0];
+	cb->max_صف = wp->w_winrow + popup_اچائی(wp) - 1
 						   - wp->w_popup_border[2];
     }
-    else
+    وإلا
     {
-	cb->min_col = 0;
-	cb->max_col = screen_Columns;
-	cb->min_row = 0;
-	cb->max_row = screen_Rows;
+	cb->min_خانہ = 0;
+	cb->max_خانہ = screen_Columns;
+	cb->min_صف = 0;
+	cb->max_صف = screen_صفاں;
     }
 # endif
 
-    if (repeated_click)
+    إذا (repeated_click)
     {
-	if (++cb->mode > SELECT_MODE_LINE)
-	    cb->mode = SELECT_MODE_CHAR;
+	إذا (++cb->منوال > SELECT_منوال_سطر)
+	    cb->منوال = SELECT_منوال_CHAR;
     }
-    else
-	cb->mode = SELECT_MODE_CHAR;
+    وإلا
+	cb->منوال = SELECT_منوال_CHAR;
 
 # ifdef FEAT_GUI
     // clear the cursor until the selection is made
-    if (gui.in_use)
+    إذا (gui.وچ_use)
 	gui_undraw_cursor();
 # endif
 
-    switch (cb->mode)
+    بدل (cb->منوال)
     {
-	case SELECT_MODE_CHAR:
-	    cb->origin_start_col = cb->start.col;
-	    cb->word_end_col = clip_get_line_end(cb, (int)cb->start.lnum);
-	    break;
+	حالة SELECT_منوال_CHAR:
+	    cb->origin_شروع_خانہ = cb->شروع.خانہ;
+	    cb->لفظ_سرا_خانہ = clip_get_سطر_سرا(cb, (صحيح)cb->شروع.lnum);
+	    اكسر;
 
-	case SELECT_MODE_WORD:
-	    clip_get_word_boundaries(cb, (int)cb->start.lnum, cb->start.col);
-	    cb->origin_start_col = cb->word_start_col;
-	    cb->origin_end_col	 = cb->word_end_col;
+	حالة SELECT_منوال_لفظ:
+	    clip_get_لفظ_boundaries(cb, (صحيح)cb->شروع.lnum, cb->شروع.خانہ);
+	    cb->origin_شروع_خانہ = cb->لفظ_شروع_خانہ;
+	    cb->origin_سرا_خانہ	 = cb->لفظ_سرا_خانہ;
 
-	    clip_invert_area(cb, (int)cb->start.lnum, cb->word_start_col,
-			    (int)cb->end.lnum, cb->word_end_col, CLIP_SET);
-	    cb->start.col = cb->word_start_col;
-	    cb->end.col   = cb->word_end_col;
-	    break;
+	    clip_invert_area(cb, (صحيح)cb->شروع.lnum, cb->لفظ_شروع_خانہ,
+			    (صحيح)cb->سرا.lnum, cb->لفظ_سرا_خانہ, CLIP_سیٹ);
+	    cb->شروع.خانہ = cb->لفظ_شروع_خانہ;
+	    cb->سرا.خانہ   = cb->لفظ_سرا_خانہ;
+	    اكسر;
 
-	case SELECT_MODE_LINE:
-	    clip_invert_area(cb, (int)cb->start.lnum, 0, (int)cb->start.lnum,
-			    (int)Columns, CLIP_SET);
-	    cb->start.col = 0;
-	    cb->end.col   = Columns;
-	    break;
+	حالة SELECT_منوال_سطر:
+	    clip_invert_area(cb, (صحيح)cb->شروع.lnum, 0, (صحيح)cb->شروع.lnum,
+			    (صحيح)Columns, CLIP_سیٹ);
+	    cb->شروع.خانہ = 0;
+	    cb->سرا.خانہ   = Columns;
+	    اكسر;
     }
 
-    cb->prev = cb->start;
+    cb->prev = cb->شروع;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection started at (%ld,%d)\n", cb->start.lnum, cb->start.col);
+    لکھو("Selection started at (%ld,%d)\n", cb->شروع.lnum, cb->شروع.خانہ);
 # endif
 }
 
 /*
  * Continue processing the selection
  */
-    void
+    فراغ
 clip_process_selection(
-    int		button,
-    int		col,
-    int		row,
+    صحيح		button,
+    صحيح		خانہ,
+    صحيح		صف,
     int_u	repeated_click)
 {
-    Clipboard_T	*cb = &clip_star;
-    int		diff;
-    int		slen = 1;	// cursor shape width
+    Clipboard_T	*cb = &clip_تارا;
+    صحيح		diff;
+    صحيح		slen = 1;	// cursor shape width
 
-    if (button == MOUSE_RELEASE)
+    إذا (button == MOUSE_RELEASE)
     {
-	if (cb->state != SELECT_IN_PROGRESS)
-	    return;
+	إذا (cb->state != SELECT_وچ_ترقی)
+	    أرجع;
 
 	// Check to make sure we have something selected
-	if (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
+	إذا (cb->شروع.lnum == cb->سرا.lnum && cb->شروع.خانہ == cb->سرا.خانہ)
 	{
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    إذا (gui.وچ_use)
 		gui_update_cursor(FALSE, FALSE);
 # endif
 	    cb->state = SELECT_CLEARED;
-	    return;
+	    أرجع;
 	}
 
 # ifdef DEBUG_SELECTION
-	printf("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
-		cb->start.col, cb->end.lnum, cb->end.col);
+	لکھو("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->شروع.lnum,
+		cb->شروع.خانہ, cb->سرا.lnum, cb->سرا.خانہ);
 # endif
-	if (clip_isautosel_star() || clip_isautosel_plus()
+	إذا (clip_isautosel_تارا() || clip_isautosel_plus()
 		|| (
 # ifdef FEAT_GUI
-		    gui.in_use ? (vim_strchr(p_go, GO_ASELML) != NULL) :
+		    gui.وچ_use ? (vim_strchr(p_go, GO_ASELML) != عدم) :
 # endif
 		    clip_autoselectml))
 	    clip_copy_modeless_selection(FALSE);
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	إذا (gui.وچ_use)
 	    gui_update_cursor(FALSE, FALSE);
 # endif
 
-	cb->state = SELECT_DONE;
-	return;
+	cb->state = SELECT_پورا;
+	أرجع;
     }
 
-    row = check_row(row);
-    col = check_col(col);
-    col = mb_fix_col(col, row);
+    صف = check_صف(صف);
+    خانہ = check_خانہ(خانہ);
+    خانہ = mb_fix_خانہ(خانہ, صف);
 
-    if (col == (int)cb->prev.col && row == cb->prev.lnum && !repeated_click)
-	return;
+    إذا (خانہ == (صحيح)cb->prev.خانہ && صف == cb->prev.lnum && !repeated_click)
+	أرجع;
 
     /*
      * When extending the selection with the right mouse button, swap the
      * start and end if the position is before half the selection
      */
-    if (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
+    إذا (cb->state == SELECT_پورا && button == MOUSE_دایاں)
     {
 	/*
 	 * If the click is before the start, or the click is inside the
 	 * selection and the start is the closest side, set the origin to the
 	 * end of the selection.
 	 */
-	if (clip_compare_pos(row, col, (int)cb->start.lnum, cb->start.col) < 0
-		|| (clip_compare_pos(row, col,
-					   (int)cb->end.lnum, cb->end.col) < 0
-		    && (((cb->start.lnum == cb->end.lnum
-			    && cb->end.col - col > col - cb->start.col))
-			|| ((diff = (cb->end.lnum - row) -
-						   (row - cb->start.lnum)) > 0
-			    || (diff == 0 && col < (int)(cb->start.col +
-							 cb->end.col) / 2)))))
+	إذا (clip_compare_pos(صف, خانہ, (صحيح)cb->شروع.lnum, cb->شروع.خانہ) < 0
+		|| (clip_compare_pos(صف, خانہ,
+					   (صحيح)cb->سرا.lnum, cb->سرا.خانہ) < 0
+		    && (((cb->شروع.lnum == cb->سرا.lnum
+			    && cb->سرا.خانہ - خانہ > خانہ - cb->شروع.خانہ))
+			|| ((diff = (cb->سرا.lnum - صف) -
+						   (صف - cb->شروع.lnum)) > 0
+			    || (diff == 0 && خانہ < (صحيح)(cb->شروع.خانہ +
+							 cb->سرا.خانہ) / 2)))))
 	{
-	    cb->origin_row = (short_u)cb->end.lnum;
-	    cb->origin_start_col = cb->end.col - 1;
-	    cb->origin_end_col = cb->end.col;
+	    cb->origin_صف = (short_u)cb->سرا.lnum;
+	    cb->origin_شروع_خانہ = cb->سرا.خانہ - 1;
+	    cb->origin_سرا_خانہ = cb->سرا.خانہ;
 	}
-	else
+	وإلا
 	{
-	    cb->origin_row = (short_u)cb->start.lnum;
-	    cb->origin_start_col = cb->start.col;
-	    cb->origin_end_col = cb->start.col;
+	    cb->origin_صف = (short_u)cb->شروع.lnum;
+	    cb->origin_شروع_خانہ = cb->شروع.خانہ;
+	    cb->origin_سرا_خانہ = cb->شروع.خانہ;
 	}
-	if (cb->mode == SELECT_MODE_WORD && !repeated_click)
-	    cb->mode = SELECT_MODE_CHAR;
+	إذا (cb->منوال == SELECT_منوال_لفظ && !repeated_click)
+	    cb->منوال = SELECT_منوال_CHAR;
     }
 
     // set state, for when using the right mouse button
-    cb->state = SELECT_IN_PROGRESS;
+    cb->state = SELECT_وچ_ترقی;
 
 # ifdef DEBUG_SELECTION
-    printf("Selection extending to (%d,%d)\n", row, col);
+    لکھو("Selection extending to (%d,%d)\n", صف, خانہ);
 # endif
 
-    if (repeated_click && ++cb->mode > SELECT_MODE_LINE)
-	cb->mode = SELECT_MODE_CHAR;
+    إذا (repeated_click && ++cb->منوال > SELECT_منوال_سطر)
+	cb->منوال = SELECT_منوال_CHAR;
 
-    switch (cb->mode)
+    بدل (cb->منوال)
     {
-	case SELECT_MODE_CHAR:
+	حالة SELECT_منوال_CHAR:
 	    // If we're on a different line, find where the line ends
-	    if (row != cb->prev.lnum)
-		cb->word_end_col = clip_get_line_end(cb, row);
+	    إذا (صف != cb->prev.lnum)
+		cb->لفظ_سرا_خانہ = clip_get_سطر_سرا(cb, صف);
 
 	    // See if we are before or after the origin of the selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
-						   cb->origin_start_col) >= 0)
+	    إذا (clip_compare_pos(صف, خانہ, cb->origin_صف,
+						   cb->origin_شروع_خانہ) >= 0)
 	    {
-		if (col >= (int)cb->word_end_col)
-		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, (int)Columns);
-		else
+		إذا (خانہ >= (صحيح)cb->لفظ_سرا_خانہ)
+		    clip_update_modeless_selection(cb, cb->origin_صف,
+			    cb->origin_شروع_خانہ, صف, (صحيح)Columns);
+		وإلا
 		{
-		    if (has_mbyte && mb_lefthalve(row, col))
+		    إذا (has_mbyte && mb_lefthalve(صف, خانہ))
 			slen = 2;
-		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, col + slen);
+		    clip_update_modeless_selection(cb, cb->origin_صف,
+			    cb->origin_شروع_خانہ, صف, خانہ + slen);
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		if (has_mbyte
-			&& mb_lefthalve(cb->origin_row, cb->origin_start_col))
+		إذا (has_mbyte
+			&& mb_lefthalve(cb->origin_صف, cb->origin_شروع_خانہ))
 		    slen = 2;
-		if (col >= (int)cb->word_end_col)
-		    clip_update_modeless_selection(cb, row, cb->word_end_col,
-			    cb->origin_row, cb->origin_start_col + slen);
-		else
-		    clip_update_modeless_selection(cb, row, col,
-			    cb->origin_row, cb->origin_start_col + slen);
+		إذا (خانہ >= (صحيح)cb->لفظ_سرا_خانہ)
+		    clip_update_modeless_selection(cb, صف, cb->لفظ_سرا_خانہ,
+			    cb->origin_صف, cb->origin_شروع_خانہ + slen);
+		وإلا
+		    clip_update_modeless_selection(cb, صف, خانہ,
+			    cb->origin_صف, cb->origin_شروع_خانہ + slen);
 	    }
-	    break;
+	    اكسر;
 
-	case SELECT_MODE_WORD:
+	حالة SELECT_منوال_لفظ:
 	    // If we are still within the same word, do nothing
-	    if (row == cb->prev.lnum && col >= (int)cb->word_start_col
-		    && col < (int)cb->word_end_col && !repeated_click)
-		return;
+	    إذا (صف == cb->prev.lnum && خانہ >= (صحيح)cb->لفظ_شروع_خانہ
+		    && خانہ < (صحيح)cb->لفظ_سرا_خانہ && !repeated_click)
+		أرجع;
 
 	    // Get new word boundaries
-	    clip_get_word_boundaries(cb, row, col);
+	    clip_get_لفظ_boundaries(cb, صف, خانہ);
 
 	    // Handle being after the origin point of selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
-		    cb->origin_start_col) >= 0)
-		clip_update_modeless_selection(cb, cb->origin_row,
-			cb->origin_start_col, row, cb->word_end_col);
-	    else
-		clip_update_modeless_selection(cb, row, cb->word_start_col,
-			cb->origin_row, cb->origin_end_col);
-	    break;
+	    إذا (clip_compare_pos(صف, خانہ, cb->origin_صف,
+		    cb->origin_شروع_خانہ) >= 0)
+		clip_update_modeless_selection(cb, cb->origin_صف,
+			cb->origin_شروع_خانہ, صف, cb->لفظ_سرا_خانہ);
+	    وإلا
+		clip_update_modeless_selection(cb, صف, cb->لفظ_شروع_خانہ,
+			cb->origin_صف, cb->origin_سرا_خانہ);
+	    اكسر;
 
-	case SELECT_MODE_LINE:
-	    if (row == cb->prev.lnum && !repeated_click)
-		return;
+	حالة SELECT_منوال_سطر:
+	    إذا (صف == cb->prev.lnum && !repeated_click)
+		أرجع;
 
-	    if (clip_compare_pos(row, col, cb->origin_row,
-		    cb->origin_start_col) >= 0)
-		clip_update_modeless_selection(cb, cb->origin_row, 0, row,
-			(int)Columns);
-	    else
-		clip_update_modeless_selection(cb, row, 0, cb->origin_row,
-			(int)Columns);
-	    break;
+	    إذا (clip_compare_pos(صف, خانہ, cb->origin_صف,
+		    cb->origin_شروع_خانہ) >= 0)
+		clip_update_modeless_selection(cb, cb->origin_صف, 0, صف,
+			(صحيح)Columns);
+	    وإلا
+		clip_update_modeless_selection(cb, صف, 0, cb->origin_صف,
+			(صحيح)Columns);
+	    اكسر;
     }
 
-    cb->prev.lnum = row;
-    cb->prev.col  = col;
+    cb->prev.lnum = صف;
+    cb->prev.خانہ  = خانہ;
 
 # ifdef DEBUG_SELECTION
-	printf("Selection is: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
-		cb->start.col, cb->end.lnum, cb->end.col);
+	لکھو("Selection is: (%ld,%d) to (%ld,%d)\n", cb->شروع.lnum,
+		cb->شروع.خانہ, cb->سرا.lnum, cb->سرا.خانہ);
 # endif
 }
 
-# if defined(FEAT_GUI)
+# إذا defined(FEAT_GUI)
 /*
  * Redraw part of the selection if character at "row,col" is inside of it.
  * Only used for the GUI.
  */
-    void
-clip_may_redraw_selection(int row, int col, int len)
+    فراغ
+clip_may_redraw_selection(صحيح صف, صحيح خانہ, صحيح len)
 {
-    int		start = col;
-    int		end = col + len;
+    صحيح		شروع = خانہ;
+    صحيح		سرا = خانہ + len;
 
-    if (clip_star.state != SELECT_CLEARED
-	    && row >= clip_star.start.lnum
-	    && row <= clip_star.end.lnum)
+    إذا (clip_تارا.state != SELECT_CLEARED
+	    && صف >= clip_تارا.شروع.lnum
+	    && صف <= clip_تارا.سرا.lnum)
     {
-	if (row == clip_star.start.lnum && start < (int)clip_star.start.col)
-	    start = clip_star.start.col;
-	if (row == clip_star.end.lnum && end > (int)clip_star.end.col)
-	    end = clip_star.end.col;
-	if (end > start)
-	    clip_invert_area(&clip_star, row, start, row, end, 0);
+	إذا (صف == clip_تارا.شروع.lnum && شروع < (صحيح)clip_تارا.شروع.خانہ)
+	    شروع = clip_تارا.شروع.خانہ;
+	إذا (صف == clip_تارا.سرا.lnum && سرا > (صحيح)clip_تارا.سرا.خانہ)
+	    سرا = clip_تارا.سرا.خانہ;
+	إذا (سرا > شروع)
+	    clip_invert_area(&clip_تارا, صف, شروع, صف, سرا, 0);
     }
 }
 # endif
@@ -1034,58 +1034,58 @@ clip_may_redraw_selection(int row, int col, int len)
 /*
  * Called from outside to clear selected region from the display
  */
-    void
+    فراغ
 clip_clear_selection(Clipboard_T *cbd)
 {
 
-    if (cbd->state == SELECT_CLEARED)
-	return;
+    إذا (cbd->state == SELECT_CLEARED)
+	أرجع;
 
-    clip_invert_area(cbd, (int)cbd->start.lnum, cbd->start.col,
-				 (int)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
+    clip_invert_area(cbd, (صحيح)cbd->شروع.lnum, cbd->شروع.خانہ,
+				 (صحيح)cbd->سرا.lnum, cbd->سرا.خانہ, CLIP_CLEAR);
     cbd->state = SELECT_CLEARED;
 }
 
 /*
  * Clear the selection if any lines from "row1" to "row2" are inside of it.
  */
-    void
-clip_may_clear_selection(int row1, int row2)
+    فراغ
+clip_may_clear_selection(صحيح row1, صحيح row2)
 {
-    if (clip_star.state == SELECT_DONE
-	    && row2 >= clip_star.start.lnum
-	    && row1 <= clip_star.end.lnum)
-	clip_clear_selection(&clip_star);
+    إذا (clip_تارا.state == SELECT_پورا
+	    && row2 >= clip_تارا.شروع.lnum
+	    && row1 <= clip_تارا.سرا.lnum)
+	clip_clear_selection(&clip_تارا);
 }
 
 /*
  * Called before the screen is scrolled up or down.  Adjusts the line numbers
  * of the selection.  Call with big number when clearing the screen.
  */
-    void
+    فراغ
 clip_scroll_selection(
-    int	    rows)		// negative for scroll down
+    صحيح	    صفاں_2)		// negative for scroll down
 {
-    int	    lnum;
+    صحيح	    lnum;
 
-    if (clip_star.state == SELECT_CLEARED)
-	return;
+    إذا (clip_تارا.state == SELECT_CLEARED)
+	أرجع;
 
-    lnum = clip_star.start.lnum - rows;
-    if (lnum <= 0)
-	clip_star.start.lnum = 0;
-    else if (lnum >= screen_Rows)	// scrolled off of the screen
-	clip_star.state = SELECT_CLEARED;
-    else
-	clip_star.start.lnum = lnum;
+    lnum = clip_تارا.شروع.lnum - صفاں_2;
+    إذا (lnum <= 0)
+	clip_تارا.شروع.lnum = 0;
+    وإلا إذا (lnum >= screen_صفاں)	// scrolled off of the screen
+	clip_تارا.state = SELECT_CLEARED;
+    وإلا
+	clip_تارا.شروع.lnum = lnum;
 
-    lnum = clip_star.end.lnum - rows;
-    if (lnum < 0)			// scrolled off of the screen
-	clip_star.state = SELECT_CLEARED;
-    else if (lnum >= screen_Rows)
-	clip_star.end.lnum = screen_Rows - 1;
-    else
-	clip_star.end.lnum = lnum;
+    lnum = clip_تارا.سرا.lnum - صفاں_2;
+    إذا (lnum < 0)			// scrolled off of the screen
+	clip_تارا.state = SELECT_CLEARED;
+    وإلا إذا (lnum >= screen_صفاں)
+	clip_تارا.سرا.lnum = screen_صفاں - 1;
+    وإلا
+	clip_تارا.سرا.lnum = lnum;
 }
 
 /*
@@ -1093,173 +1093,173 @@ clip_scroll_selection(
  * available for pasting.
  * When "both" is TRUE also copy to the other register.
  */
-    void
-clip_copy_modeless_selection(int both UNUSED)
+    فراغ
+clip_copy_modeless_selection(صحيح both بن_ورتیا)
 {
     // The info for the modeless selection is stored in '*' register, however if
     // we are using the '+' register for modeless autoselect, we copy to
     // clip_plus instead while using the info in clip_star.
-    Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_star;
-    char_u	*buffer;
+    Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_تارا;
+    char_u	*بفر;
     char_u	*bufp;
-    int		row;
-    int		start_col;
-    int		end_col;
-    int		line_end_col;
-    int		add_newline_flag = FALSE;
-    int		len;
+    صحيح		صف;
+    صحيح		شروع_خانہ;
+    صحيح		سرا_خانہ;
+    صحيح		سطر_سرا_خانہ;
+    صحيح		جوڑو_newline_flag = FALSE;
+    صحيح		len;
     char_u	*p;
-    int		row1 = clip_star.start.lnum;
-    int		col1 = clip_star.start.col;
-    int		row2 = clip_star.end.lnum;
-    int		col2 = clip_star.end.col;
+    صحيح		row1 = clip_تارا.شروع.lnum;
+    صحيح		col1 = clip_تارا.شروع.خانہ;
+    صحيح		row2 = clip_تارا.سرا.lnum;
+    صحيح		col2 = clip_تارا.سرا.خانہ;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    إذا (Screen_سطریں == عدم)
+	أرجع;
 
     /*
      * Make sure row1 <= row2, and if row1 == row2 that col1 <= col2.
      */
-    if (row1 > row2)
+    إذا (row1 > row2)
     {
-	row = row1; row1 = row2; row2 = row;
-	row = col1; col1 = col2; col2 = row;
+	صف = row1; row1 = row2; row2 = صف;
+	صف = col1; col1 = col2; col2 = صف;
     }
-    else if (row1 == row2 && col1 > col2)
+    وإلا إذا (row1 == row2 && col1 > col2)
     {
-	row = col1; col1 = col2; col2 = row;
+	صف = col1; col1 = col2; col2 = صف;
     }
 # ifdef FEAT_PROP_POPUP
-    if (col1 < clip_star.min_col)
-	col1 = clip_star.min_col;
-    if (col2 > clip_star.max_col)
-	col2 = clip_star.max_col;
-    if (row1 > clip_star.max_row || row2 < clip_star.min_row)
-	return;
-    if (row1 < clip_star.min_row)
-	row1 = clip_star.min_row;
-    if (row2 > clip_star.max_row)
-	row2 = clip_star.max_row;
+    إذا (col1 < clip_تارا.min_خانہ)
+	col1 = clip_تارا.min_خانہ;
+    إذا (col2 > clip_تارا.max_خانہ)
+	col2 = clip_تارا.max_خانہ;
+    إذا (row1 > clip_تارا.max_صف || row2 < clip_تارا.min_صف)
+	أرجع;
+    إذا (row1 < clip_تارا.min_صف)
+	row1 = clip_تارا.min_صف;
+    إذا (row2 > clip_تارا.max_صف)
+	row2 = clip_تارا.max_صف;
 # endif
     // correct starting point for being on right half of double-wide char
-    p = ScreenLines + LineOffset[row1];
-    if (enc_dbcs != 0)
-	col1 -= (*mb_head_off)(p, p + col1);
-    else if (enc_utf8 && p[col1] == 0)
+    p = Screen_سطریں + سطر_وتھ[row1];
+    إذا (enc_dbcs != 0)
+	col1 -= (*mb_سر_off)(p, p + col1);
+    وإلا إذا (enc_utf8 && p[col1] == 0)
 	--col1;
 
     // Create a temporary buffer for storing the text
     len = (row2 - row1 + 1) * Columns + 1;
-    if (enc_dbcs != 0)
+    إذا (enc_dbcs != 0)
 	len *= 2;	// max. 2 bytes per display cell
-    else if (enc_utf8)
+    وإلا إذا (enc_utf8)
 	len *= MB_MAXBYTES;
     // A newline is added after each row
     len += row2 - row1 + 2;
-    buffer = alloc(len);
-    if (buffer == NULL)	    // out of memory
-	return;
+    بفر = alloc(len);
+    إذا (بفر == عدم)	    // out of memory
+	أرجع;
 
     // Process each row in the selection
-    for (bufp = buffer, row = row1; row <= row2; row++)
+    لكل (bufp = بفر, صف = row1; صف <= row2; صف++)
     {
-	if (row == row1)
-	    start_col = col1;
-	else
+	إذا (صف == row1)
+	    شروع_خانہ = col1;
+	وإلا
 # ifdef FEAT_PROP_POPUP
-	    start_col = clip_star.min_col;
-# else
-	    start_col = 0;
+	    شروع_خانہ = clip_تارا.min_خانہ;
+# وإلا
+	    شروع_خانہ = 0;
 # endif
 
-	if (row == row2)
-	    end_col = col2;
-	else
+	إذا (صف == row2)
+	    سرا_خانہ = col2;
+	وإلا
 # ifdef FEAT_PROP_POPUP
-	    end_col = clip_star.max_col;
-# else
-	    end_col = Columns;
+	    سرا_خانہ = clip_تارا.max_خانہ;
+# وإلا
+	    سرا_خانہ = Columns;
 # endif
 
-	line_end_col = clip_get_line_end(&clip_star, row);
+	سطر_سرا_خانہ = clip_get_سطر_سرا(&clip_تارا, صف);
 
 	// See if we need to nuke some trailing whitespace
-	if (end_col >=
+	إذا (سرا_خانہ >=
 # ifdef FEAT_PROP_POPUP
-		clip_star.max_col
-# else
+		clip_تارا.max_خانہ
+# وإلا
 		Columns
 # endif
-		    && (row < row2 || end_col > line_end_col))
+		    && (صف < row2 || سرا_خانہ > سطر_سرا_خانہ))
 	{
 	    // Get rid of trailing whitespace
-	    end_col = line_end_col;
-	    if (end_col < start_col)
-		end_col = start_col;
+	    سرا_خانہ = سطر_سرا_خانہ;
+	    إذا (سرا_خانہ < شروع_خانہ)
+		سرا_خانہ = شروع_خانہ;
 
 	    // If the last line extended to the end, add an extra newline
-	    if (row == row2)
-		add_newline_flag = TRUE;
+	    إذا (صف == row2)
+		جوڑو_newline_flag = TRUE;
 	}
 
 	// If after the first row, we need to always add a newline
-	if (row > row1 && !LineWraps[row - 1])
+	إذا (صف > row1 && !سطر_Wraps[صف - 1])
 	    *bufp++ = NL;
 
 	// Safetey check for in case resizing went wrong
-	if (row < screen_Rows && end_col <= screen_Columns)
+	إذا (صف < screen_صفاں && سرا_خانہ <= screen_Columns)
 	{
-	    if (enc_dbcs != 0)
+	    إذا (enc_dbcs != 0)
 	    {
-		int	i;
+		صحيح	i;
 
-		p = ScreenLines + LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
-		    if (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
+		p = Screen_سطریں + سطر_وتھ[صف];
+		لكل (i = شروع_خانہ; i < سرا_خانہ; ++i)
+		    إذا (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
 		    {
 			// single-width double-byte char
 			*bufp++ = 0x8e;
-			*bufp++ = ScreenLines2[LineOffset[row] + i];
+			*bufp++ = ScreenLines2[سطر_وتھ[صف] + i];
 		    }
-		    else
+		    وإلا
 		    {
 			*bufp++ = p[i];
-			if (MB_BYTE2LEN(p[i]) == 2)
+			إذا (MB_BYTE2LEN(p[i]) == 2)
 			    *bufp++ = p[++i];
 		    }
 	    }
-	    else if (enc_utf8)
+	    وإلا إذا (enc_utf8)
 	    {
-		int	off;
-		int	i;
+		صحيح	off;
+		صحيح	i;
 
-		off = LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
+		off = سطر_وتھ[صف];
+		لكل (i = شروع_خانہ; i < سرا_خانہ; ++i)
 		{
 		    // The base character is either in ScreenLinesUC[] or
 		    // ScreenLines[].
-		    if (ScreenLinesUC[off + i] == 0)
-			*bufp++ = ScreenLines[off + i];
-		    else
+		    إذا (Screen_سطریں_UC[off + i] == 0)
+			*bufp++ = Screen_سطریں[off + i];
+		    وإلا
 			// Includes the composing characters.
 			bufp += utfc_char2bytes(off + i, bufp);
 		    // Skip right half of double-wide character.
-		    if (ScreenLines[off + i + 1] == 0)
+		    إذا (Screen_سطریں[off + i + 1] == 0)
 			++i;
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		STRNCPY(bufp, ScreenLines + LineOffset[row] + start_col,
-							 end_col - start_col);
-		bufp += end_col - start_col;
+		STRNCPY(bufp, Screen_سطریں + سطر_وتھ[صف] + شروع_خانہ,
+							 سرا_خانہ - شروع_خانہ);
+		bufp += سرا_خانہ - شروع_خانہ;
 	    }
 	}
     }
 
     // Add a newline at the end if the selection ended there
-    if (add_newline_flag)
+    إذا (جوڑو_newline_flag)
 	*bufp++ = NL;
 
     // First cleanup any old selection and become the owner.
@@ -1267,129 +1267,129 @@ clip_copy_modeless_selection(int both UNUSED)
     clip_own_selection(cbd);
 
     // Yank the text into the '*' register.
-    clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), cbd);
+    clip_yank_selection(MCHAR, بفر, (لما)(bufp - بفر), cbd);
 
     // Make the register contents available to the outside world.
-    clip_gen_set_selection(cbd);
+    clip_gen_سیٹ_selection(cbd);
 
 # ifdef FEAT_X11
-    if (both)
+    إذا (both)
     {
-	Clipboard_T *other = cbd == &clip_star ? &clip_plus : &clip_star;
+	Clipboard_T *other = cbd == &clip_تارا ? &clip_plus : &clip_تارا;
 	// Do the same for the '+' register.
 	clip_free_selection(other);
 	clip_own_selection(other);
-	clip_yank_selection(MCHAR, buffer, (long)(bufp - buffer), other);
-	clip_gen_set_selection(other);
+	clip_yank_selection(MCHAR, بفر, (لما)(bufp - بفر), other);
+	clip_gen_سیٹ_selection(other);
     }
 # endif
-    vim_free(buffer);
+    vim_free(بفر);
 }
 
-    void
-clip_gen_set_selection(Clipboard_T *cbd)
+    فراغ
+clip_gen_سیٹ_selection(Clipboard_T *cbd)
 {
-    if (!clip_did_set_selection)
+    إذا (!clip_did_سیٹ_selection)
     {
 	// Updating postponed, so that accessing the system clipboard won't
 	// hang Vim when accessing it many times (e.g. on a :g command).
-	if ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
-		|| (cbd == &clip_star && (clip_unnamed_saved & CLIP_UNNAMED)))
+	إذا ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
+		|| (cbd == &clip_تارا && (clip_unnamed_saved & CLIP_UNNAMED)))
 	{
 	    clipboard_needs_update = TRUE;
-	    return;
+	    أرجع;
 	}
     }
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	clip_mch_set_selection(cbd);
-    else
+    إذا (gui.وچ_use)
+	clip_mch_سیٹ_selection(cbd);
+    وإلا
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	إذا (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    clip_wl_set_selection(cbd);
+	    clip_wl_سیٹ_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	وإلا إذا (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    clip_xterm_set_selection(cbd);
+	    clip_xterm_سیٹ_selection(cbd);
 #  endif
 	}
     }
-# else
-    clip_mch_set_selection(cbd);
+# وإلا
+    clip_mch_سیٹ_selection(cbd);
 # endif
 }
 
-    static void
+    ساكن فراغ
 clip_gen_request_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.وچ_use)
 	clip_mch_request_selection(cbd);
-    else
+    وإلا
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	إذا (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_request_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	وإلا إذا (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_request_selection(cbd);
 #  endif
 	}
     }
-# else
+# وإلا
     clip_mch_request_selection(cbd);
 # endif
 }
 
-# if (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
-    static int
+# إذا (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
+    ساكن صحيح
 clip_x11_owner_exists(Clipboard_T *cbd)
 {
-    return XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
+    أرجع XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
 }
 # endif
 
-# if (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+# إذا (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(USE_SYSTEM)
-    int
-clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
+    صحيح
+clip_gen_owner_exists(Clipboard_T *cbd بن_ورتیا)
 {
-#  if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #   ifdef FEAT_GUI_GTK
-    if (gui.in_use)
-	return clip_gtk_owner_exists(cbd);
-    else
+    إذا (gui.وچ_use)
+	أرجع clip_gtk_owner_exists(cbd);
+    وإلا
 #   endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	إذا (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #   ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_owner_exists(cbd);
+	    أرجع clip_wl_owner_exists(cbd);
 #   endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	وإلا إذا (clipmethod == CLIPMETHOD_X11)
 	{
 #   ifdef FEAT_XCLIPBOARD
-	    return clip_x11_owner_exists(cbd);
+	    أرجع clip_x11_owner_exists(cbd);
 #   endif
 	}
-	else
-	    return FALSE;
+	وإلا
+	    أرجع FALSE;
     }
-#  else
-    return TRUE;
+#  وإلا
+    أرجع TRUE;
 #  endif
 }
 # endif
@@ -1398,7 +1398,7 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Stuff for the X clipboard.  Shared between VMS and Unix.
  */
 
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
 #  include <X11/Xatom.h>
 #  include <X11/Intrinsic.h>
 
@@ -1406,40 +1406,40 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Open the application context (if it hasn't been opened yet).
  * Used for Motif GUI and the xterm clipboard.
  */
-    void
-open_app_context(void)
+    فراغ
+open_app_context(فراغ)
 {
-    if (app_context == NULL)
+    إذا (app_context == عدم)
     {
 	XtToolkitInitialize();
 	app_context = XtCreateApplicationContext();
     }
 }
 
-static Atom	vim_atom;	// Vim's own special selection format
-static Atom	vimenc_atom;	// Vim's extended selection format
-static Atom	vim_mt_atom;	// Vim's own special selection format (in mime
+ساكن Atom	vim_atom;	// Vim's own special selection format
+ساكن Atom	vimenc_atom;	// Vim's extended selection format
+ساكن Atom	vim_mt_atom;	// Vim's own special selection format (in mime
 				// type format)
-static Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
+ساكن Atom	vimenc_mt_atom;	// Vim's extended selection format (in mime type
 				// format)
-static Atom	utf8_atom;
-static Atom	compound_text_atom;
-static Atom	text_atom;
-static Atom	targets_atom;
-static Atom	timestamp_atom;	// Used to get a timestamp
+ساكن Atom	utf8_atom;
+ساكن Atom	compound_متن_atom;
+ساكن Atom	متن_atom;
+ساكن Atom	targets_atom;
+ساكن Atom	timestamp_atom;	// Used to get a timestamp
 
-    void
-x11_setup_atoms(Display *dpy)
+    فراغ
+x11_تیاری_atoms(Display *dpy)
 {
     vim_atom	       = XInternAtom(dpy, VIM_ATOM_NAME,   False);
     vimenc_atom	       = XInternAtom(dpy, VIMENC_ATOM_NAME,False);
     vim_mt_atom	       = XInternAtom(dpy, VIM_MIMETYPE_NAME,   False);
     vimenc_mt_atom     = XInternAtom(dpy, VIMENC_MIMETYPE_NAME,False);
     utf8_atom	       = XInternAtom(dpy, "UTF8_STRING",   False);
-    compound_text_atom = XInternAtom(dpy, "COMPOUND_TEXT", False);
-    text_atom	       = XInternAtom(dpy, "TEXT",	   False);
+    compound_متن_atom = XInternAtom(dpy, "COMPOUND_TEXT", False);
+    متن_atom	       = XInternAtom(dpy, "TEXT",	   False);
     targets_atom       = XInternAtom(dpy, "TARGETS",	   False);
-    clip_star.sel_atom = XA_PRIMARY;
+    clip_تارا.sel_atom = XA_PRIMARY;
     clip_plus.sel_atom = XInternAtom(dpy, "CLIPBOARD",	   False);
     timestamp_atom     = XInternAtom(dpy, "TIMESTAMP",	   False);
 }
@@ -1448,157 +1448,157 @@ x11_setup_atoms(Display *dpy)
  * X Selection stuff, for cutting and pasting text to other windows.
  */
 
-    static Boolean
+    ساكن Boolean
 clip_x11_convert_selection_cb(
-    Widget	w UNUSED,
+    Widget	w بن_ورتیا,
     Atom	*sel_atom,
-    Atom	*target,
+    Atom	*نشانہ,
     Atom	*type,
-    XtPointer	*value,
-    long_u	*length,
-    int		*format)
+    Xt_اشارہ_گر	*قدر,
+    long_u	*لمائی,
+    صحيح		*format)
 {
-    static char_u   *save_result = NULL;
-    static long_u   save_length = 0;
+    ساكن char_u   *save_نتیجہ = عدم;
+    ساكن long_u   save_لمائی = 0;
     char_u	    *string;
-    int		    motion_type;
+    صحيح		    motion_type;
     Clipboard_T    *cbd;
-    int		    i;
+    صحيح		    i;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    إذا (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    وإلا
+	cbd = &clip_تارا;
 
-    if (!cbd->owned)
-	return False;	    // Shouldn't ever happen
+    إذا (!cbd->owned)
+	أرجع False;	    // Shouldn't ever happen
 
     // requestor wants to know what target types we support
-    if (*target == targets_atom)
+    إذا (*نشانہ == targets_atom)
     {
-	static Atom array[9];
+	ساكن Atom array[9];
 
-	*value = (XtPointer)array;
+	*قدر = (Xt_اشارہ_گر)array;
 	i = 0;
 	array[i++] = targets_atom;
 	array[i++] = vimenc_atom;
 	array[i++] = vim_atom;
 	array[i++] = vimenc_mt_atom;
 	array[i++] = vim_mt_atom;
-	if (enc_utf8)
+	إذا (enc_utf8)
 	    array[i++] = utf8_atom;
 	array[i++] = XA_STRING;
-	array[i++] = text_atom;
-	array[i++] = compound_text_atom;
+	array[i++] = متن_atom;
+	array[i++] = compound_متن_atom;
 
 	*type = XA_ATOM;
 	// This used to be: *format = sizeof(Atom) * 8; but that caused
 	// crashes on 64 bit machines. (Peter Derr)
 	*format = 32;
-	*length = i;
-	return True;
+	*لمائی = i;
+	أرجع True;
     }
 
-    if (       *target != XA_STRING
-	    && *target != vimenc_atom
-	    && *target != vimenc_mt_atom
-	    && (*target != utf8_atom || !enc_utf8)
-	    && *target != vim_atom
-	    && *target != vim_mt_atom
-	    && *target != text_atom
-	    && *target != compound_text_atom)
-	return False;
+    إذا (       *نشانہ != XA_STRING
+	    && *نشانہ != vimenc_atom
+	    && *نشانہ != vimenc_mt_atom
+	    && (*نشانہ != utf8_atom || !enc_utf8)
+	    && *نشانہ != vim_atom
+	    && *نشانہ != vim_mt_atom
+	    && *نشانہ != متن_atom
+	    && *نشانہ != compound_متن_atom)
+	أرجع False;
 
     clip_get_selection(cbd);
-    motion_type = clip_convert_selection(&string, length, cbd);
-    if (motion_type < 0)
-	return False;
+    motion_type = clip_convert_selection(&string, لمائی, cbd);
+    إذا (motion_type < 0)
+	أرجع False;
 
     // For our own format, the first byte contains the motion type
-    if (*target == vim_atom || *target == vim_mt_atom)
-	(*length)++;
+    إذا (*نشانہ == vim_atom || *نشانہ == vim_mt_atom)
+	(*لمائی)++;
 
     // Our own format with encoding: motion 'encoding' NUL text
-    if (*target == vimenc_atom || *target == vimenc_mt_atom)
-	*length += STRLEN(p_enc) + 2;
+    إذا (*نشانہ == vimenc_atom || *نشانہ == vimenc_mt_atom)
+	*لمائی += STRLEN(p_enc) + 2;
 
-    if (save_length < *length || save_length / 2 >= *length)
-	*value = XtRealloc((char *)save_result, (Cardinal)*length + 1);
-    else
-	*value = save_result;
-    if (*value == NULL)
+    إذا (save_لمائی < *لمائی || save_لمائی / 2 >= *لمائی)
+	*قدر = XtRealloc((حرف *)save_نتیجہ, (Cardinal)*لمائی + 1);
+    وإلا
+	*قدر = save_نتیجہ;
+    إذا (*قدر == عدم)
     {
 	vim_free(string);
-	return False;
+	أرجع False;
     }
-    save_result = (char_u *)*value;
-    save_length = *length;
+    save_نتیجہ = (char_u *)*قدر;
+    save_لمائی = *لمائی;
 
-    if (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
+    إذا (*نشانہ == XA_STRING || (*نشانہ == utf8_atom && enc_utf8))
     {
-	mch_memmove(save_result, string, (size_t)(*length));
-	*type = *target;
+	mch_memmove(save_نتیجہ, string, (size_t)(*لمائی));
+	*type = *نشانہ;
     }
-    else if (*target == compound_text_atom || *target == text_atom)
+    وإلا إذا (*نشانہ == compound_متن_atom || *نشانہ == متن_atom)
     {
-	XTextProperty	text_prop;
-	char		*string_nt = (char *)save_result;
-	int		conv_result;
+	XTextProperty	متن_prop;
+	حرف		*string_nt = (حرف *)save_نتیجہ;
+	صحيح		conv_نتیجہ;
 
 	// create NUL terminated string which XmbTextListToTextProperty wants
-	mch_memmove(string_nt, string, (size_t)*length);
-	string_nt[*length] = NUL;
-	conv_result = XmbTextListToTextProperty(X_DISPLAY, &string_nt,
-					   1, XCompoundTextStyle, &text_prop);
-	if (conv_result != Success)
+	mch_memmove(string_nt, string, (size_t)*لمائی);
+	string_nt[*لمائی] = NUL;
+	conv_نتیجہ = Xmb_متن_List_منزل_متن_Property(X_DISPLAY, &string_nt,
+					   1, XCompound_متن_Style, &متن_prop);
+	إذا (conv_نتیجہ != Success)
 	{
 	    vim_free(string);
-	    return False;
+	    أرجع False;
 	}
-	*value = (XtPointer)(text_prop.value);	//    from plain text
-	*length = text_prop.nitems;
-	*type = compound_text_atom;
-	XtFree((char *)save_result);
-	save_result = (char_u *)*value;
-	save_length = *length;
+	*قدر = (Xt_اشارہ_گر)(متن_prop.قدر);	//    from plain text
+	*لمائی = متن_prop.nitems;
+	*type = compound_متن_atom;
+	XtFree((حرف *)save_نتیجہ);
+	save_نتیجہ = (char_u *)*قدر;
+	save_لمائی = *لمائی;
     }
-    else if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    وإلا إذا (*نشانہ == vimenc_atom || *نشانہ == vimenc_mt_atom)
     {
-	int l = STRLEN(p_enc);
+	صحيح l = STRLEN(p_enc);
 
-	save_result[0] = motion_type;
-	STRCPY(save_result + 1, p_enc);
-	mch_memmove(save_result + l + 2, string, (size_t)(*length - l - 2));
-	if (*target == vimenc_atom)
+	save_نتیجہ[0] = motion_type;
+	STRCPY(save_نتیجہ + 1, p_enc);
+	mch_memmove(save_نتیجہ + l + 2, string, (size_t)(*لمائی - l - 2));
+	إذا (*نشانہ == vimenc_atom)
 	    *type = vimenc_atom;
-	else
+	وإلا
 	    *type = vimenc_mt_atom;
     }
-    else
+    وإلا
     {
-	save_result[0] = motion_type;
-	mch_memmove(save_result + 1, string, (size_t)(*length - 1));
-	if (*target == vim_atom)
+	save_نتیجہ[0] = motion_type;
+	mch_memmove(save_نتیجہ + 1, string, (size_t)(*لمائی - 1));
+	إذا (*نشانہ == vim_atom)
 	    *type = vim_atom;
-	else
+	وإلا
 	    *type = vim_mt_atom;
     }
     *format = 8;	    // 8 bits per char
     vim_free(string);
-    return True;
+    أرجع True;
 }
 
-    static void
-clip_x11_lose_ownership_cb(Widget w UNUSED, Atom *sel_atom)
+    ساكن فراغ
+clip_x11_lose_ownership_cb(Widget w بن_ورتیا, Atom *sel_atom)
 {
-    if (*sel_atom == clip_plus.sel_atom)
+    إذا (*sel_atom == clip_plus.sel_atom)
 	clip_lose_selection(&clip_plus);
-    else
-	clip_lose_selection(&clip_star);
+    وإلا
+	clip_lose_selection(&clip_تارا);
 }
 
-    static void
-clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
+    ساكن فراغ
+clip_x11_notify_cb(Widget w بن_ورتیا, Atom *sel_atom بن_ورتیا, Atom *نشانہ بن_ورتیا)
 {
     // To prevent automatically freeing the selection value.
 }
@@ -1606,102 +1606,102 @@ clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
 /*
  * Property callback to get a timestamp for XtOwnSelection.
  */
-#  if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
-    static void
+#  إذا defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+    ساكن فراغ
 clip_x11_timestamp_cb(
     Widget	w,
-    XtPointer	n UNUSED,
+    Xt_اشارہ_گر	n بن_ورتیا,
     XEvent	*event,
-    Boolean	*cont UNUSED)
+    Boolean	*cont بن_ورتیا)
 {
     Atom	    actual_type;
-    int		    format;
-    unsigned  long  nitems, bytes_after;
-    unsigned char   *prop=NULL;
+    صحيح		    format;
+    بنانشانی  لما  nitems, بائٹاں_after;
+    بنانشانی حرف   *prop=عدم;
     XPropertyEvent  *xproperty=&event->xproperty;
 
     // Must be a property notify, state can't be Delete (True), has to be
     // one of the supported selection types.
-    if (event->type != PropertyNotify || xproperty->state
-	    || (xproperty->atom != clip_star.sel_atom
+    إذا (event->type != PropertyNotify || xproperty->state
+	    || (xproperty->atom != clip_تارا.sel_atom
 				    && xproperty->atom != clip_plus.sel_atom))
-	return;
+	أرجع;
 
-    if (XGetWindowProperty(xproperty->display, xproperty->window,
+    إذا (XGet_کھڑکی_Property(xproperty->display, xproperty->کھڑکی_2,
 	  xproperty->atom, 0, 0, False, timestamp_atom, &actual_type, &format,
-						&nitems, &bytes_after, &prop))
-	return;
+						&nitems, &بائٹاں_after, &prop))
+	أرجع;
 
-    if (prop)
+    إذا (prop)
 	XFree(prop);
 
     // Make sure the property type is "TIMESTAMP" and it's 32 bits.
-    if (actual_type != timestamp_atom || format != 32)
-	return;
+    إذا (actual_type != timestamp_atom || format != 32)
+	أرجع;
 
     // Get the selection, using the event timestamp.
-    if (XtOwnSelection(w, xproperty->atom, xproperty->time,
+    إذا (XtOwnSelection(w, xproperty->atom, xproperty->ویلا,
 	    clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	    clip_x11_notify_cb) == OK)
     {
 	// Set the "owned" flag now, there may have been a call to
 	// lose_ownership_cb in between.
-	if (xproperty->atom == clip_plus.sel_atom)
+	إذا (xproperty->atom == clip_plus.sel_atom)
 	    clip_plus.owned = TRUE;
-	else
-	    clip_star.owned = TRUE;
+	وإلا
+	    clip_تارا.owned = TRUE;
     }
 }
 
-    void
-x11_setup_selection(Widget w)
+    فراغ
+x11_تیاری_selection(Widget w)
 {
-    XtAddEventHandler(w, PropertyChangeMask, False,
-	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (XtPointer)NULL);
+    Xt_جوڑو_Event_Handler(w, Property_Change_نقاب, False,
+	    /*(XtEventHandler)*/clip_x11_timestamp_cb, (Xt_اشارہ_گر)عدم);
 }
 #  endif
 
-    static void
+    ساكن فراغ
 clip_x11_request_selection_cb(
-    Widget	w UNUSED,
-    XtPointer	success,
+    Widget	w بن_ورتیا,
+    Xt_اشارہ_گر	success,
     Atom	*sel_atom,
     Atom	*type,
-    XtPointer	value,
-    long_u	*length,
-    int		*format)
+    Xt_اشارہ_گر	قدر,
+    long_u	*لمائی,
+    صحيح		*format)
 {
-    int		motion_type = MAUTO;
+    صحيح		motion_type = MAUTO;
     long_u	len;
     char_u	*p;
-    char	**text_list = NULL;
+    حرف	**متن_list = عدم;
     Clipboard_T	*cbd;
-    char_u	*tmpbuf = NULL;
+    char_u	*tmpbuf = عدم;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    إذا (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
-	cbd = &clip_star;
+    وإلا
+	cbd = &clip_تارا;
 
-    if (value == NULL || *length == 0)
+    إذا (قدر == عدم || *لمائی == 0)
     {
 	clip_free_selection(cbd);	// nothing received, clear register
-	*(int *)success = FALSE;
-	return;
+	*(صحيح *)success = FALSE;
+	أرجع;
     }
-    p = (char_u *)value;
-    len = *length;
-    if (*type == vim_atom || *type == vim_mt_atom)
+    p = (char_u *)قدر;
+    len = *لمائی;
+    إذا (*type == vim_atom || *type == vim_mt_atom)
     {
 	motion_type = *p++;
 	len--;
     }
 
-    else if (*type == vimenc_atom || *type == vimenc_mt_atom)
+    وإلا إذا (*type == vimenc_atom || *type == vimenc_mt_atom)
     {
 	char_u		*enc;
 	vimconv_T	conv;
-	int		convlen;
+	صحيح		convlen;
 
 	motion_type = *p++;
 	--len;
@@ -1713,56 +1713,56 @@ clip_x11_request_selection_cb(
 	// If the encoding of the text is different from 'encoding', attempt
 	// converting it.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	convert_تیاری(&conv, enc, p_enc);
+	إذا (conv.vc_type != CONV_NONE)
 	{
 	    convlen = len;	// Need to use an int here.
 	    tmpbuf = string_convert(&conv, p, &convlen);
 	    len = convlen;
-	    if (tmpbuf != NULL)
+	    إذا (tmpbuf != عدم)
 		p = tmpbuf;
-	    convert_setup(&conv, NULL, NULL);
+	    convert_تیاری(&conv, عدم, عدم);
 	}
     }
 
-    else if (*type == compound_text_atom
+    وإلا إذا (*type == compound_متن_atom
 	    || *type == utf8_atom
-	    || (enc_dbcs != 0 && *type == text_atom))
+	    || (enc_dbcs != 0 && *type == متن_atom))
     {
-	XTextProperty	text_prop;
-	int		n_text = 0;
-	int		status;
+	XTextProperty	متن_prop;
+	صحيح		n_متن = 0;
+	صحيح		حالت;
 
-	text_prop.value = (unsigned char *)value;
-	text_prop.encoding = *type;
-	text_prop.format = *format;
-	text_prop.nitems = len;
-#  if defined(X_HAVE_UTF8_STRING)
-	if (*type == utf8_atom)
-	    status = Xutf8TextPropertyToTextList(X_DISPLAY, &text_prop,
-							 &text_list, &n_text);
-	else
+	متن_prop.قدر = (بنانشانی حرف *)قدر;
+	متن_prop.encoding = *type;
+	متن_prop.format = *format;
+	متن_prop.nitems = len;
+#  إذا defined(X_HAVE_UTF8_STRING)
+	إذا (*type == utf8_atom)
+	    حالت = Xutf8_متن_Property_منزل_متن_List(X_DISPLAY, &متن_prop,
+							 &متن_list, &n_متن);
+	وإلا
 #  endif
-	    status = XmbTextPropertyToTextList(X_DISPLAY, &text_prop,
-							 &text_list, &n_text);
-	if (status != Success || n_text < 1)
+	    حالت = Xmb_متن_Property_منزل_متن_List(X_DISPLAY, &متن_prop,
+							 &متن_list, &n_متن);
+	إذا (حالت != Success || n_متن < 1)
 	{
-	    *(int *)success = FALSE;
-	    return;
+	    *(صحيح *)success = FALSE;
+	    أرجع;
 	}
-	p = (char_u *)text_list[0];
+	p = (char_u *)متن_list[0];
 	len = STRLEN(p);
     }
-    clip_yank_selection(motion_type, p, (long)len, cbd);
+    clip_yank_selection(motion_type, p, (لما)len, cbd);
 
-    if (text_list != NULL)
-	XFreeStringList(text_list);
+    إذا (متن_list != عدم)
+	XFreeStringList(متن_list);
     vim_free(tmpbuf);
-    XtFree((char *)value);
-    *(int *)success = TRUE;
+    XtFree((حرف *)قدر);
+    *(صحيح *)success = TRUE;
 }
 
-    void
+    فراغ
 clip_x11_request_selection(
     Widget	myShell,
     Display	*dpy,
@@ -1770,35 +1770,35 @@ clip_x11_request_selection(
 {
     XEvent	event;
     Atom	type;
-    static int	success;
-    int		i;
-    time_t	start_time;
-    int		timed_out = FALSE;
+    ساكن صحيح	success;
+    صحيح		i;
+    time_t	شروع_ویلا;
+    صحيح		timed_باہرلا = FALSE;
 
-    for (i = 0; i < 8; i++)
+    لكل (i = 0; i < 8; i++)
     {
-	switch (i)
+	بدل (i)
 	{
-	    case 0:  type = vimenc_mt_atom;	break;
-	    case 1:  type = vimenc_atom;	break;
-	    case 2:  type = vim_mt_atom;	break;
-	    case 3:  type = vim_atom;		break;
-	    case 4:  type = utf8_atom;		break;
-	    case 5:  type = compound_text_atom; break;
-	    case 6:  type = text_atom;		break;
-	    default: type = XA_STRING;
+	    حالة 0:  type = vimenc_mt_atom;	اكسر;
+	    حالة 1:  type = vimenc_atom;	اكسر;
+	    حالة 2:  type = vim_mt_atom;	اكسر;
+	    حالة 3:  type = vim_atom;		اكسر;
+	    حالة 4:  type = utf8_atom;		اكسر;
+	    حالة 5:  type = compound_متن_atom; اكسر;
+	    حالة 6:  type = متن_atom;		اكسر;
+	    افتراضي: type = XA_STRING;
 	}
-	if (type == utf8_atom
-#  if defined(X_HAVE_UTF8_STRING)
+	إذا (type == utf8_atom
+#  إذا defined(X_HAVE_UTF8_STRING)
 		&& !enc_utf8
 #  endif
 		)
 	    // Only request utf-8 when 'encoding' is utf8 and
 	    // Xutf8TextPropertyToTextList is available.
-	    continue;
+	    استمر;
 	success = MAYBE;
-	XtGetSelectionValue(myShell, cbd->sel_atom, type,
-	    clip_x11_request_selection_cb, (XtPointer)&success, CurrentTime);
+	Xt_Get_Selection_قدر(myShell, cbd->sel_atom, type,
+	    clip_x11_request_selection_cb, (Xt_اشارہ_گر)&success, Current_ویلا);
 
 	// Make sure the request for the selection goes out before waiting for
 	// a response.
@@ -1809,10 +1809,10 @@ clip_x11_request_selection(
 	 * characters, then they will appear before the one that requested the
 	 * paste!  Don't worry, we will catch up with any other events later.
 	 */
-	start_time = time(NULL);
-	while (success == MAYBE)
+	شروع_ویلا = ویلا(عدم);
+	طالما (success == MAYBE)
 	{
-	    if (XCheckTypedEvent(dpy, PropertyNotify, &event)
+	    إذا (XCheckTypedEvent(dpy, PropertyNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionRequest, &event))
 	    {
@@ -1823,7 +1823,7 @@ clip_x11_request_selection(
 		// it we hang.  KDE klipper does this, for example.
 		// We need to handle a PropertyNotify for large selections.
 		XtDispatchEvent(&event);
-		continue;
+		استمر;
 	    }
 
 	    // Time out after 2 to 3 seconds to avoid that we hang when the
@@ -1831,10 +1831,10 @@ clip_x11_request_selection(
 	    // event may still come later when the selection owner comes back
 	    // to life and the text gets inserted unexpectedly.  Don't know
 	    // why that happens or how to avoid that :-(.
-	    if (time(NULL) > start_time + 2)
+	    إذا (ویلا(عدم) > شروع_ویلا + 2)
 	    {
-		timed_out = TRUE;
-		break;
+		timed_باہرلا = TRUE;
+		اكسر;
 	    }
 
 	    // Do we need this?  Probably not.
@@ -1844,27 +1844,27 @@ clip_x11_request_selection(
 	    ui_delay(1L, TRUE);
 	}
 
-	if (success == TRUE)
-	    return;
+	إذا (success == TRUE)
+	    أرجع;
 
 	// don't do a retry with another type after timing out, otherwise we
 	// hang for 15 seconds.
-	if (timed_out)
-	    break;
+	إذا (timed_باہرلا)
+	    اكسر;
     }
 
     // Final fallback position - use the X CUT_BUFFER0 store
     yank_cut_buffer0(dpy, cbd);
 }
 
-    void
+    فراغ
 clip_x11_lose_selection(Widget myShell, Clipboard_T *cbd)
 {
     XtDisownSelection(myShell, cbd->sel_atom,
-				XtLastTimestampProcessed(XtDisplay(myShell)));
+				Xt_آخری_Timestamp_Processed(XtDisplay(myShell)));
 }
 
-    int
+    صحيح
 clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
 {
     // When using the GUI we have proper timestamps, use the one of the last
@@ -1872,81 +1872,81 @@ clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
     // them), Get the time by a zero-length append, clip_x11_timestamp_cb will
     // be called with the current timestamp.
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.وچ_use)
     {
-	if (XtOwnSelection(myShell, cbd->sel_atom,
-	       XtLastTimestampProcessed(XtDisplay(myShell)),
+	إذا (XtOwnSelection(myShell, cbd->sel_atom,
+	       Xt_آخری_Timestamp_Processed(XtDisplay(myShell)),
 	       clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	       clip_x11_notify_cb) == False)
-	    return FAIL;
+	    أرجع FAIL;
     }
-    else
+    وإلا
 #  endif
     {
-	if (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
-		  cbd->sel_atom, timestamp_atom, 32, PropModeAppend, NULL, 0))
-	    return FAIL;
+	إذا (!XChangeProperty(XtDisplay(myShell), Xt_کھڑکی(myShell),
+		  cbd->sel_atom, timestamp_atom, 32, Prop_منوال_Append, عدم, 0))
+	    أرجع FAIL;
     }
     // Flush is required in a terminal as nothing else is doing it.
     XFlush(XtDisplay(myShell));
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Send the current selection to the clipboard.  Do nothing for X because we
  * will fill in the selection only when requested by another app.
  */
-    void
-clip_x11_set_selection(Clipboard_T *cbd UNUSED)
+    فراغ
+clip_x11_سیٹ_selection(Clipboard_T *cbd بن_ورتیا)
 {
 }
 
 # endif
 
-# if (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
+# إذا (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
 	&& !defined(USE_GTK4)
 /*
  * Get the contents of the X CUT_BUFFER0 and put it in "cbd".
  */
-    void
+    فراغ
 yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 {
-    int		nbytes = 0;
-    char_u	*buffer = (char_u *)XFetchBuffer(dpy, &nbytes, 0);
+    صحيح		nbytes = 0;
+    char_u	*بفر = (char_u *)XFetch_بفر(dpy, &nbytes, 0);
 
-    if (nbytes > 0)
+    إذا (nbytes > 0)
     {
-	int  done = FALSE;
+	صحيح  پورا = FALSE;
 
 	// CUT_BUFFER0 is supposed to be always latin1.  Convert to 'enc' when
 	// using a multi-byte encoding.  Conversion between two 8-bit
 	// character sets usually fails and the text might actually be in
 	// 'enc' anyway.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    char_u	*conv_buf;
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
+	    إذا (convert_تیاری(&vc, (char_u *)"latin1", p_enc) == OK)
 	    {
-		conv_buf = string_convert(&vc, buffer, &nbytes);
-		if (conv_buf != NULL)
+		conv_buf = string_convert(&vc, بفر, &nbytes);
+		إذا (conv_buf != عدم)
 		{
-		    clip_yank_selection(MCHAR, conv_buf, (long)nbytes, cbd);
+		    clip_yank_selection(MCHAR, conv_buf, (لما)nbytes, cbd);
 		    vim_free(conv_buf);
-		    done = TRUE;
+		    پورا = TRUE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_تیاری(&vc, عدم, عدم);
 	    }
 	}
-	if (!done)  // use the text without conversion
-	    clip_yank_selection(MCHAR, buffer, (long)nbytes, cbd);
-	XFree((void *)buffer);
-	if (p_verbose > 0)
+	إذا (!پورا)  // use the text without conversion
+	    clip_yank_selection(MCHAR, بفر, (لما)nbytes, cbd);
+	XFree((فراغ *)بفر);
+	إذا (p_verbose > 0)
 	{
 	    verbose_enter();
-	    verb_msg(_("Used CUT_BUFFER0 instead of empty selection"));
+	    verb_پیغام(_("Used CUT_BUFFER0 instead of empty selection"));
 	    verbose_leave();
 	}
     }
@@ -1980,66 +1980,66 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
  * 'permanent' of the two), otherwise the PRIMARY one.
  * For now, use a hard-coded sanity limit of 1Mb of data.
  */
-# if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
-    void
-x11_export_final_selection(void)
+# إذا defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+    فراغ
+x11_export_final_selection(فراغ)
 {
     Display	*dpy;
-    char_u	*str = NULL;
+    char_u	*str = عدم;
     long_u	len = 0;
-    int		motion_type = -1;
+    صحيح		motion_type = -1;
 
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    إذا (gui.وچ_use)
 	dpy = X_DISPLAY;
-    else
+    وإلا
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	dpy = xterm_dpy;
-#  else
-	return;
+#  وإلا
+	أرجع;
 #  endif
 
     // Get selection to export
-    if (clip_plus.owned)
+    إذا (clip_plus.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_plus);
-    else if (clip_star.owned)
-	motion_type = clip_convert_selection(&str, &len, &clip_star);
+    وإلا إذا (clip_تارا.owned)
+	motion_type = clip_convert_selection(&str, &len, &clip_تارا);
 
     // Check it's OK
-    if (dpy != NULL && str != NULL && motion_type >= 0
+    إذا (dpy != عدم && str != عدم && motion_type >= 0
 					       && len < 1024*1024 && len > 0)
     {
-	int ok = TRUE;
+	صحيح ok = TRUE;
 
 	// The CUT_BUFFER0 is supposed to always contain latin1.  Convert from
 	// 'enc' when it is a multi-byte encoding.  When 'enc' is an 8-bit
 	// encoding conversion usually doesn't work, so keep the text as-is.
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
+	    إذا (convert_تیاری(&vc, p_enc, (char_u *)"latin1") == OK)
 	    {
-		int	intlen = len;
+		صحيح	intlen = len;
 		char_u	*conv_str;
 
 		vc.vc_fail = TRUE;
 		conv_str = string_convert(&vc, str, &intlen);
 		len = intlen;
-		if (conv_str != NULL)
+		إذا (conv_str != عدم)
 		{
 		    vim_free(str);
 		    str = conv_str;
 		}
-		else
+		وإلا
 		{
 		    ok = FALSE;
 		}
-		convert_setup(&vc, NULL, NULL);
+		convert_تیاری(&vc, عدم, عدم);
 	    }
-	    else
+	    وإلا
 	    {
 		ok = FALSE;
 	    }
@@ -2047,9 +2047,9 @@ x11_export_final_selection(void)
 
 	// Do not store the string if conversion failed.  Better to use any
 	// other selection than garbled text.
-	if (ok)
+	إذا (ok)
 	{
-	    XStoreBuffer(dpy, (char *)str, (int)len, 0);
+	    XStore_بفر(dpy, (حرف *)str, (صحيح)len, 0);
 	    XFlush(dpy);
 	}
     }
@@ -2058,85 +2058,85 @@ x11_export_final_selection(void)
 }
 # endif
 
-    void
+    فراغ
 clip_free_selection(Clipboard_T *cbd)
 {
     yankreg_T *y_ptr = get_y_current();
 
-    if (cbd == &clip_plus)
-	set_y_current(get_y_register(PLUS_REGISTER));
-    else
-	set_y_current(get_y_register(STAR_REGISTER));
+    إذا (cbd == &clip_plus)
+	سیٹ_y_current(get_y_رجسٹر(PLUS_رجسٹر));
+    وإلا
+	سیٹ_y_current(get_y_رجسٹر(تارا_رجسٹر));
     free_yank_all();
-    get_y_current()->y_size = 0;
-    set_y_current(y_ptr);
+    get_y_current()->y_ناپ = 0;
+    سیٹ_y_current(y_ptr);
 }
 
 /*
  * Get the selected text and put it in register '*' or '+'.
  */
-    void
+    فراغ
 clip_get_selection(Clipboard_T *cbd)
 {
-    yankreg_T	*old_y_previous, *old_y_current;
+    yankreg_T	*old_y_پچھلا, *old_y_current;
     pos_T	old_cursor;
     pos_T	old_visual;
-    int		old_visual_mode;
+    صحيح		old_visual_منوال;
     colnr_T	old_virtcol;
     colnr_T	old_curswant;
-    int		old_set_curswant;
-    pos_T	old_op_start, old_op_end;
+    صحيح		old_سیٹ_curswant;
+    pos_T	old_op_شروع, old_op_سرا;
     oparg_T	oa;
     cmdarg_T	ca;
 
-    if (cbd->owned)
+    إذا (cbd->owned)
     {
-	if ((cbd == &clip_plus
-		&& get_y_register(PLUS_REGISTER)->y_array != NULL)
-		|| (cbd == &clip_star
-		    && get_y_register(STAR_REGISTER)->y_array != NULL))
-	    return;
+	إذا ((cbd == &clip_plus
+		&& get_y_رجسٹر(PLUS_رجسٹر)->y_array != عدم)
+		|| (cbd == &clip_تارا
+		    && get_y_رجسٹر(تارا_رجسٹر)->y_array != عدم))
+	    أرجع;
 
 	// Avoid triggering autocmds such as TextYankPost.
-	block_autocmds();
+	بلاک_autocmds();
 
 	// Get the text between clip_star.start & clip_star.end
-	old_y_previous = get_y_previous();
+	old_y_پچھلا = get_y_پچھلا();
 	old_y_current = get_y_current();
 	old_cursor = curwin->w_cursor;
 	old_virtcol = curwin->w_virtcol;
 	old_curswant = curwin->w_curswant;
-	old_set_curswant = curwin->w_set_curswant;
-	old_op_start = curbuf->b_op_start;
-	old_op_end = curbuf->b_op_end;
+	old_سیٹ_curswant = curwin->w_سیٹ_curswant;
+	old_op_شروع = curbuf->b_op_شروع;
+	old_op_سرا = curbuf->b_op_سرا;
 	old_visual = VIsual;
-	old_visual_mode = VIsual_mode;
+	old_visual_منوال = VIsual_منوال;
 	clear_oparg(&oa);
 	oa.regname = (cbd == &clip_plus ? '+' : '*');
 	oa.op_type = OP_YANK;
-	CLEAR_FIELD(ca);
+	CLEAR_میدان(ca);
 	ca.oap = &oa;
 	ca.cmdchar = 'y';
 	ca.count1 = 1;
-	ca.retval = CA_NO_ADJ_OP_END;
+	ca.retval = CA_NO_ADJ_OP_سرا;
 	do_pending_operator(&ca, 0, TRUE);
 
 	// restore things
-	set_y_previous(old_y_previous);
-	set_y_current(old_y_current);
+	سیٹ_y_پچھلا(old_y_پچھلا);
+	سیٹ_y_current(old_y_current);
 	curwin->w_cursor = old_cursor;
 	curwin->w_virtcol = old_virtcol;
-	changed_cline_bef_curs();   // old w_virtcol et al. may be invalid
+	بدلیا_cline_bef_curs();   // old w_virtcol et al. may be invalid
 	curwin->w_curswant = old_curswant;
-	curwin->w_set_curswant = old_set_curswant;
-	curbuf->b_op_start = old_op_start;
-	curbuf->b_op_end = old_op_end;
+	curwin->w_سیٹ_curswant = old_سیٹ_curswant;
+	curbuf->b_op_شروع = old_op_شروع;
+	curbuf->b_op_سرا = old_op_سرا;
 	VIsual = old_visual;
-	VIsual_mode = old_visual_mode;
+	VIsual_منوال = old_visual_منوال;
 
 	unblock_autocmds();
     }
-    else if (!is_clipboard_needs_update())
+    وإلا إذا (!is_clipboard_needs_update())
     {
 	clip_free_selection(cbd);
 
@@ -2148,73 +2148,73 @@ clip_get_selection(Clipboard_T *cbd)
 /*
  * Convert from the GUI selection string into the '*'/'+' register.
  */
-    void
+    فراغ
 clip_yank_selection(
-    int		type,
+    صحيح		type,
     char_u	*str,
-    long	len,
+    لما	len,
     Clipboard_T *cbd)
 {
     yankreg_T *y_ptr;
 
-    if (cbd == &clip_plus)
-	y_ptr = get_y_register(PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    إذا (cbd == &clip_plus)
+	y_ptr = get_y_رجسٹر(PLUS_رجسٹر);
+    وإلا
+	y_ptr = get_y_رجسٹر(تارا_رجسٹر);
 
     clip_free_selection(cbd);
 
-    str_to_reg(y_ptr, type, str, len, -1, FALSE);
+    str_منزل_reg(y_ptr, type, str, len, -1, FALSE);
 }
 
-    int
-clip_convert_selection_offset(
+    صحيح
+clip_convert_selection_وتھ(
 	char_u	    **str,
 	long_u	    *len,
-	int	    offset, // Extra space to add in *str and the offset to
+	صحيح	    وتھ, // Extra space to add in *str and the offset to
 			    // place the actual string in *str.
 	Clipboard_T *cbd)
 {
     char_u	*p;
-    int		lnum;
-    int		i, j;
+    صحيح		lnum;
+    صحيح		i, j;
     int_u	eolsize;
     yankreg_T	*y_ptr;
 
-    if (cbd == &clip_plus)
-	y_ptr = get_y_register(PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    إذا (cbd == &clip_plus)
+	y_ptr = get_y_رجسٹر(PLUS_رجسٹر);
+    وإلا
+	y_ptr = get_y_رجسٹر(تارا_رجسٹر);
 
 # ifdef USE_CRNL
     eolsize = 2;
-# else
+# وإلا
     eolsize = 1;
 # endif
 
-    *str = NULL;
+    *str = عدم;
     *len = 0;
-    if (y_ptr->y_array == NULL)
-	return -1;
+    إذا (y_ptr->y_array == عدم)
+	أرجع -1;
 
-    for (i = 0; i < y_ptr->y_size; i++)
-	*len += (long_u)y_ptr->y_array[i].length + eolsize;
+    لكل (i = 0; i < y_ptr->y_ناپ; i++)
+	*len += (long_u)y_ptr->y_array[i].لمائی + eolsize;
 
     // Don't want newline character at end of last line if we're in MCHAR mode.
-    if (y_ptr->y_type == MCHAR && *len >= eolsize)
+    إذا (y_ptr->y_type == MCHAR && *len >= eolsize)
 	*len -= eolsize;
 
-    *len += offset;
+    *len += وتھ;
     p = *str = alloc(*len + 1);	// add one to avoid zero
-    if (p == NULL)
-	return -1;
-    p += offset;
+    إذا (p == عدم)
+	أرجع -1;
+    p += وتھ;
     lnum = 0;
-    for (i = 0, j = 0; i < (int)*len - offset; i++, j++)
+    لكل (i = 0, j = 0; i < (صحيح)*len - وتھ; i++, j++)
     {
-	if (y_ptr->y_array[lnum].string[j] == '\n')
+	إذا (y_ptr->y_array[lnum].string[j] == '\n')
 	    p[i] = NUL;
-	else if (y_ptr->y_array[lnum].string[j] == NUL)
+	وإلا إذا (y_ptr->y_array[lnum].string[j] == NUL)
 	{
 # ifdef USE_CRNL
 	    p[i++] = '\r';
@@ -2223,10 +2223,10 @@ clip_convert_selection_offset(
 	    lnum++;
 	    j = -1;
 	}
-	else
+	وإلا
 	    p[i] = y_ptr->y_array[lnum].string[j];
     }
-    return y_ptr->y_type;
+    أرجع y_ptr->y_type;
 }
 
 /*
@@ -2234,155 +2234,155 @@ clip_convert_selection_offset(
  * with length *len.
  * Returns the motion type, or -1 for failure.
  */
-    int
+    صحيح
 clip_convert_selection(char_u **str, long_u *len, Clipboard_T *cbd)
 {
-    return clip_convert_selection_offset(str, len, 0, cbd);
+    أرجع clip_convert_selection_وتھ(str, len, 0, cbd);
 }
 
 /*
  * When "regname" is a clipboard register, obtain the selection.  If it's not
  * available return zero, otherwise return "regname".
  */
-    int
-may_get_selection(int regname)
+    صحيح
+may_get_selection(صحيح regname)
 {
-    if (regname == '*')
+    إذا (regname == '*')
     {
-	if (!clip_star.available)
+	إذا (!clip_تارا.دستیاب)
 	    regname = 0;
-	else
-	    clip_get_selection(&clip_star);
+	وإلا
+	    clip_get_selection(&clip_تارا);
     }
-    else if (regname == '+')
+    وإلا إذا (regname == '+')
     {
-	if (!clip_plus.available)
+	إذا (!clip_plus.دستیاب)
 	    regname = 0;
-	else
+	وإلا
 	    clip_get_selection(&clip_plus);
     }
-    return regname;
+    أرجع regname;
 }
 
 /*
  * If we have written to a clipboard register, send the text to the clipboard.
  */
-    void
-may_set_selection(void)
+    فراغ
+may_سیٹ_selection(فراغ)
 {
-    if ((get_y_current() == get_y_register(STAR_REGISTER))
-	    && clip_star.available)
+    إذا ((get_y_current() == get_y_رجسٹر(تارا_رجسٹر))
+	    && clip_تارا.دستیاب)
     {
-	clip_own_selection(&clip_star);
-	clip_gen_set_selection(&clip_star);
+	clip_own_selection(&clip_تارا);
+	clip_gen_سیٹ_selection(&clip_تارا);
     }
-    else if ((get_y_current() == get_y_register(PLUS_REGISTER))
-	    && clip_plus.available)
+    وإلا إذا ((get_y_current() == get_y_رجسٹر(PLUS_رجسٹر))
+	    && clip_plus.دستیاب)
     {
 	clip_own_selection(&clip_plus);
-	clip_gen_set_selection(&clip_plus);
+	clip_gen_سیٹ_selection(&clip_plus);
     }
 }
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_WAYLAND_CLIPBOARD)
 
-    static clip_wl_selection_T *
+    ساكن clip_wl_selection_T *
 clip_wl_get_selection(wayland_selection_T sel)
 {
-    switch (sel)
+    بدل (sel)
     {
-	case WAYLAND_SELECTION_REGULAR:
-	    return &clip_wl.regular;
-	case WAYLAND_SELECTION_PRIMARY:
-	    return &clip_wl.primary;
-	default:
-	    return NULL;
+	حالة WAYLAND_SELECTION_REGULAR:
+	    أرجع &clip_wl.regular;
+	حالة WAYLAND_SELECTION_PRIMARY:
+	    أرجع &clip_wl.primary;
+	افتراضي:
+	    أرجع عدم;
     }
 }
 
-    static clip_wl_selection_T *
+    ساكن clip_wl_selection_T *
 clip_wl_get_selection_from_cbd(Clipboard_T *cbd)
 {
-    if (cbd == &clip_plus)
-	return &clip_wl.regular;
-    else if (cbd == &clip_star)
-	return &clip_wl.primary;
-    else
-	return NULL;
+    إذا (cbd == &clip_plus)
+	أرجع &clip_wl.regular;
+    وإلا إذا (cbd == &clip_تارا)
+	أرجع &clip_wl.primary;
+    وإلا
+	أرجع عدم;
 }
 
-    static Clipboard_T *
+    ساكن Clipboard_T *
 clip_wl_get_cbd_from_selection(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return &clip_plus;
-    else if (sel == &clip_wl.primary)
-	return &clip_star;
-    else
-	return NULL;
+    إذا (sel == &clip_wl.regular)
+	أرجع &clip_plus;
+    وإلا إذا (sel == &clip_wl.primary)
+	أرجع &clip_تارا;
+    وإلا
+	أرجع عدم;
 }
 
-    static wayland_selection_T
+    ساكن wayland_selection_T
 clip_wl_get_selection_type(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return WAYLAND_SELECTION_REGULAR;
-    else if (sel == &clip_wl.primary)
-	return WAYLAND_SELECTION_PRIMARY;
-    else
-	return WAYLAND_SELECTION_NONE;
+    إذا (sel == &clip_wl.regular)
+	أرجع WAYLAND_SELECTION_REGULAR;
+    وإلا إذا (sel == &clip_wl.primary)
+	أرجع WAYLAND_SELECTION_PRIMARY;
+    وإلا
+	أرجع WAYLAND_SELECTION_NONE;
 }
 
-    static bool
-wl_data_offer_listener_event_offer(
-    void *data UNUSED,
-    vwl_data_offer_T *offer UNUSED,
-    const char *mime_type
+    ساكن bool
+wl_انکڑے_offer_listener_event_offer(
+    فراغ *انکڑے بن_ورتیا,
+    vwl_انکڑے_offer_T *offer بن_ورتیا,
+    ثابت حرف *mime_type
 )
 {
     // Only accept mime type if we support it
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(mime_type, supported_mimes[i]) == 0)
-	    return true;
-    return FALSE;
+    لكل (صحيح i = 0; i < (صحيح)ARRAY_لمائی(supported_mimes); i++)
+	إذا (STRCMP(mime_type, supported_mimes[i]) == 0)
+	    أرجع true;
+    أرجع FALSE;
 }
 
-static const vwl_data_offer_listener_T vwl_data_offer_listener = {
-    .offer = wl_data_offer_listener_event_offer
+ساكن ثابت vwl_انکڑے_offer_listener_T vwl_انکڑے_offer_listener = {
+    .offer = wl_انکڑے_offer_listener_event_offer
 };
 
-    static void
-vwl_data_device_listener_event_data_offer(
-	void *data UNUSED,
-	vwl_data_device_T *device UNUSED,
-	vwl_data_offer_T *offer)
+    ساكن فراغ
+vwl_انکڑے_device_listener_event_انکڑے_offer(
+	فراغ *انکڑے بن_ورتیا,
+	vwl_انکڑے_device_T *device بن_ورتیا,
+	vwl_انکڑے_offer_T *offer)
 {
     // Immediately start listening for offer events from the data offer
-    vwl_data_offer_add_listener(offer, &vwl_data_offer_listener, NULL);
+    vwl_انکڑے_offer_جوڑو_listener(offer, &vwl_انکڑے_offer_listener, عدم);
 }
 
-    static void
-vwl_data_device_listener_event_selection(
-	void *data UNUSED,
-	vwl_data_device_T *device UNUSED,
-	vwl_data_offer_T *offer,
+    ساكن فراغ
+vwl_انکڑے_device_listener_event_selection(
+	فراغ *انکڑے بن_ورتیا,
+	vwl_انکڑے_device_T *device بن_ورتیا,
+	vwl_انکڑے_offer_T *offer,
 	wayland_selection_T selection)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection(selection);
 
     // Destroy previous offer if any, it is now invalid
-    vwl_data_offer_destroy(sel->offer);
+    vwl_انکڑے_offer_destroy(sel->offer);
 
     // There are two cases when sel->offer is NULL
     // 1. No one owns the selection
     // 2. We own the selection (we'll just access the register directly)
-    if (offer == NULL || sel->source != NULL)
+    إذا (offer == عدم || sel->سروت != عدم)
     {
 	// Selection event is from us, so we are the source client. Therefore
 	// ignore it. Or the selection is cleared, so set sel->offer to NULL
-	vwl_data_offer_destroy(offer);
-	sel->offer = NULL;
-	return;
+	vwl_انکڑے_offer_destroy(offer);
+	sel->offer = عدم;
+	أرجع;
     }
 
     // Save offer. When we want to request data, then we'll actually call the
@@ -2391,261 +2391,261 @@ vwl_data_device_listener_event_selection(
 
 }
 
-    static void
-vwl_data_device_listener_event_finished(
-	void *data UNUSED,
-	vwl_data_device_T *device)
+    ساكن فراغ
+vwl_انکڑے_device_listener_event_مکمل(
+	فراغ *انکڑے بن_ورتیا,
+	vwl_انکڑے_device_T *device)
 {
     clip_wl_selection_T *sel;
     // Device finished, guessing this can happen is when the seat becomes
     // invalid? If so, let the user call :wlrestore! to reset. There wouldn't be
     // any point in trying to create another data device for the same seat,
     // since the seat is in an invalid state.
-    if (device == clip_wl.regular.device)
+    إذا (device == clip_wl.regular.device)
     {
 	sel = &clip_wl.regular;
-	clip_wl.regular.device = NULL;
+	clip_wl.regular.device = عدم;
     }
-    else if (device == clip_wl.primary.device)
+    وإلا إذا (device == clip_wl.primary.device)
     {
 	sel = &clip_wl.primary;
-	clip_wl.primary.device = NULL;
+	clip_wl.primary.device = عدم;
     }
-    else
+    وإلا
 	// Shouldn't happen
-	return;
+	أرجع;
 
     vim_free(sel->contents);
-    vwl_data_source_destroy(sel->source);
-    vwl_data_offer_destroy(sel->offer);
-    sel->available = FALSE;
+    vwl_انکڑے_سروت_destroy(sel->سروت);
+    vwl_انکڑے_offer_destroy(sel->offer);
+    sel->دستیاب = FALSE;
 
-    vwl_data_device_destroy(device);
+    vwl_انکڑے_device_destroy(device);
 }
 
-static const vwl_data_device_listener_T vwl_data_device_listener = {
-    .data_offer = vwl_data_device_listener_event_data_offer,
-    .selection = vwl_data_device_listener_event_selection,
-    .finished = vwl_data_device_listener_event_finished
+ساكن ثابت vwl_انکڑے_device_listener_T vwl_انکڑے_device_listener = {
+    .انکڑے_offer = vwl_انکڑے_device_listener_event_انکڑے_offer,
+    .selection = vwl_انکڑے_device_listener_event_selection,
+    .مکمل = vwl_انکڑے_device_listener_event_مکمل
 };
 
 /*
  * Initialize the clipboard for Wayland using the global Wayland connection.
  * Returns OK on success and FAIL on failure.
  */
-    int
-clip_init_wayland(void)
+    صحيح
+clip_init_wayland(فراغ)
 {
     int_u supported = WAYLAND_SELECTION_NONE;
 
-    if (wayland_ct == NULL)
-	return FAIL;
+    إذا (wayland_ct == عدم)
+	أرجع FAIL;
 
-    memset(&clip_wl, 0, sizeof(clip_wl));
+    memset(&clip_wl, 0, حجم(clip_wl));
 
-    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (char *)p_wse);
+    clip_wl.seat = vwl_connection_get_seat(wayland_ct, (حرف *)p_wse);
 
-    if (clip_wl.seat == NULL)
-	return FAIL;
+    إذا (clip_wl.seat == عدم)
+	أرجع FAIL;
 
-    clip_wl.regular.manager = vwl_connection_get_data_device_manager(
+    clip_wl.regular.manager = vwl_connection_get_انکڑے_device_manager(
 	    wayland_ct, WAYLAND_SELECTION_REGULAR, &supported);
 
-    if (clip_wl.regular.manager != NULL)
+    إذا (clip_wl.regular.manager != عدم)
     {
-	clip_wl.regular.device = vwl_data_device_manager_get_data_device(
+	clip_wl.regular.device = vwl_انکڑے_device_manager_get_انکڑے_device(
 		clip_wl.regular.manager, clip_wl.seat);
 
-	if (clip_wl.regular.device != NULL)
-	    clip_wl.regular.available = true;
-	else
+	إذا (clip_wl.regular.device != عدم)
+	    clip_wl.regular.دستیاب = true;
+	وإلا
 	{
 	    // Shouldn't happen
-	    vwl_data_device_manager_discard(clip_wl.regular.manager);
-	    clip_wl.regular.manager = NULL;
-	    return FAIL;
+	    vwl_انکڑے_device_manager_discard(clip_wl.regular.manager);
+	    clip_wl.regular.manager = عدم;
+	    أرجع FAIL;
 	}
     }
 
     // If we still don't support the primary selection, try finding one for it
     // specifically.
-    if (!(supported & WAYLAND_SELECTION_PRIMARY))
+    إذا (!(supported & WAYLAND_SELECTION_PRIMARY))
     {
-	clip_wl.primary.manager = vwl_connection_get_data_device_manager(
+	clip_wl.primary.manager = vwl_connection_get_انکڑے_device_manager(
 		wayland_ct, WAYLAND_SELECTION_PRIMARY, &supported);
 
-	if (clip_wl.primary.manager != NULL)
+	إذا (clip_wl.primary.manager != عدم)
 	{
-	    clip_wl.primary.device = vwl_data_device_manager_get_data_device(
+	    clip_wl.primary.device = vwl_انکڑے_device_manager_get_انکڑے_device(
 		    clip_wl.primary.manager, clip_wl.seat);
 
-	    if (clip_wl.primary.device != NULL)
-		clip_wl.primary.available = true;
-	    else
+	    إذا (clip_wl.primary.device != عدم)
+		clip_wl.primary.دستیاب = true;
+	    وإلا
 	    {
-		vwl_data_device_manager_discard(clip_wl.primary.manager);
-		clip_wl.primary.manager = NULL;
+		vwl_انکڑے_device_manager_discard(clip_wl.primary.manager);
+		clip_wl.primary.manager = عدم;
 	    }
 	}
     }
 
-    if (clip_wl.regular.available && !clip_wl.primary.available)
+    إذا (clip_wl.regular.دستیاب && !clip_wl.primary.دستیاب)
     {
 	// The protocol supports both regular and primary selections, just use
 	// one data device manager and one data device. Or the primary selection
 	// is not supported, make it point to the regular selection instead.
-	clip_wl.primary.available = true;
+	clip_wl.primary.دستیاب = true;
 	clip_wl.primary.manager = clip_wl.regular.manager;
 	clip_wl.primary.device = clip_wl.regular.device;
     }
 
-    if (!clip_wl.regular.available && !clip_wl.primary.available)
-	return FAIL;
+    إذا (!clip_wl.regular.دستیاب && !clip_wl.primary.دستیاب)
+	أرجع FAIL;
 
     // Start listening for selection updates
-    if (clip_wl.regular.device != NULL)
-	vwl_data_device_add_listener(clip_wl.regular.device,
-		&vwl_data_device_listener, NULL);
+    إذا (clip_wl.regular.device != عدم)
+	vwl_انکڑے_device_جوڑو_listener(clip_wl.regular.device,
+		&vwl_انکڑے_device_listener, عدم);
     // Don't want to listen to the same data device twice
-    if (clip_wl.primary.device != NULL
+    إذا (clip_wl.primary.device != عدم
 	    && clip_wl.primary.device != clip_wl.regular.device)
-	vwl_data_device_add_listener(clip_wl.primary.device,
-		&vwl_data_device_listener, NULL);
+	vwl_انکڑے_device_جوڑو_listener(clip_wl.primary.device,
+		&vwl_انکڑے_device_listener, عدم);
 
-    return OK;
+    أرجع OK;
 }
 
-    void
-clip_uninit_wayland(void)
+    فراغ
+clip_uninit_wayland(فراغ)
 {
     clip_wl_selection_T *sel;
 
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+    إذا (clipmethod == CLIPMETHOD_WAYLAND)
     {
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	إذا (clip_تارا.owned)
+	    clip_lose_selection(&clip_تارا);
+	إذا (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
 
     // Don't want to double free
-    if (clip_wl.regular.manager != clip_wl.primary.manager)
-	vwl_data_device_manager_discard(clip_wl.primary.manager);
-    vwl_data_device_manager_discard(clip_wl.regular.manager);
+    إذا (clip_wl.regular.manager != clip_wl.primary.manager)
+	vwl_انکڑے_device_manager_discard(clip_wl.primary.manager);
+    vwl_انکڑے_device_manager_discard(clip_wl.regular.manager);
 
-    if (clip_wl.regular.device != clip_wl.primary.device)
-	vwl_data_device_destroy(clip_wl.primary.device);
-    vwl_data_device_destroy(clip_wl.regular.device);
+    إذا (clip_wl.regular.device != clip_wl.primary.device)
+	vwl_انکڑے_device_destroy(clip_wl.primary.device);
+    vwl_انکڑے_device_destroy(clip_wl.regular.device);
 
     sel = &clip_wl.regular;
-    while (true)
+    طالما (true)
     {
 	vim_free(sel->contents);
-	vwl_data_source_destroy(sel->source);
-	vwl_data_offer_destroy(sel->offer);
-	sel->available = false;
+	vwl_انکڑے_سروت_destroy(sel->سروت);
+	vwl_انکڑے_offer_destroy(sel->offer);
+	sel->دستیاب = false;
 
-	if (sel == &clip_wl.primary)
-	    break;
+	إذا (sel == &clip_wl.primary)
+	    اكسر;
 	sel = &clip_wl.primary;
     }
 
-    vim_memset(&clip_wl, 0, sizeof(clip_wl));
+    vim_memset(&clip_wl, 0, حجم(clip_wl));
 }
 
-    int
-clip_reset_wayland(void)
+    صحيح
+clip_reset_wayland(فراغ)
 {
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == FAIL
+    إذا (wayland_init_connection(wayland_display_name) == FAIL
 	    || clip_init_wayland() == FAIL)
-	return FAIL;
+	أرجع FAIL;
 
-    choose_clipmethod();
-    return OK;
+    چنو_clipmethod();
+    أرجع OK;
 }
 
 
 /*
  * Read data from a file descriptor and write it to the given clipboard.
  */
-    static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
+    ساكن فراغ
+clip_wl_receive_انکڑے(Clipboard_T *cbd, ثابت حرف *mime_type, صحيح fd)
 {
-    char_u	*start, *final;
-    long	len;
+    char_u	*شروع, *final;
+    لما	len;
     garray_T	buf;
-    int		motion_type = MAUTO;
+    صحيح		motion_type = MAUTO;
     ssize_t	r = 0;
-    char_u	*tofree = NULL;
+    char_u	*tofree = عدم;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    بنية pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLIN;
-#  else
+#  وإلا
     fd_set rfds;
-    struct timeval  tv;
+    بنية timeval  tv;
 
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
 #  endif
 
     // Make pipe (read end) non-blocking
-    if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
-	return;
+    إذا (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+	أرجع;
 
     ga_init2(&buf, 1, 4096);
 
     // 4096 bytes seems reasonable for initial buffer size, memory is cheap
     // anyways.
-    if (ga_grow(&buf, 4096) == FAIL)
-	return;
+    إذا (ga_grow(&buf, 4096) == FAIL)
+	أرجع;
 
-    start = buf.ga_data;
+    شروع = buf.ga_انکڑے;
 
 #  ifndef HAVE_SELECT
-    while (poll(&pfd, 1, p_wtm) > 0)
-#  else
-    while (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
-	    select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
+    طالما (poll(&pfd, 1, p_wtm) > 0)
+#  وإلا
+    طالما (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
+	    select(fd + 1, &rfds, عدم, عدم, &tv) > 0)
 #  endif
     {
-	r = read(fd, start, buf.ga_maxlen - 1 - buf.ga_len);
+	r = اقرأ(fd, شروع, buf.ga_maxlen - 1 - buf.ga_len);
 
-	if (r == 0)
-	    break;
-	else if (r < 0)
+	إذا (r == 0)
+	    اكسر;
+	وإلا إذا (r < 0)
 	{
-	    if (errno == EAGAIN || errno == EINTR)
-		continue;
-	    break;
+	    إذا (errno == EAGAIN || errno == EINTR)
+		استمر;
+	    اكسر;
 	}
 
-	start += r;
+	شروع += r;
 	buf.ga_len += r;
 
 	// Realloc if we are at the end of the buffer
-	if (buf.ga_len >= buf.ga_maxlen - 1)
+	إذا (buf.ga_len >= buf.ga_maxlen - 1)
 	{
-	    if (ga_grow(&buf, 8192) == FAIL)
-		break;
-	    start = (char_u *)buf.ga_data + buf.ga_len;
+	    إذا (ga_grow(&buf, 8192) == FAIL)
+		اكسر;
+	    شروع = (char_u *)buf.ga_انکڑے + buf.ga_len;
 	}
     }
 
-    if (buf.ga_len == 0)
+    إذا (buf.ga_len == 0)
     {
 	clip_free_selection(cbd); // Nothing received, clear register
 	ga_clear(&buf);
-	return;
+	أرجع;
     }
 
-    final = buf.ga_data;
+    final = buf.ga_انکڑے;
     len = buf.ga_len;
 
-    if (clip_convert_data(&final, &len, &motion_type,
+    إذا (clip_convert_انکڑے(&final, &len, &motion_type,
 	    STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	    || STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0,
 	    STRCMP(mime_type, VIMENC_ATOM_NAME) == 0
@@ -2659,98 +2659,98 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
  * Get the current selection and fill the respective register for cbd with the
  * data.
  */
-    static void
+    ساكن فراغ
 clip_wl_request_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
-    int			fds[2];
-    int			mime_types_len;
-    const char		**mime_types;
-    const char		*chosen_mime = NULL;
+    صحيح			fds[2];
+    صحيح			mime_types_len;
+    ثابت حرف		**mime_types;
+    ثابت حرف		*chosen_mime = عدم;
 
-    if (!sel->available)
-	goto clear;
+    إذا (!sel->دستیاب)
+	اذهب clear;
 
     // Dispatch any events that still queued up before checking for a data
     // offer.
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	goto clear;
+    إذا (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	اذهب clear;
 
-    if (sel->offer == NULL)
-	goto clear;
+    إذا (sel->offer == عدم)
+	اذهب clear;
 
     mime_types_len = sel->offer->mime_types.ga_len;
-    mime_types = sel->offer->mime_types.ga_data;
+    mime_types = sel->offer->mime_types.ga_انکڑے;
 
     // Choose mime type to receive from. Mime types with a lower index in the
     // "supported_mimes" array are prioritized over ones after it.
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes)
-	    && chosen_mime == NULL; i++)
+    لكل (صحيح i = 0; i < (صحيح)ARRAY_لمائی(supported_mimes)
+	    && chosen_mime == عدم; i++)
     {
-	for (int k = 0; k < mime_types_len && chosen_mime == NULL; k++)
-	    if (STRCMP(mime_types[k], supported_mimes[i]) == 0)
+	لكل (صحيح k = 0; k < mime_types_len && chosen_mime == عدم; k++)
+	    إذا (STRCMP(mime_types[k], supported_mimes[i]) == 0)
 		chosen_mime = supported_mimes[i];
     }
 
-    if (chosen_mime == NULL || pipe(fds) == -1)
-	goto clear;
+    إذا (chosen_mime == عدم || pipe(fds) == -1)
+	اذهب clear;
 
-    vwl_data_offer_receive(sel->offer, chosen_mime, fds[1]);
+    vwl_انکڑے_offer_receive(sel->offer, chosen_mime, fds[1]);
 
     close(fds[1]); // Close before we read data so that when the source client
 		   // closes their end we receive an EOF.
 
-    if (vwl_connection_flush(wayland_ct) >= 0)
-	clip_wl_receive_data(cbd, chosen_mime, fds[0]);
+    إذا (vwl_connection_flush(wayland_ct) >= 0)
+	clip_wl_receive_انکڑے(cbd, chosen_mime, fds[0]);
 
     close(fds[0]);
 
-    return;
+    أرجع;
 clear:
     clip_free_selection(cbd);
 }
 
-    static void
-vwl_data_source_listener_event_send(
-    void *data,
-    vwl_data_source_T *source UNUSED,
-    const char *mime_type,
+    ساكن فراغ
+vwl_انکڑے_سروت_listener_event_send(
+    فراغ *انکڑے,
+    vwl_انکڑے_سروت_T *سروت بن_ورتیا,
+    ثابت حرف *mime_type,
     int32_t fd
 )
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = انکڑے;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
     bool		have_mime = false;
-    int			motion_type;
-    long_u		length;
+    صحيح			motion_type;
+    long_u		لمائی;
     char_u		*string; // Will be reallocated to a bigger size if
 				 // needed.
-    int			offset = 0;
+    صحيح			وتھ = 0;
     bool		is_vim, is_vimenc;
-    size_t		total = 0;
+    size_t		کل = 0;
 #  ifndef HAVE_SELECT
-    struct pollfd   pfd;
+    بنية pollfd   pfd;
 
     pfd.fd = fd;
     pfd.events = POLLOUT;
-#  else
+#  وإلا
     fd_set	    wfds;
-    struct timeval  tv;
+    بنية timeval  tv;
 
     FD_ZERO(&wfds);
     FD_SET(fd, &wfds);
 #  endif
 
     // Check if we actually have mime type
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    لكل (صحيح i = 0; i < (صحيح)ARRAY_لمائی(supported_mimes); i++)
+	إذا (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = true;
-	    break;
+	    اكسر;
 	}
 
-    if (!have_mime)
-	goto exit;
+    إذا (!have_mime)
+	اذهب باہر_نکلو;
 
     // First byte sent is motion type for vim specific formats. For the vimenc
     // format, after the first byte is the encoding type, which is null
@@ -2761,70 +2761,70 @@ vwl_data_source_listener_event_send(
     is_vim = STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	|| STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
-	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
-	offset += 1;
+    إذا (is_vimenc)
+	وتھ += 2 + STRLEN(p_enc);
+    وإلا إذا (is_vim)
+	وتھ += 1;
 
     clip_get_selection(cbd);
-    motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
+    motion_type = clip_convert_selection_وتھ(&string, &لمائی, وتھ, cbd);
 
-    if (motion_type < 0)
-	goto exit;
+    إذا (motion_type < 0)
+	اذهب باہر_نکلو;
 
-    if (is_vimenc)
+    إذا (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    وإلا إذا (is_vim)
 	string[0] = (char_u)motion_type;
 
 
-    while (total < (size_t)length &&
+    طالما (کل < (size_t)لمائی &&
 #  ifndef HAVE_SELECT
 	    poll(&pfd, 1, p_wtm) > 0)
-#  else
+#  وإلا
 	    ((tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000),
-	    select(fd + 1, NULL, &wfds, NULL, &tv) > 0))
+	    select(fd + 1, عدم, &wfds, عدم, &tv) > 0))
 #  endif
     {
-	ssize_t w = write(fd, string + total, length - total);
+	ssize_t w = اكتب(fd, string + کل, لمائی - کل);
 
-	if (w == -1)
-	    break;
-	total += w;
+	إذا (w == -1)
+	    اكسر;
+	کل += w;
     }
 
     vim_free(string);
-exit:
+باہر_نکلو:
     close(fd);
 }
 
-    static void
-vwl_data_source_listener_event_cancelled(
-	void *data,
-	vwl_data_source_T *source UNUSED)
+    ساكن فراغ
+vwl_انکڑے_سروت_listener_event_cancelled(
+	فراغ *انکڑے,
+	vwl_انکڑے_سروت_T *سروت بن_ورتیا)
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = انکڑے;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
 
     clip_lose_selection(cbd);
 }
 
-static const vwl_data_source_listener_T vwl_data_source_listener = {
-    .send = vwl_data_source_listener_event_send,
-    .cancelled = vwl_data_source_listener_event_cancelled
+ساكن ثابت vwl_انکڑے_سروت_listener_T vwl_انکڑے_سروت_listener = {
+    .send = vwl_انکڑے_سروت_listener_event_send,
+    .cancelled = vwl_انکڑے_سروت_listener_event_cancelled
 };
 
-    static void
-clip_wl_do_set_selection(void *data, uint32_t serial)
+    ساكن فراغ
+clip_wl_do_سیٹ_selection(فراغ *انکڑے, uint32_t serial)
 {
-    clip_wl_selection_T *sel = data;
+    clip_wl_selection_T *sel = انکڑے;
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    vwl_data_device_set_selection(sel->device, sel->source, serial, sel_type);
+    vwl_انکڑے_device_سیٹ_selection(sel->device, sel->سروت, serial, sel_type);
 
     sel->own_success = (vwl_connection_roundtrip(wayland_ct) == OK);
 }
@@ -2834,25 +2834,25 @@ clip_wl_do_set_selection(void *data, uint32_t serial)
  * other Wayland clients so they can receive data from us. Returns OK on success
  * and FAIL on failure.
  */
-    static int
+    ساكن صحيح
 clip_wl_own_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    if (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return FAIL;
+    إذا (!sel->دستیاب || vwl_connection_roundtrip(wayland_ct) == FAIL)
+	أرجع FAIL;
 
-    if (sel->source != NULL)
+    إذا (sel->سروت != عدم)
     {
-	if (sel_type == WAYLAND_SELECTION_PRIMARY)
+	إذا (sel_type == WAYLAND_SELECTION_PRIMARY)
 	    // We already own the selection, ignore (only do this for primary
 	    // selection). We don't re set the selection because then we would
 	    // be setting the selection every time the user moves the visual
 	    // selection cursor, which is messy and inefficient. Some
 	    // applications like Google Chrome do it this way however.
-	    return OK;
-	else if (sel_type == WAYLAND_SELECTION_REGULAR)
+	    أرجع OK;
+	وإلا إذا (sel_type == WAYLAND_SELECTION_REGULAR)
 	{
 	    // Technically we don't need to do this as we already own the
 	    // selection, however if a user yanks text a second time, the
@@ -2862,195 +2862,195 @@ clip_wl_own_selection(Clipboard_T *cbd)
 	    // This can be unexpected behaviour for the user so its probably
 	    // better to do it this way. Additionally other Wayland applications
 	    // seem to set the selection every time.
-	    vwl_data_source_destroy(sel->source);
+	    vwl_انکڑے_سروت_destroy(sel->سروت);
 	}
-	else
+	وإلا
 	    // Shouldn't happen
-	    return FAIL;
+	    أرجع FAIL;
     }
 
-    sel->source = vwl_data_device_manager_create_data_source(sel->manager);
-    vwl_data_source_add_listener(sel->source, &vwl_data_source_listener, sel);
+    sel->سروت = vwl_انکڑے_device_manager_create_انکڑے_سروت(sel->manager);
+    vwl_انکڑے_سروت_جوڑو_listener(sel->سروت, &vwl_انکڑے_سروت_listener, sel);
 
     // Advertise mime types
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	vwl_data_source_offer(sel->source, supported_mimes[i]);
+    لكل (صحيح i = 0; i < (صحيح)ARRAY_لمائی(supported_mimes); i++)
+	vwl_انکڑے_سروت_offer(sel->سروت, supported_mimes[i]);
 
     sel->own_success = false;
-    clip_wl_do_set_selection(sel, 0);
+    clip_wl_do_سیٹ_selection(sel, 0);
 
-    if (!sel->own_success)
-	goto fail;
+    إذا (!sel->own_success)
+	اذهب fail;
 
-    return OK;
+    أرجع OK;
 fail:
-    vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
-    return FAIL;
+    vwl_انکڑے_سروت_destroy(sel->سروت);
+    sel->سروت = عدم;
+    أرجع FAIL;
 }
 
 /*
  * Disown the selection that cbd corresponds to.
  */
-    static void
+    ساكن فراغ
 clip_wl_lose_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (!sel->available)
-	return;
+    إذا (!sel->دستیاب)
+	أرجع;
 
-    vwl_data_source_destroy(sel->source);
-    sel->source = NULL;
+    vwl_انکڑے_سروت_destroy(sel->سروت);
+    sel->سروت = عدم;
 }
 
 /*
  * Send the current selection to the clipboard. Do nothing for Wayland because
  * we will fill in the selection only when requested by another client.
  */
-    static void
-clip_wl_set_selection(Clipboard_T *cbd UNUSED)
+    ساكن فراغ
+clip_wl_سیٹ_selection(Clipboard_T *cbd بن_ورتیا)
 {
 }
 
-#  if defined(USE_SYSTEM)
+#  إذا defined(USE_SYSTEM)
 /*
  * Return true if we own the selection corresponding to cbd or another client
  * does.
  */
-    static bool
+    ساكن bool
 clip_wl_owner_exists(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return false;
+    إذا (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	أرجع false;
 
-    return sel->available && (sel->source != NULL || sel->offer != NULL);
+    أرجع sel->دستیاب && (sel->سروت != عدم || sel->offer != عدم);
 }
 #  endif
 
 # endif // FEAT_WAYLAND_CLIPBOARD
 
-#endif // FEAT_CLIPBOARD
+#جے_انت // FEAT_CLIPBOARD
 
-#ifdef HAVE_CLIPMETHOD
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
 
 /*
  * Returns the first method for accessing the clipboard that is available/works,
  * depending on the order of values in str.
  */
-    static clipmethod_T
+    ساكن clipmethod_T
 get_clipmethod(char_u *str)
 {
-    int		len	= (int)STRLEN(str) + 1;
+    صحيح		len	= (صحيح)STRLEN(str) + 1;
     char_u	*buf	= alloc(len);
 
-    if (buf == NULL)
-	return CLIPMETHOD_FAIL;
+    إذا (buf == عدم)
+	أرجع CLIPMETHOD_FAIL;
 
     clipmethod_T ret = CLIPMETHOD_FAIL;
     char_u	*p = str;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
-	clipmethod_T method = CLIPMETHOD_NONE;
+	clipmethod_T طریقہ = CLIPMETHOD_NONE;
 
-	(void)copy_option_part(&p, buf, len, ",");
+	(فراغ)copy_option_part(&p, buf, len, ",");
 
-	if (STRCMP(buf, "wayland") == 0)
+	إذا (STRCMP(buf, "wayland") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    إذا (!gui.وچ_use)
 # endif
 	    {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-		if (clip_wl.regular.available || clip_wl.primary.available)
-		    method = CLIPMETHOD_WAYLAND;
+		إذا (clip_wl.regular.دستیاب || clip_wl.primary.دستیاب)
+		    طریقہ = CLIPMETHOD_WAYLAND;
 # endif
 	    }
 	}
-	else if (STRCMP(buf, "x11") == 0)
+	وإلا إذا (STRCMP(buf, "x11") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    إذا (!gui.وچ_use)
 # endif
 	    {
 # ifdef FEAT_XCLIPBOARD
 		// x_IOerror_handler() in os_unix.c should set xterm_dpy to NULL if
 		// we lost connection to the X server.
-		if (xterm_dpy != NULL)
+		إذا (xterm_dpy != عدم)
 		{
 		    // If the X connection is lost then that handler will longjmp
 		    // somewhere else, in that case we will call choose_clipmethod()
 		    // again from there, and this if block won't be executed since
 		    // xterm_dpy will be set to NULL.
 		    xterm_update();
-		    method = CLIPMETHOD_X11;
+		    طریقہ = CLIPMETHOD_X11;
 		}
 # endif
 	    }
 	}
-	else
+	وإلا
 	{
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	    // Check if name matches a clipboard provider
-	    int r = clip_provider_is_available(buf);
+	    صحيح r = clip_provider_is_دستیاب(buf);
 
-	    if (r == 1)
+	    إذا (r == 1)
 	    {
-		method = CLIPMETHOD_PROVIDER;
-		if (ret == CLIPMETHOD_FAIL)
+		طریقہ = CLIPMETHOD_PROVIDER;
+		إذا (ret == CLIPMETHOD_FAIL)
 		{
 		    vim_free(clip_provider);
 		    clip_provider = vim_strsave(buf);
-		    if (clip_provider == NULL)
-			goto fail;
+		    إذا (clip_provider == عدم)
+			اذهب fail;
 		}
 	    }
-	    else if (r == -1)
+	    وإلا إذا (r == -1)
 # endif
 	    {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 fail:
 # endif
 		ret = CLIPMETHOD_FAIL;
-		goto exit;
+		اذهب باہر_نکلو;
 	    }
 	}
 
 	// Keep on going in order to catch errors
-	if (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
-	    ret = method;
+	إذا (طریقہ != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
+	    ret = طریقہ;
     }
 
     // No match found, use "none".
     ret = (ret == CLIPMETHOD_FAIL) ? CLIPMETHOD_NONE : ret;
 
-exit:
+باہر_نکلو:
     vim_free(buf);
-    return ret;
+    أرجع ret;
 }
 
 
 /*
  * Returns name of clipmethod in a statically allocated string.
  */
-    static char_u *
-clipmethod_to_str(clipmethod_T method)
+    ساكن char_u *
+clipmethod_منزل_str(clipmethod_T طریقہ)
 {
-    switch(method)
+    بدل(طریقہ)
     {
-	case CLIPMETHOD_WAYLAND:
-	    return (char_u *)"wayland";
-	case CLIPMETHOD_X11:
-	    return (char_u *)"x11";
-	case CLIPMETHOD_PROVIDER:
+	حالة CLIPMETHOD_WAYLAND:
+	    أرجع (char_u *)"wayland";
+	حالة CLIPMETHOD_X11:
+	    أرجع (char_u *)"x11";
+	حالة CLIPMETHOD_PROVIDER:
 # ifdef FEAT_EVAL
-	    return clip_provider;
+	    أرجع clip_provider;
 # endif
-	default:
-	    return (char_u *)"none";
+	افتراضي:
+	    أرجع (char_u *)"none";
     }
 }
 
@@ -3058,20 +3058,20 @@ clipmethod_to_str(clipmethod_T method)
  * Sets the current clipmethod to use given by `get_clipmethod()`. Returns an
  * error message on failure else NULL.
  */
-    char *
-choose_clipmethod(void)
+    حرف *
+چنو_clipmethod(فراغ)
 {
-    clipmethod_T method = get_clipmethod(p_cpm);
+    clipmethod_T طریقہ = get_clipmethod(p_cpm);
 
-    if (method == CLIPMETHOD_FAIL)
-	return e_invalid_argument;
+    إذا (طریقہ == CLIPMETHOD_FAIL)
+	أرجع e_invalid_دلیل;
 
 // If GUI is running or we are not on a system with Wayland or X11, then always
 // return CLIPMETHOD_NONE. System or GUI clipboard handling always overrides.
 // This is unless a provider is being used.
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
-#  if defined(FEAT_GUI)
-    if (method != CLIPMETHOD_PROVIDER && gui.in_use)
+# إذا defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  إذا defined(FEAT_GUI)
+    إذا (طریقہ != CLIPMETHOD_PROVIDER && gui.وچ_use)
     {
 #   ifdef FEAT_WAYLAND
 	// We only interact with Wayland for the clipboard, we can just deinit
@@ -3079,47 +3079,47 @@ choose_clipmethod(void)
 	wayland_uninit_connection();
 #   endif
 
-	method = CLIPMETHOD_NONE;
-	goto lose_sel_exit;
+	طریقہ = CLIPMETHOD_NONE;
+	اذهب lose_sel_exit;
     }
 #  endif
-# else
+# وإلا
     // If on a system like windows or macos, then clipmethod is irrelevant, we
     // use their way of accessing the clipboard. This is unless we are using the
     // clipboard provider
 #  ifdef FEAT_CLIPBOARD_PROVIDER
-    if (method != CLIPMETHOD_PROVIDER)
+    إذا (طریقہ != CLIPMETHOD_PROVIDER)
 #  endif
     {
-	method = CLIPMETHOD_NONE;
-	goto exit;
+	طریقہ = CLIPMETHOD_NONE;
+	اذهب باہر_نکلو;
     }
 # endif
 
 # ifdef FEAT_CLIPBOARD
     // Deinitialize clipboard if there is no way to access clipboard
-    if (method == CLIPMETHOD_NONE)
+    إذا (طریقہ == CLIPMETHOD_NONE)
 	clip_init(FALSE);
     // If we have a clipmethod that works now, then initialize clipboard
-    else if (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
+    وإلا إذا (clipmethod == CLIPMETHOD_NONE && طریقہ != CLIPMETHOD_NONE)
     {
 	clip_init(TRUE);
 	did_warn_clipboard = false;
     }
     // Disown clipboard if we are switching to a new method
-    else if (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
+    وإلا إذا (clipmethod != CLIPMETHOD_NONE && طریقہ != clipmethod)
     {
-#  if (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+#  إذا (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(FEAT_GUI)
 lose_sel_exit:
 #  endif
-	if (clip_star.owned)
-	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	إذا (clip_تارا.owned)
+	    clip_lose_selection(&clip_تارا);
+	إذا (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 
-#  if defined(FEAT_GUI)
-	if (!gui.in_use)
+#  إذا defined(FEAT_GUI)
+	إذا (!gui.وچ_use)
 #  endif
 	{
 	    clip_init(TRUE);
@@ -3128,67 +3128,67 @@ lose_sel_exit:
     }
 # endif // FEAT_CLIPBOARD
 
-# if !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
-exit:
+# إذا !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
+باہر_نکلو:
 # endif
 
-    clipmethod = method;
+    clipmethod = طریقہ;
 
 # ifdef FEAT_EVAL
-    set_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_to_str(method), -1);
+    سیٹ_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_منزل_str(طریقہ), -1);
 # endif
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Call choose_clipmethod().
  */
-    void
-ex_clipreset(exarg_T *eap UNUSED)
+    فراغ
+ex_clipreset(exarg_T *eap بن_ورتیا)
 {
     clipmethod_T prev = clipmethod;
 
-    choose_clipmethod();
+    چنو_clipmethod();
 
-    if (clipmethod == CLIPMETHOD_NONE)
+    إذا (clipmethod == CLIPMETHOD_NONE)
 	smsg(_("Could not find a way to access the clipboard."));
-    else if (clipmethod != prev)
+    وإلا إذا (clipmethod != prev)
 	smsg(_("Switched to clipboard method '%s'."),
-		clipmethod_to_str(clipmethod));
+		clipmethod_منزل_str(clipmethod));
 }
 
 /*
  * Adjust the register name pointed to with "rp" for the clipboard being
  * used always and the clipboard being available.
  */
-    void
-adjust_clip_reg(int *rp)
+    فراغ
+adjust_clip_reg(صحيح *rp)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
+    إذا (clipmethod == CLIPMETHOD_PROVIDER)
     {
-	if (*rp == 0 && clip_unnamed != 0)
+	إذا (*rp == 0 && clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS)) ? '+' : '*';
-	return;
+	أرجع;
     }
 # endif
 # ifdef FEAT_CLIPBOARD
     // If no reg. specified, and "unnamed" or "unnamedplus" is in 'clipboard',
     // use '*' or '+' reg, respectively. "unnamedplus" prevails.
-    if (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
+    إذا (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
     {
-	if (clip_unnamed != 0)
-	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.available)
+	إذا (clip_unnamed != 0)
+	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.دستیاب)
 								  ? '+' : '*';
-	else
+	وإلا
 	    *rp = ((clip_unnamed_saved & CLIP_UNNAMED_PLUS)
-					   && clip_plus.available) ? '+' : '*';
+					   && clip_plus.دستیاب) ? '+' : '*';
     }
-    if ((!clip_star.available && *rp == '*') ||
-	   (!clip_plus.available && *rp == '+'))
+    إذا ((!clip_تارا.دستیاب && *rp == '*') ||
+	   (!clip_plus.دستیاب && *rp == '+'))
     {
-	msg_warn_missing_clipboard();
+	پیغام_warn_missing_clipboard();
 	*rp = 0;
     }
 # endif
@@ -3198,156 +3198,156 @@ adjust_clip_reg(int *rp)
  * Extract the items in the 'clipboard' option and set global values.
  * Return an error message or NULL for success.
  */
-    char *
-did_set_clipboard(optset_T *args UNUSED)
+    حرف *
+did_سیٹ_clipboard(optset_T *دلیلاں بن_ورتیا)
 {
-    int		new_unnamed = 0;
+    صحيح		new_unnamed = 0;
 # ifdef FEAT_CLIPBOARD
-    int		new_autoselect_star = FALSE;
-    int		new_autoselect_plus = FALSE;
-    int		new_autoselectml = FALSE;
-    int		new_html = FALSE;
+    صحيح		new_autoselect_تارا = FALSE;
+    صحيح		new_autoselect_plus = FALSE;
+    صحيح		new_autoselectml = FALSE;
+    صحيح		new_html = FALSE;
 # endif
-    regprog_T	*new_exclude_prog = NULL;
-    char	*errmsg = NULL;
+    regprog_T	*new_exclude_prog = عدم;
+    حرف	*errmsg = عدم;
     char_u	*p;
 
-    for (p = p_cb; *p != NUL; )
+    لكل (p = p_cb; *p != NUL; )
     {
 	// Note: Keep this in sync with p_cb_values.
-	if (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
+	إذا (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED;
 	    p += 7;
 	}
-	else if (STRNCMP(p, "unnamedplus", 11) == 0
+	وإلا إذا (STRNCMP(p, "unnamedplus", 11) == 0
 					    && (p[11] == ',' || p[11] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED_PLUS;
 	    p += 11;
 	}
 # ifdef FEAT_CLIPBOARD
-	else if (STRNCMP(p, "autoselect", 10) == 0
+	وإلا إذا (STRNCMP(p, "autoselect", 10) == 0
 					    && (p[10] == ',' || p[10] == NUL))
 	{
-	    new_autoselect_star = TRUE;
+	    new_autoselect_تارا = TRUE;
 	    p += 10;
 	}
-	else if (STRNCMP(p, "autoselectplus", 14) == 0
+	وإلا إذا (STRNCMP(p, "autoselectplus", 14) == 0
 					    && (p[14] == ',' || p[14] == NUL))
 	{
 	    new_autoselect_plus = TRUE;
 	    p += 14;
 	}
-	else if (STRNCMP(p, "autoselectml", 12) == 0
+	وإلا إذا (STRNCMP(p, "autoselectml", 12) == 0
 					    && (p[12] == ',' || p[12] == NUL))
 	{
 	    new_autoselectml = TRUE;
 	    p += 12;
 	}
-	else if (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
+	وإلا إذا (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
 	{
 	    new_html = TRUE;
 	    p += 4;
 	}
-	else if (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == NULL)
+	وإلا إذا (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == عدم)
 	{
 	    p += 8;
 	    new_exclude_prog = vim_regcomp(p, RE_MAGIC);
-	    if (new_exclude_prog == NULL)
-		errmsg = e_invalid_argument;
-	    break;
+	    إذا (new_exclude_prog == عدم)
+		errmsg = e_invalid_دلیل;
+	    اكسر;
 	}
 # endif
-	else
+	وإلا
 	{
-	    errmsg = e_invalid_argument;
-	    break;
+	    errmsg = e_invalid_دلیل;
+	    اكسر;
 	}
-	if (*p == ',')
+	إذا (*p == ',')
 	    ++p;
     }
-    if (errmsg == NULL)
+    إذا (errmsg == عدم)
     {
 # ifdef FEAT_CLIPBOARD
-	if (global_busy)
+	إذا (global_busy)
 	    // clip_unnamed will be reset to clip_unnamed_saved
 	    // at end_global_changes
 	    clip_unnamed_saved = new_unnamed;
-	else
+	وإلا
 # endif
 	    clip_unnamed = new_unnamed;
 # ifdef FEAT_CLIPBOARD
-	clip_autoselect_star = new_autoselect_star;
+	clip_autoselect_تارا = new_autoselect_تارا;
 	clip_autoselect_plus = new_autoselect_plus;
 	clip_autoselectml = new_autoselectml;
 	clip_html = new_html;
 	vim_regfree(clip_exclude_prog);
 	clip_exclude_prog = new_exclude_prog;
 # endif
-# if defined(FEAT_GUI_GTK)
-	if (gui.in_use)
+# إذا defined(FEAT_GUI_GTK)
+	إذا (gui.وچ_use)
 	{
 #  ifdef USE_GTK4
 	    gui_gtk_update_selection_formats(&clip_plus);
-	    gui_gtk_update_selection_formats(&clip_star);
-#  else
-	    gui_gtk_set_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
-	    gui_gtk_set_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
+	    gui_gtk_update_selection_formats(&clip_تارا);
+#  وإلا
+	    gui_gtk_سیٹ_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
+	    gui_gtk_سیٹ_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
 #  endif
 #  ifdef FEAT_DND
-	    gui_gtk_set_dnd_targets();
+	    gui_gtk_سیٹ_dnd_targets();
 #  endif
 	}
 # endif
     }
-    else
+    وإلا
 	vim_regfree(new_exclude_prog);
 
-    return errmsg;
+    أرجع errmsg;
 }
 
-#endif // HAVE_CLIPMETHOD
+#جے_انت // HAVE_CLIPMETHOD
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
 
 /*
  * Check if a clipboard provider with given name is available. Returns 1 if available,
  * 0 if not available, and -1 on error
  */
-    static int
-clip_provider_is_available(char_u *provider)
+    ساكن صحيح
+clip_provider_is_دستیاب(char_u *provider)
 {
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
     typval_T	provider_tv = {0};
     callback_T	callback = {0};
     typval_T	rettv = {0};
     typval_T	func_tv = {0};
-    int		res = 0;
+    صحيح		res = 0;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL
+    إذا (dict_get_tv(providers, (حرف *)provider, &provider_tv) == FAIL
 	    || provider_tv.v_type != VAR_DICT)
 	// clipboard provider not defined
-	return -1;
+	أرجع -1;
 
-    if (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
+    إذا (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	// If "available" function not specified assume always TRUE
-	return 1;
+	أرجع 1;
     }
 
-    if ((callback = get_callback(&func_tv)).cb_name == NULL)
-	goto fail;
+    إذا ((callback = get_callback(&func_tv)).cb_name == عدم)
+	اذهب fail;
 
-    if (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
-	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_NUMBER))
-	goto fail;
+    إذا (call_callback(&callback, -1, &rettv, 0, عدم) == FAIL ||
+	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_نمبر))
+	اذهب fail;
 
-    if (rettv.vval.v_number)
+    إذا (rettv.vval.v_نمبر)
 	res = 1;
 
-    if (FALSE)
+    إذا (FALSE)
 fail:
 	res = -1;
 
@@ -3356,14 +3356,14 @@ fail:
     clear_tv(&rettv);
     clear_tv(&provider_tv);
 
-    return res;
+    أرجع res;
 }
 
 /*
  * Get the specified callback "function" from the provider dictionary for
  * register "reg".
  */
-    static int
+    ساكن صحيح
 clip_provider_get_callback(
 	char_u *reg,
 	char_u *provider,
@@ -3376,90 +3376,90 @@ clip_provider_get_callback(
     typval_T	func_tv;
     callback_T	cb;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL)
-	return FAIL;
-    else if (provider_tv.v_type != VAR_DICT)
+    إذا (dict_get_tv(providers, (حرف *)provider, &provider_tv) == FAIL)
+	أرجع FAIL;
+    وإلا إذا (provider_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	أرجع FAIL;
     }
-    else if (dict_get_tv(
+    وإلا إذا (dict_get_tv(
 		provider_tv.vval.v_dict,
-		(char *)function,
+		(حرف *)function,
 		&action_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	أرجع FAIL;
     }
-    else if (action_tv.v_type != VAR_DICT)
+    وإلا إذا (action_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	أرجع FAIL;
     }
-    else if (dict_get_tv(action_tv.vval.v_dict, (char *)reg, &func_tv) == FAIL)
+    وإلا إذا (dict_get_tv(action_tv.vval.v_dict, (حرف *)reg, &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	أرجع FAIL;
     }
-    else if ((cb = get_callback(&func_tv)).cb_name == NULL)
+    وإلا إذا ((cb = get_callback(&func_tv)).cb_name == عدم)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
 	clear_tv(&func_tv);
-	return FAIL;
+	أرجع FAIL;
     }
     clear_tv(&provider_tv);
     clear_tv(&action_tv);
 
     // func_tv owns the function name, so we must make a copy for the callback
-    set_callback(callback, &cb);
+    سیٹ_callback(callback, &cb);
     clear_tv(&func_tv);
-    return OK;
+    أرجع OK;
 }
 
-    static void
+    ساكن فراغ
 clip_provider_copy(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    ساكن bool	recursive = false;
     callback_T	callback;
     typval_T	rettv;
     typval_T	argvars[4];
     yankreg_T	*y_ptr;
     char_u	type[2 + NUMBUFLEN] = {0};
-    list_T	*list = NULL;
+    list_T	*list = عدم;
 
-    if (recursive)
-	return;
+    إذا (recursive)
+	أرجع;
 
-    if (clip_provider_get_callback(
+    إذا (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"copy",
 		&callback) == FAIL)
-	return;
+	أرجع;
 
     // Convert register type into a string
-    if (*reg == '+')
-	y_ptr = get_y_register(REAL_PLUS_REGISTER);
-    else
-	y_ptr = get_y_register(STAR_REGISTER);
+    إذا (*reg == '+')
+	y_ptr = get_y_رجسٹر(REAL_PLUS_رجسٹر);
+    وإلا
+	y_ptr = get_y_رجسٹر(تارا_رجسٹر);
 
-    switch (y_ptr->y_type)
+    بدل (y_ptr->y_type)
     {
-	case MCHAR:
+	حالة MCHAR:
 	    type[0] = 'v';
-	    break;
-	case MLINE:
+	    اكسر;
+	حالة MLINE:
 	    type[0] = 'V';
-	    break;
-	case MBLOCK:
-	    sprintf((char *)type, "%c%d", Ctrl_V, y_ptr->y_width + 1);
-	    break;
-	default:
+	    اكسر;
+	حالة MBLOCK:
+	    sprintf((حرف *)type, "%c%d", Ctrl_V, y_ptr->y_چوڑائی + 1);
+	    اكسر;
+	افتراضي:
 	    type[0] = 0;
-	    break;
+	    اكسر;
     }
 
     argvars[0].v_type = VAR_STRING;
@@ -3471,25 +3471,25 @@ clip_provider_copy(char_u *reg, char_u *provider)
     // Get register contents by creating a list of lines
     list = list_alloc();
 
-    if (list == NULL)
+    إذا (list == عدم)
     {
 	free_callback(&callback);
-	return;
+	أرجع;
     }
 
-    for (int i = 0; i < y_ptr->y_size; i++)
-	if (list_append_string(list, y_ptr->y_array[i].string,
-	    (int)y_ptr->y_array[i].length) == FAIL)
+    لكل (صحيح i = 0; i < y_ptr->y_ناپ; i++)
+	إذا (list_append_string(list, y_ptr->y_array[i].string,
+	    (صحيح)y_ptr->y_array[i].لمائی) == FAIL)
 	{
 	    free_callback(&callback);
 	    list_unref(list);
-	    return;
+	    أرجع;
 	}
 
     list->lv_refcount++;
 
     argvars[2].v_type = VAR_LIST;
-    argvars[2].v_lock = VAR_FIXED;
+    argvars[2].v_جندرا = VAR_FIXED;
     argvars[2].vval.v_list = list;
 
     argvars[3].v_type = VAR_UNKNOWN;
@@ -3505,26 +3505,26 @@ clip_provider_copy(char_u *reg, char_u *provider)
     list_unref(list);
 }
 
-    static void
+    ساكن فراغ
 clip_provider_paste(char_u *reg, char_u *provider)
 {
-    static bool	recursive = false;
+    ساكن bool	recursive = false;
     callback_T	callback;
     typval_T	argvars[2];
     typval_T	rettv;
-    int		ret;
+    صحيح		ret;
     char_u	*reg_type;
-    list_T	*lines;
+    list_T	*سطریں;
 
-    if (recursive)
-	return;
+    إذا (recursive)
+	أرجع;
 
-    if (clip_provider_get_callback(
+    إذا (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"paste",
 		&callback) == FAIL)
-	return;
+	أرجع;
 
     argvars[0].v_type = VAR_STRING;
     argvars[0].vval.v_string = reg;
@@ -3537,30 +3537,30 @@ clip_provider_paste(char_u *reg, char_u *provider)
     recursive = false;
     textlock--;
 
-    if (ret == FAIL)
-	goto exit;
-    else if (rettv.v_type == VAR_TUPLE
+    إذا (ret == FAIL)
+	اذهب باہر_نکلو;
+    وإلا إذا (rettv.v_type == VAR_TUPLE
 	    && TUPLE_LEN(rettv.vval.v_tuple) == 2
-	    && TUPLE_ITEM(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
-	    && TUPLE_ITEM(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
+	    && TUPLE_شے(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
+	    && TUPLE_شے(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
     {
-	reg_type = TUPLE_ITEM(rettv.vval.v_tuple, 0)->vval.v_string;
-	lines = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
+	reg_type = TUPLE_شے(rettv.vval.v_tuple, 0)->vval.v_string;
+	سطریں = TUPLE_شے(rettv.vval.v_tuple, 1)->vval.v_list;
     }
-    else if (rettv.v_type == VAR_LIST
+    وإلا إذا (rettv.v_type == VAR_LIST
 	    && rettv.vval.v_list->lv_len == 2
-	    && rettv.vval.v_list->lv_first->li_tv.v_type == VAR_STRING
-	    && rettv.vval.v_list->lv_first->li_next->li_tv.v_type == VAR_LIST)
+	    && rettv.vval.v_list->lv_پہلا->li_tv.v_type == VAR_STRING
+	    && rettv.vval.v_list->lv_پہلا->li_اگلا->li_tv.v_type == VAR_LIST)
     {
-	reg_type = rettv.vval.v_list->lv_first->li_tv.vval.v_string;
-	lines = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
+	reg_type = rettv.vval.v_list->lv_پہلا->li_tv.vval.v_string;
+	سطریں = rettv.vval.v_list->lv_پہلا->li_اگلا->li_tv.vval.v_list;
     }
-    else
-	goto exit;
+    وإلا
+	اذهب باہر_نکلو;
 
     {
 	char_u		yank_type = MAUTO;
-	long		block_len = -1;
+	لما		بلاک_len = -1;
 	yankreg_T	*y_ptr, *cur_y_ptr;
 	char_u		**lstval;
 	char_u		**allocval;
@@ -3569,77 +3569,77 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	char_u		**curallocval;
 	char_u		*strval;
 	listitem_T	*li;
-	int		len;
+	صحيح		len;
 
 	// If the list is NULL handle like an empty list.
-	len = lines == NULL ? 0 : lines->lv_len;
+	len = سطریں == عدم ? 0 : سطریں->lv_len;
 
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    goto exit;
+	إذا (lstval == عدم)
+	    اذهب باہر_نکلو;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (lines != NULL)
+	إذا (سطریں != عدم)
 	{
-	    CHECK_LIST_MATERIALIZE(lines);
-	    FOR_ALL_LIST_ITEMS(lines, li)
+	    CHECK_LIST_MATERIALIZE(سطریں);
+	    FOR_ALL_LIST_اشیاء(سطریں, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
-		    goto free_lstval;
-		if (strval == buf)
+		إذا (strval == عدم)
+		    اذهب free_lstval;
+		إذا (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
-			goto free_lstval;
+		    إذا (strval == عدم)
+			اذهب free_lstval;
 		    *curallocval++ = strval;
 		}
 		*curval++ = strval;
 	    }
 	}
-	*curval++ = NULL;
+	*curval++ = عدم;
 
-	if (*reg_type != NUL && (STRLEN(reg_type) == 0
-		|| get_yank_type(&reg_type, &yank_type, &block_len) == FAIL))
+	إذا (*reg_type != NUL && (STRLEN(reg_type) == 0
+		|| get_yank_type(&reg_type, &yank_type, &بلاک_len) == FAIL))
 	{
-	    emsg(e_invalid_argument);
-	    goto free_lstval;
+	    emsg(e_invalid_دلیل);
+	    اذهب free_lstval;
 	}
 
-	if (*reg == '+')
-	    y_ptr = get_y_register(REAL_PLUS_REGISTER);
-	else
-	    y_ptr = get_y_register(STAR_REGISTER);
+	إذا (*reg == '+')
+	    y_ptr = get_y_رجسٹر(REAL_PLUS_رجسٹر);
+	وإلا
+	    y_ptr = get_y_رجسٹر(تارا_رجسٹر);
 
 	// Free previous register contents
 	cur_y_ptr = get_y_current();
-	set_y_current(y_ptr);
+	سیٹ_y_current(y_ptr);
 
 	free_yank_all();
-	get_y_current()->y_size = 0;
+	get_y_current()->y_ناپ = 0;
 
-	set_y_current(cur_y_ptr);
+	سیٹ_y_current(cur_y_ptr);
 
-	str_to_reg(y_ptr,
+	str_منزل_reg(y_ptr,
 		yank_type,
 		(char_u *)lstval,
 		-1,
-		block_len,
+		بلاک_len,
 		TRUE);
 
 free_lstval:
-	while (curallocval > allocval)
+	طالما (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
 
-exit:
+باہر_نکلو:
     free_callback(&callback);
     clear_tv(&rettv);
 }
@@ -3650,46 +3650,46 @@ exit:
 //
 // If -1 then allow provider callback to be called then set to one. Default
 // value (is allowed) is -2.
-static int star_pause_count = -2, plus_pause_count = -2;
+ساكن صحيح تارا_pause_گنتی = -2, plus_pause_گنتی = -2;
 
-    void
-call_clip_provider_request(int reg)
+    فراغ
+call_clip_provider_request(صحيح reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
+	أرجع;
 
-    if (reg == '+' && plus_pause_count < 0)
+    إذا (reg == '+' && plus_pause_گنتی < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	إذا (plus_pause_گنتی == -1)
+	    plus_pause_گنتی = 1;
 	clip_provider_paste((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    وإلا إذا (reg == '*' && تارا_pause_گنتی < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	إذا (تارا_pause_گنتی == -1)
+	    تارا_pause_گنتی = 1;
 	clip_provider_paste((char_u *)"*", clip_provider);
     }
-    else
-	return;
+    وإلا
+	أرجع;
 }
 
-    void
-call_clip_provider_set(int reg)
+    فراغ
+call_clip_provider_سیٹ(صحيح reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
+	أرجع;
 
-    if (reg == '+' && plus_pause_count < 0)
+    إذا (reg == '+' && plus_pause_گنتی < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	إذا (plus_pause_گنتی == -1)
+	    plus_pause_گنتی = 1;
 	clip_provider_copy((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    وإلا إذا (reg == '*' && تارا_pause_گنتی < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	إذا (تارا_pause_گنتی == -1)
+	    تارا_pause_گنتی = 1;
 	clip_provider_copy((char_u *)"*", clip_provider);
     }
 }
@@ -3699,32 +3699,32 @@ call_clip_provider_set(int reg)
  * ignored, until dec_clip_provider is called the same number of times after
  * again. Note that this is per clipboard register ("+", "*")
  */
-    void
-inc_clip_provider(void)
+    فراغ
+inc_clip_provider(فراغ)
 {
-    plus_pause_count = (plus_pause_count == -2
-	|| plus_pause_count == -1) ? -1 : plus_pause_count + 1;
-    star_pause_count = (star_pause_count == -2
-	|| star_pause_count == -1) ? -1 : star_pause_count + 1;
+    plus_pause_گنتی = (plus_pause_گنتی == -2
+	|| plus_pause_گنتی == -1) ? -1 : plus_pause_گنتی + 1;
+    تارا_pause_گنتی = (تارا_pause_گنتی == -2
+	|| تارا_pause_گنتی == -1) ? -1 : تارا_pause_گنتی + 1;
 }
 
-    void
-dec_clip_provider(void)
+    فراغ
+dec_clip_provider(فراغ)
 {
-    if (plus_pause_count != -2)
-	plus_pause_count = plus_pause_count == -1 ? -1 : plus_pause_count - 1;
-    if (star_pause_count != -2)
-	star_pause_count = star_pause_count == -1 ? -1 : star_pause_count - 1;
+    إذا (plus_pause_گنتی != -2)
+	plus_pause_گنتی = plus_pause_گنتی == -1 ? -1 : plus_pause_گنتی - 1;
+    إذا (تارا_pause_گنتی != -2)
+	تارا_pause_گنتی = تارا_pause_گنتی == -1 ? -1 : تارا_pause_گنتی - 1;
 
-    if (plus_pause_count == 0 || plus_pause_count == -1)
-	plus_pause_count = -2;
-    if (star_pause_count == 0 || star_pause_count == -1)
-	star_pause_count = -2;
+    إذا (plus_pause_گنتی == 0 || plus_pause_گنتی == -1)
+	plus_pause_گنتی = -2;
+    إذا (تارا_pause_گنتی == 0 || تارا_pause_گنتی == -1)
+	تارا_pause_گنتی = -2;
 }
 
-#endif // FEAT_CLIPBOARD_PROVIDER
+#جے_انت // FEAT_CLIPBOARD_PROVIDER
 
-#if defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
+#إذا defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
 /*
  * If "vim" is TRUE, then get the motion type. If "vimenc" is TRUE, then get the
  * motion type and also convert "*buf". "buf" and "len_store" will be updated to
@@ -3733,28 +3733,28 @@ dec_clip_provider(void)
  * otherwise use the free func for which "*buf" was allocated with. In both
  * cases use vim_free() on "*tofree". Returns OK on success and FAIL on failure.
  */
-    int
-clip_convert_data(
+    صحيح
+clip_convert_انکڑے(
 	char_u	**buf,
-	long	*len_store,
-	int	*motion,
+	لما	*len_store,
+	صحيح	*motion,
 	bool	vim,
 	bool	vimenc,
 	char_u	**tofree)
 {
     char_u  *final = *buf;
     char_u  *enc;
-    long    len = *len_store;
+    لما    len = *len_store;
 
-    if (vim && len >= 2)
+    إذا (vim && len >= 2)
     {
 	*motion = *final++;
 	len--;
     }
-    else if (vimenc && len >= 3)
+    وإلا إذا (vimenc && len >= 3)
     {
 	vimconv_T   conv;
-	int	    convlen;
+	صحيح	    convlen;
 
 	// First byte is motion type
 	*motion = *final++;
@@ -3765,32 +3765,32 @@ clip_convert_data(
 
 	// Skip the encoding type including null terminator in final text
 	final = memchr(final, NUL, len);
-	if (final == NULL)
-	    return FAIL;
+	إذا (final == عدم)
+	    أرجع FAIL;
 	final++; // Skip NUL
 
 	// Subtract pointers to get length of encoding;
 	len -= final - enc;
 
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	convert_تیاری(&conv, enc, p_enc);
+	إذا (conv.vc_type != CONV_NONE)
 	{
 	   char_u *tmp;
 
 	   convlen = len;
 	   tmp = string_convert(&conv, final, &convlen);
 	   len = convlen;
-	   if (tmp != NULL)
+	   إذا (tmp != عدم)
 	   {
 		final = tmp;
 		*tofree = final;
 	   }
-	   convert_setup(&conv, NULL, NULL);
+	   convert_تیاری(&conv, عدم, عدم);
 	}
     }
     *buf = final;
     *len_store = len;
-    return OK;
+    أرجع OK;
 }
-#endif
+#جے_انت

@@ -1,4 +1,4 @@
 # requires python 2.x
 
-import sys
-print(sys.version)
+استورد sys
+چھاپو(sys.نسخہ_2)

@@ -11,36 +11,36 @@
  * hardcopy.h: common stuff for hardcopy feature
  */
 
-#ifndef HARDCOPY_H
-#define HARDCOPY_H
+#جے_بنا_تعریف HARDCOPY_H
+#تعریف_کرو HARDCOPY_H
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_PRINTER)
+#إذا defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+خارجي صحيح	prt_curr_italic;
+خارجي صحيح	prt_curr_bold;
+خارجي صحيح	prt_curr_underline;
+خارجي long_u	prt_curr_bg;
+خارجي long_u	prt_curr_fg;
+خارجي صحيح	prt_ورقہ_گنتی;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+تعريفنوع بنية
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    حرف	*name;
+    مزدوج	چوڑائی; // Width and height in points for portrait
+    مزدوج	اچائی;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+خارجي prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
-#endif
+#جے_انت
 
-#endif
+#جے_انت

@@ -27,16 +27,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifdef _WIN32
+#جے_تعریف_شدہ _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#ضمن <ctype.h>
+#ضمن <io.h>
+#ضمن <wchar.h>
+#ضمن <windows.h>
 
-#ifdef USE_FILEEXTD
+#جے_تعریف_شدہ USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# إذا !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,146 +45,146 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#وإلا // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# إذا defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  وإلا
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
-#endif // USE_FILEEXTD
+#جے_انت // USE_FILEEXTD
 
-#ifdef __MINGW32__
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#جے_تعریف_شدہ __MINGW32__
+# define بن_ورتیا __attribute__((بن_ورتیا_2))
+#وإلا
+# define بن_ورتیا
+#جے_انت
 
-#include "iscygpty.h"
+#ضمن "iscygpty.h"
 
 //#define USE_DYNFILEID
-#ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+#جے_تعریف_شدہ USE_DYNFILEID
+تعريفنوع BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
-		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+		DWORD						dw_بفر_ناپ);
+ساكن pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = عدم;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
-		HANDLE						hFile UNUSED,
-		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
-		LPVOID						lpFileInformation UNUSED,
-		DWORD						dwBufferSize UNUSED)
+ساكن BOOL WINAPI stub_GetFileInformationByHandleEx(
+		HANDLE						hFile بن_ورتیا,
+		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass بن_ورتیا,
+		LPVOID						lpFileInformation بن_ورتیا,
+		DWORD						dw_بفر_ناپ بن_ورتیا)
 {
-	return FALSE;
+	أرجع FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+ساكن فراغ تیاری_fileid_api(فراغ)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	إذا (pGetFileInformationByHandleEx != عدم) {
+		أرجع;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
-		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
+		Get_Proc_پتہ(GetModuleHandle(متن_3("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	إذا (pGetFileInformationByHandleEx == عدم) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# وإلا
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#وإلا
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
-# define setup_fileid_api()
-#endif
+# define تیاری_fileid_api()
+#جے_انت
 
 
-#define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+#تعریف_کرو is_wprefix(s, اگیتر) \
+	(wcsncmp((s), (اگیتر), حجم(اگیتر) / حجم(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+صحيح is_cygpty(صحيح fd)
 {
-#ifdef STUB_IMPL
-	return 0;
-#else
+#جے_تعریف_شدہ STUB_IMPL
+	أرجع 0;
+#وإلا
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ثابت صحيح ناپ = حجم(FILE_NAME_INFO) + حجم(WCHAR) * (MAX_رستہ - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = عدم;
 
-	setup_fileid_api();
+	تیاری_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	إذا (h == INVALID_HANDLE_قدر) {
+		أرجع 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	إذا (GetFileType(h) != FILE_TYPE_PIPE) {
+		أرجع 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = حافظہ_دیو(ناپ + حجم(WCHAR));
+	إذا (nameinfo == عدم) {
+		أرجع 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	إذا (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, ناپ)) {
+		nameinfo->FileName[nameinfo->File_Name_لمائی / حجم(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		إذا (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} وإلا إذا (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} وإلا {
+			p = عدم;
 		}
-		if (p != NULL) {
+		إذا (p != عدم) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			طالما (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			إذا (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} وإلا {
+				p = عدم;
 			}
 		}
-		if (p != NULL) {
+		إذا (p != عدم) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			طالما (*p && iswascii(*p) && ہندسہ_اے(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			إذا (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} وإلا إذا (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} وإلا {
+				p = عدم;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
-#endif // STUB_IMPL
+	حرر(nameinfo);
+	أرجع (p != عدم);
+#جے_انت // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+صحيح is_cygpty_ورتیا(فراغ)
 {
-	int fd, ret = 0;
+	صحيح fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	لكل (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	أرجع ret;
 }
 
-#endif // _WIN32
+#جے_انت // _WIN32
 
 // vim: set ts=4 sw=4:

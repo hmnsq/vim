@@ -1,205 +1,205 @@
-#include "vterm_internal.h"
+#ضمن "vterm_internal.h"
 
 // vim: set sw=2 :
-#include <stdio.h>
-#include <string.h>
+#ضمن <stdio.h>
+#ضمن <string.h>
 
-#include "rect.h"
-#include "utf8.h"
+#ضمن "rect.h"
+#ضمن "utf8.h"
 
-#define UNICODE_SPACE 0x20
-#define UNICODE_LINEFEED 0x0a
+#تعریف_کرو UNICODE_SPACE 0x20
+#تعریف_کرو UNICODE_LINEFEED 0x0a
 
-#undef DEBUG_REFLOW
+#تعریف_رد DEBUG_REFLOW
 
 /* State of the pen at some moment in time, also used in a cell */
-typedef struct
+تعريفنوع بنية
 {
   /* After the bitfield */
   VTermColor   fg, bg;
 
-  unsigned int bold      : 1;
-  unsigned int underline : 2;
-  unsigned int italic    : 1;
-  unsigned int blink     : 1;
-  unsigned int reverse   : 1;
-  unsigned int conceal   : 1;
-  unsigned int strike    : 1;
-  unsigned int font      : 4; /* 0 to 9 */
-  unsigned int small     : 1;
-  unsigned int baseline  : 2;
+  بنانشانی صحيح bold      : 1;
+  بنانشانی صحيح underline : 2;
+  بنانشانی صحيح italic    : 1;
+  بنانشانی صحيح blink     : 1;
+  بنانشانی صحيح الٹ   : 1;
+  بنانشانی صحيح conceal   : 1;
+  بنانشانی صحيح strike    : 1;
+  بنانشانی صحيح font      : 4; /* 0 to 9 */
+  بنانشانی صحيح small     : 1;
+  بنانشانی صحيح baseline  : 2;
 
   /* Extra state storage that isn't strictly pen-related */
-  unsigned int protected_cell : 1;
-  unsigned int dwl            : 1; /* on a DECDWL or DECDHL line */
-  unsigned int dhl            : 2; /* on a DECDHL line (1=top 2=bottom) */
+  بنانشانی صحيح protected_cell : 1;
+  بنانشانی صحيح dwl            : 1; /* on a DECDWL or DECDHL line */
+  بنانشانی صحيح dhl            : 2; /* on a DECDHL line (1=top 2=bottom) */
 } ScreenPen;
 
 /* Internal representation of a screen cell */
-typedef struct
+تعريفنوع بنية
 {
-  uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
+  uint32_t chars[VTERM_MAX_CHARS_فی_CELL];
   ScreenPen pen;
 } ScreenCell;
 
-struct VTermScreen
+بنية VTermScreen
 {
   VTerm *vt;
   VTermState *state;
 
-  const VTermScreenCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_pushline4;
+  ثابت VTermScreenCallbacks *callbacks;
+  فراغ *cbdata;
+  صحيح callbacks_has_pushline4;
 
-  VTermDamageSize damage_merge;
+  VTerm_Damage_ناپ damage_ملاؤ;
   /* start_row == -1 => no damage */
   VTermRect damaged;
   VTermRect pending_scrollrect;
-  int pending_scroll_downward, pending_scroll_rightward;
+  صحيح pending_scroll_downward, pending_scroll_rightward;
 
-  int rows;
-  int cols;
+  صحيح صفاں_2;
+  صحيح خانے_گنتی;
 
-  unsigned int global_reverse : 1;
-  unsigned int reflow : 1;
+  بنانشانی صحيح global_الٹ : 1;
+  بنانشانی صحيح reflow : 1;
 
   /* Primary and Altscreen. buffers[1] is lazily allocated as needed */
   ScreenCell *buffers[2];
 
   /* buffer will == buffers[0] or buffers[1], depending on altscreen */
-  ScreenCell *buffer;
+  ScreenCell *بفر;
 
   /* buffer for a single screen row used in scrollback storage callbacks */
-  VTermScreenCell *sb_buffer;
+  VTermScreenCell *sb_بفر;
 
   ScreenPen pen;
 };
 
-static void clearcell(const VTermScreen *screen, ScreenCell *cell)
+ساكن فراغ clearcell(ثابت VTermScreen *screen, ScreenCell *cell)
 {
   cell->chars[0] = 0;
   cell->pen = screen->pen;
 }
 
-static ScreenCell *getcell(const VTermScreen *screen, int row, int col)
+ساكن ScreenCell *getcell(ثابت VTermScreen *screen, صحيح صف, صحيح خانہ)
 {
-  if(row < 0 || row >= screen->rows)
-    return NULL;
-  if(col < 0 || col >= screen->cols)
-    return NULL;
-  if (screen->buffer == NULL)
-    return NULL;
-  return screen->buffer + (screen->cols * row) + col;
+  إذا(صف < 0 || صف >= screen->صفاں_2)
+    أرجع عدم;
+  إذا(خانہ < 0 || خانہ >= screen->خانے_گنتی)
+    أرجع عدم;
+  إذا (screen->بفر == عدم)
+    أرجع عدم;
+  أرجع screen->بفر + (screen->خانے_گنتی * صف) + خانہ;
 }
 
-static ScreenCell *alloc_buffer(VTermScreen *screen, int rows, int cols)
+ساكن ScreenCell *alloc_بفر(VTermScreen *screen, صحيح صفاں_2, صحيح خانے_گنتی)
 {
-  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, sizeof(ScreenCell) * rows * cols);
+  ScreenCell *new_بفر = vterm_allocator_malloc(screen->vt, حجم(ScreenCell) * صفاں_2 * خانے_گنتی);
 
-  for(int row = 0; row < rows; row++) {
-    for(int col = 0; col < cols; col++) {
-      clearcell(screen, &new_buffer[row * cols + col]);
+  لكل(صحيح صف = 0; صف < صفاں_2; صف++) {
+    لكل(صحيح خانہ = 0; خانہ < خانے_گنتی; خانہ++) {
+      clearcell(screen, &new_بفر[صف * خانے_گنتی + خانہ]);
     }
   }
 
-  return new_buffer;
+  أرجع new_بفر;
 }
 
-static void damagerect(VTermScreen *screen, VTermRect rect)
+ساكن فراغ damagerect(VTermScreen *screen, VTermRect rect)
 {
   VTermRect emit;
 
-  switch(screen->damage_merge) {
-  case VTERM_DAMAGE_CELL:
+  بدل(screen->damage_ملاؤ) {
+  حالة VTERM_DAMAGE_CELL:
     /* Always emit damage event */
     emit = rect;
-    break;
+    اكسر;
 
-  case VTERM_DAMAGE_ROW:
+  حالة VTERM_DAMAGE_صف:
     /* Emit damage longer than one row. Try to merge with existing damage in
      * the same row */
-    if(rect.end_row > rect.start_row + 1) {
+    إذا(rect.سرا_صف > rect.شروع_صف + 1) {
       // Bigger than 1 line - flush existing, emit this
       vterm_screen_flush_damage(screen);
       emit = rect;
     }
-    else if(screen->damaged.start_row == -1) {
+    وإلا إذا(screen->damaged.شروع_صف == -1) {
       // None stored yet
       screen->damaged = rect;
-      return;
+      أرجع;
     }
-    else if(rect.start_row == screen->damaged.start_row) {
+    وإلا إذا(rect.شروع_صف == screen->damaged.شروع_صف) {
       // Merge with the stored line
-      if(screen->damaged.start_col > rect.start_col)
-        screen->damaged.start_col = rect.start_col;
-      if(screen->damaged.end_col < rect.end_col)
-        screen->damaged.end_col = rect.end_col;
-      return;
+      إذا(screen->damaged.شروع_خانہ > rect.شروع_خانہ)
+        screen->damaged.شروع_خانہ = rect.شروع_خانہ;
+      إذا(screen->damaged.سرا_خانہ < rect.سرا_خانہ)
+        screen->damaged.سرا_خانہ = rect.سرا_خانہ;
+      أرجع;
     }
-    else {
+    وإلا {
       // Emit the currently stored line, store a new one
       emit = screen->damaged;
       screen->damaged = rect;
     }
-    break;
+    اكسر;
 
-  case VTERM_DAMAGE_SCREEN:
-  case VTERM_DAMAGE_SCROLL:
+  حالة VTERM_DAMAGE_SCREEN:
+  حالة VTERM_DAMAGE_SCROLL:
     /* Never emit damage event */
-    if(screen->damaged.start_row == -1)
+    إذا(screen->damaged.شروع_صف == -1)
       screen->damaged = rect;
-    else {
+    وإلا {
       rect_expand(&screen->damaged, &rect);
     }
-    return;
+    أرجع;
 
-  default:
-    DEBUG_LOG1("TODO: Maybe merge damage for level %d\n", screen->damage_merge);
-    return;
+  افتراضي:
+    DEBUG_LOG1("TODO: Maybe merge damage for level %d\n", screen->damage_ملاؤ);
+    أرجع;
   }
 
-  if(screen->callbacks && screen->callbacks->damage)
+  إذا(screen->callbacks && screen->callbacks->damage)
     (*screen->callbacks->damage)(emit, screen->cbdata);
 }
 
-static void damagescreen(VTermScreen *screen)
+ساكن فراغ damagescreen(VTermScreen *screen)
 {
   VTermRect rect = {0,0,0,0};
-  rect.end_row = screen->rows;
-  rect.end_col = screen->cols;
+  rect.سرا_صف = screen->صفاں_2;
+  rect.سرا_خانہ = screen->خانے_گنتی;
 
   damagerect(screen, rect);
 }
 
-static int putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
+ساكن صحيح putglyph(VTermGlyphInfo *info, VTermPos pos, فراغ *user)
 {
   VTermScreen *screen = user;
-  ScreenCell *cell = getcell(screen, pos.row, pos.col);
+  ScreenCell *cell = getcell(screen, pos.صف, pos.خانہ);
 
-  if(!cell)
-    return 0;
+  إذا(!cell)
+    أرجع 0;
 
-  int i;
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++) {
+  صحيح i;
+  لكل(i = 0; i < VTERM_MAX_CHARS_فی_CELL && info->chars[i]; i++) {
     cell->chars[i] = info->chars[i];
     cell->pen = screen->pen;
   }
-  if(i < VTERM_MAX_CHARS_PER_CELL)
+  إذا(i < VTERM_MAX_CHARS_فی_CELL)
     cell->chars[i] = 0;
 
-  for(int col = 1; col < info->width; col++)
+  لكل(صحيح خانہ = 1; خانہ < info->چوڑائی; خانہ++)
   {
-    ScreenCell *onecell = getcell(screen, pos.row, pos.col + col);
-    if (onecell == NULL)
-      break;
+    ScreenCell *onecell = getcell(screen, pos.صف, pos.خانہ + خانہ);
+    إذا (onecell == عدم)
+      اكسر;
     onecell->chars[0] = (uint32_t)-1;
   }
 
   VTermRect rect;
-  rect.start_row = pos.row;
-  rect.end_row   = pos.row+1;
-  rect.start_col = pos.col;
-  rect.end_col   = pos.col+info->width;
+  rect.شروع_صف = pos.صف;
+  rect.سرا_صف   = pos.صف+1;
+  rect.شروع_خانہ = pos.خانہ;
+  rect.سرا_خانہ   = pos.خانہ+info->چوڑائی;
 
   cell->pen.protected_cell = info->protected_cell;
   cell->pen.dwl            = info->dwl;
@@ -207,103 +207,103 @@ static int putglyph(VTermGlyphInfo *info, VTermPos pos, void *user)
 
   damagerect(screen, rect);
 
-  return 1;
+  أرجع 1;
 }
 
-static void sb_pushline_from_row(VTermScreen *screen, int row, int continuation)
+ساكن فراغ sb_pushline_from_صف(VTermScreen *screen, صحيح صف, صحيح continuation)
 {
   VTermPos pos;
-  pos.row = row;
-  for(pos.col = 0; pos.col < screen->cols; pos.col++)
-    vterm_screen_get_cell(screen, pos, screen->sb_buffer + pos.col);
+  pos.صف = صف;
+  لكل(pos.خانہ = 0; pos.خانہ < screen->خانے_گنتی; pos.خانہ++)
+    vterm_screen_get_cell(screen, pos, screen->sb_بفر + pos.خانہ);
 
-  if(screen->callbacks_has_pushline4 && screen->callbacks->sb_pushline4)
-    (screen->callbacks->sb_pushline4)(screen->cols, screen->sb_buffer, continuation, screen->cbdata);
-  else
-    (screen->callbacks->sb_pushline)(screen->cols, screen->sb_buffer, screen->cbdata);
+  إذا(screen->callbacks_has_pushline4 && screen->callbacks->sb_pushline4)
+    (screen->callbacks->sb_pushline4)(screen->خانے_گنتی, screen->sb_بفر, continuation, screen->cbdata);
+  وإلا
+    (screen->callbacks->sb_pushline)(screen->خانے_گنتی, screen->sb_بفر, screen->cbdata);
 }
 
-static int premove(VTermRect rect, void *user)
+ساكن صحيح premove(VTermRect rect, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(((screen->callbacks && screen->callbacks->sb_pushline) ||
+  إذا(((screen->callbacks && screen->callbacks->sb_pushline) ||
         (screen->callbacks_has_pushline4 && screen->callbacks && screen->callbacks->sb_pushline4)) &&
-     rect.start_row == 0 && rect.start_col == 0 &&        // starts top-left corner
-     rect.end_col == screen->cols &&                      // full width
-     screen->buffer == screen->buffers[BUFIDX_PRIMARY]) { // not altscreen
-    for(int row = 0; row < rect.end_row; row++) {
-      const VTermLineInfo *lineinfo = vterm_state_get_lineinfo(screen->state, row);
-      sb_pushline_from_row(screen, row, lineinfo->continuation);
+     rect.شروع_صف == 0 && rect.شروع_خانہ == 0 &&        // starts top-left corner
+     rect.سرا_خانہ == screen->خانے_گنتی &&                      // full width
+     screen->بفر == screen->buffers[BUFIDX_PRIMARY]) { // not altscreen
+    لكل(صحيح صف = 0; صف < rect.سرا_صف; صف++) {
+      ثابت VTerm_سطر_Info *lineinfo = vterm_state_get_lineinfo(screen->state, صف);
+      sb_pushline_from_صف(screen, صف, lineinfo->continuation);
     }
   }
 
-  return 1;
+  أرجع 1;
 }
 
-static int moverect_internal(VTermRect dest, VTermRect src, void *user)
+ساكن صحيح moverect_اندرونی(VTermRect dest, VTermRect src, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  int cols = src.end_col - src.start_col;
-  int downward = src.start_row - dest.start_row;
+  صحيح خانے_گنتی = src.سرا_خانہ - src.شروع_خانہ;
+  صحيح downward = src.شروع_صف - dest.شروع_صف;
 
-  int init_row, test_row, inc_row;
-  if(downward < 0) {
-    init_row = dest.end_row - 1;
-    test_row = dest.start_row - 1;
-    inc_row  = -1;
+  صحيح init_صف, test_صف, inc_صف;
+  إذا(downward < 0) {
+    init_صف = dest.سرا_صف - 1;
+    test_صف = dest.شروع_صف - 1;
+    inc_صف  = -1;
   }
-  else {
-    init_row = dest.start_row;
-    test_row = dest.end_row;
-    inc_row  = +1;
+  وإلا {
+    init_صف = dest.شروع_صف;
+    test_صف = dest.سرا_صف;
+    inc_صف  = +1;
   }
 
-  for(int row = init_row; row != test_row; row += inc_row)
-    memmove(getcell(screen, row, dest.start_col),
-            getcell(screen, row + downward, src.start_col),
-            cols * sizeof(ScreenCell));
+  لكل(صحيح صف = init_صف; صف != test_صف; صف += inc_صف)
+    memmove(getcell(screen, صف, dest.شروع_خانہ),
+            getcell(screen, صف + downward, src.شروع_خانہ),
+            خانے_گنتی * حجم(ScreenCell));
 
-  return 1;
+  أرجع 1;
 }
 
-static int moverect_user(VTermRect dest, VTermRect src, void *user)
+ساكن صحيح moverect_user(VTermRect dest, VTermRect src, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->moverect) {
-    if(screen->damage_merge != VTERM_DAMAGE_SCROLL)
+  إذا(screen->callbacks && screen->callbacks->moverect) {
+    إذا(screen->damage_ملاؤ != VTERM_DAMAGE_SCROLL)
       // Avoid an infinite loop
       vterm_screen_flush_damage(screen);
 
-    if((*screen->callbacks->moverect)(dest, src, screen->cbdata))
-      return 1;
+    إذا((*screen->callbacks->moverect)(dest, src, screen->cbdata))
+      أرجع 1;
   }
 
   damagerect(screen, dest);
 
-  return 1;
+  أرجع 1;
 }
 
-static int erase_internal(VTermRect rect, int selective, void *user)
+ساكن صحيح erase_اندرونی(VTermRect rect, صحيح selective, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  for(int row = rect.start_row; row < screen->state->rows && row < rect.end_row; row++) {
-    const VTermLineInfo *info = vterm_state_get_lineinfo(screen->state, row);
+  لكل(صحيح صف = rect.شروع_صف; صف < screen->state->صفاں_2 && صف < rect.سرا_صف; صف++) {
+    ثابت VTerm_سطر_Info *info = vterm_state_get_lineinfo(screen->state, صف);
 
-    for(int col = rect.start_col; col < rect.end_col; col++) {
-      ScreenCell *cell = getcell(screen, row, col);
+    لكل(صحيح خانہ = rect.شروع_خانہ; خانہ < rect.سرا_خانہ; خانہ++) {
+      ScreenCell *cell = getcell(screen, صف, خانہ);
 
-      if (cell == NULL)
+      إذا (cell == عدم)
       {
         DEBUG_LOG2("libvterm: erase_internal() position invalid: %d / %d",
-								     row, col);
-	return 1;
+								     صف, خانہ);
+	أرجع 1;
       }
-      if(selective && cell->pen.protected_cell)
-        continue;
+      إذا(selective && cell->pen.protected_cell)
+        استمر;
 
       cell->chars[0] = 0;
       cell->pen = (ScreenPen){
@@ -316,57 +316,57 @@ static int erase_internal(VTermRect rect, int selective, void *user)
     }
   }
 
-  return 1;
+  أرجع 1;
 }
 
-static int erase_user(VTermRect rect, int selective UNUSED, void *user)
+ساكن صحيح erase_user(VTermRect rect, صحيح selective بن_ورتیا, فراغ *user)
 {
   VTermScreen *screen = user;
 
   damagerect(screen, rect);
 
-  return 1;
+  أرجع 1;
 }
 
-static int erase(VTermRect rect, int selective, void *user)
+ساكن صحيح erase(VTermRect rect, صحيح selective, فراغ *user)
 {
-  erase_internal(rect, selective, user);
-  return erase_user(rect, 0, user);
+  erase_اندرونی(rect, selective, user);
+  أرجع erase_user(rect, 0, user);
 }
 
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
+ساكن صحيح scrollrect(VTermRect rect, صحيح downward, صحيح rightward, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->damage_merge != VTERM_DAMAGE_SCROLL) {
+  إذا(screen->damage_ملاؤ != VTERM_DAMAGE_SCROLL) {
     vterm_scroll_rect(rect, downward, rightward,
-        moverect_internal, erase_internal, screen);
+        moverect_اندرونی, erase_اندرونی, screen);
 
     vterm_screen_flush_damage(screen);
 
     vterm_scroll_rect(rect, downward, rightward,
         moverect_user, erase_user, screen);
 
-    return 1;
+    أرجع 1;
   }
 
-  if(screen->damaged.start_row != -1 &&
+  إذا(screen->damaged.شروع_صف != -1 &&
      !rect_intersects(&rect, &screen->damaged)) {
     vterm_screen_flush_damage(screen);
   }
 
-  if(screen->pending_scrollrect.start_row == -1) {
+  إذا(screen->pending_scrollrect.شروع_صف == -1) {
     screen->pending_scrollrect = rect;
     screen->pending_scroll_downward  = downward;
     screen->pending_scroll_rightward = rightward;
   }
-  else if(rect_equal(&screen->pending_scrollrect, &rect) &&
+  وإلا إذا(rect_equal(&screen->pending_scrollrect, &rect) &&
      ((screen->pending_scroll_downward  == 0 && downward  == 0) ||
       (screen->pending_scroll_rightward == 0 && rightward == 0))) {
     screen->pending_scroll_downward  += downward;
     screen->pending_scroll_rightward += rightward;
   }
-  else {
+  وإلا {
     vterm_screen_flush_damage(screen);
 
     screen->pending_scrollrect = rect;
@@ -375,12 +375,12 @@ static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
   }
 
   vterm_scroll_rect(rect, downward, rightward,
-      moverect_internal, erase_internal, screen);
+      moverect_اندرونی, erase_اندرونی, screen);
 
-  if(screen->damaged.start_row == -1)
-    return 1;
+  إذا(screen->damaged.شروع_صف == -1)
+    أرجع 1;
 
-  if(rect_contains(&rect, &screen->damaged)) {
+  إذا(rect_شامل_اے(&rect, &screen->damaged)) {
     /* Scroll region entirely contains the damage; just move it */
     vterm_rect_move(&screen->damaged, -downward, -rightward);
     rect_clip(&screen->damaged, &rect);
@@ -390,348 +390,348 @@ static int scrollrect(VTermRect rect, int downward, int rightward, void *user)
    * optimising it. Namely, a vertical scroll that neatly cuts the damage
    * region in half.
    */
-  else if(rect.start_col <= screen->damaged.start_col &&
-          rect.end_col   >= screen->damaged.end_col &&
+  وإلا إذا(rect.شروع_خانہ <= screen->damaged.شروع_خانہ &&
+          rect.سرا_خانہ   >= screen->damaged.سرا_خانہ &&
           rightward == 0) {
-    if(screen->damaged.start_row >= rect.start_row &&
-       screen->damaged.start_row  < rect.end_row) {
-      screen->damaged.start_row -= downward;
-      if(screen->damaged.start_row < rect.start_row)
-        screen->damaged.start_row = rect.start_row;
-      if(screen->damaged.start_row > rect.end_row)
-        screen->damaged.start_row = rect.end_row;
+    إذا(screen->damaged.شروع_صف >= rect.شروع_صف &&
+       screen->damaged.شروع_صف  < rect.سرا_صف) {
+      screen->damaged.شروع_صف -= downward;
+      إذا(screen->damaged.شروع_صف < rect.شروع_صف)
+        screen->damaged.شروع_صف = rect.شروع_صف;
+      إذا(screen->damaged.شروع_صف > rect.سرا_صف)
+        screen->damaged.شروع_صف = rect.سرا_صف;
     }
-    if(screen->damaged.end_row >= rect.start_row &&
-       screen->damaged.end_row  < rect.end_row) {
-      screen->damaged.end_row -= downward;
-      if(screen->damaged.end_row < rect.start_row)
-        screen->damaged.end_row = rect.start_row;
-      if(screen->damaged.end_row > rect.end_row)
-        screen->damaged.end_row = rect.end_row;
+    إذا(screen->damaged.سرا_صف >= rect.شروع_صف &&
+       screen->damaged.سرا_صف  < rect.سرا_صف) {
+      screen->damaged.سرا_صف -= downward;
+      إذا(screen->damaged.سرا_صف < rect.شروع_صف)
+        screen->damaged.سرا_صف = rect.شروع_صف;
+      إذا(screen->damaged.سرا_صف > rect.سرا_صف)
+        screen->damaged.سرا_صف = rect.سرا_صف;
     }
   }
-  else {
+  وإلا {
     DEBUG_LOG2("TODO: Just flush and redo damaged=" STRFrect " rect=" STRFrect "\n",
         ARGSrect(screen->damaged), ARGSrect(rect));
   }
 
-  return 1;
+  أرجع 1;
 }
 
-static int movecursor(VTermPos pos, VTermPos oldpos, int visible, void *user)
+ساكن صحيح movecursor(VTermPos pos, VTermPos oldpos, صحيح visible, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->movecursor)
-    return (*screen->callbacks->movecursor)(pos, oldpos, visible, screen->cbdata);
+  إذا(screen->callbacks && screen->callbacks->movecursor)
+    أرجع (*screen->callbacks->movecursor)(pos, oldpos, visible, screen->cbdata);
 
-  return 0;
+  أرجع 0;
 }
 
-static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
+ساكن صحيح setpenattr(VTermAttr attr, VTerm_قدر *val, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  بدل(attr) {
+  حالة VTERM_ATTR_BOLD:
     screen->pen.bold = val->boolean;
-    return 1;
-  case VTERM_ATTR_UNDERLINE:
-    screen->pen.underline = val->number;
-    return 1;
-  case VTERM_ATTR_ITALIC:
+    أرجع 1;
+  حالة VTERM_ATTR_UNDERLINE:
+    screen->pen.underline = val->نمبر;
+    أرجع 1;
+  حالة VTERM_ATTR_ITALIC:
     screen->pen.italic = val->boolean;
-    return 1;
-  case VTERM_ATTR_BLINK:
+    أرجع 1;
+  حالة VTERM_ATTR_BLINK:
     screen->pen.blink = val->boolean;
-    return 1;
-  case VTERM_ATTR_REVERSE:
-    screen->pen.reverse = val->boolean;
-    return 1;
-  case VTERM_ATTR_CONCEAL:
+    أرجع 1;
+  حالة VTERM_ATTR_الٹ:
+    screen->pen.الٹ = val->boolean;
+    أرجع 1;
+  حالة VTERM_ATTR_CONCEAL:
     screen->pen.conceal = val->boolean;
-    return 1;
-  case VTERM_ATTR_STRIKE:
+    أرجع 1;
+  حالة VTERM_ATTR_STRIKE:
     screen->pen.strike = val->boolean;
-    return 1;
-  case VTERM_ATTR_FONT:
-    screen->pen.font = val->number;
-    return 1;
-  case VTERM_ATTR_FOREGROUND:
+    أرجع 1;
+  حالة VTERM_ATTR_FONT:
+    screen->pen.font = val->نمبر;
+    أرجع 1;
+  حالة VTERM_ATTR_FOREGROUND:
     screen->pen.fg = val->color;
-    return 1;
-  case VTERM_ATTR_BACKGROUND:
+    أرجع 1;
+  حالة VTERM_ATTR_BACKGROUND:
     screen->pen.bg = val->color;
-    return 1;
-  case VTERM_ATTR_SMALL:
+    أرجع 1;
+  حالة VTERM_ATTR_SMALL:
     screen->pen.small = val->boolean;
-    return 1;
-  case VTERM_ATTR_BASELINE:
-    screen->pen.baseline = val->number;
-    return 1;
+    أرجع 1;
+  حالة VTERM_ATTR_BASELINE:
+    screen->pen.baseline = val->نمبر;
+    أرجع 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  حالة VTERM_N_ATTRS:
+    أرجع 0;
   }
 
-  return 0;
+  أرجع 0;
 }
 
-static int settermprop(VTermProp prop, VTermValue *val, void *user)
+ساكن صحيح settermprop(VTermProp prop, VTerm_قدر *val, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  switch(prop) {
-  case VTERM_PROP_ALTSCREEN:
-    if(val->boolean && !screen->buffers[BUFIDX_ALTSCREEN])
-      return 0;
+  بدل(prop) {
+  حالة VTERM_PROP_ALTSCREEN:
+    إذا(val->boolean && !screen->buffers[BUFIDX_ALTSCREEN])
+      أرجع 0;
 
-    screen->buffer = val->boolean ? screen->buffers[BUFIDX_ALTSCREEN] : screen->buffers[BUFIDX_PRIMARY];
+    screen->بفر = val->boolean ? screen->buffers[BUFIDX_ALTSCREEN] : screen->buffers[BUFIDX_PRIMARY];
     /* only send a damage event on disable; because during enable there's an
      * erase that sends a damage anyway
      */
-    if(!val->boolean)
+    إذا(!val->boolean)
       damagescreen(screen);
-    break;
-  case VTERM_PROP_REVERSE:
-    screen->global_reverse = val->boolean;
+    اكسر;
+  حالة VTERM_PROP_الٹ:
+    screen->global_الٹ = val->boolean;
     damagescreen(screen);
-    break;
-  default:
+    اكسر;
+  افتراضي:
     ; /* ignore */
   }
 
-  if(screen->callbacks && screen->callbacks->settermprop)
-    return (*screen->callbacks->settermprop)(prop, val, screen->cbdata);
+  إذا(screen->callbacks && screen->callbacks->settermprop)
+    أرجع (*screen->callbacks->settermprop)(prop, val, screen->cbdata);
 
-  return 1;
+  أرجع 1;
 }
 
-static int bell(void *user)
+ساكن صحيح bell(فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->bell)
-    return (*screen->callbacks->bell)(screen->cbdata);
+  إذا(screen->callbacks && screen->callbacks->bell)
+    أرجع (*screen->callbacks->bell)(screen->cbdata);
 
-  return 0;
+  أرجع 0;
 }
 
 /* How many cells are non-blank
  * Returns the position of the first blank cell in the trailing blank end */
-static int line_popcount(ScreenCell *buffer, int row, int rows UNUSED, int cols)
+ساكن صحيح سطر_popcount(ScreenCell *بفر, صحيح صف, صحيح صفاں_2 بن_ورتیا, صحيح خانے_گنتی)
 {
-  int col = cols - 1;
-  while(col >= 0 && buffer[row * cols + col].chars[0] == 0)
-    col--;
-  return col + 1;
+  صحيح خانہ = خانے_گنتی - 1;
+  طالما(خانہ >= 0 && بفر[صف * خانے_گنتی + خانہ].chars[0] == 0)
+    خانہ--;
+  أرجع خانہ + 1;
 }
 
-#define REFLOW (screen->reflow)
+#تعریف_کرو REFLOW (screen->reflow)
 
-static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new_cols, int active, VTermStateFields *statefields)
+ساكن فراغ resize_بفر(VTermScreen *screen, صحيح bufidx, صحيح new_صفاں, صحيح new_خانے_گنتی, صحيح سرگرم, VTermStateFields *statefields)
 {
-  int old_rows = screen->rows;
-  int old_cols = screen->cols;
+  صحيح old_صفاں = screen->صفاں_2;
+  صحيح old_خانے_گنتی = screen->خانے_گنتی;
 
-  ScreenCell *old_buffer = screen->buffers[bufidx];
-  VTermLineInfo *old_lineinfo = statefields->lineinfos[bufidx];
+  ScreenCell *old_بفر = screen->buffers[bufidx];
+  VTerm_سطر_Info *old_lineinfo = statefields->lineinfos[bufidx];
 
-  ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, sizeof(ScreenCell) * new_rows * new_cols);
-  VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
+  ScreenCell *new_بفر = vterm_allocator_malloc(screen->vt, حجم(ScreenCell) * new_صفاں * new_خانے_گنتی);
+  VTerm_سطر_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, حجم(new_lineinfo[0]) * new_صفاں);
 
   // Find the final row of old buffer content
-  int old_row = old_rows - 1;
-  int new_row = new_rows - 1;
+  صحيح old_صف = old_صفاں - 1;
+  صحيح new_صف = new_صفاں - 1;
 
   VTermPos old_cursor = statefields->pos;
   VTermPos new_cursor = { -1, -1 };
 
-#ifdef DEBUG_REFLOW
+#جے_تعریف_شدہ DEBUG_REFLOW
   fprintf(stderr, "Resizing from %dx%d to %dx%d; cursor was at (%d,%d)\n",
-      old_cols, old_rows, new_cols, new_rows, old_cursor.col, old_cursor.row);
-#endif
+      old_خانے_گنتی, old_صفاں, new_خانے_گنتی, new_صفاں, old_cursor.خانہ, old_cursor.صف);
+#جے_انت
 
   /* Keep track of the final row that is knonw to be blank, so we know what
    * spare space we have for scrolling into
    */
-  int final_blank_row = new_rows;
+  صحيح final_blank_صف = new_صفاں;
 
-  while(old_row >= 0) {
-    int old_row_end = old_row;
+  طالما(old_صف >= 0) {
+    صحيح old_صف_سرا = old_صف;
     /* TODO: Stop if dwl or dhl */
-    while(REFLOW && old_lineinfo && old_row >= 0 && old_lineinfo[old_row].continuation)
-      old_row--;
-    int old_row_start = old_row;
+    طالما(REFLOW && old_lineinfo && old_صف >= 0 && old_lineinfo[old_صف].continuation)
+      old_صف--;
+    صحيح old_صف_شروع = old_صف;
 
-    int width = 0;
-    for(int row = old_row_start; row <= old_row_end; row++) {
-      if(REFLOW && row < (old_rows - 1) && old_lineinfo[row + 1].continuation)
-        width += old_cols;
-      else
-        width += line_popcount(old_buffer, row, old_rows, old_cols);
+    صحيح چوڑائی = 0;
+    لكل(صحيح صف = old_صف_شروع; صف <= old_صف_سرا; صف++) {
+      إذا(REFLOW && صف < (old_صفاں - 1) && old_lineinfo[صف + 1].continuation)
+        چوڑائی += old_خانے_گنتی;
+      وإلا
+        چوڑائی += سطر_popcount(old_بفر, صف, old_صفاں, old_خانے_گنتی);
     }
 
-    if(final_blank_row == (new_row + 1) && width == 0)
-      final_blank_row = new_row;
+    إذا(final_blank_صف == (new_صف + 1) && چوڑائی == 0)
+      final_blank_صف = new_صف;
 
-    int new_height = REFLOW
-      ? width ? (width + new_cols - 1) / new_cols : 1
+    صحيح new_اچائی = REFLOW
+      ? چوڑائی ? (چوڑائی + new_خانے_گنتی - 1) / new_خانے_گنتی : 1
       : 1;
 
-    int new_row_end = new_row;
-    int new_row_start = new_row - new_height + 1;
+    صحيح new_صف_سرا = new_صف;
+    صحيح new_صف_شروع = new_صف - new_اچائی + 1;
 
-    old_row = old_row_start;
-    int old_col = 0;
+    old_صف = old_صف_شروع;
+    صحيح old_خانہ = 0;
 
-    int spare_rows = new_rows - final_blank_row;
+    صحيح وادھو_صفاں = new_صفاں - final_blank_صف;
 
-    if(new_row_start < 0 && /* we'd fall off the top */
-        spare_rows >= 0 && /* we actually have spare rows */
-        (!active || new_cursor.row == -1 || (new_cursor.row - new_row_start) < new_rows))
+    إذا(new_صف_شروع < 0 && /* we'd fall off the top */
+        وادھو_صفاں >= 0 && /* we actually have spare rows */
+        (!سرگرم || new_cursor.صف == -1 || (new_cursor.صف - new_صف_شروع) < new_صفاں))
     {
       /* Attempt to scroll content down into the blank rows at the bottom to
        * make it fit
        */
-      int downwards = -new_row_start;
-      if(downwards > spare_rows)
-        downwards = spare_rows;
-      int rowcount = new_rows - downwards;
+      صحيح downwards = -new_صف_شروع;
+      إذا(downwards > وادھو_صفاں)
+        downwards = وادھو_صفاں;
+      صحيح rowcount = new_صفاں - downwards;
 
-#ifdef DEBUG_REFLOW
+#جے_تعریف_شدہ DEBUG_REFLOW
       fprintf(stderr, "  scroll %d rows +%d downwards\n", rowcount, downwards);
-#endif
+#جے_انت
 
-      memmove(&new_buffer[downwards * new_cols], &new_buffer[0],   rowcount * new_cols * sizeof(ScreenCell));
-      memmove(&new_lineinfo[downwards],          &new_lineinfo[0], rowcount            * sizeof(new_lineinfo[0]));
+      memmove(&new_بفر[downwards * new_خانے_گنتی], &new_بفر[0],   rowcount * new_خانے_گنتی * حجم(ScreenCell));
+      memmove(&new_lineinfo[downwards],          &new_lineinfo[0], rowcount            * حجم(new_lineinfo[0]));
 
-      new_row += downwards;
-      new_row_start += downwards;
-      new_row_end += downwards;
+      new_صف += downwards;
+      new_صف_شروع += downwards;
+      new_صف_سرا += downwards;
 
-      if(new_cursor.row >= 0)
-        new_cursor.row += downwards;
+      إذا(new_cursor.صف >= 0)
+        new_cursor.صف += downwards;
 
-      final_blank_row += downwards;
+      final_blank_صف += downwards;
     }
 
-#ifdef DEBUG_REFLOW
+#جے_تعریف_شدہ DEBUG_REFLOW
     fprintf(stderr, "  rows [%d..%d] <- [%d..%d] width=%d\n",
-        new_row_start, new_row_end, old_row_start, old_row_end, width);
-#endif
+        new_صف_شروع, new_صف_سرا, old_صف_شروع, old_صف_سرا, چوڑائی);
+#جے_انت
 
-    if(new_row_start < 0) {
-      if(old_row_start <= old_cursor.row && old_cursor.row < old_row_end) {
-        new_cursor.row = 0;
-        new_cursor.col = old_cursor.col;
-        if(new_cursor.col >= new_cols)
-          new_cursor.col = new_cols-1;
+    إذا(new_صف_شروع < 0) {
+      إذا(old_صف_شروع <= old_cursor.صف && old_cursor.صف < old_صف_سرا) {
+        new_cursor.صف = 0;
+        new_cursor.خانہ = old_cursor.خانہ;
+        إذا(new_cursor.خانہ >= new_خانے_گنتی)
+          new_cursor.خانہ = new_خانے_گنتی-1;
       }
-      break;
+      اكسر;
     }
 
-    for(new_row = new_row_start, old_row = old_row_start; new_row <= new_row_end; new_row++) {
-      int count = width >= new_cols ? new_cols : width;
-      width -= count;
+    لكل(new_صف = new_صف_شروع, old_صف = old_صف_شروع; new_صف <= new_صف_سرا; new_صف++) {
+      صحيح گنتی = چوڑائی >= new_خانے_گنتی ? new_خانے_گنتی : چوڑائی;
+      چوڑائی -= گنتی;
 
-      int new_col = 0;
+      صحيح new_خانہ = 0;
 
-      while(count) {
+      طالما(گنتی) {
         /* TODO: This could surely be done a lot faster by memcpy()'ing the entire range */
-        new_buffer[new_row * new_cols + new_col] = old_buffer[old_row * old_cols + old_col];
+        new_بفر[new_صف * new_خانے_گنتی + new_خانہ] = old_بفر[old_صف * old_خانے_گنتی + old_خانہ];
 
-        if(old_cursor.row == old_row && old_cursor.col == old_col)
-          new_cursor.row = new_row, new_cursor.col = new_col;
+        إذا(old_cursor.صف == old_صف && old_cursor.خانہ == old_خانہ)
+          new_cursor.صف = new_صف, new_cursor.خانہ = new_خانہ;
 
-        old_col++;
-        if(old_col == old_cols) {
-          old_row++;
+        old_خانہ++;
+        إذا(old_خانہ == old_خانے_گنتی) {
+          old_صف++;
 
-          if(!REFLOW) {
-            new_col++;
-            break;
+          إذا(!REFLOW) {
+            new_خانہ++;
+            اكسر;
           }
-          old_col = 0;
+          old_خانہ = 0;
         }
 
-        new_col++;
-        count--;
+        new_خانہ++;
+        گنتی--;
       }
 
-      if(old_cursor.row == old_row && old_cursor.col >= old_col) {
-        new_cursor.row = new_row, new_cursor.col = (old_cursor.col - old_col + new_col);
-        if(new_cursor.col >= new_cols)
-          new_cursor.col = new_cols-1;
+      إذا(old_cursor.صف == old_صف && old_cursor.خانہ >= old_خانہ) {
+        new_cursor.صف = new_صف, new_cursor.خانہ = (old_cursor.خانہ - old_خانہ + new_خانہ);
+        إذا(new_cursor.خانہ >= new_خانے_گنتی)
+          new_cursor.خانہ = new_خانے_گنتی-1;
       }
 
-      while(new_col < new_cols) {
-        clearcell(screen, &new_buffer[new_row * new_cols + new_col]);
-        new_col++;
+      طالما(new_خانہ < new_خانے_گنتی) {
+        clearcell(screen, &new_بفر[new_صف * new_خانے_گنتی + new_خانہ]);
+        new_خانہ++;
       }
 
-      new_lineinfo[new_row].continuation = (new_row > new_row_start);
+      new_lineinfo[new_صف].continuation = (new_صف > new_صف_شروع);
     }
 
-    old_row = old_row_start - 1;
-    new_row = new_row_start - 1;
+    old_صف = old_صف_شروع - 1;
+    new_صف = new_صف_شروع - 1;
   }
 
-  if(old_cursor.row <= old_row) {
+  إذا(old_cursor.صف <= old_صف) {
     /* cursor would have moved entirely off the top of the screen; lets just
      * bring it within range */
-    new_cursor.row = 0, new_cursor.col = old_cursor.col;
-    if(new_cursor.col >= new_cols)
-      new_cursor.col = new_cols-1;
+    new_cursor.صف = 0, new_cursor.خانہ = old_cursor.خانہ;
+    إذا(new_cursor.خانہ >= new_خانے_گنتی)
+      new_cursor.خانہ = new_خانے_گنتی-1;
   }
 
   /* We really expect the cursor position to be set by now */
   /* Unfortunately we do get here when "new_rows" is one.  We don't want
    * to crash, so until the above code is fixed let's just set the cursor. */
-  if(active && (new_cursor.row == -1 || new_cursor.col == -1)) {
+  إذا(سرگرم && (new_cursor.صف == -1 || new_cursor.خانہ == -1)) {
     /* fprintf(stderr, "screen_resize failed to update cursor position\n");
      * abort(); */
-    if (new_cursor.row < 0)
-      new_cursor.row = 0;
-    if (new_cursor.col < 0)
-      new_cursor.col = 0;
+    إذا (new_cursor.صف < 0)
+      new_cursor.صف = 0;
+    إذا (new_cursor.خانہ < 0)
+      new_cursor.خانہ = 0;
   }
 
-  if(old_row >= 0 && bufidx == BUFIDX_PRIMARY) {
+  إذا(old_صف >= 0 && bufidx == BUFIDX_PRIMARY) {
     /* Push spare lines to scrollback buffer */
-    if((screen->callbacks && screen->callbacks->sb_pushline) ||
+    إذا((screen->callbacks && screen->callbacks->sb_pushline) ||
           (screen->callbacks_has_pushline4 && screen->callbacks && screen->callbacks->sb_pushline4))
-      for(int row = 0; row <= old_row; row++) {
-        const VTermLineInfo *lineinfo = old_lineinfo + row;
-        sb_pushline_from_row(screen, row, lineinfo->continuation);
+      لكل(صحيح صف = 0; صف <= old_صف; صف++) {
+        ثابت VTerm_سطر_Info *lineinfo = old_lineinfo + صف;
+        sb_pushline_from_صف(screen, صف, lineinfo->continuation);
       }
-    if(active)
-      statefields->pos.row -= (old_row + 1);
+    إذا(سرگرم)
+      statefields->pos.صف -= (old_صف + 1);
   }
-  if(new_row >= 0 && bufidx == BUFIDX_PRIMARY &&
+  إذا(new_صف >= 0 && bufidx == BUFIDX_PRIMARY &&
       screen->callbacks && screen->callbacks->sb_popline) {
     /* Try to backfill rows by popping scrollback buffer */
-    while(new_row >= 0) {
+    طالما(new_صف >= 0) {
       VTermPos pos;
-      if(!(screen->callbacks->sb_popline(old_cols, screen->sb_buffer, screen->cbdata)))
-        break;
+      إذا(!(screen->callbacks->sb_popline(old_خانے_گنتی, screen->sb_بفر, screen->cbdata)))
+        اكسر;
 
-      pos.row = new_row;
-      for(pos.col = 0; pos.col < old_cols && pos.col < new_cols; pos.col += screen->sb_buffer[pos.col].width) {
-        VTermScreenCell *src = &screen->sb_buffer[pos.col];
-        ScreenCell *dst = &new_buffer[pos.row * new_cols + pos.col];
+      pos.صف = new_صف;
+      لكل(pos.خانہ = 0; pos.خانہ < old_خانے_گنتی && pos.خانہ < new_خانے_گنتی; pos.خانہ += screen->sb_بفر[pos.خانہ].چوڑائی) {
+        VTermScreenCell *src = &screen->sb_بفر[pos.خانہ];
+        ScreenCell *dst = &new_بفر[pos.صف * new_خانے_گنتی + pos.خانہ];
 
-        for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
+        لكل(صحيح i = 0; i < VTERM_MAX_CHARS_فی_CELL; i++) {
           dst->chars[i] = src->chars[i];
-          if(!src->chars[i])
-            break;
+          إذا(!src->chars[i])
+            اكسر;
         }
 
         dst->pen.bold      = src->attrs.bold;
         dst->pen.underline = src->attrs.underline;
         dst->pen.italic    = src->attrs.italic;
         dst->pen.blink     = src->attrs.blink;
-        dst->pen.reverse   = src->attrs.reverse ^ screen->global_reverse;
+        dst->pen.الٹ   = src->attrs.الٹ ^ screen->global_الٹ;
         dst->pen.conceal   = src->attrs.conceal;
         dst->pen.strike    = src->attrs.strike;
         dst->pen.font      = src->attrs.font;
@@ -741,156 +741,156 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
         dst->pen.fg = src->fg;
         dst->pen.bg = src->bg;
 
-        if(src->width == 2 && pos.col < (new_cols-1))
+        إذا(src->چوڑائی == 2 && pos.خانہ < (new_خانے_گنتی-1))
           (dst + 1)->chars[0] = (uint32_t) -1;
       }
-      for( ; pos.col < new_cols; pos.col++)
-        clearcell(screen, &new_buffer[pos.row * new_cols + pos.col]);
-      new_row--;
+      لكل( ; pos.خانہ < new_خانے_گنتی; pos.خانہ++)
+        clearcell(screen, &new_بفر[pos.صف * new_خانے_گنتی + pos.خانہ]);
+      new_صف--;
 
-      if(active)
-        statefields->pos.row++;
+      إذا(سرگرم)
+        statefields->pos.صف++;
     }
   }
-  if(new_row >= 0) {
+  إذا(new_صف >= 0) {
     /* Scroll new rows back up to the top and fill in blanks at the bottom */
-    int moverows = new_rows - new_row - 1;
-    memmove(&new_buffer[0], &new_buffer[(new_row + 1) * new_cols], moverows * new_cols * sizeof(ScreenCell));
-    memmove(&new_lineinfo[0], &new_lineinfo[new_row + 1], moverows * sizeof(new_lineinfo[0]));
+    صحيح moverows = new_صفاں - new_صف - 1;
+    memmove(&new_بفر[0], &new_بفر[(new_صف + 1) * new_خانے_گنتی], moverows * new_خانے_گنتی * حجم(ScreenCell));
+    memmove(&new_lineinfo[0], &new_lineinfo[new_صف + 1], moverows * حجم(new_lineinfo[0]));
 
-    new_cursor.row -= (new_row + 1);
+    new_cursor.صف -= (new_صف + 1);
 
-    for(new_row = moverows; new_row < new_rows; new_row++) {
-      for(int col = 0; col < new_cols; col++)
-        clearcell(screen, &new_buffer[new_row * new_cols + col]);
-      new_lineinfo[new_row] = (VTermLineInfo){ 0 };
+    لكل(new_صف = moverows; new_صف < new_صفاں; new_صف++) {
+      لكل(صحيح خانہ = 0; خانہ < new_خانے_گنتی; خانہ++)
+        clearcell(screen, &new_بفر[new_صف * new_خانے_گنتی + خانہ]);
+      new_lineinfo[new_صف] = (VTerm_سطر_Info){ 0 };
     }
   }
 
-  vterm_allocator_free(screen->vt, old_buffer);
-  screen->buffers[bufidx] = new_buffer;
+  vterm_allocator_free(screen->vt, old_بفر);
+  screen->buffers[bufidx] = new_بفر;
 
   vterm_allocator_free(screen->vt, old_lineinfo);
   statefields->lineinfos[bufidx] = new_lineinfo;
 
-  if(active)
+  إذا(سرگرم)
     statefields->pos = new_cursor;
 
-  return;
+  أرجع;
 }
 
-static int resize(int new_rows, int new_cols, VTermStateFields *fields, void *user)
+ساكن صحيح resize(صحيح new_صفاں, صحيح new_خانے_گنتی, VTermStateFields *fields, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  int altscreen_active = (screen->buffers[BUFIDX_ALTSCREEN] && screen->buffer == screen->buffers[BUFIDX_ALTSCREEN]);
+  صحيح altscreen_سرگرم = (screen->buffers[BUFIDX_ALTSCREEN] && screen->بفر == screen->buffers[BUFIDX_ALTSCREEN]);
 
-  int old_rows = screen->rows;
-  int old_cols = screen->cols;
+  صحيح old_صفاں = screen->صفاں_2;
+  صحيح old_خانے_گنتی = screen->خانے_گنتی;
 
-  if(new_cols > old_cols) {
+  إذا(new_خانے_گنتی > old_خانے_گنتی) {
     /* Ensure that ->sb_buffer is large enough for a new or and old row */
-    if(screen->sb_buffer)
-      vterm_allocator_free(screen->vt, screen->sb_buffer);
+    إذا(screen->sb_بفر)
+      vterm_allocator_free(screen->vt, screen->sb_بفر);
 
-    if (new_cols > VTERM_MAX_COLS)
-      new_cols = VTERM_MAX_COLS;
+    إذا (new_خانے_گنتی > VTERM_MAX_خانے_گنتی)
+      new_خانے_گنتی = VTERM_MAX_خانے_گنتی;
 
-    screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * new_cols);
+    screen->sb_بفر = vterm_allocator_malloc(screen->vt, حجم(VTermScreenCell) * new_خانے_گنتی);
   }
 
-  if (new_rows > VTERM_MAX_ROWS)
-    new_rows = VTERM_MAX_ROWS;
+  إذا (new_صفاں > VTERM_MAX_صفاں)
+    new_صفاں = VTERM_MAX_صفاں;
 
-  resize_buffer(screen, 0, new_rows, new_cols, !altscreen_active, fields);
-  if(screen->buffers[BUFIDX_ALTSCREEN])
-    resize_buffer(screen, 1, new_rows, new_cols, altscreen_active, fields);
-  else if(new_rows != old_rows) {
+  resize_بفر(screen, 0, new_صفاں, new_خانے_گنتی, !altscreen_سرگرم, fields);
+  إذا(screen->buffers[BUFIDX_ALTSCREEN])
+    resize_بفر(screen, 1, new_صفاں, new_خانے_گنتی, altscreen_سرگرم, fields);
+  وإلا إذا(new_صفاں != old_صفاں) {
     /* We don't need a full resize of the altscreen because it isn't enabled
      * but we should at least keep the lineinfo the right size */
     vterm_allocator_free(screen->vt, fields->lineinfos[BUFIDX_ALTSCREEN]);
 
-    VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
-    for(int row = 0; row < new_rows; row++)
-      new_lineinfo[row] = (VTermLineInfo){ 0 };
+    VTerm_سطر_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, حجم(new_lineinfo[0]) * new_صفاں);
+    لكل(صحيح صف = 0; صف < new_صفاں; صف++)
+      new_lineinfo[صف] = (VTerm_سطر_Info){ 0 };
 
     fields->lineinfos[BUFIDX_ALTSCREEN] = new_lineinfo;
   }
 
-  screen->buffer = altscreen_active ? screen->buffers[BUFIDX_ALTSCREEN] : screen->buffers[BUFIDX_PRIMARY];
+  screen->بفر = altscreen_سرگرم ? screen->buffers[BUFIDX_ALTSCREEN] : screen->buffers[BUFIDX_PRIMARY];
 
-  screen->rows = new_rows;
-  screen->cols = new_cols;
+  screen->صفاں_2 = new_صفاں;
+  screen->خانے_گنتی = new_خانے_گنتی;
 
-  if(new_cols <= old_cols) {
-    if(screen->sb_buffer)
-      vterm_allocator_free(screen->vt, screen->sb_buffer);
+  إذا(new_خانے_گنتی <= old_خانے_گنتی) {
+    إذا(screen->sb_بفر)
+      vterm_allocator_free(screen->vt, screen->sb_بفر);
 
-    screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * new_cols);
+    screen->sb_بفر = vterm_allocator_malloc(screen->vt, حجم(VTermScreenCell) * new_خانے_گنتی);
   }
 
   /* TODO: Maaaaybe we can optimise this if there's no reflow happening */
   damagescreen(screen);
 
-  if(screen->callbacks && screen->callbacks->resize)
-    return (*screen->callbacks->resize)(new_rows, new_cols, screen->cbdata);
+  إذا(screen->callbacks && screen->callbacks->resize)
+    أرجع (*screen->callbacks->resize)(new_صفاں, new_خانے_گنتی, screen->cbdata);
 
-  return 1;
+  أرجع 1;
 }
 
-static int setlineinfo(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user)
+ساكن صحيح setlineinfo(صحيح صف, ثابت VTerm_سطر_Info *newinfo, ثابت VTerm_سطر_Info *oldinfo, فراغ *user)
 {
   VTermScreen *screen = user;
 
-  if(newinfo->doublewidth != oldinfo->doublewidth ||
+  إذا(newinfo->doublewidth != oldinfo->doublewidth ||
      newinfo->doubleheight != oldinfo->doubleheight) {
-    for(int col = 0; col < screen->cols; col++) {
-      ScreenCell *cell = getcell(screen, row, col);
-      if (cell == NULL)
+    لكل(صحيح خانہ = 0; خانہ < screen->خانے_گنتی; خانہ++) {
+      ScreenCell *cell = getcell(screen, صف, خانہ);
+      إذا (cell == عدم)
       {
         DEBUG_LOG2("libvterm: setlineinfo() position invalid: %d / %d",
-								     row, col);
-	return 1;
+								     صف, خانہ);
+	أرجع 1;
       }
       cell->pen.dwl = newinfo->doublewidth;
       cell->pen.dhl = newinfo->doubleheight;
     }
 
     VTermRect rect;
-    rect.start_row = row;
-    rect.end_row   = row + 1;
-    rect.start_col = 0;
-    rect.end_col   = newinfo->doublewidth ? screen->cols / 2 : screen->cols;
+    rect.شروع_صف = صف;
+    rect.سرا_صف   = صف + 1;
+    rect.شروع_خانہ = 0;
+    rect.سرا_خانہ   = newinfo->doublewidth ? screen->خانے_گنتی / 2 : screen->خانے_گنتی;
     damagerect(screen, rect);
 
-    if(newinfo->doublewidth) {
-      rect.start_col = screen->cols / 2;
-      rect.end_col   = screen->cols;
+    إذا(newinfo->doublewidth) {
+      rect.شروع_خانہ = screen->خانے_گنتی / 2;
+      rect.سرا_خانہ   = screen->خانے_گنتی;
 
-      erase_internal(rect, 0, user);
+      erase_اندرونی(rect, 0, user);
     }
   }
 
-  return 1;
+  أرجع 1;
 }
 
-static int sb_clear(void *user) {
+ساكن صحيح sb_clear(فراغ *user) {
   VTermScreen *screen = user;
 
-  if(screen->callbacks && screen->callbacks->sb_clear)
-    if((*screen->callbacks->sb_clear)(screen->cbdata))
-      return 1;
+  إذا(screen->callbacks && screen->callbacks->sb_clear)
+    إذا((*screen->callbacks->sb_clear)(screen->cbdata))
+      أرجع 1;
 
-  return 0;
+  أرجع 0;
 }
 
-static VTermStateCallbacks state_cbs = {
+ساكن VTermStateCallbacks state_cbs = {
   &putglyph, // putglyph
   &movecursor, // movecursor
   &scrollrect, // scrollrect
-  NULL, // moverect
+  عدم, // moverect
   &erase, // erase
-  NULL, // initpen
+  عدم, // initpen
   &setpenattr, // setpenattr
   &settermprop, // settermprop
   &bell, // bell
@@ -904,157 +904,157 @@ static VTermStateCallbacks state_cbs = {
  * Allocate a new screen and return it.
  * Return NULL when out of memory.
  */
-static VTermScreen *screen_new(VTerm *vt)
+ساكن VTermScreen *screen_new(VTerm *vt)
 {
   VTermState *state = vterm_obtain_state(vt);
-  if(!state)
-    return NULL;
+  إذا(!state)
+    أرجع عدم;
 
-  VTermScreen *screen = vterm_allocator_malloc(vt, sizeof(VTermScreen));
-  if (screen == NULL)
-    return NULL;
-  int rows, cols;
+  VTermScreen *screen = vterm_allocator_malloc(vt, حجم(VTermScreen));
+  إذا (screen == عدم)
+    أرجع عدم;
+  صحيح صفاں_2, خانے_گنتی;
 
-  vterm_get_size(vt, &rows, &cols);
+  vterm_get_ناپ(vt, &صفاں_2, &خانے_گنتی);
 
   screen->vt = vt;
   screen->state = state;
 
-  screen->damage_merge = VTERM_DAMAGE_CELL;
-  screen->damaged.start_row = -1;
-  screen->pending_scrollrect.start_row = -1;
+  screen->damage_ملاؤ = VTERM_DAMAGE_CELL;
+  screen->damaged.شروع_صف = -1;
+  screen->pending_scrollrect.شروع_صف = -1;
 
-  screen->rows = rows;
-  screen->cols = cols;
+  screen->صفاں_2 = صفاں_2;
+  screen->خانے_گنتی = خانے_گنتی;
 
-  screen->global_reverse = FALSE;
+  screen->global_الٹ = FALSE;
   screen->reflow = FALSE;
 
-  screen->callbacks = NULL;
-  screen->cbdata    = NULL;
+  screen->callbacks = عدم;
+  screen->cbdata    = عدم;
   screen->callbacks_has_pushline4 = 0;
 
-  screen->buffers[BUFIDX_PRIMARY] = alloc_buffer(screen, rows, cols);
+  screen->buffers[BUFIDX_PRIMARY] = alloc_بفر(screen, صفاں_2, خانے_گنتی);
 
-  screen->buffer = screen->buffers[BUFIDX_PRIMARY];
+  screen->بفر = screen->buffers[BUFIDX_PRIMARY];
 
-  screen->sb_buffer = vterm_allocator_malloc(screen->vt, sizeof(VTermScreenCell) * cols);
-  if (screen->buffer == NULL || screen->sb_buffer == NULL)
+  screen->sb_بفر = vterm_allocator_malloc(screen->vt, حجم(VTermScreenCell) * خانے_گنتی);
+  إذا (screen->بفر == عدم || screen->sb_بفر == عدم)
   {
     vterm_screen_free(screen);
-    return NULL;
+    أرجع عدم;
   }
 
-  vterm_state_set_callbacks(screen->state, &state_cbs, screen);
+  vterm_state_سیٹ_callbacks(screen->state, &state_cbs, screen);
   vterm_state_callbacks_has_premove(screen->state);
 
-  return screen;
+  أرجع screen;
 }
 
-INTERNAL void vterm_screen_free(VTermScreen *screen)
+اندرونی فراغ vterm_screen_free(VTermScreen *screen)
 {
   vterm_allocator_free(screen->vt, screen->buffers[BUFIDX_PRIMARY]);
-  if(screen->buffers[BUFIDX_ALTSCREEN])
+  إذا(screen->buffers[BUFIDX_ALTSCREEN])
     vterm_allocator_free(screen->vt, screen->buffers[BUFIDX_ALTSCREEN]);
 
-  vterm_allocator_free(screen->vt, screen->sb_buffer);
+  vterm_allocator_free(screen->vt, screen->sb_بفر);
 
   vterm_allocator_free(screen->vt, screen);
 }
 
-void vterm_screen_reset(VTermScreen *screen, int hard)
+فراغ vterm_screen_reset(VTermScreen *screen, صحيح hard)
 {
-  screen->damaged.start_row = -1;
-  screen->pending_scrollrect.start_row = -1;
+  screen->damaged.شروع_صف = -1;
+  screen->pending_scrollrect.شروع_صف = -1;
   vterm_state_reset(screen->state, hard);
   vterm_screen_flush_damage(screen);
 }
 
-static size_t _get_chars(const VTermScreen *screen, const int utf8, void *buffer, size_t len, const VTermRect rect)
+ساكن size_t _get_chars(ثابت VTermScreen *screen, ثابت صحيح utf8, فراغ *بفر, size_t len, ثابت VTermRect rect)
 {
   size_t outpos = 0;
-  int padding = 0;
+  صحيح padding = 0;
 
-#define PUT(c)                                             \
-  if(utf8) {                                               \
+#تعریف_کرو PUT(c)                                             \
+  إذا(utf8) {                                               \
     size_t thislen = utf8_seqlen(c);                       \
-    if(buffer && outpos + thislen <= len)                  \
-      outpos += fill_utf8((c), (char *)buffer + outpos);   \
-    else                                                   \
+    إذا(بفر && outpos + thislen <= len)                  \
+      outpos += fill_utf8((c), (حرف *)بفر + outpos);   \
+    وإلا                                                   \
       outpos += thislen;                                   \
   }                                                        \
-  else {                                                   \
-    if(buffer && outpos + 1 <= len)                        \
-      ((uint32_t*)buffer)[outpos++] = (c);                 \
-    else                                                   \
+  وإلا {                                                   \
+    إذا(بفر && outpos + 1 <= len)                        \
+      ((uint32_t*)بفر)[outpos++] = (c);                 \
+    وإلا                                                   \
       outpos++;                                            \
   }
 
-  for(int row = rect.start_row; row < rect.end_row; row++) {
-    for(int col = rect.start_col; col < rect.end_col; col++) {
-      ScreenCell *cell = getcell(screen, row, col);
+  لكل(صحيح صف = rect.شروع_صف; صف < rect.سرا_صف; صف++) {
+    لكل(صحيح خانہ = rect.شروع_خانہ; خانہ < rect.سرا_خانہ; خانہ++) {
+      ScreenCell *cell = getcell(screen, صف, خانہ);
 
-      if (cell == NULL)
+      إذا (cell == عدم)
       {
         DEBUG_LOG2("libvterm: _get_chars() position invalid: %d / %d",
-								     row, col);
-	return 1;
+								     صف, خانہ);
+	أرجع 1;
       }
-      if(cell->chars[0] == 0)
+      إذا(cell->chars[0] == 0)
         // Erased cell, might need a space
         padding++;
-      else if(cell->chars[0] == (uint32_t)-1)
+      وإلا إذا(cell->chars[0] == (uint32_t)-1)
         // Gap behind a double-width char, do nothing
         ;
-      else {
-        while(padding) {
+      وإلا {
+        طالما(padding) {
           PUT(UNICODE_SPACE);
           padding--;
         }
-        for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell->chars[i]; i++) {
+        لكل(صحيح i = 0; i < VTERM_MAX_CHARS_فی_CELL && cell->chars[i]; i++) {
           PUT(cell->chars[i]);
         }
       }
     }
 
-    if(row < rect.end_row - 1) {
+    إذا(صف < rect.سرا_صف - 1) {
       PUT(UNICODE_LINEFEED);
       padding = 0;
     }
   }
 
-  return outpos;
+  أرجع outpos;
 }
 
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect)
+size_t vterm_screen_get_chars(ثابت VTermScreen *screen, uint32_t *chars, size_t len, ثابت VTermRect rect)
 {
-  return _get_chars(screen, 0, chars, len, rect);
+  أرجع _get_chars(screen, 0, chars, len, rect);
 }
 
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect)
+size_t vterm_screen_get_متن(ثابت VTermScreen *screen, حرف *str, size_t len, ثابت VTermRect rect)
 {
-  return _get_chars(screen, 1, str, len, rect);
+  أرجع _get_chars(screen, 1, str, len, rect);
 }
 
 /* Copy internal to external representation of a screen cell */
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell)
+صحيح vterm_screen_get_cell(ثابت VTermScreen *screen, VTermPos pos, VTermScreenCell *cell)
 {
-  ScreenCell *intcell = getcell(screen, pos.row, pos.col);
+  ScreenCell *intcell = getcell(screen, pos.صف, pos.خانہ);
 
-  if(!intcell)
-    return 0;
+  إذا(!intcell)
+    أرجع 0;
 
-  for(int i = 0; i < VTERM_MAX_CHARS_PER_CELL; i++) {
+  لكل(صحيح i = 0; i < VTERM_MAX_CHARS_فی_CELL; i++) {
     cell->chars[i] = intcell->chars[i];
-    if(!intcell->chars[i])
-      break;
+    إذا(!intcell->chars[i])
+      اكسر;
   }
 
   cell->attrs.bold      = intcell->pen.bold;
   cell->attrs.underline = intcell->pen.underline;
   cell->attrs.italic    = intcell->pen.italic;
   cell->attrs.blink     = intcell->pen.blink;
-  cell->attrs.reverse   = intcell->pen.reverse ^ screen->global_reverse;
+  cell->attrs.الٹ   = intcell->pen.الٹ ^ screen->global_الٹ;
   cell->attrs.conceal   = intcell->pen.conceal;
   cell->attrs.strike    = intcell->pen.strike;
   cell->attrs.font      = intcell->pen.font;
@@ -1067,54 +1067,54 @@ int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCe
   cell->fg = intcell->pen.fg;
   cell->bg = intcell->pen.bg;
 
-  if(vterm_get_special_pty_type() == 2) {
+  إذا(vterm_get_special_pty_type() == 2) {
     // Get correct cell width from cell information contained in line buffer
-    if(pos.col < (screen->cols - 1) &&
-       getcell(screen, pos.row, pos.col + 1)->chars[0] == (uint32_t)-1) {
-      if(getcell(screen, pos.row, pos.col)->chars[0] == 0x20) {
-        getcell(screen, pos.row, pos.col)->chars[0] = 0;
-        cell->width = 2;
-      } else if(getcell(screen, pos.row, pos.col)->chars[0] == 0) {
-        getcell(screen, pos.row, pos.col + 1)->chars[0] = 0;
-        cell->width = 1;
-      } else {
-        cell->width = 2;
+    إذا(pos.خانہ < (screen->خانے_گنتی - 1) &&
+       getcell(screen, pos.صف, pos.خانہ + 1)->chars[0] == (uint32_t)-1) {
+      إذا(getcell(screen, pos.صف, pos.خانہ)->chars[0] == 0x20) {
+        getcell(screen, pos.صف, pos.خانہ)->chars[0] = 0;
+        cell->چوڑائی = 2;
+      } وإلا إذا(getcell(screen, pos.صف, pos.خانہ)->chars[0] == 0) {
+        getcell(screen, pos.صف, pos.خانہ + 1)->chars[0] = 0;
+        cell->چوڑائی = 1;
+      } وإلا {
+        cell->چوڑائی = 2;
       }
-    } else
-      cell->width = 1;
-  } else {
-    if(pos.col < (screen->cols - 1) &&
-       getcell(screen, pos.row, pos.col + 1)->chars[0] == (uint32_t)-1)
-      cell->width = 2;
-    else
-      cell->width = 1;
+    } وإلا
+      cell->چوڑائی = 1;
+  } وإلا {
+    إذا(pos.خانہ < (screen->خانے_گنتی - 1) &&
+       getcell(screen, pos.صف, pos.خانہ + 1)->chars[0] == (uint32_t)-1)
+      cell->چوڑائی = 2;
+    وإلا
+      cell->چوڑائی = 1;
   }
 
-  return 1;
+  أرجع 1;
 }
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos)
+صحيح vterm_screen_is_eol(ثابت VTermScreen *screen, VTermPos pos)
 {
   /* This cell is EOL if this and every cell to the right is black */
-  for(; pos.col < screen->cols; pos.col++) {
-    ScreenCell *cell = getcell(screen, pos.row, pos.col);
-    if(cell->chars[0] != 0)
-      return 0;
+  لكل(; pos.خانہ < screen->خانے_گنتی; pos.خانہ++) {
+    ScreenCell *cell = getcell(screen, pos.صف, pos.خانہ);
+    إذا(cell->chars[0] != 0)
+      أرجع 0;
   }
 
-  return 1;
+  أرجع 1;
 }
 
 VTermScreen *vterm_obtain_screen(VTerm *vt)
 {
-  if(vt->screen)
-    return vt->screen;
+  إذا(vt->screen)
+    أرجع vt->screen;
 
   vt->screen = screen_new(vt);
-  return vt->screen;
+  أرجع vt->screen;
 }
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow)
+فراغ vterm_screen_enable_reflow(VTermScreen *screen, صحيح reflow)
 {
   screen->reflow = reflow;
 }
@@ -1126,157 +1126,157 @@ void vterm_screen_enable_reflow(VTermScreen *screen, int reflow)
 //   vterm_screen_enable_reflow(screen, reflow);
 // }
 
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen)
+فراغ vterm_screen_enable_altscreen(VTermScreen *screen, صحيح altscreen)
 {
-  if(!screen->buffers[BUFIDX_ALTSCREEN] && altscreen) {
-    int rows, cols;
-    vterm_get_size(screen->vt, &rows, &cols);
+  إذا(!screen->buffers[BUFIDX_ALTSCREEN] && altscreen) {
+    صحيح صفاں_2, خانے_گنتی;
+    vterm_get_ناپ(screen->vt, &صفاں_2, &خانے_گنتی);
 
-    screen->buffers[BUFIDX_ALTSCREEN] = alloc_buffer(screen, rows, cols);
+    screen->buffers[BUFIDX_ALTSCREEN] = alloc_بفر(screen, صفاں_2, خانے_گنتی);
   }
 }
 
-void vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user)
+فراغ vterm_screen_سیٹ_callbacks(VTermScreen *screen, ثابت VTermScreenCallbacks *callbacks, فراغ *user)
 {
   screen->callbacks = callbacks;
   screen->cbdata = user;
 }
 
-void *vterm_screen_get_cbdata(VTermScreen *screen)
+فراغ *vterm_screen_get_cbdata(VTermScreen *screen)
 {
-  return screen->cbdata;
+  أرجع screen->cbdata;
 }
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen)
+فراغ vterm_screen_callbacks_has_pushline4(VTermScreen *screen)
 {
   screen->callbacks_has_pushline4 = 1;
 }
 
-void vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user)
+فراغ vterm_screen_سیٹ_unrecognised_fallbacks(VTermScreen *screen, ثابت VTermStateFallbacks *fallbacks, فراغ *user)
 {
-  vterm_state_set_unrecognised_fallbacks(screen->state, fallbacks, user);
+  vterm_state_سیٹ_unrecognised_fallbacks(screen->state, fallbacks, user);
 }
 
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen)
+فراغ *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen)
 {
-  return vterm_state_get_unrecognised_fbdata(screen->state);
+  أرجع vterm_state_get_unrecognised_fbdata(screen->state);
 }
 
-void vterm_screen_flush_damage(VTermScreen *screen)
+فراغ vterm_screen_flush_damage(VTermScreen *screen)
 {
-  if(screen->pending_scrollrect.start_row != -1) {
+  إذا(screen->pending_scrollrect.شروع_صف != -1) {
     vterm_scroll_rect(screen->pending_scrollrect, screen->pending_scroll_downward, screen->pending_scroll_rightward,
         moverect_user, erase_user, screen);
 
-    screen->pending_scrollrect.start_row = -1;
+    screen->pending_scrollrect.شروع_صف = -1;
   }
 
-  if(screen->damaged.start_row != -1) {
-    if(screen->callbacks && screen->callbacks->damage)
+  إذا(screen->damaged.شروع_صف != -1) {
+    إذا(screen->callbacks && screen->callbacks->damage)
       (*screen->callbacks->damage)(screen->damaged, screen->cbdata);
 
-    screen->damaged.start_row = -1;
+    screen->damaged.شروع_صف = -1;
   }
 }
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size)
+فراغ vterm_screen_سیٹ_damage_ملاؤ(VTermScreen *screen, VTerm_Damage_ناپ ناپ)
 {
   vterm_screen_flush_damage(screen);
-  screen->damage_merge = size;
+  screen->damage_ملاؤ = ناپ;
 }
 
-static int attrs_differ(VTermAttrMask attrs, ScreenCell *a, ScreenCell *b)
+ساكن صحيح attrs_فرق(VTerm_Attr_نقاب attrs, ScreenCell *a, ScreenCell *b)
 {
-  if((attrs & VTERM_ATTR_BOLD_MASK)       && (a->pen.bold != b->pen.bold))
-    return 1;
-  if((attrs & VTERM_ATTR_UNDERLINE_MASK)  && (a->pen.underline != b->pen.underline))
-    return 1;
-  if((attrs & VTERM_ATTR_ITALIC_MASK)     && (a->pen.italic != b->pen.italic))
-    return 1;
-  if((attrs & VTERM_ATTR_BLINK_MASK)      && (a->pen.blink != b->pen.blink))
-    return 1;
-  if((attrs & VTERM_ATTR_REVERSE_MASK)    && (a->pen.reverse != b->pen.reverse))
-    return 1;
-  if((attrs & VTERM_ATTR_CONCEAL_MASK)    && (a->pen.conceal != b->pen.conceal))
-    return 1;
-  if((attrs & VTERM_ATTR_STRIKE_MASK)     && (a->pen.strike != b->pen.strike))
-    return 1;
-  if((attrs & VTERM_ATTR_FONT_MASK)       && (a->pen.font != b->pen.font))
-    return 1;
-  if((attrs & VTERM_ATTR_FOREGROUND_MASK) && !vterm_color_is_equal(&a->pen.fg, &b->pen.fg))
-    return 1;
-  if((attrs & VTERM_ATTR_BACKGROUND_MASK) && !vterm_color_is_equal(&a->pen.bg, &b->pen.bg))
-    return 1;
-  if((attrs & VTERM_ATTR_SMALL_MASK)    && (a->pen.small != b->pen.small))
-    return 1;
-  if((attrs & VTERM_ATTR_BASELINE_MASK)    && (a->pen.baseline != b->pen.baseline))
-    return 1;
+  إذا((attrs & VTERM_ATTR_BOLD_نقاب)       && (a->pen.bold != b->pen.bold))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_UNDERLINE_نقاب)  && (a->pen.underline != b->pen.underline))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_ITALIC_نقاب)     && (a->pen.italic != b->pen.italic))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_BLINK_نقاب)      && (a->pen.blink != b->pen.blink))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_الٹ_نقاب)    && (a->pen.الٹ != b->pen.الٹ))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_CONCEAL_نقاب)    && (a->pen.conceal != b->pen.conceal))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_STRIKE_نقاب)     && (a->pen.strike != b->pen.strike))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_FONT_نقاب)       && (a->pen.font != b->pen.font))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_FOREGROUND_نقاب) && !vterm_color_is_equal(&a->pen.fg, &b->pen.fg))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_BACKGROUND_نقاب) && !vterm_color_is_equal(&a->pen.bg, &b->pen.bg))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_SMALL_نقاب)    && (a->pen.small != b->pen.small))
+    أرجع 1;
+  إذا((attrs & VTERM_ATTR_BASELINE_نقاب)    && (a->pen.baseline != b->pen.baseline))
+    أرجع 1;
 
-  return 0;
+  أرجع 0;
 }
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs)
+صحيح vterm_screen_get_attrs_extent(ثابت VTermScreen *screen, VTermRect *extent, VTermPos pos, VTerm_Attr_نقاب attrs)
 {
-  ScreenCell *target = getcell(screen, pos.row, pos.col);
+  ScreenCell *نشانہ = getcell(screen, pos.صف, pos.خانہ);
 
   // TODO: bounds check
-  extent->start_row = pos.row;
-  extent->end_row   = pos.row + 1;
+  extent->شروع_صف = pos.صف;
+  extent->سرا_صف   = pos.صف + 1;
 
-  if(extent->start_col < 0)
-    extent->start_col = 0;
-  if(extent->end_col < 0)
-    extent->end_col = screen->cols;
+  إذا(extent->شروع_خانہ < 0)
+    extent->شروع_خانہ = 0;
+  إذا(extent->سرا_خانہ < 0)
+    extent->سرا_خانہ = screen->خانے_گنتی;
 
-  int col;
+  صحيح خانہ;
 
-  for(col = pos.col - 1; col >= extent->start_col; col--)
-    if(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
-      break;
-  extent->start_col = col + 1;
+  لكل(خانہ = pos.خانہ - 1; خانہ >= extent->شروع_خانہ; خانہ--)
+    إذا(attrs_فرق(attrs, نشانہ, getcell(screen, pos.صف, خانہ)))
+      اكسر;
+  extent->شروع_خانہ = خانہ + 1;
 
-  for(col = pos.col + 1; col < extent->end_col; col++)
-    if(attrs_differ(attrs, target, getcell(screen, pos.row, col)))
-      break;
-  extent->end_col = col - 1;
+  لكل(خانہ = pos.خانہ + 1; خانہ < extent->سرا_خانہ; خانہ++)
+    إذا(attrs_فرق(attrs, نشانہ, getcell(screen, pos.صف, خانہ)))
+      اكسر;
+  extent->سرا_خانہ = خانہ - 1;
 
-  return 1;
+  أرجع 1;
 }
 
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col)
+فراغ vterm_screen_convert_color_منزل_rgb(ثابت VTermScreen *screen, VTermColor *خانہ)
 {
-  vterm_state_convert_color_to_rgb(screen->state, col);
+  vterm_state_convert_color_منزل_rgb(screen->state, خانہ);
 }
 
-static void reset_default_colours(VTermScreen *screen, ScreenCell *buffer)
+ساكن فراغ reset_default_colours(VTermScreen *screen, ScreenCell *بفر)
 {
-  for(int row = 0; row <= screen->rows - 1; row++)
-    for(int col = 0; col <= screen->cols - 1; col++) {
-      ScreenCell *cell = &buffer[row * screen->cols + col];
-      if(VTERM_COLOR_IS_DEFAULT_FG(&cell->pen.fg))
+  لكل(صحيح صف = 0; صف <= screen->صفاں_2 - 1; صف++)
+    لكل(صحيح خانہ = 0; خانہ <= screen->خانے_گنتی - 1; خانہ++) {
+      ScreenCell *cell = &بفر[صف * screen->خانے_گنتی + خانہ];
+      إذا(VTERM_COLOR_IS_DEFAULT_FG(&cell->pen.fg))
         cell->pen.fg = screen->pen.fg;
-      if(VTERM_COLOR_IS_DEFAULT_BG(&cell->pen.bg))
+      إذا(VTERM_COLOR_IS_DEFAULT_BG(&cell->pen.bg))
         cell->pen.bg = screen->pen.bg;
     }
 }
 
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg)
+فراغ vterm_screen_سیٹ_default_colors(VTermScreen *screen, ثابت VTermColor *default_fg, ثابت VTermColor *default_bg)
 {
-  vterm_state_set_default_colors(screen->state, default_fg, default_bg);
+  vterm_state_سیٹ_default_colors(screen->state, default_fg, default_bg);
 
-  if(default_fg && VTERM_COLOR_IS_DEFAULT_FG(&screen->pen.fg)) {
+  إذا(default_fg && VTERM_COLOR_IS_DEFAULT_FG(&screen->pen.fg)) {
     screen->pen.fg = *default_fg;
-    screen->pen.fg.type = (screen->pen.fg.type & ~VTERM_COLOR_DEFAULT_MASK)
+    screen->pen.fg.type = (screen->pen.fg.type & ~VTERM_COLOR_DEFAULT_نقاب)
                         | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg && VTERM_COLOR_IS_DEFAULT_BG(&screen->pen.bg)) {
+  إذا(default_bg && VTERM_COLOR_IS_DEFAULT_BG(&screen->pen.bg)) {
     screen->pen.bg = *default_bg;
-    screen->pen.bg.type = (screen->pen.bg.type & ~VTERM_COLOR_DEFAULT_MASK)
+    screen->pen.bg.type = (screen->pen.bg.type & ~VTERM_COLOR_DEFAULT_نقاب)
                         | VTERM_COLOR_DEFAULT_BG;
   }
 
   reset_default_colours(screen, screen->buffers[0]);
-  if(screen->buffers[1])
+  إذا(screen->buffers[1])
     reset_default_colours(screen, screen->buffers[1]);
 }

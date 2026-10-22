@@ -1,4 +1,4 @@
 #!/usr/bin/python3
 
-import sys
-print(sys.version)
+استورد sys
+چھاپو(sys.نسخہ_2)

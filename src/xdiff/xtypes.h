@@ -20,43 +20,43 @@
  *
  */
 
-#if !defined(XTYPES_H)
-#define XTYPES_H
+#إذا !defined(XTYPES_H)
+#تعریف_کرو XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
+تعريفنوع بنية s_chanode {
+	بنية s_chanode *اگلا;
+	لما icurr;
 } chanode_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
-	long isize, nsize;
+تعريفنوع بنية s_chastore {
+	chanode_t *سر, *پوچھ;
+	لما isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
-	long scurr;
+	لما scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
-	unsigned long ha;
+تعريفنوع بنية s_xrecord {
+	حرف ثابت *ptr;
+	لما ناپ;
+	بنانشانی لما ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+تعريفنوع بنية s_xdfile {
 	xrecord_t *recs;
-	long nrec;
-	long dstart, dend;
-	bool *changed;
-	long *rindex;
-	long nreff;
+	لما nrec;
+	لما dstart, dend;
+	bool *بدلیا;
+	لما *rindex;
+	لما nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+تعريفنوع بنية s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 
 
 
-#endif /* #if !defined(XTYPES_H) */
+#جے_انت /* #if !defined(XTYPES_H) */

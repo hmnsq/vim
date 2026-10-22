@@ -11,7 +11,7 @@
  * register.c: functions for managing registers
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 /*
  * Registers:
@@ -23,92 +23,92 @@
  *     38 = Clipboard register '+'. Only if FEAT_CLIPBOARD and FEAT_X11
  *                                  or FEAT_WAYLAND_CLIPBOARD defined
  */
-static yankreg_T	y_regs[NUM_REGISTERS];
+ساكن yankreg_T	y_regs[عدد_REGISTERS];
 
-static yankreg_T	*y_current;	    // ptr to current yankreg
-static int		y_append;	    // TRUE when appending
-static yankreg_T	*y_previous = NULL; // ptr to last written yankreg
+ساكن yankreg_T	*y_current;	    // ptr to current yankreg
+ساكن صحيح		y_append;	    // TRUE when appending
+ساكن yankreg_T	*y_پچھلا = عدم; // ptr to last written yankreg
 
-static int	stuff_yank(int, char_u *);
-static void	put_reedit_in_typebuf(int silent);
-static int	put_in_typebuf(char_u *s, int esc, int colon, int silent);
-static int	yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space);
-#ifdef HAVE_CLIPMETHOD
-static void	copy_yank_reg(yankreg_T *reg);
-#endif
-static void	dis_msg(char_u *p, int skip_esc);
+ساكن صحيح	stuff_yank(صحيح, char_u *);
+ساكن فراغ	put_reedit_وچ_typebuf(صحيح silent);
+ساكن صحيح	put_وچ_typebuf(char_u *s, صحيح esc, صحيح colon, صحيح silent);
+ساكن صحيح	yank_copy_سطر(بنية بلاک_def *bd, لما y_idx, صحيح exclude_trailing_space);
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
+ساكن فراغ	copy_yank_reg(yankreg_T *reg);
+#جے_انت
+ساكن فراغ	dis_پیغام(char_u *p, صحيح skip_esc);
 
-#if defined(FEAT_VIMINFO)
+#إذا defined(FEAT_VIMINFO)
     yankreg_T *
-get_y_regs(void)
+get_y_regs(فراغ)
 {
-    return y_regs;
+    أرجع y_regs;
 }
-#endif
+#جے_انت
 
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+#إذا defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
     yankreg_T *
-get_y_register(int reg)
+get_y_رجسٹر(صحيح reg)
 {
-    return &y_regs[reg];
+    أرجع &y_regs[reg];
 }
-#endif
-
-    yankreg_T *
-get_y_current(void)
-{
-    return y_current;
-}
+#جے_انت
 
     yankreg_T *
-get_y_previous(void)
+get_y_current(فراغ)
 {
-    return y_previous;
+    أرجع y_current;
 }
 
-    void
-set_y_current(yankreg_T *yreg)
+    yankreg_T *
+get_y_پچھلا(فراغ)
+{
+    أرجع y_پچھلا;
+}
+
+    فراغ
+سیٹ_y_current(yankreg_T *yreg)
 {
     y_current = yreg;
 }
 
-    void
-set_y_previous(yankreg_T *yreg)
+    فراغ
+سیٹ_y_پچھلا(yankreg_T *yreg)
 {
-    y_previous = yreg;
+    y_پچھلا = yreg;
 }
 
-    void
-reset_y_append(void)
+    فراغ
+reset_y_append(فراغ)
 {
     y_append = FALSE;
 }
 
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Keep the last expression line here, for repeating.
  */
-static char_u	*expr_line = NULL;
-static exarg_T	*expr_eap = NULL;
+ساكن char_u	*اظہاریہ_سطر = عدم;
+ساكن exarg_T	*اظہاریہ_eap = عدم;
 
 /*
  * Get an expression for the "\"=expr1" or "CTRL-R =expr1"
  * Returns '=' when OK, NUL otherwise.
  */
-    int
-get_expr_register(void)
+    صحيح
+get_اظہاریہ_رجسٹر(فراغ)
 {
-    char_u	*new_line;
+    char_u	*new_سطر;
 
-    new_line = getcmdline('=', 0L, 0, 0);
-    if (new_line == NULL)
-	return NUL;
-    if (*new_line == NUL)	// use previous line
-	vim_free(new_line);
-    else
-	set_expr_line(new_line, NULL);
-    return '=';
+    new_سطر = getcmdline('=', 0L, 0, 0);
+    إذا (new_سطر == عدم)
+	أرجع NUL;
+    إذا (*new_سطر == NUL)	// use previous line
+	vim_free(new_سطر);
+    وإلا
+	سیٹ_اظہاریہ_سطر(new_سطر, عدم);
+    أرجع '=';
 }
 
 /*
@@ -117,12 +117,12 @@ get_expr_register(void)
  * "eap" may be used if the next line needs to be checked when evaluating the
  * expression.
  */
-    void
-set_expr_line(char_u *new_line, exarg_T *eap)
+    فراغ
+سیٹ_اظہاریہ_سطر(char_u *new_سطر, exarg_T *eap)
 {
-    vim_free(expr_line);
-    expr_line = new_line;
-    expr_eap = eap;
+    vim_free(اظہاریہ_سطر);
+    اظہاریہ_سطر = new_سطر;
+    اظہاریہ_eap = eap;
 }
 
 /*
@@ -130,92 +130,92 @@ set_expr_line(char_u *new_line, exarg_T *eap)
  * Returns a pointer to allocated memory, or NULL for failure.
  */
     char_u *
-get_expr_line(void)
+get_اظہاریہ_سطر(فراغ)
 {
-    char_u	*expr_copy;
+    char_u	*اظہاریہ_copy;
     char_u	*rv;
-    static int	nested = 0;
+    ساكن صحيح	nested = 0;
 
-    if (expr_line == NULL)
-	return NULL;
+    إذا (اظہاریہ_سطر == عدم)
+	أرجع عدم;
 
     // Make a copy of the expression, because evaluating it may cause it to be
     // changed.
-    expr_copy = vim_strsave(expr_line);
-    if (expr_copy == NULL)
-	return NULL;
+    اظہاریہ_copy = vim_strsave(اظہاریہ_سطر);
+    إذا (اظہاریہ_copy == عدم)
+	أرجع عدم;
 
     // When we are invoked recursively limit the evaluation to 10 levels.
     // Then return the string as-is.
-    if (nested >= 10)
-	return expr_copy;
+    إذا (nested >= 10)
+	أرجع اظہاریہ_copy;
 
     ++nested;
-    rv = eval_to_string_eap(expr_copy, TRUE, expr_eap, FALSE);
+    rv = eval_منزل_string_eap(اظہاریہ_copy, TRUE, اظہاریہ_eap, FALSE);
     --nested;
-    vim_free(expr_copy);
-    return rv;
+    vim_free(اظہاریہ_copy);
+    أرجع rv;
 }
 
 /*
  * Get the '=' register expression itself, without evaluating it.
  */
-    static char_u *
-get_expr_line_src(void)
+    ساكن char_u *
+get_اظہاریہ_سطر_src(فراغ)
 {
-    if (expr_line == NULL)
-	return NULL;
-    return vim_strsave(expr_line);
+    إذا (اظہاریہ_سطر == عدم)
+	أرجع عدم;
+    أرجع vim_strsave(اظہاریہ_سطر);
 }
-#endif // FEAT_EVAL
+#جے_انت // FEAT_EVAL
 
 /*
  * Check if 'regname' is a valid name of a yank register.
  * Note: There is no check for 0 (default register), caller should do this
  */
-    int
+    صحيح
 valid_yank_reg(
-    int	    regname,
-    int	    writing)	    // if TRUE check for writable registers
+    صحيح	    regname,
+    صحيح	    writing)	    // if TRUE check for writable registers
 {
-    if (       (regname > 0 && ASCII_ISALNUM(regname))
+    إذا (       (regname > 0 && ASCII_ISALNUM(regname))
 	    || (!writing && vim_strchr((char_u *)
-#ifdef FEAT_EVAL
+#جے_تعریف_شدہ FEAT_EVAL
 				    "/#.%:="
-#else
+#وإلا
 				    "/#.%:"
-#endif
-					, regname) != NULL)
+#جے_انت
+					, regname) != عدم)
 	    || regname == '"'
 	    || regname == '-'
 	    || regname == '_'
-#if defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
+#إذا defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
 			    // always exist.
 	    || regname == '*'
 	    || regname == '+'
-#elif defined(FEAT_CLIPBOARD_PROVIDER)
+#وإلاإذا defined(FEAT_CLIPBOARD_PROVIDER)
 	    || ( // If -clipboard, then these registers only exist when
 		 // clipmethod is set to provider.
 	     clipmethod == CLIPMETHOD_PROVIDER && (
 		 regname == '*'
 		 || regname == '+'
 	    ))
-#endif
-#ifdef FEAT_DND
+#جے_انت
+#جے_تعریف_شدہ FEAT_DND
 	    || (!writing && regname == '~')
-#endif
+#جے_انت
 							)
-	return TRUE;
-#ifndef FEAT_CLIPBOARD
+	أرجع TRUE;
+#جے_بنا_تعریف FEAT_CLIPBOARD
     // clipboard support not enabled in this build
-    else if (regname == '*' || regname == '+')
+    وإلا إذا (regname == '*' || regname == '+')
     {
 	// Warn about missing clipboard support once
-	msg_warn_missing_clipboard();
-	return FALSE;
+	پیغام_warn_missing_clipboard();
+	أرجع FALSE;
     }
-#endif
-    return FALSE;
+#جے_انت
+    أرجع FALSE;
 }
 
 /*
@@ -229,167 +229,167 @@ valid_yank_reg(
  * Return TRUE when the register should be inserted literally (selection or
  * clipboard).
  */
-    int
-get_yank_register(int regname, int writing)
+    صحيح
+get_yank_رجسٹر(صحيح regname, صحيح writing)
 {
-    int	    i;
-    int	    ret = FALSE;
+    صحيح	    i;
+    صحيح	    ret = FALSE;
 
     y_append = FALSE;
-    if ((regname == 0 || regname == '"') && !writing && y_previous != NULL)
+    إذا ((regname == 0 || regname == '"') && !writing && y_پچھلا != عدم)
     {
-	y_current = y_previous;
-	return ret;
+	y_current = y_پچھلا;
+	أرجع ret;
     }
     i = regname;
-    if (VIM_ISDIGIT(i))
+    إذا (VIM_ISDIGIT(i))
 	i -= '0';
-    else if (ASCII_ISLOWER(i))
-	i = CharOrdLow(i) + 10;
-    else if (ASCII_ISUPPER(i))
+    وإلا إذا (ASCII_ISLOWER(i))
+	i = Char_Ord_کم(i) + 10;
+    وإلا إذا (ASCII_ISUPPER(i))
     {
-	i = CharOrdUp(i) + 10;
+	i = Char_Ord_اتے(i) + 10;
 	y_append = TRUE;
     }
-    else if (regname == '-')
-	i = DELETION_REGISTER;
-#ifdef FEAT_CLIPBOARD
+    وإلا إذا (regname == '-')
+	i = DELETION_رجسٹر;
+#جے_تعریف_شدہ FEAT_CLIPBOARD
     // When selection is not available, use register 0 instead of '*'
-    else if (clip_star.available && regname == '*')
+    وإلا إذا (clip_تارا.دستیاب && regname == '*')
     {
-	i = STAR_REGISTER;
+	i = تارا_رجسٹر;
 	ret = TRUE;
     }
     // When clipboard is not available, use register 0 instead of '+'
-    else if (clip_plus.available && regname == '+')
+    وإلا إذا (clip_plus.دستیاب && regname == '+')
     {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	// We want to use the actual + register, since PLUS_REGISTER may be
 	// pointing to STAR_REGISTER.
-	if (clipmethod == CLIPMETHOD_PROVIDER)
-	    i = REAL_PLUS_REGISTER;
-	else
+	إذا (clipmethod == CLIPMETHOD_PROVIDER)
+	    i = REAL_PLUS_رجسٹر;
+	وإلا
 # endif
-	    i = PLUS_REGISTER;
+	    i = PLUS_رجسٹر;
 	ret = TRUE;
     }
-#elif defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (regname == '*')
+#وإلاإذا defined(FEAT_CLIPBOARD_PROVIDER)
+    وإلا إذا (regname == '*')
     {
-	i = STAR_REGISTER;
+	i = تارا_رجسٹر;
 	ret = TRUE;
     }
-    else if (regname == '+')
+    وإلا إذا (regname == '+')
     {
-	i = REAL_PLUS_REGISTER;
+	i = REAL_PLUS_رجسٹر;
 	ret = TRUE;
     }
-#endif
-#ifdef FEAT_DND
-    else if (!writing && regname == '~')
-	i = TILDE_REGISTER;
-#endif
-    else		// not 0-9, a-z, A-Z or '-': use register 0
+#جے_انت
+#جے_تعریف_شدہ FEAT_DND
+    وإلا إذا (!writing && regname == '~')
+	i = TILDE_رجسٹر;
+#جے_انت
+    وإلا		// not 0-9, a-z, A-Z or '-': use register 0
 	i = 0;
     y_current = &(y_regs[i]);
-    if (writing)	// remember the register we write into for do_put()
-	y_previous = y_current;
-    return ret;
+    إذا (writing)	// remember the register we write into for do_put()
+	y_پچھلا = y_current;
+    أرجع ret;
 }
 
 /*
  * Obtain the contents of a "normal" register. The register is made empty.
  * The returned pointer has allocated memory, use put_register() later.
  */
-    void *
-get_register(
-    int		name,
-    int		copy)	// make a copy, if FALSE make register empty.
+    فراغ *
+get_رجسٹر(
+    صحيح		name,
+    صحيح		copy)	// make a copy, if FALSE make register empty.
 {
     yankreg_T	*reg;
-    int		i;
+    صحيح		i;
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(name);
-#endif
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// When Visual area changed, may have to update selection.  Obtain the
 	// selection too.
-	if (name == '*' && clip_star.available)
+	إذا (name == '*' && clip_تارا.دستیاب)
 	{
-	    if (clip_isautosel_star())
-		clip_update_selection(&clip_star);
+	    إذا (clip_isautosel_تارا())
+		clip_update_selection(&clip_تارا);
 	    may_get_selection(name);
 	}
-	if (name == '+' && clip_plus.available)
+	إذا (name == '+' && clip_plus.دستیاب)
 	{
-	    if (clip_isautosel_plus())
+	    إذا (clip_isautosel_plus())
 		clip_update_selection(&clip_plus);
 	    may_get_selection(name);
 	}
     }
-#endif
+#جے_انت
 
-    get_yank_register(name, 0);
+    get_yank_رجسٹر(name, 0);
     reg = ALLOC_ONE(yankreg_T);
-    if (reg == NULL)
-	return (void *)NULL;
+    إذا (reg == عدم)
+	أرجع (فراغ *)عدم;
 
     *reg = *y_current;
-    if (copy)
+    إذا (copy)
     {
 	// If we run out of memory some or all of the lines are empty.
-	if (reg->y_size == 0 || y_current->y_array == NULL)
-	    reg->y_array = NULL;
-	else
-	    reg->y_array = ALLOC_MULT(string_T, reg->y_size);
-	if (reg->y_array != NULL)
+	إذا (reg->y_ناپ == 0 || y_current->y_array == عدم)
+	    reg->y_array = عدم;
+	وإلا
+	    reg->y_array = ALLOC_MULT(string_T, reg->y_ناپ);
+	إذا (reg->y_array != عدم)
 	{
-	    for (i = 0; i < reg->y_size; ++i)
+	    لكل (i = 0; i < reg->y_ناپ; ++i)
 	    {
 		reg->y_array[i].string = vim_strnsave(y_current->y_array[i].string,
-					    y_current->y_array[i].length);
-		if (reg->y_array[i].string == NULL)
+					    y_current->y_array[i].لمائی);
+		إذا (reg->y_array[i].string == عدم)
 		{
 		    // The allocation failed so clean up and exit
-		    while (--i >= 0)
+		    طالما (--i >= 0)
 			vim_free(reg->y_array[i].string);
 		    vim_free(reg->y_array);
 		    vim_free(reg);
-		    return (void *)NULL;
+		    أرجع (فراغ *)عدم;
 		}
 
-		reg->y_array[i].length = y_current->y_array[i].length;
+		reg->y_array[i].لمائی = y_current->y_array[i].لمائی;
 	    }
 	}
     }
-    else
-	y_current->y_array = NULL;
-    return (void *)reg;
+    وإلا
+	y_current->y_array = عدم;
+    أرجع (فراغ *)reg;
 }
 
 /*
  * Put "reg" into register "name".  Free any previous contents and "reg".
  */
-    void
-put_register(int name, void *reg)
+    فراغ
+put_رجسٹر(صحيح name, فراغ *reg)
 {
-    get_yank_register(name, 0);
+    get_yank_رجسٹر(name, 0);
     free_yank_all();
     *y_current = *(yankreg_T *)reg;
     vim_free(reg);
 
-#ifdef FEAT_CLIPBOARD
+#جے_تعریف_شدہ FEAT_CLIPBOARD
     // Send text written to clipboard register to the clipboard.
-    may_set_selection();
-#endif
+    may_سیٹ_selection();
+#جے_انت
 }
 
-#if defined(FEAT_CLIPBOARD)
-    void
-free_register(void *reg)
+#إذا defined(FEAT_CLIPBOARD)
+    فراغ
+free_رجسٹر(فراغ *reg)
 {
     yankreg_T tmp;
 
@@ -399,20 +399,20 @@ free_register(void *reg)
     vim_free(reg);
     *y_current = tmp;
 }
-#endif
+#جے_انت
 
 /*
  * return TRUE if the current yank register has type MLINE
  */
-    int
-yank_register_mline(int regname)
+    صحيح
+yank_رجسٹر_mline(صحيح regname)
 {
-    if (regname != 0 && !valid_yank_reg(regname, FALSE))
-	return FALSE;
-    if (regname == '_')		// black hole is always empty
-	return FALSE;
-    get_yank_register(regname, FALSE);
-    return (y_current->y_type == MLINE);
+    إذا (regname != 0 && !valid_yank_reg(regname, FALSE))
+	أرجع FALSE;
+    إذا (regname == '_')		// black hole is always empty
+	أرجع FALSE;
+    get_yank_رجسٹر(regname, FALSE);
+    أرجع (y_current->y_type == MLINE);
 }
 
 /*
@@ -420,20 +420,20 @@ yank_register_mline(int regname)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-do_record(int c)
+    صحيح
+do_ریکارڈ(صحيح c)
 {
     char_u	    *p;
-    static int	    regname;
-    yankreg_T	    *old_y_previous, *old_y_current;
-    int		    retval;
+    ساكن صحيح	    regname;
+    yankreg_T	    *old_y_پچھلا, *old_y_current;
+    صحيح		    retval;
 
-    if (reg_recording == 0)	    // start recording
+    إذا (reg_recording == 0)	    // start recording
     {
 	// registers 0-9, a-z and " are allowed
-	if (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
+	إذا (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
 	    retval = FAIL;
-	else
+	وإلا
 	{
 	    reg_recording = c;
 	    showmode();
@@ -441,33 +441,33 @@ do_record(int c)
 	    retval = OK;
 	}
     }
-    else			    // stop recording
+    وإلا			    // stop recording
     {
 	// Get the recorded key hits.  K_SPECIAL and CSI will be escaped, this
 	// needs to be removed again to put it in a register.  exec_reg then
 	// adds the escaping back later.
 	reg_recording = 0;
-	msg("");
+	پیغام("");
 	p = get_recorded();
-	if (p == NULL)
+	إذا (p == عدم)
 	    retval = FAIL;
-	else
+	وإلا
 	{
 	    // Remove escaping for CSI and K_SPECIAL in multi-byte chars.
 	    vim_unescape_csi(p);
 
 	    // We don't want to change the default register here, so save and
 	    // restore the current register name.
-	    old_y_previous = y_previous;
+	    old_y_پچھلا = y_پچھلا;
 	    old_y_current = y_current;
 
 	    retval = stuff_yank(regname, p);
 
-	    y_previous = old_y_previous;
+	    y_پچھلا = old_y_پچھلا;
 	    y_current = old_y_current;
 	}
     }
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -476,83 +476,83 @@ do_record(int c)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-stuff_yank(int regname, char_u *p)
+    ساكن صحيح
+stuff_yank(صحيح regname, char_u *p)
 {
     size_t  plen;
 
     // check for read-only register
-    if (regname != 0 && !valid_yank_reg(regname, TRUE))
+    إذا (regname != 0 && !valid_yank_reg(regname, TRUE))
     {
 	vim_free(p);
-	return FAIL;
+	أرجع FAIL;
     }
-    if (regname == '_')		    // black hole: don't do anything
+    إذا (regname == '_')		    // black hole: don't do anything
     {
 	vim_free(p);
-	return OK;
+	أرجع OK;
     }
 
     plen = STRLEN(p);
-    get_yank_register(regname, TRUE);
-    if (y_append && y_current->y_array != NULL)
+    get_yank_رجسٹر(regname, TRUE);
+    إذا (y_append && y_current->y_array != عدم)
     {
 	string_T    *pp;
 	char_u	    *tmp;
 	size_t	    tmplen;
 
-	pp = &(y_current->y_array[y_current->y_size - 1]);
-	tmplen = pp->length + plen;
+	pp = &(y_current->y_array[y_current->y_ناپ - 1]);
+	tmplen = pp->لمائی + plen;
 	tmp = alloc(tmplen + 1);
-	if (tmp == NULL)
+	إذا (tmp == عدم)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	STRCPY(tmp, pp->string);
-	STRCPY(tmp + pp->length, p);
+	STRCPY(tmp + pp->لمائی, p);
 	vim_free(p);
 	vim_free(pp->string);
 	pp->string = tmp;
-	pp->length = tmplen;
+	pp->لمائی = tmplen;
     }
-    else
+    وإلا
     {
 	free_yank_all();
-	if ((y_current->y_array = ALLOC_ONE(string_T)) == NULL)
+	إذا ((y_current->y_array = ALLOC_ONE(string_T)) == عدم)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	y_current->y_array[0].string = p;
-	y_current->y_array[0].length = plen;
-	y_current->y_size = 1;
+	y_current->y_array[0].لمائی = plen;
+	y_current->y_ناپ = 1;
 	y_current->y_type = MCHAR;  // used to be MLINE, why?
-#ifdef FEAT_VIMINFO
-	y_current->y_time_set = vim_time();
-#endif
+#جے_تعریف_شدہ FEAT_VIMINFO
+	y_current->y_ویلا_سیٹ = vim_ویلا();
+#جے_انت
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Last executed register (@ command)
  */
-static int execreg_lastc = NUL;
+ساكن صحيح execreg_lastc = NUL;
 
-#if defined(FEAT_VIMINFO)
-    int
-get_execreg_lastc(void)
+#إذا defined(FEAT_VIMINFO)
+    صحيح
+get_execreg_lastc(فراغ)
 {
-    return execreg_lastc;
+    أرجع execreg_lastc;
 }
 
-    void
-set_execreg_lastc(int lastc)
+    فراغ
+سیٹ_execreg_lastc(صحيح lastc)
 {
     execreg_lastc = lastc;
 }
-#endif
+#جے_انت
 
 /*
  * When executing a register as a series of ex-commands, if the
@@ -570,60 +570,60 @@ set_execreg_lastc(int lastc)
  * Returns the concatenated line. The index of the line that should be
  * processed next is returned in idx.
  */
-    static char_u *
-execreg_line_continuation(string_T *lines, long *idx)
+    ساكن char_u *
+execreg_سطر_continuation(string_T *سطریں, لما *idx)
 {
     garray_T	ga;
-    long	cmd_start = *idx;
-    long	cmd_end = *idx;
+    لما	cmd_شروع = *idx;
+    لما	cmd_سرا = *idx;
     string_T	*tmp;
-    int		j;
+    صحيح		j;
     char_u	*str;
 
-    ga_init2(&ga, sizeof(char_u), 400);
+    ga_init2(&ga, حجم(char_u), 400);
 
     // search backwards to find the first line of this command.
     // Any line not starting with \ or "\ is the start of the
     // command.
-    while (--cmd_start > 0)
+    طالما (--cmd_شروع > 0)
     {
 	char_u	*p;
 
-	p = skipwhite(lines[cmd_start].string);
-	if (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
-	    break;
+	p = skipwhite(سطریں[cmd_شروع].string);
+	إذا (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
+	    اكسر;
     }
 
     // join all the lines
-    tmp = &lines[cmd_start];
-    ga_concat_len(&ga, tmp->string, tmp->length);
-    for (j = cmd_start + 1; j <= cmd_end; j++)
+    tmp = &سطریں[cmd_شروع];
+    ga_concat_len(&ga, tmp->string, tmp->لمائی);
+    لكل (j = cmd_شروع + 1; j <= cmd_سرا; j++)
     {
 	char_u	*p;
 
-	tmp = &lines[j];
+	tmp = &سطریں[j];
 	p = skipwhite(tmp->string);
-	if (*p == '\\')
+	إذا (*p == '\\')
 	{
 	    // Adjust the growsize to the current length to
 	    // speed up concatenating many lines.
-	    if (ga.ga_len > 400)
+	    إذا (ga.ga_len > 400)
 	    {
-		if (ga.ga_len > 8000)
+		إذا (ga.ga_len > 8000)
 		    ga.ga_growsize = 8000;
-		else
+		وإلا
 		    ga.ga_growsize = ga.ga_len;
 	    }
 	    p++;
-	    ga_concat_len(&ga, p, (tmp->string + tmp->length) - p);
+	    ga_concat_len(&ga, p, (tmp->string + tmp->لمائی) - p);
 	}
     }
     ga_append(&ga, NUL);
-    str = vim_strnsave(ga.ga_data, ga.ga_len);
+    str = vim_strnsave(ga.ga_انکڑے, ga.ga_len);
     ga_clear(&ga);
 
-    *idx = cmd_start;
-    return str;
+    *idx = cmd_شروع;
+    أرجع str;
 }
 
 /*
@@ -631,174 +631,174 @@ execreg_line_continuation(string_T *lines, long *idx)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    صحيح
 do_execreg(
-    int	    regname,
-    int	    colon,		// insert ':' before each line
-    int	    addcr,		// always add '\n' to end of line
-    int	    silent)		// set "silent" flag in typeahead buffer
+    صحيح	    regname,
+    صحيح	    colon,		// insert ':' before each line
+    صحيح	    addcr,		// always add '\n' to end of line
+    صحيح	    silent)		// set "silent" flag in typeahead buffer
 {
-    long	i;
+    لما	i;
     char_u	*p;
-    int		retval = OK;
-    int		remap;
+    صحيح		retval = OK;
+    صحيح		remap;
 
     // repeat previous one
-    if (regname == '@')
+    إذا (regname == '@')
     {
-	if (execreg_lastc == NUL)
+	إذا (execreg_lastc == NUL)
 	{
-	    emsg(_(e_no_previously_used_register));
-	    return FAIL;
+	    emsg(_(e_no_previously_ورتیا_رجسٹر));
+	    أرجع FAIL;
 	}
 	regname = execreg_lastc;
     }
     // check for valid regname
-    if (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
+    إذا (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
     {
 	emsg_invreg(regname);
-	return FAIL;
+	أرجع FAIL;
     }
     execreg_lastc = regname;
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
-#endif
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
-#endif
+#جے_انت
 
     // black hole: don't stuff anything
-    if (regname == '_')
-	return OK;
+    إذا (regname == '_')
+	أرجع OK;
 
     // use last command line
-    if (regname == ':')
+    إذا (regname == ':')
     {
-	if (last_cmdline == NULL)
+	إذا (آخری_cmdline == عدم)
 	{
-	    emsg(_(e_no_previous_command_line));
-	    return FAIL;
+	    emsg(_(e_no_پچھلا_command_سطر));
+	    أرجع FAIL;
 	}
 	// don't keep the cmdline containing @:
-	VIM_CLEAR(new_last_cmdline);
+	VIM_CLEAR(new_آخری_cmdline);
 	// Escape all control characters with a CTRL-V
-	p = vim_strsave_escaped_ext(last_cmdline,
+	p = vim_strsave_escaped_ext(آخری_cmdline,
 		    (char_u *)"\001\002\003\004\005\006\007"
 			  "\010\011\012\013\014\015\016\017"
 			  "\020\021\022\023\024\025\026\027"
 			  "\030\031\032\033\034\035\036\037",
 		    Ctrl_V, FALSE);
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    // When in Visual mode "'<,'>" will be prepended to the command.
 	    // Remove it when it's already there.
-	    if (VIsual_active && STRNCMP(p, "'<,'>", 5) == 0)
-		retval = put_in_typebuf(p + 5, TRUE, TRUE, silent);
-	    else
-		retval = put_in_typebuf(p, TRUE, TRUE, silent);
+	    إذا (VIsual_سرگرم && STRNCMP(p, "'<,'>", 5) == 0)
+		retval = put_وچ_typebuf(p + 5, TRUE, TRUE, silent);
+	    وإلا
+		retval = put_وچ_typebuf(p, TRUE, TRUE, silent);
 	}
 	vim_free(p);
     }
-#ifdef FEAT_EVAL
-    else if (regname == '=')
+#جے_تعریف_شدہ FEAT_EVAL
+    وإلا إذا (regname == '=')
     {
-	p = get_expr_line();
-	if (p == NULL)
-	    return FAIL;
-	retval = put_in_typebuf(p, TRUE, colon, silent);
+	p = get_اظہاریہ_سطر();
+	إذا (p == عدم)
+	    أرجع FAIL;
+	retval = put_وچ_typebuf(p, TRUE, colon, silent);
 	vim_free(p);
     }
-#endif
-    else if (regname == '.')		// use last inserted text
+#جے_انت
+    وإلا إذا (regname == '.')		// use last inserted text
     {
-	p = get_last_insert_save();
-	if (p == NULL)
+	p = get_آخری_داخل_کرو_save();
+	إذا (p == عدم)
 	{
-	    emsg(_(e_no_inserted_text_yet));
-	    return FAIL;
+	    emsg(_(e_no_inserted_متن_yet));
+	    أرجع FAIL;
 	}
-	retval = put_in_typebuf(p, FALSE, colon, silent);
+	retval = put_وچ_typebuf(p, FALSE, colon, silent);
 	vim_free(p);
     }
-    else
+    وإلا
     {
-	get_yank_register(regname, FALSE);
-	if (y_current->y_array == NULL)
-	    return FAIL;
+	get_yank_رجسٹر(regname, FALSE);
+	إذا (y_current->y_array == عدم)
+	    أرجع FAIL;
 
 	// Disallow remapping for ":@r".
 	remap = colon ? REMAP_NONE : REMAP_YES;
 
 	// Insert lines into typeahead buffer, from last one to first one.
-	put_reedit_in_typebuf(silent);
-	for (i = y_current->y_size; --i >= 0; )
+	put_reedit_وچ_typebuf(silent);
+	لكل (i = y_current->y_ناپ; --i >= 0; )
 	{
 	    char_u *escaped;
 	    char_u *str;
-	    int	    free_str = FALSE;
+	    صحيح	    free_str = FALSE;
 
 	    // insert NL between lines and after last line if type is MLINE
-	    if (y_current->y_type == MLINE || i < y_current->y_size - 1
+	    إذا (y_current->y_type == MLINE || i < y_current->y_ناپ - 1
 								     || addcr)
 	    {
-		if (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
-		    return FAIL;
+		إذا (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
+		    أرجع FAIL;
 	    }
 
 	    // Handle line-continuation for :@<register>
 	    str = y_current->y_array[i].string;
-	    if (colon && i > 0)
+	    إذا (colon && i > 0)
 	    {
 		p = skipwhite(str);
-		if (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
+		إذا (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
 		{
-		    str = execreg_line_continuation(y_current->y_array, &i);
-		    if (str == NULL)
-			return FAIL;
+		    str = execreg_سطر_continuation(y_current->y_array, &i);
+		    إذا (str == عدم)
+			أرجع FAIL;
 		    free_str = TRUE;
 		}
 	    }
 	    escaped = vim_strsave_escape_csi(str);
-	    if (free_str)
+	    إذا (free_str)
 		vim_free(str);
-	    if (escaped == NULL)
-		return FAIL;
+	    إذا (escaped == عدم)
+		أرجع FAIL;
 	    retval = ins_typebuf(escaped, remap, 0, TRUE, silent);
 	    vim_free(escaped);
-	    if (retval == FAIL)
-		return FAIL;
-	    if (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
+	    إذا (retval == FAIL)
+		أرجع FAIL;
+	    إذا (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
 								      == FAIL)
-		return FAIL;
+		أرجع FAIL;
 	}
 	reg_executing = regname == 0 ? '"' : regname; // disable "q" command
-	pending_end_reg_executing = FALSE;
+	pending_سرا_reg_executing = FALSE;
     }
-    return retval;
+    أرجع retval;
 }
 
 /*
  * If "restart_edit" is not zero, put it in the typeahead buffer, so that it's
  * used only after other typeahead has been processed.
  */
-    static void
-put_reedit_in_typebuf(int silent)
+    ساكن فراغ
+put_reedit_وچ_typebuf(صحيح silent)
 {
-    if (restart_edit == NUL)
-	return;
+    إذا (restart_edit == NUL)
+	أرجع;
 
     char_u	buf[] = { K_SPECIAL, KS_EXTRA, KE_COMMAND,
 	// :startinsert
 	's', 't', 'a', 'r', 't', 'i', CAR, NUL };
-    if (restart_edit == 'R')
+    إذا (restart_edit == 'R')
 	buf[8] = 'r';  // :startreplace
-    else if (restart_edit == 'V')
+    وإلا إذا (restart_edit == 'V')
 	buf[8] = 'g';  // :startgreplace
-    else if (restart_edit == 'A')
+    وإلا إذا (restart_edit == 'A')
 	buf[8] = '!';  // :startinsert!
-    if (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
+    إذا (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
 	restart_edit = NUL;
 }
 
@@ -808,37 +808,37 @@ put_reedit_in_typebuf(int silent)
  * When "esc" is TRUE it is to be taken literally: Escape CSI characters and
  * no remapping.
  */
-    static int
-put_in_typebuf(
+    ساكن صحيح
+put_وچ_typebuf(
     char_u	*s,
-    int		esc,
-    int		colon,	    // add ':' before the line
-    int		silent)
+    صحيح		esc,
+    صحيح		colon,	    // add ':' before the line
+    صحيح		silent)
 {
-    int		retval = OK;
+    صحيح		retval = OK;
 
-    put_reedit_in_typebuf(silent);
-    if (colon)
+    put_reedit_وچ_typebuf(silent);
+    إذا (colon)
 	retval = ins_typebuf((char_u *)"\n", REMAP_NONE, 0, TRUE, silent);
-    if (retval == OK)
+    إذا (retval == OK)
     {
 	char_u	*p;
 
-	if (esc)
+	إذا (esc)
 	    p = vim_strsave_escape_csi(s);
-	else
+	وإلا
 	    p = s;
-	if (p == NULL)
+	إذا (p == عدم)
 	    retval = FAIL;
-	else
+	وإلا
 	    retval = ins_typebuf(p, esc ? REMAP_NONE : REMAP_YES,
 							     0, TRUE, silent);
-	if (esc)
+	إذا (esc)
 	    vim_free(p);
     }
-    if (colon && retval == OK)
+    إذا (colon && retval == OK)
 	retval = ins_typebuf((char_u *)":", REMAP_NONE, 0, TRUE, silent);
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -847,177 +847,177 @@ put_in_typebuf(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-insert_reg(
-    int		regname,
-    int		literally_arg)	// insert literally, not as if typed
+    صحيح
+داخل_کرو_reg(
+    صحيح		regname,
+    صحيح		literally_arg)	// insert literally, not as if typed
 {
-    long	i;
-    int		retval = OK;
+    لما	i;
+    صحيح		retval = OK;
     char_u	*arg;
-    int		allocated;
-    int		literally = literally_arg;
+    صحيح		allocated;
+    صحيح		literally = literally_arg;
 
     // It is possible to get into an endless loop by having CTRL-R a in
     // register a and then, in insert mode, doing CTRL-R a.
     // If you hit CTRL-C, the loop will be broken here.
     ui_breakcheck();
-    if (got_int)
-	return FAIL;
+    إذا (got_int)
+	أرجع FAIL;
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return FAIL;
+    إذا (regname != NUL && !valid_yank_reg(regname, FALSE))
+	أرجع FAIL;
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
-#endif
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
-#endif
+#جے_انت
 
-    if (regname == '.')			// insert last inserted text
+    إذا (regname == '.')			// insert last inserted text
 	retval = stuff_inserted(NUL, 1L, TRUE);
-    else if (get_spec_reg(regname, &arg, &allocated, TRUE))
+    وإلا إذا (get_spec_reg(regname, &arg, &allocated, TRUE))
     {
-	if (arg == NULL)
-	    return FAIL;
+	إذا (arg == عدم)
+	    أرجع FAIL;
 	stuffescaped(arg, literally);
-	if (allocated)
+	إذا (allocated)
 	    vim_free(arg);
     }
-    else				// name or number register
+    وإلا				// name or number register
     {
-	if (get_yank_register(regname, FALSE))
+	إذا (get_yank_رجسٹر(regname, FALSE))
 	    literally = TRUE;
-	if (y_current->y_array == NULL)
+	إذا (y_current->y_array == عدم)
 	    retval = FAIL;
-	else
+	وإلا
 	{
-	    for (i = 0; i < y_current->y_size; ++i)
+	    لكل (i = 0; i < y_current->y_ناپ; ++i)
 	    {
-		if (regname == '-' && y_current->y_type == MCHAR)
+		إذا (regname == '-' && y_current->y_type == MCHAR)
 		{
-		    int dir = BACKWARD;
-		    if ((State & REPLACE_FLAG) != 0)
+		    صحيح dir = BACKWARD;
+		    إذا ((State & REPLACE_FLAG) != 0)
 		    {
 			pos_T curpos;
-			if (u_save_cursor() == FAIL)
-			    return FAIL;
-			del_chars((long)mb_charlen(y_current->y_array[0].string), TRUE);
+			إذا (u_save_cursor() == FAIL)
+			    أرجع FAIL;
+			del_chars((لما)mb_charlen(y_current->y_array[0].string), TRUE);
 			curpos = curwin->w_cursor;
-			if (oneright() == FAIL)
+			إذا (oneright() == FAIL)
 			    // hit end of line, need to put forward (after the current position)
 			    dir = FORWARD;
 			curwin->w_cursor = curpos;
 		    }
 
-		    AppendCharToRedobuff(Ctrl_R);
-		    AppendCharToRedobuff(regname);
-		    do_put(regname, NULL, dir, 1L, PUT_CURSEND);
+		    Append_Char_منزل_Redobuff(Ctrl_R);
+		    Append_Char_منزل_Redobuff(regname);
+		    do_put(regname, عدم, dir, 1L, PUT_CURSEND);
 		}
-		else
+		وإلا
 		{
 		    stuffescaped(y_current->y_array[i].string, literally);
 		    // Insert a newline between lines and after last line if
 		    // y_type is MLINE.
-		    if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+		    إذا (y_current->y_type == MLINE || i < y_current->y_ناپ - 1)
 			stuffcharReadbuff('\n');
 		}
 	    }
 	}
     }
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * If "regname" is a special register, return TRUE and store a pointer to its
  * value in "argp".
  */
-    int
+    صحيح
 get_spec_reg(
-    int		regname,
+    صحيح		regname,
     char_u	**argp,
-    int		*allocated,	// return: TRUE when value was allocated
-    int		errmsg)		// give error message when failing
+    صحيح		*allocated,	// return: TRUE when value was allocated
+    صحيح		errmsg)		// give error message when failing
 {
-    int		cnt;
+    صحيح		cnt;
 
-    *argp = NULL;
+    *argp = عدم;
     *allocated = FALSE;
-    switch (regname)
+    بدل (regname)
     {
-	case '%':		// file name
-	    if (errmsg)
+	حالة '%':		// file name
+	    إذا (errmsg)
 		check_fname();	// will give emsg if not set
 	    *argp = curbuf->b_fname;
-	    return TRUE;
+	    أرجع TRUE;
 
-	case '#':		// alternate file name
+	حالة '#':		// alternate file name
 	    *argp = getaltfname(errmsg);	// may give emsg if not set
-	    return TRUE;
+	    أرجع TRUE;
 
-#ifdef FEAT_EVAL
-	case '=':		// result of expression
-	    *argp = get_expr_line();
+#جے_تعریف_شدہ FEAT_EVAL
+	حالة '=':		// result of expression
+	    *argp = get_اظہاریہ_سطر();
 	    *allocated = TRUE;
-	    return TRUE;
-#endif
+	    أرجع TRUE;
+#جے_انت
 
-	case ':':		// last command line
-	    if (last_cmdline == NULL && errmsg)
-		emsg(_(e_no_previous_command_line));
-	    *argp = last_cmdline;
-	    return TRUE;
+	حالة ':':		// last command line
+	    إذا (آخری_cmdline == عدم && errmsg)
+		emsg(_(e_no_پچھلا_command_سطر));
+	    *argp = آخری_cmdline;
+	    أرجع TRUE;
 
-	case '/':		// last search-pattern
-	    if (last_search_pat() == NULL && errmsg)
-		emsg(_(e_no_previous_regular_expression));
-	    *argp = last_search_pat();
-	    return TRUE;
+	حالة '/':		// last search-pattern
+	    إذا (آخری_تلاش_pat() == عدم && errmsg)
+		emsg(_(e_no_پچھلا_regular_عبارت));
+	    *argp = آخری_تلاش_pat();
+	    أرجع TRUE;
 
-	case '.':		// last inserted text
-	    *argp = get_last_insert_save();
+	حالة '.':		// last inserted text
+	    *argp = get_آخری_داخل_کرو_save();
 	    *allocated = TRUE;
-	    if (*argp == NULL && errmsg)
-		emsg(_(e_no_inserted_text_yet));
-	    return TRUE;
+	    إذا (*argp == عدم && errmsg)
+		emsg(_(e_no_inserted_متن_yet));
+	    أرجع TRUE;
 
-	case Ctrl_F:		// Filename under cursor
-	case Ctrl_P:		// Path under cursor, expand via "path"
-	    if (!errmsg)
-		return FALSE;
+	حالة Ctrl_F:		// Filename under cursor
+	حالة Ctrl_P:		// Path under cursor, expand via "path"
+	    إذا (!errmsg)
+		أرجع FALSE;
 	    *argp = file_name_at_cursor(FNAME_MESS | FNAME_HYP
-			    | (regname == Ctrl_P ? FNAME_EXP : 0), 1L, NULL);
+			    | (regname == Ctrl_P ? FNAME_EXP : 0), 1L, عدم);
 	    *allocated = TRUE;
-	    return TRUE;
+	    أرجع TRUE;
 
-	case Ctrl_W:		// word under cursor
-	case Ctrl_A:		// WORD (mnemonic All) under cursor
-	    if (!errmsg)
-		return FALSE;
-	    cnt = find_ident_under_cursor(argp, regname == Ctrl_W
-				   ?  (FIND_IDENT|FIND_STRING) : FIND_STRING);
-	    *argp = cnt ? vim_strnsave(*argp, cnt) : NULL;
+	حالة Ctrl_W:		// word under cursor
+	حالة Ctrl_A:		// WORD (mnemonic All) under cursor
+	    إذا (!errmsg)
+		أرجع FALSE;
+	    cnt = لبھو_ident_under_cursor(argp, regname == Ctrl_W
+				   ?  (لبھو_IDENT|لبھو_STRING) : لبھو_STRING);
+	    *argp = cnt ? vim_strnsave(*argp, cnt) : عدم;
 	    *allocated = TRUE;
-	    return TRUE;
+	    أرجع TRUE;
 
-	case Ctrl_L:		// Line under cursor
-	    if (!errmsg)
-		return FALSE;
+	حالة Ctrl_L:		// Line under cursor
+	    إذا (!errmsg)
+		أرجع FALSE;
 
-	    *argp = ml_get_buf(curwin->w_buffer,
+	    *argp = ml_get_buf(curwin->w_بفر,
 			curwin->w_cursor.lnum, FALSE);
-	    return TRUE;
+	    أرجع TRUE;
 
-	case '_':		// black hole: always empty
+	حالة '_':		// black hole: always empty
 	    *argp = (char_u *)"";
-	    return TRUE;
+	    أرجع TRUE;
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -1029,141 +1029,141 @@ get_spec_reg(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحيح
 cmdline_paste_reg(
-    int regname,
-    int literally_arg,	// Insert text literally instead of "as typed"
-    int remcr)		// don't add CR characters
+    صحيح regname,
+    صحيح literally_arg,	// Insert text literally instead of "as typed"
+    صحيح remcr)		// don't add CR characters
 {
-    long	i;
-    int		literally = literally_arg;
+    لما	i;
+    صحيح		literally = literally_arg;
 
-    if (get_yank_register(regname, FALSE))
+    إذا (get_yank_رجسٹر(regname, FALSE))
 	literally = TRUE;
-    if (y_current->y_array == NULL)
-	return FAIL;
+    إذا (y_current->y_array == عدم)
+	أرجع FAIL;
 
-    for (i = 0; i < y_current->y_size; ++i)
+    لكل (i = 0; i < y_current->y_ناپ; ++i)
     {
 	cmdline_paste_str(y_current->y_array[i].string, literally);
 
 	// Insert ^M between lines and after last line if type is MLINE.
 	// Don't do this when "remcr" is TRUE.
-	if ((y_current->y_type == MLINE || i < y_current->y_size - 1) && !remcr)
+	إذا ((y_current->y_type == MLINE || i < y_current->y_ناپ - 1) && !remcr)
 	    cmdline_paste_str((char_u *)"\r", literally);
 
 	// Check for CTRL-C, in case someone tries to paste a few thousand
 	// lines and gets bored.
 	ui_breakcheck();
-	if (got_int)
-	    return FAIL;
+	إذا (got_int)
+	    أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Shift the delete registers: "9 is cleared, "8 becomes "9, etc.
  */
-    void
-shift_delete_registers(void)
+    فراغ
+کھسکاؤ_delete_registers(فراغ)
 {
-    int		n;
+    صحيح		n;
 
     y_current = &y_regs[9];
     free_yank_all();			// free register nine
-    for (n = 9; n > 1; --n)
+    لكل (n = 9; n > 1; --n)
 	y_regs[n] = y_regs[n - 1];
     y_current = &y_regs[1];
-    if (!y_append)
-	y_previous = y_current;
-    y_regs[1].y_array = NULL;		// set register one to empty
+    إذا (!y_append)
+	y_پچھلا = y_current;
+    y_regs[1].y_array = عدم;		// set register one to empty
 }
 
-#if defined(FEAT_EVAL)
-    static void
-add_regtype_to_dict(int regname, dict_T *dict, char_u *buf, int bufsize)
+#إذا defined(FEAT_EVAL)
+    ساكن فراغ
+جوڑو_regtype_منزل_dict(صحيح regname, dict_T *dict, char_u *buf, صحيح bufsize)
 {
     size_t  buflen;
-    long    reglen;
+    لما    reglen;
     // Register type
-    switch (get_reg_type(regname, &reglen))
+    بدل (get_reg_type(regname, &reglen))
     {
-	case MLINE:
+	حالة MLINE:
 	    buf[0] = 'V';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MCHAR:
+	    اكسر;
+	حالة MCHAR:
 	    buf[0] = 'v';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MBLOCK:
-	    buflen = vim_snprintf_safelen((char *)buf, bufsize,
+	    اكسر;
+	حالة MBLOCK:
+	    buflen = vim_snprintf_safelen((حرف *)buf, bufsize,
 		"%c%ld", Ctrl_V, reglen + 1);
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    buf[0] = NUL;
 	    buflen = 0;
-	    break;
+	    اكسر;
     }
-    (void)dict_add_string_len(dict, "regtype", buf, (int)buflen);
+    (فراغ)dict_جوڑو_string_len(dict, "regtype", buf, (صحيح)buflen);
 }
 
-    void
+    فراغ
 yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
 {
-    static int	    recursive = FALSE;
+    ساكن صحيح	    recursive = FALSE;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    صحيح		    n;
     char_u	    buf[NUMBUFLEN + 2];
     size_t	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    إذا (recursive)
+	أرجع;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    إذا (list == عدم)
+	أرجع;
 
     // yanked text contents
-    for (n = 0; n < reg->y_size; n++)
-	list_append_string(list, reg->y_array[n].string, (int)reg->y_array[n].length);
-    list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    لكل (n = 0; n < reg->y_ناپ; n++)
+	list_append_string(list, reg->y_array[n].string, (صحيح)reg->y_array[n].لمائی);
+    list->lv_جندرا = VAR_FIXED;
+    إذا (dict_جوڑو_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)oap->regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (فراغ)dict_جوڑو_string_len(v_event, "regname", buf, (صحيح)buflen);
 
     // motion type: inclusive or exclusive
-    (void)dict_add_bool(v_event, "inclusive", oap->inclusive);
+    (فراغ)dict_جوڑو_bool(v_event, "inclusive", oap->inclusive);
 
     // kind of operation (yank, delete, change)
     buf[0] = get_op_char(oap->op_type);
     buf[1] = get_extra_op_char(oap->op_type);
     buf[2] = NUL;
     buflen = (buf[0] == NUL) ? 0 : (buf[1] == NUL) ? 1 : 2;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (فراغ)dict_جوڑو_string_len(v_event, "operator", buf, (صحيح)buflen);
 
-    add_regtype_to_dict(oap->regname, v_event, buf, sizeof(buf));
+    جوڑو_regtype_منزل_dict(oap->regname, v_event, buf, حجم(buf));
 
     // selection type - visual or not
-    (void)dict_add_bool(v_event, "visual", oap->is_VIsual);
+    (فراغ)dict_جوڑو_bool(v_event, "visual", oap->is_VIsual);
 
     // Lock the dictionary and its keys
-    dict_set_items_ro(v_event);
+    dict_سیٹ_اشیاء_ro(v_event);
 
     recursive = TRUE;
     textlock++;
-    apply_autocmds(EVENT_TEXTYANKPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_TEXTYANKPOST, عدم, عدم, FALSE, curbuf);
     textlock--;
     recursive = FALSE;
 
@@ -1171,35 +1171,35 @@ yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
     restore_v_event(v_event, &save_v_event);
 }
 
-    static void
+    ساكن فراغ
 put_do_autocmd(
-	int	    regname,
+	صحيح	    regname,
 	yankreg_T   *reg,	// May be NULL, if special register
-	string_T    *insert,	// Not NULL if special register, except '.'
+	string_T    *داخل_کرو,	// Not NULL if special register, except '.'
 	bool	    post,	// If Post or Pre
-	int	    dir)	// BACKWARD for 'P', FORWARD for 'p'
+	صحيح	    dir)	// BACKWARD for 'P', FORWARD for 'p'
 {
-    static bool	    recursive = false;
+    ساكن bool	    recursive = false;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    صحيح		    n;
     char_u	    buf[NUMBUFLEN + 2];
     size_t	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive || regname == '_')
-	return;
+    إذا (recursive || regname == '_')
+	أرجع;
 
-    if (regname != '.' && insert == NULL
-	    && reg == NULL)
+    إذا (regname != '.' && داخل_کرو == عدم
+	    && reg == عدم)
 	// Can happen when pasting text in normal mode in a terminal buffer
-	return;
+	أرجع;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    إذا (list == عدم)
+	أرجع;
 
     // Make sure regcontents will be up to date
 # ifdef FEAT_CLIPBOARD_PROVIDER
@@ -1207,116 +1207,116 @@ put_do_autocmd(
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (regname == '.')
+    إذا (regname == '.')
     {
-	if (last_insert_ga.ga_data != NULL)
+	إذا (آخری_داخل_کرو_ga.ga_انکڑے != عدم)
 	    // Get the last inserted text to place in "regcontents"
-	    list_append_string(list, last_insert_ga.ga_data,
-		    (int)last_insert_ga.ga_len);
+	    list_append_string(list, آخری_داخل_کرو_ga.ga_انکڑے,
+		    (صحيح)آخری_داخل_کرو_ga.ga_len);
     }
-    else if (insert != NULL)
+    وإلا إذا (داخل_کرو != عدم)
     {
-	list_append_string(list, insert->string, (int)insert->length);
+	list_append_string(list, داخل_کرو->string, (صحيح)داخل_کرو->لمائی);
     }
-    else
+    وإلا
     {
-	for (n = 0; n < reg->y_size; n++)
+	لكل (n = 0; n < reg->y_ناپ; n++)
 	    list_append_string(list, reg->y_array[n].string,
-		    (int)reg->y_array[n].length);
+		    (صحيح)reg->y_array[n].لمائی);
     }
 
-    list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    list->lv_جندرا = VAR_FIXED;
+    إذا (dict_جوڑو_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (فراغ)dict_جوڑو_string_len(v_event, "regname", buf, (صحيح)buflen);
 
     // kind of operation (P, p)
     buf[0] = dir == BACKWARD ? 'P' : 'p';
     buf[1] = NUL;
     buflen = 1;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (فراغ)dict_جوڑو_string_len(v_event, "operator", buf, (صحيح)buflen);
 
-    add_regtype_to_dict(regname, v_event, buf, sizeof(buf));
+    جوڑو_regtype_منزل_dict(regname, v_event, buf, حجم(buf));
 # ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 # endif
 
-    (void)dict_add_bool(v_event, "visual", VIsual_active);
+    (فراغ)dict_جوڑو_bool(v_event, "visual", VIsual_سرگرم);
 
     // Lock the dictionary and its keys
-    dict_set_items_ro(v_event);
+    dict_سیٹ_اشیاء_ro(v_event);
 
     recursive = true;
     textlock++;
-    if (post)
-	apply_autocmds(EVENT_TEXTPUTPOST, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_TEXTPUTPRE, NULL, NULL, FALSE, curbuf);
+    إذا (post)
+	apply_autocmds(EVENT_TEXTPUTPOST, عدم, عدم, FALSE, curbuf);
+    وإلا
+	apply_autocmds(EVENT_TEXTPUTPRE, عدم, عدم, FALSE, curbuf);
     textlock--;
     recursive = false;
 
     // Empty the dictionary, v:event is still valid
     restore_v_event(v_event, &save_v_event);
 }
-#endif
+#جے_انت
 
 /*
  * set all the yank registers to empty (called from main())
  */
-    void
-init_yank(void)
+    فراغ
+init_yank(فراغ)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
-	y_regs[i].y_array = NULL;
+    لكل (i = 0; i < عدد_REGISTERS; ++i)
+	y_regs[i].y_array = عدم;
 }
 
-#if defined(EXITFREE)
-    void
-clear_registers(void)
+#إذا defined(EXITFREE)
+    فراغ
+clear_registers(فراغ)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
+    لكل (i = 0; i < عدد_REGISTERS; ++i)
     {
 	y_current = &y_regs[i];
-	if (y_current->y_array != NULL)
+	إذا (y_current->y_array != عدم)
 	    free_yank_all();
     }
 }
-#endif
+#جے_انت
 
 /*
  * Free "n" lines from the current yank register.
  * Called for normal freeing and in case of error.
  */
-    static void
-free_yank(long n)
+    ساكن فراغ
+free_yank(لما n)
 {
-    if (y_current->y_array == NULL)
-	return;
+    إذا (y_current->y_array == عدم)
+	أرجع;
 
-    long	    i;
+    لما	    i;
 
-    for (i = n; --i >= 0; )
+    لكل (i = n; --i >= 0; )
 	VIM_CLEAR_STRING(y_current->y_array[i]);
     VIM_CLEAR(y_current->y_array);
 }
 
-    void
-free_yank_all(void)
+    فراغ
+free_yank_all(فراغ)
 {
-    free_yank(y_current->y_size);
+    free_yank(y_current->y_ناپ);
 }
 
 /*
@@ -1327,55 +1327,55 @@ free_yank_all(void)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-op_yank(oparg_T *oap, int deleting, int mess)
+    صحيح
+op_yank(oparg_T *oap, صحيح deleting, صحيح mess)
 {
-    long		y_idx;		// index in y_array[]
+    لما		y_idx;		// index in y_array[]
     yankreg_T		*curr;		// copy of y_current
     yankreg_T		newreg;		// new yank register when appending
     linenr_T		lnum;		// current line number
-    int			yanktype = oap->motion_type;
-    long		yanklines = oap->line_count;
-    linenr_T		yankendlnum = oap->end.lnum;
+    صحيح			yanktype = oap->motion_type;
+    لما		yanklines = oap->سطر_گنتی;
+    linenr_T		yankendlnum = oap->سرا.lnum;
     char_u		*pnew;
-    struct block_def	bd;
+    بنية بلاک_def	bd;
 
 				    // check for read-only register
-    if (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
+    إذا (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
     {
 	beep_flush();
-	return FAIL;
+	أرجع FAIL;
     }
-    if (oap->regname == '_')	    // black hole: nothing to do
-	return OK;
+    إذا (oap->regname == '_')	    // black hole: nothing to do
+	أرجع OK;
 
-#ifdef FEAT_CLIPBOARD
-    if ((!clip_star.available && oap->regname == '*') ||
-	(!clip_plus.available && oap->regname == '+'))
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا ((!clip_تارا.دستیاب && oap->regname == '*') ||
+	(!clip_plus.دستیاب && oap->regname == '+'))
     {
 	oap->regname = 0;
-	msg_warn_missing_clipboard();
+	پیغام_warn_missing_clipboard();
     }
-#endif
+#جے_انت
 
-    if (!deleting)		    // op_delete() already set y_current
-	get_yank_register(oap->regname, TRUE);
+    إذا (!deleting)		    // op_delete() already set y_current
+	get_yank_رجسٹر(oap->regname, TRUE);
 
     curr = y_current;
 				    // append to existing contents
-    if (y_append && y_current->y_array != NULL)
+    إذا (y_append && y_current->y_array != عدم)
 	y_current = &newreg;
-    else
+    وإلا
 	free_yank_all();	    // free previously yanked lines
 
     // If the cursor was in column 1 before and after the movement, and the
     // operator is not inclusive, the yank is always linewise.
-    if (       oap->motion_type == MCHAR
-	    && oap->start.col == 0
+    إذا (       oap->motion_type == MCHAR
+	    && oap->شروع.خانہ == 0
 	    && !oap->inclusive
 	    && (!oap->is_VIsual || *p_sel == 'o')
-	    && !oap->block_mode
-	    && oap->end.col == 0
+	    && !oap->بلاک_منوال
+	    && oap->سرا.خانہ == 0
 	    && yanklines > 1)
     {
 	yanktype = MLINE;
@@ -1383,147 +1383,147 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	--yanklines;
     }
 
-    y_current->y_size = yanklines;
+    y_current->y_ناپ = yanklines;
     y_current->y_type = yanktype;   // set the yank register type
-    y_current->y_width = 0;
-    y_current->y_array = lalloc_clear(sizeof(string_T) * yanklines, TRUE);
-    if (y_current->y_array == NULL)
+    y_current->y_چوڑائی = 0;
+    y_current->y_array = lalloc_clear(حجم(string_T) * yanklines, TRUE);
+    إذا (y_current->y_array == عدم)
     {
 	y_current = curr;
-	return FAIL;
+	أرجع FAIL;
     }
-#ifdef FEAT_VIMINFO
-    y_current->y_time_set = vim_time();
-#endif
+#جے_تعریف_شدہ FEAT_VIMINFO
+    y_current->y_ویلا_سیٹ = vim_ویلا();
+#جے_انت
 
     y_idx = 0;
-    lnum = oap->start.lnum;
+    lnum = oap->شروع.lnum;
 
-    if (oap->block_mode)
+    إذا (oap->بلاک_منوال)
     {
 	// Visual block mode
 	y_current->y_type = MBLOCK;	    // set the yank register type
-	y_current->y_width = oap->end_vcol - oap->start_vcol;
+	y_current->y_چوڑائی = oap->سرا_vcol - oap->شروع_vcol;
 
-	if (curwin->w_curswant == MAXCOL && y_current->y_width > 0)
-	    y_current->y_width--;
+	إذا (curwin->w_curswant == MAXCOL && y_current->y_چوڑائی > 0)
+	    y_current->y_چوڑائی--;
     }
 
-    for ( ; lnum <= yankendlnum; lnum++, y_idx++)
+    لكل ( ; lnum <= yankendlnum; lnum++, y_idx++)
     {
-	switch (y_current->y_type)
+	بدل (y_current->y_type)
 	{
-	    case MBLOCK:
-		block_prep(oap, &bd, lnum, FALSE);
-		if (yank_copy_line(&bd, y_idx, oap->excl_tr_ws) == FAIL)
-		    goto fail;
-		break;
+	    حالة MBLOCK:
+		بلاک_prep(oap, &bd, lnum, FALSE);
+		إذا (yank_copy_سطر(&bd, y_idx, oap->excl_tr_ws) == FAIL)
+		    اذهب fail;
+		اكسر;
 
-	    case MLINE:
-		y_current->y_array[y_idx].length = ml_get_len(lnum);
-		if ((y_current->y_array[y_idx].string =
+	    حالة MLINE:
+		y_current->y_array[y_idx].لمائی = ml_get_len(lnum);
+		إذا ((y_current->y_array[y_idx].string =
 					vim_strnsave(ml_get(lnum),
-					y_current->y_array[y_idx].length)) == NULL)
+					y_current->y_array[y_idx].لمائی)) == عدم)
 		{
 		    VIM_CLEAR_STRING(y_current->y_array[y_idx]);
-		    goto fail;
+		    اذهب fail;
 		}
-		break;
+		اكسر;
 
-	    case MCHAR:
+	    حالة MCHAR:
 		{
-		    int tmp;
+		    صحيح tmp;
 
-		    charwise_block_prep(oap->start, oap->end, &bd, lnum, oap->inclusive);
+		    charwise_بلاک_prep(oap->شروع, oap->سرا, &bd, lnum, oap->inclusive);
 
 		    // make sure bd.textlen is not longer than the text
-		    tmp = (int)STRLEN(bd.textstart);
-		    if (tmp < bd.textlen)
+		    tmp = (صحيح)STRLEN(bd.textstart);
+		    إذا (tmp < bd.textlen)
 			bd.textlen = tmp;
 
-		    if (yank_copy_line(&bd, y_idx, FALSE) == FAIL)
-			goto fail;
-		    break;
+		    إذا (yank_copy_سطر(&bd, y_idx, FALSE) == FAIL)
+			اذهب fail;
+		    اكسر;
 		}
 		// NOTREACHED
 	}
     }
 
-    if (curr != y_current)	// append the new block to the old block
+    إذا (curr != y_current)	// append the new block to the old block
     {
 	string_T *new_ptr;
-	long j;
+	لما j;
 
-	new_ptr = ALLOC_MULT(string_T, curr->y_size + y_current->y_size);
-	if (new_ptr == NULL)
-	    goto fail;
-	for (j = 0; j < curr->y_size; ++j)
+	new_ptr = ALLOC_MULT(string_T, curr->y_ناپ + y_current->y_ناپ);
+	إذا (new_ptr == عدم)
+	    اذهب fail;
+	لكل (j = 0; j < curr->y_ناپ; ++j)
 	    new_ptr[j] = curr->y_array[j];
 	vim_free(curr->y_array);
 	curr->y_array = new_ptr;
-#ifdef FEAT_VIMINFO
-	curr->y_time_set = vim_time();
-#endif
+#جے_تعریف_شدہ FEAT_VIMINFO
+	curr->y_ویلا_سیٹ = vim_ویلا();
+#جے_انت
 
-	if (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
+	إذا (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
 	    curr->y_type = MLINE;
 
 	// Concatenate the last line of the old block with the first line of
 	// the new block, unless being Vi compatible.
-	if (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == NULL)
+	إذا (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == عدم)
 	{
-	    pnew = alloc(curr->y_array[curr->y_size - 1].length + y_current->y_array[0].length + 1);
-	    if (pnew == NULL)
+	    pnew = alloc(curr->y_array[curr->y_ناپ - 1].لمائی + y_current->y_array[0].لمائی + 1);
+	    إذا (pnew == عدم)
 	    {
-		y_idx = y_current->y_size - 1;
-		goto fail;
+		y_idx = y_current->y_ناپ - 1;
+		اذهب fail;
 	    }
 
 	    --j;
 	    STRCPY(pnew, curr->y_array[j].string);
-	    STRCPY(pnew + curr->y_array[j].length, y_current->y_array[0].string);
+	    STRCPY(pnew + curr->y_array[j].لمائی, y_current->y_array[0].string);
 	    vim_free(curr->y_array[j].string);
 	    curr->y_array[j].string = pnew;
-	    curr->y_array[j].length = curr->y_array[j].length + y_current->y_array[0].length;
+	    curr->y_array[j].لمائی = curr->y_array[j].لمائی + y_current->y_array[0].لمائی;
 	    ++j;
 	    VIM_CLEAR_STRING(y_current->y_array[0]);
 	    y_idx = 1;
 	}
-	else
+	وإلا
 	    y_idx = 0;
-	while (y_idx < y_current->y_size)
+	طالما (y_idx < y_current->y_ناپ)
 	    curr->y_array[j++] = y_current->y_array[y_idx++];
-	curr->y_size = j;
+	curr->y_ناپ = j;
 	vim_free(y_current->y_array);
 	y_current = curr;
     }
 
-    if (mess)			// Display message about yank?
+    إذا (mess)			// Display message about yank?
     {
-	if (yanktype == MCHAR
-		&& !oap->block_mode
+	إذا (yanktype == MCHAR
+		&& !oap->بلاک_منوال
 		&& yanklines == 1)
 	    yanklines = 0;
 	// Some versions of Vi use ">=" here, some don't...
-	if (yanklines > p_report)
+	إذا (yanklines > p_report)
 	{
-	    char namebuf[100];
+	    حرف namebuf[100];
 
-	    if (oap->regname == NUL)
+	    إذا (oap->regname == NUL)
 		*namebuf = NUL;
-	    else
-		vim_snprintf(namebuf, sizeof(namebuf),
+	    وإلا
+		vim_snprintf(namebuf, حجم(namebuf),
 						_(" into \"%c"), oap->regname);
 
 	    // redisplay now, so message is not deleted
 	    update_topline_redraw();
-	    if (oap->block_mode)
+	    إذا (oap->بلاک_منوال)
 	    {
 		smsg(NGETTEXT("block of %ld line yanked%s",
 				     "block of %ld lines yanked%s", yanklines),
 			yanklines, namebuf);
 	    }
-	    else
+	    وإلا
 	    {
 		smsg(NGETTEXT("%ld line yanked%s",
 					      "%ld lines yanked%s", yanklines),
@@ -1532,106 +1532,106 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	}
     }
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    إذا ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
-	curbuf->b_op_start = oap->start;
-	curbuf->b_op_end = oap->end;
-	if (yanktype == MLINE && !oap->block_mode)
+	curbuf->b_op_شروع = oap->شروع;
+	curbuf->b_op_سرا = oap->سرا;
+	إذا (yanktype == MLINE && !oap->بلاک_منوال)
 	{
-	    curbuf->b_op_start.col = 0;
-	    curbuf->b_op_end.col = MAXCOL;
+	    curbuf->b_op_شروع.خانہ = 0;
+	    curbuf->b_op_سرا.خانہ = MAXCOL;
 	}
-	if (yanktype != MLINE && !oap->inclusive)
+	إذا (yanktype != MLINE && !oap->inclusive)
 	    // Exclude the end position.
-	    decl(&curbuf->b_op_end);
+	    decl(&curbuf->b_op_سرا);
     }
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-    if (curr == &y_regs[REAL_PLUS_REGISTER] || (!deleting && oap->regname == 0
+    إذا (curr == &y_regs[REAL_PLUS_رجسٹر] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED_PLUS)))
     {
-	if (curr != &(y_regs[REAL_PLUS_REGISTER]))
-	    copy_yank_reg(&(y_regs[REAL_PLUS_REGISTER]));
-	call_clip_provider_set('+');
+	إذا (curr != &(y_regs[REAL_PLUS_رجسٹر]))
+	    copy_yank_reg(&(y_regs[REAL_PLUS_رجسٹر]));
+	call_clip_provider_سیٹ('+');
     }
-    if (curr == &y_regs[STAR_REGISTER] || (!deleting && oap->regname == 0
+    إذا (curr == &y_regs[تارا_رجسٹر] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED)))
     {
-	if (curr != &(y_regs[STAR_REGISTER]))
-	    copy_yank_reg(&(y_regs[STAR_REGISTER]));
-	call_clip_provider_set('*');
+	إذا (curr != &(y_regs[تارا_رجسٹر]))
+	    copy_yank_reg(&(y_regs[تارا_رجسٹر]));
+	call_clip_provider_سیٹ('*');
     }
-#endif
+#جے_انت
 
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// If we were yanking to the '*' register, send result to clipboard. If
 	// no register was specified, and "unnamed" in 'clipboard', make a copy
 	// to the '*' register.
-	if (clip_star.available
-		&& (curr == &(y_regs[STAR_REGISTER])
+	إذا (clip_تارا.دستیاب
+		&& (curr == &(y_regs[تارا_رجسٹر])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) & CLIP_UNNAMED))))
 	{
-	    if (curr != &(y_regs[STAR_REGISTER]))
+	    إذا (curr != &(y_regs[تارا_رجسٹر]))
 		// Copy the text from register 0 to the clipboard register.
-		copy_yank_reg(&(y_regs[STAR_REGISTER]));
+		copy_yank_reg(&(y_regs[تارا_رجسٹر]));
 
-	    clip_own_selection(&clip_star);
-	    clip_gen_set_selection(&clip_star);
+	    clip_own_selection(&clip_تارا);
+	    clip_gen_سیٹ_selection(&clip_تارا);
 	}
 
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# إذا defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	// If we were yanking to the '+' register, send result to selection.
-	if (clip_plus.available
-		&& (curr == &(y_regs[PLUS_REGISTER])
+	إذا (clip_plus.دستیاب
+		&& (curr == &(y_regs[PLUS_رجسٹر])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) &
 			    CLIP_UNNAMED_PLUS))))
 	{
-	    if (curr != &(y_regs[PLUS_REGISTER]))
+	    إذا (curr != &(y_regs[PLUS_رجسٹر]))
 		// Copy the text from register 0 to the clipboard register.
-		copy_yank_reg(&(y_regs[PLUS_REGISTER]));
+		copy_yank_reg(&(y_regs[PLUS_رجسٹر]));
 
 	    clip_own_selection(&clip_plus);
-	    clip_gen_set_selection(&clip_plus);
+	    clip_gen_سیٹ_selection(&clip_plus);
 	}
 # endif
     }
-#endif
+#جے_انت
 
-#if defined(FEAT_EVAL)
-    if (!deleting && has_textyankpost())
+#إذا defined(FEAT_EVAL)
+    إذا (!deleting && has_textyankpost())
 	yank_do_autocmd(oap, y_current);
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
-#endif
-    return OK;
+#جے_انت
+    أرجع OK;
 
 fail:		// free the allocated lines
     free_yank(y_idx + 1);
     y_current = curr;
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Copy a block range into a register.
  * If "exclude_trailing_space" is set, do not copy trailing whitespaces.
  */
-    static int
-yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
+    ساكن صحيح
+yank_copy_سطر(بنية بلاک_def *bd, لما y_idx, صحيح exclude_trailing_space)
 {
     char_u	*pnew;
 
-    if (exclude_trailing_space)
+    إذا (exclude_trailing_space)
 	bd->endspaces = 0;
-    if ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
-								      == NULL)
-	return FAIL;
+    إذا ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
+								      == عدم)
+	أرجع FAIL;
     y_current->y_array[y_idx].string = pnew;
     vim_memset(pnew, ' ', (size_t)bd->startspaces);
     pnew += bd->startspaces;
@@ -1639,55 +1639,55 @@ yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
     pnew += bd->textlen;
     vim_memset(pnew, ' ', (size_t)bd->endspaces);
     pnew += bd->endspaces;
-    if (exclude_trailing_space)
+    إذا (exclude_trailing_space)
     {
-	int s = bd->textlen + bd->endspaces;
+	صحيح s = bd->textlen + bd->endspaces;
 
-	while (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
+	طالما (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
 	{
-	    s = s - (*mb_head_off)(bd->textstart, bd->textstart + s - 1) - 1;
+	    s = s - (*mb_سر_off)(bd->textstart, bd->textstart + s - 1) - 1;
 	    pnew--;
 	}
     }
     *pnew = NUL;
 
-    y_current->y_array[y_idx].length = (size_t)(pnew - y_current->y_array[y_idx].string);
+    y_current->y_array[y_idx].لمائی = (size_t)(pnew - y_current->y_array[y_idx].string);
 
-    return OK;
+    أرجع OK;
 }
 
-#ifdef HAVE_CLIPMETHOD
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
 /*
  * Make a copy of the y_current register to register "reg".
  */
-    static void
+    ساكن فراغ
 copy_yank_reg(yankreg_T *reg)
 {
     yankreg_T	*curr = y_current;
-    long	j;
+    لما	j;
 
     y_current = reg;
     free_yank_all();
     *y_current = *curr;
     y_current->y_array = lalloc_clear(
-				    sizeof(string_T) * y_current->y_size, TRUE);
-    if (y_current->y_array == NULL)
-	y_current->y_size = 0;
-    else
-	for (j = 0; j < y_current->y_size; ++j)
+				    حجم(string_T) * y_current->y_ناپ, TRUE);
+    إذا (y_current->y_array == عدم)
+	y_current->y_ناپ = 0;
+    وإلا
+	لكل (j = 0; j < y_current->y_ناپ; ++j)
 	{
-	    if ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
-						curr->y_array[j].length)) == NULL)
+	    إذا ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
+						curr->y_array[j].لمائی)) == عدم)
 	    {
 		free_yank(j);
-		y_current->y_size = 0;
-		break;
+		y_current->y_ناپ = 0;
+		اكسر;
 	    }
-	    y_current->y_array[j].length = curr->y_array[j].length;
+	    y_current->y_array[j].لمائی = curr->y_array[j].لمائی;
 	}
     y_current = curr;
 }
-#endif
+#جے_انت
 
 /*
  * Put contents of register "regname" into the text.
@@ -1697,123 +1697,123 @@ copy_yank_reg(yankreg_T *reg)
  *	    PUT_LINE		force linewise put (":put")
  *	    PUT_BLOCK_INNER     in block mode, do not add trailing spaces
  */
-    void
+    فراغ
 do_put(
-    int		regname,
-    char_u	*expr_result,	// result for regname "=" when compiled
-    int		dir,		// BACKWARD for 'P', FORWARD for 'p'
-    long	count,
-    int		flags)
+    صحيح		regname,
+    char_u	*اظہاریہ_نتیجہ,	// result for regname "=" when compiled
+    صحيح		dir,		// BACKWARD for 'P', FORWARD for 'p'
+    لما	گنتی,
+    صحيح		flags)
 {
     char_u	*ptr;
     char_u	*newp;
     char_u	*oldp;
-    int		yanklen;
-    int		totlen = 0;		// init for gcc
+    صحيح		yanklen;
+    صحيح		totlen = 0;		// init for gcc
     linenr_T	lnum;
-    colnr_T	col;
-    long	i;			// index in y_array[]
-    int		y_type;
-    long	y_size;
-    int		oldlen;
-    long	y_width = 0;
+    colnr_T	خانہ;
+    لما	i;			// index in y_array[]
+    صحيح		y_type;
+    لما	y_ناپ;
+    صحيح		oldlen;
+    لما	y_چوڑائی = 0;
     colnr_T	vcol;
-    string_T	*y_array = NULL;
-    yankreg_T	*y_current_used = NULL;
-    long	nr_lines = 0;
-    string_T	insert_string;
-    int		allocated = FALSE;
-    pos_T	orig_start = curbuf->b_op_start;
-    pos_T	orig_end = curbuf->b_op_end;
-    unsigned int cur_ve_flags = get_ve_flags();
+    string_T	*y_array = عدم;
+    yankreg_T	*y_current_ورتیا = عدم;
+    لما	nr_سطریں = 0;
+    string_T	داخل_کرو_string;
+    صحيح		allocated = FALSE;
+    pos_T	orig_شروع = curbuf->b_op_شروع;
+    pos_T	orig_سرا = curbuf->b_op_سرا;
+    بنانشانی صحيح cur_ve_flags = get_ve_flags();
 
-#ifdef HAVE_CLIPMETHOD
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
     adjust_clip_reg(&regname);
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
     call_clip_provider_request(regname);
-#endif
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	// Adjust register name for "unnamed" in 'clipboard'.
-	(void)may_get_selection(regname);
-#endif
+	(فراغ)may_get_selection(regname);
+#جے_انت
 
     // Remove any preinserted text (issue #19329)
-    if (ins_compl_preinsert_effect())
+    إذا (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    curbuf->b_op_start = curwin->w_cursor;	// default for '[ mark
-    curbuf->b_op_end = curwin->w_cursor;	// default for '] mark
+    curbuf->b_op_شروع = curwin->w_cursor;	// default for '[ mark
+    curbuf->b_op_سرا = curwin->w_cursor;	// default for '] mark
 
     // Using inserted text works differently, because the register includes
     // special characters (newlines, etc.).
-    if (regname == '.')
+    إذا (regname == '.')
     {
-	if (VIsual_active)
-	    stuffcharReadbuff(VIsual_mode);
+	إذا (VIsual_سرگرم)
+	    stuffcharReadbuff(VIsual_منوال);
 
-#ifdef FEAT_EVAL
+#جے_تعریف_شدہ FEAT_EVAL
 	bool has_textput_events = has_textputpre() || has_textputpost();
-	if (has_textput_events)
-	    add_last_insert++;
-#endif
+	إذا (has_textput_events)
+	    جوڑو_آخری_داخل_کرو++;
+#جے_انت
 
-	(void)stuff_inserted((dir == FORWARD ? (count == -1 ? 'o' : 'a') :
-				    (count == -1 ? 'O' : 'i')), count, FALSE);
+	(فراغ)stuff_inserted((dir == FORWARD ? (گنتی == -1 ? 'o' : 'a') :
+				    (گنتی == -1 ? 'O' : 'i')), گنتی, FALSE);
 
-#ifdef FEAT_EVAL
+#جے_تعریف_شدہ FEAT_EVAL
 	// Since the text is not inserted into the buffer immediately, just call
 	// TextPutPost after TextPutPre.
-	if (has_textputpre())
-	    put_do_autocmd('.', NULL, NULL, false, dir);
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+	إذا (has_textputpre())
+	    put_do_autocmd('.', عدم, عدم, false, dir);
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
-#endif
-#ifdef FEAT_EVAL
-	if (has_textputpost())
-	    put_do_autocmd('.', NULL, NULL, true, dir);
+#جے_انت
+#جے_تعریف_شدہ FEAT_EVAL
+	إذا (has_textputpost())
+	    put_do_autocmd('.', عدم, عدم, true, dir);
 
-	if (has_textput_events && --add_last_insert == 0)
-	    ga_clear(&last_insert_ga);
-#endif
+	إذا (has_textput_events && --جوڑو_آخری_داخل_کرو == 0)
+	    ga_clear(&آخری_داخل_کرو_ga);
+#جے_انت
 
 	// Putting the text is done later, so can't really move the cursor to
 	// the next character.  Use "l" to simulate it.
-	if ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
+	إذا ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
 	    stuffcharReadbuff('l');
-	return;
+	أرجع;
     }
 
     // For special registers '%' (file name), '#' (alternate file name) and
     // ':' (last command line), etc. we have to create a fake yank register.
     // For compiled code "expr_result" holds the expression result.
-    insert_string.string = NULL;
-    if (regname == '=' && expr_result != NULL)
-	insert_string.string = expr_result;
-    else if (get_spec_reg(regname, &insert_string.string, &allocated, TRUE)
-		&& insert_string.string == NULL)
+    داخل_کرو_string.string = عدم;
+    إذا (regname == '=' && اظہاریہ_نتیجہ != عدم)
+	داخل_کرو_string.string = اظہاریہ_نتیجہ;
+    وإلا إذا (get_spec_reg(regname, &داخل_کرو_string.string, &allocated, TRUE)
+		&& داخل_کرو_string.string == عدم)
     {
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
-#endif
-	return;
+#جے_انت
+	أرجع;
     }
 
     // Autocommands may be executed when saving lines for undo.  This might
     // make "y_array" invalid, so we start undo now to avoid that.
-    if (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
-	goto end;
+    إذا (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
+	اذهب سرا;
 
-    if (insert_string.string != NULL)
+    إذا (داخل_کرو_string.string != عدم)
     {
-	insert_string.length = STRLEN(insert_string.string);
+	داخل_کرو_string.لمائی = STRLEN(داخل_کرو_string.string);
 
 	y_type = MCHAR;
-#ifdef FEAT_EVAL
-	if (regname == '=')
+#جے_تعریف_شدہ FEAT_EVAL
+	إذا (regname == '=')
 	{
 	    size_t  ptrlen;
 	    char_u  *tmp;
@@ -1821,81 +1821,81 @@ do_put(
 	    // For the = register we need to split the string at NL
 	    // characters.
 	    // Loop twice: count the number of lines and save them.
-	    for (;;)
+	    لكل (;;)
 	    {
-		y_size = 0;
-		ptr = insert_string.string;
-		ptrlen = insert_string.length;
-		while (ptr != NULL)
+		y_ناپ = 0;
+		ptr = داخل_کرو_string.string;
+		ptrlen = داخل_کرو_string.لمائی;
+		طالما (ptr != عدم)
 		{
-		    if (y_array != NULL)
-			y_array[y_size].string = ptr;
-		    ++y_size;
+		    إذا (y_array != عدم)
+			y_array[y_ناپ].string = ptr;
+		    ++y_ناپ;
 		    tmp = vim_strchr(ptr, '\n');
-		    if (tmp == NULL)
+		    إذا (tmp == عدم)
 		    {
-			if (y_array != NULL)
-			    y_array[y_size - 1].length = ptrlen;
+			إذا (y_array != عدم)
+			    y_array[y_ناپ - 1].لمائی = ptrlen;
 		    }
-		    else
+		    وإلا
 		    {
-			if (y_array != NULL)
+			إذا (y_array != عدم)
 			{
 			    *tmp = NUL;
-			    y_array[y_size - 1].length = (size_t)(tmp - ptr);
-			    ptrlen -= y_array[y_size - 1].length + 1;
+			    y_array[y_ناپ - 1].لمائی = (size_t)(tmp - ptr);
+			    ptrlen -= y_array[y_ناپ - 1].لمائی + 1;
 			}
 			++tmp;
 			// A trailing '\n' makes the register linewise.
-			if (*tmp == NUL)
+			إذا (*tmp == NUL)
 			{
 			    y_type = MLINE;
-			    break;
+			    اكسر;
 			}
 		    }
 		    ptr = tmp;
 		}
-		if (y_array != NULL)
-		    break;
-		y_array = ALLOC_MULT(string_T, y_size);
-		if (y_array == NULL)
-		    goto end;
+		إذا (y_array != عدم)
+		    اكسر;
+		y_array = ALLOC_MULT(string_T, y_ناپ);
+		إذا (y_array == عدم)
+		    اذهب سرا;
 	    }
 	}
-	else
-#endif
+	وإلا
+#جے_انت
 	{
-	    y_size = 1;		// use fake one-line yank register
-	    y_array = &insert_string;
+	    y_ناپ = 1;		// use fake one-line yank register
+	    y_array = &داخل_کرو_string;
 	}
-#ifdef FEAT_EVAL
-	if (has_textputpre())
-	    put_do_autocmd(regname, NULL, &insert_string, false, dir);
-#endif
+#جے_تعریف_شدہ FEAT_EVAL
+	إذا (has_textputpre())
+	    put_do_autocmd(regname, عدم, &داخل_کرو_string, false, dir);
+#جے_انت
     }
-    else
+    وإلا
     {
-#ifdef FEAT_EVAL
-	if (has_textputpre())
+#جے_تعریف_شدہ FEAT_EVAL
+	إذا (has_textputpre())
 	{
 	    // Make sure to call this before we set the variables, as setreg()
 	    // may be called and invalidate them.
-	    get_yank_register(regname, FALSE);
-	    put_do_autocmd(regname, y_current, NULL, false, dir);
+	    get_yank_رجسٹر(regname, FALSE);
+	    put_do_autocmd(regname, y_current, عدم, false, dir);
 	}
-#endif
-	get_yank_register(regname, FALSE);
+#جے_انت
+	get_yank_رجسٹر(regname, FALSE);
 
 	y_type = y_current->y_type;
-	y_width = y_current->y_width;
-	y_size = y_current->y_size;
+	y_چوڑائی = y_current->y_چوڑائی;
+	y_ناپ = y_current->y_ناپ;
 	y_array = y_current->y_array;
-	y_current_used = y_current;
+	y_current_ورتیا = y_current;
     }
 
-    if (y_type == MLINE)
+    إذا (y_type == MLINE)
     {
-	if (flags & PUT_LINE_SPLIT)
+	إذا (flags & PUT_سطر_ونڈو)
 	{
 	    char_u *p_orig;
 	    char_u *p;
@@ -1903,163 +1903,163 @@ do_put(
 
 	    // "p" or "P" in Visual mode: split the lines to put the text in
 	    // between.
-	    if (u_save_cursor() == FAIL)
-		goto end;
+	    إذا (u_save_cursor() == FAIL)
+		اذهب سرا;
 	    p_orig = p = ml_get_cursor();
 	    plen = ml_get_cursor_len();
-	    if (dir == FORWARD && *p != NUL)
+	    إذا (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
 	    ptr = vim_strnsave(p, plen - (size_t)(p - p_orig));
-	    if (ptr == NULL)
-		goto end;
+	    إذا (ptr == عدم)
+		اذهب سرا;
 	    ml_append(curwin->w_cursor.lnum, ptr, (colnr_T)0, FALSE);
 	    vim_free(ptr);
 
 	    oldp = ml_get_curline();
-	    p = oldp + curwin->w_cursor.col;
-	    if (dir == FORWARD && *p != NUL)
+	    p = oldp + curwin->w_cursor.خانہ;
+	    إذا (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
 	    ptr = vim_strnsave(oldp, (size_t)(p - oldp));
-	    if (ptr == NULL)
-		goto end;
+	    إذا (ptr == عدم)
+		اذهب سرا;
 	    ml_replace(curwin->w_cursor.lnum, ptr, FALSE);
-	    ++nr_lines;
+	    ++nr_سطریں;
 	    dir = FORWARD;
 	}
-	if (flags & PUT_LINE_FORWARD)
+	إذا (flags & PUT_سطر_FORWARD)
 	{
 	    // Must be "p" for a Visual block, put lines below the block.
-	    curwin->w_cursor = curbuf->b_visual.vi_end;
+	    curwin->w_cursor = curbuf->b_visual.vi_سرا;
 	    dir = FORWARD;
 	}
-	curbuf->b_op_start = curwin->w_cursor;	// default for '[ mark
-	curbuf->b_op_end = curwin->w_cursor;	// default for '] mark
+	curbuf->b_op_شروع = curwin->w_cursor;	// default for '[ mark
+	curbuf->b_op_سرا = curwin->w_cursor;	// default for '] mark
     }
 
-    if (flags & PUT_LINE)	// :put command or "p" in Visual line mode.
+    إذا (flags & PUT_سطر)	// :put command or "p" in Visual line mode.
 	y_type = MLINE;
 
-    if (y_size == 0 || y_array == NULL)
+    إذا (y_ناپ == 0 || y_array == عدم)
     {
-	semsg(_(e_nothing_in_register_str),
+	semsg(_(e_nothing_وچ_رجسٹر_str),
 		  regname == 0 ? (char_u *)"\"" : transchar(regname));
-	goto end;
+	اذهب سرا;
     }
 
-    if (y_type == MBLOCK)
+    إذا (y_type == MBLOCK)
     {
-	lnum = curwin->w_cursor.lnum + y_size + 1;
-	if (lnum > curbuf->b_ml.ml_line_count)
-	    lnum = curbuf->b_ml.ml_line_count + 1;
-	if (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
-	    goto end;
+	lnum = curwin->w_cursor.lnum + y_ناپ + 1;
+	إذا (lnum > curbuf->b_ml.ml_سطر_گنتی)
+	    lnum = curbuf->b_ml.ml_سطر_گنتی + 1;
+	إذا (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
+	    اذهب سرا;
     }
-    else if (y_type == MLINE)
+    وإلا إذا (y_type == MLINE)
     {
 	lnum = curwin->w_cursor.lnum;
-#ifdef FEAT_FOLDING
+#جے_تعریف_شدہ FEAT_FOLDING
 	// Correct line number for closed fold.  Don't move the cursor yet,
 	// u_save() uses it.
-	if (dir == BACKWARD)
-	    (void)hasFolding(lnum, &lnum, NULL);
-	else
-	    (void)hasFolding(lnum, NULL, &lnum);
-#endif
-	if (dir == FORWARD)
+	إذا (dir == BACKWARD)
+	    (فراغ)hasFolding(lnum, &lnum, عدم);
+	وإلا
+	    (فراغ)hasFolding(lnum, عدم, &lnum);
+#جے_انت
+	إذا (dir == FORWARD)
 	    ++lnum;
 	// In an empty buffer the empty line is going to be replaced, include
 	// it in the saved lines.
-	if ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
-	    goto end;
-#ifdef FEAT_FOLDING
-	if (dir == FORWARD)
+	إذا ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
+	    اذهب سرا;
+#جے_تعریف_شدہ FEAT_FOLDING
+	إذا (dir == FORWARD)
 	    curwin->w_cursor.lnum = lnum - 1;
-	else
+	وإلا
 	    curwin->w_cursor.lnum = lnum;
-	curbuf->b_op_start = curwin->w_cursor;	// for mark_adjust()
-#endif
+	curbuf->b_op_شروع = curwin->w_cursor;	// for mark_adjust()
+#جے_انت
     }
-    else if (u_save_cursor() == FAIL)
-	goto end;
+    وإلا إذا (u_save_cursor() == FAIL)
+	اذهب سرا;
 
-    if (cur_ve_flags == VE_ALL && y_type == MCHAR)
+    إذا (cur_ve_flags == VE_ALL && y_type == MCHAR)
     {
-	if (gchar_cursor() == TAB)
+	إذا (gchar_cursor() == TAB)
 	{
-	    int viscol = getviscol();
-	    int ts = curbuf->b_p_ts;
+	    صحيح viscol = getviscol();
+	    صحيح ts = curbuf->b_p_ts;
 
 	    // Don't need to insert spaces when "p" on the last position of a
 	    // tab or "P" on the first position.
-	    if (dir == FORWARD ?
-#ifdef FEAT_VARTABS
+	    إذا (dir == FORWARD ?
+#جے_تعریف_شدہ FEAT_VARTABS
 		    tabstop_padding(viscol, ts, curbuf->b_p_vts_array) != 1
-#else
+#وإلا
 		    ts - (viscol % ts) != 1
-#endif
+#جے_انت
 		    : curwin->w_cursor.coladd > 0)
 		coladvance_force(viscol);
-	    else
+	    وإلا
 		curwin->w_cursor.coladd = 0;
 	}
-	else if (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
+	وإلا إذا (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
 	    coladvance_force(getviscol() + (dir == FORWARD));
     }
 
     lnum = curwin->w_cursor.lnum;
-    col = curwin->w_cursor.col;
+    خانہ = curwin->w_cursor.خانہ;
 
     // Block mode
-    if (y_type == MBLOCK)
+    إذا (y_type == MBLOCK)
     {
-	int	delcount;
-	int	incr = 0;
-	struct block_def bd;
-	long	j;
-	int	c = gchar_cursor();
+	صحيح	delcount;
+	صحيح	incr = 0;
+	بنية بلاک_def bd;
+	لما	j;
+	صحيح	c = gchar_cursor();
 	colnr_T	endcol2 = 0;
 
-	if (dir == FORWARD && c != NUL)
+	إذا (dir == FORWARD && c != NUL)
 	{
-	    if (cur_ve_flags == VE_ALL)
-		getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
-	    else
-		getvcol(curwin, &curwin->w_cursor, NULL, NULL, &col, 0);
+	    إذا (cur_ve_flags == VE_ALL)
+		getvcol(curwin, &curwin->w_cursor, &خانہ, عدم, &endcol2, 0);
+	    وإلا
+		getvcol(curwin, &curwin->w_cursor, عدم, عدم, &خانہ, 0);
 
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 		// move to start of next multi-byte character
-		curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-	    else
-		if (c != TAB || cur_ve_flags != VE_ALL)
-		    ++curwin->w_cursor.col;
-	    ++col;
+		curwin->w_cursor.خانہ += (*mb_ptr2len)(ml_get_cursor());
+	    وإلا
+		إذا (c != TAB || cur_ve_flags != VE_ALL)
+		    ++curwin->w_cursor.خانہ;
+	    ++خانہ;
 	}
-	else
-	    getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
+	وإلا
+	    getvcol(curwin, &curwin->w_cursor, &خانہ, عدم, &endcol2, 0);
 
-	col += curwin->w_cursor.coladd;
-	if (cur_ve_flags == VE_ALL
+	خانہ += curwin->w_cursor.coladd;
+	إذا (cur_ve_flags == VE_ALL
 		&& (curwin->w_cursor.coladd > 0
-		    || endcol2 == curwin->w_cursor.col))
+		    || endcol2 == curwin->w_cursor.خانہ))
 	{
-	    if (dir == FORWARD && c == NUL)
-		++col;
-	    if (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
-		++curwin->w_cursor.col;
-	    if (c == TAB)
+	    إذا (dir == FORWARD && c == NUL)
+		++خانہ;
+	    إذا (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
+		++curwin->w_cursor.خانہ;
+	    إذا (c == TAB)
 	    {
-		if (dir == BACKWARD && curwin->w_cursor.col)
-		    curwin->w_cursor.col--;
-		if (dir == FORWARD && col - 1 == endcol2)
-		    curwin->w_cursor.col++;
+		إذا (dir == BACKWARD && curwin->w_cursor.خانہ)
+		    curwin->w_cursor.خانہ--;
+		إذا (dir == FORWARD && خانہ - 1 == endcol2)
+		    curwin->w_cursor.خانہ++;
 	    }
 	}
 	curwin->w_cursor.coladd = 0;
 	bd.textcol = 0;
-	for (i = 0; i < y_size; ++i)
+	لكل (i = 0; i < y_ناپ; ++i)
 	{
-	    int		    spaces = 0;
-	    char	    shortline;
+	    صحيح		    spaces = 0;
+	    حرف	    shortline;
 	    chartabsize_T   cts;
 
 	    bd.startspaces = 0;
@@ -2068,12 +2068,12 @@ do_put(
 	    delcount = 0;
 
 	    // add a new line
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	    إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_سطر_گنتی)
 	    {
-		if (ml_append(curbuf->b_ml.ml_line_count, (char_u *)"",
+		إذا (ml_append(curbuf->b_ml.ml_سطر_گنتی, (char_u *)"",
 						   (colnr_T)1, FALSE) == FAIL)
-		    break;
-		++nr_lines;
+		    اكسر;
+		++nr_سطریں;
 	    }
 	    // get the old line and advance to the position to insert at
 	    oldp = ml_get_curline();
@@ -2081,7 +2081,7 @@ do_put(
 	    init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum, 0,
 								  oldp, oldp);
 
-	    while (cts.cts_vcol < col && *cts.cts_ptr != NUL)
+	    طالما (cts.cts_vcol < خانہ && *cts.cts_ptr != NUL)
 	    {
 		// Count a tab for what it's worth (if list mode not on)
 		incr = lbr_chartabsize_adv(&cts);
@@ -2092,19 +2092,19 @@ do_put(
 	    bd.textcol = (colnr_T)(ptr - oldp);
 	    clear_chartabsize_arg(&cts);
 
-	    shortline = (vcol < col) || (vcol == col && !*ptr) ;
+	    shortline = (vcol < خانہ) || (vcol == خانہ && !*ptr) ;
 
-	    if (vcol < col) // line too short, pad with spaces
-		bd.startspaces = col - vcol;
-	    else if (vcol > col)
+	    إذا (vcol < خانہ) // line too short, pad with spaces
+		bd.startspaces = خانہ - vcol;
+	    وإلا إذا (vcol > خانہ)
 	    {
-		bd.endspaces = vcol - col;
+		bd.endspaces = vcol - خانہ;
 		bd.startspaces = incr - bd.endspaces;
 		--bd.textcol;
 		delcount = 1;
-		if (has_mbyte)
-		    bd.textcol -= (*mb_head_off)(oldp, oldp + bd.textcol);
-		if (oldp[bd.textcol] != TAB)
+		إذا (has_mbyte)
+		    bd.textcol -= (*mb_سر_off)(oldp, oldp + bd.textcol);
+		إذا (oldp[bd.textcol] != TAB)
 		{
 		    // Only a Tab can be split into spaces.  Other
 		    // characters will have to be moved to after the
@@ -2114,40 +2114,40 @@ do_put(
 		}
 	    }
 
-	    yanklen = (int)y_array[i].length;
+	    yanklen = (صحيح)y_array[i].لمائی;
 
-	    if ((flags & PUT_BLOCK_INNER) == 0)
+	    إذا ((flags & PUT_بلاک_INNER) == 0)
 	    {
 		// calculate number of spaces required to fill right side of
-		// block
-		spaces = y_width + 1;
+		//بلاک
+		spaces = y_چوڑائی + 1;
 		init_chartabsize_arg(&cts, curwin, 0, 0,
 						      y_array[i].string, y_array[i].string);
 
-		while (*cts.cts_ptr != NUL)
+		طالما (*cts.cts_ptr != NUL)
 		{
 		    spaces -= lbr_chartabsize_adv(&cts);
 		    cts.cts_vcol = 0;
 		}
 		clear_chartabsize_arg(&cts);
-		if (spaces < 0)
+		إذا (spaces < 0)
 		    spaces = 0;
 	    }
 
 	    // Insert the new text.
 	    // First check for multiplication overflow.
-	    if (yanklen + spaces != 0
-		     && count > ((INT_MAX - (bd.startspaces + bd.endspaces))
+	    إذا (yanklen + spaces != 0
+		     && گنتی > ((ودھ_توں_ودھ_عدد - (bd.startspaces + bd.endspaces))
 							/ (yanklen + spaces)))
 	    {
-		emsg(_(e_resulting_text_too_long));
-		break;
+		emsg(_(e_resulting_متن_too_long));
+		اكسر;
 	    }
 
-	    totlen = count * (yanklen + spaces) + bd.startspaces + bd.endspaces;
+	    totlen = گنتی * (yanklen + spaces) + bd.startspaces + bd.endspaces;
 	    newp = alloc(totlen + oldlen + 1);
-	    if (newp == NULL)
-		break;
+	    إذا (newp == عدم)
+		اكسر;
 
 	    // copy part up to cursor to new line
 	    ptr = newp;
@@ -2159,18 +2159,18 @@ do_put(
 	    ptr += bd.startspaces;
 
 	    // insert the new text
-	    for (j = 0; j < count; ++j)
+	    لكل (j = 0; j < گنتی; ++j)
 	    {
 		mch_memmove(ptr, y_array[i].string, (size_t)yanklen);
 		ptr += yanklen;
 
 		// insert block's trailing spaces only if there's text behind
-		if ((j < count - 1 || !shortline) && spaces > 0)
+		إذا ((j < گنتی - 1 || !shortline) && spaces > 0)
 		{
 		    vim_memset(ptr, ' ', (size_t)spaces);
 		    ptr += spaces;
 		}
-		else
+		وإلا
 		    totlen -= spaces;  // didn't use these spaces
 	    }
 
@@ -2184,92 +2184,92 @@ do_put(
 	    ml_replace(curwin->w_cursor.lnum, newp, FALSE);
 
 	    ++curwin->w_cursor.lnum;
-	    if (i == 0)
-		curwin->w_cursor.col += bd.startspaces;
+	    إذا (i == 0)
+		curwin->w_cursor.خانہ += bd.startspaces;
 	}
 
-	changed_lines(lnum, 0, curwin->w_cursor.lnum - nr_lines, nr_lines);
+	بدلیا_سطریں(lnum, 0, curwin->w_cursor.lnum - nr_سطریں, nr_سطریں);
 
 	// Set '[ mark.
-	curbuf->b_op_start = curwin->w_cursor;
-	curbuf->b_op_start.lnum = lnum;
+	curbuf->b_op_شروع = curwin->w_cursor;
+	curbuf->b_op_شروع.lnum = lnum;
 
 	// adjust '] mark
-	curbuf->b_op_end.lnum = curwin->w_cursor.lnum - 1;
-	curbuf->b_op_end.col = bd.textcol + totlen - 1;
-	if (curbuf->b_op_end.col < 0)
-	    curbuf->b_op_end.col = 0;
-	curbuf->b_op_end.coladd = 0;
-	if (flags & PUT_CURSEND)
+	curbuf->b_op_سرا.lnum = curwin->w_cursor.lnum - 1;
+	curbuf->b_op_سرا.خانہ = bd.textcol + totlen - 1;
+	إذا (curbuf->b_op_سرا.خانہ < 0)
+	    curbuf->b_op_سرا.خانہ = 0;
+	curbuf->b_op_سرا.coladd = 0;
+	إذا (flags & PUT_CURSEND)
 	{
 	    colnr_T len;
 
-	    curwin->w_cursor = curbuf->b_op_end;
-	    curwin->w_cursor.col++;
+	    curwin->w_cursor = curbuf->b_op_سرا;
+	    curwin->w_cursor.خانہ++;
 
 	    // in Insert mode we might be after the NUL, correct for that
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
-		curwin->w_cursor.col = len;
+	    إذا (curwin->w_cursor.خانہ > len)
+		curwin->w_cursor.خانہ = len;
 	}
-	else
+	وإلا
 	    curwin->w_cursor.lnum = lnum;
     }
-    else
+    وإلا
     {
 	pos_T	new_cursor;
 
-	yanklen = (int)y_array[0].length;
+	yanklen = (صحيح)y_array[0].لمائی;
 
 	// Character or Line mode
-	if (y_type == MCHAR)
+	إذا (y_type == MCHAR)
 	{
 	    // if type is MCHAR, FORWARD is the same as BACKWARD on the next
 	    // char
-	    if (dir == FORWARD && gchar_cursor() != NUL)
+	    إذا (dir == FORWARD && gchar_cursor() != NUL)
 	    {
-		if (has_mbyte)
+		إذا (has_mbyte)
 		{
-		    int bytelen = (*mb_ptr2len)(ml_get_cursor());
+		    صحيح bytelen = (*mb_ptr2len)(ml_get_cursor());
 
 		    // put it on the next of the multi-byte character.
-		    col += bytelen;
-		    if (yanklen)
+		    خانہ += bytelen;
+		    إذا (yanklen)
 		    {
-			curwin->w_cursor.col += bytelen;
-			curbuf->b_op_end.col += bytelen;
+			curwin->w_cursor.خانہ += bytelen;
+			curbuf->b_op_سرا.خانہ += bytelen;
 		    }
 		}
-		else
+		وإلا
 		{
-		    ++col;
-		    if (yanklen)
+		    ++خانہ;
+		    إذا (yanklen)
 		    {
-			++curwin->w_cursor.col;
-			++curbuf->b_op_end.col;
+			++curwin->w_cursor.خانہ;
+			++curbuf->b_op_سرا.خانہ;
 		    }
 		}
 	    }
-	    curbuf->b_op_start = curwin->w_cursor;
+	    curbuf->b_op_شروع = curwin->w_cursor;
 	}
 	// Line mode: BACKWARD is the same as FORWARD on the previous line
-	else if (dir == BACKWARD)
+	وإلا إذا (dir == BACKWARD)
 	    --lnum;
 	new_cursor = curwin->w_cursor;
 
 	// simple case: insert into one line at a time
-	if (y_type == MCHAR && y_size == 1)
+	إذا (y_type == MCHAR && y_ناپ == 1)
 	{
-	    linenr_T	end_lnum = 0; // init for gcc
-	    linenr_T	start_lnum = lnum;
-	    int		first_byte_off = 0;
+	    linenr_T	سرا_lnum = 0; // init for gcc
+	    linenr_T	شروع_lnum = lnum;
+	    صحيح		پہلا_byte_off = 0;
 
-	    if (VIsual_active)
+	    إذا (VIsual_سرگرم)
 	    {
-		end_lnum = curbuf->b_visual.vi_end.lnum;
-		if (end_lnum < curbuf->b_visual.vi_start.lnum)
-		    end_lnum = curbuf->b_visual.vi_start.lnum;
-		if (end_lnum > start_lnum)
+		سرا_lnum = curbuf->b_visual.vi_سرا.lnum;
+		إذا (سرا_lnum < curbuf->b_visual.vi_شروع.lnum)
+		    سرا_lnum = curbuf->b_visual.vi_شروع.lnum;
+		إذا (سرا_lnum > شروع_lnum)
 		{
 		    pos_T   pos;
 
@@ -2277,118 +2277,118 @@ do_put(
 		    // the virtual column needs to be used.  Matters for
 		    // multi-byte characters.
 		    pos.lnum = lnum;
-		    pos.col = col;
+		    pos.خانہ = خانہ;
 		    pos.coladd = 0;
-		    getvcol(curwin, &pos, NULL, &vcol, NULL, 0);
+		    getvcol(curwin, &pos, عدم, &vcol, عدم, 0);
 		}
 	    }
 
-	    if (count == 0 || yanklen == 0)
+	    إذا (گنتی == 0 || yanklen == 0)
 	    {
-		if (VIsual_active)
-		    lnum = end_lnum;
+		إذا (VIsual_سرگرم)
+		    lnum = سرا_lnum;
 	    }
-	    else if (count > INT_MAX / yanklen)
+	    وإلا إذا (گنتی > ودھ_توں_ودھ_عدد / yanklen)
 		// multiplication overflow
-		emsg(_(e_resulting_text_too_long));
-	    else
+		emsg(_(e_resulting_متن_too_long));
+	    وإلا
 	    {
-		totlen = count * yanklen;
-		do
+		totlen = گنتی * yanklen;
+		افعل
 		{
 		    oldp = ml_get(lnum);
 		    oldlen = ml_get_len(lnum);
-		    if (lnum > start_lnum)
+		    إذا (lnum > شروع_lnum)
 		    {
 			pos_T   pos;
 
 			pos.lnum = lnum;
-			if (getvpos(&pos, vcol) == OK)
-			    col = pos.col;
-			else
-			    col = MAXCOL;
+			إذا (getvpos(&pos, vcol) == OK)
+			    خانہ = pos.خانہ;
+			وإلا
+			    خانہ = MAXCOL;
 		    }
-		    if (VIsual_active && col > oldlen)
+		    إذا (VIsual_سرگرم && خانہ > oldlen)
 		    {
 			lnum++;
-			continue;
+			استمر;
 		    }
 		    newp = alloc(totlen + oldlen + 1);
-		    if (newp == NULL)
-			goto end;	// alloc() gave an error message
-		    mch_memmove(newp, oldp, (size_t)col);
-		    ptr = newp + col;
-		    for (i = 0; i < count; ++i)
+		    إذا (newp == عدم)
+			اذهب سرا;	// alloc() gave an error message
+		    mch_memmove(newp, oldp, (size_t)خانہ);
+		    ptr = newp + خانہ;
+		    لكل (i = 0; i < گنتی; ++i)
 		    {
 			mch_memmove(ptr, y_array[0].string, (size_t)yanklen);
 			ptr += yanklen;
 		    }
-		    mch_memmove(ptr, oldp + col, (size_t)(oldlen - col) + 1);	    // +1 for NUL
+		    mch_memmove(ptr, oldp + خانہ, (size_t)(oldlen - خانہ) + 1);	    // +1 for NUL
 
 		    // compute the byte offset for the last character
-		    first_byte_off = mb_head_off(newp, ptr - 1);
+		    پہلا_byte_off = mb_سر_off(newp, ptr - 1);
 
 		    // Note: this may free "newp"
 		    ml_replace(lnum, newp, FALSE);
 
-		    inserted_bytes(lnum, col, totlen);
+		    inserted_بائٹاں(lnum, خانہ, totlen);
 
 		    // Place cursor on last putted char.
-		    if (lnum == curwin->w_cursor.lnum)
+		    إذا (lnum == curwin->w_cursor.lnum)
 		    {
 			// make sure curwin->w_virtcol is updated
-			changed_cline_bef_curs();
+			بدلیا_cline_bef_curs();
 			invalidate_botline();
-			curwin->w_cursor.col += (colnr_T)(totlen - 1);
+			curwin->w_cursor.خانہ += (colnr_T)(totlen - 1);
 		    }
-		    if (VIsual_active)
+		    إذا (VIsual_سرگرم)
 			lnum++;
-		} while (VIsual_active && lnum <= end_lnum);
+		} طالما (VIsual_سرگرم && lnum <= سرا_lnum);
 
-		if (VIsual_active) // reset lnum to the last visual line
+		إذا (VIsual_سرگرم) // reset lnum to the last visual line
 		    lnum--;
 	    }
 
 	    // put '] at the first byte of the last character
-	    curbuf->b_op_end = curwin->w_cursor;
-	    curbuf->b_op_end.col -= first_byte_off;
+	    curbuf->b_op_سرا = curwin->w_cursor;
+	    curbuf->b_op_سرا.خانہ -= پہلا_byte_off;
 
 	    // For "CTRL-O p" in Insert mode, put cursor after last char
-	    if (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
-		++curwin->w_cursor.col;
-	    else
-		curwin->w_cursor.col -= first_byte_off;
+	    إذا (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
+		++curwin->w_cursor.خانہ;
+	    وإلا
+		curwin->w_cursor.خانہ -= پہلا_byte_off;
 	}
-	else
+	وإلا
 	{
 	    linenr_T	new_lnum = new_cursor.lnum;
-	    int		indent;
-	    int		orig_indent = 0;
-	    int		indent_diff = 0;	// init for gcc
-	    int		first_indent = TRUE;
-	    int		lendiff = 0;
-	    long	cnt;
+	    صحيح		indent;
+	    صحيح		orig_indent = 0;
+	    صحيح		indent_diff = 0;	// init for gcc
+	    صحيح		پہلا_indent = TRUE;
+	    صحيح		lendiff = 0;
+	    لما	cnt;
 
-	    if (flags & PUT_FIXINDENT)
+	    إذا (flags & PUT_FIXINDENT)
 		orig_indent = get_indent();
 
 	    // Insert at least one line.  When y_type is MCHAR, break the first
 	    // line in two.
-	    for (cnt = 1; cnt <= count; ++cnt)
+	    لكل (cnt = 1; cnt <= گنتی; ++cnt)
 	    {
 		i = 0;
-		if (y_type == MCHAR)
+		إذا (y_type == MCHAR)
 		{
 		    // Split the current line in two at the insert position.
 		    // First insert y_array[size - 1] in front of second line.
 		    // Then append y_array[0] to first line.
 		    lnum = new_cursor.lnum;
-		    ptr = ml_get(lnum) + col;
-		    totlen = (int)y_array[y_size - 1].length;
-		    newp = alloc(ml_get_len(lnum) - col + totlen + 1);
-		    if (newp == NULL)
-			goto error;
-		    STRCPY(newp, y_array[y_size - 1].string);
+		    ptr = ml_get(lnum) + خانہ;
+		    totlen = (صحيح)y_array[y_ناپ - 1].لمائی;
+		    newp = alloc(ml_get_len(lnum) - خانہ + totlen + 1);
+		    إذا (newp == عدم)
+			اذهب error;
+		    STRCPY(newp, y_array[y_ناپ - 1].string);
 		    STRCPY(newp + totlen, ptr);
 		    // insert second line
 		    ml_append(lnum, newp, (colnr_T)0, FALSE);
@@ -2396,180 +2396,180 @@ do_put(
 		    vim_free(newp);
 
 		    oldp = ml_get(lnum);
-		    newp = alloc(col + yanklen + 1);
-		    if (newp == NULL)
-			goto error;
+		    newp = alloc(خانہ + yanklen + 1);
+		    إذا (newp == عدم)
+			اذهب error;
 					    // copy first part of line
-		    mch_memmove(newp, oldp, (size_t)col);
+		    mch_memmove(newp, oldp, (size_t)خانہ);
 					    // append to first line
-		    mch_memmove(newp + col, y_array[0].string, (size_t)(yanklen + 1));
+		    mch_memmove(newp + خانہ, y_array[0].string, (size_t)(yanklen + 1));
 		    ml_replace(lnum, newp, FALSE);
 
 		    curwin->w_cursor.lnum = lnum;
 		    i = 1;
 		}
 
-		for (; i < y_size; ++i)
+		لكل (; i < y_ناپ; ++i)
 		{
-		    if (y_type != MCHAR || i < y_size - 1)
+		    إذا (y_type != MCHAR || i < y_ناپ - 1)
 		    {
-			if (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
+			إذا (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
 								      == FAIL)
-			    goto error;
+			    اذهب error;
 			new_lnum++;
 		    }
 		    lnum++;
-		    ++nr_lines;
-		    if (flags & PUT_FIXINDENT)
+		    ++nr_سطریں;
+		    إذا (flags & PUT_FIXINDENT)
 		    {
 			pos_T	old_pos = curwin->w_cursor;
 
 			curwin->w_cursor.lnum = lnum;
 			ptr = ml_get(lnum);
-			if (cnt == count && i == y_size - 1)
+			إذا (cnt == گنتی && i == y_ناپ - 1)
 			    lendiff = ml_get_len(lnum);
-			if (*ptr == '#' && preprocs_left())
+			إذا (*ptr == '#' && preprocs_بایاں())
 			    indent = 0;     // Leave # lines at start
-			else if (*ptr == NUL)
+			وإلا إذا (*ptr == NUL)
 			    indent = 0;     // Ignore empty lines
-			else if (first_indent)
+			وإلا إذا (پہلا_indent)
 			{
 			    indent_diff = orig_indent - get_indent();
 			    indent = orig_indent;
-			    first_indent = FALSE;
+			    پہلا_indent = FALSE;
 			}
-			else if ((indent = get_indent() + indent_diff) < 0)
+			وإلا إذا ((indent = get_indent() + indent_diff) < 0)
 			    indent = 0;
-			(void)set_indent(indent, 0);
+			(فراغ)سیٹ_indent(indent, 0);
 			curwin->w_cursor = old_pos;
 			// remember how many chars were removed
-			if (cnt == count && i == y_size - 1)
+			إذا (cnt == گنتی && i == y_ناپ - 1)
 			    lendiff -= ml_get_len(lnum);
 		    }
 		}
-		if (cnt == 1)
+		إذا (cnt == 1)
 		    new_lnum = lnum;
 	    }
 
 error:
 	    // Adjust marks.
-	    if (y_type == MLINE)
+	    إذا (y_type == MLINE)
 	    {
-		curbuf->b_op_start.col = 0;
-		if (dir == FORWARD)
-		    curbuf->b_op_start.lnum++;
+		curbuf->b_op_شروع.خانہ = 0;
+		إذا (dir == FORWARD)
+		    curbuf->b_op_شروع.lnum++;
 	    }
-	    mark_adjust(curbuf->b_op_start.lnum + (y_type == MCHAR),
-					     (linenr_T)MAXLNUM, nr_lines, 0L);
+	    mark_adjust(curbuf->b_op_شروع.lnum + (y_type == MCHAR),
+					     (linenr_T)MAXLNUM, nr_سطریں, 0L);
 
 	    // note changed text for displaying and folding
-	    if (y_type == MCHAR)
-		changed_lines(curwin->w_cursor.lnum, col,
-					 curwin->w_cursor.lnum + 1, nr_lines);
-	    else
-		changed_lines(curbuf->b_op_start.lnum, 0,
-					   curbuf->b_op_start.lnum, nr_lines);
-	    if (y_current_used != NULL && (y_current_used != y_current
+	    إذا (y_type == MCHAR)
+		بدلیا_سطریں(curwin->w_cursor.lnum, خانہ,
+					 curwin->w_cursor.lnum + 1, nr_سطریں);
+	    وإلا
+		بدلیا_سطریں(curbuf->b_op_شروع.lnum, 0,
+					   curbuf->b_op_شروع.lnum, nr_سطریں);
+	    إذا (y_current_ورتیا != عدم && (y_current_ورتیا != y_current
 					     || y_current->y_array != y_array))
 	    {
 		// Something invoked through changed_lines() has changed the
 		// yank buffer, e.g. a GUI clipboard callback.
-		emsg(_(e_yank_register_changed_while_using_it));
-		goto end;
+		emsg(_(e_yank_رجسٹر_بدلیا_while_using_it));
+		اذهب سرا;
 	    }
 
 	    // Put the '] mark on the first byte of the last inserted character.
 	    // Correct the length for change in indent.
-	    curbuf->b_op_end.lnum = new_lnum;
-	    col = MAX(0, (colnr_T)y_array[y_size - 1].length - lendiff);
-	    if (col > 1)
+	    curbuf->b_op_سرا.lnum = new_lnum;
+	    خانہ = MAX(0, (colnr_T)y_array[y_ناپ - 1].لمائی - lendiff);
+	    إذا (خانہ > 1)
 	    {
-		curbuf->b_op_end.col = col - 1;
-		if (y_array[y_size - 1].length > 0)
-		    curbuf->b_op_end.col -= mb_head_off(y_array[y_size - 1].string,
-						y_array[y_size - 1].string + y_array[y_size - 1].length - 1);
+		curbuf->b_op_سرا.خانہ = خانہ - 1;
+		إذا (y_array[y_ناپ - 1].لمائی > 0)
+		    curbuf->b_op_سرا.خانہ -= mb_سر_off(y_array[y_ناپ - 1].string,
+						y_array[y_ناپ - 1].string + y_array[y_ناپ - 1].لمائی - 1);
 	    }
-	    else
-		curbuf->b_op_end.col = 0;
+	    وإلا
+		curbuf->b_op_سرا.خانہ = 0;
 
-	    if (flags & PUT_CURSLINE)
+	    إذا (flags & PUT_CURSLINE)
 	    {
 		// ":put": put cursor on last inserted line
 		curwin->w_cursor.lnum = lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else if (flags & PUT_CURSEND)
+	    وإلا إذا (flags & PUT_CURSEND)
 	    {
 		// put cursor after inserted text
-		if (y_type == MLINE)
+		إذا (y_type == MLINE)
 		{
-		    if (lnum >= curbuf->b_ml.ml_line_count)
-			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-		    else
+		    إذا (lnum >= curbuf->b_ml.ml_سطر_گنتی)
+			curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_گنتی;
+		    وإلا
 			curwin->w_cursor.lnum = lnum + 1;
-		    curwin->w_cursor.col = 0;
+		    curwin->w_cursor.خانہ = 0;
 		}
-		else
+		وإلا
 		{
 		    curwin->w_cursor.lnum = new_lnum;
-		    curwin->w_cursor.col = col;
-		    curbuf->b_op_end = curwin->w_cursor;
-		    if (col > 1)
-			curbuf->b_op_end.col = col - 1;
+		    curwin->w_cursor.خانہ = خانہ;
+		    curbuf->b_op_سرا = curwin->w_cursor;
+		    إذا (خانہ > 1)
+			curbuf->b_op_سرا.خانہ = خانہ - 1;
 		}
 	    }
-	    else if (y_type == MLINE)
+	    وإلا إذا (y_type == MLINE)
 	    {
 		// put cursor on first non-blank in first inserted line
-		curwin->w_cursor.col = 0;
-		if (dir == FORWARD)
+		curwin->w_cursor.خانہ = 0;
+		إذا (dir == FORWARD)
 		    ++curwin->w_cursor.lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else	// put cursor on first inserted character
+	    وإلا	// put cursor on first inserted character
 		curwin->w_cursor = new_cursor;
 	}
     }
 
-    msgmore(nr_lines);
-    curwin->w_set_curswant = true;
+    msgmore(nr_سطریں);
+    curwin->w_سیٹ_curswant = true;
 
     // Make sure the cursor is not after the NUL.
-    int len = ml_get_curline_len();
-    if (curwin->w_cursor.col > len)
+    صحيح len = ml_get_curline_len();
+    إذا (curwin->w_cursor.خانہ > len)
     {
-	if (cur_ve_flags == VE_ALL)
-	    curwin->w_cursor.coladd = curwin->w_cursor.col - len;
-	curwin->w_cursor.col = len;
+	إذا (cur_ve_flags == VE_ALL)
+	    curwin->w_cursor.coladd = curwin->w_cursor.خانہ - len;
+	curwin->w_cursor.خانہ = len;
     }
 
-end:
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+سرا:
+    إذا (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
-	curbuf->b_op_start = orig_start;
-	curbuf->b_op_end = orig_end;
+	curbuf->b_op_شروع = orig_شروع;
+	curbuf->b_op_سرا = orig_سرا;
     }
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
-#endif
+#جے_انت
 
-#ifdef FEAT_EVAL
-    if (has_textputpost())
+#جے_تعریف_شدہ FEAT_EVAL
+    إذا (has_textputpost())
     {
-	if (insert_string.string == NULL)
-	    put_do_autocmd(regname, y_current, NULL, true, dir);
-	else
-	    put_do_autocmd(regname, NULL, &insert_string, true, dir);
+	إذا (داخل_کرو_string.string == عدم)
+	    put_do_autocmd(regname, y_current, عدم, true, dir);
+	وإلا
+	    put_do_autocmd(regname, عدم, &داخل_کرو_string, true, dir);
     }
-#endif
+#جے_انت
 
-    if (allocated)
-	vim_free(insert_string.string);
-    if (regname == '=')
+    إذا (allocated)
+	vim_free(داخل_کرو_string.string);
+    إذا (regname == '=')
 	vim_free(y_array);
 
-    VIsual_active = FALSE;
+    VIsual_سرگرم = FALSE;
 
     // If the cursor is past the end of the line put it at the end.
     adjust_cursor_eol();
@@ -2578,270 +2578,270 @@ end:
 /*
  * Return the character name of the register with the given number.
  */
-    int
-get_register_name(int num)
+    صحيح
+get_رجسٹر_name(صحيح عدد)
 {
-    if (num == -1)
-	return '"';
-    else if (num < 10)
-	return num + '0';
-    else if (num == DELETION_REGISTER)
-	return '-';
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (num == STAR_REGISTER)
-	return '*';
+    إذا (عدد == -1)
+	أرجع '"';
+    وإلا إذا (عدد < 10)
+	أرجع عدد + '0';
+    وإلا إذا (عدد == DELETION_رجسٹر)
+	أرجع '-';
+#إذا defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+    وإلا إذا (عدد == تارا_رجسٹر)
+	أرجع '*';
     // If there is only one clipboard, we only want the plus register to point
     // to the star register if the clipboard provider is not being used. If the
     // clipboard provider is being used, then both registers should be available
     // no matter the platform
-    else if (clipmethod == CLIPMETHOD_PROVIDER && num == REAL_PLUS_REGISTER)
-	return '+';
-    else if (clipmethod != CLIPMETHOD_PROVIDER && num == PLUS_REGISTER)
-	return '+';
-#endif
-    else
-	return num + 'a' - 10;
+    وإلا إذا (clipmethod == CLIPMETHOD_PROVIDER && عدد == REAL_PLUS_رجسٹر)
+	أرجع '+';
+    وإلا إذا (clipmethod != CLIPMETHOD_PROVIDER && عدد == PLUS_رجسٹر)
+	أرجع '+';
+#جے_انت
+    وإلا
+	أرجع عدد + 'a' - 10;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return the index of the register "" points to.
  */
-    int
-get_unname_register(void)
+    صحيح
+get_unname_رجسٹر(فراغ)
 {
-    return y_previous == NULL ? -1 : y_previous - &y_regs[0];
+    أرجع y_پچھلا == عدم ? -1 : y_پچھلا - &y_regs[0];
 }
-#endif
+#جے_انت
 
 /*
  * ":dis" and ":registers": Display the contents of the yank registers.
  */
-    void
+    فراغ
 ex_display(exarg_T *eap)
 {
-    int		i, n;
-    long	j;
+    صحيح		i, n;
+    لما	j;
     char_u	*p;
     yankreg_T	*yb;
-    int		name;
-    int		attr;
+    صحيح		name;
+    صحيح		attr;
     char_u	*arg = eap->arg;
-    int		clen;
-    int		type;
-    string_T	insert;
+    صحيح		clen;
+    صحيح		type;
+    string_T	داخل_کرو;
 
-    silence_w23_w24_msg++;
-    if (arg != NULL && *arg == NUL)
-	arg = NULL;
+    silence_w23_w24_پیغام++;
+    إذا (arg != عدم && *arg == NUL)
+	arg = عدم;
     attr = HL_ATTR(HLF_8);
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-#endif
+#جے_انت
 
     // Highlight title
-    msg_puts_title(_("\nType Name Content"));
-    for (i = -1; i < NUM_REGISTERS && !got_int; ++i)
+    پیغام_puts_title(_("\nType Name Content"));
+    لكل (i = -1; i < عدد_REGISTERS && !got_int; ++i)
     {
-	name = get_register_name(i);
-	switch (get_reg_type(name, NULL))
+	name = get_رجسٹر_name(i);
+	بدل (get_reg_type(name, عدم))
 	{
-	    case MLINE: type = 'l'; break;
-	    case MCHAR: type = 'c'; break;
-	    default:	type = 'b'; break;
+	    حالة MLINE: type = 'l'; اكسر;
+	    حالة MCHAR: type = 'c'; اكسر;
+	    افتراضي:	type = 'b'; اكسر;
 	}
-	if (arg != NULL && vim_strchr(arg, name) == NULL
-#ifdef ONE_CLIPBOARD
+	إذا (arg != عدم && vim_strchr(arg, name) == عدم
+#جے_تعریف_شدہ ONE_CLIPBOARD
 		// Star register and plus register contain the same thing.
-		&& (name != '*' || vim_strchr(arg, '+') == NULL)
-#endif
+		&& (name != '*' || vim_strchr(arg, '+') == عدم)
+#جے_انت
 		)
-	    continue;	    // did not ask for this register
+	    استمر;	    // did not ask for this register
 
-#ifdef HAVE_CLIPMETHOD
+#جے_تعریف_شدہ HAVE_CLIPMETHOD
 	adjust_clip_reg(&name);
-#endif
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
 	call_clip_provider_request(name);
-#endif
-#ifdef FEAT_CLIPBOARD
-	if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+	إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	    // Adjust register name for "unnamed" in 'clipboard'.
 	    // When it's a clipboard register, fill it with the current contents
 	    // of the clipboard.
-	    (void)may_get_selection(name);
-#endif
+	    (فراغ)may_get_selection(name);
+#جے_انت
 
-	if (i == -1)
+	إذا (i == -1)
 	{
-	    if (y_previous != NULL)
-		yb = y_previous;
-	    else
+	    إذا (y_پچھلا != عدم)
+		yb = y_پچھلا;
+	    وإلا
 		yb = &(y_regs[0]);
 	}
-	else
+	وإلا
 	    yb = &(y_regs[i]);
 
-#ifdef FEAT_EVAL
-	if (name == MB_TOLOWER(redir_reg)
-		|| (vim_strchr((char_u *)"\"*+", redir_reg) != NULL &&
-		    (yb == y_previous || yb == &y_regs[0])))
-	    continue;	    // do not list register being written to, the
+#جے_تعریف_شدہ FEAT_EVAL
+	إذا (name == MB_TOLOWER(redir_reg)
+		|| (vim_strchr((char_u *)"\"*+", redir_reg) != عدم &&
+		    (yb == y_پچھلا || yb == &y_regs[0])))
+	    استمر;	    // do not list register being written to, the
 			    // pointer can be freed
-#endif
+#جے_انت
 
-	if (yb->y_array != NULL)
+	إذا (yb->y_array != عدم)
 	{
-	    int do_show = FALSE;
+	    صحيح do_show = FALSE;
 
-	    for (j = 0; !do_show && j < yb->y_size; ++j)
-		do_show = !message_filtered(yb->y_array[j].string);
+	    لكل (j = 0; !do_show && j < yb->y_ناپ; ++j)
+		do_show = !سنیہا_filtered(yb->y_array[j].string);
 
-	    if (do_show || yb->y_size == 0)
+	    إذا (do_show || yb->y_ناپ == 0)
 	    {
-		msg_putchar('\n');
-		msg_puts("  ");
-		msg_putchar(type);
-		msg_puts("  ");
-		msg_putchar('"');
-		msg_putchar(name);
-		msg_puts("   ");
+		پیغام_putchar('\n');
+		پیغام_puts("  ");
+		پیغام_putchar(type);
+		پیغام_puts("  ");
+		پیغام_putchar('"');
+		پیغام_putchar(name);
+		پیغام_puts("   ");
 
-		n = (int)Columns - 11;
-		for (j = 0; j < yb->y_size && n > 1; ++j)
+		n = (صحيح)Columns - 11;
+		لكل (j = 0; j < yb->y_ناپ && n > 1; ++j)
 		{
-		    if (j)
+		    إذا (j)
 		    {
-			msg_puts_attr("^J", attr);
+			پیغام_puts_attr("^J", attr);
 			n -= 2;
 		    }
-		    for (p = yb->y_array[j].string;
+		    لكل (p = yb->y_array[j].string;
 				    *p != NUL && (n -= ptr2cells(p)) >= 0; ++p)
 		    {
 			clen = (*mb_ptr2len)(p);
-			msg_outtrans_len(p, clen);
+			پیغام_outtrans_len(p, clen);
 			p += clen - 1;
 		    }
 		}
-		if (n > 1 && yb->y_type == MLINE)
-		    msg_puts_attr("^J", attr);
-		out_flush();		    // show one line at a time
+		إذا (n > 1 && yb->y_type == MLINE)
+		    پیغام_puts_attr("^J", attr);
+		باہرلا_flush();		    // show one line at a time
 	    }
 	    ui_breakcheck();
 	}
     }
 
     // display last inserted text
-    insert = get_last_insert();
-    if ((p = insert.string) != NULL
-		  && (arg == NULL || vim_strchr(arg, '.') != NULL) && !got_int
-						      && !message_filtered(p))
+    داخل_کرو = get_آخری_داخل_کرو();
+    إذا ((p = داخل_کرو.string) != عدم
+		  && (arg == عدم || vim_strchr(arg, '.') != عدم) && !got_int
+						      && !سنیہا_filtered(p))
     {
-	msg_puts("\n  c  \".   ");
-	dis_msg(p, TRUE);
+	پیغام_puts("\n  c  \".   ");
+	dis_پیغام(p, TRUE);
     }
 
     // display last command line
-    if (last_cmdline != NULL && (arg == NULL || vim_strchr(arg, ':') != NULL)
-			       && !got_int && !message_filtered(last_cmdline))
+    إذا (آخری_cmdline != عدم && (arg == عدم || vim_strchr(arg, ':') != عدم)
+			       && !got_int && !سنیہا_filtered(آخری_cmdline))
     {
-	msg_puts("\n  c  \":   ");
-	dis_msg(last_cmdline, FALSE);
+	پیغام_puts("\n  c  \":   ");
+	dis_پیغام(آخری_cmdline, FALSE);
     }
 
     // display current file name
-    if (curbuf->b_fname != NULL
-	    && (arg == NULL || vim_strchr(arg, '%') != NULL) && !got_int
-					&& !message_filtered(curbuf->b_fname))
+    إذا (curbuf->b_fname != عدم
+	    && (arg == عدم || vim_strchr(arg, '%') != عدم) && !got_int
+					&& !سنیہا_filtered(curbuf->b_fname))
     {
-	msg_puts("\n  c  \"%   ");
-	dis_msg(curbuf->b_fname, FALSE);
+	پیغام_puts("\n  c  \"%   ");
+	dis_پیغام(curbuf->b_fname, FALSE);
     }
 
     // display alternate file name
-    if ((arg == NULL || vim_strchr(arg, '#') != NULL) && !got_int)
+    إذا ((arg == عدم || vim_strchr(arg, '#') != عدم) && !got_int)
     {
 	char_u	    *fname;
 	linenr_T    dummy;
 
-	if (buflist_name_nr(0, &fname, &dummy) != FAIL
-						  && !message_filtered(fname))
+	إذا (buflist_name_nr(0, &fname, &dummy) != FAIL
+						  && !سنیہا_filtered(fname))
 	{
-	    msg_puts("\n  c  \"#   ");
-	    dis_msg(fname, FALSE);
+	    پیغام_puts("\n  c  \"#   ");
+	    dis_پیغام(fname, FALSE);
 	}
     }
 
     // display last search pattern
-    if (last_search_pat() != NULL
-		 && (arg == NULL || vim_strchr(arg, '/') != NULL) && !got_int
-				      && !message_filtered(last_search_pat()))
+    إذا (آخری_تلاش_pat() != عدم
+		 && (arg == عدم || vim_strchr(arg, '/') != عدم) && !got_int
+				      && !سنیہا_filtered(آخری_تلاش_pat()))
     {
-	msg_puts("\n  c  \"/   ");
-	dis_msg(last_search_pat(), FALSE);
+	پیغام_puts("\n  c  \"/   ");
+	dis_پیغام(آخری_تلاش_pat(), FALSE);
     }
 
-#ifdef FEAT_EVAL
+#جے_تعریف_شدہ FEAT_EVAL
     // display last used expression
-    if (expr_line != NULL && (arg == NULL || vim_strchr(arg, '=') != NULL)
-				  && !got_int && !message_filtered(expr_line))
+    إذا (اظہاریہ_سطر != عدم && (arg == عدم || vim_strchr(arg, '=') != عدم)
+				  && !got_int && !سنیہا_filtered(اظہاریہ_سطر))
     {
-	msg_puts("\n  c  \"=   ");
-	dis_msg(expr_line, FALSE);
+	پیغام_puts("\n  c  \"=   ");
+	dis_پیغام(اظہاریہ_سطر, FALSE);
     }
-#endif
+#جے_انت
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
-#endif
-    silence_w23_w24_msg--;
+#جے_انت
+    silence_w23_w24_پیغام--;
 }
 
 /*
  * display a string for do_dis()
  * truncate at end of screen line
  */
-    static void
-dis_msg(
+    ساكن فراغ
+dis_پیغام(
     char_u	*p,
-    int		skip_esc)	    // if TRUE, ignore trailing ESC
+    صحيح		skip_esc)	    // if TRUE, ignore trailing ESC
 {
-    int		n;
-    int		l;
+    صحيح		n;
+    صحيح		l;
 
-    n = (int)Columns - 6;
-    while (*p != NUL
+    n = (صحيح)Columns - 6;
+    طالما (*p != NUL
 	    && !(*p == ESC && skip_esc && *(p + 1) == NUL)
 	    && (n -= ptr2cells(p)) >= 0)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	إذا (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    msg_outtrans_len(p, l);
+	    پیغام_outtrans_len(p, l);
 	    p += l;
 	}
-	else
-	    msg_outtrans_len(p++, 1);
+	وإلا
+	    پیغام_outtrans_len(p++, 1);
     }
     ui_breakcheck();
 }
 
-#if defined(FEAT_DND)
+#إذا defined(FEAT_DND)
 /*
  * Replace the contents of the '~' register with str.
  */
-    void
-dnd_yank_drag_data(char_u *str, long len)
+    فراغ
+dnd_yank_drag_انکڑے(char_u *str, لما len)
 {
     yankreg_T *curr;
 
     curr = y_current;
-    y_current = &y_regs[TILDE_REGISTER];
+    y_current = &y_regs[TILDE_رجسٹر];
     free_yank_all();
-    str_to_reg(y_current, MCHAR, str, len, 0L, FALSE);
+    str_منزل_reg(y_current, MCHAR, str, len, 0L, FALSE);
     y_current = curr;
 }
-#endif
+#جے_انت
 
 
 /*
@@ -2850,70 +2850,70 @@ dnd_yank_drag_data(char_u *str, long len)
  * Returns MAUTO for error.
  */
     char_u
-get_reg_type(int regname, long *reglen)
+get_reg_type(صحيح regname, لما *reglen)
 {
-    switch (regname)
+    بدل (regname)
     {
-	case '%':		// file name
-	case '#':		// alternate file name
-	case '=':		// expression
-	case ':':		// last command line
-	case '/':		// last search-pattern
-	case '.':		// last inserted text
-	case Ctrl_F:		// Filename under cursor
-	case Ctrl_P:		// Path under cursor, expand via "path"
-	case Ctrl_W:		// word under cursor
-	case Ctrl_A:		// WORD (mnemonic All) under cursor
-	case '_':		// black hole: always empty
-	    return MCHAR;
+	حالة '%':		// file name
+	حالة '#':		// alternate file name
+	حالة '=':		//عبارت
+	حالة ':':		// last command line
+	حالة '/':		// last search-pattern
+	حالة '.':		// last inserted text
+	حالة Ctrl_F:		// Filename under cursor
+	حالة Ctrl_P:		// Path under cursor, expand via "path"
+	حالة Ctrl_W:		// word under cursor
+	حالة Ctrl_A:		// WORD (mnemonic All) under cursor
+	حالة '_':		// black hole: always empty
+	    أرجع MCHAR;
     }
 
-#ifdef FEAT_CLIPBOARD_PROVIDER
+#جے_تعریف_شدہ FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
-#endif
-#ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+#جے_انت
+#جے_تعریف_شدہ FEAT_CLIPBOARD
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
-#endif
+#جے_انت
 
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return MAUTO;
+    إذا (regname != NUL && !valid_yank_reg(regname, FALSE))
+	أرجع MAUTO;
 
-    get_yank_register(regname, FALSE);
+    get_yank_رجسٹر(regname, FALSE);
 
-    if (y_current->y_array != NULL)
+    إذا (y_current->y_array != عدم)
     {
-	if (reglen != NULL && y_current->y_type == MBLOCK)
-	    *reglen = y_current->y_width;
-	return y_current->y_type;
+	إذا (reglen != عدم && y_current->y_type == MBLOCK)
+	    *reglen = y_current->y_چوڑائی;
+	أرجع y_current->y_type;
     }
-    return MAUTO;
+    أرجع MAUTO;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * When "flags" has GREG_LIST return a list with text "s".
  * Otherwise just return "s".
  */
-    static char_u *
-getreg_wrap_one_line(char_u *s, int flags)
+    ساكن char_u *
+getreg_wrap_one_سطر(char_u *s, صحيح flags)
 {
-    if (flags & GREG_LIST)
+    إذا (flags & GREG_LIST)
     {
 	list_T *list = list_alloc();
 
-	if (list != NULL)
+	إذا (list != عدم)
 	{
-	    if (list_append_string(list, NULL, -1) == FAIL)
+	    إذا (list_append_string(list, عدم, -1) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		أرجع عدم;
 	    }
-	    list->lv_first->li_tv.vval.v_string = s;
+	    list->lv_پہلا->li_tv.vval.v_string = s;
 	}
-	return (char_u *)list;
+	أرجع (char_u *)list;
     }
-    return s;
+    أرجع s;
 }
 
 /*
@@ -2927,140 +2927,140 @@ getreg_wrap_one_line(char_u *s, int flags)
  *	GREG_LIST	Return a list of lines instead of a single string.
  */
     char_u *
-get_reg_contents(int regname, int flags)
+get_reg_contents(صحيح regname, صحيح flags)
 {
     linenr_T	i;
     char_u	*retval;
-    int		allocated;
-    long	len;
+    صحيح		allocated;
+    لما	len;
 
     // Don't allow using an expression register inside an expression
-    if (regname == '=')
+    إذا (regname == '=')
     {
-	if (flags & GREG_NO_EXPR)
-	    return NULL;
-	if (flags & GREG_EXPR_SRC)
-	    return getreg_wrap_one_line(get_expr_line_src(), flags);
-	return getreg_wrap_one_line(get_expr_line(), flags);
+	إذا (flags & GREG_NO_اظہاریہ)
+	    أرجع عدم;
+	إذا (flags & GREG_اظہاریہ_SRC)
+	    أرجع getreg_wrap_one_سطر(get_اظہاریہ_سطر_src(), flags);
+	أرجع getreg_wrap_one_سطر(get_اظہاریہ_سطر(), flags);
     }
 
-    if (regname == '@')	    // "@@" is used for unnamed register
+    إذا (regname == '@')	    // "@@" is used for unnamed register
 	regname = '"';
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return NULL;
+    إذا (regname != NUL && !valid_yank_reg(regname, FALSE))
+	أرجع عدم;
 
 # ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    إذا (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (get_spec_reg(regname, &retval, &allocated, FALSE))
+    إذا (get_spec_reg(regname, &retval, &allocated, FALSE))
     {
-	if (retval == NULL)
-	    return NULL;
-	if (allocated)
-	    return getreg_wrap_one_line(retval, flags);
-	return getreg_wrap_one_line(vim_strsave(retval), flags);
+	إذا (retval == عدم)
+	    أرجع عدم;
+	إذا (allocated)
+	    أرجع getreg_wrap_one_سطر(retval, flags);
+	أرجع getreg_wrap_one_سطر(vim_strsave(retval), flags);
     }
 
-    get_yank_register(regname, FALSE);
-    if (y_current->y_array == NULL)
-	return NULL;
+    get_yank_رجسٹر(regname, FALSE);
+    إذا (y_current->y_array == عدم)
+	أرجع عدم;
 
-    if (flags & GREG_LIST)
+    إذا (flags & GREG_LIST)
     {
 	list_T	*list = list_alloc();
 
-	if (list == NULL)
-	    return NULL;
-	for (i = 0; i < y_current->y_size; ++i)
+	إذا (list == عدم)
+	    أرجع عدم;
+	لكل (i = 0; i < y_current->y_ناپ; ++i)
 	{
-	    if (list_append_string(list, y_current->y_array[i].string,
-		(int)y_current->y_array[i].length) == FAIL)
+	    إذا (list_append_string(list, y_current->y_array[i].string,
+		(صحيح)y_current->y_array[i].لمائی) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		أرجع عدم;
 	    }
 	}
-	return (char_u *)list;
+	أرجع (char_u *)list;
     }
 
     // Compute length of resulting string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    لكل (i = 0; i < y_current->y_ناپ; ++i)
     {
-	len += (long)y_current->y_array[i].length;
+	len += (لما)y_current->y_array[i].لمائی;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	إذا (y_current->y_type == MLINE || i < y_current->y_ناپ - 1)
 	    ++len;
     }
 
     retval = alloc(len + 1);
-    if (retval == NULL)
-	return NULL;
+    إذا (retval == عدم)
+	أرجع عدم;
 
     // Copy the lines of the yank register into the string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    لكل (i = 0; i < y_current->y_ناپ; ++i)
     {
 	STRCPY(retval + len, y_current->y_array[i].string);
-	len += (long)y_current->y_array[i].length;
+	len += (لما)y_current->y_array[i].لمائی;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	إذا (y_current->y_type == MLINE || i < y_current->y_ناپ - 1)
 	    retval[len++] = '\n';
     }
     retval[len] = NUL;
 
-    return retval;
+    أرجع retval;
 }
 
-    static int
+    ساكن صحيح
 init_write_reg(
-    int		name,
-    yankreg_T	**old_y_previous,
+    صحيح		name,
+    yankreg_T	**old_y_پچھلا,
     yankreg_T	**old_y_current,
-    int		must_append,
-    int		*yank_type UNUSED)
+    صحيح		must_append,
+    صحيح		*yank_type بن_ورتیا)
 {
-    if (!valid_yank_reg(name, TRUE))	    // check for valid reg name
+    إذا (!valid_yank_reg(name, TRUE))	    // check for valid reg name
     {
 	emsg_invreg(name);
-	return FAIL;
+	أرجع FAIL;
     }
 
     // Don't want to change the current (unnamed) register
-    *old_y_previous = y_previous;
+    *old_y_پچھلا = y_پچھلا;
     *old_y_current = y_current;
 
-    get_yank_register(name, TRUE);
-    if (!y_append && !must_append)
+    get_yank_رجسٹر(name, TRUE);
+    إذا (!y_append && !must_append)
 	free_yank_all();
-    return OK;
+    أرجع OK;
 }
 
-    static void
-finish_write_reg(
-    int		name,
-    yankreg_T	*old_y_previous,
+    ساكن فراغ
+انت_write_reg(
+    صحيح		name,
+    yankreg_T	*old_y_پچھلا,
     yankreg_T	*old_y_current)
 {
 # ifdef FEAT_CLIPBOARD
     // Send text of clipboard register to the clipboard.
-    may_set_selection();
+    may_سیٹ_selection();
 # endif
 
     // ':let @" = "val"' should change the meaning of the "" register
-    if (name != '"')
-	y_previous = old_y_previous;
+    إذا (name != '"')
+	y_پچھلا = old_y_پچھلا;
     y_current = old_y_current;
 }
 
@@ -3073,200 +3073,200 @@ finish_write_reg(
  * Careful: 'str' is modified, you may have to use a copy!
  * If "str" ends in '\n' or '\r', use linewise, otherwise use characterwise.
  */
-    void
+    فراغ
 write_reg_contents(
-    int		name,
+    صحيح		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append)
+    صحيح		maxlen,
+    صحيح		must_append)
 {
     write_reg_contents_ex(name, str, maxlen, must_append, MAUTO, 0L);
 }
 
-    void
+    فراغ
 write_reg_contents_lst(
-    int		name,
-    char_u	**strings,
-    int		maxlen UNUSED,
-    int		must_append,
-    int		yank_type,
-    long	block_len)
+    صحيح		name,
+    char_u	**لڑیاں,
+    صحيح		maxlen بن_ورتیا,
+    صحيح		must_append,
+    صحيح		yank_type,
+    لما	بلاک_len)
 {
-    yankreg_T  *old_y_previous, *old_y_current;
+    yankreg_T  *old_y_پچھلا, *old_y_current;
 
-    if (name == '/' || name == '=' || name == '#')
+    إذا (name == '/' || name == '=' || name == '#')
     {
 	char_u	*s;
 
-	if (strings[0] == NULL)
+	إذا (لڑیاں[0] == عدم)
 	    s = (char_u *)"";
-	else if (strings[1] != NULL)
+	وإلا إذا (لڑیاں[1] != عدم)
 	{
-	    semsg(_(e_register_char_cannot_contain_multiple_lines), name);
-	    return;
+	    semsg(_(e_رجسٹر_char_cannot_contain_مضرب_سطریں), name);
+	    أرجع;
 	}
-	else
-	    s = strings[0];
-	write_reg_contents_ex(name, s, -1, must_append, yank_type, block_len);
-	return;
+	وإلا
+	    s = لڑیاں[0];
+	write_reg_contents_ex(name, s, -1, must_append, yank_type, بلاک_len);
+	أرجع;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    إذا (name == '_')	    // black hole: nothing to do
+	أرجع;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    إذا (init_write_reg(name, &old_y_پچھلا, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	أرجع;
 
-    str_to_reg(y_current, yank_type, (char_u *)strings, -1, block_len, TRUE);
+    str_منزل_reg(y_current, yank_type, (char_u *)لڑیاں, -1, بلاک_len, TRUE);
 
-    finish_write_reg(name, old_y_previous, old_y_current);
+    انت_write_reg(name, old_y_پچھلا, old_y_current);
 
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    call_clip_provider_set(name);
+    call_clip_provider_سیٹ(name);
 # endif
 }
 
-    void
+    فراغ
 write_reg_contents_ex(
-    int		name,
+    صحيح		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append,
-    int		yank_type,
-    long	block_len)
+    صحيح		maxlen,
+    صحيح		must_append,
+    صحيح		yank_type,
+    لما	بلاک_len)
 {
-    yankreg_T	*old_y_previous, *old_y_current;
-    long	len;
+    yankreg_T	*old_y_پچھلا, *old_y_current;
+    لما	len;
 
-    if (maxlen >= 0)
+    إذا (maxlen >= 0)
 	len = maxlen;
-    else
-	len = (long)STRLEN(str);
+    وإلا
+	len = (لما)STRLEN(str);
 
     // Special case: '/' search pattern
-    if (name == '/')
+    إذا (name == '/')
     {
-	set_last_search_pat(str, RE_SEARCH, TRUE, TRUE);
-	return;
+	سیٹ_آخری_تلاش_pat(str, RE_تلاش, TRUE, TRUE);
+	أرجع;
     }
 
-    if (name == '#')
+    إذا (name == '#')
     {
-	if (len == 0)
+	إذا (len == 0)
 	{
 	  curwin->w_alt_fnum = 0; // clear altfile
-	  return;
+	  أرجع;
 	}
 
 	buf_T	*buf;
 
-	if (VIM_ISDIGIT(*str))
+	إذا (VIM_ISDIGIT(*str))
 	{
-	    int	num = atoi((char *)str);
+	    صحيح	عدد = atoi((حرف *)str);
 
-	    buf = buflist_findnr(num);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist), (long)num);
+	    buf = buflist_findnr(عدد);
+	    إذا (buf == عدم)
+		semsg(_(e_بفر_nr_does_not_exist), (لما)عدد);
 	}
-	else
+	وإلا
 	    buf = buflist_findnr(buflist_findpat(str, str + len,
 							 TRUE, FALSE, FALSE));
-	if (buf == NULL)
-	    return;
+	إذا (buf == عدم)
+	    أرجع;
 	curwin->w_alt_fnum = buf->b_fnum;
-	return;
+	أرجع;
     }
 
-    if (name == '=')
+    إذا (name == '=')
     {
 	char_u	    *p, *s;
 
 	p = vim_strnsave(str, (size_t)len);
-	if (p == NULL)
-	    return;
-	if (must_append && expr_line != NULL)
+	إذا (p == عدم)
+	    أرجع;
+	إذا (must_append && اظہاریہ_سطر != عدم)
 	{
-	    s = concat_str(expr_line, p);
+	    s = concat_str(اظہاریہ_سطر, p);
 	    vim_free(p);
 	    p = s;
 	}
-	set_expr_line(p, NULL);
-	return;
+	سیٹ_اظہاریہ_سطر(p, عدم);
+	أرجع;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    إذا (name == '_')	    // black hole: nothing to do
+	أرجع;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    إذا (init_write_reg(name, &old_y_پچھلا, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	أرجع;
 
-    str_to_reg(y_current, yank_type, str, len, block_len, FALSE);
+    str_منزل_reg(y_current, yank_type, str, len, بلاک_len, FALSE);
 
-    finish_write_reg(name, old_y_previous, old_y_current);
+    انت_write_reg(name, old_y_پچھلا, old_y_current);
 
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    call_clip_provider_set(name);
+    call_clip_provider_سیٹ(name);
 # endif
 }
-#endif	// FEAT_EVAL
+#جے_انت	// FEAT_EVAL
 
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
+#إذا defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
 /*
  * Put a string into a register.  When the register is not empty, the string
  * is appended.
  */
-    void
-str_to_reg(
+    فراغ
+str_منزل_reg(
     yankreg_T	*y_ptr,		// pointer to yank register
-    int		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
+    صحيح		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
     char_u	*str,		// string to put in register
-    long	len,		// length of string
-    long	blocklen,	// width of Visual block
-    int		str_list)	// TRUE if str is char_u **
+    لما	len,		// length of string
+    لما	blocklen,	// width of Visual block
+    صحيح		str_list)	// TRUE if str is char_u **
 {
-    int		type;			// MCHAR, MLINE or MBLOCK
-    int		lnum;
-    long	start;
-    long	i;
-    int		extra;
-    int		newlines;		// number of lines added
-    int		extraline = 0;		// extra line at the end
-    int		append = FALSE;		// append to last line in register
+    صحيح		type;			// MCHAR, MLINE or MBLOCK
+    صحيح		lnum;
+    لما	شروع;
+    لما	i;
+    صحيح		extra;
+    صحيح		newlines;		// number of lines added
+    صحيح		extraline = 0;		// extra line at the end
+    صحيح		append = FALSE;		// append to last line in register
     char_u	*s;
     char_u	**ss;
     string_T	*pp;
-    long	maxlen;
+    لما	maxlen;
 
-    if (y_ptr->y_array == NULL)		// NULL means empty register
-	y_ptr->y_size = 0;
+    إذا (y_ptr->y_array == عدم)		// NULL means empty register
+	y_ptr->y_ناپ = 0;
 
-    if (yank_type == MAUTO)
+    إذا (yank_type == MAUTO)
 	type = ((str_list || (len > 0 && (str[len - 1] == NL
 					    || str[len - 1] == CAR)))
 							     ? MLINE : MCHAR);
-    else
+    وإلا
 	type = yank_type;
 
     // Count the number of lines within the string
     newlines = 0;
-    if (str_list)
+    إذا (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss)
+	لكل (ss = (char_u **) str; *ss != عدم; ++ss)
 	    ++newlines;
     }
-    else
+    وإلا
     {
-	for (i = 0; i < len; i++)
-	    if (str[i] == '\n')
+	لكل (i = 0; i < len; i++)
+	    إذا (str[i] == '\n')
 		++newlines;
-	if (type == MCHAR || len == 0 || str[len - 1] != '\n')
+	إذا (type == MCHAR || len == 0 || str[len - 1] != '\n')
 	{
 	    extraline = 1;
 	    ++newlines;	// count extra newline at the end
 	}
-	if (y_ptr->y_size > 0 && y_ptr->y_type == MCHAR)
+	إذا (y_ptr->y_ناپ > 0 && y_ptr->y_type == MCHAR)
 	{
 	    append = TRUE;
 	    --newlines;	// uncount newline when appending first line
@@ -3274,89 +3274,89 @@ str_to_reg(
     }
 
     // Without any lines make the register empty.
-    if (y_ptr->y_size + newlines == 0)
+    إذا (y_ptr->y_ناپ + newlines == 0)
     {
 	VIM_CLEAR(y_ptr->y_array);
-	return;
+	أرجع;
     }
 
     // Allocate an array to hold the pointers to the new register lines.
     // If the register was not empty, move the existing lines to the new array.
-    pp = lalloc_clear((y_ptr->y_size + newlines) * sizeof(string_T), TRUE);
-    if (pp == NULL)	// out of memory
-	return;
-    for (lnum = 0; lnum < y_ptr->y_size; ++lnum)
+    pp = lalloc_clear((y_ptr->y_ناپ + newlines) * حجم(string_T), TRUE);
+    إذا (pp == عدم)	// out of memory
+	أرجع;
+    لكل (lnum = 0; lnum < y_ptr->y_ناپ; ++lnum)
 	pp[lnum] = y_ptr->y_array[lnum];
     vim_free(y_ptr->y_array);
     y_ptr->y_array = pp;
     maxlen = 0;
 
     // Find the end of each line and save it into the array.
-    if (str_list)
+    إذا (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss, ++lnum)
+	لكل (ss = (char_u **) str; *ss != عدم; ++ss, ++lnum)
 	{
-	    pp[lnum].length = STRLEN(*ss);
-	    pp[lnum].string = vim_strnsave(*ss, pp[lnum].length);
-	    if (type == MBLOCK)
+	    pp[lnum].لمائی = STRLEN(*ss);
+	    pp[lnum].string = vim_strnsave(*ss, pp[lnum].لمائی);
+	    إذا (type == MBLOCK)
 	    {
-		int charlen = vim_strsize(*ss);
+		صحيح charlen = vim_strsize(*ss);
 
-		if (charlen > maxlen)
+		إذا (charlen > maxlen)
 		    maxlen = charlen;
 	    }
 	}
     }
-    else
+    وإلا
     {
-	for (start = 0; start < len + extraline; start += i + 1)
+	لكل (شروع = 0; شروع < len + extraline; شروع += i + 1)
 	{
-	    int charlen = 0;
+	    صحيح charlen = 0;
 
-	    for (i = start; i < len;)	// find the end of the line
+	    لكل (i = شروع; i < len;)	// find the end of the line
 	    {
-		if (str[i] == '\n')
-		    break;
-		if (type == MBLOCK)
+		إذا (str[i] == '\n')
+		    اكسر;
+		إذا (type == MBLOCK)
 		{
-		    if (str[i] >= 0x80)
+		    إذا (str[i] >= 0x80)
 			charlen += mb_ptr2cells_len(str + i, len - i);
-		    else
+		    وإلا
 			charlen += byte2cells(str[i]);
 		}
 
-		if (str[i] == NUL)
+		إذا (str[i] == NUL)
 		    i++; // registers can have NUL chars
-		else
+		وإلا
 		    i += mb_ptr2len_len(str + i, len - i);
 	    }
-	    i -= start;			// i is now length of line
-	    if (charlen > maxlen)
+	    i -= شروع;			// i is now length of line
+	    إذا (charlen > maxlen)
 		maxlen = charlen;
-	    if (append)
+	    إذا (append)
 	    {
 		--lnum;
-		extra = (int)y_ptr->y_array[lnum].length;
+		extra = (صحيح)y_ptr->y_array[lnum].لمائی;
 	    }
-	    else
+	    وإلا
 		extra = 0;
 	    s = alloc(i + extra + 1);
-	    if (s == NULL)
-		break;
-	    if (extra)
+	    إذا (s == عدم)
+		اكسر;
+	    إذا (extra)
 		mch_memmove(s, y_ptr->y_array[lnum].string, (size_t)extra);
-	    if (append)
+	    إذا (append)
 		vim_free(y_ptr->y_array[lnum].string);
-	    if (i > 0)
-		mch_memmove(s + extra, str + start, (size_t)i);
+	    إذا (i > 0)
+		mch_memmove(s + extra, str + شروع, (size_t)i);
 	    extra += i;
 	    s[extra] = NUL;
 	    y_ptr->y_array[lnum].string = s;
-	    y_ptr->y_array[lnum].length = extra;
+	    y_ptr->y_array[lnum].لمائی = extra;
 	    ++lnum;
-	    while (--extra >= 0)
+	    طالما (--extra >= 0)
 	    {
-		if (*s == NUL)
+		إذا (*s == NUL)
 		    *s = '\n';	    // replace NUL with newline
 		++s;
 	    }
@@ -3364,13 +3364,13 @@ str_to_reg(
 	}
     }
     y_ptr->y_type = type;
-    y_ptr->y_size = lnum;
-    if (type == MBLOCK)
-	y_ptr->y_width = (blocklen < 0 ? maxlen - 1 : blocklen);
-    else
-	y_ptr->y_width = 0;
+    y_ptr->y_ناپ = lnum;
+    إذا (type == MBLOCK)
+	y_ptr->y_چوڑائی = (blocklen < 0 ? maxlen - 1 : blocklen);
+    وإلا
+	y_ptr->y_چوڑائی = 0;
 # ifdef FEAT_VIMINFO
-    y_ptr->y_time_set = vim_time();
+    y_ptr->y_ویلا_سیٹ = vim_ویلا();
 # endif
 }
-#endif // FEAT_CLIPBOARD || FEAT_EVAL
+#جے_انت // FEAT_CLIPBOARD || FEAT_EVAL

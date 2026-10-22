@@ -6,9 +6,9 @@
  * Do ":help credits" in Vim to see a list of people who contributed.
  */
 
-#ifdef PROTO
+#جے_تعریف_شدہ PROTO
 
 # define WINAPI
 
-#endif
+#جے_انت
 

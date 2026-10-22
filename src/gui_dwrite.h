@@ -10,26 +10,26 @@
  * THIS FILE IS DISTRIBUTED UNDER THE VIM LICENSE.
  */
 
-#ifndef GUI_DWRITE_H
-#define GUI_DWRITE_H
+#جے_بنا_تعریف GUI_DWRITE_H
+#تعریف_کرو GUI_DWRITE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#جے_تعریف_شدہ __cplusplus
+خارجي "C" {
+#جے_انت
 
-typedef struct DWriteContext DWriteContext;
+تعريفنوع بنية DWriteContext DWriteContext;
 
-typedef struct DWriteRenderingParams {
-    float gamma;
-    float enhancedContrast;
-    float clearTypeLevel;
+تعريفنوع بنية DWriteRenderingParams {
+    عائم gamma;
+    عائم enhancedContrast;
+    عائم clearTypeLevel;
     /*
      * pixelGeometry:
      *	0 - DWRITE_PIXEL_GEOMETRY_FLAT
      *	1 - DWRITE_PIXEL_GEOMETRY_RGB
      *	2 - DWRITE_PIXEL_GEOMETRY_BGR
      */
-    int pixelGeometry;
+    صحيح pixelGeometry;
     /*
      * renderingMode:
      *	0 - DWRITE_RENDERING_MODE_DEFAULT
@@ -40,7 +40,7 @@ typedef struct DWriteRenderingParams {
      *	5 - DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC
      *	6 - DWRITE_RENDERING_MODE_OUTLINE
      */
-    int renderingMode;
+    صحيح rendering_منوال;
     /*
      * antialiasMode:
      *	0 - D2D1_TEXT_ANTIALIAS_MODE_DEFAULT
@@ -48,57 +48,57 @@ typedef struct DWriteRenderingParams {
      *	2 - D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE
      *	3 - D2D1_TEXT_ANTIALIAS_MODE_ALIASED
      */
-    int textAntialiasMode;
+    صحيح متن_Antialias_منوال;
 } DWriteRenderingParams;
 
-#define DWRITE_MAX_FONT_FEATURES 32
+#تعریف_کرو DWRITE_MAX_FONT_FEATURES 32
 
-typedef struct DWriteFontFeature {
-    unsigned int tag;	    // OpenType feature tag (4 bytes)
-    unsigned int parameter; // Feature parameter (0 = disable, 1 = enable)
+تعريفنوع بنية DWriteFontFeature {
+    بنانشانی صحيح ٹیگ;	    // OpenType feature tag (4 bytes)
+    بنانشانی صحيح parameter; // Feature parameter (0 = disable, 1 = enable)
 } DWriteFontFeature;
 
-void DWrite_Init(void);
-void DWrite_Final(void);
+فراغ DWrite_Init(فراغ);
+فراغ DWrite_Final(فراغ);
 
-DWriteContext *DWriteContext_Open(void);
-void DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect);
-void DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont);
-void DWriteContext_DrawText(
+DWriteContext *DWriteContext_Open(فراغ);
+فراغ DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, ثابت RECT *rect);
+فراغ DWrite_Context_سیٹ_Font(DWriteContext *ctx, HFONT hFont);
+فراغ DWrite_Context_Draw_متن(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	ثابت WCHAR *متن,
+	صحيح len,
+	صحيح x,
+	صحيح y,
+	صحيح w,
+	صحيح h,
+	صحيح cell_چوڑائی_2,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx);
-void DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color);
-void DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+	ثابت RECT *lprc,
+	ثابت INT *lpDx);
+فراغ DWriteContext_FillRect(DWriteContext *ctx, ثابت RECT *rc, COLORREF color);
+فراغ DWrite_Context_Draw_سطر(DWriteContext *ctx, صحيح x1, صحيح y1, صحيح x2, صحيح y2,
 	COLORREF color);
-void DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color);
-void DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc);
-void DWriteContext_Flush(DWriteContext *ctx);
-void DWriteContext_Close(DWriteContext *ctx);
+فراغ DWrite_Context_سیٹ_Pixel(DWriteContext *ctx, صحيح x, صحيح y, COLORREF color);
+فراغ DWriteContext_Scroll(DWriteContext *ctx, صحيح x, صحيح y, ثابت RECT *rc);
+فراغ DWriteContext_Flush(DWriteContext *ctx);
+فراغ DWriteContext_Close(DWriteContext *ctx);
 
-void DWriteContext_SetRenderingParams(
+فراغ DWrite_Context_سیٹ_Rendering_Params(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params);
+	ثابت DWriteRenderingParams *params);
 
 DWriteRenderingParams *DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params);
 
-void DWriteContext_SetFontFeatures(
+فراغ DWrite_Context_سیٹ_Font_Features(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count);
+	ثابت DWriteFontFeature *features,
+	صحيح گنتی);
 
-#ifdef __cplusplus
+#جے_تعریف_شدہ __cplusplus
 }
-#endif
-#endif/*GUI_DWRITE_H*/
+#جے_انت
+#جے_انت/*GUI_DWRITE_H*/

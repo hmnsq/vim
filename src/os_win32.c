@@ -20,357 +20,357 @@
  * Roger Knobbe <rogerk@wonderware.com> did the initial port of Vim 3.0.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_MZSCHEME
+#جے_تعریف_شدہ FEAT_MZSCHEME
 # include "if_mzsch.h"
-#endif
+#جے_انت
 
-#include <sys/types.h>
-#include <signal.h>
-#include <limits.h>
+#ضمن <sys/types.h>
+#ضمن <signal.h>
+#ضمن <limits.h>
 
-#include <process.h>
-#include <winternl.h>
-#include <direct.h>
+#ضمن <process.h>
+#ضمن <winternl.h>
+#ضمن <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#إذا !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
-#endif
+#جے_انت
 
-#ifdef FEAT_JOB_CHANNEL
+#جے_تعریف_شدہ FEAT_کم_CHANNEL
 # include <tlhelp32.h>
-#endif
+#جے_انت
 
 // Record all output and all keyboard & mouse input
 // #define MCH_WRITE_DUMP
 
-#ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
-#endif
+#جے_تعریف_شدہ MCH_WRITE_DUMP
+FILE* fdDump = عدم;
+#جے_انت
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
-static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
-static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
+ساكن HANDLE g_h_Con_وچ  = INVALID_HANDLE_قدر;
+ساكن HANDLE g_h_Con_باہرلا = INVALID_HANDLE_قدر;
 
 // Win32 Screen buffer,coordinate,console I/O information
-static SMALL_RECT g_srScrollRegion;
+ساكن SMALL_RECT g_srScrollRegion;
 // This is explicitly initialised to work around a LTCG issue on Windows ARM64
 // (at least of 19.39.33321).  This pushes this into the `.data` rather than
 // `.bss` which corrects code generation in `write_chars` (#13453).
-static COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
+ساكن COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
 
 // The attribute of the screen when the editor was started
-static WORD  g_attrDefault = 7;  // lightgray text on black background
-static WORD  g_attrCurrent;
+ساكن لفظ_2  g_attrDefault = 7;  // lightgray text on black background
+ساكن لفظ_2  g_attrCurrent;
 
-static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
-static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
-static int g_fForceExit = FALSE;    // set when forcefully exiting
+ساكن صحيح g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
+ساكن صحيح g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
+ساكن صحيح g_fForceExit = FALSE;    // set when forcefully exiting
 
-static void scroll(unsigned cLines);
-static void set_scroll_region(unsigned left, unsigned top,
-			      unsigned right, unsigned bottom);
-static void set_scroll_region_tb(unsigned top, unsigned bottom);
-static void set_scroll_region_lr(unsigned left, unsigned right);
-static void insert_lines(unsigned cLines);
-static void delete_lines(unsigned cLines);
-static void gotoxy(unsigned x, unsigned y);
-static void standout(void);
-static int s_cursor_visible = TRUE;
-static int did_create_conin = FALSE;
+ساكن فراغ scroll(بنانشانی c_سطریں);
+ساكن فراغ سیٹ_scroll_region(بنانشانی بایاں, بنانشانی چوٹی,
+			      بنانشانی دایاں, بنانشانی bottom);
+ساكن فراغ سیٹ_scroll_region_tb(بنانشانی چوٹی, بنانشانی bottom);
+ساكن فراغ سیٹ_scroll_region_lr(بنانشانی بایاں, بنانشانی دایاں);
+ساكن فراغ داخل_کرو_سطریں(بنانشانی c_سطریں);
+ساكن فراغ delete_سطریں(بنانشانی c_سطریں);
+ساكن فراغ gotoxy(بنانشانی x, بنانشانی y);
+ساكن فراغ standout(فراغ);
+ساكن صحيح s_cursor_visible = TRUE;
+ساكن صحيح did_create_conin = FALSE;
 // The 'input_record_buffer' is an internal dynamic fifo queue of MS-Windows
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
 // of INPUT_RECORDs.
-typedef struct input_record_buffer_node_S
+تعريفنوع بنية داخلہ_ریکارڈ_بفر_گرہ_S
 {
-    INPUT_RECORD ir;
-    struct input_record_buffer_node_S *next;
-} input_record_buffer_node_T;
-typedef struct input_record_buffer_S
+    داخلہ_ریکارڈ ir;
+    بنية داخلہ_ریکارڈ_بفر_گرہ_S *اگلا;
+} داخلہ_ریکارڈ_بفر_گرہ_T;
+تعريفنوع بنية داخلہ_ریکارڈ_بفر_S
 {
-    input_record_buffer_node_T *head;
-    input_record_buffer_node_T *tail;
-    int length;
-} input_record_buffer_T;
-static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
-#endif
-#ifdef FEAT_GUI_MSWIN
-static int s_dont_use_vimrun = TRUE;
-static int need_vimrun_warning = FALSE;
-static string_T vimrun_path = {(char_u *)"vimrun ", 7};
-static int vimrun_path_allocated = FALSE;
-#endif
+    داخلہ_ریکارڈ_بفر_گرہ_T *سر;
+    داخلہ_ریکارڈ_بفر_گرہ_T *پوچھ;
+    صحيح لمائی;
+} داخلہ_ریکارڈ_بفر_T;
+ساكن داخلہ_ریکارڈ_بفر_T داخلہ_ریکارڈ_بفر;
+ساكن صحيح read_داخلہ_ریکارڈ_بفر(داخلہ_ریکارڈ* irEvents, صحيح n_Max_لمائی);
+ساكن صحيح write_داخلہ_ریکارڈ_بفر(داخلہ_ریکارڈ* irEvents, صحيح n_لمائی);
+#جے_انت
+#جے_تعریف_شدہ FEAT_GUI_MSWIN
+ساكن صحيح s_dont_use_vimrun = TRUE;
+ساكن صحيح need_vimrun_warning = FALSE;
+ساكن string_T vimrun_رستہ = {(char_u *)"vimrun ", 7};
+ساكن صحيح vimrun_رستہ_allocated = FALSE;
+#جے_انت
 
-static int win32_getattrs(char_u *name);
-static int win32_setattrs(char_u *name, int attrs);
-static int win32_set_archive(char_u *name);
+ساكن صحيح win32_getattrs(char_u *name);
+ساكن صحيح win32_setattrs(char_u *name, صحيح attrs);
+ساكن صحيح win32_سیٹ_archive(char_u *name);
 
-static int conpty_working = 0;
-static int conpty_type = 0;
-static int conpty_stable = 0;
-static int conpty_fix_type = 0;
-static void vtp_flag_init(void);
+ساكن صحيح conpty_working = 0;
+ساكن صحيح conpty_type = 0;
+ساكن صحيح conpty_stable = 0;
+ساكن صحيح conpty_fix_type = 0;
+ساكن فراغ vtp_flag_init(فراغ);
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int vtp_working = 0;
-static void vtp_init(void);
-static void vtp_exit(void);
-static void vtp_sgr_bulk(int arg);
-static void vtp_sgr_bulks(int argc, int *argv);
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ساكن صحيح vtp_working = 0;
+ساكن فراغ vtp_init(فراغ);
+ساكن فراغ vtp_exit(فراغ);
+ساكن فراغ vtp_sgr_bulk(صحيح arg);
+ساكن فراغ vtp_sgr_bulks(صحيح argc, صحيح *argv);
 
-static int wt_working = 0;
-static void wt_init(void);
+ساكن صحيح wt_working = 0;
+ساكن فراغ wt_init(فراغ);
 
-static int g_color_index_bg = 0;
-static int g_color_index_fg = 7;
+ساكن صحيح g_color_اشاریہ_bg = 0;
+ساكن صحيح g_color_اشاریہ_fg = 7;
 
 # ifdef FEAT_TERMGUICOLORS
-static guicolor_T save_console_bg_rgb;
-static guicolor_T save_console_fg_rgb;
-static guicolor_T store_console_bg_rgb;
-static guicolor_T store_console_fg_rgb;
-static int default_console_color_bg = 0x000000; // black
-static int default_console_color_fg = 0xc0c0c0; // white
-#  define USE_VTP		(vtp_working && is_term_win32() \
+ساكن guicolor_T save_console_bg_rgb;
+ساكن guicolor_T save_console_fg_rgb;
+ساكن guicolor_T store_console_bg_rgb;
+ساكن guicolor_T store_console_fg_rgb;
+ساكن صحيح default_console_color_bg = 0x000000; // black
+ساكن صحيح default_console_color_fg = 0xc0c0c0; // white
+#  define USE_VTP		(vtp_working && is_رکن_win32() \
 						 && (p_tgc || t_colors >= 256))
 #  define USE_WT		(wt_working)
-# else
+# وإلا
 #  define USE_VTP		0
 #  define USE_WT		0
 # endif
 
-static void set_console_color_rgb(void);
-static void reset_console_color_rgb(void);
-static void restore_console_color_rgb(void);
-#endif  // !FEAT_GUI_MSWIN || VIMDLL
+ساكن فراغ سیٹ_console_color_rgb(فراغ);
+ساكن فراغ reset_console_color_rgb(فراغ);
+ساكن فراغ restore_console_color_rgb(فراغ);
+#جے_انت  // !FEAT_GUI_MSWIN || VIMDLL
 
 // This flag is newly created from Windows 10
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#جے_بنا_تعریف ENABLE_VIRTUAL_TERMINAL_PROCESSING
 # define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
+#جے_انت
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int suppress_winsize = 1;	// don't fiddle with console
-#endif
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ساكن صحيح suppress_winsize = 1;	// don't fiddle with console
+#جے_انت
 
-static WCHAR *exe_pathw = NULL;
+ساكن WCHAR *exe_pathw = عدم;
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static BOOL use_alternate_screen_buffer = FALSE;
-#endif
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ساكن BOOL use_alternate_screen_بفر = FALSE;
+#جے_انت
 
-extern DWORD win_version; // this is in os_mswin.c
+خارجي DWORD win_نسخہ; // this is in os_mswin.c
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static BOOL
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ساكن BOOL
 is_ambiwidth_event(
-    INPUT_RECORD *ir)
+    داخلہ_ریکارڈ *ir)
 {
-    return ir->EventType == KEY_EVENT
-		&& ir->Event.KeyEvent.bKeyDown
-		&& ir->Event.KeyEvent.wRepeatCount == 1
-		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
-		&& ir->Event.KeyEvent.wVirtualScanCode == 0x38
-		&& ir->Event.KeyEvent.uChar.UnicodeChar == 0
-		&& ir->Event.KeyEvent.dwControlKeyState == 2;
+    أرجع ir->EventType == کلید_EVENT
+		&& ir->Event.کلید_Event_2.b_کلید_تھلے
+		&& ir->Event.کلید_Event_2.w_Repeat_گنتی == 1
+		&& ir->Event.کلید_Event_2.w_Virtual_کلید_کوڈ == 0x12
+		&& ir->Event.کلید_Event_2.w_Virtual_جانچ_کوڈ == 0x38
+		&& ir->Event.کلید_Event_2.uChar.UnicodeChar == 0
+		&& ir->Event.کلید_Event_2.dw_Control_کلید_State == 2;
 }
 
-    static void
+    ساكن فراغ
 make_ambiwidth_event(
-    INPUT_RECORD *down,
-    INPUT_RECORD *up)
+    داخلہ_ریکارڈ *تھلے,
+    داخلہ_ریکارڈ *اتے)
 {
-    down->Event.KeyEvent.wVirtualKeyCode = 0;
-    down->Event.KeyEvent.wVirtualScanCode = 0;
-    down->Event.KeyEvent.uChar.UnicodeChar
-				    = up->Event.KeyEvent.uChar.UnicodeChar;
-    down->Event.KeyEvent.dwControlKeyState = 0;
+    تھلے->Event.کلید_Event_2.w_Virtual_کلید_کوڈ = 0;
+    تھلے->Event.کلید_Event_2.w_Virtual_جانچ_کوڈ = 0;
+    تھلے->Event.کلید_Event_2.uChar.UnicodeChar
+				    = اتے->Event.کلید_Event_2.uChar.UnicodeChar;
+    تھلے->Event.کلید_Event_2.dw_Control_کلید_State = 0;
 }
 
 /*
  * Version of ReadConsoleInput() that works with IME.
  * Works around problems on Windows 8.
  */
-    static BOOL
-read_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    int		    nLength,
+    ساكن BOOL
+read_console_داخلہ(
+    HANDLE	    h_داخلہ,
+    داخلہ_ریکارڈ    *lp_بفر,
+    صحيح		    n_لمائی,
     LPDWORD	    lpEvents)
 {
-    enum
+    تعداد
     {
 	IRSIZE = 10
     };
-    static INPUT_RECORD s_irCache[IRSIZE];
-    static DWORD s_dwIndex = 0;
-    static DWORD s_dwMax = 0;
+    ساكن داخلہ_ریکارڈ s_irCache[IRSIZE];
+    ساكن DWORD s_dw_اشاریہ = 0;
+    ساكن DWORD s_dwMax = 0;
     DWORD dwEvents;
-    int head;
-    int tail;
-    int i;
-    static INPUT_RECORD s_irPseudo;
+    صحيح سر;
+    صحيح پوچھ;
+    صحيح i;
+    ساكن داخلہ_ریکارڈ s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    إذا (s_dwMax == 0 && داخلہ_ریکارڈ_بفر.لمائی > 0)
     {
-	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
-	s_dwIndex = 0;
+	dwEvents = read_داخلہ_ریکارڈ_بفر(s_irCache, IRSIZE);
+	s_dw_اشاریہ = 0;
 	s_dwMax = dwEvents;
     }
 
-    if (nLength == -2)
-	return (s_dwMax > 0) ? TRUE : FALSE;
+    إذا (n_لمائی == -2)
+	أرجع (s_dwMax > 0) ? TRUE : FALSE;
 
-    if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
+    إذا (win_نسخہ < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
-	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	إذا (n_لمائی == -1)
+	    أرجع Peek_Console_داخلہ_W(h_داخلہ, lp_بفر, 1, lpEvents);
+	أرجع Read_Console_داخلہ_W(h_داخلہ, lp_بفر, 1, &dwEvents);
     }
 
-    if (s_dwMax == 0)
+    إذا (s_dwMax == 0)
     {
-	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
-	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
-	s_dwIndex = 0;
+	إذا (!vtp_working && n_لمائی == -1)
+	    أرجع Peek_Console_داخلہ_W(h_داخلہ, lp_بفر, 1, lpEvents);
+	Get_نمبر_دا_Console_داخلہ_Events(h_داخلہ, &dwEvents);
+	إذا (dwEvents == 0 && n_لمائی == -1)
+	    أرجع Peek_Console_داخلہ_W(h_داخلہ, lp_بفر, 1, lpEvents);
+	Read_Console_داخلہ_W(h_داخلہ, s_irCache, IRSIZE, &dwEvents);
+	s_dw_اشاریہ = 0;
 	s_dwMax = dwEvents;
-	if (dwEvents == 0)
+	إذا (dwEvents == 0)
 	{
 	    *lpEvents = 0;
-	    return TRUE;
+	    أرجع TRUE;
 	}
 
-	for (i = s_dwIndex; i < (int)s_dwMax - 1; ++i)
-	    if (is_ambiwidth_event(&s_irCache[i]))
+	لكل (i = s_dw_اشاریہ; i < (صحيح)s_dwMax - 1; ++i)
+	    إذا (is_ambiwidth_event(&s_irCache[i]))
 		make_ambiwidth_event(&s_irCache[i], &s_irCache[i + 1]);
 
-	if (s_dwMax > 1)
+	إذا (s_dwMax > 1)
 	{
-	    head = 0;
-	    tail = s_dwMax - 1;
-	    while (head != tail)
+	    سر = 0;
+	    پوچھ = s_dwMax - 1;
+	    طالما (سر != پوچھ)
 	    {
-		if (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
-			&& s_irCache[head + 1].EventType
-						  == WINDOW_BUFFER_SIZE_EVENT)
+		إذا (s_irCache[سر].EventType == کھڑکی_بفر_ناپ_EVENT
+			&& s_irCache[سر + 1].EventType
+						  == کھڑکی_بفر_ناپ_EVENT)
 		{
 		    // Remove duplicate event to avoid flicker.
-		    for (i = head; i < tail; ++i)
+		    لكل (i = سر; i < پوچھ; ++i)
 			s_irCache[i] = s_irCache[i + 1];
-		    --tail;
-		    continue;
+		    --پوچھ;
+		    استمر;
 		}
-		head++;
+		سر++;
 	    }
-	    s_dwMax = tail + 1;
+	    s_dwMax = پوچھ + 1;
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    إذا (s_irCache[s_dw_اشاریہ].EventType == کلید_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	إذا (s_irCache[s_dw_اشاریہ].Event.کلید_Event_2.w_Repeat_گنتی > 1)
 	{
-	    s_irPseudo = s_irCache[s_dwIndex];
-	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
-	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
-	    *lpBuffer = s_irPseudo;
+	    s_irPseudo = s_irCache[s_dw_اشاریہ];
+	    s_irPseudo.Event.کلید_Event_2.w_Repeat_گنتی = 1;
+	    s_irCache[s_dw_اشاریہ].Event.کلید_Event_2.w_Repeat_گنتی--;
+	    *lp_بفر = s_irPseudo;
 	    *lpEvents = 1;
-	    return TRUE;
+	    أرجع TRUE;
 	}
     }
 
-    *lpBuffer = s_irCache[s_dwIndex];
-    if (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
+    *lp_بفر = s_irCache[s_dw_اشاریہ];
+    إذا (!(n_لمائی == -1 || n_لمائی == -2) && ++s_dw_اشاریہ >= s_dwMax)
 	s_dwMax = 0;
     *lpEvents = 1;
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Version of PeekConsoleInput() that works with IME.
  */
-    static BOOL
-peek_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    DWORD	    nLength UNUSED,
+    ساكن BOOL
+peek_console_داخلہ(
+    HANDLE	    h_داخلہ,
+    داخلہ_ریکارڈ    *lp_بفر,
+    DWORD	    n_لمائی بن_ورتیا,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    أرجع read_console_داخلہ(h_داخلہ, lp_بفر, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
-    static DWORD
-msg_wait_for_multiple_objects(
-    DWORD    nCount,
+    ساكن DWORD
+پیغام_wait_for_مضرب_objects(
+    DWORD    n_گنتی,
     LPHANDLE pHandles,
     BOOL     fWaitAll,
     DWORD    dwMilliseconds,
-    DWORD    dwWakeMask)
+    DWORD    dw_Wake_نقاب)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
-				     dwMilliseconds, dwWakeMask);
+    إذا (read_console_داخلہ(عدم, عدم, -2, عدم))
+	أرجع WAIT_OBJECT_0;
+    أرجع پیغام_Wait_For_مضرب_Objects(n_گنتی, pHandles, fWaitAll,
+				     dwMilliseconds, dw_Wake_نقاب);
 }
 # endif
 
 # ifndef FEAT_CLIENTSERVER
-    static DWORD
+    ساكن DWORD
 wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return WaitForSingleObject(hHandle, dwMilliseconds);
+    إذا (read_console_داخلہ(عدم, عدم, -2, عدم))
+	أرجع WAIT_OBJECT_0;
+    أرجع WaitForSingleObject(hHandle, dwMilliseconds);
 }
 # endif
-#endif   // !FEAT_GUI_MSWIN || VIMDLL
+#جے_انت   // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_get_exe_name(void)
+    فراغ
+mch_get_exe_name(فراغ)
 {
-    int		updated = FALSE;
-    static int	enc_prev = -1;
-    WCHAR	*path;
+    صحيح		updated = FALSE;
+    ساكن صحيح	enc_prev = -1;
+    WCHAR	*رستہ;
     size_t	pathlen;
 
-    if (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
+    إذا (exe_name == عدم || exe_pathw == عدم || enc_prev != enc_codepage)
     {
-	WCHAR	buf[MAX_PATH];
+	WCHAR	buf[MAX_رستہ];
 	WCHAR	*p;
 
 	// store the name of the executable, may be used for $VIM
-	p = buf + GetModuleFileNameW(NULL, buf, MAX_PATH);
-	if (p > buf)
+	p = buf + GetModuleFileNameW(عدم, buf, MAX_رستہ);
+	إذا (p > buf)
 	{
-	    if (enc_codepage == -1)
+	    إذا (enc_codepage == -1)
 		enc_codepage = GetACP();
 	    vim_free(exe_name);
-	    exe_name = utf16_to_enc(buf, NULL);
+	    exe_name = utf16_منزل_enc(buf, عدم);
 	    enc_prev = enc_codepage;
 
 	    // truncate the buffer at the last path separator
 	    // to isolate the path.
-	    do
+	    افعل
 	    {
 		--p;
-		if (*p == L'\\')
+		إذا (*p == L'\\')
 		{
 		    *p = L'\0';
-		    break;
+		    اكسر;
 		}
-	    } while (p > buf);
+	    } طالما (p > buf);
 
 	    vim_free(exe_pathw);
 	    exe_pathw = _wcsdup(buf);
@@ -378,69 +378,69 @@ mch_get_exe_name(void)
 	}
     }
 
-    if (exe_pathw == NULL || !updated)
-	return;
+    إذا (exe_pathw == عدم || !updated)
+	أرجع;
 
     // Append our starting directory to $PATH, so that when doing
     // "!xxd" it's found in our starting directory.  Needed because
     // SearchPath() also looks there.
-    path = _wgetenv(L"PATH");
-    pathlen = (path == NULL) ? 0 : wcslen(path);
+    رستہ = _wgetenv(L"PATH");
+    pathlen = (رستہ == عدم) ? 0 : wcslen(رستہ);
 
     // Maximum length of $PATH is more than MAXPATHL. 8191 is often mentioned
     // as the maximum length that works. Add an extra 7 characters (5 for
     // "PATH=", 1 for a potential ";" and 1 for the NUL byte).
-#define EXTRA_LEN 7
-#define MAX_ENV_STRING_LEN 8191
+#تعریف_کرو EXTRA_LEN 7
+#تعریف_کرو MAX_ENV_STRING_LEN 8191
 
-    if (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
+    إذا (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
     {
-	WCHAR   temp[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
+	WCHAR   عارضی[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
 	size_t  templen = 5;
 
-	if (pathlen == 0)
-	    wcscpy(temp + templen, exe_pathw);
-	else
+	إذا (pathlen == 0)
+	    wcscpy(عارضی + templen, exe_pathw);
+	وإلا
 	{
-	    wcscpy(temp + templen, path);
+	    wcscpy(عارضی + templen, رستہ);
 
 	    // Check if exe_path is already included in $PATH.
-	    if (wcsstr(temp, exe_pathw) == NULL)
+	    إذا (wcsstr(عارضی, exe_pathw) == عدم)
 	    {
 		templen += pathlen;
 
 		// Append ';' if $PATH doesn't end with it.
-		if (temp[templen - 1] != L';')
+		إذا (عارضی[templen - 1] != L';')
 		{
-		    wcscpy(temp + templen, L";");
+		    wcscpy(عارضی + templen, L";");
 		    ++templen;
 		}
 
-		wcscpy(temp + templen, exe_pathw);
+		wcscpy(عارضی + templen, exe_pathw);
 	    }
 	}
 
-	_wputenv(temp);
-#ifdef libintl_wputenv
-	libintl_wputenv(temp);
-#endif
+	_wputenv(عارضی);
+#جے_تعریف_شدہ libintl_wputenv
+	libintl_wputenv(عارضی);
+#جے_انت
     }
-#undef EXTRA_LEN
-#undef MAX_ENV_PATH_LEN
+#تعریف_رد EXTRA_LEN
+#تعریف_رد MAX_ENV_رستہ_LEN
 }
 
 /*
  * Unescape characters in "p" that appear in "escaped".
  */
-    static void
+    ساكن فراغ
 unescape_shellxquote(char_u *p, char_u *escaped)
 {
-    int	    l = (int)STRLEN(p);
-    int	    n;
+    صحيح	    l = (صحيح)STRLEN(p);
+    صحيح	    n;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
-	if (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
+	إذا (*p == '^' && vim_strchr(escaped, p[1]) != عدم)
 	    mch_memmove(p, p + 1, l--);
 	n = (*mb_ptr2len)(p);
 	p += n;
@@ -452,60 +452,60 @@ unescape_shellxquote(char_u *p, char_u *escaped)
  * Load library "name".
  */
     HINSTANCE
-vimLoadLib(const char *name)
+vim_لدو_Lib(ثابت حرف *name)
 {
-    HINSTANCE	dll = NULL;
+    HINSTANCE	dll = عدم;
 
     // No need to load any library when registering OLE.
-    if (found_register_arg)
-	return NULL;
+    إذا (لبھیا_رجسٹر_arg)
+	أرجع عدم;
 
     // NOTE: Do not use mch_dirname() and mch_chdir() here, they may call
     // vimLoadLib() recursively, which causes a stack overflow.
-    if (exe_pathw == NULL)
+    إذا (exe_pathw == عدم)
     {
 	mch_get_exe_name();
-	if (exe_pathw == NULL)
-	    return NULL;
+	إذا (exe_pathw == عدم)
+	    أرجع عدم;
     }
 
     WCHAR old_dirw[MAXPATHL];
 
-    if (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
-	return NULL;
+    إذا (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
+	أرجع عدم;
 
     // Change directory to where the executable is, both to make
     // sure we find a .dll there and to avoid looking for a .dll
     // in the current directory.
-    SetCurrentDirectoryW(exe_pathw);
-    dll = LoadLibrary(name);
-    SetCurrentDirectoryW(old_dirw);
-    return dll;
+    سیٹ_Current_Directory_W(exe_pathw);
+    dll = لدو_Library(name);
+    سیٹ_Current_Directory_W(old_dirw);
+    أرجع dll;
 }
 
-#if defined(VIMDLL)
+#إذا defined(VIMDLL)
 /*
  * Check if the current executable file is for the GUI subsystem.
  */
-    int
-mch_is_gui_executable(void)
+    صحيح
+mch_is_gui_executable(فراغ)
 {
-    PBYTE		pImage = (PBYTE)GetModuleHandle(NULL);
-    PIMAGE_DOS_HEADER	pDOS = (PIMAGE_DOS_HEADER)pImage;
-    PIMAGE_NT_HEADERS	pPE;
+    PBYTE		pImage = (PBYTE)GetModuleHandle(عدم);
+    PIMAGE_DOS_سرخی	pDOS = (PIMAGE_DOS_سرخی)pImage;
+    PIMAGE_NT_سرخیاں	pPE;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return FALSE;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return FALSE;
-    if (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
-	return TRUE;
-    return FALSE;
+    إذا (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	أرجع FALSE;
+    pPE = (PIMAGE_NT_سرخیاں)(pImage + pDOS->e_lfanew);
+    إذا (pPE->Signature != IMAGE_NT_SIGNATURE)
+	أرجع FALSE;
+    إذا (pPE->Optional_سرخی.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
+	أرجع TRUE;
+    أرجع FALSE;
 }
-#endif
+#جے_انت
 
-#if defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
+#إذا defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
     || defined(FEAT_PYTHON3)
 /*
  * Get related information about 'funcname' which is imported by 'hInst'.
@@ -514,106 +514,106 @@ mch_is_gui_executable(void)
  * If 'info' is 2, hook the function with 'ptr', and return the original
  * function address.
  */
-    static void *
-get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
-	const void *ptr)
+    ساكن فراغ *
+get_imported_func_info(HINSTANCE hInst, ثابت حرف *funcname, صحيح info,
+	ثابت فراغ *ptr)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_سرخی		pDOS = (PIMAGE_DOS_سرخی)hInst;
+    PIMAGE_NT_سرخیاں		pPE;
     PIMAGE_IMPORT_DESCRIPTOR	pImpDesc;
-    PIMAGE_THUNK_DATA		pIAT;	    // Import Address Table
-    PIMAGE_THUNK_DATA		pINT;	    // Import Name Table
+    PIMAGE_THUNK_انکڑے		pIAT;	    // Import Address Table
+    PIMAGE_THUNK_انکڑے		pINT;	    // Import Name Table
     PIMAGE_IMPORT_BY_NAME	pImpName;
     DWORD			ImpVA;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    إذا (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	أرجع عدم;
+    pPE = (PIMAGE_NT_سرخیاں)(pImage + pDOS->e_lfanew);
+    إذا (pPE->Signature != IMAGE_NT_SIGNATURE)
+	أرجع عدم;
 
-    ImpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-    if (ImpVA == 0)
-	return NULL;	// No Import Table
+    ImpVA = pPE->Optional_سرخی
+		.انکڑے_Directory[IMAGE_DIRECTORY_اندراج_IMPORT].Virtual_پتہ;
+    إذا (ImpVA == 0)
+	أرجع عدم;	// No Import Table
     pImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pImage + ImpVA);
 
-    for (; pImpDesc->FirstThunk; ++pImpDesc)
+    لكل (; pImpDesc->پہلا_Thunk; ++pImpDesc)
     {
-	if (!pImpDesc->OriginalFirstThunk)
-	    continue;
-	pIAT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->FirstThunk);
-	pINT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->OriginalFirstThunk);
-	for (; pIAT->u1.Function; ++pIAT, ++pINT)
+	إذا (!pImpDesc->Original_پہلا_Thunk)
+	    استمر;
+	pIAT = (PIMAGE_THUNK_انکڑے)(pImage + pImpDesc->پہلا_Thunk);
+	pINT = (PIMAGE_THUNK_انکڑے)(pImage + pImpDesc->Original_پہلا_Thunk);
+	لكل (; pIAT->u1.Function; ++pIAT, ++pINT)
 	{
-	    if (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
-		continue;
+	    إذا (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
+		استمر;
 	    pImpName = (PIMAGE_IMPORT_BY_NAME)(pImage
-					+ (UINT_PTR)(pINT->u1.AddressOfData));
-	    if (strcmp((char *)pImpName->Name, funcname) == 0)
+					+ (UINT_PTR)(pINT->u1.پتہ_دا_انکڑے));
+	    إذا (strcmp((حرف *)pImpName->Name, funcname) == 0)
 	    {
-		void *original;
-		DWORD old, new = PAGE_READWRITE;
+		فراغ *original;
+		DWORD old, new = ورقہ_READWRITE;
 
-		switch (info)
+		بدل (info)
 		{
-		    case 0:
-			return (void *)pIAT->u1.Function;
-		    case 1:
-			return (void *)(pImage + pImpDesc->Name);
-		    case 2:
-			original = (void *)pIAT->u1.Function;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+		    حالة 0:
+			أرجع (فراغ *)pIAT->u1.Function;
+		    حالة 1:
+			أرجع (فراغ *)(pImage + pImpDesc->Name);
+		    حالة 2:
+			original = (فراغ *)pIAT->u1.Function;
+			VirtualProtect(&pIAT->u1.Function, حجم(فراغ *),
 				new, &old);
 			pIAT->u1.Function = (UINT_PTR)ptr;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+			VirtualProtect(&pIAT->u1.Function, حجم(فراغ *),
 				old, &new);
-			return original;
-		    default:
-			return NULL;
+			أرجع original;
+		    افتراضي:
+			أرجع عدم;
 		}
 	    }
 	}
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Get the module handle which 'funcname' in 'hInst' is imported from.
  */
     HINSTANCE
-find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
+لبھو_imported_module_by_funcname(HINSTANCE hInst, ثابت حرف *funcname)
 {
-    char    *modulename;
+    حرف    *modulename;
 
-    modulename = (char *)get_imported_func_info(hInst, funcname, 1, NULL);
-    if (modulename != NULL)
-	return GetModuleHandleA(modulename);
-    return NULL;
+    modulename = (حرف *)get_imported_func_info(hInst, funcname, 1, عدم);
+    إذا (modulename != عدم)
+	أرجع GetModuleHandleA(modulename);
+    أرجع عدم;
 }
 
 /*
  * Get the address of 'funcname' which is imported by 'hInst' DLL.
  */
-    void *
-get_dll_import_func(HINSTANCE hInst, const char *funcname)
+    فراغ *
+get_dll_import_func(HINSTANCE hInst, ثابت حرف *funcname)
 {
-    return get_imported_func_info(hInst, funcname, 0, NULL);
+    أرجع get_imported_func_info(hInst, funcname, 0, عدم);
 }
 
 /*
  * Hook the function named 'funcname' which is imported by 'hInst' DLL,
  * and return the original function address.
  */
-    void *
-hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
+    فراغ *
+hook_dll_import_func(HINSTANCE hInst, ثابت حرف *funcname, ثابت فراغ *hook)
 {
-    return get_imported_func_info(hInst, funcname, 2, hook);
+    أرجع get_imported_func_info(hInst, funcname, 2, hook);
 }
-#endif
+#جے_انت
 
-#if defined(FEAT_PYTHON3)
+#إذا defined(FEAT_PYTHON3)
 /*
  * Check if the specified DLL is a function forwarder.
  * If yes, return the instance of the forwarded DLL.
@@ -625,300 +625,300 @@ hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
 get_forwarded_dll(HINSTANCE hInst)
 {
     PBYTE			pImage = (PBYTE)hInst;
-    PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
-    PIMAGE_NT_HEADERS		pPE;
+    PIMAGE_DOS_سرخی		pDOS = (PIMAGE_DOS_سرخی)hInst;
+    PIMAGE_NT_سرخیاں		pPE;
     PIMAGE_EXPORT_DIRECTORY	pExpDir;
     DWORD			ExpVA;
-    DWORD			ExpSize;
-    LPDWORD			pFunctionTable;
+    DWORD			Exp_ناپ;
+    LPDWORD			p_Function_جدول;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
-    pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    إذا (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	أرجع عدم;
+    pPE = (PIMAGE_NT_سرخیاں)(pImage + pDOS->e_lfanew);
+    إذا (pPE->Signature != IMAGE_NT_SIGNATURE)
+	أرجع عدم;
 
-    ExpVA = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-    ExpSize = pPE->OptionalHeader
-		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    if (ExpVA == 0)
-	return hInst;	// No Export Directory
+    ExpVA = pPE->Optional_سرخی
+		.انکڑے_Directory[IMAGE_DIRECTORY_اندراج_EXPORT].Virtual_پتہ;
+    Exp_ناپ = pPE->Optional_سرخی
+		.انکڑے_Directory[IMAGE_DIRECTORY_اندراج_EXPORT].ناپ_2;
+    إذا (ExpVA == 0)
+	أرجع hInst;	// No Export Directory
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
-    pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
+    p_Function_جدول = (LPDWORD)(pImage + pExpDir->پتہ_دا_Functions);
 
-    if (pExpDir->NumberOfNames == 0)
-	return hInst;	// No export names.
+    إذا (pExpDir->نمبر_دا_ناں == 0)
+	أرجع hInst;	// No export names.
 
     // Check only the first entry.
-    if ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
+    إذا ((p_Function_جدول[0] < ExpVA) || (p_Function_جدول[0] >= ExpVA + Exp_ناپ))
 	// The first entry is not a function forwarder.
-	return hInst;
+	أرجع hInst;
 
     // The first entry is a function forwarder.
     // The name is represented as "DllName.FunctionName".
-    const char *name = (const char *)(pImage + pFunctionTable[0]);
-    const char *p = strchr(name, '.');
-    if (p == NULL)
-	return hInst;
+    ثابت حرف *name = (ثابت حرف *)(pImage + p_Function_جدول[0]);
+    ثابت حرف *p = strchr(name, '.');
+    إذا (p == عدم)
+	أرجع hInst;
 
     // Extract DllName.
-    char buf[MAX_PATH];
-    if (p - name + 1 > sizeof(buf))
-	return NULL;
+    حرف buf[MAX_رستہ];
+    إذا (p - name + 1 > حجم(buf))
+	أرجع عدم;
     strncpy(buf, name, p - name);
     buf[p - name] = NUL;
-    return GetModuleHandleA(buf);
+    أرجع GetModuleHandleA(buf);
 }
-#endif
+#جے_انت
 
-#if defined(DYNAMIC_GETTEXT)
+#إذا defined(DYNAMIC_GETTEXT)
 # ifndef GETTEXT_DLL
 #  define GETTEXT_DLL "libintl.dll"
 #  define GETTEXT_DLL_ALT1 "libintl-8.dll"
 #  define GETTEXT_DLL_ALT2 "intl.dll"
 # endif
 // Dummy functions
-static char *null_libintl_gettext(const char *);
-static char *null_libintl_ngettext(const char *, const char *, unsigned long n);
-static char *null_libintl_textdomain(const char *);
-static char *null_libintl_bindtextdomain(const char *, const char *);
-static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int null_libintl_wputenv(const wchar_t *);
+ساكن حرف *null_libintl_gettext(ثابت حرف *);
+ساكن حرف *null_libintl_ngettext(ثابت حرف *, ثابت حرف *, بنانشانی لما n);
+ساكن حرف *null_libintl_textdomain(ثابت حرف *);
+ساكن حرف *null_libintl_bindtextdomain(ثابت حرف *, ثابت حرف *);
+ساكن حرف *null_libintl_bind_textdomain_codeset(ثابت حرف *, ثابت حرف *);
+ساكن صحيح null_libintl_wputenv(ثابت wchar_t *);
 
-static HINSTANCE hLibintlDLL = NULL;
-char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
-char *(*dyn_libintl_ngettext)(const char *, const char *, unsigned long n)
+ساكن HINSTANCE hLibintlDLL = عدم;
+حرف *(*dyn_libintl_gettext)(ثابت حرف *) = null_libintl_gettext;
+حرف *(*dyn_libintl_ngettext)(ثابت حرف *, ثابت حرف *, بنانشانی لما n)
 						= null_libintl_ngettext;
-char *(*dyn_libintl_textdomain)(const char *) = null_libintl_textdomain;
-char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
+حرف *(*dyn_libintl_textdomain)(ثابت حرف *) = null_libintl_textdomain;
+حرف *(*dyn_libintl_bindtextdomain)(ثابت حرف *, ثابت حرف *)
 						= null_libintl_bindtextdomain;
-char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
+حرف *(*dyn_libintl_bind_textdomain_codeset)(ثابت حرف *, ثابت حرف *)
 				       = null_libintl_bind_textdomain_codeset;
-int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+صحيح (*dyn_libintl_wputenv)(ثابت wchar_t *) = null_libintl_wputenv;
+صحيح *dyn_libintl_nl_پیغام_cat_cntr = عدم;
 
-    int
-dyn_libintl_init(void)
+    صحيح
+dyn_libintl_init(فراغ)
 {
-    int i;
-    static struct
+    صحيح i;
+    ساكن بنية
     {
-	char	    *name;
+	حرف	    *name;
 	FARPROC	    *ptr;
-    } libintl_entry[] =
+    } libintl_اندراج[] =
     {
 	{"gettext", (FARPROC*)&dyn_libintl_gettext},
 	{"ngettext", (FARPROC*)&dyn_libintl_ngettext},
 	{"textdomain", (FARPROC*)&dyn_libintl_textdomain},
 	{"bindtextdomain", (FARPROC*)&dyn_libintl_bindtextdomain},
-	{NULL, NULL}
+	{عدم, عدم}
     };
     HINSTANCE hmsvcrt;
 
     // No need to initialize twice.
-    if (hLibintlDLL != NULL)
-	return 1;
+    إذا (hLibintlDLL != عدم)
+	أرجع 1;
     // Load gettext library (libintl.dll and other names).
-    hLibintlDLL = vimLoadLib(GETTEXT_DLL);
+    hLibintlDLL = vim_لدو_Lib(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT1
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT1);
+    إذا (!hLibintlDLL)
+	hLibintlDLL = vim_لدو_Lib(GETTEXT_DLL_ALT1);
 # endif
 # ifdef GETTEXT_DLL_ALT2
-    if (!hLibintlDLL)
-	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT2);
+    إذا (!hLibintlDLL)
+	hLibintlDLL = vim_لدو_Lib(GETTEXT_DLL_ALT2);
 # endif
-    if (!hLibintlDLL)
+    إذا (!hLibintlDLL)
     {
-	if (p_verbose > 0)
+	إذا (p_verbose > 0)
 	{
 	    verbose_enter();
-	    semsg(_(e_could_not_load_library_str_str), GETTEXT_DLL, GetWin32Error());
+	    semsg(_(e_could_not_لدو_library_str_str), GETTEXT_DLL, GetWin32Error());
 	    verbose_leave();
 	}
-	return 0;
+	أرجع 0;
     }
-    for (i = 0; libintl_entry[i].name != NULL
-					 && libintl_entry[i].ptr != NULL; ++i)
+    لكل (i = 0; libintl_اندراج[i].name != عدم
+					 && libintl_اندراج[i].ptr != عدم; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
-					      libintl_entry[i].name)) == NULL)
+	إذا ((*libintl_اندراج[i].ptr = Get_Proc_پتہ(hLibintlDLL,
+					      libintl_اندراج[i].name)) == عدم)
 	{
-	    dyn_libintl_end();
-	    if (p_verbose > 0)
+	    dyn_libintl_سرا();
+	    إذا (p_verbose > 0)
 	    {
 		verbose_enter();
-		semsg(_(e_could_not_load_library_function_str), libintl_entry[i].name);
+		semsg(_(e_could_not_لدو_library_function_str), libintl_اندراج[i].name);
 		verbose_leave();
 	    }
-	    return 0;
+	    أرجع 0;
 	}
     }
 
     // The bind_textdomain_codeset() function is optional.
-    dyn_libintl_bind_textdomain_codeset = (char *(*)(const char *, const char *))
-			GetProcAddress(hLibintlDLL, "bind_textdomain_codeset");
-    if (dyn_libintl_bind_textdomain_codeset == NULL)
+    dyn_libintl_bind_textdomain_codeset = (حرف *(*)(ثابت حرف *, ثابت حرف *))
+			Get_Proc_پتہ(hLibintlDLL, "bind_textdomain_codeset");
+    إذا (dyn_libintl_bind_textdomain_codeset == عدم)
 	dyn_libintl_bind_textdomain_codeset =
 					 null_libintl_bind_textdomain_codeset;
 
     // _wputenv() function for the libintl.dll is optional.
-    hmsvcrt = find_imported_module_by_funcname(hLibintlDLL, "getenv");
-    if (hmsvcrt != NULL)
-	dyn_libintl_wputenv = (int (*)(const wchar_t *))
-					GetProcAddress(hmsvcrt, "_wputenv");
-    if (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
+    hmsvcrt = لبھو_imported_module_by_funcname(hLibintlDLL, "getenv");
+    إذا (hmsvcrt != عدم)
+	dyn_libintl_wputenv = (صحيح (*)(ثابت wchar_t *))
+					Get_Proc_پتہ(hmsvcrt, "_wputenv");
+    إذا (dyn_libintl_wputenv == عدم || dyn_libintl_wputenv == _wputenv)
 	dyn_libintl_wputenv = null_libintl_wputenv;
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_پیغام_cat_cntr = (صحيح *)Get_Proc_پتہ(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
-    return 1;
+    أرجع 1;
 }
 
-    void
-dyn_libintl_end(void)
+    فراغ
+dyn_libintl_سرا(فراغ)
 {
-    if (hLibintlDLL)
+    إذا (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
-    hLibintlDLL			= NULL;
+    hLibintlDLL			= عدم;
     dyn_libintl_gettext		= null_libintl_gettext;
     dyn_libintl_ngettext	= null_libintl_ngettext;
     dyn_libintl_textdomain	= null_libintl_textdomain;
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset = null_libintl_bind_textdomain_codeset;
     dyn_libintl_wputenv		= null_libintl_wputenv;
-    dyn_libintl_nl_msg_cat_cntr	= NULL;
+    dyn_libintl_nl_پیغام_cat_cntr	= عدم;
 }
 
-    static char *
-null_libintl_gettext(const char *msgid)
+    ساكن حرف *
+null_libintl_gettext(ثابت حرف *msgid)
 {
-    return (char*)msgid;
+    أرجع (حرف*)msgid;
 }
 
-    static char *
+    ساكن حرف *
 null_libintl_ngettext(
-	const char *msgid,
-	const char *msgid_plural,
-	unsigned long n)
+	ثابت حرف *msgid,
+	ثابت حرف *msgid_plural,
+	بنانشانی لما n)
 {
-    return (char *)(n == 1 ? msgid : msgid_plural);
+    أرجع (حرف *)(n == 1 ? msgid : msgid_plural);
 }
 
-    static char *
+    ساكن حرف *
 null_libintl_bindtextdomain(
-	const char *domainname UNUSED,
-	const char *dirname UNUSED)
+	ثابت حرف *domainname بن_ورتیا,
+	ثابت حرف *dirname بن_ورتیا)
 {
-    return NULL;
+    أرجع عدم;
 }
 
-    static char *
+    ساكن حرف *
 null_libintl_bind_textdomain_codeset(
-	const char *domainname UNUSED,
-	const char *codeset UNUSED)
+	ثابت حرف *domainname بن_ورتیا,
+	ثابت حرف *codeset بن_ورتیا)
 {
-    return NULL;
+    أرجع عدم;
 }
 
-    static char *
-null_libintl_textdomain(const char *domainname UNUSED)
+    ساكن حرف *
+null_libintl_textdomain(ثابت حرف *domainname بن_ورتیا)
 {
-    return NULL;
+    أرجع عدم;
 }
 
-    static int
-null_libintl_wputenv(const wchar_t *envstring UNUSED)
+    ساكن صحيح
+null_libintl_wputenv(ثابت wchar_t *envstring بن_ورتیا)
 {
-    return 0;
+    أرجع 0;
 }
 
-#endif // DYNAMIC_GETTEXT
+#جے_انت // DYNAMIC_GETTEXT
 
 // This symbol is not defined in older versions of the SDK or Visual C++
 
-#ifndef VER_PLATFORM_WIN32_WINDOWS
+#جے_بنا_تعریف VER_PLATFORM_WIN32_WINDOWS
 # define VER_PLATFORM_WIN32_WINDOWS 1
-#endif
+#جے_انت
 
-#ifdef HAVE_ACL
+#جے_تعریف_شدہ HAVE_ACL
 # include <aclapi.h>
 # ifndef PROTECTED_DACL_SECURITY_INFORMATION
 #  define PROTECTED_DACL_SECURITY_INFORMATION	0x80000000L
 # endif
-#endif
+#جے_انت
 
-#ifdef HAVE_ACL
+#جے_تعریف_شدہ HAVE_ACL
 /*
  * Enables or disables the specified privilege.
  */
-    static BOOL
+    ساكن BOOL
 win32_enable_privilege(LPTSTR lpszPrivilege)
 {
     LUID		luid;
     HANDLE		hToken;
     TOKEN_PRIVILEGES	tokenPrivileges;
 
-    if (!OpenProcessToken(GetCurrentProcess(),
+    إذا (!OpenProcessToken(GetCurrentProcess(),
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-	return FALSE;
+	أرجع FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    إذا (!Lookup_Privilege_قدر(عدم, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    tokenPrivileges.PrivilegeCount	     = 1;
+    tokenPrivileges.Privilege_گنتی	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
-    tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+    tokenPrivileges.Privileges[0].گن_2 = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
+    إذا (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, عدم, عدم))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    if (GetLastError() != ERROR_SUCCESS)
+    إذا (Get_آخری_Error() != ERROR_SUCCESS)
     {
 	CloseHandle(hToken);
-	return FALSE;
+	أرجع FALSE;
     }
 
     CloseHandle(hToken);
-    return TRUE;
+    أرجع TRUE;
 }
-#endif
+#جے_انت
 
 /*
  * Fill in "windowsVersion" if possible and enable security privilege for ACL.
  */
-    void
-PlatformId(void)
+    فراغ
+PlatformId(فراغ)
 {
-#ifdef FEAT_EVAL
-    DWORD major = (win_version >> 24) & 0xFF;
-    DWORD minor = (win_version >> 16) & 0xFF;
-    vim_snprintf(windowsVersion, sizeof(windowsVersion), "%d.%d", major, minor);
-#endif
+#جے_تعریف_شدہ FEAT_EVAL
+    DWORD major = (win_نسخہ >> 24) & 0xFF;
+    DWORD minor = (win_نسخہ >> 16) & 0xFF;
+    vim_snprintf(windows_نسخہ, حجم(windows_نسخہ), "%d.%d", major, minor);
+#جے_انت
 
-#ifdef HAVE_ACL
+#جے_تعریف_شدہ HAVE_ACL
     // Enable privilege for getting or setting SACLs.
-    if (!win32_enable_privilege(SE_SECURITY_NAME))
-	return;
-#endif
+    إذا (!win32_enable_privilege(SE_SECURITY_NAME))
+	أرجع;
+#جے_انت
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SHIFT  (SHIFT_PRESSED)
-# define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
-# define ALT    (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED)
-# define ALT_GR (RIGHT_ALT_PRESSED  | LEFT_CTRL_PRESSED)
+# define کھسکاؤ_2  (کھسکاؤ_PRESSED)
+# define CTRL   (دایاں_CTRL_PRESSED | بایاں_CTRL_PRESSED)
+# define ALT    (دایاں_ALT_PRESSED  | بایاں_ALT_PRESSED)
+# define ALT_GR (دایاں_ALT_PRESSED  | بایاں_CTRL_PRESSED)
 
 
 // When uChar.AsciiChar is 0, then we need to look at wVirtualKeyCode.
@@ -928,15 +928,15 @@ PlatformId(void)
 // so that the user can have access to all SHIFT-, CTRL-, and ALT-
 // combinations of function/arrow/etc keys.
 
-static const struct
+ساكن ثابت بنية
 {
-    WORD    wVirtKey;
-    BOOL    fAnsiKey;
-    int	    chAlone;
-    int	    chShift;
-    int	    chCtrl;
-    int	    chAlt;
-} VirtKeyMap[] =
+    لفظ_2    w_Virt_کلید;
+    BOOL    f_Ansi_کلید;
+    صحيح	    chAlone;
+    صحيح	    ch_کھسکاؤ;
+    صحيح	    chCtrl;
+    صحيح	    chAlt;
+} Virt_کلید_Map[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
     { VK_ESCAPE,FALSE,	ESC,	ESC,	ESC,	    ESC,    },
@@ -955,20 +955,20 @@ static const struct
     { VK_F12,	TRUE,	'\206',	'\210',	'\212',	    '\214', },
 
     { VK_HOME,	TRUE,	'G',	'\302',	'w',	    '\303', },
-    { VK_UP,	TRUE,	'H',	'\304',	'\305',	    '\306', },
-    { VK_PRIOR,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
-    { VK_LEFT,	TRUE,	'K',	'\311',	's',	    '\312', },
-    { VK_RIGHT,	TRUE,	'M',	'\313',	't',	    '\314', },
-    { VK_END,	TRUE,	'O',	'\315',	'u',	    '\316', },
-    { VK_DOWN,	TRUE,	'P',	'\317',	'\320',	    '\321', },
-    { VK_NEXT,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
-    { VK_INSERT,TRUE,	'R',	'\324',	'\325',	    '\326', },
+    { VK_اتے,	TRUE,	'H',	'\304',	'\305',	    '\306', },
+    { VK_پہلوں,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
+    { VK_بایاں,	TRUE,	'K',	'\311',	's',	    '\312', },
+    { VK_دایاں,	TRUE,	'M',	'\313',	't',	    '\314', },
+    { VK_سرا,	TRUE,	'O',	'\315',	'u',	    '\316', },
+    { VK_تھلے,	TRUE,	'P',	'\317',	'\320',	    '\321', },
+    { VK_اگلا,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
+    { VK_داخل_کرو,TRUE,	'R',	'\324',	'\325',	    '\326', },
     { VK_DELETE,TRUE,	'S',	'\327',	'\330',	    '\331', },
-    { VK_BACK,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
+    { VK_پٹھ,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
 
     { VK_SNAPSHOT,TRUE,	0,	0,	0,	    'r', }, // PrtScrn
 
-# if 0
+# إذا 0
     // Most people don't have F13-F20, but what the hell...
     { VK_F13,	TRUE,	'\332',	'\333',	'\334',	    '\335', },
     { VK_F14,	TRUE,	'\336',	'\337',	'\340',	    '\341', },
@@ -979,8 +979,8 @@ static const struct
     { VK_F19,	TRUE,	'\362',	'\363',	'\364',	    '\365', },
     { VK_F20,	TRUE,	'\366',	'\367',	'\370',	    '\371', },
 # endif
-    { VK_ADD,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
-    { VK_SUBTRACT, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
+    { VK_جوڑو,	TRUE,   'N',    'N',    'N',	'N',	}, // keyp '+'
+    { VK_گھٹاؤ, TRUE,'J',	'J',    'J',	'J',	}, // keyp '-'
  // { VK_DIVIDE,   TRUE,'N',	'N',    'N',	'N',	}, // keyp '/'
     { VK_MULTIPLY, TRUE,'7',	'7',    '7',	'7',	}, // keyp '*'
 
@@ -1001,400 +1001,400 @@ static const struct
 /*
  * The return code indicates key code size.
  */
-    static int
-win32_kbd_patch_key(
-    KEY_EVENT_RECORD *pker)
+    ساكن صحيح
+win32_kbd_patch_کلید(
+    کلید_EVENT_ریکارڈ *pker)
 {
-    UINT uMods = pker->dwControlKeyState;
-    static int s_iIsDead = 0;
-    static WORD awAnsiCode[2];
-    static BYTE abKeystate[256];
+    UINT uMods = pker->dw_Control_کلید_State;
+    ساكن صحيح s_iIsDead = 0;
+    ساكن لفظ_2 aw_Ansi_کوڈ[2];
+    ساكن BYTE abKeystate[256];
 
-    if (s_iIsDead == 2)
+    إذا (s_iIsDead == 2)
     {
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[1];
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_کوڈ[1];
 	s_iIsDead = 0;
-	return 1;
+	أرجع 1;
     }
 
     // check if it already has a valid unicode character.
-    if (pker->uChar.UnicodeChar != 0)
-	return 1;
+    إذا (pker->uChar.UnicodeChar != 0)
+	أرجع 1;
 
-    CLEAR_FIELD(abKeystate);
+    CLEAR_میدان(abKeystate);
 
     // Clear any pending dead keys
-    ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
+    منزل_Unicode(VK_SPACE, Map_Virtual_کلید(VK_SPACE, 0), abKeystate, aw_Ansi_کوڈ, 2, 0);
 
-    if (uMods & SHIFT_PRESSED)
-	abKeystate[VK_SHIFT] = 0x80;
-    if (uMods & CAPSLOCK_ON)
+    إذا (uMods & کھسکاؤ_PRESSED)
+	abKeystate[VK_کھسکاؤ] = 0x80;
+    إذا (uMods & CAPSLOCK_ON)
 	abKeystate[VK_CAPITAL] = 1;
 
-    if ((uMods & ALT_GR) == ALT_GR)
+    إذا ((uMods & ALT_GR) == ALT_GR)
     {
 	abKeystate[VK_CONTROL] = abKeystate[VK_LCONTROL] =
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
     }
 
-    s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
-			abKeystate, awAnsiCode, 2, 0);
+    s_iIsDead = منزل_Unicode(pker->w_Virtual_کلید_کوڈ, pker->w_Virtual_جانچ_کوڈ,
+			abKeystate, aw_Ansi_کوڈ, 2, 0);
 
-    if (s_iIsDead > 0)
-	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[0];
+    إذا (s_iIsDead > 0)
+	pker->uChar.UnicodeChar = (WCHAR) aw_Ansi_کوڈ[0];
 
-    return s_iIsDead;
+    أرجع s_iIsDead;
 }
 
-static BOOL g_fJustGotFocus = FALSE;
+ساكن BOOL g_fJustGotFocus = FALSE;
 
 /*
  * Decode a KEY_EVENT into one or two keystrokes
  */
-    static BOOL
-decode_key_event(
-    KEY_EVENT_RECORD	*pker,
+    ساكن BOOL
+decode_کلید_event(
+    کلید_EVENT_ریکارڈ	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
-    int			*pmodifiers,
-    BOOL		fDoPost UNUSED)
+    صحيح			*pmodifiers,
+    BOOL		fDoPost بن_ورتیا)
 {
-    int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    صحيح i;
+    ثابت صحيح nModifs = pker->dw_Control_کلید_State & (کھسکاؤ_2 | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
-	return FALSE;
+    إذا (!pker->b_کلید_تھلے)
+	أرجع FALSE;
 
     // ignore some keystrokes
-    switch (pker->wVirtualKeyCode)
+    بدل (pker->w_Virtual_کلید_کوڈ)
     {
     // modifiers
-    case VK_SHIFT:
-    case VK_CONTROL:
-    case VK_MENU:   // Alt key
-	return FALSE;
+    حالة VK_کھسکاؤ:
+    حالة VK_CONTROL:
+    حالة VK_MENU:   // Alt key
+	أرجع FALSE;
 
-    default:
-	break;
+    افتراضي:
+	اكسر;
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    إذا (pker->w_Virtual_کلید_کوڈ == VK_TAB && (nModifs & کھسکاؤ_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
-	return TRUE;
+	أرجع TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    لكل (i = ARRAY_لمائی(Virt_کلید_Map); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	إذا (Virt_کلید_Map[i].w_Virt_کلید == pker->w_Virtual_کلید_کوڈ)
 	{
-	    *pch = VirtKeyMap[i].chAlone;
-	    if ((nModifs & SHIFT) != 0)
-		*pch = VirtKeyMap[i].chShift;
-	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
-		*pch = VirtKeyMap[i].chCtrl;
-	    else if ((nModifs & ALT) != 0)
-		*pch = VirtKeyMap[i].chAlt;
+	    *pch = Virt_کلید_Map[i].chAlone;
+	    إذا ((nModifs & کھسکاؤ_2) != 0)
+		*pch = Virt_کلید_Map[i].ch_کھسکاؤ;
+	    وإلا إذا ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
+		*pch = Virt_کلید_Map[i].chCtrl;
+	    وإلا إذا ((nModifs & ALT) != 0)
+		*pch = Virt_کلید_Map[i].chAlt;
 
-	    if (*pch != 0)
+	    إذا (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		إذا (Virt_کلید_Map[i].f_Ansi_کلید)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
-		    if (pmodifiers)
+		    إذا (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
-			    && pker->wVirtualKeyCode <= VK_F12)
+			إذا (pker->w_Virtual_کلید_کوڈ >= VK_F1
+			    && pker->w_Virtual_کلید_کوڈ <= VK_F12)
 			{
-			    if ((nModifs & ALT) != 0)
+			    إذا ((nModifs & ALT) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_نقاب_ALT;
+				إذا ((nModifs & کھسکاؤ_2) == 0)
+				    *pch2 = Virt_کلید_Map[i].chAlone;
 			    }
-			    if ((nModifs & CTRL) != 0)
+			    إذا ((nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				*pmodifiers |= MOD_نقاب_CTRL;
+				إذا ((nModifs & کھسکاؤ_2) == 0)
+				    *pch2 = Virt_کلید_Map[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
-				&& pker->wVirtualKeyCode <= VK_DOWN)
+			وإلا إذا (pker->w_Virtual_کلید_کوڈ >= VK_سرا
+				&& pker->w_Virtual_کلید_کوڈ <= VK_تھلے)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
 			    // VK_LEFT, VK_UP, VK_RIGHT, VK_DOWN
 
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0
-						    && (nModifs & ~SHIFT) == 0)
+			    *pch2 = Virt_کلید_Map[i].chAlone;
+			    إذا ((nModifs & کھسکاؤ_2) != 0
+						    && (nModifs & ~کھسکاؤ_2) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_کلید_Map[i].ch_کھسکاؤ;
 			    }
-			    if ((nModifs & CTRL) != 0
+			    إذا ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
-				    || pker->wVirtualKeyCode == VK_DOWN)
+				*pch2 = Virt_کلید_Map[i].chCtrl;
+				إذا (pker->w_Virtual_کلید_کوڈ == VK_اتے
+				    || pker->w_Virtual_کلید_کوڈ == VK_تھلے)
 				{
-				    *pmodifiers |= MOD_MASK_CTRL;
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pmodifiers |= MOD_نقاب_CTRL;
+				    *pch2 = Virt_کلید_Map[i].chAlone;
 				}
 			    }
-			    if ((nModifs & SHIFT) != 0
+			    إذا ((nModifs & کھسکاؤ_2) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
-				*pmodifiers |= MOD_MASK_CTRL;
-				*pch2 = VirtKeyMap[i].chShift;
+				*pmodifiers |= MOD_نقاب_CTRL;
+				*pch2 = Virt_کلید_Map[i].ch_کھسکاؤ;
 			    }
-			    if ((nModifs & ALT) != 0)
+			    إذا ((nModifs & ALT) != 0)
 			    {
-				*pch2 = VirtKeyMap[i].chAlt;
-				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & ~ALT) == 0)
+				*pch2 = Virt_کلید_Map[i].chAlt;
+				*pmodifiers |= MOD_نقاب_ALT;
+				إذا ((nModifs & ~ALT) == 0)
 				{
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_کلید_Map[i].chAlone;
 				}
-				else if ((nModifs & SHIFT) != 0)
+				وإلا إذا ((nModifs & کھسکاؤ_2) != 0)
 				{
-				    *pch2 = VirtKeyMap[i].chShift;
+				    *pch2 = Virt_کلید_Map[i].ch_کھسکاؤ;
 				}
-				else if ((nModifs & CTRL) != 0)
+				وإلا إذا ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
-					|| pker->wVirtualKeyCode == VK_DOWN)
+				    إذا (pker->w_Virtual_کلید_کوڈ == VK_اتے
+					|| pker->w_Virtual_کلید_کوڈ == VK_تھلے)
 				    {
-					*pmodifiers |= MOD_MASK_CTRL;
-					*pch2 = VirtKeyMap[i].chAlone;
+					*pmodifiers |= MOD_نقاب_CTRL;
+					*pch2 = Virt_کلید_Map[i].chAlone;
 				    }
-				    else
+				    وإلا
 				    {
-					*pch2 = VirtKeyMap[i].chCtrl;
+					*pch2 = Virt_کلید_Map[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
-					&& (nModifs & SHIFT) != 0
-					&& (nModifs & ~SHIFT) == 0)
+			وإلا إذا (pker->w_Virtual_کلید_کوڈ == VK_داخل_کرو
+					&& (nModifs & کھسکاؤ_2) != 0
+					&& (nModifs & ~کھسکاؤ_2) == 0)
 			{
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chShift;
+			    *pch2 = Virt_کلید_Map[i].ch_کھسکاؤ;
 			}
-			else
+			وإلا
 			{
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0)
-				*pmodifiers |= MOD_MASK_SHIFT;
-			    if ((nModifs & CTRL) != 0)
-				*pmodifiers |= MOD_MASK_CTRL;
-			    if ((nModifs & ALT) != 0)
-				*pmodifiers |= MOD_MASK_ALT;
+			    *pch2 = Virt_کلید_Map[i].chAlone;
+			    إذا ((nModifs & کھسکاؤ_2) != 0)
+				*pmodifiers |= MOD_نقاب_کھسکاؤ;
+			    إذا ((nModifs & CTRL) != 0)
+				*pmodifiers |= MOD_نقاب_CTRL;
+			    إذا ((nModifs & ALT) != 0)
+				*pmodifiers |= MOD_نقاب_ALT;
 			}
 		    }
 		}
 
-		return TRUE;
+		أرجع TRUE;
 	    }
 	}
     }
 
-    i = win32_kbd_patch_key(pker);
+    i = win32_kbd_patch_کلید(pker);
 
-    if (i < 0)
+    إذا (i < 0)
 	*pch = NUL;
-    else
+    وإلا
     {
 	*pch = (i > 0) ? pker->uChar.UnicodeChar : NUL;
 
-	if (pmodifiers != NULL)
+	إذا (pmodifiers != عدم)
 	{
 	    // Pass on the ALT key as a modifier, but only when not combined
 	    // with CTRL (which is ALTGR).
-	    if ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
-		*pmodifiers |= MOD_MASK_ALT;
+	    إذا ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
+		*pmodifiers |= MOD_نقاب_ALT;
 
 	    // Pass on SHIFT only for special keys, because we don't know when
 	    // it's already included with the character.
-	    if ((nModifs & SHIFT) != 0 && *pch <= 0x20)
-		*pmodifiers |= MOD_MASK_SHIFT;
+	    إذا ((nModifs & کھسکاؤ_2) != 0 && *pch <= 0x20)
+		*pmodifiers |= MOD_نقاب_کھسکاؤ;
 
 	    // Pass on CTRL only for non-special keys, because we don't know
 	    // when it's already included with the character.  And not when
 	    // combined with ALT (which is ALTGR).
-	    if ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
+	    إذا ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
 					       && *pch >= 0x20 && *pch < 0x80)
-		*pmodifiers |= MOD_MASK_CTRL;
+		*pmodifiers |= MOD_نقاب_CTRL;
 	}
     }
 
-    return (*pch != NUL);
+    أرجع (*pch != NUL);
 }
 
-# if defined(FEAT_EVAL)
-    static int
-encode_key_event(dict_T *args, INPUT_RECORD *ir)
+# إذا defined(FEAT_EVAL)
+    ساكن صحيح
+encode_کلید_event(dict_T *دلیلاں, داخلہ_ریکارڈ *ir)
 {
-    static int s_dwMods = 0;
+    ساكن صحيح s_dwMods = 0;
 
-    char_u *action = dict_get_string(args, "event", TRUE);
-    if (action && (STRICMP(action, "keydown") == 0
+    char_u *action = dict_get_string(دلیلاں, "event", TRUE);
+    إذا (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
-	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	BOOL is_کلید_تھلے = STRICMP(action, "keydown") == 0;
+	لفظ_2 vk_کوڈ = dict_get_نمبر_def(دلیلاں, "keycode", 0);
+	إذا (vk_کوڈ <= 0 || vk_کوڈ >= 0xFF)
 	{
-	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    semsg(_(e_invalid_دلیل_nr), (لما)vk_کوڈ);
+	    أرجع FALSE;
 	}
 
-	ir->EventType = KEY_EVENT;
-	KEY_EVENT_RECORD ker;
-	ZeroMemory(&ker, sizeof(ker));
-	ker.bKeyDown = isKeyDown;
-	ker.wRepeatCount = 1;
-	ker.wVirtualScanCode = 0;
-	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ir->EventType = کلید_EVENT;
+	کلید_EVENT_ریکارڈ ker;
+	Zero_حافظہ(&ker, حجم(ker));
+	ker.b_کلید_تھلے = is_کلید_تھلے;
+	ker.w_Repeat_گنتی = 1;
+	ker.w_Virtual_جانچ_کوڈ = 0;
+	ker.dw_Control_کلید_State = 0;
+	صحيح mods = (صحيح)dict_get_نمبر(دلیلاں, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
-	if (mods)
+	إذا (mods)
 	{
 	    // If "modifiers" is explicitly set in the args, then we reset any
 	    // remembered modifier key state that may have been set from
 	    // earlier mod-key-down events, even if they are not yet unset by
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
-	    if (mods & MOD_MASK_SHIFT)
-		ker.dwControlKeyState |= SHIFT_PRESSED;
-	    if (mods & MOD_MASK_CTRL)
-		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	    if (mods & MOD_MASK_ALT)
-		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
+	    إذا (mods & MOD_نقاب_کھسکاؤ)
+		ker.dw_Control_کلید_State |= کھسکاؤ_PRESSED;
+	    إذا (mods & MOD_نقاب_CTRL)
+		ker.dw_Control_کلید_State |= بایاں_CTRL_PRESSED;
+	    إذا (mods & MOD_نقاب_ALT)
+		ker.dw_Control_کلید_State |= بایاں_ALT_PRESSED;
 	}
 
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
+	إذا (vk_کوڈ == VK_LSHIFT || vk_کوڈ == VK_RSHIFT || vk_کوڈ == VK_کھسکاؤ)
 	{
-	    if (isKeyDown)
-		s_dwMods |= SHIFT_PRESSED;
-	    else
-		s_dwMods &= ~SHIFT_PRESSED;
+	    إذا (is_کلید_تھلے)
+		s_dwMods |= کھسکاؤ_PRESSED;
+	    وإلا
+		s_dwMods &= ~کھسکاؤ_PRESSED;
 	}
-	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
+	وإلا إذا (vk_کوڈ == VK_LCONTROL || vk_کوڈ == VK_CONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_CTRL_PRESSED;
+	    إذا (is_کلید_تھلے)
+		s_dwMods |= بایاں_CTRL_PRESSED;
+	    وإلا
+		s_dwMods &= ~بایاں_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_RCONTROL)
+	وإلا إذا (vk_کوڈ == VK_RCONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_CTRL_PRESSED;
+	    إذا (is_کلید_تھلے)
+		s_dwMods |= دایاں_CTRL_PRESSED;
+	    وإلا
+		s_dwMods &= ~دایاں_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
+	وإلا إذا (vk_کوڈ == VK_LMENU || vk_کوڈ == VK_MENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_ALT_PRESSED;
+	    إذا (is_کلید_تھلے)
+		s_dwMods |= بایاں_ALT_PRESSED;
+	    وإلا
+		s_dwMods &= ~بایاں_ALT_PRESSED;
 	}
-	else if (vkCode == VK_RMENU)
+	وإلا إذا (vk_کوڈ == VK_RMENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_ALT_PRESSED;
+	    إذا (is_کلید_تھلے)
+		s_dwMods |= دایاں_ALT_PRESSED;
+	    وإلا
+		s_dwMods &= ~دایاں_ALT_PRESSED;
 	}
-	ker.dwControlKeyState |= s_dwMods;
-	ker.wVirtualKeyCode = vkCode;
+	ker.dw_Control_کلید_State |= s_dwMods;
+	ker.w_Virtual_کلید_کوڈ = vk_کوڈ;
 	ker.uChar.UnicodeChar = 0;
-	ir->Event.KeyEvent = ker;
+	ir->Event.کلید_Event_2 = ker;
 	vim_free(action);
     }
-    else
+    وإلا
     {
-	if (action == NULL)
+	إذا (action == عدم)
 	{
-	    semsg(_(e_missing_argument_str), "event");
+	    semsg(_(e_missing_دلیل_str), "event");
 	}
-	else
+	وإلا
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
+	    semsg(_(e_invalid_قدر_for_دلیل_str_str), "event", action);
 	    vim_free(action);
 	}
-	return FALSE;
+	أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 # endif  // FEAT_EVAL
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#جے_انت // !FEAT_GUI_MSWIN || VIMDLL
 
 
 /*
  * For the GUI the mouse handling is in gui_w32.c.
  */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int g_fMouseAvail = FALSE;   // mouse present
-static int g_fMouseActive = FALSE;  // mouse enabled
-static int g_nMouseClick = -1;	    // mouse status
-static int g_xMouse;		    // mouse x coordinate
-static int g_yMouse;		    // mouse y coordinate
-static DWORD g_cmodein = 0;	    // Original console input mode
-static DWORD g_cmodeout = 0;	    // Original console output mode
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+ساكن صحيح g_fMouseAvail = FALSE;   // mouse present
+ساكن صحيح g_f_Mouse_سرگرم = FALSE;  // mouse enabled
+ساكن صحيح g_nMouseClick = -1;	    // mouse status
+ساكن صحيح g_xMouse;		    // mouse x coordinate
+ساكن صحيح g_yMouse;		    // mouse y coordinate
+ساكن DWORD g_cmodein = 0;	    // Original console input mode
+ساكن DWORD g_cmodeout = 0;	    // Original console output mode
 
 /*
  * Enable or disable mouse input
  */
-    void
-mch_setmouse(int on)
+    فراغ
+mch_setmouse(صحيح on)
 {
     DWORD cmodein;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
-    if (!g_fMouseAvail)
-	return;
+    إذا (!g_fMouseAvail)
+	أرجع;
 
-    g_fMouseActive = on;
-    GetConsoleMode(g_hConIn, &cmodein);
+    g_f_Mouse_سرگرم = on;
+    Get_Console_منوال(g_h_Con_وچ, &cmodein);
 
-    if (g_fMouseActive)
+    إذا (g_f_Mouse_سرگرم)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_داخلہ;
+	cmodein &= ~ENABLE_تیز_EDIT_منوال;
     }
-    else
+    وإلا
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_داخلہ;
+	cmodein |= g_cmodein & ENABLE_تیز_EDIT_منوال;
     }
 
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    سیٹ_Console_منوال(g_h_Con_وچ, cmodein | ENABLE_EXTENDED_FLAGS);
 }
 
 
-# if defined(FEAT_BEVAL_TERM)
+# إذا defined(FEAT_BEVAL_رکن)
 /*
  * Called when 'balloonevalterm' changed.
  */
-    void
-mch_bevalterm_changed(void)
+    فراغ
+mch_bevalterm_بدلیا(فراغ)
 {
-    mch_setmouse(g_fMouseActive);
+    mch_setmouse(g_f_Mouse_سرگرم);
 }
 # endif
 
@@ -1419,72 +1419,72 @@ mch_bevalterm_changed(void)
  *       the wheel was rotated forward, away from the user.
  *    -  Otherwise, the wheel was rotated backward, toward the user.
  */
-    static void
-decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
+    ساكن فراغ
+decode_mouse_wheel(MOUSE_EVENT_ریکارڈ *pmer)
 {
-    int	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
-    int	    zDelta = pmer->dwButtonState;
+    صحيح	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
+    صحيح	    zDelta = pmer->dwButtonState;
 
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
 # ifdef FEAT_PROP_POPUP
-    int lcol = g_xMouse;
-    int lrow = g_yMouse;
-    win_T *wp = mouse_find_win(&lrow, &lcol, FIND_POPUP);
-    if (wp != NULL && popup_is_popup(wp))
+    صحيح lcol = g_xMouse;
+    صحيح lrow = g_yMouse;
+    win_T *wp = mouse_لبھو_win(&lrow, &lcol, لبھو_POPUP);
+    إذا (wp != عدم && popup_is_popup(wp))
     {
 	g_nMouseClick = -1;
 	cmdarg_T cap;
 	oparg_T oa;
-	CLEAR_FIELD(cap);
+	CLEAR_میدان(cap);
 	clear_oparg(&oa);
 	cap.oap = &oa;
-	if (horizontal)
+	إذا (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_بایاں : MSCR_دایاں;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	وإلا
 	{
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
-	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
+	    cap.arg = zDelta < 0 ? MSCR_اتے : MSCR_تھلے;
 	}
 
 	// Mouse hovers over popup window, scroll it if possible.
-	mouse_row = wp->w_winrow;
-	mouse_col = wp->w_wincol;
+	mouse_صف = wp->w_winrow;
+	mouse_خانہ = wp->w_wincol;
 	nv_mousescroll(&cap);
 	update_screen(0);
 	setcursor();
-	out_flush();
+	باہرلا_flush();
     }
 # endif
-    mouse_col = g_xMouse;
-    mouse_row = g_yMouse;
+    mouse_خانہ = g_xMouse;
+    mouse_صف = g_yMouse;
 
     char_u modifiers = 0;
     char_u direction = 0;
 
     // Decode the direction into an event that Vim can process
-    if (horizontal)
+    إذا (horizontal)
 	direction = zDelta >= 0 ? KE_MOUSELEFT : KE_MOUSERIGHT;
-    else
+    وإلا
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
-	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
-	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
+    إذا (pmer->dw_Control_کلید_State & کھسکاؤ_PRESSED)
+	modifiers |= MOD_نقاب_کھسکاؤ; // MOUSE_SHIFT;
+    إذا (pmer->dw_Control_کلید_State & (دایاں_CTRL_PRESSED | بایاں_CTRL_PRESSED))
+	modifiers |= MOD_نقاب_CTRL; // MOUSE_CTRL;
+    إذا (pmer->dw_Control_کلید_State & (دایاں_ALT_PRESSED  | بایاں_ALT_PRESSED))
+	modifiers |= MOD_نقاب_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
     // together.
     g_nMouseClick = ((direction << 8) | modifiers);
 
-    return;
+    أرجع;
 }
 
 /*
@@ -1514,238 +1514,238 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
  * so we need to delay a little.  Also, we tend not to get MOUSE_RELEASE
  * in such cases, if the user is clicking quickly.
  */
-    static BOOL
+    ساكن BOOL
 decode_mouse_event(
-    MOUSE_EVENT_RECORD *pmer)
+    MOUSE_EVENT_ریکارڈ *pmer)
 {
-    static int s_nOldButton = -1;
-    static int s_nOldMouseClick = -1;
-    static int s_xOldMouse = -1;
-    static int s_yOldMouse = -1;
-    static linenr_T s_old_topline = 0;
+    ساكن صحيح s_nOldButton = -1;
+    ساكن صحيح s_nOldMouseClick = -1;
+    ساكن صحيح s_xOldMouse = -1;
+    ساكن صحيح s_yOldMouse = -1;
+    ساكن linenr_T s_old_topline = 0;
 # ifdef FEAT_DIFF
-    static int s_old_topfill = 0;
+    ساكن صحيح s_old_topfill = 0;
 # endif
-    static int s_cClicks = 1;
-    static BOOL s_fReleased = TRUE;
-    static DWORD s_dwLastClickTime = 0;
-    static BOOL s_fNextIsMiddle = FALSE;
+    ساكن صحيح s_cClicks = 1;
+    ساكن BOOL s_fReleased = TRUE;
+    ساكن DWORD s_dw_آخری_Click_ویلا = 0;
+    ساكن BOOL s_f_اگلا_Is_درمیان = FALSE;
 
-    static DWORD cButtons = 0;	// number of buttons supported
+    ساكن DWORD cButtons = 0;	// number of buttons supported
 
-    const DWORD LEFT = FROM_LEFT_1ST_BUTTON_PRESSED;
-    const DWORD MIDDLE = FROM_LEFT_2ND_BUTTON_PRESSED;
-    const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
-    const DWORD LEFT_RIGHT = LEFT | RIGHT;
+    ثابت DWORD بایاں_2 = FROM_بایاں_1_ST_BUTTON_PRESSED;
+    ثابت DWORD درمیان = FROM_بایاں_2_ND_BUTTON_PRESSED;
+    ثابت DWORD دایاں_2 = RIGHTMOST_BUTTON_PRESSED;
+    ثابت DWORD بایاں_دایاں = بایاں_2 | دایاں_2;
 
-    int nButton;
+    صحيح nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    إذا (cButtons == 0 && !Get_نمبر_دا_Console_Mouse_Buttons(&cButtons))
 	cButtons = 2;
 
-    if (!g_fMouseAvail || !g_fMouseActive)
+    إذا (!g_fMouseAvail || !g_f_Mouse_سرگرم)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	أرجع FALSE;
     }
 
     // get a spurious MOUSE_EVENT immediately after receiving focus; ignore
-    if (g_fJustGotFocus)
+    إذا (g_fJustGotFocus)
     {
 	g_fJustGotFocus = FALSE;
-	return FALSE;
+	أرجع FALSE;
     }
 
     // If there is an unprocessed mouse click drop this one.
-    if (g_nMouseClick != -1)
-	return TRUE;
+    إذا (g_nMouseClick != -1)
+	أرجع TRUE;
 
-    if (pmer->dwEventFlags == MOUSE_WHEELED
+    إذا (pmer->dwEventFlags == MOUSE_WHEELED
 				       || pmer->dwEventFlags == MOUSE_HWHEELED)
     {
 	decode_mouse_wheel(pmer);
-	return TRUE;  // we now should have a mouse scroll in g_nMouseClick
+	أرجع TRUE;  // we now should have a mouse scroll in g_nMouseClick
     }
 
     nButton = -1;
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
-    if (pmer->dwEventFlags == MOUSE_MOVED)
+    إذا (pmer->dwEventFlags == MOUSE_MOVED)
     {
 	// Ignore MOUSE_MOVED events if (x, y) hasn't changed.	(We get these
 	// events even when the mouse moves only within a char cell.)
-	if (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
-	    return FALSE;
+	إذا (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
+	    أرجع FALSE;
     }
 
     // If no buttons are pressed...
-    if ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
+    إذا ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
     {
 	nButton = MOUSE_RELEASE;
 
 	// If the last thing returned was MOUSE_RELEASE, ignore this
-	if (s_fReleased)
+	إذا (s_fReleased)
 	{
-# ifdef FEAT_BEVAL_TERM
+# ifdef FEAT_BEVAL_رکن
 	    // do return mouse move events when we want them
-	    if (p_bevalterm)
+	    إذا (p_bevalterm)
 		nButton = MOUSE_DRAG;
-	    else
+	    وإلا
 # endif
-		return FALSE;
+		أرجع FALSE;
 	}
 
 	s_fReleased = TRUE;
     }
-    else    // one or more buttons pressed
+    وإلا    // one or more buttons pressed
     {
 	// on a 2-button mouse, hold down left and right buttons
 	// simultaneously to get MIDDLE.
 
-	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
+	إذا (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
-	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
+	    DWORD dwLR = (pmer->dwButtonState & بایاں_دایاں);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    إذا (dwLR == بایاں_2 || dwLR == دایاں_2)
 	    {
-		for (;;)
+		لكل (;;)
 		{
 		    // wait a short time for next input event
-		    if (WaitForSingleObject(g_hConIn, p_mouset / 3)
+		    إذا (WaitForSingleObject(g_h_Con_وچ, p_mouset / 3)
 							     != WAIT_OBJECT_0)
-			break;
-		    else
+			اكسر;
+		    وإلا
 		    {
-			DWORD cRecords = 0;
-			INPUT_RECORD ir;
-			MOUSE_EVENT_RECORD* pmer2 = &ir.Event.MouseEvent;
+			DWORD c_ریکارڈاں = 0;
+			داخلہ_ریکارڈ ir;
+			MOUSE_EVENT_ریکارڈ* pmer2 = &ir.Event.MouseEvent;
 
-			peek_console_input(g_hConIn, &ir, 1, &cRecords);
+			peek_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
-			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
-				|| !(pmer2->dwButtonState & LEFT_RIGHT))
-			    break;
-			else
+			إذا (c_ریکارڈاں == 0 || ir.EventType != MOUSE_EVENT
+				|| !(pmer2->dwButtonState & بایاں_دایاں))
+			    اكسر;
+			وإلا
 			{
-			    if (pmer2->dwEventFlags != MOUSE_MOVED)
+			    إذا (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
-				return decode_mouse_event(pmer2);
+				أرجع decode_mouse_event(pmer2);
 			    }
-			    else if (s_xOldMouse == pmer2->dwMousePosition.X &&
+			    وإلا إذا (s_xOldMouse == pmer2->dwMousePosition.X &&
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
 				// are there any more mouse events in queue?
-				peek_console_input(g_hConIn, &ir, 1, &cRecords);
+				peek_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
-				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
-				    break;
+				إذا (c_ریکارڈاں==0 || ir.EventType != MOUSE_EVENT)
+				    اكسر;
 			    }
-			    else
-				break;
+			    وإلا
+				اكسر;
 			}
 		    }
 		}
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	إذا (s_f_اگلا_Is_درمیان)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
-		? MOUSE_DRAG : MOUSE_MIDDLE;
-	    s_fNextIsMiddle = FALSE;
+		? MOUSE_DRAG : MOUSE_درمیان;
+	    s_f_اگلا_Is_درمیان = FALSE;
 	}
-	else if (cButtons == 2	&&
-	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
+	وإلا إذا (cButtons == 2	&&
+	    ((pmer->dwButtonState & بایاں_دایاں) == بایاں_دایاں))
 	{
-	    nButton = MOUSE_MIDDLE;
+	    nButton = MOUSE_درمیان;
 
-	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
+	    إذا (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
-		s_fNextIsMiddle = TRUE;
+		s_f_اگلا_Is_درمیان = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
-	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
-	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
-	    nButton = MOUSE_RIGHT;
+	وإلا إذا ((pmer->dwButtonState & بایاں_2) == بایاں_2)
+	    nButton = MOUSE_بایاں;
+	وإلا إذا ((pmer->dwButtonState & درمیان) == درمیان)
+	    nButton = MOUSE_درمیان;
+	وإلا إذا ((pmer->dwButtonState & دایاں_2) == دایاں_2)
+	    nButton = MOUSE_دایاں;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	إذا (! s_fReleased && ! s_f_اگلا_Is_درمیان
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
-	    return FALSE;
+	    أرجع FALSE;
 
-	s_fReleased = s_fNextIsMiddle;
+	s_fReleased = s_f_اگلا_Is_درمیان;
     }
 
-    if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
+    إذا (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
     {
 	// button pressed or released, without mouse moving
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	إذا (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
-	    DWORD dwCurrentTime = GetTickCount();
+	    DWORD dw_Current_ویلا = Get_Tick_گنتی();
 
-	    if (s_xOldMouse != g_xMouse
+	    إذا (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
 		    || s_nOldButton != nButton
 		    || s_old_topline != curwin->w_topline
 # ifdef FEAT_DIFF
 		    || s_old_topfill != curwin->w_topfill
 # endif
-		    || (int)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
+		    || (صحيح)(dw_Current_ویلا - s_dw_آخری_Click_ویلا) > p_mouset)
 	    {
 		s_cClicks = 1;
 	    }
-	    else if (++s_cClicks > 4)
+	    وإلا إذا (++s_cClicks > 4)
 	    {
 		s_cClicks = 1;
 	    }
 
-	    s_dwLastClickTime = dwCurrentTime;
+	    s_dw_آخری_Click_ویلا = dw_Current_ویلا;
 	}
     }
-    else if (pmer->dwEventFlags == MOUSE_MOVED)
+    وإلا إذا (pmer->dwEventFlags == MOUSE_MOVED)
     {
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	إذا (nButton != -1 && nButton != MOUSE_RELEASE)
 	    nButton = MOUSE_DRAG;
 
 	s_cClicks = 1;
     }
 
-    if (nButton == -1)
-	return FALSE;
+    إذا (nButton == -1)
+	أرجع FALSE;
 
-    if (nButton != MOUSE_RELEASE)
+    إذا (nButton != MOUSE_RELEASE)
 	s_nOldButton = nButton;
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
-	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    إذا (pmer->dw_Control_کلید_State & کھسکاؤ_PRESSED)
+	g_nMouseClick |= MOUSE_کھسکاؤ;
+    إذا (pmer->dw_Control_کلید_State & (دایاں_CTRL_PRESSED | بایاں_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    إذا (pmer->dw_Control_کلید_State & (دایاں_ALT_PRESSED  | بایاں_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
-    if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
-	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
+    إذا (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
+	سیٹ_عدد_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
-    if (s_xOldMouse == g_xMouse
+    إذا (s_xOldMouse == g_xMouse
 	    && s_yOldMouse == g_yMouse
 	    && s_nOldMouseClick == g_nMouseClick)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	أرجع FALSE;
     }
 
     s_xOldMouse = g_xMouse;
@@ -1756,174 +1756,174 @@ decode_mouse_event(
 # endif
     s_nOldMouseClick = g_nMouseClick;
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 # ifdef FEAT_EVAL
-    static int
-encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
+    ساكن صحيح
+encode_mouse_event(dict_T *دلیلاں, داخلہ_ریکارڈ *ir)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    صحيح		button;
+    صحيح		صف;
+    صحيح		خانہ;
+    صحيح		repeated_click;
     int_u	mods = 0;
-    int		move;
+    صحيح		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    إذا (!dict_has_کلید(دلیلاں, "row") || !dict_has_کلید(دلیلاں, "col"))
+	أرجع FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    move = (صحيح)dict_get_bool(دلیلاں, "move", FALSE);
+    إذا (!move && (!dict_has_کلید(دلیلاں, "button")
+	    || !dict_has_کلید(دلیلاں, "multiclick")
+	    || !dict_has_کلید(دلیلاں, "modifiers")))
+	أرجع FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    صف = (صحيح)dict_get_نمبر(دلیلاں, "row") - 1;
+    خانہ = (صحيح)dict_get_نمبر(دلیلاں, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
-    MOUSE_EVENT_RECORD mer;
-    ZeroMemory(&mer, sizeof(mer));
-    mer.dwMousePosition.X  = col;
-    mer.dwMousePosition.Y  = row;
+    MOUSE_EVENT_ریکارڈ mer;
+    Zero_حافظہ(&mer, حجم(mer));
+    mer.dwMousePosition.X  = خانہ;
+    mer.dwMousePosition.Y  = صف;
 
-    if (move)
+    إذا (move)
     {
 	mer.dwButtonState = 0;
 	mer.dwEventFlags = MOUSE_MOVED;
     }
-    else
+    وإلا
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (صحيح)dict_get_نمبر(دلیلاں, "button");
+	repeated_click = (صحيح)dict_get_نمبر(دلیلاں, "multiclick");
+	mods = (صحيح)dict_get_نمبر(دلیلاں, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
-	mouse_set_hor_scroll_step(6);
-	mouse_set_vert_scroll_step(3);
+	mouse_سیٹ_hor_scroll_قدم(6);
+	mouse_سیٹ_vert_scroll_قدم(3);
 
-	switch (button)
+	بدل (button)
 	{
-	    case MOUSE_LEFT:
-		mer.dwButtonState = FROM_LEFT_1ST_BUTTON_PRESSED;
+	    حالة MOUSE_بایاں:
+		mer.dwButtonState = FROM_بایاں_1_ST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_MIDDLE:
-		mer.dwButtonState = FROM_LEFT_2ND_BUTTON_PRESSED;
+		اكسر;
+	    حالة MOUSE_درمیان:
+		mer.dwButtonState = FROM_بایاں_2_ND_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RIGHT:
+		اكسر;
+	    حالة MOUSE_دایاں:
 		mer.dwButtonState = RIGHTMOST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RELEASE:
+		اكسر;
+	    حالة MOUSE_RELEASE:
 		// umm?  Assume Left Release?
 		mer.dwEventFlags = 0;
 
-	    case MOUSE_MOVE:
+	    حالة MOUSE_MOVE:
 		mer.dwButtonState = 0;
 		mer.dwEventFlags = MOUSE_MOVED;
-		break;
-	    case MOUSE_X1:
-		mer.dwButtonState = FROM_LEFT_3RD_BUTTON_PRESSED;
-		break;
-	    case MOUSE_X2:
-		mer.dwButtonState = FROM_LEFT_4TH_BUTTON_PRESSED;
-		break;
-	    case MOUSE_4:  // KE_MOUSEDOWN;
+		اكسر;
+	    حالة MOUSE_X1:
+		mer.dwButtonState = FROM_بایاں_3_RD_BUTTON_PRESSED;
+		اكسر;
+	    حالة MOUSE_X2:
+		mer.dwButtonState = FROM_بایاں_4_TH_BUTTON_PRESSED;
+		اكسر;
+	    حالة MOUSE_4:  // KE_MOUSEDOWN;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_5:  // KE_MOUSEUP;
+		اكسر;
+	    حالة MOUSE_5:  // KE_MOUSEUP;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_6:  // KE_MOUSELEFT;
+		اكسر;
+	    حالة MOUSE_6:  // KE_MOUSELEFT;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    case MOUSE_7:  // KE_MOUSERIGHT;
+		اكسر;
+	    حالة MOUSE_7:  // KE_MOUSERIGHT;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    default:
-		semsg(_(e_invalid_argument_str), "button");
-		return FALSE;
+		اكسر;
+	    افتراضي:
+		semsg(_(e_invalid_دلیل_str), "button");
+		أرجع FALSE;
 	}
     }
 
-    mer.dwControlKeyState = 0;
-    if (mods != 0)
+    mer.dw_Control_کلید_State = 0;
+    إذا (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
-	if (mods & MOUSE_SHIFT)
-	    mer.dwControlKeyState |= SHIFT_PRESSED;
-	if (mods & MOUSE_CTRL)
-	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	if (mods & MOUSE_ALT)
-	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
+	إذا (mods & MOUSE_کھسکاؤ)
+	    mer.dw_Control_کلید_State |= کھسکاؤ_PRESSED;
+	إذا (mods & MOUSE_CTRL)
+	    mer.dw_Control_کلید_State |= بایاں_CTRL_PRESSED;
+	إذا (mods & MOUSE_ALT)
+	    mer.dw_Control_کلید_State |= بایاں_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
-    return TRUE;
+    أرجع TRUE;
 }
 # endif  // FEAT_EVAL
 
-    static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+    ساكن صحيح
+write_داخلہ_ریکارڈ_بفر(داخلہ_ریکارڈ* irEvents, صحيح n_لمائی)
 {
-    int				nCount = 0;
-    input_record_buffer_node_T	*event_node;
+    صحيح				n_گنتی = 0;
+    داخلہ_ریکارڈ_بفر_گرہ_T	*event_گرہ;
 
-    while (nCount < nLength)
+    طالما (n_گنتی < n_لمائی)
     {
-	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
-	    return -1;
+	event_گرہ = alloc(حجم(داخلہ_ریکارڈ_بفر_گرہ_T));
+	إذا (event_گرہ == عدم)
+	    أرجع -1;
 
-	event_node->ir = irEvents[nCount++];
-	event_node->next = NULL;
+	event_گرہ->ir = irEvents[n_گنتی++];
+	event_گرہ->اگلا = عدم;
 
-	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	داخلہ_ریکارڈ_بفر.لمائی++;
+	إذا (داخلہ_ریکارڈ_بفر.پوچھ == عدم)
 	{
-	    input_record_buffer.head = event_node;
-	    input_record_buffer.tail = event_node;
+	    داخلہ_ریکارڈ_بفر.سر = event_گرہ;
+	    داخلہ_ریکارڈ_بفر.پوچھ = event_گرہ;
 	}
-	else
+	وإلا
 	{
-	    input_record_buffer.tail->next = event_node;
-	    input_record_buffer.tail = input_record_buffer.tail->next;
+	    داخلہ_ریکارڈ_بفر.پوچھ->اگلا = event_گرہ;
+	    داخلہ_ریکارڈ_بفر.پوچھ = داخلہ_ریکارڈ_بفر.پوچھ->اگلا;
 	}
     }
-    return nCount;
+    أرجع n_گنتی;
 }
 
-    static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+    ساكن صحيح
+read_داخلہ_ریکارڈ_بفر(داخلہ_ریکارڈ* irEvents, صحيح n_Max_لمائی)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    صحيح n_گنتی = 0;
+    طالما (n_گنتی < n_Max_لمائی && داخلہ_ریکارڈ_بفر.سر != عدم)
     {
-	input_record_buffer.length--;
-	input_record_buffer_node_T *pop_head = input_record_buffer.head;
-	irEvents[nCount++] = pop_head->ir;
-	input_record_buffer.head = pop_head->next;
-	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
-	    input_record_buffer.tail = NULL;
+	داخلہ_ریکارڈ_بفر.لمائی--;
+	داخلہ_ریکارڈ_بفر_گرہ_T *نکالو_سر = داخلہ_ریکارڈ_بفر.سر;
+	irEvents[n_گنتی++] = نکالو_سر->ir;
+	داخلہ_ریکارڈ_بفر.سر = نکالو_سر->اگلا;
+	vim_free(نکالو_سر);
+	إذا (داخلہ_ریکارڈ_بفر.لمائی == 0)
+	    داخلہ_ریکارڈ_بفر.پوچھ = عدم;
     }
-    return nCount;
+    أرجع n_گنتی;
 }
-#else  // FEAT_GUI_MSWIN && !VIMDLL
-    void
-mch_setmouse(int on UNUSED)
+#وإلا  // FEAT_GUI_MSWIN && !VIMDLL
+    فراغ
+mch_setmouse(صحيح on بن_ورتیا)
 {
 }
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#جے_انت // FEAT_GUI_MSWIN && !VIMDLL
 
-#ifdef FEAT_EVAL
+#جے_تعریف_شدہ FEAT_EVAL
 /*
  * The 'test_mswin_event' function is for testing Vim's low-level handling of
  * user input events.  ie, this manages the encoding of INPUT_RECORD events
@@ -1941,115 +1941,115 @@ mch_setmouse(int on UNUSED)
  * Note: INPUT_RECORDs are only used by the Windows console, not the GUI.  The
  * GUI sends MSG structs instead.
  */
-    int
-test_mswin_event(char_u *event, dict_T *args)
+    صحيح
+test_mswin_event(char_u *event, dict_T *دلیلاں)
 {
-    int lpEventsWritten = 0;
+    صحيح lpEventsWritten = 0;
 
-# if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+# إذا defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
+    إذا (gui.وچ_use)
+	أرجع test_gui_w32_sendevent(event, دلیلاں);
 # endif
 
-# if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
+# إذا defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
 
 // Currently implemented event record types are; KEY_EVENT and MOUSE_EVENT
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
 // Maybe also:  MENU_EVENT
 
-    INPUT_RECORD ir;
-    BOOL input_encoded = FALSE;
+    داخلہ_ریکارڈ ir;
+    BOOL داخلہ_encoded = FALSE;
     BOOL execute = FALSE;
-    if (STRCMP(event, "key") == 0)
+    إذا (STRCMP(event, "key") == 0)
     {
-	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
-	    input_encoded = encode_key_event(args, &ir);
-	else if (!execute)
+	execute = dict_get_bool(دلیلاں, "execute", FALSE);
+	إذا (dict_has_کلید(دلیلاں, "event"))
+	    داخلہ_encoded = encode_کلید_event(دلیلاں, &ir);
+	وإلا إذا (!execute)
 	{
-	    semsg(_(e_missing_argument_str), "event");
-	    return FALSE;
+	    semsg(_(e_missing_دلیل_str), "event");
+	    أرجع FALSE;
 	}
     }
-    else if (STRCMP(event, "mouse") == 0)
+    وإلا إذا (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
-	input_encoded = encode_mouse_event(args, &ir);
+	داخلہ_encoded = encode_mouse_event(دلیلاں, &ir);
     }
-    else
+    وإلا
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_قدر_for_دلیل_str_str), "event", event);
+	أرجع FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    إذا (داخلہ_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	إذا ((lpEventsWritten = write_داخلہ_ریکارڈ_بفر(&ir, 1)) < 0)
 	{
-	    semsg(_(e_out_of_memory), "event");
-	    return FALSE;
+	    semsg(_(e_باہرلا_دا_حافظہ), "event");
+	    أرجع FALSE;
 	}
     }
 
     // Set flags to execute the event, ie. like feedkeys mode X.
-    if (execute)
+    إذا (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	صحيح save_پیغام_scroll = پیغام_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
-	msg_scroll = FALSE;
-	ch_log(NULL, "test_mswin_event() executing");
-	exec_normal(TRUE, TRUE, TRUE);
-	msg_scroll |= save_msg_scroll;
+	پیغام_scroll = FALSE;
+	ch_log(عدم, "test_mswin_event() executing");
+	exec_عام(TRUE, TRUE, TRUE);
+	پیغام_scroll |= save_پیغام_scroll;
     }
 
 # endif
-    return lpEventsWritten;
+    أرجع lpEventsWritten;
 }
-#endif // FEAT_EVAL
+#جے_انت // FEAT_EVAL
 
-#if defined(MCH_CURSOR_SHAPE)
+#إذا defined(MCH_CURSOR_SHAPE)
 /*
  * Set the shape of the cursor.
  * 'thickness' can be from 1 (thin) to 99 (block)
  */
-    static void
-mch_set_cursor_shape(int thickness)
+    ساكن فراغ
+mch_سیٹ_cursor_shape(صحيح thickness)
 {
-    if (vtp_working)
+    إذا (vtp_working)
     {
-	if (*T_CSI == NUL)
+	إذا (*T_CSI == NUL)
 	{
 	    // If 't_SI' is not set, use the default cursor styles.
-	    if (thickness < 50)
+	    إذا (thickness < 50)
 		vtp_printf("\033[3 q");	// underline
-	    else
+	    وإلا
 		vtp_printf("\033[0 q");	// default
 	}
     }
-    else
+    وإلا
     {
 	CONSOLE_CURSOR_INFO ConsoleCursorInfo;
-	ConsoleCursorInfo.dwSize = thickness;
+	ConsoleCursorInfo.dw_ناپ = thickness;
 	ConsoleCursorInfo.bVisible = s_cursor_visible;
 
-	SetConsoleCursorInfo(g_hConOut, &ConsoleCursorInfo);
-	if (s_cursor_visible)
-	    SetConsoleCursorPosition(g_hConOut, g_coord);
+	سیٹ_Console_Cursor_Info(g_h_Con_باہرلا, &ConsoleCursorInfo);
+	إذا (s_cursor_visible)
+	    سیٹ_Console_Cursor_Position(g_h_Con_باہرلا, g_coord);
     }
 }
 
-    void
-mch_update_cursor(void)
+    فراغ
+mch_update_cursor(فراغ)
 {
-    int		idx;
-    int		thickness;
+    صحيح		idx;
+    صحيح		thickness;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
 
     /*
@@ -2057,26 +2057,26 @@ mch_update_cursor(void)
      */
     idx = get_shape_idx(FALSE);
 
-    if (shape_table[idx].shape == SHAPE_BLOCK)
+    إذا (shape_جدول[idx].shape == SHAPE_بلاک)
 	thickness = 99;	// 100 doesn't work on W95
-    else
-	thickness = shape_table[idx].percentage;
-    mch_set_cursor_shape(thickness);
+    وإلا
+	thickness = shape_جدول[idx].percentage;
+    mch_سیٹ_cursor_shape(thickness);
 }
-#endif
+#جے_انت
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Handle FOCUS_EVENT.
  */
-    static void
-handle_focus_event(INPUT_RECORD ir)
+    ساكن فراغ
+handle_focus_event(داخلہ_ریکارڈ ir)
 {
-    g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
-    ui_focus_change((int)g_fJustGotFocus);
+    g_fJustGotFocus = ir.Event.FocusEvent.b_سیٹ_Focus;
+    ui_focus_change((صحيح)g_fJustGotFocus);
 }
 
-static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
+ساكن فراغ ResizeConBuf(HANDLE hConsole, COORD coordScreen);
 
 /*
  * Wait until console input from keyboard or mouse is available,
@@ -2084,116 +2084,116 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * When "ignore_input" is TRUE even wait when input is available.
  * Return TRUE if something is available FALSE if not.
  */
-    static int
-WaitForChar(long msec, int ignore_input)
+    ساكن صحيح
+WaitForChar(لما msec, صحيح ignore_داخلہ)
 {
-    DWORD	    dwNow = 0, dwEndTime = 0;
-    INPUT_RECORD    ir;
-    DWORD	    cRecords;
+    DWORD	    dwNow = 0, dw_سرا_ویلا = 0;
+    داخلہ_ریکارڈ    ir;
+    DWORD	    c_ریکارڈاں;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
-    int		    tb_change_cnt = typebuf.tb_change_cnt;
+    صحيح		    tb_change_cnt = typebuf.tb_change_cnt;
 # endif
 
-    if (msec > 0)
+    إذا (msec > 0)
 	// Wait until the specified time has elapsed.
-	dwEndTime = GetTickCount() + msec;
-    else if (msec < 0)
+	dw_سرا_ویلا = Get_Tick_گنتی() + msec;
+    وإلا إذا (msec < 0)
 	// Wait forever.
-	dwEndTime = INFINITE;
+	dw_سرا_ویلا = INFINITE;
 
     // We need to loop until the end of the time period, because
     // we might get multiple unusable mouse events in that time.
-    for (;;)
+    لكل (;;)
     {
 	// Only process messages when waiting.
-	if (msec != 0)
+	إذا (msec != 0)
 	{
-# ifdef MESSAGE_QUEUE
+# ifdef سنیہا_قطار
 	    parse_queued_messages();
 # endif
 # ifdef FEAT_MZSCHEME
-	    mzvim_check_threads();
+	    mzvim_check_دھاگے();
 # endif
 # ifdef FEAT_CLIENTSERVER
 	    serverProcessPendingMessages();
 # endif
 	}
 
-	if (g_nMouseClick != -1
+	إذا (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
-		|| (!ignore_input && input_available())
+		|| (!ignore_داخلہ && داخلہ_دستیاب())
 # endif
 	   )
-	    return TRUE;
+	    أرجع TRUE;
 
-	if (msec > 0)
+	إذا (msec > 0)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
-	    dwNow = GetTickCount();
-	    if ((int)(dwNow - dwEndTime) >= 0)
-		break;
+	    dwNow = Get_Tick_گنتی();
+	    إذا ((صحيح)(dwNow - dw_سرا_ویلا) >= 0)
+		اكسر;
 	}
-	if (msec != 0)
+	إذا (msec != 0)
 	{
-	    DWORD dwWaitTime = dwEndTime - dwNow;
+	    DWORD dw_Wait_ویلا = dw_سرا_ویلا - dwNow;
 
 	    // Don't wait for more than 11 msec to avoid dropping characters,
 	    // check channel while waiting for input and handle a callback from
 	    // 'balloonexpr'.
-	    if (dwWaitTime > 11)
-		dwWaitTime = 11;
+	    إذا (dw_Wait_ویلا > 11)
+		dw_Wait_ویلا = 11;
 
 # ifdef FEAT_MZSCHEME
-	    if (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
-		dwWaitTime = p_mzq; // don't wait longer than 'mzquantum'
+	    إذا (mzthreads_allowed() && p_mzq > 0 && (لما)dw_Wait_ویلا > p_mzq)
+		dw_Wait_ویلا = p_mzq; // don't wait longer than 'mzquantum'
 # endif
 # ifdef FEAT_TIMERS
 	    // When waiting very briefly don't trigger timers.
-	    if (dwWaitTime > 10)
+	    إذا (dw_Wait_ویلا > 10)
 	    {
-		long	due_time;
+		لما	due_ویلا;
 
 		// Trigger timers and then get the time in msec until the next
 		// one is due.  Wait up to that time.
-		due_time = check_due_timer();
-		if (typebuf.tb_change_cnt != tb_change_cnt)
+		due_ویلا = check_due_timer();
+		إذا (typebuf.tb_change_cnt != tb_change_cnt)
 		{
 		    // timer may have used feedkeys().
-		    return FALSE;
+		    أرجع FALSE;
 		}
-		if (due_time > 0 && dwWaitTime > (DWORD)due_time)
-		    dwWaitTime = due_time;
+		إذا (due_ویلا > 0 && dw_Wait_ویلا > (DWORD)due_ویلا)
+		    dw_Wait_ویلا = due_ویلا;
 	    }
 # endif
-	    if (
+	    إذا (
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
-		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
-				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
-# else
-		    wait_for_single_object(g_hConIn, dwWaitTime)
+		    پیغام_wait_for_مضرب_objects(1, &g_h_Con_وچ, FALSE,
+				  dw_Wait_ویلا, QS_SENDMESSAGE) != WAIT_OBJECT_0
+# وإلا
+		    wait_for_single_object(g_h_Con_وچ, dw_Wait_ویلا)
 							      != WAIT_OBJECT_0
 # endif
 		    )
-		continue;
+		استمر;
 	}
 
-	cRecords = 0;
-	peek_console_input(g_hConIn, &ir, 1, &cRecords);
+	c_ریکارڈاں = 0;
+	peek_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	إذا (State == منوال_CMDLINE && پیغام_صف == صفاں - 1 && msec != 0)
 	{
-	    CONSOLE_SCREEN_BUFFER_INFO csbi;
+	    CONSOLE_SCREEN_بفر_INFO csbi;
 
-	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	    إذا (Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		إذا (csbi.dwCursorPosition.Y != پیغام_صف)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2205,152 +2205,152 @@ WaitForChar(long msec, int ignore_input)
 	}
 # endif
 
-	if (cRecords > 0)
+	إذا (c_ریکارڈاں > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    إذا (ir.EventType == کلید_EVENT && ir.Event.کلید_Event_2.b_کلید_تھلے)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
-			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
+		إذا (ir.Event.کلید_Event_2.uChar.UnicodeChar == 0
+			&& ir.Event.کلید_Event_2.w_Virtual_کلید_کوڈ == 13)
 		{
-		    read_console_input(g_hConIn, &ir, 1, &cRecords);
-		    continue;
+		    read_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
+		    استمر;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
-								 NULL, FALSE))
-		    return TRUE;
+		إذا (decode_کلید_event(&ir.Event.کلید_Event_2, &ch, &ch2,
+								 عدم, FALSE))
+		    أرجع TRUE;
 	    }
 
-	    read_console_input(g_hConIn, &ir, 1, &cRecords);
+	    read_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں);
 
-	    if (ir.EventType == FOCUS_EVENT)
+	    إذا (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
-	    else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	    وإلا إذا (ir.EventType == کھڑکی_بفر_ناپ_EVENT)
 	    {
-		COORD dwSize = ir.Event.WindowBufferSizeEvent.dwSize;
+		COORD dw_ناپ = ir.Event.کھڑکی_بفر_ناپ_Event.dw_ناپ;
 
 		// Only call shell_resized() when the size actually changed to
 		// avoid the screen is cleared.
-		if (dwSize.X != Columns || dwSize.Y != Rows)
+		إذا (dw_ناپ.X != Columns || dw_ناپ.Y != صفاں)
 		{
-		    CONSOLE_SCREEN_BUFFER_INFO csbi;
-		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-		    if (dwSize.X != Columns || dwSize.Y != Rows)
+		    CONSOLE_SCREEN_بفر_INFO csbi;
+		    Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi);
+		    dw_ناپ.X = csbi.sr_کھڑکی.دایاں_3 - csbi.sr_کھڑکی.بایاں_3 + 1;
+		    dw_ناپ.Y = csbi.sr_کھڑکی.Bottom - csbi.sr_کھڑکی.چوٹی_2 + 1;
+		    إذا (dw_ناپ.X != Columns || dw_ناپ.Y != صفاں)
 		    {
-			ResizeConBuf(g_hConOut, dwSize);
+			ResizeConBuf(g_h_Con_باہرلا, dw_ناپ);
 			shell_resized();
 		    }
 		}
 	    }
-	    else if (ir.EventType == MOUSE_EVENT
+	    وإلا إذا (ir.EventType == MOUSE_EVENT
 		    && decode_mouse_event(&ir.Event.MouseEvent))
-		return TRUE;
+		أرجع TRUE;
 	}
-	else if (msec == 0)
-	    break;
+	وإلا إذا (msec == 0)
+	    اكسر;
     }
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
-	return TRUE;
+    إذا (داخلہ_دستیاب())
+	أرجع TRUE;
 # endif
 
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    صحيح
+mch_char_avail(فراغ)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    إذا (gui.وچ_use)
+	أرجع TRUE;
 # endif
-    return WaitForChar(0L, FALSE);
+    أرجع WaitForChar(0L, FALSE);
 }
 
-# if defined(FEAT_TERMINAL)
+# إذا defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    صحيح
+mch_check_messages(فراغ)
 {
 #  ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    إذا (gui.وچ_use)
+	أرجع TRUE;
 #  endif
-    return WaitForChar(0L, TRUE);
+    أرجع WaitForChar(0L, TRUE);
 }
 # endif
 
 /*
  * Create the console input.  Used when reading stdin doesn't work.
  */
-    static void
-create_conin(void)
+    ساكن فراغ
+create_conin(فراغ)
 {
-    g_hConIn =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
+    g_h_Con_وچ =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
 			FILE_SHARE_READ|FILE_SHARE_WRITE,
-			(LPSECURITY_ATTRIBUTES) NULL,
-			OPEN_EXISTING, 0, (HANDLE)NULL);
+			(LPSECURITY_گن) عدم,
+			OPEN_EXISTING, 0, (HANDLE)عدم);
     did_create_conin = TRUE;
 }
 
 /*
  * Get a keystroke or a mouse event, use a blocking wait.
  */
-    static WCHAR
-tgetch(int *pmodifiers, WCHAR *pch2)
+    ساكن WCHAR
+tgetch(صحيح *pmodifiers, WCHAR *pch2)
 {
     WCHAR ch;
 
-    for (;;)
+    لكل (;;)
     {
-	INPUT_RECORD ir;
-	DWORD cRecords = 0;
+	داخلہ_ریکارڈ ir;
+	DWORD c_ریکارڈاں = 0;
 
 # ifdef FEAT_CLIENTSERVER
-	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
-	    return 0;
-	if (g_nMouseClick != -1)
-	    return 0;
+	(فراغ)WaitForChar(-1L, FALSE);
+	إذا (داخلہ_دستیاب())
+	    أرجع 0;
+	إذا (g_nMouseClick != -1)
+	    أرجع 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	إذا (read_console_داخلہ(g_h_Con_وچ, &ir, 1, &c_ریکارڈاں) == 0)
 	{
-	    if (did_create_conin)
+	    إذا (did_create_conin)
 		read_error_exit();
 	    create_conin();
-	    continue;
+	    استمر;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	إذا (ir.EventType == کلید_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    إذا (decode_کلید_event(&ir.Event.کلید_Event_2, &ch, pch2,
 							    pmodifiers, TRUE))
-		return ch;
+		أرجع ch;
 	}
-	else if (ir.EventType == FOCUS_EVENT)
+	وإلا إذا (ir.EventType == FOCUS_EVENT)
 	    handle_focus_event(ir);
-	else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	وإلا إذا (ir.EventType == کھڑکی_بفر_ناپ_EVENT)
 	    shell_resized();
-	else if (ir.EventType == MOUSE_EVENT)
+	وإلا إذا (ir.EventType == MOUSE_EVENT)
 	{
-	    if (decode_mouse_event(&ir.Event.MouseEvent))
-		return 0;
+	    إذا (decode_mouse_event(&ir.Event.MouseEvent))
+		أرجع 0;
 	}
     }
 }
-#endif // !FEAT_GUI_MSWIN
+#جے_انت // !FEAT_GUI_MSWIN
 
 
 /*
@@ -2361,58 +2361,58 @@ tgetch(int *pmodifiers, WCHAR *pch2)
  * If time == -1, wait forever for characters.
  * Returns the number of characters read into buf.
  */
-    int
+    صحيح
 mch_inchar(
-    char_u	*buf UNUSED,
-    int		maxlen UNUSED,
-    long	time UNUSED,
-    int		tb_change_cnt UNUSED)
+    char_u	*buf بن_ورتیا,
+    صحيح		maxlen بن_ورتیا,
+    لما	ویلا بن_ورتیا,
+    صحيح		tb_change_cnt بن_ورتیا)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    int		len;
-    int		c;
+    صحيح		len;
+    صحيح		c;
 # ifdef VIMDLL
 // Extra space for maximum three CSIs. E.g. U+1B6DB -> 0xF0 0x9B 0x9B 0x9B.
 #  define TYPEAHEADSPACE    6
-# else
+# وإلا
 #  define TYPEAHEADSPACE    0
 # endif
 # define TYPEAHEADLEN	    (20 + TYPEAHEADSPACE)
-    static char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
-    static int	    typeaheadlen = 0;
+    ساكن char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
+    ساكن صحيح	    typeaheadlen = 0;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return 0;
+    إذا (gui.وچ_use)
+	أرجع 0;
 # endif
 
     // First use any typeahead that was kept because "buf" was too small.
-    if (typeaheadlen > 0)
-	goto theend;
+    إذا (typeaheadlen > 0)
+	اذهب theend;
 
-    if (time >= 0)
+    إذا (ویلا >= 0)
     {
-	if (!WaitForChar(time, FALSE))     // no character available
-	    return 0;
+	إذا (!WaitForChar(ویلا, FALSE))     // no character available
+	    أرجع 0;
     }
-    else    // time == -1, wait forever
+    وإلا    // time == -1, wait forever
     {
-	mch_set_winsize_now();	// Allow winsize changes from now on
+	mch_سیٹ_winsize_now();	// Allow winsize changes from now on
 
 	/*
 	 * If there is no character available within 2 seconds (default)
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (!WaitForChar(p_ut, FALSE))
+	إذا (!WaitForChar(p_ut, FALSE))
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    إذا (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (صحيح)KE_CURSORHOLD;
+		أرجع 3;
 	    }
 	    before_blocking();
 	}
@@ -2426,7 +2426,7 @@ mch_inchar(
     g_fCBrkPressed = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    إذا (fdDump)
 	fputc('[', fdDump);
 # endif
 
@@ -2434,32 +2434,32 @@ mch_inchar(
     // to get and still room in the buffer.  A mouse event uses up to
     // 10 bytes: 3 (modifier) + 3 (scroll event) + 4 (coordinates), and a
     // keyboard input uses up to 7 bytes: 3 (modifier) + 4 (UTF-8 char).
-    while ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
+    طالما ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
 			  && typeaheadlen + 10 + TYPEAHEADSPACE <= TYPEAHEADLEN)
     {
-	if (typebuf_changed(tb_change_cnt))
+	إذا (typebuf_بدلیا(tb_change_cnt))
 	{
 	    // "buf" may be invalid now if a client put something in the
 	    // typeahead buffer and "buf" is in the typeahead buffer.
 	    typeaheadlen = 0;
-	    break;
+	    اكسر;
 	}
-	if (g_nMouseClick != -1)
+	إذا (g_nMouseClick != -1)
 	{
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 		fprintf(fdDump, "{%02x @ %d, %d}",
 			g_nMouseClick, g_xMouse, g_yMouse);
 # endif
 	    char_u modifiers = ((char_u *)(&g_nMouseClick))[0];
 	    char_u scroll_dir = ((char_u *)(&g_nMouseClick))[1];
 
-	    if (scroll_dir == KE_MOUSEDOWN
+	    إذا (scroll_dir == KE_MOUSEDOWN
 		    || scroll_dir == KE_MOUSEUP
 		    || scroll_dir == KE_MOUSELEFT
 		    || scroll_dir == KE_MOUSERIGHT)
 	    {
-		if (modifiers > 0)
+		إذا (modifiers > 0)
 		{
 		    // use K_SPECIAL instead of CSI to make mappings work
 		    typeahead[typeaheadlen++] = K_SPECIAL;
@@ -2470,7 +2470,7 @@ mch_inchar(
 		typeahead[typeaheadlen++] = KS_EXTRA;
 		typeahead[typeaheadlen++] = scroll_dir;
 	    }
-	    else
+	    وإلا
 	    {
 		typeahead[typeaheadlen++] = ESC + 128;
 		typeahead[typeaheadlen++] = 'M';
@@ -2487,64 +2487,64 @@ mch_inchar(
 
 	    g_nMouseClick = -1;
 	}
-	else
+	وإلا
 	{
 	    WCHAR	ch2 = NUL;
-	    int		modifiers = 0;
+	    صحيح		modifiers = 0;
 
 	    c = tgetch(&modifiers, &ch2);
 
-	    c = simplify_key(c, &modifiers);
+	    c = simplify_کلید(c, &modifiers);
 
 	    // Some chars need adjustment when the Ctrl modifier is used.
-	    ++no_reduce_keys;
-	    c = may_adjust_key_for_ctrl(modifiers, c);
-	    --no_reduce_keys;
+	    ++no_reduce_کلیدیں;
+	    c = may_adjust_کلید_for_ctrl(modifiers, c);
+	    --no_reduce_کلیدیں;
 
 	    // remove the SHIFT modifier for keys where it's already included,
 	    // e.g., '(' and '*'
-	    modifiers = may_remove_shift_modifier(modifiers, c);
+	    modifiers = may_remove_کھسکاؤ_modifier(modifiers, c);
 
-	    if (typebuf_changed(tb_change_cnt))
+	    إذا (typebuf_بدلیا(tb_change_cnt))
 	    {
 		// "buf" may be invalid now if a client put something in the
 		// typeahead buffer and "buf" is in the typeahead buffer.
 		typeaheadlen = 0;
-		break;
+		اكسر;
 	    }
 
-	    if (c == Ctrl_C && ctrl_c_interrupts)
+	    إذا (c == Ctrl_C && ctrl_c_interrupts)
 	    {
-# if defined(FEAT_CLIENTSERVER)
-		trash_input_buf();
+# إذا defined(FEAT_CLIENTSERVER)
+		trash_داخلہ_buf();
 # endif
 		got_int = TRUE;
 	    }
 
-	    if (g_nMouseClick == -1)
+	    إذا (g_nMouseClick == -1)
 	    {
-		int	n = 1;
+		صحيح	n = 1;
 
-		if (ch2 == NUL)
+		إذا (ch2 == NUL)
 		{
-		    int	    i, j;
+		    صحيح	    i, j;
 		    char_u  *p;
 		    WCHAR   ch[2];
 
 		    ch[0] = c;
-		    if (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
+		    إذا (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
 		    {
 			ch[1] = tgetch(&modifiers, &ch2);
 			n++;
 		    }
-		    p = utf16_to_enc(ch, &n);
-		    if (p != NULL)
+		    p = utf16_منزل_enc(ch, &n);
+		    إذا (p != عدم)
 		    {
-			for (i = 0, j = 0; i < n; i++)
+			لكل (i = 0, j = 0; i < n; i++)
 			{
 			    typeahead[typeaheadlen + j++] = p[i];
 # ifdef VIMDLL
-			    if (p[i] == CSI)
+			    إذا (p[i] == CSI)
 			    {
 				typeahead[typeaheadlen + j++] = KS_EXTRA;
 				typeahead[typeaheadlen + j++] = KE_CSI;
@@ -2555,11 +2555,11 @@ mch_inchar(
 			vim_free(p);
 		    }
 		}
-		else
+		وإلا
 		{
 		    typeahead[typeaheadlen] = c;
 # ifdef VIMDLL
-		    if (c == CSI)
+		    إذا (c == CSI)
 		    {
 			typeahead[typeaheadlen + 1] = KS_EXTRA;
 			typeahead[typeaheadlen + 2] = KE_CSI;
@@ -2567,28 +2567,28 @@ mch_inchar(
 		    }
 # endif
 		}
-		if (ch2 != NUL)
+		إذا (ch2 != NUL)
 		{
-		    if (c == K_NUL)
+		    إذا (c == K_NUL)
 		    {
-			switch (ch2)
+			بدل (ch2)
 			{
-			case (WCHAR)'\324': // SHIFT+Insert
-			case (WCHAR)'\325': // CTRL+Insert
-			case (WCHAR)'\327': // SHIFT+Delete
-			case (WCHAR)'\330': // CTRL+Delete
+			حالة (WCHAR)'\324': // SHIFT+Insert
+			حالة (WCHAR)'\325': // CTRL+Insert
+			حالة (WCHAR)'\327': // SHIFT+Delete
+			حالة (WCHAR)'\330': // CTRL+Delete
 			    typeahead[typeaheadlen + n] = (char_u)ch2;
 			    n++;
-			    break;
+			    اكسر;
 
-			default:
+			افتراضي:
 			    typeahead[typeaheadlen + n] = 3;
 			    typeahead[typeaheadlen + n + 1] = (char_u)ch2;
 			    n += 2;
-			    break;
+			    اكسر;
 			}
 		    }
-		    else
+		    وإلا
 		    {
 			typeahead[typeaheadlen + n] = 3;
 			typeahead[typeaheadlen + n + 1] = (char_u)ch2;
@@ -2600,7 +2600,7 @@ mch_inchar(
 		// when it's one byte, the 8th bit isn't set yet and not
 		// using a double-byte encoding (would become a lead
 		// byte).
-		if ((modifiers & MOD_MASK_ALT)
+		إذا ((modifiers & MOD_نقاب_ALT)
 			&& n == 1
 			&& (typeahead[typeaheadlen] & 0x80) == 0
 			&& !enc_dbcs
@@ -2608,10 +2608,10 @@ mch_inchar(
 		{
 		    n = (*mb_char2bytes)(typeahead[typeaheadlen] | 0x80,
 						    typeahead + typeaheadlen);
-		    modifiers &= ~MOD_MASK_ALT;
+		    modifiers &= ~MOD_نقاب_ALT;
 		}
 
-		if (modifiers != 0)
+		إذا (modifiers != 0)
 		{
 		    // Prepend modifiers to the character.
 		    mch_memmove(typeahead + typeaheadlen + 3,
@@ -2624,7 +2624,7 @@ mch_inchar(
 		typeaheadlen += n;
 
 # ifdef MCH_WRITE_DUMP
-		if (fdDump)
+		إذا (fdDump)
 		    fputc(c, fdDump);
 # endif
 	    }
@@ -2632,7 +2632,7 @@ mch_inchar(
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    إذا (fdDump)
     {
 	fputs("]\n", fdDump);
 	fflush(fdDump);
@@ -2642,23 +2642,23 @@ mch_inchar(
 theend:
     // Move typeahead to "buf", as much as fits.
     len = 0;
-    while (len < maxlen && typeaheadlen > 0)
+    طالما (len < maxlen && typeaheadlen > 0)
     {
 	buf[len++] = typeahead[0];
 	mch_memmove(typeahead, typeahead + 1, --typeaheadlen);
     }
 # ifdef FEAT_EVAL
-    if (len > 0)
+    إذا (len > 0)
     {
 	buf[len] = NUL;
-	ch_log(NULL, "raw key input: \"%s\"", buf);
+	ch_log(عدم, "raw key input: \"%s\"", buf);
     }
 # endif
-    return len;
+    أرجع len;
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    return 0;
-#endif // FEAT_GUI_MSWIN && !VIMDLL
+#وإلا // FEAT_GUI_MSWIN && !VIMDLL
+    أرجع 0;
+#جے_انت // FEAT_GUI_MSWIN && !VIMDLL
 }
 
 /*
@@ -2667,32 +2667,32 @@ theend:
  * the allocated memory.
  * TODO: Should somehow check if it's really executable.
  */
-    static int
-executable_file(char *name, char_u **path)
+    ساكن صحيح
+executable_file(حرف *name, char_u **رستہ)
 {
-    int attrs = win32_getattrs((char_u *)name);
+    صحيح attrs = win32_getattrs((char_u *)name);
 
     // The file doesn't exist or is a folder.
-    if (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
-	return FALSE;
+    إذا (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
+	أرجع FALSE;
     // Check if the file is an AppExecLink, a special alias used by Windows
     // Store for its apps.
-    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    إذا (attrs & FILE_ATTRIBUTE_REPARSE_نقطہ)
     {
 	char_u	*res = resolve_appexeclink((char_u *)name);
-	if (res == NULL)
-	    res = resolve_reparse_point((char_u *)name);
-	if (res == NULL)
-	    return FALSE;
+	إذا (res == عدم)
+	    res = resolve_reparse_نقطہ((char_u *)name);
+	إذا (res == عدم)
+	    أرجع FALSE;
 	// The path is already absolute.
-	if (path != NULL)
-	    *path = res;
-	else
+	إذا (رستہ != عدم)
+	    *رستہ = res;
+	وإلا
 	    vim_free(res);
     }
-    else if (path != NULL)
-	*path = FullName_save((char_u *)name, FALSE);
-    return TRUE;
+    وإلا إذا (رستہ != عدم)
+	*رستہ = بھریا_Name_save((char_u *)name, FALSE);
+    أرجع TRUE;
 }
 
 /*
@@ -2700,27 +2700,27 @@ executable_file(char *name, char_u **path)
  * An inconclusive search (e.g. a directory which cannot be enumerated) must
  * not skip the normal checks.
  */
-    static bool
-executable_prefix_exists(char_u *name)
+    ساكن bool
+executable_اگیتر_exists(char_u *name)
 {
     WCHAR		*wn;
-    WIN32_FIND_DATAW	data;
+    WIN32_لبھو_DATAW	انکڑے;
     HANDLE		handle;
     DWORD		error;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return true;
-    handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
-					    FindExSearchNameMatch, NULL, 0);
-    error = GetLastError();
+    wn = enc_منزل_utf16(name, عدم);
+    إذا (wn == عدم)
+	أرجع true;
+    handle = لبھو_پہلا_File_Ex_W(wn, لبھو_Ex_Info_Basic, &انکڑے,
+					    لبھو_Ex_تلاش_Name_میل, عدم, 0);
+    error = Get_آخری_Error();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    إذا (handle != INVALID_HANDLE_قدر)
     {
-	FindClose(handle);
-	return true;
+	لبھو_Close(handle);
+	أرجع true;
     }
-    return error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
+    أرجع error != ERROR_FILE_NOT_لبھیا && error != ERROR_رستہ_NOT_لبھیا;
 }
 
 /*
@@ -2730,48 +2730,48 @@ executable_prefix_exists(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    static int
+    ساكن صحيح
 executable_exists(
-    char	*name,
+    حرف	*name,
     size_t	namelen,
-    char_u	**path,
-    int		use_path,
-    int		use_pathext)
+    char_u	**رستہ,
+    صحيح		use_رستہ,
+    صحيح		use_pathext)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
-    char_u	buf[_MAX_PATH * 3];
+    char_u	buf[MAX_رستہ_2 * 3];
     char_u	*p;
-    string_T	pathbuf = {NULL, 0};
-    int		pathbuf_allocated = FALSE;
-    string_T	pathext = {NULL, 0};
-    int		pathext_allocated = FALSE;
-    char_u	*shname = NULL;
-    int		noext = FALSE;
+    string_T	pathbuf = {عدم, 0};
+    صحيح		pathbuf_allocated = FALSE;
+    string_T	pathext = {عدم, 0};
+    صحيح		pathext_allocated = FALSE;
+    char_u	*shname = عدم;
+    صحيح		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
-    int		retval = FALSE;
+    صحيح		ext_گنتی = 0;
+    صحيح		retval = FALSE;
 
-    if (namelen >= sizeof(buf))	// safety check
-	return FALSE;
+    إذا (namelen >= حجم(buf))	// safety check
+	أرجع FALSE;
 
     // Using the name directly when a Unix-shell like 'shell'.
     shname = gettail(p_sh);
-    if (strstr((char *)shname, "sh") != NULL &&
-	!(strstr((char *)shname, "powershell") != NULL
-				    || strstr((char *)shname, "pwsh") != NULL))
+    إذا (لڑی_کھوج((حرف *)shname, "sh") != عدم &&
+	!(لڑی_کھوج((حرف *)shname, "powershell") != عدم
+				    || لڑی_کھوج((حرف *)shname, "pwsh") != عدم))
 	noext = TRUE;
 
-    if (use_pathext)
+    إذا (use_pathext)
     {
 	pathext.string = mch_getenv("PATHEXT");
-	if (pathext.string == NULL)
-	    STR_LITERAL_SET(pathext, ".com;.exe;.bat;.cmd");
-	else
-	    pathext.length = STRLEN(pathext.string);
+	إذا (pathext.string == عدم)
+	    STR_LITERAL_سیٹ(pathext, ".com;.exe;.bat;.cmd");
+	وإلا
+	    pathext.لمائی = STRLEN(pathext.string);
 
-	if (noext == FALSE)
+	إذا (noext == FALSE)
 	{
 	    char_u  *e;
 	    char_u  *q;
@@ -2782,32 +2782,32 @@ executable_exists(
 	     * Check "name" ends with extension.
 	     */
 	    p = pathext.string;
-	    while (*p)
+	    طالما (*p)
 	    {
-		if (p[0] == ';'
+		إذا (p[0] == ';'
 			    || (p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 		{
 		    // Skip empty or single ".".
-		    if (*p == '.')
+		    إذا (*p == '.')
 			simple_pathext = false;
 		    ++p;
-		    continue;
+		    استمر;
 		}
 		e = vim_strchr(p, ';');
-		if (e == NULL)
-		    e = pathext.string + pathext.length;
+		إذا (e == عدم)
+		    e = pathext.string + pathext.لمائی;
 		plen = (size_t)(e - p);
-		++ext_count;
-		if (*p != '.')
+		++ext_گنتی;
+		إذا (*p != '.')
 		    simple_pathext = false;
-		for (q = p + 1; q < e; ++q)
-		    if (!ASCII_ISALNUM(*q))
+		لكل (q = p + 1; q < e; ++q)
+		    إذا (!ASCII_ISALNUM(*q))
 			simple_pathext = false;
 
-		if (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
+		إذا (_strnicoll(name + namelen - plen, (حرف *)p, plen) == 0)
 		{
 		    noext = TRUE;
-		    break;
+		    اكسر;
 		}
 
 		p = e;
@@ -2816,49 +2816,49 @@ executable_exists(
     }
 
     // Prepend single "." to pathext, it means no extension added.
-    if (pathext.string == NULL)
-	STR_LITERAL_SET(pathext, ".");
-    else if (noext == TRUE)
+    إذا (pathext.string == عدم)
+	STR_LITERAL_سیٹ(pathext, ".");
+    وإلا إذا (noext == TRUE)
     {
 	char_u  *tmp;
 
-	tmp = alloc(pathext.length + 3);
-	if (tmp == NULL)
+	tmp = alloc(pathext.لمائی + 3);
+	إذا (tmp == عدم)
 	{
 	    retval = FALSE;
-	    goto theend;
+	    اذهب theend;
 	}
 
 	STRCPY(tmp, ".;");
 	STRCPY(tmp + 2, pathext.string);
 	pathext.string = tmp;
-	pathext.length += 2;
+	pathext.لمائی += 2;
 	pathext_allocated = TRUE;
     }
 
     // Use $PATH when "use_path" is TRUE and "name" is basename.
-    if (use_path && gettail((char_u *)name) == (char_u *)name)
+    إذا (use_رستہ && gettail((char_u *)name) == (char_u *)name)
     {
 	p = mch_getenv("PATH");
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    size_t  plen = STRLEN(p);
 
 	    pathbuf.string = alloc(plen + 3);
-	    if (pathbuf.string == NULL)
+	    إذا (pathbuf.string == عدم)
 	    {
 		retval = FALSE;
-		goto theend;
+		اذهب theend;
 	    }
 
-	    if (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
-		    strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+	    إذا (mch_getenv("NoDefaultCurrentDirectoryInExePath") == عدم &&
+		    لڑی_کھوج((حرف *)gettail(p_sh), "cmd.exe") != عدم)
 	    {
 		STRCPY(pathbuf.string, ".;");
-		pathbuf.length = 2;
+		pathbuf.لمائی = 2;
 	    }
-	    STRCPY(pathbuf.string + pathbuf.length, p);
-	    pathbuf.length += plen;
+	    STRCPY(pathbuf.string + pathbuf.لمائی, p);
+	    pathbuf.لمائی += plen;
 	    pathbuf_allocated = TRUE;
 	}
     }
@@ -2867,40 +2867,40 @@ executable_exists(
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    if (pathbuf.string == NULL)
-	STR_LITERAL_SET(pathbuf, ".");
+    إذا (pathbuf.string == عدم)
+	STR_LITERAL_سیٹ(pathbuf, ".");
     p = pathbuf.string;
-    while (*p)
+    طالما (*p)
     {
 	char_u	*e;
 	size_t	buflen;
 
-	if (*p == ';') // Skip empty entry
+	إذا (*p == ';') // Skip empty entry
 	{
 	    ++p;
-	    continue;
+	    استمر;
 	}
 	e = vim_strchr(p, ';');
-	if (e == NULL)
-	    e = pathbuf.string + pathbuf.length;
+	إذا (e == عدم)
+	    e = pathbuf.string + pathbuf.لمائی;
 
-	if (e - p + namelen + 2 > sizeof(buf))
+	إذا (e - p + namelen + 2 > حجم(buf))
 	{
 	    retval = FALSE;
-	    goto theend;
+	    اذهب theend;
 	}
 	// A single "." that means current dir.
-	if (e - p == 1 && *p == '.')
+	إذا (e - p == 1 && *p == '.')
 	{
 	    STRCPY(buf, name);
 	    buflen = namelen;
 	}
-	else
+	وإلا
 	{
 	    buflen = vim_snprintf_safelen(
-		(char *)buf,
-		sizeof(buf),
-		"%.*s%s%s", (int)(e - p), p,
+		(حرف *)buf,
+		حجم(buf),
+		"%.*s%s%s", (صحيح)(e - p), p,
 		!after_pathsep(p, e) ? PATHSEPSTR : "",
 		name);
 	}
@@ -2910,22 +2910,22 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
-		&& buflen + 2 <= sizeof(buf)
+	إذا (!noext && simple_pathext && ext_گنتی >= 3 && buflen > 0
+		&& buflen + 2 <= حجم(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
-		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
-		&& vim_strchr(gettail(buf), ':') == NULL)
+		&& vim_strpbrk(buf, (char_u *)"*?") == عدم
+		&& vim_strchr(gettail(buf), ':') == عدم)
 	{
 	    bool exists;
 
 	    buf[buflen] = '*';
 	    buf[buflen + 1] = NUL;
-	    exists = executable_prefix_exists(buf);
+	    exists = executable_اگیتر_exists(buf);
 	    buf[buflen] = NUL;
-	    if (!exists)
+	    إذا (!exists)
 	    {
 		p = e;
-		continue;
+		استمر;
 	    }
 	}
 
@@ -2934,34 +2934,34 @@ executable_exists(
 	 * Check "name" with extension added.
 	 */
 	p = pathext.string;
-	while (*p)
+	طالما (*p)
 	{
 	    char_u  *e2;
 
-	    if (*p == ';')
+	    إذا (*p == ';')
 	    {
 		// Skip empty entry
 		++p;
-		continue;
+		استمر;
 	    }
 	    e2 = vim_strchr(p, ';');
-	    if (e2 == NULL)
-		e2 = pathext.string + pathext.length;
+	    إذا (e2 == عدم)
+		e2 = pathext.string + pathext.لمائی;
 
-	    if (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
+	    إذا (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 	    {
 		// Not a single "." that means no extension is added.
-		if (e2 - p + buflen + 1 > sizeof(buf))
+		إذا (e2 - p + buflen + 1 > حجم(buf))
 		{
 		    retval = FALSE;
-		    goto theend;
+		    اذهب theend;
 		}
 		vim_strncpy(buf + buflen, p, e2 - p);
 	    }
-	    if (executable_file((char *)buf, path))
+	    إذا (executable_file((حرف *)buf, رستہ))
 	    {
 		retval = TRUE;
-		goto theend;
+		اذهب theend;
 	    }
 
 	    p = e2;
@@ -2971,14 +2971,14 @@ executable_exists(
     }
 
 theend:
-    if (pathbuf_allocated)
-	free(pathbuf.string);
-    if (pathext_allocated)
-	free(pathext.string);
-    return retval;
+    إذا (pathbuf_allocated)
+	حرر(pathbuf.string);
+    إذا (pathext_allocated)
+	حرر(pathext.string);
+    أرجع retval;
 }
 
-#if (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
+#إذا (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
 	(defined(_MSC_VER) && _MSC_VER >= 1400)
 /*
  * Bad parameter handler.
@@ -2992,80 +2992,80 @@ theend:
  * NULL/0.  Debug builds will also produce assert dialogs from the CRT, it is
  * worth allowing these to make debugging of issues easier.
  */
-    static void
-bad_param_handler(const wchar_t *expression UNUSED,
-    const wchar_t *function UNUSED,
-    const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
-    uintptr_t pReserved UNUSED)
+    ساكن فراغ
+bad_param_handler(ثابت wchar_t *عبارت بن_ورتیا,
+    ثابت wchar_t *function بن_ورتیا,
+    ثابت wchar_t *file بن_ورتیا,
+    بنانشانی صحيح سطر بن_ورتیا,
+    uintptr_t pReserved بن_ورتیا)
 {
 }
 
-# define SET_INVALID_PARAM_HANDLER \
-	((void)_set_invalid_parameter_handler(bad_param_handler))
-#else
-# define SET_INVALID_PARAM_HANDLER
-#endif
+# define سیٹ_INVALID_PARAM_HANDLER \
+	((فراغ)سیٹ_invalid_parameter_handler(bad_param_handler))
+#وإلا
+# define سیٹ_INVALID_PARAM_HANDLER
+#جے_انت
 
-#ifdef FEAT_GUI_MSWIN
+#جے_تعریف_شدہ FEAT_GUI_MSWIN
 
 /*
  * GUI version of mch_init().
  */
-    static void
-mch_init_g(void)
+    ساكن فراغ
+mch_init_g(فراغ)
 {
 # ifndef __MINGW32__
-    extern int _fmode;
+    خارجي صحيح _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    سیٹ_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    سیٹ_Error_منوال(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_ثنائی;		// we do our own CR-LF translation
 
     // Specify window size.  Is there a place to get the default from?
-    Rows = 25;
+    صفاں = 25;
     Columns = 80;
 
     // Look for 'vimrun'.
     {
-	char_u	vimrun_location[_MAX_PATH + 4];
+	char_u	vimrun_location[MAX_رستہ_2 + 4];
 	size_t	exe_pathlen = (size_t)(gettail(exe_name) - exe_name);
 
 	// Note: 10 is length of 'vimrun.exe'.
-	if (exe_pathlen + 10 >= sizeof(vimrun_location))
+	إذا (exe_pathlen + 10 >= حجم(vimrun_location))
 	{
-	    if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    إذا (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    عدم, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
-	else
+	وإلا
 	{
 	    // First try in same directory as gvim.exe.
-	    if (exe_pathlen > 0)
+	    إذا (exe_pathlen > 0)
 		vim_strncpy(vimrun_location, exe_name, exe_pathlen);
 	    STRCPY(vimrun_location + exe_pathlen, "vimrun.exe");
 
-	    if (mch_getperm(vimrun_location) >= 0)
+	    إذا (mch_getperm(vimrun_location) >= 0)
 	    {
 		char_u  *p;
 		size_t  plen;
 
-		if (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
+		إذا (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
 		{
 		    // Enclose path with white space in double quotes.
 		    plen = vim_snprintf_safelen(
-			(char *)vimrun_location,
-			sizeof(vimrun_location),
+			(حرف *)vimrun_location,
+			حجم(vimrun_location),
 			"\"%.*svimrun\" ",
-			(int)exe_pathlen, exe_name);
+			(صحيح)exe_pathlen, exe_name);
 		}
-		else
+		وإلا
 		{
 		    // Remove the suffix ('.exe').
 		    vimrun_location[exe_pathlen + 6] = ' ';
@@ -3074,23 +3074,23 @@ mch_init_g(void)
 		}
 
 		p = vim_strnsave(vimrun_location, plen);
-		if (p != NULL)
+		إذا (p != عدم)
 		{
-		    vimrun_path.string = p;
-		    vimrun_path.length = plen;
-		    vimrun_path_allocated = TRUE;
+		    vimrun_رستہ.string = p;
+		    vimrun_رستہ.لمائی = plen;
+		    vimrun_رستہ_allocated = TRUE;
 		    s_dont_use_vimrun = FALSE;
 		}
 	    }
-	    else if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    وإلا إذا (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    عدم, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
 
 	// Don't give the warning for a missing vimrun.exe right now, but only
 	// when vimrun was supposed to be used.  Don't bother people that do
 	// not need vimrun.exe.
-	if (s_dont_use_vimrun)
+	إذا (s_dont_use_vimrun)
 	    need_vimrun_warning = TRUE;
     }
 
@@ -3098,9 +3098,9 @@ mch_init_g(void)
      * If "findstr.exe" doesn't exist, use "grep -n" for 'grepprg'.
      * Otherwise the default "findstr /n" is used.
      */
-    if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
-	    NULL, TRUE, FALSE))
-	set_option_value_give_err((char_u *)"grepprg",
+    إذا (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
+	    عدم, TRUE, FALSE))
+	سیٹ_option_قدر_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
 
 # ifdef FEAT_CLIPBOARD
@@ -3111,12 +3111,12 @@ mch_init_g(void)
 }
 
 
-#endif // FEAT_GUI_MSWIN
+#جے_انت // FEAT_GUI_MSWIN
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
-# define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
+# define SRWIDTH(sr) ((sr).دایاں_3 - (sr).بایاں_3 + 1)
+# define SRHEIGHT(sr) ((sr).Bottom - (sr).چوٹی_2 + 1)
 
 /*
  * ClearConsoleBuffer()
@@ -3126,27 +3126,27 @@ mch_init_g(void)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-ClearConsoleBuffer(WORD wAttribute)
+    ساكن BOOL
+Clear_Console_بفر(لفظ_2 wAttribute)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_بفر_INFO csbi;
     COORD coord;
-    DWORD NumCells, dummy;
+    DWORD عدد_Cells, dummy;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    إذا (!Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
+	أرجع FALSE;
 
-    NumCells = csbi.dwSize.X * csbi.dwSize.Y;
+    عدد_Cells = csbi.dw_ناپ.X * csbi.dw_ناپ.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    إذا (!FillConsoleOutputCharacter(g_h_Con_باہرلا, ' ', عدد_Cells,
 	    coord, &dummy))
-	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+	أرجع FALSE;
+    إذا (!FillConsoleOutputAttribute(g_h_Con_باہرلا, wAttribute, عدد_Cells,
 	    coord, &dummy))
-	return FALSE;
+	أرجع FALSE;
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -3157,58 +3157,58 @@ ClearConsoleBuffer(WORD wAttribute)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-FitConsoleWindow(
-    COORD dwBufferSize,
+    ساكن BOOL
+Fit_Console_کھڑکی(
+    COORD dw_بفر_ناپ,
     BOOL WantAdjust)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    COORD dwWindowSize;
+    CONSOLE_SCREEN_بفر_INFO csbi;
+    COORD dw_کھڑکی_ناپ;
     BOOL NeedAdjust = FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    إذا (!Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
+	أرجع FALSE;
 
     /*
      * A buffer resize will fail if the current console window does
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    إذا (csbi.sr_کھڑکی.دایاں_3 >= dw_بفر_ناپ.X)
     {
-	dwWindowSize.X = SRWIDTH(csbi.srWindow);
-	if (dwWindowSize.X > dwBufferSize.X)
-	    dwWindowSize.X = dwBufferSize.X;
-	csbi.srWindow.Right = dwBufferSize.X - 1;
-	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
+	dw_کھڑکی_ناپ.X = SRWIDTH(csbi.sr_کھڑکی);
+	إذا (dw_کھڑکی_ناپ.X > dw_بفر_ناپ.X)
+	    dw_کھڑکی_ناپ.X = dw_بفر_ناپ.X;
+	csbi.sr_کھڑکی.دایاں_3 = dw_بفر_ناپ.X - 1;
+	csbi.sr_کھڑکی.بایاں_3 = dw_بفر_ناپ.X - dw_کھڑکی_ناپ.X;
 	NeedAdjust = TRUE;
     }
-    if (csbi.srWindow.Bottom >= dwBufferSize.Y)
+    إذا (csbi.sr_کھڑکی.Bottom >= dw_بفر_ناپ.Y)
     {
-	dwWindowSize.Y = SRHEIGHT(csbi.srWindow);
-	if (dwWindowSize.Y > dwBufferSize.Y)
-	    dwWindowSize.Y = dwBufferSize.Y;
-	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
-	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
+	dw_کھڑکی_ناپ.Y = SRHEIGHT(csbi.sr_کھڑکی);
+	إذا (dw_کھڑکی_ناپ.Y > dw_بفر_ناپ.Y)
+	    dw_کھڑکی_ناپ.Y = dw_بفر_ناپ.Y;
+	csbi.sr_کھڑکی.Bottom = dw_بفر_ناپ.Y - 1;
+	csbi.sr_کھڑکی.چوٹی_2 = dw_بفر_ناپ.Y - dw_کھڑکی_ناپ.Y;
 	NeedAdjust = TRUE;
     }
-    if (NeedAdjust && WantAdjust)
+    إذا (NeedAdjust && WantAdjust)
     {
-	if (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
-	    return FALSE;
+	إذا (!سیٹ_Console_کھڑکی_Info(g_h_Con_باہرلا, TRUE, &csbi.sr_کھڑکی))
+	    أرجع FALSE;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
-typedef struct ConsoleBufferStruct
+تعريفنوع بنية Console_بفر_Struct
 {
     BOOL			IsValid;
-    CONSOLE_SCREEN_BUFFER_INFO	Info;
-    PCHAR_INFO			Buffer;
-    COORD			BufferSize;
+    CONSOLE_SCREEN_بفر_INFO	Info;
+    PCHAR_INFO			بفر_2;
+    COORD			بفر_ناپ_2;
     PSMALL_RECT			Regions;
-    int				NumRegions;
-} ConsoleBuffer;
+    صحيح				عدد_Regions;
+} Console_بفر;
 
 /*
  * SaveConsoleBuffer()
@@ -3220,47 +3220,47 @@ typedef struct ConsoleBufferStruct
  *  TRUE if all information was saved; FALSE otherwise
  *  If FALSE, still sets cb->IsValid if buffer characteristics were saved.
  */
-    static BOOL
-SaveConsoleBuffer(
-    ConsoleBuffer *cb)
+    ساكن BOOL
+Save_Console_بفر(
+    Console_بفر *cb)
 {
-    DWORD NumCells;
-    COORD BufferCoord;
+    DWORD عدد_Cells;
+    COORD بفر_Coord;
     SMALL_RECT ReadRegion;
-    WORD Y, Y_incr;
-    int i, numregions;
+    لفظ_2 Y, Y_incr;
+    صحيح i, numregions;
 
-    if (cb == NULL)
-	return FALSE;
+    إذا (cb == عدم)
+	أرجع FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
+    إذا (!Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &cb->Info))
     {
 	cb->IsValid = FALSE;
-	return FALSE;
+	أرجع FALSE;
     }
     cb->IsValid = TRUE;
 
     // VTP uses alternate screen buffer.
     // No need to save buffer contents for restoration.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    إذا (use_alternate_screen_بفر)
+	أرجع TRUE;
 
     /*
      * Allocate a buffer large enough to hold the entire console screen
      * buffer.  If this ConsoleBuffer structure has already been initialized
      * with a buffer of the correct size, then just use that one.
      */
-    if (!cb->IsValid || cb->Buffer == NULL ||
-	    cb->BufferSize.X != cb->Info.dwSize.X ||
-	    cb->BufferSize.Y != cb->Info.dwSize.Y)
+    إذا (!cb->IsValid || cb->بفر_2 == عدم ||
+	    cb->بفر_ناپ_2.X != cb->Info.dw_ناپ.X ||
+	    cb->بفر_ناپ_2.Y != cb->Info.dw_ناپ.Y)
     {
-	cb->BufferSize.X = cb->Info.dwSize.X;
-	cb->BufferSize.Y = cb->Info.dwSize.Y;
-	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
-	vim_free(cb->Buffer);
-	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
-	if (cb->Buffer == NULL)
-	    return FALSE;
+	cb->بفر_ناپ_2.X = cb->Info.dw_ناپ.X;
+	cb->بفر_ناپ_2.Y = cb->Info.dw_ناپ.Y;
+	عدد_Cells = cb->بفر_ناپ_2.X * cb->بفر_ناپ_2.Y;
+	vim_free(cb->بفر_2);
+	cb->بفر_2 = ALLOC_MULT(CHAR_INFO, عدد_Cells);
+	إذا (cb->بفر_2 == عدم)
+	    أرجع FALSE;
     }
 
     /*
@@ -3272,52 +3272,52 @@ SaveConsoleBuffer(
      * same horizontal characteristics, so initialize them now.  The
      * height of each chunk will be (12000 / width).
      */
-    BufferCoord.X = 0;
-    ReadRegion.Left = 0;
-    ReadRegion.Right = cb->Info.dwSize.X - 1;
-    Y_incr = 12000 / cb->Info.dwSize.X;
+    بفر_Coord.X = 0;
+    ReadRegion.بایاں_3 = 0;
+    ReadRegion.دایاں_3 = cb->Info.dw_ناپ.X - 1;
+    Y_incr = 12000 / cb->Info.dw_ناپ.X;
 
-    numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    numregions = (cb->Info.dw_ناپ.Y + Y_incr - 1) / Y_incr;
+    إذا (cb->Regions == عدم || numregions != cb->عدد_Regions)
     {
-	cb->NumRegions = numregions;
+	cb->عدد_Regions = numregions;
 	vim_free(cb->Regions);
-	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
-	if (cb->Regions == NULL)
+	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->عدد_Regions);
+	إذا (cb->Regions == عدم)
 	{
-	    VIM_CLEAR(cb->Buffer);
-	    return FALSE;
+	    VIM_CLEAR(cb->بفر_2);
+	    أرجع FALSE;
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    لكل (i = 0, Y = 0; i < cb->عدد_Regions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
 	 */
-	BufferCoord.Y = Y;
+	بفر_Coord.Y = Y;
 	/*
 	 * Read the region whose top left corner is (0, Y) and whose bottom
 	 * right corner is (width - 1, Y + Y_incr - 1).  This should define
 	 * a region of size width by Y_incr.  Don't worry if this region is
 	 * too large for the remaining buffer; it will be cropped.
 	 */
-	ReadRegion.Top = Y;
+	ReadRegion.چوٹی_2 = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
-	if (!ReadConsoleOutputW(g_hConOut,	// output handle
-		cb->Buffer,			// our buffer
-		cb->BufferSize,			// dimensions of our buffer
-		BufferCoord,			// offset in our buffer
+	إذا (!ReadConsoleOutputW(g_h_Con_باہرلا,	// output handle
+		cb->بفر_2,			// our buffer
+		cb->بفر_ناپ_2,			// dimensions of our buffer
+		بفر_Coord,			// offset in our buffer
 		&ReadRegion))			// region to save
 	{
-	    VIM_CLEAR(cb->Buffer);
+	    VIM_CLEAR(cb->بفر_2);
 	    VIM_CLEAR(cb->Regions);
-	    return FALSE;
+	    أرجع FALSE;
 	}
 	cb->Regions[i] = ReadRegion;
     }
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -3329,85 +3329,85 @@ SaveConsoleBuffer(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-RestoreConsoleBuffer(
-    ConsoleBuffer   *cb,
+    ساكن BOOL
+Restore_Console_بفر(
+    Console_بفر   *cb,
     BOOL	    RestoreScreen)
 {
-    COORD BufferCoord;
+    COORD بفر_Coord;
     SMALL_RECT WriteRegion;
-    int i;
+    صحيح i;
 
-    if (cb == NULL || !cb->IsValid)
-	return FALSE;
+    إذا (cb == عدم || !cb->IsValid)
+	أرجع FALSE;
 
     /*
      * Before restoring the buffer contents, clear the current buffer, and
      * restore the cursor position and window information.  Doing this now
      * prevents old buffer contents from "flashing" onto the screen.
      */
-    if (RestoreScreen)
-	ClearConsoleBuffer(cb->Info.wAttributes);
+    إذا (RestoreScreen)
+	Clear_Console_بفر(cb->Info.w_گن);
 
-    FitConsoleWindow(cb->Info.dwSize, TRUE);
-    if (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
-	return FALSE;
-    if (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
-	return FALSE;
+    Fit_Console_کھڑکی(cb->Info.dw_ناپ, TRUE);
+    إذا (!سیٹ_Console_Screen_بفر_ناپ(g_h_Con_باہرلا, cb->Info.dw_ناپ))
+	أرجع FALSE;
+    إذا (!سیٹ_Console_متن_Attribute(g_h_Con_باہرلا, cb->Info.w_گن))
+	أرجع FALSE;
 
-    if (!RestoreScreen)
+    إذا (!RestoreScreen)
     {
 	/*
 	 * No need to restore the screen buffer contents, so we're done.
 	 */
-	return TRUE;
+	أرجع TRUE;
     }
 
-    if (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
-	return FALSE;
-    if (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
-	return FALSE;
+    إذا (!سیٹ_Console_Cursor_Position(g_h_Con_باہرلا, cb->Info.dwCursorPosition))
+	أرجع FALSE;
+    إذا (!سیٹ_Console_کھڑکی_Info(g_h_Con_باہرلا, TRUE, &cb->Info.sr_کھڑکی))
+	أرجع FALSE;
 
     // VTP uses alternate screen buffer.
     // No need to restore buffer contents.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    إذا (use_alternate_screen_بفر)
+	أرجع TRUE;
 
     /*
      * Restore the screen buffer contents.
      */
-    if (cb->Buffer != NULL)
+    إذا (cb->بفر_2 != عدم)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	لكل (i = 0; i < cb->عدد_Regions; i++)
 	{
-	    BufferCoord.X = cb->Regions[i].Left;
-	    BufferCoord.Y = cb->Regions[i].Top;
+	    بفر_Coord.X = cb->Regions[i].بایاں_3;
+	    بفر_Coord.Y = cb->Regions[i].چوٹی_2;
 	    WriteRegion = cb->Regions[i];
-	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
-			cb->Buffer,		// our buffer
-			cb->BufferSize,		// dimensions of our buffer
-			BufferCoord,		// offset in our buffer
+	    إذا (!WriteConsoleOutputW(g_h_Con_باہرلا,	// output handle
+			cb->بفر_2,		// our buffer
+			cb->بفر_ناپ_2,		// dimensions of our buffer
+			بفر_Coord,		// offset in our buffer
 			&WriteRegion))		// region to restore
-		return FALSE;
+		أرجع FALSE;
 	}
     }
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 # define FEAT_RESTORE_ORIG_SCREEN
 # ifdef FEAT_RESTORE_ORIG_SCREEN
-static ConsoleBuffer g_cbOrig = { 0 };
+ساكن Console_بفر g_cbOrig = { 0 };
 # endif
-static ConsoleBuffer g_cbNonTermcap = { 0 };
-static ConsoleBuffer g_cbTermcap = { 0 };
+ساكن Console_بفر g_cbNonTermcap = { 0 };
+ساكن Console_بفر g_cbTermcap = { 0 };
 
-char g_szOrigTitle[256] = { 0 };
-HWND g_hWnd = NULL;	// also used in os_mswin.c
-static HICON g_hOrigIconSmall = NULL;
-static HICON g_hOrigIcon = NULL;
-static HICON g_hVimIcon = NULL;
-static BOOL g_fCanChangeIcon = FALSE;
+حرف g_szOrigTitle[256] = { 0 };
+HWND g_hWnd = عدم;	// also used in os_mswin.c
+ساكن HICON g_hOrigIconSmall = عدم;
+ساكن HICON g_hOrigIcon = عدم;
+ساكن HICON g_hVimIcon = عدم;
+ساكن BOOL g_fCanChangeIcon = FALSE;
 
 /*
  * GetConsoleIcon()
@@ -3417,22 +3417,22 @@ static BOOL g_fCanChangeIcon = FALSE;
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    ساكن BOOL
 GetConsoleIcon(
     HWND	hWnd,
     HICON	*phIconSmall,
     HICON	*phIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    إذا (hWnd == عدم)
+	أرجع FALSE;
 
-    if (phIconSmall != NULL)
-	*phIconSmall = (HICON)SendMessage(hWnd, WM_GETICON,
+    إذا (phIconSmall != عدم)
+	*phIconSmall = (HICON)Send_سنیہا(hWnd, WM_GETICON,
 					       (WPARAM)ICON_SMALL, (LPARAM)0);
-    if (phIcon != NULL)
-	*phIcon = (HICON)SendMessage(hWnd, WM_GETICON,
+    إذا (phIcon != عدم)
+	*phIcon = (HICON)Send_سنیہا(hWnd, WM_GETICON,
 						 (WPARAM)ICON_BIG, (LPARAM)0);
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -3443,22 +3443,22 @@ GetConsoleIcon(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
-SetConsoleIcon(
+    ساكن BOOL
+سیٹ_Console_Icon(
     HWND    hWnd,
     HICON   hIconSmall,
     HICON   hIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    إذا (hWnd == عدم)
+	أرجع FALSE;
 
-    if (hIconSmall != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    إذا (hIconSmall != عدم)
+	Send_سنیہا(hWnd, WM_SETICON,
 			    (WPARAM)ICON_SMALL, (LPARAM)hIconSmall);
-    if (hIcon != NULL)
-	SendMessage(hWnd, WM_SETICON,
+    إذا (hIcon != عدم)
+	Send_سنیہا(hWnd, WM_SETICON,
 			    (WPARAM)ICON_BIG, (LPARAM) hIcon);
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -3471,12 +3471,12 @@ SetConsoleIcon(
  *  nor is it possible when running Vim remotely using Telnet (since the
  *  console window the user sees is owned by a remote process).
  */
-    static void
-SaveConsoleTitleAndIcon(void)
+    ساكن فراغ
+SaveConsoleTitleAndIcon(فراغ)
 {
     // Save the original title.
-    if (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
-	return;
+    إذا (!GetConsoleTitle(g_szOrigTitle, حجم(g_szOrigTitle)))
+	أرجع;
 
     /*
      * Obtain a handle to the console window using GetConsoleWindow() from
@@ -3485,86 +3485,86 @@ SaveConsoleTitleAndIcon(void)
      * 2000.  On older operating systems, we can't change the window icon
      * anyway.
      */
-    g_hWnd = GetConsoleWindow();
-    if (g_hWnd == NULL)
-	return;
+    g_hWnd = Get_Console_کھڑکی();
+    إذا (g_hWnd == عدم)
+	أرجع;
 
     // Save the original console window icon.
     GetConsoleIcon(g_hWnd, &g_hOrigIconSmall, &g_hOrigIcon);
-    if (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
-	return;
+    إذا (g_hOrigIconSmall == عدم || g_hOrigIcon == عدم)
+	أرجع;
 
     // Extract the first icon contained in the Vim executable.
-    if (
+    إذا (
 # ifdef FEAT_LIBCALL
-	    mch_icon_load((HANDLE *)&g_hVimIcon) == FAIL ||
+	    mch_icon_لدو((HANDLE *)&g_hVimIcon) == FAIL ||
 # endif
-	    g_hVimIcon == NULL)
-	g_hVimIcon = ExtractIcon(NULL, (LPCSTR)exe_name, 0);
-    if (g_hVimIcon != NULL)
+	    g_hVimIcon == عدم)
+	g_hVimIcon = کڈھو_Icon(عدم, (LPCSTR)exe_name, 0);
+    إذا (g_hVimIcon != عدم)
 	g_fCanChangeIcon = TRUE;
 }
 
-static int g_fWindInitCalled = FALSE;
-static int g_fTermcapMode = FALSE;
-static CONSOLE_CURSOR_INFO g_cci;
+ساكن صحيح g_fWindInitCalled = FALSE;
+ساكن صحيح g_f_Termcap_منوال = FALSE;
+ساكن CONSOLE_CURSOR_INFO g_cci;
 
 /*
  * non-GUI version of mch_init().
  */
-    static void
-mch_init_c(void)
+    ساكن فراغ
+mch_init_c(فراغ)
 {
 # ifndef FEAT_RESTORE_ORIG_SCREEN
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_بفر_INFO csbi;
 # endif
 # ifndef __MINGW32__
-    extern int _fmode;
+    خارجي صحيح _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
-    SET_INVALID_PARAM_HANDLER;
+    سیٹ_INVALID_PARAM_HANDLER;
 
     // Let critical errors result in a failure, not in a dialog box.  Required
     // for the timestamp test to work on removed floppies.
-    SetErrorMode(SEM_FAILCRITICALERRORS);
+    سیٹ_Error_منوال(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
-    out_flush();
+    _fmode = O_ثنائی;		// we do our own CR-LF translation
+    باہرلا_flush();
 
     // Obtain handles for the standard Console I/O devices
-    if (read_cmd_fd == 0)
-	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
-    else
+    إذا (read_cmd_fd == 0)
+	g_h_Con_وچ =  GetStdHandle(STD_داخلہ_HANDLE);
+    وإلا
 	create_conin();
-    g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    g_h_Con_باہرلا = GetStdHandle(STD_OUTPUT_HANDLE);
 
     wt_init();
     vtp_flag_init();
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     // Save the initial console buffer for later restoration
-    SaveConsoleBuffer(&g_cbOrig);
-    g_attrCurrent = g_attrDefault = g_cbOrig.Info.wAttributes;
-# else
+    Save_Console_بفر(&g_cbOrig);
+    g_attrCurrent = g_attrDefault = g_cbOrig.Info.w_گن;
+# وإلا
     // Get current text attributes
-    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-    g_attrCurrent = g_attrDefault = csbi.wAttributes;
+    Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi);
+    g_attrCurrent = g_attrDefault = csbi.w_گن;
 # endif
-    if (cterm_normal_fg_color == 0)
-	cterm_normal_fg_color = (g_attrCurrent & 0xf) + 1;
-    if (cterm_normal_bg_color == 0)
-	cterm_normal_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
+    إذا (cterm_عام_fg_color == 0)
+	cterm_عام_fg_color = (g_attrCurrent & 0xf) + 1;
+    إذا (cterm_عام_bg_color == 0)
+	cterm_عام_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
 
     // Fg and Bg color index number at startup
-    g_color_index_fg = g_attrDefault & 0xf;
-    g_color_index_bg = (g_attrDefault >> 4) & 0xf;
+    g_color_اشاریہ_fg = g_attrDefault & 0xf;
+    g_color_اشاریہ_bg = (g_attrDefault >> 4) & 0xf;
 
     // set termcap codes to current text attributes
     update_tcap(g_attrCurrent);
 
-    GetConsoleCursorInfo(g_hConOut, &g_cci);
-    GetConsoleMode(g_hConIn,  &g_cmodein);
-    GetConsoleMode(g_hConOut, &g_cmodeout);
+    GetConsoleCursorInfo(g_h_Con_باہرلا, &g_cci);
+    Get_Console_منوال(g_h_Con_وچ,  &g_cmodein);
+    Get_Console_منوال(g_h_Con_باہرلا, &g_cmodeout);
 
     SaveConsoleTitleAndIcon();
     /*
@@ -3572,24 +3572,24 @@ mch_init_c(void)
      * Note that Vim presently only has one size of icon (32x32), but it
      * automatically gets scaled down to 16x16 when setting the small icon.
      */
-    if (g_fCanChangeIcon)
-	SetConsoleIcon(g_hWnd, g_hVimIcon, g_hVimIcon);
+    إذا (g_fCanChangeIcon)
+	سیٹ_Console_Icon(g_hWnd, g_hVimIcon, g_hVimIcon);
 
     ui_get_shellsize();
 
     vtp_init();
     // Switch to a new alternate screen buffer.
-    if (use_alternate_screen_buffer)
+    إذا (use_alternate_screen_بفر)
 	vtp_printf("\033[?1049h");
 
 # ifdef MCH_WRITE_DUMP
     fdDump = fopen("dump", "wt");
 
-    if (fdDump)
+    إذا (fdDump)
     {
 	time_t t;
 
-	time(&t);
+	ویلا(&t);
 	fputs(ctime(&t), fdDump);
 	fflush(fdDump);
     }
@@ -3609,11 +3609,11 @@ mch_init_c(void)
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    static void
-mch_exit_c(int r)
+    ساكن فراغ
+mch_exit_c(صحيح r)
 {
     // Copy flag since stoptermcap() will clear the flag.
-    int fTermcapMode = g_fTermcapMode;
+    صحيح f_Termcap_منوال = g_f_Termcap_منوال;
 
     exiting = TRUE;
 
@@ -3621,15 +3621,15 @@ mch_exit_c(int r)
 
     stoptermcap();
     // Switch back to main screen buffer if TermcapMode was not active.
-    if (!fTermcapMode &&  use_alternate_screen_buffer)
+    إذا (!f_Termcap_منوال &&  use_alternate_screen_بفر)
 	vtp_printf("\033[?1049l");
 
-    if (g_fWindInitCalled)
+    إذا (g_fWindInitCalled)
 	settmode(TMODE_COOK);
 
     ml_close_all(TRUE);		// remove all memfiles
 
-    if (g_fWindInitCalled)
+    إذا (g_fWindInitCalled)
     {
 	mch_restore_title(SAVE_RESTORE_BOTH);
 	/*
@@ -3637,130 +3637,130 @@ mch_exit_c(int r)
 	 * what they were at startup.  Don't do this when the window is
 	 * closed, Vim would hang here.
 	 */
-	if (g_fCanChangeIcon && !g_fForceExit)
-	    SetConsoleIcon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
+	إذا (g_fCanChangeIcon && !g_fForceExit)
+	    سیٹ_Console_Icon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
 
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	إذا (fdDump)
 	{
 	    time_t t;
 
-	    time(&t);
+	    ویلا(&t);
 	    fputs(ctime(&t), fdDump);
 	    fclose(fdDump);
 	}
-	fdDump = NULL;
+	fdDump = عدم;
 # endif
     }
 
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    SetConsoleMode(g_hConIn,  g_cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, g_cmodeout);
+    سیٹ_Console_Cursor_Info(g_h_Con_باہرلا, &g_cci);
+    سیٹ_Console_منوال(g_h_Con_وچ,  g_cmodein | ENABLE_EXTENDED_FLAGS);
+    سیٹ_Console_منوال(g_h_Con_باہرلا, g_cmodeout);
 
 # ifdef DYNAMIC_GETTEXT
-    dyn_libintl_end();
+    dyn_libintl_سرا();
 # endif
 
-    exit(r);
+    باہر_نکلو(r);
 }
-#endif // !FEAT_GUI_MSWIN || VIMDLL
+#جے_انت // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_init(void)
+    فراغ
+mch_init(فراغ)
 {
-#ifdef VIMDLL
-    if (gui.starting)
+#جے_تعریف_شدہ VIMDLL
+    إذا (gui.starting)
 	mch_init_g();
-    else
+    وإلا
 	mch_init_c();
-#elif defined(FEAT_GUI_MSWIN)
+#وإلاإذا defined(FEAT_GUI_MSWIN)
     mch_init_g();
-#else
+#وإلا
     mch_init_c();
-#endif
+#جے_انت
 }
 
-    void
-mch_exit(int r)
+    فراغ
+mch_exit(صحيح r)
 {
-#ifdef FEAT_NETBEANS_INTG
+#جے_تعریف_شدہ FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
-#endif
+#جے_انت
 
-#ifdef VIMDLL
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#جے_تعریف_شدہ VIMDLL
+    إذا (vimrun_رستہ_allocated)
+	vim_free(vimrun_رستہ.string);
 
-    if (gui.in_use || gui.starting)
+    إذا (gui.وچ_use || gui.starting)
 	mch_exit_g(r);
-    else
+    وإلا
 	mch_exit_c(r);
-#elif defined(FEAT_GUI_MSWIN)
-    if (vimrun_path_allocated)
-	vim_free(vimrun_path.string);
+#وإلاإذا defined(FEAT_GUI_MSWIN)
+    إذا (vimrun_رستہ_allocated)
+	vim_free(vimrun_رستہ.string);
     mch_exit_g(r);
-#else
+#وإلا
     mch_exit_c(r);
-#endif
+#جے_انت
 }
 
 /*
  * Do we have an interactive window?
  */
-    int
+    صحيح
 mch_check_win(
-    int argc UNUSED,
-    char **argv UNUSED)
+    صحيح argc بن_ورتیا,
+    حرف **argv بن_ورتیا)
 {
     mch_get_exe_name();
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    return OK;	    // GUI always has a tty
-#else
+#إذا defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    أرجع OK;	    // GUI always has a tty
+#وإلا
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    إذا (gui.وچ_use)
+	أرجع OK;
 # endif
-    if (isatty(1))
-	return OK;
-    return FAIL;
-#endif
+    إذا (isatty(1))
+	أرجع OK;
+    أرجع FAIL;
+#جے_انت
 }
 
 /*
  * Set the case of the file name, if it already exists.
  * When "len" is > 0, also expand short to long filenames.
  */
-    void
+    فراغ
 fname_case(
     char_u	*name,
-    int		len)
+    صحيح		len)
 {
     WCHAR   *p;
-    WCHAR   buf[_MAX_PATH + 1];
+    WCHAR   buf[MAX_رستہ_2 + 1];
 
-    if (*name == NUL)
-	return;
+    إذا (*name == NUL)
+	أرجع;
 
     slash_adjust(name);
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع;
 
-    if (GetLongPathNameW(p, buf, _MAX_PATH))
+    إذا (Get_Long_رستہ_Name_W(p, buf, MAX_رستہ_2))
     {
-	char_u	*q = utf16_to_enc(buf, NULL);
+	char_u	*q = utf16_منزل_enc(buf, عدم);
 
-	if (q != NULL)
+	إذا (q != عدم)
 	{
-	    if (len > 0)
+	    إذا (len > 0)
 		vim_strncpy(name, q, len - 1);
-	    else
+	    وإلا
 	    {
 		size_t  namelen = STRLEN(name);
 
-		if (namelen >= STRLEN(q))
+		إذا (namelen >= STRLEN(q))
 		    vim_strncpy(name, q, namelen);
 	    }
 	    vim_free(q);
@@ -3773,47 +3773,47 @@ fname_case(
 /*
  * Insert user name in s[len].
  */
-    int
+    صحيح
 mch_get_user_name(
     char_u  *s,
-    int	    len)
+    صحيح	    len)
 {
     WCHAR wszUserName[256 + 1];	// UNLEN is 256
-    DWORD wcch = ARRAY_LENGTH(wszUserName);
+    DWORD wcch = ARRAY_لمائی(wszUserName);
 
-    if (GetUserNameW(wszUserName, &wcch))
+    إذا (GetUserNameW(wszUserName, &wcch))
     {
-	char_u  *p = utf16_to_enc(wszUserName, NULL);
+	char_u  *p = utf16_منزل_enc(wszUserName, عدم);
 
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    vim_strncpy(s, p, len - 1);
 	    vim_free(p);
-	    return OK;
+	    أرجع OK;
 	}
     }
     s[0] = NUL;
-    return FAIL;
+    أرجع FAIL;
 }
 
 
 /*
  * Insert host name in s[len].
  */
-    void
+    فراغ
 mch_get_host_name(
     char_u	*s,
-    int		len)
+    صحيح		len)
 {
     WCHAR wszHostName[256 + 1];
-    DWORD wcch = ARRAY_LENGTH(wszHostName);
+    DWORD wcch = ARRAY_لمائی(wszHostName);
 
-    if (!GetComputerNameW(wszHostName, &wcch))
-	return;
+    إذا (!GetComputerNameW(wszHostName, &wcch))
+	أرجع;
 
-    char_u  *p = utf16_to_enc(wszHostName, NULL);
-    if (p == NULL)
-	return;
+    char_u  *p = utf16_منزل_enc(wszHostName, عدم);
+    إذا (p == عدم)
+	أرجع;
 
     vim_strncpy(s, p, len - 1);
     vim_free(p);
@@ -3823,40 +3823,40 @@ mch_get_host_name(
 /*
  * return process ID
  */
-    long
-mch_get_pid(void)
+    لما
+mch_get_pid(فراغ)
 {
-    return (long)GetCurrentProcessId();
+    أرجع (لما)GetCurrentProcessId();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
-mch_process_running(long pid)
+    صحيح
+mch_process_running(لما pid)
 {
     HANDLE  hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, (DWORD)pid);
-    DWORD   status = 0;
-    int	    ret = FALSE;
+    DWORD   حالت = 0;
+    صحيح	    ret = FALSE;
 
-    if (hProcess == NULL)
-	return FALSE;  // might not have access
-    if (GetExitCodeProcess(hProcess, &status))
-	ret = status == STILL_ACTIVE;
+    إذا (hProcess == عدم)
+	أرجع FALSE;  // might not have access
+    إذا (Get_Exit_کوڈ_Process(hProcess, &حالت))
+	ret = حالت == STILL_سرگرم;
     CloseHandle(hProcess);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
+    صحيح
 mch_dirname(
     char_u	*buf,
-    int		len)
+    صحيح		len)
 {
-    WCHAR   wbuf[_MAX_PATH + 1];
+    WCHAR   wbuf[MAX_رستہ_2 + 1];
 
     /*
      * Originally this was:
@@ -3864,46 +3864,46 @@ mch_dirname(
      * But the Win32s known bug list says that getcwd() doesn't work
      * so use the Win32 system call instead. <Negri>
      */
-    if (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
-	return FAIL;
+    إذا (GetCurrentDirectoryW(MAX_رستہ_2, wbuf) == 0)
+	أرجع FAIL;
 
-    WCHAR   wcbuf[_MAX_PATH + 1];
-    char_u  *p = NULL;
+    WCHAR   wcbuf[MAX_رستہ_2 + 1];
+    char_u  *p = عدم;
 
-    if (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
+    إذا (Get_Long_رستہ_Name_W(wbuf, wcbuf, MAX_رستہ_2) != 0)
     {
-	p = utf16_to_enc(wcbuf, NULL);
-	if (p != NULL)
+	p = utf16_منزل_enc(wcbuf, عدم);
+	إذا (p != عدم)
 	{
-	    if (STRLEN(p) >= (size_t)len)
+	    إذا (STRLEN(p) >= (size_t)len)
 	    {
 		// long path name is too long, fall back to short one
 		VIM_CLEAR(p);
 	    }
 	}
     }
-    if (p == NULL)
-	p = utf16_to_enc(wbuf, NULL);
+    إذا (p == عدم)
+	p = utf16_منزل_enc(wbuf, عدم);
 
-    if (p == NULL)
-	return FAIL;
+    إذا (p == عدم)
+	أرجع FAIL;
 
     vim_strncpy(buf, p, len - 1);
     vim_free(p);
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get file permissions for "name".
  * Return mode_t or -1 for error.
  */
-    long
+    لما
 mch_getperm(char_u *name)
 {
     stat_T	st;
 
-    return (mch_stat((char *)name, &st) == 0)
-	? (long)(unsigned short)st.st_mode
+    أرجع (mch_stat((حرف *)name, &st) == 0)
+	? (لما)(بنانشانی چھوٹا)st.st_منوال
 	: -1L;
 }
 
@@ -3913,35 +3913,35 @@ mch_getperm(char_u *name)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-mch_setperm(char_u *name, long perm)
+    صحيح
+mch_setperm(char_u *name, لما perm)
 {
-    long	n;
+    لما	n;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FAIL;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع FAIL;
 
     n = _wchmod(p, perm);
     vim_free(p);
-    if (n == -1)
-	return FAIL;
+    إذا (n == -1)
+	أرجع FAIL;
 
-    win32_set_archive(name);
+    win32_سیٹ_archive(name);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
+    فراغ
 mch_hide(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return;
+    صحيح attrs = win32_getattrs(name);
+    إذا (attrs == -1)
+	أرجع;
 
     attrs |= FILE_ATTRIBUTE_HIDDEN;
     win32_setattrs(name, attrs);
@@ -3950,30 +3950,30 @@ mch_hide(char_u *name)
 /*
  * Return TRUE if file "name" exists and is hidden.
  */
-    int
+    صحيح
 mch_ishidden(char_u *name)
 {
-    int f = win32_getattrs(name);
+    صحيح f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    إذا (f == -1)
+	أرجع FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_HIDDEN) != 0;
+    أرجع (f & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 /*
  * return TRUE if "name" is a directory
  * return FALSE if "name" is not a directory or upon error
  */
-    int
+    صحيح
 mch_isdir(char_u *name)
 {
-    int f = win32_getattrs(name);
+    صحيح f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    إذا (f == -1)
+	أرجع FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    أرجع (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -3981,24 +3981,24 @@ mch_isdir(char_u *name)
  * Return FALSE otherwise, also when the attributes cannot be obtained for
  * another reason.
  */
-    int
+    صحيح
 mch_isdir_or_missing(char_u *name)
 {
     WCHAR	*p;
     DWORD	attr;
     DWORD	error = 0;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FALSE;
-    attr = GetFileAttributesW(p);
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	error = GetLastError();
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع FALSE;
+    attr = Get_File_گن_W(p);
+    إذا (attr == INVALID_FILE_گن)
+	error = Get_آخری_Error();
     vim_free(p);
 
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    إذا (attr == INVALID_FILE_گن)
+	أرجع error == ERROR_FILE_NOT_لبھیا || error == ERROR_رستہ_NOT_لبھیا;
+    أرجع (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -4006,103 +4006,103 @@ mch_isdir_or_missing(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    صحيح
 mch_isrealdir(char_u *name)
 {
-    return mch_isdir(name) && !mch_is_symbolic_link(name);
+    أرجع mch_isdir(name) && !mch_is_symbolic_link(name);
 }
 
 /*
  * Create directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    صحيح
 mch_mkdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    صحيح	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع -1;
     retval = _wmkdir(p);
     vim_free(p);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Delete directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    صحيح
 mch_rmdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    صحيح	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع -1;
     retval = _wrmdir(p);
     vim_free(p);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link.
  */
-    int
+    صحيح
 mch_is_hard_link(char_u *fname)
 {
     BY_HANDLE_FILE_INFORMATION info;
 
-    return win32_fileinfo(fname, &info) == FILEINFO_OK
-						   && info.nNumberOfLinks > 1;
+    أرجع win32_fileinfo(fname, &info) == FILEINFO_OK
+						   && info.n_نمبر_دا_Links > 1;
 }
 
 /*
  * Return TRUE if "name" is a symbolic link (or a junction).
  */
-    int
+    صحيح
 mch_is_symbolic_link(char_u *name)
 {
-    HANDLE		hFind;
-    int			res = FALSE;
-    DWORD		fileFlags = 0, reparseTag = 0;
+    HANDLE		h_لبھو;
+    صحيح			res = FALSE;
+    DWORD		fileFlags = 0, reparse_ٹیگ = 0;
     WCHAR		*wn;
-    WIN32_FIND_DATAW	findDataW;
+    WIN32_لبھو_DATAW	لبھو_انکڑے_W;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return FALSE;
+    wn = enc_منزل_utf16(name, عدم);
+    إذا (wn == عدم)
+	أرجع FALSE;
 
-    hFind = FindFirstFileW(wn, &findDataW);
+    h_لبھو = لبھو_پہلا_File_W(wn, &لبھو_انکڑے_W);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    إذا (h_لبھو != INVALID_HANDLE_قدر)
     {
-	fileFlags = findDataW.dwFileAttributes;
-	reparseTag = findDataW.dwReserved0;
-	FindClose(hFind);
+	fileFlags = لبھو_انکڑے_W.dw_File_گن;
+	reparse_ٹیگ = لبھو_انکڑے_W.dwReserved0;
+	لبھو_Close(h_لبھو);
     }
 
-    if ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
-	    && (reparseTag == IO_REPARSE_TAG_SYMLINK
-		|| reparseTag == IO_REPARSE_TAG_MOUNT_POINT))
+    إذا ((fileFlags & FILE_ATTRIBUTE_REPARSE_نقطہ)
+	    && (reparse_ٹیگ == IO_REPARSE_ٹیگ_SYMLINK
+		|| reparse_ٹیگ == IO_REPARSE_ٹیگ_MOUNT_نقطہ))
 	res = TRUE;
 
-    return res;
+    أرجع res;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link or if it is a symbolic
  * link.
  */
-    int
+    صحيح
 mch_is_linked(char_u *fname)
 {
-    if (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
-	return TRUE;
-    return FALSE;
+    إذا (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
+	أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
@@ -4112,36 +4112,36 @@ mch_is_linked(char_u *fname)
  * Returns FILEINFO_READ_FAIL when CreateFile() failed.
  * Returns FILEINFO_INFO_FAIL when GetFileInformationByHandle() failed.
  */
-    int
+    صحيح
 win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 {
     HANDLE	hFile;
-    int		res = FILEINFO_READ_FAIL;
+    صحيح		res = FILEINFO_READ_FAIL;
     WCHAR	*wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return FILEINFO_ENC_FAIL;
+    wn = enc_منزل_utf16(fname, عدم);
+    إذا (wn == عدم)
+	أرجع FILEINFO_ENC_FAIL;
 
     hFile = CreateFileW(wn,	// file name
 	    GENERIC_READ,	// access mode
 	    FILE_SHARE_READ | FILE_SHARE_WRITE,	// share mode
-	    NULL,		// security descriptor
+	    عدم,		// security descriptor
 	    OPEN_EXISTING,	// creation disposition
 	    FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-	    NULL);		// handle to template file
+	    عدم);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
-	return FILEINFO_READ_FAIL;
+    إذا (hFile == INVALID_HANDLE_قدر)
+	أرجع FILEINFO_READ_FAIL;
 
-    if (GetFileInformationByHandle(hFile, info) != 0)
+    إذا (GetFileInformationByHandle(hFile, info) != 0)
 	res = FILEINFO_OK;
-    else
+    وإلا
 	res = FILEINFO_INFO_FAIL;
     CloseHandle(hFile);
 
-    return res;
+    أرجع res;
 }
 
 /*
@@ -4149,20 +4149,20 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
  * -1 : error
  * else FILE_ATTRIBUTE_* defined in winnt.h
  */
-    static int
+    ساكن صحيح
 win32_getattrs(char_u *name)
 {
-    int		attr;
+    صحيح		attr;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return INVALID_FILE_ATTRIBUTES;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع INVALID_FILE_گن;
 
-    attr = GetFileAttributesW(p);
+    attr = Get_File_گن_W(p);
     vim_free(p);
 
-    return attr;
+    أرجع attr;
 }
 
 /*
@@ -4170,34 +4170,34 @@ win32_getattrs(char_u *name)
  *
  * return -1 for failure, 0 otherwise
  */
-    static int
-win32_setattrs(char_u *name, int attrs)
+    ساكن صحيح
+win32_setattrs(char_u *name, صحيح attrs)
 {
-    int	    res;
+    صحيح	    res;
     WCHAR   *p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_منزل_utf16(name, عدم);
+    إذا (p == عدم)
+	أرجع -1;
 
-    res = SetFileAttributesW(p, attrs);
+    res = سیٹ_File_گن_W(p, attrs);
     vim_free(p);
 
-    return res ? 0 : -1;
+    أرجع res ? 0 : -1;
 }
 
 /*
  * Set archive flag for "name".
  */
-    static int
-win32_set_archive(char_u *name)
+    ساكن صحيح
+win32_سیٹ_archive(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return -1;
+    صحيح attrs = win32_getattrs(name);
+    إذا (attrs == -1)
+	أرجع -1;
 
     attrs |= FILE_ATTRIBUTE_ARCHIVE;
-    return win32_setattrs(name, attrs);
+    أرجع win32_setattrs(name, attrs);
 }
 
 /*
@@ -4205,12 +4205,12 @@ win32_set_archive(char_u *name)
  * Strange semantics of Win32: a readonly directory is writable, but you can't
  * delete a file.  Let's say this means it is writable.
  */
-    int
+    صحيح
 mch_writable(char_u *name)
 {
-    int attrs = win32_getattrs(name);
+    صحيح attrs = win32_getattrs(name);
 
-    return (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
+    أرجع (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
 			  || (attrs & FILE_ATTRIBUTE_DIRECTORY)));
 }
 
@@ -4220,10 +4220,10 @@ mch_writable(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
+    صحيح
+mch_can_exe(char_u *name, char_u **رستہ, صحيح use_رستہ بن_ورتیا)
 {
-    return executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
+    أرجع executable_exists((حرف *)name, STRLEN(name), رستہ, TRUE, TRUE);
 }
 
 /*
@@ -4232,53 +4232,53 @@ mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    صحيح
 mch_nodetype(char_u *name)
 {
     HANDLE	hFile;
-    int		type;
+    صحيح		type;
     WCHAR	*wn;
 
     // We can't open a file with a name "\\.\con" or "\\.\prn" and trying to
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
-    if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+    إذا (STRNCMP(name, "\\\\.\\", 4) == 0)
+	أرجع گرہ_WRITABLE;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NODE_NORMAL;
+    wn = enc_منزل_utf16(name, عدم);
+    إذا (wn == عدم)
+	أرجع گرہ_عام;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
 	    0,			    // share mode
-	    NULL,		    // security descriptor
+	    عدم,		    // security descriptor
 	    OPEN_EXISTING,	    // creation disposition
 	    0,			    // file attributes
-	    NULL);		    // handle to template file
+	    عدم);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    إذا (hFile == INVALID_HANDLE_قدر)
+	أرجع گرہ_عام;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
-    if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
-    if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+    إذا (type == FILE_TYPE_CHAR)
+	أرجع گرہ_WRITABLE;
+    إذا (type == FILE_TYPE_DISK)
+	أرجع گرہ_عام;
+    أرجع گرہ_OTHER;
 }
 
-#ifdef HAVE_ACL
-struct my_acl
+#جے_تعریف_شدہ HAVE_ACL
+بنية my_acl
 {
     PSECURITY_DESCRIPTOR    pSecurityDescriptor;
     PSID		    pSidOwner;
-    PSID		    pSidGroup;
+    PSID		    p_Sid_گروہ;
     PACL		    pDacl;
     PACL		    pSacl;
 };
-#endif
+#جے_انت
 
 /*
  * Return a pointer to the ACL of file "fname" in allocated memory.
@@ -4287,22 +4287,22 @@ struct my_acl
     vim_acl_T
 mch_get_acl(char_u *fname)
 {
-#ifndef HAVE_ACL
-    return (vim_acl_T)NULL;
-#else
-    struct my_acl   *p = NULL;
+#جے_بنا_تعریف HAVE_ACL
+    أرجع (vim_acl_T)عدم;
+#وإلا
+    بنية my_acl   *p = عدم;
     DWORD   err;
 
-    p = ALLOC_CLEAR_ONE(struct my_acl);
-    if (p != NULL)
+    p = ALLOC_CLEAR_ONE(بنية my_acl);
+    إذا (p != عدم)
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(fname, NULL);
-	if (wn == NULL)
+	wn = enc_منزل_utf16(fname, عدم);
+	إذا (wn == عدم)
 	{
 	    vim_free(p);
-	    return NULL;
+	    أرجع عدم;
 	}
 
 	// Try to retrieve the entire security descriptor.
@@ -4310,167 +4310,167 @@ mch_get_acl(char_u *fname)
 		wn,			// Abstract filename
 		SE_FILE_OBJECT,		// File Object
 		OWNER_SECURITY_INFORMATION |
-		GROUP_SECURITY_INFORMATION |
+		گروہ_SECURITY_INFORMATION |
 		DACL_SECURITY_INFORMATION |
 		SACL_SECURITY_INFORMATION,
 		&p->pSidOwner,		// Ownership information.
-		&p->pSidGroup,		// Group membership.
+		&p->p_Sid_گروہ,		// Group membership.
 		&p->pDacl,		// Discretionary information.
 		&p->pSacl,		// For auditing purposes.
 		&p->pSecurityDescriptor);
-	if (err == ERROR_ACCESS_DENIED ||
+	إذا (err == ERROR_ACCESS_DENIED ||
 		err == ERROR_PRIVILEGE_NOT_HELD)
 	{
 	    // Retrieve only DACL.
-	    (void)GetNamedSecurityInfoW(
+	    (فراغ)GetNamedSecurityInfoW(
 		    wn,
 		    SE_FILE_OBJECT,
 		    DACL_SECURITY_INFORMATION,
-		    NULL,
-		    NULL,
+		    عدم,
+		    عدم,
 		    &p->pDacl,
-		    NULL,
+		    عدم,
 		    &p->pSecurityDescriptor);
 	}
-	if (p->pSecurityDescriptor == NULL)
+	إذا (p->pSecurityDescriptor == عدم)
 	{
 	    mch_free_acl((vim_acl_T)p);
-	    p = NULL;
+	    p = عدم;
 	}
 	vim_free(wn);
     }
 
-    return (vim_acl_T)p;
-#endif
+    أرجع (vim_acl_T)p;
+#جے_انت
 }
 
-#ifdef HAVE_ACL
+#جے_تعریف_شدہ HAVE_ACL
 /*
  * Check if "acl" contains inherited ACE.
  */
-    static BOOL
+    ساكن BOOL
 is_acl_inherited(PACL acl)
 {
     DWORD   i;
-    ACL_SIZE_INFORMATION    acl_info;
+    ACL_ناپ_INFORMATION    acl_info;
     PACCESS_ALLOWED_ACE	    ace;
 
-    acl_info.AceCount = 0;
-    GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    acl_info.Ace_گنتی = 0;
+    GetAclInformation(acl, &acl_info, حجم(acl_info), Acl_ناپ_Information);
+    لكل (i = 0; i < acl_info.Ace_گنتی; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
-	if (ace->Header.AceFlags & INHERITED_ACE)
-	    return TRUE;
+	إذا (ace->سرخی_2.AceFlags & INHERITED_ACE)
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
-#endif
+#جے_انت
 
 /*
  * Set the ACL of file "fname" to "acl" (unless it's NULL).
  * Errors are ignored.
  * This must only be called with "acl" equal to what mch_get_acl() returned.
  */
-    void
-mch_set_acl(char_u *fname, vim_acl_T acl)
+    فراغ
+mch_سیٹ_acl(char_u *fname, vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#جے_تعریف_شدہ HAVE_ACL
+    بنية my_acl   *p = (بنية my_acl *)acl;
     SECURITY_INFORMATION    sec_info = 0;
     WCHAR	    *wn;
 
-    if (p == NULL)
-	return;
+    إذا (p == عدم)
+	أرجع;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_منزل_utf16(fname, عدم);
+    إذا (wn == عدم)
+	أرجع;
 
     // Set security flags
-    if (p->pSidOwner)
+    إذا (p->pSidOwner)
 	sec_info |= OWNER_SECURITY_INFORMATION;
-    if (p->pSidGroup)
-	sec_info |= GROUP_SECURITY_INFORMATION;
-    if (p->pDacl)
+    إذا (p->p_Sid_گروہ)
+	sec_info |= گروہ_SECURITY_INFORMATION;
+    إذا (p->pDacl)
     {
 	sec_info |= DACL_SECURITY_INFORMATION;
 	// Do not inherit its parent's DACL.
 	// If the DACL is inherited, Cygwin permissions would be changed.
-	if (!is_acl_inherited(p->pDacl))
+	إذا (!is_acl_inherited(p->pDacl))
 	    sec_info |= PROTECTED_DACL_SECURITY_INFORMATION;
     }
-    if (p->pSacl)
+    إذا (p->pSacl)
 	sec_info |= SACL_SECURITY_INFORMATION;
 
-    (void)SetNamedSecurityInfoW(
+    (فراغ)سیٹ_Named_Security_Info_W(
 	    wn,			// Abstract filename
 	    SE_FILE_OBJECT,	// File Object
 	    sec_info,
 	    p->pSidOwner,	// Ownership information.
-	    p->pSidGroup,	// Group membership.
+	    p->p_Sid_گروہ,	// Group membership.
 	    p->pDacl,		// Discretionary information.
 	    p->pSacl		// For auditing purposes.
 	    );
     vim_free(wn);
-#endif
+#جے_انت
 }
 
-    void
+    فراغ
 mch_free_acl(vim_acl_T acl)
 {
-#ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+#جے_تعریف_شدہ HAVE_ACL
+    بنية my_acl   *p = (بنية my_acl *)acl;
 
-    if (p != NULL)
+    إذا (p != عدم)
     {
 	LocalFree(p->pSecurityDescriptor);	// Free the memory just in case
 	vim_free(p);
     }
-#endif
+#جے_انت
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * handler for ctrl-break, ctrl-c interrupts, and fatal events.
  */
-    static BOOL WINAPI
+    ساكن BOOL WINAPI
 handler_routine(
     DWORD dwCtrlType)
 {
-    INPUT_RECORD ir;
-    DWORD out;
+    داخلہ_ریکارڈ ir;
+    DWORD باہرلا;
 
-    switch (dwCtrlType)
+    بدل (dwCtrlType)
     {
-    case CTRL_C_EVENT:
-	if (ctrl_c_interrupts)
+    حالة CTRL_C_EVENT:
+	إذا (ctrl_c_interrupts)
 	    g_fCtrlCPressed = TRUE;
-	return TRUE;
+	أرجع TRUE;
 
-    case CTRL_BREAK_EVENT:
+    حالة CTRL_BREAK_EVENT:
 	g_fCBrkPressed	= TRUE;
 	ctrl_break_was_pressed = TRUE;
 	// ReadConsoleInput is blocking, send a key event to continue.
-	ir.EventType = KEY_EVENT;
-	ir.Event.KeyEvent.bKeyDown = TRUE;
-	ir.Event.KeyEvent.wRepeatCount = 1;
-	ir.Event.KeyEvent.wVirtualKeyCode = VK_CANCEL;
-	ir.Event.KeyEvent.wVirtualScanCode = 0;
-	ir.Event.KeyEvent.dwControlKeyState = 0;
-	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
-	WriteConsoleInput(g_hConIn, &ir, 1, &out);
-	return TRUE;
+	ir.EventType = کلید_EVENT;
+	ir.Event.کلید_Event_2.b_کلید_تھلے = TRUE;
+	ir.Event.کلید_Event_2.w_Repeat_گنتی = 1;
+	ir.Event.کلید_Event_2.w_Virtual_کلید_کوڈ = VK_CANCEL;
+	ir.Event.کلید_Event_2.w_Virtual_جانچ_کوڈ = 0;
+	ir.Event.کلید_Event_2.dw_Control_کلید_State = 0;
+	ir.Event.کلید_Event_2.uChar.UnicodeChar = 0;
+	Write_Console_داخلہ(g_h_Con_وچ, &ir, 1, &باہرلا);
+	أرجع TRUE;
 
     // fatal events: shut down gracefully
-    case CTRL_CLOSE_EVENT:
-    case CTRL_LOGOFF_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-	windgoto((int)Rows - 1, cmdline_col_off);
+    حالة CTRL_CLOSE_EVENT:
+    حالة CTRL_LOGOFF_EVENT:
+    حالة CTRL_SHUTDOWN_EVENT:
+	windgoto((صحيح)صفاں - 1, cmdline_خانہ_off);
 	g_fForceExit = TRUE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
+	vim_snprintf((حرف *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
 		(dwCtrlType == CTRL_CLOSE_EVENT
 		     ? _("close")
 		     : dwCtrlType == CTRL_LOGOFF_EVENT
@@ -4482,10 +4482,10 @@ handler_routine(
 
 	preserve_exit();	// output IObuff, preserve files and exit
 
-	return TRUE;		// not reached
+	أرجع TRUE;		// not reached
 
-    default:
-	return FALSE;
+    افتراضي:
+	أرجع FALSE;
     }
 }
 
@@ -4493,7 +4493,7 @@ handler_routine(
 /*
  * set the tty in (raw) ? "raw" : "cooked" mode
  */
-    void
+    فراغ
 mch_settmode(tmode_T tmode)
 {
     DWORD cmodein;
@@ -4501,48 +4501,48 @@ mch_settmode(tmode_T tmode)
     BOOL bEnableHandler;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
-    GetConsoleMode(g_hConIn, &cmodein);
-    GetConsoleMode(g_hConOut, &cmodeout);
-    if (tmode == TMODE_RAW)
+    Get_Console_منوال(g_h_Con_وچ, &cmodein);
+    Get_Console_منوال(g_h_Con_باہرلا, &cmodeout);
+    إذا (tmode == TMODE_RAW)
     {
-	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		     ENABLE_ECHO_INPUT);
-	if (g_fMouseActive)
+	cmodein &= ~(ENABLE_سطر_داخلہ | ENABLE_PROCESSED_داخلہ |
+		     ENABLE_ECHO_داخلہ);
+	إذا (g_f_Mouse_سرگرم)
 	{
-	    cmodein |= ENABLE_MOUSE_INPUT;
-	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= ENABLE_MOUSE_داخلہ;
+	    cmodein &= ~ENABLE_تیز_EDIT_منوال;
 	}
-	else
+	وإلا
 	{
-	    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	    cmodein |= g_cmodein & ENABLE_تیز_EDIT_منوال;
 	}
 	cmodeout &= ~(
 # ifdef FEAT_TERMGUICOLORS
 	    // Do not turn off the ENABLE_PROCESSED_OUTPUT flag when using
 	    // VTP.
 	    ((vtp_working) ? 0 : ENABLE_PROCESSED_OUTPUT) |
-# else
+# وإلا
 	    ENABLE_PROCESSED_OUTPUT |
 # endif
 	    ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = TRUE;
     }
-    else // cooked
+    وإلا // cooked
     {
-	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		    ENABLE_ECHO_INPUT);
+	cmodein |= (ENABLE_سطر_داخلہ | ENABLE_PROCESSED_داخلہ |
+		    ENABLE_ECHO_داخلہ);
 	cmodeout |= (ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = FALSE;
     }
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
-    SetConsoleMode(g_hConOut, cmodeout);
-    SetConsoleCtrlHandler(handler_routine, bEnableHandler);
+    سیٹ_Console_منوال(g_h_Con_وچ, cmodein | ENABLE_EXTENDED_FLAGS);
+    سیٹ_Console_منوال(g_h_Con_باہرلا, cmodeout);
+    سیٹ_Console_Ctrl_Handler(handler_routine, bEnableHandler);
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    إذا (fdDump)
     {
 	fprintf(fdDump, "mch_settmode(%s, in = %x, out = %x)\n",
 		tmode == TMODE_RAW ? "raw" :
@@ -4558,16 +4558,16 @@ mch_settmode(tmode_T tmode)
  * Get the size of the current window in `Rows' and `Columns'
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-mch_get_shellsize(void)
+    صحيح
+mch_get_shellsize(فراغ)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_بفر_INFO csbi;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    إذا (gui.وچ_use)
+	أرجع OK;
 # endif
-    if (!g_fTermcapMode && g_cbTermcap.IsValid)
+    إذا (!g_f_Termcap_منوال && g_cbTermcap.IsValid)
     {
 	/*
 	 * For some reason, we are trying to get the screen dimensions
@@ -4575,40 +4575,40 @@ mch_get_shellsize(void)
 	 * variables are really intended to mean the size of Vim screen
 	 * while in termcap mode.
 	 */
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	صفاں = g_cbTermcap.Info.dw_ناپ.Y;
+	Columns = g_cbTermcap.Info.dw_ناپ.X;
     }
-    else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    وإلا إذا (Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
     {
-	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	صفاں = csbi.sr_کھڑکی.Bottom - csbi.sr_کھڑکی.چوٹی_2 + 1;
+	Columns = csbi.sr_کھڑکی.دایاں_3 - csbi.sr_کھڑکی.بایاں_3 + 1;
     }
-    else
+    وإلا
     {
-	Rows = 25;
+	صفاں = 25;
 	Columns = 80;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Resize console buffer to 'COORD'
  */
-    static void
+    ساكن فراغ
 ResizeConBuf(
     HANDLE  hConsole,
     COORD   coordScreen)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    إذا (use_alternate_screen_بفر)
+	أرجع;
 
-    if (!SetConsoleScreenBufferSize(hConsole, coordScreen))
+    إذا (!سیٹ_Console_Screen_بفر_ناپ(hConsole, coordScreen))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	إذا (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleScreenBufferSize failed: %lx\n",
-		    GetLastError());
+		    Get_آخری_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4618,18 +4618,18 @@ ResizeConBuf(
 /*
  * Resize console window size to 'srWindowRect'
  */
-    static void
-ResizeWindow(
+    ساكن فراغ
+Resize_کھڑکی(
     HANDLE     hConsole,
-    SMALL_RECT srWindowRect)
+    SMALL_RECT sr_کھڑکی_Rect)
 {
-    if (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
+    إذا (!سیٹ_Console_کھڑکی_Info(hConsole, TRUE, &sr_کھڑکی_Rect))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	إذا (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleWindowInfo failed: %lx\n",
-		    GetLastError());
+		    Get_آخری_Error());
 	    fflush(fdDump);
 	}
 # endif
@@ -4639,77 +4639,77 @@ ResizeWindow(
 /*
  * Set a console window to `xSize' * `ySize'
  */
-    static void
-ResizeConBufAndWindow(
+    ساكن فراغ
+Resize_Con_Buf_And_کھڑکی(
     HANDLE  hConsole,
-    int	    xSize,
-    int	    ySize)
+    صحيح	    x_ناپ,
+    صحيح	    y_ناپ_2)
 {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;	// hold current console buffer info
-    SMALL_RECT	    srWindowRect;	// hold the new console size
+    CONSOLE_SCREEN_بفر_INFO csbi;	// hold current console buffer info
+    SMALL_RECT	    sr_کھڑکی_Rect;	// hold the new console size
     COORD	    coordScreen;
     COORD	    cursor;
-    static int	    resized = FALSE;
+    ساكن صحيح	    resized = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    إذا (fdDump)
     {
-	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", xSize, ySize);
+	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", x_ناپ, y_ناپ_2);
 	fflush(fdDump);
     }
 # endif
 
     // get the largest size we can size the console window to
-    coordScreen = GetLargestConsoleWindowSize(hConsole);
+    coordScreen = Get_سبھ_توں_وڈا_Console_کھڑکی_ناپ(hConsole);
 
     // define the new console window size and scroll position
-    srWindowRect.Left = srWindowRect.Top = (SHORT) 0;
-    srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
-    srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
+    sr_کھڑکی_Rect.بایاں_3 = sr_کھڑکی_Rect.چوٹی_2 = (SHORT) 0;
+    sr_کھڑکی_Rect.دایاں_3 =  (SHORT) (min(x_ناپ, coordScreen.X) - 1);
+    sr_کھڑکی_Rect.Bottom = (SHORT) (min(y_ناپ_2, coordScreen.Y) - 1);
 
-    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    إذا (Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
     {
-	int sx, sy;
+	صحيح sx, sy;
 
-	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	if (sy < ySize || sx < xSize)
+	sx = csbi.sr_کھڑکی.دایاں_3 - csbi.sr_کھڑکی.بایاں_3 + 1;
+	sy = csbi.sr_کھڑکی.Bottom - csbi.sr_کھڑکی.چوٹی_2 + 1;
+	إذا (sy < y_ناپ_2 || sx < x_ناپ)
 	{
 	    /*
 	     * Increasing number of lines/columns, do buffer first.
 	     * Use the maximal size in x and y direction.
 	     */
-	    if (sy < ySize)
-		coordScreen.Y = ySize;
-	    else
+	    إذا (sy < y_ناپ_2)
+		coordScreen.Y = y_ناپ_2;
+	    وإلا
 		coordScreen.Y = sy;
-	    if (sx < xSize)
-		coordScreen.X = xSize;
-	    else
+	    إذا (sx < x_ناپ)
+		coordScreen.X = x_ناپ;
+	    وإلا
 		coordScreen.X = sx;
-	    SetConsoleScreenBufferSize(hConsole, coordScreen);
+	    سیٹ_Console_Screen_بفر_ناپ(hConsole, coordScreen);
 	}
     }
 
     // define the new console buffer size
-    coordScreen.X = xSize;
-    coordScreen.Y = ySize;
+    coordScreen.X = x_ناپ;
+    coordScreen.Y = y_ناپ_2;
 
     // In the new console call API, only the first time in reverse order
-    if (!vtp_working || resized)
+    إذا (!vtp_working || resized)
     {
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_کھڑکی(hConsole, sr_کھڑکی_Rect);
 	ResizeConBuf(hConsole, coordScreen);
     }
-    else
+    وإلا
     {
 	// Workaround for a Windows 10 bug
-	cursor.X = srWindowRect.Left;
-	cursor.Y = srWindowRect.Top;
-	SetConsoleCursorPosition(hConsole, cursor);
+	cursor.X = sr_کھڑکی_Rect.بایاں_3;
+	cursor.Y = sr_کھڑکی_Rect.چوٹی_2;
+	سیٹ_Console_Cursor_Position(hConsole, cursor);
 
 	ResizeConBuf(hConsole, coordScreen);
-	ResizeWindow(hConsole, srWindowRect);
+	Resize_کھڑکی(hConsole, sr_کھڑکی_Rect);
 	resized = TRUE;
     }
 }
@@ -4718,136 +4718,136 @@ ResizeConBufAndWindow(
 /*
  * Set the console window to `Rows' * `Columns'
  */
-    void
-mch_set_shellsize(void)
+    فراغ
+mch_سیٹ_shellsize(فراغ)
 {
     COORD coordScreen;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
     // Don't change window size while still starting up
-    if (suppress_winsize != 0)
+    إذا (suppress_winsize != 0)
     {
 	suppress_winsize = 2;
-	return;
+	أرجع;
     }
 
-    if (term_console)
+    إذا (رکن_console)
     {
-	coordScreen = GetLargestConsoleWindowSize(g_hConOut);
+	coordScreen = Get_سبھ_توں_وڈا_Console_کھڑکی_ناپ(g_h_Con_باہرلا);
 
 	// Clamp Rows and Columns to reasonable values
-	if (Rows > coordScreen.Y)
-	    Rows = coordScreen.Y;
-	if (Columns > coordScreen.X)
+	إذا (صفاں > coordScreen.Y)
+	    صفاں = coordScreen.Y;
+	إذا (Columns > coordScreen.X)
 	    Columns = coordScreen.X;
 
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Resize_Con_Buf_And_کھڑکی(g_h_Con_باہرلا, Columns, صفاں);
     }
 }
 
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    فراغ
+mch_new_shellsize(فراغ)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
-    set_scroll_region(0, 0, Columns - 1, Rows - 1);
+    سیٹ_scroll_region(0, 0, Columns - 1, صفاں - 1);
 }
 
 
 /*
  * Called when started up, to set the winsize that was delayed.
  */
-    void
-mch_set_winsize_now(void)
+    فراغ
+mch_سیٹ_winsize_now(فراغ)
 {
-    if (suppress_winsize == 2)
+    إذا (suppress_winsize == 2)
     {
 	suppress_winsize = 0;
-	mch_set_shellsize();
+	mch_سیٹ_shellsize();
 	shell_resized();
     }
     suppress_winsize = 0;
 }
 
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# إذا defined(FEAT_IMAGE) || defined(FEAT_EVAL)
 /*
  * Try to get the current terminal cell size in pixels.
  */
-    void
-mch_calc_cell_size(struct cellsize *cs_out)
+    فراغ
+mch_calc_cell_ناپ(بنية cellsize *cs_باہرلا)
 {
     CONSOLE_FONT_INFOEX cfi;
     DWORD cmodeold;
     DWORD cmodein;
 
-    cs_out->cs_xpixel = -1;
-    cs_out->cs_ypixel = -1;
+    cs_باہرلا->cs_xpixel = -1;
+    cs_باہرلا->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
-	return;
+    إذا (g_h_Con_باہرلا == INVALID_HANDLE_قدر)
+	أرجع;
 
-    cfi.cbSize = sizeof(cfi);
-    if (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
-	    && cfi.dwFontSize.X > 0 && cfi.dwFontSize.Y > 0)
+    cfi.cb_ناپ = حجم(cfi);
+    إذا (GetCurrentConsoleFontEx(g_h_Con_باہرلا, FALSE, &cfi)
+	    && cfi.dw_Font_ناپ.X > 0 && cfi.dw_Font_ناپ.Y > 0)
     {
-	cs_out->cs_xpixel = cfi.dwFontSize.X;
-	cs_out->cs_ypixel = cfi.dwFontSize.Y;
-	return;
+	cs_باہرلا->cs_xpixel = cfi.dw_Font_ناپ.X;
+	cs_باہرلا->cs_ypixel = cfi.dw_Font_ناپ.Y;
+	أرجع;
     }
 
-    GetConsoleMode(g_hConIn, &cmodein);
+    Get_Console_منوال(g_h_Con_وچ, &cmodein);
     cmodeold = cmodein;
-    cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-	    | ENABLE_PROCESSED_INPUT);
-    cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    cmodein &= ~(ENABLE_سطر_داخلہ | ENABLE_ECHO_داخلہ
+	    | ENABLE_PROCESSED_داخلہ);
+    cmodein |= ENABLE_VIRTUAL_TERMINAL_داخلہ;
 
-    if (SetConsoleMode(g_hConIn, cmodein))
+    إذا (سیٹ_Console_منوال(g_h_Con_وچ, cmodein))
     {
 	// We will receive the window dimensions later
 	vtp_printf("\033[14t");
-	SetConsoleMode(g_hConIn, cmodeold);
+	سیٹ_Console_منوال(g_h_Con_وچ, cmodeold);
     }
 }
 # endif
 
-#endif
+#جے_انت
 
-    static BOOL
+    ساكن BOOL
 vim_create_process(
-    char		*cmd,
+    حرف		*cmd,
     BOOL		inherit_handles,
     DWORD		flags,
     STARTUPINFO		*si,
     PROCESS_INFORMATION *pi,
     LPVOID		*env,
-    char		*cwd)
+    حرف		*cwd)
 {
     BOOL	ret = FALSE;
-    WCHAR	*wcmd, *wcwd = NULL;
+    WCHAR	*wcmd, *wcwd = عدم;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return FALSE;
-    if (cwd != NULL)
+    wcmd = enc_منزل_utf16((char_u *)cmd, عدم);
+    إذا (wcmd == عدم)
+	أرجع FALSE;
+    إذا (cwd != عدم)
     {
-	wcwd = enc_to_utf16((char_u *)cwd, NULL);
-	if (wcwd == NULL)
-	    goto theend;
+	wcwd = enc_منزل_utf16((char_u *)cwd, عدم);
+	إذا (wcwd == عدم)
+	    اذهب theend;
     }
 
     ret = CreateProcessW(
-	    NULL,		// Executable name
+	    عدم,		// Executable name
 	    wcmd,		// Command to execute
-	    NULL,		// Process security attributes
-	    NULL,		// Thread security attributes
+	    عدم,		// Process security attributes
+	    عدم,		// Thread security attributes
 	    inherit_handles,	// Inherit handles
 	    flags,		// Creation flags
 	    env,		// Environment
@@ -4857,29 +4857,29 @@ vim_create_process(
 theend:
     vim_free(wcmd);
     vim_free(wcwd);
-    return ret;
+    أرجع ret;
 }
 
 
-    static HINSTANCE
+    ساكن HINSTANCE
 vim_shell_execute(
-    char *cmd,
+    حرف *cmd,
     INT	 n_show_cmd)
 {
     HINSTANCE	ret;
     WCHAR	*wcmd;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return (HINSTANCE) 0;
+    wcmd = enc_منزل_utf16((char_u *)cmd, عدم);
+    إذا (wcmd == عدم)
+	أرجع (HINSTANCE) 0;
 
-    ret = ShellExecuteW(NULL, NULL, wcmd, NULL, NULL, n_show_cmd);
+    ret = ShellExecuteW(عدم, عدم, wcmd, عدم, عدم, n_show_cmd);
     vim_free(wcmd);
-    return ret;
+    أرجع ret;
 }
 
 
-#if defined(FEAT_GUI_MSWIN)
+#إذا defined(FEAT_GUI_MSWIN)
 
 /*
  * Specialised version of system() for Win32 GUI mode.
@@ -4889,63 +4889,63 @@ vim_shell_execute(
  *    3. Wait for the subprocess to terminate and get its exit code
  *    4. Prompt the user to press a key to close the console window
  */
-    static int
-mch_system_classic(char *cmd, int options)
+    ساكن صحيح
+mch_system_classic(حرف *cmd, صحيح options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
     HWND		hwnd = GetFocus();
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = حجم(si);
+    si.lpReserved = عدم;
+    si.lpDesktop = عدم;
+    si.lpTitle = عدم;
     si.dwFlags = STARTF_USESHOWWINDOW;
     /*
      * It's nicer to run a filter command in a minimized window.
      * Don't activate the window to keep focus on Vim.
      */
-    if (options & SHELL_DOOUT)
-	si.wShowWindow = SW_SHOWMINNOACTIVE;
-    else
-	si.wShowWindow = SW_SHOWNORMAL;
+    إذا (options & SHELL_DOOUT)
+	si.w_Show_کھڑکی = SW_SHOWMINNOACTIVE;
+    وإلا
+	si.w_Show_کھڑکی = SW_SHOWNORMAL;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = عدم;
 
     // Now, run the command
     vim_create_process(cmd, FALSE,
-	    CREATE_DEFAULT_ERROR_MODE |	CREATE_NEW_CONSOLE,
-	    &si, &pi, NULL, NULL);
+	    CREATE_DEFAULT_ERROR_منوال |	CREATE_NEW_CONSOLE,
+	    &si, &pi, عدم, عدم);
 
     // Wait for the command to terminate before continuing
     {
-	int	    delay = 1;
+	صحيح	    delay = 1;
 
 	// Keep updating the window while waiting for the shell to finish.
-	for (;;)
+	لكل (;;)
 	{
-	    MSG	msg;
+	    پیغام_2	پیغام;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    إذا (Peek_سنیہا_W(&پیغام, (HWND)عدم, 0, 0, PM_REMOVE))
 	    {
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		Translate_سنیہا(&پیغام);
+		Dispatch_سنیہا_W(&پیغام);
 		delay = 1;
-		continue;
+		استمر;
 	    }
-	    if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
-		break;
+	    إذا (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+		اكسر;
 
 	    // We start waiting for a very short time and then increase it, so
 	    // that we respond quickly when the process is quick, and don't
 	    // consume too much overhead when it's slow.
-	    if (delay < 50)
+	    إذا (delay < 50)
 		delay += 10;
 	}
 
 	// Get the command exit code
-	GetExitCodeProcess(pi.hProcess, &ret);
+	Get_Exit_کوڈ_Process(pi.hProcess, &ret);
     }
 
     // Close the handles to the subprocess, so that it goes away
@@ -4953,13 +4953,13 @@ mch_system_classic(char *cmd, int options)
     CloseHandle(pi.hProcess);
 
     // Try to get input focus back.  Doesn't always work though.
-    PostMessage(hwnd, WM_SETFOCUS, 0, 0);
+    Post_سنیہا(hwnd, WM_SETFOCUS, 0, 0);
     // To increase the chances that WM_SETFOCUS will work, run the message loop
     // here.  In addition, it prevents problems caused by delayed WM_SETFOCUS
     // processing.
     gui_mch_update();
 
-    return ret;
+    أرجع ret;
 }
 
 /*
@@ -4967,63 +4967,63 @@ mch_system_classic(char *cmd, int options)
  * process. This way avoid to hang up vim totally if the children
  * process take a long time to process the lines.
  */
-    static unsigned int __stdcall
+    ساكن بنانشانی صحيح __stdcall
 sub_process_writer(LPVOID param)
 {
-    HANDLE	    g_hChildStd_IN_Wr = param;
-    linenr_T	    lnum = curbuf->b_op_start.lnum;
+    HANDLE	    g_h_بچہ_Std_وچ_Wr = param;
+    linenr_T	    lnum = curbuf->b_op_شروع.lnum;
     DWORD	    len = 0;
     DWORD	    l;
     char_u	    *lp = ml_get(lnum);
     char_u	    *s;
-    int		    written = 0;
+    صحيح		    written = 0;
 
-    for (;;)
+    لكل (;;)
     {
 	l = (DWORD)STRLEN(lp + written);
-	if (l == 0)
+	إذا (l == 0)
 	    len = 0;
-	else if (lp[written] == NL)
+	وإلا إذا (lp[written] == NL)
 	{
 	    // NL -> NUL translation
-	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, NULL);
+	    WriteFile(g_h_بچہ_Std_وچ_Wr, "", 1, &len, عدم);
 	}
-	else
+	وإلا
 	{
 	    s = vim_strchr(lp + written, NL);
-	    WriteFile(g_hChildStd_IN_Wr, (char *)lp + written,
-		      s == NULL ? l : (DWORD)(s - (lp + written)),
-		      &len, NULL);
+	    WriteFile(g_h_بچہ_Std_وچ_Wr, (حرف *)lp + written,
+		      s == عدم ? l : (DWORD)(s - (lp + written)),
+		      &len, عدم);
 	}
-	if (len == l)
+	إذا (len == l)
 	{
 	    // Finished a line, add a NL, unless this line should not have
 	    // one.
-	    if (lnum != curbuf->b_op_end.lnum
+	    إذا (lnum != curbuf->b_op_سرا.lnum
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
-		    && (lnum != curbuf->b_ml.ml_line_count
+		    && (lnum != curbuf->b_ml.ml_سطر_گنتی
 			|| curbuf->b_p_eol)))
 	    {
-		WriteFile(g_hChildStd_IN_Wr, "\n", 1,
-						  (LPDWORD)&vim_ignored, NULL);
+		WriteFile(g_h_بچہ_Std_وچ_Wr, "\n", 1,
+						  (LPDWORD)&vim_ignored, عدم);
 	    }
 
 	    ++lnum;
-	    if (lnum > curbuf->b_op_end.lnum)
-		break;
+	    إذا (lnum > curbuf->b_op_سرا.lnum)
+		اكسر;
 
 	    lp = ml_get(lnum);
 	    written = 0;
 	}
-	else if (len > 0)
+	وإلا إذا (len > 0)
 	    written += len;
     }
 
     // finished all the lines, close pipe
-    CloseHandle(g_hChildStd_IN_Wr);
-    return 0;
+    CloseHandle(g_h_بچہ_Std_وچ_Wr);
+    أرجع 0;
 }
 
 
@@ -5033,107 +5033,107 @@ sub_process_writer(LPVOID param)
  * This function read from the children's stdout and write the
  * data on screen or in the buffer accordingly.
  */
-    static void
-dump_pipe(int	    options,
-	  HANDLE    g_hChildStd_OUT_Rd,
+    ساكن فراغ
+dump_pipe(صحيح	    options,
+	  HANDLE    g_h_بچہ_Std_باہرلا_Rd,
 	  garray_T  *ga,
-	  char_u    buffer[],
-	  DWORD	    *buffer_off)
+	  char_u    بفر[],
+	  DWORD	    *بفر_off)
 {
-    DWORD	availableBytes = 0;
+    DWORD	دستیاب_بائٹاں = 0;
     DWORD	i;
-    int		ret;
+    صحيح		ret;
     DWORD	len;
-    DWORD	toRead;
+    DWORD	منزل_Read;
 
     // we query the pipe to see if there is any data to read
     // to avoid to perform a blocking read
-    ret = PeekNamedPipe(g_hChildStd_OUT_Rd, // pipe to query
-			NULL,		    // optional buffer
+    ret = PeekNamedPipe(g_h_بچہ_Std_باہرلا_Rd, // pipe to query
+			عدم,		    // optional buffer
 			0,		    // buffer size
-			NULL,		    // number of read bytes
-			&availableBytes,    // available bytes total
-			NULL);		    // byteLeft
+			عدم,		    // number of read bytes
+			&دستیاب_بائٹاں,    // available bytes total
+			عدم);		    // byteLeft
 
     // We got real data in the pipe, read it
-    while (ret != 0 && availableBytes > 0)
+    طالما (ret != 0 && دستیاب_بائٹاں > 0)
     {
-	toRead = (DWORD)(BUFLEN - *buffer_off);
-	toRead = availableBytes < toRead ? availableBytes : toRead;
-	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, NULL);
+	منزل_Read = (DWORD)(BUFLEN - *بفر_off);
+	منزل_Read = دستیاب_بائٹاں < منزل_Read ? دستیاب_بائٹاں : منزل_Read;
+	ReadFile(g_h_بچہ_Std_باہرلا_Rd, بفر + *بفر_off, منزل_Read , &len, عدم);
 
 	// If we haven't read anything, there is a problem
-	if (len == 0)
-	    break;
+	إذا (len == 0)
+	    اكسر;
 
-	availableBytes -= len;
+	دستیاب_بائٹاں -= len;
 
-	if (options & SHELL_READ)
+	إذا (options & SHELL_READ)
 	{
 	    // Do NUL -> NL translation, append NL separated
 	    // lines to the current buffer.
-	    for (i = 0; i < len; ++i)
+	    لكل (i = 0; i < len; ++i)
 	    {
-		if (buffer[i] == NL)
-		    append_ga_line(ga);
-		else if (buffer[i] == NUL)
+		إذا (بفر[i] == NL)
+		    append_ga_سطر(ga);
+		وإلا إذا (بفر[i] == NUL)
 		    ga_append(ga, NL);
-		else
-		    ga_append(ga, buffer[i]);
+		وإلا
+		    ga_append(ga, بفر[i]);
 	    }
 	}
-	else if (has_mbyte)
+	وإلا إذا (has_mbyte)
 	{
-	    int		l;
-	    int		c;
+	    صحيح		l;
+	    صحيح		c;
 	    char_u	*p;
 
-	    len += *buffer_off;
-	    buffer[len] = NUL;
+	    len += *بفر_off;
+	    بفر[len] = NUL;
 
 	    // Check if the last character in buffer[] is
 	    // incomplete, keep these bytes for the next
 	    // round.
-	    for (p = buffer; p < buffer + len; p += l)
+	    لكل (p = بفر; p < بفر + len; p += l)
 	    {
 		l = MB_CPTR2LEN(p);
-		if (l == 0)
+		إذا (l == 0)
 		    l = 1;  // NUL byte?
-		else if (MB_BYTE2LEN(*p) != l)
-		    break;
+		وإلا إذا (MB_BYTE2LEN(*p) != l)
+		    اكسر;
 	    }
-	    if (p == buffer)	// no complete character
+	    إذا (p == بفر)	// no complete character
 	    {
 		// avoid getting stuck at an illegal byte
-		if (len >= 12)
+		إذا (len >= 12)
 		    ++p;
-		else
+		وإلا
 		{
-		    *buffer_off = len;
-		    return;
+		    *بفر_off = len;
+		    أرجع;
 		}
 	    }
 	    c = *p;
 	    *p = NUL;
-	    msg_puts((char *)buffer);
-	    if (p < buffer + len)
+	    پیغام_puts((حرف *)بفر);
+	    إذا (p < بفر + len)
 	    {
 		*p = c;
-		*buffer_off = (DWORD)((buffer + len) - p);
-		mch_memmove(buffer, p, *buffer_off);
-		return;
+		*بفر_off = (DWORD)((بفر + len) - p);
+		mch_memmove(بفر, p, *بفر_off);
+		أرجع;
 	    }
-	    *buffer_off = 0;
+	    *بفر_off = 0;
 	}
-	else
+	وإلا
 	{
-	    buffer[len] = NUL;
-	    msg_puts((char *)buffer);
+	    بفر[len] = NUL;
+	    پیغام_puts((حرف *)بفر);
 	}
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(پیغام_صف, cmdline_خانہ_off + پیغام_خانہ);
 	cursor_on();
-	out_flush();
+	باہرلا_flush();
     }
 }
 
@@ -5141,77 +5141,77 @@ dump_pipe(int	    options,
  * Version of system to use for windows NT > 5.0 (Win2K), use pipe
  * for communication and doesn't open any new window.
  */
-    static int
-mch_system_piped(char *cmd, int options)
+    ساكن صحيح
+mch_system_piped(حرف *cmd, صحيح options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
 
-    HANDLE g_hChildStd_IN_Rd = NULL;
-    HANDLE g_hChildStd_IN_Wr = NULL;
-    HANDLE g_hChildStd_OUT_Rd = NULL;
-    HANDLE g_hChildStd_OUT_Wr = NULL;
+    HANDLE g_h_بچہ_Std_وچ_Rd = عدم;
+    HANDLE g_h_بچہ_Std_وچ_Wr = عدم;
+    HANDLE g_h_بچہ_Std_باہرلا_Rd = عدم;
+    HANDLE g_h_بچہ_Std_باہرلا_Wr = عدم;
 
-    char_u	buffer[BUFLEN + 1]; // reading buffer + size
+    char_u	بفر[BUFLEN + 1]; // reading buffer + size
     DWORD	len;
 
     // buffer used to receive keys
     char_u	ta_buf[BUFLEN + 1];	// TypeAHead
-    int		ta_len = 0;		// valid bytes in ta_buf[]
+    صحيح		ta_len = 0;		// valid bytes in ta_buf[]
 
     DWORD	i;
-    int		noread_cnt = 0;
+    صحيح		noread_cnt = 0;
     garray_T	ga;
-    int		delay = 1;
-    DWORD	buffer_off = 0;	// valid bytes in buffer[]
-    char	*p = NULL;
+    صحيح		delay = 1;
+    DWORD	بفر_off = 0;	// valid bytes in buffer[]
+    حرف	*p = عدم;
 
-    SECURITY_ATTRIBUTES saAttr;
+    SECURITY_گن saAttr;
 
     // Set the bInheritHandle flag so pipe handles are inherited.
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_لمائی = حجم(SECURITY_گن);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = عدم;
 
-    if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
+    إذا ( ! CreatePipe(&g_h_بچہ_Std_باہرلا_Rd, &g_h_بچہ_Std_باہرلا_Wr, &saAttr, 0)
 	// Ensure the read handle to the pipe for STDOUT is not inherited.
-       || ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)
+       || ! سیٹ_Handle_Information(g_h_بچہ_Std_باہرلا_Rd, HANDLE_FLAG_INHERIT, 0)
 	// Create a pipe for the child process's STDIN.
-       || ! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0)
+       || ! CreatePipe(&g_h_بچہ_Std_وچ_Rd, &g_h_بچہ_Std_وچ_Wr, &saAttr, 0)
 	// Ensure the write handle to the pipe for STDIN is not inherited.
-       || ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
+       || ! سیٹ_Handle_Information(g_h_بچہ_Std_وچ_Wr, HANDLE_FLAG_INHERIT, 0) )
     {
-	CloseHandle(g_hChildStd_IN_Rd);
-	CloseHandle(g_hChildStd_IN_Wr);
-	CloseHandle(g_hChildStd_OUT_Rd);
-	CloseHandle(g_hChildStd_OUT_Wr);
-	msg_puts(_("\nCannot create pipes\n"));
+	CloseHandle(g_h_بچہ_Std_وچ_Rd);
+	CloseHandle(g_h_بچہ_Std_وچ_Wr);
+	CloseHandle(g_h_بچہ_Std_باہرلا_Rd);
+	CloseHandle(g_h_بچہ_Std_باہرلا_Wr);
+	پیغام_puts(_("\nCannot create pipes\n"));
     }
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = حجم(si);
+    si.lpReserved = عدم;
+    si.lpDesktop = عدم;
+    si.lpTitle = عدم;
     si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
     // set-up our file redirection
-    si.hStdError = g_hChildStd_OUT_Wr;
-    si.hStdOutput = g_hChildStd_OUT_Wr;
-    si.hStdInput = g_hChildStd_IN_Rd;
-    si.wShowWindow = SW_HIDE;
+    si.hStdError = g_h_بچہ_Std_باہرلا_Wr;
+    si.hStdOutput = g_h_بچہ_Std_باہرلا_Wr;
+    si.h_Std_داخلہ = g_h_بچہ_Std_وچ_Rd;
+    si.w_Show_کھڑکی = SW_HIDE;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = عدم;
 
-    if (options & SHELL_READ)
+    إذا (options & SHELL_READ)
 	ga_init2(&ga, 1, BUFLEN);
 
-    if (cmd != NULL)
+    إذا (cmd != عدم)
     {
-	p = (char *)vim_strsave((char_u *)cmd);
-	if (p != NULL)
+	p = (حرف *)vim_strsave((char_u *)cmd);
+	إذا (p != عدم)
 	    unescape_shellxquote((char_u *)p, p_sxe);
-	else
+	وإلا
 	    p = cmd;
     }
 
@@ -5219,73 +5219,73 @@ mch_system_piped(char *cmd, int options)
     // About "Inherit handles" being TRUE: this command can be litigious,
     // handle inheritance was deactivated for pending temp file, but, if we
     // deactivate it, the pipes don't work for some reason.
-    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_MODE,
-						&si, &pi, NULL, NULL);
+    vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_منوال,
+						&si, &pi, عدم, عدم);
 
-    if (p != cmd)
+    إذا (p != cmd)
 	vim_free(p);
 
     // Close our unused side of the pipes
-    CloseHandle(g_hChildStd_IN_Rd);
-    CloseHandle(g_hChildStd_OUT_Wr);
+    CloseHandle(g_h_بچہ_Std_وچ_Rd);
+    CloseHandle(g_h_بچہ_Std_باہرلا_Wr);
 
-    if (options & SHELL_WRITE)
+    إذا (options & SHELL_WRITE)
     {
 	HANDLE thread = (HANDLE)
-	 _beginthreadex(NULL,  // security attributes
+	 _beginthreadex(عدم,  // security attributes
 			0,     // default stack size
 			sub_process_writer, // function to be executed
-			g_hChildStd_IN_Wr,  // parameter
+			g_h_بچہ_Std_وچ_Wr,  // parameter
 			0,		 // creation flag, start immediately
-			NULL);		    // we don't care about thread id
+			عدم);		    // we don't care about thread id
 	CloseHandle(thread);
-	g_hChildStd_IN_Wr = NULL;
+	g_h_بچہ_Std_وچ_Wr = عدم;
     }
 
     // Keep updating the window while waiting for the shell to finish.
-    for (;;)
+    لكل (;;)
     {
-	MSG	msg;
+	پیغام_2	پیغام;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	إذا (Peek_سنیہا_W(&پیغام, (HWND)عدم, 0, 0, PM_REMOVE))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    Translate_سنیہا(&پیغام);
+	    Dispatch_سنیہا_W(&پیغام);
 	}
 
 	// write pipe information in the window
-	if ((options & (SHELL_READ|SHELL_WRITE))
+	إذا ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
-		|| gui.in_use
+		|| gui.وچ_use
 # endif
 	    )
 	{
 	    len = 0;
-	    if (((options &
+	    إذا (((options &
 			(SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 		    != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
-		    || gui.in_use
+		    || gui.وچ_use
 # endif
 		    )
 		&& (ta_len > 0 || noread_cnt > 4))
 	    {
-		if (ta_len == 0)
+		إذا (ta_len == 0)
 		{
 		    // Get extra characters when we don't have any.  Reset the
 		    // counter and timer.
 		    noread_cnt = 0;
 		    len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		}
-		if (ta_len > 0 || len > 0)
+		إذا (ta_len > 0 || len > 0)
 		{
 		    /*
 		     * For pipes: Check for CTRL-C: send interrupt signal to
 		     * child.
 		     */
-		    if (len == 1 && cmd != NULL)
+		    إذا (len == 1 && cmd != عدم)
 		    {
-			if (ta_buf[ta_len] == Ctrl_C)
+			إذا (ta_buf[ta_len] == Ctrl_C)
 			{
 			    // Learn what exit code is expected, for
 			// now put 9 as SIGKILL
@@ -5297,41 +5297,41 @@ mch_system_piped(char *cmd, int options)
 		     * Check for CTRL-D: EOF, close pipe to child.
 		     * Ctrl_D may be decorated by _OnChar()
 		     */
-		    if ((len == 1 || len == 4 ) && cmd != NULL)
+		    إذا ((len == 1 || len == 4 ) && cmd != عدم)
 		    {
-			if (ta_buf[0] == Ctrl_D
+			إذا (ta_buf[0] == Ctrl_D
 			    || (ta_buf[0] == CSI
 				&& ta_buf[1] == KS_MODIFIER
 				&& ta_buf[3] == Ctrl_D))
 			{
-			    CloseHandle(g_hChildStd_IN_Wr);
-			    g_hChildStd_IN_Wr = NULL;
+			    CloseHandle(g_h_بچہ_Std_وچ_Wr);
+			    g_h_بچہ_Std_وچ_Wr = عدم;
 			    len = 0;
 			}
 		    }
 
-		    len = term_replace_keycodes(ta_buf, ta_len, len);
+		    len = رکن_replace_keycodes(ta_buf, ta_len, len);
 
 		    /*
 		     * For pipes: echo the typed characters.  For a pty this
 		     * does not seem to work.
 		     */
-		    for (i = ta_len; i < ta_len + len; ++i)
+		    لكل (i = ta_len; i < ta_len + len; ++i)
 		    {
-			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-			    msg_putchar(ta_buf[i]);
-			else if (has_mbyte)
+			إذا (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+			    پیغام_putchar(ta_buf[i]);
+			وإلا إذا (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(ta_buf + i);
+			    صحيح l = (*mb_ptr2len)(ta_buf + i);
 
-			    msg_outtrans_len(ta_buf + i, l);
+			    پیغام_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
-			else
-			    msg_outtrans_len(ta_buf + i, 1);
+			وإلا
+			    پیغام_outtrans_len(ta_buf + i, 1);
 		    }
-		    windgoto(msg_row, cmdline_col_off + msg_col);
-		    out_flush();
+		    windgoto(پیغام_صف, cmdline_خانہ_off + پیغام_خانہ);
+		    باہرلا_flush();
 
 		    ta_len += len;
 
@@ -5342,15 +5342,15 @@ mch_system_piped(char *cmd, int options)
 		     * lines, drop the typed characters (only check for
 		     * CTRL-C).
 		     */
-		    if (options & SHELL_WRITE)
+		    إذا (options & SHELL_WRITE)
 			ta_len = 0;
-		    else if (g_hChildStd_IN_Wr != NULL)
+		    وإلا إذا (g_h_بچہ_Std_وچ_Wr != عدم)
 		    {
-			WriteFile(g_hChildStd_IN_Wr, (char*)ta_buf,
-				    1, &len, NULL);
+			WriteFile(g_h_بچہ_Std_وچ_Wr, (حرف*)ta_buf,
+				    1, &len, عدم);
 			// if we are typing in, we want to keep things reactive
 			delay = 1;
-			if (len > 0)
+			إذا (len > 0)
 			{
 			    ta_len -= len;
 			    mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5360,44 +5360,44 @@ mch_system_piped(char *cmd, int options)
 	    }
 	}
 
-	if (ta_len)
+	إذا (ta_len)
 	    ui_inchar_undo(ta_buf, ta_len);
 
-	if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	إذا (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 	{
-	    dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
-	    break;
+	    dump_pipe(options, g_h_بچہ_Std_باہرلا_Rd, &ga, بفر, &بفر_off);
+	    اكسر;
 	}
 
 	++noread_cnt;
-	dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
+	dump_pipe(options, g_h_بچہ_Std_باہرلا_Rd, &ga, بفر, &بفر_off);
 
 	// We start waiting for a very short time and then increase it, so
 	// that we respond quickly when the process is quick, and don't
 	// consume too much overhead when it's slow.
-	if (delay < 50)
+	إذا (delay < 50)
 	    delay += 10;
     }
 
     // Close the pipe
-    CloseHandle(g_hChildStd_OUT_Rd);
-    if (g_hChildStd_IN_Wr != NULL)
-	CloseHandle(g_hChildStd_IN_Wr);
+    CloseHandle(g_h_بچہ_Std_باہرلا_Rd);
+    إذا (g_h_بچہ_Std_وچ_Wr != عدم)
+	CloseHandle(g_h_بچہ_Std_وچ_Wr);
 
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     // Get the command exit code
-    GetExitCodeProcess(pi.hProcess, &ret);
+    Get_Exit_کوڈ_Process(pi.hProcess, &ret);
 
-    if (options & SHELL_READ)
+    إذا (options & SHELL_READ)
     {
-	if (ga.ga_len > 0)
+	إذا (ga.ga_len > 0)
 	{
-	    append_ga_line(&ga);
+	    append_ga_سطر(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
-	else
+	وإلا
 	    curbuf->b_no_eol_lnum = 0;
 	ga_clear(&ga);
     }
@@ -5406,25 +5406,25 @@ mch_system_piped(char *cmd, int options)
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    return ret;
+    أرجع ret;
 }
 
-    static int
-mch_system_g(char *cmd, int options)
+    ساكن صحيح
+mch_system_g(حرف *cmd, صحيح options)
 {
     // if we can pipe and the shelltemp option is off
-    if (!p_stmp)
-	return mch_system_piped(cmd, options);
-    else
-	return mch_system_classic(cmd, options);
+    إذا (!p_stmp)
+	أرجع mch_system_piped(cmd, options);
+    وإلا
+	أرجع mch_system_classic(cmd, options);
 }
-#endif
+#جے_انت
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static int
-mch_system_c(char *cmd, int options UNUSED)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    ساكن صحيح
+mch_system_c(حرف *cmd, صحيح options بن_ورتیا)
 {
-    int		ret;
+    صحيح		ret;
     WCHAR	*wcmd;
     char_u	*buf;
     size_t	len;
@@ -5432,142 +5432,142 @@ mch_system_c(char *cmd, int options UNUSED)
     // If the command starts and ends with double quotes, enclose the command
     // in parentheses.
     len = STRLEN(cmd);
-    if (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
+    إذا (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
     {
 	len += 3;
 	buf = alloc(len);
-	if (buf == NULL)
-	    return -1;
-	vim_snprintf((char *)buf, len, "(%s)", cmd);
-	wcmd = enc_to_utf16(buf, NULL);
-	free(buf);
+	إذا (buf == عدم)
+	    أرجع -1;
+	vim_snprintf((حرف *)buf, len, "(%s)", cmd);
+	wcmd = enc_منزل_utf16(buf, عدم);
+	حرر(buf);
     }
-    else
-	wcmd = enc_to_utf16((char_u *)cmd, NULL);
+    وإلا
+	wcmd = enc_منزل_utf16((char_u *)cmd, عدم);
 
-    if (wcmd == NULL)
-	return -1;
+    إذا (wcmd == عدم)
+	أرجع -1;
 
     ret = _wsystem(wcmd);
     vim_free(wcmd);
-    return ret;
+    أرجع ret;
 }
 
-#endif
+#جے_انت
 
-    static int
-mch_system(char *cmd, int options)
+    ساكن صحيح
+mch_system(حرف *cmd, صحيح options)
 {
-#ifdef VIMDLL
-    if (gui.in_use || gui.starting)
-	return mch_system_g(cmd, options);
-    else
-	return mch_system_c(cmd, options);
-#elif defined(FEAT_GUI_MSWIN)
-    return mch_system_g(cmd, options);
-#else
-    return mch_system_c(cmd, options);
-#endif
+#جے_تعریف_شدہ VIMDLL
+    إذا (gui.وچ_use || gui.starting)
+	أرجع mch_system_g(cmd, options);
+    وإلا
+	أرجع mch_system_c(cmd, options);
+#وإلاإذا defined(FEAT_GUI_MSWIN)
+    أرجع mch_system_g(cmd, options);
+#وإلا
+    أرجع mch_system_c(cmd, options);
+#جے_انت
 }
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#إذا defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    ساكن صحيح
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    صحيح		options بن_ورتیا)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char_u	*newcmd = NULL;
+    char_u	*newcmd = عدم;
     typval_T	argvar[2];
     long_u	cmdlen;
-    int		retval = -1;
+    صحيح		retval = -1;
     buf_T	*buf;
-    job_T	*job;
+    کم_T	*کم;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (cmd == NULL)
+    إذا (cmd == عدم)
 	cmdlen = STRLEN(p_sh) + 1;
-    else
+    وإلا
 	cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
     newcmd = alloc(cmdlen);
-    if (newcmd == NULL)
-	return 255;
-    if (cmd == NULL)
+    إذا (newcmd == عدم)
+	أرجع 255;
+    إذا (cmd == عدم)
     {
 	STRCPY(newcmd, p_sh);
-	ch_log(NULL, "starting terminal to run a shell");
+	ch_log(عدم, "starting terminal to run a shell");
     }
-    else
+    وإلا
     {
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
-	ch_log(NULL, "starting terminal for system command '%s'", cmd);
+	vim_snprintf((حرف *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	ch_log(عدم, "starting terminal for system command '%s'", cmd);
     }
 
-    init_job_options(&opt);
+    init_کم_options(&opt);
 
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = newcmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    buf = term_start(argvar, NULL, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    buf = رکن_شروع(argvar, عدم, &opt, رکن_شروع_SYSTEM);
+    إذا (buf == عدم)
     {
 	vim_free(newcmd);
-	return 255;
+	أرجع 255;
     }
 
-    job = term_getjob(buf->b_term);
-    ++job->jv_refcount;
+    کم = رکن_getjob(buf->b_رکن);
+    ++کم->jv_refcount;
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    إذا (curbuf == buf)
     {
 	// Only do this when a window was found for "buf".
 	clear_oparg(&oa);
-	while (term_use_loop())
+	طالما (رکن_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    إذا (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_سرگرم)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
-		    normal_cmd(&oa, TRUE);
+		إذا (terminal_loop(TRUE) == OK)
+		    عام_cmd(&oa, TRUE);
 	    }
-	    else
-		normal_cmd(&oa, TRUE);
+	    وإلا
+		عام_cmd(&oa, TRUE);
 	}
-	retval = job->jv_exitval;
-	ch_log(NULL, "system command finished");
+	retval = کم->jv_exitval;
+	ch_log(عدم, "system command finished");
 
-	job_unref(job);
+	کم_unref(کم);
 
 	// restore curwin/curbuf and a few other things
 	aucmd_restbuf(&aco);
     }
 
     wait_return(TRUE);
-    do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
+    do_بفر(DOBUF_WIPE, DOBUF_پہلا, FORWARD, buf->b_fnum, TRUE);
 
     vim_free(newcmd);
-    return retval;
+    أرجع retval;
 }
-#endif
+#جے_انت
 /* Restore a previous environment variable value, or unset it if NULL.
  * 'must_free' indicates whether 'old_value' was allocated.
  */
-    static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+    ساكن فراغ
+restore_env_var(char_u *name, char_u *old_قدر, صحيح must_free)
 {
-    if (old_value != NULL)
+    إذا (old_قدر != عدم)
     {
-	vim_setenv(name, old_value);
-	if (must_free)
-	    vim_free(old_value);
-	return;
+	vim_setenv(name, old_قدر);
+	إذا (must_free)
+	    vim_free(old_قدر);
+	أرجع;
     }
     vim_unsetenv(name);
 }
@@ -5575,36 +5575,36 @@ restore_env_var(char_u *name, char_u *old_value, int must_free)
 /*
  * Either execute a command by calling the shell or start a new shell
  */
-    int
+    صحيح
 mch_call_shell(
     char_u  *cmd,
-    int	    options)	// SHELL_*, see vim.h
+    صحيح	    options)	// SHELL_*, see vim.h
 {
-    int		x = 0;
-    int		tmode = cur_tmode;
+    صحيح		x = 0;
+    صحيح		tmode = cur_tmode;
     WCHAR	szShellTitle[512];
-    int		must_free;
+    صحيح		must_free;
     char_u	*oldval;
 
-#ifdef FEAT_EVAL
-    ch_log(NULL, "executing shell command: %s", cmd);
-#endif
+#جے_تعریف_شدہ FEAT_EVAL
+    ch_log(عدم, "executing shell command: %s", cmd);
+#جے_انت
     // Change the title to reflect that we are in a subshell.
-    if (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
+    إذا (GetConsoleTitleW(szShellTitle, ARRAY_لمائی(szShellTitle) - 4) > 0)
     {
-	if (cmd == NULL)
+	إذا (cmd == عدم)
 	    wcscat(szShellTitle, L" :sh");
-	else
+	وإلا
 	{
-	    WCHAR *wn = enc_to_utf16((char_u *)cmd, NULL);
+	    WCHAR *wn = enc_منزل_utf16((char_u *)cmd, عدم);
 
-	    if (wn != NULL)
+	    إذا (wn != عدم)
 	    {
 		wcscat(szShellTitle, L" - !");
-		if ((wcslen(szShellTitle) + wcslen(wn) <
-			    ARRAY_LENGTH(szShellTitle)))
+		إذا ((wcslen(szShellTitle) + wcslen(wn) <
+			    ARRAY_لمائی(szShellTitle)))
 		    wcscat(szShellTitle, wn);
-		SetConsoleTitleW(szShellTitle);
+		سیٹ_Console_Title_W(szShellTitle);
 		vim_free(wn);
 	    }
 	}
@@ -5615,33 +5615,33 @@ mch_call_shell(
 	    &must_free);
     vim_setenv((char_u *)"NoDefaultCurrentDirectoryInExePath", (char_u *)"1");
 
-    out_flush();
+    باہرلا_flush();
 
-#ifdef MCH_WRITE_DUMP
-    if (fdDump)
+#جے_تعریف_شدہ MCH_WRITE_DUMP
+    إذا (fdDump)
     {
 	fprintf(fdDump, "mch_call_shell(\"%s\", %d)\n", cmd, options);
 	fflush(fdDump);
     }
-#endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#جے_انت
+#إذا defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // TODO: make the terminal window work with input or output redirected.
-    if (
+    إذا (
 # ifdef VIMDLL
-	    gui.in_use &&
+	    gui.وچ_use &&
 # endif
-	    vim_strchr(p_go, GO_TERMINAL) != NULL
+	    vim_strchr(p_go, GO_TERMINAL) != عدم
 	 && (options & (SHELL_FILTER|SHELL_DOOUT|SHELL_WRITE|SHELL_READ)) == 0)
     {
 	char_u	*cmdbase = cmd;
 
-	if (cmdbase != NULL)
+	إذا (cmdbase != عدم)
 	    // Skip a leading quote and (.
-	    while (*cmdbase == '"' || *cmdbase == '(')
+	    طالما (*cmdbase == '"' || *cmdbase == '(')
 		++cmdbase;
 
 	// Check the command does not begin with "start "
-	if (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
+	إذا (cmdbase == عدم || STRNICMP(cmdbase, "start", 5) != 0
 						   || !VIM_ISWHITE(cmdbase[5]))
 	{
 	    // Use a terminal window to run the command in.
@@ -5649,10 +5649,10 @@ mch_call_shell(
 	    resettitle();
 	    restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 		    oldval, must_free);
-	    return x;
+	    أرجع x;
 	}
     }
-#endif
+#جے_انت
 
     /*
      * Catch all deadly signals while running the external command, because a
@@ -5666,27 +5666,27 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_IGN);
     mch_signal(SIGABRT, SIG_IGN);
 
-    if (options & SHELL_COOKED)
+    إذا (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	// set to normal mode
 
-    if (cmd == NULL)
+    إذا (cmd == عدم)
     {
-	x = mch_system((char *)p_sh, options);
+	x = mch_system((حرف *)p_sh, options);
     }
-    else
+    وإلا
     {
 	// we use "command" or "cmd" to start the shell; slow but easy
-	char_u	*newcmd = NULL;
+	char_u	*newcmd = عدم;
 	char_u	*cmdbase = cmd;
 	long_u	cmdlen;
 
 	// Skip a leading ", ( and "(.
-	if (*cmdbase == '"' )
+	إذا (*cmdbase == '"' )
 	    ++cmdbase;
-	if (*cmdbase == '(')
+	إذا (*cmdbase == '(')
 	    ++cmdbase;
 
-	if ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
+	إذا ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
 	{
 	    STARTUPINFO		si;
 	    PROCESS_INFORMATION	pi;
@@ -5694,49 +5694,49 @@ mch_call_shell(
 	    INT			n_show_cmd = SW_SHOWNORMAL;
 	    char_u		*p;
 
-	    ZeroMemory(&si, sizeof(si));
-	    si.cb = sizeof(si);
-	    si.lpReserved = NULL;
-	    si.lpDesktop = NULL;
-	    si.lpTitle = NULL;
+	    Zero_حافظہ(&si, حجم(si));
+	    si.cb = حجم(si);
+	    si.lpReserved = عدم;
+	    si.lpDesktop = عدم;
+	    si.lpTitle = عدم;
 	    si.dwFlags = 0;
 	    si.cbReserved2 = 0;
-	    si.lpReserved2 = NULL;
+	    si.lpReserved2 = عدم;
 
 	    cmdbase = skipwhite(cmdbase + 5);
-	    if ((STRNICMP(cmdbase, "/min", 4) == 0)
+	    إذا ((STRNICMP(cmdbase, "/min", 4) == 0)
 		    && VIM_ISWHITE(cmdbase[4]))
 	    {
 		cmdbase = skipwhite(cmdbase + 4);
 		si.dwFlags = STARTF_USESHOWWINDOW;
-		si.wShowWindow = SW_SHOWMINNOACTIVE;
+		si.w_Show_کھڑکی = SW_SHOWMINNOACTIVE;
 		n_show_cmd = SW_SHOWMINNOACTIVE;
 	    }
-	    else if ((STRNICMP(cmdbase, "/b", 2) == 0)
+	    وإلا إذا ((STRNICMP(cmdbase, "/b", 2) == 0)
 		    && VIM_ISWHITE(cmdbase[2]))
 	    {
 		cmdbase = skipwhite(cmdbase + 2);
-		flags = CREATE_NO_WINDOW;
+		flags = CREATE_NO_کھڑکی;
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdInput = CreateFile("\\\\.\\NUL",	// File name
+		si.h_Std_داخلہ = CreateFile("\\\\.\\NUL",	// File name
 		    GENERIC_READ,			// Access flags
 		    0,					// Share flags
-		    NULL,				// Security att.
+		    عدم,				// Security att.
 		    OPEN_EXISTING,			// Open flags
-		    FILE_ATTRIBUTE_NORMAL,		// File att.
-		    NULL);				// Temp file
-		si.hStdOutput = si.hStdInput;
-		si.hStdError = si.hStdInput;
+		    FILE_ATTRIBUTE_عام,		// File att.
+		    عدم);				// Temp file
+		si.hStdOutput = si.h_Std_داخلہ;
+		si.hStdError = si.h_Std_داخلہ;
 	    }
 
 	    // Remove a trailing ", ) and )" if they have a match
 	    // at the start of the command.
-	    if (cmdbase > cmd)
+	    إذا (cmdbase > cmd)
 	    {
 		p = cmdbase + STRLEN(cmdbase);
-		if (p > cmdbase && p[-1] == '"' && *cmd == '"')
+		إذا (p > cmdbase && p[-1] == '"' && *cmd == '"')
 		    *--p = NUL;
-		if (p > cmdbase && p[-1] == ')'
+		إذا (p > cmdbase && p[-1] == ')'
 			&& (*cmd =='(' || cmd[1] == '('))
 		    *--p = NUL;
 	    }
@@ -5751,25 +5751,25 @@ mch_call_shell(
 	     * shellxescape except '|' for avoiding to be treated as
 	     * argument to them. Pass the arguments to sub-shell.
 	     */
-	    if (flags != CREATE_NEW_CONSOLE)
+	    إذا (flags != CREATE_NEW_CONSOLE)
 	    {
 		char_u	*subcmd;
 		char_u	*cmd_shell = mch_getenv("COMSPEC");
 
-		if (cmd_shell == NULL || *cmd_shell == NUL)
+		إذا (cmd_shell == عدم || *cmd_shell == NUL)
 		    cmd_shell = (char_u *)default_shell();
 
 		subcmd = vim_strsave_escaped_ext(cmdbase,
 			(char_u *)"|", '^', FALSE);
-		if (subcmd != NULL)
+		إذا (subcmd != عدم)
 		{
 		    // make "cmd.exe /c arguments"
 		    cmdlen = STRLEN(cmd_shell) + STRLEN(subcmd) + 5;
 		    newcmd = alloc(cmdlen);
-		    if (newcmd != NULL)
-			vim_snprintf((char *)newcmd, cmdlen, "%s /c %s",
+		    إذا (newcmd != عدم)
+			vim_snprintf((حرف *)newcmd, cmdlen, "%s /c %s",
 						       cmd_shell, subcmd);
-		    else
+		    وإلا
 			newcmd = cmdbase;
 		    vim_free(subcmd);
 		}
@@ -5780,94 +5780,94 @@ mch_call_shell(
 	     * inherit our handles which causes unpleasant dangling swap
 	     * files if we exit before the spawned process
 	     */
-	    if (vim_create_process((char *)newcmd, FALSE, flags,
-			&si, &pi, NULL, NULL))
+	    إذا (vim_create_process((حرف *)newcmd, FALSE, flags,
+			&si, &pi, عدم, عدم))
 		x = 0;
-	    else if (vim_shell_execute((char *)newcmd, n_show_cmd)
+	    وإلا إذا (vim_shell_execute((حرف *)newcmd, n_show_cmd)
 							       > (HINSTANCE)32)
 		x = 0;
-	    else
+	    وإلا
 	    {
 		x = -1;
-#ifdef FEAT_GUI_MSWIN
+#جے_تعریف_شدہ FEAT_GUI_MSWIN
 # ifdef VIMDLL
-		if (gui.in_use)
+		إذا (gui.وچ_use)
 # endif
-		    emsg(_(e_command_not_found));
-#endif
+		    emsg(_(e_command_not_لبھیا));
+#جے_انت
 	    }
 
-	    if (newcmd != cmdbase)
+	    إذا (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    إذا (si.dwFlags == STARTF_USESTDHANDLES && si.h_Std_داخلہ != عدم)
 	    {
 		// Close the handle to \\.\NUL created above.
-		CloseHandle(si.hStdInput);
+		CloseHandle(si.h_Std_داخلہ);
 	    }
 	    // Close the handles to the subprocess, so that it goes away
 	    CloseHandle(pi.hThread);
 	    CloseHandle(pi.hProcess);
 	}
-	else
+	وإلا
 	{
 	    cmdlen =
-#ifdef FEAT_GUI_MSWIN
-		((gui.in_use || gui.starting) ?
+#جے_تعریف_شدہ FEAT_GUI_MSWIN
+		((gui.وچ_use || gui.starting) ?
 		    (!s_dont_use_vimrun && p_stmp ?
-			vimrun_path.length : STRLEN(p_sh) + STRLEN(p_shcf))
+			vimrun_رستہ.لمائی : STRLEN(p_sh) + STRLEN(p_shcf))
 		    : 0) +
-#endif
+#جے_انت
 		STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 
 	    newcmd = alloc(cmdlen);
-	    if (newcmd != NULL)
+	    إذا (newcmd != عدم)
 	    {
-#if defined(FEAT_GUI_MSWIN)
-		if (
+#إذا defined(FEAT_GUI_MSWIN)
+		إذا (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.وچ_use || gui.starting) &&
 # endif
 		    need_vimrun_warning)
 		{
-		    char *msg = _("VIMRUN.EXE not found in your $PATH.\n"
+		    حرف *پیغام = _("VIMRUN.EXE not found in your $PATH.\n"
 			"External commands will not pause after completion.\n"
 			"See  :help win32-vimrun  for more information.");
-		    char *title = _("Vim Warning");
-		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
-		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
+		    حرف *title = _("Vim Warning");
+		    WCHAR *wmsg = enc_منزل_utf16((char_u *)پیغام, عدم);
+		    WCHAR *wtitle = enc_منزل_utf16((char_u *)title, عدم);
 
-		    if (wmsg != NULL && wtitle != NULL)
-			MessageBoxW(NULL, wmsg, wtitle, MB_ICONWARNING);
+		    إذا (wmsg != عدم && wtitle != عدم)
+			سنیہا_Box_W(عدم, wmsg, wtitle, MB_ICONWARNING);
 		    vim_free(wmsg);
 		    vim_free(wtitle);
 		    need_vimrun_warning = FALSE;
 		}
-		if (
+		إذا (
 # ifdef VIMDLL
-		    (gui.in_use || gui.starting) &&
+		    (gui.وچ_use || gui.starting) &&
 # endif
 		    !s_dont_use_vimrun && p_stmp)
 		    // Use vimrun to execute the command.  It opens a console
 		    // window, which can be closed without killing Vim.
-		    vim_snprintf((char *)newcmd, cmdlen, "%s%s%s %s %s",
-			    vimrun_path.string,
-			    (msg_silent != 0 || (options & SHELL_DOOUT))
+		    vim_snprintf((حرف *)newcmd, cmdlen, "%s%s%s %s %s",
+			    vimrun_رستہ.string,
+			    (پیغام_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
-		else if (
+		وإلا إذا (
 # ifdef VIMDLL
-			(gui.in_use || gui.starting) &&
+			(gui.وچ_use || gui.starting) &&
 # endif
 			s_dont_use_vimrun && STRCMP(p_shcf, "/c") == 0)
 		    // workaround for the case that "vimrun" does not exist
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s %s %s",
+		    vim_snprintf((حرف *)newcmd, cmdlen, "%s %s %s %s %s",
 					   p_sh, p_shcf, p_sh, p_shcf, cmd);
-		else
-#endif
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s",
+		وإلا
+#جے_انت
+		    vim_snprintf((حرف *)newcmd, cmdlen, "%s %s %s",
 							   p_sh, p_shcf, cmd);
-		x = mch_system((char *)newcmd, options);
+		x = mch_system((حرف *)newcmd, options);
 		vim_free(newcmd);
 	    }
 	}
@@ -5877,7 +5877,7 @@ mch_call_shell(
     restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 	    oldval, must_free);
 
-    if (tmode == TMODE_RAW)
+    إذا (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
@@ -5885,15 +5885,15 @@ mch_call_shell(
     }
 
     // Print the return value, unless "vimrun" was used.
-    if (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
-#if defined(FEAT_GUI_MSWIN)
-	    && ((gui.in_use || gui.starting) ?
+    إذا (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
+#إذا defined(FEAT_GUI_MSWIN)
+	    && ((gui.وچ_use || gui.starting) ?
 		((options & SHELL_DOOUT) || s_dont_use_vimrun || !p_stmp) : 1)
-#endif
+#جے_انت
 	    )
     {
 	smsg(_("shell returned %d"), x);
-	msg_putchar('\n');
+	پیغام_putchar('\n');
     }
     resettitle();
 
@@ -5905,72 +5905,72 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_DFL);
     mch_signal(SIGABRT, SIG_DFL);
 
-    return x;
+    أرجع x;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    static HANDLE
-job_io_file_open(
+#إذا defined(FEAT_کم_CHANNEL)
+    ساكن HANDLE
+کم_io_file_open(
 	char_u *fname,
 	DWORD dwDesiredAccess,
-	DWORD dwShareMode,
-	LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+	DWORD dw_Share_منوال,
+	LPSECURITY_گن lp_Security_گن,
 	DWORD dwCreationDisposition,
-	DWORD dwFlagsAndAttributes)
+	DWORD dw_Flags_And_گن)
 {
     HANDLE h;
     WCHAR *wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+    wn = enc_منزل_utf16(fname, عدم);
+    إذا (wn == عدم)
+	أرجع INVALID_HANDLE_قدر;
 
-    h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
-	    lpSecurityAttributes, dwCreationDisposition,
-	    dwFlagsAndAttributes, NULL);
+    h = CreateFileW(wn, dwDesiredAccess, dw_Share_منوال,
+	    lp_Security_گن, dwCreationDisposition,
+	    dw_Flags_And_گن, عدم);
     vim_free(wn);
-    return h;
+    أرجع h;
 }
 
 /*
  * Turn the dictionary "env" into a NUL separated list that can be used as the
  * environment argument of vim_create_process().
  */
-    void
-win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
+    فراغ
+win32_build_env(dict_T *env, garray_T *gap, صحيح is_terminal)
 {
     hashitem_T	*hi;
-    long_u	todo = env != NULL ? env->dv_hashtab.ht_used : 0;
-    LPVOID	base = GetEnvironmentStringsW();
+    long_u	todo = env != عدم ? env->dv_hashtab.ht_ورتیا : 0;
+    LPVOID	ادھار = Get_Environment_لڑیاں_W();
 
     // for last \0
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع;
 
-    if (env != NULL)
+    إذا (env != عدم)
     {
-	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_اشیاء(&env->dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    إذا (!HASHITEM_خالی_تھاواں(hi))
 	    {
-		typval_T *item = &dict_lookup(hi)->di_tv;
-		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
-		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
+		typval_T *شے = &dict_lookup(hi)->di_tv;
+		WCHAR   *wkey = enc_منزل_utf16((char_u *)hi->hi_کلید, عدم);
+		WCHAR   *wval = enc_منزل_utf16(tv_get_string(شے), عدم);
 		--todo;
-		if (wkey != NULL && wval != NULL)
+		إذا (wkey != عدم && wval != عدم)
 		{
 		    size_t	n;
 		    size_t	lkey = wcslen(wkey);
 		    size_t	lval = wcslen(wval);
 
-		    if (ga_grow(gap, (int)(lkey + lval + 2)) == FAIL)
-			continue;
-		    for (n = 0; n < lkey; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wkey[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'=';
-		    for (n = 0; n < lval; n++)
-			*((WCHAR*)gap->ga_data + gap->ga_len++) = wval[n];
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		    إذا (ga_grow(gap, (صحيح)(lkey + lval + 2)) == FAIL)
+			استمر;
+		    لكل (n = 0; n < lkey; n++)
+			*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = wkey[n];
+		    *((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = L'=';
+		    لكل (n = 0; n < lval; n++)
+			*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = wval[n];
+		    *((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = L'\0';
 		}
 		vim_free(wkey);
 		vim_free(wval);
@@ -5978,33 +5978,33 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	}
     }
 
-    if (base)
+    إذا (ادھار)
     {
-	WCHAR	*p = (WCHAR*) base;
+	WCHAR	*p = (WCHAR*) ادھار;
 
 	// for last \0
-	if (ga_grow(gap, 1) == FAIL)
-	    return;
+	إذا (ga_grow(gap, 1) == FAIL)
+	    أرجع;
 
-	while (*p != 0 || *(p + 1) != 0)
+	طالما (*p != 0 || *(p + 1) != 0)
 	{
-	    if (ga_grow(gap, 1) == OK)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = *p;
+	    إذا (ga_grow(gap, 1) == OK)
+		*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = *p;
 	    p++;
 	}
-	FreeEnvironmentStringsW(base);
-	*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	Free_Environment_لڑیاں_W(ادھار);
+	*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = L'\0';
     }
 
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
+# إذا defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
     {
 #  ifdef FEAT_CLIENTSERVER
 	char_u	*servername = get_vim_var_str(VV_SEND_SERVER);
 	size_t	servername_len = STRLEN(servername);
 #  endif
 #  ifdef FEAT_TERMINAL
-	char_u	*version = get_vim_var_str(VV_VERSION);
-	size_t	version_len = STRLEN(version);
+	char_u	*نسخہ_2 = get_vim_var_str(VV_نسخہ);
+	size_t	نسخہ_len = STRLEN(نسخہ_2);
 #  endif
 	// size of "VIM_SERVERNAME=" and value,
 	// plus "VIM_TERMINAL=" and value,
@@ -6014,31 +6014,31 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 		    + 15 + servername_len
 #  endif
 #  ifdef FEAT_TERMINAL
-		    + 13 + version_len + 2
+		    + 13 + نسخہ_len + 2
 #  endif
 		    ;
 
-	if (ga_grow(gap, (int)n) == OK)
+	إذا (ga_grow(gap, (صحيح)n) == OK)
 	{
 #  ifdef FEAT_CLIENTSERVER
-	    for (n = 0; n < 15; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    لكل (n = 0; n < 15; n++)
+		*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) =
 		    (WCHAR)"VIM_SERVERNAME="[n];
-	    for (n = 0; n < servername_len; n++)
-		*((WCHAR*)gap->ga_data + gap->ga_len++) =
+	    لكل (n = 0; n < servername_len; n++)
+		*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) =
 		    (WCHAR)servername[n];
-	    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+	    *((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = L'\0';
 #  endif
 #  ifdef FEAT_TERMINAL
-	    if (is_terminal)
+	    إذا (is_terminal)
 	    {
-		for (n = 0; n < 13; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
+		لكل (n = 0; n < 13; n++)
+		    *((WCHAR*)gap->ga_انکڑے + gap->ga_len++) =
 			(WCHAR)"VIM_TERMINAL="[n];
-		for (n = 0; n < version_len; n++)
-		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
-			(WCHAR)version[n];
-		*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
+		لكل (n = 0; n < نسخہ_len; n++)
+		    *((WCHAR*)gap->ga_انکڑے + gap->ga_len++) =
+			(WCHAR)نسخہ_2[n];
+		*((WCHAR*)gap->ga_انکڑے + gap->ga_len++) = L'\0';
 	    }
 #  endif
 	}
@@ -6050,12 +6050,12 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
  * Create a pair of pipes.
  * Return TRUE for success, FALSE for failure.
  */
-    static BOOL
+    ساكن BOOL
 create_pipe_pair(HANDLE handles[2])
 {
-    static LONG		s;
-    char		name[64];
-    SECURITY_ATTRIBUTES sa;
+    ساكن LONG		s;
+    حرف		name[64];
+    SECURITY_گن sa;
 
     sprintf(name, "\\\\?\\pipe\\vim-%08lx-%08lx",
 	    GetCurrentProcessId(),
@@ -6066,32 +6066,32 @@ create_pipe_pair(HANDLE handles[2])
 	    name,
 	    PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
-	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
+	    1, MAX_NAMED_PIPE_ناپ, 0, 0, عدم);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
-	return FALSE;
+    إذا (handles[1] == INVALID_HANDLE_قدر)
+	أرجع FALSE;
 
-    sa.nLength = sizeof(sa);
+    sa.n_لمائی = حجم(sa);
     sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
+    sa.lpSecurityDescriptor = عدم;
 
     handles[0] = CreateFile(name,
 	    FILE_GENERIC_READ,
 	    FILE_SHARE_READ, &sa,
-	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	    OPEN_EXISTING, FILE_ATTRIBUTE_عام, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    إذا (handles[0] == INVALID_HANDLE_قدر)
     {
 	CloseHandle(handles[1]);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-#endif // FEAT_JOB_CHANNEL
+#جے_انت // FEAT_JOB_CHANNEL
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -6101,72 +6101,72 @@ create_pipe_pair(HANDLE handles[2])
  * Sets v:shell_error to the exit status.
  */
     char_u *
-mch_get_cmd_output_direct(
-    char	**argv,
+mch_get_cmd_output_سدھا(
+    حرف	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    صحيح		flags بن_ورتیا,
+    صحيح		*ret_len)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
-    SECURITY_ATTRIBUTES saAttr;
-    HANDLE		hChildStdoutRd = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdoutWr = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdinRd = INVALID_HANDLE_VALUE;
+    SECURITY_گن saAttr;
+    HANDLE		h_بچہ_Stdout_Rd = INVALID_HANDLE_قدر;
+    HANDLE		h_بچہ_Stdout_Wr = INVALID_HANDLE_قدر;
+    HANDLE		h_بچہ_Stdin_Rd = INVALID_HANDLE_قدر;
     garray_T		cmd_ga;
-    garray_T		out_ga;
-    char_u		*buffer = NULL;
-    DWORD		exit_code = (DWORD)-1;
-    int			i;
+    garray_T		باہرلا_ga;
+    char_u		*بفر = عدم;
+    DWORD		exit_کوڈ = (DWORD)-1;
+    صحيح			i;
 
     // Build a command string from argv.
     ga_init2(&cmd_ga, 1, 256);
-    for (i = 0; argv[i] != NULL; i++)
+    لكل (i = 0; argv[i] != عدم; i++)
     {
 	char_u	*arg = (char_u *)argv[i];
 	char_u	*s = arg;
-	int	has_spaces = FALSE;
-	int	j;
+	صحيح	has_spaces = FALSE;
+	صحيح	j;
 
-	for (j = 0; s[j] != NUL; j++)
-	    if (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
+	لكل (j = 0; s[j] != NUL; j++)
+	    إذا (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
 	    {
 		has_spaces = TRUE;
-		break;
+		اكسر;
 	    }
 
-	if (i > 0)
+	إذا (i > 0)
 	    ga_append(&cmd_ga, ' ');
 
-	if (has_spaces)
+	إذا (has_spaces)
 	{
-	    int	num_bs;
+	    صحيح	عدد_bs;
 
 	    ga_append(&cmd_ga, '"');
-	    for (j = 0; arg[j] != NUL; j++)
+	    لكل (j = 0; arg[j] != NUL; j++)
 	    {
-		num_bs = 0;
-		while (arg[j] == '\\')
+		عدد_bs = 0;
+		طالما (arg[j] == '\\')
 		{
-		    num_bs++;
+		    عدد_bs++;
 		    j++;
 		}
 
-		if (arg[j] == NUL)
+		إذا (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    طالما (عدد_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
 		    }
-		    break;
+		    اكسر;
 		}
-		else if (arg[j] == '"')
+		وإلا إذا (arg[j] == '"')
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    طالما (عدد_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6174,310 +6174,310 @@ mch_get_cmd_output_direct(
 		    ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, '"');
 		}
-		else
+		وإلا
 		{
-		    while (num_bs-- > 0)
+		    طالما (عدد_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
 	    }
 	    ga_append(&cmd_ga, '"');
 	}
-	else
+	وإلا
 	    ga_concat(&cmd_ga, arg);
     }
     ga_append(&cmd_ga, NUL);
 
-    ga_init2(&out_ga, 1, 4096);
+    ga_init2(&باہرلا_ga, 1, 4096);
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_لمائی = حجم(SECURITY_گن);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = عدم;
 
     // Create a pipe for the child's stdout.
-    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
-	    || !SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
+    إذا (!CreatePipe(&h_بچہ_Stdout_Rd, &h_بچہ_Stdout_Wr, &saAttr, 0)
+	    || !سیٹ_Handle_Information(h_بچہ_Stdout_Rd, HANDLE_FLAG_INHERIT, 0))
     {
 	emsg(_(e_cannot_create_pipes));
-	goto done;
+	اذهب پورا;
     }
 
     // Set up stdin from infile if provided.
-    if (infile != NULL)
+    إذا (infile != عدم)
     {
-	WCHAR *winfile = enc_to_utf16(infile, NULL);
+	WCHAR *winfile = enc_منزل_utf16(infile, عدم);
 
-	if (winfile != NULL)
+	إذا (winfile != عدم)
 	{
-	    hChildStdinRd = CreateFileW(winfile, GENERIC_READ,
+	    h_بچہ_Stdin_Rd = CreateFileW(winfile, GENERIC_READ,
 		    FILE_SHARE_READ, &saAttr, OPEN_EXISTING,
-		    FILE_ATTRIBUTE_NORMAL, NULL);
+		    FILE_ATTRIBUTE_عام, عدم);
 	    vim_free(winfile);
 	}
     }
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_حافظہ(&pi, حجم(pi));
+    Zero_حافظہ(&si, حجم(si));
+    si.cb = حجم(si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
-    si.hStdOutput = hChildStdoutWr;
-    si.hStdError = hChildStdoutWr;
-    si.hStdInput = (hChildStdinRd != INVALID_HANDLE_VALUE)
-		    ? hChildStdinRd : INVALID_HANDLE_VALUE;
+    si.w_Show_کھڑکی = SW_HIDE;
+    si.hStdOutput = h_بچہ_Stdout_Wr;
+    si.hStdError = h_بچہ_Stdout_Wr;
+    si.h_Std_داخلہ = (h_بچہ_Stdin_Rd != INVALID_HANDLE_قدر)
+		    ? h_بچہ_Stdin_Rd : INVALID_HANDLE_قدر;
 
-    ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
+    ch_log(عدم, "directly executing: %s", (حرف *)cmd_ga.ga_انکڑے);
 
     // Create the child process directly, without going through the shell.
-    if (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
-		CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
-		&si, &pi, NULL, NULL))
+    إذا (!vim_create_process((حرف *)cmd_ga.ga_انکڑے, TRUE,
+		CREATE_DEFAULT_ERROR_منوال | CREATE_NEW_PROCESS_گروہ,
+		&si, &pi, عدم, عدم))
     {
-	semsg(_(e_invalid_argument_str), cmd_ga.ga_data);
-	goto done;
+	semsg(_(e_invalid_دلیل_str), cmd_ga.ga_انکڑے);
+	اذهب پورا;
     }
 
     // Close the write end of stdout pipe and stdin in the parent so that
     // ReadFile() will get EOF when the child process exits.
-    CloseHandle(hChildStdoutWr);
-    hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    CloseHandle(h_بچہ_Stdout_Wr);
+    h_بچہ_Stdout_Wr = INVALID_HANDLE_قدر;
+    إذا (h_بچہ_Stdin_Rd != INVALID_HANDLE_قدر)
     {
-	CloseHandle(hChildStdinRd);
-	hChildStdinRd = INVALID_HANDLE_VALUE;
+	CloseHandle(h_بچہ_Stdin_Rd);
+	h_بچہ_Stdin_Rd = INVALID_HANDLE_قدر;
     }
 
     // Read output from child process.
-    for (;;)
+    لكل (;;)
     {
-	char	buf[4096];
+	حرف	buf[4096];
 	DWORD	n;
 
-	if (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
-	    break;
-	if (ga_grow(&out_ga, (int)n) == OK)
+	إذا (!ReadFile(h_بچہ_Stdout_Rd, buf, حجم(buf), &n, عدم) || n == 0)
+	    اكسر;
+	إذا (ga_grow(&باہرلا_ga, (صحيح)n) == OK)
 	{
-	    mch_memmove((char *)out_ga.ga_data + out_ga.ga_len, buf, n);
-	    out_ga.ga_len += (int)n;
+	    mch_memmove((حرف *)باہرلا_ga.ga_انکڑے + باہرلا_ga.ga_len, buf, n);
+	    باہرلا_ga.ga_len += (صحيح)n;
 	}
     }
 
     // Wait for child to finish and get exit code.
     WaitForSingleObject(pi.hProcess, INFINITE);
-    GetExitCodeProcess(pi.hProcess, &exit_code);
+    Get_Exit_کوڈ_Process(pi.hProcess, &exit_کوڈ);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
 
-    set_vim_var_nr(VV_SHELL_ERROR, (long)exit_code);
+    سیٹ_vim_var_nr(VV_SHELL_ERROR, (لما)exit_کوڈ);
 
-    if (out_ga.ga_len > 0)
+    إذا (باہرلا_ga.ga_len > 0)
     {
-	buffer = alloc(out_ga.ga_len + 1);
-	if (buffer != NULL)
+	بفر = alloc(باہرلا_ga.ga_len + 1);
+	إذا (بفر != عدم)
 	{
-	    mch_memmove(buffer, out_ga.ga_data, out_ga.ga_len);
-	    if (ret_len == NULL)
+	    mch_memmove(بفر, باہرلا_ga.ga_انکڑے, باہرلا_ga.ga_len);
+	    إذا (ret_len == عدم)
 	    {
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < out_ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
-			buffer[i] = 1;
-		buffer[out_ga.ga_len] = NUL;
+		لكل (i = 0; i < باہرلا_ga.ga_len; ++i)
+		    إذا (بفر[i] == NUL)
+			بفر[i] = 1;
+		بفر[باہرلا_ga.ga_len] = NUL;
 	    }
-	    else
-		*ret_len = out_ga.ga_len;
+	    وإلا
+		*ret_len = باہرلا_ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    وإلا إذا (ret_len != عدم)
 	*ret_len = 0;
 
-done:
+پورا:
     ga_clear(&cmd_ga);
-    ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
-	CloseHandle(hChildStdinRd);
-    return buffer;
+    ga_clear(&باہرلا_ga);
+    إذا (h_بچہ_Stdout_Rd != INVALID_HANDLE_قدر)
+	CloseHandle(h_بچہ_Stdout_Rd);
+    إذا (h_بچہ_Stdout_Wr != INVALID_HANDLE_قدر)
+	CloseHandle(h_بچہ_Stdout_Wr);
+    إذا (h_بچہ_Stdin_Rd != INVALID_HANDLE_قدر)
+	CloseHandle(h_بچہ_Stdin_Rd);
+    أرجع بفر;
 }
-#endif // FEAT_EVAL
+#جے_انت // FEAT_EVAL
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-mch_job_start(char *cmd, job_T *job, jobopt_T *options)
+#إذا defined(FEAT_کم_CHANNEL)
+    فراغ
+mch_کم_شروع(حرف *cmd, کم_T *کم, jobopt_T *options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION	pi;
     HANDLE		jo;
-    SECURITY_ATTRIBUTES saAttr;
-    channel_T		*channel = NULL;
+    SECURITY_گن saAttr;
+    channel_T		*channel = عدم;
     HANDLE		ifd[2];
     HANDLE		ofd[2];
     HANDLE		efd[2];
     garray_T		ga;
 
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    صحيح		use_null_for_وچ = options->jo_io[PART_وچ] == JIO_NULL;
+    صحيح		use_null_for_باہرلا = options->jo_io[PART_باہرلا] == JIO_NULL;
+    صحيح		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    صحيح		use_file_for_وچ = options->jo_io[PART_وچ] == JIO_FILE;
+    صحيح		use_file_for_باہرلا = options->jo_io[PART_باہرلا] == JIO_FILE;
+    صحيح		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    صحيح		use_باہرلا_for_err = options->jo_io[PART_ERR] == JIO_باہرلا;
 
-    if (use_out_for_err && use_null_for_out)
+    إذا (use_باہرلا_for_err && use_null_for_باہرلا)
 	use_null_for_err = TRUE;
 
-    ifd[0] = INVALID_HANDLE_VALUE;
-    ifd[1] = INVALID_HANDLE_VALUE;
-    ofd[0] = INVALID_HANDLE_VALUE;
-    ofd[1] = INVALID_HANDLE_VALUE;
-    efd[0] = INVALID_HANDLE_VALUE;
-    efd[1] = INVALID_HANDLE_VALUE;
-    ga_init2(&ga, sizeof(wchar_t), 500);
+    ifd[0] = INVALID_HANDLE_قدر;
+    ifd[1] = INVALID_HANDLE_قدر;
+    ofd[0] = INVALID_HANDLE_قدر;
+    ofd[1] = INVALID_HANDLE_قدر;
+    efd[0] = INVALID_HANDLE_قدر;
+    efd[1] = INVALID_HANDLE_قدر;
+    ga_init2(&ga, حجم(wchar_t), 500);
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
+    jo = Create_کم_Object(عدم, عدم);
+    إذا (jo == عدم)
     {
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	کم->jv_حالت = کم_FAILED;
+	اذهب failed;
     }
 
-    if (options->jo_env != NULL)
+    إذا (options->jo_env != عدم)
 	win32_build_env(options->jo_env, &ga, FALSE);
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    Zero_حافظہ(&pi, حجم(pi));
+    Zero_حافظہ(&si, حجم(si));
+    si.cb = حجم(si);
     si.dwFlags |= STARTF_USESHOWWINDOW;
-    si.wShowWindow = SW_HIDE;
+    si.w_Show_کھڑکی = SW_HIDE;
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.n_لمائی = حجم(SECURITY_گن);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = عدم;
 
-    if (use_file_for_in)
+    إذا (use_file_for_وچ)
     {
-	char_u *fname = options->jo_io_name[PART_IN];
+	char_u *fname = options->jo_io_name[PART_وچ];
 
-	ifd[0] = job_io_file_open(fname, GENERIC_READ,
+	ifd[0] = کم_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_عام);
+	إذا (ifd[0] == INVALID_HANDLE_قدر)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    اذهب failed;
 	}
     }
-    else if (!use_null_for_in
+    وإلا إذا (!use_null_for_وچ
 	    && (!create_pipe_pair(ifd)
-		|| !SetHandleInformation(ifd[1], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+		|| !سیٹ_Handle_Information(ifd[1], HANDLE_FLAG_INHERIT, 0)))
+	اذهب failed;
 
-    if (use_file_for_out)
+    إذا (use_file_for_باہرلا)
     {
-	char_u *fname = options->jo_io_name[PART_OUT];
+	char_u *fname = options->jo_io_name[PART_باہرلا];
 
-	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	ofd[1] = کم_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_عام);
+	إذا (ofd[1] == INVALID_HANDLE_قدر)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    اذهب failed;
 	}
     }
-    else if (!use_null_for_out &&
+    وإلا إذا (!use_null_for_باہرلا &&
 	    (!CreatePipe(&ofd[0], &ofd[1], &saAttr, 0)
-	    || !SetHandleInformation(ofd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !سیٹ_Handle_Information(ofd[0], HANDLE_FLAG_INHERIT, 0)))
+	اذهب failed;
 
-    if (use_file_for_err)
+    إذا (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
-	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
+	efd[1] = کم_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_عام);
+	إذا (efd[1] == INVALID_HANDLE_قدر)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    اذهب failed;
 	}
     }
-    else if (!use_out_for_err && !use_null_for_err &&
+    وإلا إذا (!use_باہرلا_for_err && !use_null_for_err &&
 	    (!CreatePipe(&efd[0], &efd[1], &saAttr, 0)
-	    || !SetHandleInformation(efd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	    || !سیٹ_Handle_Information(efd[0], HANDLE_FLAG_INHERIT, 0)))
+	اذهب failed;
 
     si.dwFlags |= STARTF_USESTDHANDLES;
-    si.hStdInput = ifd[0];
+    si.h_Std_داخلہ = ifd[0];
     si.hStdOutput = ofd[1];
-    si.hStdError = use_out_for_err ? ofd[1] : efd[1];
+    si.hStdError = use_باہرلا_for_err ? ofd[1] : efd[1];
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    إذا (!use_null_for_وچ || !use_null_for_باہرلا || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	إذا (options->jo_سیٹ & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    إذا (channel != عدم)
 		++channel->ch_refcount;
 	}
-	else
-	    channel = add_channel();
-	if (channel == NULL)
-	    goto failed;
+	وإلا
+	    channel = جوڑو_channel();
+	إذا (channel == عدم)
+	    اذهب failed;
     }
 
-    if (!vim_create_process(cmd, TRUE,
+    إذا (!vim_create_process(cmd, TRUE,
 	    CREATE_SUSPENDED |
-	    CREATE_DEFAULT_ERROR_MODE |
-	    CREATE_NEW_PROCESS_GROUP |
+	    CREATE_DEFAULT_ERROR_منوال |
+	    CREATE_NEW_PROCESS_گروہ |
 	    CREATE_UNICODE_ENVIRONMENT |
 	    CREATE_NEW_CONSOLE,
 	    &si, &pi,
-	    ga.ga_data,
-	    (char *)options->jo_cwd))
+	    ga.ga_انکڑے,
+	    (حرف *)options->jo_cwd))
     {
 	CloseHandle(jo);
-	job->jv_status = JOB_FAILED;
-	goto failed;
+	کم->jv_حالت = کم_FAILED;
+	اذهب failed;
     }
 
     ga_clear(&ga);
 
-    if (!AssignProcessToJobObject(jo, pi.hProcess))
+    إذا (!سونپو_Process_منزل_کم_Object(jo, pi.hProcess))
     {
 	// if failing, switch the way to terminate
 	// process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = عدم;
     }
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
-    job->jv_proc_info = pi;
-    job->jv_job_object = jo;
-    job->jv_status = JOB_STARTED;
+    کم->jv_proc_info = pi;
+    کم->jv_کم_object = jo;
+    کم->jv_حالت = کم_STARTED;
 
     CloseHandle(ifd[0]);
     CloseHandle(ofd[1]);
-    if (!use_out_for_err && !use_null_for_err)
+    إذا (!use_باہرلا_for_err && !use_null_for_err)
 	CloseHandle(efd[1]);
 
-    job->jv_channel = channel;
-    if (channel != NULL)
+    کم->jv_channel = channel;
+    إذا (channel != عدم)
     {
-	channel_set_pipes(channel,
-		      use_file_for_in || use_null_for_in
+	channel_سیٹ_pipes(channel,
+		      use_file_for_وچ || use_null_for_وچ
 					      ? INVALID_FD : (sock_T)ifd[1],
-		      use_file_for_out || use_null_for_out
+		      use_file_for_باہرلا || use_null_for_باہرلا
 					     ? INVALID_FD : (sock_T)ofd[0],
-		      use_out_for_err || use_file_for_err || use_null_for_err
+		      use_باہرلا_for_err || use_file_for_err || use_null_for_err
 					    ? INVALID_FD : (sock_T)efd[0]);
-	channel_set_job(channel, job, options);
+	channel_سیٹ_کم(channel, کم, options);
     }
-    return;
+    أرجع;
 
 failed:
     CloseHandle(ifd[0]);
@@ -6490,162 +6490,162 @@ failed:
     ga_clear(&ga);
 }
 
-    char *
-mch_job_status(job_T *job)
+    حرف *
+mch_کم_حالت(کم_T *کم)
 {
-    DWORD dwExitCode = 0;
+    DWORD dw_Exit_کوڈ = 0;
 
-    if (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
-	    || dwExitCode != STILL_ACTIVE)
+    إذا (!Get_Exit_کوڈ_Process(کم->jv_proc_info.hProcess, &dw_Exit_کوڈ)
+	    || dw_Exit_کوڈ != STILL_سرگرم)
     {
-	job->jv_exitval = (int)dwExitCode;
-	if (job->jv_status < JOB_ENDED)
+	کم->jv_exitval = (صحيح)dw_Exit_کوڈ;
+	إذا (کم->jv_حالت < کم_ENDED)
 	{
-	    ch_log(job->jv_channel, "Job ended");
-	    job->jv_status = JOB_ENDED;
+	    ch_log(کم->jv_channel, "Job ended");
+	    کم->jv_حالت = کم_ENDED;
 	}
-	return "dead";
+	أرجع "dead";
     }
-    return "run";
+    أرجع "run";
 }
 
-    job_T *
-mch_detect_ended_job(job_T *job_list)
+    کم_T *
+mch_detect_ended_کم(کم_T *کم_list)
 {
-    HANDLE jobHandles[MAXIMUM_WAIT_OBJECTS];
-    job_T *jobArray[MAXIMUM_WAIT_OBJECTS];
-    job_T *job = job_list;
+    HANDLE کم_Handles[ودھ_توں_ودھ_WAIT_OBJECTS];
+    کم_T *کم_Array[ودھ_توں_ودھ_WAIT_OBJECTS];
+    کم_T *کم = کم_list;
 
-    while (job != NULL)
+    طالما (کم != عدم)
     {
 	DWORD n;
-	DWORD result;
+	DWORD نتیجہ;
 
-	for (n = 0; n < MAXIMUM_WAIT_OBJECTS
-				       && job != NULL; job = job->jv_next)
+	لكل (n = 0; n < ودھ_توں_ودھ_WAIT_OBJECTS
+				       && کم != عدم; کم = کم->jv_اگلا)
 	{
-	    if (job->jv_status == JOB_STARTED)
+	    إذا (کم->jv_حالت == کم_STARTED)
 	    {
-		jobHandles[n] = job->jv_proc_info.hProcess;
-		jobArray[n] = job;
+		کم_Handles[n] = کم->jv_proc_info.hProcess;
+		کم_Array[n] = کم;
 		++n;
 	    }
 	}
-	if (n == 0)
-	    continue;
-	result = WaitForMultipleObjects(n, jobHandles, FALSE, 0);
-	if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
+	إذا (n == 0)
+	    استمر;
+	نتیجہ = Wait_For_مضرب_Objects(n, کم_Handles, FALSE, 0);
+	إذا (نتیجہ >= WAIT_OBJECT_0 && نتیجہ < WAIT_OBJECT_0 + n)
 	{
-	    job_T *wait_job = jobArray[result - WAIT_OBJECT_0];
+	    کم_T *wait_کم = کم_Array[نتیجہ - WAIT_OBJECT_0];
 
-	    if (STRCMP(mch_job_status(wait_job), "dead") == 0)
-		return wait_job;
+	    إذا (STRCMP(mch_کم_حالت(wait_کم), "dead") == 0)
+		أرجع wait_کم;
 	}
     }
-    return NULL;
+    أرجع عدم;
 }
 
-    static BOOL
-terminate_all(HANDLE process, int code)
+    ساكن BOOL
+terminate_all(HANDLE process, صحيح کوڈ)
 {
     PROCESSENTRY32  pe;
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_قدر;
     DWORD	    pid = GetProcessId(process);
 
-    if (pid != 0)
+    إذا (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	إذا (h != INVALID_HANDLE_قدر)
 	{
-	    pe.dwSize = sizeof(PROCESSENTRY32);
-	    if (!Process32First(h, &pe))
-		goto theend;
+	    pe.dw_ناپ = حجم(PROCESSENTRY32);
+	    إذا (!Process32_پہلا(h, &pe))
+		اذهب theend;
 
-	    do
+	    افعل
 	    {
-		if (pe.th32ParentProcessID == pid)
+		إذا (pe.th32_ماپا_Process_ID == pid)
 		{
 		    HANDLE ph = OpenProcess(
 				  PROCESS_ALL_ACCESS, FALSE, pe.th32ProcessID);
-		    if (ph != NULL)
+		    إذا (ph != عدم)
 		    {
-			terminate_all(ph, code);
+			terminate_all(ph, کوڈ);
 			CloseHandle(ph);
 		    }
 		}
-	    } while (Process32Next(h, &pe));
+	    } طالما (Process32_اگلا(h, &pe));
 
 	    CloseHandle(h);
 	}
     }
 
 theend:
-    return TerminateProcess(process, code);
+    أرجع TerminateProcess(process, کوڈ);
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if it didn't work.
  */
-    int
-mch_signal_job(job_T *job, char_u *how)
+    صحيح
+mch_signal_کم(کم_T *کم, char_u *how)
 {
-    int ret;
+    صحيح ret;
 
-    if (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
+    إذا (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
     {
 	// deadly signal
-	if (job->jv_job_object != NULL)
+	إذا (کم->jv_کم_object != عدم)
 	{
-	    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
-		job->jv_channel->ch_killing = TRUE;
-	    return TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
+	    إذا (کم->jv_channel != عدم && کم->jv_channel->ch_anonymous_pipe)
+		کم->jv_channel->ch_killing = TRUE;
+	    أرجع Terminate_کم_Object(کم->jv_کم_object, (UINT)-1) ? OK : FAIL;
 	}
-	return terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
+	أرجع terminate_all(کم->jv_proc_info.hProcess, -1) ? OK : FAIL;
     }
 
-    if (!AttachConsole(job->jv_proc_info.dwProcessId))
-	return FAIL;
+    إذا (!AttachConsole(کم->jv_proc_info.dwProcessId))
+	أرجع FAIL;
     ret = GenerateConsoleCtrlEvent(
 		STRCMP(how, "int") == 0 ? CTRL_C_EVENT : CTRL_BREAK_EVENT,
-		job->jv_proc_info.dwProcessId)
+		کم->jv_proc_info.dwProcessId)
 	    ? OK : FAIL;
     FreeConsole();
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Clear the data related to "job".
  */
-    void
-mch_clear_job(job_T *job)
+    فراغ
+mch_clear_کم(کم_T *کم)
 {
-    if (job->jv_status == JOB_FAILED)
-	return;
+    إذا (کم->jv_حالت == کم_FAILED)
+	أرجع;
 
-    if (job->jv_job_object != NULL)
-	CloseHandle(job->jv_job_object);
-    CloseHandle(job->jv_proc_info.hProcess);
+    إذا (کم->jv_کم_object != عدم)
+	CloseHandle(کم->jv_کم_object);
+    CloseHandle(کم->jv_proc_info.hProcess);
 }
-#endif
+#جے_انت
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * Start termcap mode
  */
-    static void
-termcap_mode_start(void)
+    ساكن فراغ
+termcap_منوال_شروع(فراغ)
 {
     DWORD cmodein;
 
-    if (g_fTermcapMode)
-	return;
+    إذا (g_f_Termcap_منوال)
+	أرجع;
 
-    SaveConsoleBuffer(&g_cbNonTermcap);
+    Save_Console_بفر(&g_cbNonTermcap);
 
-    if (g_cbTermcap.IsValid)
+    إذا (g_cbTermcap.IsValid)
     {
 	/*
 	 * We've been in termcap mode before.  Restore certain screen
@@ -6653,87 +6653,87 @@ termcap_mode_start(void)
 	 * size.  Since we will be redrawing the screen, we don't need
 	 * to restore the actual contents of the buffer.
 	 */
-	RestoreConsoleBuffer(&g_cbTermcap, FALSE);
+	Restore_Console_بفر(&g_cbTermcap, FALSE);
 	reset_console_color_rgb();
-	SetConsoleWindowInfo(g_hConOut, TRUE, &g_cbTermcap.Info.srWindow);
-	Rows = g_cbTermcap.Info.dwSize.Y;
-	Columns = g_cbTermcap.Info.dwSize.X;
+	سیٹ_Console_کھڑکی_Info(g_h_Con_باہرلا, TRUE, &g_cbTermcap.Info.sr_کھڑکی);
+	صفاں = g_cbTermcap.Info.dw_ناپ.Y;
+	Columns = g_cbTermcap.Info.dw_ناپ.X;
     }
-    else
+    وإلا
     {
 	/*
 	 * This is our first time entering termcap mode.  Clear the console
 	 * screen buffer, and resize the buffer to match the current window
 	 * size.  We will use this as the size of our editing environment.
 	 */
-	ClearConsoleBuffer(g_attrCurrent);
-	set_console_color_rgb();
-	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
+	Clear_Console_بفر(g_attrCurrent);
+	سیٹ_console_color_rgb();
+	Resize_Con_Buf_And_کھڑکی(g_h_Con_باہرلا, Columns, صفاں);
     }
 
     resettitle();
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    if (g_fMouseActive)
+    Get_Console_منوال(g_h_Con_وچ, &cmodein);
+    إذا (g_f_Mouse_سرگرم)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
-	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
+	cmodein |= ENABLE_MOUSE_داخلہ;
+	cmodein &= ~ENABLE_تیز_EDIT_منوال;
     }
-    else
+    وإلا
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
-	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
+	cmodein &= ~ENABLE_MOUSE_داخلہ;
+	cmodein |= g_cmodein & ENABLE_تیز_EDIT_منوال;
     }
-    cmodein |= ENABLE_WINDOW_INPUT;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    cmodein |= ENABLE_کھڑکی_داخلہ;
+    سیٹ_Console_منوال(g_h_Con_وچ, cmodein | ENABLE_EXTENDED_FLAGS);
 
     redraw_later_clear();
-    g_fTermcapMode = TRUE;
+    g_f_Termcap_منوال = TRUE;
 }
 
 
 /*
  * End termcap mode
  */
-    static void
-termcap_mode_end(void)
+    ساكن فراغ
+termcap_منوال_سرا(فراغ)
 {
     DWORD cmodein;
-    ConsoleBuffer *cb;
+    Console_بفر *cb;
     COORD coord;
     DWORD dwDummy;
 
-    if (!g_fTermcapMode)
-	return;
+    إذا (!g_f_Termcap_منوال)
+	أرجع;
 
-    SaveConsoleBuffer(&g_cbTermcap);
+    Save_Console_بفر(&g_cbTermcap);
 
-    GetConsoleMode(g_hConIn, &cmodein);
-    cmodein &= ~(ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
-    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
-    SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
+    Get_Console_منوال(g_h_Con_وچ, &cmodein);
+    cmodein &= ~(ENABLE_MOUSE_داخلہ | ENABLE_کھڑکی_داخلہ);
+    cmodein |= g_cmodein & ENABLE_تیز_EDIT_منوال;
+    سیٹ_Console_منوال(g_h_Con_وچ, cmodein | ENABLE_EXTENDED_FLAGS);
 
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     cb = exiting ? &g_cbOrig : &g_cbNonTermcap;
-# else
+# وإلا
     cb = &g_cbNonTermcap;
 # endif
-    RestoreConsoleBuffer(cb, p_rs);
+    Restore_Console_بفر(cb, p_rs);
     restore_console_color_rgb();
 
     // Switch back to main screen buffer.
-    if (exiting && use_alternate_screen_buffer)
+    إذا (exiting && use_alternate_screen_بفر)
 	vtp_printf("\033[?1049l");
 
-    if (!USE_WT && (p_rs || exiting))
+    إذا (!USE_WT && (p_rs || exiting))
     {
 	/*
 	 * Clear anything that happens to be on the current line.
 	 */
 	coord.X = 0;
-	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (Rows - 1));
-	FillConsoleOutputCharacter(g_hConOut, ' ',
-		cb->Info.dwSize.X, coord, &dwDummy);
+	coord.Y = (SHORT) (p_rs ? cb->Info.dwCursorPosition.Y : (صفاں - 1));
+	FillConsoleOutputCharacter(g_h_Con_باہرلا, ' ',
+		cb->Info.dw_ناپ.X, coord, &dwDummy);
 	/*
 	 * The following is just for aesthetics.  If we are exiting without
 	 * restoring the screen, then we want to have a prompt string
@@ -6742,40 +6742,40 @@ termcap_mode_end(void)
 	 * the prompt string, which causes the screen to scroll.  To
 	 * counter this, move the cursor up one line before exiting.
 	 */
-	if (exiting && !p_rs)
+	إذا (exiting && !p_rs)
 	    coord.Y--;
 	/*
 	 * Position the cursor at the leftmost column of the desired row.
 	 */
-	SetConsoleCursorPosition(g_hConOut, coord);
+	سیٹ_Console_Cursor_Position(g_h_Con_باہرلا, coord);
     }
-    SetConsoleCursorInfo(g_hConOut, &g_cci);
-    g_fTermcapMode = FALSE;
+    سیٹ_Console_Cursor_Info(g_h_Con_باہرلا, &g_cci);
+    g_f_Termcap_منوال = FALSE;
 }
-#endif
+#جے_انت
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * clear `n' chars, starting from `coord'
  */
-    static void
+    ساكن فراغ
 clear_chars(
     COORD coord,
     DWORD n)
 {
-    if (!vtp_working)
+    إذا (!vtp_working)
     {
 	DWORD dwDummy;
 
-	FillConsoleOutputCharacter(g_hConOut, ' ', n, coord, &dwDummy);
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, n, coord,
+	FillConsoleOutputCharacter(g_h_Con_باہرلا, ' ', n, coord, &dwDummy);
+	FillConsoleOutputAttribute(g_h_Con_باہرلا, g_attrCurrent, n, coord,
 								     &dwDummy);
     }
-    else
+    وإلا
     {
-	set_console_color_rgb();
+	سیٹ_console_color_rgb();
 	gotoxy(coord.X + 1, coord.Y + 1);
 	vtp_printf("\033[%dX", n);
     }
@@ -6785,16 +6785,16 @@ clear_chars(
 /*
  * Clear the screen
  */
-    static void
-clear_screen(void)
+    ساكن فراغ
+clear_screen(فراغ)
 {
     g_coord.X = g_coord.Y = 0;
 
-    if (!vtp_working)
-	clear_chars(g_coord, Rows * Columns);
-    else
+    إذا (!vtp_working)
+	clear_chars(g_coord, صفاں * Columns);
+    وإلا
     {
-	set_console_color_rgb();
+	سیٹ_console_color_rgb();
 	gotoxy(1, 1);
 	vtp_printf("\033[2J");
     }
@@ -6804,17 +6804,17 @@ clear_screen(void)
 /*
  * Clear to end of display
  */
-    static void
-clear_to_end_of_display(void)
+    ساكن فراغ
+clear_منزل_سرا_دا_display(فراغ)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
-	clear_chars(g_coord, (Rows - g_coord.Y - 1)
+    إذا (!vtp_working)
+	clear_chars(g_coord, (صفاں - g_coord.Y - 1)
 					   * Columns + (Columns - g_coord.X));
-    else
+    وإلا
     {
-	set_console_color_rgb();
+	سیٹ_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0J");
 
@@ -6827,16 +6827,16 @@ clear_to_end_of_display(void)
 /*
  * Clear to end of line
  */
-    static void
-clear_to_end_of_line(void)
+    ساكن فراغ
+clear_منزل_سرا_دا_سطر(فراغ)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    إذا (!vtp_working)
 	clear_chars(g_coord, Columns - g_coord.X);
-    else
+    وإلا
     {
-	set_console_color_rgb();
+	سیٹ_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 	vtp_printf("\033[0K");
 
@@ -6849,13 +6849,13 @@ clear_to_end_of_line(void)
 /*
  * Scroll the scroll region up by `cLines' lines
  */
-    static void
-scroll(unsigned cLines)
+    ساكن فراغ
+scroll(بنانشانی c_سطریں)
 {
     COORD oldcoord = g_coord;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
-    delete_lines(cLines);
+    gotoxy(g_srScrollRegion.بایاں_3 + 1, g_srScrollRegion.چوٹی_2 + 1);
+    delete_سطریں(c_سطریں);
 
     g_coord = oldcoord;
 }
@@ -6864,84 +6864,84 @@ scroll(unsigned cLines)
 /*
  * Set the scroll region
  */
-    static void
-set_scroll_region(
-    unsigned left,
-    unsigned top,
-    unsigned right,
-    unsigned bottom)
+    ساكن فراغ
+سیٹ_scroll_region(
+    بنانشانی بایاں,
+    بنانشانی چوٹی,
+    بنانشانی دایاں,
+    بنانشانی bottom)
 {
-    if (left >= right
-	    || top >= bottom
-	    || right > (unsigned) Columns - 1
-	    || bottom > (unsigned) Rows - 1)
-	return;
+    إذا (بایاں >= دایاں
+	    || چوٹی >= bottom
+	    || دایاں > (بنانشانی) Columns - 1
+	    || bottom > (بنانشانی) صفاں - 1)
+	أرجع;
 
-    g_srScrollRegion.Left =   left;
-    g_srScrollRegion.Top =    top;
-    g_srScrollRegion.Right =  right;
+    g_srScrollRegion.بایاں_3 =   بایاں;
+    g_srScrollRegion.چوٹی_2 =    چوٹی;
+    g_srScrollRegion.دایاں_3 =  دایاں;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_tb(
-    unsigned top,
-    unsigned bottom)
+    ساكن فراغ
+سیٹ_scroll_region_tb(
+    بنانشانی چوٹی,
+    بنانشانی bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
-	return;
+    إذا (چوٹی >= bottom || bottom > (بنانشانی)صفاں - 1)
+	أرجع;
 
-    g_srScrollRegion.Top = top;
+    g_srScrollRegion.چوٹی_2 = چوٹی;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
-set_scroll_region_lr(
-    unsigned left,
-    unsigned right)
+    ساكن فراغ
+سیٹ_scroll_region_lr(
+    بنانشانی بایاں,
+    بنانشانی دایاں)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
-	return;
+    إذا (بایاں >= دایاں || دایاں > (بنانشانی)Columns - 1)
+	أرجع;
 
-    g_srScrollRegion.Left = left;
-    g_srScrollRegion.Right = right;
+    g_srScrollRegion.بایاں_3 = بایاں;
+    g_srScrollRegion.دایاں_3 = دایاں;
 }
 
 
 /*
  * Insert `cLines' lines at the current cursor position
  */
-    static void
-insert_lines(unsigned cLines)
+    ساكن فراغ
+داخل_کرو_سطریں(بنانشانی c_سطریں)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    سروت, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.بایاں_3 + 1, g_srScrollRegion.چوٹی_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
-    dest.Y = g_coord.Y + cLines;
+    dest.X = g_srScrollRegion.بایاں_3;
+    dest.Y = g_coord.Y + c_سطریں;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom - cLines;
+    سروت.بایاں_3   = g_srScrollRegion.بایاں_3;
+    سروت.چوٹی_2	  = g_coord.Y;
+    سروت.دایاں_3  = g_srScrollRegion.دایاں_3;
+    سروت.Bottom = g_srScrollRegion.Bottom - c_سطریں;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.بایاں_3   = g_srScrollRegion.بایاں_3;
+    clip.چوٹی_2    = g_coord.Y;
+    clip.دایاں_3  = g_srScrollRegion.دایاں_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!USE_VTP)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    إذا (!USE_VTP)
+	fill.گن_2 = g_attrCurrent;
+    وإلا
+	fill.گن_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    سیٹ_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_بفر(g_h_Con_باہرلا, &سروت, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake: If the scroll
     // region looks like abc and we scroll c to a and fill with d we get
@@ -6950,29 +6950,29 @@ insert_lines(unsigned cLines)
     // here... (this also occurs scrolling the same way in the other
     // direction).
 
-    if (source.Bottom < dest.Y)
+    إذا (سروت.Bottom < dest.Y)
     {
 	COORD coord;
-	int   i;
+	صحيح   i;
 
-	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	coord.X = سروت.بایاں_3;
+	لكل (i = clip.چوٹی_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, سروت.دایاں_3 - سروت.بایاں_3 + 1);
 	}
     }
 
-    if (vtp_working)
+    إذا (vtp_working)
     {
 	COORD coord;
-	int i;
+	صحيح i;
 
-	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	coord.X = سروت.بایاں_3;
+	لكل (i = سروت.چوٹی_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, سروت.دایاں_3 - سروت.بایاں_3 + 1);
 	}
     }
 }
@@ -6981,67 +6981,67 @@ insert_lines(unsigned cLines)
 /*
  * Delete `cLines' lines at the current cursor position
  */
-    static void
-delete_lines(unsigned cLines)
+    ساكن فراغ
+delete_سطریں(بنانشانی c_سطریں)
 {
-    SMALL_RECT	    source, clip;
+    SMALL_RECT	    سروت, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
-    int		    nb;
+    صحيح		    nb;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.بایاں_3 + 1, g_srScrollRegion.چوٹی_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
+    dest.X = g_srScrollRegion.بایاں_3;
     dest.Y = g_coord.Y;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y + cLines;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom;
+    سروت.بایاں_3   = g_srScrollRegion.بایاں_3;
+    سروت.چوٹی_2	  = g_coord.Y + c_سطریں;
+    سروت.دایاں_3  = g_srScrollRegion.دایاں_3;
+    سروت.Bottom = g_srScrollRegion.Bottom;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.بایاں_3   = g_srScrollRegion.بایاں_3;
+    clip.چوٹی_2    = g_coord.Y;
+    clip.دایاں_3  = g_srScrollRegion.دایاں_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!vtp_working)
-	fill.Attributes = g_attrCurrent;
-    else
-	fill.Attributes = g_attrDefault;
+    إذا (!vtp_working)
+	fill.گن_2 = g_attrCurrent;
+    وإلا
+	fill.گن_2 = g_attrDefault;
 
-    set_console_color_rgb();
+    سیٹ_console_color_rgb();
 
-    ScrollConsoleScreenBuffer(g_hConOut, &source, &clip, dest, &fill);
+    Scroll_Console_Screen_بفر(g_h_Con_باہرلا, &سروت, &clip, dest, &fill);
 
     // Here we have to deal with a win32 console flake; See insert_lines()
     // above.
 
-    nb = dest.Y + (source.Bottom - source.Top) + 1;
+    nb = dest.Y + (سروت.Bottom - سروت.چوٹی_2) + 1;
 
-    if (nb < source.Top)
+    إذا (nb < سروت.چوٹی_2)
     {
 	COORD coord;
-	int   i;
+	صحيح   i;
 
-	coord.X = source.Left;
-	for (i = nb; i < clip.Bottom; ++i)
+	coord.X = سروت.بایاں_3;
+	لكل (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, سروت.دایاں_3 - سروت.بایاں_3 + 1);
 	}
     }
 
-    if (vtp_working)
+    إذا (vtp_working)
     {
 	COORD coord;
-	int i;
+	صحيح i;
 
-	coord.X = source.Left;
-	for (i = nb; i <= source.Bottom; ++i)
+	coord.X = سروت.بایاں_3;
+	لكل (i = nb; i <= سروت.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, سروت.دایاں_3 - سروت.بایاں_3 + 1);
 	}
     }
 }
@@ -7050,28 +7050,28 @@ delete_lines(unsigned cLines)
 /*
  * Set the cursor position to (x,y) (1-based).
  */
-    static void
+    ساكن فراغ
 gotoxy(
-    unsigned x,
-    unsigned y)
+    بنانشانی x,
+    بنانشانی y)
 {
-    if (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
-	return;
+    إذا (x < 1 || x > (بنانشانی)Columns || y < 1 || y > (بنانشانی)صفاں)
+	أرجع;
 
-    if (!USE_VTP)
+    إذا (!USE_VTP)
     {
 	// There are reports of double-width characters not displayed
 	// correctly.  This workaround should fix it, similar to how it's done
 	// for VTP.
 	g_coord.X = 0;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	سیٹ_Console_Cursor_Position(g_h_Con_باہرلا, g_coord);
 
 	// external cursor coords are 1-based; internal are 0-based
 	g_coord.X = x - 1;
 	g_coord.Y = y - 1;
-	SetConsoleCursorPosition(g_hConOut, g_coord);
+	سیٹ_Console_Cursor_Position(g_h_Con_باہرلا, g_coord);
     }
-    else
+    وإلا
     {
 	// Move the cursor to the left edge of the screen to prevent screen
 	// destruction.  Insider build bug.  Always enabled because it's cheap
@@ -7090,35 +7090,35 @@ gotoxy(
  * Set the current text attribute = (foreground | background)
  * See ../runtime/doc/os_win32.txt for the numbers.
  */
-    static void
-textattr(WORD wAttr)
+    ساكن فراغ
+textattr(لفظ_2 wAttr)
 {
     g_attrCurrent = wAttr & 0xff;
 
-    SetConsoleTextAttribute(g_hConOut, wAttr);
+    سیٹ_Console_متن_Attribute(g_h_Con_باہرلا, wAttr);
 }
 
 
-    static void
-textcolor(WORD wAttr)
+    ساكن فراغ
+textcolor(لفظ_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0xf0) + (wAttr & 0x0f);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    إذا (!vtp_working)
+	سیٹ_Console_متن_Attribute(g_h_Con_باہرلا, g_attrCurrent);
+    وإلا
 	vtp_sgr_bulk(wAttr);
 }
 
 
-    static void
-textbackground(WORD wAttr)
+    ساكن فراغ
+textbackground(لفظ_2 wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0x0f) + ((wAttr & 0x0f) << 4);
 
-    if (!vtp_working)
-	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    إذا (!vtp_working)
+	سیٹ_Console_متن_Attribute(g_h_Con_باہرلا, g_attrCurrent);
+    وإلا
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7126,37 +7126,37 @@ textbackground(WORD wAttr)
 /*
  * restore the default text attribute (whatever we started with)
  */
-    static void
-normvideo(void)
+    ساكن فراغ
+normvideo(فراغ)
 {
-    if (!vtp_working)
+    إذا (!vtp_working)
 	textattr(g_attrDefault);
-    else
+    وإلا
 	vtp_sgr_bulk(0);
 }
 
 
-static WORD g_attrPreStandout = 0;
+ساكن لفظ_2 g_attrPreStandout = 0;
 
 /*
  * Make the text standout, by brightening it
  */
-    static void
-standout(void)
+    ساكن فراغ
+standout(فراغ)
 {
     g_attrPreStandout = g_attrCurrent;
 
-    textattr((WORD) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
+    textattr((لفظ_2) (g_attrCurrent|FOREGROUND_INTENSITY|BACKGROUND_INTENSITY));
 }
 
 
 /*
  * Turn off standout mode
  */
-    static void
-standend(void)
+    ساكن فراغ
+standend(فراغ)
 {
-    if (g_attrPreStandout)
+    إذا (g_attrPreStandout)
 	textattr(g_attrPreStandout);
 
     g_attrPreStandout = 0;
@@ -7166,15 +7166,15 @@ standend(void)
 /*
  * Set normal fg/bg color, based on T_ME.  Called when t_me has been set.
  */
-    void
-mch_set_normal_colors(void)
+    فراغ
+mch_سیٹ_عام_colors(فراغ)
 {
     char_u	*p;
-    int		n;
+    صحيح		n;
 
-    cterm_normal_fg_color = (g_attrDefault & 0xf) + 1;
-    cterm_normal_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
-    if (
+    cterm_عام_fg_color = (g_attrDefault & 0xf) + 1;
+    cterm_عام_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
+    إذا (
 # ifdef FEAT_TERMGUICOLORS
 	!p_tgc &&
 # endif
@@ -7182,15 +7182,15 @@ mch_set_normal_colors(void)
     {
 	p = T_ME + 2;
 	n = getdigits(&p);
-	if (*p == 'm' && n > 0)
+	إذا (*p == 'm' && n > 0)
 	{
-	    cterm_normal_fg_color = (n & 0xf) + 1;
-	    cterm_normal_bg_color = ((n >> 4) & 0xf) + 1;
+	    cterm_عام_fg_color = (n & 0xf) + 1;
+	    cterm_عام_bg_color = ((n >> 4) & 0xf) + 1;
 	}
     }
 # ifdef FEAT_TERMGUICOLORS
-    cterm_normal_fg_gui_color = INVALCOLOR;
-    cterm_normal_bg_gui_color = INVALCOLOR;
+    cterm_عام_fg_gui_color = INVALCOLOR;
+    cterm_عام_bg_gui_color = INVALCOLOR;
 # endif
 }
 
@@ -7198,34 +7198,34 @@ mch_set_normal_colors(void)
 /*
  * visual bell: flash the screen
  */
-    static void
-visual_bell(void)
+    ساكن فراغ
+visual_bell(فراغ)
 {
     COORD   coordOrigin = {0, 0};
-    WORD    attrFlash = ~g_attrCurrent & 0xff;
+    لفظ_2    attrFlash = ~g_attrCurrent & 0xff;
 
     DWORD   dwDummy;
-    LPWORD  oldattrs = NULL;
+    LPWORD  oldattrs = عدم;
 
 # ifdef FEAT_TERMGUICOLORS
-    if (!(p_tgc || t_colors >= 256))
+    إذا (!(p_tgc || t_colors >= 256))
 # endif
     {
-	oldattrs = ALLOC_MULT(WORD, Rows * Columns);
-	if (oldattrs == NULL)
-	    return;
-	ReadConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	oldattrs = ALLOC_MULT(لفظ_2, صفاں * Columns);
+	إذا (oldattrs == عدم)
+	    أرجع;
+	ReadConsoleOutputAttribute(g_h_Con_باہرلا, oldattrs, صفاں * Columns,
 			       coordOrigin, &dwDummy);
     }
 
-    FillConsoleOutputAttribute(g_hConOut, attrFlash, Rows * Columns,
+    FillConsoleOutputAttribute(g_h_Con_باہرلا, attrFlash, صفاں * Columns,
 			       coordOrigin, &dwDummy);
 
     Sleep(15);	    // wait for 15 msec
 
-    if (oldattrs != NULL)
+    إذا (oldattrs != عدم)
     {
-	WriteConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
+	WriteConsoleOutputAttribute(g_h_Con_باہرلا, oldattrs, صفاں * Columns,
 				coordOrigin, &dwDummy);
 	vim_free(oldattrs);
     }
@@ -7235,19 +7235,19 @@ visual_bell(void)
 /*
  * Make the cursor visible or invisible
  */
-    static void
+    ساكن فراغ
 cursor_visible(BOOL fVisible)
 {
     s_cursor_visible = fVisible;
 
-    if (vtp_working)
+    إذا (vtp_working)
     {
 	// In vtp mode, visibility is controlled solely by DECTCEM.  Skip
 	// mch_update_cursor() since shape is independent of visibility and
 	// re-emitting DECSCUSR can cause the terminal to briefly redisplay
 	// the cursor while a redraw is in progress.
 	vtp_printf("\033[?25%c", fVisible ? 'h' : 'l');
-	return;
+	أرجع;
     }
 
 # ifdef MCH_CURSOR_SHAPE
@@ -7263,201 +7263,201 @@ cursor_visible(BOOL fVisible)
  * Write "cbToWrite" bytes in `pchBuf' to the screen.
  * Returns the number of bytes actually written (at least one).
  */
-    static DWORD
+    ساكن DWORD
 write_chars(
     char_u *pchBuf,
-    DWORD  cbToWrite)
+    DWORD  cb_منزل_Write)
 {
     COORD	    coord = g_coord;
     DWORD	    written;
     DWORD	    n, cchwritten;
-    static DWORD    cells;
-    static WCHAR    *unicodebuf = NULL;
-    static int	    unibuflen = 0;
-    static int	    length;
-    int		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
-    static WCHAR    *utf8spbuf = NULL;
-    static int	    utf8splength;
-    static DWORD    utf8spcells;
-    static WCHAR    **utf8usingbuf = &unicodebuf;
+    ساكن DWORD    cells;
+    ساكن WCHAR    *unicodebuf = عدم;
+    ساكن صحيح	    unibuflen = 0;
+    ساكن صحيح	    لمائی;
+    صحيح		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
+    ساكن WCHAR    *utf8spbuf = عدم;
+    ساكن صحيح	    utf8splength;
+    ساكن DWORD    utf8spcells;
+    ساكن WCHAR    **utf8usingbuf = &unicodebuf;
 
-    if (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
+    إذا (cb_منزل_Write != 1 || *pchBuf != ' ' || !enc_utf8)
     {
 	utf8usingbuf = &unicodebuf;
-	do
+	افعل
 	{
-	    length = MultiByteToWideChar(cp, 0, (LPCSTR)pchBuf, cbToWrite,
+	    لمائی = Multi_Byte_منزل_Wide_Char(cp, 0, (LPCSTR)pchBuf, cb_منزل_Write,
 							unicodebuf, unibuflen);
-	    if (length && length <= unibuflen)
-		break;
+	    إذا (لمائی && لمائی <= unibuflen)
+		اكسر;
 	    vim_free(unicodebuf);
-	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : NULL;
-	    unibuflen = unibuflen ? 0 : length;
-	} while (TRUE);
-	cells = mb_string2cells(pchBuf, cbToWrite);
+	    unicodebuf = لمائی ? LALLOC_MULT(WCHAR, لمائی) : عدم;
+	    unibuflen = unibuflen ? 0 : لمائی;
+	} طالما (TRUE);
+	cells = mb_string2cells(pchBuf, cb_منزل_Write);
     }
-    else // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
+    وإلا // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
     {
-	if (utf8usingbuf != &utf8spbuf)
+	إذا (utf8usingbuf != &utf8spbuf)
 	{
-	    if (utf8spbuf == NULL)
+	    إذا (utf8spbuf == عدم)
 	    {
 		cells = mb_string2cells((char_u *)" ", 1);
-		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, NULL, 0);
-		utf8spbuf = LALLOC_MULT(WCHAR, length);
-		if (utf8spbuf != NULL)
+		لمائی = Multi_Byte_منزل_Wide_Char(CP_UTF8, 0, " ", 1, عدم, 0);
+		utf8spbuf = LALLOC_MULT(WCHAR, لمائی);
+		إذا (utf8spbuf != عدم)
 		{
-		    MultiByteToWideChar(CP_UTF8, 0, " ", 1, utf8spbuf, length);
+		    Multi_Byte_منزل_Wide_Char(CP_UTF8, 0, " ", 1, utf8spbuf, لمائی);
 		    utf8usingbuf = &utf8spbuf;
-		    utf8splength = length;
+		    utf8splength = لمائی;
 		    utf8spcells = cells;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		utf8usingbuf = &utf8spbuf;
-		length = utf8splength;
+		لمائی = utf8splength;
 		cells = utf8spcells;
 	    }
 	}
     }
 
-    if (!USE_VTP)
+    إذا (!USE_VTP)
     {
-	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, cells,
+	FillConsoleOutputAttribute(g_h_Con_باہرلا, g_attrCurrent, cells,
 				    coord, &written);
 	// When writing fails or didn't write a single character, pretend one
 	// character was written, otherwise we get stuck.
-	if (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
+	إذا (WriteConsoleOutputCharacterW(g_h_Con_باہرلا, *utf8usingbuf, لمائی,
 		    coord, &cchwritten) == 0
 		|| cchwritten == 0 || cchwritten == (DWORD)-1)
 	    cchwritten = 1;
     }
-    else
+    وإلا
     {
-	if (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
-		    NULL) == 0 || cchwritten == 0)
+	إذا (WriteConsoleW(g_h_Con_باہرلا, *utf8usingbuf, لمائی, &cchwritten,
+		    عدم) == 0 || cchwritten == 0)
 	    cchwritten = 1;
     }
 
-    if (cchwritten == (DWORD)length)
+    إذا (cchwritten == (DWORD)لمائی)
     {
-	written = cbToWrite;
+	written = cb_منزل_Write;
 	g_coord.X += (SHORT)cells;
     }
-    else
+    وإلا
     {
 	char_u *p = pchBuf;
-	for (n = 0; n < cchwritten; n++)
+	لكل (n = 0; n < cchwritten; n++)
 	    MB_CPTR_ADV(p);
 	written = p - pchBuf;
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    طالما (g_coord.X > g_srScrollRegion.دایاں_3)
     {
 	g_coord.X -= (SHORT) Columns;
-	if (g_coord.Y < g_srScrollRegion.Bottom)
+	إذا (g_coord.Y < g_srScrollRegion.Bottom)
 	    g_coord.Y++;
     }
 
     // Cursor under VTP is always in the correct position, no need to reset.
-    if (!USE_VTP)
+    إذا (!USE_VTP)
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 
-    return written;
+    أرجع written;
 }
 
-    static char_u *
+    ساكن char_u *
 get_seq(
-    int *args,
-    int *count,
-    char_u *head)
+    صحيح *دلیلاں,
+    صحيح *گنتی,
+    char_u *سر)
 {
-    int argc;
+    صحيح argc;
     char_u *p;
 
-    if (head == NULL || *head != '\033')
-	return NULL;
+    إذا (سر == عدم || *سر != '\033')
+	أرجع عدم;
 
     argc = 0;
-    p = head;
+    p = سر;
     ++p;
-    do
+    افعل
     {
 	++p;
-	args[argc] = getdigits(&p);
+	دلیلاں[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
-    } while (*p == ';');
-    *count = argc;
+    } طالما (*p == ';');
+    *گنتی = argc;
 
-    return p;
+    أرجع p;
 }
 
-    static char_u *
+    ساكن char_u *
 get_sgr(
-    int *args,
-    int *count,
-    char_u *head)
+    صحيح *دلیلاں,
+    صحيح *گنتی,
+    char_u *سر)
 {
-    char_u *p = get_seq(args, count, head);
+    char_u *p = get_seq(دلیلاں, گنتی, سر);
 
-    return (p && *p == 'm') ? ++p : NULL;
+    أرجع (p && *p == 'm') ? ++p : عدم;
 }
 
 /*
  * Pointer to next if SGR (^[[n;2;*;*;*m), NULL otherwise.
  */
-    static char_u *
+    ساكن char_u *
 sgrn2(
-    char_u *head,
-    int	   n)
+    char_u *سر,
+    صحيح	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    صحيح argc;
+    صحيح دلیلاں[16];
+    char_u *p = get_sgr(دلیلاں, &argc, سر);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    أرجع p && argc == 5 && دلیلاں[0] == n && دلیلاں[1] == 2 ? p : عدم;
 }
 
 /*
  * Pointer to next if SGR(^[[nm)<space>ESC, NULL otherwise.
  */
-    static char_u *
+    ساكن char_u *
 sgrnc(
-    char_u *head,
-    int	   n)
+    char_u *سر,
+    صحيح	   n)
 {
-    int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    صحيح argc;
+    صحيح دلیلاں[16];
+    char_u *p = get_sgr(دلیلاں, &argc, سر);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
-								    ? p : NULL;
+    أرجع p && argc == 1 && دلیلاں[0] == n && (p = skipwhite(p)) && *p == '\033'
+								    ? p : عدم;
 }
 
-    static char_u *
+    ساكن char_u *
 skipblank(char_u *q)
 {
     char_u *p = q;
 
-    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+    طالما (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 	++p;
-    return p;
+    أرجع p;
 }
 
 /*
  * Pointer to the next if any whitespace that may follow SGR is ESC, otherwise
  * NULL.
  */
-    static char_u *
+    ساكن char_u *
 sgrn2c(
-    char_u *head,
-    int	   n)
+    char_u *سر,
+    صحيح	   n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(سر, n);
 
-    return p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
+    أرجع p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : عدم;
 }
 
 /*
@@ -7465,38 +7465,38 @@ sgrn2c(
  * a pointer to the character following the newline is returned.
  * Otherwise NULL.
  */
-    static char_u *
+    ساكن char_u *
 sgrn2cn(
-    char_u *head,
-    int n)
+    char_u *سر,
+    صحيح n)
 {
-    char_u *p = sgrn2(head, n);
+    char_u *p = sgrn2(سر, n);
 
-    return p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
+    أرجع p && p[0] == 0x0a && p[1] == '\033' ? ++p : عدم;
 }
 
-static bool in_dcs = false;	// inside a DCS (sixel) sequence
-static bool dcs_esc = false;	// last DCS byte written was ESC
+ساكن bool وچ_dcs = false;	// inside a DCS (sixel) sequence
+ساكن bool dcs_esc = false;	// last DCS byte written was ESC
 
 /*
  * Write "len" bytes at "s" with WriteConsoleW, so that the console's own VT
  * parser processes them.  Needed for DCS sequences when USE_VTP is off.
  */
-    static void
-write_vt(char_u *s, int len)
+    ساكن فراغ
+write_vt(char_u *s, صحيح len)
 {
-    int		wlen;
+    صحيح		wlen;
     WCHAR	*ws;
     DWORD	written;
 
-    wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, NULL, 0);
-    if (wlen <= 0)
-	return;
+    wlen = Multi_Byte_منزل_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, عدم, 0);
+    إذا (wlen <= 0)
+	أرجع;
     ws = ALLOC_MULT(WCHAR, wlen);
-    if (ws == NULL)
-	return;
-    MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
-    WriteConsoleW(g_hConOut, ws, wlen, &written, NULL);
+    إذا (ws == عدم)
+	أرجع;
+    Multi_Byte_منزل_Wide_Char(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
+    WriteConsoleW(g_h_Con_باہرلا, ws, wlen, &written, عدم);
     vim_free(ws);
 }
 
@@ -7505,171 +7505,171 @@ write_vt(char_u *s, int len)
  * Returns "end" when the ST is not in this chunk; "in_dcs" then stays set so
  * that the next mch_write() call continues the scan.
  */
-    static char_u *
-skip_dcs(char_u *s, char_u *end)
+    ساكن char_u *
+skip_dcs(char_u *s, char_u *سرا)
 {
-    for (char_u *p = s; p < end; ++p)
+    لكل (char_u *p = s; p < سرا; ++p)
     {
-	if (dcs_esc && *p == '\\')
+	إذا (dcs_esc && *p == '\\')
 	{
 	    dcs_esc = false;
-	    in_dcs = false;
-	    return p + 1;
+	    وچ_dcs = false;
+	    أرجع p + 1;
 	}
 	dcs_esc = *p == ESC;
     }
-    return end;
+    أرجع سرا;
 }
 
 /*
  * mch_write(): write the output buffer to the screen, translating ESC
  * sequences into calls to console output routines.
  */
-    void
+    فراغ
 mch_write(
     char_u  *s,
-    int	    len)
+    صحيح	    len)
 {
-    char_u  *end = s + len;
+    char_u  *سرا = s + len;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    إذا (gui.وچ_use)
+	أرجع;
 # endif
 
-    if (!term_console)
+    إذا (!رکن_console)
     {
-	write(1, s, (unsigned)len);
-	return;
+	اكتب(1, s, (بنانشانی)len);
+	أرجع;
     }
 
     // translate ESC | sequences into faked bios calls
-    while (len--)
+    طالما (len--)
     {
-	int prefix = -1;
+	صحيح اگیتر = -1;
 	char_u ch;
 
 	// While processing a sequence, on rare occasions it seems that another
 	// sequence may be inserted asynchronously.
-	if (len < 0)
+	إذا (len < 0)
 	{
 	    redraw_all_later(UPD_CLEAR);
-	    return;
+	    أرجع;
 	}
 
-	if (in_dcs)
+	إذا (وچ_dcs)
 	{
 	    // Continuation of a DCS sequence split over several writes.
-	    int	l = (int)(skip_dcs(s, end) - s);
+	    صحيح	l = (صحيح)(skip_dcs(s, سرا) - s);
 
-	    if (vtp_working)
+	    إذا (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
-	    continue;
+	    استمر;
 	}
 
-	while (s + ++prefix < end)
+	طالما (s + ++اگیتر < سرا)
 	{
-	    ch = s[prefix];
-	    if (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
+	    ch = s[اگیتر];
+	    إذا (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
 						&& ch != '\a' && ch != '\033'))
-		break;
+		اكسر;
 	}
 
-	if (p_wd)
+	إذا (p_wd)
 	{
 	    WaitForChar(p_wd, FALSE);
-	    if (prefix != 0)
-		prefix = 1;
+	    إذا (اگیتر != 0)
+		اگیتر = 1;
 	}
 
-	if (prefix != 0)
+	إذا (اگیتر != 0)
 	{
 	    DWORD nWritten;
 
-	    nWritten = write_chars(s, prefix);
+	    nWritten = write_chars(s, اگیتر);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, حجم(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
 	    len -= (nWritten - 1);
 	    s += nWritten;
 	}
-	else if (s[0] == '\n')
+	وإلا إذا (s[0] == '\n')
 	{
 	    // \n, newline: go to the beginning of the next line or scroll
-	    if (g_coord.Y == g_srScrollRegion.Bottom)
+	    إذا (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
-		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
+		gotoxy(g_srScrollRegion.بایاں_3 + 1, g_srScrollRegion.Bottom + 1);
 	    }
-	    else
+	    وإلا
 	    {
-		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
+		gotoxy(g_srScrollRegion.بایاں_3 + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 		fputs("\\n\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\r')
+	وإلا إذا (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
-	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
+	    gotoxy(g_srScrollRegion.بایاں_3+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 		fputs("\\r\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\b')
+	وإلا إذا (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    إذا (g_coord.X > g_srScrollRegion.بایاں_3)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    وإلا إذا (g_coord.Y > g_srScrollRegion.چوٹی_2)
 	    {
-		g_coord.X = g_srScrollRegion.Right;
+		g_coord.X = g_srScrollRegion.دایاں_3;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 		fputs("\\b\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\a')
+	وإلا إذا (s[0] == '\a')
 	{
 	    // \a, bell
-	    MessageBeep(0xFFFFFFFF);
+	    سنیہا_Beep(0xFFFFFFFF);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 		fputs("\\a\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '|')
+	وإلا إذا (s[0] == ESC && len >= 3-1 && s[1] == '|')
 	{
 # ifdef MCH_WRITE_DUMP
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    صحيح	    arg1 = 0, arg2 = 0, argc = 0, دلیلاں[16];
 	    char_u  *sp;
 
-	    switch (s[2])
+	    بدل (s[2])
 	    {
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
-		    goto notsgr;
+	    حالة '0': حالة '1': حالة '2': حالة '3': حالة '4':
+	    حالة '5': حالة '6': حالة '7': حالة '8': حالة '9':
+		إذا (*(p = get_seq(دلیلاں, &argc, s)) != 'm')
+		    اذهب notsgr;
 
 		p = s;
 
@@ -7678,164 +7678,164 @@ mch_write(
 
 		// If resetFG,FG,BG,<cr>,BG,FG are connected, the preceding
 		// resetFG,FG,BG are omitted.
-		if (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
+		إذا (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
 		{
 		    p = sgrn2(sgrn2(sgrnc(p, 39), 38), 48);
-		    len = len + 1 - (int)(p - s);
+		    len = len + 1 - (صحيح)(p - s);
 		    s = p;
-		    break;
+		    اكسر;
 		}
 
 		// If FG,BG,BG,FG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
+		إذا (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
 		    p = sp;
 
 		// If FG,BG,FG,BG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
+		إذا (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
 		    p = sp;
 
 		// If BG,BG of SGR are connected, the first BG can be omitted.
-		if (sgrn2((sp = sgrn2(p, 48)), 48))
+		إذا (sgrn2((sp = sgrn2(p, 48)), 48))
 		    p = sp;
 
 		// If restoreFG and FG are connected, the restoreFG can be
 		// omitted.
-		if (sgrn2((sp = sgrnc(p, 39)), 38))
+		إذا (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
-		p = get_seq(args, &argc, p);
+		p = get_seq(دلیلاں, &argc, p);
 
 notsgr:
-		arg1 = args[0];
-		arg2 = args[1];
-		if (*p == 'm')
+		arg1 = دلیلاں[0];
+		arg2 = دلیلاں[1];
+		إذا (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    إذا (argc == 1 && دلیلاں[0] == 0)
 			normvideo();
-		    else if (argc == 1)
+		    وإلا إذا (argc == 1)
 		    {
-			if (USE_VTP)
-			    textcolor((WORD)arg1);
-			else
-			    textattr((WORD)arg1);
+			إذا (USE_VTP)
+			    textcolor((لفظ_2)arg1);
+			وإلا
+			    textattr((لفظ_2)arg1);
 		    }
-		    else if (vtp_working)
-			vtp_sgr_bulks(argc, args);
+		    وإلا إذا (vtp_working)
+			vtp_sgr_bulks(argc, دلیلاں);
 		}
-		else if (argc == 2 && *p == 'H')
+		وإلا إذا (argc == 2 && *p == 'H')
 		{
 		    gotoxy(arg2, arg1);
 		}
-		else if (argc == 2 && *p == 'r')
+		وإلا إذا (argc == 2 && *p == 'r')
 		{
-		    set_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
+		    سیٹ_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
 		}
-		else if (argc == 2 && *p == 'R')
+		وإلا إذا (argc == 2 && *p == 'R')
 		{
-		    set_scroll_region_tb(arg1, arg2);
+		    سیٹ_scroll_region_tb(arg1, arg2);
 		}
-		else if (argc == 2 && *p == 'V')
+		وإلا إذا (argc == 2 && *p == 'V')
 		{
-		    set_scroll_region_lr(arg1, arg2);
+		    سیٹ_scroll_region_lr(arg1, arg2);
 		}
-		else if (argc == 1 && *p == 'A')
+		وإلا إذا (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
-			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
+			   max(g_srScrollRegion.چوٹی_2, g_coord.Y - arg1) + 1);
 		}
-		else if (argc == 1 && *p == 'b')
+		وإلا إذا (argc == 1 && *p == 'b')
 		{
-		    textbackground((WORD) arg1);
+		    textbackground((لفظ_2) arg1);
 		}
-		else if (argc == 1 && *p == 'C')
+		وإلا إذا (argc == 1 && *p == 'C')
 		{
-		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
+		    gotoxy(min(g_srScrollRegion.دایاں_3, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
-		else if (argc == 1 && *p == 'f')
+		وإلا إذا (argc == 1 && *p == 'f')
 		{
-		    textcolor((WORD) arg1);
+		    textcolor((لفظ_2) arg1);
 		}
-		else if (argc == 1 && *p == 'H')
+		وإلا إذا (argc == 1 && *p == 'H')
 		{
 		    gotoxy(1, arg1);
 		}
-		else if (argc == 1 && *p == 'L')
+		وإلا إذا (argc == 1 && *p == 'L')
 		{
-		    insert_lines(arg1);
+		    داخل_کرو_سطریں(arg1);
 		}
-		else if (argc == 1 && *p == 'M')
+		وإلا إذا (argc == 1 && *p == 'M')
 		{
-		    delete_lines(arg1);
+		    delete_سطریں(arg1);
 		}
 
-		len -= (int)(p - s);
+		len -= (صحيح)(p - s);
 		s = p + 1;
-		break;
+		اكسر;
 
-	    case 'A':
+	    حالة 'A':
 		gotoxy(g_coord.X + 1,
-		       max(g_srScrollRegion.Top, g_coord.Y - 1) + 1);
-		goto got3;
+		       max(g_srScrollRegion.چوٹی_2, g_coord.Y - 1) + 1);
+		اذهب got3;
 
-	    case 'B':
+	    حالة 'B':
 		visual_bell();
-		goto got3;
+		اذهب got3;
 
-	    case 'C':
-		gotoxy(min(g_srScrollRegion.Right, g_coord.X + 1) + 1,
+	    حالة 'C':
+		gotoxy(min(g_srScrollRegion.دایاں_3, g_coord.X + 1) + 1,
 		       g_coord.Y + 1);
-		goto got3;
+		اذهب got3;
 
-	    case 'E':
-		termcap_mode_end();
-		goto got3;
+	    حالة 'E':
+		termcap_منوال_سرا();
+		اذهب got3;
 
-	    case 'F':
+	    حالة 'F':
 		standout();
-		goto got3;
+		اذهب got3;
 
-	    case 'f':
+	    حالة 'f':
 		standend();
-		goto got3;
+		اذهب got3;
 
-	    case 'H':
+	    حالة 'H':
 		gotoxy(1, 1);
-		goto got3;
+		اذهب got3;
 
-	    case 'j':
-		clear_to_end_of_display();
-		goto got3;
+	    حالة 'j':
+		clear_منزل_سرا_دا_display();
+		اذهب got3;
 
-	    case 'J':
+	    حالة 'J':
 		clear_screen();
-		goto got3;
+		اذهب got3;
 
-	    case 'K':
-		clear_to_end_of_line();
-		goto got3;
+	    حالة 'K':
+		clear_منزل_سرا_دا_سطر();
+		اذهب got3;
 
-	    case 'L':
-		insert_lines(1);
-		goto got3;
+	    حالة 'L':
+		داخل_کرو_سطریں(1);
+		اذهب got3;
 
-	    case 'M':
-		delete_lines(1);
-		goto got3;
+	    حالة 'M':
+		delete_سطریں(1);
+		اذهب got3;
 
-	    case 'S':
-		termcap_mode_start();
-		goto got3;
+	    حالة 'S':
+		termcap_منوال_شروع();
+		اذهب got3;
 
-	    case 'V':
+	    حالة 'V':
 		cursor_visible(TRUE);
-		goto got3;
+		اذهب got3;
 
-	    case 'v':
+	    حالة 'v':
 		cursor_visible(FALSE);
-		goto got3;
+		اذهب got3;
 
 	    got3:
 		s += 3;
@@ -7843,61 +7843,61 @@ notsgr:
 	    }
 
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 	    {
 		fputs("ESC | ", fdDump);
-		fwrite(old_s + 2, sizeof(char_u), s - old_s - 2, fdDump);
+		fwrite(old_s + 2, حجم(char_u), s - old_s - 2, fdDump);
 		fputc('\n', fdDump);
 	    }
 # endif
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '[')
+	وإلا إذا (s[0] == ESC && len >= 3-1 && s[1] == '[')
 	{
 	    // CSI sequences should not be written as plain text to the
 	    // console.  Parse the sequence and skip over it.  When
 	    // USE_VTP is active, pass through known safe ones (e.g.
 	    // DECSCUSR for cursor shape) via vtp_printf().
-	    int l = 2;
+	    صحيح l = 2;
 
 	    // skip parameter and intermediate bytes (0x20-0x3F)
-	    while (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
+	    طالما (s + l < سرا && s[l] >= 0x20 && s[l] <= 0x3F)
 		l++;
 	    // skip the final byte (0x40-0x7E)
-	    if (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
+	    إذا (s + l < سرا && s[l] >= 0x40 && s[l] <= 0x7E)
 	    {
 		// DECSCUSR (cursor style): pass through to terminal
-		if (USE_VTP && s[l] == 'q')
+		إذا (USE_VTP && s[l] == 'q')
 		    vtp_printf("%.*s", l + 1, s);
 		l++;
 	    }
 	    len -= l - 1;
 	    s += l;
 	}
-	else if (s[0] == ESC && len >= 2-1 && s[1] == 'P')
+	وإلا إذا (s[0] == ESC && len >= 2-1 && s[1] == 'P')
 	{
 	    // DCS (e.g. sixel image): write_chars() would print it as raw text
 	    // when USE_VTP is off, so let the console's VT parser handle it.
-	    int	l;
+	    صحيح	l;
 
-	    in_dcs = true;
+	    وچ_dcs = true;
 	    dcs_esc = false;
-	    l = (int)(skip_dcs(s + 2, end) - s);
-	    if (vtp_working)
+	    l = (صحيح)(skip_dcs(s + 2, سرا) - s);
+	    إذا (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	}
-	else
+	وإلا
 	{
 	    // Write a single character
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    إذا (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, حجم(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
@@ -7908,63 +7908,63 @@ notsgr:
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    إذا (fdDump)
 	fflush(fdDump);
 # endif
 }
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    void
+#وإلا // FEAT_GUI_MSWIN && !VIMDLL
+    فراغ
 mch_write(
-    char_u  *s UNUSED,
-    int	    len UNUSED)
+    char_u  *s بن_ورتیا,
+    صحيح	    len بن_ورتیا)
 {
     // never used
 }
 
-#endif
+#جے_انت
 
 
 /*
  * Delay for "msec" milliseconds.
  */
-    void
+    فراغ
 mch_delay(
-    long    msec,
-    int	    flags UNUSED)
+    لما    msec,
+    صحيح	    flags بن_ورتیا)
 {
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    Sleep((int)msec);	    // never wait for input
-#else // Console
+#إذا defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    Sleep((صحيح)msec);	    // never wait for input
+#وإلا // Console
 # ifdef VIMDLL
-    if (gui.in_use)
+    إذا (gui.وچ_use)
     {
-	Sleep((int)msec);	    // never wait for input
-	return;
+	Sleep((صحيح)msec);	    // never wait for input
+	أرجع;
     }
 # endif
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    إذا (flags & MCH_DELAY_IGNOREINPUT)
 # ifdef FEAT_MZSCHEME
-	if (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
+	إذا (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
 	{
-	    int towait = p_mzq;
+	    صحيح towait = p_mzq;
 
 	    // if msec is large enough, wait by portions in p_mzq
-	    while (msec > 0)
+	    طالما (msec > 0)
 	    {
-		mzvim_check_threads();
-		if (msec < towait)
+		mzvim_check_دھاگے();
+		إذا (msec < towait)
 		    towait = msec;
 		Sleep(towait);
 		msec -= towait;
 	    }
 	}
-	else
+	وإلا
 # endif
-	    Sleep((int)msec);
-    else
+	    Sleep((صحيح)msec);
+    وإلا
 	WaitForChar(msec, FALSE);
-#endif
+#جے_انت
 }
 
 
@@ -7973,77 +7973,77 @@ mch_delay(
  * This can also remove a symbolic link like Unix.
  * Return 0 for success, -1 for failure.
  */
-    int
+    صحيح
 mch_remove(char_u *name)
 {
     WCHAR	*wn;
-    int		n;
+    صحيح		n;
 
     /*
      * On Windows, deleting a directory's symbolic link is done by
      * RemoveDirectory(): mch_rmdir.  It seems unnatural, but it is fact.
      */
-    if (mch_isdir(name) && mch_is_symbolic_link(name))
-	return mch_rmdir(name);
+    إذا (mch_isdir(name) && mch_is_symbolic_link(name))
+	أرجع mch_rmdir(name);
 
-    win32_setattrs(name, FILE_ATTRIBUTE_NORMAL);
+    win32_setattrs(name, FILE_ATTRIBUTE_عام);
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_منزل_utf16(name, عدم);
+    إذا (wn == عدم)
+	أرجع -1;
 
     n = DeleteFileW(wn) ? 0 : -1;
     vim_free(wn);
-    return n;
+    أرجع n;
 }
 
 
 /*
  * Check for an "interrupt signal": CTRL-break or CTRL-C.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    فراغ
+mch_breakcheck(صحيح force بن_ورتیا)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    إذا (!gui.وچ_use)
 # endif
-	if (g_fCtrlCPressed || g_fCBrkPressed)
+	إذا (g_fCtrlCPressed || g_fCBrkPressed)
 	{
 	    ctrl_break_was_pressed = g_fCBrkPressed;
 	    g_fCtrlCPressed = g_fCBrkPressed = FALSE;
 	    got_int = TRUE;
 	}
-#endif
+#جے_انت
 }
 
 // physical RAM to leave for the OS
-#define WINNT_RESERVE_BYTES     (256*1024*1024)
+#تعریف_کرو WINNT_RESERVE_بائٹاں     (256*1024*1024)
 
 /*
  * How much main memory in KiB that can be used by VIM.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_کل_mem(صحيح special بن_ورتیا)
 {
     MEMORYSTATUSEX  ms;
 
     // Need to use GlobalMemoryStatusEx() when there is more memory than
     // what fits in 32 bits.
-    ms.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&ms);
-    if (ms.ullAvailVirtual < ms.ullTotalPhys)
+    ms.dw_لمائی = حجم(MEMORYSTATUSEX);
+    Global_حافظہ_حالت_Ex(&ms);
+    إذا (ms.ullAvailVirtual < ms.ull_کل_Phys)
     {
 	// Process address space fits in physical RAM, use all of it.
-	return (long_u)(ms.ullAvailVirtual / 1024);
+	أرجع (long_u)(ms.ullAvailVirtual / 1024);
     }
-    if (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
+    إذا (ms.ull_کل_Phys <= WINNT_RESERVE_بائٹاں)
     {
 	// Catch old NT box or perverse hardware setup.
-	return (long_u)((ms.ullTotalPhys / 2) / 1024);
+	أرجع (long_u)((ms.ull_کل_Phys / 2) / 1024);
     }
     // Use physical RAM less reserve for OS + data.
-    return (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
+    أرجع (long_u)((ms.ull_کل_Phys - WINNT_RESERVE_بائٹاں) / 1024);
 }
 
 /*
@@ -8052,13 +8052,13 @@ mch_total_mem(int special UNUSED)
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    صحيح
 mch_expandpath(
     garray_T	*gap,
-    char_u	*path,
-    int		flags)		// EW_* flags
+    char_u	*رستہ,
+    صحيح		flags)		// EW_* flags
 {
-    return dos_expandpath(gap, path, 0, flags, FALSE);
+    أرجع dos_expandpath(gap, رستہ, 0, flags, FALSE);
 }
 
 /*
@@ -8070,56 +8070,56 @@ mch_expandpath(
  * Like rename(), returns 0 upon success, non-zero upon failure.
  * Should probably set errno appropriately when errors occur.
  */
-    int
+    صحيح
 mch_wrename(WCHAR *wold, WCHAR *wnew)
 {
     WCHAR	*p;
     WCHAR	*q;
-    WCHAR	szTempFile[_MAX_PATH + 1];
-    WCHAR	szNewPath[_MAX_PATH + 1];
+    WCHAR	sz_عارضی_File[MAX_رستہ_2 + 1];
+    WCHAR	sz_New_رستہ[MAX_رستہ_2 + 1];
     HANDLE	hf;
 
     // No need to play tricks unless the file name contains a "~" as the
     // seventh character.
-    for (p = q = wold; *p != L'\0'; ++p)
+    لكل (p = q = wold; *p != L'\0'; ++p)
     {
-	switch (*p)
+	بدل (*p)
 	{
-	case L'/':
-	case L'\\':
-	case L':':
-	    if (*(p + 1) != L'\0')
+	حالة L'/':
+	حالة L'\\':
+	حالة L':':
+	    إذا (*(p + 1) != L'\0')
 		q = p + 1;	    // point to the character after the path
 				    // separator.
-	    break;
+	    اكسر;
 
-	default:
-	    break;
+	افتراضي:
+	    اكسر;
 	}
     }
 
     // If the length of the file name is less than 8 characters or the seventh
     // character is not a "~', do a normal move.
-    if ((int)(p - q) < 8 || q[6] != L'~')
-	return (MoveFileW(wold, wnew) == 0);
+    إذا ((صحيح)(p - q) < 8 || q[6] != L'~')
+	أرجع (MoveFileW(wold, wnew) == 0);
 
     // Get base path of new file name.  Undocumented feature: If pszNewFile is
     // a directory, no error is returned and pszFilePart will be NULL.
-    if (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
-	return -1;
+    إذا (Get_بھریا_رستہ_Name_W(wnew, MAX_رستہ_2, sz_New_رستہ, &p) == 0 || p == عدم)
+	أرجع -1;
     *p = NUL;
 
     // Get (and create) a unique temporary file name in directory of new file
-    if (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
-	return -2;
+    إذا (Get_عارضی_File_Name_W(sz_New_رستہ, L"VIM", 0, sz_عارضی_File) == 0)
+	أرجع -2;
 
     // blow the temp file away
-    if (!DeleteFileW(szTempFile))
-	return -3;
+    إذا (!DeleteFileW(sz_عارضی_File))
+	أرجع -3;
 
     // rename old file to the temp file
-    if (!MoveFileW(wold, szTempFile))
-	return -4;
+    إذا (!MoveFileW(wold, sz_عارضی_File))
+	أرجع -4;
 
     // now create an empty file called pszOldFile; this prevents the operating
     // system using pszOldFile as an alias (SFN) if we're renaming within the
@@ -8130,29 +8130,29 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // cause all sorts of problems later in buf_write().  So, we create an
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
-    if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-	return -5;
-    if (!CloseHandle(hf))
-	return -6;
+    إذا ((hf = CreateFileW(wold, GENERIC_WRITE, 0, عدم, CREATE_NEW,
+		    FILE_ATTRIBUTE_عام, عدم)) == INVALID_HANDLE_قدر)
+	أرجع -5;
+    إذا (!CloseHandle(hf))
+	أرجع -6;
 
     // rename the temp file to the new file
-    if (!MoveFileW(szTempFile, wnew))
+    إذا (!MoveFileW(sz_عارضی_File, wnew))
     {
 	// Renaming failed.  Rename the file back to its old name, so that it
 	// looks like nothing happened.
-	(void)MoveFileW(szTempFile, wold);
-	return -7;
+	(فراغ)MoveFileW(sz_عارضی_File, wold);
+	أرجع -7;
     }
 
     // Seems to be left around on Novell filesystems
-    DeleteFileW(szTempFile);
+    DeleteFileW(sz_عارضی_File);
 
     // finally, remove the empty old file
-    if (!DeleteFileW(wold))
-	return -8;
+    إذا (!DeleteFileW(wold))
+	أرجع -8;
 
-    return 0;
+    أرجع 0;
 }
 
 
@@ -8160,159 +8160,159 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
  * Converts the filenames to UTF-16, then call mch_wrename().
  * Like rename(), returns 0 upon success, non-zero upon failure.
  */
-    int
+    صحيح
 mch_rename(
-    const char	*pszOldFile,
-    const char	*pszNewFile)
+    ثابت حرف	*pszOldFile,
+    ثابت حرف	*pszNewFile)
 {
-    WCHAR	*wold = NULL;
-    WCHAR	*wnew = NULL;
-    int		retval = -1;
+    WCHAR	*wold = عدم;
+    WCHAR	*wnew = عدم;
+    صحيح		retval = -1;
 
-    wold = enc_to_utf16((char_u *)pszOldFile, NULL);
-    wnew = enc_to_utf16((char_u *)pszNewFile, NULL);
-    if (wold != NULL && wnew != NULL)
+    wold = enc_منزل_utf16((char_u *)pszOldFile, عدم);
+    wnew = enc_منزل_utf16((char_u *)pszNewFile, عدم);
+    إذا (wold != عدم && wnew != عدم)
 	retval = mch_wrename(wold, wnew);
     vim_free(wold);
     vim_free(wnew);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Get the default shell for the current hardware platform
  */
-    char *
-default_shell(void)
+    حرف *
+default_shell(فراغ)
 {
-    return "cmd.exe";
+    أرجع "cmd.exe";
 }
 
 /*
  * mch_access() extends access() to do more detailed check on network drives.
  * Returns 0 if file "n" has access rights according to "p", -1 otherwise.
  */
-    int
-mch_access(char *n, int p)
+    صحيح
+mch_access(حرف *n, صحيح p)
 {
     HANDLE	hFile;
-    int		retval = -1;	    // default: fail
+    صحيح		retval = -1;	    // default: fail
     WCHAR	*wn;
 
-    wn = enc_to_utf16((char_u *)n, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_منزل_utf16((char_u *)n, عدم);
+    إذا (wn == عدم)
+	أرجع -1;
 
-    if (mch_isdir((char_u *)n))
+    إذا (mch_isdir((char_u *)n))
     {
-	WCHAR TempNameW[_MAX_PATH + 16] = L"";
+	WCHAR عارضی_Name_W[MAX_رستہ_2 + 16] = L"";
 
-	if (p & R_OK)
+	إذا (p & R_OK)
 	{
 	    // Read check is performed by seeing if we can do a find file on
 	    // the directory for any file.
-	    int			i;
-	    WIN32_FIND_DATAW    d;
+	    صحيح			i;
+	    WIN32_لبھو_DATAW    d;
 
-	    for (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
-		TempNameW[i] = wn[i];
-	    if (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
-		TempNameW[i++] = '\\';
-	    TempNameW[i++] = '*';
-	    TempNameW[i++] = 0;
+	    لكل (i = 0; i < MAX_رستہ_2 && wn[i] != 0; ++i)
+		عارضی_Name_W[i] = wn[i];
+	    إذا (عارضی_Name_W[i - 1] != '\\' && عارضی_Name_W[i - 1] != '/')
+		عارضی_Name_W[i++] = '\\';
+	    عارضی_Name_W[i++] = '*';
+	    عارضی_Name_W[i++] = 0;
 
-	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
-		goto getout;
-	    else
-		(void)FindClose(hFile);
+	    hFile = لبھو_پہلا_File_W(عارضی_Name_W, &d);
+	    إذا (hFile == INVALID_HANDLE_قدر)
+		اذهب getout;
+	    وإلا
+		(فراغ)لبھو_Close(hFile);
 	}
 
-	if (p & W_OK)
+	إذا (p & W_OK)
 	{
 	    // Trying to create a temporary file in the directory should catch
 	    // directories on read-only network shares.  However, in
 	    // directories whose ACL allows writes but denies deletes will end
 	    // up keeping the temporary file :-(.
-	    if (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
-		goto getout;
-	    else
-		DeleteFileW(TempNameW);
+	    إذا (!Get_عارضی_File_Name_W(wn, L"VIM", 0, عارضی_Name_W))
+		اذهب getout;
+	    وإلا
+		DeleteFileW(عارضی_Name_W);
 	}
     }
-    else
+    وإلا
     {
 	// Don't consider a file read-only if another process has opened it.
-	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	DWORD share_منوال = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
 	// Trying to open the file for the required access does ACL, read-only
 	// network share, and file attribute checks.
-	DWORD access_mode = ((p & W_OK) ? GENERIC_WRITE : 0)
+	DWORD access_منوال = ((p & W_OK) ? GENERIC_WRITE : 0)
 					     | ((p & R_OK) ? GENERIC_READ : 0);
 
-	hFile = CreateFileW(wn, access_mode, share_mode,
-					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
-	    goto getout;
+	hFile = CreateFileW(wn, access_منوال, share_منوال,
+					     عدم, OPEN_EXISTING, 0, عدم);
+	إذا (hFile == INVALID_HANDLE_قدر)
+	    اذهب getout;
 	CloseHandle(hFile);
     }
 
     retval = 0;	    // success
 getout:
     vim_free(wn);
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Version of open() that may use UTF-16 file name.
  */
-    int
-mch_open(const char *name, int flags, int mode)
+    صحيح
+mch_open(ثابت حرف *name, صحيح flags, صحيح منوال)
 {
     WCHAR	*wn;
-    int		f;
+    صحيح		f;
 
-    wn = enc_to_utf16((char_u *)name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_منزل_utf16((char_u *)name, عدم);
+    إذا (wn == عدم)
+	أرجع -1;
 
-    f = _wopen(wn, flags, mode);
+    f = _wopen(wn, flags, منوال);
     vim_free(wn);
-    return f;
+    أرجع f;
 }
 
 /*
  * Version of fopen() that uses UTF-16 file name.
  */
     FILE *
-mch_fopen(const char *name, const char *mode)
+mch_fopen(ثابت حرف *name, ثابت حرف *منوال)
 {
     WCHAR	*wn, *wm;
-    FILE	*f = NULL;
+    FILE	*f = عدم;
 
-#if defined(DEBUG) && _MSC_VER >= 1400
+#إذا defined(DEBUG) && _MSC_VER >= 1400
     // Work around an annoying assertion in the Microsoft debug CRT
     // when mode's text/binary setting doesn't match _get_fmode().
-    char newMode = mode[strlen(mode) - 1];
-    int oldMode = 0;
+    حرف new_منوال = منوال[لڑی_لمبائی(منوال) - 1];
+    صحيح old_منوال_2 = 0;
 
-    _get_fmode(&oldMode);
-    if (newMode == 't')
-	_set_fmode(_O_TEXT);
-    else if (newMode == 'b')
-	_set_fmode(_O_BINARY);
-#endif
-    wn = enc_to_utf16((char_u *)name, NULL);
-    wm = enc_to_utf16((char_u *)mode, NULL);
-    if (wn != NULL && wm != NULL)
+    _get_fmode(&old_منوال_2);
+    إذا (new_منوال == 't')
+	سیٹ_fmode(O_متن);
+    وإلا إذا (new_منوال == 'b')
+	سیٹ_fmode(O_ثنائی_2);
+#جے_انت
+    wn = enc_منزل_utf16((char_u *)name, عدم);
+    wm = enc_منزل_utf16((char_u *)منوال, عدم);
+    إذا (wn != عدم && wm != عدم)
 	f = _wfopen(wn, wm);
     vim_free(wn);
     vim_free(wm);
 
-#if defined(DEBUG) && _MSC_VER >= 1400
-    if (oldMode != 0)
-	_set_fmode(oldMode);
-#endif
-    return f;
+#إذا defined(DEBUG) && _MSC_VER >= 1400
+    إذا (old_منوال_2 != 0)
+	سیٹ_fmode(old_منوال_2);
+#جے_انت
+    أرجع f;
 }
 
 /*
@@ -8336,123 +8336,123 @@ mch_fopen(const char *name, const char *mode)
  * and write to stream "substream" of file "to".
  * Errors are ignored.
  */
-    static void
-copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
+    ساكن فراغ
+copy_substream(HANDLE sh, فراغ *context, WCHAR *منزل, WCHAR *substream, لما len)
 {
-    HANDLE  hTo;
-    WCHAR   *to_name;
+    HANDLE  h_منزل;
+    WCHAR   *منزل_name;
 
-    to_name = alloc((wcslen(to) + wcslen(substream) + 1) * sizeof(WCHAR));
-    if (to_name == NULL)
-	return;
+    منزل_name = alloc((wcslen(منزل) + wcslen(substream) + 1) * حجم(WCHAR));
+    إذا (منزل_name == عدم)
+	أرجع;
 
-    wcscpy(to_name, to);
-    wcscat(to_name, substream);
+    wcscpy(منزل_name, منزل);
+    wcscat(منزل_name, substream);
 
-    hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    h_منزل = CreateFileW(منزل_name, GENERIC_WRITE, 0, عدم, OPEN_ALWAYS,
+						 FILE_ATTRIBUTE_عام, عدم);
+    إذا (h_منزل != INVALID_HANDLE_قدر)
     {
-	long	done;
+	لما	پورا;
 	DWORD	todo;
 	DWORD	readcnt, written;
-	char	buf[4096];
+	حرف	buf[4096];
 
 	// Copy block of bytes at a time.  Abort when something goes wrong.
-	for (done = 0; done < len; done += written)
+	لكل (پورا = 0; پورا < len; پورا += written)
 	{
 	    // (size_t) cast for Borland C 5.5
-	    todo = (DWORD)((size_t)(len - done) > sizeof(buf) ? sizeof(buf)
-						       : (size_t)(len - done));
-	    if (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
+	    todo = (DWORD)((size_t)(len - پورا) > حجم(buf) ? حجم(buf)
+						       : (size_t)(len - پورا));
+	    إذا (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
 						       FALSE, FALSE, context)
 		    || readcnt != todo
-		    || !WriteFile(hTo, buf, todo, &written, NULL)
+		    || !WriteFile(h_منزل, buf, todo, &written, عدم)
 		    || written != todo)
-		break;
+		اكسر;
 	}
-	CloseHandle(hTo);
+	CloseHandle(h_منزل);
     }
 
-    free(to_name);
+    حرر(منزل_name);
 }
 
 /*
  * Copy info streams from file "from" to file "to".
  */
-    static void
-copy_infostreams(char_u *from, char_u *to)
+    ساكن فراغ
+copy_infostreams(char_u *from, char_u *منزل)
 {
     WCHAR		*fromw;
     WCHAR		*tow;
     HANDLE		sh;
-    WIN32_STREAM_ID	sid;
-    int			headersize;
-    WCHAR		streamname[_MAX_PATH];
+    WIN32_دھارا_ID	sid;
+    صحيح			headersize;
+    WCHAR		streamname[MAX_رستہ_2];
     DWORD		readcount;
-    void		*context = NULL;
+    فراغ		*context = عدم;
     DWORD		lo, hi;
-    int			len;
+    صحيح			len;
 
     // Convert the file names to wide characters.
-    fromw = enc_to_utf16(from, NULL);
-    tow = enc_to_utf16(to, NULL);
-    if (fromw != NULL && tow != NULL)
+    fromw = enc_منزل_utf16(from, عدم);
+    tow = enc_منزل_utf16(منزل, عدم);
+    إذا (fromw != عدم && tow != عدم)
     {
 	// Open the file for reading.
-	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
-			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, عدم,
+			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, عدم);
+	إذا (sh != INVALID_HANDLE_قدر)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
-	    for (;;)
+	    لكل (;;)
 	    {
 		// Get the header to find the length of the stream name.  If
 		// the "readcount" is zero we have done all info streams.
-		ZeroMemory(&sid, sizeof(WIN32_STREAM_ID));
-		headersize = (int)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
-		if (!BackupRead(sh, (LPBYTE)&sid, headersize,
+		Zero_حافظہ(&sid, حجم(WIN32_دھارا_ID));
+		headersize = (صحيح)((حرف *)&sid.c_دھارا_Name - (حرف *)&sid.dw_دھارا_Id);
+		إذا (!BackupRead(sh, (LPBYTE)&sid, headersize,
 					   &readcount, FALSE, FALSE, &context)
 			|| readcount == 0)
-		    break;
+		    اكسر;
 
 		// We only deal with streams that have a name.  The normal
 		// file data appears to be without a name, even though docs
 		// suggest it is called "::$DATA".
-		if (sid.dwStreamNameSize > 0)
+		إذا (sid.dw_دھارا_Name_ناپ > 0)
 		{
 		    // Read the stream name.
-		    if (!BackupRead(sh, (LPBYTE)streamname,
-							 sid.dwStreamNameSize,
+		    إذا (!BackupRead(sh, (LPBYTE)streamname,
+							 sid.dw_دھارا_Name_ناپ,
 					  &readcount, FALSE, FALSE, &context))
-			break;
+			اكسر;
 
 		    // Copy an info stream with a name ":anything:$DATA".
 		    // Skip "::$DATA", it has no stream name (examples suggest
 		    // it might be used for the normal file contents).
 		    // Note that BackupRead() counts bytes, but the name is in
 		    // wide characters.
-		    len = readcount / sizeof(WCHAR);
+		    len = readcount / حجم(WCHAR);
 		    streamname[len] = 0;
-		    if (len > 7 && wcsicmp(streamname + len - 6,
+		    إذا (len > 7 && wcsicmp(streamname + len - 6,
 							      L":$DATA") == 0)
 		    {
 			streamname[len - 6] = 0;
 			copy_substream(sh, &context, tow, streamname,
-						    (long)sid.Size.u.LowPart);
+						    (لما)sid.ناپ_2.u.کم_Part);
 		    }
 		}
 
 		// Advance to the next stream.  We might try seeking too far,
 		// but BackupSeek() doesn't skip over stream borders, thus
 		// that's OK.
-		(void)BackupSeek(sh, sid.Size.u.LowPart, sid.Size.u.HighPart,
+		(فراغ)BackupSeek(sh, sid.ناپ_2.u.کم_Part, sid.ناپ_2.u.بلند_Part,
 							  &lo, &hi, &context);
 	    }
 
 	    // Clear the context.
-	    (void)BackupRead(sh, NULL, 0, &readcount, TRUE, FALSE, &context);
+	    (فراغ)BackupRead(sh, عدم, 0, &readcount, TRUE, FALSE, &context);
 
 	    CloseHandle(sh);
 	}
@@ -8464,154 +8464,154 @@ copy_infostreams(char_u *from, char_u *to)
 /*
  * ntdll.dll definitions
  */
-#define FileEaInformation   7
-#ifndef STATUS_SUCCESS
-# define STATUS_SUCCESS	    ((NTSTATUS) 0x00000000L)
-#endif
+#تعریف_کرو FileEaInformation   7
+#جے_بنا_تعریف حالت_SUCCESS
+# define حالت_SUCCESS	    ((NTSTATUS) 0x00000000L)
+#جے_انت
 
-typedef struct _FILE_FULL_EA_INFORMATION_ {
-    ULONG  NextEntryOffset;
+تعريفنوع بنية FILE_بھریا_EA_INFORMATION {
+    ULONG  اگلا_اندراج_وتھ;
     UCHAR  Flags;
-    UCHAR  EaNameLength;
-    USHORT EaValueLength;
+    UCHAR  Ea_Name_لمائی;
+    USHORT Ea_قدر_لمائی;
     CHAR   EaName[1];
-} FILE_FULL_EA_INFORMATION_, *PFILE_FULL_EA_INFORMATION_;
+} FILE_بھریا_EA_INFORMATION_2, *PFILE_بھریا_EA_INFORMATION;
 
-typedef struct _FILE_EA_INFORMATION_ {
-    ULONG EaSize;
+تعريفنوع بنية _FILE_EA_INFORMATION_ {
+    ULONG Ea_ناپ;
 } FILE_EA_INFORMATION_, *PFILE_EA_INFORMATION_;
 
-#ifndef PROTO
-typedef NTSTATUS (NTAPI *PfnNtOpenFile)(
+#جے_بنا_تعریف PROTO
+تعريفنوع NTSTATUS (NTAPI *PfnNtOpenFile)(
 	PHANDLE FileHandle,
-	ACCESS_MASK DesiredAccess,
-	POBJECT_ATTRIBUTES ObjectAttributes,
-	PIO_STATUS_BLOCK IoStatusBlock,
+	ACCESS_نقاب DesiredAccess,
+	POBJECT_گن Object_گن,
+	PIO_حالت_بلاک Io_حالت_بلاک,
 	ULONG ShareAccess,
 	ULONG OpenOptions);
-typedef NTSTATUS (NTAPI *PfnNtClose)(
+تعريفنوع NTSTATUS (NTAPI *PfnNtClose)(
 	HANDLE Handle);
-typedef NTSTATUS (NTAPI *PfnNtSetEaFile)(
+تعريفنوع NTSTATUS (NTAPI *Pfn_Nt_سیٹ_Ea_File)(
 	HANDLE		    FileHandle,
-	PIO_STATUS_BLOCK    IoStatusBlock,
-	PVOID		    Buffer,
-	ULONG		    Length);
-typedef NTSTATUS (NTAPI *PfnNtQueryEaFile)(
+	PIO_حالت_بلاک    Io_حالت_بلاک,
+	PVOID		    بفر_2,
+	ULONG		    لمائی_2);
+تعريفنوع NTSTATUS (NTAPI *PfnNtQueryEaFile)(
 	HANDLE FileHandle,
-	PIO_STATUS_BLOCK IoStatusBlock,
-	PVOID Buffer,
-	ULONG Length,
-	BOOLEAN ReturnSingleEntry,
+	PIO_حالت_بلاک Io_حالت_بلاک,
+	PVOID بفر_2,
+	ULONG لمائی_2,
+	BOOLEAN Return_Single_اندراج,
 	PVOID EaList,
-	ULONG EaListLength,
-	PULONG EaIndex,
-	BOOLEAN RestartScan);
-typedef NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
+	ULONG Ea_List_لمائی,
+	PULONG Ea_اشاریہ,
+	BOOLEAN Restart_جانچ);
+تعريفنوع NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
 	HANDLE			FileHandle,
-	PIO_STATUS_BLOCK	IoStatusBlock,
+	PIO_حالت_بلاک	Io_حالت_بلاک,
 	PVOID			FileInformation,
-	ULONG			Length,
+	ULONG			لمائی_2,
 	FILE_INFORMATION_CLASS FileInformationClass);
-typedef VOID (NTAPI *PfnRtlInitUnicodeString)(
+تعريفنوع VOID (NTAPI *PfnRtlInitUnicodeString)(
 	PUNICODE_STRING DestinationString,
-	PCWSTR SourceString);
+	PCWSTR سروت_String);
 
-PfnNtOpenFile pNtOpenFile = NULL;
-PfnNtClose pNtClose = NULL;
-PfnNtSetEaFile pNtSetEaFile = NULL;
-PfnNtQueryEaFile pNtQueryEaFile = NULL;
-PfnNtQueryInformationFile pNtQueryInformationFile = NULL;
-PfnRtlInitUnicodeString pRtlInitUnicodeString = NULL;
-#endif
+PfnNtOpenFile pNtOpenFile = عدم;
+PfnNtClose pNtClose = عدم;
+Pfn_Nt_سیٹ_Ea_File p_Nt_سیٹ_Ea_File = عدم;
+PfnNtQueryEaFile pNtQueryEaFile = عدم;
+PfnNtQueryInformationFile pNtQueryInformationFile = عدم;
+PfnRtlInitUnicodeString pRtlInitUnicodeString = عدم;
+#جے_انت
 
 /*
  * Load ntdll.dll functions.
  */
-    static BOOL
-load_ntdll(void)
+    ساكن BOOL
+لدو_ntdll(فراغ)
 {
-    static int	loaded = -1;
+    ساكن صحيح	loaded = -1;
 
-    if (loaded != -1)
-	return (BOOL) loaded;
+    إذا (loaded != -1)
+	أرجع (BOOL) loaded;
 
     HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll != NULL)
+    إذا (hNtdll != عدم)
     {
-	pNtOpenFile = (PfnNtOpenFile) GetProcAddress(hNtdll, "NtOpenFile");
-	pNtClose = (PfnNtClose) GetProcAddress(hNtdll, "NtClose");
-	pNtSetEaFile = (PfnNtSetEaFile)
-	    GetProcAddress(hNtdll, "NtSetEaFile");
+	pNtOpenFile = (PfnNtOpenFile) Get_Proc_پتہ(hNtdll, "NtOpenFile");
+	pNtClose = (PfnNtClose) Get_Proc_پتہ(hNtdll, "NtClose");
+	p_Nt_سیٹ_Ea_File = (Pfn_Nt_سیٹ_Ea_File)
+	    Get_Proc_پتہ(hNtdll, "NtSetEaFile");
 	pNtQueryEaFile = (PfnNtQueryEaFile)
-	    GetProcAddress(hNtdll, "NtQueryEaFile");
+	    Get_Proc_پتہ(hNtdll, "NtQueryEaFile");
 	pNtQueryInformationFile = (PfnNtQueryInformationFile)
-	    GetProcAddress(hNtdll, "NtQueryInformationFile");
+	    Get_Proc_پتہ(hNtdll, "NtQueryInformationFile");
 	pRtlInitUnicodeString = (PfnRtlInitUnicodeString)
-	    GetProcAddress(hNtdll, "RtlInitUnicodeString");
+	    Get_Proc_پتہ(hNtdll, "RtlInitUnicodeString");
     }
-    if (pNtOpenFile == NULL
-	    || pNtClose == NULL
-	    || pNtSetEaFile == NULL
-	    || pNtQueryEaFile == NULL
-	    || pNtQueryInformationFile == NULL
-	    || pRtlInitUnicodeString == NULL)
+    إذا (pNtOpenFile == عدم
+	    || pNtClose == عدم
+	    || p_Nt_سیٹ_Ea_File == عدم
+	    || pNtQueryEaFile == عدم
+	    || pNtQueryInformationFile == عدم
+	    || pRtlInitUnicodeString == عدم)
 	loaded = FALSE;
-    else
+    وإلا
 	loaded = TRUE;
-    return (BOOL) loaded;
+    أرجع (BOOL) loaded;
 }
 
 /*
  * Copy extended attributes (EA) from file "from" to file "to".
  */
-    static void
-copy_extattr(char_u *from, char_u *to)
+    ساكن فراغ
+copy_extattr(char_u *from, char_u *منزل)
 {
-    char_u		    *fromf = NULL;
-    char_u		    *tof = NULL;
-    WCHAR		    *fromw = NULL;
-    WCHAR		    *tow = NULL;
+    char_u		    *fromf = عدم;
+    char_u		    *tof = عدم;
+    WCHAR		    *fromw = عدم;
+    WCHAR		    *tow = عدم;
     UNICODE_STRING	    u;
     HANDLE		    h;
-    OBJECT_ATTRIBUTES	    oa;
-    IO_STATUS_BLOCK	    iosb;
+    OBJECT_گن	    oa;
+    IO_حالت_بلاک	    iosb;
     FILE_EA_INFORMATION_    eainfo = {0};
-    void		    *ea = NULL;
+    فراغ		    *ea = عدم;
 
-    if (!load_ntdll())
-	return;
+    إذا (!لدو_ntdll())
+	أرجع;
 
     // Convert the file names to the fully qualified object names.
     fromf = alloc(STRLEN(from) + 5);
-    tof = alloc(STRLEN(to) + 5);
-    if (fromf == NULL || tof == NULL)
-	goto theend;
+    tof = alloc(STRLEN(منزل) + 5);
+    إذا (fromf == عدم || tof == عدم)
+	اذهب theend;
     STRCPY(fromf, "\\??\\");
     STRCPY(fromf + STRLEN_LITERAL("\\??\\"), from);
     STRCPY(tof, "\\??\\");
-    STRCPY(tof + STRLEN_LITERAL("\\??\\"), to);
+    STRCPY(tof + STRLEN_LITERAL("\\??\\"), منزل);
 
     // Convert the names to wide characters.
-    fromw = enc_to_utf16(fromf, NULL);
-    tow = enc_to_utf16(tof, NULL);
-    if (fromw == NULL || tow == NULL)
-	goto theend;
+    fromw = enc_منزل_utf16(fromf, عدم);
+    tow = enc_منزل_utf16(tof, عدم);
+    إذا (fromw == عدم || tow == عدم)
+	اذهب theend;
 
     // Get the EA.
     pRtlInitUnicodeString(&u, fromw);
-    InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-    if (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
-		FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	goto theend;
-    pNtQueryInformationFile(h, &iosb, &eainfo, sizeof(eainfo),
+    Initialize_Object_گن(&oa, &u, 0, عدم, عدم);
+    إذا (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
+		FILE_NON_DIRECTORY_FILE) != حالت_SUCCESS)
+	اذهب theend;
+    pNtQueryInformationFile(h, &iosb, &eainfo, حجم(eainfo),
 	    FileEaInformation);
-    if (eainfo.EaSize != 0)
+    إذا (eainfo.Ea_ناپ != 0)
     {
-	ea = alloc(eainfo.EaSize);
-	if (ea != NULL)
+	ea = alloc(eainfo.Ea_ناپ);
+	إذا (ea != عدم)
 	{
-	    if (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
-			NULL, 0, NULL, TRUE) != STATUS_SUCCESS)
+	    إذا (pNtQueryEaFile(h, &iosb, ea, eainfo.Ea_ناپ, FALSE,
+			عدم, 0, عدم, TRUE) != حالت_SUCCESS)
 	    {
 		VIM_CLEAR(ea);
 	    }
@@ -8620,15 +8620,15 @@ copy_extattr(char_u *from, char_u *to)
     pNtClose(h);
 
     // Set the EA.
-    if (ea != NULL)
+    إذا (ea != عدم)
     {
 	pRtlInitUnicodeString(&u, tow);
-	InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-	if (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
-		    FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	    goto theend;
+	Initialize_Object_گن(&oa, &u, 0, عدم, عدم);
+	إذا (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
+		    FILE_NON_DIRECTORY_FILE) != حالت_SUCCESS)
+	    اذهب theend;
 
-	pNtSetEaFile(h, &iosb, ea, eainfo.EaSize);
+	p_Nt_سیٹ_Ea_File(h, &iosb, ea, eainfo.Ea_ناپ);
 	pNtClose(h);
     }
 
@@ -8645,73 +8645,73 @@ theend:
  * For Windows NT and later we copy info streams.
  * Always returns zero, errors are ignored.
  */
-    int
-mch_copy_file_attribute(char_u *from, char_u *to)
+    صحيح
+mch_copy_file_attribute(char_u *from, char_u *منزل)
 {
     // File streams only work on Windows NT and later.
-    copy_infostreams(from, to);
-    copy_extattr(from, to);
-    return 0;
+    copy_infostreams(from, منزل);
+    copy_extattr(from, منزل);
+    أرجع 0;
 }
 
 
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
-static LPWSTR	*ArglistW = NULL;
-static int	global_argc = 0;
-static char	**global_argv;
+ساكن صحيح	n_دلیلاں_W = 0;
+ساكن LPWSTR	*ArglistW = عدم;
+ساكن صحيح	global_argc = 0;
+ساكن حرف	**global_argv;
 
-static int	used_file_argc = 0;	// last argument in global_argv[] used
+ساكن صحيح	ورتیا_file_argc = 0;	// last argument in global_argv[] used
 					// for the argument list.
-static int	*used_file_indexes = NULL; // indexes in global_argv[] for
+ساكن صحيح	*ورتیا_file_indexes = عدم; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
-static int	used_file_literal = FALSE;  // take file names literally
-static int	used_file_full_path = FALSE;  // file name was full path
-#ifdef FEAT_DIFF
-static int	used_file_diff_mode = FALSE;  // file name was with diff mode
-#endif
-static int	used_alist_count = 0;
+ساكن صحيح	ورتیا_file_گنتی = 0;	// nr of entries in used_file_indexes
+ساكن صحيح	ورتیا_file_literal = FALSE;  // take file names literally
+ساكن صحيح	ورتیا_file_بھریا_رستہ = FALSE;  // file name was full path
+#جے_تعریف_شدہ FEAT_DIFF
+ساكن صحيح	ورتیا_file_diff_منوال = FALSE;  // file name was with diff mode
+#جے_انت
+ساكن صحيح	ورتیا_alist_گنتی = 0;
 
 
 /*
  * Get the command line arguments.  Unicode version.
  * Returns argc.  Zero when something fails.
  */
-    int
-get_cmd_argsW(char ***argvp)
+    صحيح
+get_cmd_دلیلاں_W(حرف ***argvp)
 {
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    حرف	**argv = عدم;
+    صحيح		argc = 0;
+    صحيح		i;
 
-    free_cmd_argsW();
-    ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
-    if (ArglistW != NULL)
+    free_cmd_دلیلاں_W();
+    ArglistW = Command_سطر_منزل_Argv_W(Get_Command_سطر_W(), &n_دلیلاں_W);
+    إذا (ArglistW != عدم)
     {
-	argv = alloc((nArgsW + 1) * sizeof(char *));
-	if (argv != NULL)
+	argv = alloc((n_دلیلاں_W + 1) * حجم(حرف *));
+	إذا (argv != عدم)
 	{
-	    argc = nArgsW;
-	    argv[argc] = NULL;
-	    for (i = 0; i < argc; ++i)
+	    argc = n_دلیلاں_W;
+	    argv[argc] = عدم;
+	    لكل (i = 0; i < argc; ++i)
 	    {
-		int	len;
+		صحيح	len;
 
 		// Convert each Unicode argument to UTF-8.
-		WideCharToMultiByte_alloc(CP_UTF8, 0,
-				ArglistW[i], (int)wcslen(ArglistW[i]) + 1,
+		Wide_Char_منزل_Multi_Byte_alloc(CP_UTF8, 0,
+				ArglistW[i], (صحيح)wcslen(ArglistW[i]) + 1,
 				(LPSTR *)&argv[i], &len, 0, 0);
-		if (argv[i] == NULL)
+		إذا (argv[i] == عدم)
 		{
 		    // Out of memory, clear everything.
-		    while (i > 0)
-			free(argv[--i]);
-		    free(argv);
-		    argv = NULL;
+		    طالما (i > 0)
+			حرر(argv[--i]);
+		    حرر(argv);
+		    argv = عدم;
 		    argc = 0;
 		}
 	    }
@@ -8720,26 +8720,26 @@ get_cmd_argsW(char ***argvp)
 
     global_argc = argc;
     global_argv = argv;
-    if (argc > 0)
+    إذا (argc > 0)
     {
-	if (used_file_indexes != NULL)
-	    free(used_file_indexes);
-	used_file_indexes = alloc(argc * sizeof(int));
+	إذا (ورتیا_file_indexes != عدم)
+	    حرر(ورتیا_file_indexes);
+	ورتیا_file_indexes = alloc(argc * حجم(صحيح));
     }
 
-    if (argvp != NULL)
+    إذا (argvp != عدم)
 	*argvp = argv;
-    return argc;
+    أرجع argc;
 }
 
-    void
-free_cmd_argsW(void)
+    فراغ
+free_cmd_دلیلاں_W(فراغ)
 {
-    if (ArglistW == NULL)
-	return;
+    إذا (ArglistW == عدم)
+	أرجع;
 
     GlobalFree(ArglistW);
-    ArglistW = NULL;
+    ArglistW = عدم;
 }
 
 /*
@@ -8747,35 +8747,35 @@ free_cmd_argsW(void)
  * This avoids that we have to re-parse the argument list when fix_arg_enc()
  * is called.
  */
-    void
-used_file_arg(char *name, int literal, int full_path, int diff_mode)
+    فراغ
+ورتیا_file_arg(حرف *name, صحيح literal, صحيح بھریا_رستہ, صحيح diff_منوال)
 {
-    int		i;
+    صحيح		i;
 
-    if (used_file_indexes == NULL)
-	return;
-    for (i = used_file_argc + 1; i < global_argc; ++i)
-	if (STRCMP(global_argv[i], name) == 0)
+    إذا (ورتیا_file_indexes == عدم)
+	أرجع;
+    لكل (i = ورتیا_file_argc + 1; i < global_argc; ++i)
+	إذا (STRCMP(global_argv[i], name) == 0)
 	{
-	    used_file_argc = i;
-	    used_file_indexes[used_file_count++] = i;
-	    break;
+	    ورتیا_file_argc = i;
+	    ورتیا_file_indexes[ورتیا_file_گنتی++] = i;
+	    اكسر;
 	}
-    used_file_literal = literal;
-    used_file_full_path = full_path;
-#ifdef FEAT_DIFF
-    used_file_diff_mode = diff_mode;
-#endif
+    ورتیا_file_literal = literal;
+    ورتیا_file_بھریا_رستہ = بھریا_رستہ;
+#جے_تعریف_شدہ FEAT_DIFF
+    ورتیا_file_diff_منوال = diff_منوال;
+#جے_انت
 }
 
 /*
  * Remember the length of the argument list as it was.  If it changes then we
  * leave it alone when 'encoding' is set.
  */
-    void
-set_alist_count(void)
+    فراغ
+سیٹ_alist_گنتی(فراغ)
 {
-    used_alist_count = GARGCOUNT;
+    ورتیا_alist_گنتی = GARGCOUNT;
 }
 
 /*
@@ -8783,83 +8783,83 @@ set_alist_count(void)
  * has been changed while starting up.  Use the UTF-16 command line arguments
  * and convert them to 'encoding'.
  */
-    void
-fix_arg_enc(void)
+    فراغ
+fix_arg_enc(فراغ)
 {
-    int		i;
-    int		idx;
+    صحيح		i;
+    صحيح		idx;
     char_u	*str;
-    int		*fnum_list;
+    صحيح		*fnum_list;
 
     // Safety checks:
     // - if argument count differs between the wide and non-wide argument
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
-	    || ArglistW == NULL
-	    || used_file_indexes == NULL
-	    || used_file_count == 0
-	    || used_alist_count != GARGCOUNT)
-	return;
+    إذا (global_argc != n_دلیلاں_W
+	    || ArglistW == عدم
+	    || ورتیا_file_indexes == عدم
+	    || ورتیا_file_گنتی == 0
+	    || ورتیا_alist_گنتی != GARGCOUNT)
+	أرجع;
 
     // Remember the buffer numbers for the arguments.
-    fnum_list = ALLOC_MULT(int, GARGCOUNT);
-    if (fnum_list == NULL)
-	return;		// out of memory
-    for (i = 0; i < GARGCOUNT; ++i)
+    fnum_list = ALLOC_MULT(صحيح, GARGCOUNT);
+    إذا (fnum_list == عدم)
+	أرجع;		// out of memory
+    لكل (i = 0; i < GARGCOUNT; ++i)
 	fnum_list[i] = GARGLIST[i].ae_fnum;
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
-	return;		// out of memory
+    إذا (ga_grow(&global_alist.al_ga, ورتیا_file_گنتی) == FAIL)
+	أرجع;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    لكل (i = 0; i < ورتیا_file_گنتی; ++i)
     {
-	idx = used_file_indexes[i];
-	str = utf16_to_enc(ArglistW[idx], NULL);
-	if (str != NULL)
+	idx = ورتیا_file_indexes[i];
+	str = utf16_منزل_enc(ArglistW[idx], عدم);
+	إذا (str != عدم)
 	{
-	    int literal = used_file_literal;
+	    صحيح literal = ورتیا_file_literal;
 
-#ifdef FEAT_DIFF
+#جے_تعریف_شدہ FEAT_DIFF
 	    // When using diff mode may need to concatenate file name to
 	    // directory name.  Just like it's done in main().
-	    if (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
+	    إذا (ورتیا_file_diff_منوال && mch_isdir(str) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
-		char_u	    *tail;
+		char_u	    *پوچھ;
 		string_T    ret;
 
-		tail = gettail(alist_name(&GARGLIST[0]));
-		concat_fnames(str, STRLEN(str), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		پوچھ = gettail(alist_name(&GARGLIST[0]));
+		concat_fnames(str, STRLEN(str), پوچھ, STRLEN(پوچھ), TRUE, &ret);
+		إذا (ret.string != عدم)
 		{
 		    vim_free(str);
 		    str = ret.string;
 		}
 	    }
-#endif
+#جے_انت
 	    // Re-use the old buffer by renaming it.  When not using literal
 	    // names it's done by alist_expand() below.
-	    if (used_file_literal)
-		buf_set_name(fnum_list[i], str);
+	    إذا (ورتیا_file_literal)
+		buf_سیٹ_name(fnum_list[i], str);
 
 	    // Check backtick literal. backtick literal is already expanded in
 	    // main.c, so this part add str as literal.
-	    if (literal == FALSE)
+	    إذا (literal == FALSE)
 	    {
 		size_t len = STRLEN(str);
 
-		if (len > 2 && *str == '`' && *(str + len - 1) == '`')
+		إذا (len > 2 && *str == '`' && *(str + len - 1) == '`')
 		    literal = TRUE;
 	    }
-	    alist_add(&global_alist, str, literal ? 2 : 0);
+	    alist_جوڑو(&global_alist, str, literal ? 2 : 0);
 	}
     }
 
-    if (!used_file_literal)
+    إذا (!ورتیا_file_literal)
     {
 	// Now expand wildcards in the arguments.
 	// Temporarily add '(' and ')' to 'isfname'.  These are valid
@@ -8871,7 +8871,7 @@ fix_arg_enc(void)
 	// Use :legacy so that it also works when in Vim9 script.
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_ISF = &isf|set isf+=(,)");
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_WIG = &wig|set wig=");
-	alist_expand(fnum_list, used_alist_count);
+	alist_expand(fnum_list, ورتیا_alist_گنتی);
 	do_cmdline_cmd(
 		(char_u *)":legacy let &isf = g:SaVe_ISF|unlet g:SaVe_ISF");
 	do_cmdline_cmd(
@@ -8880,83 +8880,83 @@ fix_arg_enc(void)
 
     // If wildcard expansion failed, we are editing the first file of the
     // arglist and there is no file name: Edit the first argument now.
-    if (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
+    إذا (curwin->w_arg_idx == 0 && curbuf->b_fname == عدم)
     {
 	do_cmdline_cmd((char_u *)":rewind");
-	if (GARGCOUNT == 1 && used_file_full_path
+	إذا (GARGCOUNT == 1 && ورتیا_file_بھریا_رستہ
 		&& vim_chdirfile(alist_name(&GARGLIST[0]), "drop") == OK)
-	    last_chdir_reason = "drop";
+	    آخری_chdir_reason = "drop";
     }
 
-    set_alist_count();
+    سیٹ_alist_گنتی();
 }
 
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    صحيح
+mch_setenv(حرف *var, حرف *قدر, صحيح x بن_ورتیا)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
-    envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
-    if (envbuf == NULL)
-	return -1;
+    envbuf = alloc(STRLEN(var) + STRLEN(قدر) + 2);
+    إذا (envbuf == عدم)
+	أرجع -1;
 
-    sprintf((char *)envbuf, "%s=%s", var, value);
+    sprintf((حرف *)envbuf, "%s=%s", var, قدر);
 
-    p = enc_to_utf16(envbuf, NULL);
+    p = enc_منزل_utf16(envbuf, عدم);
 
     vim_free(envbuf);
-    if (p == NULL)
-	return -1;
+    إذا (p == عدم)
+	أرجع -1;
     _wputenv(p);
-#ifdef libintl_wputenv
+#جے_تعریف_شدہ libintl_wputenv
     libintl_wputenv(p);
-#endif
+#جے_انت
     // Unlike Un*x systems, we can free the string for _wputenv().
     vim_free(p);
 
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Support for 256 colors and 24-bit colors was added in Windows 10
  * version 1703 (Creators update).
  */
-#define VTP_FIRST_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
+#تعریف_کرو VTP_پہلا_SUPPORT_BUILD	    MAKE_VER(10, 0, 15063)
 
 /*
  * Support for pseudo-console (ConPTY) was added in windows 10
  * version 1809 (October 2018 update).
  */
-#define CONPTY_FIRST_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
+#تعریف_کرو CONPTY_پہلا_SUPPORT_BUILD  MAKE_VER(10, 0, 17763)
 
 /*
  * ConPTY differences between versions, need different logic.
  * version 1903 (May 2019 update).
  */
-#define CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
+#تعریف_کرو CONPTY_1903_BUILD	    MAKE_VER(10, 0, 18362)
 
 /*
  * version 1909 (November 2019 update).
  */
-#define CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
+#تعریف_کرو CONPTY_1909_BUILD	    MAKE_VER(10, 0, 18363)
 
 /*
  * Stay ahead of the next update, and when it's done, fix this.
  * version ? (2020 update, temporarily use the build number of insider preview)
  */
-#define CONPTY_NEXT_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
+#تعریف_کرو CONPTY_اگلا_UPDATE_BUILD    MAKE_VER(10, 0, 19587)
 
 /*
  * Confirm until this version.  Also the logic changes.
  * insider preview.
  */
-#define CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
+#تعریف_کرو CONPTY_INSIDER_BUILD	    MAKE_VER(10, 0, 18995)
 
 /*
  * Make conpty default on Windows 11
  */
-#define CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
+#تعریف_کرو CONPTY_STABLE_BUILD	    MAKE_VER(10, 0, 22000)
 // Notes:
 // Win 10 22H2 Final is build 19045, its conpty is widely used.
 // Strangely, 19045 is newer but is a lower build number than the 2020 insider
@@ -8964,218 +8964,218 @@ mch_setenv(char *var, char *value, int x UNUSED)
 // Win Server 2022 (May 10, 2022) is build 20348, its conpty is widely used.
 // Win 11 starts from build 22000, even though the major version says 10!
 
-    static void
-vtp_flag_init(void)
+    ساكن فراغ
+vtp_flag_init(فراغ)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    DWORD   mode;
-    HANDLE  out;
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    DWORD   منوال;
+    HANDLE  باہرلا;
 
 # ifdef VIMDLL
-    if (!gui.in_use)
+    إذا (!gui.وچ_use)
 # endif
     {
-	out = GetStdHandle(STD_OUTPUT_HANDLE);
+	باہرلا = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	vtp_working = (win_version >= VTP_FIRST_SUPPORT_BUILD) ? 1 : 0;
-	GetConsoleMode(out, &mode);
-	mode |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	if (SetConsoleMode(out, mode) == 0)
+	vtp_working = (win_نسخہ >= VTP_پہلا_SUPPORT_BUILD) ? 1 : 0;
+	Get_Console_منوال(باہرلا, &منوال);
+	منوال |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	إذا (سیٹ_Console_منوال(باہرلا, منوال) == 0)
 	    vtp_working = 0;
 
 	// VTP uses alternate screen buffer.
 	// But, not if running in a nested terminal
-	use_alternate_screen_buffer = win_version >= MAKE_VER(10, 0, 19045)
+	use_alternate_screen_بفر = win_نسخہ >= MAKE_VER(10, 0, 19045)
 	    && p_rs && vtp_working && !mch_getenv("VIM_TERMINAL");
     }
-#endif
+#جے_انت
 
-    if (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
+    إذا (win_نسخہ >= CONPTY_پہلا_SUPPORT_BUILD)
 	conpty_working = 1;
-    if (win_version >= CONPTY_STABLE_BUILD)
+    إذا (win_نسخہ >= CONPTY_STABLE_BUILD)
 	conpty_stable = 1;
 
-    if (win_version <= CONPTY_INSIDER_BUILD)
+    إذا (win_نسخہ <= CONPTY_INSIDER_BUILD)
 	conpty_type = 3;
-    if (win_version <= CONPTY_1909_BUILD)
+    إذا (win_نسخہ <= CONPTY_1909_BUILD)
 	conpty_type = 2;
-    if (win_version <= CONPTY_1903_BUILD)
+    إذا (win_نسخہ <= CONPTY_1903_BUILD)
 	conpty_type = 2;
-    if (win_version < CONPTY_FIRST_SUPPORT_BUILD)
+    إذا (win_نسخہ < CONPTY_پہلا_SUPPORT_BUILD)
 	conpty_type = 1;
 
-    if (win_version >= CONPTY_NEXT_UPDATE_BUILD)
+    إذا (win_نسخہ >= CONPTY_اگلا_UPDATE_BUILD)
 	conpty_fix_type = 1;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    static void
-vtp_init(void)
+    ساكن فراغ
+vtp_init(فراغ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
-    save_console_bg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_bg];
-    save_console_fg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_fg];
+    CONSOLE_SCREEN_بفر_INFOEX csbi;
+    csbi.cb_ناپ = حجم(csbi);
+    Get_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
+    save_console_bg_rgb = (guicolor_T)csbi.Color_جدول[g_color_اشاریہ_bg];
+    save_console_fg_rgb = (guicolor_T)csbi.Color_جدول[g_color_اشاریہ_fg];
     store_console_bg_rgb = save_console_bg_rgb;
     store_console_fg_rgb = save_console_fg_rgb;
 
     COLORREF bg;
-    bg = (COLORREF)csbi.ColorTable[g_color_index_bg];
+    bg = (COLORREF)csbi.Color_جدول[g_color_اشاریہ_bg];
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
     default_console_color_bg = bg;
 
     COLORREF fg;
-    fg = (COLORREF)csbi.ColorTable[g_color_index_fg];
+    fg = (COLORREF)csbi.Color_جدول[g_color_اشاریہ_fg];
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     default_console_color_fg = fg;
 # endif
-    set_console_color_rgb();
+    سیٹ_console_color_rgb();
 }
 
-    static void
-vtp_exit(void)
+    ساكن فراغ
+vtp_exit(فراغ)
 {
     restore_console_color_rgb();
 }
 
-    int
+    صحيح
 vtp_printf(
-    char *format,
+    حرف *format,
     ...)
 {
     char_u  buf[100];
     va_list list;
-    DWORD   result;
-    int	    len;
+    DWORD   نتیجہ;
+    صحيح	    len;
 
-    if (silent_mode)
-	return 0;
+    إذا (silent_منوال)
+	أرجع 0;
 
     va_start(list, format);
-    len = vim_vsnprintf((char *)buf, 100, (char *)format, list);
+    len = vim_vsnprintf((حرف *)buf, 100, (حرف *)format, list);
     va_end(list);
-    WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, NULL);
-    return (int)result;
+    WriteConsoleA(g_h_Con_باہرلا, buf, (DWORD)len, &نتیجہ, عدم);
+    أرجع (صحيح)نتیجہ;
 }
 
-    static void
+    ساكن فراغ
 vtp_sgr_bulk(
-    int arg)
+    صحيح arg)
 {
-    int args[1];
+    صحيح دلیلاں[1];
 
-    args[0] = arg;
-    vtp_sgr_bulks(1, args);
+    دلیلاں[0] = arg;
+    vtp_sgr_bulks(1, دلیلاں);
 }
 
 # define FAST256(x) \
-    if ((*p-- = "0123456789"[(n = x % 10)]) \
+    إذا ((*p-- = "0123456789"[(n = x % 10)]) \
 	    && x >= 10 && (*p-- = "0123456789"[((m = x % 100) - n) / 10]) \
 	    && x >= 100 && (*p-- = "012"[((x & 0xff) - m) / 100]));
 
 # define FAST256CASE(x) \
-    case x: \
+    حالة x: \
 	FAST256(newargs[x - 1]);
 
-    static void
+    ساكن فراغ
 vtp_sgr_bulks(
-    int argc,
-    int *args)
+    صحيح argc,
+    صحيح *دلیلاں)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
     char_u  buf[SGRBUFSIZE];
     char_u  *p;
-    int	    in, out;
-    int	    newargs[16];
-    static int sgrfgr = -1, sgrfgg, sgrfgb;
-    static int sgrbgr = -1, sgrbgg, sgrbgb;
+    صحيح	    وچ, باہرلا;
+    صحيح	    newargs[16];
+    ساكن صحيح sgrfgr = -1, sgrfgg, sgrfgb;
+    ساكن صحيح sgrbgr = -1, sgrbgg, sgrbgb;
 
-    if (argc == 0)
+    إذا (argc == 0)
     {
 	sgrfgr = sgrbgr = -1;
 	vtp_printf("\033[m");
-	return;
+	أرجع;
     }
 
-    in = out = 0;
-    while (in < argc)
+    وچ = باہرلا = 0;
+    طالما (وچ < argc)
     {
-	int s = args[in];
-	int copylen = 1;
+	صحيح s = دلیلاں[وچ];
+	صحيح copylen = 1;
 
-	if (s == 38)
+	إذا (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    إذا (argc - وچ >= 5 && دلیلاں[وچ + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
-						     && sgrfgb == args[in + 4])
+		إذا (sgrfgr == دلیلاں[وچ + 2] && sgrfgg == دلیلاں[وچ + 3]
+						     && sgrfgb == دلیلاں[وچ + 4])
 		{
-		    in += 5;
+		    وچ += 5;
 		    copylen = 0;
 		}
-		else
+		وإلا
 		{
-		    sgrfgr = args[in + 2];
-		    sgrfgg = args[in + 3];
-		    sgrfgb = args[in + 4];
+		    sgrfgr = دلیلاں[وچ + 2];
+		    sgrfgg = دلیلاں[وچ + 3];
+		    sgrfgb = دلیلاں[وچ + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    وإلا إذا (argc - وچ >= 3 && دلیلاں[وچ + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (s == 48)
+	وإلا إذا (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    إذا (argc - وچ >= 5 && دلیلاں[وچ + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
-						     && sgrbgb == args[in + 4])
+		إذا (sgrbgr == دلیلاں[وچ + 2] && sgrbgg == دلیلاں[وچ + 3]
+						     && sgrbgb == دلیلاں[وچ + 4])
 		{
-		    in += 5;
+		    وچ += 5;
 		    copylen = 0;
 		}
-		else
+		وإلا
 		{
-		    sgrbgr = args[in + 2];
-		    sgrbgg = args[in + 3];
-		    sgrbgb = args[in + 4];
+		    sgrbgr = دلیلاں[وچ + 2];
+		    sgrbgg = دلیلاں[وچ + 3];
+		    sgrbgb = دلیلاں[وچ + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    وإلا إذا (argc - وچ >= 3 && دلیلاں[وچ + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (30 <= s && s <= 39)
+	وإلا إذا (30 <= s && s <= 39)
 	    sgrfgr = -1;
-	else if (90 <= s && s <= 97)
+	وإلا إذا (90 <= s && s <= 97)
 	    sgrfgr = -1;
-	else if (40 <= s && s <= 49)
+	وإلا إذا (40 <= s && s <= 49)
 	    sgrbgr = -1;
-	else if (100 <= s && s <= 107)
+	وإلا إذا (100 <= s && s <= 107)
 	    sgrbgr = -1;
-	else if (s == 0)
+	وإلا إذا (s == 0)
 	    sgrfgr = sgrbgr = -1;
 
-	while (copylen--)
-	    newargs[out++] = args[in++];
+	طالما (copylen--)
+	    newargs[باہرلا++] = دلیلاں[وچ++];
     }
 
-    p = &buf[sizeof(buf) - 1];
+    p = &buf[حجم(buf) - 1];
     *p-- = 'm';
 
-    switch (out)
+    بدل (باہرلا)
     {
-	int	n, m;
+	صحيح	n, m;
 	DWORD	r;
 
 	FAST256CASE(16);
@@ -9211,110 +9211,110 @@ vtp_sgr_bulks(
 	FAST256CASE(1);
 	*p-- = '[';
 	*p = '\033';
-	WriteConsoleA(g_hConOut, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, NULL);
-    default:
-	break;
+	WriteConsoleA(g_h_Con_باہرلا, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, عدم);
+    افتراضي:
+	اكسر;
     }
 }
 
-    static void
-wt_init(void)
+    ساكن فراغ
+wt_init(فراغ)
 {
-    wt_working = mch_getenv("WT_SESSION") != NULL;
+    wt_working = mch_getenv("WT_SESSION") != عدم;
 }
 
 # ifdef FEAT_TERMGUICOLORS
-    static int
+    ساكن صحيح
 ctermtoxterm(
-    int cterm)
+    صحيح cterm)
 {
     char_u r, g, b, idx;
 
     cterm_color2rgb(cterm, &r, &g, &b, &idx);
-    return (((int)r << 16) | ((int)g << 8) | (int)b);
+    أرجع (((صحيح)r << 16) | ((صحيح)g << 8) | (صحيح)b);
 }
 # endif
 
-    static void
-set_console_color_rgb(void)
+    ساكن فراغ
+سیٹ_console_color_rgb(فراغ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_بفر_INFOEX csbi;
     guicolor_T	fg, bg;
-    int		ctermfg, ctermbg;
+    صحيح		ctermfg, ctermbg;
 
-    if (!vtp_working)
-	return;
+    إذا (!vtp_working)
+	أرجع;
 
     get_default_console_color(&ctermfg, &ctermbg, &fg, &bg);
 
-    if (p_tgc || t_colors >= 256)
+    إذا (p_tgc || t_colors >= 256)
     {
-	term_fg_rgb_color(fg);
-	term_bg_rgb_color(bg);
-	return;
+	رکن_fg_rgb_color(fg);
+	رکن_bg_rgb_color(bg);
+	أرجع;
     }
 
-    if (use_alternate_screen_buffer)
-	return;
+    إذا (use_alternate_screen_بفر)
+	أرجع;
 
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    Get_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    store_console_bg_rgb = csbi.ColorTable[g_color_index_bg];
-    store_console_fg_rgb = csbi.ColorTable[g_color_index_fg];
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)bg;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)fg;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    csbi.sr_کھڑکی.دایاں_3 += 1;
+    csbi.sr_کھڑکی.Bottom += 1;
+    store_console_bg_rgb = csbi.Color_جدول[g_color_اشاریہ_bg];
+    store_console_fg_rgb = csbi.Color_جدول[g_color_اشاریہ_fg];
+    csbi.Color_جدول[g_color_اشاریہ_bg] = (COLORREF)bg;
+    csbi.Color_جدول[g_color_اشاریہ_fg] = (COLORREF)fg;
+    سیٹ_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 # endif
 }
 
-# if defined(FEAT_TERMGUICOLORS)
-    void
+# إذا defined(FEAT_TERMGUICOLORS)
+    فراغ
 get_default_console_color(
-    int *cterm_fg,
-    int *cterm_bg,
+    صحيح *cterm_fg,
+    صحيح *cterm_bg,
     guicolor_T *gui_fg,
     guicolor_T *gui_bg)
 {
-    int id;
+    صحيح id;
     guicolor_T guifg = INVALCOLOR;
     guicolor_T guibg = INVALCOLOR;
-    int ctermfg = 0;
-    int ctermbg = 0;
-    int dummynull = 0;
+    صحيح ctermfg = 0;
+    صحيح ctermbg = 0;
+    صحيح dummynull = 0;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0 && p_tgc)
+    إذا (id > 0 && p_tgc)
 	syn_id2colors(id, &guifg, &guibg);
-    if (guifg == INVALCOLOR)
+    إذا (guifg == INVALCOLOR)
     {
 	ctermfg = -1;
-	if (id > 0)
+	إذا (id > 0)
 	    syn_id2cterm_bg(id, &ctermfg, &dummynull);
-	if (ctermfg != -1)
+	إذا (ctermfg != -1)
 	    guifg = ctermtoxterm(ctermfg);
-	else
+	وإلا
 	    guifg = USE_WT ? INVALCOLOR : default_console_color_fg;
-	cterm_normal_fg_gui_color = guifg;
+	cterm_عام_fg_gui_color = guifg;
 	ctermfg = ctermfg < 0 ? 0 : ctermfg;
     }
-    if (guibg == INVALCOLOR)
+    إذا (guibg == INVALCOLOR)
     {
 	ctermbg = -1;
-	if (id > 0)
+	إذا (id > 0)
 	    syn_id2cterm_bg(id, &dummynull, &ctermbg);
-	if (ctermbg != -1)
+	إذا (ctermbg != -1)
 	    guibg = ctermtoxterm(ctermbg);
-	else
+	وإلا
 	    guibg = USE_WT ? INVALCOLOR : default_console_color_bg;
-	cterm_normal_bg_gui_color = guibg;
+	cterm_عام_bg_gui_color = guibg;
 	ctermbg = ctermbg < 0 ? 0 : ctermbg;
     }
 
@@ -9328,172 +9328,172 @@ get_default_console_color(
 /*
  * Set the console colors to the original colors or the last set colors.
  */
-    static void
-reset_console_color_rgb(void)
+    ساكن فراغ
+reset_console_color_rgb(فراغ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    إذا (use_alternate_screen_بفر)
+	أرجع;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_بفر_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    Get_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)store_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)store_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    csbi.sr_کھڑکی.دایاں_3 += 1;
+    csbi.sr_کھڑکی.Bottom += 1;
+    csbi.Color_جدول[g_color_اشاریہ_bg] = (COLORREF)store_console_bg_rgb;
+    csbi.Color_جدول[g_color_اشاریہ_fg] = (COLORREF)store_console_fg_rgb;
+    سیٹ_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 # endif
 }
 
 /*
  * Set the console colors to the original colors.
  */
-    static void
-restore_console_color_rgb(void)
+    ساكن فراغ
+restore_console_color_rgb(فراغ)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    إذا (use_alternate_screen_بفر)
+	أرجع;
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    CONSOLE_SCREEN_بفر_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    Get_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
-    csbi.srWindow.Bottom += 1;
-    csbi.ColorTable[g_color_index_bg] = (COLORREF)save_console_bg_rgb;
-    csbi.ColorTable[g_color_index_fg] = (COLORREF)save_console_fg_rgb;
-    SetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
+    csbi.cb_ناپ = حجم(csbi);
+    csbi.sr_کھڑکی.دایاں_3 += 1;
+    csbi.sr_کھڑکی.Bottom += 1;
+    csbi.Color_جدول[g_color_اشاریہ_bg] = (COLORREF)save_console_bg_rgb;
+    csbi.Color_جدول[g_color_اشاریہ_fg] = (COLORREF)save_console_fg_rgb;
+    سیٹ_Console_Screen_بفر_Info_Ex(g_h_Con_باہرلا, &csbi);
 # endif
 }
 
-    void
-control_console_color_rgb(void)
+    فراغ
+control_console_color_rgb(فراغ)
 {
-    if (vtp_working)
-	set_console_color_rgb();
-    else
+    إذا (vtp_working)
+	سیٹ_console_color_rgb();
+    وإلا
 	reset_console_color_rgb();
 }
 
-    int
-use_vtp(void)
+    صحيح
+use_vtp(فراغ)
 {
-    return USE_VTP;
+    أرجع USE_VTP;
 }
 
-    int
-is_term_win32(void)
+    صحيح
+is_رکن_win32(فراغ)
 {
-    return T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
+    أرجع T_NAME != عدم && STRCMP(T_NAME, "win32") == 0;
 }
 
-    int
-has_vtp_working(void)
+    صحيح
+has_vtp_working(فراغ)
 {
-    return vtp_working;
+    أرجع vtp_working;
 }
 
-#endif
+#جے_انت
 
-    int
-has_conpty_working(void)
+    صحيح
+has_conpty_working(فراغ)
 {
-    return conpty_working;
+    أرجع conpty_working;
 }
 
-    int
-get_conpty_type(void)
+    صحيح
+get_conpty_type(فراغ)
 {
-    return conpty_type;
+    أرجع conpty_type;
 }
 
-    int
-is_conpty_stable(void)
+    صحيح
+is_conpty_stable(فراغ)
 {
-    return conpty_stable;
+    أرجع conpty_stable;
 }
 
-    int
-get_conpty_fix_type(void)
+    صحيح
+get_conpty_fix_type(فراغ)
 {
-    return conpty_fix_type;
+    أرجع conpty_fix_type;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    void
-resize_console_buf(void)
+#إذا !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    فراغ
+resize_console_buf(فراغ)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    إذا (use_alternate_screen_بفر)
+	أرجع;
 
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    CONSOLE_SCREEN_بفر_INFO csbi;
     COORD coord;
     SMALL_RECT newsize;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return;
+    إذا (!Get_Console_Screen_بفر_Info(g_h_Con_باہرلا, &csbi))
+	أرجع;
 
-    coord.X = SRWIDTH(csbi.srWindow);
-    coord.Y = SRHEIGHT(csbi.srWindow);
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    coord.X = SRWIDTH(csbi.sr_کھڑکی);
+    coord.Y = SRHEIGHT(csbi.sr_کھڑکی);
+    سیٹ_Console_Screen_بفر_ناپ(g_h_Con_باہرلا, coord);
 
-    newsize.Left = 0;
-    newsize.Top = 0;
-    newsize.Right = coord.X - 1;
+    newsize.بایاں_3 = 0;
+    newsize.چوٹی_2 = 0;
+    newsize.دایاں_3 = coord.X - 1;
     newsize.Bottom = coord.Y - 1;
-    SetConsoleWindowInfo(g_hConOut, TRUE, &newsize);
+    سیٹ_Console_کھڑکی_Info(g_h_Con_باہرلا, TRUE, &newsize);
 
-    SetConsoleScreenBufferSize(g_hConOut, coord);
+    سیٹ_Console_Screen_بفر_ناپ(g_h_Con_باہرلا, coord);
 }
-#endif
+#جے_انت
 
-    char *
-GetWin32Error(void)
+    حرف *
+GetWin32Error(فراغ)
 {
-    static char	*oldmsg = NULL;
-    char	*acp_msg = NULL;
+    ساكن حرف	*oldmsg = عدم;
+    حرف	*acp_پیغام = عدم;
     DWORD	acp_len;
-    char	*enc_msg = NULL;
-    int		enc_len = 0;
+    حرف	*enc_پیغام = عدم;
+    صحيح		enc_len = 0;
 
     // get formatted message from OS
-    acp_len = FormatMessage(
-	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
-	return NULL;
+    acp_len = Format_سنیہا(
+	    FORMAT_سنیہا_ALLOCATE_بفر|FORMAT_سنیہا_FROM_SYSTEM,
+	    عدم, Get_آخری_Error(), 0, (LPSTR)&acp_پیغام, 0, عدم);
+    إذا (acp_len == 0 || acp_پیغام == عدم)
+	أرجع عدم;
 
     // clean oldmsg if remained.
-    if (oldmsg != NULL)
+    إذا (oldmsg != عدم)
     {
 	vim_free(oldmsg);
-	oldmsg = NULL;
+	oldmsg = عدم;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
-    LocalFree(acp_msg);
-    if (enc_msg == NULL)
-	return NULL;
+    acp_منزل_enc((char_u *)acp_پیغام, (صحيح)acp_len, (char_u **)&enc_پیغام, &enc_len);
+    LocalFree(acp_پیغام);
+    إذا (enc_پیغام == عدم)
+	أرجع عدم;
 
     // remove trailing \r\n
-    char *pcrlf = strstr(enc_msg, "\r\n");
-    if (pcrlf != NULL)
+    حرف *pcrlf = لڑی_کھوج(enc_پیغام, "\r\n");
+    إذا (pcrlf != عدم)
 	*pcrlf = NUL;
 
-    oldmsg = enc_msg;
-    return enc_msg;
+    oldmsg = enc_پیغام;
+    أرجع enc_پیغام;
 }
 
-#if defined(FEAT_RELTIME)
-static HANDLE   timer_handle;
-static int      timer_active = FALSE;
+#إذا defined(FEAT_RELTIME)
+ساكن HANDLE   timer_handle;
+ساكن صحيح      timer_سرگرم = FALSE;
 
 /*
  * Calls to start_timeout alternate the return value pointer between the two
@@ -9503,13 +9503,13 @@ static int      timer_active = FALSE;
  * deleted. Ping-ponging between the two flags prevents this causing 'fake'
  * timeouts.
  */
-static sig_atomic_t timeout_flags[2];
-static int	    timeout_flag_idx = 0;
-static sig_atomic_t *timeout_flag = &timeout_flags[0];
+ساكن sig_atomic_t timeout_flags[2];
+ساكن صحيح	    timeout_flag_idx = 0;
+ساكن sig_atomic_t *timeout_flag = &timeout_flags[0];
 
 
-    static void CALLBACK
-set_flag(void *param, BOOLEAN unused2 UNUSED)
+    ساكن فراغ CALLBACK
+سیٹ_flag(فراغ *param, BOOLEAN unused2 بن_ورتیا)
 {
     *(sig_atomic_t *)param = TRUE;
 }
@@ -9517,14 +9517,14 @@ set_flag(void *param, BOOLEAN unused2 UNUSED)
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    فراغ
+stop_timeout(فراغ)
 {
-    if (timer_active)
+    إذا (timer_سرگرم)
     {
-	BOOL ret = DeleteTimerQueueTimer(NULL, timer_handle, NULL);
-	timer_active = FALSE;
-	if (!ret && GetLastError() != ERROR_IO_PENDING)
+	BOOL ret = Delete_Timer_قطار_Timer(عدم, timer_handle, عدم);
+	timer_سرگرم = FALSE;
+	إذا (!ret && Get_آخری_Error() != ERROR_IO_PENDING)
 	{
 	    semsg(_(e_could_not_clear_timeout_str), GetWin32Error());
 	}
@@ -9545,27 +9545,27 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it still returns a
  * valid flag pointer; the flag will remain stuck at zero.
  */
-    volatile sig_atomic_t *
-start_timeout(long msec)
+    متطاير sig_atomic_t *
+شروع_timeout(لما msec)
 {
     BOOL ret;
 
     timeout_flag = &timeout_flags[timeout_flag_idx];
 
     stop_timeout();
-    ret = CreateTimerQueueTimer(
-	    &timer_handle, NULL, set_flag, timeout_flag,
+    ret = Create_Timer_قطار_Timer(
+	    &timer_handle, عدم, سیٹ_flag, timeout_flag,
 	    (DWORD)msec, 0, WT_EXECUTEDEFAULT);
-    if (!ret)
+    إذا (!ret)
     {
-	semsg(_(e_could_not_set_timeout_str), GetWin32Error());
+	semsg(_(e_could_not_سیٹ_timeout_str), GetWin32Error());
     }
-    else
+    وإلا
     {
 	timeout_flag_idx = (timeout_flag_idx + 1) % 2;
-	timer_active = TRUE;
+	timer_سرگرم = TRUE;
 	*timeout_flag = FALSE;
     }
-    return timeout_flag;
+    أرجع timeout_flag;
 }
-#endif
+#جے_انت
