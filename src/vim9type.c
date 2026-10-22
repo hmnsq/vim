@@ -12,9 +12,9 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_EVAL)
+#जइ defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -29,15 +29,15 @@ get_type_ptr(garray_T *type_gap)
 {
     type_T *type;
 
-    if (ga_grow(type_gap, 1) == FAIL)
-	return NULL;
+    जइ (ga_grow(type_gap, 1) == FAIL)
+	प्रत्यागम रिक्त;
     type = ALLOC_CLEAR_ONE(type_T);
-    if (type == NULL)
-	return NULL;
+    जइ (type == रिक्त)
+	प्रत्यागम रिक्त;
 
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] = type;
     ++type_gap->ga_len;
-    return type;
+    प्रत्यागम type;
 }
 
 /*
@@ -49,47 +49,47 @@ copy_type(type_T *type, garray_T *type_gap)
 {
     type_T *copy = get_type_ptr(type_gap);
 
-    if (copy == NULL)
-	return type;
+    जइ (copy == रिक्त)
+	प्रत्यागम type;
     *copy = *type;
     copy->tt_flags &= ~TTFLAG_STATIC;
 
-    if (type->tt_args != NULL
+    जइ (type->tt_args != रिक्त
 	   && func_type_add_arg_types(copy, type->tt_argcount, type_gap) == OK)
-	for (int i = 0; i < type->tt_argcount; ++i)
+	प्रति (पूर्णाङ्क i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = type->tt_args[i];
 
-    return copy;
+    प्रत्यागम copy;
 }
 
 /*
  * Inner part of copy_type_deep().
  * When allocation fails returns "type".
  */
-    static type_T *
+    स्थिर type_T *
 copy_type_deep_rec(type_T *type, garray_T *type_gap, garray_T *seen_types)
 {
-    for (int i = 0; i < seen_types->ga_len; ++i)
-	if (((type_T **)seen_types->ga_data)[i * 2] == type)
+    प्रति (पूर्णाङ्क i = 0; i < seen_types->ga_len; ++i)
+	जइ (((type_T **)seen_types->ga_data)[i * 2] == type)
 	    // seen this type before, return the copy we made
-	    return ((type_T **)seen_types->ga_data)[i * 2 + 1];
+	    प्रत्यागम ((type_T **)seen_types->ga_data)[i * 2 + 1];
 
     type_T *copy = copy_type(type, type_gap);
-    if (ga_grow(seen_types, 1) == FAIL)
-	return copy;
+    जइ (ga_grow(seen_types, 1) == FAIL)
+	प्रत्यागम copy;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2] = type;
     ((type_T **)seen_types->ga_data)[seen_types->ga_len * 2 + 1] = copy;
     ++seen_types->ga_len;
 
-    if (copy->tt_member != NULL)
+    जइ (copy->tt_member != रिक्त)
 	copy->tt_member = copy_type_deep_rec(copy->tt_member,
 							 type_gap, seen_types);
-    if (type->tt_args != NULL)
-	for (int i = 0; i < type->tt_argcount; ++i)
+    जइ (type->tt_args != रिक्त)
+	प्रति (पूर्णाङ्क i = 0; i < type->tt_argcount; ++i)
 	    copy->tt_args[i] = copy_type_deep_rec(copy->tt_args[i],
 							 type_gap, seen_types);
 
-    return copy;
+    प्रत्यागम copy;
 }
 
 /*
@@ -101,29 +101,29 @@ copy_type_deep(type_T *type, garray_T *type_gap)
 {
     garray_T seen_types;
     // stores type pairs : a type we have seen and the copy used
-    ga_init2(&seen_types, sizeof(type_T *) * 2, 20);
+    ga_init2(&seen_types, परिमाण(type_T *) * 2, 20);
 
     type_T *res = copy_type_deep_rec(type, type_gap, &seen_types);
 
     ga_clear(&seen_types);
-    return res;
+    प्रत्यागम res;
 }
 
-    void
+    शून्य
 clear_type_list(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    जाव (gap->ga_len > 0)
 	vim_free(((type_T **)gap->ga_data)[--gap->ga_len]);
     ga_clear(gap);
 }
 
-    void
+    शून्य
 clear_func_type_list(garray_T *gap, type_T **func_type)
 {
-    while (gap->ga_len > 0)
+    जाव (gap->ga_len > 0)
     {
 	// func_type pointing to the uf_type_list, so reset pointer
-	if (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
+	जइ (*func_type == ((type_T **)gap->ga_data)[--gap->ga_len])
 	    *func_type = &t_func_any;
 	vim_free(((type_T **)gap->ga_data)[gap->ga_len]);
     }
@@ -139,49 +139,49 @@ alloc_type(type_T *type)
 {
     type_T *ret;
 
-    if (type == NULL)
-	return NULL;
+    जइ (type == रिक्त)
+	प्रत्यागम रिक्त;
 
     // A fixed type never contains allocated types, return as-is.
-    if (type->tt_flags & TTFLAG_STATIC)
-	return type;
+    जइ (type->tt_flags & TTFLAG_STATIC)
+	प्रत्यागम type;
 
     ret = ALLOC_ONE(type_T);
-    if (ret == NULL)
-	return NULL;
+    जइ (ret == रिक्त)
+	प्रत्यागम रिक्त;
     *ret = *type;
 
-    if (ret->tt_member != NULL)
+    जइ (ret->tt_member != रिक्त)
 	ret->tt_member = alloc_type(ret->tt_member);
 
-    if (type->tt_argcount > 0 && type->tt_args != NULL)
+    जइ (type->tt_argcount > 0 && type->tt_args != रिक्त)
     {
-	int i;
+	पूर्णाङ्क i;
 
 	ret->tt_args = ALLOC_MULT(type_T *, type->tt_argcount);
-	if (ret->tt_args != NULL)
-	    for (i = 0; i < type->tt_argcount; ++i)
+	जइ (ret->tt_args != रिक्त)
+	    प्रति (i = 0; i < type->tt_argcount; ++i)
 		ret->tt_args[i] = alloc_type(type->tt_args[i]);
     }
-    else
-	ret->tt_args = NULL;
+    अण्णहा
+	ret->tt_args = रिक्त;
 
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
  * Free a type that was created with alloc_type().
  */
-    void
+    शून्य
 free_type(type_T *type)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    if (type == NULL || (type->tt_flags & TTFLAG_STATIC))
-	return;
-    if (type->tt_args != NULL)
+    जइ (type == रिक्त || (type->tt_flags & TTFLAG_STATIC))
+	प्रत्यागम;
+    जइ (type->tt_args != रिक्त)
     {
-	for (i = 0; i < type->tt_argcount; ++i)
+	प्रति (i = 0; i < type->tt_argcount; ++i)
 	    free_type(type->tt_args[i]);
 	vim_free(type->tt_args);
     }
@@ -194,13 +194,13 @@ free_type(type_T *type)
 /*
  * Return TRUE if "type" is to be recursed into for setting the type.
  */
-    static int
+    स्थिर पूर्णाङ्क
 set_tv_type_recurse(type_T *type)
 {
-    return type->tt_member != NULL
+    प्रत्यागम type->tt_member != रिक्त
 		&& (type->tt_member->tt_type == VAR_DICT
 				|| type->tt_member->tt_type == VAR_LIST)
-		&& type->tt_member->tt_member != NULL
+		&& type->tt_member->tt_member != रिक्त
 		&& type->tt_member->tt_member != &t_any
 		&& type->tt_member->tt_member != &t_unknown;
 }
@@ -208,26 +208,26 @@ set_tv_type_recurse(type_T *type)
 /*
  * Set the type of Dict "d" to "type"
  */
-    static void
+    स्थिर शून्य
 set_tv_type_dict(dict_T *d, type_T *type)
 {
-    if (d->dv_type == type)
-	return;
+    जइ (d->dv_type == type)
+	प्रत्यागम;
 
     free_type(d->dv_type);
     d->dv_type = alloc_type(type);
 
     // Need to recursively set the type of dict items?
-    if (!set_tv_type_recurse(type))
-	return;
+    जइ (!set_tv_type_recurse(type))
+	प्रत्यागम;
 
-    int		todo = (int)d->dv_hashtab.ht_used;
+    पूर्णाङ्क		todo = (पूर्णाङ्क)d->dv_hashtab.ht_used;
     hashitem_T	*hi;
     dictitem_T	*di;
 
-    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_वस्तूनि(&d->dv_hashtab, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	जइ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    di = HI2DI(hi);
@@ -239,49 +239,49 @@ set_tv_type_dict(dict_T *d, type_T *type)
 /*
  * Set the type of List "l" to "type"
  */
-    static void
+    स्थिर शून्य
 set_tv_type_list(list_T *l, type_T *type)
 {
-    if (l->lv_type == type)
-	return;
+    जइ (l->lv_type == type)
+	प्रत्यागम;
 
     free_type(l->lv_type);
     l->lv_type = alloc_type(type);
 
     // Need to recursively set the type of list items?
-    if (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
-	return;
+    जइ (l->lv_first == &range_list_item || !set_tv_type_recurse(type))
+	प्रत्यागम;
 
     listitem_T	*li;
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_वस्तूनि(l, li)
 	set_tv_type(&li->li_tv, type->tt_member);
 }
 
 /*
  * Set the type of Tuple "tuple" to "type"
  */
-    static void
+    स्थिर शून्य
 set_tv_type_tuple(tuple_T *tuple, type_T *type)
 {
-    if (tuple->tv_type == type)
-	return;
+    जइ (tuple->tv_type == type)
+	प्रत्यागम;
 
     free_type(tuple->tv_type);
     tuple->tv_type = alloc_type(type);
 
-    if (type->tt_argcount <= 0)
-	return;
+    जइ (type->tt_argcount <= 0)
+	प्रत्यागम;
 
     // recursively set the type of list items
     type_T	*item_type;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    प्रति (पूर्णाङ्क i = 0; i < tuple_len(tuple); i++)
     {
-	if ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
+	जइ ((type->tt_flags & TTFLAG_VARARGS) && (i >= type->tt_argcount - 1))
 	    // For a variadic tuple, the last type is a List.  So use the
 	    // List member type.
 	    item_type = type->tt_args[type->tt_argcount - 1]->tt_member;
-	else
+	अण्णहा
 	    item_type = type->tt_args[i];
 
 	set_tv_type(TUPLE_ITEM(tuple, i), item_type);
@@ -291,19 +291,19 @@ set_tv_type_tuple(tuple_T *tuple, type_T *type)
 /*
  * Set the type of "tv" to "type" if it is a list or tuple or dict.
  */
-    void
+    शून्य
 set_tv_type(typval_T *tv, type_T *type)
 {
-    if (type->tt_type == VAR_ANY)
+    जइ (type->tt_type == VAR_ANY)
 	// If the variable type is "any", then keep the value type.
 	// e.g.  var x: any = [1, 2] or var y: any = {v: 1}
-	return;
+	प्रत्यागम;
 
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    जइ (tv->v_type == VAR_DICT && tv->vval.v_dict != रिक्त)
 	set_tv_type_dict(tv->vval.v_dict, type);
-    else if (tv->v_type == VAR_LIST && tv->vval.v_list != NULL)
+    अण्णहा जइ (tv->v_type == VAR_LIST && tv->vval.v_list != रिक्त)
 	set_tv_type_list(tv->vval.v_list, type);
-    else if (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != NULL)
+    अण्णहा जइ (tv->v_type == VAR_TUPLE && tv->vval.v_tuple != रिक्त)
 	set_tv_type_tuple(tv->vval.v_tuple, type);
 }
 
@@ -311,24 +311,24 @@ set_tv_type(typval_T *tv, type_T *type)
  * For a tuple type, reserve space for "typecount" types (including the
  * repeated type).
  */
-    static int
+    स्थिर पूर्णाङ्क
 tuple_type_add_types(
     type_T	*tupletype,
-    int		typecount,
+    पूर्णाङ्क		typecount,
     garray_T	*type_gap)
 {
     // To make it easy to free the space needed for the types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
-    tupletype->tt_args = alloc_clear_id(sizeof(type_T *) * typecount,
+    जइ (ga_grow(type_gap, 1) == FAIL)
+	प्रत्यागम FAIL;
+    tupletype->tt_args = alloc_clear_id(परिमाण(type_T *) * typecount,
 							  aid_tuple_type_args);
-    if (tupletype->tt_args == NULL)
-	return FAIL;
+    जइ (tupletype->tt_args == रिक्त)
+	प्रत्यागम FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
-						(void *)tupletype->tt_args;
+						(शून्य *)tupletype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
@@ -342,28 +342,28 @@ get_list_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_list_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    जइ (member_type == रिक्त || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_list_any;
-    if (member_type->tt_type == VAR_VOID
+	प्रत्यागम &t_list_any;
+    जइ (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_list_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_list_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_list_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_list_string;
+	प्रत्यागम &t_list_empty;
+    जइ (member_type->tt_type == VAR_BOOL)
+	प्रत्यागम &t_list_bool;
+    जइ (member_type->tt_type == VAR_सङ्ख्या)
+	प्रत्यागम &t_list_सङ्ख्या;
+    जइ (member_type->tt_type == VAR_STRING)
+	प्रत्यागम &t_list_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    जइ (type == रिक्त)
+	प्रत्यागम &t_any;
     type->tt_type = VAR_LIST;
     type->tt_member = member_type;
     type->tt_argcount = 0;
-    type->tt_args = NULL;
-    return type;
+    type->tt_args = रिक्त;
+    प्रत्यागम type;
 }
 
 /*
@@ -375,28 +375,28 @@ get_tuple_type(garray_T *tuple_types_gap, garray_T *type_gap)
 {
     type_T	*type;
     type_T	**tuple_types = tuple_types_gap->ga_data;
-    int		typecount = tuple_types_gap->ga_len;
+    पूर्णाङ्क		typecount = tuple_types_gap->ga_len;
 
     // recognize commonly used types
-    if (typecount == 0)
-	return &t_tuple_any;
+    जइ (typecount == 0)
+	प्रत्यागम &t_tuple_any;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    जइ (type == रिक्त)
+	प्रत्यागम &t_any;
     type->tt_type = VAR_TUPLE;
-    type->tt_member = NULL;
-    if (typecount > 0)
+    type->tt_member = रिक्त;
+    जइ (typecount > 0)
     {
-	if (tuple_type_add_types(type, typecount, type_gap) == FAIL)
-	    return &t_any;
-	mch_memmove(type->tt_args, tuple_types, sizeof(type_T *) * typecount);
+	जइ (tuple_type_add_types(type, typecount, type_gap) == FAIL)
+	    प्रत्यागम &t_any;
+	mch_memmove(type->tt_args, tuple_types, परिमाण(type_T *) * typecount);
     }
     type->tt_argcount = typecount;
     type->tt_flags = 0;
 
-    return type;
+    प्रत्यागम type;
 }
 
 /*
@@ -410,62 +410,62 @@ get_dict_type(type_T *member_type, garray_T *type_gap)
     // recognize commonly used types
     // A generic type is t_any initially before being set to a concrete type
     // later.  So don't use the static t_dict_any for a generic type.
-    if (member_type == NULL || (member_type->tt_type == VAR_ANY
+    जइ (member_type == रिक्त || (member_type->tt_type == VAR_ANY
 					&& !IS_GENERIC_TYPE(member_type)))
-	return &t_dict_any;
-    if (member_type->tt_type == VAR_VOID
+	प्रत्यागम &t_dict_any;
+    जइ (member_type->tt_type == VAR_VOID
 	    || member_type->tt_type == VAR_UNKNOWN)
-	return &t_dict_empty;
-    if (member_type->tt_type == VAR_BOOL)
-	return &t_dict_bool;
-    if (member_type->tt_type == VAR_NUMBER)
-	return &t_dict_number;
-    if (member_type->tt_type == VAR_STRING)
-	return &t_dict_string;
+	प्रत्यागम &t_dict_empty;
+    जइ (member_type->tt_type == VAR_BOOL)
+	प्रत्यागम &t_dict_bool;
+    जइ (member_type->tt_type == VAR_सङ्ख्या)
+	प्रत्यागम &t_dict_सङ्ख्या;
+    जइ (member_type->tt_type == VAR_STRING)
+	प्रत्यागम &t_dict_string;
 
     // Not a common type, create a new entry.
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return &t_any;
+    जइ (type == रिक्त)
+	प्रत्यागम &t_any;
     type->tt_type = VAR_DICT;
     type->tt_member = member_type;
     type->tt_argcount = 0;
-    type->tt_args = NULL;
-    return type;
+    type->tt_args = रिक्त;
+    प्रत्यागम type;
 }
 
 /*
  * Allocate a new type for a function.
  */
     type_T *
-alloc_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+alloc_func_type(type_T *ret_type, पूर्णाङ्क argcount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    जइ (type == रिक्त)
+	प्रत्यागम &t_any;
     type->tt_type = VAR_FUNC;
-    type->tt_member = ret_type == NULL ? &t_unknown : ret_type;
+    type->tt_member = ret_type == रिक्त ? &t_unknown : ret_type;
     type->tt_argcount = argcount;
-    type->tt_args = NULL;
-    return type;
+    type->tt_args = रिक्त;
+    प्रत्यागम type;
 }
 
 /*
  * Allocate a new type for a tuple.
  */
-    static type_T *
-alloc_tuple_type(int typecount, garray_T *type_gap)
+    स्थिर type_T *
+alloc_tuple_type(पूर्णाङ्क typecount, garray_T *type_gap)
 {
     type_T *type = get_type_ptr(type_gap);
 
-    if (type == NULL)
-	return &t_any;
+    जइ (type == रिक्त)
+	प्रत्यागम &t_any;
     type->tt_type = VAR_TUPLE;
-    type->tt_member = NULL;
+    type->tt_member = रिक्त;
     type->tt_argcount = typecount;
-    type->tt_args = NULL;
-    return type;
+    type->tt_args = रिक्त;
+    प्रत्यागम type;
 }
 
 /*
@@ -473,100 +473,100 @@ alloc_tuple_type(int typecount, garray_T *type_gap)
  * "argcount" must be -1 or 0, a predefined type can be used.
  */
     type_T *
-get_func_type(type_T *ret_type, int argcount, garray_T *type_gap)
+get_func_type(type_T *ret_type, पूर्णाङ्क argcount, garray_T *type_gap)
 {
     // recognize commonly used types
-    if (ret_type == &t_unknown || ret_type == NULL)
+    जइ (ret_type == &t_unknown || ret_type == रिक्त)
     {
 	// (argcount == 0) is not possible
-	return &t_func_unknown;
+	प्रत्यागम &t_func_unknown;
     }
-    if (ret_type == &t_void)
+    जइ (ret_type == &t_void)
     {
-	if (argcount == 0)
-	    return &t_func_0_void;
-	else
-	    return &t_func_void;
+	जइ (argcount == 0)
+	    प्रत्यागम &t_func_0_void;
+	अण्णहा
+	    प्रत्यागम &t_func_void;
     }
-    if (ret_type == &t_any)
+    जइ (ret_type == &t_any)
     {
-	if (argcount == 0)
-	    return &t_func_0_any;
-	else
-	    return &t_func_any;
+	जइ (argcount == 0)
+	    प्रत्यागम &t_func_0_any;
+	अण्णहा
+	    प्रत्यागम &t_func_any;
     }
-    if (ret_type == &t_number)
+    जइ (ret_type == &t_सङ्ख्या)
     {
-	if (argcount == 0)
-	    return &t_func_0_number;
-	else
-	    return &t_func_number;
+	जइ (argcount == 0)
+	    प्रत्यागम &t_func_0_सङ्ख्या;
+	अण्णहा
+	    प्रत्यागम &t_func_सङ्ख्या;
     }
-    if (ret_type == &t_string)
+    जइ (ret_type == &t_string)
     {
-	if (argcount == 0)
-	    return &t_func_0_string;
-	else
-	    return &t_func_string;
+	जइ (argcount == 0)
+	    प्रत्यागम &t_func_0_string;
+	अण्णहा
+	    प्रत्यागम &t_func_string;
     }
 
-    return alloc_func_type(ret_type, argcount, type_gap);
+    प्रत्यागम alloc_func_type(ret_type, argcount, type_gap);
 }
 
 /*
  * For a function type, reserve space for "argcount" argument types (including
  * vararg).
  */
-    int
+    पूर्णाङ्क
 func_type_add_arg_types(
 	type_T	    *functype,
-	int	    argcount,
+	पूर्णाङ्क	    argcount,
 	garray_T    *type_gap)
 {
     // To make it easy to free the space needed for the argument types, add the
     // pointer to type_gap.
-    if (ga_grow(type_gap, 1) == FAIL)
-	return FAIL;
+    जइ (ga_grow(type_gap, 1) == FAIL)
+	प्रत्यागम FAIL;
     functype->tt_args = ALLOC_CLEAR_MULT(type_T *, argcount);
-    if (functype->tt_args == NULL)
-	return FAIL;
+    जइ (functype->tt_args == रिक्त)
+	प्रत्यागम FAIL;
     ((type_T **)type_gap->ga_data)[type_gap->ga_len] =
-						     (void *)functype->tt_args;
+						     (शून्य *)functype->tt_args;
     ++type_gap->ga_len;
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Return TRUE if "type" is NULL, any or unknown.
  * This also works for const (comparing with &t_any and &t_unknown doesn't).
  */
-    int
+    पूर्णाङ्क
 type_any_or_unknown(type_T *type)
 {
-    return type == NULL || type->tt_type == VAR_ANY
+    प्रत्यागम type == रिक्त || type->tt_type == VAR_ANY
 					|| type->tt_type == VAR_UNKNOWN;
 }
 
 /*
  * Get a type_T for a "special" typval in "tv".
  */
-    static type_T *
+    स्थिर type_T *
 special_typval2type(typval_T *tv)
 {
-    switch (tv->vval.v_number)
+    विकल्प (tv->vval.v_सङ्ख्या)
     {
-	case VVAL_NULL:
-	    return &t_null;
+	पक्ष VVAL_NULL:
+	    प्रत्यागम &t_null;
 
-	case VVAL_NONE:
-	    return &t_none;
+	पक्ष VVAL_NONE:
+	    प्रत्यागम &t_none;
 
-	case VVAL_TRUE:
-	case VVAL_FALSE:
-	    return &t_bool;
+	पक्ष VVAL_TRUE:
+	पक्ष VVAL_FALSE:
+	    प्रत्यागम &t_bool;
 
-	default:
-	    return &t_unknown;
+	स्वभाव:
+	    प्रत्यागम &t_unknown;
     }
 }
 
@@ -577,44 +577,44 @@ special_typval2type(typval_T *tv)
  * When "flags" has TVTT_MORE_SPECIFIC get the more specific member type if it
  * is "any".
  */
-    static type_T *
-list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+    स्थिर type_T *
+list_typval2type(typval_T *tv, पूर्णाङ्क copyID, garray_T *type_gap, पूर्णाङ्क flags)
 {
     list_T	*l = tv->vval.v_list;
     listitem_T	*li;
-    type_T	*member_type = NULL;
+    type_T	*member_type = रिक्त;
 
     // An empty list has type list<unknown>, unless the type was specified
     // and is not list<any>.  This matters when assigning to a variable
     // with a specific list type.
-    if (l == NULL || (l->lv_first == NULL
-		&& (l->lv_type == NULL || l->lv_type->tt_member == &t_any)))
-	return &t_list_empty;
+    जइ (l == रिक्त || (l->lv_first == रिक्त
+		&& (l->lv_type == रिक्त || l->lv_type->tt_member == &t_any)))
+	प्रत्यागम &t_list_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_list_any;
+    जइ ((flags & TVTT_DO_MEMBER) == 0)
+	प्रत्यागम &t_list_any;
 
     // If the type is list<any> go through the members, it may end up a
     // more specific type.
-    if (l->lv_type != NULL && (l->lv_first == NULL
+    जइ (l->lv_type != रिक्त && (l->lv_first == रिक्त
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| l->lv_type->tt_member != &t_any))
 	// make a copy, lv_type may be freed if the list is freed
-	return copy_type_deep(l->lv_type, type_gap);
+	प्रत्यागम copy_type_deep(l->lv_type, type_gap);
 
-    if (l->lv_first == &range_list_item)
-	return &t_list_number;
+    जइ (l->lv_first == &range_list_item)
+	प्रत्यागम &t_list_सङ्ख्या;
 
-    if (l->lv_copyID == copyID)
+    जइ (l->lv_copyID == copyID)
 	// avoid recursion
-	return &t_list_any;
+	प्रत्यागम &t_list_any;
 
     l->lv_copyID = copyID;
 
     // Use the common type of all members.
     member_type = typval2type(&l->lv_first->li_tv, copyID, type_gap,
 							TVTT_DO_MEMBER);
-    for (li = l->lv_first->li_next; li != NULL; li = li->li_next)
+    प्रति (li = l->lv_first->li_next; li != रिक्त; li = li->li_next)
 	common_type(typval2type(&li->li_tv, copyID, type_gap, TVTT_DO_MEMBER),
 					member_type, &member_type, type_gap);
 
@@ -622,7 +622,7 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     l->lv_copyID = 0;
 
-    return get_list_type(member_type, type_gap);
+    प्रत्यागम get_list_type(member_type, type_gap);
 }
 
 /*
@@ -632,49 +632,49 @@ list_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * When "flags" has TVTT_MORE_SPECIFIC get the more specific member type if it
  * is "any".
  */
-    static type_T *
-tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+    स्थिर type_T *
+tuple_typval2type(typval_T *tv, पूर्णाङ्क copyID, garray_T *type_gap, पूर्णाङ्क flags)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    int		len = tuple_len(tuple);
-    type_T	*type = NULL;
+    पूर्णाङ्क		len = tuple_len(tuple);
+    type_T	*type = रिक्त;
 
     // An empty tuple has type tuple<unknown>, unless the type was specified
     // and is not tuple<any>.  This matters when assigning to a variable
     // with a specific tuple type.
-    if (tuple == NULL || (len == 0 && (tuple->tv_type == NULL
+    जइ (tuple == रिक्त || (len == 0 && (tuple->tv_type == रिक्त
 				|| tuple->tv_type->tt_argcount == 0)))
-	return &t_tuple_empty;
+	प्रत्यागम &t_tuple_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_tuple_any;
+    जइ ((flags & TVTT_DO_MEMBER) == 0)
+	प्रत्यागम &t_tuple_any;
 
     // If the type is tuple<any> go through the members, it may end up a
     // more specific type.
-    if (tuple->tv_type != NULL && (len == 0
+    जइ (tuple->tv_type != रिक्त && (len == 0
 					|| (flags & TVTT_MORE_SPECIFIC) == 0))
 	// make a copy, tv_type may be freed if the tuple is freed
-	return copy_type_deep(tuple->tv_type, type_gap);
+	प्रत्यागम copy_type_deep(tuple->tv_type, type_gap);
 
-    if (tuple->tv_copyID == copyID)
+    जइ (tuple->tv_copyID == copyID)
 	// avoid recursion
-	return &t_tuple_any;
+	प्रत्यागम &t_tuple_any;
 
     tuple->tv_copyID = copyID;
 
     garray_T	tuple_types_ga;
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
-    for (int i = 0; i < len; i++)
+    ga_init2(&tuple_types_ga, परिमाण(type_T *), 10);
+    प्रति (पूर्णाङ्क i = 0; i < len; i++)
     {
 	type = typval2type(TUPLE_ITEM(tuple, i), copyID, type_gap,
 							TVTT_DO_MEMBER);
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	जइ (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
 	    // Reset copyID so that a shared reference to this tuple can be
 	    // processed again.
 	    tuple->tv_copyID = 0;
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
@@ -687,7 +687,7 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
     // reference) can be processed again to get the correct type.
     tuple->tv_copyID = 0;
 
-    return tuple_type;
+    प्रत्यागम tuple_type;
 }
 
 /*
@@ -697,146 +697,146 @@ tuple_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
  * When "flags" has TVTT_MORE_SPECIFIC get the more specific member type if it
  * is "any".
  */
-    static type_T *
-dict_typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+    स्थिर type_T *
+dict_typval2type(typval_T *tv, पूर्णाङ्क copyID, garray_T *type_gap, पूर्णाङ्क flags)
 {
     dict_iterator_T	iter;
-    typval_T		*value;
+    typval_T		*मानम्;
     dict_T		*d = tv->vval.v_dict;
-    type_T		*member_type = NULL;
+    type_T		*member_type = रिक्त;
 
-    if (d == NULL || (d->dv_hashtab.ht_used == 0 && d->dv_type == NULL))
-	return &t_dict_empty;
+    जइ (d == रिक्त || (d->dv_hashtab.ht_used == 0 && d->dv_type == रिक्त))
+	प्रत्यागम &t_dict_empty;
 
-    if ((flags & TVTT_DO_MEMBER) == 0)
-	return &t_dict_any;
+    जइ ((flags & TVTT_DO_MEMBER) == 0)
+	प्रत्यागम &t_dict_any;
 
     // If the type is dict<any> go through the members, it may end up a
     // more specific type.
-    if (d->dv_type != NULL && (d->dv_hashtab.ht_used == 0
+    जइ (d->dv_type != रिक्त && (d->dv_hashtab.ht_used == 0
 		|| (flags & TVTT_MORE_SPECIFIC) == 0
 		|| d->dv_type->tt_member != &t_any))
-	return d->dv_type;
+	प्रत्यागम d->dv_type;
 
-    if (d->dv_copyID == copyID)
+    जइ (d->dv_copyID == copyID)
 	// avoid recursion
-	return &t_dict_any;
+	प्रत्यागम &t_dict_any;
 
     d->dv_copyID = copyID;
 
     // Use the common type of all values.
     dict_iterate_start(tv, &iter);
-    dict_iterate_next(&iter, &value);
-    member_type = typval2type(value, copyID, type_gap, TVTT_DO_MEMBER);
+    dict_iterate_next(&iter, &मानम्);
+    member_type = typval2type(मानम्, copyID, type_gap, TVTT_DO_MEMBER);
 
-    while (dict_iterate_next(&iter, &value) != NULL)
-	common_type(typval2type(value, copyID, type_gap, TVTT_DO_MEMBER),
+    जाव (dict_iterate_next(&iter, &मानम्) != रिक्त)
+	common_type(typval2type(मानम्, copyID, type_gap, TVTT_DO_MEMBER),
 					member_type, &member_type, type_gap);
 
     // Reset copyID so that a shared reference to this dict (not a circular
     // reference) can be processed again to get the correct type.
     d->dv_copyID = 0;
 
-    return get_dict_type(member_type, type_gap);
+    प्रत्यागम get_dict_type(member_type, type_gap);
 }
 
 /*
  * Get a type_T for a "partial" typval in "tv".
  */
-    static type_T *
+    स्थिर type_T *
 partial_typval2type(typval_T *tv, ufunc_T *ufunc, garray_T *type_gap)
 {
     partial_T *pt = tv->vval.v_partial;
     type_T  *type;
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    जइ (type == रिक्त)
+	प्रत्यागम रिक्त;
 
     *type = *ufunc->uf_func_type;
-    if (type->tt_argcount >= 0 && pt->pt_argc > 0)
+    जइ (type->tt_argcount >= 0 && pt->pt_argc > 0)
     {
 	type->tt_argcount -= pt->pt_argc;
 	type->tt_min_argcount -= pt->pt_argc;
-	if (type->tt_argcount > 0 && func_type_add_arg_types(type,
+	जइ (type->tt_argcount > 0 && func_type_add_arg_types(type,
 		    type->tt_argcount, type_gap) == OK)
-	    for (int i = 0; i < type->tt_argcount; ++i)
+	    प्रति (पूर्णाङ्क i = 0; i < type->tt_argcount; ++i)
 		type->tt_args[i] =
 		    ufunc->uf_func_type->tt_args[i + pt->pt_argc];
     }
-    if (pt->pt_func != NULL)
+    जइ (pt->pt_func != रिक्त)
 	type->tt_member = pt->pt_func->uf_ret_type;
 
-    return type;
+    प्रत्यागम type;
 }
 
 /*
  * Get a type_T for a "class" or an "object" typval in "tv".
  */
-    static type_T *
+    स्थिर type_T *
 oc_typval2type(typval_T *tv)
 {
-    if (tv->v_type == VAR_CLASS)
+    जइ (tv->v_type == VAR_CLASS)
     {
-	if (tv->vval.v_class == NULL)
-	    return &t_class;
+	जइ (tv->vval.v_class == रिक्त)
+	    प्रत्यागम &t_class;
 
-	return &tv->vval.v_class->class_type;
+	प्रत्यागम &tv->vval.v_class->class_type;
     }
 
-    if (tv->vval.v_object != NULL)
-	return &tv->vval.v_object->obj_class->class_object_type;
+    जइ (tv->vval.v_object != रिक्त)
+	प्रत्यागम &tv->vval.v_object->obj_class->class_object_type;
 
-    return &t_object_any;
+    प्रत्यागम &t_object_any;
 }
 
 /*
  * Get a type_T for a "function" or a "partial"
  */
-    static type_T *
+    स्थिर type_T *
 fp_typval2type(typval_T *tv, garray_T *type_gap)
 {
-    char_u	*name = NULL;
-    ufunc_T	*ufunc = NULL;
+    char_u	*name = रिक्त;
+    ufunc_T	*ufunc = रिक्त;
     type_T	*type;
-    type_T	*member_type = NULL;
-    int		argcount = 0;
-    int		min_argcount = 0;
+    type_T	*member_type = रिक्त;
+    पूर्णाङ्क		argcount = 0;
+    पूर्णाङ्क		min_argcount = 0;
 
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
+    जइ (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != रिक्त)
     {
-	if (tv->vval.v_partial->pt_func != NULL)
+	जइ (tv->vval.v_partial->pt_func != रिक्त)
 	    ufunc = tv->vval.v_partial->pt_func;
-	else
+	अण्णहा
 	    name = tv->vval.v_partial->pt_name;
     }
-    else
+    अण्णहा
 	name = tv->vval.v_string;
 
-    if (name == NULL && ufunc == NULL)
-	return &t_func_unknown;
+    जइ (name == रिक्त && ufunc == रिक्त)
+	प्रत्यागम &t_func_unknown;
 
-    if (name != NULL)
+    जइ (name != रिक्त)
     {
-	int idx = find_internal_func(name);
+	पूर्णाङ्क idx = find_internal_func(name);
 
-	if (idx >= 0)
+	जइ (idx >= 0)
 	{
 	    type_T *decl_type;  // unused
 
 	    internal_func_get_argcount(idx, &argcount, &min_argcount);
-	    member_type = internal_func_ret_type(idx, 0, NULL, &decl_type,
+	    member_type = internal_func_ret_type(idx, 0, रिक्त, &decl_type,
 		    type_gap);
 	}
-	else
+	अण्णहा
 	{
 	    // Check if name contains "<".  If it does, then replace "<" with
 	    // NUL and lookup the function and then look up the specific
 	    // generic function using the supplied types.
 	    char_u *p = generic_func_find_open_bracket(name);
-	    if (p == NULL)
+	    जइ (p == रिक्त)
 		ufunc = find_func(name, FALSE);
-	    else
+	    अण्णहा
 	    {
 		// generic function
 		char_u	cc = *p;
@@ -844,40 +844,40 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
 		*p = NUL;
 		ufunc = find_func(name, FALSE);
 		*p = cc;
-		if (ufunc != NULL && IS_GENERIC_FUNC(ufunc))
+		जइ (ufunc != रिक्त && IS_GENERIC_FUNC(ufunc))
 		{
 		    ufunc = find_generic_func(ufunc, name, &p);
-		    if (ufunc == NULL)
-			return NULL;
+		    जइ (ufunc == रिक्त)
+			प्रत्यागम रिक्त;
 		}
 	    }
 	}
     }
-    if (ufunc != NULL)
+    जइ (ufunc != रिक्त)
     {
 	// May need to get the argument types from default values by
 	// compiling the function.
-	if (ufunc->uf_def_status == UF_TO_BE_COMPILED
-		&& compile_def_function(ufunc, TRUE, CT_NONE, NULL)
+	जइ (ufunc->uf_def_status == UF_TO_BE_COMPILED
+		&& compile_def_function(ufunc, TRUE, CT_NONE, रिक्त)
 		== FAIL)
-	    return NULL;
-	if (ufunc->uf_func_type == NULL)
+	    प्रत्यागम रिक्त;
+	जइ (ufunc->uf_func_type == रिक्त)
 	    set_function_type(ufunc);
-	if (ufunc->uf_func_type != NULL)
+	जइ (ufunc->uf_func_type != रिक्त)
 	{
-	    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL)
-		return partial_typval2type(tv, ufunc, type_gap);
-	    return ufunc->uf_func_type;
+	    जइ (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != रिक्त)
+		प्रत्यागम partial_typval2type(tv, ufunc, type_gap);
+	    प्रत्यागम ufunc->uf_func_type;
 	}
     }
 
     type = get_type_ptr(type_gap);
-    if (type == NULL)
-	return NULL;
+    जइ (type == रिक्त)
+	प्रत्यागम रिक्त;
     type->tt_type = tv->v_type;
     type->tt_argcount = argcount;
     type->tt_min_argcount = min_argcount;
-    if (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != NULL
+    जइ (tv->v_type == VAR_PARTIAL && tv->vval.v_partial != रिक्त
 					&& tv->vval.v_partial->pt_argc > 0)
     {
 	type->tt_argcount -= tv->vval.v_partial->pt_argc;
@@ -885,7 +885,7 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
     }
     type->tt_member = member_type;
 
-    return type;
+    प्रत्यागम type;
 }
 
 /*
@@ -896,83 +896,83 @@ fp_typval2type(typval_T *tv, garray_T *type_gap)
  * When "flags" has TVTT_MORE_SPECIFIC get the more specific member type if it
  * is "any".
  */
-    static type_T *
-typval2type_int(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+    स्थिर type_T *
+typval2type_int(typval_T *tv, पूर्णाङ्क copyID, garray_T *type_gap, पूर्णाङ्क flags)
 {
-    switch (tv->v_type)
+    विकल्प (tv->v_type)
     {
-	case VAR_UNKNOWN:
-	    return &t_unknown;
+	पक्ष VAR_UNKNOWN:
+	    प्रत्यागम &t_unknown;
 
-	case VAR_ANY:
-	    return &t_any;
+	पक्ष VAR_ANY:
+	    प्रत्यागम &t_any;
 
-	case VAR_VOID:
-	    return &t_void;
+	पक्ष VAR_VOID:
+	    प्रत्यागम &t_void;
 
-	case VAR_BOOL:
-	    return &t_bool;
+	पक्ष VAR_BOOL:
+	    प्रत्यागम &t_bool;
 
-	case VAR_SPECIAL:
-	    return special_typval2type(tv);
+	पक्ष VAR_SPECIAL:
+	    प्रत्यागम special_typval2type(tv);
 
-	case VAR_NUMBER:
-	    return &t_number;
+	पक्ष VAR_सङ्ख्या:
+	    प्रत्यागम &t_सङ्ख्या;
 
-	case VAR_FLOAT:
-	    return &t_float;
+	पक्ष VAR_FLOAT:
+	    प्रत्यागम &t_float;
 
-	case VAR_STRING:
-	    return &t_string;
+	पक्ष VAR_STRING:
+	    प्रत्यागम &t_string;
 
-	case VAR_BLOB:
-	    if (tv->vval.v_blob == NULL)
-		return &t_blob_null;
-	    return &t_blob;
+	पक्ष VAR_BLOB:
+	    जइ (tv->vval.v_blob == रिक्त)
+		प्रत्यागम &t_blob_null;
+	    प्रत्यागम &t_blob;
 
-	case VAR_LIST:
-	    return list_typval2type(tv, copyID, type_gap, flags);
+	पक्ष VAR_LIST:
+	    प्रत्यागम list_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_TUPLE:
-	    return tuple_typval2type(tv, copyID, type_gap, flags);
+	पक्ष VAR_TUPLE:
+	    प्रत्यागम tuple_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_DICT:
-	    return dict_typval2type(tv, copyID, type_gap, flags);
+	पक्ष VAR_DICT:
+	    प्रत्यागम dict_typval2type(tv, copyID, type_gap, flags);
 
-	case VAR_JOB:
-	    return &t_job;
+	पक्ष VAR_JOB:
+	    प्रत्यागम &t_job;
 
-	case VAR_CHANNEL:
-	    return &t_channel;
+	पक्ष VAR_CHANNEL:
+	    प्रत्यागम &t_channel;
 
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	    return oc_typval2type(tv);
+	पक्ष VAR_CLASS:
+	पक्ष VAR_OBJECT:
+	    प्रत्यागम oc_typval2type(tv);
 
-	case VAR_TYPEALIAS:
-	    return &t_typealias;
+	पक्ष VAR_TYPEALIAS:
+	    प्रत्यागम &t_typealias;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    return fp_typval2type(tv, type_gap);
+	पक्ष VAR_FUNC:
+	पक्ष VAR_PARTIAL:
+	    प्रत्यागम fp_typval2type(tv, type_gap);
 
-	case VAR_INSTR:
-	default:
-	    break;
+	पक्ष VAR_INSTR:
+	स्वभाव:
+	    भङ्ग;
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Return TRUE if "tv" is not a bool but should be converted to bool.
  */
-    int
+    पूर्णाङ्क
 need_convert_to_bool(type_T *type, typval_T *tv)
 {
-    return type != NULL && type == &t_bool && tv->v_type != VAR_BOOL
-	    && (tv->v_type == VAR_NUMBER
-		       && (tv->vval.v_number == 0 || tv->vval.v_number == 1));
+    प्रत्यागम type != रिक्त && type == &t_bool && tv->v_type != VAR_BOOL
+	    && (tv->v_type == VAR_सङ्ख्या
+		       && (tv->vval.v_सङ्ख्या == 0 || tv->vval.v_सङ्ख्या == 1));
 }
 
 /*
@@ -983,41 +983,41 @@ need_convert_to_bool(type_T *type, typval_T *tv)
  * When "flags" has TVTT_MORE_SPECIFIC get the most specific member type.
  */
     type_T *
-typval2type(typval_T *tv, int copyID, garray_T *type_gap, int flags)
+typval2type(typval_T *tv, पूर्णाङ्क copyID, garray_T *type_gap, पूर्णाङ्क flags)
 {
     type_T *type = typval2type_int(tv, copyID, type_gap, flags);
 
-    if (type == NULL)
-	return NULL;
+    जइ (type == रिक्त)
+	प्रत्यागम रिक्त;
 
-    if (type != &t_bool && (tv->v_type == VAR_NUMBER
-		&& (tv->vval.v_number == 0 || tv->vval.v_number == 1)))
+    जइ (type != &t_bool && (tv->v_type == VAR_सङ्ख्या
+		&& (tv->vval.v_सङ्ख्या == 0 || tv->vval.v_सङ्ख्या == 1)))
 	// Number 0 and 1 and expression with "&&" or "||" can also be used
 	// for bool.
-	type = &t_number_bool;
-    else if (type != &t_float && tv->v_type == VAR_NUMBER)
+	type = &t_सङ्ख्या_bool;
+    अण्णहा जइ (type != &t_float && tv->v_type == VAR_सङ्ख्या)
 	// A number can also be used for float.
-	type = &t_number_float;
-    return type;
+	type = &t_सङ्ख्या_float;
+    प्रत्यागम type;
 }
 
 /*
  * Return TRUE if "type" can be used for a variable declaration.
  * Give an error and return FALSE if not.
  */
-    int
+    पूर्णाङ्क
 valid_declaration_type(type_T *type)
 {
-    if (type->tt_type == VAR_SPECIAL  // null, none
+    जइ (type->tt_type == VAR_SPECIAL  // null, none
 	    || type->tt_type == VAR_VOID)
     {
-	char *tofree = NULL;
-	char *name = type_name(type, &tofree);
+	वर्ण *tofree = रिक्त;
+	वर्ण *name = type_name(type, &tofree);
 	semsg(_(e_invalid_type_in_variable_declaration_str), name);
 	vim_free(tofree);
-	return FALSE;
+	प्रत्यागम FALSE;
     }
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
@@ -1027,41 +1027,41 @@ valid_declaration_type(type_T *type)
     type_T *
 typval2type_vimvar(typval_T *tv, garray_T *type_gap)
 {
-    if (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
-	return &t_list_string;
-    if (tv->v_type == VAR_DICT)  // e.g. for v:event
-	return &t_dict_any;
-    return typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
+    जइ (tv->v_type == VAR_LIST)  // e.g. for v:oldfiles
+	प्रत्यागम &t_list_string;
+    जइ (tv->v_type == VAR_DICT)  // e.g. for v:event
+	प्रत्यागम &t_dict_any;
+    प्रत्यागम typval2type(tv, get_copyID(), type_gap, TVTT_DO_MEMBER);
 }
 
-    int
+    पूर्णाङ्क
 check_typval_arg_type(
 	type_T	    *expected,
 	typval_T    *actual_tv,
-	char	    *func_name,
-	int	    arg_idx)
+	वर्ण	    *func_name,
+	पूर्णाङ्क	    arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    जइ (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
     }
     where.wt_func_name = func_name;
-    return check_typval_type(expected, actual_tv, where);
+    प्रत्यागम check_typval_type(expected, actual_tv, where);
 }
 
 /*
  * Return true if "expected" is list<any> or dict<any> and "actual_tv" is a
  * list or dict of that kind, which matches whatever its values are.
  */
-    static bool
+    स्थिर bool
 matches_listdict_any(type_T *expected, typval_T *actual_tv)
 {
-    return (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
+    प्रत्यागम (expected->tt_type == VAR_LIST || expected->tt_type == VAR_DICT)
 	    && actual_tv->v_type == expected->tt_type
-	    && expected->tt_member != NULL
+	    && expected->tt_member != रिक्त
 	    && (expected->tt_member->tt_type == VAR_ANY
 		|| expected->tt_member->tt_type == VAR_UNKNOWN);
 }
@@ -1070,39 +1070,39 @@ matches_listdict_any(type_T *expected, typval_T *actual_tv)
  * Return FAIL if "expected" and "actual" don't match.
  * When "argidx" > 0 it is included in the error message.
  */
-    int
+    पूर्णाङ्क
 check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 {
     garray_T	type_list;
     type_T	*actual_type;
-    int		res = FAIL;
+    पूर्णाङ्क		res = FAIL;
 
-    if (expected == NULL)
-	return OK;  // didn't expect anything.
+    जइ (expected == रिक्त)
+	प्रत्यागम OK;  // didn't expect anything.
 
     // No need to go through the values of a possibly big list or dict.
-    if (matches_listdict_any(expected, actual_tv))
-	return OK;
+    जइ (matches_listdict_any(expected, actual_tv))
+	प्रत्यागम OK;
 
-    ga_init2(&type_list, sizeof(type_T *), 10);
+    ga_init2(&type_list, परिमाण(type_T *), 10);
 
     // A null_function and null_partial are special cases, they can be used to
     // clear a variable.
-    if ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == NULL)
+    जइ ((actual_tv->v_type == VAR_FUNC && actual_tv->vval.v_string == रिक्त)
 	    || (actual_tv->v_type == VAR_PARTIAL
-					 && actual_tv->vval.v_partial == NULL))
+					 && actual_tv->vval.v_partial == रिक्त))
 	actual_type = &t_func_unknown;
-    else
+    अण्णहा
 	// When the actual type is list<any> or dict<any> go through the values
 	// to possibly get a more specific type.
 	actual_type = typval2type(actual_tv, get_copyID(), &type_list,
 					  TVTT_DO_MEMBER | TVTT_MORE_SPECIFIC);
-    if (actual_type != NULL)
+    जइ (actual_type != रिक्त)
     {
 	res = check_type_maybe(expected, actual_type, TRUE, where);
-	if (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
+	जइ (res == MAYBE && !(actual_type->tt_type == VAR_FUNC
 				      && (actual_type->tt_member == &t_unknown
-					  || actual_type->tt_member == NULL)))
+					  || actual_type->tt_member == रिक्त)))
 	{
 	    // If a type check is needed that means assigning "any" or
 	    // "unknown" to a more specific type, which fails here.
@@ -1114,15 +1114,15 @@ check_typval_type(type_T *expected, typval_T *actual_tv, where_T where)
 	}
     }
     clear_type_list(&type_list);
-    return res;
+    प्रत्यागम res;
 }
 
-    void
-arg_type_mismatch(type_T *expected, type_T *actual, int arg_idx)
+    शून्य
+arg_type_mismatch(type_T *expected, type_T *actual, पूर्णाङ्क arg_idx)
 {
     where_T	where = WHERE_INIT;
 
-    if (arg_idx > 0)
+    जइ (arg_idx > 0)
     {
 	where.wt_index = arg_idx;
 	where.wt_kind = WT_ARGUMENT;
@@ -1130,50 +1130,50 @@ arg_type_mismatch(type_T *expected, type_T *actual, int arg_idx)
     type_mismatch_where(expected, actual, where);
 }
 
-    void
+    शून्य
 type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 {
-    char *tofree1, *tofree2;
-    char *typename1 = type_name(expected, &tofree1);
-    char *typename2 = type_name(actual, &tofree2);
+    वर्ण *tofree1, *tofree2;
+    वर्ण *typename1 = type_name(expected, &tofree1);
+    वर्ण *typename2 = type_name(actual, &tofree2);
 
-    switch (where.wt_kind)
+    विकल्प (where.wt_kind)
     {
-	case WT_MEMBER:
+	पक्ष WT_MEMBER:
 	    semsg(_(e_variable_str_type_mismatch_expected_str_but_got_str),
 		    where.wt_func_name, typename1, typename2);
-	    break;
-	case WT_METHOD:
-	case WT_METHOD_ARG:
-	case WT_METHOD_RETURN:
+	    भङ्ग;
+	पक्ष WT_METHOD:
+	पक्ष WT_METHOD_ARG:
+	पक्ष WT_METHOD_RETURN:
 	    semsg(_(e_method_str_type_mismatch_expected_str_but_got_str),
 		    where.wt_func_name, typename1, typename2);
-	    break;
-	case WT_VARIABLE:
-	    if (where.wt_func_name == NULL)
+	    भङ्ग;
+	पक्ष WT_VARIABLE:
+	    जइ (where.wt_func_name == रिक्त)
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    अण्णहा
 		semsg(_(e_variable_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
-	    break;
-	case WT_ARGUMENT:
-	    if (where.wt_func_name == NULL)
+	    भङ्ग;
+	पक्ष WT_ARGUMENT:
+	    जइ (where.wt_func_name == रिक्त)
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str),
 			where.wt_index, typename1, typename2);
-	    else
+	    अण्णहा
 		semsg(_(e_argument_nr_type_mismatch_expected_str_but_got_str_in_str),
 			where.wt_index, typename1, typename2, where.wt_func_name);
-	    break;
-	case WT_CAST:
-	case WT_UNKNOWN:
-	    if (where.wt_func_name == NULL)
+	    भङ्ग;
+	पक्ष WT_CAST:
+	पक्ष WT_UNKNOWN:
+	    जइ (where.wt_func_name == रिक्त)
 		semsg(_(e_type_mismatch_expected_str_but_got_str),
 			typename1, typename2);
-	    else
+	    अण्णहा
 		semsg(_(e_type_mismatch_expected_str_but_got_str_in_str),
 			typename1, typename2, where.wt_func_name);
-	    break;
+	    भङ्ग;
     }
 
     vim_free(tofree1);
@@ -1183,58 +1183,58 @@ type_mismatch_where(type_T *expected, type_T *actual, where_T where)
 /*
  * Check if the expected and actual types match for a tuple
  */
-    static int
+    स्थिर पूर्णाङ्क
 check_tuple_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    if (expected->tt_argcount == -1 || actual->tt_argcount == -1
-		|| expected->tt_args == NULL || actual->tt_args == NULL)
-	return OK;
+    जइ (expected->tt_argcount == -1 || actual->tt_argcount == -1
+		|| expected->tt_args == रिक्त || actual->tt_args == रिक्त)
+	प्रत्यागम OK;
 
     // For a non-variadic tuple, the number of items must match
-    if (!(expected->tt_flags & TTFLAG_VARARGS)
+    जइ (!(expected->tt_flags & TTFLAG_VARARGS)
 	    && expected->tt_argcount != actual->tt_argcount)
-	return FAIL;
+	प्रत्यागम FAIL;
 
     // compare the type of each tuple item
-    for (int i = 0; i < actual->tt_argcount; ++i)
+    प्रति (पूर्णाङ्क i = 0; i < actual->tt_argcount; ++i)
     {
 	type_T	*exp_type;
 	type_T	*actual_type;
 
-	if (expected->tt_flags & TTFLAG_VARARGS)
+	जइ (expected->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < expected->tt_argcount - 1)
+	    जइ (i < expected->tt_argcount - 1)
 		exp_type = expected->tt_args[i];
-	    else
+	    अण्णहा
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		exp_type = expected->tt_args[expected->tt_argcount - 1]->tt_member;
 	}
-	else
+	अण्णहा
 	    exp_type = expected->tt_args[i];
 
-	if (actual->tt_flags & TTFLAG_VARARGS)
+	जइ (actual->tt_flags & TTFLAG_VARARGS)
 	{
-	    if (i < actual->tt_argcount - 1)
+	    जइ (i < actual->tt_argcount - 1)
 		actual_type = actual->tt_args[i];
-	    else
+	    अण्णहा
 		// For a variadic tuple, the last type is a List.  So use the
 		// List member type.
 		actual_type = actual->tt_args[actual->tt_argcount - 1]->tt_member;
 	}
-	else
+	अण्णहा
 	    actual_type = actual->tt_args[i];
 
 	// Allow for using "any" type for a tuple item
-	if (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
+	जइ (actual->tt_args[i] != &t_any && check_type(exp_type, actual_type,
 						FALSE, where) == FAIL)
-	    return FAIL;
+	    प्रत्यागम FAIL;
     }
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
@@ -1243,19 +1243,19 @@ check_tuple_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    स्थिर पूर्णाङ्क
 check_func_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    पूर्णाङ्क ret = OK;
 
     // If the return type is unknown it can be anything, including
     // nothing, thus there is no point in checking.
-    if (expected->tt_member != &t_unknown)
+    जइ (expected->tt_member != &t_unknown)
     {
-	if (actual->tt_member != NULL
+	जइ (actual->tt_member != रिक्त
 		&& actual->tt_member != &t_unknown)
 	{
 	    where_T  func_where = where;
@@ -1265,47 +1265,47 @@ check_func_type_maybe(
 		    actual->tt_member, FALSE,
 		    func_where);
 	}
-	else
+	अण्णहा
 	    ret = MAYBE;
     }
-    if (ret != FAIL
+    जइ (ret != FAIL
 	    && ((expected->tt_flags & TTFLAG_VARARGS)
 		!= (actual->tt_flags & TTFLAG_VARARGS))
 	    && expected->tt_argcount != -1)
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_argcount != -1
+    जइ (ret != FAIL && expected->tt_argcount != -1
 	    && actual->tt_min_argcount != -1
 	    && (actual->tt_argcount == -1
 		|| (actual->tt_argcount < expected->tt_min_argcount
 		    || actual->tt_argcount > expected->tt_argcount)))
 	ret = FAIL;
-    if (ret != FAIL && expected->tt_args != NULL
-	    && actual->tt_args != NULL)
+    जइ (ret != FAIL && expected->tt_args != रिक्त
+	    && actual->tt_args != रिक्त)
     {
-	int i;
+	पूर्णाङ्क i;
 
-	for (i = 0; i < expected->tt_argcount
+	प्रति (i = 0; i < expected->tt_argcount
 		&& i < actual->tt_argcount; ++i)
 	{
 	    where_T  func_where = where;
 	    func_where.wt_kind = WT_METHOD_ARG;
 
 	    // Allow for using "any" argument type, lambda's have them.
-	    if (actual->tt_args[i] != &t_any && check_type(
+	    जइ (actual->tt_args[i] != &t_any && check_type(
 			expected->tt_args[i], actual->tt_args[i], FALSE,
 			func_where) == FAIL)
 	    {
 		ret = FAIL;
-		break;
+		भङ्ग;
 	    }
 	}
     }
-    if (ret == OK && expected->tt_argcount >= 0
+    जइ (ret == OK && expected->tt_argcount >= 0
 	    && actual->tt_argcount == -1)
 	// check the argument count at runtime
 	ret = MAYBE;
 
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
@@ -1314,43 +1314,43 @@ check_func_type_maybe(
  * Returns FAIL if "expected" and "actual" are different types.
  * Returns MAYBE when a runtime type check is needed.
  */
-    static int
+    स्थिर पूर्णाङ्क
 check_object_type_maybe(
     type_T	*expected,
     type_T	*actual,
     where_T	where)
 {
-    int ret = OK;
+    पूर्णाङ्क ret = OK;
 
-    if (actual->tt_type == VAR_ANY)
-	return MAYBE;	// use runtime type check
-    if (actual->tt_type != VAR_OBJECT)
-	return FAIL;	// don't use tt_class
-    if (actual->tt_class == NULL)    // null object
-	return OK;
+    जइ (actual->tt_type == VAR_ANY)
+	प्रत्यागम MAYBE;	// use runtime type check
+    जइ (actual->tt_type != VAR_OBJECT)
+	प्रत्यागम FAIL;	// don't use tt_class
+    जइ (actual->tt_class == रिक्त)    // null object
+	प्रत्यागम OK;
     // t_object_any matches any object except for an enum item
-    if (expected == &t_object_any && !IS_ENUM(actual->tt_class))
-	return OK;
+    जइ (expected == &t_object_any && !IS_ENUM(actual->tt_class))
+	प्रत्यागम OK;
 
     // For object method arguments, do a invariant type check in
     // an extended class.  For all others, do a covariance type check.
-    if (where.wt_kind == WT_METHOD_ARG)
+    जइ (where.wt_kind == WT_METHOD_ARG)
     {
-	if (actual->tt_class != expected->tt_class)
+	जइ (actual->tt_class != expected->tt_class)
 	    ret = FAIL;
     }
-    else if (!class_instance_of(actual->tt_class, expected->tt_class))
+    अण्णहा जइ (!class_instance_of(actual->tt_class, expected->tt_class))
     {
 	// Check if this is an up-cast, if so we'll have to check the type at
 	// runtime.
-	if (where.wt_kind == WT_CAST &&
+	जइ (where.wt_kind == WT_CAST &&
 		class_instance_of(expected->tt_class, actual->tt_class))
 	    ret = MAYBE;
-	else
+	अण्णहा
 	    ret = FAIL;
     }
 
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
@@ -1360,34 +1360,34 @@ check_object_type_maybe(
  * Return OK if types match.
  * Return FAIL if types do not match.
  */
-    int
+    पूर्णाङ्क
 check_type(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	पूर्णाङ्क	give_सन्देशः,
 	where_T where)
 {
-    int ret = check_type_maybe(expected, actual, give_msg, where);
+    पूर्णाङ्क ret = check_type_maybe(expected, actual, give_सन्देशः, where);
 
-    return ret == MAYBE ? OK : ret;
+    प्रत्यागम ret == MAYBE ? OK : ret;
 }
 
 /*
  * As check_type() but return MAYBE when a runtime type check should be used
  * when compiling.
  */
-    int
+    पूर्णाङ्क
 check_type_maybe(
 	type_T	*expected,
 	type_T	*actual,
-	int	give_msg,
+	पूर्णाङ्क	give_सन्देशः,
 	where_T where)
 {
-    int ret = OK;
+    पूर्णाङ्क ret = OK;
 
     // When expected is "unknown" we accept any actual type.
     // When expected is "any" we accept any actual type except "void".
-    if (expected->tt_type != VAR_UNKNOWN
+    जइ (expected->tt_type != VAR_UNKNOWN
 	    && !(expected->tt_type == VAR_ANY && actual->tt_type != VAR_VOID))
 
     {
@@ -1395,56 +1395,56 @@ check_type_maybe(
 	// variable with type "func".
 	// And "unknown" (using global variable) and "any" need a runtime type
 	// check.
-	if (!(expected->tt_type == actual->tt_type
+	जइ (!(expected->tt_type == actual->tt_type
 		    || actual->tt_type == VAR_UNKNOWN
 		    || actual->tt_type == VAR_ANY
 		    || (expected->tt_type == VAR_FUNC
 					   && actual->tt_type == VAR_PARTIAL)))
 	{
-	    if (expected->tt_type == VAR_BOOL
+	    जइ (expected->tt_type == VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		// Using number 0 or 1 for bool is OK.
-		return OK;
-	    if (expected->tt_type == VAR_FLOAT
-		    && actual->tt_type == VAR_NUMBER
-		    && ((expected->tt_flags & TTFLAG_NUMBER_OK)
+		प्रत्यागम OK;
+	    जइ (expected->tt_type == VAR_FLOAT
+		    && actual->tt_type == VAR_सङ्ख्या
+		    && ((expected->tt_flags & TTFLAG_सङ्ख्या_OK)
 			     || (actual->tt_flags & TTFLAG_FLOAT_OK)))
 		// Using a number where a float is expected is OK here.
-		return OK;
-	    if (expected->tt_type == VAR_LIST
+		प्रत्यागम OK;
+	    जइ (expected->tt_type == VAR_LIST
 		    && actual->tt_type == VAR_TUPLE
 		    && (expected->tt_flags & TTFLAG_TUPLE_OK))
 		// Using a tuple where a list is expected is OK here.
-		return OK;
-	    if (give_msg)
+		प्रत्यागम OK;
+	    जइ (give_सन्देशः)
 		type_mismatch_where(expected, actual, where);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
-	if (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
+	जइ (expected->tt_type == VAR_DICT || expected->tt_type == VAR_LIST)
 	{
 	    // "unknown" is used for an empty list or dict
-	    if (actual->tt_member != NULL && actual->tt_member != &t_unknown)
+	    जइ (actual->tt_member != रिक्त && actual->tt_member != &t_unknown)
 		ret = check_type_maybe(expected->tt_member, actual->tt_member,
 								 FALSE, where);
 	}
-	else if (expected->tt_type == VAR_TUPLE && actual != &t_any)
+	अण्णहा जइ (expected->tt_type == VAR_TUPLE && actual != &t_any)
 	    ret =  check_tuple_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_FUNC && actual != &t_any)
+	अण्णहा जइ (expected->tt_type == VAR_FUNC && actual != &t_any)
 	    ret = check_func_type_maybe(expected, actual, where);
-	else if (expected->tt_type == VAR_OBJECT)
+	अण्णहा जइ (expected->tt_type == VAR_OBJECT)
 	    ret = check_object_type_maybe(expected, actual, where);
 
-	if (ret == FAIL && give_msg)
+	जइ (ret == FAIL && give_सन्देशः)
 	    type_mismatch_where(expected, actual, where);
     }
 
-    if (ret == OK && expected->tt_type != VAR_UNKNOWN
+    जइ (ret == OK && expected->tt_type != VAR_UNKNOWN
 	    && expected->tt_type != VAR_ANY
 	    && (actual->tt_type == VAR_UNKNOWN || actual->tt_type == VAR_ANY))
 	// check the type at runtime
 	ret = MAYBE;
 
-    return ret;
+    प्रत्यागम ret;
 }
 
 /*
@@ -1452,65 +1452,65 @@ check_type_maybe(
  * "base_tv" is from "expr->Func()".
  * Return OK/FAIL.
  */
-    int
+    पूर्णाङ्क
 check_argument_types(
 	type_T	    *type,
 	typval_T    *argvars,
-	int	    argcount,
+	पूर्णाङ्क	    argcount,
 	typval_T    *base_tv,
 	char_u	    *name)
 {
-    int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    int	    i;
-    int	    totcount = argcount + (base_tv == NULL ? 0 : 1);
+    पूर्णाङ्क	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    पूर्णाङ्क	    i;
+    पूर्णाङ्क	    totcount = argcount + (base_tv == रिक्त ? 0 : 1);
 
-    if (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
-	return OK;  // just in case
-    if (totcount < type->tt_min_argcount - varargs)
+    जइ (type->tt_type != VAR_FUNC && type->tt_type != VAR_PARTIAL)
+	प्रत्यागम OK;  // just in case
+    जइ (totcount < type->tt_min_argcount - varargs)
     {
 	emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    if (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
+    जइ (!varargs && type->tt_argcount >= 0 && totcount > type->tt_argcount)
     {
 	emsg_funcname(e_too_many_arguments_for_function_str, name);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
-    if (type->tt_args == NULL)
-	return OK;  // cannot check
+    जइ (type->tt_args == रिक्त)
+	प्रत्यागम OK;  // cannot check
 
 
-    for (i = 0; i < totcount; ++i)
+    प्रति (i = 0; i < totcount; ++i)
     {
 	type_T	    *expected;
 	typval_T    *tv;
 
-	if (base_tv != NULL)
+	जइ (base_tv != रिक्त)
 	{
-	    if (i == 0)
+	    जइ (i == 0)
 		tv = base_tv;
-	    else
+	    अण्णहा
 		tv = &argvars[i - 1];
 	}
-	else
+	अण्णहा
 	    tv = &argvars[i];
-	if (varargs && i >= type->tt_argcount - 1)
+	जइ (varargs && i >= type->tt_argcount - 1)
 	{
 	    expected = type->tt_args[type->tt_argcount - 1];
-	    if (expected != NULL && expected->tt_type == VAR_LIST)
+	    जइ (expected != रिक्त && expected->tt_type == VAR_LIST)
 		expected = expected->tt_member;
-	    if (expected == NULL)
+	    जइ (expected == रिक्त)
 		expected = &t_any;
 	}
-	else
+	अण्णहा
 	    expected = type->tt_args[i];
 
 	// check the type, unless the value is v:none
-	if ((tv->v_type != VAR_SPECIAL || tv->vval.v_number != VVAL_NONE)
-		   && check_typval_arg_type(expected, tv, NULL, i + 1) == FAIL)
-	    return FAIL;
+	जइ ((tv->v_type != VAR_SPECIAL || tv->vval.v_सङ्ख्या != VVAL_NONE)
+		   && check_typval_arg_type(expected, tv, रिक्त, i + 1) == FAIL)
+	    प्रत्यागम FAIL;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 // Maximum nesting of types, to avoid running out of stack space.  E.g.
@@ -1520,127 +1520,127 @@ check_argument_types(
 // Current number of levels of parse_type() and the deepest level reached while
 // parsing the current type.  The nesting is one less than the number of
 // levels.
-static int	parse_depth = 0;
-static int	parse_max_depth = 0;
+स्थिर पूर्णाङ्क	parse_depth = 0;
+स्थिर पूर्णाङ्क	parse_max_depth = 0;
 
 /*
  * Skip over type in list<type>, dict<type> or tuple<type>.
  * Returns a pointer to the character after the type.  "syn_error" is set to
  * TRUE on syntax error.
  */
-    static char_u *
-skip_member_type(char_u *start, char_u *p, int *syn_error)
+    स्थिर char_u *
+skip_member_type(char_u *start, char_u *p, पूर्णाङ्क *syn_error)
 {
-    if (STRNCMP("tuple", start, 5) == 0)
+    जइ (STRNCMP("tuple", start, 5) == 0)
     {
 	// handle tuple<{type1}, {type2}, ....<type>>
 	p = skipwhite(p + 1);
-	while (*p != '>' && *p != NUL)
+	जाव (*p != '>' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    जइ (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    जइ (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		प्रत्यागम p;  // syntax error
 	    }
-	    if (*p == ',')
+	    जइ (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == '>')
+	जइ (*p == '>')
 	    p++;
     }
-    else
+    अण्णहा
     {
 	p = skipwhite(p);
 	p = skip_type(skipwhite(p + 1), FALSE);
 	p = skipwhite(p);
-	if (*p == '>')
+	जइ (*p == '>')
 	    ++p;
     }
 
-    return p;
+    प्रत्यागम p;
 }
 
 /*
  * Skip over a function type.  Returns a pointer to the character after the
  * type.  "syn_error" is set to TRUE on syntax error.
  */
-    static char_u *
-skip_func_type(char_u *p, int *syn_error)
+    स्थिर char_u *
+skip_func_type(char_u *p, पूर्णाङ्क *syn_error)
 {
-    if (*p == '(')
+    जइ (*p == '(')
     {
 	// handle func(args): type
 	++p;
-	while (*p != ')' && *p != NUL)
+	जाव (*p != ')' && *p != NUL)
 	{
 	    char_u *sp = p;
 
-	    if (STRNCMP(p, "...", 3) == 0)
+	    जइ (STRNCMP(p, "...", 3) == 0)
 		p += 3;
 	    p = skip_type(p, TRUE);
-	    if (p == sp)
+	    जइ (p == sp)
 	    {
 		*syn_error = TRUE;
-		return p;  // syntax error
+		प्रत्यागम p;  // syntax error
 	    }
-	    if (*p == ',')
+	    जइ (*p == ',')
 		p = skipwhite(p + 1);
 	}
-	if (*p == ')')
+	जइ (*p == ')')
 	{
-	    if (p[1] == ':')
+	    जइ (p[1] == ':')
 		p = skip_type(skipwhite(p + 2), FALSE);
-	    else
+	    अण्णहा
 		++p;
 	}
     }
-    else
+    अण्णहा
     {
 	// handle func: return_type
 	p = skip_type(skipwhite(p + 1), FALSE);
     }
 
-    return p;
+    प्रत्यागम p;
 }
 
 /*
  * Inner part of skip_type().
  */
-    static char_u *
-skip_type_inner(char_u *start, int optional)
+    स्थिर char_u *
+skip_type_inner(char_u *start, पूर्णाङ्क optional)
 {
     char_u	*p = start;
-    int		syn_error = FALSE;
+    पूर्णाङ्क		syn_error = FALSE;
 
-    if (optional && *p == '?')
+    जइ (optional && *p == '?')
 	++p;
 
     // Also skip over "." for imported classes: "import.ClassName".
-    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
+    जाव (ASCII_ISALNUM(*p) || *p == '_' || *p == '.')
 	++p;
 
     // Skip over "<type>"; this is permissive about white space.
-    if (*skipwhite(p) == '<')
+    जइ (*skipwhite(p) == '<')
     {
 	p = skip_member_type(start, p, &syn_error);
-	if (syn_error)
-	    return p;
+	जइ (syn_error)
+	    प्रत्यागम p;
     }
-    else if ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
+    अण्णहा जइ ((*p == '(' || (*p == ':' && VIM_ISWHITE(p[1])))
 					     && STRNCMP("func", start, 4) == 0)
     {
 	// skip over function type
 	p = skip_func_type(p, &syn_error);
-	if (syn_error)
-	    return p;
+	जइ (syn_error)
+	    प्रत्यागम p;
     }
 
-    return p;
+    प्रत्यागम p;
 }
 
 /*
@@ -1648,39 +1648,39 @@ skip_type_inner(char_u *start, int optional)
  * When "optional" is TRUE then a leading "?" is accepted.
  */
     char_u *
-skip_type(char_u *start, int optional)
+skip_type(char_u *start, पूर्णाङ्क optional)
 {
-    static int	skip_depth = 0;
+    स्थिर पूर्णाङ्क	skip_depth = 0;
     char_u	*p = start;
 
     // Too deeply nested: skip to the matching ">" without recursing, an
     // error is given when parsing the type.
-    if (skip_depth > MAX_TYPE_DEPTH)
+    जइ (skip_depth > MAX_TYPE_DEPTH)
     {
-	int	depth = 0;
+	पूर्णाङ्क	depth = 0;
 
-	for ( ; *p != NUL; ++p)
+	प्रति ( ; *p != NUL; ++p)
 	{
-	    if (*p == '<')
+	    जइ (*p == '<')
 		++depth;
-	    else if (*p == '>')
+	    अण्णहा जइ (*p == '>')
 	    {
-		if (depth == 0)
-		    break;
-		if (--depth == 0)
-		    return p + 1;
+		जइ (depth == 0)
+		    भङ्ग;
+		जइ (--depth == 0)
+		    प्रत्यागम p + 1;
 	    }
-	    else if (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
+	    अण्णहा जइ (depth == 0 && !ASCII_ISALNUM(*p) && *p != '_'
 								&& *p != '.')
-		break;
+		भङ्ग;
 	}
-	return p;
+	प्रत्यागम p;
     }
 
     ++skip_depth;
     p = skip_type_inner(start, optional);
     --skip_depth;
-    return p;
+    प्रत्यागम p;
 }
 
 /*
@@ -1689,49 +1689,49 @@ skip_type(char_u *start, int optional)
  * "info" is extra information for an error message.
  * Returns NULL in case of failure.
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_member(
 	char_u	    **arg,
 	type_T	    *type,
 	garray_T    *type_gap,
-	int	    give_error,
-	char	    *info,
+	पूर्णाङ्क	    give_error,
+	वर्ण	    *info,
 	ufunc_T	    *ufunc,
 	cctx_T	    *cctx)
 {
     char_u  *arg_start = *arg;
     type_T  *member_type;
-    int	    prev_called_emsg = called_emsg;
+    पूर्णाङ्क	    prev_called_emsg = called_emsg;
 
-    if (**arg != '<')
+    जइ (**arg != '<')
     {
-	if (give_error)
+	जइ (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    जइ (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    अण्णहा
 		semsg(_(e_missing_type_after_str), info);
 	}
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     *arg = skipwhite(*arg + 1);
 
     member_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-    if (member_type == NULL || !valid_declaration_type(member_type))
-	return NULL;
+    जइ (member_type == रिक्त || !valid_declaration_type(member_type))
+	प्रत्यागम रिक्त;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    जइ (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	जइ (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     ++*arg;
 
-    if (type->tt_type == VAR_LIST)
-	return get_list_type(member_type, type_gap);
-    return get_dict_type(member_type, type_gap);
+    जइ (type->tt_type == VAR_LIST)
+	प्रत्यागम get_list_type(member_type, type_gap);
+    प्रत्यागम get_dict_type(member_type, type_gap);
 }
 
 /*
@@ -1739,26 +1739,26 @@ parse_type_member(
  * When "give_error" is TRUE give error messages, otherwise be quiet.
  * Return NULL for failure.
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_func(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    पूर्णाङ्क		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u  *p;
     type_T  *type;
     type_T  *ret_type = &t_unknown;
-    int	argcount = -1;
-    int	flags = 0;
-    int	first_optional = -1;
+    पूर्णाङ्क	argcount = -1;
+    पूर्णाङ्क	flags = 0;
+    पूर्णाङ्क	first_optional = -1;
     type_T	*arg_type[MAX_FUNC_ARGS + 1];
 
     // func({type}, ...{type}): {type}
     *arg += len;
-    if (**arg == '(')
+    जइ (**arg == '(')
     {
 	// "func" may or may not return a value, "func()" does
 	// not return a value.
@@ -1766,108 +1766,108 @@ parse_type_func(
 
 	p = ++*arg;
 	argcount = 0;
-	while (*p != NUL && *p != ')')
+	जाव (*p != NUL && *p != ')')
 	{
-	    if (*p == '?')
+	    जइ (*p == '?')
 	    {
-		if (first_optional == -1)
+		जइ (first_optional == -1)
 		    first_optional = argcount;
 		++p;
 	    }
-	    else if (STRNCMP(p, "...", 3) == 0)
+	    अण्णहा जइ (STRNCMP(p, "...", 3) == 0)
 	    {
 		flags |= TTFLAG_VARARGS;
 		p += 3;
 	    }
-	    else if (first_optional != -1)
+	    अण्णहा जइ (first_optional != -1)
 	    {
-		if (give_error)
+		जइ (give_error)
 		    emsg(_(e_mandatory_argument_after_optional_argument));
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 
 	    type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	    if (type == NULL || !valid_declaration_type(type))
-		return NULL;
-	    if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	    जइ (type == रिक्त || !valid_declaration_type(type))
+		प्रत्यागम रिक्त;
+	    जइ ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	    {
-		char *tofree;
+		वर्ण *tofree;
 		semsg(_(e_variable_arguments_type_must_be_list_str),
 			type_name(type, &tofree));
 		vim_free(tofree);
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 	    arg_type[argcount++] = type;
 
 	    // Nothing comes after "...{type}".
-	    if (flags & TTFLAG_VARARGS)
-		break;
+	    जइ (flags & TTFLAG_VARARGS)
+		भङ्ग;
 
-	    if (*p != ',' && *skipwhite(p) == ',')
+	    जइ (*p != ',' && *skipwhite(p) == ',')
 	    {
-		if (give_error)
+		जइ (give_error)
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 			    ",", p);
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
-	    if (*p == ',')
+	    जइ (*p == ',')
 	    {
 		++p;
-		if (!VIM_ISWHITE(*p))
+		जइ (!VIM_ISWHITE(*p))
 		{
-		    if (give_error)
+		    जइ (give_error)
 			semsg(_(e_white_space_required_after_str_str),
 				",", p - 1);
-		    return NULL;
+		    प्रत्यागम रिक्त;
 		}
 	    }
 	    p = skipwhite(p);
-	    if (argcount == MAX_FUNC_ARGS)
+	    जइ (argcount == MAX_FUNC_ARGS)
 	    {
-		if (give_error)
+		जइ (give_error)
 		    emsg(_(e_too_many_argument_types));
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 	}
 
 	p = skipwhite(p);
-	if (*p != ')')
+	जइ (*p != ')')
 	{
-	    if (give_error)
+	    जइ (give_error)
 		emsg(_(e_missing_closing_paren));
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
 	*arg = p + 1;
     }
-    if (**arg == ':')
+    जइ (**arg == ':')
     {
 	// parse return type
 	++*arg;
-	if (!VIM_ISWHITE(**arg) && give_error)
+	जइ (!VIM_ISWHITE(**arg) && give_error)
 	    semsg(_(e_white_space_required_after_str_str), ":", *arg - 1);
 	*arg = skipwhite(*arg);
 	ret_type = parse_type(arg, type_gap, ufunc, cctx, give_error);
-	if (ret_type == NULL)
-	    return NULL;
+	जइ (ret_type == रिक्त)
+	    प्रत्यागम रिक्त;
     }
-    if (flags == 0 && first_optional == -1 && argcount <= 0)
+    जइ (flags == 0 && first_optional == -1 && argcount <= 0)
 	type = get_func_type(ret_type, argcount, type_gap);
-    else
+    अण्णहा
     {
 	type = alloc_func_type(ret_type, argcount, type_gap);
 	type->tt_flags = flags;
-	if (argcount > 0)
+	जइ (argcount > 0)
 	{
 	    type->tt_argcount = argcount;
 	    type->tt_min_argcount = first_optional == -1
 						? argcount : first_optional;
-	    if (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
-		return NULL;
-	    mch_memmove(type->tt_args, arg_type, sizeof(type_T *) * argcount);
+	    जइ (func_type_add_arg_types(type, argcount, type_gap) == FAIL)
+		प्रत्यागम रिक्त;
+	    mch_memmove(type->tt_args, arg_type, परिमाण(type_T *) * argcount);
 	}
     }
 
-    return type;
+    प्रत्यागम type;
 }
 
 /*
@@ -1875,118 +1875,118 @@ parse_type_func(
  * When "give_error" is TRUE give error messages, otherwise be quiet.
  * Return NULL for failure.
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_tuple(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    पूर्णाङ्क		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
     char_u	*p;
     type_T	*type;
-    type_T	*ret_type = NULL;
-    int		typecount = -1;
-    int		flags = 0;
+    type_T	*ret_type = रिक्त;
+    पूर्णाङ्क		typecount = -1;
+    पूर्णाङ्क		flags = 0;
     garray_T	tuple_types_ga;
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, परिमाण(type_T *), 10);
 
     // tuple<{type}, {type}>
     // tuple<{type}, ...{type}>
-    if (**arg != '<')
+    जइ (**arg != '<')
     {
-	if (give_error)
+	जइ (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    जइ (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    अण्णहा
 		semsg(_(e_missing_type_after_str), "tuple");
 	}
 
 	// only "tuple" is specified
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     p = ++*arg;
     typecount = 0;
-    while (*p != NUL && *p != '>')
+    जाव (*p != NUL && *p != '>')
     {
-	if (STRNCMP(p, "...", 3) == 0)
+	जइ (STRNCMP(p, "...", 3) == 0)
 	{
 	    flags |= TTFLAG_VARARGS;
 	    p += 3;
 	}
 
 	type = parse_type(&p, type_gap, ufunc, cctx, give_error);
-	if (type == NULL || !valid_declaration_type(type))
-	    goto on_err;
+	जइ (type == रिक्त || !valid_declaration_type(type))
+	    गच्छ on_err;
 
-	if ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
+	जइ ((flags & TTFLAG_VARARGS) != 0 && type->tt_type != VAR_LIST)
 	{
-	    char *tofree;
+	    वर्ण *tofree;
 	    semsg(_(e_variadic_tuple_must_end_with_list_type_str),
 						type_name(type, &tofree));
 	    vim_free(tofree);
-	    goto on_err;
+	    गच्छ on_err;
 	}
 
 	// Add the item type
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
-	    goto on_err;
+	जइ (ga_grow(&tuple_types_ga, 1) == FAIL)
+	    गच्छ on_err;
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] = type;
 	tuple_types_ga.ga_len++;
 	typecount++;
 
 	// Nothing comes after "...{type}".
-	if (flags & TTFLAG_VARARGS)
-	    break;
+	जइ (flags & TTFLAG_VARARGS)
+	    भङ्ग;
 
-	if (*p != ',' && *skipwhite(p) == ',')
+	जइ (*p != ',' && *skipwhite(p) == ',')
 	{
-	    if (give_error)
+	    जइ (give_error)
 		semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
-	    goto on_err;
+	    गच्छ on_err;
 	}
-	if (*p == ',')
+	जइ (*p == ',')
 	{
 	    ++p;
-	    if (!VIM_ISWHITE(*p))
+	    जइ (!VIM_ISWHITE(*p))
 	    {
-		if (give_error)
+		जइ (give_error)
 		    semsg(_(e_white_space_required_after_str_str),
 			    ",", p - 1);
-		goto on_err;
+		गच्छ on_err;
 	    }
 	}
 	p = skipwhite(p);
     }
 
     p = skipwhite(p);
-    if (*p != '>' || typecount <= 0)
+    जइ (*p != '>' || typecount <= 0)
     {
-	if (give_error)
+	जइ (give_error)
 	    semsg(_(e_missing_type_after_str), p);
-	goto on_err;
+	गच्छ on_err;
     }
     *arg = p + 1;
 
     ret_type = alloc_tuple_type(typecount, type_gap);
-    if (ret_type == &t_any
+    जइ (ret_type == &t_any
 	    || tuple_type_add_types(ret_type, typecount, type_gap) == FAIL)
     {
-	ret_type = NULL;
-	goto on_err;
+	ret_type = रिक्त;
+	गच्छ on_err;
     }
     ret_type->tt_flags = flags;
     ret_type->tt_argcount = typecount;
     mch_memmove(ret_type->tt_args, tuple_types_ga.ga_data,
-						sizeof(type_T *) * typecount);
+						परिमाण(type_T *) * typecount);
 
 on_err:
     ga_clear(&tuple_types_ga);
 
-    return ret_type;
+    प्रत्यागम ret_type;
 }
 
 /*
@@ -1994,60 +1994,60 @@ on_err:
  * When "give_error" is TRUE give error messages, otherwise be quiet.
  * Return NULL for failure.
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_object(
     char_u	**arg,
     garray_T	*type_gap,
-    int		give_error,
+    पूर्णाङ्क		give_error,
     cctx_T	*cctx)
 {
     char_u	*arg_start = *arg;
     type_T	*object_type;
-    int		prev_called_emsg = called_emsg;
+    पूर्णाङ्क		prev_called_emsg = called_emsg;
 
     // object<X> or object<any>
-    if (**arg != '<')
+    जइ (**arg != '<')
     {
-	if (give_error)
+	जइ (give_error)
 	{
-	    if (*skipwhite(*arg) == '<')
+	    जइ (*skipwhite(*arg) == '<')
 		semsg(_(e_no_white_space_allowed_before_str_str), "<", *arg);
-	    else
+	    अण्णहा
 		semsg(_(e_missing_type_after_str), "object");
 	}
 
 	// only "object" is specified
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
     // skip spaces following "object<"
     *arg = skipwhite(*arg + 1);
 
-    object_type = parse_type(arg, type_gap, NULL, cctx, give_error);
-    if (object_type == NULL)
-	return NULL;
+    object_type = parse_type(arg, type_gap, रिक्त, cctx, give_error);
+    जइ (object_type == रिक्त)
+	प्रत्यागम रिक्त;
 
     *arg = skipwhite(*arg);
-    if (**arg != '>' && called_emsg == prev_called_emsg)
+    जइ (**arg != '>' && called_emsg == prev_called_emsg)
     {
-	if (give_error)
+	जइ (give_error)
 	    semsg(_(e_missing_gt_after_type_str), arg_start);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
     ++*arg;
 
-    if (object_type->tt_type == VAR_ANY)
-	return &t_object_any;
+    जइ (object_type->tt_type == VAR_ANY)
+	प्रत्यागम &t_object_any;
 
-    if (object_type->tt_type != VAR_OBJECT)
+    जइ (object_type->tt_type != VAR_OBJECT)
     {
 	// specified type is not a class
-	if (give_error)
+	जइ (give_error)
 	    semsg(_(e_class_name_not_found_str), arg_start);
-	return NULL;
+	प्रत्यागम रिक्त;
     }
 
-    return object_type;
+    प्रत्यागम object_type;
 }
 
 /*
@@ -2055,25 +2055,25 @@ parse_type_object(
  * It can be a class or an interface or a typealias name, possibly imported.
  * Return NULL if a type is not found.
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_user_defined(
     char_u	**arg,
     size_t	len,
     garray_T	*type_gap,
-    int		give_error,
+    पूर्णाङ्क		give_error,
     ufunc_T	*ufunc,
     cctx_T	*cctx)
 {
-    int		did_emsg_before = did_emsg;
+    पूर्णाङ्क		did_emsg_before = did_emsg;
     typval_T	tv;
 
     tv.v_type = VAR_UNKNOWN;
-    if (eval_variable_import(*arg, &tv) == OK)
+    जइ (eval_variable_import(*arg, &tv) == OK)
     {
-	if (tv.v_type == VAR_CLASS && tv.vval.v_class != NULL)
+	जइ (tv.v_type == VAR_CLASS && tv.vval.v_class != रिक्त)
 	{
 	    type_T *type = get_type_ptr(type_gap);
-	    if (type != NULL)
+	    जइ (type != रिक्त)
 	    {
 		// Although the name is that of a class or interface, the type
 		// uses will be an object.
@@ -2083,36 +2083,36 @@ parse_type_user_defined(
 
 		*arg += len;
 		// Skip over ".ClassName".
-		while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+		जाव (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		    ++*arg;
 
-		return type;
+		प्रत्यागम type;
 	    }
 	}
-	else if (tv.v_type == VAR_TYPEALIAS)
+	अण्णहा जइ (tv.v_type == VAR_TYPEALIAS)
 	{
 	    // user defined type
 	    // The type alias may itself be a nested type, check the resulting
 	    // nesting depth.
-	    int	depth = parse_depth - 1
+	    पूर्णाङ्क	depth = parse_depth - 1
 				+ MAX(tv.vval.v_typealias->ta_depth, 1);
-	    if (depth - 1 > MAX_TYPE_DEPTH)
+	    जइ (depth - 1 > MAX_TYPE_DEPTH)
 	    {
 		clear_tv(&tv);
-		if (give_error)
+		जइ (give_error)
 		    emsg(_(e_type_nested_too_deep));
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
-	    if (depth > parse_max_depth)
+	    जइ (depth > parse_max_depth)
 		parse_max_depth = depth;
 
 	    type_T *type = copy_type(tv.vval.v_typealias->ta_type, type_gap);
 	    *arg += len;
 	    clear_tv(&tv);
 	    // Skip over ".TypeName".
-	    while (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
+	    जाव (ASCII_ISALNUM(**arg) || **arg == '_' || **arg == '.')
 		++*arg;
-	    return type;
+	    प्रत्यागम type;
 	}
 
 	clear_tv(&tv);
@@ -2120,147 +2120,147 @@ parse_type_user_defined(
 
     // Check whether it is a generic type
     type_T *type = find_generic_type(*arg, len, ufunc, cctx);
-    if (type != NULL)
+    जइ (type != रिक्त)
     {
 	*arg += len;
-	return type;
+	प्रत्यागम type;
     }
 
-    if (give_error && (did_emsg == did_emsg_before))
+    जइ (give_error && (did_emsg == did_emsg_before))
     {
 	char_u	*p = skip_type(*arg, FALSE);
-	char	cc = *p;
+	वर्ण	cc = *p;
 
 	*p = NUL;
 	semsg(_(e_type_not_recognized_str), *arg);
 	*p = cc;
     }
 
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
 /*
  * Inner part of parse_type().
  */
-    static type_T *
+    स्थिर type_T *
 parse_type_inner(
     char_u	**arg,
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    पूर्णाङ्क		give_error)
 {
     char_u  *p = *arg;
     size_t  len;
 
     // Skip over the first word.
-    while (ASCII_ISALNUM(*p) || *p == '_')
+    जाव (ASCII_ISALNUM(*p) || *p == '_')
 	++p;
     len = p - *arg;
 
-    switch (**arg)
+    विकल्प (**arg)
     {
-	case 'a':
-	    if (len == 3 && STRNCMP(*arg, "any", len) == 0)
+	पक्ष 'a':
+	    जइ (len == 3 && STRNCMP(*arg, "any", len) == 0)
 	    {
 		*arg += len;
-		return &t_any;
+		प्रत्यागम &t_any;
 	    }
-	    break;
-	case 'b':
-	    if (len == 4 && STRNCMP(*arg, "bool", len) == 0)
+	    भङ्ग;
+	पक्ष 'b':
+	    जइ (len == 4 && STRNCMP(*arg, "bool", len) == 0)
 	    {
 		*arg += len;
-		return &t_bool;
+		प्रत्यागम &t_bool;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "blob", len) == 0)
+	    जइ (len == 4 && STRNCMP(*arg, "blob", len) == 0)
 	    {
 		*arg += len;
-		return &t_blob;
+		प्रत्यागम &t_blob;
 	    }
-	    break;
-	case 'c':
-	    if (len == 7 && STRNCMP(*arg, "channel", len) == 0)
+	    भङ्ग;
+	पक्ष 'c':
+	    जइ (len == 7 && STRNCMP(*arg, "channel", len) == 0)
 	    {
 		*arg += len;
-		return &t_channel;
+		प्रत्यागम &t_channel;
 	    }
-	    break;
-	case 'd':
-	    if (len == 4 && STRNCMP(*arg, "dict", len) == 0)
+	    भङ्ग;
+	पक्ष 'd':
+	    जइ (len == 4 && STRNCMP(*arg, "dict", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_dict_any, type_gap,
+		प्रत्यागम parse_type_member(arg, &t_dict_any, type_gap,
 						give_error, "dict", ufunc,
 						cctx);
 	    }
-	    break;
-	case 'f':
-	    if (len == 5 && STRNCMP(*arg, "float", len) == 0)
+	    भङ्ग;
+	पक्ष 'f':
+	    जइ (len == 5 && STRNCMP(*arg, "float", len) == 0)
 	    {
 		*arg += len;
-		return &t_float;
+		प्रत्यागम &t_float;
 	    }
-	    if (len == 4 && STRNCMP(*arg, "func", len) == 0)
-		return parse_type_func(arg, len, type_gap, give_error, ufunc,
+	    जइ (len == 4 && STRNCMP(*arg, "func", len) == 0)
+		प्रत्यागम parse_type_func(arg, len, type_gap, give_error, ufunc,
 									cctx);
-	    break;
-	case 'j':
-	    if (len == 3 && STRNCMP(*arg, "job", len) == 0)
+	    भङ्ग;
+	पक्ष 'j':
+	    जइ (len == 3 && STRNCMP(*arg, "job", len) == 0)
 	    {
 		*arg += len;
-		return &t_job;
+		प्रत्यागम &t_job;
 	    }
-	    break;
-	case 'l':
-	    if (len == 4 && STRNCMP(*arg, "list", len) == 0)
+	    भङ्ग;
+	पक्ष 'l':
+	    जइ (len == 4 && STRNCMP(*arg, "list", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_member(arg, &t_list_any, type_gap,
+		प्रत्यागम parse_type_member(arg, &t_list_any, type_gap,
 						give_error, "list", ufunc,
 						cctx);
 	    }
-	    break;
-	case 'n':
-	    if (len == 6 && STRNCMP(*arg, "number", len) == 0)
+	    भङ्ग;
+	पक्ष 'n':
+	    जइ (len == 6 && STRNCMP(*arg, "number", len) == 0)
 	    {
 		*arg += len;
-		return &t_number;
+		प्रत्यागम &t_सङ्ख्या;
 	    }
-	    break;
-	case 'o':
-	    if (len == 6 && STRNCMP(*arg, "object", len) == 0)
+	    भङ्ग;
+	पक्ष 'o':
+	    जइ (len == 6 && STRNCMP(*arg, "object", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_object(arg, type_gap, give_error, cctx);
+		प्रत्यागम parse_type_object(arg, type_gap, give_error, cctx);
 	    }
-	    break;
-	case 's':
-	    if (len == 6 && STRNCMP(*arg, "string", len) == 0)
+	    भङ्ग;
+	पक्ष 's':
+	    जइ (len == 6 && STRNCMP(*arg, "string", len) == 0)
 	    {
 		*arg += len;
-		return &t_string;
+		प्रत्यागम &t_string;
 	    }
-	    break;
-	case 't':
-	    if (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
+	    भङ्ग;
+	पक्ष 't':
+	    जइ (len == 5 && STRNCMP(*arg, "tuple", len) == 0)
 	    {
 		*arg += len;
-		return parse_type_tuple(arg, type_gap, give_error, ufunc,
+		प्रत्यागम parse_type_tuple(arg, type_gap, give_error, ufunc,
 									cctx);
 	    }
-	    break;
-	case 'v':
-	    if (len == 4 && STRNCMP(*arg, "void", len) == 0)
+	    भङ्ग;
+	पक्ष 'v':
+	    जइ (len == 4 && STRNCMP(*arg, "void", len) == 0)
 	    {
 		*arg += len;
-		return &t_void;
+		प्रत्यागम &t_void;
 	    }
-	    break;
+	    भङ्ग;
     }
 
     // User defined type
-    return parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
+    प्रत्यागम parse_type_user_defined(arg, len, type_gap, give_error, ufunc,
 									cctx);
 }
 
@@ -2275,33 +2275,33 @@ parse_type(
     garray_T	*type_gap,
     ufunc_T	*ufunc,
     cctx_T	*cctx,
-    int		give_error)
+    पूर्णाङ्क		give_error)
 {
     type_T	*type;
 
-    if (parse_depth > MAX_TYPE_DEPTH)
+    जइ (parse_depth > MAX_TYPE_DEPTH)
     {
-	if (give_error)
+	जइ (give_error)
 	    emsg(_(e_type_nested_too_deep));
-	return NULL;
+	प्रत्यागम रिक्त;
     }
-    if (parse_depth == 0)
+    जइ (parse_depth == 0)
 	parse_max_depth = 0;
     ++parse_depth;
-    if (parse_depth > parse_max_depth)
+    जइ (parse_depth > parse_max_depth)
 	parse_max_depth = parse_depth;
     type = parse_type_inner(arg, type_gap, ufunc, cctx, give_error);
     --parse_depth;
-    return type;
+    प्रत्यागम type;
 }
 
 /*
  * Return the number of levels of the type last parsed by parse_type().
  */
-    int
-parse_type_depth(void)
+    पूर्णाङ्क
+parse_type_depth(शून्य)
 {
-    return parse_max_depth;
+    प्रत्यागम parse_max_depth;
 }
 
 /*
@@ -2309,73 +2309,73 @@ parse_type_depth(void)
  * "flags" can have ETYPE_ARG_UNKNOWN, which means that an unknown argument
  * type in "type1" is accepted.
  */
-    int
-equal_type(type_T *type1, type_T *type2, int flags)
+    पूर्णाङ्क
+equal_type(type_T *type1, type_T *type2, पूर्णाङ्क flags)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    if (type1 == NULL || type2 == NULL)
-	return FALSE;
-    if (type1->tt_type != type2->tt_type)
-	return FALSE;
-    switch (type1->tt_type)
+    जइ (type1 == रिक्त || type2 == रिक्त)
+	प्रत्यागम FALSE;
+    जइ (type1->tt_type != type2->tt_type)
+	प्रत्यागम FALSE;
+    विकल्प (type1->tt_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_SPECIAL:
-	case VAR_BOOL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_TYPEALIAS:
-	    break;  // not composite is always OK
-	case VAR_OBJECT:
-	case VAR_CLASS:
+	पक्ष VAR_UNKNOWN:
+	पक्ष VAR_ANY:
+	पक्ष VAR_VOID:
+	पक्ष VAR_SPECIAL:
+	पक्ष VAR_BOOL:
+	पक्ष VAR_सङ्ख्या:
+	पक्ष VAR_FLOAT:
+	पक्ष VAR_STRING:
+	पक्ष VAR_BLOB:
+	पक्ष VAR_JOB:
+	पक्ष VAR_CHANNEL:
+	पक्ष VAR_INSTR:
+	पक्ष VAR_TYPEALIAS:
+	    भङ्ग;  // not composite is always OK
+	पक्ष VAR_OBJECT:
+	पक्ष VAR_CLASS:
 	    // Objects are considered equal if they are from the same class
-	    return type1->tt_class == type2->tt_class;
-	case VAR_LIST:
-	case VAR_DICT:
-	    return equal_type(type1->tt_member, type2->tt_member, flags);
-	case VAR_TUPLE:
-	    if (type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
-			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
-	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+	    प्रत्यागम type1->tt_class == type2->tt_class;
+	पक्ष VAR_LIST:
+	पक्ष VAR_DICT:
+	    प्रत्यागम equal_type(type1->tt_member, type2->tt_member, flags);
+	पक्ष VAR_TUPLE:
+	    जइ (type1->tt_argcount != type2->tt_argcount)
+		प्रत्यागम FALSE;
+	    जइ (type1->tt_argcount < 0
+			   || type1->tt_args == रिक्त || type2->tt_args == रिक्त)
+		प्रत्यागम TRUE;
+	    प्रति (i = 0; i < type1->tt_argcount; ++i)
+		जइ ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    if (!equal_type(type1->tt_member, type2->tt_member, flags)
+		    प्रत्यागम FALSE;
+	    प्रत्यागम TRUE;
+	पक्ष VAR_FUNC:
+	पक्ष VAR_PARTIAL:
+	    जइ (!equal_type(type1->tt_member, type2->tt_member, flags)
 		    || type1->tt_argcount != type2->tt_argcount)
-		return FALSE;
-	    if (type1->tt_argcount < 0
-			   || type1->tt_args == NULL || type2->tt_args == NULL)
-		return TRUE;
-	    for (i = 0; i < type1->tt_argcount; ++i)
-		if ((flags & ETYPE_ARG_UNKNOWN) == 0
+		प्रत्यागम FALSE;
+	    जइ (type1->tt_argcount < 0
+			   || type1->tt_args == रिक्त || type2->tt_args == रिक्त)
+		प्रत्यागम TRUE;
+	    प्रति (i = 0; i < type1->tt_argcount; ++i)
+		जइ ((flags & ETYPE_ARG_UNKNOWN) == 0
 			&& !equal_type(type1->tt_args[i], type2->tt_args[i],
 									flags))
-		    return FALSE;
-	    return TRUE;
+		    प्रत्यागम FALSE;
+	    प्रत्यागम TRUE;
     }
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
  * Find the common type of "type1" (VAR_FUNC) and "type2" (VAR_FUNC) and put it
  * in "dest".  "type2" and "dest" may be the same.
  */
-    static void
+    स्थिर शून्य
 common_type_var_func(
     type_T	*type1,
     type_T	*type2,
@@ -2386,35 +2386,35 @@ common_type_var_func(
 
     // When one of the types is t_func_unknown return the other one.
     // Useful if a list or dict item is null_func.
-    if (type1 == &t_func_unknown)
+    जइ (type1 == &t_func_unknown)
     {
 	*dest = type2;
-	return;
+	प्रत्यागम;
     }
-    if (type2 == &t_func_unknown)
+    जइ (type2 == &t_func_unknown)
     {
 	*dest = type1;
-	return;
+	प्रत्यागम;
     }
 
     common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-    if (type1->tt_argcount == type2->tt_argcount
+    जइ (type1->tt_argcount == type2->tt_argcount
 	    && type1->tt_argcount >= 0)
     {
-	int argcount = type1->tt_argcount;
-	int i;
+	पूर्णाङ्क argcount = type1->tt_argcount;
+	पूर्णाङ्क i;
 
 	*dest = alloc_func_type(common, argcount, type_gap);
-	if (type1->tt_args != NULL && type2->tt_args != NULL)
+	जइ (type1->tt_args != रिक्त && type2->tt_args != रिक्त)
 	{
-	    if (func_type_add_arg_types(*dest, argcount,
+	    जइ (func_type_add_arg_types(*dest, argcount,
 			type_gap) == OK)
-		for (i = 0; i < argcount; ++i)
+		प्रति (i = 0; i < argcount; ++i)
 		    common_type(type1->tt_args[i], type2->tt_args[i],
 			    &(*dest)->tt_args[i], type_gap);
 	}
     }
-    else
+    अण्णहा
 	// Use -1 for "tt_argcount" to indicate an unknown number of
 	// arguments.
 	*dest = alloc_func_type(common, -1, type_gap);
@@ -2429,51 +2429,51 @@ common_type_var_func(
  * Find the common type of "type1" and "type2" and put it in "dest".
  * "type2" and "dest" may be the same.
  */
-    void
+    शून्य
 common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
 {
-    if (equal_type(type1, type2, 0))
+    जइ (equal_type(type1, type2, 0))
     {
 	*dest = type1;
-	return;
+	प्रत्यागम;
     }
 
     // If either is VAR_UNKNOWN use the other type.  An empty list/dict has no
     // specific type.
-    if (type1 == NULL || type1->tt_type == VAR_UNKNOWN)
+    जइ (type1 == रिक्त || type1->tt_type == VAR_UNKNOWN)
     {
 	*dest = type2;
-	return;
+	प्रत्यागम;
     }
-    if (type2 == NULL || type2->tt_type == VAR_UNKNOWN)
+    जइ (type2 == रिक्त || type2->tt_type == VAR_UNKNOWN)
     {
 	*dest = type1;
-	return;
+	प्रत्यागम;
     }
 
-    if (type1->tt_type == type2->tt_type)
+    जइ (type1->tt_type == type2->tt_type)
     {
-	if (type1->tt_type == VAR_LIST
+	जइ (type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_DICT)
 	{
 	    type_T *common;
 
 	    common_type(type1->tt_member, type2->tt_member, &common, type_gap);
-	    if (type1->tt_type == VAR_LIST)
+	    जइ (type1->tt_type == VAR_LIST)
 		*dest = get_list_type(common, type_gap);
-	    else
+	    अण्णहा
 		*dest = get_dict_type(common, type_gap);
-	    return;
+	    प्रत्यागम;
 	}
-	else if (type1->tt_type == VAR_FUNC)
+	अण्णहा जइ (type1->tt_type == VAR_FUNC)
 	{
 	    common_type_var_func(type1, type2, dest, type_gap);
-	    return;
+	    प्रत्यागम;
 	}
-	else if (type1->tt_type == VAR_OBJECT)
+	अण्णहा जइ (type1->tt_type == VAR_OBJECT)
 	{
 	    *dest = &t_object_any;
-	    return;
+	    प्रत्यागम;
 	}
     }
 
@@ -2486,19 +2486,19 @@ common_type(type_T *type1, type_T *type2, type_T **dest, garray_T *type_gap)
     type_T *
 get_item_type(type_T *type)
 {
-    if (type->tt_type == VAR_TUPLE)
+    जइ (type->tt_type == VAR_TUPLE)
     {
-	if (type->tt_argcount != 1)
-	    return &t_any;
+	जइ (type->tt_argcount != 1)
+	    प्रत्यागम &t_any;
 
-	if (type->tt_flags & TTFLAG_VARARGS)
-	    return type->tt_args[0]->tt_member;
-	else
-	    return type->tt_args[0];
+	जइ (type->tt_flags & TTFLAG_VARARGS)
+	    प्रत्यागम type->tt_args[0]->tt_member;
+	अण्णहा
+	    प्रत्यागम type->tt_args[0];
     }
 
     // For "any" the item type is not known.
-    return type->tt_member == NULL ? &t_any : type->tt_member;
+    प्रत्यागम type->tt_member == रिक्त ? &t_any : type->tt_member;
 }
 
 /*
@@ -2506,10 +2506,10 @@ get_item_type(type_T *type)
  * and the declared type.
  * Returns FAIL when out of memory.
  */
-    int
-push_type_stack(cctx_T *cctx, type_T *type)
+    पूर्णाङ्क
+प्रक्षिप_type_राशिः(cctx_T *cctx, type_T *type)
 {
-    return push_type_stack2(cctx, type, type);
+    प्रत्यागम प्रक्षिप_type_stack2(cctx, type, type);
 }
 
 /*
@@ -2517,30 +2517,30 @@ push_type_stack(cctx_T *cctx, type_T *type)
  * is the declared type.
  * Returns FAIL when out of memory.
  */
-    int
-push_type_stack2(cctx_T *cctx, type_T *type, type_T *decl_type)
+    पूर्णाङ्क
+प्रक्षिप_type_stack2(cctx_T *cctx, type_T *type, type_T *decl_type)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
     type2_T	*typep;
 
-    if (GA_GROW_FAILS(stack, 1))
-	return FAIL;
-    typep = ((type2_T *)stack->ga_data) + stack->ga_len;
+    जइ (GA_GROW_FAILS(राशिः, 1))
+	प्रत्यागम FAIL;
+    typep = ((type2_T *)राशिः->ga_data) + राशिः->ga_len;
     typep->type_curr = type;
     typep->type_decl = decl_type;
-    ++stack->ga_len;
-    return OK;
+    ++राशिः->ga_len;
+    प्रत्यागम OK;
 }
 
 /*
  * Set the type of the top of the stack to "type".
  */
-    void
-set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
+    शून्य
+set_type_on_राशिः(cctx_T *cctx, type_T *type, पूर्णाङ्क offset)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
-    type2_T	*typep = ((type2_T *)stack->ga_data)
-						  + stack->ga_len - 1 - offset;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
+    type2_T	*typep = ((type2_T *)राशिः->ga_data)
+						  + राशिः->ga_len - 1 - offset;
 
     typep->type_curr = type;
     typep->type_decl = &t_any;
@@ -2553,13 +2553,13 @@ set_type_on_stack(cctx_T *cctx, type_T *type, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_type_on_stack(cctx_T *cctx, int offset)
+get_type_on_राशिः(cctx_T *cctx, पूर्णाङ्क offset)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    जइ (offset + 1 > राशिः->ga_len)
+	प्रत्यागम &t_unknown;
+    प्रत्यागम (((type2_T *)राशिः->ga_data) + राशिः->ga_len - offset - 1)
 								   ->type_curr;
 }
 
@@ -2570,13 +2570,13 @@ get_type_on_stack(cctx_T *cctx, int offset)
  * Returns &t_unknown if there is no such stack entry.
  */
     type_T *
-get_decl_type_on_stack(cctx_T *cctx, int offset)
+get_decl_type_on_राशिः(cctx_T *cctx, पूर्णाङ्क offset)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
 
-    if (offset + 1 > stack->ga_len)
-	return &t_unknown;
-    return (((type2_T *)stack->ga_data) + stack->ga_len - offset - 1)
+    जइ (offset + 1 > राशिः->ga_len)
+	प्रत्यागम &t_unknown;
+    प्रत्यागम (((type2_T *)राशिः->ga_data) + राशिः->ga_len - offset - 1)
 								   ->type_decl;
 }
 
@@ -2588,169 +2588,169 @@ get_decl_type_on_stack(cctx_T *cctx, int offset)
  * Otherwise finds the common type of all items.
  */
     type_T *
-get_member_type_from_stack(
-	int	    count,
-	int	    skip,
+get_member_type_from_राशिः(
+	पूर्णाङ्क	    गणनम्,
+	पूर्णाङ्क	    skip,
 	cctx_T	    *cctx)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
     type2_T	*typep;
     garray_T    *type_gap = cctx->ctx_type_list;
-    int		i;
+    पूर्णाङ्क		i;
     type_T	*result;
     type_T	*type;
 
     // Use "unknown" for an empty list or dict.
-    if (count == 0)
-	return &t_unknown;
+    जइ (गणनम् == 0)
+	प्रत्यागम &t_unknown;
     // Find the common type from following items.
-    typep = ((type2_T *)stack->ga_data) + stack->ga_len;
+    typep = ((type2_T *)राशिः->ga_data) + राशिः->ga_len;
     result = &t_unknown;
-    for (i = 0; i < count; ++i)
+    प्रति (i = 0; i < गणनम्; ++i)
     {
-	type = (typep -((count - i) * skip) + skip - 1)->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return NULL;
-	if (result != &t_any)
+	type = (typep -((गणनम् - i) * skip) + skip - 1)->type_curr;
+	जइ (check_type_is_मानम्(type) == FAIL)
+	    प्रत्यागम रिक्त;
+	जइ (result != &t_any)
 	    common_type(type, result, &result, type_gap);
     }
 
-    return result;
+    प्रत्यागम result;
 }
 
 /*
  * Get the types of items in a tuple on the stack of "cctx".
  * Returns the number of types.  Returns -1 on failure.
  */
-    int
-get_tuple_type_from_stack(
-    int		count,
+    पूर्णाङ्क
+get_tuple_type_from_राशिः(
+    पूर्णाङ्क		गणनम्,
     garray_T	*tuple_types_gap,
     cctx_T	*cctx)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*राशिः = &cctx->ctx_type_राशिः;
     type2_T	*typep;
-    type_T	*type = NULL;
+    type_T	*type = रिक्त;
 
     // Use "unknown" for an empty tuple
-    if (count == 0)
-	return 0;
+    जइ (गणनम् == 0)
+	प्रत्यागम 0;
 
     // Find the common type from following items.
-    typep = ((type2_T *)stack->ga_data) + stack->ga_len;
-    for (int i = 0; i < count; i++)
+    typep = ((type2_T *)राशिः->ga_data) + राशिः->ga_len;
+    प्रति (पूर्णाङ्क i = 0; i < गणनम्; i++)
     {
-	type = (typep - (count - i))->type_curr;
-	if (check_type_is_value(type) == FAIL)
-	    return -1;
-	if (ga_grow(tuple_types_gap, 1) == FAIL)
-	    return -1;
+	type = (typep - (गणनम् - i))->type_curr;
+	जइ (check_type_is_मानम्(type) == FAIL)
+	    प्रत्यागम -1;
+	जइ (ga_grow(tuple_types_gap, 1) == FAIL)
+	    प्रत्यागम -1;
 	((type_T **)tuple_types_gap->ga_data)[tuple_types_gap->ga_len] = type;
 	tuple_types_gap->ga_len++;
     }
 
-    return tuple_types_gap->ga_len;
+    प्रत्यागम tuple_types_gap->ga_len;
 }
 
-    char *
+    वर्ण *
 vartype_name(vartype_T type)
 {
-    switch (type)
+    विकल्प (type)
     {
-	case VAR_UNKNOWN: break;
-	case VAR_ANY: return "any";
-	case VAR_VOID: return "void";
-	case VAR_SPECIAL: return "special";
-	case VAR_BOOL: return "bool";
-	case VAR_NUMBER: return "number";
-	case VAR_FLOAT: return "float";
-	case VAR_STRING: return "string";
-	case VAR_BLOB: return "blob";
-	case VAR_JOB: return "job";
-	case VAR_CHANNEL: return "channel";
-	case VAR_LIST: return "list";
-	case VAR_TUPLE: return "tuple";
-	case VAR_DICT: return "dict";
-	case VAR_INSTR: return "instr";
-	case VAR_CLASS: return "class";
-	case VAR_OBJECT: return "object";
-	case VAR_TYPEALIAS: return "typealias";
+	पक्ष VAR_UNKNOWN: भङ्ग;
+	पक्ष VAR_ANY: प्रत्यागम "any";
+	पक्ष VAR_VOID: प्रत्यागम "void";
+	पक्ष VAR_SPECIAL: प्रत्यागम "special";
+	पक्ष VAR_BOOL: प्रत्यागम "bool";
+	पक्ष VAR_सङ्ख्या: प्रत्यागम "number";
+	पक्ष VAR_FLOAT: प्रत्यागम "float";
+	पक्ष VAR_STRING: प्रत्यागम "string";
+	पक्ष VAR_BLOB: प्रत्यागम "blob";
+	पक्ष VAR_JOB: प्रत्यागम "job";
+	पक्ष VAR_CHANNEL: प्रत्यागम "channel";
+	पक्ष VAR_LIST: प्रत्यागम "list";
+	पक्ष VAR_TUPLE: प्रत्यागम "tuple";
+	पक्ष VAR_DICT: प्रत्यागम "dict";
+	पक्ष VAR_INSTR: प्रत्यागम "instr";
+	पक्ष VAR_CLASS: प्रत्यागम "class";
+	पक्ष VAR_OBJECT: प्रत्यागम "object";
+	पक्ष VAR_TYPEALIAS: प्रत्यागम "typealias";
 
-	case VAR_FUNC:
-	case VAR_PARTIAL: return "func";
+	पक्ष VAR_FUNC:
+	पक्ष VAR_PARTIAL: प्रत्यागम "func";
     }
-    return "unknown";
+    प्रत्यागम "unknown";
 }
 
 /*
  * Return the type name of a List (list<type>) or Dict (dict<type>).
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_list_or_dict(char *name, type_T *type, char **tofree)
+    स्थिर वर्ण *
+type_name_list_or_dict(वर्ण *name, type_T *type, वर्ण **tofree)
 {
-    char *member_free;
-    char *member_name;
+    वर्ण *member_free;
+    वर्ण *member_name;
 
-    if (type->tt_member->tt_type == VAR_UNKNOWN)
+    जइ (type->tt_member->tt_type == VAR_UNKNOWN)
 	member_name = type_name(&t_any, &member_free);
-    else
+    अण्णहा
 	member_name = type_name(type->tt_member, &member_free);
 
     size_t len = STRLEN(name) + STRLEN(member_name) + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
+    जइ (*tofree == रिक्त)
     {
 	vim_free(member_free);
-	return name;
+	प्रत्यागम name;
     }
 
     vim_snprintf(*tofree, len, "%s<%s>", name, member_name);
     vim_free(member_free);
-    return *tofree;
+    प्रत्यागम *tofree;
 }
 
 /*
  * Return the type name of a tuple.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_tuple(type_T *type, char **tofree)
+    स्थिर वर्ण *
+type_name_tuple(type_T *type, वर्ण **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    char	*arg_free = NULL;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    वर्ण	*arg_free = रिक्त;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
-	goto failed;
+    जइ (ga_grow(&ga, 20) == FAIL)
+	गच्छ failed;
     STRCPY(ga.ga_data, "tuple<");
     ga.ga_len += 6;
 
-    if (type->tt_argcount <= 0)
+    जइ (type->tt_argcount <= 0)
 	// empty tuple
 	GA_CONCAT_LITERAL(&ga, "any");
-    else
+    अण्णहा
     {
-	if (type->tt_args == NULL)
+	जइ (type->tt_args == रिक्त)
 	    GA_CONCAT_LITERAL(&ga, "[unknown]");
-	else
+	अण्णहा
 	{
-	    for (i = 0; i < type->tt_argcount; ++i)
+	    प्रति (i = 0; i < type->tt_argcount; ++i)
 	    {
 		string_T    arg_type;
 
 		arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
-		if (i > 0)
+		जइ (i > 0)
 		{
-		    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
+		    STRCPY((वर्ण *)ga.ga_data + ga.ga_len, ", ");
 		    ga.ga_len += 2;
 		}
 		arg_type.length = STRLEN(arg_type.string);
-		if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
-		    goto failed;
-		if (varargs && i == type->tt_argcount - 1)
+		जइ (ga_grow(&ga, (पूर्णाङ्क)arg_type.length + 8) == FAIL)
+		    गच्छ failed;
+		जइ (varargs && i == type->tt_argcount - 1)
 		    GA_CONCAT_LITERAL(&ga, "...");
 		ga_concat_len(&ga, arg_type.string, arg_type.length);
 		VIM_CLEAR(arg_free);
@@ -2758,191 +2758,191 @@ type_name_tuple(type_T *type, char **tofree)
 	}
     }
 
-    STRCPY((char *)ga.ga_data + ga.ga_len, ">");
+    STRCPY((वर्ण *)ga.ga_data + ga.ga_len, ">");
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    प्रत्यागम ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    प्रत्यागम "[unknown]";
 }
 
 /*
  * Return the type name of a Class (class<name>) or Object (object<name>).
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_class_or_obj(char *name, type_T *type, char **tofree)
+    स्थिर वर्ण *
+type_name_class_or_obj(वर्ण *name, type_T *type, वर्ण **tofree)
 {
     string_T	class_name;
 
-    if (type->tt_class != NULL)
+    जइ (type->tt_class != रिक्त)
     {
 	class_name.string = type->tt_class->class_name.string;
 	class_name.length = type->tt_class->class_name.length;
-	if (IS_ENUM(type->tt_class))
+	जइ (IS_ENUM(type->tt_class))
 	    name = "enum";
     }
-    else
+    अण्णहा
 	STR_LITERAL_SET(class_name, "any");
 
     size_t len = STRLEN(name) + class_name.length + 3;
     *tofree = alloc(len);
-    if (*tofree == NULL)
-	return name;
+    जइ (*tofree == रिक्त)
+	प्रत्यागम name;
 
     vim_snprintf(*tofree, len, "%s<%s>", name, class_name.string);
-    return *tofree;
+    प्रत्यागम *tofree;
 }
 
 /*
  * Return the type name of a function.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    static char *
-type_name_func(type_T *type, char **tofree)
+    स्थिर वर्ण *
+type_name_func(type_T *type, वर्ण **tofree)
 {
     garray_T    ga;
-    int		i;
-    int		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
-    char	*arg_free = NULL;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+    वर्ण	*arg_free = रिक्त;
 
     ga_init2(&ga, 1, 100);
-    if (ga_grow(&ga, 20) == FAIL)
-	goto failed;
+    जइ (ga_grow(&ga, 20) == FAIL)
+	गच्छ failed;
     STRCPY(ga.ga_data, "func(");
     ga.ga_len += 5;
 
-    for (i = 0; i < type->tt_argcount; ++i)
+    प्रति (i = 0; i < type->tt_argcount; ++i)
     {
 	string_T    arg_type;
 
-	if (type->tt_args == NULL)
+	जइ (type->tt_args == रिक्त)
 	    STR_LITERAL_SET(arg_type, "[unknown]");
-	else
+	अण्णहा
 	{
 	    arg_type.string = (char_u *)type_name(type->tt_args[i], &arg_free);
 	    arg_type.length = STRLEN(arg_type.string);
 	}
-	if (i > 0)
+	जइ (i > 0)
 	{
-	    STRCPY((char *)ga.ga_data + ga.ga_len, ", ");
+	    STRCPY((वर्ण *)ga.ga_data + ga.ga_len, ", ");
 	    ga.ga_len += 2;
 	}
-	if (ga_grow(&ga, (int)arg_type.length + 8) == FAIL)
-	    goto failed;
-	if (varargs && i == type->tt_argcount - 1)
+	जइ (ga_grow(&ga, (पूर्णाङ्क)arg_type.length + 8) == FAIL)
+	    गच्छ failed;
+	जइ (varargs && i == type->tt_argcount - 1)
 	    GA_CONCAT_LITERAL(&ga, "...");
-	else if (i >= type->tt_min_argcount)
-	    *((char *)ga.ga_data + ga.ga_len++) = '?';
+	अण्णहा जइ (i >= type->tt_min_argcount)
+	    *((वर्ण *)ga.ga_data + ga.ga_len++) = '?';
 	ga_concat_len(&ga, arg_type.string, arg_type.length);
 	VIM_CLEAR(arg_free);
     }
-    if (type->tt_argcount < 0)
+    जइ (type->tt_argcount < 0)
 	// any number of arguments
 	GA_CONCAT_LITERAL(&ga, "...");
 
-    if (type->tt_member == &t_void)
-	STRCPY((char *)ga.ga_data + ga.ga_len, ")");
-    else
+    जइ (type->tt_member == &t_void)
+	STRCPY((वर्ण *)ga.ga_data + ga.ga_len, ")");
+    अण्णहा
     {
-	char *ret_free = NULL;
-	char *ret_name = type_name(type->tt_member, &ret_free);
-	int  len;
+	वर्ण *ret_free = रिक्त;
+	वर्ण *ret_name = type_name(type->tt_member, &ret_free);
+	पूर्णाङ्क  len;
 
-	len = (int)STRLEN(ret_name) + 4;
-	if (ga_grow(&ga, len) == FAIL)
+	len = (पूर्णाङ्क)STRLEN(ret_name) + 4;
+	जइ (ga_grow(&ga, len) == FAIL)
 	{
 	    vim_free(ret_free);
-	    goto failed;
+	    गच्छ failed;
 	}
-	STRCPY((char *)ga.ga_data + ga.ga_len, "): ");
-	STRCPY((char *)ga.ga_data + ga.ga_len + 3, ret_name);
+	STRCPY((वर्ण *)ga.ga_data + ga.ga_len, "): ");
+	STRCPY((वर्ण *)ga.ga_data + ga.ga_len + 3, ret_name);
 	vim_free(ret_free);
     }
     *tofree = ga.ga_data;
-    return ga.ga_data;
+    प्रत्यागम ga.ga_data;
 
 failed:
     vim_free(arg_free);
     ga_clear(&ga);
-    return "[unknown]";
+    प्रत्यागम "[unknown]";
 }
 
 /*
  * Return the name of a type.
  * The result may be in allocated memory, in which case "tofree" is set.
  */
-    char *
-type_name(type_T *type, char **tofree)
+    वर्ण *
+type_name(type_T *type, वर्ण **tofree)
 {
-    char *name;
+    वर्ण *name;
 
-    *tofree = NULL;
-    if (type == NULL)
-	return "[unknown]";
+    *tofree = रिक्त;
+    जइ (type == रिक्त)
+	प्रत्यागम "[unknown]";
     name = vartype_name(type->tt_type);
 
-    switch (type->tt_type)
+    विकल्प (type->tt_type)
     {
-	case VAR_LIST:
-	case VAR_DICT:
-	    return type_name_list_or_dict(name, type, tofree);
+	पक्ष VAR_LIST:
+	पक्ष VAR_DICT:
+	    प्रत्यागम type_name_list_or_dict(name, type, tofree);
 
-	case VAR_TUPLE:
-	    return type_name_tuple(type, tofree);
+	पक्ष VAR_TUPLE:
+	    प्रत्यागम type_name_tuple(type, tofree);
 
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	    return type_name_class_or_obj(name, type, tofree);
+	पक्ष VAR_CLASS:
+	पक्ष VAR_OBJECT:
+	    प्रत्यागम type_name_class_or_obj(name, type, tofree);
 
-	case VAR_FUNC:
-	    return type_name_func(type, tofree);
+	पक्ष VAR_FUNC:
+	    प्रत्यागम type_name_func(type, tofree);
 
-	default:
-	    break;
+	स्वभाव:
+	    भङ्ग;
     }
 
-    return name;
+    प्रत्यागम name;
 }
 
 /*
  * "typename(expr)" function
  */
-    void
+    शून्य
 f_typename(typval_T *argvars, typval_T *rettv)
 {
     garray_T	type_list;
     type_T	*type;
-    char	*tofree;
-    char	*name;
+    वर्ण	*tofree;
+    वर्ण	*name;
 
     rettv->v_type = VAR_STRING;
-    ga_init2(&type_list, sizeof(type_T *), 10);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    ga_init2(&type_list, परिमाण(type_T *), 10);
+    जइ (argvars[0].v_type == VAR_TYPEALIAS)
     {
 	type = copy_type(argvars[0].vval.v_typealias->ta_type, &type_list);
 	// A type alias for a class has the type set to VAR_OBJECT.  Change it
 	// to VAR_CLASS, so that the name is "typealias<class<xxx>>"
-	if (type->tt_type == VAR_OBJECT)
+	जइ (type->tt_type == VAR_OBJECT)
 	    type->tt_type = VAR_CLASS;
     }
-    else
+    अण्णहा
 	type = typval2type(argvars, get_copyID(), &type_list, TVTT_DO_MEMBER);
     name = type_name(type, &tofree);
-    if (argvars[0].v_type == VAR_TYPEALIAS)
+    जइ (argvars[0].v_type == VAR_TYPEALIAS)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "typealias<%s>", name);
+	vim_snprintf((वर्ण *)IObuff, IOSIZE, "typealias<%s>", name);
 	rettv->vval.v_string = vim_strsave((char_u *)IObuff);
-	if (tofree != NULL)
+	जइ (tofree != रिक्त)
 	    vim_free(tofree);
     }
-    else
+    अण्णहा
     {
-	if (tofree != NULL)
+	जइ (tofree != रिक्त)
 	    rettv->vval.v_string = (char_u *)tofree;
-	else
+	अण्णहा
 	    rettv->vval.v_string = vim_strsave((char_u *)name);
     }
     clear_type_list(&type_list);
@@ -2954,67 +2954,67 @@ f_typename(typval_T *argvars, typval_T *rettv)
  *
  * Return OK if it's a value type, else FAIL
  */
-    int
-check_typval_is_value(typval_T *tv)
+    पूर्णाङ्क
+check_typval_is_मानम्(typval_T *tv)
 {
-    if (tv == NULL)
-	return OK;
+    जइ (tv == रिक्त)
+	प्रत्यागम OK;
 
-    switch (tv->v_type)
+    विकल्प (tv->v_type)
     {
-	case VAR_CLASS:
+	पक्ष VAR_CLASS:
 	    {
 		class_T *cl = tv->vval.v_class;
-		char_u *class_name = (cl == NULL) ? (char_u *)""
+		char_u *class_name = (cl == रिक्त) ? (char_u *)""
 							: cl->class_name.string;
-		if (cl != NULL && IS_ENUM(cl))
-		    semsg(_(e_using_enum_as_value_str), class_name);
-		else
-		    semsg(_(e_using_class_as_value_str), class_name);
+		जइ (cl != रिक्त && IS_ENUM(cl))
+		    semsg(_(e_using_enum_as_मानम्_str), class_name);
+		अण्णहा
+		    semsg(_(e_using_class_as_मानम्_str), class_name);
 	    }
-	    return FAIL;
+	    प्रत्यागम FAIL;
 
-	case VAR_TYPEALIAS:
-	    semsg(_(e_using_typealias_as_value_str),
+	पक्ष VAR_TYPEALIAS:
+	    semsg(_(e_using_typealias_as_मानम्_str),
 		    tv->vval.v_typealias->ta_name);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 
-	default:
-	    break;
+	स्वभाव:
+	    भङ्ग;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 /*
  * Same as above, except check type_T.
  */
-    int
-check_type_is_value(type_T *type)
+    पूर्णाङ्क
+check_type_is_मानम्(type_T *type)
 {
-    if (type == NULL)
-	return OK;
-    switch (type->tt_type)
+    जइ (type == रिक्त)
+	प्रत्यागम OK;
+    विकल्प (type->tt_type)
     {
-	case VAR_CLASS:
-	    if (type->tt_class != NULL && IS_ENUM(type->tt_class))
-		semsg(_(e_using_enum_as_value_str),
+	पक्ष VAR_CLASS:
+	    जइ (type->tt_class != रिक्त && IS_ENUM(type->tt_class))
+		semsg(_(e_using_enum_as_मानम्_str),
 			type->tt_class->class_name.string);
-	    else
-		semsg(_(e_using_class_as_value_str),
-			type->tt_class == NULL ? (char_u *)""
+	    अण्णहा
+		semsg(_(e_using_class_as_मानम्_str),
+			type->tt_class == रिक्त ? (char_u *)""
 			: type->tt_class->class_name.string);
-	    return FAIL;
+	    प्रत्यागम FAIL;
 
-	case VAR_TYPEALIAS:
+	पक्ष VAR_TYPEALIAS:
 	    // TODO: Not sure what could be done here to get a name.
 	    //       Maybe an optional argument?
 	    emsg(_(e_using_typealias_as_var_val));
-	    return FAIL;
+	    प्रत्यागम FAIL;
 
-	default:
-	    break;
+	स्वभाव:
+	    भङ्ग;
     }
-    return OK;
+    प्रत्यागम OK;
 }
 
 #endif // FEAT_EVAL

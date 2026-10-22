@@ -20,7 +20,7 @@
  *
  */
 
-#include "xinclude.h"
+#अन्तर्भाव "xinclude.h"
 
 /*
  * The basic idea of patience diff is to find lines that are unique in
@@ -45,9 +45,9 @@
  * This is a hash mapping from line hash to line numbers in the first and
  * second file.
  */
-struct hashmap {
-	int nr, alloc;
-	struct entry {
+संरचना hashmap {
+	पूर्णाङ्क nr, alloc;
+	संरचना entry {
 		unsigned long hash;
 		/*
 		 * 0 = unused entry, 1 = first line, 2 = second, etc.
@@ -60,7 +60,7 @@ struct hashmap {
 		 * sequence;
 		 * initially, "next" reflects only the order in file1.
 		 */
-		struct entry *next, *previous;
+		संरचना entry *next, *previous;
 
 		/*
 		 * If 1, this entry can serve as an anchor. See
@@ -71,26 +71,26 @@ struct hashmap {
 	/* were common records found? */
 	unsigned long has_matches;
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ध्रुव *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+स्थिर पूर्णाङ्क is_anchor(xpparam_t ध्रुव *xpp, ध्रुव वर्ण *पङ्क्तिः)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	प्रति (i = 0; i < xpp->anchors_nr; i++) {
+		जइ (!strncmp(पङ्क्तिः, xpp->anchors[i], strlen(xpp->anchors[i])))
+			प्रत्यागम 1;
 	}
-	return 0;
+	प्रत्यागम 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+स्थिर शून्य निवेशय_record(xpparam_t ध्रुव *xpp, पूर्णाङ्क पङ्क्तिः, संरचना hashmap *map,
+			  पूर्णाङ्क pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
-	xrecord_t *record = &records[line - 1];
+	xrecord_t *record = &records[पङ्क्तिः - 1];
 	/*
 	 * After xdl_prepare_env() (or more precisely, due to
 	 * xdl_classify_record()), the "ha" member of the records (AKA lines)
@@ -101,30 +101,30 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	पूर्णाङ्क index = (पूर्णाङ्क)((record->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
+	जाव (map->entries[index].line1) {
+		जइ (map->entries[index].hash != record->ha) {
+			जइ (++index >= map->alloc)
 				index = 0;
-			continue;
+			अनुवर्त;
 		}
-		if (pass == 2)
+		जइ (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
+		जइ (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
-		else
-			map->entries[index].line2 = line;
-		return;
+		अण्णहा
+			map->entries[index].line2 = पङ्क्तिः;
+		प्रत्यागम;
 	}
-	if (pass == 2)
-		return;
-	map->entries[index].line1 = line;
+	जइ (pass == 2)
+		प्रत्यागम;
+	map->entries[index].line1 = पङ्क्तिः;
 	map->entries[index].hash = record->ha;
-	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
+	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[पङ्क्तिः - 1].ptr);
+	जइ (!map->first)
 		map->first = map->entries + index;
-	if (map->last) {
+	जइ (map->last) {
 		map->last->next = map->entries + index;
 		map->entries[index].previous = map->last;
 	}
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
-		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+स्थिर पूर्णाङ्क fill_hashmap(xpparam_t ध्रुव *xpp, xdfenv_t *env,
+		संरचना hashmap *result,
+		पूर्णाङ्क line1, पूर्णाङ्क count1, पूर्णाङ्क line2, पूर्णाङ्क count2)
 {
 	result->xpp = xpp;
 	result->env = env;
 
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	जइ (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
+		प्रत्यागम -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
-		insert_record(xpp, line1++, result, 1);
+	जाव (count1--)
+		निवेशय_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
-		insert_record(xpp, line2++, result, 2);
+	जाव (count2--)
+		निवेशय_record(xpp, line2++, result, 2);
 
-	return 0;
+	प्रत्यागम 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
-		struct entry *entry)
+स्थिर पूर्णाङ्क द्विमान_अन्वेषणम्(संरचना entry **sequence, पूर्णाङ्क longest,
+		संरचना entry *entry)
 {
-	int left = -1, right = longest;
+	पूर्णाङ्क वामः = -1, दक्षिणः = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	जाव (वामः + 1 < दक्षिणः) {
+		पूर्णाङ्क मध्यः_2 = वामः + (दक्षिणः - वामः) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
-			right = middle;
-		else
-			left = middle;
+		जइ (sequence[मध्यः_2]->line2 > entry->line2)
+			दक्षिणः = मध्यः_2;
+		अण्णहा
+			वामः = मध्यः_2;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	प्रत्यागम वामः;
 }
 
 /*
@@ -192,106 +192,106 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+स्थिर पूर्णाङ्क find_longest_common_sequence(संरचना hashmap *map, संरचना entry **res)
 {
-	struct entry **sequence;
-	int longest = 0, i;
-	struct entry *entry;
+	संरचना entry **sequence;
+	पूर्णाङ्क longest = 0, i;
+	संरचना entry *entry;
 
 	/*
 	 * If not -1, this entry in sequence must never be overridden.
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	पूर्णाङ्क anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	जइ (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		प्रत्यागम -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
-			continue;
-		i = binary_search(sequence, longest, entry);
-		entry->previous = i < 0 ? NULL : sequence[i];
+	प्रति (entry = map->first; entry; entry = entry->next) {
+		जइ (!entry->line2 || entry->line2 == NON_UNIQUE)
+			अनुवर्त;
+		i = द्विमान_अन्वेषणम्(sequence, longest, entry);
+		entry->previous = i < 0 ? रिक्त : sequence[i];
 		++i;
-		if (i <= anchor_i)
-			continue;
+		जइ (i <= anchor_i)
+			अनुवर्त;
 		sequence[i] = entry;
-		if (entry->anchor) {
+		जइ (entry->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} अण्णहा जइ (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
-		*res = NULL;
+	जइ (!longest) {
+		*res = रिक्त;
 		xdl_free(sequence);
-		return 0;
+		प्रत्यागम 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
 	entry = sequence[longest - 1];
-	entry->next = NULL;
-	while (entry->previous) {
+	entry->next = रिक्त;
+	जाव (entry->previous) {
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
 	*res = entry;
 	xdl_free(sequence);
-	return 0;
+	प्रत्यागम 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+स्थिर पूर्णाङ्क match(संरचना hashmap *map, पूर्णाङ्क line1, पूर्णाङ्क line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	प्रत्यागम record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+स्थिर पूर्णाङ्क patience_diff(xpparam_t ध्रुव *xpp, xdfenv_t *env,
+		पूर्णाङ्क line1, पूर्णाङ्क count1, पूर्णाङ्क line2, पूर्णाङ्क count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+स्थिर पूर्णाङ्क walk_common_sequence(संरचना hashmap *map, संरचना entry *first,
+		पूर्णाङ्क line1, पूर्णाङ्क count1, पूर्णाङ्क line2, पूर्णाङ्क count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	पूर्णाङ्क end1 = line1 + count1, end2 = line2 + count2;
+	पूर्णाङ्क next1, next2;
 
-	for (;;) {
+	प्रति (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
+		जइ (first) {
 			next1 = first->line1;
 			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
+			जाव (next1 > line1 && next2 > line2 &&
 					match(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} अण्णहा {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
+		जाव (line1 < next1 && line2 < next2 &&
 				match(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		जइ (next1 > line1 || next2 > line2) {
+			जइ (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				प्रत्यागम -1;
 		}
 
-		if (!first)
-			return 0;
+		जइ (!first)
+			प्रत्यागम 0;
 
-		while (first->next &&
+		जाव (first->next &&
 				first->next->line1 == first->line1 + 1 &&
 				first->next->line2 == first->line2 + 1)
 			first = first->next;
@@ -303,15 +303,15 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+स्थिर पूर्णाङ्क fall_back_to_classic_diff(संरचना hashmap *map,
+		पूर्णाङ्क line1, पूर्णाङ्क count1, पूर्णाङ्क line2, पूर्णाङ्क count2)
 {
 	xpparam_t xpp;
 
-	memset(&xpp, 0, sizeof(xpp));
+	memset(&xpp, 0, परिमाण(xpp));
 	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	प्रत्यागम xdl_fall_back_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+स्थिर पूर्णाङ्क patience_diff(xpparam_t ध्रुव *xpp, xdfenv_t *env,
+		पूर्णाङ्क line1, पूर्णाङ्क count1, पूर्णाङ्क line2, पूर्णाङ्क count2)
 {
-	struct hashmap map;
-	struct entry *first;
-	int result = 0;
+	संरचना hashmap map;
+	संरचना entry *first;
+	पूर्णाङ्क result = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
+	जइ (!count1) {
+		जाव(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		प्रत्यागम 0;
+	} अण्णहा जइ (!count2) {
+		जाव(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		प्रत्यागम 0;
 	}
 
-	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	memset(&map, 0, परिमाण(map));
+	जइ (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		प्रत्यागम -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
+	जइ (!map.has_matches) {
+		जाव(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
+		जाव(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		प्रत्यागम 0;
 	}
 
 	result = find_longest_common_sequence(&map, &first);
-	if (result)
-		goto out;
-	if (first)
+	जइ (result)
+		गच्छ out;
+	जइ (first)
 		result = walk_common_sequence(&map, first,
 			line1, count1, line2, count2);
-	else
+	अण्णहा
 		result = fall_back_to_classic_diff(&map,
 			line1, count1, line2, count2);
  out:
 	xdl_free(map.entries);
-	return result;
+	प्रत्यागम result;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+पूर्णाङ्क xdl_do_patience_diff(xpparam_t ध्रुव *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	प्रत्यागम patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

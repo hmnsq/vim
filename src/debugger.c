@@ -11,49 +11,49 @@
  * debugger.c: Vim script debugger functions
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_EVAL)
-static int debug_greedy = FALSE;	// batch mode debugging: don't save
+#जइ defined(FEAT_EVAL)
+स्थिर पूर्णाङ्क debug_greedy = FALSE;	// batch mode debugging: don't save
 					// and restore typeahead.
-static void do_setdebugtracelevel(char_u *arg);
-static void do_checkbacktracelevel(void);
-static void do_showbacktrace(char_u *cmd);
+स्थिर शून्य do_setdebugtracelevel(char_u *arg);
+स्थिर शून्य do_checkbacktracelevel(शून्य);
+स्थिर शून्य do_showbacktrace(char_u *cmd);
 
-static char_u *debug_oldval = NULL;	// old and newval for debug expressions
-static char_u *debug_newval = NULL;
-static int     debug_expr   = 0;	// use debug_expr
+स्थिर char_u *debug_oldval = रिक्त;	// old and newval for debug expressions
+स्थिर char_u *debug_newval = रिक्त;
+स्थिर पूर्णाङ्क     debug_व्यञ्जकम्   = 0;	// use debug_expr
 
-    int
-has_watchexpr(void)
+    पूर्णाङ्क
+has_watchexpr(शून्य)
 {
-    return debug_expr;
+    प्रत्यागम debug_व्यञ्जकम्;
 }
 
 /*
  * do_debug(): Debug mode.
  * Repeatedly get Ex commands, until told to continue normal execution.
  */
-    void
+    शून्य
 do_debug(char_u *cmd)
 {
-    int		save_msg_scroll = msg_scroll;
-    int		save_State = State;
-    int		save_did_emsg = did_emsg;
-    int		save_cmd_silent = cmd_silent;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_redir_off = redir_off;
+    पूर्णाङ्क		save_सन्देशः_scroll = सन्देशः_scroll;
+    पूर्णाङ्क		save_State = State;
+    पूर्णाङ्क		save_did_emsg = did_emsg;
+    पूर्णाङ्क		save_cmd_silent = cmd_silent;
+    पूर्णाङ्क		save_सन्देशः_silent = सन्देशः_silent;
+    पूर्णाङ्क		save_emsg_silent = emsg_silent;
+    पूर्णाङ्क		save_redir_off = redir_off;
     tasave_T	typeaheadbuf;
-    int		typeahead_saved = FALSE;
-    int		save_ignore_script = 0;
-    int		save_ex_normal_busy;
-    int		n;
-    char_u	*cmdline = NULL;
+    पूर्णाङ्क		typeahead_saved = FALSE;
+    पूर्णाङ्क		save_ignore_script = 0;
+    पूर्णाङ्क		save_ex_normal_busy;
+    पूर्णाङ्क		n;
+    char_u	*cmdline = रिक्त;
     char_u	*p;
     char_u	*sname;
-    char	*tail = NULL;
-    static int	last_cmd = 0;
+    वर्ण	*tail = रिक्त;
+    स्थिर पूर्णाङ्क	last_cmd = 0;
 #define CMD_CONT	1
 #define CMD_NEXT	2
 #define CMD_STEP	3
@@ -67,11 +67,11 @@ do_debug(char_u *cmd)
 
 #ifdef ALWAYS_USE_GUI
     // Can't do this when there is no terminal for input/output.
-    if (!gui.in_use)
+    जइ (!gui.in_use)
     {
 	// Break as soon as possible.
 	debug_break_level = 9999;
-	return;
+	प्रत्यागम;
     }
 #endif
 
@@ -84,7 +84,7 @@ do_debug(char_u *cmd)
     ++no_wait_return;		// don't wait for return
     did_emsg = FALSE;		// don't use error from debugged stuff
     cmd_silent = FALSE;		// display commands
-    msg_silent = FALSE;		// display messages
+    सन्देशः_silent = FALSE;		// display messages
     emsg_silent = FALSE;	// display error messages
     redir_off = TRUE;		// don't redirect debug commands
     save_timeout_for_debugging();   // disable  regexp timeout flag
@@ -92,31 +92,31 @@ do_debug(char_u *cmd)
     State = MODE_NORMAL;
     debug_mode = TRUE;
 
-    if (!debug_did_msg)
-	msg(_("Entering Debug mode.  Type \"cont\" to continue."));
-    if (debug_oldval != NULL)
+    जइ (!debug_did_सन्देशः)
+	सन्देशः(_("Entering Debug mode.  Type \"cont\" to continue."));
+    जइ (debug_oldval != रिक्त)
     {
 	smsg(_("Oldval = \"%s\""), debug_oldval);
 	VIM_CLEAR(debug_oldval);
     }
-    if (debug_newval != NULL)
+    जइ (debug_newval != रिक्त)
     {
 	smsg(_("Newval = \"%s\""), debug_newval);
 	VIM_CLEAR(debug_newval);
     }
     sname = estack_sfile(ESTACK_NONE);
-    if (sname != NULL)
-	msg((char *)sname);
+    जइ (sname != रिक्त)
+	सन्देशः((वर्ण *)sname);
     vim_free(sname);
-    if (SOURCING_LNUM != 0)
+    जइ (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), SOURCING_LNUM, cmd);
-    else
+    अण्णहा
 	smsg(_("cmd: %s"), cmd);
 
     // Repeat getting a command and executing it.
-    for (;;)
+    प्रति (;;)
     {
-	msg_scroll = TRUE;
+	सन्देशः_scroll = TRUE;
 	need_wait_return = FALSE;
 
 	// Save the current typeahead buffer and replace it with an empty one.
@@ -126,7 +126,7 @@ do_debug(char_u *cmd)
 	// it empty. Set ignore_script to avoid reading from script input.
 	save_ex_normal_busy = ex_normal_busy;
 	ex_normal_busy = 0;
-	if (!debug_greedy)
+	जइ (!debug_greedy)
 	{
 	    save_typeahead(&typeaheadbuf);
 	    typeahead_saved = TRUE;
@@ -139,221 +139,221 @@ do_debug(char_u *cmd)
 	debug_break_level = -1;
 
 	vim_free(cmdline);
-	cmdline = getcmdline_prompt('>', NULL, 0, EXPAND_NOTHING, NULL);
+	cmdline = getcmdline_prompt('>', रिक्त, 0, EXPAND_NOTHING, रिक्त);
 
 	debug_break_level = n;
-	if (typeahead_saved)
+	जइ (typeahead_saved)
 	{
 	    restore_typeahead(&typeaheadbuf, TRUE);
 	    ignore_script = save_ignore_script;
 	}
 	ex_normal_busy = save_ex_normal_busy;
 
-	cmdline_row = msg_row;
-	msg_starthere();
-	if (cmdline != NULL)
+	cmdline_row = सन्देशः_row;
+	सन्देशः_starthere();
+	जइ (cmdline != रिक्त)
 	{
 	    // If this is a debug command, set "last_cmd".
 	    // If not, reset "last_cmd".
 	    // For a blank line use previous command.
 	    p = skipwhite(cmdline);
-	    if (*p != NUL)
+	    जइ (*p != NUL)
 	    {
-		switch (*p)
+		विकल्प (*p)
 		{
-		    case 'c': last_cmd = CMD_CONT;
+		    पक्ष 'c': last_cmd = CMD_CONT;
 			      tail = "ont";
-			      break;
-		    case 'n': last_cmd = CMD_NEXT;
+			      भङ्ग;
+		    पक्ष 'n': last_cmd = CMD_NEXT;
 			      tail = "ext";
-			      break;
-		    case 's': last_cmd = CMD_STEP;
+			      भङ्ग;
+		    पक्ष 's': last_cmd = CMD_STEP;
 			      tail = "tep";
-			      break;
-		    case 'f':
+			      भङ्ग;
+		    पक्ष 'f':
 			      last_cmd = 0;
-			      if (p[1] == 'r')
+			      जइ (p[1] == 'r')
 			      {
 				  last_cmd = CMD_FRAME;
 				  tail = "rame";
 			      }
-			      else
+			      अण्णहा
 			      {
 				  last_cmd = CMD_FINISH;
 				  tail = "inish";
 			      }
-			      break;
-		    case 'q': last_cmd = CMD_QUIT;
+			      भङ्ग;
+		    पक्ष 'q': last_cmd = CMD_QUIT;
 			      tail = "uit";
-			      break;
-		    case 'i': last_cmd = CMD_INTERRUPT;
+			      भङ्ग;
+		    पक्ष 'i': last_cmd = CMD_INTERRUPT;
 			      tail = "nterrupt";
-			      break;
-		    case 'b': last_cmd = CMD_BACKTRACE;
-			      if (p[1] == 't')
+			      भङ्ग;
+		    पक्ष 'b': last_cmd = CMD_BACKTRACE;
+			      जइ (p[1] == 't')
 				  tail = "t";
-			      else
+			      अण्णहा
 				  tail = "acktrace";
-			      break;
-		    case 'w': last_cmd = CMD_BACKTRACE;
+			      भङ्ग;
+		    पक्ष 'w': last_cmd = CMD_BACKTRACE;
 			      tail = "here";
-			      break;
-		    case 'u': last_cmd = CMD_UP;
+			      भङ्ग;
+		    पक्ष 'u': last_cmd = CMD_UP;
 			      tail = "p";
-			      break;
-		    case 'd': last_cmd = CMD_DOWN;
+			      भङ्ग;
+		    पक्ष 'd': last_cmd = CMD_DOWN;
 			      tail = "own";
-			      break;
-		    default: last_cmd = 0;
+			      भङ्ग;
+		    स्वभाव: last_cmd = 0;
 		}
-		if (last_cmd != 0)
+		जइ (last_cmd != 0)
 		{
 		    // Check that the tail matches.
 		    ++p;
-		    while (*p != NUL && *p == *tail)
+		    जाव (*p != NUL && *p == *tail)
 		    {
 			++p;
 			++tail;
 		    }
-		    if (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
+		    जइ (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
 			last_cmd = 0;
 		}
 	    }
 
-	    if (last_cmd != 0)
+	    जइ (last_cmd != 0)
 	    {
 		// Execute debug command: decide where to break next and
 		// return.
-		switch (last_cmd)
+		विकल्प (last_cmd)
 		{
-		    case CMD_CONT:
+		    पक्ष CMD_CONT:
 			debug_break_level = -1;
-			break;
-		    case CMD_NEXT:
+			भङ्ग;
+		    पक्ष CMD_NEXT:
 			debug_break_level = ex_nesting_level;
-			break;
-		    case CMD_STEP:
+			भङ्ग;
+		    पक्ष CMD_STEP:
 			debug_break_level = 9999;
-			break;
-		    case CMD_FINISH:
+			भङ्ग;
+		    पक्ष CMD_FINISH:
 			debug_break_level = ex_nesting_level - 1;
-			break;
-		    case CMD_QUIT:
+			भङ्ग;
+		    पक्ष CMD_QUIT:
 			got_int = TRUE;
 			debug_break_level = -1;
-			break;
-		    case CMD_INTERRUPT:
+			भङ्ग;
+		    पक्ष CMD_INTERRUPT:
 			got_int = TRUE;
 			debug_break_level = 9999;
 			// Do not repeat ">interrupt" cmd, continue stepping.
 			last_cmd = CMD_STEP;
-			break;
-		    case CMD_BACKTRACE:
+			भङ्ग;
+		    पक्ष CMD_BACKTRACE:
 			do_showbacktrace(cmd);
-			continue;
-		    case CMD_FRAME:
-			if (*p == NUL)
+			अनुवर्त;
+		    पक्ष CMD_FRAME:
+			जइ (*p == NUL)
 			{
 			    do_showbacktrace(cmd);
 			}
-			else
+			अण्णहा
 			{
 			    p = skipwhite(p);
 			    do_setdebugtracelevel(p);
 			}
-			continue;
-		    case CMD_UP:
+			अनुवर्त;
+		    पक्ष CMD_UP:
 			debug_backtrace_level++;
 			do_checkbacktracelevel();
-			continue;
-		    case CMD_DOWN:
+			अनुवर्त;
+		    पक्ष CMD_DOWN:
 			debug_backtrace_level--;
 			do_checkbacktracelevel();
-			continue;
+			अनुवर्त;
 		}
 		// Going out reset backtrace_level
 		debug_backtrace_level = 0;
-		break;
+		भङ्ग;
 	    }
 
 	    // don't debug this command
 	    n = debug_break_level;
 	    debug_break_level = -1;
-	    (void)do_cmdline(cmdline, getexline, NULL,
+	    (शून्य)do_cmdline(cmdline, getexline, रिक्त,
 						DOCMD_VERBOSE|DOCMD_EXCRESET);
 	    debug_break_level = n;
 	}
-	lines_left = Rows - 1;
+	पङ्क्तयः_वामः = Rows - 1;
     }
     vim_free(cmdline);
 
-    if (RedrawingDisabled > 0)
+    जइ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     redraw_all_later(UPD_NOT_VALID);
     need_wait_return = FALSE;
-    msg_scroll = save_msg_scroll;
+    सन्देशः_scroll = save_सन्देशः_scroll;
     restore_timeout_for_debugging();
-    lines_left = Rows - 1;
+    पङ्क्तयः_वामः = Rows - 1;
     State = save_State;
     debug_mode = FALSE;
     did_emsg = save_did_emsg;
     cmd_silent = save_cmd_silent;
-    msg_silent = save_msg_silent;
+    सन्देशः_silent = save_सन्देशः_silent;
     emsg_silent = save_emsg_silent;
     redir_off = save_redir_off;
 
     // Only print the message again when typing a command before coming back
     // here.
-    debug_did_msg = TRUE;
+    debug_did_सन्देशः = TRUE;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 get_maxbacktrace_level(char_u *sname)
 {
-    char	*p, *q;
-    int		maxbacktrace = 0;
+    वर्ण	*p, *q;
+    पूर्णाङ्क		maxbacktrace = 0;
 
-    if (sname == NULL)
-	return 0;
+    जइ (sname == रिक्त)
+	प्रत्यागम 0;
 
-    p = (char *)sname;
-    while ((q = strstr(p, "..")) != NULL)
+    p = (वर्ण *)sname;
+    जाव ((q = strstr(p, "..")) != रिक्त)
     {
 	p = q + 2;
 	maxbacktrace++;
     }
-    return maxbacktrace;
+    प्रत्यागम maxbacktrace;
 }
 
-    static void
+    स्थिर शून्य
 do_setdebugtracelevel(char_u *arg)
 {
-    int level;
+    पूर्णाङ्क level;
 
-    level = atoi((char *)arg);
-    if (*arg == '+' || level < 0)
+    level = atoi((वर्ण *)arg);
+    जइ (*arg == '+' || level < 0)
 	debug_backtrace_level += level;
-    else
+    अण्णहा
 	debug_backtrace_level = level;
 
     do_checkbacktracelevel();
 }
 
-    static void
-do_checkbacktracelevel(void)
+    स्थिर शून्य
+do_checkbacktracelevel(शून्य)
 {
-    if (debug_backtrace_level < 0)
+    जइ (debug_backtrace_level < 0)
     {
 	debug_backtrace_level = 0;
-	msg(_("frame is zero"));
+	सन्देशः(_("frame is zero"));
     }
-    else
+    अण्णहा
     {
 	char_u	*sname = estack_sfile(ESTACK_NONE);
-	int	max = get_maxbacktrace_level(sname);
+	पूर्णाङ्क	max = get_maxbacktrace_level(sname);
 
-	if (debug_backtrace_level > max)
+	जइ (debug_backtrace_level > max)
 	{
 	    debug_backtrace_level = max;
 	    smsg(_("frame at highest level: %d"), max);
@@ -362,59 +362,59 @@ do_checkbacktracelevel(void)
     }
 }
 
-    static void
+    स्थिर शून्य
 do_showbacktrace(char_u *cmd)
 {
     char_u  *sname;
-    char    *cur;
-    char    *next;
-    int	    i = 0;
-    int	    max;
+    वर्ण    *cur;
+    वर्ण    *next;
+    पूर्णाङ्क	    i = 0;
+    पूर्णाङ्क	    max;
 
     sname = estack_sfile(ESTACK_NONE);
     max = get_maxbacktrace_level(sname);
-    if (sname != NULL)
+    जइ (sname != रिक्त)
     {
-	cur = (char *)sname;
-	while (!got_int)
+	cur = (वर्ण *)sname;
+	जाव (!got_int)
 	{
 	    next = strstr(cur, "..");
-	    if (next != NULL)
+	    जइ (next != रिक्त)
 		*next = NUL;
-	    if (i == max - debug_backtrace_level)
+	    जइ (i == max - debug_backtrace_level)
 		smsg("->%d %s", max - i, cur);
-	    else
+	    अण्णहा
 		smsg("  %d %s", max - i, cur);
 	    ++i;
-	    if (next == NULL)
-		break;
+	    जइ (next == रिक्त)
+		भङ्ग;
 	    *next = '.';
 	    cur = next + 2;
 	}
 	vim_free(sname);
     }
 
-    if (SOURCING_LNUM != 0)
+    जइ (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), (long)SOURCING_LNUM, cmd);
-    else
+    अण्णहा
 	smsg(_("cmd: %s"), cmd);
 }
 
 /*
  * ":debug".
  */
-    void
+    शून्य
 ex_debug(exarg_T *eap)
 {
-    int		debug_break_level_save = debug_break_level;
+    पूर्णाङ्क		debug_break_level_save = debug_break_level;
 
     debug_break_level = 9999;
     do_cmdline_cmd(eap->arg);
     debug_break_level = debug_break_level_save;
 }
 
-static char_u	*debug_breakpoint_name = NULL;
-static linenr_T	debug_breakpoint_lnum;
+स्थिर char_u	*debug_breakpoint_name = रिक्त;
+स्थिर linenr_T	debug_breakpoint_lnum;
 
 /*
  * When debugging or a breakpoint is set on a skipped command, no debug prompt
@@ -423,8 +423,8 @@ static linenr_T	debug_breakpoint_lnum;
  * a skipped command decides itself that a debug prompt should be displayed, it
  * can do so by calling dbg_check_skipped().
  */
-static int	debug_skipped;
-static char_u	*debug_skipped_name;
+स्थिर पूर्णाङ्क	debug_skipped;
+स्थिर char_u	*debug_skipped_name;
 
 /*
  * Go to debug mode when a breakpoint was encountered or "ex_nesting_level" is
@@ -433,45 +433,45 @@ static char_u	*debug_skipped_name;
  * decide to execute something themselves.
  * Called from do_one_cmd() before executing a command.
  */
-    void
+    शून्य
 dbg_check_breakpoint(exarg_T *eap)
 {
     char_u	*p;
 
     debug_skipped = FALSE;
-    if (debug_breakpoint_name != NULL)
+    जइ (debug_breakpoint_name != रिक्त)
     {
-	if (!eap->skip)
+	जइ (!eap->skip)
 	{
 	    // replace K_SNR with "<SNR>"
-	    if (debug_breakpoint_name[0] == K_SPECIAL
+	    जइ (debug_breakpoint_name[0] == K_SPECIAL
 		    && debug_breakpoint_name[1] == KS_EXTRA
 		    && debug_breakpoint_name[2] == KE_SNR)
 		p = (char_u *)"<SNR>";
-	    else
+	    अण्णहा
 		p = (char_u *)"";
 	    smsg(_("Breakpoint in \"%s%s\" line %ld"),
 		    p,
 		    debug_breakpoint_name + (*p == NUL ? 0 : 3),
 		    (long)debug_breakpoint_lnum);
-	    debug_breakpoint_name = NULL;
+	    debug_breakpoint_name = रिक्त;
 	    do_debug(eap->cmd);
 	}
-	else
+	अण्णहा
 	{
 	    debug_skipped = TRUE;
 	    debug_skipped_name = debug_breakpoint_name;
-	    debug_breakpoint_name = NULL;
+	    debug_breakpoint_name = रिक्त;
 	}
     }
-    else if (ex_nesting_level <= debug_break_level)
+    अण्णहा जइ (ex_nesting_level <= debug_break_level)
     {
-	if (!eap->skip)
+	जइ (!eap->skip)
 	    do_debug(eap->cmd);
-	else
+	अण्णहा
 	{
 	    debug_skipped = TRUE;
-	    debug_skipped_name = NULL;
+	    debug_skipped_name = रिक्त;
 	}
     }
 }
@@ -480,13 +480,13 @@ dbg_check_breakpoint(exarg_T *eap)
  * Go to debug mode if skipped by dbg_check_breakpoint() because eap->skip was
  * set.  Return TRUE when the debug mode is entered this time.
  */
-    int
+    पूर्णाङ्क
 dbg_check_skipped(exarg_T *eap)
 {
-    int		prev_got_int;
+    पूर्णाङ्क		prev_got_int;
 
-    if (!debug_skipped)
-	return FALSE;
+    जइ (!debug_skipped)
+	प्रत्यागम FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
     // interruption cause flushing the input buffer.
@@ -495,49 +495,49 @@ dbg_check_skipped(exarg_T *eap)
     debug_breakpoint_name = debug_skipped_name;
     // eap->skip is TRUE
     eap->skip = FALSE;
-    (void)dbg_check_breakpoint(eap);
+    (शून्य)dbg_check_breakpoint(eap);
     eap->skip = TRUE;
     got_int |= prev_got_int;
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
  * The list of breakpoints: dbg_breakp.
  * This is a grow-array of structs.
  */
-struct debuggy
+संरचना debuggy
 {
-    int		dbg_nr;		// breakpoint number
-    int		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
+    पूर्णाङ्क		dbg_nr;		// breakpoint number
+    पूर्णाङ्क		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
     char_u	*dbg_name;	// function, expression or file name
     regprog_T	*dbg_prog;	// regexp program
     linenr_T	dbg_lnum;	// line number in function or file
-    int		dbg_forceit;	// ! used
+    पूर्णाङ्क		dbg_forceit;	// ! used
 #ifdef FEAT_EVAL
     typval_T    *dbg_val;       // last result of watchexpression
 #endif
-    int		dbg_level;      // stored nested level for expr
+    पूर्णाङ्क		dbg_level;      // stored nested level for expr
 };
 
-static garray_T dbg_breakp = {0, 0, sizeof(struct debuggy), 4, NULL};
-#define BREAKP(idx)		(((struct debuggy *)dbg_breakp.ga_data)[idx])
-#define DEBUGGY(gap, idx)	(((struct debuggy *)gap->ga_data)[idx])
-static int last_breakp = 0;	// nr of last defined breakpoint
-static int has_expr_breakpoint = FALSE;
+स्थिर garray_T dbg_breakp = {0, 0, परिमाण(संरचना debuggy), 4, रिक्त};
+#define BREAKP(idx)		(((संरचना debuggy *)dbg_breakp.ga_data)[idx])
+#define DEBUGGY(gap, idx)	(((संरचना debuggy *)gap->ga_data)[idx])
+स्थिर पूर्णाङ्क last_breakp = 0;	// nr of last defined breakpoint
+स्थिर पूर्णाङ्क has_व्यञ्जकम्_breakpoint = FALSE;
 
 #ifdef FEAT_PROFILE
 // Profiling uses file and func names similar to breakpoints.
-static garray_T prof_ga = {0, 0, sizeof(struct debuggy), 4, NULL};
+स्थिर garray_T prof_ga = {0, 0, परिमाण(संरचना debuggy), 4, रिक्त};
 
 // Profiling caches results of regexp lookups for function/script name.
 # define N_PROF_HTAB 2
-static hashtab_T prof_cache[N_PROF_HTAB];
+स्थिर hashtab_T prof_cache[N_PROF_HTAB];
 # define PROF_HTAB_FUNCS 0
 # define PROF_HTAB_FILES 1
-static int prof_cache_initialized;
-typedef struct profentry_S
+स्थिर पूर्णाङ्क prof_cache_initialized;
+प्रकारनिर्देश संरचना profentry_S
 {
-    char    pen_flags;	// cache data booleans: profiling, forceit
+    वर्ण    pen_flags;	// cache data booleans: profiling, forceit
     char_u  pen_name[1]; // actually longer
 } profentry_T;
 # define PEN_FLAG_PROFILING 1
@@ -549,36 +549,36 @@ typedef struct profentry_S
 
 # define PE2HIKEY(pe)	((pe)->pen_name)
 # define HIKEY2PE(p)	((profentry_T *)((p) - (offsetof(profentry_T, pen_name))))
-# define HI2PE(hi)	HIKEY2PE((hi)->hi_key)
+# define HI2PE(hi)	HIKEY2PE((hi)->hi_कुञ्चिका)
 
-static void prof_clear_cache(void);
-# define PROF_CLEAR_CACHE(gap) do {if ((gap) == &prof_ga) prof_clear_cache();} while (0)
+स्थिर शून्य prof_clear_cache(शून्य);
+# define PROF_CLEAR_CACHE(gap) करेहि {जइ ((gap) == &prof_ga) prof_clear_cache();} जाव (0)
 // Can enable to get some info about profile caching
 // #define PROF_CACHE_LOG
-#else
-# define PROF_CLEAR_CACHE(gap) do {} while (0)
+#अण्णहा
+# define PROF_CLEAR_CACHE(gap) करेहि {} जाव (0)
 #endif
 #define DBG_FUNC	1
 #define DBG_FILE	2
-#define DBG_EXPR	3
+#define DBG_व्यञ्जकम्	3
 
-static linenr_T debuggy_find(int file,char_u *fname, linenr_T after, garray_T *gap, int *fp);
+स्थिर linenr_T debuggy_find(पूर्णाङ्क file,char_u *fname, linenr_T after, garray_T *gap, पूर्णाङ्क *fp);
 
 /*
  * Evaluate the "bp->dbg_name" expression and return the result.
  * Disables error messages.
  */
-    static typval_T *
-eval_expr_no_emsg(struct debuggy *bp)
+    स्थिर typval_T *
+eval_व्यञ्जकम्_no_emsg(संरचना debuggy *bp)
 {
     typval_T	*tv;
 
     // Disable error messages, a bad expression would make Vim unusable.
     ++emsg_off;
-    tv = eval_expr(bp->dbg_name, NULL);
+    tv = eval_व्यञ्जकम्(bp->dbg_name, रिक्त);
     --emsg_off;
 
-    return tv;
+    प्रत्यागम tv;
 }
 
 /*
@@ -587,56 +587,56 @@ eval_expr_no_emsg(struct debuggy *bp)
  * is allocated.
  * Returns FAIL for failure.
  */
-    static int
+    स्थिर पूर्णाङ्क
 dbg_parsearg(
     char_u	*arg,
     garray_T	*gap)	    // either &dbg_breakp or &prof_ga
 {
     char_u	*p = arg;
     char_u	*q;
-    struct debuggy *bp;
-    int		here = FALSE;
+    संरचना debuggy *bp;
+    पूर्णाङ्क		here = FALSE;
 
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    जइ (ga_grow(gap, 1) == FAIL)
+	प्रत्यागम FAIL;
     bp = &DEBUGGY(gap, gap->ga_len);
 
     // Find "func" or "file".
-    if (STRNCMP(p, "func", 4) == 0)
+    जइ (STRNCMP(p, "func", 4) == 0)
 	bp->dbg_type = DBG_FUNC;
-    else if (STRNCMP(p, "file", 4) == 0)
+    अण्णहा जइ (STRNCMP(p, "file", 4) == 0)
 	bp->dbg_type = DBG_FILE;
-    else if (
+    अण्णहा जइ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "here", 4) == 0)
     {
-	if (curbuf->b_ffname == NULL)
+	जइ (curbuf->b_ffname == रिक्त)
 	{
 	    emsg(_(e_no_file_name));
-	    return FAIL;
+	    प्रत्यागम FAIL;
 	}
 	bp->dbg_type = DBG_FILE;
 	here = TRUE;
     }
-    else if (
+    अण्णहा जइ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "expr", 4) == 0)
-	bp->dbg_type = DBG_EXPR;
-    else
+	bp->dbg_type = DBG_व्यञ्जकम्;
+    अण्णहा
     {
 	semsg(_(e_invalid_argument_str), p);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
     p = skipwhite(p + 4);
 
     // Find optional line number.
-    if (here)
+    जइ (here)
 	bp->dbg_lnum = curwin->w_cursor.lnum;
-    else if (
+    अण्णहा जइ (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
@@ -645,92 +645,92 @@ dbg_parsearg(
 	bp->dbg_lnum = getdigits(&p);
 	p = skipwhite(p);
     }
-    else
+    अण्णहा
 	bp->dbg_lnum = 0;
 
     // Find the function or file name.  Don't accept a function name with ().
-    if ((!here && *p == NUL)
+    जइ ((!here && *p == NUL)
 	    || (here && *p != NUL)
-	    || (bp->dbg_type == DBG_FUNC && strstr((char *)p, "()") != NULL))
+	    || (bp->dbg_type == DBG_FUNC && strstr((वर्ण *)p, "()") != रिक्त))
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
-    if (bp->dbg_type == DBG_FUNC)
+    जइ (bp->dbg_type == DBG_FUNC)
 	bp->dbg_name = vim_strsave(STRNCMP(p, "g:", 2) == 0 ? p + 2 : p);
-    else if (here)
+    अण्णहा जइ (here)
 	bp->dbg_name = vim_strsave(curbuf->b_ffname);
-    else if (bp->dbg_type == DBG_EXPR)
+    अण्णहा जइ (bp->dbg_type == DBG_व्यञ्जकम्)
     {
 	bp->dbg_name = vim_strsave(p);
-	if (bp->dbg_name != NULL)
-	    bp->dbg_val = eval_expr_no_emsg(bp);
+	जइ (bp->dbg_name != रिक्त)
+	    bp->dbg_val = eval_व्यञ्जकम्_no_emsg(bp);
     }
-    else
+    अण्णहा
     {
 	// Expand the file name in the same way as do_source().  This means
 	// doing it twice, so that $DIR/file gets expanded when $DIR is
 	// "~/dir".
 	q = expand_env_save(p);
-	if (q == NULL)
-	    return FAIL;
+	जइ (q == रिक्त)
+	    प्रत्यागम FAIL;
 	p = expand_env_save(q);
 	vim_free(q);
-	if (p == NULL)
-	    return FAIL;
-	if (*p != '*')
+	जइ (p == रिक्त)
+	    प्रत्यागम FAIL;
+	जइ (*p != '*')
 	{
 	    bp->dbg_name = fix_fname(p);
 	    vim_free(p);
 	}
-	else
+	अण्णहा
 	    bp->dbg_name = p;
     }
 
-    if (bp->dbg_name == NULL)
-	return FAIL;
-    return OK;
+    जइ (bp->dbg_name == रिक्त)
+	प्रत्यागम FAIL;
+    प्रत्यागम OK;
 }
 
 /*
  * ":breakadd".  Also used for ":profile".
  */
-    void
+    शून्य
 ex_breakadd(exarg_T *eap)
 {
-    struct debuggy *bp;
+    संरचना debuggy *bp;
     char_u	*pat;
     garray_T	*gap;
 
     gap = &dbg_breakp;
 #ifdef FEAT_PROFILE
-    if (eap->cmdidx == CMD_profile)
+    जइ (eap->cmdidx == CMD_profile)
 	gap = &prof_ga;
 #endif
 
-    if (dbg_parsearg(eap->arg, gap) != OK)
-	return;
+    जइ (dbg_parsearg(eap->arg, gap) != OK)
+	प्रत्यागम;
 
     bp = &DEBUGGY(gap, gap->ga_len);
     bp->dbg_forceit = eap->forceit;
 
-    if (bp->dbg_type != DBG_EXPR)
+    जइ (bp->dbg_type != DBG_व्यञ्जकम्)
     {
-	pat = file_pat_to_reg_pat(bp->dbg_name, NULL, NULL, FALSE);
-	if (pat != NULL)
+	pat = file_pat_to_reg_pat(bp->dbg_name, रिक्त, रिक्त, FALSE);
+	जइ (pat != रिक्त)
 	{
 	    bp->dbg_prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
 	    vim_free(pat);
 	}
-	if (pat == NULL || bp->dbg_prog == NULL)
+	जइ (pat == रिक्त || bp->dbg_prog == रिक्त)
 	    vim_free(bp->dbg_name);
-	else
+	अण्णहा
 	{
-	    if (bp->dbg_lnum == 0)	// default line number is 1
+	    जइ (bp->dbg_lnum == 0)	// default line number is 1
 		bp->dbg_lnum = 1;
 #ifdef FEAT_PROFILE
-	    if (eap->cmdidx != CMD_profile)
+	    जइ (eap->cmdidx != CMD_profile)
 #endif
 	    {
 		DEBUGGY(gap, gap->ga_len).dbg_nr = ++last_breakp;
@@ -740,102 +740,102 @@ ex_breakadd(exarg_T *eap)
 	    PROF_CLEAR_CACHE(gap);
 	}
     }
-    else
+    अण्णहा
     {
 	// DBG_EXPR
 	DEBUGGY(gap, gap->ga_len++).dbg_nr = ++last_breakp;
 	++debug_tick;
-	if (gap == &dbg_breakp)
-	    has_expr_breakpoint = TRUE;
+	जइ (gap == &dbg_breakp)
+	    has_व्यञ्जकम्_breakpoint = TRUE;
     }
 }
 
 /*
  * ":debuggreedy".
  */
-    void
+    शून्य
 ex_debuggreedy(exarg_T *eap)
 {
-    if (eap->addr_count == 0 || eap->line2 != 0)
+    जइ (eap->addr_गणनम् == 0 || eap->line2 != 0)
 	debug_greedy = TRUE;
-    else
+    अण्णहा
 	debug_greedy = FALSE;
 }
 
-    static void
-update_has_expr_breakpoint(void)
+    स्थिर शून्य
+update_has_व्यञ्जकम्_breakpoint(शून्य)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    has_expr_breakpoint = FALSE;
-    for (i = 0; i < dbg_breakp.ga_len; ++i)
-	if (BREAKP(i).dbg_type == DBG_EXPR)
+    has_व्यञ्जकम्_breakpoint = FALSE;
+    प्रति (i = 0; i < dbg_breakp.ga_len; ++i)
+	जइ (BREAKP(i).dbg_type == DBG_व्यञ्जकम्)
 	{
-	    has_expr_breakpoint = TRUE;
-	    break;
+	    has_व्यञ्जकम्_breakpoint = TRUE;
+	    भङ्ग;
 	}
 }
 
 /*
  * Return TRUE if there is any expression breakpoint.
  */
-    int
-debug_has_expr_breakpoint(void)
+    पूर्णाङ्क
+debug_has_व्यञ्जकम्_breakpoint(शून्य)
 {
-    return has_expr_breakpoint;
+    प्रत्यागम has_व्यञ्जकम्_breakpoint;
 }
 
 /*
  * ":breakdel" and ":profdel".
  */
-    void
+    शून्य
 ex_breakdel(exarg_T *eap)
 {
-    struct debuggy *bp, *bpi;
-    int		nr;
-    int		todel = -1;
-    int		del_all = FALSE;
-    int		i;
+    संरचना debuggy *bp, *bpi;
+    पूर्णाङ्क		nr;
+    पूर्णाङ्क		todel = -1;
+    पूर्णाङ्क		del_all = FALSE;
+    पूर्णाङ्क		i;
     linenr_T	best_lnum = 0;
     garray_T	*gap;
 
     gap = &dbg_breakp;
-    if (eap->cmdidx == CMD_profdel)
+    जइ (eap->cmdidx == CMD_profdel)
     {
 #ifdef FEAT_PROFILE
 	gap = &prof_ga;
-#else
+#अण्णहा
 	ex_ni(eap);
-	return;
+	प्रत्यागम;
 #endif
     }
 
-    if (vim_isdigit(*eap->arg))
+    जइ (vim_isdigit(*eap->arg))
     {
 	// ":breakdel {nr}"
-	nr = atol((char *)eap->arg);
-	for (i = 0; i < gap->ga_len; ++i)
-	    if (DEBUGGY(gap, i).dbg_nr == nr)
+	nr = atol((वर्ण *)eap->arg);
+	प्रति (i = 0; i < gap->ga_len; ++i)
+	    जइ (DEBUGGY(gap, i).dbg_nr == nr)
 	    {
 		todel = i;
-		break;
+		भङ्ग;
 	    }
     }
-    else if (*eap->arg == '*')
+    अण्णहा जइ (*eap->arg == '*')
     {
 	todel = 0;
 	del_all = TRUE;
     }
-    else
+    अण्णहा
     {
 	// ":breakdel {func|file|expr} [lnum] {name}"
-	if (dbg_parsearg(eap->arg, gap) == FAIL)
-	    return;
+	जइ (dbg_parsearg(eap->arg, gap) == FAIL)
+	    प्रत्यागम;
 	bp = &DEBUGGY(gap, gap->ga_len);
-	for (i = 0; i < gap->ga_len; ++i)
+	प्रति (i = 0; i < gap->ga_len; ++i)
 	{
 	    bpi = &DEBUGGY(gap, i);
-	    if (bp->dbg_type == bpi->dbg_type
+	    जइ (bp->dbg_type == bpi->dbg_type
 		    && STRCMP(bp->dbg_name, bpi->dbg_name) == 0
 		    && (bp->dbg_lnum == bpi->dbg_lnum
 			|| (bp->dbg_lnum == 0
@@ -849,68 +849,68 @@ ex_breakdel(exarg_T *eap)
 	vim_free(bp->dbg_name);
     }
 
-    if (todel < 0)
+    जइ (todel < 0)
     {
 	semsg(_(e_breakpoint_not_found_str), eap->arg);
-	return;
+	प्रत्यागम;
     }
 
-    while (gap->ga_len > 0)
+    जाव (gap->ga_len > 0)
     {
 	vim_free(DEBUGGY(gap, todel).dbg_name);
 #ifdef FEAT_EVAL
-	if (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
-		&& DEBUGGY(gap, todel).dbg_val != NULL)
+	जइ (DEBUGGY(gap, todel).dbg_type == DBG_व्यञ्जकम्
+		&& DEBUGGY(gap, todel).dbg_val != रिक्त)
 	    free_tv(DEBUGGY(gap, todel).dbg_val);
 #endif
 	vim_regfree(DEBUGGY(gap, todel).dbg_prog);
 	--gap->ga_len;
-	if (todel < gap->ga_len)
+	जइ (todel < gap->ga_len)
 	    mch_memmove(&DEBUGGY(gap, todel), &DEBUGGY(gap, todel + 1),
-		    (gap->ga_len - todel) * sizeof(struct debuggy));
+		    (gap->ga_len - todel) * परिमाण(संरचना debuggy));
 #ifdef FEAT_PROFILE
-	if (eap->cmdidx == CMD_breakdel)
+	जइ (eap->cmdidx == CMD_breakdel)
 #endif
 	    ++debug_tick;
-	if (!del_all)
-	    break;
+	जइ (!del_all)
+	    भङ्ग;
     }
     PROF_CLEAR_CACHE(gap);
 
     // If all breakpoints were removed clear the array.
-    if (gap->ga_len == 0)
+    जइ (gap->ga_len == 0)
 	ga_clear(gap);
-    if (gap == &dbg_breakp)
-	update_has_expr_breakpoint();
+    जइ (gap == &dbg_breakp)
+	update_has_व्यञ्जकम्_breakpoint();
 }
 
 /*
  * ":breaklist".
  */
-    void
+    शून्य
 ex_breaklist(exarg_T *eap UNUSED)
 {
-    struct debuggy *bp;
-    int		i;
+    संरचना debuggy *bp;
+    पूर्णाङ्क		i;
 
-    if (dbg_breakp.ga_len == 0)
+    जइ (dbg_breakp.ga_len == 0)
     {
-	msg(_("No breakpoints defined"));
-	return;
+	सन्देशः(_("No breakpoints defined"));
+	प्रत्यागम;
     }
 
-    for (i = 0; i < dbg_breakp.ga_len; ++i)
+    प्रति (i = 0; i < dbg_breakp.ga_len; ++i)
     {
 	bp = &BREAKP(i);
-	if (bp->dbg_type == DBG_FILE)
-	    home_replace(NULL, bp->dbg_name, NameBuff, MAXPATHL, TRUE);
-	if (bp->dbg_type != DBG_EXPR)
+	जइ (bp->dbg_type == DBG_FILE)
+	    home_replace(रिक्त, bp->dbg_name, NameBuff, MAXPATHL, TRUE);
+	जइ (bp->dbg_type != DBG_व्यञ्जकम्)
 	    smsg(_("%3d  %s %s  line %ld"),
 		    bp->dbg_nr,
 		    bp->dbg_type == DBG_FUNC ? "func" : "file",
 		    bp->dbg_type == DBG_FUNC ? bp->dbg_name : NameBuff,
 		    (long)bp->dbg_lnum);
-	else
+	अण्णहा
 	    smsg(_("%3d  expr %s"),
 		    bp->dbg_nr, bp->dbg_name);
     }
@@ -922,87 +922,87 @@ ex_breaklist(exarg_T *eap UNUSED)
  */
     linenr_T
 dbg_find_breakpoint(
-    int		file,	    // TRUE for a file, FALSE for a function
+    पूर्णाङ्क		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after)	    // after this line number
 {
-    return debuggy_find(file, fname, after, &dbg_breakp, NULL);
+    प्रत्यागम debuggy_find(file, fname, after, &dbg_breakp, रिक्त);
 }
 
-#if defined(FEAT_PROFILE)
-# if defined(PROF_CACHE_LOG)
-static int count_lookups[2];
+#जइ defined(FEAT_PROFILE)
+# जइ defined(PROF_CACHE_LOG)
+स्थिर पूर्णाङ्क गणनम्_lookups[2];
 # endif
 /*
  * Return TRUE if profiling is on for a function or sourced file.
  * Cache the results of debuggy_find().
  * Cache is cleared whenever prof_ga.ga_len is changed.
  */
-    int
+    पूर्णाङ्क
 has_profiling(
-    int		file,	    // TRUE for a file, FALSE for a function
+    पूर्णाङ्क		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
-    int		*fp,	    // return: forceit
+    पूर्णाङ्क		*fp,	    // return: forceit
     hash_T	*hashp)	    // use/return fname hash, may be NULL
 {
-    if (prof_ga.ga_len == 0 || !prof_cache_initialized)
-	return debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
+    जइ (prof_ga.ga_len == 0 || !prof_cache_initialized)
+	प्रत्यागम debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
 							     != (linenr_T)0;
 
     hash_T hash;
-    if (hashp != NULL)
+    जइ (hashp != रिक्त)
     {
 	hash = *hashp;
-	if (hash == 0)
+	जइ (hash == 0)
 	{
 	    hash = hash_hash(fname);
 	    *hashp = hash;
 	}
     }
-    else
+    अण्णहा
 	hash = hash_hash(fname);
 
     hashtab_T *ht = &prof_cache[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS];
     hashitem_T *hi = hash_lookup(ht, fname, hash);
     profentry_T *pe;
-    if (HASHITEM_EMPTY(hi))
+    जइ (HASHITEM_EMPTY(hi))
     {
 	pe = alloc(offsetof(profentry_T, pen_name) + STRLEN(fname) + 1);
-	if (pe == NULL)
-	    return FALSE;
+	जइ (pe == रिक्त)
+	    प्रत्यागम FALSE;
 	STRCPY(pe->pen_name, fname);
 	pe->pen_flags = 0;
 	// run debuggy_find and capture return and forceit
-	int f;
-	int lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
-	if (lnum)
+	पूर्णाङ्क f;
+	पूर्णाङ्क lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
+	जइ (lnum)
 	{
 	    PEN_SET_PROFILING(pe);
-	    if (f)
+	    जइ (f)
 		PEN_SET_FORCEIT(pe);
 	}
 	hash_add_item(ht, hi, pe->pen_name, hash);
-# if defined(PROF_CACHE_LOG)
-	ch_log(NULL, "has_profiling: %s %s forceit %s, profile %s",
+# जइ defined(PROF_CACHE_LOG)
+	ch_log(रिक्त, "has_profiling: %s %s forceit %s, profile %s",
 	       file ? "file" : "func", fname,
 	       PEN_IS_FORCEIT(pe) ? "true" : "false",
 	       PEN_IS_PROFILING(pe) ? "true" : "false");
 # endif
     }
-    else
+    अण्णहा
 	pe = HI2PE(hi);
-    if (fp)
+    जइ (fp)
 	*fp = PEN_IS_FORCEIT(pe);
-# if defined(PROF_CACHE_LOG)
-    count_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
+# जइ defined(PROF_CACHE_LOG)
+    गणनम्_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
 # endif
-    return PEN_IS_PROFILING(pe);
+    प्रत्यागम PEN_IS_PROFILING(pe);
 }
 
-    static void
-prof_clear_cache(void)
+    स्थिर शून्य
+prof_clear_cache(शून्य)
 {
-    if (!prof_cache_initialized)
+    जइ (!prof_cache_initialized)
     {
 	hash_init(&prof_cache[PROF_HTAB_FUNCS]);
 	hash_init(&prof_cache[PROF_HTAB_FILES]);
@@ -1010,17 +1010,17 @@ prof_clear_cache(void)
     }
 
     hashtab_T *ht;
-    for (ht = &prof_cache[0]; ht < &prof_cache[N_PROF_HTAB]; ht++)
+    प्रति (ht = &prof_cache[0]; ht < &prof_cache[N_PROF_HTAB]; ht++)
     {
-	if (ht->ht_used > 0)
+	जइ (ht->ht_used > 0)
 	{
-# if defined(PROF_CACHE_LOG)
-	    int idx = ht == &prof_cache[PROF_HTAB_FUNCS]
+# जइ defined(PROF_CACHE_LOG)
+	    पूर्णाङ्क idx = ht == &prof_cache[PROF_HTAB_FUNCS]
 		      ? PROF_HTAB_FUNCS : PROF_HTAB_FILES;
-	    ch_log(NULL, "prof_clear_cache: %s, used: %ld, lookups: %d",
+	    ch_log(रिक्त, "prof_clear_cache: %s, used: %ld, lookups: %d",
 		   idx == PROF_HTAB_FUNCS ? "function" : "script",
-		   ht->ht_used, count_lookups[idx]);
-	    count_lookups[idx] = 0;
+		   ht->ht_used, गणनम्_lookups[idx]);
+	    गणनम्_lookups[idx] = 0;
 # endif
 	    hash_clear_all(ht, offsetof(profentry_T, pen_name));
 	    hash_init(ht);
@@ -1032,24 +1032,24 @@ prof_clear_cache(void)
 /*
  * Common code for dbg_find_breakpoint() and has_profiling().
  */
-    static linenr_T
+    स्थिर linenr_T
 debuggy_find(
-    int		is_file,    // TRUE for a file, FALSE for a function
+    पूर्णाङ्क		is_file,    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after,	    // after this line number
     garray_T	*gap,	    // either &dbg_breakp or &prof_ga
-    int		*fp)	    // if not NULL: return forceit
+    पूर्णाङ्क		*fp)	    // if not NULL: return forceit
 {
-    struct debuggy *bp;
-    int		i;
+    संरचना debuggy *bp;
+    पूर्णाङ्क		i;
     linenr_T	lnum = 0;
-    char_u	*name = NULL;
+    char_u	*name = रिक्त;
     char_u	*short_name = fname;
-    int		prev_got_int;
+    पूर्णाङ्क		prev_got_int;
 
     // Return quickly when there are no breakpoints.
-    if (gap->ga_len == 0)
-	return (linenr_T)0;
+    जइ (gap->ga_len == 0)
+	प्रत्यागम (linenr_T)0;
 
     // For a script-local function remove the prefix, so that
     // "profile func Func" matches "Func" in any script.  Otherwise it's very
@@ -1057,24 +1057,24 @@ debuggy_find(
     // function in the wrong script, but that is much better than not being
     // able to profile/debug a function in a script with unknown ID.
     // Also match a script-specific name.
-    if (!is_file && fname[0] == K_SPECIAL)
+    जइ (!is_file && fname[0] == K_SPECIAL)
     {
 	short_name = vim_strchr(fname, '_') + 1;
 	name = alloc(STRLEN(fname) + 3);
-	if (name != NULL)
+	जइ (name != रिक्त)
 	{
 	    STRCPY(name, "<SNR>");
 	    STRCPY(name + 5, fname + 3);
 	}
     }
 
-    for (i = 0; i < gap->ga_len; ++i)
+    प्रति (i = 0; i < gap->ga_len; ++i)
     {
 	// Skip entries that are not useful or are for a line that is beyond
 	// an already found breakpoint.
 	bp = &DEBUGGY(gap, i);
-	if (((bp->dbg_type == DBG_FILE) == is_file
-		    && bp->dbg_type != DBG_EXPR && (
+	जइ (((bp->dbg_type == DBG_FILE) == is_file
+		    && bp->dbg_type != DBG_व्यञ्जकम् && (
 #ifdef FEAT_PROFILE
 		gap == &prof_ga ||
 #endif
@@ -1085,57 +1085,57 @@ debuggy_find(
 	    // while matching should abort it.
 	    prev_got_int = got_int;
 	    got_int = FALSE;
-	    if ((name != NULL
+	    जइ ((name != रिक्त
 		   && vim_regexec_prog(&bp->dbg_prog, FALSE, name, (colnr_T)0))
 		    || vim_regexec_prog(&bp->dbg_prog, FALSE,
 						       short_name, (colnr_T)0))
 	    {
 		lnum = bp->dbg_lnum;
-		if (fp != NULL)
+		जइ (fp != रिक्त)
 		    *fp = bp->dbg_forceit;
 	    }
 	    got_int |= prev_got_int;
 #ifdef FEAT_PROFILE
-	    if (lnum && gap == &prof_ga)
-		break;
+	    जइ (lnum && gap == &prof_ga)
+		भङ्ग;
 #endif
 	}
 #ifdef FEAT_EVAL
-	else if (bp->dbg_type == DBG_EXPR)
+	अण्णहा जइ (bp->dbg_type == DBG_व्यञ्जकम्)
 	{
 	    typval_T *tv;
-	    int	      line = FALSE;
+	    पूर्णाङ्क	      पङ्क्तिः = FALSE;
 
-	    tv = eval_expr_no_emsg(bp);
-	    if (tv != NULL)
+	    tv = eval_व्यञ्जकम्_no_emsg(bp);
+	    जइ (tv != रिक्त)
 	    {
-		if (bp->dbg_val == NULL)
+		जइ (bp->dbg_val == रिक्त)
 		{
 		    vim_free(debug_oldval);
-		    debug_oldval = typval_tostring(NULL, TRUE);
+		    debug_oldval = typval_tostring(रिक्त, TRUE);
 		    bp->dbg_val = tv;
 		    vim_free(debug_newval);
 		    debug_newval = typval_tostring(bp->dbg_val, TRUE);
-		    line = TRUE;
+		    पङ्क्तिः = TRUE;
 		}
-		else
+		अण्णहा
 		{
 		    // Use "==" instead of "is" for strings, that is what we
 		    // always have done.
 		    exprtype_T	type = tv->v_type == VAR_STRING
-							? EXPR_EQUAL : EXPR_IS;
+							? व्यञ्जकम्_EQUAL : व्यञ्जकम्_IS;
 
-		    if (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
-			    && tv->vval.v_number == FALSE)
+		    जइ (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
+			    && tv->vval.v_सङ्ख्या == FALSE)
 		    {
 			typval_T *v;
 
-			line = TRUE;
+			पङ्क्तिः = TRUE;
 			vim_free(debug_oldval);
 			debug_oldval = typval_tostring(bp->dbg_val, TRUE);
 			// Need to evaluate again, typval_compare() overwrites
 			// "tv".
-			v = eval_expr_no_emsg(bp);
+			v = eval_व्यञ्जकम्_no_emsg(bp);
 			vim_free(debug_newval);
 			debug_newval = typval_tostring(v, TRUE);
 			free_tv(bp->dbg_val);
@@ -1144,35 +1144,35 @@ debuggy_find(
 		    free_tv(tv);
 		}
 	    }
-	    else if (bp->dbg_val != NULL)
+	    अण्णहा जइ (bp->dbg_val != रिक्त)
 	    {
 		vim_free(debug_oldval);
 		debug_oldval = typval_tostring(bp->dbg_val, TRUE);
 		vim_free(debug_newval);
-		debug_newval = typval_tostring(NULL, TRUE);
+		debug_newval = typval_tostring(रिक्त, TRUE);
 		free_tv(bp->dbg_val);
-		bp->dbg_val = NULL;
-		line = TRUE;
+		bp->dbg_val = रिक्त;
+		पङ्क्तिः = TRUE;
 	    }
 
-	    if (line)
+	    जइ (पङ्क्तिः)
 	    {
 		lnum = after > 0 ? after : 1;
-		break;
+		भङ्ग;
 	    }
 	}
 #endif
     }
-    if (name != fname)
+    जइ (name != fname)
 	vim_free(name);
 
-    return lnum;
+    प्रत्यागम lnum;
 }
 
 /*
  * Called when a breakpoint was encountered.
  */
-    void
+    शून्य
 dbg_breakpoint(char_u *name, linenr_T lnum)
 {
     // We need to check if this line is actually executed in do_one_cmd()

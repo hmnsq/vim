@@ -20,17 +20,17 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#जइ !defined(XTYPES_H)
 #define XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
+प्रकारनिर्देश संरचना s_chanode {
+	संरचना s_chanode *next;
 	long icurr;
 } chanode_t;
 
-typedef struct s_chastore {
+प्रकारनिर्देश संरचना s_chastore {
 	chanode_t *head, *tail;
 	long isize, nsize;
 	chanode_t *ancur;
@@ -38,13 +38,13 @@ typedef struct s_chastore {
 	long scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
+प्रकारनिर्देश संरचना s_xrecord {
+	वर्ण ध्रुव *ptr;
 	long size;
 	unsigned long ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+प्रकारनिर्देश संरचना s_xdfile {
 	xrecord_t *recs;
 	long nrec;
 	long dstart, dend;
@@ -53,7 +53,7 @@ typedef struct s_xdfile {
 	long nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+प्रकारनिर्देश संरचना s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 

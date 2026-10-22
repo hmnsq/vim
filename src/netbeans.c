@@ -23,9 +23,9 @@
  * may not invoke the idle loop.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_NETBEANS_INTG)
+#जइ defined(FEAT_NETBEANS_INTG)
 
 #ifndef MSWIN
 # include <netdb.h>
@@ -34,7 +34,7 @@
 # endif
 #endif
 
-#include "version.h"
+#अन्तर्भाव "version.h"
 
 #define GUARDED		10000 // typenr for "guarded" annotation
 #define GUARDEDOFFSET 1000000 // base for "guarded" sign id's
@@ -47,30 +47,30 @@
 
 // The first implementation (working only with Netbeans) returned "1.1".  The
 // protocol implemented here also supports A-A-P.
-static char *ExtEdProtocolVersion = "2.5";
+स्थिर वर्ण *ExtEdProtocolVersion = "2.5";
 
-static long pos2off(buf_T *, pos_T *);
-static pos_T *off2pos(buf_T *, long);
-static pos_T *get_off_or_lnum(buf_T *buf, char_u **argp);
-static long get_buf_size(buf_T *);
-static int netbeans_keystring(char_u *keystr);
-static void special_keys(char_u *args);
+स्थिर long pos2off(buf_T *, pos_T *);
+स्थिर pos_T *off2pos(buf_T *, long);
+स्थिर pos_T *get_off_or_lnum(buf_T *buf, char_u **argp);
+स्थिर long get_buf_size(buf_T *);
+स्थिर पूर्णाङ्क netbeans_keystring(char_u *keystr);
+स्थिर शून्य special_कुञ्चिकाः(char_u *args);
 
-static int getConnInfo(char *file, char **host, char **port, char **password);
+स्थिर पूर्णाङ्क getConnInfo(वर्ण *file, वर्ण **host, वर्ण **port, वर्ण **password);
 
-static void nb_init_graphics(void);
-static void coloncmd(char *cmd, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
-static void nb_set_curbuf(buf_T *buf);
-static void nb_parse_cmd(char_u *);
-static int  nb_do_cmd(int, char_u *, int, int, char_u *);
-static void nb_send(char *buf, char *fun);
-static void nb_free(void);
+स्थिर शून्य nb_init_graphics(शून्य);
+स्थिर शून्य coloncmd(वर्ण *cmd, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+स्थिर शून्य nb_set_curbuf(buf_T *buf);
+स्थिर शून्य nb_parse_cmd(char_u *);
+स्थिर पूर्णाङ्क  nb_do_cmd(पूर्णाङ्क, char_u *, पूर्णाङ्क, पूर्णाङ्क, char_u *);
+स्थिर शून्य nb_send(वर्ण *buf, वर्ण *fun);
+स्थिर शून्य nb_free(शून्य);
 
 #define NETBEANS_OPEN (channel_can_write_to(nb_channel))
-static channel_T *nb_channel = NULL;
+स्थिर channel_T *nb_channel = रिक्त;
 
-static int r_cmdno;			// current command number for reply
-static int dosetvisible = FALSE;
+स्थिर पूर्णाङ्क r_cmdno;			// current command number for reply
+स्थिर पूर्णाङ्क dosetvisible = FALSE;
 
 /*
  * Include the debugging code if wanted.
@@ -79,51 +79,51 @@ static int dosetvisible = FALSE;
 # include "nbdebug.c"
 #endif
 
-static int needupdate = 0;
-static int inAtomic = 0;
+स्थिर पूर्णाङ्क needupdate = 0;
+स्थिर पूर्णाङ्क inAtomic = 0;
 
 /*
  * Return TRUE if "str" contains only characters from "allowed".
  * Used to validate NetBeans-supplied strings before interpolating them
  * into Ex commands via coloncmd().
  */
-    static int
+    स्थिर पूर्णाङ्क
 nb_is_safe_string(char_u *str, char_u *allowed)
 {
-    if (str == NULL)
-	return FALSE;
-    for (char_u *p = str; *p != NUL; p++)
-	if (vim_strchr(allowed, *p) == NULL)
-	    return FALSE;
-    return TRUE;
+    जइ (str == रिक्त)
+	प्रत्यागम FALSE;
+    प्रति (char_u *p = str; *p != NUL; p++)
+	जइ (vim_strchr(allowed, *p) == रिक्त)
+	    प्रत्यागम FALSE;
+    प्रत्यागम TRUE;
 }
 
 /*
  * Callback invoked when the channel is closed.
  */
-    static void
-nb_channel_closed(void)
+    स्थिर शून्य
+nb_channel_closed(शून्य)
 {
-    nb_channel = NULL;
+    nb_channel = रिक्त;
 }
 
 /*
  * Close the connection and cleanup.
  * May be called when the socket was closed earlier.
  */
-    static void
-netbeans_close(void)
+    स्थिर शून्य
+netbeans_close(शून्य)
 {
-    if (NETBEANS_OPEN)
+    जइ (NETBEANS_OPEN)
     {
 	netbeans_send_disconnect();
-	if (nb_channel != NULL)
+	जइ (nb_channel != रिक्त)
 	{
 	    // Close the socket and remove the input handlers.
 	    channel_close(nb_channel, TRUE);
 	    channel_clear(nb_channel);
 	}
-	nb_channel = NULL;
+	nb_channel = रिक्त;
     }
 
 #ifdef FEAT_BEVAL_GUI
@@ -147,89 +147,89 @@ netbeans_close(void)
 #define NB_DEF_ADDR "3219"
 #define NB_DEF_PASS "changeme"
 
-    static int
-netbeans_connect(char *params, int doabort)
+    स्थिर पूर्णाङ्क
+netbeans_connect(वर्ण *params, पूर्णाङ्क doabort)
 {
-    int		port;
-    char	buf[32];
-    char	*hostname = NULL;
-    char	*address = NULL;
-    char	*password = NULL;
-    char	*fname;
-    char	*arg = NULL;
+    पूर्णाङ्क		port;
+    वर्ण	buf[32];
+    वर्ण	*hostname = रिक्त;
+    वर्ण	*address = रिक्त;
+    वर्ण	*password = रिक्त;
+    वर्ण	*fname;
+    वर्ण	*arg = रिक्त;
 
-    if (*params == '=')
+    जइ (*params == '=')
     {
 	// "=fname": Read info from specified file.
-	if (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
-	    return FAIL;
+	जइ (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
+	    प्रत्यागम FAIL;
     }
-    else
+    अण्णहा
     {
-	if (*params == ':')
+	जइ (*params == ':')
 	    // ":<host>:<addr>:<password>": get info from argument
 	    arg = params + 1;
-	if (arg == NULL && (fname = getenv("__NETBEANS_CONINFO")) != NULL)
+	जइ (arg == रिक्त && (fname = getenv("__NETBEANS_CONINFO")) != रिक्त)
 	{
 	    // "": get info from file specified in environment
-	    if (getConnInfo(fname, &hostname, &address, &password) == FAIL)
-		return FAIL;
+	    जइ (getConnInfo(fname, &hostname, &address, &password) == FAIL)
+		प्रत्यागम FAIL;
 	}
-	else
+	अण्णहा
 	{
-	    if (arg != NULL)
+	    जइ (arg != रिक्त)
 	    {
 		// ":<host>:<addr>:<password>": get info from argument
 		hostname = arg;
 		address = strchr(hostname, ':');
-		if (address != NULL)
+		जइ (address != रिक्त)
 		{
 		    *address++ = '\0';
 		    password = strchr(address, ':');
-		    if (password != NULL)
+		    जइ (password != रिक्त)
 			*password++ = '\0';
 		}
 	    }
 
 	    // Get the missing values from the environment.
-	    if (hostname == NULL || *hostname == '\0')
+	    जइ (hostname == रिक्त || *hostname == '\0')
 		hostname = getenv("__NETBEANS_HOST");
-	    if (address == NULL)
+	    जइ (address == रिक्त)
 		address = getenv("__NETBEANS_SOCKET");
-	    if (password == NULL)
+	    जइ (password == रिक्त)
 		password = getenv("__NETBEANS_VIM_PASSWORD");
 
 	    // Move values to allocated memory.
-	    if (hostname != NULL)
-		hostname = (char *)vim_strsave((char_u *)hostname);
-	    if (address != NULL)
-		address = (char *)vim_strsave((char_u *)address);
-	    if (password != NULL)
-		password = (char *)vim_strsave((char_u *)password);
+	    जइ (hostname != रिक्त)
+		hostname = (वर्ण *)vim_strsave((char_u *)hostname);
+	    जइ (address != रिक्त)
+		address = (वर्ण *)vim_strsave((char_u *)address);
+	    जइ (password != रिक्त)
+		password = (वर्ण *)vim_strsave((char_u *)password);
 	}
     }
 
     // Use the default when a value is missing.
-    if (hostname == NULL || *hostname == '\0')
+    जइ (hostname == रिक्त || *hostname == '\0')
     {
 	vim_free(hostname);
-	hostname = (char *)vim_strsave((char_u *)NB_DEF_HOST);
+	hostname = (वर्ण *)vim_strsave((char_u *)NB_DEF_HOST);
     }
-    if (address == NULL || *address == '\0')
+    जइ (address == रिक्त || *address == '\0')
     {
 	vim_free(address);
-	address = (char *)vim_strsave((char_u *)NB_DEF_ADDR);
+	address = (वर्ण *)vim_strsave((char_u *)NB_DEF_ADDR);
     }
-    if (password == NULL || *password == '\0')
+    जइ (password == रिक्त || *password == '\0')
     {
 	vim_free(password);
-	password = (char *)vim_strsave((char_u *)NB_DEF_PASS);
+	password = (वर्ण *)vim_strsave((char_u *)NB_DEF_PASS);
     }
-    if (hostname != NULL && address != NULL && password != NULL)
+    जइ (hostname != रिक्त && address != रिक्त && password != रिक्त)
     {
 	port = atoi(address);
 	nb_channel = channel_open(hostname, port, 3000, nb_channel_closed);
-	if (nb_channel != NULL)
+	जइ (nb_channel != रिक्त)
 	{
 	    // success
 #ifdef FEAT_BEVAL_GUI
@@ -237,7 +237,7 @@ netbeans_connect(char *params, int doabort)
 #endif
 
 	    // success, login
-	    vim_snprintf(buf, sizeof(buf), "AUTH %s\n", password);
+	    vim_snprintf(buf, परिमाण(buf), "AUTH %s\n", password);
 	    nb_send(buf, "netbeans_connect");
 
 	    sprintf(buf, "0:version=0 \"%s\"\n", ExtEdProtocolVersion);
@@ -245,13 +245,13 @@ netbeans_connect(char *params, int doabort)
 	}
     }
 
-    if (nb_channel == NULL && doabort)
+    जइ (nb_channel == रिक्त && doabort)
 	getout(1);
 
     vim_free(hostname);
     vim_free(address);
     vim_free(password);
-    return NETBEANS_OPEN ? OK : FAIL;
+    प्रत्यागम NETBEANS_OPEN ? OK : FAIL;
 }
 
 /*
@@ -260,8 +260,8 @@ netbeans_connect(char *params, int doabort)
  * Return FAIL if the file could not be read, OK otherwise (no matter what it
  * contains).
  */
-    static int
-getConnInfo(char *file, char **host, char **port, char **auth)
+    स्थिर पूर्णाङ्क
+getConnInfo(वर्ण *file, वर्ण **host, वर्ण **port, वर्ण **auth)
 {
     FILE *fp;
     char_u buf[BUFSIZ];
@@ -274,62 +274,62 @@ getConnInfo(char *file, char **host, char **port, char **auth)
      * For Unix only accept the file when it's not accessible by others.
      * The open will then fail if we don't own the file.
      */
-    if (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
+    जइ (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
     {
 	nbdebug(("Wrong access mode for NetBeans connection info file: \"%s\"\n",
 								       file));
 	semsg(_(e_wrong_access_mode_for_netbeans_connection_info_file_str),
 									file);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 #endif
 
     fp = mch_fopen(file, "r");
-    if (fp == NULL)
+    जइ (fp == रिक्त)
     {
 	nbdebug(("Cannot open NetBeans connection info file\n"));
 	PERROR(e_cannot_open_netbeans_connection_info_file);
-	return FAIL;
+	प्रत्यागम FAIL;
     }
 
     // Read the file. There should be one of each parameter
-    while ((lp = (char_u *)fgets((char *)buf, BUFSIZ, fp)) != NULL)
+    जाव ((lp = (char_u *)fgets((वर्ण *)buf, BUFSIZ, fp)) != रिक्त)
     {
-	if ((nlp = vim_strchr(lp, '\n')) != NULL)
+	जइ ((nlp = vim_strchr(lp, '\n')) != रिक्त)
 	    *nlp = 0;	    // strip off the trailing newline
 
-	if (STRNCMP(lp, "host=", 5) == 0)
+	जइ (STRNCMP(lp, "host=", 5) == 0)
 	{
 	    vim_free(*host);
-	    *host = (char *)vim_strsave(&buf[5]);
+	    *host = (वर्ण *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "port=", 5) == 0)
+	अण्णहा जइ (STRNCMP(lp, "port=", 5) == 0)
 	{
 	    vim_free(*port);
-	    *port = (char *)vim_strsave(&buf[5]);
+	    *port = (वर्ण *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "auth=", 5) == 0)
+	अण्णहा जइ (STRNCMP(lp, "auth=", 5) == 0)
 	{
 	    vim_free(*auth);
-	    *auth = (char *)vim_strsave(&buf[5]);
+	    *auth = (वर्ण *)vim_strsave(&buf[5]);
 	}
     }
     fclose(fp);
 
-    return OK;
+    प्रत्यागम OK;
 }
 
 
-struct keyqueue
+संरचना keyqueue
 {
     char_u	    *keystr;
-    struct keyqueue *next;
-    struct keyqueue *prev;
+    संरचना keyqueue *next;
+    संरचना keyqueue *prev;
 };
 
-typedef struct keyqueue keyQ_T;
+प्रकारनिर्देश संरचना keyqueue कुञ्चिका_Q_T;
 
-static keyQ_T keyHead; // dummy node, header for circular queue
+स्थिर कुञ्चिका_Q_T कुञ्चिका_Head; // dummy node, header for circular queue
 
 
 /*
@@ -337,53 +337,53 @@ static keyQ_T keyHead; // dummy node, header for circular queue
  * We store the string, because it may depend on the global mod_mask and
  * :nbkey doesn't have a key number.
  */
-    static void
+    स्थिर शून्य
 postpone_keycommand(char_u *keystr)
 {
-    keyQ_T *node;
+    कुञ्चिका_Q_T *ग्रन्थिः;
 
-    node = ALLOC_ONE(keyQ_T);
-    if (node == NULL)
-	return;  // out of memory, drop the key
+    ग्रन्थिः = ALLOC_ONE(कुञ्चिका_Q_T);
+    जइ (ग्रन्थिः == रिक्त)
+	प्रत्यागम;  // out of memory, drop the key
 
-    if (keyHead.next == NULL) // initialize circular queue
+    जइ (कुञ्चिका_Head.next == रिक्त) // initialize circular queue
     {
-	keyHead.next = &keyHead;
-	keyHead.prev = &keyHead;
+	कुञ्चिका_Head.next = &कुञ्चिका_Head;
+	कुञ्चिका_Head.prev = &कुञ्चिका_Head;
     }
 
     // insert node at tail of queue
-    node->next = &keyHead;
-    node->prev = keyHead.prev;
-    keyHead.prev->next = node;
-    keyHead.prev = node;
+    ग्रन्थिः->next = &कुञ्चिका_Head;
+    ग्रन्थिः->prev = कुञ्चिका_Head.prev;
+    कुञ्चिका_Head.prev->next = ग्रन्थिः;
+    कुञ्चिका_Head.prev = ग्रन्थिः;
 
-    node->keystr = vim_strsave(keystr);
+    ग्रन्थिः->keystr = vim_strsave(keystr);
 }
 
 /*
  * Handle any queued-up NetBeans keycommands to be send.
  */
-    static void
-handle_key_queue(void)
+    स्थिर शून्य
+handle_कुञ्चिका_queue(शून्य)
 {
-    int postponed = FALSE;
+    पूर्णाङ्क postponed = FALSE;
 
-    while (!postponed && keyHead.next && keyHead.next != &keyHead)
+    जाव (!postponed && कुञ्चिका_Head.next && कुञ्चिका_Head.next != &कुञ्चिका_Head)
     {
 	// first, unlink the node
-	keyQ_T *node = keyHead.next;
-	keyHead.next = node->next;
-	node->next->prev = node->prev;
+	कुञ्चिका_Q_T *ग्रन्थिः = कुञ्चिका_Head.next;
+	कुञ्चिका_Head.next = ग्रन्थिः->next;
+	ग्रन्थिः->next->prev = ग्रन्थिः->prev;
 
 	// Now, send the keycommand.  This may cause it to be postponed again
 	// and change keyHead.
-	if (node->keystr != NULL)
-	    postponed = !netbeans_keystring(node->keystr);
-	vim_free(node->keystr);
+	जइ (ग्रन्थिः->keystr != रिक्त)
+	    postponed = !netbeans_keystring(ग्रन्थिः->keystr);
+	vim_free(ग्रन्थिः->keystr);
 
 	// Finally, dispose of the node
-	vim_free(node);
+	vim_free(ग्रन्थिः);
     }
 }
 
@@ -391,30 +391,30 @@ handle_key_queue(void)
 /*
  * While there's still a command in the work queue, parse and execute it.
  */
-    void
-netbeans_parse_messages(void)
+    शून्य
+netbeans_parse_messages(शून्य)
 {
-    readq_T	*node;
+    readq_T	*ग्रन्थिः;
     char_u	*buffer;
     char_u	*p;
-    int		own_node;
+    पूर्णाङ्क		own_ग्रन्थिः;
 
-    while (nb_channel != NULL)
+    जाव (nb_channel != रिक्त)
     {
-	node = channel_peek(nb_channel, PART_SOCK);
-	if (node == NULL)
-	    break;	// nothing to read
+	ग्रन्थिः = channel_peek(nb_channel, PART_SOCK);
+	जइ (ग्रन्थिः == रिक्त)
+	    भङ्ग;	// nothing to read
 
 	// Locate the end of the first line in the first buffer.
-	p = channel_first_nl(node);
-	if (p == NULL)
+	p = channel_first_nl(ग्रन्थिः);
+	जइ (p == रिक्त)
 	{
 	    // Command isn't complete.  If there is no following buffer,
 	    // return (wait for more). If there is another buffer following,
 	    // prepend the text to that buffer and delete this one.
-	    if (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
-		return;
-	    continue;
+	    जइ (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
+		प्रत्यागम;
+	    अनुवर्त;
 	}
 
 	// There is a complete command at the start of the buffer.
@@ -422,28 +422,28 @@ netbeans_parse_messages(void)
 	// the buffer.  Do this before executing, because new buffers can
 	// be added while busy handling the command.
 	*p++ = NUL;
-	if (*p == NUL)
+	जइ (*p == NUL)
 	{
-	    own_node = TRUE;
-	    buffer = channel_get(nb_channel, PART_SOCK, NULL);
+	    own_ग्रन्थिः = TRUE;
+	    buffer = channel_get(nb_channel, PART_SOCK, रिक्त);
 	    // "node" is now invalid!
 	}
-	else
+	अण्णहा
 	{
-	    own_node = FALSE;
-	    buffer = node->rq_buffer;
+	    own_ग्रन्थिः = FALSE;
+	    buffer = ग्रन्थिः->rq_buffer;
 	}
 
 	// Now, parse and execute the commands.  This may set nb_channel to
 	// NULL if the channel is closed.
 	nb_parse_cmd(buffer);
 
-	if (own_node)
+	जइ (own_ग्रन्थिः)
 	    // buffer finished, dispose of it
 	    vim_free(buffer);
-	else if (nb_channel != NULL)
+	अण्णहा जइ (nb_channel != रिक्त)
 	    // more follows, move it to the start
-	    channel_consume(nb_channel, PART_SOCK, (int)(p - buffer));
+	    channel_consume(nb_channel, PART_SOCK, (पूर्णाङ्क)(p - buffer));
     }
 }
 
@@ -463,15 +463,15 @@ netbeans_parse_messages(void)
  *
  * for function calls, the ! is replaced by a /
  */
-    static void
+    स्थिर शून्य
 nb_parse_cmd(char_u *cmd)
 {
-    char	*verb;
-    char	*q;
-    int		bufno;
-    int		isfunc = -1;
+    वर्ण	*verb;
+    वर्ण	*q;
+    पूर्णाङ्क		bufno;
+    पूर्णाङ्क		isfunc = -1;
 
-    if (STRCMP(cmd, "DISCONNECT") == 0)
+    जइ (STRCMP(cmd, "DISCONNECT") == 0)
     {
 	// We assume the server knows that we can safely exit!
 	// Disconnect before exiting, Motif hangs in a Select error
@@ -481,7 +481,7 @@ nb_parse_cmd(char_u *cmd)
 	// NOTREACHED
     }
 
-    if (STRCMP(cmd, "DETACH") == 0)
+    जइ (STRCMP(cmd, "DETACH") == 0)
     {
 	buf_T	*buf;
 
@@ -490,47 +490,47 @@ nb_parse_cmd(char_u *cmd)
 
 	// The IDE is breaking the connection.
 	netbeans_close();
-	return;
+	प्रत्यागम;
     }
 
-    bufno = strtol((char *)cmd, &verb, 10);
+    bufno = strtol((वर्ण *)cmd, &verb, 10);
 
-    if (*verb != ':')
+    जइ (*verb != ':')
     {
 	nbdebug(("    missing colon: %s\n", cmd));
 	semsg(_(e_missing_colon_str), cmd);
-	return;
+	प्रत्यागम;
     }
     ++verb; // skip colon
 
-    for (q = verb; *q; q++)
+    प्रति (q = verb; *q; q++)
     {
-	if (*q == '!')
+	जइ (*q == '!')
 	{
 	    *q++ = NUL;
 	    isfunc = 0;
-	    break;
+	    भङ्ग;
 	}
-	else if (*q == '/')
+	अण्णहा जइ (*q == '/')
 	{
 	    *q++ = NUL;
 	    isfunc = 1;
-	    break;
+	    भङ्ग;
 	}
     }
 
-    if (isfunc < 0)
+    जइ (isfunc < 0)
     {
 	nbdebug(("    missing ! or / in: %s\n", cmd));
 	semsg(_(e_missing_bang_or_slash_in_str), cmd);
-	return;
+	प्रत्यागम;
     }
 
     r_cmdno = strtol(q, &q, 10);
 
-    q = (char *)skipwhite((char_u *)q);
+    q = (वर्ण *)skipwhite((char_u *)q);
 
-    if (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
+    जइ (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
     {
 #ifdef NBDEBUG
 	/*
@@ -544,56 +544,56 @@ nb_parse_cmd(char_u *cmd)
     }
 }
 
-struct nbbuf_struct
+संरचना nbbuf_struct
 {
     buf_T		*bufp;
-    unsigned int	 fireChanges:1;
-    unsigned int	 initDone:1;
-    unsigned int	 insertDone:1;
-    unsigned int	 modified:1;
-    int			 nbbuf_number;
-    char		*displayname;
-    int			*signmap;
+    unsigned पूर्णाङ्क	 fireChanges:1;
+    unsigned पूर्णाङ्क	 initDone:1;
+    unsigned पूर्णाङ्क	 निवेशय_Done:1;
+    unsigned पूर्णाङ्क	 modified:1;
+    पूर्णाङ्क			 nbbuf_सङ्ख्या;
+    वर्ण		*displayname;
+    पूर्णाङ्क			*signmap;
     short_u		 signmaplen;
     short_u		 signmapused;
 };
 
-typedef struct nbbuf_struct nbbuf_T;
+प्रकारनिर्देश संरचना nbbuf_struct nbbuf_T;
 
-static nbbuf_T *buf_list = NULL;
-static int buf_list_size = 0;	// size of buf_list
-static int buf_list_used = 0;	// nr of entries in buf_list actually in use
+स्थिर nbbuf_T *buf_list = रिक्त;
+स्थिर पूर्णाङ्क buf_list_size = 0;	// size of buf_list
+स्थिर पूर्णाङ्क buf_list_used = 0;	// nr of entries in buf_list actually in use
 
-static char **globalsignmap = NULL;
-static int globalsignmaplen = 0;
-static int globalsignmapused = 0;
+स्थिर वर्ण **globalsignmap = रिक्त;
+स्थिर पूर्णाङ्क globalsignmaplen = 0;
+स्थिर पूर्णाङ्क globalsignmapused = 0;
 
-static int  mapsigntype(nbbuf_T *, int localsigntype);
-static void addsigntype(nbbuf_T *, int localsigntype, char_u *typeName,
+स्थिर पूर्णाङ्क  mapsigntype(nbbuf_T *, पूर्णाङ्क localsigntype);
+स्थिर शून्य addsigntype(nbbuf_T *, पूर्णाङ्क localsigntype, char_u *typeName,
 			char_u *tooltip, char_u *glyphfile,
 			char_u *fg, char_u *bg);
-static void print_read_msg(nbbuf_T *buf);
-static void print_save_msg(nbbuf_T *buf, off_T nchars);
+स्थिर शून्य print_read_सन्देशः(nbbuf_T *buf);
+स्थिर शून्य print_save_सन्देशः(nbbuf_T *buf, off_T nchars);
 
-static int curPCtype = -1;
+स्थिर पूर्णाङ्क curPCtype = -1;
 
 /*
  * Free netbeans resources.
  */
-    static void
-nb_free(void)
+    स्थिर शून्य
+nb_free(शून्य)
 {
-    keyQ_T *key_node = keyHead.next;
+    कुञ्चिका_Q_T *कुञ्चिका_ग्रन्थिः = कुञ्चिका_Head.next;
     nbbuf_T buf;
-    int i;
+    पूर्णाङ्क i;
 
     // free the netbeans buffer list
-    for (i = 0; i < buf_list_used; i++)
+    प्रति (i = 0; i < buf_list_used; i++)
     {
 	buf = buf_list[i];
 	vim_free(buf.displayname);
 	vim_free(buf.signmap);
-	if (buf.bufp != NULL && buf_valid(buf.bufp))
+	जइ (buf.bufp != रिक्त && buf_valid(buf.bufp))
 	{
 	    buf.bufp->b_netbeans_file = false;
 	    buf.bufp->b_was_netbeans_file = false;
@@ -604,46 +604,46 @@ nb_free(void)
     buf_list_used = 0;
 
     // free the queued key commands
-    while (key_node != NULL && key_node != &keyHead)
+    जाव (कुञ्चिका_ग्रन्थिः != रिक्त && कुञ्चिका_ग्रन्थिः != &कुञ्चिका_Head)
     {
-	keyQ_T *next = key_node->next;
-	vim_free(key_node->keystr);
-	vim_free(key_node);
-	if (next == &keyHead)
+	कुञ्चिका_Q_T *next = कुञ्चिका_ग्रन्थिः->next;
+	vim_free(कुञ्चिका_ग्रन्थिः->keystr);
+	vim_free(कुञ्चिका_ग्रन्थिः);
+	जइ (next == &कुञ्चिका_Head)
 	{
-	    keyHead.next = &keyHead;
-	    keyHead.prev = &keyHead;
-	    break;
+	    कुञ्चिका_Head.next = &कुञ्चिका_Head;
+	    कुञ्चिका_Head.prev = &कुञ्चिका_Head;
+	    भङ्ग;
 	}
-	key_node = next;
+	कुञ्चिका_ग्रन्थिः = next;
     }
 
     // free the queued netbeans commands
-    if (nb_channel != NULL)
+    जइ (nb_channel != रिक्त)
 	channel_clear(nb_channel);
 }
 
 /*
  * Get the Netbeans buffer number for the specified buffer.
  */
-    static int
+    स्थिर पूर्णाङ्क
 nb_getbufno(buf_T *bufp)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    for (i = 0; i < buf_list_used; i++)
-	if (buf_list[i].bufp == bufp)
-	    return i;
-    return -1;
+    प्रति (i = 0; i < buf_list_used; i++)
+	जइ (buf_list[i].bufp == bufp)
+	    प्रत्यागम i;
+    प्रत्यागम -1;
 }
 
 /*
  * Is this a NetBeans-owned buffer?
  */
-    int
+    पूर्णाङ्क
 isNetbeansBuffer(buf_T *bufp)
 {
-    return NETBEANS_OPEN && bufp->b_netbeans_file;
+    प्रत्यागम NETBEANS_OPEN && bufp->b_netbeans_file;
 }
 
 /*
@@ -655,20 +655,20 @@ isNetbeansBuffer(buf_T *bufp)
  * So this function is for the corner case where Vim thinks a buffer is
  * unmodified but NetBeans thinks it IS modified.
  */
-    int
+    पूर्णाङ्क
 isNetbeansModified(buf_T *bufp)
 {
-    if (isNetbeansBuffer(bufp))
+    जइ (isNetbeansBuffer(bufp))
     {
-	int bufno = nb_getbufno(bufp);
+	पूर्णाङ्क bufno = nb_getbufno(bufp);
 
-	if (bufno > 0)
-	    return buf_list[bufno].modified;
-	else
-	    return FALSE;
+	जइ (bufno > 0)
+	    प्रत्यागम buf_list[bufno].modified;
+	अण्णहा
+	    प्रत्यागम FALSE;
     }
-    else
-	return FALSE;
+    अण्णहा
+	प्रत्यागम FALSE;
 }
 
 /*
@@ -676,49 +676,49 @@ isNetbeansModified(buf_T *bufp)
  * Returns NULL for 0 or a negative number. A 0 bufno means a
  * non-buffer related command has been sent.
  */
-    static nbbuf_T *
-nb_get_buf(int bufno)
+    स्थिर nbbuf_T *
+nb_get_buf(पूर्णाङ्क bufno)
 {
     // find or create a buffer with the given number
-    int incr;
+    पूर्णाङ्क incr;
 
-    if (bufno <= 0)
-	return NULL;
+    जइ (bufno <= 0)
+	प्रत्यागम रिक्त;
 
-    if (!buf_list)
+    जइ (!buf_list)
     {
 	// initialize
-	buf_list = alloc_clear(100 * sizeof(nbbuf_T));
+	buf_list = alloc_clear(100 * परिमाण(nbbuf_T));
 	buf_list_size = 100;
     }
-    if (bufno >= buf_list_used) // new
+    जइ (bufno >= buf_list_used) // new
     {
-	if (bufno >= buf_list_size) // grow list
+	जइ (bufno >= buf_list_size) // grow list
 	{
 	    nbbuf_T	*t_buf_list = buf_list;
 	    size_t	bufsize;
 
 	    incr = bufno - buf_list_size + 90;
 	    buf_list_size += incr;
-	    bufsize = buf_list_size * sizeof(nbbuf_T);
-	    if (bufsize == 0 || bufsize / sizeof(nbbuf_T)
+	    bufsize = buf_list_size * परिमाण(nbbuf_T);
+	    जइ (bufsize == 0 || bufsize / परिमाण(nbbuf_T)
 						      != (size_t)buf_list_size)
 	    {
 		// list size overflow, bail out
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 	    buf_list = vim_realloc(buf_list, bufsize);
-	    if (buf_list == NULL)
+	    जइ (buf_list == रिक्त)
 	    {
 		vim_free(t_buf_list);
 		buf_list_size = 0;
-		return NULL;
+		प्रत्यागम रिक्त;
 	    }
 	    vim_memset(buf_list + buf_list_size - incr, 0,
-						      incr * sizeof(nbbuf_T));
+						      incr * परिमाण(nbbuf_T));
 	}
 
-	while (buf_list_used <= bufno)
+	जाव (buf_list_used <= bufno)
 	{
 	    // Default is to fire text changes.
 	    buf_list[buf_list_used].fireChanges = 1;
@@ -726,42 +726,42 @@ nb_get_buf(int bufno)
 	}
     }
 
-    return buf_list + bufno;
+    प्रत्यागम buf_list + bufno;
 }
 
 /*
  * Return the number of buffers that are modified.
  */
-    static int
-count_changed_buffers(void)
+    स्थिर पूर्णाङ्क
+गणनम्_changed_buffers(शून्य)
 {
     buf_T	*bufp;
-    int		n;
+    पूर्णाङ्क		n;
 
     n = 0;
     FOR_ALL_BUFFERS(bufp)
-	if (bufp->b_changed)
+	जइ (bufp->b_changed)
 	    ++n;
-    return n;
+    प्रत्यागम n;
 }
 
 /*
  * End the netbeans session.
  */
-    void
-netbeans_end(void)
+    शून्य
+netbeans_end(शून्य)
 {
-    int i;
-    static char buf[128];
+    पूर्णाङ्क i;
+    स्थिर वर्ण buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
-    for (i = 0; i < buf_list_used; i++)
+    प्रति (i = 0; i < buf_list_used; i++)
     {
-	if (!buf_list[i].bufp)
-	    continue;
-	if (netbeansForcedQuit)
+	जइ (!buf_list[i].bufp)
+	    अनुवर्त;
+	जइ (netbeansForcedQuit)
 	{
 	    // mark as unmodified so NetBeans won't put up dialog on "killed"
 	    sprintf(buf, "%d:unmodified=%d\n", i, r_cmdno);
@@ -771,8 +771,8 @@ netbeans_end(void)
 	sprintf(buf, "%d:killed=%d\n", i, r_cmdno);
 	nbdebug(("EVT: %s", buf));
 	// nb_send(buf, "netbeans_end");    avoid "write failed" messages
-	nb_send(buf, NULL);
-	buf_list[i].bufp = NULL;
+	nb_send(buf, रिक्त);
+	buf_list[i].bufp = रिक्त;
     }
 }
 
@@ -780,28 +780,28 @@ netbeans_end(void)
  * Send a message to netbeans.
  * When "fun" is NULL no error is given.
  */
-    static void
-nb_send(char *buf, char *fun)
+    स्थिर शून्य
+nb_send(वर्ण *buf, वर्ण *fun)
 {
-    if (nb_channel != NULL)
+    जइ (nb_channel != रिक्त)
 	channel_send(nb_channel, PART_SOCK, (char_u *)buf,
-						       (int)STRLEN(buf), fun);
+						       (पूर्णाङ्क)STRLEN(buf), fun);
 }
 
 /*
  * Some input received from netbeans requires a response. This function
  * handles a response with no information (except the command number).
  */
-    static void
-nb_reply_nil(int cmdno)
+    स्थिर शून्य
+nb_reply_nil(पूर्णाङ्क cmdno)
 {
-    char reply[32];
+    वर्ण reply[32];
 
     nbdebug(("REP %d: <none>\n", cmdno));
 
     // Avoid printing an annoying error message.
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     sprintf(reply, "%d\n", cmdno);
     nb_send(reply, "nb_reply_nil");
@@ -812,16 +812,16 @@ nb_reply_nil(int cmdno)
  * Send a response with text.
  * "result" must have been quoted already (using nb_quote()).
  */
-    static void
-nb_reply_text(int cmdno, char_u *result)
+    स्थिर शून्य
+nb_reply_text(पूर्णाङ्क cmdno, char_u *result)
 {
     char_u *reply;
 
-    nbdebug(("REP %d: %s\n", cmdno, (char *)result));
+    nbdebug(("REP %d: %s\n", cmdno, (वर्ण *)result));
 
     reply = alloc(STRLEN(result) + 32);
-    sprintf((char *)reply, "%d %s\n", cmdno, (char *)result);
-    nb_send((char *)reply, "nb_reply_text");
+    sprintf((वर्ण *)reply, "%d %s\n", cmdno, (वर्ण *)result);
+    nb_send((वर्ण *)reply, "nb_reply_text");
 
     vim_free(reply);
 }
@@ -830,10 +830,10 @@ nb_reply_text(int cmdno, char_u *result)
 /*
  * Send a response with a number result code.
  */
-    static void
-nb_reply_nr(int cmdno, long result)
+    स्थिर शून्य
+nb_reply_nr(पूर्णाङ्क cmdno, long result)
 {
-    char reply[32];
+    वर्ण reply[32];
 
     nbdebug(("REP %d: %ld\n", cmdno, result));
 
@@ -845,36 +845,36 @@ nb_reply_nr(int cmdno, long result)
 /*
  * Encode newline, ret, backslash, double quote for transmission to NetBeans.
  */
-    static char_u *
+    स्थिर char_u *
 nb_quote(char_u *txt)
 {
     char_u *buf = alloc(2 * STRLEN(txt) + 1);
     char_u *p = txt;
     char_u *q = buf;
 
-    if (buf == NULL)
-	return NULL;
-    for (; *p; p++)
+    जइ (buf == रिक्त)
+	प्रत्यागम रिक्त;
+    प्रति (; *p; p++)
     {
-	switch (*p)
+	विकल्प (*p)
 	{
-	    case '\"':
-	    case '\\':
-		*q++ = '\\'; *q++ = *p; break;
+	    पक्ष '\"':
+	    पक्ष '\\':
+		*q++ = '\\'; *q++ = *p; भङ्ग;
 	 // case '\t':
 	 //     *q++ = '\\'; *q++ = 't'; break;
-	    case '\n':
-		*q++ = '\\'; *q++ = 'n'; break;
-	    case '\r':
-		*q++ = '\\'; *q++ = 'r'; break;
-	    default:
+	    पक्ष '\n':
+		*q++ = '\\'; *q++ = 'n'; भङ्ग;
+	    पक्ष '\r':
+		*q++ = '\\'; *q++ = 'r'; भङ्ग;
+	    स्वभाव:
 		*q++ = *p;
-		break;
+		भङ्ग;
 	}
     }
     *q = '\0';
 
-    return buf;
+    प्रत्यागम buf;
 }
 
 
@@ -884,83 +884,83 @@ nb_quote(char_u *txt)
  * If "endp" is not NULL it is set to the character after the terminating
  * quote.
  */
-    static char *
+    स्थिर वर्ण *
 nb_unquote(char_u *p, char_u **endp)
 {
-    char *result = 0;
-    char *q;
-    int done = 0;
+    वर्ण *result = 0;
+    वर्ण *q;
+    पूर्णाङ्क done = 0;
 
     // result is never longer than input
     result = alloc_clear(STRLEN(p) + 1);
-    if (result == NULL)
-	return NULL;
+    जइ (result == रिक्त)
+	प्रत्यागम रिक्त;
 
-    if (*p++ != '"')
+    जइ (*p++ != '"')
     {
 	nbdebug(("nb_unquote called with string that doesn't start with a quote!: %s\n",
 			p));
 	result[0] = NUL;
-	return result;
+	प्रत्यागम result;
     }
 
-    for (q = result; !done && *p != NUL;)
+    प्रति (q = result; !done && *p != NUL;)
     {
-	switch (*p)
+	विकल्प (*p)
 	{
-	    case '"':
+	    पक्ष '"':
 		/*
 		 * Unbackslashed dquote marks the end, if first char was dquote.
 		 */
 		done = 1;
-		break;
+		भङ्ग;
 
-	    case '\\':
+	    पक्ष '\\':
 		++p;
-		switch (*p)
+		विकल्प (*p)
 		{
-		    case '\\':	*q++ = '\\';	break;
-		    case 'n':	*q++ = '\n';	break;
-		    case 't':	*q++ = '\t';	break;
-		    case 'r':	*q++ = '\r';	break;
-		    case '"':	*q++ = '"';	break;
-		    case NUL:	--p;		break;
+		    पक्ष '\\':	*q++ = '\\';	भङ्ग;
+		    पक्ष 'n':	*q++ = '\n';	भङ्ग;
+		    पक्ष 't':	*q++ = '\t';	भङ्ग;
+		    पक्ष 'r':	*q++ = '\r';	भङ्ग;
+		    पक्ष '"':	*q++ = '"';	भङ्ग;
+		    पक्ष NUL:	--p;		भङ्ग;
 		    // default: skip over illegal chars
 		}
 		++p;
-		break;
+		भङ्ग;
 
-	    default:
+	    स्वभाव:
 		*q++ = *p++;
 	}
     }
 
-    if (endp != NULL)
+    जइ (endp != रिक्त)
 	*endp = p;
 
-    return result;
+    प्रत्यागम result;
 }
 
 /*
  * Remove from "first" byte to "last" byte (inclusive), at line "lnum" of the
  * current buffer.  Remove to end of line when "last" is MAXCOL.
  */
-    static void
+    स्थिर शून्य
 nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
 {
     char_u *oldtext, *newtext;
-    int oldlen;
-    int lastbyte = last;
+    पूर्णाङ्क oldlen;
+    पूर्णाङ्क lastbyte = last;
 
     oldtext = ml_get(lnum);
     oldlen = ml_get_len(lnum);
-    if (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
-	return;
-    if (lastbyte >= oldlen)
+    जइ (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
+	प्रत्यागम;
+    जइ (lastbyte >= oldlen)
 	lastbyte = oldlen - 1;
     newtext = alloc(oldlen - (lastbyte - first));
-    if (newtext == NULL)
-	return;
+    जइ (newtext == रिक्त)
+	प्रत्यागम;
 
     mch_memmove(newtext, oldtext, first);
     STRMOVE(newtext + first, oldtext + lastbyte + 1);
@@ -972,17 +972,17 @@ nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
  * Replace the "first" line with the concatenation of the "first" and
  * the "other" line. The "other" line is not removed.
  */
-    static void
+    स्थिर शून्य
 nb_joinlines(linenr_T first, linenr_T other)
 {
-    int len_first, len_other;
+    पूर्णाङ्क len_first, len_other;
     char_u *p;
 
     len_first = ml_get_len(first);
     len_other = ml_get_len(other);
     p = alloc(len_first + len_other + 1);
-    if (p == NULL)
-	return;
+    जइ (p == रिक्त)
+	प्रत्यागम;
 
     mch_memmove(p, ml_get(first), len_first);
     mch_memmove(p + len_first, ml_get(other), len_other + 1);
@@ -998,212 +998,212 @@ nb_joinlines(linenr_T first, linenr_T other)
  * gets a response (it's required) but a command does not.
  * For arguments see comment for nb_parse_cmd().
  */
-    static int
+    स्थिर पूर्णाङ्क
 nb_do_cmd(
-    int		bufno,
+    पूर्णाङ्क		bufno,
     char_u	*cmd,
-    int		func,
-    int		cmdno,
+    पूर्णाङ्क		func,
+    पूर्णाङ्क		cmdno,
     char_u	*args)	    // points to space before arguments or NUL
 {
-    int		do_update = 0;
+    पूर्णाङ्क		do_update = 0;
     long	off = 0;
     nbbuf_T	*buf = nb_get_buf(bufno);
-    static int	skip = 0;
-    int		retval = OK;
-    char	*cp;	    // for when a char pointer is needed
+    स्थिर पूर्णाङ्क	skip = 0;
+    पूर्णाङ्क		retval = OK;
+    वर्ण	*cp;	    // for when a char pointer is needed
 
     nbdebug(("%s %d: (%d) %s %s\n", (func) ? "FUN" : "CMD", cmdno, bufno, cmd,
-	STRCMP(cmd, "insert") == 0 ? "<text>" : (char *)args));
+	STRCMP(cmd, "insert") == 0 ? "<text>" : (वर्ण *)args));
 
-    if (func)
+    जइ (func)
     {
 // =====================================================================
-	if (streq((char *)cmd, "getModified"))
+	जइ (streq((वर्ण *)cmd, "getModified"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 		// Return the number of buffers that are modified.
-		nb_reply_nr(cmdno, (long)count_changed_buffers());
-	    else
+		nb_reply_nr(cmdno, (long)गणनम्_changed_buffers());
+	    अण्णहा
 		// Return whether the buffer is modified.
 		nb_reply_nr(cmdno, (long)(buf->bufp->b_changed
 					   || isNetbeansModified(buf->bufp)));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveAndExit"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "saveAndExit"))
 	{
 	    // Note: this will exit Vim if successful.
 	    coloncmd(":confirm qall");
 
 	    // We didn't exit: return the number of changed buffers.
-	    nb_reply_nr(cmdno, (long)count_changed_buffers());
+	    nb_reply_nr(cmdno, (long)गणनम्_changed_buffers());
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getCursor"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "getCursor"))
 	{
 	    char_u text[200];
 
 	    // Note: nb_getbufno() may return -1.  This indicates the IDE
 	    // didn't assign a number to the current buffer in response to a
 	    // fileOpened event.
-	    sprintf((char *)text, "%d %ld %d %ld",
+	    sprintf((वर्ण *)text, "%d %ld %d %ld",
 		    nb_getbufno(curbuf),
 		    (long)curwin->w_cursor.lnum,
-		    (int)curwin->w_cursor.col,
+		    (पूर्णाङ्क)curwin->w_cursor.col,
 		    pos2off(curbuf, &curwin->w_cursor));
 	    nb_reply_text(cmdno, text);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getAnno"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "getAnno"))
 	{
 	    long linenum = 0;
 #ifdef FEAT_SIGNS
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    Invalid buffer identifier in getAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getanno));
 		retval = FAIL;
 	    }
-	    else
+	    अण्णहा
 	    {
-		int serNum;
+		पूर्णाङ्क ser_अङ्कः;
 
-		cp = (char *)args;
-		serNum = strtol(cp, &cp, 10);
+		cp = (वर्ण *)args;
+		ser_अङ्कः = strtol(cp, &cp, 10);
 		// If the sign isn't found linenum will be zero.
-		linenum = (long)buf_findsign(buf->bufp, serNum, NULL);
+		linenum = (long)buf_findsign(buf->bufp, ser_अङ्कः, रिक्त);
 	    }
 #endif
 	    nb_reply_nr(cmdno, linenum);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getLength"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "getLength"))
 	{
 	    long len = 0;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in getLength\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getlength));
 		retval = FAIL;
 	    }
-	    else
+	    अण्णहा
 	    {
 		len = get_buf_size(buf->bufp);
 	    }
 	    nb_reply_nr(cmdno, len);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getText"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "getText"))
 	{
 	    long	len;
 	    linenr_T	nlines;
-	    char_u	*text = NULL;
+	    char_u	*text = रिक्त;
 	    linenr_T	lno = 1;
 	    char_u	*p;
-	    char_u	*line;
+	    char_u	*पङ्क्तिः;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in getText\n"));
 		emsg(_(e_invalid_buffer_identifier_in_gettext));
 		retval = FAIL;
 	    }
-	    else
+	    अण्णहा
 	    {
 		len = get_buf_size(buf->bufp);
-		nlines = buf->bufp->b_ml.ml_line_count;
+		nlines = buf->bufp->b_ml.ml_पङ्क्तिः_गणनम्;
 		text = alloc((len > 0) ? ((len + nlines) * 2) : 4);
-		if (text == NULL)
+		जइ (text == रिक्त)
 		{
 		    nbdebug(("    nb_do_cmd: getText has null text field\n"));
 		    retval = FAIL;
 		}
-		else
+		अण्णहा
 		{
 		    p = text;
 		    *p++ = '\"';
-		    for (; lno <= nlines ; lno++)
+		    प्रति (; lno <= nlines ; lno++)
 		    {
-			line = nb_quote(ml_get_buf(buf->bufp, lno, FALSE));
-			if (line != NULL)
+			पङ्क्तिः = nb_quote(ml_get_buf(buf->bufp, lno, FALSE));
+			जइ (पङ्क्तिः != रिक्त)
 			{
-			    STRCPY(p, line);
-			    p += STRLEN(line);
+			    STRCPY(p, पङ्क्तिः);
+			    p += STRLEN(पङ्क्तिः);
 			    *p++ = '\\';
 			    *p++ = 'n';
-			    vim_free(line);
+			    vim_free(पङ्क्तिः);
 			}
 		    }
 		    *p++ = '\"';
 		    *p = '\0';
 		}
 	    }
-	    if (text == NULL)
+	    जइ (text == रिक्त)
 		nb_reply_text(cmdno, (char_u *)"");
-	    else
+	    अण्णहा
 	    {
 		nb_reply_text(cmdno, text);
 		vim_free(text);
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "remove"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "remove"))
 	{
-	    long count;
+	    long गणनम्;
 	    pos_T first, last;
 	    pos_T *pos;
 	    pos_T *next;
 	    linenr_T del_from_lnum, del_to_lnum;  // lines to be deleted as a whole
-	    int oldFire = netbeansFireChanges;
-	    int oldSuppress = netbeansSuppressNoLines;
-	    int wasChanged;
+	    पूर्णाङ्क oldFire = netbeansFireChanges;
+	    पूर्णाङ्क oldSuppress = netbeans_Suppress_No_पङ्क्तयः;
+	    पूर्णाङ्क wasChanged;
 
-	    if (skip >= SKIP_STOP)
+	    जइ (skip >= SKIP_STOP)
 	    {
-		nbdebug(("    Skipping %s command\n", (char *) cmd));
+		nbdebug(("    Skipping %s command\n", (वर्ण *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		प्रत्यागम OK;
 	    }
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in remove\n"));
 		emsg(_(e_invalid_buffer_identifier_in_remove));
 		retval = FAIL;
 	    }
-	    else
+	    अण्णहा
 	    {
 		netbeansFireChanges = FALSE;
-		netbeansSuppressNoLines = TRUE;
+		netbeans_Suppress_No_पङ्क्तयः = TRUE;
 
 		nb_set_curbuf(buf->bufp);
 		wasChanged = buf->bufp->b_changed;
-		cp = (char *)args;
+		cp = (वर्ण *)args;
 		off = strtol(cp, &cp, 10);
-		count = strtol(cp, &cp, 10);
+		गणनम् = strtol(cp, &cp, 10);
 		args = (char_u *)cp;
 		// delete "count" chars, starting at "off"
 		pos = off2pos(buf->bufp, off);
-		if (!pos)
+		जइ (!pos)
 		{
 		    nbdebug(("    !bad position\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad position");
 		    netbeansFireChanges = oldFire;
-		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    netbeans_Suppress_No_पङ्क्तयः = oldSuppress;
+		    प्रत्यागम FAIL;
 		}
 		first = *pos;
 		nbdebug(("    FIRST POS: line %ld, col %d\n",
 						      first.lnum, first.col));
-		pos = off2pos(buf->bufp, off+count-1);
-		if (!pos)
+		pos = off2pos(buf->bufp, off+गणनम्-1);
+		जइ (!pos)
 		{
 		    nbdebug(("    !bad count\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad count");
 		    netbeansFireChanges = oldFire;
-		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    netbeans_Suppress_No_पङ्क्तयः = oldSuppress;
+		    प्रत्यागम FAIL;
 		}
 		last = *pos;
 		nbdebug(("    LAST POS: line %ld, col %d\n",
@@ -1215,19 +1215,19 @@ nb_do_cmd(
 		// Get the position of the first byte after the deleted
 		// section.  "next" is NULL when deleting to the end of the
 		// file.
-		next = off2pos(buf->bufp, off + count);
+		next = off2pos(buf->bufp, off + गणनम्);
 
 		// Remove part of the first line.
-		if (first.col != 0
-				|| (next != NULL && first.lnum == next->lnum))
+		जइ (first.col != 0
+				|| (next != रिक्त && first.lnum == next->lnum))
 		{
-		    if (first.lnum != last.lnum
-			    || (next != NULL && first.lnum != next->lnum))
+		    जइ (first.lnum != last.lnum
+			    || (next != रिक्त && first.lnum != next->lnum))
 		    {
 			// remove to the end of the first line
 			nb_partialremove(first.lnum, first.col,
 							     (colnr_T)MAXCOL);
-			if (first.lnum == last.lnum)
+			जइ (first.lnum == last.lnum)
 			{
 			    // Partial line to remove includes the end of
 			    // line.  Join the line with the next one, have
@@ -1236,7 +1236,7 @@ nb_do_cmd(
 			    del_to_lnum = next->lnum;
 			}
 		    }
-		    else
+		    अण्णहा
 		    {
 			// remove within one line
 			nb_partialremove(first.lnum, first.col, last.col);
@@ -1245,17 +1245,17 @@ nb_do_cmd(
 		}
 
 		// Remove part of the last line.
-		if (first.lnum != last.lnum && next != NULL
+		जइ (first.lnum != last.lnum && next != रिक्त
 			&& next->col != 0 && last.lnum == next->lnum)
 		{
 		    nb_partialremove(last.lnum, 0, last.col);
-		    if (del_from_lnum > first.lnum)
+		    जइ (del_from_lnum > first.lnum)
 		    {
 			// Join end of last line to start of first line; last
 			// line is deleted below.
 			nb_joinlines(first.lnum, last.lnum);
 		    }
-		    else
+		    अण्णहा
 			// First line is deleted as a whole, keep the last
 			// line.
 			--del_to_lnum;
@@ -1264,29 +1264,29 @@ nb_do_cmd(
 		// First is partial line; last line to remove includes
 		// the end of line; join first line to line following last
 		// line; line following last line is deleted below.
-		if (first.lnum != last.lnum && del_from_lnum > first.lnum
-			&& next != NULL && last.lnum != next->lnum)
+		जइ (first.lnum != last.lnum && del_from_lnum > first.lnum
+			&& next != रिक्त && last.lnum != next->lnum)
 		{
 		    nb_joinlines(first.lnum, next->lnum);
 		    del_to_lnum = next->lnum;
 		}
 
 		// Delete whole lines if there are any.
-		if (del_to_lnum >= del_from_lnum)
+		जइ (del_to_lnum >= del_from_lnum)
 		{
-		    int i;
+		    पूर्णाङ्क i;
 
 		    // delete signs from the lines being deleted
-		    for (i = del_from_lnum; i <= del_to_lnum; i++)
+		    प्रति (i = del_from_lnum; i <= del_to_lnum; i++)
 		    {
-			int id = buf_findsign_id(buf->bufp, (linenr_T)i, NULL);
-			if (id > 0)
+			पूर्णाङ्क id = buf_findsign_id(buf->bufp, (linenr_T)i, रिक्त);
+			जइ (id > 0)
 			{
 			    nbdebug(("    Deleting sign %d on line %d\n",
 								      id, i));
-			    buf_delsign(buf->bufp, 0, id, NULL);
+			    buf_delsign(buf->bufp, 0, id, रिक्त);
 			}
-			else
+			अण्णहा
 			{
 			    nbdebug(("    No sign on line %d\n", i));
 			}
@@ -1296,7 +1296,7 @@ nb_do_cmd(
 						 del_from_lnum, del_to_lnum));
 		    curwin->w_cursor.lnum = del_from_lnum;
 		    curwin->w_cursor.col = 0;
-		    del_lines(del_to_lnum - del_from_lnum + 1, FALSE);
+		    del_पङ्क्तयः(del_to_lnum - del_from_lnum + 1, FALSE);
 		}
 
 		// Leave cursor at first deleted byte.
@@ -1304,51 +1304,51 @@ nb_do_cmd(
 		check_cursor_lnum();
 		buf->bufp->b_changed = wasChanged; // logically unchanged
 		netbeansFireChanges = oldFire;
-		netbeansSuppressNoLines = oldSuppress;
+		netbeans_Suppress_No_पङ्क्तयः = oldSuppress;
 
 		u_clearallandblockfree(buf->bufp);
 	    }
 	    nb_reply_nil(cmdno);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insert"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "insert"))
 	{
 	    char_u	*to_free;
 
-	    if (skip >= SKIP_STOP)
+	    जइ (skip >= SKIP_STOP)
 	    {
-		nbdebug(("    Skipping %s command\n", (char *) cmd));
+		nbdebug(("    Skipping %s command\n", (वर्ण *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		प्रत्यागम OK;
 	    }
 
 	    // get offset
-	    cp = (char *)args;
+	    cp = (वर्ण *)args;
 	    off = strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 
 	    // get text to be inserted
 	    args = skipwhite(args);
-	    args = to_free = (char_u *)nb_unquote(args, NULL);
+	    args = to_free = (char_u *)nb_unquote(args, रिक्त);
 	    /*
 	    nbdebug(("    CHUNK[%d]: %d bytes at offset %d\n",
 		    buf->bufp->b_ml.ml_line_count, STRLEN(args), off));
 	    */
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in insert\n"));
-		emsg(_(e_invalid_buffer_identifier_in_insert));
+		emsg(_(e_invalid_buffer_identifier_in_निवेशय));
 		retval = FAIL;
 	    }
-	    else if (args != NULL)
+	    अण्णहा जइ (args != रिक्त)
 	    {
-		int	ff_detected = EOL_UNKNOWN;
-		int	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
+		पूर्णाङ्क	ff_detected = EOL_UNKNOWN;
+		पूर्णाङ्क	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
 		size_t	len = 0;
-		int	added = 0;
-		int	oldFire = netbeansFireChanges;
-		int	old_b_changed;
+		पूर्णाङ्क	added = 0;
+		पूर्णाङ्क	oldFire = netbeansFireChanges;
+		पूर्णाङ्क	old_b_changed;
 		char_u	*nlp;
 		linenr_T lnum;
 		linenr_T lnum_start;
@@ -1364,21 +1364,21 @@ nb_do_cmd(
 		// Convert the specified character offset into a lnum/col
 		// position.
 		pos = off2pos(curbuf, off);
-		if (pos != NULL)
+		जइ (pos != रिक्त)
 		{
-		    if (pos->lnum <= 0)
+		    जइ (pos->lnum <= 0)
 			lnum_start = 1;
-		    else
+		    अण्णहा
 			lnum_start = pos->lnum;
 		}
-		else
+		अण्णहा
 		{
 		    // If the given position is not found, assume we want
 		    // the end of the file.  See setLocAndSize HACK.
-		    if (buf_was_empty)
+		    जइ (buf_was_empty)
 			lnum_start = 1;	    // above empty line
-		    else
-			lnum_start = curbuf->b_ml.ml_line_count + 1;
+		    अण्णहा
+			lnum_start = curbuf->b_ml.ml_पङ्क्तिः_गणनम् + 1;
 		}
 
 		// "lnum" is the line where we insert: either append to it or
@@ -1387,16 +1387,16 @@ nb_do_cmd(
 
 		// Loop over the "\n" separated lines of the argument.
 		do_update = 1;
-		while (*args != NUL)
+		जाव (*args != NUL)
 		{
 		    nlp = vim_strchr(args, '\n');
-		    if (nlp == NULL)
+		    जइ (nlp == रिक्त)
 		    {
 			// Incomplete line, probably truncated.  Next "insert"
 			// command should append to this one.
 			len = STRLEN(args);
 		    }
-		    else
+		    अण्णहा
 		    {
 			len = nlp - args;
 
@@ -1404,27 +1404,27 @@ nb_do_cmd(
 			 * We need to detect EOL style, because the commands
 			 * use a character offset.
 			 */
-			if (nlp > args && nlp[-1] == '\r')
+			जइ (nlp > args && nlp[-1] == '\r')
 			{
 			    ff_detected = EOL_DOS;
 			    --len;
 			}
-			else
+			अण्णहा
 			    ff_detected = EOL_UNIX;
 		    }
 		    args[len] = NUL;
 
-		    if (lnum == lnum_start
-			    && ((pos != NULL && pos->col > 0)
+		    जइ (lnum == lnum_start
+			    && ((pos != रिक्त && pos->col > 0)
 				|| (lnum == 1 && buf_was_empty)))
 		    {
 			char_u	*oldline = ml_get(lnum);
 			char_u	*newline;
-			int	col = pos == NULL ? 0 : pos->col;
+			पूर्णाङ्क	col = pos == रिक्त ? 0 : pos->col;
 
 			// Insert halfway a line.
 			newline = alloc(ml_get_len(lnum) + len + 1);
-			if (newline != NULL)
+			जइ (newline != रिक्त)
 			{
 			    mch_memmove(newline, oldline, (size_t)col);
 			    newline[col] = NUL;
@@ -1433,7 +1433,7 @@ nb_do_cmd(
 			    ml_replace(lnum, newline, FALSE);
 			}
 		    }
-		    else
+		    अण्णहा
 		    {
 			// Append a new line.  Not that we always do this,
 			// also when the text doesn't end in a "\n".
@@ -1442,25 +1442,25 @@ nb_do_cmd(
 			++added;
 		    }
 
-		    if (nlp == NULL)
-			break;
+		    जइ (nlp == रिक्त)
+			भङ्ग;
 		    ++lnum;
 		    args = nlp + 1;
 		}
 
 		// Adjust the marks below the inserted lines.
-		appended_lines_mark(lnum_start - 1, (long)added);
+		appended_पङ्क्तयः_mark(lnum_start - 1, (long)added);
 
 		/*
 		 * When starting with an empty buffer set the fileformat.
 		 * This is just guessing...
 		 */
-		if (buf_was_empty)
+		जइ (buf_was_empty)
 		{
-		    if (ff_detected == EOL_UNKNOWN)
-#if defined(MSWIN)
+		    जइ (ff_detected == EOL_UNKNOWN)
+#जइ defined(MSWIN)
 			ff_detected = EOL_DOS;
-#else
+#अण्णहा
 			ff_detected = EOL_UNIX;
 #endif
 		    set_fileformat(ff_detected, OPT_LOCAL);
@@ -1481,95 +1481,95 @@ nb_do_cmd(
 	    vim_free(to_free);
 	    nb_reply_nil(cmdno); // or !error
 	}
-	else
+	अण्णहा
 	{
 	    nbdebug(("UNIMPLEMENTED FUNCTION: %s\n", cmd));
 	    nb_reply_nil(cmdno);
 	    retval = FAIL;
 	}
     }
-    else // Not a function; no reply required.
+    अण्णहा // Not a function; no reply required.
     {
 // =====================================================================
-	if (streq((char *)cmd, "create"))
+	जइ (streq((वर्ण *)cmd, "create"))
 	{
 	    // Create a buffer without a name.
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in create\n"));
 		emsg(_(e_invalid_buffer_identifier_in_create));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    VIM_CLEAR(buf->displayname);
 
 	    netbeansReadFile = 0; // don't try to open disk file
-	    do_ecmd(0, NULL, 0, 0, ECMD_ONE, ECMD_HIDE + ECMD_OLDBUF, curwin);
+	    do_ecmd(0, रिक्त, 0, 0, ECMD_ONE, ECMD_HIDE + ECMD_OLDBUF, curwin);
 	    netbeansReadFile = 1;
 	    buf->bufp = curbuf;
 	    maketitle();
-	    buf->insertDone = FALSE;
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+	    buf->निवेशय_Done = FALSE;
+#जइ defined(FEAT_MENU) && defined(FEAT_GUI)
+	    जइ (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insertDone"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "insertDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in insertDone\n"));
 	    }
-	    else
+	    अण्णहा
 	    {
 		buf->bufp->b_start_eol = *args == 'T';
-		buf->insertDone = TRUE;
+		buf->निवेशय_Done = TRUE;
 		args += 2;
 		buf->bufp->b_p_ro = *args == 'T';
-		print_read_msg(buf);
+		print_read_सन्देशः(buf);
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveDone"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "saveDone"))
 	{
-	    long savedChars = atol((char *)args);
+	    long savedChars = atol((वर्ण *)args);
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 		nbdebug(("    invalid buffer identifier in saveDone\n"));
-	    else
-		print_save_msg(buf, savedChars);
+	    अण्णहा
+		print_save_सन्देशः(buf, savedChars);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startDocumentListen"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "startDocumentListen"))
 	{
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in startDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_startdocumentlisten));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    buf->fireChanges = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "stopDocumentListen"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "stopDocumentListen"))
 	{
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in stopDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_stopdocumentlisten));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    buf->fireChanges = 0;
-	    if (buf->bufp != NULL && buf->bufp->b_was_netbeans_file)
+	    जइ (buf->bufp != रिक्त && buf->bufp->b_was_netbeans_file)
 	    {
-		if (!buf->bufp->b_netbeans_file)
+		जइ (!buf->bufp->b_netbeans_file)
 		{
 		    nbdebug((e_netbeans_connection_lost_for_buffer_nr,
 							   buf->bufp->b_fnum));
 		    semsg(_(e_netbeans_connection_lost_for_buffer_nr),
 							   buf->bufp->b_fnum);
 		}
-		else
+		अण्णहा
 		{
 		    // NetBeans uses stopDocumentListen when it stops editing
 		    // a file.  It then expects the buffer in Vim to
@@ -1581,25 +1581,25 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setTitle"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setTitle"))
 	{
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setTitle\n"));
 		emsg(_(e_invalid_buffer_identifier_in_settitle));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    vim_free(buf->displayname);
-	    buf->displayname = nb_unquote(args, NULL);
+	    buf->displayname = nb_unquote(args, रिक्त);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "initDone"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "initDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in initDone\n"));
 		emsg(_(e_invalid_buffer_identifier_in_initdone));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    do_update = 1;
 	    buf->initDone = TRUE;
@@ -1607,59 +1607,59 @@ nb_do_cmd(
 	    apply_autocmds(EVENT_BUFREADPOST, 0, 0, FALSE, buf->bufp);
 
 	    // handle any postponed key commands
-	    handle_key_queue();
+	    handle_कुञ्चिका_queue();
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setBufferNumber")
-		|| streq((char *)cmd, "putBufferNumber"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setBufferNumber")
+		|| streq((वर्ण *)cmd, "putBufferNumber"))
 	{
 	    char_u	*path;
 	    buf_T	*bufp;
 
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setBufferNumber\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setbuffernumber));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    path = (char_u *)nb_unquote(args, NULL);
-	    if (path == NULL)
-		return FAIL;
+	    path = (char_u *)nb_unquote(args, रिक्त);
+	    जइ (path == रिक्त)
+		प्रत्यागम FAIL;
 	    bufp = buflist_findname(path);
 	    vim_free(path);
-	    if (bufp == NULL)
+	    जइ (bufp == रिक्त)
 	    {
 		nbdebug(("    File %s not found in setBufferNumber\n", args));
 		semsg(_(e_file_str_not_found_in_setbuffernumber), args);
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    buf->bufp = bufp;
-	    buf->nbbuf_number = bufp->b_fnum;
+	    buf->nbbuf_सङ्ख्या = bufp->b_fnum;
 
 	    // "setBufferNumber" has the side effect of jumping to the buffer
 	    // (don't know why!).  Don't do that for "putBufferNumber".
-	    if (*cmd != 'p')
+	    जइ (*cmd != 'p')
 		coloncmd(":buffer %d", bufp->b_fnum);
-	    else
+	    अण्णहा
 	    {
 		buf->initDone = TRUE;
 
 		// handle any postponed key commands
-		handle_key_queue();
+		handle_कुञ्चिका_queue();
 	    }
 
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setFullName"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setFullName"))
 	{
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setFullName\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setfullname));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    vim_free(buf->displayname);
-	    buf->displayname = nb_unquote(args, NULL);
+	    buf->displayname = nb_unquote(args, रिक्त);
 
 	    netbeansReadFile = 0; // don't try to open disk file
 	    do_ecmd(0, (char_u *)buf->displayname, 0, 0, ECMD_ONE,
@@ -1667,47 +1667,47 @@ nb_do_cmd(
 	    netbeansReadFile = 1;
 	    buf->bufp = curbuf;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#जइ defined(FEAT_MENU) && defined(FEAT_GUI)
+	    जइ (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "editFile"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "editFile"))
 	{
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in editFile\n"));
 		emsg(_(e_invalid_buffer_identifier_in_editfile));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    // Edit a file: like create + setFullName + read the file.
 	    vim_free(buf->displayname);
-	    buf->displayname = nb_unquote(args, NULL);
-	    do_ecmd(0, (char_u *)buf->displayname, NULL, NULL, ECMD_ONE,
+	    buf->displayname = nb_unquote(args, रिक्त);
+	    do_ecmd(0, (char_u *)buf->displayname, रिक्त, रिक्त, ECMD_ONE,
 					     ECMD_HIDE + ECMD_OLDBUF, curwin);
 	    buf->bufp = curbuf;
 	    buf->initDone = TRUE;
 	    do_update = 1;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#जइ defined(FEAT_MENU) && defined(FEAT_GUI)
+	    जइ (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setVisible"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setVisible"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setVisible\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		जइ (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setvisible));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    if (streq((char *)args, "T") && buf->bufp != curbuf)
+	    जइ (streq((वर्ण *)args, "T") && buf->bufp != curbuf)
 	    {
 		exarg_T exarg;
 		CLEAR_FIELD(exarg);
@@ -1721,54 +1721,54 @@ nb_do_cmd(
 
 #ifdef FEAT_GUI
 		// Side effect!!!.
-		if (gui.in_use)
+		जइ (gui.in_use)
 		    gui_mch_set_foreground();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "raise"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "raise"))
 	{
 #ifdef FEAT_GUI
 	    // Bring gvim to the foreground.
-	    if (gui.in_use)
+	    जइ (gui.in_use)
 		gui_mch_set_foreground();
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModified"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setModified"))
 	{
-	    int prev_b_changed;
+	    पूर्णाङ्क prev_b_changed;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setModified\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		जइ (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setmodified));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    prev_b_changed = buf->bufp->b_changed;
-	    if (streq((char *)args, "T"))
+	    जइ (streq((वर्ण *)args, "T"))
 		buf->bufp->b_changed = TRUE;
-	    else
+	    अण्णहा
 	    {
 		stat_T	st;
 
 		// Assume NetBeans stored the file.  Reset the timestamp to
 		// avoid "file changed" warnings.
-		if (buf->bufp->b_ffname != NULL
-			&& mch_stat((char *)buf->bufp->b_ffname, &st) >= 0)
+		जइ (buf->bufp->b_ffname != रिक्त
+			&& mch_stat((वर्ण *)buf->bufp->b_ffname, &st) >= 0)
 		    buf_store_time(buf->bufp, &st, buf->bufp->b_ffname);
 		buf->bufp->b_changed = FALSE;
 	    }
 	    buf->modified = buf->bufp->b_changed;
-	    if (prev_b_changed != buf->bufp->b_changed)
+	    जइ (prev_b_changed != buf->bufp->b_changed)
 	    {
 		check_status(buf->bufp);
 		redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#जइ defined(FEAT_TABPANEL)
 		redraw_tabpanel = TRUE;
 #endif
 		maketitle();
@@ -1776,76 +1776,76 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModtime"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setModtime"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 		nbdebug(("    invalid buffer identifier in setModtime\n"));
-	    else
+	    अण्णहा
 	    {
-		buf->bufp->b_mtime = atoi((char *)args);
+		buf->bufp->b_mtime = atoi((वर्ण *)args);
 		buf->bufp->b_mtime_ns = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setReadOnly"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setReadOnly"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 		nbdebug(("    invalid buffer identifier in setReadOnly\n"));
-	    else if (streq((char *)args, "T"))
+	    अण्णहा जइ (streq((वर्ण *)args, "T"))
 		buf->bufp->b_p_ro = TRUE;
-	    else
+	    अण्णहा
 		buf->bufp->b_p_ro = FALSE;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setMark"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setMark"))
 	{
 	    // not yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "showBalloon"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "showBalloon"))
 	{
-#if defined(FEAT_BEVAL_GUI)
-	    static char	*text = NULL;
+#जइ defined(FEAT_BEVAL_GUI)
+	    स्थिर वर्ण	*text = रिक्त;
 
 	    /*
 	     * Set up the Balloon Expression Evaluation area.
 	     * Ignore 'ballooneval' here.
 	     * The text pointer must remain valid for a while.
 	     */
-	    if (balloonEval != NULL)
+	    जइ (balloonEval != रिक्त)
 	    {
 		vim_free(text);
-		text = nb_unquote(args, NULL);
-		if (text != NULL)
+		text = nb_unquote(args, रिक्त);
+		जइ (text != रिक्त)
 		    gui_mch_post_balloon(balloonEval, (char_u *)text);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setDot"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setDot"))
 	{
 	    pos_T *pos;
 #ifdef NBDEBUG
 	    char_u *s;
 #endif
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in setDot\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setdot));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 
 	    nb_set_curbuf(buf->bufp);
 
 	    // Don't want Visual mode now.
-	    if (VIsual_active)
+	    जइ (VIsual_active)
 		end_visual_mode();
 #ifdef NBDEBUG
 	    s = args;
 #endif
 	    pos = get_off_or_lnum(buf->bufp, &args);
-	    if (pos)
+	    जइ (pos)
 	    {
 		curwin->w_cursor = *pos;
 		check_cursor();
@@ -1853,7 +1853,7 @@ nb_do_cmd(
 		foldOpenCursor();
 #endif
 	    }
-	    else
+	    अण्णहा
 	    {
 		nbdebug(("    BAD POSITION in setDot: %s\n", s));
 	    }
@@ -1867,83 +1867,83 @@ nb_do_cmd(
 	    out_flush_cursor(TRUE, FALSE);
 
 	    // Quit a hit-return or more prompt.
-	    if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	    जइ (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	    {
 #ifdef FEAT_GUI_GTK
-		if (gui.in_use && gtk_main_level() > 0)
+		जइ (gui.in_use && gtk_main_level() > 0)
 		    gtk_main_quit();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "close"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "close"))
 	{
 #ifdef NBDEBUG
-	    char *name = "<NONE>";
+	    वर्ण *name = "<NONE>";
 #endif
 
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		emsg(_(e_invalid_buffer_identifier_in_close));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 
 #ifdef NBDEBUG
-	    if (buf->displayname != NULL)
+	    जइ (buf->displayname != रिक्त)
 		name = buf->displayname;
 #endif
-	    if (buf->bufp == NULL)
+	    जइ (buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		जइ (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_close));
 	    }
 	    nbdebug(("    CLOSE %d: %s\n", bufno, name));
 #ifdef FEAT_GUI
 	    need_mouse_correct = TRUE;
 #endif
-	    if (buf->bufp != NULL)
+	    जइ (buf->bufp != रिक्त)
 		do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD,
 						     buf->bufp->b_fnum, TRUE);
-	    buf->bufp = NULL;
+	    buf->bufp = रिक्त;
 	    buf->initDone = FALSE;
 	    do_update = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setStyle")) // obsolete...
+	अण्णहा जइ (streq((वर्ण *)cmd, "setStyle")) // obsolete...
 	{
 	    nbdebug(("    setStyle is obsolete!\n"));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setExitDelay"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "setExitDelay"))
 	{
 	    // Only used in version 2.1.
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "defineAnnoType"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "defineAnnoType"))
 	{
 #ifdef FEAT_SIGNS
-	    int typeNum;
+	    पूर्णाङ्क type_अङ्कः;
 	    char_u *typeName;
 	    char_u *tooltip;
 	    char_u *p;
 	    char_u *glyphFile;
-	    int parse_error = FALSE;
+	    पूर्णाङ्क parse_error = FALSE;
 	    char_u *fg;
 	    char_u *bg;
 
-	    if (buf == NULL)
+	    जइ (buf == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in defineAnnoType\n"));
 		emsg(_(e_invalid_buffer_identifier_in_defineannotype));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 
-	    cp = (char *)args;
-	    typeNum = strtol(cp, &cp, 10);
+	    cp = (वर्ण *)args;
+	    type_अङ्कः = strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 	    args = skipwhite(args);
 	    typeName = (char_u *)nb_unquote(args, &args);
@@ -1957,20 +1957,20 @@ nb_do_cmd(
 
 	    args = skipwhite(args + 1);
 	    p = skiptowhite(args);
-	    if (*p != NUL)
+	    जइ (*p != NUL)
 	    {
 		*p = NUL;
 		p = skipwhite(p + 1);
 	    }
 	    fg = vim_strsave(args);
 	    bg = vim_strsave(p);
-	    if (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
+	    जइ (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
 	    {
 		emsg(_(e_highlighting_color_name_too_long_in_defineAnnoType));
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
+	    अण्णहा जइ (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
 		    (*fg != NUL && !nb_is_safe_string(fg, VALID_COLOR_CHARS)) ||
 		    (*bg != NUL && !nb_is_safe_string(bg, VALID_COLOR_CHARS)))
 	    {
@@ -1979,134 +1979,134 @@ nb_do_cmd(
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (typeName != NULL && tooltip != NULL && glyphFile != NULL)
-		addsigntype(buf, typeNum, typeName, tooltip, glyphFile, fg, bg);
+	    अण्णहा जइ (typeName != रिक्त && tooltip != रिक्त && glyphFile != रिक्त)
+		addsigntype(buf, type_अङ्कः, typeName, tooltip, glyphFile, fg, bg);
 
 	    vim_free(typeName);
 	    vim_free(fg);
 	    vim_free(bg);
 	    vim_free(tooltip);
 	    vim_free(glyphFile);
-	    if (parse_error)
-		return FAIL;
+	    जइ (parse_error)
+		प्रत्यागम FAIL;
 
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "addAnno"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "addAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
-	    int localTypeNum;
-	    int typeNum;
+	    पूर्णाङ्क ser_अङ्कः;
+	    पूर्णाङ्क local_Type_अङ्कः;
+	    पूर्णाङ्क type_अङ्कः;
 	    pos_T *pos;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in addAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_addanno));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 
 	    do_update = 1;
 
-	    cp = (char *)args;
-	    serNum = strtol(cp, &cp, 10);
+	    cp = (वर्ण *)args;
+	    ser_अङ्कः = strtol(cp, &cp, 10);
 
 	    // Get the typenr specific for this buffer and convert it to
 	    // the global typenumber, as used for the sign name.
-	    localTypeNum = strtol(cp, &cp, 10);
+	    local_Type_अङ्कः = strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
-	    typeNum = mapsigntype(buf, localTypeNum);
+	    type_अङ्कः = mapsigntype(buf, local_Type_अङ्कः);
 
 	    pos = get_off_or_lnum(buf->bufp, &args);
 
-	    cp = (char *)args;
-	    vim_ignored = (int)strtol(cp, &cp, 10);
+	    cp = (वर्ण *)args;
+	    vim_ignored = (पूर्णाङ्क)strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 # ifdef NBDEBUG
-	    if (vim_ignored != -1)
+	    जइ (vim_ignored != -1)
 		nbdebug(("    partial line annotation -- Not Yet Implemented!\n"));
 # endif
-	    if (serNum >= GUARDEDOFFSET)
+	    जइ (ser_अङ्कः >= GUARDEDOFFSET)
 	    {
 		nbdebug(("    too many annotations! ignoring...\n"));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    if (pos)
+	    जइ (pos)
 	    {
 		coloncmd(":sign place %d line=%ld name=%d buffer=%d",
-			   serNum, pos->lnum, typeNum, buf->bufp->b_fnum);
-		if (typeNum == curPCtype)
-		    coloncmd(":sign jump %d buffer=%d", serNum,
+			   ser_अङ्कः, pos->lnum, type_अङ्कः, buf->bufp->b_fnum);
+		जइ (type_अङ्कः == curPCtype)
+		    coloncmd(":sign jump %d buffer=%d", ser_अङ्कः,
 						       buf->bufp->b_fnum);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "removeAnno"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "removeAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
+	    पूर्णाङ्क ser_अङ्कः;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in removeAnno\n"));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    do_update = 1;
-	    cp = (char *)args;
-	    serNum = strtol(cp, &cp, 10);
+	    cp = (वर्ण *)args;
+	    ser_अङ्कः = strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 	    coloncmd(":sign unplace %d buffer=%d",
-		     serNum, buf->bufp->b_fnum);
+		     ser_अङ्कः, buf->bufp->b_fnum);
 	    redraw_buf_later(buf->bufp, UPD_NOT_VALID);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "moveAnnoToFront"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "moveAnnoToFront"))
 	{
 #ifdef FEAT_SIGNS
 	    nbdebug(("    moveAnnoToFront: Not Yet Implemented!\n"));
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "guard") || streq((char *)cmd, "unguard"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "guard") || streq((वर्ण *)cmd, "unguard"))
 	{
-	    int len;
+	    पूर्णाङ्क len;
 	    pos_T first;
 	    pos_T last;
 	    pos_T *pos;
-	    int un = (cmd[0] == 'u');
-	    static int guardId = GUARDEDOFFSET;
+	    पूर्णाङ्क un = (cmd[0] == 'u');
+	    स्थिर पूर्णाङ्क guardId = GUARDEDOFFSET;
 
-	    if (skip >= SKIP_STOP)
+	    जइ (skip >= SKIP_STOP)
 	    {
-		nbdebug(("    Skipping %s command\n", (char *) cmd));
-		return OK;
+		nbdebug(("    Skipping %s command\n", (वर्ण *) cmd));
+		प्रत्यागम OK;
 	    }
 
 	    nb_init_graphics();
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 	    nb_set_curbuf(buf->bufp);
-	    cp = (char *)args;
+	    cp = (वर्ण *)args;
 	    off = strtol(cp, &cp, 10);
-	    len = strtol(cp, NULL, 10);
+	    len = strtol(cp, रिक्त, 10);
 	    args = (char_u *)cp;
 	    pos = off2pos(buf->bufp, off);
 	    do_update = 1;
-	    if (!pos)
+	    जइ (!pos)
 		nbdebug(("    no such start pos in %s, %ld\n", cmd, off));
-	    else
+	    अण्णहा
 	    {
 		first = *pos;
 		pos = off2pos(buf->bufp, off + len - 1);
-		if (pos != NULL && pos->col == 0)
+		जइ (pos != रिक्त && pos->col == 0)
 		{
 			/*
 			 * In Java Swing the offset is a position between 2
@@ -2115,10 +2115,10 @@ nb_do_cmd(
 			 */
 			pos = off2pos(buf->bufp, off + len - 2);
 		}
-		if (!pos)
+		जइ (!pos)
 		    nbdebug(("    no such end pos in %s, %ld\n",
 			    cmd, off + len - 1));
-		else
+		अण्णहा
 		{
 		    long lnum;
 		    last = *pos;
@@ -2127,15 +2127,15 @@ nb_do_cmd(
 			     first.lnum, first.col,
 			     last.lnum, last.col));
 #ifdef FEAT_SIGNS
-		    for (lnum = first.lnum; lnum <= last.lnum; lnum++)
+		    प्रति (lnum = first.lnum; lnum <= last.lnum; lnum++)
 		    {
-			if (un)
+			जइ (un)
 			{
 			    // never used
 			}
-			else
+			अण्णहा
 			{
-			    if (buf_findsigntype_id(buf->bufp, lnum,
+			    जइ (buf_findsigntype_id(buf->bufp, lnum,
 				GUARDED) == 0)
 			    {
 				coloncmd(
@@ -2151,40 +2151,40 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startAtomic"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "startAtomic"))
 	{
 	    inAtomic = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "endAtomic"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "endAtomic"))
 	{
 	    inAtomic = 0;
-	    if (needupdate)
+	    जइ (needupdate)
 	    {
 		do_update = 1;
 		needupdate = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "save"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "save"))
 	{
 	    /*
 	     * NOTE - This command is obsolete wrt NetBeans. It's left in
 	     * only for historical reasons.
 	     */
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
 
 	    // the following is taken from ex_cmds.c (do_wqall function)
-	    if (bufIsChanged(buf->bufp))
+	    जइ (bufIsChanged(buf->bufp))
 	    {
 		// Only write if the buffer can be written.
-		if (p_write
+		जइ (p_write
 			&& !buf->bufp->b_p_ro
-			&& buf->bufp->b_ffname != NULL
+			&& buf->bufp->b_ffname != रिक्त
 			&& !bt_dontwrite(buf->bufp))
 		{
 		    bufref_T bufref;
@@ -2192,47 +2192,47 @@ nb_do_cmd(
 		    set_bufref(&bufref, buf->bufp);
 		    buf_write_all(buf->bufp, FALSE);
 		    // an autocommand may have deleted the buffer
-		    if (!bufref_valid(&bufref))
-			buf->bufp = NULL;
+		    जइ (!bufref_valid(&bufref))
+			buf->bufp = रिक्त;
 		}
 	    }
-	    else
+	    अण्णहा
 	    {
 		nbdebug(("    Buffer has no changes!\n"));
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "netbeansBuffer"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "netbeansBuffer"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    जइ (buf == रिक्त || buf->bufp == रिक्त)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		प्रत्यागम FAIL;
 	    }
-	    if (*args == 'T')
+	    जइ (*args == 'T')
 	    {
 		buf->bufp->b_netbeans_file = true;
 		buf->bufp->b_was_netbeans_file = true;
 	    }
-	    else
+	    अण्णहा
 		buf->bufp->b_netbeans_file = false;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "specialKeys"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "specialKeys"))
 	{
-	    special_keys(args);
+	    special_कुञ्चिकाः(args);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "actionMenuItem"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "actionMenuItem"))
 	{
 	    // not used yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "version"))
+	अण्णहा जइ (streq((वर्ण *)cmd, "version"))
 	{
 	    // not used yet
 	}
-	else
+	अण्णहा
 	{
 	    nbdebug(("Unrecognised command: %s\n", cmd));
 	}
@@ -2240,7 +2240,7 @@ nb_do_cmd(
 	 * Unrecognized command is ignored.
 	 */
     }
-    if (inAtomic && do_update)
+    जइ (inAtomic && do_update)
     {
 	needupdate = 1;
 	do_update = 0;
@@ -2251,7 +2251,7 @@ nb_do_cmd(
      * and it may no longer be necessary. If it's not needed then needupdate
      * and do_update can also be removed.
      */
-    if (buf != NULL && buf->initDone && do_update)
+    जइ (buf != रिक्त && buf->initDone && do_update)
     {
 	update_screen(UPD_NOT_VALID);
 	setcursor();
@@ -2259,16 +2259,16 @@ nb_do_cmd(
 	out_flush_cursor(TRUE, FALSE);
 
 	// Quit a hit-return or more prompt.
-	if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	जइ (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	{
 #ifdef FEAT_GUI_GTK
-	    if (gui.in_use && gtk_main_level() > 0)
+	    जइ (gui.in_use && gtk_main_level() > 0)
 		gtk_main_quit();
 #endif
 	}
     }
 
-    return retval;
+    प्रत्यागम retval;
 }
 
 
@@ -2277,35 +2277,35 @@ nb_do_cmd(
  * buffer.  If there is no such window then close the current buffer and set
  * the current buffer as "buf".
  */
-    static void
+    स्थिर शून्य
 nb_set_curbuf(buf_T *buf)
 {
-    if (curbuf == buf)
-	return;
+    जइ (curbuf == buf)
+	प्रत्यागम;
 
-    if (buf_jump_open_win(buf) != NULL)
-	return;
-    if ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != NULL)
-	return;
+    जइ (buf_jump_open_win(buf) != रिक्त)
+	प्रत्यागम;
+    जइ ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != रिक्त)
+	प्रत्यागम;
     set_curbuf(buf, DOBUF_GOTO);
 }
 
 /*
  * Process a vim colon command.
  */
-    static void
-coloncmd(char *cmd, ...)
+    स्थिर शून्य
+coloncmd(वर्ण *cmd, ...)
 {
-    char buf[1024];
+    वर्ण buf[1024];
     va_list ap;
 
     va_start(ap, cmd);
-    vim_vsnprintf(buf, sizeof(buf), cmd, ap);
+    vim_vsnprintf(buf, परिमाण(buf), cmd, ap);
     va_end(ap);
 
     nbdebug(("    COLONCMD %s\n", buf));
 
-    do_cmdline((char_u *)buf, NULL, NULL, DOCMD_NOWAIT | DOCMD_KEYTYPED);
+    do_cmdline((char_u *)buf, रिक्त, रिक्त, DOCMD_NOWAIT | DOCMD_KEYTYPED);
 
     setcursor();		// restore the cursor position
     out_flush_cursor(TRUE, FALSE);
@@ -2315,105 +2315,105 @@ coloncmd(char *cmd, ...)
 /*
  * Parse the specialKeys argument and issue the appropriate map commands.
  */
-    static void
-special_keys(char_u *args)
+    स्थिर शून्य
+special_कुञ्चिकाः(char_u *args)
 {
-    char *save_str = nb_unquote(args, NULL);
-    char *tok = strtok(save_str, " ");
-    char *sep;
+    वर्ण *save_str = nb_unquote(args, रिक्त);
+    वर्ण *tok = strtok(save_str, " ");
+    वर्ण *sep;
 #define KEYBUFLEN 64
-    char keybuf[KEYBUFLEN];
-    char cmdbuf[256];
+    वर्ण keybuf[KEYBUFLEN];
+    वर्ण cmdbuf[256];
 
-    while (tok != NULL)
+    जाव (tok != रिक्त)
     {
-	int i = 0;
+	पूर्णाङ्क i = 0;
 
-	if ((sep = strchr(tok, '-')) != NULL)
+	जइ ((sep = strchr(tok, '-')) != रिक्त)
 	{
 	    *sep = NUL;
-	    while (*tok && i + 2 < KEYBUFLEN)
+	    जाव (*tok && i + 2 < KEYBUFLEN)
 	    {
-		switch (*tok)
+		विकल्प (*tok)
 		{
-		    case 'A':
-		    case 'M':
-		    case 'C':
-		    case 'S':
+		    पक्ष 'A':
+		    पक्ष 'M':
+		    पक्ष 'C':
+		    पक्ष 'S':
 			keybuf[i++] = *tok;
 			keybuf[i++] = '-';
-			break;
+			भङ्ग;
 		}
 		tok++;
 	    }
 	    tok++;
 	}
 
-	if (strlen(tok) + i < KEYBUFLEN)
+	जइ (strlen(tok) + i < KEYBUFLEN)
 	{
 	    // Only allow alphanumeric and function-key name characters.
 	    // Reject anything else to prevent map command injection.
-	    int safe = TRUE;
-	    for (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
+	    पूर्णाङ्क safe = TRUE;
+	    प्रति (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
 	    {
-		if (!ASCII_ISALNUM(*tp) && *tp != '-')
+		जइ (!ASCII_ISALNUM(*tp) && *tp != '-')
 		{
 		    safe = FALSE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    if (safe)
+	    जइ (safe)
 	    {
 		vim_strncpy((char_u *)&keybuf[i], (char_u *)tok, KEYBUFLEN - i - 1);
-		vim_snprintf(cmdbuf, sizeof(cmdbuf),
+		vim_snprintf(cmdbuf, परिमाण(cmdbuf),
 				"<silent><%s> :nbkey %s<CR>", keybuf, keybuf);
 		do_map(MAPTYPE_MAP, (char_u *)cmdbuf, MODE_NORMAL, FALSE);
 	    }
 	}
-	tok = strtok(NULL, " ");
+	tok = strtok(रिक्त, " ");
     }
     vim_free(save_str);
 }
 
-    void
+    शून्य
 ex_nbclose(exarg_T *eap UNUSED)
 {
     netbeans_close();
 }
 
-    void
+    शून्य
 ex_nbkey(exarg_T *eap)
 {
-    (void)netbeans_keystring(eap->arg);
+    (शून्य)netbeans_keystring(eap->arg);
 }
 
-    void
+    शून्य
 ex_nbstart(
     exarg_T	*eap)
 {
 #ifdef FEAT_GUI
-# if !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
+# जइ !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
 		&& !defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
+    जइ (gui.in_use)
     {
 	emsg(_(e_netbeans_is_not_supported_with_this_GUI));
-	return;
+	प्रत्यागम;
     }
 # endif
 #endif
-    netbeans_open((char *)eap->arg, FALSE);
+    netbeans_open((वर्ण *)eap->arg, FALSE);
 }
 
 /*
  * Initialize highlights and signs for use by netbeans  (mostly obsolete)
  */
-    static void
-nb_init_graphics(void)
+    स्थिर शून्य
+nb_init_graphics(शून्य)
 {
-    static int did_init = FALSE;
+    स्थिर पूर्णाङ्क did_init = FALSE;
 
-    if (did_init)
-	return;
+    जइ (did_init)
+	प्रत्यागम;
 
     coloncmd(":highlight NBGuarded guibg=Cyan guifg=Black"
 	    " ctermbg=LightCyan ctermfg=Black");
@@ -2425,109 +2425,109 @@ nb_init_graphics(void)
 /*
  * Convert key to netbeans name.  This uses the global "mod_mask".
  */
-    static void
-netbeans_keyname(int key, char *buf)
+    स्थिर शून्य
+netbeans_keyname(पूर्णाङ्क कुञ्चिका, वर्ण *buf)
 {
-    char *name = 0;
-    char namebuf[2];
-    int ctrl  = 0;
-    int shift = 0;
-    int alt   = 0;
+    वर्ण *name = 0;
+    वर्ण namebuf[2];
+    पूर्णाङ्क ctrl  = 0;
+    पूर्णाङ्क shift = 0;
+    पूर्णाङ्क alt   = 0;
 
-    if (mod_mask & MOD_MASK_CTRL)
+    जइ (mod_mask & MOD_MASK_CTRL)
 	ctrl = 1;
-    if (mod_mask & MOD_MASK_SHIFT)
+    जइ (mod_mask & MOD_MASK_SHIFT)
 	shift = 1;
-    if (mod_mask & MOD_MASK_ALT)
+    जइ (mod_mask & MOD_MASK_ALT)
 	alt = 1;
 
 
-    switch (key)
+    विकल्प (कुञ्चिका)
     {
-	case K_F1:		name = "F1";		break;
-	case K_S_F1:	name = "F1";	shift = 1;	break;
-	case K_F2:		name = "F2";		break;
-	case K_S_F2:	name = "F2";	shift = 1;	break;
-	case K_F3:		name = "F3";		break;
-	case K_S_F3:	name = "F3";	shift = 1;	break;
-	case K_F4:		name = "F4";		break;
-	case K_S_F4:	name = "F4";	shift = 1;	break;
-	case K_F5:		name = "F5";		break;
-	case K_S_F5:	name = "F5";	shift = 1;	break;
-	case K_F6:		name = "F6";		break;
-	case K_S_F6:	name = "F6";	shift = 1;	break;
-	case K_F7:		name = "F7";		break;
-	case K_S_F7:	name = "F7";	shift = 1;	break;
-	case K_F8:		name = "F8";		break;
-	case K_S_F8:	name = "F8";	shift = 1;	break;
-	case K_F9:		name = "F9";		break;
-	case K_S_F9:	name = "F9";	shift = 1;	break;
-	case K_F10:		name = "F10";		break;
-	case K_S_F10:	name = "F10";	shift = 1;	break;
-	case K_F11:		name = "F11";		break;
-	case K_S_F11:	name = "F11";	shift = 1;	break;
-	case K_F12:		name = "F12";		break;
-	case K_S_F12:	name = "F12";	shift = 1;	break;
-	default:
-			if (key >= ' ' && key <= '~')
+	पक्ष K_F1:		name = "F1";		भङ्ग;
+	पक्ष K_S_F1:	name = "F1";	shift = 1;	भङ्ग;
+	पक्ष K_F2:		name = "F2";		भङ्ग;
+	पक्ष K_S_F2:	name = "F2";	shift = 1;	भङ्ग;
+	पक्ष K_F3:		name = "F3";		भङ्ग;
+	पक्ष K_S_F3:	name = "F3";	shift = 1;	भङ्ग;
+	पक्ष K_F4:		name = "F4";		भङ्ग;
+	पक्ष K_S_F4:	name = "F4";	shift = 1;	भङ्ग;
+	पक्ष K_F5:		name = "F5";		भङ्ग;
+	पक्ष K_S_F5:	name = "F5";	shift = 1;	भङ्ग;
+	पक्ष K_F6:		name = "F6";		भङ्ग;
+	पक्ष K_S_F6:	name = "F6";	shift = 1;	भङ्ग;
+	पक्ष K_F7:		name = "F7";		भङ्ग;
+	पक्ष K_S_F7:	name = "F7";	shift = 1;	भङ्ग;
+	पक्ष K_F8:		name = "F8";		भङ्ग;
+	पक्ष K_S_F8:	name = "F8";	shift = 1;	भङ्ग;
+	पक्ष K_F9:		name = "F9";		भङ्ग;
+	पक्ष K_S_F9:	name = "F9";	shift = 1;	भङ्ग;
+	पक्ष K_F10:		name = "F10";		भङ्ग;
+	पक्ष K_S_F10:	name = "F10";	shift = 1;	भङ्ग;
+	पक्ष K_F11:		name = "F11";		भङ्ग;
+	पक्ष K_S_F11:	name = "F11";	shift = 1;	भङ्ग;
+	पक्ष K_F12:		name = "F12";		भङ्ग;
+	पक्ष K_S_F12:	name = "F12";	shift = 1;	भङ्ग;
+	स्वभाव:
+			जइ (कुञ्चिका >= ' ' && कुञ्चिका <= '~')
 			{
 			    // Allow ASCII characters.
 			    name = namebuf;
-			    namebuf[0] = key;
+			    namebuf[0] = कुञ्चिका;
 			    namebuf[1] = NUL;
 			}
-			else
+			अण्णहा
 			    name = "X";
-			break;
+			भङ्ग;
     }
 
     buf[0] = '\0';
-    if (ctrl)
+    जइ (ctrl)
 	strcat(buf, "C");
-    if (shift)
+    जइ (shift)
 	strcat(buf, "S");
-    if (alt)
+    जइ (alt)
 	strcat(buf, "M"); // META
-    if (ctrl || shift || alt)
+    जइ (ctrl || shift || alt)
 	strcat(buf, "-");
     strcat(buf, name);
 }
 
-#if defined(FEAT_BEVAL)
+#जइ defined(FEAT_BEVAL)
 /*
  * Function to be called for balloon evaluation.  Grabs the text under the
  * cursor and sends it to the debugger for evaluation.  The debugger should
  * respond with a showBalloon command when there is a useful result.
  */
-    void
+    शून्य
 netbeans_beval_cb(
 	BalloonEval	*beval,
-	int		 state UNUSED)
+	पूर्णाङ्क		 state UNUSED)
 {
     win_T	*wp;
     char_u	*text;
     linenr_T	lnum;
-    int		col;
-    char	*buf;
+    पूर्णाङ्क		col;
+    वर्ण	*buf;
     char_u	*p;
 
     // Don't do anything when 'ballooneval' is off, messages scrolled the
     // windows up or we have no connection.
-    if (!can_use_beval() || !NETBEANS_OPEN)
-	return;
+    जइ (!can_use_beval() || !NETBEANS_OPEN)
+	प्रत्यागम;
 
-    if (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
-	return;
+    जइ (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
+	प्रत्यागम;
 
     // Send debugger request.  Only when the text is of reasonable
     // length.
-    if (text != NULL && text[0] != NUL && STRLEN(text) < MAXPATHL)
+    जइ (text != रिक्त && text[0] != NUL && STRLEN(text) < MAXPATHL)
     {
 	buf = alloc(MAXPATHL * 2 + 25);
-	if (buf != NULL)
+	जइ (buf != रिक्त)
 	{
 	    p = nb_quote(text);
-	    if (p != NULL)
+	    जइ (p != रिक्त)
 	    {
 		vim_snprintf(buf, MAXPATHL * 2 + 25,
 			"0:balloonText=%d \"%s\"\n", r_cmdno, p);
@@ -2545,28 +2545,28 @@ netbeans_beval_cb(
 /*
  * Return TRUE when the netbeans connection is active.
  */
-    int
-netbeans_active(void)
+    पूर्णाङ्क
+netbeans_active(शून्य)
 {
-    return NETBEANS_OPEN;
+    प्रत्यागम NETBEANS_OPEN;
 }
 
 /*
  * Tell netbeans that the window was opened, ready for commands.
  */
-    void
-netbeans_open(char *params, int doabort)
+    शून्य
+netbeans_open(वर्ण *params, पूर्णाङ्क doabort)
 {
-    char *cmd = "0:startupDone=0\n";
+    वर्ण *cmd = "0:startupDone=0\n";
 
-    if (NETBEANS_OPEN)
+    जइ (NETBEANS_OPEN)
     {
 	emsg(_(e_netbeans_already_connected));
-	return;
+	प्रत्यागम;
     }
 
-    if (netbeans_connect(params, doabort) != OK)
-	return;
+    जइ (netbeans_connect(params, doabort) != OK)
+	प्रत्यागम;
 
     nbdebug(("EVT: %s", cmd));
     nb_send(cmd, "netbeans_startup_done");
@@ -2583,12 +2583,12 @@ netbeans_open(char *params, int doabort)
  * Tell netbeans that we're exiting. This should be called right
  * before calling exit.
  */
-    void
-netbeans_send_disconnect(void)
+    शून्य
+netbeans_send_disconnect(शून्य)
 {
-    char buf[128];
+    वर्ण buf[128];
 
-    if (NETBEANS_OPEN)
+    जइ (NETBEANS_OPEN)
     {
 	sprintf(buf, "0:disconnect=%d\n", r_cmdno);
 	nbdebug(("EVT: %s", buf));
@@ -2596,37 +2596,37 @@ netbeans_send_disconnect(void)
     }
 }
 
-#if defined(FEAT_EVAL)
-    int
-set_ref_in_nb_channel(int copyID)
+#जइ defined(FEAT_EVAL)
+    पूर्णाङ्क
+set_ref_in_nb_channel(पूर्णाङ्क copyID)
 {
-    int abort = FALSE;
+    पूर्णाङ्क abort = FALSE;
     typval_T tv;
 
-    if (nb_channel == NULL)
-	return FALSE;
+    जइ (nb_channel == रिक्त)
+	प्रत्यागम FALSE;
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = nb_channel;
-    abort = set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
-    return abort;
+    abort = set_ref_in_item(&tv, copyID, रिक्त, रिक्त, रिक्त);
+    प्रत्यागम abort;
 }
 #endif
 
-#if defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
+#जइ defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
 /*
  * Tell netbeans that the window was moved or resized.
  */
-    void
-netbeans_frame_moved(int new_x, int new_y)
+    शून्य
+netbeans_frame_moved(पूर्णाङ्क new_x, पूर्णाङ्क new_y)
 {
-    char buf[128];
+    वर्ण buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     sprintf(buf, "0:geometry=%d %d %d %d %d\n",
-		    r_cmdno, (int)Columns, (int)Rows, new_x, new_y);
+		    r_cmdno, (पूर्णाङ्क)Columns, (पूर्णाङ्क)Rows, new_x, new_y);
     // nbdebug(("EVT: %s", buf)); happens too many times during a move
     nb_send(buf, "netbeans_frame_moved");
 }
@@ -2635,30 +2635,30 @@ netbeans_frame_moved(int new_x, int new_y)
 /*
  * Tell netbeans the user opened or activated a file.
  */
-    void
+    शून्य
 netbeans_file_activated(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
+    पूर्णाङ्क bufno = nb_getbufno(bufp);
     nbbuf_T *bp = nb_get_buf(bufno);
-    char    buffer[2*MAXPATHL];
+    वर्ण    buffer[2*MAXPATHL];
     char_u  *q;
 
-    if (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
-	return;
+    जइ (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
+	प्रत्यागम;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp == NULL)
+    जइ (q == रिक्त)
+	प्रत्यागम;
+    जइ (bp == रिक्त)
     {
 	vim_free(q);
-	return;
+	प्रत्यागम;
     }
 
-    vim_snprintf(buffer, sizeof(buffer),  "%d:fileOpened=%d \"%s\" %s %s\n",
+    vim_snprintf(buffer, परिमाण(buffer),  "%d:fileOpened=%d \"%s\" %s %s\n",
 	    bufno,
 	    bufno,
-	    (char *)q,
+	    (वर्ण *)q,
 	    "T",  // open in NetBeans
 	    "F"); // modified
 
@@ -2671,30 +2671,30 @@ netbeans_file_activated(buf_T *bufp)
 /*
  * Tell netbeans the user opened a file.
  */
-    void
+    शून्य
 netbeans_file_opened(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
-    char    buffer[2*MAXPATHL];
+    पूर्णाङ्क bufno = nb_getbufno(bufp);
+    वर्ण    buffer[2*MAXPATHL];
     char_u  *q;
     nbbuf_T *bp = nb_get_buf(nb_getbufno(bufp));
-    int	    bnum;
+    पूर्णाङ्क	    bnum;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp != NULL)
+    जइ (q == रिक्त)
+	प्रत्यागम;
+    जइ (bp != रिक्त)
 	bnum = bufno;
-    else
+    अण्णहा
 	bnum = 0;
 
-    vim_snprintf(buffer, sizeof(buffer), "%d:fileOpened=%d \"%s\" %s %s\n",
+    vim_snprintf(buffer, परिमाण(buffer), "%d:fileOpened=%d \"%s\" %s %s\n",
 	    bnum,
 	    0,
-	    (char *)q,
+	    (वर्ण *)q,
 	    "T",  // open in NetBeans
 	    "F"); // modified
 
@@ -2702,7 +2702,7 @@ netbeans_file_opened(buf_T *bufp)
     nbdebug(("EVT: %s", buffer));
 
     nb_send(buffer, "netbeans_file_opened");
-    if (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
+    जइ (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
     {
 	last_chdir_reason = "netbeans";
 	shorten_fnames(TRUE);
@@ -2712,15 +2712,15 @@ netbeans_file_opened(buf_T *bufp)
 /*
  * Tell netbeans that a file was deleted or wiped out.
  */
-    void
+    शून्य
 netbeans_file_killed(buf_T *bufp)
 {
-    int		bufno = nb_getbufno(bufp);
+    पूर्णाङ्क		bufno = nb_getbufno(bufp);
     nbbuf_T	*nbbuf = nb_get_buf(bufno);
-    char	buffer[2*MAXPATHL];
+    वर्ण	buffer[2*MAXPATHL];
 
-    if (!NETBEANS_OPEN || bufno == -1)
-	return;
+    जइ (!NETBEANS_OPEN || bufno == -1)
+	प्रत्यागम;
 
     nbdebug(("netbeans_file_killed:\n"));
     nbdebug(("    Killing bufno: %d", bufno));
@@ -2731,8 +2731,8 @@ netbeans_file_killed(buf_T *bufp)
 
     nb_send(buffer, "netbeans_file_killed");
 
-    if (nbbuf != NULL)
-	nbbuf->bufp = NULL;
+    जइ (nbbuf != रिक्त)
+	nbbuf->bufp = रिक्त;
 }
 
 /*
@@ -2740,55 +2740,55 @@ netbeans_file_killed(buf_T *bufp)
  * Return NULL if there is no such buffer or changes are not to be reported.
  * Otherwise store the buffer number in "*bufnop".
  */
-    static nbbuf_T *
-nb_bufp2nbbuf_fire(buf_T *bufp, int *bufnop)
+    स्थिर nbbuf_T *
+nb_bufp2nbbuf_fire(buf_T *bufp, पूर्णाङ्क *bufnop)
 {
-    int		bufno;
+    पूर्णाङ्क		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN || !netbeansFireChanges)
-	return NULL;		// changes are not reported at all
+    जइ (!NETBEANS_OPEN || !netbeansFireChanges)
+	प्रत्यागम रिक्त;		// changes are not reported at all
 
     bufno = nb_getbufno(bufp);
-    if (bufno <= 0)
-	return NULL;		// file is not known to NetBeans
+    जइ (bufno <= 0)
+	प्रत्यागम रिक्त;		// file is not known to NetBeans
 
     nbbuf = nb_get_buf(bufno);
-    if (nbbuf != NULL && !nbbuf->fireChanges)
-	return NULL;		// changes in this buffer are not reported
+    जइ (nbbuf != रिक्त && !nbbuf->fireChanges)
+	प्रत्यागम रिक्त;		// changes in this buffer are not reported
 
     *bufnop = bufno;
-    return nbbuf;
+    प्रत्यागम nbbuf;
 }
 
 /*
  * Tell netbeans the user inserted some text.
  */
-    void
+    शून्य
 netbeans_inserted(
     buf_T	*bufp,
     linenr_T	linenr,
     colnr_T	col,
     char_u	*txt,
-    int		newlen)
+    पूर्णाङ्क		newlen)
 {
     char_u	*buf;
-    int		bufno;
+    पूर्णाङ्क		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
     char_u	*p;
     char_u	*newtxt;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    जइ (nbbuf == रिक्त)
+	प्रत्यागम;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    जइ (nbbuf->निवेशय_Done)
 	nbbuf->modified = 1;
 
     // send the "insert" EVT
@@ -2801,13 +2801,13 @@ netbeans_inserted(
     off = pos2off(bufp, &pos);
 
     p = nb_quote(newtxt);
-    if (p != NULL)
+    जइ (p != रिक्त)
     {
 	buf = alloc(128 + 2*newlen);
-	sprintf((char *)buf, "%d:insert=%d %ld \"%s\"\n",
+	sprintf((वर्ण *)buf, "%d:insert=%d %ld \"%s\"\n",
 						      bufno, r_cmdno, off, p);
 	nbdebug(("EVT: %s", buf));
-	nb_send((char *)buf, "netbeans_inserted");
+	nb_send((वर्ण *)buf, "netbeans_inserted");
 	vim_free(p);
 	vim_free(buf);
     }
@@ -2817,7 +2817,7 @@ netbeans_inserted(
 /*
  * Tell netbeans some bytes have been removed.
  */
-    void
+    शून्य
 netbeans_removed(
     buf_T	*bufp,
     linenr_T	linenr,
@@ -2825,22 +2825,22 @@ netbeans_removed(
     long	len)
 {
     char_u	buf[128];
-    int		bufno;
+    पूर्णाङ्क		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    जइ (nbbuf == रिक्त)
+	प्रत्यागम;
 
-    if (len < 0)
+    जइ (len < 0)
     {
 	nbdebug(("Negative len %ld in netbeans_removed()!\n", len));
-	return;
+	प्रत्यागम;
     }
 
     nbbuf->modified = 1;
@@ -2850,15 +2850,15 @@ netbeans_removed(
 
     off = pos2off(bufp, &pos);
 
-    sprintf((char *)buf, "%d:remove=%d %ld %ld\n", bufno, r_cmdno, off, len);
+    sprintf((वर्ण *)buf, "%d:remove=%d %ld %ld\n", bufno, r_cmdno, off, len);
     nbdebug(("EVT: %s", buf));
-    nb_send((char *)buf, "netbeans_removed");
+    nb_send((वर्ण *)buf, "netbeans_removed");
 }
 
 /*
  * Send netbeans an unmodified command.
  */
-    void
+    शून्य
 netbeans_unmodified(buf_T *bufp UNUSED)
 {
     // This is a no-op, because NetBeans considers a buffer modified
@@ -2869,21 +2869,21 @@ netbeans_unmodified(buf_T *bufp UNUSED)
  * Send a button release event back to netbeans. It's up to netbeans
  * to decide what to do (if anything) with this event.
  */
-    void
-netbeans_button_release(int button)
+    शून्य
+netbeans_button_release(पूर्णाङ्क button)
 {
-    char	buf[128];
-    int		bufno;
+    वर्ण	buf[128];
+    पूर्णाङ्क		bufno;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     bufno = nb_getbufno(curbuf);
 
-    if (bufno < 0 || curwin == NULL || curwin->w_buffer != curbuf)
-	return;
+    जइ (bufno < 0 || curwin == रिक्त || curwin->w_buffer != curbuf)
+	प्रत्यागम;
 
-    int col = mouse_col - curwin->w_wincol
+    पूर्णाङ्क col = mouse_col - curwin->w_wincol
 	- ((curwin->w_p_nu || curwin->w_p_rnu) ? 9 : 1);
     long off = pos2off(curbuf, &curwin->w_cursor);
 
@@ -2905,13 +2905,13 @@ netbeans_button_release(int button)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    int
-netbeans_keycommand(int key)
+    पूर्णाङ्क
+netbeans_keycommand(पूर्णाङ्क कुञ्चिका)
 {
-    char	keyName[60];
+    वर्ण	कुञ्चिका_Name[60];
 
-    netbeans_keyname(key, keyName);
-    return netbeans_keystring((char_u *)keyName);
+    netbeans_keyname(कुञ्चिका, कुञ्चिका_Name);
+    प्रत्यागम netbeans_keystring((char_u *)कुञ्चिका_Name);
 }
 
 
@@ -2921,35 +2921,35 @@ netbeans_keycommand(int key)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    static int
-netbeans_keystring(char_u *keyName)
+    स्थिर पूर्णाङ्क
+netbeans_keystring(char_u *कुञ्चिका_Name)
 {
-    char	buf[2*MAXPATHL];
-    int		bufno = nb_getbufno(curbuf);
+    वर्ण	buf[2*MAXPATHL];
+    पूर्णाङ्क		bufno = nb_getbufno(curbuf);
     long	off;
     char_u	*q;
 
-    if (!NETBEANS_OPEN)
-	return TRUE;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम TRUE;
 
-    if (bufno == -1)
+    जइ (bufno == -1)
     {
 	nbdebug(("got keycommand for non-NetBeans buffer, opening...\n"));
-	q = curbuf->b_ffname == NULL ? (char_u *)""
+	q = curbuf->b_ffname == रिक्त ? (char_u *)""
 						 : nb_quote(curbuf->b_ffname);
-	if (q == NULL)
-	    return TRUE;
-	vim_snprintf(buf, sizeof(buf), "0:fileOpened=%d \"%s\" %s %s\n", 0,
+	जइ (q == रिक्त)
+	    प्रत्यागम TRUE;
+	vim_snprintf(buf, परिमाण(buf), "0:fileOpened=%d \"%s\" %s %s\n", 0,
 		q,
 		"T",  // open in NetBeans
 		"F"); // modified
-	if (curbuf->b_ffname != NULL)
+	जइ (curbuf->b_ffname != रिक्त)
 	    vim_free(q);
 	nbdebug(("EVT: %s", buf));
 	nb_send(buf, "netbeans_keycommand");
 
-	postpone_keycommand(keyName);
-	return FALSE;
+	postpone_keycommand(कुञ्चिका_Name);
+	प्रत्यागम FALSE;
     }
 
     // sync the cursor position
@@ -2963,68 +2963,68 @@ netbeans_keystring(char_u *keyName)
     // more synchronous
 
     // now send keyCommand event
-    vim_snprintf(buf, sizeof(buf), "%d:keyCommand=%d \"%s\"\n",
-						     bufno, r_cmdno, keyName);
+    vim_snprintf(buf, परिमाण(buf), "%d:keyCommand=%d \"%s\"\n",
+						     bufno, r_cmdno, कुञ्चिका_Name);
     nbdebug(("EVT: %s", buf));
     nb_send(buf, "netbeans_keycommand");
 
     // New: do both at once and include the lnum/col.
-    vim_snprintf(buf, sizeof(buf), "%d:keyAtPos=%d \"%s\" %ld %ld/%ld\n",
-	    bufno, r_cmdno, keyName,
+    vim_snprintf(buf, परिमाण(buf), "%d:keyAtPos=%d \"%s\" %ld %ld/%ld\n",
+	    bufno, r_cmdno, कुञ्चिका_Name,
 		off, (long)curwin->w_cursor.lnum, (long)curwin->w_cursor.col);
     nbdebug(("EVT: %s", buf));
     nb_send(buf, "netbeans_keycommand");
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 
 /*
  * Send a save event to netbeans.
  */
-    void
+    शून्य
 netbeans_save_buffer(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    पूर्णाङ्क		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    जइ (nbbuf == रिक्त)
+	प्रत्यागम;
 
     nbbuf->modified = 0;
 
-    sprintf((char *)buf, "%d:save=%d\n", bufno, r_cmdno);
+    sprintf((वर्ण *)buf, "%d:save=%d\n", bufno, r_cmdno);
     nbdebug(("EVT: %s", buf));
-    nb_send((char *)buf, "netbeans_save_buffer");
+    nb_send((वर्ण *)buf, "netbeans_save_buffer");
 }
 
 
 /*
  * Send remove command to netbeans (this command has been turned off).
  */
-    void
-netbeans_deleted_all_lines(buf_T *bufp)
+    शून्य
+netbeans_deleted_all_पङ्क्तयः(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    पूर्णाङ्क		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    जइ (nbbuf == रिक्त)
+	प्रत्यागम;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    जइ (nbbuf->निवेशय_Done)
 	nbbuf->modified = 1;
 
-    sprintf((char *)buf, "%d:remove=%d 0 -1\n", bufno, r_cmdno);
+    sprintf((वर्ण *)buf, "%d:remove=%d 0 -1\n", bufno, r_cmdno);
     nbdebug(("EVT(suppressed): %s", buf));
 //     nb_send(buf, "netbeans_deleted_all_lines");
 }
@@ -3035,43 +3035,43 @@ netbeans_deleted_all_lines(buf_T *bufp)
  * u_savecommon(), these are the line above the change and the line below the
  * change.
  */
-    int
-netbeans_is_guarded(linenr_T top, linenr_T bot)
+    पूर्णाङ्क
+netbeans_is_guarded(linenr_T शिखरम्, linenr_T bot)
 {
     sign_entry_T	*p;
-    int			lnum;
+    पूर्णाङ्क			lnum;
 
-    if (!NETBEANS_OPEN)
-	return FALSE;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम FALSE;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
-	if (p->se_id >= GUARDEDOFFSET)
-	    for (lnum = top + 1; lnum < bot; lnum++)
-		if (lnum == p->se_lnum)
-		    return TRUE;
+	जइ (p->se_id >= GUARDEDOFFSET)
+	    प्रति (lnum = शिखरम् + 1; lnum < bot; lnum++)
+		जइ (lnum == p->se_lnum)
+		    प्रत्यागम TRUE;
 
-    return FALSE;
+    प्रत्यागम FALSE;
 }
 
-#if defined(FEAT_GUI_X11)
+#जइ defined(FEAT_GUI_X11)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the Motif version.
  */
-    void
-netbeans_draw_multisign_indicator(int row)
+    शून्य
+netbeans_draw_multisign_indicator(पूर्णाङ्क row)
 {
-    int i;
-    int y;
-    int x;
+    पूर्णाङ्क i;
+    पूर्णाङ्क y;
+    पूर्णाङ्क x;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     x = 0;
     y = row * gui.char_height + 2;
 
-    for (i = 0; i < gui.char_height - 3; i++)
+    प्रति (i = 0; i < gui.char_height - 3; i++)
 	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+2, y++);
 
     XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+0, y);
@@ -3084,42 +3084,42 @@ netbeans_draw_multisign_indicator(int row)
 }
 #endif // FEAT_GUI_X11
 
-#if defined(FEAT_GUI_GTK) && !defined(PROTO)
+#जइ defined(FEAT_GUI_GTK) && !defined(PROTO)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the GTK/Gnome version.
  */
-    void
-netbeans_draw_multisign_indicator(int row)
+    शून्य
+netbeans_draw_multisign_indicator(पूर्णाङ्क row)
 {
-    int i;
-    int y;
-    int x;
-# if GTK_CHECK_VERSION(3,0,0)
-    cairo_t *cr = NULL;
-# else
+    पूर्णाङ्क i;
+    पूर्णाङ्क y;
+    पूर्णाङ्क x;
+# जइ GTK_CHECK_VERSION(3,0,0)
+    cairo_t *cr = रिक्त;
+# अण्णहा
     GdkDrawable *drawable = gui.drawarea->window;
 # endif
 # ifdef USE_GTK4
     cairo_surface_t *surf;
 # endif
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     x = 0;
 # ifdef USE_GTK4
     y = 2;
-# else
+# अण्णहा
     y = row * gui.char_height + 2;
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# जइ GTK_CHECK_VERSION(3,0,0)
 #  ifdef USE_GTK4
     surf = cairo_image_surface_create(
 	    CAIRO_FORMAT_ARGB32, 5, gui.char_height);
     cr = cairo_create(surf);
-#  else
+#  अण्णहा
     cr = cairo_create(gui.surface);
 #  endif
     cairo_set_source_rgba(cr,
@@ -3127,14 +3127,14 @@ netbeans_draw_multisign_indicator(int row)
 	    gui.fgcolor->alpha);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
-# if GTK_CHECK_VERSION(3,0,0)
+    प्रति (i = 0; i < gui.char_height - 3; i++)
+# जइ GTK_CHECK_VERSION(3,0,0)
 	cairo_rectangle(cr, x+2, y++, 1, 1);
-# else
+# अण्णहा
     gdk_draw_point(drawable, gui.text_gc, x+2, y++);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# जइ GTK_CHECK_VERSION(3,0,0)
     cairo_rectangle(cr, x+0, y, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+4, y++, 1, 1);
@@ -3142,7 +3142,7 @@ netbeans_draw_multisign_indicator(int row)
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+3, y++, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
-# else
+# अण्णहा
     gdk_draw_point(drawable, gui.text_gc, x+0, y);
     gdk_draw_point(drawable, gui.text_gc, x+2, y);
     gdk_draw_point(drawable, gui.text_gc, x+4, y++);
@@ -3157,7 +3157,7 @@ netbeans_draw_multisign_indicator(int row)
     gui_gtk4_add_multisign(surf, row, 0, 5, gui.char_height);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# जइ GTK_CHECK_VERSION(3,0,0)
     cairo_destroy(cr);
 # endif
 # ifdef USE_GTK4
@@ -3170,28 +3170,28 @@ netbeans_draw_multisign_indicator(int row)
  * If the mouse is clicked in the gutter of a line with multiple
  * annotations, cycle through the set of signs.
  */
-    void
+    शून्य
 netbeans_gutter_click(linenr_T lnum)
 {
     sign_entry_T	*p;
 
-    if (!NETBEANS_OPEN)
-	return;
+    जइ (!NETBEANS_OPEN)
+	प्रत्यागम;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
     {
-	if (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
+	जइ (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
 	{
 	    sign_entry_T *tail;
 
 	    // remove "p" from list, reinsert it at the tail of the sublist
-	    if (p->se_prev)
+	    जइ (p->se_prev)
 		p->se_prev->se_next = p->se_next;
-	    else
+	    अण्णहा
 		curbuf->b_signlist = p->se_next;
 	    p->se_next->se_prev = p->se_prev;
 	    // now find end of sublist and insert p
-	    for (tail = p->se_next;
+	    प्रति (tail = p->se_next;
 		  tail->se_next && tail->se_next->se_lnum == lnum
 				       && tail->se_next->se_id < GUARDEDOFFSET;
 		  tail = tail->se_next)
@@ -3199,12 +3199,12 @@ netbeans_gutter_click(linenr_T lnum)
 	    // tail now points to last entry with same lnum (except
 	    // that "guarded" annotations are always last)
 	    p->se_next = tail->se_next;
-	    if (tail->se_next)
+	    जइ (tail->se_next)
 		tail->se_next->se_prev = p;
 	    p->se_prev = tail;
 	    tail->se_next = p;
 	    update_debug_sign(curbuf, lnum);
-	    break;
+	    भङ्ग;
 	}
     }
 }
@@ -3224,130 +3224,130 @@ netbeans_gutter_click(linenr_T lnum)
  * buf->signmapused[]	maps buffer-local annotation IDs to an index in
  *			globalsignmap[].
  */
-    static void
+    स्थिर शून्य
 addsigntype(
     nbbuf_T	*buf,
-    int		typeNum,
+    पूर्णाङ्क		type_अङ्कः,
     char_u	*typeName,
     char_u	*tooltip UNUSED,
     char_u	*glyphFile,
     char_u	*fg,
     char_u	*bg)
 {
-    int i, j;
-    int use_fg = (*fg && STRCMP(fg, "none") != 0);
-    int use_bg = (*bg && STRCMP(bg, "none") != 0);
+    पूर्णाङ्क i, j;
+    पूर्णाङ्क use_fg = (*fg && STRCMP(fg, "none") != 0);
+    पूर्णाङ्क use_bg = (*bg && STRCMP(bg, "none") != 0);
 
-    for (i = 0; i < globalsignmapused; i++)
-	if (STRCMP(typeName, globalsignmap[i]) == 0)
-	    break;
+    प्रति (i = 0; i < globalsignmapused; i++)
+	जइ (STRCMP(typeName, globalsignmap[i]) == 0)
+	    भङ्ग;
 
-    if (i == globalsignmapused) // not found; add it to global map
+    जइ (i == globalsignmapused) // not found; add it to global map
     {
 	nbdebug(("DEFINEANNOTYPE(%d,%s,%s,%s,%s,%s)\n",
-			    typeNum, typeName, tooltip, glyphFile, fg, bg));
-	if (use_fg || use_bg)
+			    type_अङ्कः, typeName, tooltip, glyphFile, fg, bg));
+	जइ (use_fg || use_bg)
 	{
-	    char fgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
-	    char bgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
-	    char *ptr;
-	    int value;
+	    वर्ण fgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
+	    वर्ण bgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
+	    वर्ण *ptr;
+	    पूर्णाङ्क मानम्;
 
-	    value = strtol((char *)fg, &ptr, 10);
-	    if (ptr != (char *)fg)
-		sprintf(fgbuf, "guifg=#%06x", value & 0xFFFFFF);
-	    else
+	    मानम् = strtol((वर्ण *)fg, &ptr, 10);
+	    जइ (ptr != (वर्ण *)fg)
+		sprintf(fgbuf, "guifg=#%06x", मानम् & 0xFFFFFF);
+	    अण्णहा
 		sprintf(fgbuf, "guifg=%s ctermfg=%s", fg, fg);
 
-	    value = strtol((char *)bg, &ptr, 10);
-	    if (ptr != (char *)bg)
-		sprintf(bgbuf, "guibg=#%06x", value & 0xFFFFFF);
-	    else
+	    मानम् = strtol((वर्ण *)bg, &ptr, 10);
+	    जइ (ptr != (वर्ण *)bg)
+		sprintf(bgbuf, "guibg=#%06x", मानम् & 0xFFFFFF);
+	    अण्णहा
 		sprintf(bgbuf, "guibg=%s ctermbg=%s", bg, bg);
 
 	    coloncmd(":highlight NB_%s %s %s", typeName, (use_fg) ? fgbuf : "",
 		     (use_bg) ? bgbuf : "");
-	    if (*glyphFile == NUL)
+	    जइ (*glyphFile == NUL)
 		// no glyph, line highlighting only
 		coloncmd(":sign define %d linehl=NB_%s", i + 1, typeName);
-	    else if (vim_strsize(glyphFile) <= 2)
+	    अण्णहा जइ (vim_strsize(glyphFile) <= 2)
 		// one- or two-character glyph name, use as text glyph with
 		// texthl
 		coloncmd(":sign define %d text=%s texthl=NB_%s", i + 1,
 							 glyphFile, typeName);
-	    else
+	    अण्णहा
 		// glyph, line highlighting
 		coloncmd(":sign define %d icon=%s linehl=NB_%s", i + 1,
 							 glyphFile, typeName);
 	}
-	else
+	अण्णहा
 	    // glyph, no line highlighting
 	    coloncmd(":sign define %d icon=%s", i + 1, glyphFile);
 
-	if (STRCMP(typeName,"CurrentPC") == 0)
-	    curPCtype = typeNum;
+	जइ (STRCMP(typeName,"CurrentPC") == 0)
+	    curPCtype = type_अङ्कः;
 
-	if (globalsignmapused == globalsignmaplen)
+	जइ (globalsignmapused == globalsignmaplen)
 	{
-	    if (globalsignmaplen == 0) // first allocation
+	    जइ (globalsignmaplen == 0) // first allocation
 	    {
 		globalsignmaplen = 20;
-		globalsignmap = ALLOC_CLEAR_MULT(char *, globalsignmaplen);
+		globalsignmap = ALLOC_CLEAR_MULT(वर्ण *, globalsignmaplen);
 	    }
-	    else    // grow it
+	    अण्णहा    // grow it
 	    {
-		int incr;
-		int oldlen = globalsignmaplen;
-		char **t_globalsignmap = globalsignmap;
+		पूर्णाङ्क incr;
+		पूर्णाङ्क oldlen = globalsignmaplen;
+		वर्ण **t_globalsignmap = globalsignmap;
 
 		globalsignmaplen *= 2;
 		incr = globalsignmaplen - oldlen;
 		globalsignmap = vim_realloc(globalsignmap,
-					   globalsignmaplen * sizeof(char *));
-		if (globalsignmap == NULL)
+					   globalsignmaplen * परिमाण(वर्ण *));
+		जइ (globalsignmap == रिक्त)
 		{
 		    vim_free(t_globalsignmap);
 		    globalsignmaplen = 0;
-		    return;
+		    प्रत्यागम;
 		}
-		vim_memset(globalsignmap + oldlen, 0, incr * sizeof(char *));
+		vim_memset(globalsignmap + oldlen, 0, incr * परिमाण(वर्ण *));
 	    }
 	}
 
-	globalsignmap[i] = (char *)vim_strsave(typeName);
+	globalsignmap[i] = (वर्ण *)vim_strsave(typeName);
 	globalsignmapused = i + 1;
     }
 
     // check local map; should *not* be found!
-    for (j = 0; j < buf->signmapused; j++)
-	if (buf->signmap[j] == i + 1)
-	    return;
+    प्रति (j = 0; j < buf->signmapused; j++)
+	जइ (buf->signmap[j] == i + 1)
+	    प्रत्यागम;
 
     // add to local map
-    if (buf->signmapused == buf->signmaplen)
+    जइ (buf->signmapused == buf->signmaplen)
     {
-	if (buf->signmaplen == 0) // first allocation
+	जइ (buf->signmaplen == 0) // first allocation
 	{
 	    buf->signmaplen = 5;
-	    buf->signmap = ALLOC_CLEAR_MULT(int, buf->signmaplen);
+	    buf->signmap = ALLOC_CLEAR_MULT(पूर्णाङ्क, buf->signmaplen);
 	}
-	else    // grow it
+	अण्णहा    // grow it
 	{
-	    int incr;
-	    int oldlen = buf->signmaplen;
-	    int *t_signmap = buf->signmap;
+	    पूर्णाङ्क incr;
+	    पूर्णाङ्क oldlen = buf->signmaplen;
+	    पूर्णाङ्क *t_signmap = buf->signmap;
 
 	    buf->signmaplen *= 2;
 	    incr = buf->signmaplen - oldlen;
 	    buf->signmap = vim_realloc(buf->signmap,
-					       buf->signmaplen * sizeof(int));
-	    if (buf->signmap == NULL)
+					       buf->signmaplen * परिमाण(पूर्णाङ्क));
+	    जइ (buf->signmap == रिक्त)
 	    {
 		vim_free(t_signmap);
 		buf->signmaplen = 0;
-		return;
+		प्रत्यागम;
 	    }
-	    vim_memset(buf->signmap + oldlen, 0, incr * sizeof(int));
+	    vim_memset(buf->signmap + oldlen, 0, incr * परिमाण(पूर्णाङ्क));
 	}
     }
 
@@ -3359,75 +3359,75 @@ addsigntype(
 /*
  * See if we have the requested sign type in the buffer.
  */
-    static int
-mapsigntype(nbbuf_T *buf, int localsigntype)
+    स्थिर पूर्णाङ्क
+mapsigntype(nbbuf_T *buf, पूर्णाङ्क localsigntype)
 {
-    if (--localsigntype >= 0 && localsigntype < buf->signmapused)
-	return buf->signmap[localsigntype];
+    जइ (--localsigntype >= 0 && localsigntype < buf->signmapused)
+	प्रत्यागम buf->signmap[localsigntype];
 
-    return 0;
+    प्रत्यागम 0;
 }
 
 
 /*
  * Compute length of buffer, don't print anything.
  */
-    static long
+    स्थिर long
 get_buf_size(buf_T *bufp)
 {
     linenr_T	lnum;
-    long	char_count = 0;
-    int		eol_size;
+    long	char_गणनम् = 0;
+    पूर्णाङ्क		eol_size;
     long	last_check = 100000L;
 
-    if (bufp->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    जइ (bufp->b_ml.ml_flags & ML_EMPTY)
+	प्रत्यागम 0;
 
-    if (get_fileformat(bufp) == EOL_DOS)
+    जइ (get_fileformat(bufp) == EOL_DOS)
 	eol_size = 2;
-    else
+    अण्णहा
 	eol_size = 1;
-    for (lnum = 1; lnum <= bufp->b_ml.ml_line_count; ++lnum)
+    प्रति (lnum = 1; lnum <= bufp->b_ml.ml_पङ्क्तिः_गणनम्; ++lnum)
     {
-	char_count += ml_get_buf_len(bufp, lnum) + eol_size;
+	char_गणनम् += ml_get_buf_len(bufp, lnum) + eol_size;
 	// Check for a CTRL-C every 100000 characters
-	if (char_count > last_check)
+	जइ (char_गणनम् > last_check)
 	{
 	    ui_breakcheck();
-	    if (got_int)
-		return char_count;
-	    last_check = char_count + 100000L;
+	    जइ (got_int)
+		प्रत्यागम char_गणनम्;
+	    last_check = char_गणनम् + 100000L;
 	}
     }
     // Correction for when last line doesn't have an EOL.
-    if (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
-	char_count -= eol_size;
+    जइ (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
+	char_गणनम् -= eol_size;
 
-    return char_count;
+    प्रत्यागम char_गणनम्;
 }
 
 /*
  * Convert character offset to lnum,col
  */
-    static pos_T *
+    स्थिर pos_T *
 off2pos(buf_T *buf, long offset)
 {
     linenr_T	 lnum;
-    static pos_T pos;
+    स्थिर pos_T pos;
 
     pos.lnum = 0;
     pos.col = 0;
     pos.coladd = 0;
 
-    if (!(buf->b_ml.ml_flags & ML_EMPTY))
+    जइ (!(buf->b_ml.ml_flags & ML_EMPTY))
     {
-	if ((lnum = ml_find_line_or_offset(buf, (linenr_T)0, &offset)) < 0)
-	    return NULL;
+	जइ ((lnum = ml_find_पङ्क्तिः_or_offset(buf, (linenr_T)0, &offset)) < 0)
+	    प्रत्यागम रिक्त;
 	pos.lnum = lnum;
 	pos.col = offset;
     }
 
-    return &pos;
+    प्रत्यागम &pos;
 }
 
 /*
@@ -3437,41 +3437,41 @@ off2pos(buf_T *buf, long offset)
  * "argp" is advanced to after the argument.
  * Return a pointer to the position, NULL if something is wrong.
  */
-    static pos_T *
+    स्थिर pos_T *
 get_off_or_lnum(buf_T *buf, char_u **argp)
 {
-    static pos_T	mypos;
+    स्थिर pos_T	mypos;
     long		off;
 
-    off = strtol((char *)*argp, (char **)argp, 10);
-    if (**argp == '/')
+    off = strtol((वर्ण *)*argp, (वर्ण **)argp, 10);
+    जइ (**argp == '/')
     {
 	mypos.lnum = (linenr_T)off;
 	++*argp;
-	mypos.col = strtol((char *)*argp, (char **)argp, 10);
+	mypos.col = strtol((वर्ण *)*argp, (वर्ण **)argp, 10);
 	mypos.coladd = 0;
-	return &mypos;
+	प्रत्यागम &mypos;
     }
-    return off2pos(buf, off);
+    प्रत्यागम off2pos(buf, off);
 }
 
 
 /*
  * Convert (lnum,col) to byte offset in the file.
  */
-    static long
+    स्थिर long
 pos2off(buf_T *buf, pos_T *pos)
 {
     long	 offset = 0;
 
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    जइ (buf->b_ml.ml_flags & ML_EMPTY)
+	प्रत्यागम 0;
 
-    if ((offset = ml_find_line_or_offset(buf, pos->lnum, 0)) < 0)
-	return 0;
+    जइ ((offset = ml_find_पङ्क्तिः_or_offset(buf, pos->lnum, 0)) < 0)
+	प्रत्यागम 0;
     offset += pos->col;
 
-    return offset;
+    प्रत्यागम offset;
 }
 
 
@@ -3480,34 +3480,34 @@ pos2off(buf_T *buf, pos_T *pos)
  * similar to the message readfile() uses, but since NetBeans
  * doesn't normally call readfile, we do our own.
  */
-    static void
-print_read_msg(nbbuf_T *buf)
+    स्थिर शून्य
+print_read_सन्देशः(nbbuf_T *buf)
 {
-    int	    lnum = buf->bufp->b_ml.ml_line_count;
+    पूर्णाङ्क	    lnum = buf->bufp->b_ml.ml_पङ्क्तिः_गणनम्;
     off_T   nchars = buf->bufp->b_orig_size;
     char_u  c;
 
-    msg_add_fname(buf->bufp, buf->bufp->b_ffname);
+    सन्देशः_add_fname(buf->bufp, buf->bufp->b_ffname);
     c = FALSE;
 
-    if (buf->bufp->b_p_ro)
+    जइ (buf->bufp->b_p_ro)
     {
 	STRCAT(IObuff, shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 	c = TRUE;
     }
-    if (!buf->bufp->b_start_eol)
+    जइ (!buf->bufp->b_start_eol)
     {
 	STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]")
 					       : _("[Incomplete last line]"));
 	c = TRUE;
     }
-    msg_add_lines(c, (long)lnum, nchars);
+    सन्देशः_add_पङ्क्तयः(c, (long)lnum, nchars);
 
     // Now display it
-    VIM_CLEAR(keep_msg);
-    msg_scrolled_ign = TRUE;
-    msg_trunc_attr((char *)IObuff, FALSE, 0);
-    msg_scrolled_ign = FALSE;
+    VIM_CLEAR(keep_सन्देशः);
+    सन्देशः_scrolled_ign = TRUE;
+    सन्देशः_trunc_attr((वर्ण *)IObuff, FALSE, 0);
+    सन्देशः_scrolled_ign = FALSE;
 }
 
 
@@ -3516,25 +3516,25 @@ print_read_msg(nbbuf_T *buf)
  * identical to the standard message a non-netbeans user would see when
  * writing a file.
  */
-    static void
-print_save_msg(nbbuf_T *buf, off_T nchars)
+    स्थिर शून्य
+print_save_सन्देशः(nbbuf_T *buf, off_T nchars)
 {
     char_u	c;
     char_u	*p;
 
-    if (nchars >= 0)
+    जइ (nchars >= 0)
     {
 	// put fname in IObuff with quotes
-	msg_add_fname(buf->bufp, buf->bufp->b_ffname);
+	सन्देशः_add_fname(buf->bufp, buf->bufp->b_ffname);
 	c = FALSE;
 
-	msg_add_lines(c, buf->bufp->b_ml.ml_line_count,
+	सन्देशः_add_पङ्क्तयः(c, buf->bufp->b_ml.ml_पङ्क्तिः_गणनम्,
 						buf->bufp->b_orig_size);
 
-	VIM_CLEAR(keep_msg);
-	msg_scrolled_ign = TRUE;
-	p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
-	if ((msg_scrolled && !need_wait_return) || !buf->initDone)
+	VIM_CLEAR(keep_सन्देशः);
+	सन्देशः_scrolled_ign = TRUE;
+	p = (char_u *)सन्देशः_trunc_attr((वर्ण *)IObuff, FALSE, 0);
+	जइ ((सन्देशः_scrolled && !need_wait_return) || !buf->initDone)
 	{
 	    // Need to repeat the message after redrawing when:
 	    // - When reading from stdin (the screen will be cleared next).
@@ -3542,14 +3542,14 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg(p, 0);
+	    set_keep_सन्देशः(p, 0);
 	}
-	msg_scrolled_ign = FALSE;
+	सन्देशः_scrolled_ign = FALSE;
 	// add_to_input_buf((char_u *)"\f", 1);
     }
-    else
+    अण्णहा
     {
-	char msgbuf[IOSIZE];
+	वर्ण msgbuf[IOSIZE];
 
 	vim_snprintf(msgbuf, IOSIZE,
 		       _(e_is_read_only_add_bang_to_override), IObuff);

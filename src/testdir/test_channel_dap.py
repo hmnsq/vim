@@ -2,52 +2,52 @@
 
 # Used by Test_channel_dap_mode in test_channel.vim to test DAP functionality.
 
-import json
-import socket
-import threading
-import time
+आनयन json
+आनयन socket
+आनयन threading
+आनयन time
 
-try:
-    import socketserver
-except ImportError:
-    import SocketServer as socketserver
+यत्न:
+    आनयन socketserver
+अपवाद ImportError:
+    आनयन SocketServer इव socketserver
 
 def make_dap_message(obj):
     payload = json.dumps(obj).encode("utf-8")
     header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    प्रत्यागम header + payload
 
 
 def parse_messages(buffer):
     messages = []
 
-    while True:
+    जाव सच्च:
         hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+        जइ hdr_end == -1:
+            भङ्ग
 
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        प्रति पङ्क्तिः अन्तः header.split("\r\n"):
+            जइ पङ्क्तिः.lower().startswith("content-length:"):
+                content_length = पूर्णाङ्क(पङ्क्तिः.split(":")[1].strip())
 
-        if content_length is None:
-            break
+        जइ content_length is None:
+            भङ्ग
 
         total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        जइ len(buffer) < total_len:
+            भङ्ग  # partial
 
         body = buffer[hdr_end + 4:total_len]
         messages.append(json.loads(body.decode("utf-8")))
         buffer = buffer[total_len:]
 
-    return messages, buffer
+    प्रत्यागम messages, buffer
 
 
-class DAPHandler(socketserver.BaseRequestHandler):
+वर्ग DAPHandler(socketserver.BaseRequestHandler):
 
     def setup(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -58,58 +58,58 @@ class DAPHandler(socketserver.BaseRequestHandler):
         self.seq += 1
         self.request.sendall(make_dap_message(obj))
 
-    def send_response(self, request, body=None, success=True):
+    def send_response(self, request, body=None, success=सच्च):
         self.send({
             "type": "response",
             "request_seq": request["seq"],
             "success": success,
             "command": request["command"],
-            "body": body or {}
+            "body": body वा {}
         })
 
     def send_event(self, event, body=None):
         self.send({
             "type": "event",
             "event": event,
-            "body": body or {}
+            "body": body वा {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    def handle_request(self, सन्देशः):
+        cmd = सन्देशः.get("command")
 
-        if cmd == "initialize":
-            self.send_response(msg, {
-                "supportsConfigurationDoneRequest": True
+        जइ cmd == "initialize":
+            self.send_response(सन्देशः, {
+                "supportsConfigurationDoneRequest": सच्च
             })
             self.send_event("initialized")
-        else:
-            self.send_response(msg)
+        अण्णहा:
+            self.send_response(सन्देशः)
 
-        return True
+        प्रत्यागम सच्च
 
     def handle(self):
         buffer = b""
 
-        while True:
+        जाव सच्च:
             data = self.request.recv(4096)
-            if not data:
-                break
+            जइ ण data:
+                भङ्ग
 
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            प्रति सन्देशः अन्तः messages:
+                जइ सन्देशः.get("type") == "request":
+                    जइ ण self.handle_request(सन्देशः):
+                        प्रत्यागम
 
 
-class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
+वर्ग ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    allow_reuse_address = सच्च
 
 def write_port_to_file(port, filename="Xportnr"):
-    with open(filename, "w") as f:
-        f.write(str(port))
+    with open(filename, "w") इव f:
+        f.लिख(str(port))
 
 def main():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
@@ -120,16 +120,16 @@ def main():
     # Write port so client/test can read it
     write_port_to_file(assigned_port)
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
+    thread = threading.तन्तु(target=server.serve_forever)
+    thread.daemon = सच्च
     thread.start()
 
-    try:
-        while thread.is_alive():
+    यत्न:
+        जाव thread.is_alive():
             thread.join(1)
-    except KeyboardInterrupt:
+    अपवाद KeyboardInterrupt:
         server.shutdown()
 
-if __name__ == "__main__":
+जइ __name__ == "__main__":
     main()
 

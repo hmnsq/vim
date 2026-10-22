@@ -10,71 +10,71 @@
 /*
  * popupmenu.c: Popup menu (PUM)
  */
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-static pumitem_T *pum_array = NULL;	// items of displayed pum
-static int pum_size;			// nr of items in "pum_array"
-static int pum_selected;		// index of selected item or -1
-static int pum_first = 0;		// index of top item
+स्थिर pumitem_T *pum_array = रिक्त;	// items of displayed pum
+स्थिर पूर्णाङ्क pum_size;			// nr of items in "pum_array"
+स्थिर पूर्णाङ्क pum_selected;		// index of selected item or -1
+स्थिर पूर्णाङ्क pum_first = 0;		// index of top item
 
-static int call_update_screen = FALSE;
-static int pum_in_cmdline = FALSE;
+स्थिर पूर्णाङ्क call_update_screen = FALSE;
+स्थिर पूर्णाङ्क pum_in_cmdline = FALSE;
 
-static int pum_height;			// nr of displayed pum items
-static int pum_width;			// width of displayed pum items
-static int pum_base_width;		// width of pum items base
-static int pum_kind_width;		// width of pum items kind column
-static int pum_extra_width;		// width of extra stuff
-static int pum_scrollbar;		// TRUE when scrollbar present
+स्थिर पूर्णाङ्क pum_height;			// nr of displayed pum items
+स्थिर पूर्णाङ्क pum_width;			// width of displayed pum items
+स्थिर पूर्णाङ्क pum_base_width;		// width of pum items base
+स्थिर पूर्णाङ्क pum_kind_width;		// width of pum items kind column
+स्थिर पूर्णाङ्क pum_extra_width;		// width of extra stuff
+स्थिर पूर्णाङ्क pum_scrollbar;		// TRUE when scrollbar present
 #ifdef FEAT_RIGHTLEFT
-static int pum_rl;			// TRUE when pum is drawn 'rightleft'
+स्थिर पूर्णाङ्क pum_rl;			// TRUE when pum is drawn 'rightleft'
 #endif
 
-static int pum_row;			// top row of pum
-static int pum_col;			// left column of pum
+स्थिर पूर्णाङ्क pum_row;			// top row of pum
+स्थिर पूर्णाङ्क pum_col;			// left column of pum
 
-static win_T *pum_window = NULL;
-static int pum_win_row;
-static int pum_win_height;
-static int pum_win_col;
-static int pum_win_wcol;
-static int pum_win_width;
+स्थिर win_T *pum_window = रिक्त;
+स्थिर पूर्णाङ्क pum_win_row;
+स्थिर पूर्णाङ्क pum_win_height;
+स्थिर पूर्णाङ्क pum_win_col;
+स्थिर पूर्णाङ्क pum_win_wcol;
+स्थिर पूर्णाङ्क pum_win_width;
 
 // Some parts are not updated when a popup menu is visible.  Setting this flag
 // makes pum_visible() return FALSE even when there is a popup menu.
-static int pum_pretend_not_visible = FALSE;
+स्थिर पूर्णाङ्क pum_pretend_not_visible = FALSE;
 
 // Border support
-static int pum_border = 0;
-static int pum_margin = 0;	// margin of 1 cell on left and right
-static int pum_shadow = 0;
+स्थिर पूर्णाङ्क pum_border = 0;
+स्थिर पूर्णाङ्क pum_margin = 0;	// margin of 1 cell on left and right
+स्थिर पूर्णाङ्क pum_shadow = 0;
 
 #ifdef FEAT_IMAGE_POPUP
-static image_placement_T *pum_imagep = NULL;
+स्थिर image_placement_T *pum_imagep = रिक्त;
 #endif
 
 // Border characters
-static struct {
-    int top;
-    int right;
-    int bottom;
-    int left;
-    int top_left;
-    int top_right;
-    int bottom_right;
-    int bottom_left;
+स्थिर संरचना {
+    पूर्णाङ्क शिखरम्;
+    पूर्णाङ्क दक्षिणः;
+    पूर्णाङ्क bottom;
+    पूर्णाङ्क वामः;
+    पूर्णाङ्क शिखरम्_वामः;
+    पूर्णाङ्क शिखरम्_दक्षिणः;
+    पूर्णाङ्क bottom_दक्षिणः;
+    पूर्णाङ्क bottom_वामः;
 } pum_border_chars;
 
-static int pum_set_selected(int n, int repeat);
-static void pum_draw_border(void);
-static void pum_draw_shadow(void);
-static void compute_margins(int *right_margin, int *left_margin, int *left_padding);
+स्थिर पूर्णाङ्क pum_set_selected(पूर्णाङ्क n, पूर्णाङ्क repeat);
+स्थिर शून्य pum_draw_border(शून्य);
+स्थिर शून्य pum_draw_shadow(शून्य);
+स्थिर शून्य compute_margins(पूर्णाङ्क *दक्षिणः_margin, पूर्णाङ्क *वामः_margin, पूर्णाङ्क *वामः_padding);
 
 #define PUM_DEF_HEIGHT 10
 
 #define DEFINE_PUM_SETTER(feature) \
-	void \
-    pum_set_##feature(int enable) \
+	शून्य \
+    pum_set_##feature(पूर्णाङ्क enable) \
     { \
 	pum_##feature = enable ? 1 : 0; \
     }
@@ -83,33 +83,33 @@ DEFINE_PUM_SETTER(border)
 DEFINE_PUM_SETTER(shadow)
 DEFINE_PUM_SETTER(margin)
 
-    static void
-pum_compute_size(void)
+    स्थिर शून्य
+pum_compute_size(शून्य)
 {
-    int	w;
+    पूर्णाङ्क	w;
 
     // Compute the width of the widest match and the widest extra.
     pum_base_width = 0;
     pum_kind_width = 0;
     pum_extra_width = 0;
-    for (int i = 0; i < pum_size; ++i)
+    प्रति (पूर्णाङ्क i = 0; i < pum_size; ++i)
     {
-	if (pum_array[i].pum_text != NULL)
+	जइ (pum_array[i].pum_text != रिक्त)
 	{
 	    w = vim_strsize(pum_array[i].pum_text);
-	    if (pum_base_width < w)
+	    जइ (pum_base_width < w)
 		pum_base_width = w;
 	}
-	if (pum_array[i].pum_kind != NULL)
+	जइ (pum_array[i].pum_kind != रिक्त)
 	{
 	    w = vim_strsize(pum_array[i].pum_kind) + 1;
-	    if (pum_kind_width < w)
+	    जइ (pum_kind_width < w)
 		pum_kind_width = w;
 	}
-	if (pum_array[i].pum_extra != NULL)
+	जइ (pum_array[i].pum_extra != रिक्त)
 	{
 	    w = vim_strsize(pum_array[i].pum_extra) + 1;
-	    if (pum_extra_width < w)
+	    जइ (pum_extra_width < w)
 		pum_extra_width = w;
 	}
     }
@@ -119,74 +119,74 @@ pum_compute_size(void)
  * Calculate vertical placement for popup menu.
  * Sets pum_row and pum_height based on available space.
  */
-    static void
+    स्थिर शून्य
 pum_compute_vertical_placement(
-	int size,
-	int above_row,
-	int below_row)
+	पूर्णाङ्क size,
+	पूर्णाङ्क above_row,
+	पूर्णाङ्क below_row)
 {
-    int context_lines;
-    int cline_visible_offset;
-    int extra_height = 2 * pum_border + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
+    पूर्णाङ्क context_पङ्क्तयः;
+    पूर्णाङ्क cline_visible_offset;
+    पूर्णाङ्क extra_height = 2 * pum_border + pum_shadow;
+    पूर्णाङ्क extra_offset = pum_border + pum_shadow;
 
     pum_height = MIN(size, PUM_DEF_HEIGHT);
-    if (p_ph > 0 && pum_height > p_ph)
+    जइ (p_ph > 0 && pum_height > p_ph)
 	pum_height = p_ph;
 
     // Put the pum below "pum_win_row" if possible.  If there are few lines
     // decide on where there is more room.
-    if (pum_win_row + 2 >= below_row - pum_height - extra_height
+    जइ (pum_win_row + 2 >= below_row - pum_height - extra_height
 	    && pum_win_row - above_row > (below_row - above_row) / 2)
     {
 	// pum above "pum_win_row"
-	if (State & MODE_CMDLINE)
+	जइ (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_पङ्क्तयः = 0;
+	अण्णहा
 	    // Leave two lines of context if possible
-	    context_lines = MIN(2, curwin->w_wrow - curwin->w_cline_row);
+	    context_पङ्क्तयः = MIN(2, curwin->w_wrow - curwin->w_cline_row);
 
-	if (pum_win_row >= size + context_lines + extra_height)
+	जइ (pum_win_row >= size + context_पङ्क्तयः + extra_height)
 	{
-	    pum_row = pum_win_row - size - context_lines - extra_offset;
+	    pum_row = pum_win_row - size - context_पङ्क्तयः - extra_offset;
 	    pum_height = size;
 	}
-	else
+	अण्णहा
 	{
 	    pum_row = pum_border;
-	    pum_height = pum_win_row - context_lines - extra_height;
+	    pum_height = pum_win_row - context_पङ्क्तयः - extra_height;
 	}
-	if (p_ph > 0 && pum_height > p_ph)
+	जइ (p_ph > 0 && pum_height > p_ph)
 	{
 	    pum_row += pum_height - p_ph;
 	    pum_height = p_ph;
 	}
     }
-    else
+    अण्णहा
     {
 	// pum below "pum_win_row"
-	if (State & MODE_CMDLINE)
+	जइ (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_पङ्क्तयः = 0;
+	अण्णहा
 	{
 	    // Leave three lines of context if possible
 	    validate_cheight();
 	    cline_visible_offset = curwin->w_cline_row +
 		curwin->w_cline_height - curwin->w_wrow;
-	    context_lines = MIN(3, cline_visible_offset);
+	    context_पङ्क्तयः = MIN(3, cline_visible_offset);
 	}
 
-	pum_row = pum_win_row + context_lines + pum_border;
+	pum_row = pum_win_row + context_पङ्क्तयः + pum_border;
 	pum_height = MIN(below_row - pum_row - extra_offset, size);
-	if (p_ph > 0 && pum_height > p_ph)
+	जइ (p_ph > 0 && pum_height > p_ph)
 	    pum_height = p_ph;
     }
 
-#if defined(FEAT_QUICKFIX)
+#जइ defined(FEAT_QUICKFIX)
     // If there is a preview window above avoid drawing over it.
-    if (above_row > 0 && pum_row < above_row && pum_height > above_row)
+    जइ (above_row > 0 && pum_row < above_row && pum_height > above_row)
     {
 	pum_row = above_row;
 	pum_height = pum_win_row - above_row;
@@ -198,48 +198,48 @@ pum_compute_vertical_placement(
  * Try to set 'pum_width' so that it fits within available_width.
  * Returns TRUE if pum_width was successfully set, FALSE otherwise.
  */
-    static int
-set_pum_width_aligned_with_cursor(int width, int available_width)
+    स्थिर पूर्णाङ्क
+set_pum_width_aligned_with_cursor(पूर्णाङ्क width, पूर्णाङ्क available_width)
 {
-    int end_padding = TRUE;
+    पूर्णाङ्क end_padding = TRUE;
 
-    if (width < p_pw)
+    जइ (width < p_pw)
     {
 	width = p_pw;
 	end_padding = FALSE;
     }
-    if (p_pmw > 0 && width >= p_pmw)
+    जइ (p_pmw > 0 && width >= p_pmw)
     {
 	width = p_pmw;
 	end_padding = FALSE;
     }
 
     pum_width = width + (end_padding && width >= p_pw ? 1 : 0);
-    return available_width >= pum_width;
+    प्रत्यागम available_width >= pum_width;
 }
 
 /*
  * Calculate horizontal placement for popup menu. Sets pum_col and pum_width
  * based on cursor position and available space.
  */
-    static void
-pum_compute_horizontal_placement(int cursor_col)
+    स्थिर शून्य
+pum_compute_horizontal_placement(पूर्णाङ्क cursor_col)
 {
-    int desired_width = pum_base_width + pum_kind_width + pum_extra_width;
-    int available_width;
-    int col_offset;
-    int trailing_overhead = pum_scrollbar + pum_border
+    पूर्णाङ्क desired_width = pum_base_width + pum_kind_width + pum_extra_width;
+    पूर्णाङ्क available_width;
+    पूर्णाङ्क col_offset;
+    पूर्णाङ्क trailing_overhead = pum_scrollbar + pum_border
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
 	col_offset = pum_border && (cursor_col >= Columns - 2)
 	    ? (3 - Columns + cursor_col) : 0;
 	available_width = cursor_col + 1;
 	pum_col = cursor_col - col_offset;
     }
-    else
+    अण्णहा
 #endif
     {
 	col_offset = pum_border && (cursor_col <= 1) ? (2 - cursor_col) : 0;
@@ -250,35 +250,35 @@ pum_compute_horizontal_placement(int cursor_col)
     available_width -= trailing_overhead + col_offset;
 
     // Case 1: Align pum with "cursor_col"
-    if (set_pum_width_aligned_with_cursor(desired_width, available_width))
-	return;
+    जइ (set_pum_width_aligned_with_cursor(desired_width, available_width))
+	प्रत्यागम;
     // Show the pum truncated, provided it is at least as wide as 'pum_width'
-    if (available_width > p_pw)
+    जइ (available_width > p_pw)
     {
 	pum_width = available_width;
-	return;
+	प्रत्यागम;
     }
 
     // Case 2: Truncated pum is no longer aligned with "cursor_col"
     available_width = Columns - trailing_overhead - col_offset;
 
-    if (available_width > p_pw)
+    जइ (available_width > p_pw)
     {
 	pum_width = p_pw;  // Truncate beyond 'pum_width'
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    pum_col = pum_width + trailing_overhead;
-	else
+	अण्णहा
 #endif
 	    pum_col = Columns - pum_width - trailing_overhead;
-	return;
+	प्रत्यागम;
     }
 
     // Case 3: Not enough room anywhere, use what we have
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
 	pum_col = Columns - 1 - col_offset;
-    else
+    अण्णहा
 #endif
 	pum_col = col_offset;
     pum_width = Columns - trailing_overhead;
@@ -290,20 +290,20 @@ pum_compute_horizontal_placement(int cursor_col)
  * When possible the leftmost character is aligned with cursor column.
  * The menu appears above the screen line "row" or at "row" + "height" - 1.
  */
-    void
+    शून्य
 pum_display(
 	pumitem_T   *array,
-	int	    size,
-	int	    selected,   // index of initially selected item, -1 if
+	पूर्णाङ्क	    size,
+	पूर्णाङ्क	    selected,   // index of initially selected item, -1 if
 				// out of range
-	int	    pum_wcol)   // screen column to align the menu to, or -1
+	पूर्णाङ्क	    pum_wcol)   // screen column to align the menu to, or -1
 				// to use the cursor column
 {
-    int	    cursor_col;
-    int	    above_row;
-    int	    below_row;
-    int	    redo_count = 0;
-#if defined(FEAT_QUICKFIX)
+    पूर्णाङ्क	    cursor_col;
+    पूर्णाङ्क	    above_row;
+    पूर्णाङ्क	    below_row;
+    पूर्णाङ्क	    redo_गणनम् = 0;
+#जइ defined(FEAT_QUICKFIX)
     win_T   *pvwin;
 #endif
 
@@ -311,7 +311,7 @@ pum_display(
     pum_rl = (State & MODE_CMDLINE) == 0 && curwin->w_p_rl;
 #endif
 
-    do
+    करेहि
     {
 	above_row = 0;
 	below_row = cmdline_row;
@@ -320,30 +320,30 @@ pum_display(
 	// when 'cuc' is on.
 	pum_array = (pumitem_T *)1;
 	validate_cursor_col();
-	pum_array = NULL;
+	pum_array = रिक्त;
 
 	// Remember the essential parts of the window position and size, so we
 	// can decide when to reposition the popup menu.
 	pum_window = curwin;
-	if (State & MODE_CMDLINE)
+	जइ (State & MODE_CMDLINE)
 	    // cmdline completion popup menu
 	    pum_win_row = cmdline_row;
-	else
+	अण्णहा
 	    pum_win_row = curwin->w_wrow + W_WINROW(curwin);
 	pum_win_height = curwin->w_height;
 	pum_win_col = curwin->w_wincol;
 	pum_win_wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	pum_win_width = curwin->w_width;
 
-#if defined(FEAT_QUICKFIX)
+#जइ defined(FEAT_QUICKFIX)
 	FOR_ALL_WINDOWS(pvwin)
-	    if (pvwin->w_p_pvw)
-		break;
-	if (pvwin != NULL)
+	    जइ (pvwin->w_p_pvw)
+		भङ्ग;
+	जइ (pvwin != रिक्त)
 	{
-	    if (W_WINROW(pvwin) < W_WINROW(curwin))
+	    जइ (W_WINROW(pvwin) < W_WINROW(curwin))
 		above_row = W_WINROW(pvwin) + pvwin->w_height;
-	    else if (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
+	    अण्णहा जइ (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
 		below_row = W_WINROW(pvwin);
 	}
 #endif
@@ -352,40 +352,40 @@ pum_display(
 	pum_compute_vertical_placement(size, above_row, below_row);
 
 	// don't display when we only have room for one line
-	if (pum_height < 1 || (pum_height == 1 && size > 1))
-	    return;
+	जइ (pum_height < 1 || (pum_height == 1 && size > 1))
+	    प्रत्यागम;
 
 	pum_array = array;
 	pum_size = size;
 	pum_compute_size();
 
 	// Calculate cursor column
-	if (State & MODE_CMDLINE)
+	जइ (State & MODE_CMDLINE)
 	    // cmdline completion popup menu
 	    cursor_col = cmdline_compl_startcol();
-	else
+	अण्णहा
 	{
-	    int wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
+	    पूर्णाङ्क wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	    // w_wcol includes virtual text "above".
-	    if (curwin->w_width > 0)
+	    जइ (curwin->w_width > 0)
 		wcol %= curwin->w_width;
-	    else
+	    अण्णहा
 		wcol = 0;
 #ifdef FEAT_CONCEAL
 	    // w_wcol does not account for text concealed before the cursor;
 	    // shift by the offset win_line() recorded for the cursor line so the
 	    // menu lines up with the visible text.
-	    if (curwin->w_p_cole > 0 && conceal_cursor_line(curwin))
+	    जइ (curwin->w_p_cole > 0 && conceal_cursor_पङ्क्तिः(curwin))
 	    {
 		wcol -= curwin->w_wcol_conceal_off;
-		if (wcol < 0)
+		जइ (wcol < 0)
 		    wcol = 0;
 	    }
 #endif
 #ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    जइ (pum_rl)
 		cursor_col = curwin->w_wincol + curwin->w_width - wcol - 1;
-	    else
+	    अण्णहा
 #endif
 		cursor_col = curwin->w_wincol + wcol;
 	}
@@ -399,7 +399,7 @@ pum_display(
 	// Set selected item and redraw.  If the window size changed need to
 	// redo the positioning.  Limit this to two times, when there is not
 	// much room the window size will keep changing.
-    } while (pum_set_selected(selected, redo_count) && ++redo_count <= 2);
+    } जाव (pum_set_selected(selected, redo_गणनम्) && ++redo_गणनम् <= 2);
 
     pum_redraw();
 }
@@ -408,8 +408,8 @@ pum_display(
  * Set a flag that when pum_redraw() is called it first calls update_screen().
  * This will avoid clearing and redrawing the popup menu, prevent flicker.
  */
-    void
-pum_call_update_screen(void)
+    शून्य
+pum_call_update_screen(शून्य)
 {
     call_update_screen = TRUE;
 
@@ -424,122 +424,122 @@ pum_call_update_screen(void)
  * Return TRUE if we are going to redraw the popup menu and the screen position
  * "row"/"col" is under the popup menu.
  */
-    int
-pum_under_menu(int row, int col, int only_redrawing)
+    पूर्णाङ्क
+pum_under_menu(पूर्णाङ्क row, पूर्णाङ्क col, पूर्णाङ्क only_redrawing)
 {
-    int	extra_left = pum_border + (pum_margin && pum_border ? 1 : 0);
-    int	extra_right = pum_border + (pum_margin && pum_border ? 1 : 0)
+    पूर्णाङ्क	extra_वामः = pum_border + (pum_margin && pum_border ? 1 : 0);
+    पूर्णाङ्क	extra_दक्षिणः = pum_border + (pum_margin && pum_border ? 1 : 0)
 						+ (pum_shadow ? 2 : 0);
-    int	extra_above = pum_border;
-    int	extra_below = pum_border + (pum_shadow ? 1 : 0);
-    int	top = pum_row - extra_above;
-    int	bot = pum_row + pum_height + extra_below;
-    int	left = pum_col - 1 - extra_left;
-    int	right = pum_col + pum_width + pum_scrollbar + extra_right;
+    पूर्णाङ्क	extra_above = pum_border;
+    पूर्णाङ्क	extra_below = pum_border + (pum_shadow ? 1 : 0);
+    पूर्णाङ्क	शिखरम् = pum_row - extra_above;
+    पूर्णाङ्क	bot = pum_row + pum_height + extra_below;
+    पूर्णाङ्क	वामः = pum_col - 1 - extra_वामः;
+    पूर्णाङ्क	दक्षिणः = pum_col + pum_width + pum_scrollbar + extra_दक्षिणः;
 
-    if (!((!only_redrawing || pum_will_redraw)
-	    && row >= top && row < bot && col >= left && col < right))
-	return FALSE;
+    जइ (!((!only_redrawing || pum_will_redraw)
+	    && row >= शिखरम् && row < bot && col >= वामः && col < दक्षिणः))
+	प्रत्यागम FALSE;
 
-    if (pum_shadow)
+    जइ (pum_shadow)
     {
 	// The shadow recolors the cells underneath.  When the menu will be
 	// redrawn, leave the shadow cells unprotected so the window refreshes
 	// them first, clearing stale content left by a larger menu.
-	if (only_redrawing)
+	जइ (only_redrawing)
 	{
-	    if (col >= right - 2 || row == bot - 1)
-		return FALSE;
+	    जइ (col >= दक्षिणः - 2 || row == bot - 1)
+		प्रत्यागम FALSE;
 	}
-	else
+	अण्णहा
 	{
 	    // Menu stays as-is: exclude only the corner cells the shadow never
 	    // draws.
-	    int	    right_margin, left_margin, left_padding;
+	    पूर्णाङ्क	    दक्षिणः_margin, वामः_margin, वामः_padding;
 
-	    compute_margins(&right_margin, &left_margin, &left_padding);
-	    if (row == top && col >= right - 2)
-		return FALSE;
-	    if (row == bot - 1 && col < pum_col + 2 - left_padding - pum_border
-		    - left_margin)
-		return FALSE;
+	    compute_margins(&दक्षिणः_margin, &वामः_margin, &वामः_padding);
+	    जइ (row == शिखरम् && col >= दक्षिणः - 2)
+		प्रत्यागम FALSE;
+	    जइ (row == bot - 1 && col < pum_col + 2 - वामः_padding - pum_border
+		    - वामः_margin)
+		प्रत्यागम FALSE;
 	}
     }
-    return TRUE;
+    प्रत्यागम TRUE;
 }
 
 /*
  * Computes attributes of text on the popup menu.
  * Returns attributes for every cell, or NULL if all attributes are the same.
  */
-    static int *
-pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
+    स्थिर पूर्णाङ्क *
+pum_compute_text_attrs(char_u *text, hlf_T hlf, पूर्णाङ्क user_hlattr)
 {
-    int		i;
+    पूर्णाङ्क		i;
     size_t	leader_len;
-    int		char_cells;
-    int		new_attr;
+    पूर्णाङ्क		char_cells;
+    पूर्णाङ्क		new_attr;
     char_u	*ptr = text;
-    int		cell_idx = 0;
-    garray_T	*ga = NULL;
-    int		*attrs = NULL;
-    char_u	*leader = NULL;
-    int		in_fuzzy;
-    int		matched_len = -1;
+    पूर्णाङ्क		cell_idx = 0;
+    garray_T	*ga = रिक्त;
+    पूर्णाङ्क		*attrs = रिक्त;
+    char_u	*leader = रिक्त;
+    पूर्णाङ्क		in_fuzzy;
+    पूर्णाङ्क		matched_len = -1;
     int_u	char_pos = 0;
-    int		is_select = FALSE;
+    पूर्णाङ्क		is_select = FALSE;
 
-    if (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
+    जइ (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
 	    || (highlight_attr[HLF_PMSI] == highlight_attr[HLF_PSI]
 		&& highlight_attr[HLF_PMNI] == highlight_attr[HLF_PNI]))
-	return NULL;
+	प्रत्यागम रिक्त;
 
     is_select = hlf == HLF_PSI;
     leader = (State & MODE_CMDLINE) ? cmdline_compl_pattern()
 							  : ins_compl_leader();
-    if (leader == NULL || *leader == NUL)
-	return NULL;
+    जइ (leader == रिक्त || *leader == NUL)
+	प्रत्यागम रिक्त;
 
-    attrs = ALLOC_MULT(int, vim_strsize(text));
-    if (attrs == NULL)
-	return NULL;
+    attrs = ALLOC_MULT(पूर्णाङ्क, vim_strsize(text));
+    जइ (attrs == रिक्त)
+	प्रत्यागम रिक्त;
 
     in_fuzzy = (State & MODE_CMDLINE) ? cmdline_compl_is_fuzzy()
 					  : (get_cot_flags() & COT_FUZZY) != 0;
     leader_len = STRLEN(leader);
 
-    if (in_fuzzy)
+    जइ (in_fuzzy)
     {
 	ga = fuzzy_match_str_with_pos(text, leader);
-	if (!ga)
+	जइ (!ga)
 	{
 	    vim_free(attrs);
-	    return NULL;
+	    प्रत्यागम रिक्त;
 	}
     }
 
-    while (*ptr != NUL)
+    जाव (*ptr != NUL)
     {
 	new_attr = highlight_attr[hlf];
 
-	if (ga != NULL)
+	जइ (ga != रिक्त)
 	{
 	    // Handle fuzzy matching
-	    for (i = 0; i < ga->ga_len; i++)
+	    प्रति (i = 0; i < ga->ga_len; i++)
 	    {
-		if (char_pos == ((int_u *)ga->ga_data)[i])
+		जइ (char_pos == ((int_u *)ga->ga_data)[i])
 		{
 		    new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		    new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
-		    break;
+		    भङ्ग;
 		}
 	    }
 	}
-	else
+	अण्णहा
 	{
-	    if (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
-		matched_len = (int)leader_len;
-	    if (matched_len > 0)
+	    जइ (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
+		matched_len = (पूर्णाङ्क)leader_len;
+	    जइ (matched_len > 0)
 	    {
 		new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
@@ -548,11 +548,11 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	}
 
 	new_attr = hl_combine_attr(highlight_attr[HLF_PNI], new_attr);
-	if (user_hlattr > 0)
+	जइ (user_hlattr > 0)
 	    new_attr = hl_combine_attr(new_attr, user_hlattr);
 
 	char_cells = mb_ptr2cells(ptr);
-	for (i = 0; i < char_cells; i++)
+	प्रति (i = 0; i < char_cells; i++)
 	    attrs[cell_idx + i] = new_attr;
 	cell_idx += char_cells;
 
@@ -560,39 +560,39 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	char_pos++;
     }
 
-    if (ga != NULL)
+    जइ (ga != रिक्त)
     {
 	ga_clear(ga);
 	vim_free(ga);
     }
-    return attrs;
+    प्रत्यागम attrs;
 }
 
 /*
  * Displays text on the popup menu with specific attributes.
  */
-    static void
+    स्थिर शून्य
 pum_screen_puts_with_attrs(
-    int		row,
-    int		col,
-    int		cells UNUSED,
+    पूर्णाङ्क		row,
+    पूर्णाङ्क		col,
+    पूर्णाङ्क		cells UNUSED,
     char_u	*text,
-    int		textlen,
-    int		*attrs)
+    पूर्णाङ्क		textlen,
+    पूर्णाङ्क		*attrs)
 {
-    int		col_start = col;
+    पूर्णाङ्क		col_start = col;
     char_u	*ptr = text;
-    int		char_len;
-    int		attr;
+    पूर्णाङ्क		char_len;
+    पूर्णाङ्क		attr;
 
     // Render text with proper attributes
-    while (*ptr != NUL && ptr < text + textlen)
+    जाव (*ptr != NUL && ptr < text + textlen)
     {
 	char_len = mb_ptr2len(ptr);
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    attr = attrs[col_start + cells - col - 1];
-	else
+	अण्णहा
 #endif
 	    attr = attrs[col - col_start];
 	screen_puts_len(ptr, char_len, row, col, attr);
@@ -601,27 +601,27 @@ pum_screen_puts_with_attrs(
     }
 }
 
-    static inline char_u *
-pum_get_item(int index, int type)
+    स्थिर अन्तःस्थ char_u *
+pum_get_item(पूर्णाङ्क index, पूर्णाङ्क type)
 {
-    switch(type)
+    विकल्प(type)
     {
-	case CPT_ABBR: return pum_array[index].pum_text;
-	case CPT_KIND: return pum_array[index].pum_kind;
-	case CPT_MENU: return pum_array[index].pum_extra;
+	पक्ष CPT_ABBR: प्रत्यागम pum_array[index].pum_text;
+	पक्ष CPT_KIND: प्रत्यागम pum_array[index].pum_kind;
+	पक्ष CPT_MENU: प्रत्यागम pum_array[index].pum_extra;
     }
-    return NULL;
+    प्रत्यागम रिक्त;
 }
 
-    static inline int
-pum_user_attr_combine(int idx, int type, int attr)
+    स्थिर अन्तःस्थ पूर्णाङ्क
+pum_user_attr_combine(पूर्णाङ्क idx, पूर्णाङ्क type, पूर्णाङ्क attr)
 {
-    int user_attr[] = {
+    पूर्णाङ्क user_attr[] = {
 	pum_array[idx].pum_user_abbr_hlattr,
 	pum_array[idx].pum_user_kind_hlattr,
     };
 
-    return user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
+    प्रत्यागम user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
 }
 
 #ifdef FEAT_RIGHTLEFT
@@ -629,37 +629,37 @@ pum_user_attr_combine(int idx, int type, int attr)
  * Display RTL text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
+    स्थिर पूर्णाङ्क
 pum_display_rtl_text(
-	int	row,
-	int     col,
+	पूर्णाङ्क	row,
+	पूर्णाङ्क     col,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	पूर्णाङ्क     attr,
+	पूर्णाङ्क     *attrs,
+	पूर्णाङ्क     width,
+	पूर्णाङ्क     width_limit,
+	पूर्णाङ्क     totwidth,
+	पूर्णाङ्क     next_isempty,
+	पूर्णाङ्क	selected)
 {
-    char_u  *rt = NULL;
-    int     cells = 0;
-    int     over_cell = 0;
-    int     truncated = FALSE;
-    int     pad = next_isempty ? 0 : 2;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    truncrl = curwin->w_fill_chars.truncrl != NUL
+    char_u  *rt = रिक्त;
+    पूर्णाङ्क     cells = 0;
+    पूर्णाङ्क     over_cell = 0;
+    पूर्णाङ्क     truncated = FALSE;
+    पूर्णाङ्क     pad = next_isempty ? 0 : 2;
+    पूर्णाङ्क     remaining = 0;
+    पूर्णाङ्क	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    पूर्णाङ्क	    truncrl = curwin->w_fill_chars.truncrl != NUL
 					? curwin->w_fill_chars.truncrl : '<';
 
-    if (st == NULL)
-	return col;
+    जइ (st == रिक्त)
+	प्रत्यागम col;
 
     rt = reverse_text(st);
-    if (rt == NULL)
+    जइ (rt == रिक्त)
     {
 	VIM_CLEAR(st);
-	return col;
+	प्रत्यागम col;
     }
 
     char_u *rt_start = rt;
@@ -667,15 +667,15 @@ pum_display_rtl_text(
     truncated = width_limit - totwidth < cells + pad;
 
     // only draw the text that fits
-    if (cells > width_limit)
+    जइ (cells > width_limit)
     {
-	do
+	करेहि
 	{
 	    cells -= has_mbyte ? (*mb_ptr2cells)(rt) : 1;
 	    MB_PTR_ADV(rt);
-	} while (cells > width_limit);
+	} जाव (cells > width_limit);
 
-	if (cells < width_limit)
+	जइ (cells < width_limit)
 	{
 	    // Most left character requires 2-cells
 	    // but only 1 cell is available on screen.
@@ -685,23 +685,23 @@ pum_display_rtl_text(
 	}
     }
 
-    if (truncated)
+    जइ (truncated)
     {
 	char_u  *orig_rt = rt;
-	int     size = 0;
+	पूर्णाङ्क     size = 0;
 
 	remaining = width_limit - totwidth - 1;
 	cells = mb_string2cells(rt, -1);
-	if (cells > remaining)
+	जइ (cells > remaining)
 	{
-	    while (cells > remaining)
+	    जाव (cells > remaining)
 	    {
 		MB_PTR_ADV(orig_rt);
 		cells -= has_mbyte ? (*mb_ptr2cells)(orig_rt) : 1;
 	    }
 	}
-	size = (int)STRLEN(orig_rt);
-	if (cells < remaining)
+	size = (पूर्णाङ्क)STRLEN(orig_rt);
+	जइ (cells < remaining)
 	    over_cell = remaining - cells;
 
 	cells = mb_string2cells(orig_rt, size);
@@ -710,20 +710,20 @@ pum_display_rtl_text(
 
 	screen_putchar(truncrl, row, col - width + 1, trunc_attr);
 
-	if (over_cell > 0)
+	जइ (over_cell > 0)
 	    screen_fill(row, row + 1, col - width + 2,
 		    col - width + 2 + over_cell, ' ', ' ', attr);
     }
 
-    if (attrs == NULL)
-	screen_puts_len(rt, (int)STRLEN(rt), row, col - cells + 1, attr);
-    else
+    जइ (attrs == रिक्त)
+	screen_puts_len(rt, (पूर्णाङ्क)STRLEN(rt), row, col - cells + 1, attr);
+    अण्णहा
 	pum_screen_puts_with_attrs(row, col - cells + 1, cells, rt,
-		(int)STRLEN(rt), attrs);
+		(पूर्णाङ्क)STRLEN(rt), attrs);
 
     vim_free(rt_start);
     VIM_CLEAR(st);
-    return col - width;
+    प्रत्यागम col - width;
 }
 #endif
 
@@ -731,58 +731,58 @@ pum_display_rtl_text(
  * Display LTR text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
+    स्थिर पूर्णाङ्क
 pum_display_ltr_text(
-	int     row,
-	int     col,
+	पूर्णाङ्क     row,
+	पूर्णाङ्क     col,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,        // width already calculated in outer loop
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	पूर्णाङ्क     attr,
+	पूर्णाङ्क     *attrs,
+	पूर्णाङ्क     width,        // width already calculated in outer loop
+	पूर्णाङ्क     width_limit,
+	पूर्णाङ्क     totwidth,
+	पूर्णाङ्क     next_isempty,
+	पूर्णाङ्क	selected)
 {
-    int     size = 0;
-    int     cells = 0;
-    char_u  *st_end = NULL;
-    int     over_cell = 0;
-    int     pad = next_isempty ? 0 : 2;
-    int     truncated = FALSE;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    trunc = curwin->w_fill_chars.trunc != NUL
+    पूर्णाङ्क     size = 0;
+    पूर्णाङ्क     cells = 0;
+    char_u  *st_end = रिक्त;
+    पूर्णाङ्क     over_cell = 0;
+    पूर्णाङ्क     pad = next_isempty ? 0 : 2;
+    पूर्णाङ्क     truncated = FALSE;
+    पूर्णाङ्क     remaining = 0;
+    पूर्णाङ्क	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    पूर्णाङ्क	    trunc = curwin->w_fill_chars.trunc != NUL
 					    ? curwin->w_fill_chars.trunc : '>';
 
-    if (st == NULL)
-	return col;
+    जइ (st == रिक्त)
+	प्रत्यागम col;
 
-    size = (int)STRLEN(st);
+    size = (पूर्णाङ्क)STRLEN(st);
     cells = (*mb_string2cells)(st, size);
     truncated = width_limit - totwidth < cells + pad;
 
     // only draw the text that fits
-    while (size > 0 && col + cells > width_limit + pum_col)
+    जाव (size > 0 && col + cells > width_limit + pum_col)
     {
 	--size;
-	if (has_mbyte)
+	जइ (has_mbyte)
 	{
 	    size -= (*mb_head_off)(st, st + size);
 	    cells -= (*mb_ptr2cells)(st + size);
 	}
-	else
+	अण्णहा
 	    --cells;
     }
 
     // truncated
-    if (truncated)
+    जइ (truncated)
     {
 	remaining = width_limit - totwidth - 1;
-	if (cells > remaining)
+	जइ (cells > remaining)
 	{
 	    st_end = st + size;
-	    while (st_end > st && cells > remaining)
+	    जाव (st_end > st && cells > remaining)
 	    {
 		MB_PTR_BACK(st, st_end);
 		cells -= has_mbyte ? (*mb_ptr2cells)(st_end) : 1;
@@ -790,20 +790,20 @@ pum_display_ltr_text(
 	    size = st_end - st;
 	}
 
-	if (cells < remaining)
+	जइ (cells < remaining)
 	    over_cell = remaining - cells;
 	cells = mb_string2cells(st, size);
 	width = cells + over_cell + 1;
     }
 
-    if (attrs == NULL)
+    जइ (attrs == रिक्त)
 	screen_puts_len(st, size, row, col, attr);
-    else
+    अण्णहा
 	pum_screen_puts_with_attrs(row, col, cells, st, size, attrs);
 
-    if (truncated)
+    जइ (truncated)
     {
-	if (over_cell > 0)
+	जइ (over_cell > 0)
 	    screen_fill(row, row + 1, col + cells,
 		    col + cells + over_cell, ' ', ' ', attr);
 
@@ -811,7 +811,7 @@ pum_display_ltr_text(
     }
 
     VIM_CLEAR(st);
-    return col + width;
+    प्रत्यागम col + width;
 }
 
 
@@ -819,133 +819,133 @@ pum_display_ltr_text(
  * Process and display a single popup menu item (text/kind/extra).
  * Returns the new column position after drawing.
  */
-    static int
+    स्थिर पूर्णाङ्क
 pum_process_item(
-	int     row,
-	int     col,
-	int     idx,
-	int     j,         // Current position in order array
-	int     *order,    // Order array
+	पूर्णाङ्क     row,
+	पूर्णाङ्क     col,
+	पूर्णाङ्क     idx,
+	पूर्णाङ्क     j,         // Current position in order array
+	पूर्णाङ्क     *order,    // Order array
 	hlf_T   hlf,
-	int     attr,
-	int     *totwidth_ptr,
-	int     next_isempty)
+	पूर्णाङ्क     attr,
+	पूर्णाङ्क     *totwidth_ptr,
+	पूर्णाङ्क     next_isempty)
 {
-    int     item_type = order[j];
-    char_u  *s = NULL;
+    पूर्णाङ्क     item_type = order[j];
+    char_u  *s = रिक्त;
     char_u  *p = pum_get_item(idx, item_type);
-    int     width = 0;  // item width
-    int     w;		// char width
-    int	    selected = idx == pum_selected;
+    पूर्णाङ्क     width = 0;  // item width
+    पूर्णाङ्क     w;		// char width
+    पूर्णाङ्क	    selected = idx == pum_selected;
 
-    for ( ; ; MB_PTR_ADV(p))
+    प्रति ( ; ; MB_PTR_ADV(p))
     {
-	if (s == NULL)
+	जइ (s == रिक्त)
 	    s = p;
 	w = ptr2cells(p);
-	if (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
+	जइ (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
 	{
 	    width += w;
-	    continue;
+	    अनुवर्त;
 	}
 
 	// Display the text that fits or comes before a Tab.
 	// First convert it to printable characters.
 	char_u  *st;
-	int     *attrs = NULL;
-	int     saved = *p;
+	पूर्णाङ्क     *attrs = रिक्त;
+	पूर्णाङ्क     saved = *p;
 
-	if (saved != NUL)
+	जइ (saved != NUL)
 	    *p = NUL;
 	st = transstr(s);
-	if (saved != NUL)
+	जइ (saved != NUL)
 	    *p = saved;
 
-	if (item_type == CPT_ABBR)
+	जइ (item_type == CPT_ABBR)
 	    attrs = pum_compute_text_attrs(st, hlf,
 		      pum_array[idx].pum_user_abbr_hlattr);
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    col = pum_display_rtl_text(row, col, st, attr, attrs,
 		    width, pum_width, *totwidth_ptr, next_isempty, selected);
-	else
+	अण्णहा
 #endif
 	    col = pum_display_ltr_text(row, col, st, attr, attrs,
 		    width, pum_width, *totwidth_ptr, next_isempty, selected);
 
-	if (attrs != NULL)
+	जइ (attrs != रिक्त)
 	    VIM_CLEAR(attrs);
 
-	if (*p != TAB)
-	    break;
+	जइ (*p != TAB)
+	    भङ्ग;
 
 	// Display two spaces for a Tab.
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	{
 	    screen_puts_len((char_u *)"  ", 2, row, col - 1, attr);
 	    col -= 2;
 	}
-	else
+	अण्णहा
 #endif
 	{
 	    screen_puts_len((char_u *)"  ", 2, row, col, attr);
 	    col += 2;
 	}
 	*totwidth_ptr += 2;
-	s = NULL;  // start text at next char
+	s = रिक्त;  // start text at next char
 	width = 0;
     }
 
-    return col;
+    प्रत्यागम col;
 }
 
 /*
  * Draw the scrollbar for the popup menu.
  */
-    static void
+    स्थिर शून्य
 pum_draw_scrollbar(
-	int	row,
-	int	i,
-	int	thumb_pos,
-	int	thumb_height)
+	पूर्णाङ्क	row,
+	पूर्णाङ्क	i,
+	पूर्णाङ्क	thumb_pos,
+	पूर्णाङ्क	thumb_height)
 {
-    if (pum_scrollbar <= 0)
-	return;
+    जइ (pum_scrollbar <= 0)
+	प्रत्यागम;
 
-    int attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
+    पूर्णाङ्क attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
 			highlight_attr[HLF_PST] : highlight_attr[HLF_PSB];
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
 	screen_putchar(' ', row, pum_col - pum_width, attr);
-    else
+    अण्णहा
 #endif
 	screen_putchar(' ', row, pum_col + pum_width, attr);
 }
 
-    static inline void
-pum_align_order(int *order)
+    स्थिर अन्तःस्थ शून्य
+pum_align_order(पूर्णाङ्क *order)
 {
-    int is_default = cia_flags == 0;
+    पूर्णाङ्क is_default = cia_flags == 0;
     order[0] = is_default ? CPT_ABBR : cia_flags / 100;
     order[1] = is_default ? CPT_KIND : (cia_flags / 10) % 10;
     order[2] = is_default ? CPT_MENU : cia_flags % 10;
 }
 
-static void pum_free_bg(void);
+स्थिर शून्य pum_free_bg(शून्य);
 
 /*
  * Called when the pum opacity value has changed.
  * Invalidates cached background and triggers redraw if pum is visible.
  */
-    void
-pum_opacity_changed(void)
+    शून्य
+pum_opacity_changed(शून्य)
 {
     // Invalidate cached background so it gets re-saved.
     pum_free_bg();
 
-    if (pum_visible())
+    जइ (pum_visible())
     {
 	// Force full screen clear so ScreenAttrs doesn't retain
 	// stale blended values from the previous pumopacity.
@@ -955,16 +955,16 @@ pum_opacity_changed(void)
     }
 }
 
-    static void
-pum_free_bg(void)
+    स्थिर शून्य
+pum_free_bg(शून्य)
 {
-    int k;
+    पूर्णाङ्क k;
     VIM_CLEAR(pum_bg_attrs);
-    VIM_CLEAR(pum_bg_lines);
-    VIM_CLEAR(pum_bg_linesUC);
-    for (k = 0; k < MAX_MCO; ++k)
-	VIM_CLEAR(pum_bg_linesC[k]);
-    pum_bg_top = 0;
+    VIM_CLEAR(pum_bg_पङ्क्तयः);
+    VIM_CLEAR(pum_bg_पङ्क्तयः_UC);
+    प्रति (k = 0; k < MAX_MCO; ++k)
+	VIM_CLEAR(pum_bg_पङ्क्तयः_C[k]);
+    pum_bg_शिखरम् = 0;
     pum_bg_bot = 0;
     pum_bg_cols = 0;
 }
@@ -972,35 +972,35 @@ pum_free_bg(void)
 /*
  * Redraw the popup menu, using "pum_first" and "pum_selected".
  */
-    void
-pum_redraw(void)
+    शून्य
+pum_redraw(शून्य)
 {
-    int		row = pum_row;
-    int		col;
+    पूर्णाङ्क		row = pum_row;
+    पूर्णाङ्क		col;
     hlf_T	*hlfs; // array used for highlights
     hlf_T	hlf;
-    int		attr;
-    int		i, j;
-    int		idx;
-    char_u	*p = NULL;
-    int		totwidth;
-    int		thumb_pos = 0;
-    int		thumb_height = 1;
-    int		item_type;
-    int		order[3];
-    int		next_isempty = FALSE;
-    int		n;
-    int		items_width_array[3] = { pum_base_width, pum_kind_width,
+    पूर्णाङ्क		attr;
+    पूर्णाङ्क		i, j;
+    पूर्णाङ्क		idx;
+    char_u	*p = रिक्त;
+    पूर्णाङ्क		totwidth;
+    पूर्णाङ्क		thumb_pos = 0;
+    पूर्णाङ्क		thumb_height = 1;
+    पूर्णाङ्क		item_type;
+    पूर्णाङ्क		order[3];
+    पूर्णाङ्क		next_isempty = FALSE;
+    पूर्णाङ्क		n;
+    पूर्णाङ्क		वस्तूनि_width_array[3] = { pum_base_width, pum_kind_width,
 							    pum_extra_width };
-    int		basic_width;  // first item width
-    int		last_isabbr = FALSE;
-    int		orig_attr = -1;
-    int		scroll_range = pum_size - pum_height;
+    पूर्णाङ्क		basic_width;  // first item width
+    पूर्णाङ्क		last_isabbr = FALSE;
+    पूर्णाङ्क		orig_attr = -1;
+    पूर्णाङ्क		scroll_range = pum_size - pum_height;
     bool	override_success;
-    int		opacity_active = (p_po > 0 && p_po < 100);
+    पूर्णाङ्क		opacity_active = (p_po > 0 && p_po < 100);
 
     // Use current window for highlight overrides when using 'winhighlight'
-    override_success = push_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
+    override_success = प्रक्षिप_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
 
     // Batch the underlying screen update and the pum drawing into a single
     // synchronized output frame to avoid flicker.
@@ -1008,11 +1008,11 @@ pum_redraw(void)
 
 #ifdef FEAT_IMAGE_POPUP
     // Create a image placement so that other images are clipped correctly
-    if (pum_imagep == NULL)
+    जइ (pum_imagep == रिक्त)
 	// Make pom always be on top of any image placement with same zindex.
-	pum_imagep = image_placement_new(NULL, UINT_MAX,
+	pum_imagep = image_placement_new(रिक्त, UINT_MAX,
 		IMAGE_PLACEMENT_USE_PUM, true);
-    if (pum_imagep != NULL)
+    जइ (pum_imagep != रिक्त)
     {
 	image_placement_set_zindex(pum_imagep, POPUPMENU_ZINDEX);
 	image_placement_set_position(pum_imagep, pum_row, pum_col);
@@ -1034,17 +1034,17 @@ pum_redraw(void)
     hlfsNorm[2] = HLF_PNX;
     hlfsSel[2] = HLF_PSX;
 
-    if (call_update_screen)
+    जइ (call_update_screen)
     {
 	call_update_screen = FALSE;
 	// Invalidate cached background if screen size changed (e.g.
 	// after window resize).
-	if (opacity_active && pum_bg_lines != NULL
+	जइ (opacity_active && pum_bg_पङ्क्तयः != रिक्त
 		&& (pum_bg_cols != screen_Columns
 		    || pum_bg_bot > screen_Rows))
 	    pum_free_bg();
 
-	if (opacity_active && pum_bg_lines != NULL)
+	जइ (opacity_active && pum_bg_पङ्क्तयः != रिक्त)
 	{
 	    // Already have saved background; skip update_screen to avoid
 	    // flickering.  Just do a normal pum_will_redraw update.
@@ -1052,7 +1052,7 @@ pum_redraw(void)
 	    update_screen(0);
 	    pum_will_redraw = FALSE;
 	}
-	else if (opacity_active)
+	अण्णहा जइ (opacity_active)
 	{
 	    // For opacity: draw background including the area under the
 	    // pum, then save it.
@@ -1061,66 +1061,66 @@ pum_redraw(void)
 	    pum_pretend_not_visible = FALSE;
 
 	    // Save background to static buffers.
-	    if (ScreenLines != NULL && ScreenAttrs != NULL)
+	    जइ (Screen_पङ्क्तयः != रिक्त && ScreenAttrs != रिक्त)
 	    {
-		int	save_top, save_bot, save_ncells, k;
+		पूर्णाङ्क	save_शिखरम्, save_bot, save_ncells, k;
 
 		pum_free_bg();
-		save_top = pum_row - pum_border;
+		save_शिखरम् = pum_row - pum_border;
 		save_bot = pum_row + pum_height + pum_border
 					    + (pum_shadow ? 1 : 0) + 1;
-		if (save_top < 0)
-		    save_top = 0;
-		if (save_bot > screen_Rows)
+		जइ (save_शिखरम् < 0)
+		    save_शिखरम् = 0;
+		जइ (save_bot > screen_Rows)
 		    save_bot = screen_Rows;
-		pum_bg_top = save_top;
+		pum_bg_शिखरम् = save_शिखरम्;
 		pum_bg_bot = save_bot;
 		pum_bg_cols = screen_Columns;
-		if (save_top < save_bot)
+		जइ (save_शिखरम् < save_bot)
 		{
-		    save_ncells = (save_bot - save_top) * screen_Columns;
+		    save_ncells = (save_bot - save_शिखरम्) * screen_Columns;
 		    pum_bg_attrs = LALLOC_MULT(sattr_T, save_ncells);
-		    pum_bg_lines = LALLOC_MULT(schar_T, save_ncells);
-		    if (enc_utf8)
+		    pum_bg_पङ्क्तयः = LALLOC_MULT(schar_T, save_ncells);
+		    जइ (enc_utf8)
 		    {
-			pum_bg_linesUC = LALLOC_MULT(u8char_T, save_ncells);
-			for (k = 0; k < MAX_MCO; ++k)
-			    pum_bg_linesC[k] = LALLOC_MULT(u8char_T,
+			pum_bg_पङ्क्तयः_UC = LALLOC_MULT(u8char_T, save_ncells);
+			प्रति (k = 0; k < MAX_MCO; ++k)
+			    pum_bg_पङ्क्तयः_C[k] = LALLOC_MULT(u8char_T,
 							    save_ncells);
 		    }
-		    if (pum_bg_attrs != NULL && pum_bg_lines != NULL)
+		    जइ (pum_bg_attrs != रिक्त && pum_bg_पङ्क्तयः != रिक्त)
 		    {
-			for (int r = save_top; r < save_bot; ++r)
+			प्रति (पूर्णाङ्क r = save_शिखरम्; r < save_bot; ++r)
 			{
-			    int soff = (r - save_top) * screen_Columns;
-			    int loff = LineOffset[r];
+			    पूर्णाङ्क soff = (r - save_शिखरम्) * screen_Columns;
+			    पूर्णाङ्क loff = पङ्क्तिः_Offset[r];
 
 			    mch_memmove(pum_bg_attrs + soff,
 				    ScreenAttrs + loff,
-				    screen_Columns * sizeof(sattr_T));
-			    mch_memmove(pum_bg_lines + soff,
-				    ScreenLines + loff,
-				    screen_Columns * sizeof(schar_T));
-			    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+				    screen_Columns * परिमाण(sattr_T));
+			    mch_memmove(pum_bg_पङ्क्तयः + soff,
+				    Screen_पङ्क्तयः + loff,
+				    screen_Columns * परिमाण(schar_T));
+			    जइ (enc_utf8 && pum_bg_पङ्क्तयः_UC != रिक्त
+						&& Screen_पङ्क्तयः_UC != रिक्त)
 			    {
-				mch_memmove(pum_bg_linesUC + soff,
-					ScreenLinesUC + loff,
-					screen_Columns * sizeof(u8char_T));
-				for (k = 0; k < MAX_MCO; ++k)
-				    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-					mch_memmove(pum_bg_linesC[k] + soff,
-						ScreenLinesC[k] + loff,
+				mch_memmove(pum_bg_पङ्क्तयः_UC + soff,
+					Screen_पङ्क्तयः_UC + loff,
+					screen_Columns * परिमाण(u8char_T));
+				प्रति (k = 0; k < MAX_MCO; ++k)
+				    जइ (pum_bg_पङ्क्तयः_C[k] != रिक्त
+						    && Screen_पङ्क्तयः_C[k] != रिक्त)
+					mch_memmove(pum_bg_पङ्क्तयः_C[k] + soff,
+						Screen_पङ्क्तयः_C[k] + loff,
 						screen_Columns
-						    * sizeof(u8char_T));
+						    * परिमाण(u8char_T));
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	else
+	अण्णहा
 	{
 	    // Do not redraw in pum_may_redraw() and don't draw in the area
 	    // where the popup menu will be.
@@ -1133,10 +1133,10 @@ pum_redraw(void)
     // never display more than we have
     pum_first = MIN(pum_first, scroll_range);
 
-    if (pum_scrollbar)
+    जइ (pum_scrollbar)
     {
 	thumb_height = pum_height * pum_height / pum_size;
-	if (thumb_height == 0)
+	जइ (thumb_height == 0)
 	    thumb_height = 1;
 	thumb_pos = (pum_first * (pum_height - thumb_height)
 			    + scroll_range / 2) / scroll_range;
@@ -1150,17 +1150,17 @@ pum_redraw(void)
 
     // Draw border and shadow first if enabled, before setting blend
     // so that border/shadow characters are drawn without opacity.
-    if (pum_border)
+    जइ (pum_border)
 	pum_draw_border();
-    if (pum_shadow)
+    जइ (pum_shadow)
 	pum_draw_shadow();
 
     // Set blend for screen_puts_len / screen_fill to use.
     // Only the pum content area should be blended, not border/shadow.
-    if (opacity_active)
-	screen_pum_blend = 100 - (int)p_po;
+    जइ (opacity_active)
+	screen_pum_blend = 100 - (पूर्णाङ्क)p_po;
 
-    for (i = 0; i < pum_height; ++i)
+    प्रति (i = 0; i < pum_height; ++i)
     {
 	idx = i + pum_first;
 	hlfs = (idx == pum_selected) ? hlfsSel : hlfsNorm;
@@ -1169,15 +1169,15 @@ pum_redraw(void)
 
 	// prepend a space if there is room
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	{
-	    if (pum_col < curwin->w_wincol + curwin->w_width - 1
+	    जइ (pum_col < curwin->w_wincol + curwin->w_width - 1
 							    - pum_border)
 		screen_putchar(' ', row, pum_col + 1, attr);
 	}
-	else
+	अण्णहा
 #endif
-	    if (pum_col > pum_border)
+	    जइ (pum_col > pum_border)
 		screen_putchar(' ', row, pum_col - 1, attr);
 
 	// Display each entry, use two spaces for a Tab.
@@ -1185,47 +1185,47 @@ pum_redraw(void)
 	col = pum_col;
 	totwidth = 0;
 	pum_align_order(order);
-	basic_width = items_width_array[order[0]];
+	basic_width = वस्तूनि_width_array[order[0]];
 	last_isabbr = order[2] == CPT_ABBR;
-	for (j = 0; j < 3; ++j)
+	प्रति (j = 0; j < 3; ++j)
 	{
 	    item_type = order[j];
 	    hlf = hlfs[item_type];
 	    attr = highlight_attr[hlf];
 	    orig_attr = attr;
-	    if (item_type < 2)  // try combine attr with user custom
+	    जइ (item_type < 2)  // try combine attr with user custom
 		attr = pum_user_attr_combine(idx, item_type, attr);
 	    p = pum_get_item(idx, item_type);
 
-	    if (j + 1 < 3)
-		next_isempty = pum_get_item(idx, order[j + 1]) == NULL;
-	    else
+	    जइ (j + 1 < 3)
+		next_isempty = pum_get_item(idx, order[j + 1]) == रिक्त;
+	    अण्णहा
 		next_isempty = TRUE;
 
-	    if (p != NULL)
+	    जइ (p != रिक्त)
 		// Process and display the item
 		col = pum_process_item(row, col, idx, j, order, hlf, attr,
 						    &totwidth, next_isempty);
 
-	    if (j > 0)
-		n = items_width_array[order[1]] + (last_isabbr ? 0 : 1);
-	    else
+	    जइ (j > 0)
+		n = वस्तूनि_width_array[order[1]] + (last_isabbr ? 0 : 1);
+	    अण्णहा
 		n = order[j] == CPT_ABBR ? 1 : 0;
 
 	    // Stop when there is nothing more to display.
-	    if (j == 2
+	    जइ (j == 2
 		    || (next_isempty && (j == 1 || (j == 0
-				&& pum_get_item(idx, order[j + 2]) == NULL)))
+				&& pum_get_item(idx, order[j + 2]) == रिक्त)))
 		    || basic_width + n >= pum_width)
-		break;
+		भङ्ग;
 #ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    जइ (pum_rl)
 	    {
 		screen_fill(row, row + 1, pum_col - basic_width - n + 1,
 						col + 1, ' ', ' ', orig_attr);
 		col = pum_col - basic_width - n;
 	    }
-	    else
+	    अण्णहा
 #endif
 	    {
 		screen_fill(row, row + 1, col, pum_col + basic_width + n,
@@ -1236,10 +1236,10 @@ pum_redraw(void)
 	}
 
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    screen_fill(row, row + 1, pum_col - pum_width + 1, col + 1,
 							    ' ', ' ', orig_attr);
-	else
+	अण्णहा
 #endif
 	    screen_fill(row, row + 1, col, pum_col + pum_width, ' ', ' ',
 								orig_attr);
@@ -1254,73 +1254,73 @@ pum_redraw(void)
     screen_zindex = 0;
 #endif
 
-    if (override_success)
-	pop_highlight_overrides();
+    जइ (override_success)
+	निष्कासय_highlight_overrides();
 
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#जइ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * Position the info popup relative to the popup menu item.
  */
-    void
+    शून्य
 pum_position_info_popup(win_T *wp)
 {
-    int col = pum_col + pum_width + pum_scrollbar + 1;
-    int row = pum_row;
-    int botpos = POPPOS_BOTLEFT;
-    int	used_maxwidth_opt = FALSE;
-    int	right_margin, left_margin, dummy;
-    int left_extra_width, right_extra_width;
+    पूर्णाङ्क col = pum_col + pum_width + pum_scrollbar + 1;
+    पूर्णाङ्क row = pum_row;
+    पूर्णाङ्क botpos = POPPOS_BOTLEFT;
+    पूर्णाङ्क	used_maxwidth_opt = FALSE;
+    पूर्णाङ्क	दक्षिणः_margin, वामः_margin, dummy;
+    पूर्णाङ्क वामः_extra_width, दक्षिणः_extra_width;
 
-    (void)compute_margins(&right_margin, &left_margin, &dummy);
+    (शून्य)compute_margins(&दक्षिणः_margin, &वामः_margin, &dummy);
 
-    left_extra_width = pum_border + left_margin;
-    right_extra_width = pum_border + right_margin + (pum_shadow ? 2 : 0);
-    col += right_extra_width;
+    वामः_extra_width = pum_border + वामः_margin;
+    दक्षिणः_extra_width = pum_border + दक्षिणः_margin + (pum_shadow ? 2 : 0);
+    col += दक्षिणः_extra_width;
 
     wp->w_popup_pos = POPPOS_TOPLEFT;
-    if (Columns - col < 20 && Columns - col < pum_col)
+    जइ (Columns - col < 20 && Columns - col < pum_col)
     {
-	col = pum_col - 1 - left_extra_width;
+	col = pum_col - 1 - वामः_extra_width;
 	wp->w_popup_pos = POPPOS_TOPRIGHT;
 	botpos = POPPOS_BOTRIGHT;
-	wp->w_maxwidth = pum_col - 1 - left_extra_width;
+	wp->w_maxwidth = pum_col - 1 - वामः_extra_width;
     }
-    else
+    अण्णहा
 	wp->w_maxwidth = Columns - col + 1;
     wp->w_maxwidth -= popup_extra_width(wp);
-    if (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
+    जइ (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
     {
 	// option value overrules computed value
 	wp->w_maxwidth = wp->w_maxwidth_opt;
 	used_maxwidth_opt = TRUE;
     }
 
-    row -= popup_top_extra(wp);
-    if (wp->w_popup_flags & POPF_INFO_MENU)
+    row -= popup_शिखरम्_extra(wp);
+    जइ (wp->w_popup_flags & POPF_INFO_MENU)
     {
-	if (pum_row < pum_win_row)
+	जइ (pum_row < pum_win_row)
 	{
 	    // menu above cursor line, align with bottom
 	    row += pum_height;
 	    wp->w_popup_pos = botpos;
 	}
-	else
+	अण्णहा
 	    // menu below cursor line, align with top
 	    row += 1;
     }
-    else
+    अण्णहा
 	// align with the selected item
 	row += pum_selected - pum_first + 1;
 
     wp->w_popup_flags &= ~POPF_HIDDEN;
-    if (wp->w_maxwidth < 10 && !used_maxwidth_opt)
+    जइ (wp->w_maxwidth < 10 && !used_maxwidth_opt)
 	// The popup is not going to fit or will overlap with the cursor
 	// position, hide the popup.
 	wp->w_popup_flags |= POPF_HIDDEN;
-    else
+    अण्णहा
 	popup_set_wantpos_rowcol(wp, row, col);
 }
 #endif
@@ -1335,63 +1335,63 @@ pum_position_info_popup(win_T *wp)
  * Returns TRUE when the window was resized and the location of the popup menu
  * must be recomputed.
  */
-    static int
-pum_set_selected(int n, int repeat UNUSED)
+    स्थिर पूर्णाङ्क
+pum_set_selected(पूर्णाङ्क n, पूर्णाङ्क repeat UNUSED)
 {
-    int	    resized = FALSE;
-    int	    context = pum_height / 2;
-    int	    scroll_offset;
+    पूर्णाङ्क	    resized = FALSE;
+    पूर्णाङ्क	    context = pum_height / 2;
+    पूर्णाङ्क	    scroll_offset;
 #ifdef FEAT_QUICKFIX
-    int	    prev_selected = pum_selected;
+    पूर्णाङ्क	    prev_selected = pum_selected;
     unsigned	cur_cot_flags = get_cot_flags();
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    int	    has_info = FALSE;
+#जइ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    पूर्णाङ्क	    has_info = FALSE;
 #endif
 
     pum_selected = n;
     scroll_offset = pum_selected - pum_height;
 
-    if (pum_selected >= 0 && pum_selected < pum_size)
+    जइ (pum_selected >= 0 && pum_selected < pum_size)
     {
-	if (pum_first > pum_selected - 4)
+	जइ (pum_first > pum_selected - 4)
 	{
 	    // scroll down; when we did a jump it's probably a PageUp then
 	    // scroll a whole page
-	    if (pum_first > pum_selected - 2)
+	    जइ (pum_first > pum_selected - 2)
 	    {
 		pum_first -= pum_height - 2;
-		if (pum_first < 0)
+		जइ (pum_first < 0)
 		    pum_first = 0;
-		else if (pum_first > pum_selected)
+		अण्णहा जइ (pum_first > pum_selected)
 		    pum_first = pum_selected;
 	    }
-	    else
+	    अण्णहा
 		pum_first = pum_selected;
 	}
-	else if (pum_first < scroll_offset + 5)
+	अण्णहा जइ (pum_first < scroll_offset + 5)
 	{
 	    // scroll up; when we did a jump it's probably a PageDown then
 	    // scroll a whole page
-	    if (pum_first < scroll_offset + 3)
+	    जइ (pum_first < scroll_offset + 3)
 		pum_first = MAX(pum_first + pum_height - 2, scroll_offset + 1);
-	    else
+	    अण्णहा
 		pum_first = scroll_offset + 1;
 	}
 
 	// Give a few lines of context when possible.
 	context = MIN(context, 3);
-	if (pum_height > 2)
+	जइ (pum_height > 2)
 	{
-	    if (pum_first > pum_selected - context)
+	    जइ (pum_first > pum_selected - context)
 		pum_first = MAX(pum_selected - context, 0);  // scroll down
-	    else if (pum_first < pum_selected + context - pum_height + 1)
+	    अण्णहा जइ (pum_first < pum_selected + context - pum_height + 1)
 		pum_first = pum_selected + context - pum_height + 1;  // up
 	}
 	// adjust for the number of lines displayed
 	pum_first = MIN(pum_first, pum_size - pum_height);
 
-#if defined(FEAT_QUICKFIX)
+#जइ defined(FEAT_QUICKFIX)
 	/*
 	 * Show extra info in the preview window if there is something and
 	 * 'completeopt' contains "preview" or "popup" or "popuphidden".
@@ -1400,7 +1400,7 @@ pum_set_selected(int n, int repeat UNUSED)
 	 * Skip this for command-window when 'completeopt' contains "preview".
 	 * NOTE: Be very careful not to sync undo!
 	 */
-	if (pum_array[pum_selected].pum_info != NULL
+	जइ (pum_array[pum_selected].pum_info != रिक्त
 		&& Rows > 10
 		&& repeat <= 1
 		&& (cur_cot_flags & COT_ANY_PREVIEW)
@@ -1410,18 +1410,18 @@ pum_set_selected(int n, int repeat UNUSED)
 	    tabpage_T   *curtab_save = curtab;
 # ifdef FEAT_PROP_POPUP
 	    use_popup_T	use_popup;
-# else
+# अण्णहा
 #  define use_popup USEPOPUP_NONE
 # endif
 # ifdef FEAT_PROP_POPUP
 	    has_info = TRUE;
-	    if (cur_cot_flags & COT_POPUPHIDDEN)
+	    जइ (cur_cot_flags & COT_POPUPHIDDEN)
 		use_popup = USEPOPUP_HIDDEN;
-	    else if (cur_cot_flags & COT_POPUP)
+	    अण्णहा जइ (cur_cot_flags & COT_POPUP)
 		use_popup = USEPOPUP_NORMAL;
-	    else
+	    अण्णहा
 		use_popup = USEPOPUP_NONE;
-	    if (use_popup != USEPOPUP_NONE)
+	    जइ (use_popup != USEPOPUP_NONE)
 		// don't use WinEnter or WinLeave autocommands for the info
 		// popup
 		block_autocmds();
@@ -1429,7 +1429,7 @@ pum_set_selected(int n, int repeat UNUSED)
 	    // Open a preview window and set "curwin" to it.
 	    // 3 lines by default, prefer 'previewheight' if set and smaller.
 	    g_do_tagpreview = 3;
-	    if (p_pvh > 0 && p_pvh < g_do_tagpreview)
+	    जइ (p_pvh > 0 && p_pvh < g_do_tagpreview)
 		g_do_tagpreview = p_pvh;
 	    ++RedrawingDisabled;
 	    // Prevent undo sync here, if an autocommand syncs undo weird
@@ -1437,117 +1437,117 @@ pum_set_selected(int n, int repeat UNUSED)
 	    ++no_u_sync;
 	    resized = prepare_tagpreview(FALSE, FALSE, use_popup);
 	    --no_u_sync;
-	    if (RedrawingDisabled > 0)
+	    जइ (RedrawingDisabled > 0)
 		--RedrawingDisabled;
 	    g_do_tagpreview = 0;
 
-	    if (curwin->w_p_pvw
+	    जइ (curwin->w_p_pvw
 # ifdef FEAT_PROP_POPUP
 		    || (curwin->w_popup_flags & POPF_INFO)
 # endif
 		    )
 	    {
-		int	res = OK;
+		पूर्णाङ्क	res = OK;
 
-		if (!resized
+		जइ (!resized
 			&& curbuf->b_nwindows == 1
-			&& curbuf->b_fname == NULL
+			&& curbuf->b_fname == रिक्त
 			&& bt_nofile(curbuf)
 			&& curbuf->b_p_bh[0] == 'w')
 		{
 		    // Already a "wipeout" buffer, make it empty.
-		    while (!BUFEMPTY())
+		    जाव (!BUFEMPTY())
 			ml_delete((linenr_T)1);
 		}
-		else
+		अण्णहा
 		{
 		    // Don't want to sync undo in the current buffer.
 		    ++no_u_sync;
-		    res = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, 0, NULL);
+		    res = do_ecmd(0, रिक्त, रिक्त, रिक्त, ECMD_ONE, 0, रिक्त);
 		    --no_u_sync;
-		    if (res == OK)
+		    जइ (res == OK)
 		    {
 			// Edit a new, empty buffer. Set options for a "wipeout"
 			// buffer.
-			set_option_value_give_err((char_u *)"swf",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bl",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bt",
+			set_option_मानम्_give_err((char_u *)"swf",
+							  0L, रिक्त, OPT_LOCAL);
+			set_option_मानम्_give_err((char_u *)"bl",
+							  0L, रिक्त, OPT_LOCAL);
+			set_option_मानम्_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bh",
+			set_option_मानम्_give_err((char_u *)"bh",
 					      0L, (char_u *)"wipe", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"diff",
-							  0L, NULL, OPT_LOCAL);
+			set_option_मानम्_give_err((char_u *)"diff",
+							  0L, रिक्त, OPT_LOCAL);
 		    }
 		}
-		if (res == OK)
+		जइ (res == OK)
 		{
 		    char_u	*p, *e;
 		    linenr_T	lnum = 0;
 
-		    for (p = pum_array[pum_selected].pum_info; *p != NUL; )
+		    प्रति (p = pum_array[pum_selected].pum_info; *p != NUL; )
 		    {
 			e = vim_strchr(p, '\n');
-			if (e == NULL)
+			जइ (e == रिक्त)
 			{
 			    ml_append(lnum++, p, 0, FALSE);
-			    break;
+			    भङ्ग;
 			}
 			*e = NUL;
-			ml_append(lnum++, p, (int)(e - p + 1), FALSE);
+			ml_append(lnum++, p, (पूर्णाङ्क)(e - p + 1), FALSE);
 			*e = '\n';
 			p = e + 1;
 		    }
 		    // delete the empty last line
-		    ml_delete(curbuf->b_ml.ml_line_count);
+		    ml_delete(curbuf->b_ml.ml_पङ्क्तिः_गणनम्);
 
 		    // Increase the height of the preview window to show the
 		    // text, but no more than 'previewheight' lines.
-		    if (repeat == 0 && use_popup == USEPOPUP_NONE)
+		    जइ (repeat == 0 && use_popup == USEPOPUP_NONE)
 		    {
 			lnum = MIN(lnum, p_pvh);
-			if (curwin->w_height < lnum)
+			जइ (curwin->w_height < lnum)
 			{
-			    win_setheight((int)lnum);
+			    win_setheight((पूर्णाङ्क)lnum);
 			    resized = TRUE;
 			}
 		    }
 
 		    curbuf->b_changed = 0;
 		    curbuf->b_p_ma = FALSE;
-		    if (pum_selected != prev_selected)
+		    जइ (pum_selected != prev_selected)
 		    {
 # ifdef FEAT_PROP_POPUP
 			curwin->w_firstline = 0;
 # endif
 			curwin->w_topline = 1;
 		    }
-		    else if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-			curwin->w_topline = curbuf->b_ml.ml_line_count;
+		    अण्णहा जइ (curwin->w_topline > curbuf->b_ml.ml_पङ्क्तिः_गणनम्)
+			curwin->w_topline = curbuf->b_ml.ml_पङ्क्तिः_गणनम्;
 		    curwin->w_cursor.lnum = curwin->w_topline;
 		    curwin->w_cursor.col = 0;
 # ifdef FEAT_PROP_POPUP
-		    if (use_popup != USEPOPUP_NONE)
+		    जइ (use_popup != USEPOPUP_NONE)
 		    {
 			pum_position_info_popup(curwin);
-			if (win_valid(curwin_save))
+			जइ (win_valid(curwin_save))
 			    redraw_win_later(curwin_save, UPD_SOME_VALID);
 		    }
 # endif
-		    if ((curwin != curwin_save && win_valid(curwin_save))
+		    जइ ((curwin != curwin_save && win_valid(curwin_save))
 			    || (curtab != curtab_save
 						&& valid_tabpage(curtab_save)))
 		    {
-			int save_redr_status;
+			पूर्णाङ्क save_redr_status;
 
-			if (curtab != curtab_save && valid_tabpage(curtab_save))
+			जइ (curtab != curtab_save && valid_tabpage(curtab_save))
 			    goto_tabpage_tp(curtab_save, FALSE, FALSE);
 
 			// When the first completion is done and the preview
 			// window is not resized, skip the preview window's
 			// status line redrawing.
-			if (ins_compl_active() && !resized)
+			जइ (ins_compl_active() && !resized)
 			    curwin->w_redr_status = false;
 
 			// Return cursor to where we were
@@ -1558,7 +1558,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			// update the view on the buffer.  Only go back to
 			// the window when needed, otherwise it will always be
 			// redrawn.
-			if (resized && win_valid(curwin_save))
+			जइ (resized && win_valid(curwin_save))
 			{
 			    ++no_u_sync;
 			    win_enter(curwin_save, TRUE);
@@ -1584,7 +1584,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			pum_will_redraw = FALSE;
 			curwin_save->w_redr_status = save_redr_status;
 
-			if (!resized && win_valid(curwin_save))
+			जइ (!resized && win_valid(curwin_save))
 			{
 # ifdef FEAT_PROP_POPUP
 			    win_T *wp = curwin;
@@ -1593,7 +1593,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			    win_enter(curwin_save, TRUE);
 			    --no_u_sync;
 # ifdef FEAT_PROP_POPUP
-			    if (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
+			    जइ (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
 				popup_hide(wp);
 # endif
 			}
@@ -1609,54 +1609,54 @@ pum_set_selected(int n, int repeat UNUSED)
 		    }
 		}
 	    }
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	    if (WIN_IS_POPUP(curwin))
+# जइ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	    जइ (WIN_IS_POPUP(curwin))
 		// can't keep focus in a popup window
 		win_enter(firstwin, TRUE);
 # endif
 # ifdef FEAT_PROP_POPUP
-	    if (use_popup != USEPOPUP_NONE)
+	    जइ (use_popup != USEPOPUP_NONE)
 		unblock_autocmds();
 # endif
 	}
 #endif
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    if (!has_info)
+#जइ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    जइ (!has_info)
 	// hide any popup info window
 	popup_hide_info();
 #endif
 
-    return resized;
+    प्रत्यागम resized;
 }
 
 /*
  * Undisplay the popup menu (later).
  */
-    void
-pum_undisplay(void)
+    शून्य
+pum_undisplay(शून्य)
 {
 #ifdef FEAT_IMAGE_POPUP
-    if (pum_imagep != NULL)
+    जइ (pum_imagep != रिक्त)
     {
 	image_placement_free(pum_imagep);
-	pum_imagep = NULL;
+	pum_imagep = रिक्त;
     }
 #endif
     pum_free_bg();
-    pum_array = NULL;
+    pum_array = रिक्त;
     redraw_all_later(UPD_NOT_VALID);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#जइ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-    if (pum_in_cmdline)
+    जइ (pum_in_cmdline)
     {
 	clear_cmdline = TRUE;
 	pum_in_cmdline = FALSE;
     }
     status_redraw_all();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#जइ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     // hide any popup info window
     popup_hide_info();
 #endif
@@ -1666,8 +1666,8 @@ pum_undisplay(void)
  * Clear the popup menu.  Currently only resets the offset to the first
  * displayed item.
  */
-    void
-pum_clear(void)
+    शून्य
+pum_clear(शून्य)
 {
     pum_first = 0;
 }
@@ -1677,23 +1677,23 @@ pum_clear(void)
  * that could overwrite it.  Overruled when "pum_pretend_not_visible" is set,
  * used to redraw the status lines.
  */
-    int
-pum_visible(void)
+    पूर्णाङ्क
+pum_visible(शून्य)
 {
-    return !pum_pretend_not_visible && pum_array != NULL;
+    प्रत्यागम !pum_pretend_not_visible && pum_array != रिक्त;
 }
 
 /*
  * Return TRUE if the popup can be redrawn in the same position.
  */
-    static int
-pum_in_same_position(void)
+    स्थिर पूर्णाङ्क
+pum_in_same_position(शून्य)
 {
-    int	    row = (State & MODE_CMDLINE)
+    पूर्णाङ्क	    row = (State & MODE_CMDLINE)
 			? cmdline_row
 			: curwin->w_wrow + W_WINROW(curwin);
 
-    return pum_window != curwin
+    प्रत्यागम pum_window != curwin
 	    || (pum_win_row == row
 		&& pum_win_height == curwin->w_height
 		&& pum_win_col == curwin->w_wincol
@@ -1704,33 +1704,33 @@ pum_in_same_position(void)
  * Return TRUE when pum_may_redraw() will call pum_redraw().
  * This means that the pum area should not be overwritten to avoid flicker.
  */
-    int
-pum_redraw_in_same_position(void)
+    पूर्णाङ्क
+pum_redraw_in_same_position(शून्य)
 {
-    if (!pum_visible() || pum_will_redraw)
-	return FALSE;  // nothing to do
+    जइ (!pum_visible() || pum_will_redraw)
+	प्रत्यागम FALSE;  // nothing to do
 
-    return pum_in_same_position();
+    प्रत्यागम pum_in_same_position();
 }
 
 /*
  * Reposition the popup menu to adjust for window layout changes.
  */
-    void
-pum_may_redraw(void)
+    शून्य
+pum_may_redraw(शून्य)
 {
     pumitem_T	*array = pum_array;
-    int		len = pum_size;
-    int		selected = pum_selected;
+    पूर्णाङ्क		len = pum_size;
+    पूर्णाङ्क		selected = pum_selected;
 
-    if (!pum_visible() || pum_will_redraw)
-	return;  // nothing to do
+    जइ (!pum_visible() || pum_will_redraw)
+	प्रत्यागम;  // nothing to do
 
-    if (pum_in_same_position())
+    जइ (pum_in_same_position())
     {
 	pum_redraw();  // Redraw window in same position
     }
-    else
+    अण्णहा
     {
 	// Window layout changed, recompute the position.
 	// Use the remembered w_wcol value, the cursor may have moved when a
@@ -1744,57 +1744,57 @@ pum_may_redraw(void)
  * Return the height of the popup menu, the number of entries visible.
  * Only valid when pum_visible() returns TRUE!
  */
-    int
-pum_get_height(void)
+    पूर्णाङ्क
+pum_get_height(शून्य)
 {
-    return pum_height;
+    प्रत्यागम pum_height;
 }
 
-#if defined(FEAT_EVAL)
+#जइ defined(FEAT_EVAL)
 /*
  * Add size information about the pum to "dict".
  */
-    void
+    शून्य
 pum_set_event_info(dict_T *dict)
 {
-    if (!pum_visible())
-	return;
-    (void)dict_add_number(dict, "height", pum_height);
-    (void)dict_add_number(dict, "width", pum_width);
-    (void)dict_add_number(dict, "row", pum_row);
-    (void)dict_add_number(dict, "col", pum_col);
-    (void)dict_add_number(dict, "size", pum_size);
-    (void)dict_add_bool(dict, "scrollbar",
+    जइ (!pum_visible())
+	प्रत्यागम;
+    (शून्य)dict_add_सङ्ख्या(dict, "height", pum_height);
+    (शून्य)dict_add_सङ्ख्या(dict, "width", pum_width);
+    (शून्य)dict_add_सङ्ख्या(dict, "row", pum_row);
+    (शून्य)dict_add_सङ्ख्या(dict, "col", pum_col);
+    (शून्य)dict_add_सङ्ख्या(dict, "size", pum_size);
+    (शून्य)dict_add_bool(dict, "scrollbar",
 				       pum_scrollbar ? VVAL_TRUE : VVAL_FALSE);
 }
 #endif
 
-#if defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
-    static void
-pum_position_at_mouse(int min_width)
+#जइ defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
+    स्थिर शून्य
+pum_position_at_mouse(पूर्णाङ्क min_width)
 {
-    int extra_height = pum_border * 2 + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
-    int trailing_overhead = 0;
-    int col_offset = 0;
-    int available_width;
+    पूर्णाङ्क extra_height = pum_border * 2 + pum_shadow;
+    पूर्णाङ्क extra_offset = pum_border + pum_shadow;
+    पूर्णाङ्क trailing_overhead = 0;
+    पूर्णाङ्क col_offset = 0;
+    पूर्णाङ्क available_width;
 
-    if (Rows - mouse_row - extra_height > pum_size
+    जइ (Rows - mouse_row - extra_height > pum_size
 	    || Rows - mouse_row > mouse_row)
     {
 	// Enough space below the mouse row,
 	// or there is more space below the mouse row than above.
 	pum_row = mouse_row + 1 + pum_border;
-	if (pum_height > Rows - pum_row - extra_height)
+	जइ (pum_height > Rows - pum_row - extra_height)
 	    pum_height = Rows - pum_row - extra_height;
-	if (pum_row + pum_height + extra_offset >= cmdline_row)
+	जइ (pum_row + pum_height + extra_offset >= cmdline_row)
 	    pum_in_cmdline = TRUE;
     }
-    else
+    अण्णहा
     {
 	// Show above the mouse row, reduce height if it does not fit.
 	pum_row = mouse_row - pum_size - extra_offset;
-	if (pum_row < pum_border)
+	जइ (pum_row < pum_border)
 	{
 	    pum_height += pum_row - pum_border;
 	    pum_row = pum_border;
@@ -1805,27 +1805,27 @@ pum_position_at_mouse(int min_width)
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 # ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
 	col_offset = (mouse_col == Columns - 1) && pum_border;
 	available_width = mouse_col + 1 - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	जइ (available_width >= pum_base_width || available_width > min_width)
 	    // Enough space to show at mouse column.
 	    pum_col = mouse_col - col_offset;
-	else
+	अण्णहा
 	    // Not enough space, left align with window.
 	    pum_col = MIN(pum_base_width, min_width) - 1 + trailing_overhead;
 	pum_width = pum_col + 1 - trailing_overhead;
     }
-    else
+    अण्णहा
 # endif
     {
 	col_offset = (mouse_col == 0) && pum_border;
 	available_width = Columns - mouse_col - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	जइ (available_width >= pum_base_width || available_width > min_width)
 	    // Enough space to show at mouse column.
 	    pum_col = mouse_col + col_offset;
-	else
+	अण्णहा
 	    // Not enough space, right align with window.
 	    pum_col = Columns - MIN(pum_base_width, min_width)
 		- trailing_overhead;
@@ -1834,23 +1834,23 @@ pum_position_at_mouse(int min_width)
 
     pum_width = MIN(pum_width, pum_base_width + 1);
     // Do not redraw at cursor position.
-    pum_window = NULL;
+    pum_window = रिक्त;
 }
 
 #endif
 
-#if defined(FEAT_BEVAL_TERM)
-static pumitem_T *balloon_array = NULL;
-static int balloon_arraysize;
+#जइ defined(FEAT_BEVAL_TERM)
+स्थिर pumitem_T *balloon_array = रिक्त;
+स्थिर पूर्णाङ्क balloon_arraysize;
 
 # define BALLOON_MIN_WIDTH 50
 # define BALLOON_MIN_HEIGHT 10
 
-typedef struct {
+प्रकारनिर्देश संरचना {
     char_u	*start;
-    int		bytelen;
-    int		cells;
-    int		indent;
+    पूर्णाङ्क		bytelen;
+    पूर्णाङ्क		cells;
+    पूर्णाङ्क		indent;
 } balpart_T;
 
 /*
@@ -1859,154 +1859,154 @@ typedef struct {
  * strings and make a struct look good.
  * Resulting array is stored in "array" and returns the size of the array.
  */
-    int
+    पूर्णाङ्क
 split_message(char_u *mesg, pumitem_T **array)
 {
     garray_T	ga;
     char_u	*p;
     balpart_T	*item;
-    int		quoted = FALSE;
-    int		height;
-    int		line;
-    int		item_idx;
-    int		indent = 0;
-    int		max_cells = 0;
-    int		max_height = Rows / 2 - 1;
-    int		long_item_count = 0;
-    int		split_long_items = FALSE;
+    पूर्णाङ्क		quoted = FALSE;
+    पूर्णाङ्क		height;
+    पूर्णाङ्क		पङ्क्तिः;
+    पूर्णाङ्क		item_idx;
+    पूर्णाङ्क		indent = 0;
+    पूर्णाङ्क		max_cells = 0;
+    पूर्णाङ्क		max_height = Rows / 2 - 1;
+    पूर्णाङ्क		long_item_गणनम् = 0;
+    पूर्णाङ्क		split_long_वस्तूनि = FALSE;
 
-    ga_init2(&ga, sizeof(balpart_T), 20);
+    ga_init2(&ga, परिमाण(balpart_T), 20);
     p = mesg;
 
-    while (*p != NUL)
+    जाव (*p != NUL)
     {
-	if (ga_grow(&ga, 1) == FAIL)
-	    goto failed;
+	जइ (ga_grow(&ga, 1) == FAIL)
+	    गच्छ failed;
 	item = ((balpart_T *)ga.ga_data) + ga.ga_len;
 	item->start = p;
 	item->indent = indent;
 	item->cells = indent * 2;
 	++ga.ga_len;
-	while (*p != NUL)
+	जाव (*p != NUL)
 	{
-	    if (*p == '"')
+	    जइ (*p == '"')
 		quoted = !quoted;
-	    else if (*p == '\n')
-		break;
-	    else if (*p == '\\' && p[1] != NUL)
+	    अण्णहा जइ (*p == '\n')
+		भङ्ग;
+	    अण्णहा जइ (*p == '\\' && p[1] != NUL)
 		++p;
-	    else if (!quoted)
+	    अण्णहा जइ (!quoted)
 	    {
-		if ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
+		जइ ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
 		{
 		    // Looks like a good point to break.
-		    if (*p == '{')
+		    जइ (*p == '{')
 			++indent;
-		    else if (*p == '}' && indent > 0)
+		    अण्णहा जइ (*p == '}' && indent > 0)
 			--indent;
 		    ++item->cells;
 		    p = skipwhite(p + 1);
-		    break;
+		    भङ्ग;
 		}
 	    }
 	    item->cells += ptr2cells(p);
 	    p += mb_ptr2len(p);
 	}
 	item->bytelen = p - item->start;
-	if (*p == '\n')
+	जइ (*p == '\n')
 	    ++p;
-	if (item->cells > max_cells)
+	जइ (item->cells > max_cells)
 	    max_cells = item->cells;
-	long_item_count += (item->cells - 1) / BALLOON_MIN_WIDTH;
+	long_item_गणनम् += (item->cells - 1) / BALLOON_MIN_WIDTH;
     }
 
     height = 2 + ga.ga_len;
 
     // If there are long items and the height is below the limit: split lines
-    if (long_item_count > 0 && height + long_item_count <= max_height)
+    जइ (long_item_गणनम् > 0 && height + long_item_गणनम् <= max_height)
     {
-	split_long_items = TRUE;
-	height += long_item_count;
+	split_long_वस्तूनि = TRUE;
+	height += long_item_गणनम्;
     }
 
     // Limit to half the window height, it has to fit above or below the mouse
     // position.
-    if (height > max_height)
+    जइ (height > max_height)
 	height = max_height;
     *array = ALLOC_CLEAR_MULT(pumitem_T, height);
-    if (*array == NULL)
-	goto failed;
+    जइ (*array == रिक्त)
+	गच्छ failed;
 
     // Add an empty line above and below, looks better.
     (*array)->pum_text = vim_strsave((char_u *)"");
     (*array + height - 1)->pum_text = vim_strsave((char_u *)"");
 
-    for (line = 1, item_idx = 0; line < height - 1; ++item_idx)
+    प्रति (पङ्क्तिः = 1, item_idx = 0; पङ्क्तिः < height - 1; ++item_idx)
     {
-	int	skip;
-	int	thislen;
-	int	copylen;
-	int	ind;
-	int	cells;
+	पूर्णाङ्क	skip;
+	पूर्णाङ्क	thislen;
+	पूर्णाङ्क	copylen;
+	पूर्णाङ्क	ind;
+	पूर्णाङ्क	cells;
 
 	item = ((balpart_T *)ga.ga_data) + item_idx;
-	if (item->bytelen == 0)
-	    (*array)[line++].pum_text = vim_strsave((char_u *)"");
-	else
-	    for (skip = 0; skip < item->bytelen; skip += thislen)
+	जइ (item->bytelen == 0)
+	    (*array)[पङ्क्तिः++].pum_text = vim_strsave((char_u *)"");
+	अण्णहा
+	    प्रति (skip = 0; skip < item->bytelen; skip += thislen)
 	    {
-		if (split_long_items && item->cells >= BALLOON_MIN_WIDTH)
+		जइ (split_long_वस्तूनि && item->cells >= BALLOON_MIN_WIDTH)
 		{
 		    cells = item->indent * 2;
-		    for (p = item->start + skip;
+		    प्रति (p = item->start + skip;
 			    p < item->start + item->bytelen;
 							    p += mb_ptr2len(p))
-			if ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
-			    break;
+			जइ ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
+			    भङ्ग;
 		    thislen = p - (item->start + skip);
 		}
-		else
+		अण्णहा
 		    thislen = item->bytelen;
 
 		// put indent at the start
 		p = alloc(thislen + item->indent * 2 + 1);
-		if (p == NULL)
+		जइ (p == रिक्त)
 		{
-		    for (line = 0; line <= height - 1; ++line)
-			vim_free((*array)[line].pum_text);
+		    प्रति (पङ्क्तिः = 0; पङ्क्तिः <= height - 1; ++पङ्क्तिः)
+			vim_free((*array)[पङ्क्तिः].pum_text);
 		    vim_free(*array);
-		    goto failed;
+		    गच्छ failed;
 		}
-		for (ind = 0; ind < item->indent * 2; ++ind)
+		प्रति (ind = 0; ind < item->indent * 2; ++ind)
 		    p[ind] = ' ';
 
 		// exclude spaces at the end of the string
-		for (copylen = thislen; copylen > 0; --copylen)
-		    if (item->start[skip + copylen - 1] != ' ')
-			break;
+		प्रति (copylen = thislen; copylen > 0; --copylen)
+		    जइ (item->start[skip + copylen - 1] != ' ')
+			भङ्ग;
 
 		vim_strncpy(p + ind, item->start + skip, copylen);
-		(*array)[line].pum_text = p;
+		(*array)[पङ्क्तिः].pum_text = p;
 		item->indent = 0;  // wrapped line has no indent
-		++line;
+		++पङ्क्तिः;
 	    }
     }
     ga_clear(&ga);
-    return height;
+    प्रत्यागम height;
 
 failed:
     ga_clear(&ga);
-    return 0;
+    प्रत्यागम 0;
 }
 
-    void
-ui_remove_balloon(void)
+    शून्य
+ui_remove_balloon(शून्य)
 {
-    if (balloon_array == NULL)
-	return;
+    जइ (balloon_array == रिक्त)
+	प्रत्यागम;
 
     pum_undisplay();
-    while (balloon_arraysize > 0)
+    जाव (balloon_arraysize > 0)
 	vim_free(balloon_array[--balloon_arraysize].pum_text);
     VIM_CLEAR(balloon_array);
 }
@@ -2014,39 +2014,39 @@ ui_remove_balloon(void)
 /*
  * Terminal version of a balloon, uses the popup menu code.
  */
-    void
+    शून्य
 ui_post_balloon(char_u *mesg, list_T *list)
 {
     ui_remove_balloon();
 
-    if (mesg == NULL && list == NULL)
+    जइ (mesg == रिक्त && list == रिक्त)
     {
 	pum_undisplay();
-	return;
+	प्रत्यागम;
     }
-    if (list != NULL)
+    जइ (list != रिक्त)
     {
 	listitem_T  *li;
-	int	    idx;
+	पूर्णाङ्क	    idx;
 
 	balloon_arraysize = list->lv_len;
 	balloon_array = ALLOC_CLEAR_MULT(pumitem_T, list->lv_len);
-	if (balloon_array == NULL)
-	    return;
+	जइ (balloon_array == रिक्त)
+	    प्रत्यागम;
 	CHECK_LIST_MATERIALIZE(list);
-	for (idx = 0, li = list->lv_first; li != NULL; li = li->li_next, ++idx)
+	प्रति (idx = 0, li = list->lv_first; li != रिक्त; li = li->li_next, ++idx)
 	{
 	    char_u *text = tv_get_string_chk(&li->li_tv);
 
 	    balloon_array[idx].pum_text = vim_strsave(
-					   text == NULL ? (char_u *)"" : text);
+					   text == रिक्त ? (char_u *)"" : text);
 	}
     }
-    else
+    अण्णहा
 	balloon_arraysize = split_message(mesg, &balloon_array);
 
-    if (balloon_arraysize <= 0)
-	return;
+    जइ (balloon_arraysize <= 0)
+	प्रत्यागम;
 
     pum_array = balloon_array;
     pum_size = balloon_arraysize;
@@ -2066,8 +2066,8 @@ ui_post_balloon(char_u *mesg, list_T *list)
 /*
  * Called when the mouse moved, may remove any displayed balloon.
  */
-    void
-ui_may_remove_balloon(void)
+    शून्य
+ui_may_remove_balloon(शून्य)
 {
     // For now: remove the balloon whenever the mouse moves to another screen
     // cell.
@@ -2075,37 +2075,37 @@ ui_may_remove_balloon(void)
 }
 #endif
 
-#if defined(FEAT_TERM_POPUP_MENU)
+#जइ defined(FEAT_TERM_POPUP_MENU)
 /*
  * Select the pum entry at the mouse position.
  */
-    static void
-pum_select_mouse_pos(void)
+    स्थिर शून्य
+pum_select_mouse_pos(शून्य)
 {
-    int idx = mouse_row - pum_row;
+    पूर्णाङ्क idx = mouse_row - pum_row;
 
-    if (idx < 0 || idx >= pum_height)
+    जइ (idx < 0 || idx >= pum_height)
 	pum_selected = -1;
-    else if (*pum_array[idx].pum_text != NUL)
+    अण्णहा जइ (*pum_array[idx].pum_text != NUL)
 	pum_selected = idx;
 }
 
 /*
  * Execute the currently selected popup menu item.
  */
-    static void
-pum_execute_menu(vimmenu_T *menu, int mode)
+    स्थिर शून्य
+pum_execute_menu(vimmenu_T *menu, पूर्णाङ्क mode)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    पूर्णाङ्क		idx = 0;
     exarg_T	ea;
 
     FOR_ALL_CHILD_MENUS(menu, mp)
-	if ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
+	जइ ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
 	{
 	    CLEAR_FIELD(ea);
 	    execute_menu(&ea, mp, -1);
-	    break;
+	    भङ्ग;
 	}
 }
 
@@ -2113,51 +2113,51 @@ pum_execute_menu(vimmenu_T *menu, int mode)
  * Open the terminal version of the popup menu and don't return until it is
  * closed.
  */
-    void
+    शून्य
 pum_show_popupmenu(vimmenu_T *menu)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    पूर्णाङ्क		idx = 0;
     pumitem_T	*array;
 # ifdef FEAT_BEVAL_TERM
-    int		save_bevalterm = p_bevalterm;
+    पूर्णाङ्क		save_bevalterm = p_bevalterm;
 # endif
-    int		mode;
+    पूर्णाङ्क		mode;
 
     pum_undisplay();
     pum_size = 0;
     mode = get_menu_mode_flag();
 
     FOR_ALL_CHILD_MENUS(menu, mp)
-	if (menu_is_separator(mp->dname)
+	जइ (menu_is_separator(mp->dname)
 		|| (mp->modes & mp->enabled & mode))
 	    ++pum_size;
 
     // When there are only Terminal mode menus, using "popup Edit" results in
     // pum_size being zero.
-    if (pum_size <= 0)
+    जइ (pum_size <= 0)
     {
 	emsg(_(e_menu_only_exists_in_another_mode));
-	return;
+	प्रत्यागम;
     }
 
     array = ALLOC_CLEAR_MULT(pumitem_T, pum_size);
-    if (array == NULL)
-	return;
+    जइ (array == रिक्त)
+	प्रत्यागम;
 
     FOR_ALL_CHILD_MENUS(menu, mp)
     {
-	char_u *s = NULL;
+	char_u *s = रिक्त;
 
 	// Make a copy of the text, the menu may be redefined in a callback.
-	if (menu_is_separator(mp->dname))
+	जइ (menu_is_separator(mp->dname))
 	    s = (char_u *)"";
-	else if (mp->modes & mp->enabled & mode)
+	अण्णहा जइ (mp->modes & mp->enabled & mode)
 	    s = mp->dname;
-	if (s != NULL)
+	जइ (s != रिक्त)
 	{
 	    s = vim_strsave(s);
-	    if (s != NULL)
+	    जइ (s != रिक्त)
 		array[idx++].pum_text = s;
 	}
     }
@@ -2178,9 +2178,9 @@ pum_show_popupmenu(vimmenu_T *menu)
     mch_setmouse(TRUE);
 # endif
 
-    for (;;)
+    प्रति (;;)
     {
-	int	c;
+	पूर्णाङ्क	c;
 
 	pum_redraw();
 	setcursor_mayforce(TRUE);
@@ -2190,61 +2190,61 @@ pum_show_popupmenu(vimmenu_T *menu)
 
 	// Bail out when typing Esc, CTRL-C or some callback or <expr> mapping
 	// closed the popup menu.
-	if (c == ESC || c == Ctrl_C || pum_array == NULL)
-	    break;
-	else if (c == CAR || c == NL)
+	जइ (c == ESC || c == Ctrl_C || pum_array == रिक्त)
+	    भङ्ग;
+	अण्णहा जइ (c == CAR || c == NL)
 	{
 	    // enter: select current item, if any, and close
 	    pum_execute_menu(menu, mode);
-	    break;
+	    भङ्ग;
 	}
-	else if (c == 'k' || c == K_UP || c == K_MOUSEUP)
+	अण्णहा जइ (c == 'k' || c == K_UP || c == K_MOUSEUP)
 	{
 	    // cursor up: select previous item
-	    while (pum_selected > 0)
+	    जाव (pum_selected > 0)
 	    {
 		--pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		जइ (*array[pum_selected].pum_text != NUL)
+		    भङ्ग;
 	    }
 	}
-	else if (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
+	अण्णहा जइ (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
 	{
 	    // cursor down: select next item
-	    while (pum_selected < pum_size - 1)
+	    जाव (pum_selected < pum_size - 1)
 	    {
 		++pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		जइ (*array[pum_selected].pum_text != NUL)
+		    भङ्ग;
 	    }
 	}
-	else if (c == K_RIGHTMOUSE)
+	अण्णहा जइ (c == K_RIGHTMOUSE)
 	{
 	    // Right mouse down: reposition the menu.
 	    vungetc(c);
-	    break;
+	    भङ्ग;
 	}
-	else if (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
+	अण्णहा जइ (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
 	{
 	    // mouse moved: select item in the mouse row
 	    pum_select_mouse_pos();
 	}
-	else if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
+	अण्णहा जइ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
 	{
 	    // left mouse click: select clicked item, if any, and close;
 	    // right mouse release: select clicked item, close if any
 	    pum_select_mouse_pos();
-	    if (pum_selected >= 0)
+	    जइ (pum_selected >= 0)
 	    {
 		pum_execute_menu(menu, mode);
-		break;
+		भङ्ग;
 	    }
-	    if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
-		break;
+	    जइ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
+		भङ्ग;
 	}
     }
 
-    for (idx = 0; idx < pum_size; ++idx)
+    प्रति (idx = 0; idx < pum_size; ++idx)
 	vim_free(array[idx].pum_text);
     vim_free(array);
     pum_undisplay();
@@ -2254,12 +2254,12 @@ pum_show_popupmenu(vimmenu_T *menu)
 # endif
 }
 
-    void
-pum_make_popup(char_u *path_name, int use_mouse_pos)
+    शून्य
+pum_make_popup(char_u *path_name, पूर्णाङ्क use_mouse_pos)
 {
     vimmenu_T *menu;
 
-    if (!use_mouse_pos)
+    जइ (!use_mouse_pos)
     {
 	// Hack: set mouse position at the cursor so that the menu pops up
 	// around there.
@@ -2272,185 +2272,185 @@ pum_make_popup(char_u *path_name, int use_mouse_pos)
     }
 
     menu = gui_find_menu(path_name);
-    if (menu != NULL)
+    जइ (menu != रिक्त)
 	pum_show_popupmenu(menu);
 }
 #endif
 
-    static int
-is_singlewidth(int c)
+    स्थिर पूर्णाङ्क
+is_singlewidth(पूर्णाङ्क c)
 {
-    if (c >= 0 && c < 0x80)
-	return TRUE;
-    if (utf_char2cells(c) == 1)
-	return TRUE;
-    return FALSE;
+    जइ (c >= 0 && c < 0x80)
+	प्रत्यागम TRUE;
+    जइ (utf_char2cells(c) == 1)
+	प्रत्यागम TRUE;
+    प्रत्यागम FALSE;
 }
 
 /*
  * Set border characters for popup menu.
  */
-    void
+    शून्य
 pum_set_border_chars(
-	int top,
-	int right,
-	int bottom,
-	int left,
-	int top_left,
-	int top_right,
-	int bottom_right,
-	int bottom_left)
+	पूर्णाङ्क शिखरम्,
+	पूर्णाङ्क दक्षिणः,
+	पूर्णाङ्क bottom,
+	पूर्णाङ्क वामः,
+	पूर्णाङ्क शिखरम्_वामः,
+	पूर्णाङ्क शिखरम्_दक्षिणः,
+	पूर्णाङ्क bottom_दक्षिणः,
+	पूर्णाङ्क bottom_वामः)
 {
-    if (!is_singlewidth(top) || !is_singlewidth(right)
-	    || !is_singlewidth(bottom) || !is_singlewidth(left)
-	    || !is_singlewidth(top_left) || !is_singlewidth(top_right)
-	    || !is_singlewidth(bottom_right) || !is_singlewidth(bottom_left))
-	return;
-    pum_border_chars.top = top;
-    pum_border_chars.right = right;
+    जइ (!is_singlewidth(शिखरम्) || !is_singlewidth(दक्षिणः)
+	    || !is_singlewidth(bottom) || !is_singlewidth(वामः)
+	    || !is_singlewidth(शिखरम्_वामः) || !is_singlewidth(शिखरम्_दक्षिणः)
+	    || !is_singlewidth(bottom_दक्षिणः) || !is_singlewidth(bottom_वामः))
+	प्रत्यागम;
+    pum_border_chars.शिखरम् = शिखरम्;
+    pum_border_chars.दक्षिणः = दक्षिणः;
     pum_border_chars.bottom = bottom;
-    pum_border_chars.left = left;
-    pum_border_chars.top_left = top_left;
-    pum_border_chars.top_right = top_right;
-    pum_border_chars.bottom_right = bottom_right;
-    pum_border_chars.bottom_left = bottom_left;
+    pum_border_chars.वामः = वामः;
+    pum_border_chars.शिखरम्_वामः = शिखरम्_वामः;
+    pum_border_chars.शिखरम्_दक्षिणः = शिखरम्_दक्षिणः;
+    pum_border_chars.bottom_दक्षिणः = bottom_दक्षिणः;
+    pum_border_chars.bottom_वामः = bottom_वामः;
     pum_border = 1;
 }
 
 /*
  * Compute margins for the popup menu.
  */
-    static void
-compute_margins(int *right_margin, int *left_margin, int *left_padding)
+    स्थिर शून्य
+compute_margins(पूर्णाङ्क *दक्षिणः_margin, पूर्णाङ्क *वामः_margin, पूर्णाङ्क *वामः_padding)
 {
-    *right_margin = pum_margin && pum_border;
+    *दक्षिणः_margin = pum_margin && pum_border;
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
-	*left_padding = (pum_col < Columns - 1 - pum_border);
-	*left_margin = *right_margin && (pum_col < Columns - 3);
-	return;
+	*वामः_padding = (pum_col < Columns - 1 - pum_border);
+	*वामः_margin = *दक्षिणः_margin && (pum_col < Columns - 3);
+	प्रत्यागम;
     }
 #endif
-    *left_padding = (pum_col > pum_border);
-    *left_margin = *right_margin && (pum_col > 2);
+    *वामः_padding = (pum_col > pum_border);
+    *वामः_margin = *दक्षिणः_margin && (pum_col > 2);
 }
 
 /*
  * Draw the border around the popup menu
  */
-    static void
-pum_draw_border(void)
+    स्थिर शून्य
+pum_draw_border(शून्य)
 {
-    int	top_row = pum_row - 1;
-    int	bottom_row = pum_row + pum_height;
-    int	col;
-    int	attr = highlight_attr[HLF_PMB];
-    int	right_margin, left_margin, left_padding;
-    int	inner_width;
+    पूर्णाङ्क	शिखरम्_row = pum_row - 1;
+    पूर्णाङ्क	bottom_row = pum_row + pum_height;
+    पूर्णाङ्क	col;
+    पूर्णाङ्क	attr = highlight_attr[HLF_PMB];
+    पूर्णाङ्क	दक्षिणः_margin, वामः_margin, वामः_padding;
+    पूर्णाङ्क	inner_width;
 
-    if (!pum_border)
-	return;
+    जइ (!pum_border)
+	प्रत्यागम;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
+    (शून्य)compute_margins(&दक्षिणः_margin, &वामः_margin, &वामः_padding);
 
-    inner_width = pum_width + pum_scrollbar + left_padding;
+    inner_width = pum_width + pum_scrollbar + वामः_padding;
 
     // Draw border left to right or right to left (for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	col = pum_col + left_padding + 1;
-    else
+    जइ (pum_rl)
+	col = pum_col + वामः_padding + 1;
+    अण्णहा
 #endif
-	col = pum_col - left_padding - 1;
+	col = pum_col - वामः_padding - 1;
 
     // left corners (right corners for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_right, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col + 1, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.शिखरम्_दक्षिणः, शिखरम्_row, col, attr);
+	जइ (वामः_margin)
+	    screen_putchar(' ', शिखरम्_row, col + 1, attr);
+	screen_putchar(pum_border_chars.bottom_दक्षिणः, bottom_row, col, attr);
+	जइ (वामः_margin)
 	    screen_putchar(' ', bottom_row, col + 1, attr);
     }
-    else
+    अण्णहा
 #endif
     {
-	screen_putchar(pum_border_chars.top_left, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col - 1, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.शिखरम्_वामः, शिखरम्_row, col, attr);
+	जइ (वामः_margin)
+	    screen_putchar(' ', शिखरम्_row, col - 1, attr);
+	screen_putchar(pum_border_chars.bottom_वामः, bottom_row, col, attr);
+	जइ (वामः_margin)
 	    screen_putchar(' ', bottom_row, col - 1, attr);
     }
 
     // Top horizontal lines
-    for (int i = 0; i < inner_width; i++)
+    प्रति (पूर्णाङ्क i = 0; i < inner_width; i++)
     {
-	int cur_col;
+	पूर्णाङ्क cur_col;
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    cur_col = col - 1 - i;
-	else
+	अण्णहा
 #endif
 	    cur_col = col + 1 + i;
-	screen_putchar(pum_border_chars.top, top_row, cur_col, attr);
+	screen_putchar(pum_border_chars.शिखरम्, शिखरम्_row, cur_col, attr);
 	screen_putchar(pum_border_chars.bottom, bottom_row, cur_col, attr);
     }
 
     // right corners (left corners for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_left, top_row,
+	screen_putchar(pum_border_chars.शिखरम्_वामः, शिखरम्_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col - inner_width - 2, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row,
+	जइ (दक्षिणः_margin)
+	    screen_putchar(' ', शिखरम्_row, col - inner_width - 2, attr);
+	screen_putchar(pum_border_chars.bottom_वामः, bottom_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
+	जइ (दक्षिणः_margin)
 	    screen_putchar(' ', bottom_row, col - inner_width - 2, attr);
     }
-    else
+    अण्णहा
 #endif
     {
-	screen_putchar(pum_border_chars.top_right, top_row,
+	screen_putchar(pum_border_chars.शिखरम्_दक्षिणः, शिखरम्_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col + inner_width + 2, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row,
+	जइ (दक्षिणः_margin)
+	    screen_putchar(' ', शिखरम्_row, col + inner_width + 2, attr);
+	screen_putchar(pum_border_chars.bottom_दक्षिणः, bottom_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
+	जइ (दक्षिणः_margin)
 	    screen_putchar(' ', bottom_row, col + inner_width + 2, attr);
     }
 
     // Draw side borders
-    for (int i = 0; i < pum_height; i++)
+    प्रति (पूर्णाङ्क i = 0; i < pum_height; i++)
     {
-	int row = pum_row + i;
+	पूर्णाङ्क row = pum_row + i;
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.वामः, row, col, attr);
+	    जइ (वामः_margin)
 		screen_putchar(' ', row, col + 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.दक्षिणः, row,
 		    col - inner_width - 1, attr);
-	    if (right_margin)
+	    जइ (दक्षिणः_margin)
 		screen_putchar(' ', row, col - inner_width - 2, attr);
 	}
-	else
+	अण्णहा
 #endif
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.वामः, row, col, attr);
+	    जइ (वामः_margin)
 		screen_putchar(' ', row, col - 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.दक्षिणः, row,
 		    col + inner_width + 1, attr);
-	    if (right_margin)
+	    जइ (दक्षिणः_margin)
 		screen_putchar(' ', row, col + inner_width + 2, attr);
 	}
     }
@@ -2460,12 +2460,12 @@ pum_draw_border(void)
  * Get the underlying character and redraw with shadow highlight.
  * Preserve bold, italic, underline, and reverse text underneath the shadow.
  */
-    void
-put_shadow_char(int row, int col)
+    शून्य
+put_shadow_char(पूर्णाङ्क row, पूर्णाङ्क col)
 {
     char_u  buf[MB_MAXBYTES + 1];
-    int	    shadow_attr = highlight_attr[HLF_PMS];
-    int	    char_attr, new_attr;
+    पूर्णाङ्क	    shadow_attr = highlight_attr[HLF_PMS];
+    पूर्णाङ्क	    char_attr, new_attr;
 
     screen_getbytes(row, col, buf, &char_attr);
     new_attr = hl_combine_attr(char_attr, shadow_attr);
@@ -2475,35 +2475,35 @@ put_shadow_char(int row, int col)
 /*
  * Draw the shadow
  */
-    static void
-pum_draw_shadow(void)
+    स्थिर शून्य
+pum_draw_shadow(शून्य)
 {
-    int	row, col, next_col;
-    int	width, offset;
-    int	inner_width;
-    int	right_margin, left_margin, left_padding;
+    पूर्णाङ्क	row, col, next_col;
+    पूर्णाङ्क	width, offset;
+    पूर्णाङ्क	inner_width;
+    पूर्णाङ्क	दक्षिणः_margin, वामः_margin, वामः_padding;
 
-    if (!pum_shadow)
-	return;
+    जइ (!pum_shadow)
+	प्रत्यागम;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
-    inner_width = pum_width + pum_scrollbar + pum_border + right_margin;
+    (शून्य)compute_margins(&दक्षिणः_margin, &वामः_margin, &वामः_padding);
+    inner_width = pum_width + pum_scrollbar + pum_border + दक्षिणः_margin;
 
     // Draw right side shadow (left for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    जइ (pum_rl)
     {
 	col = pum_col - inner_width;
 	next_col = col - 1;
     }
-    else
+    अण्णहा
 #endif
     {
 	col = pum_col + inner_width;
 	next_col = col + 1;
     }
 
-    for (int i = 0; i < pum_height + pum_border; i++)
+    प्रति (पूर्णाङ्क i = 0; i < pum_height + pum_border; i++)
     {
 	row = pum_row + 1 + i - pum_border;
 	put_shadow_char(row, col);
@@ -2512,15 +2512,15 @@ pum_draw_shadow(void)
 
     // Bottom shadow
     row = pum_row + pum_height + pum_border;
-    width = inner_width + left_padding + pum_border + left_margin;
-    offset = 2 - left_padding - pum_border - left_margin;
+    width = inner_width + वामः_padding + pum_border + वामः_margin;
+    offset = 2 - वामः_padding - pum_border - वामः_margin;
 
-    for (int i = 0; i < width; i++)
+    प्रति (पूर्णाङ्क i = 0; i < width; i++)
     {
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	जइ (pum_rl)
 	    col = pum_col - offset - i;
-	else
+	अण्णहा
 #endif
 	    col = pum_col + offset + i;
 	put_shadow_char(row, col);
